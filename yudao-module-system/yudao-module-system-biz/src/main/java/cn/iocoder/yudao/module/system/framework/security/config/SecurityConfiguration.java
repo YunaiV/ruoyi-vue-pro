@@ -20,16 +20,24 @@ public class SecurityConfiguration {
             public void customize(ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry) {
                 // 登录的接口
                 registry.antMatchers(buildAdminApi("/system/auth/login")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/auth/logout")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/auth/refresh-token")).permitAll();
                 // 社交登陆的接口
                 registry.antMatchers(buildAdminApi("/system/auth/social-auth-redirect")).permitAll();
                 registry.antMatchers(buildAdminApi("/system/auth/social-quick-login")).permitAll();
                 registry.antMatchers(buildAdminApi("/system/auth/social-bind-login")).permitAll();
+                // 登录登录的接口
+                registry.antMatchers(buildAdminApi("/system/auth/sms-login")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/auth/send-sms-code")).permitAll();
                 // 验证码的接口
                 registry.antMatchers(buildAdminApi("/system/captcha/**")).permitAll();
                 // 获得租户编号的接口
                 registry.antMatchers(buildAdminApi("/system/tenant/get-id-by-name")).permitAll();
                 // 短信回调 API
                 registry.antMatchers(buildAdminApi("/system/sms/callback/**")).permitAll();
+                // OAuth2 API
+                registry.antMatchers(buildAdminApi("/system/oauth2/token")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/oauth2/check-token")).permitAll();
             }
 
         };

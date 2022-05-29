@@ -1,46 +1,38 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthLoginReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBindLoginReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialQuickLoginReqVO;
+import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.enums.auth.OAuth2ClientConstants;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
+import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import cn.iocoder.yudao.module.system.service.common.CaptchaService;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
-import cn.iocoder.yudao.module.system.service.permission.PermissionService;
+import cn.iocoder.yudao.module.system.service.member.MemberService;
+import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.util.Objects;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
-import static java.util.Collections.singleton;
 
 /**
  * Auth Service 实现类
@@ -52,63 +44,84 @@ import static java.util.Collections.singleton;
 public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Resource
-    @Lazy // 延迟加载，因为存在相互依赖的问题
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // UserService 存在重名
     private AdminUserService userService;
-    @Resource
-    private PermissionService permissionService;
     @Resource
     private CaptchaService captchaService;
     @Resource
     private LoginLogService loginLogService;
     @Resource
-    private UserSessionService userSessionService;
+    private OAuth2TokenService oauth2TokenService;
     @Resource
     private SocialUserService socialUserService;
+    @Resource
+    private MemberService memberService;
 
     @Resource
     private Validator validator;
 
+    @Resource
+    private SmsCodeApi smsCodeApi;
+
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 获取 username 对应的 AdminUserDO
+    public AdminUserDO authenticate(String username, String password) {
+        final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_USERNAME;
+        // 校验账号是否存在
         AdminUserDO user = userService.getUserByUsername(username);
         if (user == null) {
-            throw new UsernameNotFoundException(username);
+            createLoginLog(null, username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
         }
-        // 创建 LoginUser 对象
-        return buildLoginUser(user);
+        if (!userService.isPasswordMatch(password, user.getPassword())) {
+            createLoginLog(user.getId(), username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
+        }
+        // 校验是否禁用
+        if (ObjectUtil.notEqual(user.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+            createLoginLog(user.getId(), username, logTypeEnum, LoginResultEnum.USER_DISABLED);
+            throw exception(AUTH_LOGIN_USER_DISABLED);
+        }
+        return user;
     }
 
     @Override
-    public LoginUser mockLogin(Long userId) {
-        // 获取用户编号对应的 AdminUserDO
-        AdminUserDO user = userService.getUser(userId);
-        if (user == null) {
-            throw new UsernameNotFoundException(String.valueOf(userId));
-        }
-        createLoginLog(user.getUsername(), LoginLogTypeEnum.LOGIN_MOCK, LoginResultEnum.SUCCESS);
-
-        // 创建 LoginUser 对象
-        return buildLoginUser(user);
-    }
-
-    @Override
-    public String login(AuthLoginReqVO reqVO, String userIp, String userAgent) {
+    public AuthLoginRespVO login(AuthLoginReqVO reqVO) {
         // 判断验证码是否正确
         verifyCaptcha(reqVO);
 
         // 使用账号密码，进行登录
-        LoginUser loginUser = login0(reqVO.getUsername(), reqVO.getPassword());
+        AdminUserDO user = authenticate(reqVO.getUsername(), reqVO.getPassword());
 
-        // 缓存登陆用户到 Redis 中，返回 sessionId 编号
-        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
     }
 
-    private void verifyCaptcha(AuthLoginReqVO reqVO) {
+    @Override
+    public void sendSmsCode(AuthSmsSendReqVO reqVO) {
+        // 登录场景，验证是否存在
+        if (userService.getUserByMobile(reqVO.getMobile()) == null) {
+            throw exception(AUTH_MOBILE_NOT_EXISTS);
+        }
+        // 发送验证码
+        smsCodeApi.sendSmsCode(AuthConvert.INSTANCE.convert(reqVO).setCreateIp(getClientIP()));
+    }
+
+    @Override
+    public AuthLoginRespVO smsLogin(AuthSmsLoginReqVO reqVO) {
+        // 校验验证码
+        smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.ADMIN_MEMBER_LOGIN.getScene(), getClientIP()));
+
+        // 获得用户信息
+        AdminUserDO user = userService.getUserByMobile(reqVO.getMobile());
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+
+        // 缓存登陆用户到 Redis 中，返回 sessionId 编号
+        return createTokenAfterLoginSuccess(user.getId(), reqVO.getMobile(), LoginLogTypeEnum.LOGIN_MOBILE);
+    }
+
+    @VisibleForTesting
+    void verifyCaptcha(AuthLoginReqVO reqVO) {
         // 如果验证码关闭，则不进行校验
         if (!captchaService.isCaptchaEnable()) {
             return;
@@ -120,53 +133,26 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         String code = captchaService.getCaptchaCode(reqVO.getUuid());
         if (code == null) {
             // 创建登录失败日志（验证码不存在）
-            this.createLoginLog(reqVO.getUsername(), logTypeEnum, LoginResultEnum.CAPTCHA_NOT_FOUND);
+            createLoginLog(null, reqVO.getUsername(), logTypeEnum, LoginResultEnum.CAPTCHA_NOT_FOUND);
             throw exception(AUTH_LOGIN_CAPTCHA_NOT_FOUND);
         }
         // 验证码不正确
         if (!code.equals(reqVO.getCode())) {
             // 创建登录失败日志（验证码不正确)
-            this.createLoginLog(reqVO.getUsername(), logTypeEnum, LoginResultEnum.CAPTCHA_CODE_ERROR);
+            createLoginLog(null, reqVO.getUsername(), logTypeEnum, LoginResultEnum.CAPTCHA_CODE_ERROR);
             throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR);
         }
         // 正确，所以要删除下验证码
         captchaService.deleteCaptchaCode(reqVO.getUuid());
     }
 
-    private LoginUser login0(String username, String password) {
-        final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_USERNAME;
-        // 用户验证
-        Authentication authentication;
-        try {
-            // 调用 Spring Security 的 AuthenticationManager#authenticate(...) 方法，使用账号密码进行认证
-            // 在其内部，会调用到 loadUserByUsername 方法，获取 User 信息
-            authentication = authenticationManager.authenticate(new MultiUsernamePasswordAuthenticationToken(
-                    username, password, getUserType()));
-        } catch (BadCredentialsException badCredentialsException) {
-            this.createLoginLog(username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
-            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
-        } catch (DisabledException disabledException) {
-            this.createLoginLog(username, logTypeEnum, LoginResultEnum.USER_DISABLED);
-            throw exception(AUTH_LOGIN_USER_DISABLED);
-        } catch (AuthenticationException authenticationException) {
-            log.error("[login0][username({}) 发生未知异常]", username, authenticationException);
-            this.createLoginLog(username, logTypeEnum, LoginResultEnum.UNKNOWN_ERROR);
-            throw exception(AUTH_LOGIN_FAIL_UNKNOWN);
-        }
-        Assert.notNull(authentication.getPrincipal(), "Principal 不会为空");
-        return (LoginUser) authentication.getPrincipal();
-    }
-
-    private void createLoginLog(String username, LoginLogTypeEnum logTypeEnum, LoginResultEnum loginResult) {
-        // 获得用户
-        AdminUserDO user = userService.getUserByUsername(username);
+    private void createLoginLog(Long userId, String username,
+                                LoginLogTypeEnum logTypeEnum, LoginResultEnum loginResult) {
         // 插入登录日志
         LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
         reqDTO.setLogType(logTypeEnum.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
-        if (user != null) {
-            reqDTO.setUserId(user.getId());
-        }
+        reqDTO.setUserId(userId);
         reqDTO.setUserType(getUserType().getValue());
         reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
@@ -174,23 +160,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         reqDTO.setResult(loginResult.getResult());
         loginLogService.createLoginLog(reqDTO);
         // 更新最后登录时间
-        if (user != null && Objects.equals(LoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
-            userService.updateUserLogin(user.getId(), ServletUtils.getClientIP());
+        if (userId != null && Objects.equals(LoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
+            userService.updateUserLogin(userId, ServletUtils.getClientIP());
         }
     }
 
-    /**
-     * 获得 User 拥有的角色编号数组
-     *
-     * @param userId 用户编号
-     * @return 角色编号数组
-     */
-    private Set<Long> getUserRoleIds(Long userId) {
-        return permissionService.getUserRoleIds(userId, singleton(CommonStatusEnum.ENABLE.getStatus()));
-    }
-
     @Override
-    public String socialLogin(AuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent) {
+    public AuthLoginRespVO socialQuickLogin(AuthSocialQuickLoginReqVO reqVO) {
         // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
         Long userId = socialUserService.getBindUserId(UserTypeEnum.ADMIN.getValue(), reqVO.getType(),
                 reqVO.getCode(), reqVO.getState());
@@ -198,105 +174,82 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
 
-        // 自动登录
+        // 获得用户
         AdminUserDO user = userService.getUser(userId);
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
 
-        // 创建 LoginUser 对象
-        LoginUser loginUser = buildLoginUser(user);
-
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user.getId(), user.getUsername(), LoginLogTypeEnum.LOGIN_SOCIAL);
     }
 
     @Override
-    public String socialBindLogin(AuthSocialBindLoginReqVO reqVO, String userIp, String userAgent) {
+    public AuthLoginRespVO socialBindLogin(AuthSocialBindLoginReqVO reqVO) {
         // 使用账号密码，进行登录。
-        LoginUser loginUser = login0(reqVO.getUsername(), reqVO.getPassword());
+        AdminUserDO user = authenticate(reqVO.getUsername(), reqVO.getPassword());
 
         // 绑定社交用户
-        socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
+        socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(user.getId(), getUserType().getValue(), reqVO));
 
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
-    }
-
-    private String createUserSessionAfterLoginSuccess(LoginUser loginUser, LoginLogTypeEnum logType, String userIp, String userAgent) {
-        // 插入登陆日志
-        createLoginLog(loginUser.getUsername(), logType, LoginResultEnum.SUCCESS);
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionService.createUserSession(loginUser, userIp, userAgent);
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_SOCIAL);
     }
 
     @Override
-    public void logout(String token) {
-        // 查询用户信息
-        LoginUser loginUser = userSessionService.getLoginUser(token);
-        if (loginUser == null) {
+    public AuthLoginRespVO refreshToken(String refreshToken) {
+        OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.refreshAccessToken(refreshToken, OAuth2ClientConstants.CLIENT_ID_DEFAULT);
+        return AuthConvert.INSTANCE.convert(accessTokenDO);
+    }
+
+    private AuthLoginRespVO createTokenAfterLoginSuccess(Long userId, String username, LoginLogTypeEnum logType) {
+        // 插入登陆日志
+        createLoginLog(userId, username, logType, LoginResultEnum.SUCCESS);
+        // 创建访问令牌
+        OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.createAccessToken(userId, getUserType().getValue(),
+                OAuth2ClientConstants.CLIENT_ID_DEFAULT, null);
+        // 构建返回结果
+        return AuthConvert.INSTANCE.convert(accessTokenDO);
+    }
+
+    @Override
+    public void logout(String token, Integer logType) {
+        // 删除访问令牌
+        OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.removeAccessToken(token);
+        if (accessTokenDO == null) {
             return;
         }
-        // 删除 session
-        userSessionService.deleteUserSession(token);
-        // 记录登出日志
-        this.createLogoutLog(loginUser.getId(), loginUser.getUsername());
+        // 删除成功，则记录登出日志
+        createLogoutLog(accessTokenDO.getUserId(), accessTokenDO.getUserType(), logType);
     }
 
-    @Override
-    public UserTypeEnum getUserType() {
-        return UserTypeEnum.ADMIN;
-    }
-
-    private void createLogoutLog(Long userId, String username) {
+    private void createLogoutLog(Long userId, Integer userType, Integer logType) {
         LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
-        reqDTO.setLogType(LoginLogTypeEnum.LOGOUT_SELF.getType());
+        reqDTO.setLogType(logType);
         reqDTO.setTraceId(TracerUtils.getTraceId());
         reqDTO.setUserId(userId);
-        reqDTO.setUserType(getUserType().getValue());
-        reqDTO.setUsername(username);
+        reqDTO.setUserType(userType);
+        if (ObjectUtil.notEqual(getUserType(), userType)) {
+            reqDTO.setUsername(getUsername(userId));
+        } else {
+            reqDTO.setUsername(memberService.getMemberUserMobile(userId));
+        }
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setResult(LoginResultEnum.SUCCESS.getResult());
         loginLogService.createLoginLog(reqDTO);
     }
 
-    @Override
-    public LoginUser verifyTokenAndRefresh(String token) {
-        // 获得 LoginUser
-        LoginUser loginUser = userSessionService.getLoginUser(token);
-        if (loginUser == null) {
+    private String getUsername(Long userId) {
+        if (userId == null) {
             return null;
         }
-        // 刷新 LoginUser 缓存
-        return this.refreshLoginUserCache(token, loginUser);
+        AdminUserDO user = userService.getUser(userId);
+        return user != null ? user.getUsername() : null;
     }
 
-    private LoginUser refreshLoginUserCache(String token, LoginUser loginUser) {
-        // 每 1/3 的 Session 超时时间，刷新 LoginUser 缓存
-        if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() <
-                userSessionService.getSessionTimeoutMillis() / 3) {
-            return loginUser;
-        }
-
-        // 重新加载 AdminUserDO 信息
-        AdminUserDO user = userService.getUser(loginUser.getId());
-        if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
-            throw exception(AUTH_TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面
-        }
-
-        // 刷新 LoginUser 缓存
-        LoginUser newLoginUser= this.buildLoginUser(user);
-        userSessionService.refreshUserSession(token, newLoginUser);
-        return newLoginUser;
-    }
-
-    private LoginUser buildLoginUser(AdminUserDO user) {
-        LoginUser loginUser = AuthConvert.INSTANCE.convert(user);
-        // 补全字段
-        loginUser.setDeptId(user.getDeptId());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
-        return loginUser;
+    private UserTypeEnum getUserType() {
+        return UserTypeEnum.ADMIN;
     }
 
 }

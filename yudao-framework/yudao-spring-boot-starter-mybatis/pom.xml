@@ -15,10 +15,6 @@
     <description>数据库连接池、多数据源、事务、MyBatis 拓展</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
-    <properties>
-        <mysql.version>5.1.46</mysql.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
@@ -36,8 +32,20 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
@@ -50,6 +58,14 @@
             <groupId>com.baomidou</groupId>
             <artifactId>dynamic-datasource-spring-boot-starter</artifactId> <!-- 多数据源 -->
         </dependency>
+
+        <!-- 工具类相关 -->
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId> <!-- 加解密 -->
+            <optional>true</optional>
+        </dependency>
+
     </dependencies>
 
 </project>

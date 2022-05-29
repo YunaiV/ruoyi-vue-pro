@@ -427,3 +427,15 @@ export function isNumberStr(str) {
   return /^[+-]?(0|([1-9]\d*))(\.\d+)?$/g.test(str)
 }
 
+// -转驼峰
+export function toCamelCase(str, upperCaseFirst) {
+  str = (str || '').toLowerCase().replace(/-(.)/g, function (match, group1) {
+    return group1.toUpperCase();
+  });
+
+  if (upperCaseFirst && str) {
+    str = str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  return str;
+}

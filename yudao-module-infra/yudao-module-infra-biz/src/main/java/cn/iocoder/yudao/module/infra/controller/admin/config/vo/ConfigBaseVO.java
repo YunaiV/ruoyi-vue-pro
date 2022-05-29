@@ -18,7 +18,7 @@ public class ConfigBaseVO {
     @ApiModelProperty(value = "参数分组", required = true, example = "biz")
     @NotEmpty(message = "参数分组不能为空")
     @Size(max = 50, message = "参数名称不能超过50个字符")
-    private String group;
+    private String category;
 
     @ApiModelProperty(value = "参数名称", required = true, example = "数据库名")
     @NotBlank(message = "参数名称不能为空")
@@ -32,7 +32,7 @@ public class ConfigBaseVO {
 
     @ApiModelProperty(value = "是否敏感", required = true, example = "true")
     @NotNull(message = "是否敏感不能为空")
-    private Boolean sensitive;
+    private Boolean visible;
 
     @ApiModelProperty(value = "备注", example = "备注一下很帅气！")
     private String remark;

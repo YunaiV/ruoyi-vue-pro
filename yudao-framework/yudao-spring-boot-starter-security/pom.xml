@@ -44,18 +44,11 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- TODO 芋艿： -->
+        <!-- 业务组件 -->
         <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-engine</artifactId>
-            <version>7.1.0.M6</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-            <optional>true</optional>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-system-api</artifactId> <!-- 需要使用它，进行 Token 的校验 -->
+            <version>${revision}</version>
         </dependency>
     </dependencies>
 

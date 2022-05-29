@@ -13,7 +13,7 @@ public interface ErrorCodeConstants {
     ErrorCode CONFIG_NOT_EXISTS = new ErrorCode(1001000001, "参数配置不存在");
     ErrorCode CONFIG_KEY_DUPLICATE = new ErrorCode(1001000002, "参数配置 key 重复");
     ErrorCode CONFIG_CAN_NOT_DELETE_SYSTEM_TYPE = new ErrorCode(1001000003, "不能删除类型为系统内置的参数配置");
-    ErrorCode CONFIG_GET_VALUE_ERROR_IF_SENSITIVE = new ErrorCode(1001000004, "不允许获取敏感配置到前端");
+    ErrorCode CONFIG_GET_VALUE_ERROR_IF_VISIBLE = new ErrorCode(1001000004, "获取参数配置失败，原因：不允许获取不可见配置");
 
     // ========== 定时任务 1001001000 ==========
     ErrorCode JOB_NOT_EXISTS = new ErrorCode(1001001000, "定时任务不存在");
@@ -36,11 +36,12 @@ public interface ErrorCodeConstants {
     ErrorCode CODEGEN_TABLE_EXISTS = new ErrorCode(1003001000, "表定义已经存在");
     ErrorCode CODEGEN_IMPORT_TABLE_NULL = new ErrorCode(1003001001, "导入的表不存在");
     ErrorCode CODEGEN_IMPORT_COLUMNS_NULL = new ErrorCode(1003001002, "导入的字段不存在");
-    ErrorCode CODEGEN_PARSE_SQL_ERROR = new ErrorCode(1003001003, "解析 SQL 失败，请检查");
     ErrorCode CODEGEN_TABLE_NOT_EXISTS = new ErrorCode(1003001004, "表定义不存在");
     ErrorCode CODEGEN_COLUMN_NOT_EXISTS = new ErrorCode(1003001005, "字段义不存在");
     ErrorCode CODEGEN_SYNC_COLUMNS_NULL = new ErrorCode(1003001006, "同步的字段不存在");
     ErrorCode CODEGEN_SYNC_NONE_CHANGE = new ErrorCode(1003001007, "同步失败，不存在改变");
+    ErrorCode CODEGEN_TABLE_INFO_TABLE_COMMENT_IS_NULL = new ErrorCode(1003001008, "数据库的表注释未填写");
+    ErrorCode CODEGEN_TABLE_INFO_COLUMN_COMMENT_IS_NULL = new ErrorCode(1003001009, "数据库的表字段({})注释未填写");
 
     // ========== 字典类型（测试）1001005000 ==========
     ErrorCode TEST_DEMO_NOT_EXISTS = new ErrorCode(1001005000, "测试示例不存在");

@@ -37,7 +37,7 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
                 .likeIfPresent(DictDataDO::getLabel, reqVO.getLabel())
                 .likeIfPresent(DictDataDO::getDictType, reqVO.getDictType())
                 .eqIfPresent(DictDataDO::getStatus, reqVO.getStatus())
-                .orderByAsc(Arrays.asList(DictDataDO::getDictType, DictDataDO::getSort)));
+                .orderByDesc(Arrays.asList(DictDataDO::getDictType, DictDataDO::getSort)));
     }
 
     default List<DictDataDO> selectList(DictDataExportReqVO reqVO) {
@@ -46,7 +46,7 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
                 .eqIfPresent(DictDataDO::getStatus, reqVO.getStatus()));
     }
 
-    @Select("SELECT id FROM system_dict_data WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    @Select("SELECT COUNT(*) FROM system_dict_data WHERE update_time > #{maxUpdateTime}")
+    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
 
 }

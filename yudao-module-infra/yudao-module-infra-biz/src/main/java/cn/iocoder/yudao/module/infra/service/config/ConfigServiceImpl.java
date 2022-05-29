@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.config;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigCreateReqVO;
@@ -96,7 +97,9 @@ public class ConfigServiceImpl implements ConfigService {
         // 校验自己存在
         checkConfigExists(id);
         // 校验参数配置 key 的唯一性
-        checkConfigKeyUnique(id, key);
+        if (StrUtil.isNotEmpty(key)) {
+            checkConfigKeyUnique(id, key);
+        }
     }
 
     @VisibleForTesting

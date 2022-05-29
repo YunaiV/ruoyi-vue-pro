@@ -27,9 +27,11 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
 
     @Override
     protected void doInit() {
-        // 补全风格。例如说 Linux 是 /，Windows 是 \
-        if (!config.getBasePath().endsWith(File.separator)) {
-            config.setBasePath(config.getBasePath() + File.separator);
+        // 把配置的 \ 替换成 /, 如果路径配置 \a\test, 替换成 /a/test, 替换方法已经处理 null 情况
+        config.setBasePath(StrUtil.replace(config.getBasePath(), StrUtil.BACKSLASH, StrUtil.SLASH));
+        // ftp的路径是 / 结尾
+        if (!config.getBasePath().endsWith(StrUtil.SLASH)) {
+            config.setBasePath(config.getBasePath() + StrUtil.SLASH);
         }
         // 初始化 Ftp 对象
         this.ftp = new Ftp(config.getHost(), config.getPort(), config.getUsername(), config.getPassword(),
@@ -42,6 +44,7 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
         String filePath = getFilePath(path);
         String fileName = FileUtil.getName(filePath);
         String dir = StrUtil.removeSuffix(filePath, fileName);
+        ftp.reconnectIfTimeout();
         boolean success = ftp.upload(dir, fileName, new ByteArrayInputStream(content));
         if (!success) {
             throw new FtpException(StrUtil.format("上传文件到目标目录 ({}) 失败", filePath));
@@ -53,6 +56,7 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
     @Override
     public void delete(String path) {
         String filePath = getFilePath(path);
+        ftp.reconnectIfTimeout();
         ftp.delFile(filePath);
     }
 
@@ -60,8 +64,9 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
     public byte[] getContent(String path) {
         String filePath = getFilePath(path);
         String fileName = FileUtil.getName(filePath);
-        String dir = StrUtil.removeSuffix(path, fileName);
+        String dir = StrUtil.removeSuffix(filePath, fileName);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ftp.reconnectIfTimeout();
         ftp.download(dir, fileName, out);
         return out.toByteArray();
     }

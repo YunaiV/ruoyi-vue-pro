@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.web.core.filter.DemoFilter;
 import cn.iocoder.yudao.framework.web.core.filter.XssFilter;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalResponseBodyHandler;
+import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -63,6 +64,13 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
     @Bean
     public GlobalResponseBodyHandler globalResponseBodyHandler() {
         return new GlobalResponseBodyHandler();
+    }
+
+    @Bean
+    @SuppressWarnings("InstantiationOfUtilityClass")
+    public WebFrameworkUtils webFrameworkUtils(WebProperties webProperties) {
+        // 由于 WebFrameworkUtils 需要使用到 webProperties 属性，所以注册为一个 Bean
+        return new WebFrameworkUtils(webProperties);
     }
 
     // ========== Filter 相关 ==========

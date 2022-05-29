@@ -1,15 +1,17 @@
 package cn.iocoder.yudao.module.system.controller.admin.auth;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
+import cn.iocoder.yudao.framework.security.config.SecurityProperties;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.service.auth.AdminAuthService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
@@ -25,18 +27,19 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
-import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getUserAgent;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserRoleIds;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.obtainAuthorization;
+import static java.util.Collections.singleton;
 
 @Api(tags = "管理后台 - 认证")
 @RestController
-@RequestMapping("/system/auth") // 暂时不跟 /auth 结尾
+@RequestMapping("/system/auth")
 @Validated
 @Slf4j
 public class AuthController {
@@ -52,13 +55,33 @@ public class AuthController {
     @Resource
     private SocialUserService socialUserService;
 
+    @Resource
+    private SecurityProperties securityProperties;
+
     @PostMapping("/login")
     @ApiOperation("使用账号密码登录")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> login(@RequestBody @Valid AuthLoginReqVO reqVO) {
-        String token = authService.login(reqVO, getClientIP(), getUserAgent());
-        // 返回结果
-        return success(AuthLoginRespVO.builder().token(token).build());
+        return success(authService.login(reqVO));
+    }
+
+    @PostMapping("/logout")
+    @ApiOperation("登出系统")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<Boolean> logout(HttpServletRequest request) {
+        String token = obtainAuthorization(request, securityProperties.getTokenHeader());
+        if (StrUtil.isNotBlank(token)) {
+            authService.logout(token, LoginLogTypeEnum.LOGOUT_SELF.getType());
+        }
+        return success(true);
+    }
+
+    @PostMapping("/refresh-token")
+    @ApiOperation("刷新令牌")
+    @ApiImplicitParam(name = "refreshToken", value = "刷新令牌", required = true, dataTypeClass = String.class)
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<AuthLoginRespVO> refreshToken(@RequestParam("refreshToken") String refreshToken) {
+        return success(authService.refreshToken(refreshToken));
     }
 
     @GetMapping("/get-permission-info")
@@ -70,12 +93,12 @@ public class AuthController {
             return null;
         }
         // 获得角色列表
-        List<RoleDO> roleList = roleService.getRolesFromCache(getLoginUserRoleIds());
+        Set<Long> roleIds = permissionService.getUserRoleIdsFromCache(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
+        List<RoleDO> roleList = roleService.getRolesFromCache(roleIds);
         // 获得菜单列表
-        List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(
-                getLoginUserRoleIds(), // 注意，基于登录的角色，因为后续的权限判断也是基于它
+        List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(roleIds,
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType(), MenuTypeEnum.BUTTON.getType()),
-                SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
+                singleton(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的
         // 拼接结果返回
         return success(AuthConvert.INSTANCE.convert(user, roleList, menuList));
     }
@@ -83,13 +106,31 @@ public class AuthController {
     @GetMapping("/list-menus")
     @ApiOperation("获得登录用户的菜单列表")
     public CommonResult<List<AuthMenuRespVO>> getMenus() {
+        // 获得角色列表
+        Set<Long> roleIds = permissionService.getUserRoleIdsFromCache(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 获得用户拥有的菜单列表
-        List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(
-                getLoginUserRoleIds(), // 注意，基于登录的角色，因为后续的权限判断也是基于它
+        List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(roleIds,
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()), // 只要目录和菜单类型
-                SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的
+                singleton(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的
         // 转换成 Tree 结构返回
         return success(AuthConvert.INSTANCE.buildMenuTree(menuList));
+    }
+
+    // ========== 短信登录相关 ==========
+
+    @PostMapping("/sms-login")
+    @ApiOperation("使用短信验证码登录")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<AuthLoginRespVO> smsLogin(@RequestBody @Valid AuthSmsLoginReqVO reqVO) {
+        return success(authService.smsLogin(reqVO));
+    }
+
+    @PostMapping("/send-sms-code")
+    @ApiOperation(value = "发送手机验证码")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<Boolean> sendLoginSmsCode(@RequestBody @Valid AuthSmsSendReqVO reqVO) {
+        authService.sendSmsCode(reqVO);
+        return success(true);
     }
 
     // ========== 社交登录相关 ==========
@@ -109,18 +150,14 @@ public class AuthController {
     @ApiOperation("社交快捷登录，使用 code 授权码")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> socialQuickLogin(@RequestBody @Valid AuthSocialQuickLoginReqVO reqVO) {
-        String token = authService.socialLogin(reqVO, getClientIP(), getUserAgent());
-        // 返回结果
-        return success(AuthLoginRespVO.builder().token(token).build());
+        return success(authService.socialQuickLogin(reqVO));
     }
 
     @PostMapping("/social-bind-login")
     @ApiOperation("社交绑定登录，使用 code 授权码 + 账号密码")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> socialBindLogin(@RequestBody @Valid AuthSocialBindLoginReqVO reqVO) {
-        String token = authService.socialBindLogin(reqVO, getClientIP(), getUserAgent());
-        // 返回结果
-        return success(AuthLoginRespVO.builder().token(token).build());
+        return success(authService.socialBindLogin(reqVO));
     }
 
 }

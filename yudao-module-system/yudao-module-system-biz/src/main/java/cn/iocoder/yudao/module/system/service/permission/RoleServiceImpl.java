@@ -116,7 +116,7 @@ public class RoleServiceImpl implements RoleService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadRoleIfUpdate][首次加载全量角色]");
         } else { // 判断数据库中是否有更新的角色
-            if (roleMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
+            if (roleMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
             log.info("[loadRoleIfUpdate][增量加载全量角色]");
@@ -215,6 +215,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<RoleDO> getRoles(@Nullable Collection<Integer> statuses) {
+        if (CollUtil.isEmpty(statuses)) {
+    		return roleMapper.selectList();
+		}
         return roleMapper.selectListByStatus(statuses);
     }
 
@@ -247,7 +250,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<RoleDO> getRoleList(RoleExportReqVO reqVO) {
-        return roleMapper.listRoles(reqVO);
+        return roleMapper.selectList(reqVO);
     }
 
     /**

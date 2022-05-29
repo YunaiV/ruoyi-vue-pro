@@ -5,6 +5,10 @@
 **「我喜欢写代码，乐此不疲」**  
 **「我喜欢做开源，以此为乐」**
 
+我 🐶 在上海艰苦奋斗，早中晚在 top3 大厂认真搬砖，夜里为开源做贡献。
+
+如果这个项目让你有所收获，记得 Star 关注哦，这对我是非常不错的鼓励与支持。
+
 ## 🐯 平台简介
 
 **芋道**，以开发者为中心，打造中国第一流的快速开发平台，全部开源，个人与企业可 100% 免费使用。
@@ -15,6 +19,7 @@
 
 * 前端采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) ，正在支持 Vue 3 + ElementUI Plus 最新方案。
 * 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson。
+* 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
 * 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统。
 * 支持加载动态权限菜单，按钮级别权限控制，本地缓存提升性能。
 * 支持 SaaS 多租户系统，可自定义每个租户的权限，提供透明化的多租户底层封装。
@@ -26,7 +31,7 @@
 | 项目名                | 说明                     | 传说门                                                                                                                                 |
 |--------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | `ruoyi-vue-pro`    | Spring Boot 多模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro)     |
-| `ruoyi-vue-cloud`  | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/onemall)         |
+| `yudao-cloud`  | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)         |
 | `Spring-Boot-Labs` | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/zhijiantianya/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/SpringBoot-Labs) |
 
 ## 🐶 在线体验

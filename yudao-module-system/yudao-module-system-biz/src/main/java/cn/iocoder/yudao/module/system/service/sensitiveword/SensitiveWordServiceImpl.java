@@ -139,7 +139,7 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
         if (maxUpdateTime == null) {
             log.info("[loadSensitiveWordIfUpdate][首次加载全量敏感词]");
         } else { // 判断数据库中是否有更新的敏感词
-            if (sensitiveWordMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
+            if (sensitiveWordMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
             log.info("[loadSensitiveWordIfUpdate][增量加载全量敏感词]");

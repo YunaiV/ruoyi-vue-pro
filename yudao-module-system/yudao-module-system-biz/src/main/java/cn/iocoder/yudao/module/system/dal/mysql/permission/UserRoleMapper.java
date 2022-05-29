@@ -4,8 +4,10 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.UserRoleDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -36,4 +38,8 @@ public interface UserRoleMapper extends BaseMapperX<UserRoleDO> {
     default List<UserRoleDO> selectListByRoleIds(Collection<Long> roleIds) {
         return selectList(UserRoleDO::getRoleId, roleIds);
     }
+
+    @Select("SELECT COUNT(*) FROM system_user_role WHERE update_time > #{maxUpdateTime}")
+    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
+
 }

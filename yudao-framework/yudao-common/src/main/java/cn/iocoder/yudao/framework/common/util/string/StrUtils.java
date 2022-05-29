@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.framework.common.util.string;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 
-import java.util.Map;
+import java.util.Collection;
 
 /**
  * 字符串工具类
@@ -17,21 +17,24 @@ public class StrUtils {
     }
 
     /**
-     * 指定字符串的
-     * @param str
-     * @param replaceMap
-     * @return
+     * 给定字符串是否以任何一个字符串开始
+     * 给定字符串和数组为空都返回 false
+     *
+     * @param str      给定字符串
+     * @param prefixes 需要检测的开始字符串
+     * @since 3.0.6
      */
-    public static String replace(String str, Map<String, String> replaceMap) {
-        assert StrUtil.isNotBlank(str);
-        if (ObjectUtil.isEmpty(replaceMap)) {
-            return str;
+    public static boolean startWithAny(String str, Collection<String> prefixes) {
+        if (StrUtil.isEmpty(str) || ArrayUtil.isEmpty(prefixes)) {
+            return false;
         }
-        String result = null;
-        for (String key : replaceMap.keySet()) {
-            result = str.replace(key, replaceMap.get(key));
+
+        for (CharSequence suffix : prefixes) {
+            if (StrUtil.startWith(str, suffix, false)) {
+                return true;
+            }
         }
-        return result;
+        return false;
     }
 
 }

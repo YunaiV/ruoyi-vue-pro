@@ -6,7 +6,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.Duration;
 
 @ConfigurationProperties(prefix = "yudao.security")
 @Validated
@@ -18,18 +17,6 @@ public class SecurityProperties {
      */
     @NotEmpty(message = "Token Header 不能为空")
     private String tokenHeader;
-    /**
-     * Token 过期时间
-     */
-    @NotNull(message = "Token 过期时间不能为空")
-    private Duration tokenTimeout;
-    /**
-     * Session 过期时间
-     *
-     * 当 User 用户超过当前时间未操作，则 Session 会过期
-     */
-    @NotNull(message = "Session 过期时间不能为空")
-    private Duration sessionTimeout;
 
     /**
      * mock 模式的开关

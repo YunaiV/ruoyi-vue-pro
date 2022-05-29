@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.member.controller.app.auth;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.service.auth.MemberAuthService;
 import io.swagger.annotations.Api;
@@ -14,11 +17,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
-import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getUserAgent;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Api(tags = "用户 APP - 认证")
@@ -31,25 +33,44 @@ public class AppAuthController {
     @Resource
     private MemberAuthService authService;
 
+    @Resource
+    private SecurityProperties securityProperties;
+
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
     public CommonResult<AppAuthLoginRespVO> login(@RequestBody @Valid AppAuthLoginReqVO reqVO) {
-        String token = authService.login(reqVO, getClientIP(), getUserAgent());
-        // 返回结果
-        return success(AppAuthLoginRespVO.builder().token(token).build());
+        return success(authService.login(reqVO));
     }
+
+    @PostMapping("/logout")
+    @ApiOperation("登出系统")
+    public CommonResult<Boolean> logout(HttpServletRequest request) {
+        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
+        if (StrUtil.isNotBlank(token)) {
+            authService.logout(token);
+        }
+        return success(true);
+    }
+
+    @PostMapping("/refresh-token")
+    @ApiOperation("刷新令牌")
+    @ApiImplicitParam(name = "refreshToken", value = "刷新令牌", required = true, dataTypeClass = String.class)
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<AppAuthLoginRespVO> refreshToken(@RequestParam("refreshToken") String refreshToken) {
+        return success(authService.refreshToken(refreshToken));
+    }
+
+    // ========== 短信登录相关 ==========
 
     @PostMapping("/sms-login")
     @ApiOperation("使用手机 + 验证码登录")
     public CommonResult<AppAuthLoginRespVO> smsLogin(@RequestBody @Valid AppAuthSmsLoginReqVO reqVO) {
-        String token = authService.smsLogin(reqVO, getClientIP(), getUserAgent());
-        // 返回结果
-        return success(AppAuthLoginRespVO.builder().token(token).build());
+        return success(authService.smsLogin(reqVO));
     }
 
     @PostMapping("/send-sms-code")
     @ApiOperation(value = "发送手机验证码")
-    public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid AppAuthSendSmsReqVO reqVO) {
+    public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid AppAuthSmsSendReqVO reqVO) {
         authService.sendSmsCode(getLoginUserId(), reqVO);
         return success(true);
     }
@@ -85,16 +106,14 @@ public class AppAuthController {
 
     @PostMapping("/social-quick-login")
     @ApiOperation(value = "社交快捷登录，使用 code 授权码", notes = "适合未登录的用户，但是社交账号已绑定用户")
-    public CommonResult<AppAuthLoginRespVO> socialLogin(@RequestBody @Valid AppAuthSocialQuickLoginReqVO reqVO) {
-        String token = authService.socialQuickLogin(reqVO, getClientIP(), getUserAgent());
-        return success(AppAuthLoginRespVO.builder().token(token).build());
+    public CommonResult<AppAuthLoginRespVO> socialQuickLogin(@RequestBody @Valid AppAuthSocialQuickLoginReqVO reqVO) {
+        return success(authService.socialQuickLogin(reqVO));
     }
 
     @PostMapping("/social-bind-login")
     @ApiOperation(value = "社交绑定登录，使用 手机号 + 手机验证码", notes = "适合未登录的用户，进行登录 + 绑定")
-    public CommonResult<AppAuthLoginRespVO> socialLogin2(@RequestBody @Valid AppAuthSocialBindLoginReqVO reqVO) {
-        String token = authService.socialBindLogin(reqVO, getClientIP(), getUserAgent());
-        return success(AppAuthLoginRespVO.builder().token(token).build());
+    public CommonResult<AppAuthLoginRespVO> socialBindLogin(@RequestBody @Valid AppAuthSocialBindLoginReqVO reqVO) {
+        return success(authService.socialBindLogin(reqVO));
     }
 
 }

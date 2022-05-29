@@ -81,6 +81,7 @@ public class TenantServiceImpl implements TenantService {
     @Getter
     private volatile Date maxUpdateTime;
 
+    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
     @Autowired(required = false) // 由于 yudao.tenant.enable 配置项，可以关闭多租户的功能，所以这里只能不强制注入
     private TenantProperties tenantProperties;
 
@@ -137,7 +138,7 @@ public class TenantServiceImpl implements TenantService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadTenantIfUpdate][首次加载全量租户]");
         } else { // 判断数据库中是否有更新的租户
-            if (tenantMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
+            if (tenantMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
             log.info("[loadTenantIfUpdate][增量加载全量租户]");

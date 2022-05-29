@@ -115,7 +115,7 @@ public class DictDataServiceImpl implements DictDataService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadDictDataIfUpdate][首次加载全量字典数据]");
         } else { // 判断数据库中是否有更新的字典数据
-            if (dictDataMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
+            if (dictDataMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
             log.info("[loadDictDataIfUpdate][增量加载全量字典数据]");

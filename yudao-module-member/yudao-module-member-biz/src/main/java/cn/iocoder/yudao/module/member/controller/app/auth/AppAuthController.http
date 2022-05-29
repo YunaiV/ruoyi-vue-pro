@@ -1,5 +1,5 @@
 ### 请求 /login 接口 => 成功
-POST {{appApi}}/member/login
+POST {{appApi}}/member/auth/login
 Content-Type: application/json
 tenant-id: {{appTenentId}}
 
@@ -9,7 +9,7 @@ tenant-id: {{appTenentId}}
 }
 
 ### 请求 /send-sms-code 接口 => 成功
-POST {{appApi}}/member/send-sms-code
+POST {{appApi}}/member/auth/send-sms-code
 Content-Type: application/json
 tenant-id: {{appTenentId}}
 
@@ -19,7 +19,7 @@ tenant-id: {{appTenentId}}
 }
 
 ### 请求 /sms-login 接口 => 成功
-POST {{appApi}}/member/sms-login
+POST {{appApi}}/member/auth/sms-login
 Content-Type: application/json
 tenant-id: {{appTenentId}}
 
@@ -29,7 +29,12 @@ tenant-id: {{appTenentId}}
 }
 
 ### 请求 /logout 接口 => 成功
-POST {{appApi}}/member/logout
+POST {{appApi}}/member/auth/logout
 Content-Type: application/json
 Authorization: Bearer c1b76bdaf2c146c581caa4d7fd81ee66
+tenant-id: {{appTenentId}}
+
+### 请求 /auth/refresh-token 接口 => 成功
+POST {{appApi}}/member/auth/refresh-token?refreshToken=bc43d929094849a28b3a69f6e6940d70
+Content-Type: application/json
 tenant-id: {{appTenentId}}

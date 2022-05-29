@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.dal.mysql.task;
 
-import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -20,6 +20,6 @@ public interface BpmTaskExtMapper extends BaseMapperX<BpmTaskExtDO> {
     }
 
     default List<BpmTaskExtDO> selectListByProcessInstanceId(String processInstanceId) {
-        return selectList("process_instance_id", processInstanceId);
+        return selectList(BpmTaskExtDO::getProcessInstanceId, processInstanceId);
     }
 }

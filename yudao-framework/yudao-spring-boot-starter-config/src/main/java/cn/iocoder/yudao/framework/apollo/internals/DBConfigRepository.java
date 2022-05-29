@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Predicate;
 
 @Slf4j
 public class DBConfigRepository extends AbstractConfigRepository {
@@ -172,7 +171,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadConfigIfUpdate][首次加载全量配置]");
         } else { // 判断数据库中是否有更新的配置
-            if (!configFrameworkDAO.selectExistsByUpdateTimeAfter(maxUpdateTime)) {
+            if (configFrameworkDAO.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
             log.info("[loadConfigIfUpdate][增量加载全量配置]");

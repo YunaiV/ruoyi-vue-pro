@@ -55,10 +55,9 @@
 <script>
 import {getProcessDefinitionBpmnXML, getProcessDefinitionList} from "@/api/bpm/definition";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
-import {createProcessInstance, getMyProcessInstancePage} from "@/api/bpm/processInstance";
+import {createProcessInstance} from "@/api/bpm/processInstance";
 
 // 流程实例的发起
 export default {
