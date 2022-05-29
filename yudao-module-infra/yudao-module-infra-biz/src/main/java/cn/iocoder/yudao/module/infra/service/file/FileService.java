@@ -22,11 +22,11 @@ public interface FileService {
     /**
      * 保存文件，并返回文件的访问路径
      *
-     * @param originalName 原文件名称
+     * @param name 原文件名称
      * @param content 文件内容
      * @return 文件路径
      */
-    String createFile(String originalName, byte[] content) throws Exception;
+    String createFile(String name, byte[] content) throws Exception;
 
     /**
      * 删除文件

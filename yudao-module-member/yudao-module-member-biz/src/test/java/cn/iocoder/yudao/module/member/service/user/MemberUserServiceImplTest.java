@@ -86,10 +86,9 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
         ByteArrayInputStream avatarFile = new ByteArrayInputStream(avatarFileBytes);
         // mock 方法
         String avatar = randomString();
-        String originalName = "单测文件名";
-        when(fileApi.createFile(originalName, eq(avatarFileBytes))).thenReturn(avatar);
+        when(fileApi.createFile(eq(avatarFileBytes))).thenReturn(avatar);
         // 调用
-        String str = memberUserService.updateUserAvatar(userId, originalName, avatarFile);
+        String str = memberUserService.updateUserAvatar(userId, avatarFile);
         // 断言
         assertEquals(avatar, str);
     }

@@ -17,7 +17,7 @@ public class FileRespVO {
     private String path;
 
     @ApiModelProperty(value = "原文件名", required = true, example = "yudao.jpg")
-    private String originalName;
+    private String name;
 
     @ApiModelProperty(value = "文件 URL", required = true, example = "https://www.iocoder.cn/yudao.jpg")
     private String url;

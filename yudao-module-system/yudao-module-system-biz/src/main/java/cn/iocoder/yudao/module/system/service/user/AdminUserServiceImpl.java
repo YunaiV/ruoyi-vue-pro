@@ -153,10 +153,10 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public String updateUserAvatar(Long id, String originalName, InputStream avatarFile) throws Exception {
+    public String updateUserAvatar(Long id, InputStream avatarFile) throws Exception {
         checkUserExists(id);
         // 存储文件
-        String avatar = fileApi.createFile(originalName,IoUtil.readBytes(avatarFile));
+        String avatar = fileApi.createFile(IoUtil.readBytes(avatarFile));
         // 更新路径
         AdminUserDO sysUserDO = new AdminUserDO();
         sysUserDO.setId(id);

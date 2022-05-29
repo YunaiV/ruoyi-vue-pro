@@ -36,7 +36,7 @@ public class FileDO extends BaseDO {
     /**
      * 原文件名
      */
-    private String originalName;
+    private String name;
     /**
      * 路径，即文件名
      */

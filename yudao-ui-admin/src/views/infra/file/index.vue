@@ -26,6 +26,7 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
+      <el-table-column label="原文件名" align="center" prop="name" />
       <el-table-column label="文件名" align="center" prop="path" />
       <el-table-column label="URL" align="center" prop="url" />
       <el-table-column label="文件大小" align="center" prop="size" width="120" :formatter="sizeFormat" />

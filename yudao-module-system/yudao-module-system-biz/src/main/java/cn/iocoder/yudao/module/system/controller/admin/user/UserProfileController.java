@@ -97,12 +97,11 @@ public class UserProfileController {
 
     @PutMapping("/update-avatar")
     @ApiOperation("上传用户个人头像")
-    public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file,
-                                                 @RequestParam(value = "originalName", required = false) String originalName) throws Exception {
+    public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw ServiceExceptionUtil.exception(FILE_IS_EMPTY);
         }
-        String avatar = userService.updateUserAvatar(getLoginUserId(), originalName, file.getInputStream());
+        String avatar = userService.updateUserAvatar(getLoginUserId(), file.getInputStream());
         return success(avatar);
     }
 

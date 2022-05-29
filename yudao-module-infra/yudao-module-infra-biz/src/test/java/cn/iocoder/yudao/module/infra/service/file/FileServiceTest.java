@@ -80,9 +80,9 @@ public class FileServiceTest extends BaseDbUnitTest {
         String url = randomString();
         when(client.upload(same(content), same(path))).thenReturn(url);
         when(client.getId()).thenReturn(10L);
-        String originalName = "单测文件名";
+        String name = "单测文件名";
         // 调用
-        String result = fileService.createFile(originalName, content);
+        String result = fileService.createFile(name, content);
         // 断言
         assertEquals(result, url);
         // 校验数据

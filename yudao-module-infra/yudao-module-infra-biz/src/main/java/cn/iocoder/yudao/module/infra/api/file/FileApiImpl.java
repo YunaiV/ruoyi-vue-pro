@@ -19,8 +19,8 @@ public class FileApiImpl implements FileApi {
     private FileService fileService;
 
     @Override
-    public String createFile(String originalName, byte[] content) throws Exception {
-        return fileService.createFile(originalName, content);
+    public String createFile(String name, byte[] content) throws Exception {
+        return fileService.createFile(name, content);
     }
 
 }
