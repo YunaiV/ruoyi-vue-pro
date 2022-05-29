@@ -10,7 +10,7 @@ import javax.validation.constraints.*;
 * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
 */
 @Data
-public class PropertyValueBaseVO {
+public class ProductPropertyValueBaseVO {
 
     @ApiModelProperty(value = "规格键id")
     private Long propertyId;

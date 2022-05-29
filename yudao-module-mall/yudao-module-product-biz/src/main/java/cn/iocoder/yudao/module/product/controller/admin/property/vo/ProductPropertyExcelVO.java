@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo;
+package cn.iocoder.yudao.module.product.controller.admin.property.vo;
 
 import lombok.*;
 import java.util.*;
@@ -7,23 +7,20 @@ import io.swagger.annotations.*;
 import com.alibaba.excel.annotation.ExcelProperty;
 
 /**
- * 规格值 Excel VO
+ * 规格名称 Excel VO
  *
  * @author 芋道源码
  */
 @Data
-public class PropertyValueExcelVO {
+public class ProductPropertyExcelVO {
 
     @ExcelProperty("主键")
-    private Integer id;
+    private Long id;
 
-    @ExcelProperty("规格键id")
-    private Long propertyId;
-
-    @ExcelProperty("规格值名字")
+    @ExcelProperty("规格名称")
     private String name;
 
-    @ExcelProperty("状态： 1 开启 ，2 禁用")
+    @ExcelProperty("状态： 0 开启 ，1 禁用")
     private Integer status;
 
     @ExcelProperty("创建时间")

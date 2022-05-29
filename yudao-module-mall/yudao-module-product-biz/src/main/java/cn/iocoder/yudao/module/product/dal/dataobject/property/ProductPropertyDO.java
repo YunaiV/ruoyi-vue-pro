@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-// TODO @franky：每个表名，都加个 Product 前缀哈。
 /**
  * 规格名称 DO
  *
@@ -21,7 +20,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PropertyDO extends BaseDO {
+public class ProductPropertyDO extends BaseDO {
 
     /**
      * 主键
@@ -35,7 +34,7 @@ public class PropertyDO extends BaseDO {
     /**
      * 状态： 0 开启 ，1 禁用
      *
-     * TODO @franky：加个 枚举 {@link CommonStatusEnum} ，这样就能更好的知道
+     * {@link CommonStatusEnum}
      */
     private Integer status;
 

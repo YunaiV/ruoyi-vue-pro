@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo;
+package cn.iocoder.yudao.module.product.controller.admin.property.vo;
 
 import lombok.*;
 import java.util.*;
@@ -8,19 +8,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel("管理后台 - 规格值分页 Request VO")
+@ApiModel(value = "管理后台 - 规格名称 Excel 导出 Request VO", description = "参数和 PropertyPageReqVO 是一致的")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class PropertyValuePageReqVO extends PageParam {
+public class ProductPropertyExportReqVO {
 
-    @ApiModelProperty(value = "规格键id")
-    private Long propertyId;
-
-    @ApiModelProperty(value = "规格值名字")
+    @ApiModelProperty(value = "规格名称")
     private String name;
 
-    @ApiModelProperty(value = "状态： 1 开启 ，2 禁用")
+    @ApiModelProperty(value = "状态： 0 开启 ，1 禁用")
     private Integer status;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

@@ -24,16 +24,17 @@
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
                    v-hasPermi="['product:property:create']">新增</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
-                   v-hasPermi="['product:property:export']">导出</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="规格名称" align="center" prop="name" />
+       <el-table-column label="规格名称" align="center" prop="propertyValueList">
+        <template slot-scope="scope">
+          <span>{{formatList(scope.row.propertyValueList)}}</span>
+        </template>
+       </el-table-column>
       <el-table-column label="开启状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
@@ -74,19 +75,19 @@
           <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="addPropertyValue()">添加</el-button>
         </el-form-item>
         <el-form-item
-            v-for="(domain, index) in form.propertyValues"
+            v-for="(domain, index) in form.propertyValueList"
             :key="domain.key"
-            :prop="'propertyValues.' + index + '.value'"
+            :prop="'propertyValueList.' + index + '.name'"
             :rules="{
-              required: true, message: '域名不能为空', trigger: 'blur'
+              required: true, message: '属性值不能为空', trigger: 'blur'
             }"
           >
             <el-row>
               <el-col :span="18">
-                <el-input v-model="domain.value"></el-input>
+                <el-input v-model="domain.name" size="mini"></el-input>
               </el-col>
               <el-col :span="6">
-                <el-button @click.prevent="removePropertyValue(domain)">删除</el-button>
+                <el-button style="margin-left: 20px;" size="mini" @click.prevent="removePropertyValue(domain)">删除</el-button>
               </el-col>
             </el-row>
           </el-form-item>
@@ -134,8 +135,8 @@ export default {
       form: {
         name:'',
         status:'',
-        propertyValues: [{
-          value: ''
+        propertyValueList: [{
+          name: ''
         }],
       },
       // 表单校验
@@ -171,12 +172,10 @@ export default {
         id: undefined,
         name: undefined,
         status: undefined,
+        propertyValueList: [{
+          name: ''
+        }]
       };
-      this.form.propertyValues = [{
-        key:'',
-        value: ''
-      }];
-      console.log("this.form", this.form)
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
@@ -194,7 +193,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加规格名称";
+      this.title = "添加规格";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -203,7 +202,7 @@ export default {
       getProperty(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改规格名称";
+        this.title = "修改规格";
       });
     },
     /** 提交按钮 */
@@ -232,7 +231,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$modal.confirm('是否确认删除规格名称编号为"' + id + '"的数据项?').then(function() {
+      this.$modal.confirm('是否确认删除规格名称为"' + row.name + '"的数据项?').then(function() {
           return deleteProperty(id);
         }).then(() => {
           this.getList();
@@ -256,17 +255,25 @@ export default {
         }).catch(() => {});
     },
     removePropertyValue(item) {
-      var index = this.form.propertyValues.indexOf(item)
+      var index = this.form.propertyValueList.indexOf(item)
       if (index !== -1) {
-        this.form.propertyValues.splice(index, 1)
+        this.form.propertyValueList.splice(index, 1)
       }
     },
     addPropertyValue() {
-      console.log("this.form.propertyValues", this.form.propertyValues)
-      this.form.propertyValues.push({
-        value: '',
-        key: Date.now()
+      this.form.propertyValueList.push({
+        name: ''
       });
+    },
+    formatList(list) {
+      let str = ''
+      for (var i = 0; i < list.length; i++) {
+        str += list[i].name;
+        if(i != list.length-1){
+          str+="/";
+        }
+      }
+      return str
     }
   }
 };

@@ -171,7 +171,7 @@ VALUES ('商品导出', 'product:spu:export', 3, 5, @parentId, '', '', '', 0);
 drop table if exists product_property;
 create table product_property
 (
-    id          bigint comment '主键',
+    id          bigint NOT NULL AUTO_INCREMENT comment '主键',
     name        varchar(64) comment '规格名称',
     status      tinyint comment '状态： 0 开启 ，1 禁用',
     create_time datetime        default current_timestamp comment '创建时间',
@@ -179,7 +179,7 @@ create table product_property
     creator     varchar(64) comment '创建人',
     updater     varchar(64) comment '更新人',
     tenant_id   bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-    deleted     bit(1) comment '状态',
+    deleted   bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
     primary key (id),
     key         idx_name ( name (32)) comment '规格名称索引'
 ) comment '规格名称' character set utf8mb4
@@ -189,7 +189,7 @@ create table product_property
 drop table if exists product_property_value;
 create table product_property_value
 (
-    id          int comment '主键',
+    id          bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
     property_id bigint comment '规格键id',
     name        varchar(128) comment '规格值名字',
     status      tinyint comment '状态： 1 开启 ，2 禁用',
@@ -198,7 +198,7 @@ create table product_property_value
     creator     varchar(64) comment '创建人',
     updater     varchar(64) comment '更新人',
     tenant_id   bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-    deleted     bit(1) comment '状态',
+    deleted   bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
     primary key (id)
 ) comment '规格值' character set utf8mb4
                 collate utf8mb4_general_ci;
@@ -207,7 +207,7 @@ create table product_property_value
 drop table if exists product_spu;
 create table product_spu
 (
-    id          int comment '主键',
+    id          bigint        NOT NULL AUTO_INCREMENT COMMENT '主键',
     name        varchar(128) comment '商品名称',
     sell_point  varchar(128)  not null comment '卖点',
     description text          not null comment '描述',
@@ -223,7 +223,7 @@ create table product_spu
     creator     varchar(64) comment '创建人',
     updater     varchar(64) comment '更新人',
     tenant_id   bigint        NOT NULL DEFAULT '0' COMMENT '租户编号',
-    deleted     bit(1) comment '状态',
+    deleted   bit(1)        NOT NULL DEFAULT b'0' COMMENT '是否删除',
     primary key (id)
 ) comment '商品spu' character set utf8mb4
                   collate utf8mb4_general_ci;
@@ -233,7 +233,7 @@ create table product_spu
 drop table if exists product_sku;
 create table product_sku
 (
-    id             int comment '主键',
+    id             bigint       NOT NULL AUTO_INCREMENT COMMENT '主键',
     spu_id         bigint       not null comment 'spu编号',
     properties     varchar(64)  not null comment '规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]',
     price          int          not null DEFAULT -1 comment '销售价格，单位：分',
@@ -247,7 +247,7 @@ create table product_sku
     creator        varchar(64) comment '创建人',
     updater        varchar(64) comment '更新人',
     tenant_id      bigint       NOT NULL DEFAULT '0' COMMENT '租户编号',
-    deleted        bit(1) comment '状态',
+    deleted      bit(1)       NOT NULL DEFAULT b'0' COMMENT '是否删除',
     primary key (id)
 ) comment '商品sku' character set utf8mb4
                   collate utf8mb4_general_ci;
