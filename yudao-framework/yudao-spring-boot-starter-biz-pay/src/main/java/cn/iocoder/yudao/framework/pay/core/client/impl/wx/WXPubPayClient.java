@@ -139,7 +139,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
      */
     @Override
     public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws WxPayException {
-        log.info("微信支付回调data数据:{}", data.getBody());
+        log.info("[parseOrderNotify][微信支付回调data数据: {}]", data.getBody());
         // 微信支付 v2 回调结果处理
         switch (config.getApiVersion()) {
             case WXPayClientConfig.API_VERSION_V2:
@@ -155,7 +155,8 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         WxPayOrderNotifyV3Result wxPayOrderNotifyV3Result = client.parseOrderNotifyV3Result(data.getBody(), null);
         WxPayOrderNotifyV3Result.DecryptNotifyResult result = wxPayOrderNotifyV3Result.getResult();
         // 转换结果
-        Assert.isTrue(Objects.equals(wxPayOrderNotifyV3Result.getResult().getTradeState(), "SUCCESS"), "支付结果非 SUCCESS");
+        Assert.isTrue(Objects.equals(wxPayOrderNotifyV3Result.getResult().getTradeState(), "SUCCESS"),
+                "支付结果非 SUCCESS");
         return PayOrderNotifyRespDTO
                 .builder()
                 .orderExtensionNo(result.getOutTradeNo())
@@ -182,14 +183,13 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
 
     @Override
     public PayRefundNotifyDTO parseRefundNotify(PayNotifyDataDTO notifyData) {
-        //TODO 需要实现
+        // TODO 需要实现
         throw new UnsupportedOperationException("需要实现");
     }
 
-
     @Override
     protected PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
-        //TODO 需要实现
+        // TODO 需要实现
         throw new UnsupportedOperationException();
     }
 

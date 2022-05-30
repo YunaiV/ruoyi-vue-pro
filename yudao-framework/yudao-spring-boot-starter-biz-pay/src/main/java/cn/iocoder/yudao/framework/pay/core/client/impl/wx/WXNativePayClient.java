@@ -29,9 +29,14 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.CODE_SUCCESS;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.MESSAGE_SUCCESS;
 
-
+/**
+ * 微信 App 支付
+ *
+ * @author zwy
+ */
 @Slf4j
 public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
+
     private WxPayService client;
 
     public WXNativePayClient(Long channelId, WXPayClientConfig config) {
@@ -62,7 +67,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
     @Override
     public PayCommonResult<String> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         // 这里原生的返回的是支付的 url 所以直接使用string接收
-        //"invokeResponse": "weixin://wxpay/bizpayurl?pr=EGYAem7zz"
+        // "invokeResponse": "weixin://wxpay/bizpayurl?pr=EGYAem7zz"
         String responseV3;
         try {
             switch (config.getApiVersion()) {
@@ -110,11 +115,8 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
         request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         // 执行请求
-
-
         return client.createOrderV3(TradeTypeEnum.NATIVE, request);
     }
-
 
     /**
      *
@@ -136,15 +138,14 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
             default:
                 throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
         }
-
     }
 
     private PayOrderNotifyRespDTO parseOrderNotifyV3(PayNotifyDataDTO data) throws WxPayException {
         WxPayOrderNotifyV3Result wxPayOrderNotifyV3Result = client.parseOrderNotifyV3Result(data.getBody(), null);
         WxPayOrderNotifyV3Result.DecryptNotifyResult result = wxPayOrderNotifyV3Result.getResult();
         // 转换结果
-        Assert.isTrue(Objects.equals(wxPayOrderNotifyV3Result.getResult().getTradeState(), "SUCCESS"), "支付结果非 SUCCESS");
-
+        Assert.isTrue(Objects.equals(wxPayOrderNotifyV3Result.getResult().getTradeState(), "SUCCESS"),
+                "支付结果非 SUCCESS");
         return PayOrderNotifyRespDTO
                 .builder()
                 .orderExtensionNo(result.getOutTradeNo())
@@ -171,14 +172,15 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
 
     @Override
     public PayRefundNotifyDTO parseRefundNotify(PayNotifyDataDTO notifyData) {
-        //TODO 需要实现
+        // TODO 需要实现
         throw new UnsupportedOperationException("需要实现");
     }
 
 
     @Override
     protected PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
-        //TODO 需要实现
+        // TODO 需要实现
         throw new UnsupportedOperationException();
     }
+
 }

@@ -33,8 +33,9 @@ import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.M
 
 
 /**
- *
  * 微信小程序下支付
+ *
+ * @author zwy
  */
 @Slf4j
 public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
@@ -91,15 +92,13 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
         return PayCommonResult.build(CODE_SUCCESS, MESSAGE_SUCCESS, response, codeMapping);
     }
 
-
     private WxPayMpOrderResult unifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderRequest request = WxPayUnifiedOrderRequest.newBuilder()
                 .outTradeNo(reqDTO.getMerchantOrderId())
                 .body(reqDTO.getBody())
                 .totalFee(reqDTO.getAmount().intValue()) // 单位分
-                //v2的时间格式
-                .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyyMMddHHmmss"))
+                .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyyMMddHHmmss")) // v2的时间格式
                 .spbillCreateIp(reqDTO.getUserIp())
                 .openid(getOpenid(reqDTO))
                 .notifyUrl(reqDTO.getNotifyUrl())
@@ -119,11 +118,8 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .setTotal(reqDTO
                         .getAmount()
                         .intValue())); // 单位分
-        //v3的时间格式
-        request.setTimeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"));
-        request.setPayer(new WxPayUnifiedOrderV3Request
-                .Payer()
-                .setOpenid(getOpenid(reqDTO)));
+        request.setTimeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ssXXX")); // v3的时间格式
+        request.setPayer(new WxPayUnifiedOrderV3Request.Payer().setOpenid(getOpenid(reqDTO)));
         request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         // 执行请求
@@ -140,7 +136,7 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
 
     /**
      *
-     * 微信支付回调 分v2 和v3 的处理方式
+     * 微信支付回调 分 v2 和v3 的处理方式
      *
      * @param data 通知结果
      * @return 支付回调对象
@@ -148,7 +144,7 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
      */
     @Override
     public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws WxPayException {
-        log.info("微信支付回调data数据:{}", data.getBody());
+        log.info("[parseOrderNotify][微信支付回调data数据:{}]", data.getBody());
         // 微信支付 v2 回调结果处理
         switch (config.getApiVersion()) {
             case WXPayClientConfig.API_VERSION_V2:
@@ -158,14 +154,14 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
             default:
                 throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
         }
-
     }
 
     private PayOrderNotifyRespDTO parseOrderNotifyV3(PayNotifyDataDTO data) throws WxPayException {
         WxPayOrderNotifyV3Result wxPayOrderNotifyV3Result = client.parseOrderNotifyV3Result(data.getBody(), null);
         WxPayOrderNotifyV3Result.DecryptNotifyResult result = wxPayOrderNotifyV3Result.getResult();
         // 转换结果
-        Assert.isTrue(Objects.equals(wxPayOrderNotifyV3Result.getResult().getTradeState(), "SUCCESS"), "支付结果非 SUCCESS");
+        Assert.isTrue(Objects.equals(wxPayOrderNotifyV3Result.getResult().getTradeState(), "SUCCESS"),
+                "支付结果非 SUCCESS");
 
         return PayOrderNotifyRespDTO
                 .builder()

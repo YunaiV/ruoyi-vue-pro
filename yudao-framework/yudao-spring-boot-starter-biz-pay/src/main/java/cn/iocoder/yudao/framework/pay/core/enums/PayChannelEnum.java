@@ -22,7 +22,6 @@ public enum PayChannelEnum {
     WX_APP("wx_app", "微信 App 支付", WXPayClientConfig.class),
     WX_NATIVE("wx_native", "微信 native 支付", WXPayClientConfig.class),
 
-
     ALIPAY_PC("alipay_pc", "支付宝 PC 网站支付", AlipayPayClientConfig.class),
     ALIPAY_WAP("alipay_wap", "支付宝 Wap 网站支付", AlipayPayClientConfig.class),
     ALIPAY_APP("alipay_app", "支付宝App 支付", AlipayPayClientConfig.class),
