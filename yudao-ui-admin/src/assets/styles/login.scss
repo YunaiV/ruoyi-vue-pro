@@ -14,7 +14,8 @@ $containerBgImage: '../assets/images/bg.png';
 // container-logo
 $logoWidth: 417px;
 $logoHeight: 64px;
-$logoImage: '../assets/logo/login-logo.png';
+// $logoImage: '../assets/logo/login-logo.png';
+$logoImage:'';
 // container-content
 $contentWidth: round($W / $H * 100) * 1vw;
 $contentHeight: round($picH / $W * 100) / 100 * $contentWidth;
