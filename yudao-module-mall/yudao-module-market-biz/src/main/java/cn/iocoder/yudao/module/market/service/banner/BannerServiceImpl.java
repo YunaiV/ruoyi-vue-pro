@@ -73,6 +73,11 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
+    public List<BannerDO> getBannerList() {
+        return bannerMapper.selectList();
+    }
+
+    @Override
     public PageResult<BannerDO> getBannerPage(BannerPageReqVO pageReqVO) {
         return bannerMapper.selectPage(pageReqVO);
     }

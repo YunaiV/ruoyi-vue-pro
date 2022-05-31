@@ -57,6 +57,12 @@ public interface BannerService {
     List<BannerDO> getBannerList(Collection<Long> ids);
 
     /**
+     * 获得所有Banner列表
+     * @return Banner列表
+     */
+    List<BannerDO> getBannerList();
+
+    /**
      * 获得Banner分页
      *
      * @param pageReqVO 分页查询
