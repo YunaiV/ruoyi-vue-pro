@@ -253,3 +253,35 @@ create table product_sku
                   collate utf8mb4_general_ci;
 
 
+---Market-Banner管理SQL
+drop table if exists market_banner;
+CREATE TABLE `market_banner` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Banner编号',
+  `title` varchar(64) NOT NULL DEFAULT '' COMMENT 'Banner标题',
+  `pic_url` varchar(255) NOT NULL COMMENT '图片URL',
+  `status` tinyint(4) NOT NULL DEFAULT '-1' COMMENT '活动状态',
+  `url` varchar(255) NOT NULL COMMENT '跳转地址',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '租户编号',
+  `sort` tinyint(4) DEFAULT NULL COMMENT '排序',
+  `memo` varchar(255) DEFAULT NULL COMMENT '描述',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='Banner管理';
+-- 菜单 SQL
+INSERT INTO `system_menu`(`id`,`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`)
+VALUES (2002, 'Banner管理', '', 2, 1, 2000, 'brand', '', 'mall/market/banner/index', 0);
+-- 按钮父菜单ID
+SELECT @parentId := LAST_INSERT_ID();
+-- 按钮 SQL
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`)
+VALUES ('Banner查询', 'market:banner:query', 3, 1, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`)
+VALUES ('Banner创建', 'market:banner:create', 3, 2, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`)
+VALUES ('Banner更新', 'market:banner:update', 3, 3, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`)
+VALUES ('Banner删除', 'market:banner:delete', 3, 4, @parentId, '', '', '', 0);

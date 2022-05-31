@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.market.service.banner;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.market.controller.admin.activity.vo.ActivityCreateReqVO;
-import cn.iocoder.yudao.module.market.controller.admin.activity.vo.ActivityPageReqVO;
-import cn.iocoder.yudao.module.market.controller.admin.activity.vo.ActivityUpdateReqVO;
-import cn.iocoder.yudao.module.market.convert.activity.ActivityConvert;
-import cn.iocoder.yudao.module.market.dal.dataobject.activity.ActivityDO;
-import cn.iocoder.yudao.module.market.dal.mysql.activity.ActivityMapper;
+import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerCreateReqVO;
+import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerPageReqVO;
+import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerUpdateReqVO;
+import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerUpdateStatusReqVO;
+import cn.iocoder.yudao.module.market.convert.banner.BannerConvert;
+import cn.iocoder.yudao.module.market.dal.dataobject.banner.BannerDO;
+import cn.iocoder.yudao.module.market.dal.mysql.banner.BannerMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -15,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.market.enums.ErrorCodeConstants.ACTIVITY_NOT_EXISTS;
+import static cn.iocoder.yudao.module.market.enums.ErrorCodeConstants.*;
 
 /**
  * 首页banner 实现类
@@ -24,56 +25,65 @@ import static cn.iocoder.yudao.module.market.enums.ErrorCodeConstants.ACTIVITY_N
  */
 @Service
 @Validated
-public class ActivityServiceImpl implements ActivityService {
+public class BannerServiceImpl implements BannerService {
 
     @Resource
-    private ActivityMapper activityMapper;
+    private BannerMapper bannerMapper;
 
     @Override
-    public Long createActivity(ActivityCreateReqVO createReqVO) {
+    public Long createBanner(BannerCreateReqVO createReqVO) {
         // 插入
-        ActivityDO activity = ActivityConvert.INSTANCE.convert(createReqVO);
-        activityMapper.insert(activity);
+        BannerDO banner = BannerConvert.INSTANCE.convert(createReqVO);
+        bannerMapper.insert(banner);
         // 返回
-        return activity.getId();
+        return banner.getId();
     }
 
     @Override
-    public void updateActivity(ActivityUpdateReqVO updateReqVO) {
+    public void updateBanner(BannerUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validateActivityExists(updateReqVO.getId());
+        this.validateBannerExists(updateReqVO.getId());
         // 更新
-        ActivityDO updateObj = ActivityConvert.INSTANCE.convert(updateReqVO);
-        activityMapper.updateById(updateObj);
+        BannerDO updateObj = BannerConvert.INSTANCE.convert(updateReqVO);
+        bannerMapper.updateById(updateObj);
     }
 
     @Override
-    public void deleteActivity(Long id) {
+    public void deleteBanner(Long id) {
         // 校验存在
-        this.validateActivityExists(id);
+        this.validateBannerExists(id);
         // 删除
-        activityMapper.deleteById(id);
+        bannerMapper.deleteById(id);
     }
 
-    private void validateActivityExists(Long id) {
-        if (activityMapper.selectById(id) == null) {
-            throw exception(ACTIVITY_NOT_EXISTS);
+    private void validateBannerExists(Long id) {
+        if (bannerMapper.selectById(id) == null) {
+            throw exception(BANNER_NOT_EXISTS);
         }
     }
 
     @Override
-    public ActivityDO getActivity(Long id) {
-        return activityMapper.selectById(id);
+    public BannerDO getBanner(Long id) {
+        return bannerMapper.selectById(id);
     }
 
     @Override
-    public List<ActivityDO> getActivityList(Collection<Long> ids) {
-        return activityMapper.selectBatchIds(ids);
+    public List<BannerDO> getBannerList(Collection<Long> ids) {
+        return bannerMapper.selectBatchIds(ids);
     }
 
     @Override
-    public PageResult<ActivityDO> getActivityPage(ActivityPageReqVO pageReqVO) {
-        return activityMapper.selectPage(pageReqVO);
+    public PageResult<BannerDO> getBannerPage(BannerPageReqVO pageReqVO) {
+        return bannerMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public void updateBannerStatus(BannerUpdateStatusReqVO updateStatusReqVO) {
+        // 校验是否可以更新
+        this.validateBannerExists(updateStatusReqVO.getId());
+        // 更新状态
+        BannerDO updateObj = BannerConvert.INSTANCE.convert(updateStatusReqVO);
+        bannerMapper.updateById(updateObj);
     }
 
 }
