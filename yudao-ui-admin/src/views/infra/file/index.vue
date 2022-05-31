@@ -161,7 +161,7 @@ export default {
     },
     /** 处理上传的文件发生变化 */
     handleFileChange(file, fileList) {
-      this.upload.data.path = file.name;
+      
     },
     /** 处理文件上传中 */
     handleFileUploadProgress(event, file, fileList) {

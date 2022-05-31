@@ -37,10 +37,12 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public String createFile(String name, byte[] content) throws Exception {
+    public String createFile(String name, String path, byte[] content) throws Exception {
         // 计算默认的 path 名
         String type = FileTypeUtil.getType(new ByteArrayInputStream(content), name);
-        String path = DigestUtil.md5Hex(content) + '.' + type;
+        if (StrUtil.isEmpty(path)) {
+            path = DigestUtil.md5Hex(content) + '.' + type;
+        }
 
         // 上传到文件存储器
         FileClient client = fileConfigService.getMasterFileClient();
