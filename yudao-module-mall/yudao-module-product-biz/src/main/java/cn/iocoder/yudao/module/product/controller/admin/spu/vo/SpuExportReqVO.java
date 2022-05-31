@@ -25,7 +25,7 @@ public class SpuExportReqVO {
     private Long categoryId;
 
     @ApiModelProperty(value = "商品主图地址,* 数组，以逗号分隔,最多上传15张")
-    private String picUrls;
+    private List<String> picUrls;
 
     @ApiModelProperty(value = "排序字段")
     private Integer sort;

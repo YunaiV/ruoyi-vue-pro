@@ -8,7 +8,7 @@ import io.swagger.annotations.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SkuRespVO extends SkuBaseVO {
+public class ProductSkuRespVO extends ProductSkuBaseVO {
 
     @ApiModelProperty(value = "主键", required = true)
     private Integer id;

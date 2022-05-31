@@ -12,7 +12,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
  * @author 芋道源码
  */
 @Data
-public class SkuExcelVO {
+public class ProductSkuExcelVO {
 
     @ExcelProperty("主键")
     private Integer id;
@@ -21,7 +21,7 @@ public class SkuExcelVO {
     private Long spuId;
 
     @ExcelProperty("规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]")
-    private String properties;
+    private List<Property> properties;
 
     @ExcelProperty("销售价格，单位：分")
     private Integer price;
@@ -44,4 +44,9 @@ public class SkuExcelVO {
     @ExcelProperty("创建时间")
     private Date createTime;
 
+    @Data
+    public static class Property {
+        private Integer propertyId;
+        private Integer valueId;
+    }
 }

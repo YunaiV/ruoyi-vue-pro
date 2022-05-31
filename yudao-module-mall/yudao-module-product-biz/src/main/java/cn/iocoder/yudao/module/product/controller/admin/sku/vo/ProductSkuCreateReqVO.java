@@ -9,6 +9,6 @@ import javax.validation.constraints.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SkuCreateReqVO extends SkuBaseVO {
+public class ProductSkuCreateReqVO extends ProductSkuBaseVO {
 
 }

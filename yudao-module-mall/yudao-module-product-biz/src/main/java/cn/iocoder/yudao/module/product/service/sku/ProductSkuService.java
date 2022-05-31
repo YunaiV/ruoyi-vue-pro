@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.product.service.sku;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.SkuDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
@@ -11,7 +11,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
  *
  * @author 芋道源码
  */
-public interface SkuService {
+public interface ProductSkuService {
 
     /**
      * 创建商品sku
@@ -19,14 +19,14 @@ public interface SkuService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Integer createSku(@Valid SkuCreateReqVO createReqVO);
+    Integer createSku(@Valid ProductSkuCreateReqVO createReqVO);
 
     /**
      * 更新商品sku
      *
      * @param updateReqVO 更新信息
      */
-    void updateSku(@Valid SkuUpdateReqVO updateReqVO);
+    void updateSku(@Valid ProductSkuUpdateReqVO updateReqVO);
 
     /**
      * 删除商品sku
@@ -41,7 +41,7 @@ public interface SkuService {
      * @param id 编号
      * @return 商品sku
      */
-    SkuDO getSku(Integer id);
+    ProductSkuDO getSku(Integer id);
 
     /**
      * 获得商品sku列表
@@ -49,7 +49,7 @@ public interface SkuService {
      * @param ids 编号
      * @return 商品sku列表
      */
-    List<SkuDO> getSkuList(Collection<Integer> ids);
+    List<ProductSkuDO> getSkuList(Collection<Integer> ids);
 
     /**
      * 获得商品sku分页
@@ -57,7 +57,7 @@ public interface SkuService {
      * @param pageReqVO 分页查询
      * @return 商品sku分页
      */
-    PageResult<SkuDO> getSkuPage(SkuPageReqVO pageReqVO);
+    PageResult<ProductSkuDO> getSkuPage(ProductSkuPageReqVO pageReqVO);
 
     /**
      * 获得商品sku列表, 用于 Excel 导出
@@ -65,6 +65,6 @@ public interface SkuService {
      * @param exportReqVO 查询条件
      * @return 商品sku列表
      */
-    List<SkuDO> getSkuList(SkuExportReqVO exportReqVO);
+    List<ProductSkuDO> getSkuList(ProductSkuExportReqVO exportReqVO);
 
 }

@@ -6,11 +6,11 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.spu.SpuDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import cn.iocoder.yudao.module.product.convert.spu.SpuConvert;
-import cn.iocoder.yudao.module.product.dal.mysql.spu.SpuMapper;
+import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
+import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
@@ -22,16 +22,16 @@ import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
-public class SpuServiceImpl implements SpuService {
+public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Resource
-    private SpuMapper spuMapper;
+    private ProductSpuMapper ProductSpuMapper;
 
     @Override
-    public Integer createSpu(SpuCreateReqVO createReqVO) {
+    public Integer createSpu(ProductSpuCreateReqVO createReqVO) {
         // 插入
-        SpuDO spu = SpuConvert.INSTANCE.convert(createReqVO);
-        spuMapper.insert(spu);
+        ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
+        ProductSpuMapper.insert(spu);
         // 返回
         return spu.getId();
     }
@@ -41,8 +41,8 @@ public class SpuServiceImpl implements SpuService {
         // 校验存在
         this.validateSpuExists(updateReqVO.getId());
         // 更新
-        SpuDO updateObj = SpuConvert.INSTANCE.convert(updateReqVO);
-        spuMapper.updateById(updateObj);
+        ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
+        ProductSpuMapper.updateById(updateObj);
     }
 
     @Override
@@ -50,33 +50,33 @@ public class SpuServiceImpl implements SpuService {
         // 校验存在
         this.validateSpuExists(id);
         // 删除
-        spuMapper.deleteById(id);
+        ProductSpuMapper.deleteById(id);
     }
 
     private void validateSpuExists(Integer id) {
-        if (spuMapper.selectById(id) == null) {
+        if (ProductSpuMapper.selectById(id) == null) {
             throw exception(SPU_NOT_EXISTS);
         }
     }
 
     @Override
-    public SpuDO getSpu(Integer id) {
-        return spuMapper.selectById(id);
+    public ProductSpuDO getSpu(Integer id) {
+        return ProductSpuMapper.selectById(id);
     }
 
     @Override
-    public List<SpuDO> getSpuList(Collection<Integer> ids) {
-        return spuMapper.selectBatchIds(ids);
+    public List<ProductSpuDO> getSpuList(Collection<Integer> ids) {
+        return ProductSpuMapper.selectBatchIds(ids);
     }
 
     @Override
-    public PageResult<SpuDO> getSpuPage(SpuPageReqVO pageReqVO) {
-        return spuMapper.selectPage(pageReqVO);
+    public PageResult<ProductSpuDO> getSpuPage(SpuPageReqVO pageReqVO) {
+        return ProductSpuMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<SpuDO> getSpuList(SpuExportReqVO exportReqVO) {
-        return spuMapper.selectList(exportReqVO);
+    public List<ProductSpuDO> getSpuList(SpuExportReqVO exportReqVO) {
+        return ProductSpuMapper.selectList(exportReqVO);
     }
 
 }

@@ -8,9 +8,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel(value = "管理后台 - 商品sku Excel 导出 Request VO", description = "参数和 SkuPageReqVO 是一致的")
+@ApiModel("管理后台 - 商品sku分页 Request VO")
 @Data
-public class SkuExportReqVO {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class ProductSkuPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "spu编号")
     private Long spuId;

@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.util.List;
+
 /**
  * 商品spu DO
  *
@@ -19,7 +21,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpuDO extends BaseDO {
+public class ProductSpuDO extends BaseDO {
 
     /**
      * 主键
@@ -46,7 +48,7 @@ public class SpuDO extends BaseDO {
      * 商品主图地址,* 数组，以逗号分隔,最多上传15张
      */
     // TODO franky：List<String>
-    private String picUrls;
+    private List<String> picUrls;
     /**
      * 排序字段
      */

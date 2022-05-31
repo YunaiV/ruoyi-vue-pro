@@ -30,7 +30,7 @@ public class SpuExcelVO {
     private Long categoryId;
 
     @ExcelProperty("商品主图地址,* 数组，以逗号分隔,最多上传15张")
-    private String picUrls;
+    private List<String> picUrls;
 
     @ExcelProperty("排序字段")
     private Integer sort;

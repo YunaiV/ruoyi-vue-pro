@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.product.service.spu;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.spu.SpuDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
@@ -11,7 +11,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
  *
  * @author 芋道源码
  */
-public interface SpuService {
+public interface ProductSpuService {
 
     /**
      * 创建商品spu
@@ -19,7 +19,7 @@ public interface SpuService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Integer createSpu(@Valid SpuCreateReqVO createReqVO);
+    Integer createSpu(@Valid ProductSpuCreateReqVO createReqVO);
 
     /**
      * 更新商品spu
@@ -41,7 +41,7 @@ public interface SpuService {
      * @param id 编号
      * @return 商品spu
      */
-    SpuDO getSpu(Integer id);
+    ProductSpuDO getSpu(Integer id);
 
     /**
      * 获得商品spu列表
@@ -49,7 +49,7 @@ public interface SpuService {
      * @param ids 编号
      * @return 商品spu列表
      */
-    List<SpuDO> getSpuList(Collection<Integer> ids);
+    List<ProductSpuDO> getSpuList(Collection<Integer> ids);
 
     /**
      * 获得商品spu分页
@@ -57,7 +57,7 @@ public interface SpuService {
      * @param pageReqVO 分页查询
      * @return 商品spu分页
      */
-    PageResult<SpuDO> getSpuPage(SpuPageReqVO pageReqVO);
+    PageResult<ProductSpuDO> getSpuPage(SpuPageReqVO pageReqVO);
 
     /**
      * 获得商品spu列表, 用于 Excel 导出
@@ -65,6 +65,6 @@ public interface SpuService {
      * @param exportReqVO 查询条件
      * @return 商品spu列表
      */
-    List<SpuDO> getSpuList(SpuExportReqVO exportReqVO);
+    List<ProductSpuDO> getSpuList(SpuExportReqVO exportReqVO);
 
 }

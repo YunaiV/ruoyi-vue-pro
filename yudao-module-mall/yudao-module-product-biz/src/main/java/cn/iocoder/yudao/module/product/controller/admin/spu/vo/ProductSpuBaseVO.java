@@ -10,7 +10,7 @@ import javax.validation.constraints.*;
 * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
 */
 @Data
-public class SpuBaseVO {
+public class ProductSpuBaseVO {
 
     @ApiModelProperty(value = "商品名称")
     private String name;
@@ -29,7 +29,7 @@ public class SpuBaseVO {
 
     @ApiModelProperty(value = "商品主图地址,* 数组，以逗号分隔,最多上传15张", required = true)
     @NotNull(message = "商品主图地址,* 数组，以逗号分隔,最多上传15张不能为空")
-    private String picUrls;
+    private List<String> picUrls;
 
     @ApiModelProperty(value = "排序字段", required = true)
     @NotNull(message = "排序字段不能为空")

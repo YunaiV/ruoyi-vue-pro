@@ -22,31 +22,31 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
 
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.SkuDO;
-import cn.iocoder.yudao.module.product.convert.sku.SkuConvert;
-import cn.iocoder.yudao.module.product.service.sku.SkuService;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
+import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
+import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 
 @Api(tags = "管理后台 - 商品sku")
 @RestController
 @RequestMapping("/product/sku")
 @Validated
-public class SkuController {
+public class ProductSkuController {
 
     @Resource
-    private SkuService skuService;
+    private ProductSkuService ProductSkuService;
 
     @PostMapping("/create")
     @ApiOperation("创建商品sku")
     @PreAuthorize("@ss.hasPermission('product:sku:create')")
-    public CommonResult<Integer> createSku(@Valid @RequestBody SkuCreateReqVO createReqVO) {
-        return success(skuService.createSku(createReqVO));
+    public CommonResult<Integer> createSku(@Valid @RequestBody ProductSkuCreateReqVO createReqVO) {
+        return success(ProductSkuService.createSku(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新商品sku")
     @PreAuthorize("@ss.hasPermission('product:sku:update')")
-    public CommonResult<Boolean> updateSku(@Valid @RequestBody SkuUpdateReqVO updateReqVO) {
-        skuService.updateSku(updateReqVO);
+    public CommonResult<Boolean> updateSku(@Valid @RequestBody ProductSkuUpdateReqVO updateReqVO) {
+        ProductSkuService.updateSku(updateReqVO);
         return success(true);
     }
 
@@ -55,7 +55,7 @@ public class SkuController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Integer.class)
     @PreAuthorize("@ss.hasPermission('product:sku:delete')")
     public CommonResult<Boolean> deleteSku(@RequestParam("id") Integer id) {
-        skuService.deleteSku(id);
+        ProductSkuService.deleteSku(id);
         return success(true);
     }
 
@@ -63,38 +63,38 @@ public class SkuController {
     @ApiOperation("获得商品sku")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Integer.class)
     @PreAuthorize("@ss.hasPermission('product:sku:query')")
-    public CommonResult<SkuRespVO> getSku(@RequestParam("id") Integer id) {
-        SkuDO sku = skuService.getSku(id);
-        return success(SkuConvert.INSTANCE.convert(sku));
+    public CommonResult<ProductSkuRespVO> getSku(@RequestParam("id") Integer id) {
+        ProductSkuDO sku = ProductSkuService.getSku(id);
+        return success(ProductSkuConvert.INSTANCE.convert(sku));
     }
 
     @GetMapping("/list")
     @ApiOperation("获得商品sku列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('product:sku:query')")
-    public CommonResult<List<SkuRespVO>> getSkuList(@RequestParam("ids") Collection<Integer> ids) {
-        List<SkuDO> list = skuService.getSkuList(ids);
-        return success(SkuConvert.INSTANCE.convertList(list));
+    public CommonResult<List<ProductSkuRespVO>> getSkuList(@RequestParam("ids") Collection<Integer> ids) {
+        List<ProductSkuDO> list = ProductSkuService.getSkuList(ids);
+        return success(ProductSkuConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")
     @ApiOperation("获得商品sku分页")
     @PreAuthorize("@ss.hasPermission('product:sku:query')")
-    public CommonResult<PageResult<SkuRespVO>> getSkuPage(@Valid SkuPageReqVO pageVO) {
-        PageResult<SkuDO> pageResult = skuService.getSkuPage(pageVO);
-        return success(SkuConvert.INSTANCE.convertPage(pageResult));
+    public CommonResult<PageResult<ProductSkuRespVO>> getSkuPage(@Valid ProductSkuPageReqVO pageVO) {
+        PageResult<ProductSkuDO> pageResult = ProductSkuService.getSkuPage(pageVO);
+        return success(ProductSkuConvert.INSTANCE.convertPage(pageResult));
     }
 
     @GetMapping("/export-excel")
     @ApiOperation("导出商品sku Excel")
     @PreAuthorize("@ss.hasPermission('product:sku:export')")
     @OperateLog(type = EXPORT)
-    public void exportSkuExcel(@Valid SkuExportReqVO exportReqVO,
+    public void exportSkuExcel(@Valid ProductSkuExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<SkuDO> list = skuService.getSkuList(exportReqVO);
+        List<ProductSkuDO> list = ProductSkuService.getSkuList(exportReqVO);
         // 导出 Excel
-        List<SkuExcelVO> datas = SkuConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "商品sku.xls", "数据", SkuExcelVO.class, datas);
+        List<ProductSkuExcelVO> datas = ProductSkuConvert.INSTANCE.convertList02(list);
+        ExcelUtils.write(response, "商品sku.xls", "数据", ProductSkuExcelVO.class, datas);
     }
 
 }

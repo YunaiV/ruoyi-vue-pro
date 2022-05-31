@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SkuUpdateReqVO extends SkuBaseVO {
+public class ProductSkuUpdateReqVO extends ProductSkuBaseVO {
 
     @ApiModelProperty(value = "主键", required = true)
     @NotNull(message = "主键不能为空")
