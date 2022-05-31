@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerCreateReqVO;
 import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerPageReqVO;
 import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerUpdateReqVO;
-import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerUpdateStatusReqVO;
 import cn.iocoder.yudao.module.market.convert.banner.BannerConvert;
 import cn.iocoder.yudao.module.market.dal.dataobject.banner.BannerDO;
 import cn.iocoder.yudao.module.market.dal.mysql.banner.BannerMapper;
@@ -12,11 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.market.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.market.enums.ErrorCodeConstants.BANNER_NOT_EXISTS;
 
 /**
  * 首页banner 实现类
@@ -68,11 +66,6 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
-    public List<BannerDO> getBannerList(Collection<Long> ids) {
-        return bannerMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public List<BannerDO> getBannerList() {
         return bannerMapper.selectList();
     }
@@ -80,15 +73,6 @@ public class BannerServiceImpl implements BannerService {
     @Override
     public PageResult<BannerDO> getBannerPage(BannerPageReqVO pageReqVO) {
         return bannerMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public void updateBannerStatus(BannerUpdateStatusReqVO updateStatusReqVO) {
-        // 校验是否可以更新
-        this.validateBannerExists(updateStatusReqVO.getId());
-        // 更新状态
-        BannerDO updateObj = BannerConvert.INSTANCE.convert(updateStatusReqVO);
-        bannerMapper.updateById(updateObj);
     }
 
 }

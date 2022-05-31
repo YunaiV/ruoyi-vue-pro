@@ -29,12 +29,6 @@
                    v-hasPermi="['market:banner:create']">新增
         </el-button>
       </el-col>
-<!--      <el-col :span="1.5">-->
-<!--        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"-->
-<!--                   :loading="exportLoading"-->
-<!--                   v-hasPermi="['market:banner:export']">导出-->
-<!--        </el-button>-->
-<!--      </el-col>-->
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -256,23 +250,6 @@ export default {
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
-      }).catch(() => {
-      });
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      // 处理查询参数
-      let params = {...this.queryParams};
-      params.pageNo = undefined;
-      params.pageSize = undefined;
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
-      // 执行导出
-      this.$modal.confirm('是否确认导出所有Banner数据项?').then(() => {
-        this.exportLoading = true;
-        return exportBannerExcel(params);
-      }).then(response => {
-        this.$download.excel(response, "Banner.xls");
-        this.exportLoading = false;
       }).catch(() => {
       });
     }
