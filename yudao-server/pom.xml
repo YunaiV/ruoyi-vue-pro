@@ -47,6 +47,7 @@
             <artifactId>yudao-module-bpm-biz-flowable</artifactId>
             <version>${revision}</version>
         </dependency>
+
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
 <!--            <artifactId>yudao-module-bpm-biz-activiti</artifactId>-->
@@ -58,6 +59,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+        <!-- 微信公众号 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-wechat-mp-biz</artifactId>
+            <version>${revision}</version>
         </dependency>
 
         <!-- 服务保障相关 -->

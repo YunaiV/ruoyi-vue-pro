@@ -2647,3 +2647,248 @@ INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, 
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+-- 公众号
+DROP TABLE IF EXISTS `wx_account`;
+CREATE TABLE `wx_account`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `name` varchar(100) DEFAULT NULL COMMENT '公众号名称',
+  `account` varchar(100) DEFAULT NULL COMMENT '公众号账户',
+  `appid` varchar(100) DEFAULT NULL COMMENT '公众号appid',
+  `appsecret` varchar(100) DEFAULT NULL COMMENT '公众号密钥',
+  `url` varchar(100) DEFAULT NULL COMMENT '公众号url',
+  `token` varchar(100) DEFAULT NULL COMMENT '公众号token',
+  `aeskey` varchar(300) DEFAULT NULL COMMENT '加密密钥',
+  `qr_url` varchar(200) DEFAULT NULL COMMENT '二维码图片URL',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '公众号账户表';
+
+DROP TABLE IF EXISTS `wx_account_fans`;
+CREATE TABLE `wx_account_fans`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `openid` varchar(100) DEFAULT NULL COMMENT '用户标识',
+  `subscribe_status` char(1) DEFAULT NULL COMMENT '订阅状态，0未关注，1已关注',
+  `subscribe_time` datetime DEFAULT NULL COMMENT '订阅时间',
+  `nickname` varbinary(2000) DEFAULT NULL COMMENT '昵称',
+  `gender` varchar(10) DEFAULT NULL COMMENT '性别，1男，2女，0未知',
+  `language` varchar(30) DEFAULT NULL COMMENT '语言',
+  `country` varchar(30) DEFAULT NULL COMMENT '国家',
+  `province` varchar(30) DEFAULT NULL COMMENT '省份',
+  `city` varchar(30) DEFAULT NULL COMMENT '城市',
+  `headimg_url` varchar(500) DEFAULT NULL COMMENT '头像地址',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信公众号ID',
+  `wx_account_appid` varchar(100) DEFAULT NULL COMMENT '微信公众号appid',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '微信公众号粉丝表';
+
+    DROP TABLE IF EXISTS `wx_account_fans_tag`;
+    CREATE TABLE `wx_account_fans_tag` (
+            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+            `openid` varchar(100) DEFAULT NULL COMMENT '用户标识',
+            `tag_id` varchar(32) DEFAULT NULL COMMENT '标签ID',
+            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='粉丝标签关联表';
+
+    DROP TABLE IF EXISTS `wx_fans_msg`;
+    CREATE TABLE `wx_fans_msg` (
+            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+            `openid` varchar(100) DEFAULT NULL COMMENT '用户标识',
+            `nickname` varbinary(2000) DEFAULT NULL COMMENT '昵称',
+            `headimg_url` varchar(500) DEFAULT NULL COMMENT '头像地址',
+            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+            `msg_type` varchar(32) DEFAULT NULL COMMENT '消息类型',
+            `content` varchar(500) DEFAULT NULL COMMENT '内容',
+            `res_content` text COMMENT '最近一条回复内容',
+            `is_res` varchar(32) DEFAULT NULL COMMENT '是否已回复',
+            `media_id` varchar(100) DEFAULT NULL COMMENT '微信素材ID',
+            `pic_url` varchar(500) DEFAULT NULL COMMENT '微信图片URL',
+            `pic_path` varchar(500) DEFAULT NULL COMMENT '本地图片路径',
+            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8 COMMENT='粉丝消息表 ';
+
+    DROP TABLE IF EXISTS `wx_fans_msg_res`;
+    CREATE TABLE `wx_fans_msg_res` (
+            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+            `fans_msg_id` varchar(32) DEFAULT NULL COMMENT '粉丝消息ID',
+            `res_content` text COMMENT '回复内容',
+            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COMMENT='回复粉丝消息历史表 ';
+
+
+    DROP TABLE IF EXISTS `wx_fans_tag`;
+    CREATE TABLE `wx_fans_tag` (
+            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+            `name` varchar(32) DEFAULT NULL COMMENT '标签名称',
+            `count` int(11) DEFAULT NULL COMMENT '粉丝数量',
+            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='粉丝标签表';
+
+    DROP TABLE IF EXISTS `wx_media_upload`;
+    CREATE TABLE `wx_media_upload` (
+            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+            `type` varchar(32) DEFAULT NULL COMMENT '类型',
+            `url` varchar(500) DEFAULT NULL COMMENT '图片URL',
+            `media_id` varchar(32) DEFAULT NULL COMMENT '素材ID',
+            `thumb_media_id` varchar(32) DEFAULT NULL COMMENT '缩略图素材ID',
+            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='微信素材上传表 ';
+
+    DROP TABLE IF EXISTS `wx_menu`;
+    CREATE TABLE `wx_menu` (
+            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+            `parent_id` varchar(32) DEFAULT NULL COMMENT '父ID',
+            `menu_name` varchar(32) DEFAULT NULL COMMENT '菜单名称',
+            `menu_type` varchar(32) DEFAULT NULL COMMENT '菜单类型 1文本消息；2图文消息；3网址链接；4小程序',
+            `menu_level` varchar(32) DEFAULT NULL COMMENT '菜单等级',
+            `tpl_id` varchar(32) DEFAULT NULL COMMENT '模板ID',
+            `menu_url` varchar(255) DEFAULT NULL COMMENT '菜单URL',
+            `menu_sort` varchar(32) DEFAULT NULL COMMENT '排序',
+            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+            `miniprogram_appid` varchar(32) DEFAULT NULL COMMENT '小程序appid',
+            `miniprogram_pagepath` varchar(200) DEFAULT NULL COMMENT '小程序页面路径',
+            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='微信菜单表';
+
+
+    DROP TABLE IF EXISTS `wx_news_article_item`;
+    CREATE TABLE `wx_news_article_item` (
+            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+            `title` varchar(32) DEFAULT NULL COMMENT '标题',
+            `digest` varchar(50) DEFAULT NULL COMMENT '摘要',
+            `author` varchar(32) DEFAULT NULL COMMENT '作者',
+            `show_cover_pic` char(1) DEFAULT NULL COMMENT '是否展示封面图片（0/1）',
+            `thumb_media_id` varchar(50) DEFAULT NULL COMMENT '上传微信，封面图片标识',
+            `content` text COMMENT '内容',
+            `content_source_url` varchar(50) DEFAULT NULL COMMENT '内容链接',
+            `order_no` int(11) DEFAULT NULL COMMENT '文章排序',
+            `pic_path` varchar(255) DEFAULT NULL COMMENT '图片路径',
+            `need_open_comment` varchar(32) DEFAULT NULL COMMENT '是否可以留言',
+            `only_fans_can_comment` varchar(32) DEFAULT NULL COMMENT '是否仅粉丝可以留言',
+            `news_id` varchar(32) DEFAULT NULL COMMENT '图文ID',
+            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='图文消息文章列表表 ';
+
+    DROP TABLE IF EXISTS `wx_news_template`;
+    CREATE TABLE `wx_news_template` (
+            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键 主键ID',
+            `tpl_name` varchar(32) DEFAULT NULL COMMENT '模板名称',
+            `is_upload` varchar(32) DEFAULT NULL COMMENT '是否已上传微信',
+            `media_id` varchar(50) DEFAULT NULL,
+  `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='图文消息模板表';
+
+
+    DROP TABLE IF EXISTS `wx_receive_text`;
+    CREATE TABLE `wx_receive_text` (
+            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+            `receive_text` varchar(32) DEFAULT NULL COMMENT '关键字',
+            `msg_type` varchar(32) DEFAULT NULL COMMENT '消息类型 1文本消息；2图文消息；',
+            `tpl_id` varchar(32) DEFAULT NULL COMMENT '模板ID',
+            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='回复关键字表';
+
+
+    DROP TABLE IF EXISTS `wx_subscribe_text`;
+    CREATE TABLE `wx_subscribe_text` (
+            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+            `msg_type` varchar(32) DEFAULT NULL COMMENT '消息类型 1文本消息；2图文消息；',
+            `tpl_id` varchar(32) DEFAULT NULL COMMENT '模板ID',
+            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='关注欢迎语表';
+
+
+    DROP TABLE IF EXISTS `wx_text_template`;
+    CREATE TABLE `wx_text_template` (
+            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+            `tpl_name` varchar(32) DEFAULT NULL COMMENT '模板名字',
+            `content` varchar(255) DEFAULT NULL COMMENT '模板内容',
+            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='文本模板表';

@@ -64,6 +64,7 @@
         <tencentcloud-sdk-java.version>3.1.471</tencentcloud-sdk-java.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
+        <weixin-java-mp.version>3.3.0</weixin-java-mp.version>
     </properties>
 
     <dependencyManagement>
@@ -565,6 +566,12 @@
                 <groupId>com.xkcoding.justauth</groupId>
                 <artifactId>justauth-spring-boot-starter</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
                 <version>${justauth.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-mp</artifactId>
+                <version>${weixin-java-mp.version}</version>
             </dependency>
 
         </dependencies>
