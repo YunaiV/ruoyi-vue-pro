@@ -27,9 +27,11 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class AppBannerController {
 
+    // TODO @xia：使用 @Resource 哈
     @Autowired
     private BannerService bannerService;
 
+    // TODO @xia：新建一个 AppBannerRespVO，只返回必要的字段。status 要过滤下。然后 sort 下结果
     @GetMapping("/list")
     @ApiOperation("获得banner列表")
     @PreAuthorize("@ss.hasPermission('market:banner:query')")
