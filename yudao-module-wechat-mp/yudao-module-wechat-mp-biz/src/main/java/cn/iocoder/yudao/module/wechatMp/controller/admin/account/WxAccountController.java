@@ -1,34 +1,31 @@
 package cn.iocoder.yudao.module.wechatMp.controller.admin.account;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.module.wechatMp.controller.admin.account.vo.*;
+import cn.iocoder.yudao.module.wechatMp.convert.account.WxAccountConvert;
+import cn.iocoder.yudao.module.wechatMp.dal.dataobject.account.WxAccountDO;
+import cn.iocoder.yudao.module.wechatMp.service.account.WxAccountService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.annotations.*;
-
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
-import cn.iocoder.yudao.module.wechatMp.controller.admin.account.vo.*;
-import cn.iocoder.yudao.module.wechatMp.dal.dataobject.account.WxAccountDO;
-import cn.iocoder.yudao.module.wechatMp.convert.account.WxAccountConvert;
-import cn.iocoder.yudao.module.wechatMp.service.account.WxAccountService;
-
+// TODO @亚洲：/mp/account 即可
 @Api(tags = "管理后台 - 公众号账户")
 @RestController
 @RequestMapping("/wechatMp/wx-account")

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+// TODO @芋艿：思考有没更好的处理方式
 @Component
 @Slf4j
 public class WxMpConfig implements InitializingBean {
@@ -49,6 +50,7 @@ public class WxMpConfig implements InitializingBean {
 
     public static void init(List<WxAccountDO> wxAccountDOS) {
         mpServices = wxAccountDOS.stream().map(wxAccountDO -> {
+            // TODO 亚洲：使用 WxMpInMemoryConfigStorage 的话，多节点会不会存在 accessToken 冲突
             WxMpInMemoryConfigStorage configStorage = new WxMpInMemoryConfigStorage();
             configStorage.setAppId(wxAccountDO.getAppid());
             configStorage.setSecret(wxAccountDO.getAppsecret());
@@ -60,7 +62,6 @@ public class WxMpConfig implements InitializingBean {
             routers.put(wxAccountDO.getAppid(), newRouter(service));
             return service;
         }).collect(Collectors.toMap(s -> s.getWxMpConfigStorage().getAppId(), a -> a, (o, n) -> o));
-
     }
 
     public static Map<String, WxMpMessageRouter> getRouters() {

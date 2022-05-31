@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.wechatMp.dal.dataobject.account;
 
-import lombok.*;
-import java.util.*;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
+// TODO 亚洲：这个模块的相关类，使用 Mp 作为前缀哈
 /**
  * 公众号账户 DO
  *
@@ -33,10 +35,12 @@ public class WxAccountDO extends BaseDO {
      * 公众号账户
      */
     private String account;
+    // TODO 亚洲：appId
     /**
-     * 公众号appid
+     * 公众号 appid
      */
     private String appid;
+    // TODO 亚洲：appSecret
     /**
      * 公众号密钥
      */
@@ -52,10 +56,12 @@ public class WxAccountDO extends BaseDO {
     /**
      * 加密密钥
      */
+    // TODO 亚洲：aesKey
     private String aeskey;
     /**
-     * 二维码图片URL
+     * 二维码图片 URL
      */
+    // TODO 亚洲：qrCodeUrl
     private String qrUrl;
     /**
      * 备注
