@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.swagger.config;
 
+import cn.iocoder.yudao.framework.swagger.core.SpringFoxHandlerProviderBeanPostProcessor;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -21,8 +22,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.Collections;
 import java.util.List;
 
-import static springfox.documentation.builders.RequestHandlerSelectors.basePackage;
-
 /**
  * Swagger2 自动配置类
  *
@@ -36,6 +35,11 @@ import static springfox.documentation.builders.RequestHandlerSelectors.basePacka
 @ConditionalOnProperty(prefix = "yudao.swagger", value = "enable", matchIfMissing = true)
 @EnableConfigurationProperties(SwaggerProperties.class)
 public class YudaoSwaggerAutoConfiguration {
+
+    @Bean
+    public SpringFoxHandlerProviderBeanPostProcessor springFoxHandlerProviderBeanPostProcessor() {
+        return new SpringFoxHandlerProviderBeanPostProcessor();
+    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -52,8 +56,8 @@ public class YudaoSwaggerAutoConfiguration {
                 .apiInfo(apiInfo(properties))
                 // 设置扫描指定 package 包下的
                 .select()
-                .apis(basePackage(properties.getBasePackage()))
-//                .apis(basePackage("cn.iocoder.yudao.module.infra")) // 可用于 swagger 无法展示时使用
+//                .apis(basePackage(properties.getBasePackage()))
+//                .apis(basePackage("cn.iocoder.yudao.module.system")) // 可用于 swagger 无法展示时使用
                 .paths(PathSelectors.any())
                 .build()
                 .securitySchemes(securitySchemes())

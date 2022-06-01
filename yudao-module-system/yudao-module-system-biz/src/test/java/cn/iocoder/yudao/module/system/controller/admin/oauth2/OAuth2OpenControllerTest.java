@@ -77,7 +77,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
 
         // mock 方法（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(addTime(Duration.ofMillis(30010L))); // 多给 10 毫秒，保证可执行完
+                .setExpiresTime(addTime(Duration.ofMillis(30050L))); // 多给 10 毫秒，保证可执行完
         when(oauth2GrantService.grantAuthorizationCodeForAccessToken(eq("test_client_id"),
                 eq(code), eq(redirectUri), eq(state))).thenReturn(accessTokenDO);
 
@@ -105,7 +105,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
 
         // mock 方法（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(addTime(Duration.ofMillis(30010L))); // 多给 10 毫秒，保证可执行完
+                .setExpiresTime(addTime(Duration.ofMillis(30050L))); // 多给 10 毫秒，保证可执行完
         when(oauth2GrantService.grantPassword(eq(username), eq(password), eq("test_client_id"),
                 eq(Lists.newArrayList("write", "read")))).thenReturn(accessTokenDO);
 

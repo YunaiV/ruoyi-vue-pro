@@ -5,12 +5,18 @@ spring:
   profiles:
     active: local
 
+  main:
+    allow-circular-references: true # 允许循环依赖，因为项目是三层架构，无法避免这个情况。
+
   # Servlet 配置
   servlet:
     # 文件上传相关配置项
     multipart:
       max-file-size: 16MB # 单个文件大小
       max-request-size: 32MB # 设置总上传的文件大小
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER # 解决 SpringFox 与 SpringBoot 2.6.x 不兼容的问题，参见 SpringFoxHandlerProviderBeanPostProcessor 类
 
   # Jackson 配置项
   jackson:
