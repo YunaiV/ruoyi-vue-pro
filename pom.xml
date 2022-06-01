@@ -18,7 +18,6 @@
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
         <module>yudao-module-pay</module>
-        <module>yudao-module-wechat-mp</module>
         <module>yudao-module-wechat</module>
     </modules>
 
