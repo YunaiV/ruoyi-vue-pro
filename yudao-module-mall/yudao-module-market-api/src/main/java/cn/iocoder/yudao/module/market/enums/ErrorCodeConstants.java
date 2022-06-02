@@ -12,4 +12,7 @@ public interface ErrorCodeConstants {
 
     // ========== 促销活动相关  1003001000============
     ErrorCode ACTIVITY_NOT_EXISTS = new ErrorCode(1003001000, "促销活动不存在");
+
+    // ========== banner相关  1003002000============
+    ErrorCode BANNER_NOT_EXISTS = new ErrorCode(1003002000, "Banner不存在");
 }

@@ -12,24 +12,17 @@
       <el-form-item label="分类id" prop="categoryId">
         <el-input v-model="queryParams.categoryId" placeholder="请输入分类id" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="商品主图地址" prop="picUrls">
-        <el-input v-model="queryParams.picUrls" placeholder="请输入商品主图地址" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="排序字段" prop="sort">
-        <el-input v-model="queryParams.sort" placeholder="请输入排序字段" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="点赞初始人数" prop="likeCount">
-        <el-input v-model="queryParams.likeCount" placeholder="请输入点赞初始人数" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="价格 单位使用：分" prop="price">
+      <el-form-item label="价格(分)" prop="price">
         <el-input v-model="queryParams.price" placeholder="请输入价格 单位使用：分" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="库存数量" prop="quantity">
         <el-input v-model="queryParams.quantity" placeholder="请输入库存数量" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="上下架状态： 0 上架（开启） 1 下架（禁用）" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择上下架状态： 0 上架（开启） 1 下架（禁用）" clearable size="small">
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择上下架状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
+          <el-option label="上架" value="0" />
+          <el-option label="下架" value="1" />
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
@@ -65,9 +58,9 @@
       <el-table-column label="商品主图地址" align="center" prop="picUrls" />
       <el-table-column label="排序字段" align="center" prop="sort" />
       <el-table-column label="点赞初始人数" align="center" prop="likeCount" />
-      <el-table-column label="价格 单位使用：分" align="center" prop="price" />
+      <el-table-column label="价格 (分)" align="center" prop="price" />
       <el-table-column label="库存数量" align="center" prop="quantity" />
-      <el-table-column label="上下架状态： 0 上架（开启） 1 下架（禁用）" align="center" prop="status" />
+      <el-table-column label="状态" align="center" prop="status" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -87,7 +80,7 @@
                 @pagination="getList"/>
 
     <!-- 对话框(添加 / 修改) -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="商品名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入商品名称" />
@@ -116,9 +109,10 @@
         <el-form-item label="库存数量" prop="quantity">
           <el-input v-model="form.quantity" placeholder="请输入库存数量" />
         </el-form-item>
-        <el-form-item label="上下架状态： 0 上架（开启） 1 下架（禁用）" prop="status">
+        <el-form-item label="上下架状态" prop="status">
           <el-radio-group v-model="form.status">
-            <el-radio label="1">请选择字典生成</el-radio>
+            <el-radio label="0">上架</el-radio>
+            <el-radio label="1">下架</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
