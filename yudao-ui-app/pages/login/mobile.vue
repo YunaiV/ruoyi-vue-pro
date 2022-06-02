@@ -139,14 +139,29 @@ export default {
     },
     handleSubmit() {
       this.$refs.form.validate().then(res => {
-        this.$store.dispatch('Login', { type: this.currentModeIndex, data: this.formData }).then(res => {
-          uni.$u.toast('登录成功')
-          setTimeout(() => {
-            uni.switchTab({
-              url: '/pages/user/user'
-            })
-          }, 300)
+        uni.login({
+          provider: 'weixin',
+          success: res => {
+            let data = this.formData
+            data.socialType = 34 //WECHAT_MINI_APP 先指定固定值
+            data.socialCode = res.code
+            data.socialState = Math.random() // 该参数没有实际意义暂时传随机数
+            this.mobileLogin(data)
+          },
+          fail: res => {
+            this.mobileLogin(this.formData)
+          }
         })
+      })
+    },
+    mobileLogin(data){
+      this.$store.dispatch('Login', { type: this.currentModeIndex, data: data }).then(res => {
+        uni.$u.toast('登录成功')
+        setTimeout(() => {
+          uni.switchTab({
+            url: '/pages/user/user'
+          })
+        }, 300)
       })
     }
   }

@@ -2,24 +2,25 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { logout } from '@/api/auth'
 import { getUserInfo } from '@/api/user'
-import { passwordLogin, smsLogin, socialLogin } from '@/api/auth'
+import { passwordLogin, smsLogin, weixinMiniAppLogin } from '@/api/auth'
 
-const TokenKey = 'App-Token'
+const AccessTokenKey = 'ACCESS_TOKEN'
+const RefreshTokenKey = 'REFRESH_TOKEN'
 
 Vue.use(Vuex) // vue的插件机制
 
 // Vuex.Store 构造器选项
 const store = new Vuex.Store({
   state: {
-    openExamine: false, // 是否开启审核状态。用于小程序、App 等审核时，关闭部分功能。TODO 芋艿：暂时没找到刷新的地方
-    token: uni.getStorageSync(TokenKey), // 用户身份 Token
-    userInfo: {}, // 用户基本信息
-    timerIdent: false // 全局 1s 定时器，只在全局开启一个，所有需要定时执行的任务监听该值即可，无需额外开启 TODO 芋艿：需要看看
+    accessToken: uni.getStorageSync(AccessTokenKey), // 访问令牌
+    refreshToken: uni.getStorageSync(RefreshTokenKey), // 刷新令牌
+    userInfo: {}
   },
   getters: {
-    token: state => state.token,
+    accessToken: state => state.accessToken,
+    refreshToken: state => state.refreshToken,
     userInfo: state => state.userInfo,
-    hasLogin: state => !!state.token
+    hasLogin: state => !!state.accessToken
   },
   mutations: {
     // 更新 state 的通用方法
@@ -32,12 +33,14 @@ const store = new Vuex.Store({
         state[param.key] = param.val
       }
     },
-    // 更新token
+    // 更新令牌
     SET_TOKEN(state, data) {
-      // 设置 Token
-      const { token } = data
-      state.token = token
-      uni.setStorageSync(TokenKey, token)
+      // 设置令牌
+      const { accessToken, refreshToken } = data
+      state.accessToken = accessToken
+      state.refreshToken = refreshToken
+      uni.setStorageSync(AccessTokenKey, accessToken)
+      uni.setStorageSync(RefreshTokenKey, refreshToken)
 
       // 加载用户信息
       this.dispatch('ObtainUserInfo')
@@ -46,10 +49,12 @@ const store = new Vuex.Store({
     SET_USER_INFO(state, data) {
       state.userInfo = data
     },
-    // 清空 Token 和 用户信息
+    // 清空令牌 和 用户信息
     CLEAR_LOGIN_INFO(state) {
-      uni.removeStorageSync(TokenKey)
-      state.token = ''
+      uni.removeStorageSync(AccessTokenKey)
+      uni.removeStorageSync(RefreshTokenKey)
+      state.accessToken = ''
+      state.refreshToken = ''
       state.userInfo = {}
     }
   },
@@ -65,7 +70,7 @@ const store = new Vuex.Store({
           commit('SET_TOKEN', res.data)
         })
       } else {
-        return socialLogin(data).then(res => {
+        return weixinMiniAppLogin(data).then(res => {
           commit('SET_TOKEN', res.data)
         })
       }

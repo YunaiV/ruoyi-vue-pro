@@ -33,7 +33,7 @@ export default {
   onReady() {},
   methods: {
     getPhoneNumber(e) {
-      let code = e.detail.code
+      let phoneCode = e.detail.code
       if (!e.detail.code) {
         uni.showModal({
           title: '授权失败',
@@ -50,10 +50,10 @@ export default {
           }
         })
       } else {
-        uni.getUserInfo({
+        uni.login({
           provider: 'weixin',
           success: res => {
-            this.$store.dispatch('Login', { type: 2, data: { code: code, userData: res } }).then(res => {
+            this.$store.dispatch('Login', { type: 2, data: { phoneCode: phoneCode, loginCode: res.code } }).then(res => {
               uni.$u.toast('登录成功')
               setTimeout(() => {
                 uni.switchTab({
