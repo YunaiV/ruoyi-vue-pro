@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.mp.handler;
 
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansUpdateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.accountfans.WxAccountFansDO;
 import cn.iocoder.yudao.module.mp.service.account.WxAccountService;

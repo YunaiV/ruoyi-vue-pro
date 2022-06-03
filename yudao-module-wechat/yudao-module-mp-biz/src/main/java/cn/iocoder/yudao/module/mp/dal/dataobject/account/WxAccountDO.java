@@ -35,16 +35,14 @@ public class WxAccountDO extends BaseDO {
      * 公众号账户
      */
     private String account;
-    // TODO 亚洲：appId
     /**
      * 公众号 appid
      */
-    private String appid;
-    // TODO 亚洲：appSecret
+    private String appId;
     /**
      * 公众号密钥
      */
-    private String appsecret;
+    private String appSecret;
     /**
      * 公众号url
      */
@@ -56,13 +54,11 @@ public class WxAccountDO extends BaseDO {
     /**
      * 加密密钥
      */
-    // TODO 亚洲：aesKey
-    private String aeskey;
+    private String aesKey;
     /**
      * 二维码图片 URL
      */
-    // TODO 亚洲：qrCodeUrl
-    private String qrUrl;
+    private String qrCodeUrl;
     /**
      * 备注
      */

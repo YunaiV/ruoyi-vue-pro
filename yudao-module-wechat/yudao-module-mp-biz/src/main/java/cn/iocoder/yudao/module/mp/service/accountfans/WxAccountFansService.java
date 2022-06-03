@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.mp.service.accountfans;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansCreateReqVO;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansExportReqVO;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansPageReqVO;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansUpdateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansCreateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansExportReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansPageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.accountfans.WxAccountFansDO;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 

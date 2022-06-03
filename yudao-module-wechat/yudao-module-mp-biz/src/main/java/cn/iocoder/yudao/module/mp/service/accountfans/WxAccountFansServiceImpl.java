@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.mp.service.accountfans;
 
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansCreateReqVO;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansExportReqVO;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansPageReqVO;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansUpdateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansCreateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansExportReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansPageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansUpdateReqVO;
 import cn.iocoder.yudao.module.mp.convert.accountfans.WxAccountFansConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.accountfans.WxAccountFansDO;
 import cn.iocoder.yudao.module.mp.dal.mysql.accountfans.WxAccountFansMapper;

@@ -2,22 +2,28 @@ package cn.iocoder.yudao.module.mp.config;
 
 
 import cn.hutool.extra.spring.SpringUtil;
-import cn.iocoder.yudao.module.mp.admin.account.vo.WxAccountExportReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.account.vo.WxAccountExportReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
 import cn.iocoder.yudao.module.mp.handler.*;
 import cn.iocoder.yudao.module.mp.service.account.WxAccountService;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
+import me.chanjar.weixin.common.redis.JedisWxRedisOps;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.config.impl.WxMpDefaultConfigImpl;
+import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
 import me.chanjar.weixin.mp.constant.WxMpEventConstants;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.List;
 import java.util.Map;
@@ -25,6 +31,7 @@ import java.util.stream.Collectors;
 
 // TODO @芋艿：思考有没更好的处理方式
 @Component
+@EnableConfigurationProperties(WxMpProperties.class)
 @Slf4j
 public class WxMpConfig implements InitializingBean {
 
@@ -33,6 +40,10 @@ public class WxMpConfig implements InitializingBean {
 
     @Autowired
     private WxAccountService wxAccountService;
+    @Autowired
+    private WxMpProperties wxMpProperties;
+
+    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
 
     /**
      * 初始化公众号配置
@@ -43,22 +54,39 @@ public class WxMpConfig implements InitializingBean {
         if (CollectionUtils.isEmpty(wxAccountList)) {
             return;
         }
-        WxMpConfig.init(wxAccountList);
+        WxMpConfig.init(wxAccountList, wxMpProperties);
         log.info("加载公众号配置成功");
     }
 
-    public static void init(List<WxAccountDO> wxAccountDOS) {
+
+    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
+    public void schedulePeriodicRefresh() {
+        initWxConfig();
+    }
+
+    public static void init(List<WxAccountDO> wxAccountDOS, WxMpProperties properties) {
         mpServices = wxAccountDOS.stream().map(wxAccountDO -> {
             // TODO 亚洲：使用 WxMpInMemoryConfigStorage 的话，多节点会不会存在 accessToken 冲突
-            WxMpDefaultConfigImpl configStorage = new WxMpDefaultConfigImpl();
-            configStorage.setAppId(wxAccountDO.getAppid());
-            configStorage.setSecret(wxAccountDO.getAppsecret());
+
+            WxMpDefaultConfigImpl configStorage;
+            if (properties.isUseRedis()) {
+                final WxMpProperties.RedisConfig redisConfig = properties.getRedisConfig();
+                JedisPoolConfig poolConfig = new JedisPoolConfig();
+                JedisPool jedisPool = new JedisPool(poolConfig, redisConfig.getHost(), redisConfig.getPort(),
+                        redisConfig.getTimeout(), redisConfig.getPassword());
+                configStorage = new WxMpRedisConfigImpl(new JedisWxRedisOps(jedisPool), wxAccountDO.getAppId());
+            } else {
+                configStorage = new WxMpDefaultConfigImpl();
+            }
+
+            configStorage.setAppId(wxAccountDO.getAppId());
+            configStorage.setSecret(wxAccountDO.getAppSecret());
             configStorage.setToken(wxAccountDO.getToken());
-            configStorage.setAesKey(wxAccountDO.getAeskey());
+            configStorage.setAesKey(wxAccountDO.getAesKey());
 
             WxMpService service = new WxMpServiceImpl();
             service.setWxMpConfigStorage(configStorage);
-            routers.put(wxAccountDO.getAppid(), newRouter(service));
+            routers.put(wxAccountDO.getAppId(), newRouter(service));
             return service;
         }).collect(Collectors.toMap(s -> s.getWxMpConfigStorage().getAppId(), a -> a, (o, n) -> o));
     }

@@ -1707,6 +1707,729 @@ INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_i
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1265, '客户端创建', 'system:oauth2-client:create', 3, 2, 1263, '', '', '', 0, b'1', b'1', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:23', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1266, '客户端更新', 'system:oauth2-client:update', 3, 3, 1263, '', '', '', 0, b'1', b'1', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:28', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1267, '客户端删除', 'system:oauth2-client:delete', 3, 4, 1263, '', '', '', 0, b'1', b'1', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:33', b'0');
+--微信公众号--
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信公众号粉丝管理', '', 2, 0, 1268,
+    'wx-account-fans', '', 'wechatMp/wxAccountFans/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信公众号粉丝查询', 'wechatMp:wx-account-fans:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信公众号粉丝创建', 'wechatMp:wx-account-fans:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信公众号粉丝更新', 'wechatMp:wx-account-fans:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信公众号粉丝删除', 'wechatMp:wx-account-fans:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信公众号粉丝导出', 'wechatMp:wx-account-fans:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '公众号账户管理', '', 2, 0, 1268,
+    'wx-account', '', 'wechatMp/wxAccount/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '公众号账户查询', 'wechatMp:wx-account:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '公众号账户创建', 'wechatMp:wx-account:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '公众号账户更新', 'wechatMp:wx-account:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '公众号账户删除', 'wechatMp:wx-account:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '公众号账户导出', 'wechatMp:wx-account:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+
+
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '文本模板管理', '', 2, 0, 1268,
+    'wx-text-template', '', 'wechatMp/wxTextTemplate/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '文本模板查询', 'wechatMp:wx-text-template:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '文本模板创建', 'wechatMp:wx-text-template:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '文本模板更新', 'wechatMp:wx-text-template:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '文本模板删除', 'wechatMp:wx-text-template:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '文本模板导出', 'wechatMp:wx-text-template:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签关联管理', '', 2, 0, 1268,
+    'wx-account-fans-tag', '', 'wechatMp/wxAccountFansTag/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签关联查询', 'wechatMp:wx-account-fans-tag:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签关联创建', 'wechatMp:wx-account-fans-tag:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签关联更新', 'wechatMp:wx-account-fans-tag:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签关联删除', 'wechatMp:wx-account-fans-tag:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签关联导出', 'wechatMp:wx-account-fans-tag:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝消息表 管理', '', 2, 0, 1268,
+    'wx-fans-msg', '', 'wechatMp/wxFansMsg/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝消息表 查询', 'wechatMp:wx-fans-msg:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝消息表 创建', 'wechatMp:wx-fans-msg:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝消息表 更新', 'wechatMp:wx-fans-msg:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝消息表 删除', 'wechatMp:wx-fans-msg:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝消息表 导出', 'wechatMp:wx-fans-msg:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复粉丝消息历史表 管理', '', 2, 0, 1268,
+    'wx-fans-msg-res', '', 'wechatMp/wxFansMsgRes/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复粉丝消息历史表 查询', 'wechatMp:wx-fans-msg-res:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复粉丝消息历史表 创建', 'wechatMp:wx-fans-msg-res:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复粉丝消息历史表 更新', 'wechatMp:wx-fans-msg-res:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复粉丝消息历史表 删除', 'wechatMp:wx-fans-msg-res:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复粉丝消息历史表 导出', 'wechatMp:wx-fans-msg-res:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签管理', '', 2, 0, 1268,
+    'wx-fans-tag', '', 'wechatMp/wxFansTag/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签查询', 'wechatMp:wx-fans-tag:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签创建', 'wechatMp:wx-fans-tag:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签更新', 'wechatMp:wx-fans-tag:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签删除', 'wechatMp:wx-fans-tag:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '粉丝标签导出', 'wechatMp:wx-fans-tag:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信素材上传表 管理', '', 2, 0, 1268,
+    'wx-media-upload', '', 'wechatMp/wxMediaUpload/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信素材上传表 查询', 'wechatMp:wx-media-upload:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信素材上传表 创建', 'wechatMp:wx-media-upload:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信素材上传表 更新', 'wechatMp:wx-media-upload:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信素材上传表 删除', 'wechatMp:wx-media-upload:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信素材上传表 导出', 'wechatMp:wx-media-upload:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信菜单管理', '', 2, 0, 1268,
+    'wx-menu', '', 'wechatMp/wxMenu/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信菜单查询', 'wechatMp:wx-menu:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信菜单创建', 'wechatMp:wx-menu:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信菜单更新', 'wechatMp:wx-menu:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信菜单删除', 'wechatMp:wx-menu:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '微信菜单导出', 'wechatMp:wx-menu:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息文章列表表 管理', '', 2, 0, 1268,
+    'wx-news-article-item', '', 'wechatMp/wxNewsArticleItem/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息文章列表表 查询', 'wechatMp:wx-news-article-item:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息文章列表表 创建', 'wechatMp:wx-news-article-item:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息文章列表表 更新', 'wechatMp:wx-news-article-item:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息文章列表表 删除', 'wechatMp:wx-news-article-item:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息文章列表表 导出', 'wechatMp:wx-news-article-item:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息模板管理', '', 2, 0, 1268,
+    'wx-news-template', '', 'wechatMp/wxNewsTemplate/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息模板查询', 'wechatMp:wx-news-template:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息模板创建', 'wechatMp:wx-news-template:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息模板更新', 'wechatMp:wx-news-template:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息模板删除', 'wechatMp:wx-news-template:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '图文消息模板导出', 'wechatMp:wx-news-template:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复关键字管理', '', 2, 0, 1268,
+    'wx-receive-text', '', 'wechatMp/wxReceiveText/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复关键字查询', 'wechatMp:wx-receive-text:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复关键字创建', 'wechatMp:wx-receive-text:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复关键字更新', 'wechatMp:wx-receive-text:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复关键字删除', 'wechatMp:wx-receive-text:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '回复关键字导出', 'wechatMp:wx-receive-text:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '关注欢迎语管理', '', 2, 0, 1268,
+    'wx-subscribe-text', '', 'wechatMp/wxSubscribeText/index', 0
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '关注欢迎语查询', 'wechatMp:wx-subscribe-text:query', 3, 1, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '关注欢迎语创建', 'wechatMp:wx-subscribe-text:create', 3, 2, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '关注欢迎语更新', 'wechatMp:wx-subscribe-text:update', 3, 3, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '关注欢迎语删除', 'wechatMp:wx-subscribe-text:delete', 3, 4, @parentId,
+    '', '', '', 0
+);
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '关注欢迎语导出', 'wechatMp:wx-subscribe-text:export', 3, 5, @parentId,
+    '', '', '', 0
+);
+
+
 COMMIT;
 
 -- ----------------------------
@@ -2651,25 +3374,25 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- 公众号
 DROP TABLE IF EXISTS `wx_account`;
-CREATE TABLE `wx_account`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `name` varchar(100) DEFAULT NULL COMMENT '公众号名称',
-  `account` varchar(100) DEFAULT NULL COMMENT '公众号账户',
-  `appid` varchar(100) DEFAULT NULL COMMENT '公众号appid',
-  `appsecret` varchar(100) DEFAULT NULL COMMENT '公众号密钥',
-  `url` varchar(100) DEFAULT NULL COMMENT '公众号url',
-  `token` varchar(100) DEFAULT NULL COMMENT '公众号token',
-  `aeskey` varchar(300) DEFAULT NULL COMMENT '加密密钥',
-  `qr_url` varchar(200) DEFAULT NULL COMMENT '二维码图片URL',
-  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+CREATE TABLE `wx_account` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '公众号名称',
+  `account` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '公众号账户',
+  `app_id` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '公众号appid',
+  `app_secret` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '公众号密钥',
+  `url` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '公众号url',
+  `token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '公众号token',
+  `aes_key` varchar(300) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '加密密钥',
+  `qr_code_url` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '二维码图片URL',
+  `remark` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  `tenant_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '公众号账户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公众号账户表';
 
 DROP TABLE IF EXISTS `wx_account_fans`;
 CREATE TABLE `wx_account_fans`  (
@@ -2696,199 +3419,199 @@ CREATE TABLE `wx_account_fans`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '微信公众号粉丝表';
 
-    DROP TABLE IF EXISTS `wx_account_fans_tag`;
-    CREATE TABLE `wx_account_fans_tag` (
-            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
-            `openid` varchar(100) DEFAULT NULL COMMENT '用户标识',
-            `tag_id` varchar(32) DEFAULT NULL COMMENT '标签ID',
-            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
-            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `wx_account_fans_tag`;
+CREATE TABLE `wx_account_fans_tag` (
+        `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+        `openid` varchar(100) DEFAULT NULL COMMENT '用户标识',
+        `tag_id` varchar(32) DEFAULT NULL COMMENT '标签ID',
+        `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+        `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+        `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='粉丝标签关联表';
 
-    DROP TABLE IF EXISTS `wx_fans_msg`;
-    CREATE TABLE `wx_fans_msg` (
-            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
-            `openid` varchar(100) DEFAULT NULL COMMENT '用户标识',
-            `nickname` varbinary(2000) DEFAULT NULL COMMENT '昵称',
-            `headimg_url` varchar(500) DEFAULT NULL COMMENT '头像地址',
-            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
-            `msg_type` varchar(32) DEFAULT NULL COMMENT '消息类型',
-            `content` varchar(500) DEFAULT NULL COMMENT '内容',
-            `res_content` text COMMENT '最近一条回复内容',
-            `is_res` varchar(32) DEFAULT NULL COMMENT '是否已回复',
-            `media_id` varchar(100) DEFAULT NULL COMMENT '微信素材ID',
-            `pic_url` varchar(500) DEFAULT NULL COMMENT '微信图片URL',
-            `pic_path` varchar(500) DEFAULT NULL COMMENT '本地图片路径',
-            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `wx_fans_msg`;
+CREATE TABLE `wx_fans_msg` (
+        `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+        `openid` varchar(100) DEFAULT NULL COMMENT '用户标识',
+        `nickname` varbinary(2000) DEFAULT NULL COMMENT '昵称',
+        `headimg_url` varchar(500) DEFAULT NULL COMMENT '头像地址',
+        `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+        `msg_type` varchar(32) DEFAULT NULL COMMENT '消息类型',
+        `content` varchar(500) DEFAULT NULL COMMENT '内容',
+        `res_content` text COMMENT '最近一条回复内容',
+        `is_res` varchar(32) DEFAULT NULL COMMENT '是否已回复',
+        `media_id` varchar(100) DEFAULT NULL COMMENT '微信素材ID',
+        `pic_url` varchar(500) DEFAULT NULL COMMENT '微信图片URL',
+        `pic_path` varchar(500) DEFAULT NULL COMMENT '本地图片路径',
+        `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+        `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8 COMMENT='粉丝消息表 ';
 
-    DROP TABLE IF EXISTS `wx_fans_msg_res`;
-    CREATE TABLE `wx_fans_msg_res` (
-            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
-            `fans_msg_id` varchar(32) DEFAULT NULL COMMENT '粉丝消息ID',
-            `res_content` text COMMENT '回复内容',
-            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `wx_fans_msg_res`;
+CREATE TABLE `wx_fans_msg_res` (
+        `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+        `fans_msg_id` varchar(32) DEFAULT NULL COMMENT '粉丝消息ID',
+        `res_content` text COMMENT '回复内容',
+        `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+        `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COMMENT='回复粉丝消息历史表 ';
 
 
-    DROP TABLE IF EXISTS `wx_fans_tag`;
-    CREATE TABLE `wx_fans_tag` (
-            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
-            `name` varchar(32) DEFAULT NULL COMMENT '标签名称',
-            `count` int(11) DEFAULT NULL COMMENT '粉丝数量',
-            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
-            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `wx_fans_tag`;
+CREATE TABLE `wx_fans_tag` (
+        `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+        `name` varchar(32) DEFAULT NULL COMMENT '标签名称',
+        `count` int(11) DEFAULT NULL COMMENT '粉丝数量',
+        `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+        `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+        `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='粉丝标签表';
 
-    DROP TABLE IF EXISTS `wx_media_upload`;
-    CREATE TABLE `wx_media_upload` (
-            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
-            `type` varchar(32) DEFAULT NULL COMMENT '类型',
-            `url` varchar(500) DEFAULT NULL COMMENT '图片URL',
-            `media_id` varchar(32) DEFAULT NULL COMMENT '素材ID',
-            `thumb_media_id` varchar(32) DEFAULT NULL COMMENT '缩略图素材ID',
-            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
-            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `wx_media_upload`;
+CREATE TABLE `wx_media_upload` (
+        `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+        `type` varchar(32) DEFAULT NULL COMMENT '类型',
+        `url` varchar(500) DEFAULT NULL COMMENT '图片URL',
+        `media_id` varchar(32) DEFAULT NULL COMMENT '素材ID',
+        `thumb_media_id` varchar(32) DEFAULT NULL COMMENT '缩略图素材ID',
+        `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+        `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+        `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='微信素材上传表 ';
 
-    DROP TABLE IF EXISTS `wx_menu`;
-    CREATE TABLE `wx_menu` (
-            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
-            `parent_id` varchar(32) DEFAULT NULL COMMENT '父ID',
-            `menu_name` varchar(32) DEFAULT NULL COMMENT '菜单名称',
-            `menu_type` varchar(32) DEFAULT NULL COMMENT '菜单类型 1文本消息；2图文消息；3网址链接；4小程序',
-            `menu_level` varchar(32) DEFAULT NULL COMMENT '菜单等级',
-            `tpl_id` varchar(32) DEFAULT NULL COMMENT '模板ID',
-            `menu_url` varchar(255) DEFAULT NULL COMMENT '菜单URL',
-            `menu_sort` varchar(32) DEFAULT NULL COMMENT '排序',
-            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
-            `miniprogram_appid` varchar(32) DEFAULT NULL COMMENT '小程序appid',
-            `miniprogram_pagepath` varchar(200) DEFAULT NULL COMMENT '小程序页面路径',
-            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `wx_menu`;
+CREATE TABLE `wx_menu` (
+        `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+        `parent_id` varchar(32) DEFAULT NULL COMMENT '父ID',
+        `menu_name` varchar(32) DEFAULT NULL COMMENT '菜单名称',
+        `menu_type` varchar(32) DEFAULT NULL COMMENT '菜单类型 1文本消息；2图文消息；3网址链接；4小程序',
+        `menu_level` varchar(32) DEFAULT NULL COMMENT '菜单等级',
+        `tpl_id` varchar(32) DEFAULT NULL COMMENT '模板ID',
+        `menu_url` varchar(255) DEFAULT NULL COMMENT '菜单URL',
+        `menu_sort` varchar(32) DEFAULT NULL COMMENT '排序',
+        `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+        `miniprogram_appid` varchar(32) DEFAULT NULL COMMENT '小程序appid',
+        `miniprogram_pagepath` varchar(200) DEFAULT NULL COMMENT '小程序页面路径',
+        `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+        `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='微信菜单表';
 
 
-    DROP TABLE IF EXISTS `wx_news_article_item`;
-    CREATE TABLE `wx_news_article_item` (
-            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
-            `title` varchar(32) DEFAULT NULL COMMENT '标题',
-            `digest` varchar(50) DEFAULT NULL COMMENT '摘要',
-            `author` varchar(32) DEFAULT NULL COMMENT '作者',
-            `show_cover_pic` char(1) DEFAULT NULL COMMENT '是否展示封面图片（0/1）',
-            `thumb_media_id` varchar(50) DEFAULT NULL COMMENT '上传微信，封面图片标识',
-            `content` text COMMENT '内容',
-            `content_source_url` varchar(50) DEFAULT NULL COMMENT '内容链接',
-            `order_no` int(11) DEFAULT NULL COMMENT '文章排序',
-            `pic_path` varchar(255) DEFAULT NULL COMMENT '图片路径',
-            `need_open_comment` varchar(32) DEFAULT NULL COMMENT '是否可以留言',
-            `only_fans_can_comment` varchar(32) DEFAULT NULL COMMENT '是否仅粉丝可以留言',
-            `news_id` varchar(32) DEFAULT NULL COMMENT '图文ID',
-            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
-            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `wx_news_article_item`;
+CREATE TABLE `wx_news_article_item` (
+        `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+        `title` varchar(32) DEFAULT NULL COMMENT '标题',
+        `digest` varchar(50) DEFAULT NULL COMMENT '摘要',
+        `author` varchar(32) DEFAULT NULL COMMENT '作者',
+        `show_cover_pic` char(1) DEFAULT NULL COMMENT '是否展示封面图片（0/1）',
+        `thumb_media_id` varchar(50) DEFAULT NULL COMMENT '上传微信，封面图片标识',
+        `content` text COMMENT '内容',
+        `content_source_url` varchar(50) DEFAULT NULL COMMENT '内容链接',
+        `order_no` int(11) DEFAULT NULL COMMENT '文章排序',
+        `pic_path` varchar(255) DEFAULT NULL COMMENT '图片路径',
+        `need_open_comment` varchar(32) DEFAULT NULL COMMENT '是否可以留言',
+        `only_fans_can_comment` varchar(32) DEFAULT NULL COMMENT '是否仅粉丝可以留言',
+        `news_id` varchar(32) DEFAULT NULL COMMENT '图文ID',
+        `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+        `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+        `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='图文消息文章列表表 ';
 
-    DROP TABLE IF EXISTS `wx_news_template`;
-    CREATE TABLE `wx_news_template` (
-            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键 主键ID',
-            `tpl_name` varchar(32) DEFAULT NULL COMMENT '模板名称',
-            `is_upload` varchar(32) DEFAULT NULL COMMENT '是否已上传微信',
-            `media_id` varchar(50) DEFAULT NULL,
-  `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
-            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `wx_news_template`;
+CREATE TABLE `wx_news_template` (
+        `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键 主键ID',
+        `tpl_name` varchar(32) DEFAULT NULL COMMENT '模板名称',
+        `is_upload` varchar(32) DEFAULT NULL COMMENT '是否已上传微信',
+        `media_id` varchar(50) DEFAULT NULL COMMENT '微信素材ID',
+        `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+        `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+        `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='图文消息模板表';
 
 
-    DROP TABLE IF EXISTS `wx_receive_text`;
-    CREATE TABLE `wx_receive_text` (
-            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
-            `receive_text` varchar(32) DEFAULT NULL COMMENT '关键字',
-            `msg_type` varchar(32) DEFAULT NULL COMMENT '消息类型 1文本消息；2图文消息；',
-            `tpl_id` varchar(32) DEFAULT NULL COMMENT '模板ID',
-            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
-            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `wx_receive_text`;
+CREATE TABLE `wx_receive_text` (
+        `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+        `receive_text` varchar(32) DEFAULT NULL COMMENT '关键字',
+        `msg_type` varchar(32) DEFAULT NULL COMMENT '消息类型 1文本消息；2图文消息；',
+        `tpl_id` varchar(32) DEFAULT NULL COMMENT '模板ID',
+        `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+        `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+        `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='回复关键字表';
 
 
-    DROP TABLE IF EXISTS `wx_subscribe_text`;
-    CREATE TABLE `wx_subscribe_text` (
-            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
-            `msg_type` varchar(32) DEFAULT NULL COMMENT '消息类型 1文本消息；2图文消息；',
-            `tpl_id` varchar(32) DEFAULT NULL COMMENT '模板ID',
-            `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
-            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `wx_subscribe_text`;
+CREATE TABLE `wx_subscribe_text` (
+        `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+        `msg_type` varchar(32) DEFAULT NULL COMMENT '消息类型 1文本消息；2图文消息；',
+        `tpl_id` varchar(32) DEFAULT NULL COMMENT '模板ID',
+        `wx_account_id` varchar(32) DEFAULT NULL COMMENT '微信账号ID',
+        `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+        `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='关注欢迎语表';
 
 
-    DROP TABLE IF EXISTS `wx_text_template`;
-    CREATE TABLE `wx_text_template` (
-            `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
-            `tpl_name` varchar(32) DEFAULT NULL COMMENT '模板名字',
-            `content` varchar(255) DEFAULT NULL COMMENT '模板内容',
-            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-            `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `wx_text_template`;
+CREATE TABLE `wx_text_template` (
+        `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+        `tpl_name` varchar(32) DEFAULT NULL COMMENT '模板名字',
+        `content` varchar(255) DEFAULT NULL COMMENT '模板内容',
+         `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+        `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='文本模板表';

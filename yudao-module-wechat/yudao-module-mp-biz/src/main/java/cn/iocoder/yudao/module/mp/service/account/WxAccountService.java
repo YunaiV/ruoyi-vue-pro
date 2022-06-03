@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.mp.service.account;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.mp.admin.account.vo.WxAccountCreateReqVO;
-import cn.iocoder.yudao.module.mp.admin.account.vo.WxAccountExportReqVO;
-import cn.iocoder.yudao.module.mp.admin.account.vo.WxAccountPageReqVO;
-import cn.iocoder.yudao.module.mp.admin.account.vo.WxAccountUpdateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.account.vo.WxAccountCreateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.account.vo.WxAccountExportReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.account.vo.WxAccountPageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.account.vo.WxAccountUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 

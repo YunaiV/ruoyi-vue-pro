@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.mp.convert.accountfans;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansCreateReqVO;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansExcelVO;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansRespVO;
-import cn.iocoder.yudao.module.mp.admin.accountfans.vo.WxAccountFansUpdateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansCreateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansExcelVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansRespVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.accountfans.WxAccountFansDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

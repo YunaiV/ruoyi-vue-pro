@@ -1,5 +1,19 @@
 package cn.iocoder.yudao.module.mp.handler;
 
+import cn.hutool.core.date.DateUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.mp.builder.TextBuilder;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansCreateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansUpdateReqVO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.accountfans.WxAccountFansDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.subscribetext.WxSubscribeTextDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.texttemplate.WxTextTemplateDO;
+import cn.iocoder.yudao.module.mp.service.account.WxAccountService;
+import cn.iocoder.yudao.module.mp.service.accountfans.WxAccountFansService;
+import cn.iocoder.yudao.module.mp.service.accountfanstag.WxAccountFansTagService;
+import cn.iocoder.yudao.module.mp.service.subscribetext.WxSubscribeTextService;
+import cn.iocoder.yudao.module.mp.service.texttemplate.WxTextTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
@@ -7,15 +21,18 @@ import me.chanjar.weixin.mp.api.WxMpMessageHandler;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import me.chanjar.weixin.mp.bean.result.WxMpUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 @Component
 @Slf4j
 public class SubscribeHandler implements WxMpMessageHandler {
 
-   /* @Autowired
+    @Autowired
     private WxTextTemplateService wxTextTemplateService;
 
     @Autowired
@@ -28,7 +45,7 @@ public class SubscribeHandler implements WxMpMessageHandler {
     private WxAccountFansService wxAccountFansService;
 
     @Autowired
-    private WxAccountFansTagService wxAccountFansTagService;*/
+    private WxAccountFansTagService wxAccountFansTagService;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
@@ -36,7 +53,6 @@ public class SubscribeHandler implements WxMpMessageHandler {
                                     WxSessionManager sessionManager) throws WxErrorException {
 
         log.info("新关注用户 OPENID: " + wxMessage.getFromUser());
-/*
 
         // 获取微信用户基本信息
         try {
@@ -57,15 +73,11 @@ public class SubscribeHandler implements WxMpMessageHandler {
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        wxAccountFansCreateReqVO.setGender(String.valueOf(wxmpUser.getSex()));
                         wxAccountFansCreateReqVO.setLanguage(wxmpUser.getLanguage());
-                        wxAccountFansCreateReqVO.setCountry(wxmpUser.getCountry());
-                        wxAccountFansCreateReqVO.setProvince(wxmpUser.getProvince());
-                        wxAccountFansCreateReqVO.setCity(wxmpUser.getCity());
                         wxAccountFansCreateReqVO.setHeadimgUrl(wxmpUser.getHeadImgUrl());
                         wxAccountFansCreateReqVO.setRemark(wxmpUser.getRemark());
                         wxAccountFansCreateReqVO.setWxAccountId(String.valueOf(wxAccount.getId()));
-                        wxAccountFansCreateReqVO.setWxAccountAppid(wxAccount.getAppid());
+                        wxAccountFansCreateReqVO.setWxAccountAppid(wxAccount.getAppId());
                         wxAccountFansService.createWxAccountFans(wxAccountFansCreateReqVO);
 
                         //process tags
@@ -82,15 +94,11 @@ public class SubscribeHandler implements WxMpMessageHandler {
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        wxAccountFansUpdateReqVO.setGender(String.valueOf(wxmpUser.getSex()));
                         wxAccountFansUpdateReqVO.setLanguage(wxmpUser.getLanguage());
-                        wxAccountFansUpdateReqVO.setCountry(wxmpUser.getCountry());
-                        wxAccountFansUpdateReqVO.setProvince(wxmpUser.getProvince());
-                        wxAccountFansUpdateReqVO.setCity(wxmpUser.getCity());
                         wxAccountFansUpdateReqVO.setHeadimgUrl(wxmpUser.getHeadImgUrl());
                         wxAccountFansUpdateReqVO.setRemark(wxmpUser.getRemark());
                         wxAccountFansUpdateReqVO.setWxAccountId(String.valueOf(wxAccount.getId()));
-                        wxAccountFansUpdateReqVO.setWxAccountAppid(wxAccount.getAppid());
+                        wxAccountFansUpdateReqVO.setWxAccountAppid(wxAccount.getAppId());
                         wxAccountFansService.updateWxAccountFans(wxAccountFansUpdateReqVO);
 
                         //process tags
@@ -122,9 +130,9 @@ public class SubscribeHandler implements WxMpMessageHandler {
             String content = "感谢关注！";//默认
             WxAccountDO wxAccount = wxAccountService.findBy(WxAccountDO::getAccount, wxMessage.getToUser());
             if (wxAccount != null) {
-                WxSubscribeText wxSubscribeText = wxSubscribeTextService.findBy("wxAccountId", String.valueOf(wxAccount.getId()));
+                WxSubscribeTextDO wxSubscribeText = wxSubscribeTextService.findBy(WxSubscribeTextDO::getWxAccountId, String.valueOf(wxAccount.getId()));
                 if (wxSubscribeText != null) {
-                    WxTextTemplate wxTextTemplate = wxTextTemplateService.findById(Integer.parseInt(wxSubscribeText.getTplId()));
+                    WxTextTemplateDO wxTextTemplate = wxTextTemplateService.getWxTextTemplate(Integer.parseInt(wxSubscribeText.getTplId()));
                     if (wxTextTemplate != null) {
                         content = wxTextTemplate.getContent();
                     }
@@ -135,7 +143,6 @@ public class SubscribeHandler implements WxMpMessageHandler {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-*/
 
         return null;
     }

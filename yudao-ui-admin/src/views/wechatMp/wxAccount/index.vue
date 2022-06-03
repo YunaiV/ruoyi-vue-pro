@@ -9,8 +9,8 @@
       <el-form-item label="公众号账户" prop="account">
         <el-input v-model="queryParams.account" placeholder="请输入公众号账户" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="公众号appid" prop="appid">
-        <el-input v-model="queryParams.appid" placeholder="请输入公众号appid" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="公众号appId" prop="appId">
+        <el-input v-model="queryParams.appId" placeholder="请输入公众号appId" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
@@ -40,12 +40,12 @@
       <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="公众号名称" align="center" prop="name" />
       <el-table-column label="公众号账户" align="center" prop="account" />
-      <el-table-column label="公众号appid" align="center" prop="appid" />
-      <el-table-column label="公众号密钥" align="center" prop="appsecret" />
+      <el-table-column label="公众号appId" align="center" prop="appId"/>
+      <el-table-column label="公众号密钥" align="center" prop="appSecret"/>
       <el-table-column label="公众号url" align="center" prop="url" />
       <el-table-column label="公众号token" align="center" prop="token" />
-      <el-table-column label="加密密钥" align="center" prop="aeskey" />
-      <el-table-column label="二维码图片URL" align="center" prop="qrUrl" />
+      <el-table-column label="加密密钥" align="center" prop="aesKey"/>
+      <el-table-column label="二维码图片URL" align="center" prop="qrCodeUrl"/>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
@@ -74,17 +74,17 @@
         <el-form-item label="公众号账户" prop="account">
           <el-input v-model="form.account" placeholder="请输入公众号账户" />
         </el-form-item>
-        <el-form-item label="公众号appid" prop="appid">
-          <el-input v-model="form.appid" placeholder="请输入公众号appid" />
+        <el-form-item label="公众号appId" prop="appId">
+          <el-input v-model="form.appId" placeholder="请输入公众号appId"/>
         </el-form-item>
-        <el-form-item label="公众号密钥" prop="appsecret">
-          <el-input v-model="form.appsecret" placeholder="请输入公众号密钥" />
+        <el-form-item label="公众号密钥" prop="appSecret">
+          <el-input v-model="form.appSecret" placeholder="请输入公众号密钥"/>
         </el-form-item>
         <el-form-item label="公众号token" prop="token">
           <el-input v-model="form.token" placeholder="请输入公众号token" />
         </el-form-item>
-        <el-form-item label="加密密钥" prop="aeskey">
-          <el-input v-model="form.aeskey" placeholder="请输入加密密钥" />
+        <el-form-item label="加密密钥" prop="aesKey">
+          <el-input v-model="form.aesKey" placeholder="请输入加密密钥"/>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请输入备注" />
@@ -128,7 +128,7 @@ export default {
         pageSize: 10,
         name: null,
         account: null,
-        appid: null,
+        appId: null,
       },
       // 表单参数
       form: {},
@@ -165,10 +165,10 @@ export default {
         id: undefined,
         name: undefined,
         account: undefined,
-        appid: undefined,
-        appsecret: undefined,
+        appId: undefined,
+        appSecret: undefined,
         token: undefined,
-        aeskey: undefined,
+        aesKey: undefined,
         remark: undefined,
       };
       this.resetForm("form");
