@@ -22,6 +22,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.Collections;
 import java.util.List;
 
+import static springfox.documentation.builders.RequestHandlerSelectors.basePackage;
+
 /**
  * Swagger2 自动配置类
  *
@@ -56,7 +58,7 @@ public class YudaoSwaggerAutoConfiguration {
                 .apiInfo(apiInfo(properties))
                 // 设置扫描指定 package 包下的
                 .select()
-//                .apis(basePackage(properties.getBasePackage()))
+                .apis(basePackage(properties.getBasePackage()))
 //                .apis(basePackage("cn.iocoder.yudao.module.system")) // 可用于 swagger 无法展示时使用
                 .paths(PathSelectors.any())
                 .build()
