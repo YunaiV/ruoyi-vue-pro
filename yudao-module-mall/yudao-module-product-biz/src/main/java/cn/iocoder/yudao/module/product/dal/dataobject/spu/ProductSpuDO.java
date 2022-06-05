@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.spu;
 
+import cn.hutool.log.Log;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -27,7 +28,7 @@ public class ProductSpuDO extends BaseDO {
      * 主键
      */
     @TableId
-    private Integer id;
+    private Long id;
     /**
      * 商品名称
      */
@@ -48,7 +49,7 @@ public class ProductSpuDO extends BaseDO {
      * 商品主图地址,* 数组，以逗号分隔,最多上传15张
      */
     // TODO franky：List<String>
-    private List<String> picUrls;
+    private String picUrls;
     /**
      * 排序字段
      */

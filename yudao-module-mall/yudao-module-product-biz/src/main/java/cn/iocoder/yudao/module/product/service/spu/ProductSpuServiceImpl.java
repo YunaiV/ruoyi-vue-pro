@@ -1,7 +1,13 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.service.category.CategoryService;
+import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
+import javax.validation.Valid;
+
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
@@ -27,10 +33,25 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Resource
     private ProductSpuMapper ProductSpuMapper;
 
+    @Resource
+    private CategoryService categoryService;
+
+    @Resource
+    private ProductSkuService productSkuService;
+
     @Override
-    public Integer createSpu(ProductSpuCreateReqVO createReqVO) {
+    @Transactional
+    public Long createSpu(ProductSpuCreateReqVO createReqVO) {
+        // 校验分类
+        categoryService.validatedCategoryById(createReqVO.getCategoryId());
+        // 校验SKU
+        List<ProductSkuCreateReqVO> skuCreateReqList = createReqVO.getProductSkuCreateReqVOS();
+        productSkuService.validatedSkuReq(skuCreateReqList);
         // 插入
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
+        skuCreateReqList.forEach(p -> {
+            p.setSpuId(spu.getId());
+        });
         ProductSpuMapper.insert(spu);
         // 返回
         return spu.getId();
@@ -46,26 +67,26 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public void deleteSpu(Integer id) {
+    public void deleteSpu(Long id) {
         // 校验存在
         this.validateSpuExists(id);
         // 删除
         ProductSpuMapper.deleteById(id);
     }
 
-    private void validateSpuExists(Integer id) {
+    private void validateSpuExists(Long id) {
         if (ProductSpuMapper.selectById(id) == null) {
             throw exception(SPU_NOT_EXISTS);
         }
     }
 
     @Override
-    public ProductSpuDO getSpu(Integer id) {
+    public ProductSpuDO getSpu(Long id) {
         return ProductSpuMapper.selectById(id);
     }
 
     @Override
-    public List<ProductSpuDO> getSpuList(Collection<Integer> ids) {
+    public List<ProductSpuDO> getSpuList(Collection<Long> ids) {
         return ProductSpuMapper.selectBatchIds(ids);
     }
 

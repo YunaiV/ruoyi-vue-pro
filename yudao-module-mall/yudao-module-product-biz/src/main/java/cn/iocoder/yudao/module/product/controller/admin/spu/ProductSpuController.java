@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu;
 
+import nonapi.io.github.classgraph.utils.LogNode;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -38,7 +39,7 @@ public class ProductSpuController {
     @PostMapping("/create")
     @ApiOperation("创建商品spu")
     @PreAuthorize("@ss.hasPermission('product:spu:create')")
-    public CommonResult<Integer> createSpu(@Valid @RequestBody ProductSpuCreateReqVO createReqVO) {
+    public CommonResult<Long> createSpu(@Valid @RequestBody ProductSpuCreateReqVO createReqVO) {
         return success(spuService.createSpu(createReqVO));
     }
 
@@ -52,27 +53,27 @@ public class ProductSpuController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除商品spu")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Integer.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:spu:delete')")
-    public CommonResult<Boolean> deleteSpu(@RequestParam("id") Integer id) {
+    public CommonResult<Boolean> deleteSpu(@RequestParam("id") Long id) {
         spuService.deleteSpu(id);
         return success(true);
     }
 
     @GetMapping("/get")
     @ApiOperation("获得商品spu")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Integer.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<SpuRespVO> getSpu(@RequestParam("id") Integer id) {
+    public CommonResult<SpuRespVO> getSpu(@RequestParam("id") Long id) {
         ProductSpuDO spu = spuService.getSpu(id);
         return success(ProductSpuConvert.INSTANCE.convert(spu));
     }
 
     @GetMapping("/list")
     @ApiOperation("获得商品spu列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
+    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<List<SpuRespVO>> getSpuList(@RequestParam("ids") Collection<Integer> ids) {
+    public CommonResult<List<SpuRespVO>> getSpuList(@RequestParam("ids") Collection<Long> ids) {
         List<ProductSpuDO> list = spuService.getSpuList(ids);
         return success(ProductSpuConvert.INSTANCE.convertList(list));
     }

@@ -13,6 +13,6 @@ public class ProductSkuUpdateReqVO extends ProductSkuBaseVO {
 
     @ApiModelProperty(value = "主键", required = true)
     @NotNull(message = "主键不能为空")
-    private Integer id;
+    private Long id;
 
 }

@@ -46,7 +46,7 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
         ProductSkuCreateReqVO reqVO = randomPojo(ProductSkuCreateReqVO.class);
 
         // 调用
-        Integer skuId = ProductSkuService.createSku(reqVO);
+        Long skuId = ProductSkuService.createSku(reqVO);
         // 断言
         assertNotNull(skuId);
         // 校验记录的属性是否正确
@@ -86,7 +86,7 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
         ProductSkuDO dbSku = randomPojo(ProductSkuDO.class);
         ProductSkuMapper.insert(dbSku);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        Integer id = dbSku.getId();
+        Long id = dbSku.getId();
 
         // 调用
         ProductSkuService.deleteSku(id);
@@ -97,7 +97,7 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteSku_notExists() {
         // 准备参数
-        Integer id = 1;
+        Long id = 1L;
 
         // 调用, 并断言异常
         assertServiceException(() -> ProductSkuService.deleteSku(id), SKU_NOT_EXISTS);

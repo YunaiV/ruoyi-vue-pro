@@ -19,7 +19,7 @@ public interface ProductSpuService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Integer createSpu(@Valid ProductSpuCreateReqVO createReqVO);
+    Long createSpu(@Valid ProductSpuCreateReqVO createReqVO);
 
     /**
      * 更新商品spu
@@ -33,7 +33,7 @@ public interface ProductSpuService {
      *
      * @param id 编号
      */
-    void deleteSpu(Integer id);
+    void deleteSpu(Long id);
 
     /**
      * 获得商品spu
@@ -41,7 +41,7 @@ public interface ProductSpuService {
      * @param id 编号
      * @return 商品spu
      */
-    ProductSpuDO getSpu(Integer id);
+    ProductSpuDO getSpu(Long id);
 
     /**
      * 获得商品spu列表
@@ -49,7 +49,7 @@ public interface ProductSpuService {
      * @param ids 编号
      * @return 商品spu列表
      */
-    List<ProductSpuDO> getSpuList(Collection<Integer> ids);
+    List<ProductSpuDO> getSpuList(Collection<Long> ids);
 
     /**
      * 获得商品spu分页

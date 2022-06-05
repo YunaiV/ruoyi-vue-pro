@@ -27,7 +27,7 @@ public class ProductSkuDO extends BaseDO {
      * 主键
      */
     @TableId
-    private Integer id;
+    private Long id;
     /**
      * spu编号
      */
@@ -36,7 +36,7 @@ public class ProductSkuDO extends BaseDO {
      * 规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]
      */
     // TODO franky：可以定义一个内部的 Property 类，然后 List<Property>
-    private List<Property> properties;
+    private String properties;
     /**
      * 销售价格，单位：分
      */
@@ -61,12 +61,6 @@ public class ProductSkuDO extends BaseDO {
      * 状态： 0-正常 1-禁用
      */
     private Integer status;
-
-    @Data
-    public static class Property {
-        private Integer propertyId;
-        private Integer valueId;
-    }
 
 }
 

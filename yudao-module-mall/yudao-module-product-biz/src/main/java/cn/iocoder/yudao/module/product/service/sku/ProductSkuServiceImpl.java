@@ -5,6 +5,8 @@ import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -28,7 +30,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     private ProductSkuMapper ProductSkuMapper;
 
     @Override
-    public Integer createSku(ProductSkuCreateReqVO createReqVO) {
+    public Long createSku(ProductSkuCreateReqVO createReqVO) {
         // 插入
         ProductSkuDO sku = ProductSkuConvert.INSTANCE.convert(createReqVO);
         ProductSkuMapper.insert(sku);
@@ -46,26 +48,26 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public void deleteSku(Integer id) {
+    public void deleteSku(Long id) {
         // 校验存在
         this.validateSkuExists(id);
         // 删除
         ProductSkuMapper.deleteById(id);
     }
 
-    private void validateSkuExists(Integer id) {
+    private void validateSkuExists(Long id) {
         if (ProductSkuMapper.selectById(id) == null) {
             throw exception(SKU_NOT_EXISTS);
         }
     }
 
     @Override
-    public ProductSkuDO getSku(Integer id) {
+    public ProductSkuDO getSku(Long id) {
         return ProductSkuMapper.selectById(id);
     }
 
     @Override
-    public List<ProductSkuDO> getSkuList(Collection<Integer> ids) {
+    public List<ProductSkuDO> getSkuList(Collection<Long> ids) {
         return ProductSkuMapper.selectBatchIds(ids);
     }
 
@@ -79,4 +81,11 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         return ProductSkuMapper.selectList(exportReqVO);
     }
 
+    @Override
+    public void validatedSkuReq(List<ProductSkuCreateReqVO> skuCreateReqList) {
+        // 校验规格属性以及规格值是否存在
+        List<Integer> propertyIds = skuCreateReqList.stream().flatMap(p -> p.getProperties().stream()).map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toList());
+
+        // 校验是否有重复的sku组合
+    }
 }

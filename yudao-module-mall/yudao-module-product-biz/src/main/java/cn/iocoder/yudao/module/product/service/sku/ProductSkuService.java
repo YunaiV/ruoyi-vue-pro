@@ -19,7 +19,7 @@ public interface ProductSkuService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Integer createSku(@Valid ProductSkuCreateReqVO createReqVO);
+    Long createSku(@Valid ProductSkuCreateReqVO createReqVO);
 
     /**
      * 更新商品sku
@@ -33,7 +33,7 @@ public interface ProductSkuService {
      *
      * @param id 编号
      */
-    void deleteSku(Integer id);
+    void deleteSku(Long id);
 
     /**
      * 获得商品sku
@@ -41,7 +41,7 @@ public interface ProductSkuService {
      * @param id 编号
      * @return 商品sku
      */
-    ProductSkuDO getSku(Integer id);
+    ProductSkuDO getSku(Long id);
 
     /**
      * 获得商品sku列表
@@ -49,7 +49,7 @@ public interface ProductSkuService {
      * @param ids 编号
      * @return 商品sku列表
      */
-    List<ProductSkuDO> getSkuList(Collection<Integer> ids);
+    List<ProductSkuDO> getSkuList(Collection<Long> ids);
 
     /**
      * 获得商品sku分页
@@ -67,4 +67,9 @@ public interface ProductSkuService {
      */
     List<ProductSkuDO> getSkuList(ProductSkuExportReqVO exportReqVO);
 
+    /**
+     *对sku的组合的属性等进行合法性校验
+     * @param skuCreateReqList sku组合的集合
+     */
+    void validatedSkuReq(List<ProductSkuCreateReqVO> skuCreateReqList);
 }

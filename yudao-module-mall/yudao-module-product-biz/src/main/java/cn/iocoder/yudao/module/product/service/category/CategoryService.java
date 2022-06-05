@@ -76,4 +76,10 @@ public interface CategoryService {
      * @return 商品分类列表
      */
     List<CategoryDO> getCategoryTreeList(CategoryTreeListReqVO treeListReqVO);
+
+    /**
+     *  验证选择的分类的合法性
+     * @param categoryId 分类id
+     */
+    void validatedCategoryById(Long categoryId);
 }

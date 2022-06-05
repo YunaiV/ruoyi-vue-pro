@@ -65,11 +65,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private CategoryDO validateCategoryExists(Long id, ErrorCode errorCode) {
+        if (id == 0) {
+            return new CategoryDO().setId(id);
+        }
         CategoryDO categoryDO = categoryMapper.selectById(id);
         if (categoryDO == null) {
             throw exception(errorCode);
         }
         return categoryDO;
+    }
+
+    @Override
+    public void validatedCategoryById(Long categoryId) {
+        this.validateCategoryExists(categoryId, CATEGORY_NOT_EXISTS);
     }
 
     @Override

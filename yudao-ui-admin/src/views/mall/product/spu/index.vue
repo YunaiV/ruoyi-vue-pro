@@ -95,7 +95,7 @@
           <el-input v-model="form.categoryId" placeholder="请输入分类id" />
         </el-form-item>
         <el-form-item label="商品主图地址" prop="picUrls">
-          <el-input v-model="form.picUrls" placeholder="请输入商品主图地址" />
+          <ImageUpload v-model="form.picUrls" :limit="1"/>
         </el-form-item>
         <el-form-item label="排序字段" prop="sort">
           <el-input v-model="form.sort" placeholder="请输入排序字段" />

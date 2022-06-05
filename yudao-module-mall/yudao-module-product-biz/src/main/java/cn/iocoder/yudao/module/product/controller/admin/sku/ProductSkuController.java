@@ -38,7 +38,7 @@ public class ProductSkuController {
     @PostMapping("/create")
     @ApiOperation("创建商品sku")
     @PreAuthorize("@ss.hasPermission('product:sku:create')")
-    public CommonResult<Integer> createSku(@Valid @RequestBody ProductSkuCreateReqVO createReqVO) {
+    public CommonResult<Long> createSku(@Valid @RequestBody ProductSkuCreateReqVO createReqVO) {
         return success(ProductSkuService.createSku(createReqVO));
     }
 
@@ -52,18 +52,18 @@ public class ProductSkuController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除商品sku")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Integer.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:sku:delete')")
-    public CommonResult<Boolean> deleteSku(@RequestParam("id") Integer id) {
+    public CommonResult<Boolean> deleteSku(@RequestParam("id") Long id) {
         ProductSkuService.deleteSku(id);
         return success(true);
     }
 
     @GetMapping("/get")
     @ApiOperation("获得商品sku")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Integer.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:sku:query')")
-    public CommonResult<ProductSkuRespVO> getSku(@RequestParam("id") Integer id) {
+    public CommonResult<ProductSkuRespVO> getSku(@RequestParam("id") Long id) {
         ProductSkuDO sku = ProductSkuService.getSku(id);
         return success(ProductSkuConvert.INSTANCE.convert(sku));
     }
@@ -72,7 +72,7 @@ public class ProductSkuController {
     @ApiOperation("获得商品sku列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('product:sku:query')")
-    public CommonResult<List<ProductSkuRespVO>> getSkuList(@RequestParam("ids") Collection<Integer> ids) {
+    public CommonResult<List<ProductSkuRespVO>> getSkuList(@RequestParam("ids") Collection<Long> ids) {
         List<ProductSkuDO> list = ProductSkuService.getSkuList(ids);
         return success(ProductSkuConvert.INSTANCE.convertList(list));
     }

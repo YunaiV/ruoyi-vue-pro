@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
+
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 @ApiModel("管理后台 - 商品spu创建 Request VO")
@@ -10,5 +13,9 @@ import javax.validation.constraints.*;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSpuCreateReqVO extends ProductSpuBaseVO {
+
+    @ApiModelProperty(value = "sku组合")
+    @Valid
+    List<ProductSkuCreateReqVO> productSkuCreateReqVOS;
 
 }

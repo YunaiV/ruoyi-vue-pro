@@ -46,7 +46,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         ProductSpuCreateReqVO reqVO = randomPojo(ProductSpuCreateReqVO.class);
 
         // 调用
-        Integer spuId = spuService.createSpu(reqVO);
+        Long spuId = spuService.createSpu(reqVO);
         // 断言
         assertNotNull(spuId);
         // 校验记录的属性是否正确
@@ -86,7 +86,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         ProductSpuDO dbSpu = randomPojo(ProductSpuDO.class);
         ProductSpuMapper.insert(dbSpu);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        Integer id = dbSpu.getId();
+        Long id = dbSpu.getId();
 
         // 调用
         spuService.deleteSpu(id);
@@ -97,7 +97,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteSpu_notExists() {
         // 准备参数
-        Integer id = 1;
+        Long id = 1L;
 
         // 调用, 并断言异常
         assertServiceException(() -> spuService.deleteSpu(id), SPU_NOT_EXISTS);

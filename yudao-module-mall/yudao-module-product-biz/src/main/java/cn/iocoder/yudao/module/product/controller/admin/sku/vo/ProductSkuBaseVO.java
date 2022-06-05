@@ -16,8 +16,8 @@ public class ProductSkuBaseVO {
     @NotNull(message = "spu编号不能为空")
     private Long spuId;
 
-    @ApiModelProperty(value = "规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]", required = true)
-    @NotNull(message = "规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]不能为空")
+    @ApiModelProperty(value = "规格值数组-json格式， [{propertyId: , valueId: }, {propertyId: , valueId: }]", required = true)
+    @NotNull(message = "规格值数组-json格式， [{propertyId: , valueId: }, {propertyId: , valueId: }]不能为空")
     private List<Property> properties;
 
     @ApiModelProperty(value = "销售价格，单位：分", required = true)
