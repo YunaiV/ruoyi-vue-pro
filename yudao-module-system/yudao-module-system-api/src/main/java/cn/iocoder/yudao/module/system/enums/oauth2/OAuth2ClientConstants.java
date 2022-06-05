@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.enums.auth;
+package cn.iocoder.yudao.module.system.enums.oauth2;
 
 /**
  * OAuth2.0 客户端的通用枚举
