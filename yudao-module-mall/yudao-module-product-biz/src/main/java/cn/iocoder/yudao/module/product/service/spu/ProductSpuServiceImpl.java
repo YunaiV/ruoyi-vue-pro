@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.service.category.CategoryService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -47,12 +51,16 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验SKU
         List<ProductSkuCreateReqVO> skuCreateReqList = createReqVO.getProductSkuCreateReqVOS();
         productSkuService.validatedSkuReq(skuCreateReqList);
-        // 插入
+        // 插入SPU
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
+        ProductSpuMapper.insert(spu);
+        // sku关联SPU属性
         skuCreateReqList.forEach(p -> {
             p.setSpuId(spu.getId());
         });
-        ProductSpuMapper.insert(spu);
+        List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertSkuDOList(skuCreateReqList);
+        // 批量插入sku
+        productSkuService.batchSave(skuDOList);
         // 返回
         return spu.getId();
     }

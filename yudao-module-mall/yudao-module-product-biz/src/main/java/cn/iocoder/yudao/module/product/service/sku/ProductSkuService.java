@@ -72,4 +72,11 @@ public interface ProductSkuService {
      * @param skuCreateReqList sku组合的集合
      */
     void validatedSkuReq(List<ProductSkuCreateReqVO> skuCreateReqList);
+
+    /**
+     * 批量保存sku
+     * @param skuDOList sku对象集合
+     * @return
+     */
+    void batchSave(List<ProductSkuDO> skuDOList);
 }

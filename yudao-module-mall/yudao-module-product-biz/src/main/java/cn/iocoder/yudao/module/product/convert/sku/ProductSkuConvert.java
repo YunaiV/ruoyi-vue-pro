@@ -37,6 +37,8 @@ public interface ProductSkuConvert {
 
     List<ProductSkuRespVO> convertList(List<ProductSkuDO> list);
 
+    List<ProductSkuDO> convertSkuDOList(List<ProductSkuCreateReqVO> list);
+
     PageResult<ProductSkuRespVO> convertPage(PageResult<ProductSkuDO> page);
 
     List<ProductSkuExcelVO> convertList02(List<ProductSkuDO> list);

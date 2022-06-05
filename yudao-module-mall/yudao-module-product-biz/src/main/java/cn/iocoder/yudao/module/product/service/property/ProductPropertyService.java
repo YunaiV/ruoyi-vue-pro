@@ -76,4 +76,10 @@ public interface ProductPropertyService {
 
     ProductPropertyRespVO getPropertyResp(Long id);
 
+    /**
+     * 根据数据名id集合查询属性名以及属性值的集合
+     * @param propertyIds 属性名id集合
+     * @return
+     */
+    List<ProductPropertyRespVO> selectByIds(List<Integer> propertyIds);
 }

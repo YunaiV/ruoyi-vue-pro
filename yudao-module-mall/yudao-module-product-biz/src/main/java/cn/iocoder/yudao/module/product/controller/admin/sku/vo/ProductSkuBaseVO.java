@@ -45,7 +45,9 @@ public class ProductSkuBaseVO {
 
     @Data
     public static class Property {
+        @NotNull(message = "规格属性名id不能为空")
         private Integer propertyId;
+        @NotNull(message = "规格属性值id不能为空")
         private Integer valueId;
     }
 

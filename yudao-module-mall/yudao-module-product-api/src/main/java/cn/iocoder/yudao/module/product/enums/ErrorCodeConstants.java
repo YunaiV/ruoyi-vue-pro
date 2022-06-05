@@ -28,4 +28,5 @@ public interface ErrorCodeConstants {
 
     // ========== 商品sku 1008006000 ==========
     ErrorCode SKU_NOT_EXISTS = new ErrorCode(1008006000, "商品sku不存在");
+    ErrorCode SKU_PROPERTIES_DUPLICATED = new ErrorCode(1008006001, "商品sku的属性组合存在重复");
 }

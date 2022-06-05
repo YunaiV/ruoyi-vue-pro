@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.service.property;
 
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.*;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyCreateReqVO;
@@ -113,13 +114,13 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         //获取属性列表
         PageResult<ProductPropertyDO> pageResult = productPropertyMapper.selectPage(pageReqVO);
         PageResult<ProductPropertyRespVO> propertyRespVOPageResult = ProductPropertyConvert.INSTANCE.convertPage(pageResult);
-        List<Long> propertyIds = propertyRespVOPageResult.getList().stream().map(x -> x.getId()).collect(Collectors.toList());
+        List<Long> propertyIds = propertyRespVOPageResult.getList().stream().map(ProductPropertyRespVO::getId).collect(Collectors.toList());
 
         //获取属性值列表
         List<ProductPropertyValueDO> productPropertyValueDOList = productPropertyValueService.getPropertyValueListByPropertyId(propertyIds);
         List<ProductPropertyValueRespVO> propertyValueRespVOList = ProductPropertyValueConvert.INSTANCE.convertList(productPropertyValueDOList);
         //组装一对多
-        propertyRespVOPageResult.getList().stream().forEach(x->{
+        propertyRespVOPageResult.getList().forEach(x->{
             Long propertyId = x.getId();
             List<ProductPropertyValueRespVO> valueDOList = propertyValueRespVOList.stream().filter(v -> v.getPropertyId().equals(propertyId)).collect(Collectors.toList());
             x.setPropertyValueList(valueDOList);
@@ -140,4 +141,8 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         return propertyRespVO;
     }
 
+    @Override
+    public List<ProductPropertyRespVO> selectByIds(List<Integer> propertyIds) {
+        return ProductPropertyConvert.INSTANCE.convertList(productPropertyMapper.selectBatchIds(propertyIds));
+    }
 }
