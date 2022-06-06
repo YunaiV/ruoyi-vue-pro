@@ -88,6 +88,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         return productSkuMapper.selectList(exportReqVO);
     }
 
+    // TODO @franky：这个方法，貌似实现的还是有点问题哈。例如说，throw 异常，后面还执行逻辑~
     @Override
     public void validatedSkuReq(List<ProductSkuCreateReqVO> skuCreateReqList) {
         List<ProductSkuBaseVO.Property> skuPropertyList = skuCreateReqList.stream().flatMap(p -> p.getProperties().stream()).collect(Collectors.toList());

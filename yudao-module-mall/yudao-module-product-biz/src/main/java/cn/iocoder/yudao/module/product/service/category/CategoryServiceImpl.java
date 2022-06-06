@@ -65,6 +65,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private CategoryDO validateCategoryExists(Long id, ErrorCode errorCode) {
+        // TODO franky：0 要枚举哈
         if (id == 0) {
             return new CategoryDO().setId(id);
         }
