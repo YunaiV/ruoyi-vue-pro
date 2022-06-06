@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.mp.dal.dataobject.texttemplate;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.*;
-
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-
+// TODO @亚洲：消息使用统一的表存储，思考下咋做哈。
 /**
  * 文本模板 DO
  *

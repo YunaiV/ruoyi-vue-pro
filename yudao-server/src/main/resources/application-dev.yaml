@@ -204,7 +204,7 @@ justauth:
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
 wx:
   mp:
-    useRedis: false
+    useRedis: false # TODO @亚洲：要使用 redis 哈，和默认的 redis 使用同一个
     defaultContent: \u60A8\u597D\uFF0C\u6709\u4EC0\u4E48\u95EE\u9898\uFF1F
     redisConfig:
       host: 127.0.0.1
