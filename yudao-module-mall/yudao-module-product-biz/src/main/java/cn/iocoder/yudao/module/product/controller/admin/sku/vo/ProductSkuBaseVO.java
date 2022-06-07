@@ -12,8 +12,7 @@ import javax.validation.constraints.*;
 @Data
 public class ProductSkuBaseVO {
 
-    @ApiModelProperty(value = "spu编号", required = true)
-    @NotNull(message = "spu编号不能为空")
+    @ApiModelProperty(value = "spu编号")
     private Long spuId;
 
     @ApiModelProperty(value = "规格值数组-json格式， [{propertyId: , valueId: }, {propertyId: , valueId: }]", required = true)
@@ -46,9 +45,9 @@ public class ProductSkuBaseVO {
     @Data
     public static class Property {
         @NotNull(message = "规格属性名id不能为空")
-        private Integer propertyId;
+        private Long propertyId;
         @NotNull(message = "规格属性值id不能为空")
-        private Integer valueId;
+        private Long valueId;
     }
 
 }

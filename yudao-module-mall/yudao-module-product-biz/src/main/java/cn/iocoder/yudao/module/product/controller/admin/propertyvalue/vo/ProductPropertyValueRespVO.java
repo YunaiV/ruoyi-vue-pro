@@ -11,7 +11,7 @@ import io.swagger.annotations.*;
 public class ProductPropertyValueRespVO extends ProductPropertyValueBaseVO {
 
     @ApiModelProperty(value = "主键", required = true)
-    private Integer id;
+    private Long id;
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;

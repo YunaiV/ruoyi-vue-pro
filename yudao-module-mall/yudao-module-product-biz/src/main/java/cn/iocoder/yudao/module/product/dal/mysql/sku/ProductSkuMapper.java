@@ -5,6 +5,7 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
@@ -45,4 +46,9 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
                 .orderByDesc(ProductSkuDO::getId));
     }
 
+    default List<ProductSkuDO> selectBySpuId(Long spuId) {
+        return selectList(new LambdaQueryWrapperX<ProductSkuDO>()
+                .eqIfPresent(ProductSkuDO::getSpuId, spuId)
+        );
+    }
 }

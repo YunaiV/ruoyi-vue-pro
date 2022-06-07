@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
@@ -15,5 +16,7 @@ public class SpuRespVO extends ProductSpuBaseVO {
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
+
+    List<ProductSkuRespVO> productSkuRespVOS;
 
 }

@@ -92,7 +92,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     public void validatedSkuReq(List<ProductSkuCreateReqVO> skuCreateReqList) {
         List<ProductSkuBaseVO.Property> skuPropertyList = skuCreateReqList.stream().flatMap(p -> p.getProperties().stream()).collect(Collectors.toList());
         // 校验规格属性以及规格值是否存在
-        List<Integer> propertyIds = skuPropertyList.stream().map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toList());
+        List<Long> propertyIds = skuPropertyList.stream().map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toList());
         List<ProductPropertyRespVO> propertyAndValueList = productPropertyService.selectByIds(propertyIds);
         if (propertyAndValueList.isEmpty())
             throw ServiceExceptionUtil.exception(PROPERTY_NOT_EXISTS);
@@ -121,5 +121,10 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     @Override
     public void batchSave(List<ProductSkuDO> skuDOList) {
         productSkuMapper.insertBatch(skuDOList);
+    }
+
+    @Override
+    public List<ProductSkuDO> getSkusBySpuId(Long spuId) {
+        return productSkuMapper.selectBySpuId(spuId);
     }
 }

@@ -41,7 +41,7 @@ public interface ProductSpuService {
      * @param id 编号
      * @return 商品spu
      */
-    ProductSpuDO getSpu(Long id);
+    SpuRespVO getSpu(Long id);
 
     /**
      * 获得商品spu列表

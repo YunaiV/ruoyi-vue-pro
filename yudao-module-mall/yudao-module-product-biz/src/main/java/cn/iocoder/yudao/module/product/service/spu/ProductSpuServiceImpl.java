@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.service.category.CategoryService;
@@ -89,8 +90,12 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public ProductSpuDO getSpu(Long id) {
-        return ProductSpuMapper.selectById(id);
+    public SpuRespVO getSpu(Long id) {
+        ProductSpuDO spu = ProductSpuMapper.selectById(id);
+        SpuRespVO spuVO = ProductSpuConvert.INSTANCE.convert(spu);
+        List<ProductSkuRespVO> skuReqs = ProductSkuConvert.INSTANCE.convertList( productSkuService.getSkusBySpuId(id));
+        spuVO.setProductSkuRespVOS(skuReqs);
+        return spuVO;
     }
 
     @Override

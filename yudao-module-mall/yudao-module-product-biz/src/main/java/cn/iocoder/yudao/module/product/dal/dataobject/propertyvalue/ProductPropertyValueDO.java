@@ -27,7 +27,7 @@ public class ProductPropertyValueDO extends BaseDO {
      * 主键
      */
     @TableId
-    private Integer id;
+    private Long id;
     /**
      * 规格键 id
      *

@@ -79,4 +79,12 @@ public interface ProductSkuService {
      * @return
      */
     void batchSave(List<ProductSkuDO> skuDOList);
+
+    /**
+     * 获得商品sku 集合
+     *
+     * @param spuId spu 编号
+     * @return 商品sku 集合
+     */
+    List<ProductSkuDO> getSkusBySpuId(Long spuId);
 }

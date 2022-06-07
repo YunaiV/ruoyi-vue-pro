@@ -65,8 +65,7 @@ public class ProductSpuController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<SpuRespVO> getSpu(@RequestParam("id") Long id) {
-        ProductSpuDO spu = spuService.getSpu(id);
-        return success(ProductSpuConvert.INSTANCE.convert(spu));
+        return success(spuService.getSpu(id));
     }
 
     @GetMapping("/list")

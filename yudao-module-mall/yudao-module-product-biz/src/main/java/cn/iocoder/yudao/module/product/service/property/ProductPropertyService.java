@@ -81,5 +81,5 @@ public interface ProductPropertyService {
      * @param propertyIds 属性名id集合
      * @return
      */
-    List<ProductPropertyRespVO> selectByIds(List<Integer> propertyIds);
+    List<ProductPropertyRespVO> selectByIds(List<Long> propertyIds);
 }
