@@ -1,31 +1,31 @@
 package cn.iocoder.yudao.module.product.controller.admin.sku;
 
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+
+// TODO @franky：中英文之间要有空格哈。商品 sku
 @Api(tags = "管理后台 - 商品sku")
 @RestController
 @RequestMapping("/product/sku")

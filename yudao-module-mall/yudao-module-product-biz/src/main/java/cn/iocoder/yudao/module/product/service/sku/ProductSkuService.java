@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuExportReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 商品sku Service 接口
@@ -67,8 +72,10 @@ public interface ProductSkuService {
      */
     List<ProductSkuDO> getSkuList(ProductSkuExportReqVO exportReqVO);
 
+    // TODO @franky：validateSkus;skuCreateReqList => list
     /**
-     *对sku的组合的属性等进行合法性校验
+     * 对 sku 的组合的属性等进行合法性校验
+     *
      * @param skuCreateReqList sku组合的集合
      */
     void validatedSkuReq(List<ProductSkuCreateReqVO> skuCreateReqList);
@@ -76,7 +83,7 @@ public interface ProductSkuService {
     /**
      * 批量保存sku
      * @param skuDOList sku对象集合
-     * @return
+     * @return // TODO @franky：这里的 return 可以去掉；方法名可以改成 createSkus(list)
      */
     void batchSave(List<ProductSkuDO> skuDOList);
 
