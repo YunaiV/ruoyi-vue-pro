@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.Product
 import cn.iocoder.yudao.module.product.convert.property.ProductPropertyConvert;
 import cn.iocoder.yudao.module.product.convert.propertyvalue.ProductPropertyValueConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.propertyvalue.ProductPropertyValueDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.mysql.property.ProductPropertyMapper;
 import cn.iocoder.yudao.module.product.dal.mysql.propertyvalue.ProductPropertyValueMapper;
 import org.springframework.stereotype.Service;

@@ -90,8 +90,8 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     // TODO @franky：这个方法，貌似实现的还是有点问题哈。例如说，throw 异常，后面还执行逻辑~
     @Override
-    public void validatedSkuReq(List<ProductSkuCreateReqVO> skuCreateReqList) {
-        List<ProductSkuBaseVO.Property> skuPropertyList = skuCreateReqList.stream().flatMap(p -> p.getProperties().stream()).collect(Collectors.toList());
+    public void validateSkus(List<ProductSkuCreateReqVO> list) {
+        List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> p.getProperties().stream()).collect(Collectors.toList());
         // 校验规格属性以及规格值是否存在
         List<Long> propertyIds = skuPropertyList.stream().map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toList());
         List<ProductPropertyRespVO> propertyAndValueList = productPropertyService.selectByIds(propertyIds);
@@ -109,7 +109,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
             }
         });
         // 校验是否有重复的sku组合
-        List<List<ProductSkuBaseVO.Property>> skuProperties = skuCreateReqList.stream().map(ProductSkuBaseVO::getProperties).collect(Collectors.toList());
+        List<List<ProductSkuBaseVO.Property>> skuProperties = list.stream().map(ProductSkuBaseVO::getProperties).collect(Collectors.toList());
         Set<String> skuPropertiesConvertSet = new HashSet<>();
         skuProperties.forEach(p -> {
             // 组合属性值id为 1~2~3.... 形式的字符串，通过set的特性判断是否有重复的组合
@@ -120,7 +120,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public void batchSave(List<ProductSkuDO> skuDOList) {
+    public void createSkus(List<ProductSkuDO> skuDOList) {
         productSkuMapper.insertBatch(skuDOList);
     }
 

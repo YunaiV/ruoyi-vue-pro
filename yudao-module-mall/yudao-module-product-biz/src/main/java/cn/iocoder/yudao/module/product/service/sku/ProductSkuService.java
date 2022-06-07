@@ -72,20 +72,18 @@ public interface ProductSkuService {
      */
     List<ProductSkuDO> getSkuList(ProductSkuExportReqVO exportReqVO);
 
-    // TODO @franky：validateSkus;skuCreateReqList => list
     /**
      * 对 sku 的组合的属性等进行合法性校验
      *
-     * @param skuCreateReqList sku组合的集合
+     * @param list sku组合的集合
      */
-    void validatedSkuReq(List<ProductSkuCreateReqVO> skuCreateReqList);
+    void validateSkus(List<ProductSkuCreateReqVO> list);
 
     /**
      * 批量保存sku
-     * @param skuDOList sku对象集合
-     * @return // TODO @franky：这里的 return 可以去掉；方法名可以改成 createSkus(list)
+     * @param list sku对象集合
      */
-    void batchSave(List<ProductSkuDO> skuDOList);
+    void createSkus(List<ProductSkuDO> list);
 
     /**
      * 获得商品sku 集合

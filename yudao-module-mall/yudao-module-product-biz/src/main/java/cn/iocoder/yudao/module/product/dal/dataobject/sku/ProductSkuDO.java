@@ -35,7 +35,6 @@ public class ProductSkuDO extends BaseDO {
     /**
      * 规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]
      */
-    // TODO franky：可以定义一个内部的 Property 类，然后 List<Property>
     private String properties;
     /**
      * 销售价格，单位：分

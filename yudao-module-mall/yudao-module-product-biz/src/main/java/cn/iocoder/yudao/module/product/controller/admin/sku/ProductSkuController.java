@@ -25,8 +25,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-// TODO @franky：中英文之间要有空格哈。商品 sku
-@Api(tags = "管理后台 - 商品sku")
+@Api(tags = "管理后台-商品 sku")
 @RestController
 @RequestMapping("/product/sku")
 @Validated

@@ -4,7 +4,7 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.product.dal.dataobject.propertyvalue.ProductPropertyValueDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

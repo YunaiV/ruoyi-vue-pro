@@ -16,9 +16,8 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSpuCreateReqVO extends ProductSpuBaseVO {
 
-    // TODO @franky：这种可以缩写下，skus
     @ApiModelProperty(value = "sku组合")
     @Valid
-    List<ProductSkuCreateReqVO> productSkuCreateReqVOS;
+    List<ProductSkuCreateReqVO> skus;
 
 }

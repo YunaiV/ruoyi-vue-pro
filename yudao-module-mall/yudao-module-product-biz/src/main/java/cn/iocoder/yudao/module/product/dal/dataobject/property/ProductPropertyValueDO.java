@@ -1,13 +1,12 @@
-package cn.iocoder.yudao.module.product.dal.dataobject.propertyvalue;
+package cn.iocoder.yudao.module.product.dal.dataobject.property;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-// TODO @franky：包放到 property 中
+
 /**
  * 规格值 DO
  *
