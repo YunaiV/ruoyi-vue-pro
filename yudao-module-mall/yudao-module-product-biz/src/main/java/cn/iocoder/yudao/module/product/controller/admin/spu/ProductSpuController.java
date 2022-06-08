@@ -80,8 +80,7 @@ public class ProductSpuController {
     @ApiOperation("获得商品spu分页")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<PageResult<SpuRespVO>> getSpuPage(@Valid SpuPageReqVO pageVO) {
-        PageResult<ProductSpuDO> pageResult = spuService.getSpuPage(pageVO);
-        return success(ProductSpuConvert.INSTANCE.convertPage(pageResult));
+        return success(spuService.getSpuPage(pageVO));
     }
 
     @GetMapping("/export-excel")

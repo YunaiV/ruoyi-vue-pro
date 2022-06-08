@@ -20,6 +20,6 @@ public class SpuUpdateReqVO extends ProductSpuBaseVO {
 
     @ApiModelProperty(value = "sku组合")
     @Valid
-    List<ProductSkuCreateReqVO> productSkuCreateReqVOS;
+    List<ProductSkuCreateReqVO> skus;
 
 }

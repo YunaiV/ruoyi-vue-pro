@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.service.category.CategoryService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
@@ -67,20 +68,31 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
+    @Transactional
     public void updateSpu(SpuUpdateReqVO updateReqVO) {
-        // 校验存在
+        // 校验 spu 是否存在
         this.validateSpuExists(updateReqVO.getId());
+        // 校验分类
+        categoryService.validatedCategoryById(updateReqVO.getCategoryId());
+        // 校验SKU
+        List<ProductSkuCreateReqVO> skuCreateReqList = updateReqVO.getSkus();
+        productSkuService.validateSkus(skuCreateReqList);
         // 更新
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
         ProductSpuMapper.updateById(updateObj);
+        // 更新 sku
+        productSkuService.updateSkus(updateObj.getId(), updateReqVO.getSkus());
     }
 
     @Override
+    @Transactional
     public void deleteSpu(Long id) {
         // 校验存在
         this.validateSpuExists(id);
-        // 删除
+        // 删除 SPU
         ProductSpuMapper.deleteById(id);
+        // 删除关联的 SKU
+        productSkuService.deleteSkuBySpuId(id);
     }
 
     private void validateSpuExists(Long id) {
@@ -93,8 +105,10 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public SpuRespVO getSpu(Long id) {
         ProductSpuDO spu = ProductSpuMapper.selectById(id);
         SpuRespVO spuVO = ProductSpuConvert.INSTANCE.convert(spu);
-        List<ProductSkuRespVO> skuReqs = ProductSkuConvert.INSTANCE.convertList( productSkuService.getSkusBySpuId(id));
-        spuVO.setProductSkuRespVOS(skuReqs);
+        if (null != spuVO) {
+            List<ProductSkuRespVO> skuReqs = ProductSkuConvert.INSTANCE.convertList(productSkuService.getSkusBySpuId(id));
+            spuVO.setSkus(skuReqs);
+        }
         return spuVO;
     }
 
@@ -104,8 +118,17 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public PageResult<ProductSpuDO> getSpuPage(SpuPageReqVO pageReqVO) {
-        return ProductSpuMapper.selectPage(pageReqVO);
+    public PageResult<SpuRespVO> getSpuPage(SpuPageReqVO pageReqVO) {
+        PageResult<SpuRespVO> spuVOs = ProductSpuConvert.INSTANCE.convertPage(ProductSpuMapper.selectPage(pageReqVO));
+        // 查询 sku 的信息
+        List<Long> spuIds = spuVOs.getList().stream().map(SpuRespVO::getId).collect(Collectors.toList());
+        List<ProductSkuRespVO> skus = ProductSkuConvert.INSTANCE.convertList(productSkuService.getSkusBySpuIds(spuIds));
+        Map<Long, List<ProductSkuRespVO>> skuMap = skus.stream().collect(Collectors.groupingBy(ProductSkuRespVO::getSpuId));
+        // 将 spu 和 sku 进行组装
+        spuVOs.getList().forEach(p -> {
+            p.setSkus(skuMap.get(p.getId()));
+        });
+        return spuVOs;
     }
 
     @Override

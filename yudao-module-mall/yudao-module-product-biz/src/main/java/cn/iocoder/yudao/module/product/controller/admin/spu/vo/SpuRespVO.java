@@ -12,11 +12,11 @@ import io.swagger.annotations.*;
 public class SpuRespVO extends ProductSpuBaseVO {
 
     @ApiModelProperty(value = "主键", required = true)
-    private Integer id;
+    private Long id;
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
-    List<ProductSkuRespVO> productSkuRespVOS;
+    List<ProductSkuRespVO> skus;
 
 }

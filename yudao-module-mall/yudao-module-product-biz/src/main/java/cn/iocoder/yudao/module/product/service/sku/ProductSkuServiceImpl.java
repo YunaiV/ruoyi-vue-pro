@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -89,14 +90,16 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     // TODO @franky：这个方法，貌似实现的还是有点问题哈。例如说，throw 异常，后面还执行逻辑~
+    // TODO @艿艿 咳咳，throw 那里我是偷懒省略了{}，哈哈，我加上，然后我调试下，在优化下
     @Override
     public void validateSkus(List<ProductSkuCreateReqVO> list) {
         List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> p.getProperties().stream()).collect(Collectors.toList());
         // 校验规格属性以及规格值是否存在
         List<Long> propertyIds = skuPropertyList.stream().map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toList());
         List<ProductPropertyRespVO> propertyAndValueList = productPropertyService.selectByIds(propertyIds);
-        if (propertyAndValueList.isEmpty())
+        if (propertyAndValueList.isEmpty()) {
             throw ServiceExceptionUtil.exception(PROPERTY_NOT_EXISTS);
+        }
         Map<Long, ProductPropertyRespVO> propertyMap = propertyAndValueList.stream().collect(Collectors.toMap(ProductPropertyRespVO::getId, p -> p));
         skuPropertyList.forEach(p -> {
             ProductPropertyRespVO productPropertyRespVO = propertyMap.get(p.getPropertyId());
@@ -126,6 +129,55 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     public List<ProductSkuDO> getSkusBySpuId(Long spuId) {
-        return productSkuMapper.selectBySpuId(spuId);
+        return productSkuMapper.selectBySpuIds(Collections.singletonList(spuId));
+    }
+
+    @Override
+    public List<ProductSkuDO> getSkusBySpuIds(List<Long> spuIds) {
+        return productSkuMapper.selectBySpuIds(spuIds);
+    }
+
+    @Override
+    public void deleteSkuBySpuId(Long spuId) {
+        productSkuMapper.deleteBySpuId(spuId);
+    }
+
+    @Override
+    @Transactional
+    public void updateSkus(Long spuId, List<ProductSkuCreateReqVO> skus) {
+        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertSkuDOList(skus);
+        // 查询 spu 下已经存在的 sku 的集合
+        List<ProductSkuDO> existsSkus = productSkuMapper.selectBySpuIds(Collections.singletonList(spuId));
+        Map<Long, ProductSkuDO> existsSkuMap = existsSkus.stream().collect(Collectors.toMap(ProductSkuDO::getId, p -> p));
+
+        // 拆分三个集合， 新插入的， 需要更新的，需要删除的
+        List<ProductSkuDO> insertSkus = new ArrayList<>();
+        List<ProductSkuDO> updateSkus = new ArrayList<>();
+        List<ProductSkuDO> deleteSkus = new ArrayList<>();
+
+        allUpdateSkus.forEach(p -> {
+            if (null != p.getId()) {
+                if (existsSkuMap.get(p.getId()) != null) {
+                    updateSkus.add(p);
+                    return;
+                }
+                deleteSkus.add(p);
+                return;
+            }
+            p.setSpuId(spuId);
+            insertSkus.add(p);
+        });
+
+        if (insertSkus.size() > 0) {
+            productSkuMapper.insertBatch(insertSkus);
+        }
+
+        if (updateSkus.size() > 0) {
+            updateSkus.forEach(p -> productSkuMapper.updateById(p));
+        }
+
+        if (deleteSkus.size() > 0) {
+            productSkuMapper.deleteBatchIds(deleteSkus.stream().map(ProductSkuDO::getId).collect(Collectors.toList()));
+        }
     }
 }

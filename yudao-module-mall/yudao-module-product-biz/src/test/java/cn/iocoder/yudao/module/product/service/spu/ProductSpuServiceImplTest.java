@@ -159,7 +159,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
        reqVO.setEndCreateTime(null);
 
        // 调用
-       PageResult<ProductSpuDO> pageResult = spuService.getSpuPage(reqVO);
+       PageResult<SpuRespVO> pageResult = spuService.getSpuPage(reqVO);
        // 断言
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());

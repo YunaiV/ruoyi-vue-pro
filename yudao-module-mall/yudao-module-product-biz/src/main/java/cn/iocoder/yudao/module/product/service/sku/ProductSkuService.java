@@ -92,4 +92,24 @@ public interface ProductSkuService {
      * @return 商品sku 集合
      */
     List<ProductSkuDO> getSkusBySpuId(Long spuId);
+
+    /**
+     *
+     * @param spuIds spu 编码集合
+     * @return  商品 sku 集合
+     */
+    List<ProductSkuDO> getSkusBySpuIds(List<Long> spuIds);
+
+    /**
+     * 通过 spuId 删除 sku 信息
+     * @param spuId spu 编码
+     */
+    void deleteSkuBySpuId(Long spuId);
+
+    /**
+     * 根据 spuId 更新 spu 下的 sku 信息
+     * @param spuId spu 编码
+     * @param skus sku 的集合
+     */
+    void updateSkus(Long spuId, List<ProductSkuCreateReqVO> skus);
 }

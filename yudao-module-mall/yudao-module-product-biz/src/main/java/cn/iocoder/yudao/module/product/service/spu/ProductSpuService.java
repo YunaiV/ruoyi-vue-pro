@@ -57,7 +57,7 @@ public interface ProductSpuService {
      * @param pageReqVO 分页查询
      * @return 商品spu分页
      */
-    PageResult<ProductSpuDO> getSpuPage(SpuPageReqVO pageReqVO);
+    PageResult<SpuRespVO> getSpuPage(SpuPageReqVO pageReqVO);
 
     /**
      * 获得商品spu列表, 用于 Excel 导出
