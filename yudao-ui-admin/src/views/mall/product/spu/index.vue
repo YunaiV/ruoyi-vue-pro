@@ -111,31 +111,33 @@
         <el-form-item label="商品规格">
           <el-button size="mini" @click="shopTagInput()">添加规格</el-button>
           <div v-for="(tag, tagIndex) in skuTags" :key="tagIndex">
-            <span>{{tag.tagName}}</span>
-            <el-button class="button-new-tag" type="text"  icon="el-icon-delete" @click="removeTag(tagIndex)">删除</el-button>
+            <span>{{tag.name}}</span>
+            <el-button style="margin-left: 10px" class="button-new-tag" type="text" icon="el-icon-delete"
+                       @click="removeTag(tagIndex)">删除
+            </el-button>
             <br/>
             <el-tag
-              v-for="(tagItem, tagItemIndex) in tag.tagItems"
-              :key="tagItem.valueId"
-              closable
-              :disable-transitions="false"
-              @close="handleTagClose(tagIndex, tagItemIndex)">
-              {{tagItem.propValue}}
+              v-for="(tagItem, tagItemIndex) in tag.selectValues"
+              :key="tagItem"
+              style="margin-right: 10px"
+              :disable-transitions="false">
+              {{tagItem}}
             </el-tag>
-            <el-input
-              class="input-new-tag"
-              v-if="tagItemInputs[tagIndex] && tagItemInputs[tagIndex].visible"
-              v-model="tagItemInputs[tagIndex].value"
-              :ref="`saveTagInput${tagIndex}`"
-              size="small"
-              @keyup.enter.native="handleInputConfirm(tagIndex)"
-              @blur="handleInputConfirm(tagIndex)">
-            </el-input>
+            <!--            <el-input-->
+            <!--              class="input-new-tag"-->
+            <!--              v-if="tagItemInputs[tagIndex] && tagItemInputs[tagIndex].visible"-->
+            <!--              v-model="tagItemInputs[tagIndex].value"-->
+            <!--              :ref="`saveTagInput${tagIndex}`"-->
+            <!--              size="small"-->
+            <!--              @keyup.enter.native="handleInputConfirm(tagIndex)"-->
+            <!--              @blur="handleInputConfirm(tagIndex)">-->
+            <!--            </el-input>-->
           </div>
         </el-form-item>
         <el-form-item label="规格名" v-show="isShowTagInput">
           <el-col :span="8">
-            <el-select v-model="addTagInput.name" filterable allow-create default-first-option placeholder="请选择" @change="handleTagClick">
+            <el-select v-model="addTagInput.name" filterable allow-create default-first-option placeholder="请选择"
+                       @change="handleTagClick">
               <el-option
                 v-for="item in unUseTags"
                 :key="item.id"
@@ -147,12 +149,13 @@
         </el-form-item>
         <el-form-item label="规格值" v-show="isShowTagInput">
           <el-col :span="8">
-            <el-select v-model="addTagInput.selectValues" multiple filterable allow-create default-first-option placeholder="请选择">
+            <el-select v-model="addTagInput.selectValues" multiple filterable allow-create default-first-option
+                       placeholder="请选择">
               <el-option
                 v-for="item in dbTagValues"
-                :key="item.valueId"
-                :label="item.propValue"
-                :value="item.propValue">
+                :key="item.id"
+                :label="item.name"
+                :value="item.name">
               </el-option>
             </el-select>
           </el-col>
@@ -161,7 +164,90 @@
           <el-button size="mini" type="primary" @click="addTag()" v-show="isShowTagInput">确定</el-button>
           <el-button size="mini" @click="hideTagInput()" v-show="isShowTagInput">取消</el-button>
         </el-form-item>
-
+        <el-form-item v-if="form.skus.length>0">
+          <el-table
+            :data="form.skus"
+            border
+            style="width: 100%; margin-top: 20px"
+            :span-method="tableSpanMethod">
+            <el-table-column v-for="(leftTitle, index) in skuTags" :key="index" :label="leftTitle.name">
+              <template slot-scope="scope">
+                {{scope.row.propertyChildNames[index]}}
+              </template>
+            </el-table-column>
+            <el-table-column v-if="skuTags.length"
+                             prop="picUrl"
+                             label="sku图片"
+                             width="180">
+              <template slot-scope="scope">
+                <ImageUpload v-model="scope.row.picUrl" :limit="1">
+                </ImageUpload>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="prodName"
+              label="条形码"
+              width="250" v-if="skuTags.length">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.barCode" type="textarea" :disabled="scope.row.status==1"></el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="price"
+              label="销售价">
+              <template slot-scope="scope">
+                <el-input-number
+                  size="small"
+                  v-model="scope.row.price"
+                  controls-position="right"
+                  :precision="2"
+                  :max="1000000000"
+                  :min="0.01"
+                  :disabled="scope.row.status==1">
+                </el-input-number>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="oriPrice"
+              label="成本价">
+              <template slot-scope="scope">
+                <el-input-number
+                  size="small"
+                  v-model="scope.row.costPrice"
+                  controls-position="right"
+                  :precision="2"
+                  :max="1000000000"
+                  :min="0.01"
+                  :disabled="scope.row.status==1">
+                </el-input-number>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="oriPrice"
+              label="原价">
+              <template slot-scope="scope">
+                <el-input-number
+                  size="small"
+                  v-model="scope.row.originalPrice"
+                  controls-position="right"
+                  :precision="2"
+                  :max="1000000000"
+                  :min="0.01"
+                  :disabled="scope.row.status==1">
+                </el-input-number>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="操作">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" @click="changeSkuStatus(`${scope.$index}`)" v-if="scope.row.status==0">
+                  正常
+                </el-button>
+                <el-button type="text" size="small" @click="changeSkuStatus(`${scope.$index}`)" v-else>已禁用</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
         <el-form-item label="排序字段" prop="sort">
           <el-input v-model="form.sort" placeholder="请输入排序字段"/>
         </el-form-item>
@@ -199,30 +285,42 @@
         listCategory,
         updateCategory
     } from "@/api/mall/product/category";
-    import { createProperty, updateProperty, deleteProperty, getProperty, getPropertyPage, exportPropertyExcel } from "@/api/mall/product/property";
+    import {
+        createProperty,
+        updateProperty,
+        deleteProperty,
+        getProperty,
+        getPropertyPage,
+        exportPropertyExcel
+    } from "@/api/mall/product/property";
 
     import Editor from '@/components/Editor';
     import ImageUpload from '@/components/ImageUpload';
+
     export default {
         name: "Spu",
         components: {
-            Editor,ImageUpload
+            Editor, ImageUpload
         },
         data() {
             return {
-                dbTagValues:[],
-                unUseTags:[],
-                propertyPageList:[],
+                tableLeftTitles: [],
+                dbTagValues: [],
+                allhistoryTags: [],
+                unUseTags: [],
+                propertyPageList: [],
                 isShowTagInput: false,
                 addTagInput: {
                     name: '',
-                    selectValues: []
+                    propertyId: '',
+                    selectValues: [],
+                    selectValueIds: [],
                 },
-                skuTags:[],
+                skuTags: [],
                 propName: {
                     checkStrictly: true,
-                    label:'name',
-                    value:'id'
+                    label: 'name',
+                    value: 'id'
                 },
                 categoryList: [],
                 // 遮罩层
@@ -256,7 +354,22 @@
                     status: null,
                 },
                 // 表单参数
-                form: {},
+                form: {
+                    id: undefined,
+                    name: undefined,
+                    sellPoint: undefined,
+                    description: undefined,
+                    categoryId: undefined,
+                    categoryIds: [],
+                    picUrls: undefined,
+                    sort: undefined,
+                    likeCount: undefined,
+                    price: undefined,
+                    quantity: undefined,
+                    status: undefined,
+                    isShowTagInput: undefined,
+                    skus:[],
+                },
                 // 表单校验
                 rules: {
                     sellPoint: [{required: true, message: "卖点不能为空", trigger: "blur"}],
@@ -264,38 +377,183 @@
                     categoryIds: [{required: true, message: "分类id不能为空", trigger: "blur"}],
                     picUrls: [{required: true, message: "商品主图地址", trigger: "blur"}],
                     sort: [{required: true, message: "排序字段不能为空", trigger: "blur"}],
-                }
+                },
+                tagIndex:0,
             };
         },
         created() {
+
             this.getList();
-            this.getListCategory();
-            this.getPropertyPageList();
+
         },
         methods: {
-            addTag(){
+            getTableSpecData() {
+                return this.value
+            },
+            tableSpanMethod({row, column, rowIndex, columnIndex}) {
 
             },
-            hideTagInput(){
+            changeSkuStatus(tagIndex) {
+                if(this.form.skus[tagIndex].status == 0){
+                    this.form.skus[tagIndex].status = 1 ;
+                }else {
+                    this.form.skus[tagIndex].status = 0 ;
+                }
 
             },
-            shopTagInput(){
+            skuAddProdName() {
+                if (this.initing) {
+                    return
+                }
+                let skuList = []
+                for (let i = 0; i < this.value.length; i++) {
+                    const sku = Object.assign({}, this.value[i])
+                    if (!sku.properties) {
+                        return
+                    }
+                    sku.skuName = ''
+                    let properties = sku.properties.split(';')
+                    for (const propertiesKey in properties) {
+                        sku.skuName += properties[propertiesKey].split(':')[1] + ' '
+                    }
+                    sku.prodName = this.prodName + ' ' + sku.skuName
+                    skuList.push(sku)
+                }
+                this.$emit('input', skuList)
+            },
+            handleTagClose(tagIndex, tagItemIndex) {
 
             },
-            removeTag(row){
+            //确定添加sku规格
+            addTag() {
 
+                let skus = this.unUseTags.map(function (item, index) {
+                    return item.name
+                });
+                console.log("skus=="+JSON.stringify(skus))
+                let index = skus.indexOf(this.addTagInput.name);
+                console.log("index=="+index)
+                console.log("skus[index].id=="+this.unUseTags[index].id)
+                console.log("this.unUseTags[index].propertyValueList=="+JSON.stringify(this.unUseTags[index].propertyValueList))
+                this.addTagInput.propertyId = this.unUseTags[index].id;
+                for (let i = 0; i < this.addTagInput.selectValues.length; i++) {
+                    for (let j = 0; j < this.unUseTags[index].propertyValueList.length; j++) {
+                        if (this.addTagInput.selectValues[i] == this.unUseTags[index].propertyValueList[j].name) {
+                            this.addTagInput.selectValueIds.push(this.unUseTags[index].propertyValueList[j].id)
+                        }
+                    }
+                }
+                let addTagInput = JSON.parse(JSON.stringify(this.addTagInput))
+                console.log("addTagInput=="+JSON.stringify(addTagInput))
+                this.skuTags.push(addTagInput);
+                this.unUseTags.splice(index, 1);
+                this.isShowTagInput = false;
+                this.getTable();
             },
-            handleTagClick(row){
+            getTable(){
+                this.form.skus=[];
+                let skuTags = JSON.parse(JSON.stringify(this.skuTags));
+                let sku1s = [];
+                let skuIds = [];
+                let propertyIds = [];
+                let propertyNames = [];
+                for (let i = 0; i < skuTags.length; i++) {
+                    sku1s.push(skuTags[i].selectValues);
+                   skuIds.push(skuTags[i].selectValueIds);
+                   propertyIds.push(skuTags[i].propertyId);
+                   propertyNames.push(skuTags[i].name);
+                }
+                let skuAll = sku1s.reduce((x,y) =>{
+                    let arr = [];
+                    x.forEach(m => y.forEach(y => arr.push(m.concat([y]))))
+                    return arr;
+                },[[]])
+                console.log(skuAll);
 
+                let skuIdAll = skuIds.reduce((x,y) =>{
+                    let arr = [];
+                    x.forEach(m => y.forEach(y => arr.push(m.concat([y]))))
+                    return arr;
+                },[[]])
+                console.log(skuIdAll);
+                for (let i = 0; i < skuAll.length; i++) {
+                    let han = {
+                        propertyNames:propertyNames,
+                        propertyIds:propertyIds,
+                        propertyChildNames:skuAll[i],
+                        propertyChildIds:skuIdAll[i],
+                        properties: [],
+                        picUrl: '',
+                        costPrice: '',
+                        originalPrice: '',
+                        spuId: '',
+                        prodName: '',
+                        price: '',
+                        barCode: '',
+                        status: '0',
+                    }
+                    this.form.skus.push(han);
+                }
+                this.form.skus.forEach(x=>{
+                    x.properties=[];
+                    for (let i = 0; i <x.propertyIds.length ; i++) {
+                        x.properties.push({
+                            propertyId:x.propertyIds[i],
+                            valueId:x.propertyChildIds[i]
+                        })
+                    }
+                })
+
+                console.log("this.skus=="+JSON.stringify(this.form.skus))
+            },
+            hideTagInput() {
+                this.isShowTagInput = false;
+                this.addTagInput = {
+                    name: '',
+                    propertyId: '',
+                    selectValues: [],
+                    selectValueIds: [],
+                };
+            },
+            shopTagInput() {
+                if (this.unUseTags.length <= 0) {
+                    return this.$message.error("规格已经添加完毕")
+                }
+                this.isShowTagInput = true;
+                this.addTagInput = {
+                    name: '',
+                    propertyId: '',
+                    selectValues: [],
+                    selectValueIds: [],
+                };
+            },
+            //删除已选的规格
+            removeTag(row) {
+                let skus = this.allhistoryTags.map(function (item, index) {
+                    return item.name
+                })
+                let index = skus.indexOf(this.skuTags[row].name);
+                this.unUseTags.push(this.allhistoryTags[index]);
+                this.skuTags.splice(row, 1);
+                this.getTable();
+            },
+            handleTagClick(row) {
+                for (let i = 0; i < this.propertyPageList.length; i++) {
+                    if (row == this.propertyPageList[i].name) {
+                        this.dbTagValues = this.propertyPageList[i].propertyValueList
+                    }
+                }
             },
             /** 查询规格 */
             getPropertyPageList() {
                 // 执行查询
                 getPropertyPage().then(response => {
                     this.propertyPageList = response.data.list;
-                    this.unUseTags= this.propertyPageList.map(function (item,index) {
+
+                    this.unUseTags = this.propertyPageList.map(function (item, index) {
                         return item
                     })
+                    this.allhistoryTags = JSON.parse(JSON.stringify(this.unUseTags));
                     console.log(this.propertyPageList)
                 });
             },
@@ -327,6 +585,7 @@
             },
             /** 表单重置 */
             reset() {
+
                 this.form = {
                     id: undefined,
                     name: undefined,
@@ -340,9 +599,10 @@
                     price: undefined,
                     quantity: undefined,
                     status: undefined,
-                    isShowTagInput:undefined,
-
+                    isShowTagInput: undefined,
+                    skus:[],
                 };
+                this.skuTags=[];
                 this.resetForm("form");
             },
             /** 搜索按钮操作 */
@@ -361,13 +621,31 @@
                 this.reset();
                 this.open = true;
                 this.title = "添加商品spu";
+                this.getListCategory();
+                this.getPropertyPageList();
             },
             /** 修改按钮操作 */
             handleUpdate(row) {
                 this.reset();
                 const id = row.id;
                 getSpu(id).then(response => {
-                    this.form = response.data;
+                    let dataSpu = response.data;
+                    this.form = {
+                        id: dataSpu.id,
+                        name: dataSpu.name,
+                        sellPoint: dataSpu.sellPoint,
+                        description: dataSpu.sellPoint,
+                        categoryId: dataSpu.sellPoint,
+                        categoryIds: [],
+                        picUrls: dataSpu.picUrls,
+                        sort: dataSpu.sort,
+                        likeCount: dataSpu.likeCount,
+                        price: dataSpu.price,
+                        quantity: dataSpu.quantity,
+                        status: dataSpu.status,
+                        isShowTagInput:undefined,
+                        skus:dataSpu.productSkuRespVOS,
+                    };
                     this.open = true;
                     this.title = "修改商品spu";
                 });
@@ -380,7 +658,9 @@
                     if (!valid) {
                         return;
                     }
-                    this.form.categoryId= this.form.categoryIds[(this.form.categoryIds.length-1)]
+                    this.form.picUrls = this.form.picUrls.split(',');
+                    this.form.categoryId = this.form.categoryIds[(this.form.categoryIds.length - 1)];
+                    this.form.status = Number(this.form.status);
                     // 修改的提交
                     if (this.form.id != null) {
                         updateSpu(this.form).then(response => {
@@ -429,3 +709,24 @@
         }
     };
 </script>
+<style lang="scss">
+  .app-container {
+    .el-tag + .el-tag {
+      margin-left: 10px;
+    }
+
+    .button-new-tag {
+      margin-left: 10px;
+      height: 32px;
+      line-height: 30px;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .input-new-tag {
+      width: 90px;
+      margin-left: 10px;
+      vertical-align: bottom;
+    }
+  }
+</style>
