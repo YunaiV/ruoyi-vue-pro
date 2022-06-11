@@ -75,12 +75,6 @@ yudao:
     version: 1.0.0
     base-package: cn.iocoder.yudao
   web:
-    admin-api:
-      prefix: /admin-api
-      controller: '**.controller.admin.**'
-    app-api:
-      prefix: /app-api
-      controller: '**.controller.app.**'
     admin-ui:
       url: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
   swagger:
