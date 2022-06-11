@@ -229,7 +229,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         reqDTO.setTraceId(TracerUtils.getTraceId());
         reqDTO.setUserId(userId);
         reqDTO.setUserType(userType);
-        if (ObjectUtil.notEqual(getUserType(), userType)) {
+        if (ObjectUtil.equal(getUserType().getValue(), userType)) {
             reqDTO.setUsername(getUsername(userId));
         } else {
             reqDTO.setUsername(memberService.getMemberUserMobile(userId));
