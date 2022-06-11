@@ -22,6 +22,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.Collections;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
 import static springfox.documentation.builders.RequestHandlerSelectors.basePackage;
 
 /**
@@ -114,7 +115,8 @@ public class YudaoSwaggerAutoConfiguration {
     // ========== globalRequestParameters ==========
 
     private static List<RequestParameter> globalRequestParameters() {
-        RequestParameterBuilder tenantParameter = new RequestParameterBuilder().name("tenant-id").description("租户编号")
+        RequestParameterBuilder tenantParameter = new RequestParameterBuilder()
+                .name(HEADER_TENANT_ID).description("租户编号")
                 .in(ParameterType.HEADER).example(new ExampleBuilder().value(1L).build());
         return Collections.singletonList(tenantParameter.build());
     }
