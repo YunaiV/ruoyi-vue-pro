@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.product.controller.admin.sku.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
-
 import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 商品sku Excel VO
@@ -20,6 +20,7 @@ public class ProductSkuExcelVO {
     @ExcelProperty("spu编号")
     private Long spuId;
 
+    // TODO @franky：这个单元格，可能会有点展示的问题
     @ExcelProperty("规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]")
     private List<Property> properties;
 

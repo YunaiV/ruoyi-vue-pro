@@ -148,6 +148,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertSkuDOList(skus);
         // 查询 spu 下已经存在的 sku 的集合
         List<ProductSkuDO> existsSkus = productSkuMapper.selectBySpuIds(Collections.singletonList(spuId));
+        // TODO @franky：使用 CollUtils 即可
         Map<Long, ProductSkuDO> existsSkuMap = existsSkus.stream().collect(Collectors.toMap(ProductSkuDO::getId, p -> p));
 
         // 拆分三个集合， 新插入的， 需要更新的，需要删除的
@@ -155,6 +156,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         List<ProductSkuDO> updateSkus = new ArrayList<>();
         List<ProductSkuDO> deleteSkus = new ArrayList<>();
 
+        // TODO @芋艿：是不是基于规格匹配会比较好。
         allUpdateSkus.forEach(p -> {
             if (null != p.getId()) {
                 if (existsSkuMap.get(p.getId()) != null) {
