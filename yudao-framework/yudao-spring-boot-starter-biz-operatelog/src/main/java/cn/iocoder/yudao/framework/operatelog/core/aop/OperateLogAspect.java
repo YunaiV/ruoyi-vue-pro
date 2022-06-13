@@ -9,9 +9,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.framework.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
+import cn.iocoder.yudao.framework.operatelog.core.service.OperateLog;
 import cn.iocoder.yudao.framework.operatelog.core.service.OperateLogFrameworkService;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import com.google.common.collect.Maps;
@@ -57,13 +56,13 @@ public class OperateLogAspect {
     /**
      * 用于记录操作内容的上下文
      *
-     * @see OperateLogCreateReqDTO#getContent()
+     * @see OperateLog#getContent()
      */
     private static final ThreadLocal<String> CONTENT = new ThreadLocal<>();
     /**
      * 用于记录拓展字段的上下文
      *
-     * @see OperateLogCreateReqDTO#getExts()
+     * @see OperateLog#getExts()
      */
     private static final ThreadLocal<Map<String, Object>> EXTS = new ThreadLocal<>();
 
@@ -73,16 +72,20 @@ public class OperateLogAspect {
     @Around("@annotation(apiOperation)")
     public Object around(ProceedingJoinPoint joinPoint, ApiOperation apiOperation) throws Throwable {
         // 可能也添加了 @ApiOperation 注解
-        OperateLog operateLog = getMethodAnnotation(joinPoint, OperateLog.class);
+        cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog = getMethodAnnotation(joinPoint,
+                cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog.class);
         return around0(joinPoint, operateLog, apiOperation);
     }
 
     @Around("!@annotation(io.swagger.annotations.ApiOperation) && @annotation(operateLog)") // 兼容处理，只添加 @OperateLog 注解的情况
-    public Object around(ProceedingJoinPoint joinPoint, OperateLog operateLog) throws Throwable {
+    public Object around(ProceedingJoinPoint joinPoint,
+                         cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog) throws Throwable {
         return around0(joinPoint, operateLog, null);
     }
 
-    private Object around0(ProceedingJoinPoint joinPoint, OperateLog operateLog, ApiOperation apiOperation) throws Throwable {
+    private Object around0(ProceedingJoinPoint joinPoint,
+                           cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
+                           ApiOperation apiOperation) throws Throwable {
         // 目前，只有管理员，才记录操作日志！所以非管理员，直接调用，不进行记录
         Integer userType = WebFrameworkUtils.getLoginUserType();
         if (!Objects.equals(userType, UserTypeEnum.ADMIN.getValue())) {
@@ -121,7 +124,9 @@ public class OperateLogAspect {
         EXTS.remove();
     }
 
-    private void log(ProceedingJoinPoint joinPoint, OperateLog operateLog, ApiOperation apiOperation,
+    private void log(ProceedingJoinPoint joinPoint,
+                     cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
+                     ApiOperation apiOperation,
                      Date startTime, Object result, Throwable exception) {
         try {
             // 判断不记录的情况
@@ -136,113 +141,119 @@ public class OperateLogAspect {
         }
     }
 
-    private void log0(ProceedingJoinPoint joinPoint, OperateLog operateLog, ApiOperation apiOperation,
+    private void log0(ProceedingJoinPoint joinPoint,
+                      cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
+                      ApiOperation apiOperation,
                       Date startTime, Object result, Throwable exception) {
-        OperateLogCreateReqDTO operateLogDTO = new OperateLogCreateReqDTO();
+        OperateLog operateLogObj = new OperateLog();
         // 补全通用字段
-        operateLogDTO.setTraceId(TracerUtils.getTraceId());
-        operateLogDTO.setStartTime(startTime);
+        operateLogObj.setTraceId(TracerUtils.getTraceId());
+        operateLogObj.setStartTime(startTime);
         // 补充用户信息
-        fillUserFields(operateLogDTO);
+        fillUserFields(operateLogObj);
         // 补全模块信息
-        fillModuleFields(operateLogDTO, joinPoint, operateLog, apiOperation);
+        fillModuleFields(operateLogObj, joinPoint, operateLog, apiOperation);
         // 补全请求信息
-        fillRequestFields(operateLogDTO);
+        fillRequestFields(operateLogObj);
         // 补全方法信息
-        fillMethodFields(operateLogDTO, joinPoint, operateLog, startTime, result, exception);
+        fillMethodFields(operateLogObj, joinPoint, operateLog, startTime, result, exception);
 
         // 异步记录日志
-        operateLogFrameworkService.createOperateLogAsync(operateLogDTO);
+        operateLogFrameworkService.createOperateLog(operateLogObj);
     }
 
-    private static void fillUserFields(OperateLogCreateReqDTO operateLogDTO) {
-        operateLogDTO.setUserId(WebFrameworkUtils.getLoginUserId());
-        operateLogDTO.setUserType(WebFrameworkUtils.getLoginUserType());
+    private static void fillUserFields(OperateLog operateLogObj) {
+        operateLogObj.setUserId(WebFrameworkUtils.getLoginUserId());
+        operateLogObj.setUserType(WebFrameworkUtils.getLoginUserType());
     }
 
-    private static void fillModuleFields(OperateLogCreateReqDTO operateLogDTO,
-                                         ProceedingJoinPoint joinPoint, OperateLog operateLog, ApiOperation apiOperation) {
+    private static void fillModuleFields(OperateLog operateLogObj,
+                                         ProceedingJoinPoint joinPoint,
+                                         cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
+                                         ApiOperation apiOperation) {
         // module 属性
         if (operateLog != null) {
-            operateLogDTO.setModule(operateLog.module());
+            operateLogObj.setModule(operateLog.module());
         }
-        if (StrUtil.isEmpty(operateLogDTO.getModule())) {
+        if (StrUtil.isEmpty(operateLogObj.getModule())) {
             Api api = getClassAnnotation(joinPoint, Api.class);
             if (api != null) {
                 // 优先读取 @API 的 name 属性
                 if (StrUtil.isNotEmpty(api.value())) {
-                    operateLogDTO.setModule(api.value());
+                    operateLogObj.setModule(api.value());
                 }
                 // 没有的话，读取 @API 的 tags 属性
-                if (StrUtil.isEmpty(operateLogDTO.getModule()) && ArrayUtil.isNotEmpty(api.tags())) {
-                    operateLogDTO.setModule(api.tags()[0]);
+                if (StrUtil.isEmpty(operateLogObj.getModule()) && ArrayUtil.isNotEmpty(api.tags())) {
+                    operateLogObj.setModule(api.tags()[0]);
                 }
             }
         }
         // name 属性
         if (operateLog != null) {
-            operateLogDTO.setName(operateLog.name());
+            operateLogObj.setName(operateLog.name());
         }
-        if (StrUtil.isEmpty(operateLogDTO.getName()) && apiOperation != null) {
-            operateLogDTO.setName(apiOperation.value());
+        if (StrUtil.isEmpty(operateLogObj.getName()) && apiOperation != null) {
+            operateLogObj.setName(apiOperation.value());
         }
         // type 属性
         if (operateLog != null && ArrayUtil.isNotEmpty(operateLog.type())) {
-            operateLogDTO.setType(operateLog.type()[0].getType());
+            operateLogObj.setType(operateLog.type()[0].getType());
         }
-        if (operateLogDTO.getType() == null) {
+        if (operateLogObj.getType() == null) {
             RequestMethod requestMethod = obtainFirstMatchRequestMethod(obtainRequestMethod(joinPoint));
             OperateTypeEnum operateLogType = convertOperateLogType(requestMethod);
-            operateLogDTO.setType(operateLogType != null ? operateLogType.getType() : null);
+            operateLogObj.setType(operateLogType != null ? operateLogType.getType() : null);
         }
         // content 和 exts 属性
-        operateLogDTO.setContent(CONTENT.get());
-        operateLogDTO.setExts(EXTS.get());
+        operateLogObj.setContent(CONTENT.get());
+        operateLogObj.setExts(EXTS.get());
     }
 
-    private static void fillRequestFields(OperateLogCreateReqDTO operateLogDTO) {
+    private static void fillRequestFields(OperateLog operateLogObj) {
         // 获得 Request 对象
         HttpServletRequest request = ServletUtils.getRequest();
         if (request == null) {
             return;
         }
         // 补全请求信息
-        operateLogDTO.setRequestMethod(request.getMethod());
-        operateLogDTO.setRequestUrl(request.getRequestURI());
-        operateLogDTO.setUserIp(ServletUtil.getClientIP(request));
-        operateLogDTO.setUserAgent(ServletUtils.getUserAgent(request));
+        operateLogObj.setRequestMethod(request.getMethod());
+        operateLogObj.setRequestUrl(request.getRequestURI());
+        operateLogObj.setUserIp(ServletUtil.getClientIP(request));
+        operateLogObj.setUserAgent(ServletUtils.getUserAgent(request));
     }
 
-    private static void fillMethodFields(OperateLogCreateReqDTO operateLogDTO,
-                                         ProceedingJoinPoint joinPoint, OperateLog operateLog,
+    private static void fillMethodFields(OperateLog operateLogObj,
+                                         ProceedingJoinPoint joinPoint,
+                                         cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
                                          Date startTime, Object result, Throwable exception) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-        operateLogDTO.setJavaMethod(methodSignature.toString());
+        operateLogObj.setJavaMethod(methodSignature.toString());
         if (operateLog == null || operateLog.logArgs()) {
-            operateLogDTO.setJavaMethodArgs(obtainMethodArgs(joinPoint));
+            operateLogObj.setJavaMethodArgs(obtainMethodArgs(joinPoint));
         }
         if (operateLog == null || operateLog.logResultData()) {
-            operateLogDTO.setResultData(obtainResultData(result));
+            operateLogObj.setResultData(obtainResultData(result));
         }
-        operateLogDTO.setDuration((int) (System.currentTimeMillis() - startTime.getTime()));
+        operateLogObj.setDuration((int) (System.currentTimeMillis() - startTime.getTime()));
         // （正常）处理 resultCode 和 resultMsg 字段
         if (result != null) {
             if (result instanceof CommonResult) {
                 CommonResult<?> commonResult = (CommonResult<?>) result;
-                operateLogDTO.setResultCode(commonResult.getCode());
-                operateLogDTO.setResultMsg(commonResult.getMsg());
+                operateLogObj.setResultCode(commonResult.getCode());
+                operateLogObj.setResultMsg(commonResult.getMsg());
             } else {
-                operateLogDTO.setResultCode(SUCCESS.getCode());
+                operateLogObj.setResultCode(SUCCESS.getCode());
             }
         }
         // （异常）处理 resultCode 和 resultMsg 字段
         if (exception != null) {
-            operateLogDTO.setResultCode(INTERNAL_SERVER_ERROR.getCode());
-            operateLogDTO.setResultMsg(ExceptionUtil.getRootCauseMessage(exception));
+            operateLogObj.setResultCode(INTERNAL_SERVER_ERROR.getCode());
+            operateLogObj.setResultMsg(ExceptionUtil.getRootCauseMessage(exception));
         }
     }
 
-    private static boolean isLogEnable(ProceedingJoinPoint joinPoint, OperateLog operateLog) {
+    private static boolean isLogEnable(ProceedingJoinPoint joinPoint,
+                                       cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog) {
         // 有 @OperateLog 注解的情况下
         if (operateLog != null) {
             return operateLog.enable();
@@ -256,9 +267,9 @@ public class OperateLogAspect {
             return null;
         }
         return Arrays.stream(requestMethods).filter(requestMethod ->
-                           requestMethod == RequestMethod.POST
-                        || requestMethod == RequestMethod.PUT
-                        || requestMethod == RequestMethod.DELETE)
+                        requestMethod == RequestMethod.POST
+                                || requestMethod == RequestMethod.PUT
+                                || requestMethod == RequestMethod.DELETE)
                 .findFirst().orElse(null);
     }
 
