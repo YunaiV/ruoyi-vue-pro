@@ -26,6 +26,7 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
+      <el-table-column label="原文件名" align="center" prop="name" />
       <el-table-column label="文件名" align="center" prop="path" />
       <el-table-column label="URL" align="center" prop="url" />
       <el-table-column label="文件大小" align="center" prop="size" width="120" :formatter="sizeFormat" />
@@ -160,7 +161,7 @@ export default {
     },
     /** 处理上传的文件发生变化 */
     handleFileChange(file, fileList) {
-      this.upload.data.path = file.name;
+      
     },
     /** 处理文件上传中 */
     handleFileUploadProgress(event, file, fileList) {
