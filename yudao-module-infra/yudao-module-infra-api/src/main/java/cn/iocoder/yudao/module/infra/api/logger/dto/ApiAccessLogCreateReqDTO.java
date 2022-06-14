@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.apilog.core.service.dto;
+package cn.iocoder.yudao.module.infra.api.logger.dto;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
- * API 访问日志创建 DTO
+ * API 访问日志
  *
  * @author 芋道源码
  */

@@ -1,19 +1,17 @@
-package cn.iocoder.yudao.framework.apilog.core.service.dto;
+package cn.iocoder.yudao.framework.apilog.core.service;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
- * API 错误日志创建 DTO
+ * API 错误日志
  *
  * @author 芋道源码
  */
 @Data
-@Accessors(chain = true)
-public class ApiErrorLogCreateReqDTO {
+public class ApiErrorLog {
 
     /**
      * 链路编号
@@ -104,5 +102,6 @@ public class ApiErrorLogCreateReqDTO {
      */
     @NotNull(message = "异常导致的消息不能为空")
     private String exceptionMessage;
+
 
 }
