@@ -12,7 +12,7 @@
  Target Server Version : 140002
  File Encoding         : 65001
 
- Date: 26/05/2022 00:10:12
+ Date: 15/06/2022 08:13:44
 */
 
 
@@ -365,32 +365,10 @@ START 1
 CACHE 1;
 
 -- ----------------------------
--- Sequence structure for system_oauth2_approve_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "system_oauth2_approve_seq";
-CREATE SEQUENCE "system_oauth2_approve_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
 -- Sequence structure for system_oauth2_client_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_oauth2_client_seq";
 CREATE SEQUENCE "system_oauth2_client_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for system_oauth2_code_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "system_oauth2_code_seq";
-CREATE SEQUENCE "system_oauth2_code_seq" 
 INCREMENT 1
 MINVALUE  1
 MAXVALUE 9223372036854775807
@@ -1745,7 +1723,8 @@ CREATE TABLE "infra_file" (
   "create_time" timestamp(6) NOT NULL,
   "updater" varchar(64) COLLATE "pg_catalog"."default",
   "update_time" timestamp(6) NOT NULL,
-  "deleted" int2 NOT NULL DEFAULT 0
+  "deleted" int2 NOT NULL DEFAULT 0,
+  "name" varchar(255) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "infra_file"."id" IS '文件编号';
@@ -1759,6 +1738,7 @@ COMMENT ON COLUMN "infra_file"."create_time" IS '创建时间';
 COMMENT ON COLUMN "infra_file"."updater" IS '更新者';
 COMMENT ON COLUMN "infra_file"."update_time" IS '更新时间';
 COMMENT ON COLUMN "infra_file"."deleted" IS '是否删除';
+COMMENT ON COLUMN "infra_file"."name" IS '文件名';
 COMMENT ON TABLE "infra_file" IS '文件表';
 
 -- ----------------------------
@@ -3413,47 +3393,6 @@ BEGIN;
 COMMIT;
 
 -- ----------------------------
--- Table structure for system_oauth2_approve
--- ----------------------------
-DROP TABLE IF EXISTS "system_oauth2_approve";
-CREATE TABLE "system_oauth2_approve" (
-  "id" int8 NOT NULL,
-  "user_id" int8 NOT NULL,
-  "user_type" int2 NOT NULL,
-  "client_id" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "scope" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "approved" bool NOT NULL,
-  "expires_time" timestamp(6) NOT NULL,
-  "creator" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6) NOT NULL,
-  "updater" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6) NOT NULL,
-  "deleted" int2 NOT NULL DEFAULT 0,
-  "tenant_id" int8 NOT NULL
-)
-;
-COMMENT ON COLUMN "system_oauth2_approve"."id" IS '编号';
-COMMENT ON COLUMN "system_oauth2_approve"."user_id" IS '用户编号';
-COMMENT ON COLUMN "system_oauth2_approve"."user_type" IS '用户类型';
-COMMENT ON COLUMN "system_oauth2_approve"."client_id" IS '客户端编号';
-COMMENT ON COLUMN "system_oauth2_approve"."scope" IS '授权范围';
-COMMENT ON COLUMN "system_oauth2_approve"."approved" IS '是否接受';
-COMMENT ON COLUMN "system_oauth2_approve"."expires_time" IS '过期时间';
-COMMENT ON COLUMN "system_oauth2_approve"."creator" IS '创建者';
-COMMENT ON COLUMN "system_oauth2_approve"."create_time" IS '创建时间';
-COMMENT ON COLUMN "system_oauth2_approve"."updater" IS '更新者';
-COMMENT ON COLUMN "system_oauth2_approve"."update_time" IS '更新时间';
-COMMENT ON COLUMN "system_oauth2_approve"."deleted" IS '是否删除';
-COMMENT ON COLUMN "system_oauth2_approve"."tenant_id" IS '租户编号';
-COMMENT ON TABLE "system_oauth2_approve" IS 'OAuth2 批准表';
-
--- ----------------------------
--- Records of system_oauth2_approve
--- ----------------------------
-BEGIN;
-COMMIT;
-
--- ----------------------------
 -- Table structure for system_oauth2_client
 -- ----------------------------
 DROP TABLE IF EXISTS "system_oauth2_client";
@@ -3510,51 +3449,6 @@ COMMENT ON TABLE "system_oauth2_client" IS 'OAuth2 客户端表';
 BEGIN;
 INSERT INTO "system_oauth2_client" ("id", "client_id", "secret", "name", "logo", "description", "status", "access_token_validity_seconds", "refresh_token_validity_seconds", "redirect_uris", "authorized_grant_types", "scopes", "authorities", "resource_ids", "additional_information", "creator", "create_time", "updater", "update_time", "deleted", "auto_approve_scopes") VALUES (1, 'default', 'admin123', '芋道源码', 'http://test.yudao.iocoder.cn/a5e2e244368878a366b516805a4aabf1.png', '我是描述', 0, 180, 8640, '["https://www.iocoder.cn","https://doc.iocoder.cn"]', '["password","authorization_code","implicit","refresh_token"]', '["user.read","user.write"]', '["system:user:query"]', '[]', '{}', '1', '2022-05-11 21:47:12', '1', '2022-05-12 01:00:20', 0, NULL);
 INSERT INTO "system_oauth2_client" ("id", "client_id", "secret", "name", "logo", "description", "status", "access_token_validity_seconds", "refresh_token_validity_seconds", "redirect_uris", "authorized_grant_types", "scopes", "authorities", "resource_ids", "additional_information", "creator", "create_time", "updater", "update_time", "deleted", "auto_approve_scopes") VALUES (40, 'test', 'test2', 'biubiu', 'http://test.yudao.iocoder.cn/277a899d573723f1fcdfb57340f00379.png', NULL, 0, 1800, 43200, '["https://www.iocoder.cn"]', '["password","authorization_code","implicit"]', '[]', '[]', '[]', '{}', '1', '2022-05-12 00:28:20', '1', '2022-05-25 23:45:33.005', 0, '[]');
-COMMIT;
-
--- ----------------------------
--- Table structure for system_oauth2_code
--- ----------------------------
-DROP TABLE IF EXISTS "system_oauth2_code";
-CREATE TABLE "system_oauth2_code" (
-  "id" int8 NOT NULL,
-  "user_id" int8 NOT NULL,
-  "user_type" int2 NOT NULL,
-  "code" varchar(32) COLLATE "pg_catalog"."default" NOT NULL,
-  "client_id" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "scopes" varchar(255) COLLATE "pg_catalog"."default",
-  "expires_time" timestamp(6) NOT NULL,
-  "redirect_uri" varchar(255) COLLATE "pg_catalog"."default",
-  "state" varchar(255) COLLATE "pg_catalog"."default",
-  "creator" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6) NOT NULL,
-  "updater" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6) NOT NULL,
-  "deleted" int2 NOT NULL DEFAULT 0,
-  "tenant_id" int8 NOT NULL
-)
-;
-COMMENT ON COLUMN "system_oauth2_code"."id" IS '编号';
-COMMENT ON COLUMN "system_oauth2_code"."user_id" IS '用户编号';
-COMMENT ON COLUMN "system_oauth2_code"."user_type" IS '用户类型';
-COMMENT ON COLUMN "system_oauth2_code"."code" IS '授权码';
-COMMENT ON COLUMN "system_oauth2_code"."client_id" IS '客户端编号';
-COMMENT ON COLUMN "system_oauth2_code"."scopes" IS '授权范围';
-COMMENT ON COLUMN "system_oauth2_code"."expires_time" IS '过期时间';
-COMMENT ON COLUMN "system_oauth2_code"."redirect_uri" IS '可重定向的 URI 地址';
-COMMENT ON COLUMN "system_oauth2_code"."state" IS '状态';
-COMMENT ON COLUMN "system_oauth2_code"."creator" IS '创建者';
-COMMENT ON COLUMN "system_oauth2_code"."create_time" IS '创建时间';
-COMMENT ON COLUMN "system_oauth2_code"."updater" IS '更新者';
-COMMENT ON COLUMN "system_oauth2_code"."update_time" IS '更新时间';
-COMMENT ON COLUMN "system_oauth2_code"."deleted" IS '是否删除';
-COMMENT ON COLUMN "system_oauth2_code"."tenant_id" IS '租户编号';
-COMMENT ON TABLE "system_oauth2_code" IS 'OAuth2 授权码表';
-
--- ----------------------------
--- Records of system_oauth2_code
--- ----------------------------
-BEGIN;
 COMMIT;
 
 -- ----------------------------
@@ -4025,7 +3919,7 @@ COMMIT;
 DROP TABLE IF EXISTS "system_sms_channel";
 CREATE TABLE "system_sms_channel" (
   "id" int8 NOT NULL,
-  "signature" varchar(10) COLLATE "pg_catalog"."default" NOT NULL,
+  "signature" varchar(12) COLLATE "pg_catalog"."default" NOT NULL,
   "code" varchar(63) COLLATE "pg_catalog"."default" NOT NULL,
   "status" int2 NOT NULL,
   "remark" varchar(255) COLLATE "pg_catalog"."default",
@@ -4729,17 +4623,7 @@ SELECT setval('"system_oauth2_access_token_seq"', 11, true);
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
-SELECT setval('"system_oauth2_approve_seq"', 4, true);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
 SELECT setval('"system_oauth2_client_seq"', 1, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-SELECT setval('"system_oauth2_code_seq"', 4, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -5169,19 +5053,9 @@ ALTER TABLE "system_notice" ADD CONSTRAINT "system_notice_pkey" PRIMARY KEY ("id
 ALTER TABLE "system_oauth2_access_token" ADD CONSTRAINT "system_oauth2_access_token_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
--- Primary Key structure for table system_oauth2_approve
--- ----------------------------
-ALTER TABLE "system_oauth2_approve" ADD CONSTRAINT "system_oauth2_approve_pkey" PRIMARY KEY ("id");
-
--- ----------------------------
 -- Primary Key structure for table system_oauth2_client
 -- ----------------------------
 ALTER TABLE "system_oauth2_client" ADD CONSTRAINT "system_oauth2_client_pkey" PRIMARY KEY ("id");
-
--- ----------------------------
--- Primary Key structure for table system_oauth2_code
--- ----------------------------
-ALTER TABLE "system_oauth2_code" ADD CONSTRAINT "system_oauth2_code_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table system_oauth2_refresh_token

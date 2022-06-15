@@ -43,6 +43,10 @@ public class FileServiceImpl implements FileService {
         if (StrUtil.isEmpty(path)) {
             path = DigestUtil.md5Hex(content) + '.' + type;
         }
+        // 如果 name 为空，则使用 path 填充
+        if (StrUtil.isEmpty(name)) {
+            name = path;
+        }
 
         // 上传到文件存储器
         FileClient client = fileConfigService.getMasterFileClient();
