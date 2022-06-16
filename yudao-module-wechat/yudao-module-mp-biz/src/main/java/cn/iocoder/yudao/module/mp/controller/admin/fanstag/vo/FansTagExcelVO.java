@@ -12,7 +12,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
  * @author 芋道源码
  */
 @Data
-public class WxFansTagExcelVO {
+public class FansTagExcelVO {
 
     @ExcelProperty("主键")
     private Integer id;
@@ -22,9 +22,6 @@ public class WxFansTagExcelVO {
 
     @ExcelProperty("粉丝数量")
     private Integer count;
-
-    @ExcelProperty("微信账号ID")
-    private String wxAccountId;
 
     @ExcelProperty("创建时间")
     private Date createTime;

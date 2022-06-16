@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class WxFansTagUpdateReqVO extends WxFansTagBaseVO {
+public class FansTagUpdateReqVO extends FansTagBaseVO {
 
     @ApiModelProperty(value = "主键", required = true)
     @NotNull(message = "主键不能为空")
