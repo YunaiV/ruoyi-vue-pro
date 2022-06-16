@@ -14,7 +14,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class FansTagPageReqVO extends PageParam {
+public class WxFansTagPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "标签名称")
     private String name;

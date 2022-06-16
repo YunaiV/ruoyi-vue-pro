@@ -4,31 +4,31 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import me.chanjar.weixin.mp.bean.tag.WxUserTag;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.module.mp.controller.admin.fanstag.vo.*;
+import cn.iocoder.yudao.module.mp.dal.dataobject.fanstag.WxFansTagDO;
 
 /**
  * 粉丝标签 Convert
  *
- * @author fengdan
+ * @author 芋道源码
  */
 @Mapper
 public interface WxFansTagConvert {
 
     WxFansTagConvert INSTANCE = Mappers.getMapper(WxFansTagConvert.class);
 
-    WxUserTag convert(FansTagCreateReqVO bean);
+    WxFansTagDO convert(WxFansTagCreateReqVO bean);
 
-    WxUserTag convert(FansTagUpdateReqVO bean);
+    WxFansTagDO convert(WxFansTagUpdateReqVO bean);
 
-    FansTagRespVO convert(WxUserTag bean);
+    WxFansTagRespVO convert(WxFansTagDO bean);
 
-    List<FansTagRespVO> convertList(List<WxUserTag> list);
+    List<WxFansTagRespVO> convertList(List<WxFansTagDO> list);
 
-    PageResult<FansTagRespVO> convertPage(PageResult<WxUserTag> page);
+    PageResult<WxFansTagRespVO> convertPage(PageResult<WxFansTagDO> page);
 
-    List<FansTagExcelVO> convertList02(List<WxUserTag> list);
+    List<WxFansTagExcelVO> convertList02(List<WxFansTagDO> list);
 
 }

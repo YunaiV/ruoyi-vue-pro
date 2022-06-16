@@ -11,7 +11,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 
 @ApiModel(value = "管理后台 - 粉丝标签 Excel 导出 Request VO", description = "参数和 WxFansTagPageReqVO 是一致的")
 @Data
-public class FansTagExportReqVO {
+public class WxFansTagExportReqVO {
 
     @ApiModelProperty(value = "标签名称")
     private String name;
