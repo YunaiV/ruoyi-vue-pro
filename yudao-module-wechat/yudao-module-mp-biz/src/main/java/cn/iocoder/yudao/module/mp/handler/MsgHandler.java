@@ -34,13 +34,6 @@ import java.util.Map;
 @Component
 @Slf4j
 public class MsgHandler implements WxMpMessageHandler {
-
-    @Autowired
-    private WxReceiveTextService wxReceiveTextService;
-
-    @Autowired
-    private WxTextTemplateService wxTextTemplateService;
-
     @Autowired
     private WxAccountService wxAccountService;
 
@@ -49,9 +42,6 @@ public class MsgHandler implements WxMpMessageHandler {
 
     @Resource
     private FileApi fileApi;
-
-    @Autowired
-    private WxMpProperties wxMpProperties;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
@@ -147,8 +137,7 @@ public class MsgHandler implements WxMpMessageHandler {
         }
 
         //组装默认回复消息
-        String content = wxMpProperties.getDefaultContent();//默认
-        return new TextBuilder().build(content, wxMessage, weixinService);
+        return new TextBuilder().build("测试", wxMessage, weixinService);
     }
 
 

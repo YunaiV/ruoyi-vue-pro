@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * wechat mp properties
  */
 @Data
-@ConfigurationProperties(prefix = "wx.mp")
+//@ConfigurationProperties(prefix = "wx.mp")
 public class WxMpProperties {
     /**
      * 是否使用redis存储access token
