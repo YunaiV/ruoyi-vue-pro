@@ -12,7 +12,7 @@
  Target Server Version : 15004198
  File Encoding         : 65001
 
- Date: 26/05/2022 01:01:02
+ Date: 15/06/2022 08:15:45
 */
 
 
@@ -2640,7 +2640,8 @@ CREATE TABLE [dbo].[infra_file] (
   [create_time] datetime2(7)  NOT NULL,
   [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [update_time] datetime2(7)  NOT NULL,
-  [deleted] bit DEFAULT 0 NOT NULL
+  [deleted] bit DEFAULT 0 NOT NULL,
+  [name] nvarchar(256) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL
 )
 GO
 
@@ -2722,6 +2723,13 @@ EXEC sp_addextendedproperty
 'SCHEMA', N'dbo',
 'TABLE', N'infra_file',
 'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'文件路径',
+'SCHEMA', N'dbo',
+'TABLE', N'infra_file',
+'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
@@ -9490,7 +9498,7 @@ GO
 
 CREATE TABLE [dbo].[system_sms_channel] (
   [id] bigint  IDENTITY(1,1) NOT NULL,
-  [signature] nvarchar(10) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [signature] nvarchar(12) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [code] nvarchar(63) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [status] tinyint  NOT NULL,
   [remark] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,

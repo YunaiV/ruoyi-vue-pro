@@ -3,8 +3,8 @@ package cn.iocoder.yudao.framework.apilog.core.filter;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.extra.servlet.ServletUtil;
+import cn.iocoder.yudao.framework.apilog.core.service.ApiAccessLog;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiAccessLogFrameworkService;
-import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiAccessLogCreateReqDTO;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
@@ -66,16 +66,16 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
 
     private void createApiAccessLog(HttpServletRequest request, Date beginTime,
                                     Map<String, String> queryString, String requestBody, Exception ex) {
-        ApiAccessLogCreateReqDTO accessLog = new ApiAccessLogCreateReqDTO();
+        ApiAccessLog accessLog = new ApiAccessLog();
         try {
             this.buildApiAccessLogDTO(accessLog, request, beginTime, queryString, requestBody, ex);
-            apiAccessLogFrameworkService.createApiAccessLogAsync(accessLog);
+            apiAccessLogFrameworkService.createApiAccessLog(accessLog);
         } catch (Throwable th) {
             log.error("[createApiAccessLog][url({}) log({}) 发生异常]", request.getRequestURI(), toJsonString(accessLog), th);
         }
     }
 
-    private void buildApiAccessLogDTO(ApiAccessLogCreateReqDTO accessLog, HttpServletRequest request, Date beginTime,
+    private void buildApiAccessLogDTO(ApiAccessLog accessLog, HttpServletRequest request, Date beginTime,
                                       Map<String, String> queryString, String requestBody, Exception ex) {
         // 处理用户信息
         accessLog.setUserId(WebFrameworkUtils.getLoginUserId(request));

@@ -34,6 +34,10 @@ public class FileDO extends BaseDO {
      */
     private Long configId;
     /**
+     * 原文件名
+     */
+    private String name;
+    /**
      * 路径，即文件名
      */
     private String path;

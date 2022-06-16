@@ -164,11 +164,6 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @Override
-    public List<DictDataRespDTO> listDictDatasFromCache(String type) {
-        return DictDataConvert.INSTANCE.convertList03(labelDictDataCache.row(type).values());
-    }
-
-    @Override
     public Long createDictData(DictDataCreateReqVO reqVO) {
         // 校验正确性
         checkCreateOrUpdate(null, reqVO.getValue(), reqVO.getDictType());

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.api.dept;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 
 import java.util.Collection;
@@ -45,6 +46,9 @@ public interface DeptApi {
      * @param ids 部门编号数组
      * @return 部门 Map
      */
-    Map<Long, DeptRespDTO> getDeptMap(Set<Long> ids);
+    default Map<Long, DeptRespDTO> getDeptMap(Set<Long> ids) {
+        List<DeptRespDTO> list = getDepts(ids);
+        return CollectionUtils.convertMap(list, DeptRespDTO::getId);
+    }
 
 }
