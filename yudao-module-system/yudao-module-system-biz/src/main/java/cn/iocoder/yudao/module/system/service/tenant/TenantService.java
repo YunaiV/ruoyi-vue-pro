@@ -120,4 +120,18 @@ public interface TenantService extends TenantFrameworkService {
      * @param handler 处理器
      */
     void handleTenantMenu(TenantMenuHandler handler);
+
+    /**
+     * 获得所有租户
+     *
+     * @return 租户编号数组
+     */
+    List<Long> getTenantIds();
+
+    /**
+     * 校验租户是否合法
+     *
+     * @param id 租户编号
+     */
+    void validTenant(Long id);
 }
