@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.framework.errorcode.config;
+package cn.iocoder.yudao.framework.errorcode.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

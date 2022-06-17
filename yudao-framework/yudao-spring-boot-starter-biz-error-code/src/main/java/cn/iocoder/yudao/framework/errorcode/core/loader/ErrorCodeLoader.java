@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.framework.errorcode.core.loader;
+package cn.iocoder.yudao.framework.errorcode.core.loader;
 
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 

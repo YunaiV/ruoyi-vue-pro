@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.framework.errorcode.core.dto;
+package cn.iocoder.yudao.module.system.api.errorcode.dto;
 
 import lombok.Data;
 

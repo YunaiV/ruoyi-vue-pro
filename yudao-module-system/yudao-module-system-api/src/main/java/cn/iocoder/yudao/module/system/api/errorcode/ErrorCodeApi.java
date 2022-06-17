@@ -1,18 +1,18 @@
-package cn.iocoder.yudao.module.system.framework.errorcode.core.service;
+package cn.iocoder.yudao.module.system.api.errorcode;
 
-import cn.iocoder.yudao.module.system.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
-import cn.iocoder.yudao.module.system.framework.errorcode.core.dto.ErrorCodeRespDTO;
+import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeAutoGenerateReqDTO;
+import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeRespDTO;
 
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
 /**
- * 错误码 Framework Service 接口
+ * 错误码 Api 接口
  *
  * @author 芋道源码
  */
-public interface ErrorCodeFrameworkService {
+public interface ErrorCodeApi {
 
     /**
      * 自动创建错误码

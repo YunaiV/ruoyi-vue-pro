@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.module.system.framework.errorcode.core.loader;
+package cn.iocoder.yudao.framework.errorcode.core.loader;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.system.framework.errorcode.core.dto.ErrorCodeRespDTO;
-import cn.iocoder.yudao.module.system.framework.errorcode.core.service.ErrorCodeFrameworkService;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.module.system.api.errorcode.ErrorCodeApi;
+import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeRespDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -34,9 +34,9 @@ public class ErrorCodeLoaderImpl implements ErrorCodeLoader {
      */
     private final String applicationName;
     /**
-     * 错误码 Service
+     * 错误码 Api
      */
-    private final ErrorCodeFrameworkService errorCodeService;
+    private final ErrorCodeApi errorCodeApi;
 
     /**
      * 缓存错误码的最大更新时间，用于后续的增量轮询，判断是否有更新
@@ -55,7 +55,7 @@ public class ErrorCodeLoaderImpl implements ErrorCodeLoader {
 
     private void loadErrorCodes0() {
         // 加载错误码
-        List<ErrorCodeRespDTO> errorCodeRespDTOs = errorCodeService.getErrorCodeList(applicationName, maxUpdateTime);
+        List<ErrorCodeRespDTO> errorCodeRespDTOs = errorCodeApi.getErrorCodeList(applicationName, maxUpdateTime);
         if (CollUtil.isEmpty(errorCodeRespDTOs)) {
             return;
         }

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.framework.errorcode.core.generator;
+package cn.iocoder.yudao.framework.errorcode.core.generator;
 
 /**
  * 错误码的自动生成器
