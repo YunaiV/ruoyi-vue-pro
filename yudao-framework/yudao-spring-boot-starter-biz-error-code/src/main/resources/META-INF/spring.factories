@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  cn.iocoder.yudao.framework.errorcode.config.ErrorCodeConfiguration
+  cn.iocoder.yudao.framework.errorcode.config.YudaoErrorCodeConfiguration

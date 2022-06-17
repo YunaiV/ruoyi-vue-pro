@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.common.pojo;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ServerException;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -91,8 +92,22 @@ public class CommonResult<T> implements Serializable {
         if (isSuccess()) {
             return;
         }
+        // 服务端异常
+        if (GlobalErrorCodeConstants.isServerErrorCode(code)) {
+            throw new ServerException(code, msg);
+        }
         // 业务异常
         throw new ServiceException(code, msg);
+    }
+
+    /**
+     * 判断是否有异常。如果有，则抛出 {@link ServiceException} 异常
+     * 如果没有，则返回 {@link #data} 数据
+     */
+    @JsonIgnore // 避免 jackson 序列化
+    public T getCheckedData() {
+        checkError();
+        return data;
     }
 
     public static <T> CommonResult<T> error(ServiceException serviceException) {

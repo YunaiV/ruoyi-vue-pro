@@ -19,7 +19,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableConfigurationProperties(ErrorCodeProperties.class)
 @EnableScheduling // 开启调度任务的功能，因为 ErrorCodeRemoteLoader 通过定时刷新错误码
-public class ErrorCodeConfiguration {
+public class YudaoErrorCodeConfiguration {
 
     @Bean
     public ErrorCodeAutoGenerator errorCodeAutoGenerator(@Value("${spring.application.name}") String applicationName,
