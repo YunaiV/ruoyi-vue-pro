@@ -63,6 +63,10 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-banner</artifactId>
+        </dependency>
 
         <!-- 服务保障相关 -->
         <dependency>
