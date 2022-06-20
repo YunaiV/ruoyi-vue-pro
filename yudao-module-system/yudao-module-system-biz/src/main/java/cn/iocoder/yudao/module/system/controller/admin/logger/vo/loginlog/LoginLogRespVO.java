@@ -18,8 +18,7 @@ public class LoginLogRespVO extends LoginLogBaseVO {
     @ApiModelProperty(value = "日志编号", required = true, example = "1024")
     private Long id;
 
-    @ApiModelProperty(value = "用户编号", required = true, example = "666")
-    @NotNull(message = "用户编号不能为空")
+    @ApiModelProperty(value = "用户编号", example = "666")
     private Long userId;
 
     @ApiModelProperty(value = "用户类型", required = true, example = "2", notes = "参见 UserTypeEnum 枚举")

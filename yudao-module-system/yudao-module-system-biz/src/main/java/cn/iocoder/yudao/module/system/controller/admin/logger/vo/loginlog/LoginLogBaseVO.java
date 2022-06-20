@@ -19,7 +19,7 @@ public class LoginLogBaseVO {
     @NotNull(message = "日志类型不能为空")
     private Integer logType;
 
-    @ApiModelProperty(value = "链路追踪编号", required = true, example = "89aca178-a370-411c-ae02-3f0d672be4ab")
+    @ApiModelProperty(value = "链路追踪编号", example = "89aca178-a370-411c-ae02-3f0d672be4ab")
     @NotEmpty(message = "链路追踪编号不能为空")
     private String traceId;
 
@@ -36,8 +36,7 @@ public class LoginLogBaseVO {
     @NotEmpty(message = "用户 IP 不能为空")
     private String userIp;
 
-    @ApiModelProperty(value = "浏览器 UserAgent", required = true, example = "Mozilla/5.0")
-    @NotEmpty(message = "浏览器 UserAgent 不能为空")
+    @ApiModelProperty(value = "浏览器 UserAgent", example = "Mozilla/5.0")
     private String userAgent;
 
 }
