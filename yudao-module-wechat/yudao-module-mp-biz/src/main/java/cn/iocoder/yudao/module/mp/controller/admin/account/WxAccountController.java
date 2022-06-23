@@ -25,10 +25,12 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-// TODO @亚洲：/mp/account 即可
+/**
+ * @author fengdan
+ */
 @Api(tags = "管理后台 - 公众号账户")
 @RestController
-@RequestMapping("/wechatMp/wx-account")
+@RequestMapping("/wechatMp/account")
 @Validated
 public class WxAccountController {
 
@@ -37,14 +39,14 @@ public class WxAccountController {
 
     @PostMapping("/create")
     @ApiOperation("创建公众号账户")
-    @PreAuthorize("@ss.hasPermission('wechatMp:wx-account:create')")
+    @PreAuthorize("@ss.hasPermission('wechatMp:account:create')")
     public CommonResult<Long> createWxAccount(@Valid @RequestBody WxAccountCreateReqVO createReqVO) {
         return success(wxAccountService.createWxAccount(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新公众号账户")
-    @PreAuthorize("@ss.hasPermission('wechatMp:wx-account:update')")
+    @PreAuthorize("@ss.hasPermission('wechatMp:account:update')")
     public CommonResult<Boolean> updateWxAccount(@Valid @RequestBody WxAccountUpdateReqVO updateReqVO) {
         wxAccountService.updateWxAccount(updateReqVO);
         return success(true);
@@ -53,7 +55,7 @@ public class WxAccountController {
     @DeleteMapping("/delete")
     @ApiOperation("删除公众号账户")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
-    @PreAuthorize("@ss.hasPermission('wechatMp:wx-account:delete')")
+    @PreAuthorize("@ss.hasPermission('wechatMp:account:delete')")
     public CommonResult<Boolean> deleteWxAccount(@RequestParam("id") Long id) {
         wxAccountService.deleteWxAccount(id);
         return success(true);
@@ -62,7 +64,7 @@ public class WxAccountController {
     @GetMapping("/get")
     @ApiOperation("获得公众号账户")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    @PreAuthorize("@ss.hasPermission('wechatMp:wx-account:query')")
+    @PreAuthorize("@ss.hasPermission('wechatMp:account:query')")
     public CommonResult<WxAccountRespVO> getWxAccount(@RequestParam("id") Long id) {
         WxAccountDO wxAccount = wxAccountService.getWxAccount(id);
         return success(WxAccountConvert.INSTANCE.convert(wxAccount));
@@ -71,7 +73,7 @@ public class WxAccountController {
     @GetMapping("/list")
     @ApiOperation("获得公众号账户列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    @PreAuthorize("@ss.hasPermission('wechatMp:wx-account:query')")
+    @PreAuthorize("@ss.hasPermission('wechatMp:account:query')")
     public CommonResult<List<WxAccountRespVO>> getWxAccountList(@RequestParam("ids") Collection<Long> ids) {
         List<WxAccountDO> list = wxAccountService.getWxAccountList(ids);
         return success(WxAccountConvert.INSTANCE.convertList(list));
@@ -79,7 +81,7 @@ public class WxAccountController {
 
     @GetMapping("/page")
     @ApiOperation("获得公众号账户分页")
-    @PreAuthorize("@ss.hasPermission('wechatMp:wx-account:query')")
+    @PreAuthorize("@ss.hasPermission('wechatMp:account:query')")
     public CommonResult<PageResult<WxAccountRespVO>> getWxAccountPage(@Valid WxAccountPageReqVO pageVO) {
         PageResult<WxAccountDO> pageResult = wxAccountService.getWxAccountPage(pageVO);
         return success(WxAccountConvert.INSTANCE.convertPage(pageResult));
@@ -87,7 +89,7 @@ public class WxAccountController {
 
     @GetMapping("/export-excel")
     @ApiOperation("导出公众号账户 Excel")
-    @PreAuthorize("@ss.hasPermission('wechatMp:wx-account:export')")
+    @PreAuthorize("@ss.hasPermission('wechatMp:account:export')")
     @OperateLog(type = EXPORT)
     public void exportWxAccountExcel(@Valid WxAccountExportReqVO exportReqVO,
                                      HttpServletResponse response) throws IOException {

@@ -22,7 +22,7 @@ public interface WxAccountMapper extends BaseMapperX<WxAccountDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<WxAccountDO>()
                 .likeIfPresent(WxAccountDO::getName, reqVO.getName())
                 .eqIfPresent(WxAccountDO::getAccount, reqVO.getAccount())
-                .eqIfPresent(WxAccountDO::getAppId, reqVO.getAppid())
+                .eqIfPresent(WxAccountDO::getAppId, reqVO.getAppId())
                 .betweenIfPresent(WxAccountDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc(WxAccountDO::getId));
     }
@@ -31,7 +31,7 @@ public interface WxAccountMapper extends BaseMapperX<WxAccountDO> {
         return selectList(new LambdaQueryWrapperX<WxAccountDO>()
                 .likeIfPresent(WxAccountDO::getName, reqVO.getName())
                 .eqIfPresent(WxAccountDO::getAccount, reqVO.getAccount())
-                .eqIfPresent(WxAccountDO::getAppId, reqVO.getAppid())
+                .eqIfPresent(WxAccountDO::getAppId, reqVO.getAppId())
                 .betweenIfPresent(WxAccountDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc(WxAccountDO::getId));
     }

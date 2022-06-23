@@ -7,6 +7,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @author fengdan
+ */
 @ApiModel(value = "管理后台 - 公众号账户 Excel 导出 Request VO", description = "参数和 WxAccountPageReqVO 是一致的")
 @Data
 public class WxAccountExportReqVO {
@@ -18,7 +21,7 @@ public class WxAccountExportReqVO {
     private String account;
 
     @ApiModelProperty(value = "公众号appid")
-    private String appid;
+    private String appId;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "开始创建时间")

@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.mp.controller.admin.account.vo;
 
-import lombok.*;
-import java.util.*;
-
 import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
+
+import java.util.Date;
+
 
 /**
  * 公众号账户 Excel VO
@@ -23,10 +24,7 @@ public class WxAccountExcelVO {
     private String account;
 
     @ExcelProperty("公众号appid")
-    private String appid;
-
-    @ExcelProperty("公众号密钥")
-    private String appsecret;
+    private String appId;
 
     @ExcelProperty("公众号url")
     private String url;
@@ -35,7 +33,7 @@ public class WxAccountExcelVO {
     private String token;
 
     @ExcelProperty("加密密钥")
-    private String aeskey;
+    private String aesKey;
 
     @ExcelProperty("二维码图片URL")
     private String qrCodeUrl;
@@ -45,5 +43,4 @@ public class WxAccountExcelVO {
 
     @ExcelProperty("创建时间")
     private Date createTime;
-
 }

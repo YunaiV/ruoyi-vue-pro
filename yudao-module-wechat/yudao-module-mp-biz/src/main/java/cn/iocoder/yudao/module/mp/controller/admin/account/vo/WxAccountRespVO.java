@@ -1,9 +1,16 @@
 package cn.iocoder.yudao.module.mp.controller.admin.account.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+import java.util.Date;
+
+/**
+ * @author fengdan
+ */
 @ApiModel("管理后台 - 公众号账户 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -22,4 +29,6 @@ public class WxAccountRespVO extends WxAccountBaseVO {
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;
 
+    @ApiModelProperty(value = "公众号密钥", required = true)
+    private String appSecret;
 }
