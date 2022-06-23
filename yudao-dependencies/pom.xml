@@ -64,7 +64,7 @@
         <tencentcloud-sdk-java.version>3.1.471</tencentcloud-sdk-java.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
-        <weixin-java-mp.version>4.3.0</weixin-java-mp.version>
+        <wx-java-mp.version>4.3.0</wx-java-mp.version>
     </properties>
 
     <dependencyManagement>
@@ -570,8 +570,8 @@
 
             <dependency>
                 <groupId>com.github.binarywang</groupId>
-                <artifactId>weixin-java-mp</artifactId>
-                <version>${weixin-java-mp.version}</version>
+                <artifactId>wx-java-mp-spring-boot-starter</artifactId>
+                <version>${wx-java-mp.version}</version>
             </dependency>
 
         </dependencies>
