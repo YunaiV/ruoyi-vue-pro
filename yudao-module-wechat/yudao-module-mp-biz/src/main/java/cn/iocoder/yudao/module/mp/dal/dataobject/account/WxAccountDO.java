@@ -4,7 +4,11 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
 import lombok.*;
+import me.chanjar.weixin.common.redis.RedisTemplateWxRedisOps;
+import me.chanjar.weixin.mp.config.WxMpConfigStorage;
+import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
 
 // TODO 亚洲：这个模块的相关类，使用 Mp 作为前缀哈
 /**
@@ -64,4 +68,12 @@ public class WxAccountDO extends BaseDO {
      */
     private String remark;
 
+    public WxMpConfigStorage toWxMpConfigStorage(RedisTemplateWxRedisOps redisTemplateWxRedisOps, WxMpProperties wxMpProperties) {
+        WxMpRedisConfigImpl wxMpRedisConfig = new WxMpRedisConfigImpl(redisTemplateWxRedisOps, wxMpProperties.getConfigStorage().getKeyPrefix());
+        wxMpRedisConfig.setAppId(appId);
+        wxMpRedisConfig.setSecret(appSecret);
+        wxMpRedisConfig.setToken(token);
+        wxMpRedisConfig.setAesKey(aesKey);
+        return wxMpRedisConfig;
+    }
 }

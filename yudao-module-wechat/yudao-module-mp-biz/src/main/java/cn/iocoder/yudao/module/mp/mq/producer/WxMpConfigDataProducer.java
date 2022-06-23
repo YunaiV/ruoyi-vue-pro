@@ -1,7 +1,7 @@
-package cn.iocoder.yudao.module.mp.mq.producer.dict;
+package cn.iocoder.yudao.module.mp.mq.producer;
 
 import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
-import cn.iocoder.yudao.module.mp.mq.message.dict.WxConfigDataRefreshMessage;
+import cn.iocoder.yudao.module.mp.mq.message.WxConfigDataRefreshMessage;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
