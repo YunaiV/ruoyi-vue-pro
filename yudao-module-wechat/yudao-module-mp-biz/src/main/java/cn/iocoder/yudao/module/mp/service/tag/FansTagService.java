@@ -5,10 +5,10 @@ import cn.iocoder.yudao.module.mp.controller.admin.fanstag.vo.FansTagCreateReqVO
 import cn.iocoder.yudao.module.mp.controller.admin.fanstag.vo.FansTagExportReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.fanstag.vo.FansTagPageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.fanstag.vo.FansTagUpdateReqVO;
+import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.bean.tag.WxUserTag;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,40 +21,39 @@ public interface FansTagService {
     /**
      * 创建粉丝标签
      *
-     * @param createReqVO 创建信息
-     * @return 编号
+     * @param createReqVO 创建标签信息
+     * @return {@link WxUserTag}  用户标签对象
+     * @throws WxErrorException 微信异常
      */
-    WxUserTag createWxFansTag(@Valid FansTagCreateReqVO createReqVO);
+    WxUserTag createWxFansTag(FansTagCreateReqVO createReqVO) throws WxErrorException;
 
     /**
      * 更新粉丝标签
      *
      * @param updateReqVO 更新信息
+     * @return {@link         Boolean}
+     * @throws WxErrorException 微信异常
      */
-    void updateWxFansTag(@Valid FansTagUpdateReqVO updateReqVO);
+    Boolean updateWxFansTag(@Valid FansTagUpdateReqVO updateReqVO) throws WxErrorException;
 
     /**
      * 删除粉丝标签
      *
-     * @param id 编号
+     * @param id    编号
+     * @param appId 公众号appId
+     * @return {@link         Boolean}
+     * @throws WxErrorException 微信异常
      */
-    void deleteWxFansTag(Integer id);
+    Boolean deleteWxFansTag(Long id, String appId) throws WxErrorException;
 
     /**
-     * 获得粉丝标签
+     * 获取公众号已创建的标签
      *
-     * @param id 编号
-     * @return 粉丝标签
-     */
-    WxUserTag getWxFansTag(Integer id);
-
-    /**
-     * 获得粉丝标签列表
-     *
-     * @param ids 编号
+     * @param appId 公众号appId
      * @return 粉丝标签列表
+     * @throws WxErrorException 微信异常
      */
-    List<WxUserTag> getWxFansTagList(Collection<Integer> ids);
+    List<WxUserTag> getWxFansTagList(String appId) throws WxErrorException;
 
     /**
      * 获得粉丝标签分页

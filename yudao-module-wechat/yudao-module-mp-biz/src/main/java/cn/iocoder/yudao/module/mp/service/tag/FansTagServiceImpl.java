@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.mp.service.tag;
 
+import cn.hutool.core.util.ReUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.mp.controller.admin.fanstag.vo.FansTagCreateReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.fanstag.vo.FansTagExportReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.fanstag.vo.FansTagPageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.fanstag.vo.FansTagUpdateReqVO;
-import cn.iocoder.yudao.module.mp.convert.fanstag.WxFansTagConvert;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,42 +25,33 @@ import java.util.List;
 @Service
 @Validated
 public class FansTagServiceImpl implements FansTagService {
-
     @Resource
     private WxMpService wxMpService;
 
     @Override
-    public WxUserTag createWxFansTag(FansTagCreateReqVO createReqVO) {
-        try {
-            return wxMpService.getUserTagService().tagCreate("wxFansTag");
-        } catch (WxErrorException e) {
-            throw new RuntimeException(e);
-        }
+    public WxUserTag createWxFansTag(FansTagCreateReqVO createReqVO) throws WxErrorException {
+        // TODO 切换公众号操作 调整为 aop 或者 过滤器\拦截器 处理
+        wxMpService.switchover(createReqVO.getAppId());
+        return wxMpService.getUserTagService().tagCreate(createReqVO.getName());
     }
 
     @Override
-    public void updateWxFansTag(FansTagUpdateReqVO updateReqVO) {
-        // 校验存在
-        // 更新
-        WxUserTag updateObj = WxFansTagConvert.INSTANCE.convert(updateReqVO);
-
+    public Boolean updateWxFansTag(FansTagUpdateReqVO updateReqVO) throws WxErrorException {
+        wxMpService.switchover(updateReqVO.getAppId());
+        return wxMpService.getUserTagService().tagUpdate(updateReqVO.getId(), updateReqVO.getName());
     }
 
     @Override
-    public void deleteWxFansTag(Integer id) {
-        // 校验存在
-        // 删除
+    public Boolean deleteWxFansTag(Long id, String appId) throws WxErrorException {
+        wxMpService.switchover(appId);
+        return wxMpService.getUserTagService().tagDelete(id);
     }
 
 
     @Override
-    public WxUserTag getWxFansTag(Integer id) {
-        return null;
-    }
-
-    @Override
-    public List<WxUserTag> getWxFansTagList(Collection<Integer> ids) {
-        return null;
+    public List<WxUserTag> getWxFansTagList(String appId) throws WxErrorException {
+        wxMpService.switchover(appId);
+        return wxMpService.getUserTagService().tagGet();
     }
 
     @Override
