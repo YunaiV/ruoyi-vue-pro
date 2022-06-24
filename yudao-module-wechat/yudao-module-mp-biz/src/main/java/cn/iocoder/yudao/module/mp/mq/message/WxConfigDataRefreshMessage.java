@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.mq.message.dict;
+package cn.iocoder.yudao.module.mp.mq.message;
 
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessage;
 import lombok.Data;

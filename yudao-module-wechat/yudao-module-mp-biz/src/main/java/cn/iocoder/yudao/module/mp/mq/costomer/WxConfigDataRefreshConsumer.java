@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.module.mp.mq.costomer.dict;
+package cn.iocoder.yudao.module.mp.mq.costomer;
 
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
-import cn.iocoder.yudao.module.mp.config.WxMpConfig;
-import cn.iocoder.yudao.module.mp.mq.message.dict.WxConfigDataRefreshMessage;
+import cn.iocoder.yudao.module.mp.mq.message.WxConfigDataRefreshMessage;
+import cn.iocoder.yudao.module.mp.service.account.WxAccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -18,12 +18,12 @@ import javax.annotation.Resource;
 public class WxConfigDataRefreshConsumer extends AbstractChannelMessageListener<WxConfigDataRefreshMessage> {
 
     @Resource
-    private WxMpConfig wxMpConfig;
+    private WxAccountService wxAccountService;
 
     @Override
     public void onMessage(WxConfigDataRefreshMessage message) {
         log.info("[onMessage][收到 WxConfigData 刷新消息]");
-        wxMpConfig.initWxConfig();
+        wxAccountService.initLoadWxMpConfigStorages();
     }
 
 }

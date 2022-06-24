@@ -81,4 +81,9 @@ public interface WxAccountService {
      * @return
      */
     WxAccountDO findBy(SFunction<WxAccountDO, ?> field, Object val);
+
+    /**
+     * 初始化
+     */
+    void initLoadWxMpConfigStorages();
 }

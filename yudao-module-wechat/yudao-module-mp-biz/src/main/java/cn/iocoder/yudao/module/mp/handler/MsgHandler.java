@@ -6,13 +6,10 @@ import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.mp.builder.TextBuilder;
-import cn.iocoder.yudao.module.mp.config.WxMpProperties;
 import cn.iocoder.yudao.module.mp.controller.admin.fansmsg.vo.WxFansMsgCreateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
 import cn.iocoder.yudao.module.mp.service.account.WxAccountService;
 import cn.iocoder.yudao.module.mp.service.fansmsg.WxFansMsgService;
-import cn.iocoder.yudao.module.mp.service.receivetext.WxReceiveTextService;
-import cn.iocoder.yudao.module.mp.service.texttemplate.WxTextTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -34,13 +31,6 @@ import java.util.Map;
 @Component
 @Slf4j
 public class MsgHandler implements WxMpMessageHandler {
-
-    @Autowired
-    private WxReceiveTextService wxReceiveTextService;
-
-    @Autowired
-    private WxTextTemplateService wxTextTemplateService;
-
     @Autowired
     private WxAccountService wxAccountService;
 
@@ -49,9 +39,6 @@ public class MsgHandler implements WxMpMessageHandler {
 
     @Resource
     private FileApi fileApi;
-
-    @Autowired
-    private WxMpProperties wxMpProperties;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
@@ -112,7 +99,7 @@ public class MsgHandler implements WxMpMessageHandler {
                             if (!downloadDir.exists()) {
                                 downloadDir.mkdirs();
                             }
-                            String filepath = downloadDirStr + String.valueOf(System.currentTimeMillis()) + ".png";
+                            String filepath = downloadDirStr + System.currentTimeMillis() + ".png";
                             //微信pic url下载到本地，防止失效
                             long size = HttpUtil.downloadFile(wxMessage.getPicUrl(), FileUtil.file(filepath));
                             log.info("download pic size : {}", size);
@@ -147,8 +134,7 @@ public class MsgHandler implements WxMpMessageHandler {
         }
 
         //组装默认回复消息
-        String content = wxMpProperties.getDefaultContent();//默认
-        return new TextBuilder().build(content, wxMessage, weixinService);
+        return new TextBuilder().build("测试", wxMessage, weixinService);
     }
 
 

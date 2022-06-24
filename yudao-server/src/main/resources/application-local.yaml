@@ -177,13 +177,13 @@ logging:
 wx: # 参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档
   mp:
     # 公众号配置(必填)
-    app-id: wx041349c6f39b268b
+    appId: wx041349c6f39b268b
     secret: 5abee519483bc9f8cb37ce280e814bd0
     # 存储配置，解决 AccessToken 的跨节点的共享
     config-storage:
-      type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
+      type: RedisTemplate  # 配置类型: Memory(默认), Jedis, RedisTemplate
       key-prefix: wx # Redis Key 的前缀 TODO 芋艿：解决下 Redis key 管理的配置
-      http-client-type: HttpClient # 采用 HttpClient 请求微信公众号平台
+      http-client-type: HttpClient # http客户端类型: HttpClient(默认), OkHttp, JoddHttp
 
 --- #################### 芋道相关配置 ####################
 

@@ -10,10 +10,10 @@ import io.swagger.annotations.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class WxFansTagRespVO extends WxFansTagBaseVO {
+public class FansTagRespVO extends FansTagBaseVO {
 
-    @ApiModelProperty(value = "主键", required = true)
-    private Integer id;
+    @ApiModelProperty(value = "标签id，由微信分配.")
+    private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;
