@@ -202,6 +202,8 @@ yudao:
     pay-notify-url: http://niubi.natapp1.cc/api/pay/order/notify
     pay-return-url: http://niubi.natapp1.cc/api/pay/order/return
     refund-notify-url: http://niubi.natapp1.cc/api/pay/refund/notify
+  access-log: # 访问日志的配置项
+    enable: false
   demo: false # 关闭演示模式
 
 justauth:
