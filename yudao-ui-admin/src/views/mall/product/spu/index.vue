@@ -55,15 +55,19 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="主键" align="center" prop="id"/>
       <el-table-column label="商品名称" align="center" prop="name"/>
-      <el-table-column label="卖点" align="center" prop="sellPoint"/>
-      <el-table-column label="描述" align="center" prop="description"/>
+<!--      <el-table-column label="卖点" align="center" prop="sellPoint"/>-->
+<!--      <el-table-column label="描述" align="center" prop="description"/>-->
       <el-table-column label="分类id" align="center" prop="categoryId"/>
-      <el-table-column label="商品主图地址" align="center" prop="picUrls"/>
+      <el-table-column label="商品主图地址" align="center" prop="picUrls">
+        <template slot-scope="scope">
+          <img v-if="scope.row.picUrls" :src="scope.row.picUrls[0]" alt="分类图片" class="img-height"/>
+        </template>
+      </el-table-column>
       <el-table-column label="排序字段" align="center" prop="sort"/>
       <el-table-column label="点赞初始人数" align="center" prop="likeCount"/>
       <el-table-column label="价格 (分)" align="center" prop="price"/>
       <el-table-column label="库存数量" align="center" prop="quantity"/>
-      <el-table-column label="状态" align="center" prop="status"/>
+<!--      <el-table-column label="状态" align="center" prop="status"/>-->
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -85,7 +89,7 @@
                 @pagination="getList"/>
 
     <!-- 对话框(添加 / 修改) -->
-    <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="1500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="商品名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入商品名称"/>
@@ -240,7 +244,7 @@
             <el-table-column
               label="操作">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="changeSkuStatus(`${scope.$index}`)" v-if="scope.row.status==0">
+                <el-button type="text" size="small" @click="changeSkuStatus(`${scope.$index}`)" v-if="scope.row.status===0">
                   正常
                 </el-button>
                 <el-button type="text" size="small" @click="changeSkuStatus(`${scope.$index}`)" v-else>已禁用</el-button>
@@ -438,7 +442,7 @@
                 this.addTagInput.propertyId = this.unUseTags[index].id;
                 for (let i = 0; i < this.addTagInput.selectValues.length; i++) {
                     for (let j = 0; j < this.unUseTags[index].propertyValueList.length; j++) {
-                        if (this.addTagInput.selectValues[i] == this.unUseTags[index].propertyValueList[j].name) {
+                        if (this.addTagInput.selectValues[i] === this.unUseTags[index].propertyValueList[j].name) {
                             this.addTagInput.selectValueIds.push(this.unUseTags[index].propertyValueList[j].id)
                         }
                     }
@@ -629,6 +633,7 @@
                 this.reset();
                 const id = row.id;
                 getSpu(id).then(response => {
+                  console.log(">>>>>> response.data:" + JSON.stringify(response.data))
                     let dataSpu = response.data;
                     this.form = {
                         id: dataSpu.id,
@@ -642,9 +647,9 @@
                         likeCount: dataSpu.likeCount,
                         price: dataSpu.price,
                         quantity: dataSpu.quantity,
-                        status: dataSpu.status,
+                        // status: dataSpu.status,
                         isShowTagInput:undefined,
-                        skus:dataSpu.productSkuRespVOS,
+                        // skus:dataSpu.productSkuRespVOS,
                     };
                     this.open = true;
                     this.title = "修改商品spu";
@@ -727,6 +732,10 @@
       width: 90px;
       margin-left: 10px;
       vertical-align: bottom;
+    }
+
+    .img-height {
+      height: 65px;
     }
   }
 </style>
