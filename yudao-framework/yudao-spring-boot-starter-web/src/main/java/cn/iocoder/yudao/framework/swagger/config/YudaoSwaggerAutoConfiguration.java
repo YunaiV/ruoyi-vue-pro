@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.swagger.config;
 import cn.iocoder.yudao.framework.swagger.core.SpringFoxHandlerProviderBeanPostProcessor;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -45,27 +44,22 @@ public class YudaoSwaggerAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public SwaggerProperties swaggerProperties() {
-        return new SwaggerProperties();
-    }
-
-    @Bean
-    public Docket createRestApi() {
-        SwaggerProperties properties = swaggerProperties();
+    public Docket createRestApi(SwaggerProperties properties) {
         // 创建 Docket 对象
         return new Docket(DocumentationType.SWAGGER_2)
-                // 用来创建该 API 的基本信息，展示在文档的页面中（自定义展示的信息）
+                // ① 用来创建该 API 的基本信息，展示在文档的页面中（自定义展示的信息）
                 .apiInfo(apiInfo(properties))
-                // 设置扫描指定 package 包下的
+                // ② 设置扫描指定 package 包下的
                 .select()
                 .apis(basePackage(properties.getBasePackage()))
 //                .apis(basePackage("cn.iocoder.yudao.module.system")) // 可用于 swagger 无法展示时使用
                 .paths(PathSelectors.any())
                 .build()
+                // ③ 安全上下文（认证）
                 .securitySchemes(securitySchemes())
-                .globalRequestParameters(globalRequestParameters())
-                .securityContexts(securityContexts());
+                .securityContexts(securityContexts())
+                // ④ 全局参数（多租户 header）
+                .globalRequestParameters(globalRequestParameters());
     }
 
     // ========== apiInfo ==========
@@ -100,6 +94,7 @@ public class YudaoSwaggerAutoConfiguration {
     private static List<SecurityContext> securityContexts() {
         return Collections.singletonList(SecurityContext.builder()
                 .securityReferences(securityReferences())
+                // 通过 PathSelectors.regex("^(?!auth).*$")，排除包含 "auth" 的接口不需要使用securitySchemes
                 .forPaths(PathSelectors.regex("^(?!auth).*$"))
                 .build());
     }
