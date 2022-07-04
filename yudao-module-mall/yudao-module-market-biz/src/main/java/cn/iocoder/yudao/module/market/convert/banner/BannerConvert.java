@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerCreateReqVO;
 import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerRespVO;
 import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerUpdateReqVO;
-import cn.iocoder.yudao.module.market.controller.admin.banner.vo.BannerUpdateStatusReqVO;
 import cn.iocoder.yudao.module.market.dal.dataobject.banner.BannerDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -32,5 +31,4 @@ public interface BannerConvert {
 
     BannerDO convert(BannerUpdateReqVO updateReqVO);
 
-    BannerDO convert(BannerUpdateStatusReqVO updateStatusReqVO);
 }
