@@ -89,7 +89,7 @@
                 @pagination="getList"/>
 
     <!-- 对话框(添加 / 修改) -->
-    <el-dialog :title="title" :visible.sync="open" width="1500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="商品名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入商品名称"/>
@@ -641,20 +641,22 @@
                         sellPoint: dataSpu.sellPoint,
                         description: dataSpu.sellPoint,
                         categoryId: dataSpu.sellPoint,
-                        categoryIds: [],
+                        categoryIds: dataSpu.categoryIds,
                         picUrls: dataSpu.picUrls,
                         sort: dataSpu.sort,
                         likeCount: dataSpu.likeCount,
                         price: dataSpu.price,
                         quantity: dataSpu.quantity,
-                        // status: dataSpu.status,
+                        status: dataSpu.status,
                         isShowTagInput:undefined,
+                        skus:dataSpu.skus
                         // skus:dataSpu.productSkuRespVOS,
                     };
                     this.open = true;
                     this.title = "修改商品spu";
                 });
             },
+
             /** 提交按钮 */
             submitForm() {
                 console.log(this.form.picUrls.split(','));
