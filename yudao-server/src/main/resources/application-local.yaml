@@ -198,9 +198,7 @@ yudao:
   captcha:
     enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试
   security:
-    token-header: Authorization
     mock-enable: true
-    mock-secret: test
   xss:
     enable: false
     exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系
@@ -210,6 +208,10 @@ yudao:
     pay-notify-url: http://niubi.natapp1.cc/api/pay/order/notify
     pay-return-url: http://niubi.natapp1.cc/api/pay/order/return
     refund-notify-url: http://niubi.natapp1.cc/api/pay/refund/notify
+  access-log: # 访问日志的配置项
+    enable: false
+  error-code: # 错误码相关配置项
+    enable: false
   demo: false # 关闭演示模式
 
 justauth:

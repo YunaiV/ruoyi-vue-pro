@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.infra.service.logger;
 
-import cn.iocoder.yudao.framework.apilog.core.service.ApiAccessLogFrameworkService;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.infra.api.logger.dto.ApiAccessLogCreateReqDTO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog.ApiAccessLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog.ApiAccessLogPageReqVO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiAccessLogDO;
 
 import java.util.List;
@@ -13,7 +13,14 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface ApiAccessLogService extends ApiAccessLogFrameworkService {
+public interface ApiAccessLogService {
+
+    /**
+     * 创建 API 访问日志
+     *
+     * @param createReqDTO API 访问日志
+     */
+    void createApiAccessLog(ApiAccessLogCreateReqDTO createReqDTO);
 
     /**
      * 获得 API 访问日志分页

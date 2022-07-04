@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 
-@ApiModel("管理后台 - OAuth2.0 更新用户基本信息 Request VO")
+@ApiModel("管理后台 - OAuth2 更新用户基本信息 Request VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

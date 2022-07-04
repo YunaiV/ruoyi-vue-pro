@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2Open
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ApproveDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
-import cn.iocoder.yudao.module.system.enums.auth.OAuth2GrantTypeEnum;
+import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2GrantTypeEnum;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ApproveService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ClientService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2GrantService;
@@ -77,7 +77,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
 
         // mock 方法（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(addTime(Duration.ofMillis(30010L))); // 多给 10 毫秒，保证可执行完
+                .setExpiresTime(addTime(Duration.ofMillis(30050L))); // 多给 10 毫秒，保证可执行完
         when(oauth2GrantService.grantAuthorizationCodeForAccessToken(eq("test_client_id"),
                 eq(code), eq(redirectUri), eq(state))).thenReturn(accessTokenDO);
 
@@ -105,7 +105,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
 
         // mock 方法（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(addTime(Duration.ofMillis(30010L))); // 多给 10 毫秒，保证可执行完
+                .setExpiresTime(addTime(Duration.ofMillis(30050L))); // 多给 10 毫秒，保证可执行完
         when(oauth2GrantService.grantPassword(eq(username), eq(password), eq("test_client_id"),
                 eq(Lists.newArrayList("write", "read")))).thenReturn(accessTokenDO);
 

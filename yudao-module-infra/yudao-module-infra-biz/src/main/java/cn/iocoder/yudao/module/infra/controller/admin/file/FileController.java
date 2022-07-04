@@ -46,7 +46,7 @@ public class FileController {
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
     public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file,
                                            @RequestParam(value = "path", required = false) String path) throws Exception {
-        return success(fileService.createFile(path, IoUtil.readBytes(file.getInputStream())));
+        return success(fileService.createFile(file.getOriginalFilename(), path, IoUtil.readBytes(file.getInputStream())));
     }
 
     @DeleteMapping("/delete")

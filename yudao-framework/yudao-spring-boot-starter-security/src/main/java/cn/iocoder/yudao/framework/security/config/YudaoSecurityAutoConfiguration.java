@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.security.core.handler.AuthenticationEntryPoint
 import cn.iocoder.yudao.framework.security.core.service.SecurityFrameworkService;
 import cn.iocoder.yudao.framework.security.core.service.SecurityFrameworkServiceImpl;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
-import cn.iocoder.yudao.module.system.api.auth.OAuth2TokenApi;
+import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -81,7 +81,7 @@ public class YudaoSecurityAutoConfiguration {
         return new TokenAuthenticationFilter(securityProperties, globalExceptionHandler, oauth2TokenApi);
     }
 
-    @Bean("ss") // 使用 Spring Security 的缩写，方便食用
+    @Bean("ss") // 使用 Spring Security 的缩写，方便使用
     public SecurityFrameworkService securityFrameworkService(PermissionApi permissionApi) {
         return new SecurityFrameworkServiceImpl(permissionApi);
     }

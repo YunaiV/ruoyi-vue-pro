@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.excel.core.convert;
 
 import cn.hutool.core.convert.Convert;
-import cn.iocoder.yudao.framework.dict.core.dto.DictDataRespDTO;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import com.alibaba.excel.converters.Converter;
@@ -12,7 +11,7 @@ import com.alibaba.excel.metadata.property.ExcelContentProperty;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Excel {@link DictDataRespDTO} 数据字典转换器
+ * Excel 数据字典转换器
  *
  * @author 芋道源码
  */
@@ -35,14 +34,14 @@ public class DictConvert implements Converter<Object> {
         // 使用字典解析
         String type = getType(contentProperty);
         String label = cellData.getStringValue();
-        DictDataRespDTO dictData = DictFrameworkUtils.parseDictDataFromCache(type, label);
-        if (dictData == null) {
+        String value = DictFrameworkUtils.parseDictDataValue(type, label);
+        if (value == null) {
             log.error("[convertToJavaData][type({}) 解析不掉 label({})]", type, label);
             return null;
         }
         // 将 String 的 value 转换成对应的属性
         Class<?> fieldClazz = contentProperty.getField().getType();
-        return Convert.convert(fieldClazz, dictData.getValue());
+        return Convert.convert(fieldClazz, value);
     }
 
     @Override
@@ -56,13 +55,13 @@ public class DictConvert implements Converter<Object> {
         // 使用字典格式化
         String type = getType(contentProperty);
         String value = String.valueOf(object);
-        DictDataRespDTO dictData = DictFrameworkUtils.getDictDataFromCache(type, value);
-        if (dictData == null) {
+        String label = DictFrameworkUtils.getDictDataLabel(type, value);
+        if (label == null) {
             log.error("[convertToExcelData][type({}) 转换不了 label({})]", type, value);
             return new CellData<>("");
         }
         // 生成 Excel 小表格
-        return new CellData<>(dictData.getLabel());
+        return new CellData<>(label);
     }
 
     private static String getType(ExcelContentProperty contentProperty) {

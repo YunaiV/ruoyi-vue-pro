@@ -36,9 +36,15 @@ public interface GlobalErrorCodeConstants {
 
     ErrorCode UNKNOWN = new ErrorCode(999, "未知错误");
 
-   static boolean isMatch(Integer code) {
+    /**
+     * 是否为服务端错误，参考 HTTP 5XX 错误码段
+     *
+     * @param code 错误码
+     * @return 是否
+     */
+   static boolean isServerErrorCode(Integer code) {
        return code != null
-               && code >= SUCCESS.getCode() && code <= UNKNOWN.getCode();
+               && code >= INTERNAL_SERVER_ERROR.getCode() && code <= INTERNAL_SERVER_ERROR.getCode() + 99;
    }
 
 }

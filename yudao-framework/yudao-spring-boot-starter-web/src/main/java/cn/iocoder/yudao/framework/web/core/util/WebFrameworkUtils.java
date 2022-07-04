@@ -23,7 +23,7 @@ public class WebFrameworkUtils {
 
     private static final String REQUEST_ATTRIBUTE_COMMON_RESULT = "common_result";
 
-    private static final String HEADER_TENANT_ID = "tenant-id";
+    public static final String HEADER_TENANT_ID = "tenant-id";
 
     private static WebProperties properties;
 
