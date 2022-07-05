@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 @ApiModel("管理后台 - 商品spu Response VO")
@@ -28,5 +29,8 @@ public class SpuRespVO extends ProductSpuBaseVO {
      * SKU 数组
      */
     List<ProductSkuRespVO> skus;
+
+    @ApiModelProperty(value = "分类id数组，一直递归到一级父节点", example = "[1,2,4]")
+    LinkedList<Long> categoryIds;
 
 }
