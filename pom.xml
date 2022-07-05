@@ -18,6 +18,7 @@
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
         <module>yudao-module-pay</module>
+        <module>yudao-module-mall</module>
     </modules>
 
     <name>${project.artifactId}</name>

@@ -3,12 +3,15 @@ import {getRefreshToken} from "@/utils/auth";
 import service from "@/utils/request";
 
 // 登录方法
-export function login(username, password, code, uuid) {
+export function login(username, password, code, uuid,
+                      socialType, socialCode, socialState) {
   const data = {
     username,
     password,
     code,
-    uuid
+    uuid,
+    // 社交相关
+    socialType, socialCode, socialState
   }
   return request({
     url: '/system/auth/login',
@@ -51,29 +54,14 @@ export function socialAuthRedirect(type, redirectUri) {
 }
 
 // 社交快捷登录，使用 code 授权码
-export function socialQuickLogin(type, code, state) {
+export function socialLogin(type, code, state) {
   return request({
-    url: '/system/auth/social-quick-login',
+    url: '/system/auth/social-login',
     method: 'post',
     data: {
       type,
       code,
       state
-    }
-  })
-}
-
-// 社交绑定登录，使用 code 授权码 + + 账号密码
-export function socialBindLogin(type, code, state, username, password) {
-  return request({
-    url: '/system/auth/social-bind-login',
-    method: 'post',
-    data: {
-      type,
-      code,
-      state,
-      username,
-      password
     }
   })
 }

@@ -141,23 +141,16 @@ public class AuthController {
             @ApiImplicitParam(name = "type", value = "社交类型", required = true, dataTypeClass = Integer.class),
             @ApiImplicitParam(name = "redirectUri", value = "回调路径", dataTypeClass = String.class)
     })
-    public CommonResult<String> socialAuthRedirect(@RequestParam("type") Integer type,
+    public CommonResult<String> socialLogin(@RequestParam("type") Integer type,
                                                     @RequestParam("redirectUri") String redirectUri) {
         return CommonResult.success(socialUserService.getAuthorizeUrl(type, redirectUri));
     }
 
-    @PostMapping("/social-quick-login")
-    @ApiOperation("社交快捷登录，使用 code 授权码")
+    @PostMapping("/social-login")
+    @ApiOperation(value = "社交快捷登录，使用 code 授权码", notes = "适合未登录的用户，但是社交账号已绑定用户")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
-    public CommonResult<AuthLoginRespVO> socialQuickLogin(@RequestBody @Valid AuthSocialQuickLoginReqVO reqVO) {
-        return success(authService.socialQuickLogin(reqVO));
-    }
-
-    @PostMapping("/social-bind-login")
-    @ApiOperation("社交绑定登录，使用 code 授权码 + 账号密码")
-    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
-    public CommonResult<AuthLoginRespVO> socialBindLogin(@RequestBody @Valid AuthSocialBindLoginReqVO reqVO) {
-        return success(authService.socialBindLogin(reqVO));
+    public CommonResult<AuthLoginRespVO> socialQuickLogin(@RequestBody @Valid AuthSocialLoginReqVO reqVO) {
+        return success(authService.socialLogin(reqVO));
     }
 
 }

@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.system.api.social.dto;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -14,6 +16,8 @@ import javax.validation.constraints.NotNull;
  * @author 芋道源码
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SocialUserBindReqDTO {
 
     /**
@@ -42,7 +46,7 @@ public class SocialUserBindReqDTO {
     /**
      * state
      */
-    @NotEmpty(message = "state 不能为空")
+    @NotNull(message = "state 不能为空")
     private String state;
 
 }

@@ -87,6 +87,8 @@ export default {
         username: "admin",
         password: "admin123",
         rememberMe: false,
+        code: "",
+        uuid: "",
       },
       loginRules: {
         username: [
@@ -170,16 +172,20 @@ export default {
             removeUsername()
             removePassword()
           }
-          this.$store.dispatch("SocialLogin2", {
-            code: this.code,
-            state: this.state,
-            type: this.type,
+          this.$store.dispatch("Login", {
+            socialCode: this.code,
+            socialState: this.state,
+            socialType: this.type,
+            // 账号密码登录
             username: this.loginForm.username,
-            password: this.loginForm.password
+            password: this.loginForm.password,
+            code: this.loginForm.code,
+            uuid: this.loginForm.uuid,
           }).then(() => {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
           }).catch(() => {
             this.loading = false;
+            this.getCode()
           });
         }
       });
