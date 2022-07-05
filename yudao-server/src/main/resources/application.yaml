@@ -5,12 +5,18 @@ spring:
   profiles:
     active: local
 
+  main:
+    allow-circular-references: true # 允许循环依赖，因为项目是三层架构，无法避免这个情况。
+
   # Servlet 配置
   servlet:
     # 文件上传相关配置项
     multipart:
       max-file-size: 16MB # 单个文件大小
       max-request-size: 32MB # 设置总上传的文件大小
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER # 解决 SpringFox 与 SpringBoot 2.6.x 不兼容的问题，参见 SpringFoxHandlerProviderBeanPostProcessor 类
 
   # Jackson 配置项
   jackson:
@@ -69,12 +75,6 @@ yudao:
     version: 1.0.0
     base-package: cn.iocoder.yudao
   web:
-    admin-api:
-      prefix: /admin-api
-      controller: '**.controller.admin.**'
-    app-api:
-      prefix: /app-api
-      controller: '**.controller.app.**'
     admin-ui:
       url: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
   swagger:
@@ -103,6 +103,7 @@ yudao:
       - /admin-api/system/captcha/get-image # 获取图片验证码，和租户无关
       - /admin-api/infra/file/*/get/** # 获取图片，和租户无关
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
+      - /app-api/pay/order/notify/* # 支付回调通知，不携带租户编号
     ignore-tables:
       - system_tenant
       - system_tenant_package

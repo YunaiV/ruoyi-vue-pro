@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.mq.message.sms.SmsSendMessage;
@@ -40,7 +41,8 @@ public class SmsSendServiceImpl implements SmsSendService {
     private AdminUserService adminUserService;
     @Resource
     private MemberService memberService;
-
+    @Resource
+    private SmsChannelService smsChannelService;
     @Resource
     private SmsTemplateService smsTemplateService;
     @Resource
@@ -80,13 +82,18 @@ public class SmsSendServiceImpl implements SmsSendService {
                               String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否合法
         SmsTemplateDO template = this.checkSmsTemplateValid(templateCode);
+        // 校验短信渠道是否合法
+        SmsChannelDO smsChannel = this.checkSmsChannelValid(template.getChannelId());
+
         // 校验手机号码是否存在
         mobile = this.checkMobile(mobile);
         // 构建有序的模板参数。为什么放在这个位置，是提前保证模板参数的正确性，而不是到了插入发送日志
         List<KeyValue<String, Object>> newTemplateParams = this.buildTemplateParams(template, templateParams);
 
         // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
-        Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus());
+        Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus())
+                && CommonStatusEnum.ENABLE.getStatus().equals(smsChannel.getStatus());
+        ;
         String content = smsTemplateService.formatSmsTemplateContent(template.getContent(), templateParams);
         Long sendLogId = smsLogService.createSmsLog(mobile, userId, userType, isSend, template, content, templateParams);
 
@@ -98,6 +105,16 @@ public class SmsSendServiceImpl implements SmsSendService {
         return sendLogId;
     }
 
+    @VisibleForTesting
+    public SmsChannelDO checkSmsChannelValid(Long channelId) {
+        // 获得短信模板。考虑到效率，从缓存中获取
+        SmsChannelDO channelDO = smsChannelService.getSmsChannel(channelId);
+        // 短信模板不存在
+        if (channelDO == null) {
+            throw exception(SMS_SEND_TEMPLATE_NOT_EXISTS);
+        }
+        return channelDO;
+    }
 
     @VisibleForTesting
     public SmsTemplateDO checkSmsTemplateValid(String templateCode) {
@@ -112,10 +129,10 @@ public class SmsSendServiceImpl implements SmsSendService {
 
     /**
      * 将参数模板，处理成有序的 KeyValue 数组
-     *
+     * <p>
      * 原因是，部分短信平台并不是使用 key 作为参数，而是数组下标，例如说腾讯云 https://cloud.tencent.com/document/product/382/39023
      *
-     * @param template 短信模板
+     * @param template       短信模板
      * @param templateParams 原始参数
      * @return 处理后的参数
      */

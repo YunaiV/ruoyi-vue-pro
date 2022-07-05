@@ -77,7 +77,7 @@
           <el-input v-model="form.remark" placeholder="请输入备注" />
         </el-form-item>
         <el-form-item label="存储器" prop="storage">
-          <el-select v-model="form.storage" placeholder="请选择存储器" :disabled="form.id">
+          <el-select v-model="form.storage" placeholder="请选择存储器" :disabled="form.id !== undefined">
             <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_FILE_STORAGE)"
                        :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
           </el-select>
@@ -91,7 +91,7 @@
           <el-input v-model="form.config.host" placeholder="请输入主机地址" />
         </el-form-item>
         <el-form-item v-if="form.storage >= 11 && form.storage <= 12" label="主机端口" prop="config.port">
-          <el-input-number min="0" v-model="form.config.port" placeholder="请输入主机端口" />
+          <el-input-number :min="0" v-model="form.config.port" placeholder="请输入主机端口" />
         </el-form-item>
         <el-form-item v-if="form.storage >= 11 && form.storage <= 12" label="用户名" prop="config.username">
           <el-input v-model="form.config.username" placeholder="请输入密码" />

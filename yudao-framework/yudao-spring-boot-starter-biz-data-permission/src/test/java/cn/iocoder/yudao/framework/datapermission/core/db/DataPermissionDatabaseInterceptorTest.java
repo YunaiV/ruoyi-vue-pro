@@ -62,7 +62,7 @@ public class DataPermissionDatabaseInterceptorTest extends BaseMockitoUnitTest {
             // 调用
             interceptor.beforeQuery(null, mappedStatement, null, null, null, boundSql);
             // 断言
-            pluginUtilsMock.verify(never(), () -> PluginUtils.mpBoundSql(boundSql));
+            pluginUtilsMock.verify(() -> PluginUtils.mpBoundSql(boundSql), never());
         }
     }
 

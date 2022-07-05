@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@ApiModel("管理后台 - OAuth2.0 获得用户基本信息 Response VO")
+@ApiModel("管理后台 - OAuth2 获得用户基本信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

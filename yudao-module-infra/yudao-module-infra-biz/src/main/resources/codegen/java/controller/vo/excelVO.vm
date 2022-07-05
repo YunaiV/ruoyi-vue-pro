@@ -2,6 +2,12 @@ package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePac
 
 import lombok.*;
 import java.util.*;
+#foreach ($column in $columns)
+#if (${column.javaType} == "BigDecimal")
+import java.math.BigDecimal;
+#break
+#end
+#end
 import io.swagger.annotations.*;
 
 import com.alibaba.excel.annotation.ExcelProperty;
