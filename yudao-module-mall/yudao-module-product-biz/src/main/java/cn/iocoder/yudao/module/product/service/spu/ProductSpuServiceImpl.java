@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
@@ -16,9 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -105,6 +104,19 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         if (null != spuVO) {
             List<ProductSkuRespVO> skuReqs = ProductSkuConvert.INSTANCE.convertList(productSkuService.getSkusBySpuId(id));
             spuVO.setSkus(skuReqs);
+            // 组合分类
+            if (null != spuVO.getCategoryId()) {
+                LinkedList<Long> categoryArray = new LinkedList<>();
+                Long parentId = spuVO.getCategoryId();
+                categoryArray.addFirst(parentId);
+                while (parentId != 0) {
+                    parentId = categoryService.getCategory(parentId).getParentId();
+                    if (parentId > 0) {
+                        categoryArray.addFirst(parentId);
+                    }
+                }
+                spuVO.setCategoryIds(categoryArray);
+            }
         }
         return spuVO;
     }
