@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -59,6 +60,7 @@ public class FileController {
     }
 
     @GetMapping("/{configId}/get/{path}")
+    @PermitAll
     @ApiOperation("下载文件")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "configId", value = "配置编号",  required = true, dataTypeClass = Long.class),
