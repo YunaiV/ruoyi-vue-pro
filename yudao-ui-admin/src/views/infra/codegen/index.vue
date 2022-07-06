@@ -292,7 +292,9 @@ export default {
     /** 修改按钮操作 */
     handleEditTable(row) {
       const tableId = row.id;
-      this.$router.push("/codegen/edit/" + tableId);
+      const tableName = row.tableName || this.tableNames[0];
+      const params = { pageNum: this.queryParams.pageNum };
+      this.$tab.openPage("修改[" + tableName + "]生成配置", '/codegen/edit/' + tableId, params);
     },
     /** 删除按钮操作 */
     handleDelete(row) {
