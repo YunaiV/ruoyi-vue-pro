@@ -217,7 +217,7 @@ export default {
       return result.value || '&nbsp;';
     },
     /** 复制代码成功 */
-    clipboardSuccess(){
+    clipboardSuccess() {
       this.$modal.msgSuccess("复制成功");
     },
     /** 生成 files 目录 **/
