@@ -12,7 +12,7 @@
         </div>
         <div class="head-container">
           <el-tree :data="deptOptions" :props="defaultProps" :expand-on-click-node="false" :filter-node-method="filterNode"
-                   ref="tree" default-expand-all @node-click="handleNodeClick"/>
+                   ref="tree" default-expand-all highlight-current @node-click="handleNodeClick"/>
         </div>
       </el-col>
       <!--用户数据-->
