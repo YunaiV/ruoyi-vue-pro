@@ -58,7 +58,7 @@ public class RedisController {
         return success(Keys);
     }
 
-    @DeleteMapping("/clear-key/{keyDefine}")
+    @DeleteMapping("/clear-key-define/{keyDefine}")
     @ApiOperation("删除 Redis Key 根据模板")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
     public CommonResult<Boolean> clearKeyDefineKeys(@PathVariable("keyDefine") String keyDefine) {
