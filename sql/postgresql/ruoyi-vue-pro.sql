@@ -1717,21 +1717,23 @@ CREATE TABLE "infra_file" (
   "config_id" int8,
   "path" varchar(512) COLLATE "pg_catalog"."default" NOT NULL,
   "url" varchar(1024) COLLATE "pg_catalog"."default" NOT NULL,
-  "type" varchar(63) COLLATE "pg_catalog"."default",
+  "ext_name" varchar(63) COLLATE "pg_catalog"."default",
+  "mime_type" varchar(63) COLLATE "pg_catalog"."default",
   "size" int4 NOT NULL,
   "creator" varchar(64) COLLATE "pg_catalog"."default",
   "create_time" timestamp(6) NOT NULL,
   "updater" varchar(64) COLLATE "pg_catalog"."default",
   "update_time" timestamp(6) NOT NULL,
   "deleted" int2 NOT NULL DEFAULT 0,
-  "name" varchar(255) COLLATE "pg_catalog"."default"
+  "name" varchar(512) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "infra_file"."id" IS '文件编号';
 COMMENT ON COLUMN "infra_file"."config_id" IS '配置编号';
 COMMENT ON COLUMN "infra_file"."path" IS '文件路径';
 COMMENT ON COLUMN "infra_file"."url" IS '文件 URL';
-COMMENT ON COLUMN "infra_file"."type" IS '文件类型';
+COMMENT ON COLUMN "infra_file"."ext_name" IS '文件扩展名';
+COMMENT ON COLUMN "infra_file"."mime_type" IS '文件MIME类型';
 COMMENT ON COLUMN "infra_file"."size" IS '文件大小';
 COMMENT ON COLUMN "infra_file"."creator" IS '创建者';
 COMMENT ON COLUMN "infra_file"."create_time" IS '创建时间';
