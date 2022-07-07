@@ -52,7 +52,7 @@ public class RedisController {
 
     @GetMapping("/get-key/{keyDefine}")
     @ApiOperation("获得 Redis keys 键名列表")
-    @PreAuthorize("@ss.hasPermission('infra:redis:get-key-define')")
+    @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
     public CommonResult<Set<String>> getKeyDefineKeys(@PathVariable("keyDefine") String keyDefine) {
         Set<String> Keys = stringRedisTemplate.keys(keyDefine + "*");
         return success(Keys);
@@ -60,7 +60,7 @@ public class RedisController {
 
     @DeleteMapping("/clear-key/{keyDefine}")
     @ApiOperation("删除 Redis Key 根据模板")
-    @PreAuthorize("@ss.hasPermission('infra:redis:clear-key-define')")
+    @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
     public CommonResult<Boolean> clearKeyDefineKeys(@PathVariable("keyDefine") String keyDefine) {
         stringRedisTemplate.delete(Objects.requireNonNull(stringRedisTemplate.keys(keyDefine + "*")));
         return success(Boolean.TRUE);
@@ -68,7 +68,7 @@ public class RedisController {
 
     @GetMapping("/get-key/{keyDefine}/{cacheKey}")
     @ApiOperation("获得 Redis key 内容")
-    @PreAuthorize("@ss.hasPermission('infra:redis:get-key-value')")
+    @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
     public CommonResult<RedisValuesRespVO> getKeyValue(@PathVariable("keyDefine") String keyDefine, @PathVariable("cacheKey") String cacheKey) {
         String cacheValue = stringRedisTemplate.opsForValue().get(cacheKey);
         return success(new RedisValuesRespVO(keyDefine, cacheKey, cacheValue));
@@ -76,7 +76,7 @@ public class RedisController {
 
     @DeleteMapping("/clear-key/{cacheKey}")
     @ApiOperation("删除 Redis Key 根据key")
-    @PreAuthorize("@ss.hasPermission('infra:redis:clear-key-value')")
+    @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
     public CommonResult<Boolean> clearCacheKey(@PathVariable String cacheKey) {
         stringRedisTemplate.delete(cacheKey);
         return success(Boolean.TRUE);
@@ -84,7 +84,7 @@ public class RedisController {
 
     @DeleteMapping("/clear-cache-all")
     @ApiOperation(value="删除 所有缓存", notes="不使用该接口")
-    @PreAuthorize("@ss.hasPermission('infra:redis:clear-cache-all')")
+    @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
     public CommonResult<Boolean> clearCacheAll() {
         Collection<String> cacheKeys = stringRedisTemplate.keys("*");
         stringRedisTemplate.delete(cacheKeys);
