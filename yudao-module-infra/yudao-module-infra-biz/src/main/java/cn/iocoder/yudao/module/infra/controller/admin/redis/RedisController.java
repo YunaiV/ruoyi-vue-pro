@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
 import cn.iocoder.yudao.framework.redis.core.RedisKeyRegistry;
 import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisKeyRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisMonitorRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisValuesRespVO;
 import cn.iocoder.yudao.module.infra.convert.redis.RedisConvert;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,13 +13,10 @@ import org.springframework.data.redis.connection.RedisServerCommands;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -50,6 +48,44 @@ public class RedisController {
     public CommonResult<List<RedisKeyRespVO>> getKeyList() {
         List<RedisKeyDefine> keyDefines = RedisKeyRegistry.list();
         return success(RedisConvert.INSTANCE.convertList(keyDefines));
+    }
+
+    @GetMapping("/get-key/{keyDefine}")
+    @ApiOperation("获得 Redis Key")
+//    @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
+    public CommonResult<Set<String>> getKeyDefineKeys(@PathVariable("keyDefine") String keyDefine) {
+        Set<String> Keys = stringRedisTemplate.keys(keyDefine + "*");
+        return success(Keys);
+    }
+
+    @DeleteMapping("/clear-key/{keyDefine}")
+    @ApiOperation("获得 Redis Key")
+//    @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
+    public CommonResult<Boolean> clearKeyDefineKeys(@PathVariable("keyDefine") String keyDefine) {
+        stringRedisTemplate.delete(Objects.requireNonNull(stringRedisTemplate.keys(keyDefine + "*")));
+        return success(Boolean.TRUE);
+    }
+
+//    @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
+    @GetMapping("/get-key/{cacheName}/{cacheKey}")
+    public CommonResult<RedisValuesRespVO> getKeyValue(@PathVariable("cacheName") String cacheName, @PathVariable("cacheKey") String cacheKey) {
+        String cacheValue = stringRedisTemplate.opsForValue().get(cacheKey);
+        return success(new RedisValuesRespVO(cacheName, cacheKey, cacheValue));
+    }
+
+//    @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
+    @DeleteMapping("/clearCacheKey/{cacheKey}")
+    public CommonResult<Boolean> clearCacheKey(@PathVariable String cacheKey) {
+        stringRedisTemplate.delete(cacheKey);
+        return success(Boolean.TRUE);
+    }
+
+//    @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
+    @DeleteMapping("/clearCacheAll")
+    public CommonResult<Boolean> clearCacheAll() {
+        Collection<String> cacheKeys = stringRedisTemplate.keys("*");
+        stringRedisTemplate.delete(cacheKeys);
+        return success(Boolean.TRUE);
     }
 
 }
