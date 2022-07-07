@@ -232,21 +232,27 @@ export default {
       this.auditForms = [];
       getTaskListByProcessInstanceId(this.id).then(response => {
         // 审批记录
-        this.tasks = response.data;
+        this.tasks = [];
+        // 移除已取消的审批
+        response.data.forEach(task => {
+          if (task.result !== 4) {
+            this.tasks.push(task);
+          }
+        });
         // 排序，将未完成的排在前面，已完成的排在后面；
-        // this.tasks.sort((a, b) => {
-        //   // 有已完成的情况，按照完成时间倒序
-        //   if (a.endTime && b.endTime) {
-        //     return b.endTime - a.endTime;
-        //   } else if (a.endTime) {
-        //     return 1;
-        //   } else if (b.endTime) {
-        //     return -1;
-        //     // 都是未完成，按照创建时间倒序
-        //   } else {
-        //     return b.createTime - a.createTime;
-        //   }
-        // });
+        this.tasks.sort((a, b) => {
+          // 有已完成的情况，按照完成时间倒序
+          if (a.endTime && b.endTime) {
+            return b.endTime - a.endTime;
+          } else if (a.endTime) {
+            return 1;
+          } else if (b.endTime) {
+            return -1;
+            // 都是未完成，按照创建时间倒序
+          } else {
+            return b.createTime - a.createTime;
+          }
+        });
 
         // 需要审核的记录
         const userId = store.getters.userId;

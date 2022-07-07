@@ -17,11 +17,6 @@
         </foreach>
     </delete>
 
-    <select id="listAll" resultType="cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmActivityDO">
-        SELECT *
-        FROM act_hi_taskinst;
-    </select>
-
     <select id="listAllByProcInstIdAndDelete"
             resultType="cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmActivityDO">
         SELECT id_                AS `id`,

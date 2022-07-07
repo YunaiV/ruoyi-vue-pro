@@ -18,8 +18,8 @@ import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
-import cn.iocoder.yudao.module.business.hi.task.inst.service.HiTaskInstService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -78,8 +78,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     private BpmTaskAssignRuleMapper taskAssignRuleMapper;
     @Resource
     private BpmActivityMapper bpmActivityMapper;
-    @Resource
-    private HiTaskInstService hiTaskInstService;
 
     @Override
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
@@ -161,22 +159,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     public List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId) {
         // 获得任务列表
-       /* List<HistoricTaskInstance> tasks =
-            historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId)
+        List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
+                .processInstanceId(processInstanceId)
                 .orderByHistoricTaskInstanceStartTime().desc() // 创建时间倒序
                 .list();
         if (CollUtil.isEmpty(tasks)) {
             return Collections.emptyList();
-        }*/
+        }
+
         // 获得 TaskExtDO Map
-        //        List<BpmTaskExtDO> bpmTaskExtDOList =
-        //            taskExtMapper.selectListByTaskIds(convertSet(tasks, HistoricTaskInstance::getId));
-
-//        List<BpmTaskExtDO> bpmTaskExtDOList = taskExtMapper.listByProcInstId(processInstanceId);
-        //        List<BpmTaskExtDO> bpmTaskExtDOList = BpmTaskConvert.INSTANCE.distinct(tmpBpmTaskExtDOList);
-        //        bpmTaskExtDOList.forEach(var -> log.info("var = " + var));
-
-        /*Map<String, BpmTaskExtDO> bpmTaskExtDoMap = convertMap(bpmTaskExtDOList, BpmTaskExtDO::getTaskId);
+        List<BpmTaskExtDO> bpmTaskExtDOs = taskExtMapper.selectListByTaskIds(convertSet(tasks, HistoricTaskInstance::getId));
+        Map<String, BpmTaskExtDO> bpmTaskExtDOMap = convertMap(bpmTaskExtDOs, BpmTaskExtDO::getTaskId);
         // 获得 ProcessInstance Map
         HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
         // 获得 User Map
@@ -184,14 +177,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         userIds.add(NumberUtils.parseLong(processInstance.getStartUserId()));
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         // 获得 Dept Map
-        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));*/
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
 
         // 拼接数据
-//        List<BpmTaskExtDO> tmpBpmTaskExtDOList = taskExtMapper.listByProcInstId(processInstanceId);
-        // TODO @ke：这个钉钉是咋处理的？得讨论下流程预测的需要程度哈。
-        List<BpmTaskExtDO> tmpBpmTaskExtDOList = taskExtMapper.selectListByProcessInstanceId(processInstanceId);
-        tmpBpmTaskExtDOList.sort(Comparator.comparing(BpmTaskExtDO::getCreateTime));
-        return hiTaskInstService.taskGetComment(tmpBpmTaskExtDOList, "");
+        return BpmTaskConvert.INSTANCE.convertList3(tasks, bpmTaskExtDOMap, processInstance, userMap, deptMap);
     }
 
     @Override
