@@ -26,14 +26,15 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="文件名" align="center" prop="name" />
-      <el-table-column label="文件路径" align="center" prop="path" />
-      <el-table-column label="文件 URL" align="center" prop="url" />
+      <el-table-column  label="文件名" :show-overflow-tooltip="true" align="center" min-width="250" prop="name" />
+      <el-table-column :show-overflow-tooltip="true" label="文件路径" align="center" min-width="300" prop="path" />
+      <el-table-column :show-overflow-tooltip="true" label="文件 URL" align="center" min-width="400" prop="url" />
       <el-table-column label="文件大小" align="center" prop="size" width="120" :formatter="sizeFormat" />
-      <el-table-column label="文件类型" align="center" prop="type" width="80" />
+      <el-table-column label="文件类型" align="center" prop="mimeType" width="210" />
+      <el-table-column label="文件扩展名" align="center" prop="extName" width="80" />
 <!--      <el-table-column label="文件内容" align="center" prop="content">-->
 <!--        <template slot-scope="scope">-->
-<!--          <img v-if="scope.row.type === 'jpg' || scope.row.type === 'png' || scope.row.type === 'gif'"-->
+<!--          <img v-if="scope.row.extName === 'jpg' || scope.row.extName === 'png' || scope.row.extName === 'gif'"-->
 <!--               width="200px" :src="getFileUrl + scope.row.id">-->
 <!--          <i v-else>非图片，无法预览</i>-->
 <!--        </template>-->
@@ -101,7 +102,7 @@ export default {
         pageNo: 1,
         pageSize: 10,
         path: null,
-        type: null,
+        extName: null,
       },
       // 用户导入参数
       upload: {
