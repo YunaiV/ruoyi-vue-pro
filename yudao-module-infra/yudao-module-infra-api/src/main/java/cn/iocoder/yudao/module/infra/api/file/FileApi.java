@@ -14,7 +14,7 @@ public interface FileApi {
      * @return 文件路径
      */
     default String createFile(byte[] content) {
-        return createFile(null, null, content);
+        return createFile(null, null, "application/octet-stream", content);
     }
 
     /**
@@ -25,17 +25,18 @@ public interface FileApi {
      * @return 文件路径
      */
     default String createFile(String path, byte[] content) {
-        return createFile(null, path, content);
+        return createFile(null, path, "application/octet-stream", content);
     }
 
     /**
      * 保存文件，并返回文件的访问路径
      *
-     * @param name 文件名称
-     * @param path 文件路径
-     * @param content 文件内容
+     * @param name     文件名称
+     * @param path     文件路径
+     * @param mimeType 文件类型
+     * @param content  文件内容
      * @return 文件路径
      */
-    String createFile(String name, String path, byte[] content);
+    String createFile(String name, String path, String mimeType, byte[] content);
 
 }

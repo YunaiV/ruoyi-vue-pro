@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
 import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
@@ -39,11 +40,13 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @SneakyThrows
-    public String createFile(String name, String path, byte[] content) {
-        // 计算默认的 path 名
-        String type = FileTypeUtil.getType(new ByteArrayInputStream(content), name);
+    public String createFile(String name, String path, String mimeType, byte[] content) {
+        //获取文件的真实扩展名
+        String extName = FileTypeUtil.getType(new ByteArrayInputStream(content), name);
+        FileNameUtil.extName(name);
         if (StrUtil.isEmpty(path)) {
-            path = DigestUtil.md5Hex(content) + '.' + type;
+            //使用sha256计算文件都唯一路径，降低碰撞概率
+            path = DigestUtil.sha256Hex(content) + '.' + extName;
         }
         // 如果 name 为空，则使用 path 填充
         if (StrUtil.isEmpty(name)) {
@@ -61,7 +64,8 @@ public class FileServiceImpl implements FileService {
         file.setName(name);
         file.setPath(path);
         file.setUrl(url);
-        file.setType(type);
+        file.setExtName(extName);
+        file.setMimeType(mimeType);
         file.setSize(content.length);
         fileMapper.insert(file);
         return url;

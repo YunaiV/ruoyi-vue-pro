@@ -2634,14 +2634,15 @@ CREATE TABLE [dbo].[infra_file] (
   [config_id] bigint  NULL,
   [path] nvarchar(512) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [url] nvarchar(1024) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [type] nvarchar(63) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [ext_name] nvarchar(63) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [mime_type] nvarchar(63) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [size] int  NOT NULL,
   [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [create_time] datetime2(7)  NOT NULL,
   [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [update_time] datetime2(7)  NOT NULL,
   [deleted] bit DEFAULT 0 NOT NULL,
-  [name] nvarchar(256) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL
+  [name] nvarchar(512) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL
 )
 GO
 
@@ -2677,10 +2678,17 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'文件类型',
+'MS_Description', N'文件扩展名',
 'SCHEMA', N'dbo',
 'TABLE', N'infra_file',
-'COLUMN', N'type'
+'COLUMN', N'ext_name'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'文件MIME类型',
+'SCHEMA', N'dbo',
+'TABLE', N'infra_file',
+'COLUMN', N'mime_type'
 GO
 
 EXEC sp_addextendedproperty

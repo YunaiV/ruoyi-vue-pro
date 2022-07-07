@@ -38,7 +38,7 @@ public class FileDO extends BaseDO {
      */
     private String name;
     /**
-     * 路径，即文件名
+     * 路径，即文件名，唯一不可重复
      */
     private String path;
     /**
@@ -46,11 +46,15 @@ public class FileDO extends BaseDO {
      */
     private String url;
     /**
-     * 文件类型
-     *
+     * 文件扩展名
+     * <p>
      * 通过 {@link cn.hutool.core.io.FileTypeUtil#getType(InputStream)} 获取
      */
-    private String type;
+    private String extName;
+    /**
+     * 文件的MIME类型，默认为"application/octet-stream"
+     */
+    private String mimeType;
     /**
      * 文件大小
      */
