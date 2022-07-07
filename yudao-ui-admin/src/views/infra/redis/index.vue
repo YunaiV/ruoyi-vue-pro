@@ -93,7 +93,7 @@
     <el-dialog
       :title="keyTemplate + '模块'"
       :visible.sync="open"
-      width="50vw"
+      width="60vw"
       append-to-body
     >
       <el-row :gutter="10">

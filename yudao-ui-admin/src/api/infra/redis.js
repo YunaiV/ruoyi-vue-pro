@@ -35,7 +35,7 @@ export function getKeyValue(keyDefine, key) {
 // 根据键名删除缓存
 export function clearCacheKey(key) {
   return request({
-    url: '/infra/redis/clearCacheKey/' + key,
+    url: '/infra/redis/clear-key/' + key,
     method: 'delete'
   })
 }
