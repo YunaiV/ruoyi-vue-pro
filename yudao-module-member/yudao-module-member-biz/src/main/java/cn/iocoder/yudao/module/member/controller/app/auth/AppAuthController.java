@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -43,6 +44,7 @@ public class AppAuthController {
     }
 
     @PostMapping("/logout")
+    @PermitAll
     @ApiOperation("登出系统")
     public CommonResult<Boolean> logout(HttpServletRequest request) {
         String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());

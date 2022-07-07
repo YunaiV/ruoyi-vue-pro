@@ -31,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
@@ -82,6 +83,7 @@ public class OAuth2OpenController {
      * 注意，默认需要传递 client_id + client_secret 参数
      */
     @PostMapping("/token")
+    @PermitAll
     @ApiOperation(value = "获得访问令牌", notes = "适合 code 授权码模式，或者 implicit 简化模式；在 sso.vue 单点登录界面被【获取】调用")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "grant_type", required = true, value = "授权类型", example = "code", dataTypeClass = String.class),
@@ -141,6 +143,7 @@ public class OAuth2OpenController {
     }
 
     @DeleteMapping("/token")
+    @PermitAll
     @ApiOperation(value = "删除访问令牌")
     @ApiImplicitParam(name = "token", required = true, value = "访问令牌", example = "biu", dataTypeClass = String.class)
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
@@ -159,6 +162,7 @@ public class OAuth2OpenController {
      * 对应 Spring Security OAuth 的 CheckTokenEndpoint 类的 checkToken 方法
      */
     @PostMapping("/check-token")
+    @PermitAll
     @ApiOperation(value = "校验访问令牌")
     @ApiImplicitParam(name = "token", required = true, value = "访问令牌", example = "biu", dataTypeClass = String.class)
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
