@@ -9,12 +9,16 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.impl.BpmTaskAssignStartUserScript;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.PostApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
+import cn.iocoder.yudao.module.system.api.permission.RoleApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -37,7 +41,7 @@ import static org.mockito.Mockito.when;
  *
  * @author 芋道源码
  */
-@Import(BpmTaskAssignRuleServiceImpl.class)
+@Import({BpmTaskAssignRuleServiceImpl.class, BpmTaskAssignStartUserScript.class}) // Import 引入 BpmTaskAssignStartUserScript 目的是保证不报错
 public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
 
     @Resource
@@ -51,6 +55,12 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
     private AdminUserApi adminUserApi;
     @MockBean
     private PermissionApi permissionApi;
+    @MockBean
+    private RoleApi roleApi;
+    @MockBean
+    private PostApi postApi;
+    @MockBean
+    private DictDataApi dictDataApi;
 
     @Test
     public void testCalculateTaskCandidateUsers_Role() {
@@ -159,7 +169,7 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
         BpmTaskAssignScript script1 = new BpmTaskAssignScript() {
 
             @Override
-            public Set<Long> calculateTaskCandidateUsers(TaskEntity task) {
+            public Set<Long> calculateTaskCandidateUsers(DelegateExecution task) {
                 return singleton(11L);
             }
 
@@ -171,7 +181,7 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
         BpmTaskAssignScript script2 = new BpmTaskAssignScript() {
 
             @Override
-            public Set<Long> calculateTaskCandidateUsers(TaskEntity task) {
+            public Set<Long> calculateTaskCandidateUsers(DelegateExecution task) {
                 return singleton(22L);
             }
 
