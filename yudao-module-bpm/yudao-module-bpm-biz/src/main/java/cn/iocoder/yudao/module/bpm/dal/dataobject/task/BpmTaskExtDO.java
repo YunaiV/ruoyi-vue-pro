@@ -29,10 +29,6 @@ public class BpmTaskExtDO extends BaseDO {
     private Long id;
 
     /**
-     * 流程任务key TODO 芋艿，看看这个字段的作用
-     */
-    private String taskDefKey;
-    /**
      * 任务的审批人
      *
      * 冗余 Task 的 assignee 属性

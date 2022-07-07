@@ -1,17 +1,14 @@
 package cn.iocoder.yudao.module.bpm.convert.task;
 
-import cn.hutool.core.util.BooleanUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskDonePageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -21,7 +18,9 @@ import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.BeanUtils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -149,7 +148,7 @@ public interface BpmTaskConvert {
         AdminUserRespDTO startUser);
 
     default BpmTaskExtDO convert2TaskExt(Task task) {
-        BpmTaskExtDO taskExtDO = new BpmTaskExtDO().setTaskId(task.getId()).setTaskDefKey(task.getTaskDefinitionKey())
+        BpmTaskExtDO taskExtDO = new BpmTaskExtDO().setTaskId(task.getId())
             .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee())).setName(task.getName())
             .setProcessDefinitionId(task.getProcessDefinitionId()).setProcessInstanceId(task.getProcessInstanceId());
         taskExtDO.setCreateTime(task.getCreateTime());
@@ -166,30 +165,4 @@ public interface BpmTaskConvert {
         return reqDTO;
     }
 
-    /**
-     * bpmTaskExtDo 类数据去重
-     *
-     * @param bpmTaskExtDOList bpmTaskExtDo 类列表
-     *
-     * @return 返回新的list
-     */
-    default List<BpmTaskExtDO> distinct(List<BpmTaskExtDO> bpmTaskExtDOList) {
-        HashMap<String, BpmTaskExtDO> tmpMap = new HashMap<>(50);
-        List<BpmTaskExtDO> result = new ArrayList<>();
-        for (BpmTaskExtDO bpmTaskExtDO : bpmTaskExtDOList) {
-            boolean containsResult = tmpMap.containsKey(bpmTaskExtDO.getTaskDefKey());
-            if (BooleanUtil.isFalse(containsResult)) {
-                tmpMap.put(bpmTaskExtDO.getTaskDefKey(), bpmTaskExtDO);
-            }
-            BpmTaskExtDO tmpBpmTaskExtDO = tmpMap.get(bpmTaskExtDO.getTaskDefKey());
-            if (bpmTaskExtDO.getTaskDefKey().equals(tmpBpmTaskExtDO.getTaskDefKey())) {
-                if (!bpmTaskExtDO.getResult().equals(BpmProcessInstanceResultEnum.PROCESS.getResult())) {
-                    tmpMap.remove(bpmTaskExtDO.getTaskDefKey());
-                    tmpMap.put(bpmTaskExtDO.getTaskDefKey(), bpmTaskExtDO);
-                }
-            }
-        }
-        tmpMap.forEach((key, var) -> result.add(var));
-        return result;
-    }
 }
