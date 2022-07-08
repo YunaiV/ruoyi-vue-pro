@@ -67,32 +67,133 @@
     </el-row>
 
     <el-table
-        v-loading="keyListLoad"
-        :data="keyList"
-        row-key="id"
+      v-loading="keyListLoad"
+      :data="keyList"
+      row-key="id"
+      @row-click="openCacheInfo"
     >
       <el-table-column prop="keyTemplate" label="Key 模板" width="200" />
       <el-table-column prop="keyType" label="Key 类型" width="100" />
       <el-table-column prop="valueType" label="Value 类型" />
       <el-table-column prop="timeoutType" label="超时时间" width="200">
         <template slot-scope="scope">
-          <dict-tag :type="DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE" :value="scope.row.timeoutType" />
-          <span v-if="scope.row.timeout > 0">({{ scope.row.timeout / 1000 }} 秒)</span>
+          <dict-tag
+            :type="DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE"
+            :value="scope.row.timeoutType"
+          />
+          <span v-if="scope.row.timeout > 0"
+            >({{ scope.row.timeout / 1000 }} 秒)</span
+          >
         </template>
       </el-table-column>
       <el-table-column prop="memo" label="备注" />
     </el-table>
-  </div>
 
+    <!-- 缓存模块信息框 -->
+    <el-dialog
+      :title="keyTemplate + '模块'"
+      :visible.sync="open"
+      width="60vw"
+      append-to-body
+    >
+      <el-row :gutter="10">
+        <el-col :span="10" class="card-box">
+          <el-card style="height: 70vh">
+            <div slot="header">
+              <span>键名列表</span>
+              <el-button
+                style="float: right; padding: 3px 0"
+                type="text"
+                icon="el-icon-refresh-right"
+                @click="refreshCacheKeys"
+              ></el-button>
+            </div>
+            <el-table
+                :data="cachekeys"
+                style="width: 100%"
+                @row-click="handleCacheValue"
+            >
+              <el-table-column
+                label="序号"
+                width="60"
+                type="index"
+              ></el-table-column>
+              <el-table-column
+                label="缓存键名"
+                align="center"
+                :show-overflow-tooltip="true"
+                :formatter="keyFormatter"
+              >
+              </el-table-column>
+              <el-table-column
+                label="操作"
+                width="60"
+                align="center"
+                class-name="small-padding fixed-width"
+              >
+                <template slot-scope="scope">
+                  <el-button
+                    size="mini"
+                    type="text"
+                    icon="el-icon-delete"
+                    @click="handleClearCacheKey(scope.row)"
+                  ></el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+        </el-col>
+
+        <el-col :span="14">
+          <el-card :bordered="false" style="height: 70vh">
+            <div slot="header">
+              <span>缓存内容</span>
+              <!-- <el-button
+                style="float: right; padding: 3px 0"
+                type="text"
+                icon="el-icon-refresh-right"
+                @click="handleClearCacheAll()"
+                >清理全部</el-button>
+                -->
+            </div>
+          <el-form :model="cacheForm">
+            <el-row :gutter="32">
+              <el-col :offset="1" :span="22">
+                <el-form-item label="缓存名称:" prop="keyTemplate">
+                  <el-input v-model="cacheForm.keyTemplate" :readOnly="true" />
+                </el-form-item>
+              </el-col>
+              <el-col :offset="1" :span="22">
+                <el-form-item label="缓存键名:" prop="key">
+                  <el-input v-model="cacheForm.key" :readOnly="true" />
+                </el-form-item>
+                </el-col>
+                <el-col :offset="1" :span="22">
+                  <el-form-item label="缓存内容:" prop="value">
+                    <el-input
+                      v-model="cacheForm.value"
+                      type="textarea"
+                      :rows="12"
+                      :readOnly="true"
+                    />
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-form>
+          </el-card>
+        </el-col>
+      </el-row>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
-import { getCache, getKeyList } from "@/api/infra/redis";
+import { getCache, getKeyList, getKeyDefines, getKeyValue, deleteKeyValue } from "@/api/infra/redis";
 import echarts from "echarts";
 
 export default {
   name: "Server",
-  data() {
+  data () {
     return {
       // 统计命令信息
       commandstats: null,
@@ -103,15 +204,20 @@ export default {
       // key 列表
       keyListLoad: true,
       keyList: [],
+      // 模块弹出框
+      open: false,
+      keyTemplate: "",
+      cachekeys: [],
+      cacheForm: {}
     };
   },
-  created() {
+  created () {
     this.getList();
     this.openLoading();
   },
   methods: {
     /** 查缓存询信息 */
-    getList() {
+    getList () {
       // 查询 Redis 监控信息
       getCache().then((response) => {
         this.cache = response.data;
@@ -174,9 +280,54 @@ export default {
         this.keyListLoad = false;
       });
     },
+
     // 打开加载层
-    openLoading() {
+    openLoading () {
       this.$modal.loading("正在加载缓存监控数据，请稍后！");
+    },
+
+    // 打开缓存弹窗
+    openCacheInfo (e) {
+      this.open = true;
+      let keyDefine = e.keyTemplate.substring(0, e.keyTemplate.length - 2);
+      this.keyTemplate = keyDefine;
+      // 加载键名列表
+      this.handleCacheKeys(keyDefine);
+    },
+
+    /** 键名前缀去除 */
+    keyFormatter (cacheKey) {
+      return cacheKey.replace(this.keyTemplate, "");
+    },
+
+    // 获取键名列表
+    handleCacheKeys (keyDefine){
+      const cacheName = keyDefine !== undefined ? keyDefine : this.keyTemplate;
+      getKeyDefines(cacheName).then(response => {
+        this.cachekeys = response.data
+        this.cacheForm = {}
+      })
+    },
+
+    // 获取缓存值
+    handleCacheValue (e){
+      getKeyValue(this.keyTemplate, e).then(response => {
+        this.cacheForm = response.data
+      })
+    },
+
+    // 刷新键名列表
+    refreshCacheKeys(){
+      this.$modal.msgSuccess("刷新键名列表成功");
+      this.handleCacheKeys();
+    },
+
+    // 删除缓存
+    handleClearCacheKey(key){
+      deleteKeyValue(key).then(response =>{
+        this.$modal.msgSuccess("清理缓存键名[" + key + "]成功");
+        this.handleCacheKeys();
+      })
     },
   },
 };
