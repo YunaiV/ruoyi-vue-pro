@@ -58,6 +58,7 @@
         <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
+        <tika-core.version>2.4.1</tika-core.version>
         <!-- 三方云服务相关 -->
         <minio.version>8.2.2</minio.version>
         <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
@@ -478,6 +479,12 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
                 <version>${easyexcel.verion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId> <!-- 文件类型的识别 -->
+                <version>${tika-core.version}</version>
             </dependency>
 
             <dependency>

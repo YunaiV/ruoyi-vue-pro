@@ -58,4 +58,8 @@ public class FileUtils {
         return file;
     }
 
+
+    public static void main(String[] args) {
+    }
+
 }
