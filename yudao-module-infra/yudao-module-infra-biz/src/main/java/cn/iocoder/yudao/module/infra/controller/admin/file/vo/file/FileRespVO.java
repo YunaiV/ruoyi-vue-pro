@@ -13,6 +13,9 @@ public class FileRespVO {
     @ApiModelProperty(value = "文件编号", required = true, example = "1024")
     private Long id;
 
+    @ApiModelProperty(value = "配置编号", required = true, example = "11")
+    private Long configId;
+
     @ApiModelProperty(value = "文件路径", required = true, example = "yudao.jpg")
     private String path;
 

@@ -31,13 +31,17 @@
       <el-table-column :show-overflow-tooltip="true" label="文件 URL" align="center" min-width="400" prop="url" />
       <el-table-column label="文件大小" align="center" prop="size" width="120" :formatter="sizeFormat" />
       <el-table-column label="文件类型" align="center" prop="type" width="210" />
-<!--      <el-table-column label="文件内容" align="center" prop="content">-->
-<!--        <template slot-scope="scope">-->
-<!--          <img v-if="scope.row.type&&scope.row.type.indexOf('image/') === 0"-->
-<!--               width="200px" :src="getFileUrl + scope.row.id">-->
-<!--          <i v-else>非图片，无法预览</i>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
+      <el-table-column label="文件内容" align="center" prop="content" min-width="150px">
+        <template slot-scope="scope">
+          <image-preview v-if="scope.row.type&&scope.row.type.indexOf('image/') === 0" :src="scope.row.url"
+                         :width="'100px'"></image-preview>
+          <i v-else>无法预览，点击
+            <el-link type="primary" :underline="false" style="font-size:12px;vertical-align: baseline;"
+                     :href="getFileUrl+scope.row.configId+'/get/' + scope.row.path">下载
+            </el-link>
+          </i>
+        </template>
+      </el-table-column>
       <el-table-column label="上传时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -79,12 +83,16 @@
 <script>
 import { deleteFile, getFilePage } from "@/api/infra/file";
 import {getAccessToken} from "@/utils/auth";
+import ImagePreview from "@/components/ImagePreview";
 
 export default {
   name: "File",
+  components: {
+    ImagePreview
+  },
   data() {
     return {
-      getFileUrl: process.env.VUE_APP_BASE_API + '/admin-api/infra/file/get/',
+      getFileUrl: process.env.VUE_APP_BASE_API + '/admin-api/infra/file/',
       // 遮罩层
       loading: true,
       // 显示搜索条件
