@@ -5,7 +5,6 @@ import org.flowable.engine.delegate.DelegateExecution;
 
 import java.util.Set;
 
-// TODO @芋艿：迁移到 bpm 的 core 下
 /**
  * Bpm 任务分配的自定义 Script 脚本
  * 使用场景：

@@ -412,15 +412,16 @@ export default {
     },
     /** 处理审批退回的操作 */
     handleBack(task) {
-      const data = {
-        id: task.id,
-        assigneeUserId: 1
-      }
-      // this.$modal.msgError("暂不支持【--退回】功能！");
-      backTask(data).then(response => {
-        this.$modal.msgSuccess("回退成功！");
-        this.getDetail(); // 获得最新详情
-      });
+      this.$modal.msgError("暂不支持【退回】功能！");
+      // 可参考 http://blog.wya1.com/article/636697030/details/7296
+      // const data = {
+      //   id: task.id,
+      //   assigneeUserId: 1
+      // }
+      // backTask(data).then(response => {
+      //   this.$modal.msgSuccess("回退成功！");
+      //   this.getDetail(); // 获得最新详情
+      // });
     }
   }
 };

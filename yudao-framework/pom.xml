@@ -25,7 +25,6 @@
 
         <module>yudao-spring-boot-starter-excel</module>
         <module>yudao-spring-boot-starter-test</module>
-        <module>yudao-spring-boot-starter-extension</module>
 
         <module>yudao-spring-boot-starter-biz-operatelog</module>
         <module>yudao-spring-boot-starter-biz-dict</module>

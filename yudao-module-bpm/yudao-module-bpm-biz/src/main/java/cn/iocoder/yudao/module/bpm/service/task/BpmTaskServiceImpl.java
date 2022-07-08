@@ -2,15 +2,12 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmActivityDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmTaskAssignRuleMapper;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmActivityMapper;
@@ -24,7 +21,6 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -40,7 +36,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -59,8 +54,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Resource
     private TaskService taskService;
-    @Resource
-    private RuntimeService runtimeService;
     @Resource
     private HistoryService historyService;
 
@@ -224,44 +217,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskExtMapper.updateByTaskId(
             new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.REJECT.getResult())
                 .setReason(reqVO.getReason()));
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    @TenantIgnore
-    public CommonResult<Boolean> backTask(BpmTaskBackReqVO reqVO) {
-        Long userId = Long.valueOf(reqVO.getUserId());
-        // 校验任务存在
-        Task task = checkTask(userId, reqVO.getTaskId());
-        ArrayList<String> oldTaskDefKeyList = CollUtil.newArrayList(reqVO.getOldTaskDefKey());
-
-        //        List<HistoricActivityInstance> hisActInstList =
-        //            historyService.createHistoricActivityInstanceQuery().processInstanceId(reqVO.getProcInstId()).list();
-        // TODO @ke：使用 historyService.createHistoricActivityInstanceQuery().processInstanceId(reqVO.getProcInstId()).list() 读取，会存在啥问题呀？
-        List<BpmActivityDO> bpmActivityDOList = bpmActivityMapper.listAllByProcInstIdAndDelete(reqVO.getProcInstId());
-        //        List<BpmActivityDO> bpmActivityDOList = BpmTaskConvert.INSTANCE.copyList(hisActInstList, BpmActivityDO.class);
-        //        bpmActivityDOList.forEach(bpmActivityDO -> log.info("bpmActivityDO = " + bpmActivityDO));
-        // TODO @ke：如果 开始->a->b->c->d->结束，从 d 驳回到 b 的话，这样会不会导致 a 也被删除呀？http://blog.wya1.com/article/636697030/details/7296 可以看看这篇文章哈。
-        List<String> taskIdList = bpmActivityDOList.stream().filter(
-                bpmActivityDO -> bpmActivityDO.getActivityId().equals(reqVO.getOldTaskDefKey())
-                    && !bpmActivityDO.getTaskId().equals(reqVO.getTaskId())).map(BpmActivityDO::getTaskId)
-            .collect(Collectors.toList());
-
-        // 使用flowable更改任务节点
-        runtimeService.createChangeActivityStateBuilder().processInstanceId(reqVO.getProcInstId())
-            .moveActivityIdsToSingleActivityId(oldTaskDefKeyList, reqVO.getNewTaskDefKey()).changeState();
-
-        // 逻辑删除hiActInst表任务
-        Boolean delHiActInstResult = bpmActivityMapper.delHiActInstByTaskId(taskIdList);
-        // 逻辑删除hiTaskInst表任务
-        Boolean delHiTaskInstResult = bpmActivityMapper.delHiTaskInstByTaskId(taskIdList);
-        // 更新任务拓展表
-        Boolean backResult = taskExtMapper.backByTaskId(reqVO.getTaskId(), reqVO.getReason());
-        Boolean delTaskResult = taskExtMapper.delByTaskIds(taskIdList);
-        if (!delHiActInstResult && !delHiTaskInstResult && !backResult && !delTaskResult) {
-            throw new RuntimeException("任务驳回失败！！！");
-        }
-        return CommonResult.success(true);
     }
 
     @Override
