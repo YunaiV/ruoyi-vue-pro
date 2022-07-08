@@ -188,7 +188,7 @@
 </template>
 
 <script>
-import { getCache, getKeyList, getKeyDefineKeys, getKeyValue, clearCacheKey } from "@/api/infra/redis";
+import { getCache, getKeyList, getKeyDefines, getKeyValue, deleteKeyValue } from "@/api/infra/redis";
 import echarts from "echarts";
 
 export default {
@@ -303,7 +303,7 @@ export default {
     // 获取键名列表
     handleCacheKeys (keyDefine){
       const cacheName = keyDefine !== undefined ? keyDefine : this.keyTemplate;
-      getKeyDefineKeys(cacheName).then(response => {
+      getKeyDefines(cacheName).then(response => {
         this.cachekeys = response.data
         this.cacheForm = {}
       })
@@ -324,7 +324,7 @@ export default {
 
     // 删除缓存
     handleClearCacheKey(key){
-      clearCacheKey(key).then(response =>{
+      deleteKeyValue(key).then(response =>{
         this.$modal.msgSuccess("清理缓存键名[" + key + "]成功");
         this.handleCacheKeys();
       })

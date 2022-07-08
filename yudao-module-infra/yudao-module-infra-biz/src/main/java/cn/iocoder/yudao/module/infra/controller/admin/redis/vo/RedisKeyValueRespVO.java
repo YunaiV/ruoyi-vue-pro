@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.infra.controller.admin.redis.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -9,7 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 @ApiModel("管理后台 - Redis Key Value onse VO")
 @Data
 @Builder
-public class RedisValuesRespVO {
+@AllArgsConstructor
+public class RedisKeyValueRespVO {
 
     @ApiModelProperty(value = "oauth2_access_token:%s", required = true, example = "String")
     private String keyTemplate;
@@ -20,10 +22,12 @@ public class RedisValuesRespVO {
     @ApiModelProperty(required = true, example = "String")
     private String value;
 
-    public RedisValuesRespVO(String keyTemplate, String key, String value){
-        this.keyTemplate = StringUtils.replace(keyTemplate, ":", "");
-        this.key = StringUtils.replace(key, keyTemplate, "");
-        this.value = value;
+    public static RedisKeyValueRespVO of(String keyTemplate, String key, String value){
+        return RedisKeyValueRespVO.builder()
+                .keyTemplate(StringUtils.replace(keyTemplate, ":", ""))
+                .key(StringUtils.replace(key, keyTemplate, ""))
+                .value(value)
+                .build();
     }
 
 

@@ -4,19 +4,25 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
 import cn.iocoder.yudao.framework.redis.core.RedisKeyRegistry;
 import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisKeyRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisKeyValueRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisMonitorRespVO;
-import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisValuesRespVO;
 import cn.iocoder.yudao.module.infra.convert.redis.RedisConvert;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.redis.connection.RedisServerCommands;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -50,45 +56,61 @@ public class RedisController {
         return success(RedisConvert.INSTANCE.convertList(keyDefines));
     }
 
-    @GetMapping("/get-key/{keyDefine}")
+    @GetMapping("/get-key-Defines")
     @ApiOperation("获得 Redis keys 键名列表")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
-    public CommonResult<Set<String>> getKeyDefineKeys(@PathVariable("keyDefine") String keyDefine) {
-        Set<String> Keys = stringRedisTemplate.keys(keyDefine + "*");
-        return success(Keys);
+    public CommonResult<Set<String>> getKeyDefines(@RequestParam("keyDefine") String keyDefine) {
+        Set<String> keys = new HashSet<>();
+         stringRedisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            try (Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions()
+                    .match(keyDefine + "*")
+                    .count(Integer.MAX_VALUE).build())) {
+                while (cursor.hasNext()) {
+                    keys.add(new String(cursor.next(), StandardCharsets.UTF_8));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return keys;
+        });
+        return success(keys);
     }
 
-    @DeleteMapping("/clear-key-define/{keyDefine}")
+    @DeleteMapping("/delete-key-defines")
     @ApiOperation("删除 Redis Key 根据模板")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
-    public CommonResult<Boolean> clearKeyDefineKeys(@PathVariable("keyDefine") String keyDefine) {
-        stringRedisTemplate.delete(Objects.requireNonNull(stringRedisTemplate.keys(keyDefine + "*")));
+    public CommonResult<Boolean> deleteKeyDefines(@RequestParam("keyDefine") String keyDefine) {
+        Set<String> keys = stringRedisTemplate.keys(keyDefine + "*");
+        if(keys != null && keys.isEmpty()){
+             stringRedisTemplate.delete(keys);
+        }
         return success(Boolean.TRUE);
     }
 
-    @GetMapping("/get-key/{keyDefine}/{cacheKey}")
+    @GetMapping("/get-key-value")
     @ApiOperation("获得 Redis key 内容")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
-    public CommonResult<RedisValuesRespVO> getKeyValue(@PathVariable("keyDefine") String keyDefine, @PathVariable("cacheKey") String cacheKey) {
+    public CommonResult<RedisKeyValueRespVO> getKeyValue(@RequestParam("keyDefine") String keyDefine, @RequestParam("cacheKey") String cacheKey) {
         String cacheValue = stringRedisTemplate.opsForValue().get(cacheKey);
-        return success(new RedisValuesRespVO(keyDefine, cacheKey, cacheValue));
+        return success(RedisKeyValueRespVO.of(keyDefine, cacheKey, cacheValue));
     }
 
-    @DeleteMapping("/clear-key/{cacheKey}")
+    @DeleteMapping("/delete-key-value")
     @ApiOperation("删除 Redis Key 根据key")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
-    public CommonResult<Boolean> clearCacheKey(@PathVariable String cacheKey) {
+    public CommonResult<Boolean> deleteKeyValue(@RequestParam("cacheKey") String cacheKey) {
         stringRedisTemplate.delete(cacheKey);
         return success(Boolean.TRUE);
     }
 
-    @DeleteMapping("/clear-cache-all")
+    @DeleteMapping("/delete-cache-all")
     @ApiOperation(value="删除 所有缓存", notes="不使用该接口")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
-    public CommonResult<Boolean> clearCacheAll() {
-        Collection<String> cacheKeys = stringRedisTemplate.keys("*");
-        stringRedisTemplate.delete(cacheKeys);
-        return success(Boolean.TRUE);
+    public CommonResult<Boolean> deleteCacheAll() {
+        return success(stringRedisTemplate.execute((RedisCallback<Boolean>) connection -> {
+            connection.flushAll();
+            return Boolean.TRUE;
+        }));
     }
 
 }
