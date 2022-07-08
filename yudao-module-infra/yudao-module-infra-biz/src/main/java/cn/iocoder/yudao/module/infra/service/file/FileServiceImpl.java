@@ -41,12 +41,12 @@ public class FileServiceImpl implements FileService {
     @Override
     @SneakyThrows
     public String createFile(String name, String path, String mimeType, byte[] content) {
-        //获取文件的真实扩展名
-        String extName = FileTypeUtil.getType(new ByteArrayInputStream(content), name);
-        FileNameUtil.extName(name);
+        //获取文件的扩展名
+        String extName = FileNameUtil.extName(name);
         if (StrUtil.isEmpty(path)) {
             //使用sha256计算文件都唯一路径，降低碰撞概率
-            path = DigestUtil.sha256Hex(content) + '.' + extName;
+            String sha256Hex = DigestUtil.sha256Hex(content);
+            path = StrUtil.isBlank(extName) ? sha256Hex : (sha256Hex + '.' + extName);
         }
         // 如果 name 为空，则使用 path 填充
         if (StrUtil.isEmpty(name)) {
@@ -64,8 +64,7 @@ public class FileServiceImpl implements FileService {
         file.setName(name);
         file.setPath(path);
         file.setUrl(url);
-        file.setExtName(extName);
-        file.setMimeType(mimeType);
+        file.setType(mimeType);
         file.setSize(content.length);
         fileMapper.insert(file);
         return url;

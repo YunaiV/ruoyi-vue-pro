@@ -22,11 +22,8 @@ public class FileRespVO {
     @ApiModelProperty(value = "文件 URL", required = true, example = "https://www.iocoder.cn/yudao.jpg")
     private String url;
 
-    @ApiModelProperty(value = "文件扩展名", example = "jpg")
-    private String extName;
-
     @ApiModelProperty(value = "文件MIME类型", example = "application/octet-stream")
-    private String mimeType;
+    private String type;
 
     @ApiModelProperty(value = "文件大小", example = "2048", required = true)
     private Integer size;

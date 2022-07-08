@@ -45,16 +45,11 @@ public class FileDO extends BaseDO {
      * 访问地址
      */
     private String url;
-    /**
-     * 文件扩展名
-     * <p>
-     * 通过 {@link cn.hutool.core.io.FileTypeUtil#getType(InputStream)} 获取
-     */
-    private String extName;
+
     /**
      * 文件的MIME类型，默认为"application/octet-stream"
      */
-    private String mimeType;
+    private String type;
     /**
      * 文件大小
      */

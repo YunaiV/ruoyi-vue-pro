@@ -30,11 +30,10 @@
       <el-table-column :show-overflow-tooltip="true" label="文件路径" align="center" min-width="300" prop="path" />
       <el-table-column :show-overflow-tooltip="true" label="文件 URL" align="center" min-width="400" prop="url" />
       <el-table-column label="文件大小" align="center" prop="size" width="120" :formatter="sizeFormat" />
-      <el-table-column label="文件类型" align="center" prop="mimeType" width="210" />
-      <el-table-column label="文件扩展名" align="center" prop="extName" width="80" />
+      <el-table-column label="文件类型" align="center" prop="type" width="210" />
 <!--      <el-table-column label="文件内容" align="center" prop="content">-->
 <!--        <template slot-scope="scope">-->
-<!--          <img v-if="scope.row.extName === 'jpg' || scope.row.extName === 'png' || scope.row.extName === 'gif'"-->
+<!--          <img v-if="scope.row.type&&scope.row.type.indexOf('image/') === 0"-->
 <!--               width="200px" :src="getFileUrl + scope.row.id">-->
 <!--          <i v-else>非图片，无法预览</i>-->
 <!--        </template>-->
@@ -101,8 +100,7 @@ export default {
       queryParams: {
         pageNo: 1,
         pageSize: 10,
-        path: null,
-        extName: null,
+        path: null
       },
       // 用户导入参数
       upload: {
