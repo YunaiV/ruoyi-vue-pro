@@ -60,7 +60,7 @@
                   审批人：{{ item.assigneeUser.nickname }}
                   <el-tag type="info" size="mini">{{ item.assigneeUser.deptName }}</el-tag>
                 </label>
-                <label style="font-weight: normal">创建时间：</label>
+                <label style="font-weight: normal" v-if="item.createTime">创建时间：</label>
                 <label style="color:#8a909c; font-weight: normal">{{ parseTime(item.createTime) }}</label>
                 <label v-if="item.endTime" style="margin-left: 30px;font-weight: normal">审批时间：</label>
                 <label v-if="item.endTime" style="color:#8a909c;font-weight: normal"> {{ parseTime(item.endTime) }}</label>
@@ -109,7 +109,7 @@ import store from "@/store";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
 import {createProcessInstance, getProcessInstance} from "@/api/bpm/processInstance";
-import {approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssignee} from "@/api/bpm/task";
+import {approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssignee,backTask} from "@/api/bpm/task";
 import {getDate} from "@/utils/dateUtils";
 import {listSimpleUsers} from "@/api/system/user";
 import {getActivityList} from "@/api/bpm/activity";
@@ -232,7 +232,13 @@ export default {
       this.auditForms = [];
       getTaskListByProcessInstanceId(this.id).then(response => {
         // 审批记录
-        this.tasks = response.data;
+        this.tasks = [];
+        // 移除已取消的审批
+        response.data.forEach(task => {
+          if (task.result !== 4) {
+            this.tasks.push(task);
+          }
+        });
         // 排序，将未完成的排在前面，已完成的排在后面；
         this.tasks.sort((a, b) => {
           // 有已完成的情况，按照完成时间倒序
@@ -407,6 +413,15 @@ export default {
     /** 处理审批退回的操作 */
     handleBack(task) {
       this.$modal.msgError("暂不支持【退回】功能！");
+      // 可参考 http://blog.wya1.com/article/636697030/details/7296
+      // const data = {
+      //   id: task.id,
+      //   assigneeUserId: 1
+      // }
+      // backTask(data).then(response => {
+      //   this.$modal.msgSuccess("回退成功！");
+      //   this.getDetail(); // 获得最新详情
+      // });
     }
   }
 };

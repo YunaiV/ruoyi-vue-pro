@@ -23,7 +23,7 @@
 * 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统。
 * 支持加载动态权限菜单，按钮级别权限控制，本地缓存提升性能。
 * 支持 SaaS 多租户系统，可自定义每个租户的权限，提供透明化的多租户底层封装。
-* 工作流使用 Activiti + Flowable，支持动态表单、在线设计流程、多种任务分配方式。
+* 工作流使用 Flowable，支持动态表单、在线设计流程、会签 / 或签、多种任务分配方式。
 * 高效率开发，使用代码生成器可以一键生成前后端代码 + 单元测试 + Swagger 接口文档 + Validator 参数校验。
 * 集成微信小程序、微信公众号、企业微信、钉钉等三方登陆，集成支付宝、微信等支付与退款。
 * 集成阿里云、腾讯云、云片等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务。
@@ -167,7 +167,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架           | 5.3.20   | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
 | [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架      | 5.6.5    | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
 | [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件           | 6.2.3    | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
-| [Activiti](https://github.com/Activiti/Activiti)                                            | 工作流引擎            | 7.1.0.M6 | [文档](TODO)                                                     |
+| [Flowable](https://github.com/flowable/flowable-engine)                                            | 工作流引擎            | 6.7.0 | [文档](https://doc.iocoder.cn/bpm/)                                                     |
 | [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.3.2    | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
 | [Knife4j](https://gitee.com/xiaoym/knife4j)                                                 | Swagger 增强 UI 实现 | 3.0.3    | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
 | [Resilience4j](https://github.com/resilience4j/resilience4j)                                | 服务保障组件           | 1.7.1    | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao)    |
