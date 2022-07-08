@@ -1,17 +1,17 @@
 package cn.iocoder.yudao.framework.operatelog.core.service;
 
-import cn.iocoder.yudao.framework.operatelog.core.dto.OperateLogCreateReqDTO;
-
-import java.util.concurrent.Future;
-
+/**
+ * 操作日志 Framework Service 接口
+ *
+ * @author 芋道源码
+ */
 public interface OperateLogFrameworkService {
 
     /**
-     * 异步记录操作日志
+     * 记录操作日志
      *
-     * @param reqVO 操作日志请求
-     * @return true: 记录成功,false: 记录失败
+     * @param operateLog 操作日志请求
      */
-    Future<Boolean> createOperateLogAsync(OperateLogCreateReqDTO reqVO);
+    void createOperateLog(OperateLog operateLog);
 
 }

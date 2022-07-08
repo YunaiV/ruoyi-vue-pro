@@ -8,11 +8,9 @@ import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPage
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -21,6 +19,11 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
     default DictDataDO selectByDictTypeAndValue(String dictType, String value) {
         return selectOne(new LambdaQueryWrapper<DictDataDO>().eq(DictDataDO::getDictType, dictType)
                 .eq(DictDataDO::getValue, value));
+    }
+
+    default DictDataDO selectByDictTypeAndLabel(String dictType, String label) {
+        return selectOne(new LambdaQueryWrapper<DictDataDO>().eq(DictDataDO::getDictType, dictType)
+                .eq(DictDataDO::getLabel, label));
     }
 
     default List<DictDataDO> selectByDictTypeAndValues(String dictType, Collection<String> values) {
@@ -45,8 +48,5 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
                 .likeIfPresent(DictDataDO::getDictType, reqVO.getDictType())
                 .eqIfPresent(DictDataDO::getStatus, reqVO.getStatus()));
     }
-
-    @Select("SELECT COUNT(*) FROM system_dict_data WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
 
 }

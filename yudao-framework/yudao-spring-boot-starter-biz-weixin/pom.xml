@@ -33,9 +33,13 @@
         <!-- 三方云服务相关 -->
         <dependency>
             <groupId>com.github.binarywang</groupId>
-<!--            <artifactId>weixin-java-mp</artifactId>-->
             <artifactId>wx-java-mp-spring-boot-starter</artifactId>
-            <version>4.1.9.B</version>
+            <version>4.3.4.B</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>wx-java-miniapp-spring-boot-starter</artifactId>
+            <version>4.3.4.B</version>
         </dependency>
         <!-- TODO 芋艿：清理 -->
     </dependencies>

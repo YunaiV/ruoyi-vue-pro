@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -22,6 +23,7 @@ public class CaptchaController {
     private CaptchaService captchaService;
 
     @GetMapping("/get-image")
+    @PermitAll
     @ApiOperation("生成图片验证码")
     public CommonResult<CaptchaImageRespVO> getCaptchaImage() {
         return success(captchaService.getCaptchaImage());

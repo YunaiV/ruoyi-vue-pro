@@ -26,8 +26,8 @@ public interface OAuth2CodeService {
      * @param state 状态
      * @return 授权码的信息
      */
-    OAuth2CodeDO createAuthorizationCode(Long userId, Integer userType, String clientId, List<String> scopes,
-                                         String redirectUri, String state);
+    OAuth2CodeDO createAuthorizationCode(Long userId, Integer userType, String clientId,
+                                         List<String> scopes, String redirectUri, String state);
 
     /**
      * 使用授权码

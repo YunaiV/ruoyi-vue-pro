@@ -60,15 +60,7 @@ public interface AdminAuthService {
      * @param reqVO 登录信息
      * @return 登录结果
      */
-    AuthLoginRespVO socialQuickLogin(@Valid AuthSocialQuickLoginReqVO reqVO);
-
-    /**
-     * 社交绑定登录，使用 code 授权码 + 账号密码
-     *
-     * @param reqVO 登录信息
-     * @return 登录结果
-     */
-    AuthLoginRespVO socialBindLogin(@Valid AuthSocialBindLoginReqVO reqVO);
+    AuthLoginRespVO socialLogin(@Valid AuthSocialLoginReqVO reqVO);
 
     /**
      * 刷新访问令牌

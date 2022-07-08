@@ -76,7 +76,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
 
         // 已过期的情况下，删除刷新令牌
         if (DateUtils.isExpired(refreshTokenDO.getExpiresTime())) {
-            oauth2AccessTokenMapper.deleteById(refreshTokenDO.getId());
+            oauth2RefreshTokenMapper.deleteById(refreshTokenDO.getId());
             throw exception0(GlobalErrorCodeConstants.UNAUTHORIZED.getCode(), "刷新令牌已过期");
         }
 

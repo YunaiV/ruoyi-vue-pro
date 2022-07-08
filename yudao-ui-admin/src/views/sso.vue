@@ -37,7 +37,7 @@
               <el-form-item style="width:100%;">
                 <el-button :loading="loading" size="medium" type="primary" style="width:60%;"
                            @click.native.prevent="handleAuthorize(true)">
-                  <span v-if="!loading">统一授权</span>
+                  <span v-if="!loading">同意授权</span>
                   <span v-else>授 权 中...</span>
                 </el-button>
                 <el-button size="medium" style="width:36%"

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.*;
@@ -130,11 +131,20 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
         }
     }
 
+
+
+    /**
+     * 支付宝统一回调参数  str 转 map
+     *
+     * @param s 支付宝支付通知回调参数
+     * @return map 支付宝集合
+     */
     public static Map<String, String> strToMap(String s) {
+        // TODO @zxy：这个可以使用 hutool 的 HttpUtil decodeParams 方法么？
         Map<String, String> stringStringMap = new HashMap<>();
-        //调整时间格式
+        // 调整时间格式
         String s3 = s.replaceAll("%3A", ":");
-        //获取map
+        // 获取 map
         String s4 = s3.replace("+", " ");
         String[] split = s4.split("&");
         for (String s1 : split) {
@@ -143,4 +153,5 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
         }
         return stringStringMap;
     }
+
 }

@@ -27,7 +27,7 @@ export default {
     return {
       height: document.documentElement.clientHeight - 94.5 + "px;",
       loading: true,
-      src: undefined,
+      src: "undefined",
     };
   },
   mounted: function() {

@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.infra.service.logger;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiErrorLogCreateReqDTO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiErrorLogPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiErrorLogDO;
@@ -187,7 +187,7 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
                 dto -> dto.setUserType(RandomUtil.randomEle(UserTypeEnum.values()).getValue()));
 
         // 调用
-        apiErrorLogService.createApiErrorLogAsync(createDTO);
+        apiErrorLogService.createApiErrorLog(createDTO);
         // 断言
         ApiErrorLogDO infApiErrorLogDO = infApiErrorLogMapper.selectOne(null);
         assertNotNull(infApiErrorLogDO);
