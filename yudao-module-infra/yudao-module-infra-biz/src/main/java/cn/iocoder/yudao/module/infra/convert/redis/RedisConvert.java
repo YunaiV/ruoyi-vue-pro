@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.infra.convert.redis;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
-import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisKeyRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisKeyDefineRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisMonitorRespVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -29,6 +29,6 @@ public interface RedisConvert {
         return respVO;
     }
 
-    List<RedisKeyRespVO> convertList(List<RedisKeyDefine> list);
+    List<RedisKeyDefineRespVO> convertList(List<RedisKeyDefine> list);
 
 }

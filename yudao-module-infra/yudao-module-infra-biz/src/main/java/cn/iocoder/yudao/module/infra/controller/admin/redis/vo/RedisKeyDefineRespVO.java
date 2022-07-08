@@ -13,9 +13,9 @@ import java.time.Duration;
 @Data
 @Builder
 @AllArgsConstructor
-public class RedisKeyRespVO {
+public class RedisKeyDefineRespVO {
 
-    @ApiModelProperty(value = "login_user:%s", required = true, example = "String")
+    @ApiModelProperty(value = "Key 模板", required = true, example = "login_user:%s")
     private String keyTemplate;
 
     @ApiModelProperty(value = "Key 类型的枚举", required = true, example = "String")

@@ -31,7 +31,7 @@
                 </tr>
                 <tr>
                   <td><div class="cell">AOF是否开启</div></td>
-                  <td><div class="cell" v-if="cache.info">{{ cache.info.aof_enabled == "0" ? "否" : "是" }}</div></td>
+                  <td><div class="cell" v-if="cache.info">{{ cache.info.aof_enabled === "0" ? "否" : "是" }}</div></td>
                   <td><div class="cell">RDB是否成功</div></td>
                   <td><div class="cell" v-if="cache.info">{{ cache.info.rdb_last_bgsave_status }}</div></td>
                   <td><div class="cell">Key数量</div></td>
@@ -66,12 +66,7 @@
       </el-col>
     </el-row>
 
-    <el-table
-      v-loading="keyListLoad"
-      :data="keyList"
-      row-key="id"
-      @row-click="openCacheInfo"
-    >
+    <el-table v-loading="keyDefineListLoad" :data="keyDefineList" row-key="id" @row-click="openKeyTemplate">
       <el-table-column prop="keyTemplate" label="Key 模板" width="200" />
       <el-table-column prop="keyType" label="Key 类型" width="100" />
       <el-table-column prop="valueType" label="Value 类型" />
@@ -90,79 +85,36 @@
     </el-table>
 
     <!-- 缓存模块信息框 -->
-    <el-dialog
-      :title="keyTemplate + '模块'"
-      :visible.sync="open"
-      width="60vw"
-      append-to-body
-    >
+    <el-dialog :title="keyTemplate + ' 模板'" :visible.sync="open" width="70vw" append-to-body>
       <el-row :gutter="10">
-        <el-col :span="10" class="card-box">
-          <el-card style="height: 70vh">
+        <el-col :span="14" class="card-box">
+          <el-card style="height: 70vh; overflow: scroll">
             <div slot="header">
               <span>键名列表</span>
-              <el-button
-                style="float: right; padding: 3px 0"
-                type="text"
-                icon="el-icon-refresh-right"
-                @click="refreshCacheKeys"
-              ></el-button>
+              <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-refresh-right" @click="refreshKeys" />
             </div>
-            <el-table
-                :data="cachekeys"
-                style="width: 100%"
-                @row-click="handleCacheValue"
-            >
-              <el-table-column
-                label="序号"
-                width="60"
-                type="index"
-              ></el-table-column>
-              <el-table-column
-                label="缓存键名"
-                align="center"
-                :show-overflow-tooltip="true"
-                :formatter="keyFormatter"
-              >
+            <el-table :data="cacheKeys" style="width: 100%" @row-click="handleKeyValue">
+              <el-table-column label="缓存键名" align="center" :show-overflow-tooltip="true">
+                <template slot-scope="scope">{{ scope.row }}</template>
               </el-table-column>
-              <el-table-column
-                label="操作"
-                width="60"
-                align="center"
-                class-name="small-padding fixed-width"
-              >
+              <el-table-column label="操作" width="60" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
-                  <el-button
-                    size="mini"
-                    type="text"
-                    icon="el-icon-delete"
-                    @click="handleClearCacheKey(scope.row)"
-                  ></el-button>
+                  <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDeleteKey(scope.row)" />
                 </template>
               </el-table-column>
             </el-table>
           </el-card>
         </el-col>
 
-        <el-col :span="14">
+        <el-col :span="10">
           <el-card :bordered="false" style="height: 70vh">
             <div slot="header">
               <span>缓存内容</span>
-              <!-- <el-button
-                style="float: right; padding: 3px 0"
-                type="text"
-                icon="el-icon-refresh-right"
-                @click="handleClearCacheAll()"
-                >清理全部</el-button>
-                -->
+              <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-refresh-right"
+                         @click="handleDeleteKeys(keyTemplate)">清理全部</el-button>
             </div>
           <el-form :model="cacheForm">
             <el-row :gutter="32">
-              <el-col :offset="1" :span="22">
-                <el-form-item label="缓存名称:" prop="keyTemplate">
-                  <el-input v-model="cacheForm.keyTemplate" :readOnly="true" />
-                </el-form-item>
-              </el-col>
               <el-col :offset="1" :span="22">
                 <el-form-item label="缓存键名:" prop="key">
                   <el-input v-model="cacheForm.key" :readOnly="true" />
@@ -170,12 +122,7 @@
                 </el-col>
                 <el-col :offset="1" :span="22">
                   <el-form-item label="缓存内容:" prop="value">
-                    <el-input
-                      v-model="cacheForm.value"
-                      type="textarea"
-                      :rows="12"
-                      :readOnly="true"
-                    />
+                    <el-input v-model="cacheForm.value" type="textarea" :rows="12" :readOnly="true"/>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -188,7 +135,7 @@
 </template>
 
 <script>
-import { getCache, getKeyList, getKeyDefines, getKeyValue, deleteKeyValue } from "@/api/infra/redis";
+import {getCache, getKeyDefineList, getKeyList, getKeyValue, deleteKey, deleteKeys} from "@/api/infra/redis";
 import echarts from "echarts";
 
 export default {
@@ -202,12 +149,12 @@ export default {
       // cache 信息
       cache: [],
       // key 列表
-      keyListLoad: true,
-      keyList: [],
+      keyDefineListLoad: true,
+      keyDefineList: [],
       // 模块弹出框
       open: false,
       keyTemplate: "",
-      cachekeys: [],
+      cacheKeys: [],
       cacheForm: {}
     };
   },
@@ -275,9 +222,9 @@ export default {
       });
 
       // 查询 Redis Key 列表
-      getKeyList().then(response => {
-        this.keyList = response.data;
-        this.keyListLoad = false;
+      getKeyDefineList().then(response => {
+        this.keyDefineList = response.data;
+        this.keyDefineListLoad = false;
       });
     },
 
@@ -287,46 +234,45 @@ export default {
     },
 
     // 打开缓存弹窗
-    openCacheInfo (e) {
+    openKeyTemplate (keyDefine) {
       this.open = true;
-      let keyDefine = e.keyTemplate.substring(0, e.keyTemplate.length - 2);
-      this.keyTemplate = keyDefine;
       // 加载键名列表
-      this.handleCacheKeys(keyDefine);
-    },
-
-    /** 键名前缀去除 */
-    keyFormatter (cacheKey) {
-      return cacheKey.replace(this.keyTemplate, "");
+      this.keyTemplate = keyDefine.keyTemplate;
+      this.doGetKeyList(this.keyTemplate);
     },
 
     // 获取键名列表
-    handleCacheKeys (keyDefine){
-      const cacheName = keyDefine !== undefined ? keyDefine : this.keyTemplate;
-      getKeyDefines(cacheName).then(response => {
-        this.cachekeys = response.data
+    doGetKeyList (keyTemplate) {
+      getKeyList(keyTemplate).then(response => {
+        this.cacheKeys = response.data
         this.cacheForm = {}
       })
     },
 
     // 获取缓存值
-    handleCacheValue (e){
-      getKeyValue(this.keyTemplate, e).then(response => {
+    handleKeyValue (key) {
+      getKeyValue(key).then(response => {
         this.cacheForm = response.data
       })
     },
 
     // 刷新键名列表
-    refreshCacheKeys(){
+    refreshKeys() {
       this.$modal.msgSuccess("刷新键名列表成功");
-      this.handleCacheKeys();
+      this.doGetKeyList(this.keyTemplate);
     },
 
     // 删除缓存
-    handleClearCacheKey(key){
-      deleteKeyValue(key).then(response =>{
+    handleDeleteKey(key){
+      deleteKey(key).then(response => {
         this.$modal.msgSuccess("清理缓存键名[" + key + "]成功");
-        this.handleCacheKeys();
+        this.doGetKeyList(this.keyTemplate);
+      })
+    },
+    handleDeleteKeys(keyTemplate){
+      deleteKeys(keyTemplate).then(response => {
+        this.$modal.msgSuccess("清空[" + keyTemplate + "]成功");
+        this.doGetKeyList(this.keyTemplate);
       })
     },
   },

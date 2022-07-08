@@ -9,34 +9,46 @@ export function getCache() {
 }
 
 // 获取模块
-export function getKeyList() {
+export function getKeyDefineList() {
   return request({
-    url: '/infra/redis/get-key-list',
+    url: '/infra/redis/get-key-define-list',
     method: 'get'
   })
 }
 
 // 获取键名列表
-export function getKeyDefines(keyDefine) {
+export function getKeyList(keyTemplate) {
   return request({
-    url: '/infra/redis/get-key-Defines?keyDefine=' + keyDefine,
-    method: 'get'
+    url: '/infra/redis/get-key-list',
+    method: 'get',
+    params: {
+      keyTemplate
+    }
   })
 }
 
 // 获取缓存内容
-export function getKeyValue(keyDefine, key) {
+export function getKeyValue(key) {
   return request({
-    url: '/infra/redis/get-key-value?keyDefine=' + keyDefine + "&cacheKey=" + key,
+    url: '/infra/redis/get-key-value?key=' + key,
     method: 'get'
   })
 }
 
 // 根据键名删除缓存
-export function deleteKeyValue(key) {
+export function deleteKey(key) {
   return request({
-    url: '/infra/redis/delete-key-value?cacheKey=' + key,
+    url: '/infra/redis/delete-key?key=' + key,
     method: 'delete'
   })
 }
 
+export function deleteKeys(keyTemplate) {
+  return request({
+    url: '/infra/redis/delete-keys?',
+    method: 'delete',
+    params: {
+      keyTemplate
+    }
+  })
+}
