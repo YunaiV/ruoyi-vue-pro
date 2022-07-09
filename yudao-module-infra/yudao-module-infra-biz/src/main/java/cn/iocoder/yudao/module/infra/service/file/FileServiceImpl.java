@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
+import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
@@ -13,6 +15,7 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.ByteArrayInputStream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
@@ -40,10 +43,16 @@ public class FileServiceImpl implements FileService {
     @SneakyThrows
     public String createFile(String name, String path, byte[] content) {
         // 计算默认的 path 名
-        String type = FileTypeUtils.getMineType(content);
+        String type = FileTypeUtils.getMineType(content, name);
         if (StrUtil.isEmpty(path)) {
-            path = DigestUtil.md5Hex(content)
-                    + '.' + StrUtil.subAfter(type, '/', true); // 文件的后缀
+            String sha256Hex = DigestUtil.sha256Hex(content);
+            /*  如果存在name，则优先使用name的后缀 */
+            if (StrUtil.isNotBlank(name)) {
+                String extName = FileNameUtil.extName(name);
+                path = StrUtil.isBlank(extName) ? sha256Hex : sha256Hex + "." + extName;
+            } else {
+                path = sha256Hex + '.' + FileTypeUtil.getType(new ByteArrayInputStream(content), name);
+            }
         }
         // 如果 name 为空，则使用 path 填充
         if (StrUtil.isEmpty(name)) {
