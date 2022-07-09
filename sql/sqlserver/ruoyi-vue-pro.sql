@@ -2677,7 +2677,7 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'文件MIME类型',
+'MS_Description', N'文件 MIME 类型',
 'SCHEMA', N'dbo',
 'TABLE', N'infra_file',
 'COLUMN', N'type'
