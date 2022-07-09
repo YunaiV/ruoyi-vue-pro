@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.digest.DigestUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
 import cn.iocoder.yudao.framework.file.core.utils.FileTypeUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
@@ -40,10 +41,9 @@ public class FileServiceImpl implements FileService {
     @SneakyThrows
     public String createFile(String name, String path, byte[] content) {
         // 计算默认的 path 名
-        String type = FileTypeUtils.getMineType(content);
+        String type = FileTypeUtils.getMineType(content, name);
         if (StrUtil.isEmpty(path)) {
-            path = DigestUtil.md5Hex(content)
-                    + '.' + StrUtil.subAfter(type, '/', true); // 文件的后缀
+            path = FileUtils.generatePath(content, name);
         }
         // 如果 name 为空，则使用 path 填充
         if (StrUtil.isEmpty(name)) {

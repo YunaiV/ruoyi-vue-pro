@@ -46,9 +46,7 @@ public class FileDO extends BaseDO {
      */
     private String url;
     /**
-     * 文件类型
-     *
-     * 通过 {@link cn.hutool.core.io.FileTypeUtil#getType(InputStream)} 获取
+     * 文件的MIME类型，例如"application/octet-stream"
      */
     private String type;
     /**

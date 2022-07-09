@@ -21,7 +21,7 @@ public class FilePageReqVO extends PageParam {
     @ApiModelProperty(value = "文件路径", example = "yudao", notes = "模糊匹配")
     private String path;
 
-    @ApiModelProperty(value = "文件类型", example = "jpg", notes = "模糊匹配")
+    @ApiModelProperty(value = "文件类型", example = "application/octet-stream", notes = "模糊匹配")
     private String type;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

@@ -40,7 +40,7 @@ public class FileServiceTest extends BaseDbUnitTest {
         // mock 数据
         FileDO dbFile = randomPojo(FileDO.class, o -> { // 等会查询到
             o.setPath("yunai");
-            o.setType("jpg");
+            o.setType("image/jpg");
             o.setCreateTime(buildTime(2021, 1, 15));
         });
         fileMapper.insert(dbFile);
@@ -48,7 +48,7 @@ public class FileServiceTest extends BaseDbUnitTest {
         fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> o.setPath("tudou")));
         // 测试 type 不匹配
         fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> {
-            o.setType("png");
+            o.setType("image/png");
         }));
         // 测试 createTime 不匹配
         fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> {
@@ -90,7 +90,7 @@ public class FileServiceTest extends BaseDbUnitTest {
         assertEquals(10L, file.getConfigId());
         assertEquals(path, file.getPath());
         assertEquals(url, file.getUrl());
-        assertEquals("jpg", file.getType());
+        assertEquals("image/jpg", file.getType());
         assertEquals(content.length, file.getSize());
     }
 
