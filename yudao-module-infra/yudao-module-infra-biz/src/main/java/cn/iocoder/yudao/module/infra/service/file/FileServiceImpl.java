@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
-import cn.hutool.core.io.FileTypeUtil;
-import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
+import cn.iocoder.yudao.framework.file.core.utils.FileTypeUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileMapper;
@@ -14,7 +13,6 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.io.ByteArrayInputStream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
@@ -40,13 +38,12 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @SneakyThrows
-    public String createFile(String name, String path, String mimeType, byte[] content) {
-        //获取文件的扩展名
-        String extName = FileNameUtil.extName(name);
+    public String createFile(String name, String path, byte[] content) {
+        // 计算默认的 path 名
+        String type = FileTypeUtils.getMineType(content);
         if (StrUtil.isEmpty(path)) {
-            //使用sha256计算文件都唯一路径，降低碰撞概率
-            String sha256Hex = DigestUtil.sha256Hex(content);
-            path = StrUtil.isBlank(extName) ? sha256Hex : (sha256Hex + '.' + extName);
+            path = DigestUtil.md5Hex(content)
+                    + '.' + StrUtil.subAfter(type, '/', true); // 文件的后缀
         }
         // 如果 name 为空，则使用 path 填充
         if (StrUtil.isEmpty(name)) {
@@ -64,7 +61,7 @@ public class FileServiceImpl implements FileService {
         file.setName(name);
         file.setPath(path);
         file.setUrl(url);
-        file.setType(mimeType);
+        file.setType(type);
         file.setSize(content.length);
         fileMapper.insert(file);
         return url;

@@ -15,7 +15,7 @@
         <el-form-item label="循环基数" key="loopCardinality">
           <el-input v-model="loopInstanceForm.loopCardinality" clearable @change="updateLoopCardinality" />
         </el-form-item>
-        <el-form-item label="集合" key="collection">
+        <el-form-item label="集合" key="collection" v-show="false">
           <el-input v-model="loopInstanceForm.collection" clearable @change="updateLoopBase" />
         </el-form-item>
         <el-form-item label="元素变量" key="elementVariable">
@@ -131,7 +131,7 @@ export default {
       if (type === "SequentialMultiInstance") {
         this.multiLoopInstance = window.bpmnInstances.moddle.create("bpmn:MultiInstanceLoopCharacteristics", { isSequential: true });
       } else {
-        this.multiLoopInstance = window.bpmnInstances.moddle.create("bpmn:MultiInstanceLoopCharacteristics");
+        this.multiLoopInstance = window.bpmnInstances.moddle.create("bpmn:MultiInstanceLoopCharacteristics", { collection: "${coll_userList}" });
       }
       window.bpmnInstances.modeling.updateProperties(this.bpmnElement, {
         loopCharacteristics: this.multiLoopInstance

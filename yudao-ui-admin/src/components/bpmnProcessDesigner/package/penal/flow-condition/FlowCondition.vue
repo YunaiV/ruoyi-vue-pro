@@ -15,7 +15,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="表达式" v-if="flowConditionForm.conditionType && flowConditionForm.conditionType === 'expression'" key="express">
-        <el-input v-model="flowConditionForm.body" clearable @change="updateFlowCondition" />
+        <el-input v-model="flowConditionForm.body" style="width:192px;"  clearable @change="updateFlowCondition" />
       </el-form-item>
       <template v-if="flowConditionForm.conditionType && flowConditionForm.conditionType === 'script'">
         <el-form-item label="脚本语言" key="language">

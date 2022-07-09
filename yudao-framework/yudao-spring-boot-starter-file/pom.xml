@@ -61,6 +61,11 @@
             <artifactId>jsch</artifactId> <!-- 解决 sftp 连接 -->
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId> <!-- 文件类型的识别 -->
+        </dependency>
+
         <!-- 三方云服务相关 -->
         <dependency>
             <groupId>io.minio</groupId>

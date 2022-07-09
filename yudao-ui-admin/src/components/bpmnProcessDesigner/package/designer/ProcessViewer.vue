@@ -116,10 +116,11 @@ export default {
       let todoActivity = activityList.find(m => !m.endTime) // 找到待办的任务
       let endActivity = activityList[activityList.length - 1] // 获得最后一个任务
       // debugger
-      console.log(this.bpmnModeler.getDefinitions().rootElements[0].flowElements);
+      // console.log(this.bpmnModeler.getDefinitions().rootElements[0].flowElements);
       this.bpmnModeler.getDefinitions().rootElements[0].flowElements?.forEach(n => {
         let activity = activityList.find(m => m.key === n.id) // 找到对应的活动
         if (n.$type === 'bpmn:UserTask') { // 用户任务
+          debugger
           if (!activity) {
             return;
           }
