@@ -5,8 +5,6 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.io.InputStream;
-
 /**
  * 文件表
  * 每次文件上传，都会记录一条记录到该表中
@@ -46,7 +44,7 @@ public class FileDO extends BaseDO {
      */
     private String url;
     /**
-     * 文件的MIME类型，例如"application/octet-stream"
+     * 文件的 MIME 类型，例如 "application/octet-stream"
      */
     private String type;
     /**

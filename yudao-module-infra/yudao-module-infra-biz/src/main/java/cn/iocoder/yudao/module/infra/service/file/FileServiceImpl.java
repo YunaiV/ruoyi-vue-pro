@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;

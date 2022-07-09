@@ -52,7 +52,7 @@ public class AdminUserDO extends TenantBaseDO {
      */
     private String remark;
     /**
-     * 部门ID
+     * 部门 ID
      */
     private Long deptId;
     /**

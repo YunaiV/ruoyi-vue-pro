@@ -123,7 +123,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw exception(USER_NOT_EXISTS);
         }
 
-        // 缓存登陆用户到 Redis 中，返回 sessionId 编号
+        // 创建 Token 令牌，记录登录日志
         return createTokenAfterLoginSuccess(user.getId(), reqVO.getMobile(), LoginLogTypeEnum.LOGIN_MOBILE);
     }
 

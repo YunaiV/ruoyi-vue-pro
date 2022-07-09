@@ -42,7 +42,7 @@
 文档地址：<http://www.iocoder.cn/categories/Yudao/>
 * [《如何搭建环境》](http://www.iocoder.cn/categories/Yudao/?yudao)
 
-> 未来会补充文档和视频，方便胖友冲冲冲！
+视频教程：<https://doc.iocoder.cn/video/>
 
 ## 🐼 内置功能
 
