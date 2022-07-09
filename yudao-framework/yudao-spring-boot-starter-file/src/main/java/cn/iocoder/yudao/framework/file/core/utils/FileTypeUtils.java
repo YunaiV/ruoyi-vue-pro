@@ -16,7 +16,7 @@ public class FileTypeUtils {
     /**
      * 获得文件的 mineType，对于doc，jar等文件会有误差
      *
-     * @param data 包含文件开头几千个字节的字节数组
+     * @param data 文件内容
      * @return mineType 无法识别时会返回“application/octet-stream”
      */
     @SneakyThrows
@@ -37,7 +37,7 @@ public class FileTypeUtils {
     /**
      * 在拥有文件和数据的情况下，最好使用此方法，最为准确
      *
-     * @param data 包含文件开头几千个字节的字节数组
+     * @param data 文件内容
      * @param name 文件名
      * @return mineType 无法识别时会返回“application/octet-stream”
      */

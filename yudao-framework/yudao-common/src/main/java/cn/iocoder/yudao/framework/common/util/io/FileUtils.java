@@ -1,9 +1,14 @@
 package cn.iocoder.yudao.framework.common.util.io;
 
+import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import lombok.SneakyThrows;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 
 /**
@@ -58,8 +63,20 @@ public class FileUtils {
         return file;
     }
 
-
-    public static void main(String[] args) {
+    /**
+     * @param content      文件内容
+     * @param originalName 原始文件名
+     * @return path，唯一不可重复
+     */
+    public static String generatePath(byte[] content, String originalName) {
+        String sha256Hex = DigestUtil.sha256Hex(content);
+        // 如果存在name，则优先使用name的后缀
+        if (StrUtil.isNotBlank(originalName)) {
+            String extName = FileNameUtil.extName(originalName);
+            return StrUtil.isBlank(extName) ? sha256Hex : sha256Hex + "." + extName;
+        } else {
+            return sha256Hex + '.' + FileTypeUtil.getType(new ByteArrayInputStream(content));
+        }
     }
 
 }

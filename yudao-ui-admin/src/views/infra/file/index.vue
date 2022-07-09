@@ -37,7 +37,7 @@
                          :width="'100px'"></image-preview>
           <i v-else>无法预览，点击
             <el-link type="primary" :underline="false" style="font-size:12px;vertical-align: baseline;"
-                     :href="getFileUrl+scope.row.configId+'/get/' + scope.row.path">下载
+                     :href="getFileUrl + scope.row.configId + '/get/' + scope.row.path">下载
             </el-link>
           </i>
         </template>
