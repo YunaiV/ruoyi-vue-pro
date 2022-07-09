@@ -108,7 +108,8 @@ export default {
       queryParams: {
         pageNo: 1,
         pageSize: 10,
-        path: null
+        path: null,
+        type: null,
       },
       // 用户导入参数
       upload: {

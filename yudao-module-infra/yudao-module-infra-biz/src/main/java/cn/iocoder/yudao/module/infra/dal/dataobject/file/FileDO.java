@@ -38,16 +38,15 @@ public class FileDO extends BaseDO {
      */
     private String name;
     /**
-     * 路径，即文件名，唯一不可重复
+     * 路径，即文件名
      */
     private String path;
     /**
      * 访问地址
      */
     private String url;
-
     /**
-     * 文件的MIME类型，默认为"application/octet-stream"
+     * 文件的MIME类型，例如"application/octet-stream"
      */
     private String type;
     /**
