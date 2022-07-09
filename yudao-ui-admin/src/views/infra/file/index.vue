@@ -26,11 +26,11 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column  label="文件名" :show-overflow-tooltip="true" align="center" min-width="250" prop="name" />
-      <el-table-column :show-overflow-tooltip="true" label="文件路径" align="center" min-width="300" prop="path" />
-      <el-table-column :show-overflow-tooltip="true" label="文件 URL" align="center" min-width="400" prop="url" />
-      <el-table-column label="文件大小" align="center" prop="size" width="120" :formatter="sizeFormat" />
-      <el-table-column label="文件类型" align="center" prop="type" width="210" />
+      <el-table-column label="文件名" :show-overflow-tooltip="true" align="center" min-width="200px" prop="name"/>
+      <el-table-column label="文件路径" :show-overflow-tooltip="true" align="center" min-width="250px" prop="path"/>
+      <el-table-column label="文件 URL" :show-overflow-tooltip="true" align="center" min-width="300px" prop="url"/>
+      <el-table-column label="文件大小" align="center" prop="size" min-width="120px" :formatter="sizeFormat"/>
+      <el-table-column label="文件类型" :show-overflow-tooltip="true" align="center" prop="type" width="180px"/>
       <el-table-column label="文件内容" align="center" prop="content" min-width="150px">
         <template slot-scope="scope">
           <image-preview v-if="scope.row.type&&scope.row.type.indexOf('image/') === 0" :src="scope.row.url"
@@ -42,15 +42,16 @@
           </i>
         </template>
       </el-table-column>
-      <el-table-column label="上传时间" align="center" prop="createTime" width="180">
+      <el-table-column label="上传时间" align="center" prop="createTime" min-width="170px">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="100">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="100px">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                     v-hasPermi="['infra:file:delete']">删除</el-button>
+                     v-hasPermi="['infra:file:delete']">删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -81,7 +82,7 @@
 </template>
 
 <script>
-import { deleteFile, getFilePage } from "@/api/infra/file";
+import {deleteFile, getFilePage} from "@/api/infra/file";
 import {getAccessToken} from "@/utils/auth";
 import ImagePreview from "@/components/ImagePreview";
 
