@@ -66,6 +66,7 @@
         <tencentcloud-sdk-java.version>3.1.471</tencentcloud-sdk-java.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
+        <jimureport.version>1.4.0</jimureport.version>
     </properties>
 
     <dependencyManagement>
@@ -593,6 +594,13 @@
                 <groupId>com.xkcoding.justauth</groupId>
                 <artifactId>justauth-spring-boot-starter</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
                 <version>${justauth.version}</version>
+            </dependency>
+
+            <!-- 积木报表-->
+            <dependency>
+                <groupId>org.jeecgframework.jimureport</groupId>
+                <artifactId>jimureport-spring-boot-starter</artifactId>
+                <version>${jimureport.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
