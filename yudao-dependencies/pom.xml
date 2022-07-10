@@ -66,7 +66,7 @@
         <tencentcloud-sdk-java.version>3.1.471</tencentcloud-sdk-java.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
-        <jimureport.version>1.5.1</jimureport.version>
+        <jimureport.version>1.4.32</jimureport.version>
     </properties>
 
     <dependencyManagement>

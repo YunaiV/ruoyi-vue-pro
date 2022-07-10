@@ -68,6 +68,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     private PayNotifyLogCoreMapper payNotifyLogCoreMapper;
 
     @Resource
+    @Lazy
     private ThreadPoolTaskExecutor threadPoolTaskExecutor; // TODO 芋艿：未来提供独立的线程池
 
     @Resource
