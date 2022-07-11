@@ -7,9 +7,6 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.mq.message.mail.MailAccountRefreshMessage;
 import cn.iocoder.yudao.module.system.mq.message.mail.MailSendMessage;
 import cn.iocoder.yudao.module.system.mq.message.mail.MailTemplateRefreshMessage;
-import cn.iocoder.yudao.module.system.mq.message.sms.SmsChannelRefreshMessage;
-import cn.iocoder.yudao.module.system.mq.message.sms.SmsSendMessage;
-import cn.iocoder.yudao.module.system.mq.message.sms.SmsTemplateRefreshMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -48,25 +45,27 @@ public class MailProducer {
     /**
      * 发送 {@link MailSendMessage} 消息
      *
+     * @param sendLogId 发送日志编码
      * @param mailAccountDO 邮箱账号信息
      * @param mailTemplateDO 邮箱模版信息
      * @param content 内容
-     * @param tos 收件人
-     * @param title 标题
+     * @param templateParams 邮箱模版参数
+     * @param to 收件人
      */
-    public void sendMailSendMessage(MailAccountDO mailAccountDO, MailTemplateDO mailTemplateDO, String content, List<String> tos, String title , Long sendLogId) {
+    public void sendMailSendMessage(Long sendLogId,MailAccountDO mailAccountDO, MailTemplateDO mailTemplateDO, String content,List<KeyValue<String, Object>> templateParams,String to) {
         MailSendMessage message = new MailSendMessage();
-        message.setContent(content);
-        message.setFromAddress(mailAccountDO.getFromAddress());
-        message.setHost(mailAccountDO.getHost());
-        message.setPort(mailAccountDO.getPort());
-        message.setPassword(mailAccountDO.getPassword());
-        message.setUsername(mailAccountDO.getUsername());
-        message.setSslEnable(mailAccountDO.getSslEnable());
-        message.setTemplateCode(mailTemplateDO.getCode());
-        message.setTitle(title);
-        message.setTos(tos);
-        message.setLogId(sendLogId);
+        message.setContent(content)
+        .setFromAddress(mailAccountDO.getFromAddress())
+        .setHost(mailAccountDO.getHost())
+        .setPort(mailAccountDO.getPort())
+        .setPassword(mailAccountDO.getPassword())
+        .setUsername(mailAccountDO.getUsername())
+        .setSslEnable(mailAccountDO.getSslEnable())
+        .setTemplateCode(mailTemplateDO.getCode())
+        .setTitle(mailTemplateDO.getTitle())
+        .setTo(to)
+        .setLogId(sendLogId)
+        .setTemplateParams(templateParams);
         redisMQTemplate.send(message);
     }
 }

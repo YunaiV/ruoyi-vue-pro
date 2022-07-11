@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.system.enums.mail.MailLogUserTypeEnum;
 import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 邮箱日志
@@ -29,15 +33,29 @@ public class MailLogDO extends BaseDO implements Serializable {
      */
     private Long id;
 
+    /**
+     * 用户编码
+     */
+    private Long userId;
+
+    /**
+     * 用户类型
+     *
+     * 冗余 {@link MailLogUserTypeEnum#getUserType}
+     */
+    private Integer userType;
+
     // TODO @wangjingyi：accountId
     /**
      * 邮箱账号编号
      */
     private Long accountId;
 
-    // TODO @wangjingyi：如果是冗余字段，记得 @ 下；
+    // TODO @wangjingyi：如果是冗余字段，记得 @ 下；DONE
     /**
      * 邮箱账号
+     *
+     * 冗余 {@link MailAccountDO}
      */
     private String fromAddress;
 
@@ -47,30 +65,22 @@ public class MailLogDO extends BaseDO implements Serializable {
     private Long templateId;
 
     /**
-     * 模版编号
+     * 模版内容
      */
-    private String templateCode;
+    private String templateContent;
 
     /**
-     * 标题
+     * 基于 {@link MailTemplateDO#getParams()} 输入后的参数
      */
-    private String title;
-
-    /**
-     * 内容
-     */
-    private String content;
-
-    /**
-     * 收件人
-     */
-    private String to;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String,Object> templateParams;
 
     /**
      * 发送时间
      */
     private Date sendTime;
 
+    //=========接收相关字段=========
     /**
      * 发送状态
      *
@@ -82,6 +92,11 @@ public class MailLogDO extends BaseDO implements Serializable {
      * 发送结果
      */
     private String sendResult;
+
+    /**
+     *  消息ID
+     */
+    private String messageId;
 
 
 }

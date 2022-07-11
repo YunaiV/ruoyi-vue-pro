@@ -26,10 +26,12 @@ public interface MailSendService {
      * @param templateCode 邮件模版编码
      * @param from 邮箱
      * @param content 内容
-     * @param tos 收件人
-     * @param title 标题
+     * @param templateParams 模版参数
+     * @param to 收件人
+     * @param userId 用户编码
+     * @param userType 用户类型
      */
-    void sendMail(String templateCode, String from , String content , List<String> tos , String title);
+    void sendMail(Long userId, Integer userType, String templateCode, String from,String to, String content, Map<String, Object> templateParams);
 
     /**
      * 执行真正的邮件发送

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.mq.message.mail;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessage;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -46,7 +47,7 @@ public class MailSendMessage extends AbstractStreamMessage {
      * 收件人
      */
     @NotNull(message = "收件人不能为空")
-    private List<String> tos;
+    private String to;
     /**
      * 标题
      */
@@ -69,6 +70,10 @@ public class MailSendMessage extends AbstractStreamMessage {
      * 是否开启 SSL
      */
     private Boolean sslEnable;
+    /**
+     * 邮箱模板参数
+     */
+    private List<KeyValue<String, Object>> templateParams;
 
     @Override
     public String getStreamKey() {

@@ -83,7 +83,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     @Override
     public void update(@Valid MailTemplateUpdateReqVO updateReqVO) {
         // 校验是否唯一
-        // TODO @wangjingyi：参考下我在 account 给的唯一校验的说明。
+        // TODO @wangjingyi：参考下我在 account 给的唯一校验的说明。DONE
         this.validateMailTemplateOnlyByCode(updateReqVO.getId(),updateReqVO.getCode());
         MailTemplateDO mailTemplateDO = MailTemplateConvert.INSTANCE.convert(updateReqVO);
         mailTemplateMapper.updateById(mailTemplateDO);

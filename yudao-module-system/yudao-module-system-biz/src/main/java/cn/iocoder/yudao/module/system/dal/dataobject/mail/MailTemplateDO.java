@@ -2,11 +2,13 @@ package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
+import java.util.List;
 
 /**
  * 邮箱模版
@@ -43,6 +45,11 @@ public class MailTemplateDO extends BaseDO {
      * 内容
      */
     private String content;
+    /**
+     * 参数数组(自动根据内容生成)
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> params;
     /**
      * 状态
      *

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.mq.consumer.mail;
 
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.module.system.mq.message.mail.MailTemplateRefreshMessage;
-import cn.iocoder.yudao.module.system.mq.message.sms.SmsTemplateRefreshMessage;
 import cn.iocoder.yudao.module.system.service.mail.MailTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

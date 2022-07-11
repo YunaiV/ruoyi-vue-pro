@@ -131,5 +131,6 @@ public interface ErrorCodeConstants {
     ErrorCode MAIL_TEMPLATE_NOT_EXISTS = new ErrorCode(1002021000, "邮箱模版不存在");
     ErrorCode MAIL_TEMPLATE_EXISTS = new ErrorCode(1002021001, "邮箱模版存在");
     ErrorCode MAIL_ACCOUNT_RELATE_TEMPLATE_EXISTS = new ErrorCode(1002021002, "存在关联邮箱模版");
+    ErrorCode MAIL_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002021003, "模板参数({})缺失");
 
 }
