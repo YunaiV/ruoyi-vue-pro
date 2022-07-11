@@ -8,9 +8,10 @@ import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
-import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
@@ -173,6 +174,19 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Override
     public List<ProductSpuDO> getSpuList(SpuExportReqVO exportReqVO) {
         return ProductSpuMapper.selectList(exportReqVO);
+    }
+
+    @Override
+    public PageResult<AppSpuPageRespVO> getSpuPage(AppSpuPageReqVO pageReqVO) {
+        PageResult<ProductSpuDO> productSpuDOPageResult = ProductSpuMapper.selectPage(ProductSpuConvert.INSTANCE.convert(pageReqVO));
+        PageResult<AppSpuPageRespVO> pageResult = new PageResult<>();
+        List<AppSpuPageRespVO> collect = productSpuDOPageResult.getList()
+                .stream()
+                .map(ProductSpuConvert.INSTANCE::convertAppResp)
+                .collect(Collectors.toList());
+        pageResult.setList(collect);
+        pageResult.setTotal(productSpuDOPageResult.getTotal());
+        return pageResult;
     }
 
 }

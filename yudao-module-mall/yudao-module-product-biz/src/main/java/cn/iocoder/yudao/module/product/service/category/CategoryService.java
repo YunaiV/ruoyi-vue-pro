@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.product.service.category;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.*;
+import cn.iocoder.yudao.module.product.controller.app.category.vo.AppCategoryListRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
 
 import javax.validation.Valid;
@@ -83,4 +84,11 @@ public interface CategoryService {
      * @param categoryId 分类id
      */
     void validatedCategoryById(Long categoryId);
+
+    /**
+     * app端获得商品分类列表
+     *
+     * @return 商品分类列表
+     */
+    List<CategoryDO> getCategoryList();
 }
