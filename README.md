@@ -9,6 +9,12 @@
 
 如果这个项目让你有所收获，记得 Star 关注哦，这对我是非常不错的鼓励与支持。
 
+## 🐶 新手必读
+
+* 演示地址：<http://dashboard.yudao.iocoder.cn>
+* 启动文档：<https://doc.iocoder.cn/quick-start/>
+* 视频教程：<https://doc.iocoder.cn/video/>
+
 ## 🐯 平台简介
 
 **芋道**，以开发者为中心，打造中国第一流的快速开发平台，全部开源，个人与企业可 100% 免费使用。
@@ -34,15 +40,6 @@
 | `yudao-cloud`  | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)         |
 | `Spring-Boot-Labs` | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/zhijiantianya/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/SpringBoot-Labs) |
 
-## 🐶 在线体验
-
-演示地址：<http://dashboard.yudao.iocoder.cn>
-* 账号密码：admin/admin123
-
-文档地址：<http://www.iocoder.cn/categories/Yudao/>
-* [《如何搭建环境》](http://www.iocoder.cn/categories/Yudao/?yudao)
-
-视频教程：<https://doc.iocoder.cn/video/>
 
 ## 🐼 内置功能
 

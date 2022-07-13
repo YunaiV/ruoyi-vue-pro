@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 社交用户
+ * 社交（三方）用户
  *
  * @author weir
  */
