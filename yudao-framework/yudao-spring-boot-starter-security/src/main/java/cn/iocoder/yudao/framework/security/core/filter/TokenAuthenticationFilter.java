@@ -37,34 +37,13 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final OAuth2TokenApi oauth2TokenApi;
 
-    /**
-     * 积木报表内部请求获取token
-     *
-     * @param request
-     * @return
-     */
-    private static String getToken(HttpServletRequest request) {
-        String token = request.getParameter("token");
-        if (token == null) {
-            token = request.getHeader("X-Access-Token");
-        }
-        return token;
-    }
-
     @Override
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String token;
-        Integer userType;
-        if (request.getRequestURI().startsWith("/jmreport/")) {
-            token = getToken(request);
-            userType = 2;
-        } else {
-            token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
-            userType = WebFrameworkUtils.getLoginUserType(request);
-        }
+        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
         if (StrUtil.isNotEmpty(token)) {
+            Integer userType = WebFrameworkUtils.getLoginUserType(request);
             try {
                 // 1.1 基于 token 构建登录用户
                 LoginUser loginUser = buildLoginUserByToken(token, userType);
@@ -109,11 +88,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * 模拟登录用户，方便日常开发调试
-     * <p>
+     *
      * 注意，在线上环境下，一定要关闭该功能！！！
      *
-     * @param request  请求
-     * @param token    模拟的 token，格式为 {@link SecurityProperties#getMockSecret()} + 用户编号
+     * @param request 请求
+     * @param token 模拟的 token，格式为 {@link SecurityProperties#getMockSecret()} + 用户编号
      * @param userType 用户类型
      * @return 模拟的 LoginUser
      */

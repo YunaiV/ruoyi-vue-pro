@@ -25,20 +25,6 @@ public class SecurityFrameworkUtils {
     private SecurityFrameworkUtils() {}
 
     /**
-     * 积木报表内部请求获取token
-     *
-     * @param request
-     * @return
-     */
-    private static String getToken(HttpServletRequest request) {
-        String token = request.getParameter("token");
-        if (token == null) {
-            token = request.getHeader("X-Access-Token");
-        }
-        return token;
-    }
-
-    /**
      * 从请求中，获得认证 Token
      *
      * @param request 请求
@@ -46,9 +32,6 @@ public class SecurityFrameworkUtils {
      * @return 认证 Token
      */
     public static String obtainAuthorization(HttpServletRequest request, String header) {
-        if (request.getRequestURI().startsWith("/jmreport/")) {
-            return getToken(request);
-        }
         String authorization = request.getHeader(header);
         if (!StringUtils.hasText(authorization)) {
             return null;
