@@ -63,7 +63,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
 
     @Override
     protected void activityCancelled(FlowableActivityCancelledEvent event) {
-        HistoricActivityInstance activity = activityService.getHistoricActivityByExecutionId(event.getExecutionId());
+        HistoricActivityInstance activity = activityService.getHistoricActivityByExecutionId(event.getActivityId());
         if (activity == null) {
             log.error("[activityCancelled][使用 executionId({}) 查找不到对应的活动实例]", event.getExecutionId());
             return;
