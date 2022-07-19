@@ -29,7 +29,7 @@ const router = createRouter({
   scrollBehavior: () => ({ left: 0, top: 0 })
 })
 
-// 路由白名单
+// 路由不重定向白名单
 const whiteList = [
   '/login',
   '/social-login',
@@ -96,7 +96,6 @@ export const resetRouter = (): void => {
       router.hasRoute(name) && router.removeRoute(name)
     }
   })
-  routes: remainingRouter as RouteRecordRaw[]
 }
 
 export const setupRouter = (app: App<Element>) => {

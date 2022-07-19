@@ -1,7 +1,7 @@
 {
   "name": "ruoyi-vue-pro-vue3",
-  "version": "0.0.160",
-  "description": "基于vue3、element-plus、typesScript、vite3。",
+  "version": "1.0.160",
+  "description": "基于vue3、element-plus、typesScript、vite3",
   "author": "xingyu",
   "private": false,
   "scripts": {
@@ -93,7 +93,7 @@
     "typescript": "4.7.4",
     "unplugin-vue-define-options": "^0.6.2",
     "vite": "3.0.2",
-    "vite-plugin-eslint": "^1.6.1",
+    "vite-plugin-eslint": "^1.7.0",
     "vite-plugin-html": "^3.2.0",
     "vite-plugin-purge-icons": "^0.8.1",
     "vite-plugin-style-import": "^1.4.1",
