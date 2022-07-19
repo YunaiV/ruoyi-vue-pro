@@ -12,7 +12,7 @@ const { wsCache } = useCache()
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<FileVO>, FileVO>({
+const { register, tableObject, methods } = useTable<FileVO>({
   getListApi: FileApi.getFilePageApi,
   delListApi: FileApi.deleteFileApi
 })

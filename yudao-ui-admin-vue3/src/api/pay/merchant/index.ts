@@ -1,19 +1,21 @@
-import { defHttp } from '@/config/axios'
+import { useAxios } from '@/hooks/web/useAxios'
 import type { MerchantVO } from './types'
 
+const request = useAxios()
+
 // 查询列表支付商户
-export const getMerchantPageApi = ({ params }) => {
-  return defHttp.get<PageResult<MerchantVO>>({ url: '/pay/merchant/page', params })
+export const getMerchantPageApi = (params) => {
+  return request.get({ url: '/pay/merchant/page', params })
 }
 
 // 查询详情支付商户
 export const getMerchantApi = (id: number) => {
-  return defHttp.get<MerchantVO>({ url: '/pay/merchant/get?id=' + id })
+  return request.get({ url: '/pay/merchant/get?id=' + id })
 }
 
 // 根据商户名称搜索商户列表
 export const getMerchantListByNameApi = (name: string) => {
-  return defHttp.get<MerchantVO>({
+  return request.get({
     url: '/pay/merchant/list-by-name?id=',
     params: {
       name: name
@@ -22,23 +24,23 @@ export const getMerchantListByNameApi = (name: string) => {
 }
 
 // 新增支付商户
-export const createMerchantApi = (params: MerchantVO) => {
-  return defHttp.post({ url: '/pay/merchant/create', params })
+export const createMerchantApi = (data: MerchantVO) => {
+  return request.post({ url: '/pay/merchant/create', data })
 }
 
 // 修改支付商户
-export const updateMerchantApi = (params: MerchantVO) => {
-  return defHttp.put({ url: '/pay/merchant/update', params })
+export const updateMerchantApi = (data: MerchantVO) => {
+  return request.put({ url: '/pay/merchant/update', data })
 }
 
 // 删除支付商户
 export const deleteMerchantApi = (id: number) => {
-  return defHttp.delete({ url: '/pay/merchant/delete?id=' + id })
+  return request.delete({ url: '/pay/merchant/delete?id=' + id })
 }
 
 // 导出支付商户
 export const exportMerchantApi = (params) => {
-  return defHttp.get({ url: '/pay/merchant/export-excel', params, responseType: 'blob' })
+  return request.get({ url: '/pay/merchant/export-excel', params, responseType: 'blob' })
 }
 // 支付商户状态修改
 export const changeMerchantStatusApi = (id: number, status: number) => {
@@ -46,5 +48,5 @@ export const changeMerchantStatusApi = (id: number, status: number) => {
     id,
     status
   }
-  return defHttp.put({ url: '/pay/merchant/update-status', data: data })
+  return request.put({ url: '/pay/merchant/update-status', data: data })
 }

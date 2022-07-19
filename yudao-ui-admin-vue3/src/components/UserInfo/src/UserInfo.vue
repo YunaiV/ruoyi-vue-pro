@@ -22,9 +22,9 @@ const { push, replace } = useRouter()
 
 const user = wsCache.get('user')
 
-const avatar = user ? user.user.avatar : '@/assets/imgs/avatar.gif'
+const avatar = user?.user?.avatar ? user.user.avatar : '@/assets/imgs/avatar.gif'
 
-const userName = user ? user.user.nickname : 'Admin'
+const userName = user?.user?.nickname ? user.user.nickname : 'Admin'
 
 const loginOut = () => {
   ElMessageBox.confirm(t('common.loginOutMessage'), t('common.reminder'), {
@@ -38,7 +38,6 @@ const loginOut = () => {
       removeToken()
       tagsViewStore.delAllViews()
       replace('/login')
-      // }
     })
     .catch(() => {})
 }

@@ -21,11 +21,11 @@ declare type AxiosHeaders =
   | 'application/x-www-form-urlencoded'
   | 'multipart/form-data'
 
-declare type AxiosMethod = 'get' | 'post' | 'delete' | 'put'
+declare type AxiosMethod = 'GET' | 'POST' | 'DELETE' | 'PUT'
 
 declare type AxiosResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
 
-declare type AxiosConfig = {
+declare interface AxiosConfig {
   params?: any
   data?: any
   url?: string
@@ -34,7 +34,7 @@ declare type AxiosConfig = {
   responseType?: AxiosResponseType
 }
 
-declare type PageResult<T> = {
-  list: T[]
-  total?: number
+declare interface IResponse<T = any> {
+  code?: number
+  data: T extends any ? T : T & any
 }

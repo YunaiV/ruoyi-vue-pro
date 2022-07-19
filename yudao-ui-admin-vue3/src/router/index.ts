@@ -26,7 +26,6 @@ const router = createRouter({
   history: createWebHashHistory(),
   strict: true,
   routes: remainingRouter as RouteRecordRaw[],
-  // routes: constantRoutes.concat(...remainingRouter),
   scrollBehavior: () => ({ left: 0, top: 0 })
 })
 

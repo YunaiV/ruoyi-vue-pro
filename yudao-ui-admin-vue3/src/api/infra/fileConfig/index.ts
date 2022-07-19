@@ -1,37 +1,39 @@
-import { defHttp } from '@/config/axios'
+import { useAxios } from '@/hooks/web/useAxios'
 import type { FileConfigVO } from './types'
 
+const request = useAxios()
+
 // 查询文件配置列表
-export const getFileConfigPageApi = ({ params }) => {
-  return defHttp.get<PageResult<FileConfigVO>>({ url: '/infra/file-config/page', params })
+export const getFileConfigPageApi = (params) => {
+  return request.get({ url: '/infra/file-config/page', params })
 }
 
 // 查询文件配置详情
 export const getFileConfigApi = (id: number) => {
-  return defHttp.get<FileConfigVO>({ url: '/infra/file-config/get?id=' + id })
+  return request.get({ url: '/infra/file-config/get?id=' + id })
 }
 
 // 更新文件配置为主配置
 export const updateFileConfigMasterApi = (id: number) => {
-  return defHttp.get<FileConfigVO>({ url: '/infra/file-config/update-master?id=' + id })
+  return request.get({ url: '/infra/file-config/update-master?id=' + id })
 }
 
 // 新增文件配置
-export const createFileConfigApi = (params: FileConfigVO) => {
-  return defHttp.post({ url: '/infra/file-config/create', params })
+export const createFileConfigApi = (data: FileConfigVO) => {
+  return request.post({ url: '/infra/file-config/create', data })
 }
 
 // 修改文件配置
-export const updateFileConfigApi = (params: FileConfigVO) => {
-  return defHttp.put({ url: '/infra/file-config/update', params })
+export const updateFileConfigApi = (data: FileConfigVO) => {
+  return request.put({ url: '/infra/file-config/update', data })
 }
 
 // 删除文件配置
 export const deleteFileConfigApi = (id: number) => {
-  return defHttp.delete({ url: '/infra/file-config/delete?id=' + id })
+  return request.delete({ url: '/infra/file-config/delete?id=' + id })
 }
 
 // 测试文件配置
 export const testFileConfigApi = (id: number) => {
-  return defHttp.get({ url: '/infra/file-config/test?id=' + id })
+  return request.get({ url: '/infra/file-config/test?id=' + id })
 }

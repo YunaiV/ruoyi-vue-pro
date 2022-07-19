@@ -12,7 +12,7 @@ import * as ClientApi from '@/api/system/oauth2/client'
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<OAuth2ClientVo>, OAuth2ClientVo>({
+const { register, tableObject, methods } = useTable<OAuth2ClientVo>({
   getListApi: ClientApi.getOAuth2ClientPageApi,
   delListApi: ClientApi.deleteOAuth2ClientApi
 })
@@ -96,7 +96,7 @@ getList()
     <!-- 操作工具栏 -->
     <div class="mb-10px">
       <el-button type="primary" v-hasPermi="['system:oauth2-client:create']" @click="handleCreate">
-        <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
       </el-button>
     </div>
     <!-- 列表 -->

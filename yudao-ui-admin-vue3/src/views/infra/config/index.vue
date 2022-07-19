@@ -12,7 +12,7 @@ import * as ConfigApi from '@/api/infra/config'
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<ConfigVO>, ConfigVO>({
+const { register, tableObject, methods } = useTable<ConfigVO>({
   getListApi: ConfigApi.getConfigPageApi,
   delListApi: ConfigApi.deleteConfigApi,
   exportListApi: ConfigApi.exportConfigApi
@@ -102,7 +102,7 @@ getList()
     <!-- 操作工具栏 -->
     <div class="mb-10px">
       <el-button type="primary" v-hasPermi="['infra:config:create']" @click="handleCreate">
-        <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
       </el-button>
       <el-button
         type="warning"

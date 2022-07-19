@@ -12,8 +12,8 @@ import {
   ElDivider
 } from 'element-plus'
 import { reactive, ref, unref, onMounted, computed, watch } from 'vue'
-import { getCodeImgApi, getTenantIdByNameApi, loginApi, getAsyncRoutesApi } from '@/api/login'
-import { setToken } from '@/utils/auth'
+import * as LoginApi from '@/api/login'
+import { setToken, setTenantId } from '@/utils/auth'
 import { useUserStoreWithOut } from '@/store/modules/user'
 import { useCache } from '@/hooks/web/useCache'
 import { usePermissionStore } from '@/store/modules/permission'
@@ -68,14 +68,14 @@ const loginData = reactive({
 
 // 获取验证码
 const getCode = async () => {
-  const res = await getCodeImgApi()
+  const res = await LoginApi.getCodeImgApi()
   loginData.codeImg = 'data:image/gif;base64,' + res.img
   loginData.loginForm.uuid = res.uuid
 }
 //获取租户ID
 const getTenantId = async () => {
-  const res = await getTenantIdByNameApi(loginData.loginForm.tenantName)
-  wsCache.set('tenantId', res)
+  const res = await LoginApi.getTenantIdByNameApi(loginData.loginForm.tenantName)
+  setTenantId(res)
 }
 // 登录
 const handleLogin = async () => {
@@ -83,10 +83,11 @@ const handleLogin = async () => {
   const data = await validForm()
   if (!data) return
   loginLoading.value = true
-  await loginApi(loginData.loginForm)
+  await LoginApi.loginApi(loginData.loginForm)
     .then(async (res) => {
       setToken(res)
-      await userStore.getUserInfoAction()
+      const userInfo = await LoginApi.getInfoApi()
+      await userStore.getUserInfoAction(userInfo)
       await getRoutes()
     })
     .catch(() => {
@@ -100,9 +101,9 @@ const handleLogin = async () => {
 // 获取路由
 const getRoutes = async () => {
   // 后端过滤菜单
-  const routers = await getAsyncRoutesApi()
-  wsCache.set('roleRouters', routers)
-  await permissionStore.generateRoutes(routers).catch(() => {})
+  const res = await LoginApi.getAsyncRoutesApi()
+  wsCache.set('roleRouters', res)
+  await permissionStore.generateRoutes(res).catch(() => {})
   permissionStore.getAddRouters.forEach((route) => {
     addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
   })

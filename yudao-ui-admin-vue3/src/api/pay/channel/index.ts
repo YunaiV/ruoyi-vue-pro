@@ -1,9 +1,11 @@
-import { defHttp } from '@/config/axios'
+import { useAxios } from '@/hooks/web/useAxios'
 import type { ChannelVO } from './types'
 
+const request = useAxios()
+
 // 查询列表支付渠道
-export const getChannelPageApi = ({ params }) => {
-  return defHttp.get<PageResult<ChannelVO>>({ url: '/pay/channel/page', params })
+export const getChannelPageApi = (params) => {
+  return request.get({ url: '/pay/channel/page', params })
 }
 
 // 查询详情支付渠道
@@ -13,25 +15,25 @@ export const getChannelApi = (merchantId: number, appId: string, code: string) =
     appId: appId,
     code: code
   }
-  return defHttp.get<ChannelVO>({ url: '/pay/channel/get-channel', params: params })
+  return request.get({ url: '/pay/channel/get-channel', params: params })
 }
 
 // 新增支付渠道
-export const createChannelApi = (params: ChannelVO) => {
-  return defHttp.post({ url: '/pay/channel/create', params })
+export const createChannelApi = (data: ChannelVO) => {
+  return request.post({ url: '/pay/channel/create', data })
 }
 
 // 修改支付渠道
-export const updateChannelApi = (params: ChannelVO) => {
-  return defHttp.put({ url: '/pay/channel/update', params })
+export const updateChannelApi = (data: ChannelVO) => {
+  return request.put({ url: '/pay/channel/update', data })
 }
 
 // 删除支付渠道
 export const deleteChannelApi = (id: number) => {
-  return defHttp.delete({ url: '/pay/channel/delete?id=' + id })
+  return request.delete({ url: '/pay/channel/delete?id=' + id })
 }
 
 // 导出支付渠道
 export const exportChannelApi = (params) => {
-  return defHttp.get({ url: '/pay/channel/export-excel', params, responseType: 'blob' })
+  return request.get({ url: '/pay/channel/export-excel', params, responseType: 'blob' })
 }

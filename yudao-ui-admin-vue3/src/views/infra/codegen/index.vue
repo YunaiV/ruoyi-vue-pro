@@ -14,7 +14,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 const { t } = useI18n() // 国际化
 const { push } = useRouter()
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<CodegenTableVO>, CodegenTableVO>({
+const { register, tableObject, methods } = useTable<CodegenTableVO>({
   getListApi: CodegenApi.getCodegenTablePageApi,
   delListApi: CodegenApi.deleteCodegenTableApi
 })
@@ -71,7 +71,7 @@ getList()
     <!-- 操作工具栏 -->
     <div class="mb-10px">
       <el-button type="primary" v-hasPermi="['infra:codegen:create']" @click="openImportTable">
-        <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.import') }}
+        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.import') }}
       </el-button>
     </div>
     <!-- 列表 -->

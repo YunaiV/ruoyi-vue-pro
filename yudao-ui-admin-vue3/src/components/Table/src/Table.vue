@@ -13,7 +13,7 @@ export default defineComponent({
     pageSize: propTypes.number.def(10),
     currentPage: propTypes.number.def(1),
     // 是否多选
-    selection: propTypes.bool.def(true),
+    selection: propTypes.bool.def(false),
     // 是否所有的超出隐藏，优先级低于schema中的showOverflowTooltip,
     showOverflowTooltip: propTypes.bool.def(true),
     // 表头
@@ -294,9 +294,3 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="less" scoped>
-:deep(.el-button.is-text) {
-  margin-left: 0;
-  padding: 8px 10px;
-}
-</style>

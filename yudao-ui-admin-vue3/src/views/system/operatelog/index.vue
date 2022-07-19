@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { useTable } from '@/hooks/web/useTable'
-import { allSchemas } from './operateLog.data'
+import { allSchemas } from './operatelog.data'
 import { DICT_TYPE } from '@/utils/dict'
 import { useI18n } from '@/hooks/web/useI18n'
-import type { OperateLogVO } from '@/api/system/operateLog/types'
-import * as OperateLogApi from '@/api/system/operateLog'
+import type { OperateLogVO } from '@/api/system/operatelog/types'
+import * as OperateLogApi from '@/api/system/operatelog'
 import { ref } from 'vue'
 const { t } = useI18n() // 国际化
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<OperateLogVO>, OperateLogVO>({
+const { register, tableObject, methods } = useTable<OperateLogVO>({
   getListApi: OperateLogApi.getOperateLogPageApi,
   exportListApi: OperateLogApi.exportOperateLogApi
 })
@@ -20,7 +20,7 @@ const dialogTitle = ref(t('action.detail')) // 弹出层标题
 const { getList, setSearchParams, exportList } = methods
 // 导出操作
 const handleExport = async () => {
-  await exportList('数据.xls')
+  await exportList('操作日志.xls')
 }
 // 详情
 const handleDetail = (row: OperateLogVO) => {

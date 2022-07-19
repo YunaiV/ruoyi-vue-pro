@@ -30,7 +30,7 @@ const menuExpand = ref(false)
 const menuNodeAll = ref(false)
 
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<TenantPackageVO>, TenantPackageVO>({
+const { register, tableObject, methods } = useTable<TenantPackageVO>({
   getListApi: TenantPackageApi.getTenantPackageTypePageApi,
   delListApi: TenantPackageApi.deleteTenantPackageTypeApi
 })
@@ -123,7 +123,7 @@ onMounted(async () => {
     <!-- 操作工具栏 -->
     <div class="mb-10px">
       <el-button type="primary" @click="handleCreate">
-        <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
       </el-button>
     </div>
     <!-- 列表 -->

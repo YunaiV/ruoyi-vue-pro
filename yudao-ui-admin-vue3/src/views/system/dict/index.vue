@@ -16,7 +16,7 @@ const {
   register: typeRegister,
   tableObject: typeTableObject,
   methods: typeMethods
-} = useTable<PageResult<DictTypeVO>, DictTypeVO>({
+} = useTable<DictTypeVO>({
   getListApi: DictTypeApi.getDictTypePageApi,
   delListApi: DictTypeApi.deleteDictTypeApi
 })
@@ -49,7 +49,7 @@ const {
   register: dataRegister,
   tableObject: dataTableObject,
   methods: dataMethods
-} = useTable<PageResult<DictDataVO>, DictDataVO>({
+} = useTable<DictDataVO>({
   getListApi: DictDataApi.getDictDataPageApi,
   delListApi: DictDataApi.deleteDictDataApi
 })
@@ -79,7 +79,7 @@ const handleDataDelete = async (row: DictTypeVO) => {
 const parentType = ref('')
 const onClickType = async (data: { [key: string]: any }) => {
   tableTypeSelect.value = true
-  dataTableObject.paramsObj.params = {
+  dataTableObject.params = {
     dictType: data.type
   }
   getDataList()
@@ -161,7 +161,7 @@ onMounted(async () => {
       <!-- 操作工具栏 -->
       <div class="mb-10px">
         <el-button type="primary" v-hasPermi="['system:dict:create']" @click="handleTypeCreate">
-          <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
         </el-button>
       </div>
       <!-- 列表 -->
@@ -221,7 +221,7 @@ onMounted(async () => {
         <!-- 操作工具栏 -->
         <div class="mb-10px">
           <el-button type="primary" v-hasPermi="['system:dict:create']" @click="handleDataCreate">
-            <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+            <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
           </el-button>
         </div>
         <Table
