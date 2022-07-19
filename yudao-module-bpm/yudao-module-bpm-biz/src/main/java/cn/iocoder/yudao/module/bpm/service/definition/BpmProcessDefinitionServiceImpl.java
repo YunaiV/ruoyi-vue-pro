@@ -127,7 +127,8 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
                 .deploy();
 
         // 设置 ProcessDefinition 的 category 分类
-        ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
+        ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
+                .deploymentId(deploy.getId()).singleResult();
         repositoryService.setProcessDefinitionCategory(definition.getId(), createReqDTO.getCategory());
         // 注意 1，ProcessDefinition 的 key 和 name 是通过 BPMN 中的 <bpmn2:process /> 的 id 和 name 决定
         // 注意 2，目前该项目的设计上，需要保证 Model、Deployment、ProcessDefinition 使用相同的 key，保证关联性。
@@ -198,7 +199,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         // 校验 BPMN XML 信息
         BpmnModel newModel = buildBpmnModel(createReqDTO.getBpmnBytes());
         BpmnModel oldModel = getBpmnModel(oldProcessDefinition.getId());
-        //TODO  貌似 flowable 不修改这个也不同。需要看看。 sourceSystemId 不同
+        // TODO  貌似 flowable 不修改这个也不同。需要看看。 sourceSystemId 不同
         if (FlowableUtils.equals(oldModel, newModel)) {
             return false;
         }
@@ -217,8 +218,6 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         BpmnXMLConverter converter = new BpmnXMLConverter();
         return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), true, true);
     }
-
-
 
     @Override
     public BpmProcessDefinitionExtDO getProcessDefinitionExt(String id) {

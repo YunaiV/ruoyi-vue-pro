@@ -22,6 +22,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @RequestMapping("/bpm/process-instance")
 @Validated
 public class BpmProcessInstanceController {
+
     @Resource
     private BpmProcessInstanceService processInstanceService;
 

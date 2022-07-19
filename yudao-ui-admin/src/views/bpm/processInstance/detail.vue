@@ -35,7 +35,7 @@
       <el-col v-if="this.processInstance.processDefinition && this.processInstance.processDefinition.formType === 10"
               :span="16" :offset="6">
         <div >
-          <parser :key="new Date().getTime()" :form-conf="detailForm" @submit="submitForm" />
+          <parser :key="new Date().getTime()" :form-conf="detailForm" />
         </div>
       </el-col>
       <div v-if="this.processInstance.processDefinition && this.processInstance.processDefinition.formType === 20">
@@ -289,31 +289,6 @@ export default {
         this.$router.push({ path: row.formCustomCreatePath});
         // 这里暂时无需加载流程图，因为跳出到另外个 Tab；
       }
-    },
-    /** 提交按钮 */
-    submitForm(params) {
-      if (!params) {
-        return;
-      }
-      // 设置表单禁用
-      const conf = params.conf;
-      conf.disabled = true; // 表单禁用
-      conf.formBtns = false; // 按钮隐藏
-
-      // 提交表单，创建流程
-      const variables = params.values;
-      createProcessInstance({
-        processDefinitionId: this.selectProcessInstance.id,
-        variables: variables
-      }).then(response => {
-        this.$modal.msgSuccess("发起流程成功");
-        // 关闭当前窗口
-        this.$tab.closeOpenPage();
-        this.$router.go(-1);
-      }).catch(() => {
-        conf.disabled = false; // 表单开启
-        conf.formBtns = true; // 按钮展示
-      })
     },
     getDateStar(ms) {
       return getDate(ms);
