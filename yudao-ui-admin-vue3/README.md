@@ -7,7 +7,7 @@
 ## 注意事项
 
 - 项目路径请不要使用中文命名！！！会造成解析乱码！！！请使用全英文路径！！！
-- node >=14.18.0 ,pnpm >=7
+- node >=14.18.0(建议使用16版本) ,pnpm >=7
 - 开发建议使用 [谷歌浏览器-开发者版](https://www.google.cn/intl/zh-CN/chrome/dev/) 不支持 IE\QQ 等浏览器
 
 ### 前端依赖
@@ -65,6 +65,10 @@ pnpm install
 
 pnpm run dev
 
+# 打包
+
+pnpm run build:pro
+
 # 安装一个包
 
 pnpm add 包名
@@ -72,6 +76,8 @@ pnpm add 包名
 # 卸载一个包
 
 pnpm remove 包名
+
+# 其他命令请看package.json
 ```
 
 ## 浏览器支持
