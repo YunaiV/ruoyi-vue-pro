@@ -23,8 +23,8 @@
 >
 > 😜 给项目点点 Star 吧，这对我们真的很重要！
 
-* 前端vue2版本采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)
-* 前端vue3版本采用 [vue-element-plus-admin](https://gitee.com/kailong110120130/vue-element-plus-admin)
+* 前端 vue2 版本采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)
+* 前端 vue3 版本采用 [vue-element-plus-admin](https://gitee.com/kailong110120130/vue-element-plus-admin)
 * 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson。
 * 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
 * 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统。
@@ -177,14 +177,14 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架      | 5.8.2    | -                                                              |
 | [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架     | 4.0.0    | -                                                              |
 
-### vue2前端
+### vue2 前端
 
 | 框架                                                                           | 说明            | 版本     |
 |------------------------------------------------------------------------------|---------------|--------|
 | [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.6.12 |
 | [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -      |
 
-### vue3前端
+### vue3 前端
 
 | 框架                                                                           | 说明            | 版本     |
 |------------------------------------------------------------------------------|---------------|--------|
