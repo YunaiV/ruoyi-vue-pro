@@ -138,7 +138,7 @@ const submitForm = async () => {
 }
 // 改变用户状态操作
 const handleStatusChange = async (row: UserVO) => {
-  const text = row.status === CommonStatusEnum.ENABLE ? '停用' : '启用'
+  const text = row.status === CommonStatusEnum.ENABLE ? '启用' : '停用'
   ElMessageBox.confirm('确认要"' + text + '""' + row.username + '"用户吗?', t('common.reminder'), {
     confirmButtonText: t('common.ok'),
     cancelButtonText: t('common.cancel'),
@@ -146,9 +146,8 @@ const handleStatusChange = async (row: UserVO) => {
   })
     .then(async () => {
       row.status =
-        row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE : CommonStatusEnum.ENABLE
-      const res = await UserApi.updateUserStatusApi(row.id, row.status)
-      console.info(res)
+        row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.ENABLE : CommonStatusEnum.DISABLE
+      await UserApi.updateUserStatusApi(row.id, row.status)
       ElMessage.success(text + '成功')
       await getList()
     })
@@ -159,12 +158,10 @@ const handleStatusChange = async (row: UserVO) => {
 }
 // 重置密码
 const handleResetPwd = (row: UserVO) => {
-  ElMessageBox.prompt('请输入"' + row.username + '"的新密码', '提示', {
+  ElMessageBox.prompt('请输入"' + row.username + '"的新密码', t('common.reminder'), {
     confirmButtonText: t('common.ok'),
     cancelButtonText: t('common.cancel')
   }).then(({ value }) => {
-    console.log(row.id)
-    console.log(value)
     UserApi.resetUserPwdApi(row.id, value).then(() => {
       ElMessage.success('修改成功，新密码是：' + value)
     })
