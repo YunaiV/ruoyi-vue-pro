@@ -47,7 +47,7 @@ const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
 const tableTitle = ref('用户列表')
-const { register, tableObject, methods } = useTable<PageResult<UserVO>, UserVO>({
+const { register, tableObject, methods } = useTable<UserVO>({
   getListApi: UserApi.getUserPageApi,
   delListApi: UserApi.deleteUserApi,
   exportListApi: UserApi.exportUserApi
@@ -67,7 +67,7 @@ const filterNode = (value: string, data: Tree) => {
   return data.name.includes(value)
 }
 const handleDeptNodeClick = (data: { [key: string]: any }) => {
-  tableObject.paramsObj.params = {
+  tableObject.params = {
     deptId: data.id
   }
   tableTitle.value = data.name
@@ -156,6 +156,19 @@ const handleStatusChange = async (row: UserVO) => {
       row.status =
         row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE : CommonStatusEnum.ENABLE
     })
+}
+// 重置密码
+const handleResetPwd = (row: UserVO) => {
+  ElMessageBox.prompt('请输入"' + row.username + '"的新密码', '提示', {
+    confirmButtonText: t('common.ok'),
+    cancelButtonText: t('common.cancel')
+  }).then(({ value }) => {
+    console.log(row.id)
+    console.log(value)
+    UserApi.resetUserPwdApi(row.id, value).then(() => {
+      ElMessage.success('修改成功，新密码是：' + value)
+    })
+  })
 }
 // 删除操作
 const handleDelete = (row: UserVO) => {
@@ -283,12 +296,16 @@ getList()
       <!-- 操作工具栏 -->
       <div class="mb-10px">
         <el-button type="primary" v-hasPermi="['system:user:create']" @click="handleAdd">
-          <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
         </el-button>
-        <el-button v-hasPermi="['system:user:import']" @click="importDialogVisible = true">
+        <el-button
+          type="info"
+          v-hasPermi="['system:user:import']"
+          @click="importDialogVisible = true"
+        >
           <Icon icon="ep:upload" class="mr-5px" /> {{ t('action.import') }}
         </el-button>
-        <el-button v-hasPermi="['system:user:export']" @click="handleExport">
+        <el-button type="warning" v-hasPermi="['system:user:export']" @click="handleExport">
           <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
         </el-button>
       </div>
@@ -335,6 +352,14 @@ getList()
             @click="handleDetail(row)"
           >
             <Icon icon="ep:view" class="mr-5px" /> {{ t('action.detail') }}
+          </el-button>
+          <el-button
+            link
+            type="primary"
+            v-hasPermi="['system:user:update-password']"
+            @click="handleResetPwd(row)"
+          >
+            <Icon icon="ep:key" class="mr-5px" /> 重置密码
           </el-button>
           <el-button
             link
@@ -411,6 +436,7 @@ getList()
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
   </Dialog>
+  <!-- 导入 -->
   <Dialog
     v-model="importDialogVisible"
     :title="importDialogTitle"

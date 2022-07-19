@@ -13,14 +13,14 @@ import { allSchemas } from './jobLog.data'
 const { t } = useI18n() // 国际化
 const { query } = useRoute()
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<JobLogVO>, JobLogVO>({
+const { register, tableObject, methods } = useTable<JobLogVO>({
   getListApi: JobLogApi.getJobLogPageApi,
   exportListApi: JobLogApi.exportJobLogApi
 })
 const { getList, setSearchParams, exportList } = methods
 const getTableList = async () => {
   const id = (query.id as unknown as number) && (query.jobId as unknown as number)
-  tableObject.paramsObj.params = {
+  tableObject.params = {
     jobId: id
   }
   await getList()

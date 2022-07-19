@@ -1,38 +1,36 @@
-import { defHttp } from '@/config/axios'
+import { useAxios } from '@/hooks/web/useAxios'
 import type { JobVO } from './types'
 
+const request = useAxios()
+
 // 任务列表
-export const getJobPageApi = ({ params }) => {
-  return defHttp.get<PageResult<JobVO>>({ url: '/infra/job/page', params })
+export const getJobPageApi = (params) => {
+  return request.get({ url: '/infra/job/page', params })
 }
 
 // 任务详情
 export const getJobApi = (id: number) => {
-  return defHttp.get<JobVO>({ url: '/infra/job/get?id=' + id })
+  return request.get({ url: '/infra/job/get?id=' + id })
 }
 
 // 新增任务
-export const createJobApi = (params: JobVO) => {
-  return defHttp.post({ url: '/infra/job/create', params })
+export const createJobApi = (data: JobVO) => {
+  return request.post({ url: '/infra/job/create', data })
 }
 
 // 修改定时任务调度
 export const updateJobApi = (params: JobVO) => {
-  return defHttp.put({ url: '/infra/job/update', params })
+  return request.put({ url: '/infra/job/update', params })
 }
 
 // 删除定时任务调度
 export const deleteJobApi = (id: number) => {
-  return defHttp.delete({ url: '/infra/job/delete?id=' + id })
+  return request.delete({ url: '/infra/job/delete?id=' + id })
 }
 
 // 导出定时任务调度
 export const exportJobApi = (params) => {
-  return defHttp.get({
-    url: '/infra/job/export-excel',
-    params,
-    responseType: 'blob'
-  })
+  return request.get({ url: '/infra/job/export-excel', params, responseType: 'blob' })
 }
 
 // 任务状态修改
@@ -41,15 +39,15 @@ export const updateJobStatusApi = (id: number, status: number) => {
     id,
     status
   }
-  return defHttp.put({ url: '/infra/job/update-status', data: data })
+  return request.put({ url: '/infra/job/update-status', data: data })
 }
 
 // 定时任务立即执行一次
 export const runJobApi = (id: number) => {
-  return defHttp.put({ url: '/infra/job/trigger?id=' + id })
+  return request.put({ url: '/infra/job/trigger?id=' + id })
 }
 
 // 获得定时任务的下 n 次执行时间
 export const getJobNextTimesApi = (id: number) => {
-  return defHttp.get({ url: '/infra/job/get_next_times?id=' + id })
+  return request.get({ url: '/infra/job/get_next_times?id=' + id })
 }

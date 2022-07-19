@@ -1,11 +1,12 @@
-import { defHttp } from '@/config/axios'
-import type { LoginLogVO } from './types'
+import { useAxios } from '@/hooks/web/useAxios'
+
+const request = useAxios()
 
 // 查询登录日志列表
-export const getLoginLogPageApi = ({ params }) => {
-  return defHttp.get<PageResult<LoginLogVO>>({ url: '/system/login-log/page', params })
+export const getLoginLogPageApi = (params) => {
+  return request.get({ url: '/system/login-log/page', params })
 }
 // 导出登录日志
 export const exportLoginLogApi = (params) => {
-  return defHttp.get({ url: '/system/login-log/export', params, responseType: 'blob' })
+  return request.get({ url: '/system/login-log/export', params, responseType: 'blob' })
 }

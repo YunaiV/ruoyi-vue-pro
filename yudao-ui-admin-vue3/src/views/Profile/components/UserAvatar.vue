@@ -53,7 +53,9 @@ const beforeUpload = (file: Blob) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onload = () => {
-      state.options.img = reader.result
+      if (reader.result) {
+        state.options.img = reader.result as string
+      }
     }
   }
 }

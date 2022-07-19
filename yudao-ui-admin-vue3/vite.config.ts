@@ -30,8 +30,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     env = loadEnv(mode, root)
   }
   return {
-    base: command === 'serve' ? './' : env.VITE_BASE_PATH,
-    root: process.cwd(),
+    base: env.VITE_BASE_PATH,
+    root: root,
     // 服务端渲染
     server: {
       // 是否开启 https
@@ -65,6 +65,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         }]
       }),
       EslintPlugin({
+        cache: false,
         include: ['src/**/*.vue', 'src/**/*.ts', 'src/**/*.tsx'] // 检查的文件
       }),
       VueI18n({
@@ -88,6 +89,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         }
       })
     ],
+
     css: {
       preprocessorOptions: {
         less: {
@@ -113,6 +115,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       minify: 'terser',
       outDir: env.VITE_OUT_DIR || 'dist',
       sourcemap: env.VITE_SOURCEMAP === 'true' ? 'inline' : false,
+      // brotliSize: false,
       terserOptions: {
         compress: {
           drop_debugger: env.VITE_DROP_DEBUGGER === 'true',

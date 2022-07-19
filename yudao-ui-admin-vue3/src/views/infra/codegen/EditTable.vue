@@ -27,7 +27,6 @@ const loading = ref(false)
 const activeName = ref('cloum')
 const basicInfoRef = ref<ComponentRef<typeof BasicInfoForm>>()
 const genInfoRef = ref<ComponentRef<typeof GenInfoFormVue>>()
-// TODO: 提交
 const submitForm = async () => {
   const basicInfo = unref(basicInfoRef)
   const genInfo = unref(genInfoRef)

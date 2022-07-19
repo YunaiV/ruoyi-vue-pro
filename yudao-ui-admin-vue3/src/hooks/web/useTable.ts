@@ -1,33 +1,38 @@
 import download from '@/utils/download'
-import { useI18n } from '@/hooks/web/useI18n'
 import { Table, TableExpose } from '@/components/Table'
-import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
-import { computed, nextTick, reactive, ref, unref, watch } from 'vue'
+import { ElTable, ElMessageBox, ElMessage } from 'element-plus'
+import { ref, reactive, watch, computed, unref, nextTick } from 'vue'
 import type { TableProps } from '@/components/Table/src/types'
-const { t } = useI18n()
+import { useI18n } from '@/hooks/web/useI18n'
 
-interface UseTableConfig<T, L> {
-  getListApi: (option: L) => Promise<T>
-  delListApi?: (ids: string | number) => Promise<unknown>
-  exportListApi?: (option: L) => Promise<T>
+const { t } = useI18n()
+interface ResponseType<T = any> {
+  list: T[]
+  total?: string
+}
+
+interface UseTableConfig<T = any> {
+  getListApi: (option: any) => Promise<T>
+  delListApi?: (option: any) => Promise<T>
+  exportListApi?: (option: any) => Promise<T>
+  // 返回数据格式配置
+  response?: ResponseType
   props?: TableProps
 }
 
-interface TableObject<K, L> {
+interface TableObject<T = any> {
   pageSize: number
   currentPage: number
   total: number
-  tableList: K[]
-  paramsObj: L
+  tableList: T[]
+  params: any
   loading: boolean
   exportLoading: boolean
-  currentRow: Nullable<K>
+  currentRow: Nullable<T>
 }
 
-export const useTable = <T, K, L extends AxiosConfig = AxiosConfig>(
-  config?: UseTableConfig<T, L>
-) => {
-  const tableObject = reactive<TableObject<K, L>>({
+export const useTable = <T = any>(config?: UseTableConfig<T>) => {
+  const tableObject = reactive<TableObject<T>>({
     // 页数
     pageSize: 10,
     // 当前页
@@ -37,7 +42,7 @@ export const useTable = <T, K, L extends AxiosConfig = AxiosConfig>(
     // 表格数据
     tableList: [],
     // AxiosConfig 配置
-    paramsObj: {} as L,
+    params: {},
     // 加载中
     loading: true,
     // 导出加载中
@@ -48,11 +53,9 @@ export const useTable = <T, K, L extends AxiosConfig = AxiosConfig>(
 
   const paramsObj = computed(() => {
     return {
-      params: {
-        ...tableObject.paramsObj.params,
-        pageSize: tableObject.pageSize,
-        pageNo: tableObject.currentPage
-      }
+      ...tableObject.params,
+      pageSize: tableObject.pageSize,
+      pageNo: tableObject.currentPage
     }
   })
 
@@ -109,33 +112,25 @@ export const useTable = <T, K, L extends AxiosConfig = AxiosConfig>(
       await (config?.delListApi && config?.delListApi(ids))
     }
     ElMessage.success(t('common.delSuccess'))
+
     // 计算出临界点
-    tableObject.currentPage =
+    const currentPage =
       tableObject.total % tableObject.pageSize === idsLength || tableObject.pageSize === 1
         ? tableObject.currentPage > 1
           ? tableObject.currentPage - 1
           : tableObject.currentPage
         : tableObject.currentPage
+
+    tableObject.currentPage = currentPage
     methods.getList()
   }
 
-  const methods: {
-    setProps: (props: Recordable) => void
-    getList: () => Promise<void>
-    setColumn: (columnProps: TableSetPropsType[]) => void
-    setSearchParams: (data: Recordable) => void
-    getSelections: () => Promise<K[]>
-    delList: (ids: string | number | string[] | number[], multiple: boolean) => Promise<void>
-    exportList: (fileName: string) => Promise<void>
-  } = {
+  const methods = {
     getList: async () => {
       tableObject.loading = true
-      const res = await config
-        ?.getListApi(unref(paramsObj) as unknown as L)
-        .catch(() => {})
-        .finally(() => {
-          tableObject.loading = false
-        })
+      const res = await config?.getListApi(unref(paramsObj)).finally(() => {
+        tableObject.loading = false
+      })
       if (res) {
         tableObject.tableList = res?.list
         tableObject.total = res?.total
@@ -151,41 +146,42 @@ export const useTable = <T, K, L extends AxiosConfig = AxiosConfig>(
     },
     getSelections: async () => {
       const table = await getTable()
-      return (table?.selections || []) as K[]
+      return (table?.selections || []) as T[]
     },
     // 与Search组件结合
     setSearchParams: (data: Recordable) => {
       tableObject.currentPage = 1
-      tableObject.paramsObj = Object.assign(tableObject.paramsObj, {
-        params: {
-          pageSize: tableObject.pageSize,
-          pageNo: tableObject.currentPage,
-          ...data
-        }
+      tableObject.params = Object.assign(tableObject.params, {
+        pageSize: tableObject.pageSize,
+        pageNo: tableObject.currentPage,
+        ...data
       })
       methods.getList()
     },
     // 删除数据
-    delList: async (ids: string | number | string[] | number[], multiple: boolean) => {
+    delList: async (
+      ids: string | number | string[] | number[],
+      multiple: boolean,
+      message = true
+    ) => {
       const tableRef = await getTable()
-      let message = 'common.delDataMessage'
       if (multiple) {
         if (!tableRef?.selections.length) {
           ElMessage.warning(t('common.delNoData'))
           return
-        } else {
-          message = 'common.delMessage'
         }
       }
-      ElMessageBox.confirm(t(message), t('common.confirmTitle'), {
-        confirmButtonText: t('common.ok'),
-        cancelButtonText: t('common.cancel'),
-        type: 'warning'
-      })
-        .then(async () => {
+      if (message) {
+        ElMessageBox.confirm(t('common.delMessage'), t('common.confirmTitle'), {
+          confirmButtonText: t('common.ok'),
+          cancelButtonText: t('common.cancel'),
+          type: 'warning'
+        }).then(async () => {
           await delData(ids)
         })
-        .catch(() => {})
+      } else {
+        await delData(ids)
+      }
     },
     // 导出列表
     exportList: async (fileName: string) => {
@@ -196,14 +192,11 @@ export const useTable = <T, K, L extends AxiosConfig = AxiosConfig>(
         type: 'warning'
       })
         .then(async () => {
-          const res = await config
-            ?.exportListApi?.(unref(paramsObj) as unknown as L)
-            .catch(() => {})
+          const res = await config?.exportListApi?.(unref(paramsObj) as unknown as T)
           if (res) {
             download.excel(res, fileName)
           }
         })
-        .catch(() => {})
         .finally(() => {
           tableObject.exportLoading = false
         })

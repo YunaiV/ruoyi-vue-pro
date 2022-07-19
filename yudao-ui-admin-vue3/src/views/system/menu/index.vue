@@ -195,7 +195,7 @@ onMounted(async () => {
   <ContentWrap>
     <div class="mb-10px">
       <el-button type="primary" v-hasPermi="['system:notice:create']" @click="handleCreate">
-        <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
       </el-button>
     </div>
     <el-table

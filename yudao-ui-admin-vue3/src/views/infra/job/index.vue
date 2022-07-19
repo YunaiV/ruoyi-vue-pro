@@ -14,7 +14,7 @@ import { useRouter } from 'vue-router'
 const { t } = useI18n() // 国际化
 const { push } = useRouter()
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<JobVO>, JobVO>({
+const { register, tableObject, methods } = useTable<JobVO>({
   getListApi: JobApi.getJobPageApi,
   delListApi: JobApi.deleteJobApi,
   exportListApi: JobApi.exportJobApi
@@ -126,7 +126,7 @@ getList()
     <!-- 操作工具栏 -->
     <div class="mb-10px">
       <el-button type="primary" v-hasPermi="['infra:job:create']" @click="handleCreate">
-        <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
       </el-button>
       <el-button
         type="warning"
@@ -137,7 +137,7 @@ getList()
         <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
       </el-button>
       <el-button type="info" v-hasPermi="['infra:job:query']" @click="handleJobLog">
-        <Icon icon="el:zoom-in" class="mr-5px" /> 执行日志
+        <Icon icon="ep:zoom-in" class="mr-5px" /> 执行日志
       </el-button>
     </div>
     <!-- 列表 -->

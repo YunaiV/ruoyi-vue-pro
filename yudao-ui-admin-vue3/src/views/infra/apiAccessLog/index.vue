@@ -10,7 +10,7 @@ import * as ApiAccessLogApi from '@/api/infra/apiAccessLog'
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<ApiAccessLogVO>, ApiAccessLogVO>({
+const { register, tableObject, methods } = useTable<ApiAccessLogVO>({
   getListApi: ApiAccessLogApi.getApiAccessLogPageApi
 })
 const { getList, setSearchParams } = methods

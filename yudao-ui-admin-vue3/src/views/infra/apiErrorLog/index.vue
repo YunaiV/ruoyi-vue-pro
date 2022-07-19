@@ -12,7 +12,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<ApiErrorLogVO>, ApiErrorLogVO>({
+const { register, tableObject, methods } = useTable<ApiErrorLogVO>({
   getListApi: ApiErrorLogApi.getApiErrorLogPageApi,
   exportListApi: ApiErrorLogApi.exportApiErrorLogApi
 })

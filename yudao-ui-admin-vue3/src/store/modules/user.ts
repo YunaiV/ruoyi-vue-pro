@@ -1,8 +1,9 @@
 import { store } from '../index'
 import { defineStore } from 'pinia'
-import { getInfoApi } from '@/api/login'
 import { getAccessToken } from '@/utils/auth'
 import { useCache } from '@/hooks/web/useCache'
+
+const { wsCache } = useCache()
 
 interface UserInfoVO {
   permissions: []
@@ -13,7 +14,6 @@ interface UserInfoVO {
     nickname: string
   }
 }
-const { wsCache } = useCache()
 
 export const useUserStore = defineStore({
   id: 'admin-user',
@@ -27,17 +27,15 @@ export const useUserStore = defineStore({
     }
   }),
   actions: {
-    // TODO 设置store刷新页面就消失
-    async getUserInfoAction() {
+    async getUserInfoAction(userInfo: UserInfoVO) {
       if (!getAccessToken()) {
         this.resetState()
         return null
       }
-      const res = await getInfoApi()
-      this.permissions = res.permissions
-      this.roles = res.roles
-      this.user = res.user
-      wsCache.set('user', res)
+      this.permissions = userInfo.permissions
+      this.roles = userInfo.roles
+      this.user = userInfo.user
+      wsCache.set('user', userInfo)
     },
     resetState() {
       this.permissions = []

@@ -11,7 +11,7 @@ import { rules, allSchemas } from './order.data'
 import * as OrderApi from '@/api/pay/order'
 const { t } = useI18n() // 国际化
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<OrderVO>, OrderVO>({
+const { register, tableObject, methods } = useTable<OrderVO>({
   getListApi: OrderApi.getOrderPageApi,
   delListApi: OrderApi.deleteOrderApi,
   exportListApi: OrderApi.exportOrderApi
@@ -99,7 +99,7 @@ getList()
     <!-- 操作工具栏 -->
     <div class="mb-10px">
       <el-button type="primary" v-hasPermi="['pay:order:create']" @click="handleCreate">
-        <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
       </el-button>
       <el-button
         type="warning"

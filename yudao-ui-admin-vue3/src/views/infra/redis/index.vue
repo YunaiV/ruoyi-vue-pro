@@ -20,10 +20,10 @@ const keyListLoad = ref(true)
 const keyList = ref<RedisKeyInfo[]>([])
 // 基本信息
 const readRedisInfo = async () => {
-  const data = await RedisApi.redisMonitorInfo()
+  const data = await RedisApi.getCacheApi()
   cache.value = data
-  loadEchartOptions(cache.value.commandStats)
-  const redisKeysInfo = await RedisApi.redisKeysInfo()
+  loadEchartOptions(data.commandStats)
+  const redisKeysInfo = await RedisApi.getKeyDefineListApi()
   keyList.value = redisKeysInfo
   keyListLoad.value = false //加载完成
 }

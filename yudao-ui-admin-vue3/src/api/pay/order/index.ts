@@ -1,32 +1,34 @@
-import { defHttp } from '@/config/axios'
+import { useAxios } from '@/hooks/web/useAxios'
 import type { OrderVO } from './types'
 
+const request = useAxios()
+
 // 查询列表支付订单
-export const getOrderPageApi = ({ params }) => {
-  return defHttp.get<PageResult<OrderVO>>({ url: '/pay/order/page', params })
+export const getOrderPageApi = async (params) => {
+  return await request.get({ url: '/pay/order/page', params })
 }
 
 // 查询详情支付订单
-export const getOrderApi = (id: number) => {
-  return defHttp.get<OrderVO>({ url: '/pay/order/get?id=' + id })
+export const getOrderApi = async (id: number) => {
+  return await request.get({ url: '/pay/order/get?id=' + id })
 }
 
 // 新增支付订单
-export const createOrderApi = (params: OrderVO) => {
-  return defHttp.post({ url: '/pay/order/create', params })
+export const createOrderApi = async (data: OrderVO) => {
+  return await request.post({ url: '/pay/order/create', data })
 }
 
 // 修改支付订单
-export const updateOrderApi = (params: OrderVO) => {
-  return defHttp.put({ url: '/pay/order/update', params })
+export const updateOrderApi = async (data: OrderVO) => {
+  return await request.put({ url: '/pay/order/update', data })
 }
 
 // 删除支付订单
-export const deleteOrderApi = (id: number) => {
-  return defHttp.delete({ url: '/pay/order/delete?id=' + id })
+export const deleteOrderApi = async (id: number) => {
+  return await request.delete({ url: '/pay/order/delete?id=' + id })
 }
 
 // 导出支付订单
-export const exportOrderApi = (params) => {
-  return defHttp.get({ url: '/pay/order/export-excel', params, responseType: 'blob' })
+export const exportOrderApi = async (params) => {
+  return await request.get({ url: '/pay/order/export-excel', params, responseType: 'blob' })
 }

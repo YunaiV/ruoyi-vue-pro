@@ -84,7 +84,7 @@ const refreshSelectedTag = async (view?: RouteLocationNormalizedLoaded) => {
   tagsViewStore.delCachedView()
   const { path, query } = view
   await nextTick()
-  await replace({
+  replace({
     path: '/redirect' + path,
     query: query
   })
@@ -107,7 +107,15 @@ const toLastView = () => {
   if (latestView) {
     push(latestView)
   } else {
-    push('/')
+    if (
+      unref(currentRoute).path === permissionStore.getAddRouters[0].path ||
+      unref(currentRoute).path === permissionStore.getAddRouters[0].redirect
+    ) {
+      addTags()
+      return
+    }
+    // You can set another route
+    push(permissionStore.getAddRouters[0].path)
   }
 }
 

@@ -92,7 +92,7 @@ onMounted(async () => {
         type="primary"
         @click="handleCreate"
       >
-        <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
       </el-button>
     </div>
     <Table :columns="allSchemas.tableColumns" :data="tableData">

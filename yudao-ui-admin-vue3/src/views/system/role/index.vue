@@ -27,7 +27,7 @@ import { SystemDataScopeEnum } from '@/utils/constants'
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<RoleVO>, RoleVO>({
+const { register, tableObject, methods } = useTable<RoleVO>({
   getListApi: RoleApi.getRolePageApi,
   delListApi: RoleApi.deleteRoleApi
 })
@@ -159,7 +159,7 @@ getList()
     <!-- 操作工具栏 -->
     <div class="mb-10px">
       <el-button type="primary" v-hasPermi="['system:role:create']" @click="handleCreate">
-        <Icon icon="el:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
       </el-button>
     </div>
     <!-- 列表 -->

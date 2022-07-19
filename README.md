@@ -23,7 +23,8 @@
 >
 > 😜 给项目点点 Star 吧，这对我们真的很重要！
 
-* 前端采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) ，正在支持 Vue 3 + ElementUI Plus 最新方案。
+* 前端 vue2 版本采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)
+* 前端 vue3 版本采用 [vue-element-plus-admin](https://gitee.com/kailong110120130/vue-element-plus-admin)
 * 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson。
 * 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
 * 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统。
@@ -176,12 +177,28 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架      | 5.8.2    | -                                                              |
 | [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架     | 4.0.0    | -                                                              |
 
-### 前端
+### vue2 前端
 
 | 框架                                                                           | 说明            | 版本     |
 |------------------------------------------------------------------------------|---------------|--------|
 | [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.6.12 |
 | [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -      |
+
+### vue3 前端
+
+| 框架                                                                           | 说明            | 版本     |
+|------------------------------------------------------------------------------|---------------|--------|
+| [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.37 |
+| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.0.1 |
+| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.9 |
+| [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.7.4 |
+| [pinia](https://pinia.vuejs.org/) | Vue 存储库 替代 vuex5 | 2.0.16 |
+| [vueuse](https://vueuse.org//) | 常用工具集 | 8.9.4 |
+| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化 | 9.1.10 |
+| [vue-router](https://router.vuejs.org/) | vue 路由 | 4.1.2 |
+| [windicss](https://cn.windicss.org/) | 下一代工具优先的 CSS 框架 | 3.5.6 |
+| [iconify](https://icon-sets.iconify.design/) | 在线图标库 | 2.2.1 |
+| [wangeditor](https://www.wangeditor.com/) | 富文本编辑器 | 5.1.11 |
 
 ## 🐷 演示图
 

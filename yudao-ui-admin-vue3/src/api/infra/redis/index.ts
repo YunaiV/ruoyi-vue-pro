@@ -1,16 +1,25 @@
-import { defHttp } from '@/config/axios'
-import { RedisKeyInfo, RedisMonitorInfoVO } from '@/api/infra/redis/types'
+import { useAxios } from '@/hooks/web/useAxios'
+
+const request = useAxios()
 
 /**
  * 获取redis 监控信息
  */
-export const redisMonitorInfo = () => {
-  return defHttp.get<RedisMonitorInfoVO>({ url: '/infra/redis/get-monitor-info' })
+export const getCacheApi = () => {
+  return request.get({ url: '/infra/redis/get-monitor-info' })
 }
-
+// 获取模块
+export const getKeyDefineListApi = () => {
+  return request.get({ url: '/infra/redis/get-key-define-list' })
+}
 /**
  * 获取redis key列表
  */
-export const redisKeysInfo = () => {
-  return defHttp.get<RedisKeyInfo[]>({ url: '/infra/redis/get-key-list' })
+export const getKeyListApi = (keyTemplate: string) => {
+  return request.get({
+    url: '/infra/redis/get-key-list',
+    params: {
+      keyTemplate
+    }
+  })
 }

@@ -10,7 +10,7 @@ import * as SmsLoglApi from '@/api/system/sms/smsLog'
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<SmsLogVO>, SmsLogVO>({
+const { register, tableObject, methods } = useTable<SmsLogVO>({
   getListApi: SmsLoglApi.getSmsLogPageApi
 })
 const { getList, setSearchParams } = methods

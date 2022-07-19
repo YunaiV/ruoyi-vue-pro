@@ -9,7 +9,7 @@ import * as TokenApi from '@/api/system/oauth2/token'
 import { ref } from 'vue'
 const { t } = useI18n() // 国际化
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<OAuth2TokenVo>, OAuth2TokenVo>({
+const { register, tableObject, methods } = useTable<OAuth2TokenVo>({
   getListApi: TokenApi.getAccessTokenPageApi,
   delListApi: TokenApi.deleteAccessTokenApi
 })

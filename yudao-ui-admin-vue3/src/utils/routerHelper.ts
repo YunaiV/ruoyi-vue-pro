@@ -94,13 +94,13 @@ export const generateRoutes = (routes: AppCustomRouteRecordRaw[]): AppRouteRecor
   }
   return res
 }
-export const getRedirect = (parentPath: string, children: Array<Object>) => {
+export const getRedirect = (parentPath: string, children: AppCustomRouteRecordRaw[]) => {
   if (!children || children.length == 0) {
     return parentPath
   }
-  const path = generateRoutePath(parentPath, children[0]?.path)
+  const path = generateRoutePath(parentPath, children[0].path)
   // 递归子节点
-  return getRedirect(path, children[0]?.children)
+  if (children[0].children) return getRedirect(path, children[0].children)
 }
 const generateRoutePath = (parentPath: string, path: string) => {
   if (parentPath.endsWith('/')) {

@@ -27,8 +27,8 @@ export const useValidator = () => {
     }
   }
 
-  // 不能有空格
   const notSpace = (val: any, callback: Callback, message: string) => {
+    // 用户名不能有空格
     if (val.indexOf(' ') !== -1) {
       callback(new Error(message))
     } else {
@@ -36,8 +36,8 @@ export const useValidator = () => {
     }
   }
 
-  // 不能是特殊字符
   const notSpecialCharacters = (val: any, callback: Callback, message: string) => {
+    // 密码不能是特殊字符
     if (/[`~!@#$%^&*()_+<>?:"{},.\/;'[\]]/gi.test(val)) {
       callback(new Error(message))
     } else {

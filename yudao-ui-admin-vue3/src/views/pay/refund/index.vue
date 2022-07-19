@@ -10,7 +10,7 @@ import * as RefundApi from '@/api/pay/refund'
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<RefundVO>, RefundVO>({
+const { register, tableObject, methods } = useTable<RefundVO>({
   getListApi: RefundApi.getRefundPageApi,
   delListApi: RefundApi.deleteRefundApi,
   exportListApi: RefundApi.exportRefundApi

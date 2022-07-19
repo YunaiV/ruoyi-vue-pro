@@ -10,7 +10,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 
 const { t } = useI18n() // 国际化
 // ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<PageResult<LoginLogVO>, LoginLogVO>({
+const { register, tableObject, methods } = useTable<LoginLogVO>({
   getListApi: getLoginLogPageApi,
   exportListApi: exportLoginLogApi
 })

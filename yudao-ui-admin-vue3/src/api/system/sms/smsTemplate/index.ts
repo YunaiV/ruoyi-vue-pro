@@ -1,37 +1,39 @@
-import { defHttp } from '@/config/axios'
+import { useAxios } from '@/hooks/web/useAxios'
 import type { SmsTemplateVO, SmsSendVO } from './types'
 
+const request = useAxios()
+
 // 查询短信模板列表
-export const getSmsTemplatePageApi = ({ params }) => {
-  return defHttp.get<PageResult<SmsTemplateVO>>({ url: '/system/sms-template/page', params })
+export const getSmsTemplatePageApi = (params) => {
+  return request.get({ url: '/system/sms-template/page', params })
 }
 
 // 查询短信模板详情
 export const getSmsTemplateApi = (id: number) => {
-  return defHttp.get<SmsTemplateVO>({ url: '/system/sms-template/get?id=' + id })
+  return request.get({ url: '/system/sms-template/get?id=' + id })
 }
 
 // 新增短信模板
-export const createSmsTemplateApi = (params: SmsTemplateVO) => {
-  return defHttp.post({ url: '/system/sms-template/create', params })
+export const createSmsTemplateApi = (data: SmsTemplateVO) => {
+  return request.post({ url: '/system/sms-template/create', data })
 }
 
 // 修改短信模板
-export const updateSmsTemplateApi = (params: SmsTemplateVO) => {
-  return defHttp.put({ url: '/system/sms-template/update', params })
+export const updateSmsTemplateApi = (data: SmsTemplateVO) => {
+  return request.put({ url: '/system/sms-template/update', data })
 }
 
 // 删除短信模板
 export const deleteSmsTemplateApi = (id: number) => {
-  return defHttp.delete({ url: '/system/sms-template/delete?id=' + id })
+  return request.delete({ url: '/system/sms-template/delete?id=' + id })
 }
 
 // 发送短信
-export function sendSms(params: SmsSendVO) {
-  return defHttp.post({ url: '/system/sms-template/send-sms', params })
+export function sendSms(data: SmsSendVO) {
+  return request.post({ url: '/system/sms-template/send-sms', data })
 }
 
 // 导出短信模板
 export const exportPostApi = (params) => {
-  return defHttp.get({ url: '/system/sms-template/export-excel', params, responseType: 'blob' })
+  return request.get({ url: '/system/sms-template/export-excel', params, responseType: 'blob' })
 }

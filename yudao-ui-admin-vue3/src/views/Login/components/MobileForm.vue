@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { useIcon } from '@/hooks/web/useIcon'
-import { reactive, ref, unref, watch, onMounted, computed } from 'vue'
+import { reactive, ref, unref, watch, computed } from 'vue'
 import LoginFormTitle from './LoginFormTitle.vue'
 import { ElForm, ElFormItem, ElInput, ElRow, ElCol, ElMessage } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
 import {
   getTenantIdByNameApi,
-  getCodeImgApi,
   getAsyncRoutesApi,
   sendSmsCodeApi,
-  smsLoginApi
+  smsLoginApi,
+  getInfoApi
 } from '@/api/login'
 import { useCache } from '@/hooks/web/useCache'
 import { usePermissionStore } from '@/store/modules/permission'
@@ -40,9 +40,6 @@ const rules = {
 }
 const loginData = reactive({
   codeImg: '',
-  // TODO @jinz：多余的变量 isShowPassword、captchaEnable
-  isShowPassword: false,
-  captchaEnable: true,
   tenantEnable: true,
   token: '',
   loading: {
@@ -55,8 +52,7 @@ const loginData = reactive({
     code: ''
   }
 })
-// TODO @jinz：smsVO 小写哈
-const SmsVO = reactive({
+const smsVO = reactive({
   smsCode: {
     mobile: '',
     scene: 21
@@ -70,9 +66,9 @@ const mobileCodeTimer = ref(0)
 const redirect = ref<string>('')
 const getSmsCode = async () => {
   await getTenantId()
-  SmsVO.smsCode.mobile = loginData.loginForm.mobileNumber
-  console.log('getSmsCode begin:', SmsVO.smsCode)
-  await sendSmsCodeApi(SmsVO.smsCode)
+  smsVO.smsCode.mobile = loginData.loginForm.mobileNumber
+  console.log('getSmsCode begin:', smsVO.smsCode)
+  await sendSmsCodeApi(smsVO.smsCode)
     .then(async (res) => {
       // 提示验证码发送成功
       ElMessage({
@@ -102,12 +98,6 @@ watch(
     immediate: true
   }
 )
-// 获取验证码 TODO @jinz：是不是可以去掉？手机这里暂时不用验证码
-const getCode = async () => {
-  const res = await getCodeImgApi()
-  loginData.codeImg = 'data:image/gif;base64,' + res.img
-  loginData.loginForm.uuid = res.uuid
-}
 // 获取租户 ID
 const getTenantId = async () => {
   const res = await getTenantIdByNameApi(loginData.loginForm.tenantName)
@@ -119,12 +109,13 @@ const signIn = async () => {
   const data = await validForm()
   if (!data) return
   loginLoading.value = true
-  SmsVO.loginSms.mobile = loginData.loginForm.mobileNumber
-  SmsVO.loginSms.code = loginData.loginForm.code
-  await smsLoginApi(SmsVO.loginSms)
+  smsVO.loginSms.mobile = loginData.loginForm.mobileNumber
+  smsVO.loginSms.code = loginData.loginForm.code
+  await smsLoginApi(smsVO.loginSms)
     .then(async (res) => {
       setToken(res?.token)
-      await userStore.getUserInfoAction()
+      const userInfo = await getInfoApi()
+      await userStore.getUserInfoAction(userInfo)
       getRoutes()
     })
     .catch(() => {})
@@ -145,9 +136,6 @@ const getRoutes = async () => {
   permissionStore.setIsAddRouters(true)
   push({ path: redirect.value || permissionStore.addRouters[0].path })
 }
-onMounted(() => {
-  getCode()
-})
 </script>
 <template>
   <el-form

@@ -4,5 +4,5 @@ dist
 dist-ssr
 *.local
 /dist*
+*-lock.*
 pnpm-debug
-/frank*

@@ -1,32 +1,34 @@
-import { defHttp } from '@/config/axios'
+import { useAxios } from '@/hooks/web/useAxios'
 import type { TenantVO } from './types'
 
+const request = useAxios()
+
 // 查询租户列表
-export const getTenantPageApi = ({ params }) => {
-  return defHttp.get<PageResult<TenantVO>>({ url: '/system/tenant/page', params })
+export const getTenantPageApi = (params) => {
+  return request.get({ url: '/system/tenant/page', params })
 }
 
 // 查询租户详情
 export const getTenantApi = (id: number) => {
-  return defHttp.get<TenantVO>({ url: '/system/tenant/get?id=' + id })
+  return request.get({ url: '/system/tenant/get?id=' + id })
 }
 
 // 新增租户
-export const createTenantApi = (params: TenantVO) => {
-  return defHttp.post({ url: '/system/tenant/create', params })
+export const createTenantApi = (data: TenantVO) => {
+  return request.post({ url: '/system/tenant/create', data })
 }
 
 // 修改租户
-export const updateTenantApi = (params: TenantVO) => {
-  return defHttp.put({ url: '/system/tenant/update', params })
+export const updateTenantApi = (data: TenantVO) => {
+  return request.put({ url: '/system/tenant/update', data })
 }
 
 // 删除租户
 export const deleteTenantApi = (id: number) => {
-  return defHttp.delete({ url: '/system/tenant/delete?id=' + id })
+  return request.delete({ url: '/system/tenant/delete?id=' + id })
 }
 
 // 导出租户
 export const exportTenantApi = (params) => {
-  return defHttp.get({ url: '/system/tenant/export-excel', params, responseType: 'blob' })
+  return request.get({ url: '/system/tenant/export-excel', params, responseType: 'blob' })
 }
