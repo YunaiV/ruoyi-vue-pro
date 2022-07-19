@@ -41,31 +41,6 @@ export function useFormValid<T extends Object = any>(formRef: Ref<any>) {
   }
 }
 
-// TODO @jinz：多余的，是不是可以删除哈
-export function useFormRules(formData?: Recordable) {
-  const { t } = useI18n()
-
-  const getAccountFormRule = computed(() => createRule(t('sys.login.accountPlaceholder')))
-  const getPasswordFormRule = computed(() => createRule(t('sys.login.passwordPlaceholder')))
-  const getSmsFormRule = computed(() => createRule(t('sys.login.smsPlaceholder')))
-  const getMobileFormRule = computed(() => createRule(t('sys.login.mobilePlaceholder')))
-
-  const validatePolicy = async (_: RuleObject, value: boolean) => {
-    return !value ? Promise.reject(t('sys.login.policyPlaceholder')) : Promise.resolve()
-  }
-
-  const validateConfirmPassword = (password: string) => {
-    return async (_: RuleObject, value: string) => {
-      if (!value) {
-        return Promise.reject(t('sys.login.passwordPlaceholder'))
-      }
-      if (value !== password) {
-        return Promise.reject(t('sys.login.diffPwd'))
-      }
-      return Promise.resolve()
-    }
-  }
-
   const getFormRules = computed(
     (): {
       [k: string]: ValidationRule | ValidationRule[]

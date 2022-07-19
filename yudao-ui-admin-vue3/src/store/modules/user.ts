@@ -27,7 +27,6 @@ export const useUserStore = defineStore({
     }
   }),
   actions: {
-    // TODO 设置store刷新页面就消失
     async getUserInfoAction() {
       if (!getAccessToken()) {
         this.resetState()

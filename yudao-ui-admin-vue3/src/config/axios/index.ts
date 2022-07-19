@@ -56,11 +56,6 @@ const transform: AxiosTransform = {
     //  这里 code，result，message为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
     const { code, msg } = data
     const result = data.data
-    // TODO 输出res 方便调试，完成后删除
-    // console.info('data')
-    // console.info(data)
-    // console.info('result')
-    // console.info(result)
     // TODO 芋艿：文件下载，需要特殊处理
     if (code === undefined) {
       console.log(res)

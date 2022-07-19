@@ -40,9 +40,6 @@ const rules = {
 }
 const loginData = reactive({
   codeImg: '',
-  // TODO @jinz：多余的变量 isShowPassword、captchaEnable
-  isShowPassword: false,
-  captchaEnable: true,
   tenantEnable: true,
   token: '',
   loading: {
@@ -55,8 +52,7 @@ const loginData = reactive({
     code: ''
   }
 })
-// TODO @jinz：smsVO 小写哈
-const SmsVO = reactive({
+const smsVO = reactive({
   smsCode: {
     mobile: '',
     scene: 21
@@ -70,9 +66,9 @@ const mobileCodeTimer = ref(0)
 const redirect = ref<string>('')
 const getSmsCode = async () => {
   await getTenantId()
-  SmsVO.smsCode.mobile = loginData.loginForm.mobileNumber
-  console.log('getSmsCode begin:', SmsVO.smsCode)
-  await sendSmsCodeApi(SmsVO.smsCode)
+  smsVO.smsCode.mobile = loginData.loginForm.mobileNumber
+  console.log('getSmsCode begin:', smsVO.smsCode)
+  await sendSmsCodeApi(smsVO.smsCode)
     .then(async (res) => {
       // 提示验证码发送成功
       ElMessage({
@@ -119,9 +115,9 @@ const signIn = async () => {
   const data = await validForm()
   if (!data) return
   loginLoading.value = true
-  SmsVO.loginSms.mobile = loginData.loginForm.mobileNumber
-  SmsVO.loginSms.code = loginData.loginForm.code
-  await smsLoginApi(SmsVO.loginSms)
+  smsVO.loginSms.mobile = loginData.loginForm.mobileNumber
+  smsVO.loginSms.code = loginData.loginForm.code
+  await smsLoginApi(smsVO.loginSms)
     .then(async (res) => {
       setToken(res?.token)
       await userStore.getUserInfoAction()
