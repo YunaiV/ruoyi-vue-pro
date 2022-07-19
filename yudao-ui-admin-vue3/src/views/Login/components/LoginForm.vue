@@ -13,7 +13,14 @@ import {
 } from 'element-plus'
 import { reactive, ref, unref, onMounted, computed, watch } from 'vue'
 import * as LoginApi from '@/api/login'
-import { setToken, setTenantId } from '@/utils/auth'
+import {
+  setToken,
+  setTenantId,
+  getUsername,
+  getRememberMe,
+  getPassword,
+  getTenantName
+} from '@/utils/auth'
 import { useUserStoreWithOut } from '@/store/modules/user'
 import { useCache } from '@/hooks/web/useCache'
 import { usePermissionStore } from '@/store/modules/permission'
@@ -40,7 +47,6 @@ const iconHouse = useIcon({ icon: 'ep:house' })
 const iconAvatar = useIcon({ icon: 'ep:avatar' })
 const iconLock = useIcon({ icon: 'ep:lock' })
 const iconCircleCheck = useIcon({ icon: 'ep:circle-check' })
-const remember = ref(false)
 const LoginRules = {
   tenantName: [required],
   username: [required],
@@ -61,6 +67,7 @@ const loginData = reactive({
     tenantName: '芋道源码',
     username: 'admin',
     password: 'admin123',
+    rememberMe: false,
     code: '',
     uuid: ''
   }
@@ -76,6 +83,20 @@ const getCode = async () => {
 const getTenantId = async () => {
   const res = await LoginApi.getTenantIdByNameApi(loginData.loginForm.tenantName)
   setTenantId(res)
+}
+// 记住我
+const getCookie = () => {
+  const username = getUsername()
+  const password = getPassword()
+  const rememberMe = getRememberMe()
+  const tenantName = getTenantName()
+  loginData.loginForm = {
+    ...loginData.loginForm,
+    username: username ? username : loginData.loginForm.username,
+    password: password ? password : loginData.loginForm.password,
+    rememberMe: rememberMe ? getRememberMe() : false,
+    tenantName: tenantName ? tenantName : loginData.loginForm.tenantName
+  }
 }
 // 登录
 const handleLogin = async () => {
@@ -103,7 +124,7 @@ const getRoutes = async () => {
   // 后端过滤菜单
   const res = await LoginApi.getAsyncRoutesApi()
   wsCache.set('roleRouters', res)
-  await permissionStore.generateRoutes(res).catch(() => {})
+  await permissionStore.generateRoutes(res)
   permissionStore.getAddRouters.forEach((route) => {
     addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
   })
@@ -120,8 +141,9 @@ watch(
     immediate: true
   }
 )
-onMounted(() => {
-  getCode()
+onMounted(async () => {
+  await getCode()
+  getCookie()
 })
 </script>
 <template>
@@ -165,7 +187,7 @@ onMounted(() => {
           <el-input
             v-model="loginData.loginForm.password"
             type="password"
-            :placeholder="t('login.password')"
+            :placeholder="t('login.passwordPlaceholder')"
             show-password
             @keyup.enter="handleLogin"
             :prefix-icon="iconLock"
@@ -178,7 +200,7 @@ onMounted(() => {
             <el-col :span="14">
               <el-input
                 v-model="loginData.loginForm.code"
-                :placeholder="t('login.code')"
+                :placeholder="t('login.codePlaceholder')"
                 @keyup.enter="handleLogin"
                 :prefix-icon="iconCircleCheck"
                 style="width: 90%"
@@ -199,7 +221,9 @@ onMounted(() => {
         <el-form-item>
           <el-row justify="space-between" style="width: 100%">
             <el-col :span="6">
-              <el-checkbox v-model="remember">{{ t('login.remember') }}</el-checkbox>
+              <el-checkbox v-model="loginData.loginForm.rememberMe">
+                {{ t('login.remember') }}
+              </el-checkbox>
             </el-col>
             <el-col :span="12" :offset="6">
               <el-link type="primary" style="float: right">{{ t('login.forgetPassword') }}</el-link>
@@ -254,7 +278,7 @@ onMounted(() => {
               class="cursor-pointer anticon"
             />
             <Icon
-              icon="ant-design:weibo-circle-filled"
+              icon="ant-design:dingtalk-circle-filled"
               :size="iconSize"
               :color="iconColor"
               class="cursor-pointer anticon"
