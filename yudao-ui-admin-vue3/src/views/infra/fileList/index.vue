@@ -4,9 +4,9 @@ import dayjs from 'dayjs'
 import { ElMessage, ElUpload, UploadInstance, UploadRawFile, ElImage } from 'element-plus'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
-import type { FileVO } from '@/api/infra/file/types'
+import type { FileVO } from '@/api/infra/fileList/types'
 import { allSchemas } from './fileList.data'
-import * as FileApi from '@/api/infra/file'
+import * as FileApi from '@/api/infra/fileList'
 import { getAccessToken, getTenantId } from '@/utils/auth'
 
 const { t } = useI18n() // 国际化
