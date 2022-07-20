@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { LoginForm } from './components'
-import { MobileForm } from './components'
+import { LoginForm, MobileForm, RegisterForm } from './components'
 import { ThemeSwitch } from '@/components/ThemeSwitch'
 import { LocaleDropdown } from '@/components/LocaleDropdown'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -8,13 +7,13 @@ import { underlineToHump } from '@/utils'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
 
+const { t } = useI18n()
+
 const { getPrefixCls } = useDesign()
 
 const prefixCls = getPrefixCls('login')
 
 const appStore = useAppStore()
-
-const { t } = useI18n()
 </script>
 
 <template>
@@ -67,6 +66,8 @@ const { t } = useI18n()
             <LoginForm class="p-20px h-auto m-auto <xl:(rounded-3xl light:bg-white)" />
             <!-- 手机登录 -->
             <MobileForm class="p-20px h-auto m-auto <xl:(rounded-3xl light:bg-white)" />
+            <!-- 注册 -->
+            <RegisterForm class="p-20px h-auto m-auto <xl:(rounded-3xl light:bg-white)" />
           </div>
         </Transition>
       </div>

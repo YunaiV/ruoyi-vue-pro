@@ -131,7 +131,6 @@ const getRoutes = async () => {
   permissionStore.setIsAddRouters(true)
   push({ path: redirect.value || permissionStore.addRouters[0].path })
 }
-
 watch(
   () => currentRoute.value,
   (route: RouteLocationNormalizedLoaded) => {
@@ -233,24 +232,26 @@ onMounted(async () => {
       </el-col>
       <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
         <el-form-item>
-          <el-button :loading="loginLoading" type="primary" class="w-[100%]" @click="handleLogin">{{
-            t('login.login')
-          }}</el-button>
+          <el-button :loading="loginLoading" type="primary" class="w-[100%]" @click="handleLogin">
+            {{ t('login.login') }}
+          </el-button>
         </el-form-item>
       </el-col>
       <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
         <el-form-item>
           <el-row justify="space-between" style="width: 100%" :gutter="5">
             <el-col :span="8">
-              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.MOBILE)">{{
-                t('login.btnMobile')
-              }}</el-button>
+              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.MOBILE)">
+                {{ t('login.btnMobile') }}
+              </el-button>
             </el-col>
             <el-col :span="8">
               <el-button class="w-[100%]">{{ t('login.btnQRCode') }}</el-button>
             </el-col>
             <el-col :span="8">
-              <el-button class="w-[100%]">{{ t('login.btnRegister') }}</el-button>
+              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.REGISTER)">
+                {{ t('login.btnRegister') }}
+              </el-button>
             </el-col>
           </el-row>
         </el-form-item>
@@ -290,6 +291,11 @@ onMounted(async () => {
   </el-form>
 </template>
 <style lang="less" scoped>
+:deep(.anticon) {
+  &:hover {
+    color: var(--el-color-primary) !important;
+  }
+}
 .login-code {
   width: 100%;
   height: 38px;
