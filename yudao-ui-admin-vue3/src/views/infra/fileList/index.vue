@@ -4,11 +4,11 @@ import dayjs from 'dayjs'
 import { ElMessage, ElUpload, UploadInstance, UploadRawFile, ElImage } from 'element-plus'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
-import type { FileVO } from '@/api/infra/file/types'
+import type { FileVO } from '@/api/infra/fileList/types'
 import { allSchemas } from './fileList.data'
-import * as FileApi from '@/api/infra/file'
-import { useCache } from '@/hooks/web/useCache'
-const { wsCache } = useCache()
+import * as FileApi from '@/api/infra/fileList'
+import { getAccessToken, getTenantId } from '@/utils/auth'
+
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
@@ -29,7 +29,7 @@ const uploadHeaders = ref()
 const beforeUpload = (file: UploadRawFile) => {
   const isImg = file.type === 'image/jpeg' || 'image/gif' || 'image/png'
   const isLt5M = file.size / 1024 / 1024 < 5
-  if (!isImg) ElMessage.error('上传文件只能是 xls / xlsx 格式!')
+  if (!isImg) ElMessage.error('上传文件只能是 jpeg / gif / png 格式!')
   if (!isLt5M) ElMessage.error('上传文件大小不能超过 5MB!')
   return isImg && isLt5M
 }
@@ -40,8 +40,8 @@ const beforeUpload = (file: UploadRawFile) => {
 // 文件上传
 const submitFileForm = () => {
   uploadHeaders.value = {
-    Authorization: 'Bearer ' + wsCache.get('ACCESS_TOKEN'),
-    'tenant-id': wsCache.get('tenantId')
+    Authorization: 'Bearer ' + getAccessToken(),
+    'tenant-id': getTenantId()
   }
   uploadDisabled.value = true
   uploadRef.value!.submit()
@@ -122,7 +122,7 @@ getList()
       </template>
       <template #action="{ row }">
         <el-button link type="primary" @click="handleDetail(row)">
-          <Icon icon="ep:view" class="mr-5px" /> {{ t('action.detail') }}
+          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
         </el-button>
         <el-button
           link
@@ -130,7 +130,7 @@ getList()
           v-hasPermi="['infra:file:delete']"
           @click="handleDelete(row)"
         >
-          <Icon icon="ep:delete" class="mr-5px" /> {{ t('action.del') }}
+          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>
       </template>
     </Table>

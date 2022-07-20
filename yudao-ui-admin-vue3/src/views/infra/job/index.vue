@@ -158,19 +158,19 @@ getList()
       </template>
       <template #action="{ row }">
         <el-button link type="primary" v-hasPermi="['infra:job:update']" @click="handleUpdate(row)">
-          <Icon icon="ep:edit" class="mr-5px" /> {{ t('action.edit') }}
+          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
         </el-button>
         <el-button link type="primary" v-hasPermi="['infra:job:query']" @click="handleDetail(row)">
-          <Icon icon="ep:view" class="mr-5px" /> {{ t('action.detail') }}
+          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
         </el-button>
         <el-button link type="primary" v-hasPermi="['infra:job:delete']" @click="handleDelete(row)">
-          <Icon icon="ep:delete" class="mr-5px" /> {{ t('action.del') }}
+          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>
         <el-button link type="primary" v-hasPermi="['infra:job:trigger']" @click="handleRun(row)">
-          <Icon icon="ep:view" class="mr-5px" /> 执行一次
+          <Icon icon="ep:view" class="mr-1px" /> 执行一次
         </el-button>
         <el-button link type="primary" v-hasPermi="['infra:job:query']" @click="handleJobLog(row)">
-          <Icon icon="ep:view" class="mr-5px" /> 调度日志
+          <Icon icon="ep:view" class="mr-1px" /> 调度日志
         </el-button>
       </template>
     </Table>

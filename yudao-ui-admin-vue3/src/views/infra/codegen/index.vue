@@ -100,7 +100,7 @@ getList()
           v-hasPermi="['infra:codegen:preview']"
           @click="handlePreview(row)"
         >
-          <Icon icon="ep:view" class="mr-5px" /> {{ t('action.preview') }}
+          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.preview') }}
         </el-button>
         <el-button
           link
@@ -108,7 +108,7 @@ getList()
           v-hasPermi="['infra:codegen:update']"
           @click="handleEditTable(row)"
         >
-          <Icon icon="ep:edit" class="mr-5px" /> {{ t('action.edit') }}
+          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
         </el-button>
         <el-button
           link
@@ -116,7 +116,7 @@ getList()
           v-hasPermi="['infra:codegen:delete']"
           @click="handleDelete(row)"
         >
-          <Icon icon="ep:delete" class="mr-5px" /> {{ t('action.del') }}
+          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>
         <el-button
           link
@@ -124,7 +124,7 @@ getList()
           v-hasPermi="['infra:codegen:update']"
           @click="handleSynchDb(row)"
         >
-          <Icon icon="ep:refresh" class="mr-5px" /> {{ t('action.sync') }}
+          <Icon icon="ep:refresh" class="mr-1px" /> {{ t('action.sync') }}
         </el-button>
         <el-button
           link
@@ -132,7 +132,7 @@ getList()
           v-hasPermi="['infra:codegen:download']"
           @click="handleGenTable(row)"
         >
-          <Icon icon="ep:download" class="mr-5px" /> {{ t('action.generate') }}
+          <Icon icon="ep:download" class="mr-1px" /> {{ t('action.generate') }}
         </el-button>
       </template>
     </Table>

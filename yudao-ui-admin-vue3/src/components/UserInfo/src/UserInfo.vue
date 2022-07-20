@@ -7,6 +7,7 @@ import { resetRouter } from '@/router'
 import { useRouter } from 'vue-router'
 import { useDesign } from '@/hooks/web/useDesign'
 import { useTagsViewStore } from '@/store/modules/tagsView'
+import avatarImg from '@/assets/imgs/avatar.gif'
 
 const tagsViewStore = useTagsViewStore()
 
@@ -22,9 +23,9 @@ const { push, replace } = useRouter()
 
 const user = wsCache.get('user')
 
-const avatar = user?.user?.avatar ? user.user.avatar : '@/assets/imgs/avatar.gif'
+const avatar = user.user.avatar ? user.user.avatar : avatarImg
 
-const userName = user?.user?.nickname ? user.user.nickname : 'Admin'
+const userName = user.user.nickname ? user.user.nickname : 'Admin'
 
 const loginOut = () => {
   ElMessageBox.confirm(t('common.loginOutMessage'), t('common.reminder'), {

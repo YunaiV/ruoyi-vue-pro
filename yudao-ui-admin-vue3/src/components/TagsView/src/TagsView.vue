@@ -455,7 +455,7 @@ watch(
         class="w-[var(--tags-view-height)] h-[var(--tags-view-height)] text-center leading-[var(--tags-view-height)] cursor-pointer block"
       >
         <Icon
-          icon="ep:setting"
+          icon="ep:menu"
           :color="appStore.getIsDark ? 'var(--el-text-color-regular)' : '#333'"
         />
       </span>

@@ -43,7 +43,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
   {
     path: '/user',
     component: Layout,
-    name: 'User',
+    name: 'UserInfo',
     meta: {
       hidden: true
     },
@@ -53,9 +53,10 @@ const remainingRouter: AppRouteRecordRaw[] = [
         component: () => import('@/views/Profile/Index.vue'),
         name: 'Profile',
         meta: {
-          hidden: true,
-          icon: 'ep:user',
           canTo: true,
+          hidden: true,
+          noTagsView: true,
+          icon: 'ep:user',
           title: t('common.profile')
         }
       }
@@ -64,7 +65,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
   {
     path: '/codegen',
     component: Layout,
-    name: 'Codegen',
+    name: 'CodegenEdit',
     meta: {
       hidden: true
     },
@@ -74,7 +75,6 @@ const remainingRouter: AppRouteRecordRaw[] = [
         component: () => import('@/views/infra/codegen/EditTable.vue'),
         name: 'EditTable',
         meta: {
-          noTagsView: true,
           noCache: true,
           hidden: true,
           canTo: true,
@@ -88,7 +88,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
   {
     path: '/job',
     component: Layout,
-    name: 'Job',
+    name: 'JobL',
     meta: {
       hidden: true
     },
@@ -98,7 +98,6 @@ const remainingRouter: AppRouteRecordRaw[] = [
         component: () => import('@/views/infra/job/JobLog.vue'),
         name: 'JobLog',
         meta: {
-          noTagsView: true,
           noCache: true,
           hidden: true,
           canTo: true,
