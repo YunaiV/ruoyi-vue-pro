@@ -246,7 +246,9 @@ onMounted(async () => {
               </el-button>
             </el-col>
             <el-col :span="8">
-              <el-button class="w-[100%]">{{ t('login.btnQRCode') }}</el-button>
+              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.QR_CODE)">
+                {{ t('login.btnQRCode') }}
+              </el-button>
             </el-col>
             <el-col :span="8">
               <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.REGISTER)">

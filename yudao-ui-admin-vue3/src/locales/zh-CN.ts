@@ -124,6 +124,7 @@ export default {
     getSmsCode: '获取验证码',
     btnMobile: '手机登录',
     btnQRCode: '二维码登录',
+    qrcode: '扫描二维码登录',
     btnRegister: '注册',
     SmsSendMsg: '验证码已发送'
   },

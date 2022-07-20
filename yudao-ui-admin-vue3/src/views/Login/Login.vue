@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LoginForm, MobileForm, RegisterForm } from './components'
+import { LoginForm, MobileForm, RegisterForm, QrCodeForm } from './components'
 import { ThemeSwitch } from '@/components/ThemeSwitch'
 import { LocaleDropdown } from '@/components/LocaleDropdown'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -66,6 +66,8 @@ const appStore = useAppStore()
             <LoginForm class="p-20px h-auto m-auto <xl:(rounded-3xl light:bg-white)" />
             <!-- 手机登录 -->
             <MobileForm class="p-20px h-auto m-auto <xl:(rounded-3xl light:bg-white)" />
+            <!-- 二维码登录 -->
+            <QrCodeForm class="p-20px h-auto m-auto <xl:(rounded-3xl light:bg-white)" />
             <!-- 注册 -->
             <RegisterForm class="p-20px h-auto m-auto <xl:(rounded-3xl light:bg-white)" />
           </div>

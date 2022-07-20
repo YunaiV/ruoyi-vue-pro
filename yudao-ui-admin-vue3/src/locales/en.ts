@@ -124,6 +124,7 @@ export default {
     getSmsCode: 'Get SMS Code',
     btnMobile: 'Mobile sign in',
     btnQRCode: 'QR code sign in',
+    qrcode: 'Scan the QR code to log in',
     btnRegister: 'Sign up',
     SmsSendMsg: 'code has been sent'
   },

@@ -121,20 +121,20 @@ const loginRegister = async () => {
 
     <template #code="form">
       <div class="w-[100%] flex">
-        <ElInput v-model="form['code']" :placeholder="t('login.codePlaceholder')" />
+        <el-input v-model="form['code']" :placeholder="t('login.codePlaceholder')" />
       </div>
     </template>
 
     <template #register>
       <div class="w-[100%]">
-        <ElButton type="primary" class="w-[100%]" :loading="loading" @click="loginRegister">
+        <el-button type="primary" class="w-[100%]" :loading="loading" @click="loginRegister">
           {{ t('login.register') }}
-        </ElButton>
+        </el-button>
       </div>
       <div class="w-[100%] mt-15px">
-        <ElButton class="w-[100%]" @click="handleBackLogin">
+        <el-button class="w-[100%]" @click="handleBackLogin">
           {{ t('login.hasUser') }}
-        </ElButton>
+        </el-button>
       </div>
     </template>
   </Form>
