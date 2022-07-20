@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, unref } from 'vue'
+import { onMounted, ref, unref, watch } from 'vue'
 import dayjs from 'dayjs'
 import {
+  ElInput,
   ElMessage,
   ElCard,
   ElTree,
@@ -55,6 +56,7 @@ const { register, tableObject, methods } = useTable<UserVO>({
 const { getList, setSearchParams, delList, exportList } = methods
 
 // ========== 创建部门树结构 ==========
+const filterText = ref('')
 const deptOptions = ref([]) // 树形结构
 const searchForm = ref<FormExpose>()
 const treeRef = ref<InstanceType<typeof ElTree>>()
@@ -73,7 +75,9 @@ const handleDeptNodeClick = (data: { [key: string]: any }) => {
   tableTitle.value = data.name
   methods.getList()
 }
-
+watch(filterText, (val) => {
+  treeRef.value!.filter(val)
+})
 // ========== CRUD 相关 ==========
 const loading = ref(false) // 遮罩层
 const actionType = ref('') // 操作按钮的类型
@@ -265,6 +269,7 @@ getList()
           <span>部门列表</span>
         </div>
       </template>
+      <el-input v-model="filterText" placeholder="搜索部门" />
       <el-tree
         ref="treeRef"
         node-key="id"
@@ -272,7 +277,7 @@ getList()
         :data="deptOptions"
         :props="defaultProps"
         :highlight-current="true"
-        :filter-method="filterNode"
+        :filter-node-method="filterNode"
         :expand-on-click-node="false"
         @node-click="handleDeptNodeClick"
       />
