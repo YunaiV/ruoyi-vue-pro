@@ -36,8 +36,8 @@ public class BpmActivityServiceImpl implements BpmActivityService {
     }
 
     @Override
-    public HistoricActivityInstance getHistoricActivityByExecutionId(String executionId) {
-        return historyService.createHistoricActivityInstanceQuery().executionId(executionId).singleResult();
+    public List<HistoricActivityInstance> getHistoricActivityListByExecutionId(String executionId) {
+        return historyService.createHistoricActivityInstanceQuery().executionId(executionId).list();
     }
 
 }

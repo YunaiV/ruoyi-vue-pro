@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.service.task.BpmActivityService;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -63,15 +65,18 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
 
     @Override
     protected void activityCancelled(FlowableActivityCancelledEvent event) {
-        HistoricActivityInstance activity = activityService.getHistoricActivityByExecutionId(event.getActivityId());
-        if (activity == null) {
+        List<HistoricActivityInstance> activityList = activityService.getHistoricActivityListByExecutionId(event.getExecutionId());
+        if (CollUtil.isEmpty(activityList)) {
             log.error("[activityCancelled][使用 executionId({}) 查找不到对应的活动实例]", event.getExecutionId());
             return;
         }
-        if (StrUtil.isEmpty(activity.getTaskId())) {
-            return;
-        }
-        taskService.updateTaskExtCancel(activity.getTaskId());
+        // 遍历处理
+        activityList.forEach(activity -> {
+            if (StrUtil.isEmpty(activity.getTaskId())) {
+                return;
+            }
+            taskService.updateTaskExtCancel(activity.getTaskId());
+        });
     }
 
 }
