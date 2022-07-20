@@ -128,7 +128,7 @@ getList()
           v-hasPermi="['system:sms-channel:update']"
           @click="handleUpdate(row)"
         >
-          <Icon icon="ep:edit" class="mr-5px" /> {{ t('action.edit') }}
+          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
         </el-button>
         <el-button
           link
@@ -136,7 +136,7 @@ getList()
           v-hasPermi="['system:sms-channel:update']"
           @click="handleDetail(row)"
         >
-          <Icon icon="ep:view" class="mr-5px" /> {{ t('action.detail') }}
+          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
         </el-button>
         <el-button
           link
@@ -144,7 +144,7 @@ getList()
           v-hasPermi="['system:sms-channel:delete']"
           @click="handleDelete(row)"
         >
-          <Icon icon="ep:delete" class="mr-5px" /> {{ t('action.del') }}
+          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>
       </template>
     </Table>

@@ -124,13 +124,13 @@ onMounted(async () => {
               <span>{{ node.label }}</span>
               <span>
                 <el-button link v-hasPermi="['system:dept:create']" @click="handleAdd(data)">
-                  <Icon icon="ep:plus" class="mr-5px" />
+                  <Icon icon="ep:plus" class="mr-1px" />
                 </el-button>
                 <el-button link v-hasPermi="['system:dept:update']" @click="handleUpdate(data)">
-                  <Icon icon="ep:edit" class="mr-5px" />
+                  <Icon icon="ep:edit" class="mr-1px" />
                 </el-button>
                 <el-button link v-hasPermi="['system:dept:delete']" @click="handleDelete(data)">
-                  <Icon icon="ep:delete" class="mr-5px" />
+                  <Icon icon="ep:delete" class="mr-1px" />
                 </el-button>
               </span>
             </span>

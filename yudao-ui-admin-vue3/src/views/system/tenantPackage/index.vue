@@ -147,10 +147,10 @@ onMounted(async () => {
       </template>
       <template #action="{ row }">
         <el-button link type="primary" @click="handleUpdate(row)">
-          <Icon icon="ep:edit" class="mr-5px" /> {{ t('action.edit') }}
+          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
         </el-button>
         <el-button link type="primary" @click="handleDelete(row)">
-          <Icon icon="ep:delete" class="mr-5px" /> {{ t('action.del') }}
+          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>
       </template>
     </Table>

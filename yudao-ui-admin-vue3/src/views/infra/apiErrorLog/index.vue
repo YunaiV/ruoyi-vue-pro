@@ -96,7 +96,7 @@ getList()
           v-hasPermi="['infra:api-error-log:export']"
           @click="handleDetail(row)"
         >
-          <Icon icon="ep:view" class="mr-5px" /> {{ t('action.detail') }}
+          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
         </el-button>
         <el-button
           link
@@ -105,7 +105,7 @@ getList()
           v-hasPermi="['infra:api-error-log:update-status']"
           @click="handleProcessClick(row, InfraApiErrorLogProcessStatusEnum.DONE, '已处理')"
         >
-          <Icon icon="ep:cpu" class="mr-5px" /> 已处理
+          <Icon icon="ep:cpu" class="mr-1px" /> 已处理
         </el-button>
         <el-button
           link
@@ -114,7 +114,7 @@ getList()
           v-hasPermi="['infra:api-error-log:update-status']"
           @click="handleProcessClick(row, InfraApiErrorLogProcessStatusEnum.IGNORE, '已忽略')"
         >
-          <Icon icon="ep:mute-notification" class="mr-5px" /> 已忽略
+          <Icon icon="ep:mute-notification" class="mr-1px" /> 已忽略
         </el-button>
       </template>
     </Table>
