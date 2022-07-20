@@ -7,7 +7,7 @@
 ## 注意事项
 
 - 项目路径请不要使用中文命名！！！会造成解析乱码！！！请使用全英文路径！！！
-- node >=14.18.0(建议使用16版本) ,pnpm >=7
+- node >=14.18.0(建议使用 16 版本) ,pnpm >=7
 - 开发建议使用 [谷歌浏览器-开发者版](https://www.google.cn/intl/zh-CN/chrome/dev/) 不支持 IE\QQ 等浏览器
 
 ### 前端依赖
@@ -26,8 +26,6 @@
 | [iconify](https://icon-sets.iconify.design/) | 在线图标库 | 2.2.1 |
 | [wangeditor](https://www.wangeditor.com/) | 富文本编辑器 | 5.1.11 |
 
-## 用法
-
 ### 推荐 VScode 开发，插件如下
 
 - WindiCSS IntelliSense WindiCSS --- 自动完成、语法突出显示、代码折叠和构建等高级功能
@@ -42,43 +40,57 @@
 
 ### 安装 pnpm 并启动项目
 
-```
-# 查看当前 npm 源
+- 查看当前 npm 源
 
+```bash
 npm config ls
-
-# 如果执行上面命令您并未看到 registry = "https://registry.npmjs.org/"，说明使用的非npm官方源，请执行下面命令
-
-npm config set registry https://registry.npmjs.org
-
-# 如果您还没安装 pnpm，请执行下面命令
-
-npm install -g pnpm
-
-# mac 用户遇到安装报错请在命令前加上 sudo
-
-# 安装依赖
-
-pnpm install
-
-# 运行项目
-
-pnpm run dev
-
-# 打包
-
-pnpm run build:pro
-
-# 安装一个包
-
-pnpm add 包名
-
-# 卸载一个包
-
-pnpm remove 包名
-
-# 其他命令请看package.json
 ```
+
+- 如果执行上面命令您并未看到 registry = "https://registry.npmjs.org/"，说明使用的非npm官方源，请执行下面命令
+
+```bash
+npm config set registry https://registry.npmjs.org
+```
+
+- 如果您还没安装 pnpm，请执行下面命令
+
+```bash
+npm install -g pnpm
+```
+
+- mac 用户遇到安装报错请在命令前加上 sudo
+
+- 安装依赖
+
+```bash
+pnpm install
+```
+
+- 运行项目
+
+```bash
+pnpm run dev
+```
+
+- 打包
+
+```bash
+pnpm run build:pro
+```
+
+- 安装一个包
+
+```bash
+pnpm add 包名
+```
+
+- 卸载一个包
+
+```bash
+pnpm remove 包名
+```
+
+- 其他命令请看 package.json
 
 ## 浏览器支持
 
