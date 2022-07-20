@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, unref } from 'vue'
+import { onMounted, ref, unref, watch } from 'vue'
 import dayjs from 'dayjs'
 import {
+  ElInput,
   ElMessage,
   ElCard,
   ElTree,
@@ -29,9 +30,8 @@ import { listSimplePostsApi } from '@/api/system/post'
 import { rules, allSchemas } from './user.data'
 import * as UserApi from '@/api/system/user'
 import download from '@/utils/download'
-import { useCache } from '@/hooks/web/useCache'
 import { CommonStatusEnum } from '@/utils/constants'
-const { wsCache } = useCache()
+import { getAccessToken, getTenantId } from '@/utils/auth'
 interface Tree {
   id: number
   name: string
@@ -55,6 +55,7 @@ const { register, tableObject, methods } = useTable<UserVO>({
 const { getList, setSearchParams, delList, exportList } = methods
 
 // ========== 创建部门树结构 ==========
+const filterText = ref('')
 const deptOptions = ref([]) // 树形结构
 const searchForm = ref<FormExpose>()
 const treeRef = ref<InstanceType<typeof ElTree>>()
@@ -73,7 +74,9 @@ const handleDeptNodeClick = (data: { [key: string]: any }) => {
   tableTitle.value = data.name
   methods.getList()
 }
-
+watch(filterText, (val) => {
+  treeRef.value!.filter(val)
+})
 // ========== CRUD 相关 ==========
 const loading = ref(false) // 遮罩层
 const actionType = ref('') // 操作按钮的类型
@@ -138,7 +141,7 @@ const submitForm = async () => {
 }
 // 改变用户状态操作
 const handleStatusChange = async (row: UserVO) => {
-  const text = row.status === CommonStatusEnum.ENABLE ? '停用' : '启用'
+  const text = row.status === CommonStatusEnum.ENABLE ? '启用' : '停用'
   ElMessageBox.confirm('确认要"' + text + '""' + row.username + '"用户吗?', t('common.reminder'), {
     confirmButtonText: t('common.ok'),
     cancelButtonText: t('common.cancel'),
@@ -146,9 +149,8 @@ const handleStatusChange = async (row: UserVO) => {
   })
     .then(async () => {
       row.status =
-        row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE : CommonStatusEnum.ENABLE
-      const res = await UserApi.updateUserStatusApi(row.id, row.status)
-      console.info(res)
+        row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.ENABLE : CommonStatusEnum.DISABLE
+      await UserApi.updateUserStatusApi(row.id, row.status)
       ElMessage.success(text + '成功')
       await getList()
     })
@@ -159,12 +161,10 @@ const handleStatusChange = async (row: UserVO) => {
 }
 // 重置密码
 const handleResetPwd = (row: UserVO) => {
-  ElMessageBox.prompt('请输入"' + row.username + '"的新密码', '提示', {
+  ElMessageBox.prompt('请输入"' + row.username + '"的新密码', t('common.reminder'), {
     confirmButtonText: t('common.ok'),
     cancelButtonText: t('common.cancel')
   }).then(({ value }) => {
-    console.log(row.id)
-    console.log(value)
     UserApi.resetUserPwdApi(row.id, value).then(() => {
       ElMessage.success('修改成功，新密码是：' + value)
     })
@@ -215,8 +215,8 @@ const beforeExcelUpload = (file: UploadRawFile) => {
 const uploadRef = ref<UploadInstance>()
 const submitFileForm = () => {
   uploadHeaders.value = {
-    Authorization: 'Bearer ' + wsCache.get('ACCESS_TOKEN'),
-    'tenant-id': wsCache.get('tenantId')
+    Authorization: 'Bearer ' + getAccessToken(),
+    'tenant-id': getTenantId()
   }
   uploadDisabled.value = true
   uploadRef.value!.submit()
@@ -268,6 +268,7 @@ getList()
           <span>部门列表</span>
         </div>
       </template>
+      <el-input v-model="filterText" placeholder="搜索部门" />
       <el-tree
         ref="treeRef"
         node-key="id"
@@ -275,7 +276,7 @@ getList()
         :data="deptOptions"
         :props="defaultProps"
         :highlight-current="true"
-        :filter-method="filterNode"
+        :filter-node-method="filterNode"
         :expand-on-click-node="false"
         @node-click="handleDeptNodeClick"
       />
@@ -343,7 +344,7 @@ getList()
             v-hasPermi="['system:user:update']"
             @click="handleUpdate(row)"
           >
-            <Icon icon="ep:edit" class="mr-5px" /> {{ t('action.edit') }}
+            <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
           </el-button>
           <el-button
             link
@@ -351,7 +352,7 @@ getList()
             v-hasPermi="['system:user:update']"
             @click="handleDetail(row)"
           >
-            <Icon icon="ep:view" class="mr-5px" /> {{ t('action.detail') }}
+            <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
           </el-button>
           <el-button
             link
@@ -359,7 +360,7 @@ getList()
             v-hasPermi="['system:user:update-password']"
             @click="handleResetPwd(row)"
           >
-            <Icon icon="ep:key" class="mr-5px" /> 重置密码
+            <Icon icon="ep:key" class="mr-1px" /> 重置密码
           </el-button>
           <el-button
             link
@@ -367,7 +368,7 @@ getList()
             v-hasPermi="['system:user:delete']"
             @click="handleDelete(row)"
           >
-            <Icon icon="ep:delete" class="mr-5px" /> {{ t('action.del') }}
+            <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
           </el-button>
         </template>
       </Table>

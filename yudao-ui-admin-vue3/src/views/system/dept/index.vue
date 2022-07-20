@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElCard, ElTree, ElTreeSelect, ElMessage, ElMessageBox } from 'element-plus'
+import { ElInput, ElCard, ElTree, ElTreeSelect, ElMessage, ElMessageBox } from 'element-plus'
 import { handleTree } from '@/utils/tree'
-import { onMounted, ref, unref } from 'vue'
+import { onMounted, ref, unref, watch } from 'vue'
 import * as DeptApi from '@/api/system/dept'
 import { Form, FormExpose } from '@/components/Form'
 import { modelSchema } from './dept.data'
@@ -28,6 +28,7 @@ const deptParentId = ref(0) // 上级ID
 const formRef = ref<FormExpose>()
 
 // ========== 创建部门树结构 ==========
+const filterText = ref('')
 const deptOptions = ref([]) // 树形结构
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const getTree = async () => {
@@ -38,9 +39,13 @@ const filterNode = (value: string, data: Tree) => {
   if (!value) return true
   return data.name.includes(value)
 }
+watch(filterText, (val) => {
+  treeRef.value!.filter(val)
+})
 // 新增
-const handleAdd = () => {
+const handleAdd = (data: { id: number }) => {
   // 重置表单
+  deptParentId.value = data.id
   formTitle.value = '新增部门'
   unref(formRef)?.getElFormRef()?.resetFields()
   showForm.value = true
@@ -73,7 +78,7 @@ const submitForm = async () => {
   // 提交请求
   try {
     const data = unref(formRef)?.formModel as DeptVO
-    deptParentId.value = data.parentId
+    data.parentId = deptParentId.value
     // TODO: 表单提交待完善
     if (formTitle.value.startsWith('新增')) {
       await DeptApi.createDeptApi(data)
@@ -104,6 +109,7 @@ onMounted(async () => {
       <div class="custom-tree-container">
         <!-- <p>部门列表</p> -->
         <!-- 操作工具栏 -->
+        <el-input v-model="filterText" placeholder="搜索部门" />
         <el-tree
           ref="treeRef"
           node-key="id"
@@ -111,20 +117,20 @@ onMounted(async () => {
           :props="defaultProps"
           :highlight-current="true"
           default-expand-all
-          :filter-method="filterNode"
+          :filter-node-method="filterNode"
         >
           <template #default="{ node, data }">
             <span class="custom-tree-node">
               <span>{{ node.label }}</span>
               <span>
-                <el-button link v-hasPermi="['system:dept:create']" @click="handleAdd()">
-                  <Icon icon="ep:plus" class="mr-5px" />
+                <el-button link v-hasPermi="['system:dept:create']" @click="handleAdd(data)">
+                  <Icon icon="ep:plus" class="mr-1px" />
                 </el-button>
                 <el-button link v-hasPermi="['system:dept:update']" @click="handleUpdate(data)">
-                  <Icon icon="ep:edit" class="mr-5px" />
+                  <Icon icon="ep:edit" class="mr-1px" />
                 </el-button>
                 <el-button link v-hasPermi="['system:dept:delete']" @click="handleDelete(data)">
-                  <Icon icon="ep:delete" class="mr-5px" />
+                  <Icon icon="ep:delete" class="mr-1px" />
                 </el-button>
               </span>
             </span>

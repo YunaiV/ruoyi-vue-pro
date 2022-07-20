@@ -108,7 +108,10 @@ export default {
     login: '登录',
     relogin: '重新登录',
     otherLogin: '其他登录方式',
+    register: '注册',
+    checkPassword: '确认密码',
     remember: '记住我',
+    hasUser: '已有账号？去登录',
     forgetPassword: '忘记密码?',
     tenantNamePlaceholder: '请输入租户名称',
     usernamePlaceholder: '请输入用户名',
@@ -121,6 +124,7 @@ export default {
     getSmsCode: '获取验证码',
     btnMobile: '手机登录',
     btnQRCode: '二维码登录',
+    qrcode: '扫描二维码登录',
     btnRegister: '注册',
     SmsSendMsg: '验证码已发送'
   },

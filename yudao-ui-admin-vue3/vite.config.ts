@@ -11,6 +11,7 @@ import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import PurgeIcons from 'vite-plugin-purge-icons'
 import DefineOptions from 'unplugin-vue-define-options/vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
+import viteCompression from 'vite-plugin-compression'
 
 // 当前执行node命令时文件夹的地址（工作目录）
 const root = process.cwd()
@@ -80,11 +81,19 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       }),
       PurgeIcons(),
       DefineOptions(),
+      viteCompression({
+        verbose: true, // 是否在控制台输出压缩结果
+        disable: true, // 是否禁用
+        threshold: 10240, // 体积大于 threshold 才会被压缩,单位 b
+        algorithm: 'gzip', // 压缩算法,可选 [ 'gzip' , 'brotliCompress' ,'deflate' , 'deflateRaw']
+        ext: '.gz', // 生成的压缩包后缀
+        deleteOriginFile: false //压缩后是否删除源文件
+      }),
       createHtmlPlugin({
         inject: {
           data: {
             title: env.VITE_APP_TITLE,
-            injectScript: `<script src="./inject.js"></script>`,
+            injectScript: `<script src="./inject.js"></script>`
           }
         }
       })

@@ -108,7 +108,10 @@ export default {
     login: 'Sign in',
     relogin: 'Sign in again',
     otherLogin: 'Sign in with',
+    register: 'Register',
+    checkPassword: 'Confirm password',
     remember: 'Remember me',
+    hasUser: 'Existing account? Go to login',
     forgetPassword: 'Forget password?',
     tenantNamePlaceholder: 'Please Enter Tenant Name',
     usernamePlaceholder: 'Please Enter Username',
@@ -121,6 +124,7 @@ export default {
     getSmsCode: 'Get SMS Code',
     btnMobile: 'Mobile sign in',
     btnQRCode: 'QR code sign in',
+    qrcode: 'Scan the QR code to log in',
     btnRegister: 'Sign up',
     SmsSendMsg: 'code has been sent'
   },

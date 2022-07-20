@@ -297,6 +297,10 @@ export default defineComponent({
 <style lang="less" scoped>
 :deep(.el-button.is-text) {
   margin-left: 0;
-  padding: 8px 10px;
+  padding: 8px 4px;
+}
+:deep(.el-button.is-link) {
+  margin-left: 0;
+  padding: 8px 4px;
 }
 </style>

@@ -69,7 +69,7 @@ getList()
           v-hasPermi="['infra:api-access-log:query']"
           @click="handleDetail(row)"
         >
-          <Icon icon="ep:view" class="mr-5px" /> {{ t('action.detail') }}
+          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
         </el-button>
       </template>
     </Table>

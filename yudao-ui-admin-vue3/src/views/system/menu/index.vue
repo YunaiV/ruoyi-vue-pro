@@ -195,7 +195,7 @@ onMounted(async () => {
   <ContentWrap>
     <div class="mb-10px">
       <el-button type="primary" v-hasPermi="['system:notice:create']" @click="handleCreate">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        <Icon icon="ep:zoom-in" class="mr-1px" /> {{ t('action.add') }}
       </el-button>
     </div>
     <el-table
@@ -238,7 +238,7 @@ onMounted(async () => {
             v-hasPermi="['system:menu:update']"
             @click="handleUpdate(scope.row)"
           >
-            <Icon icon="ep:edit" class="mr-5px" /> {{ t('action.edit') }}
+            <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
           </el-button>
           <el-button
             link
@@ -246,7 +246,7 @@ onMounted(async () => {
             v-hasPermi="['system:menu:delete']"
             @click="handleDelete(scope.row)"
           >
-            <Icon icon="ep:delete" class="mr-5px" /> {{ t('action.del') }}
+            <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
           </el-button>
         </template>
       </el-table-column>

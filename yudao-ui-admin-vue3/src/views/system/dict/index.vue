@@ -189,7 +189,7 @@ onMounted(async () => {
             v-hasPermi="['system:dict:update']"
             @click="handleTypeUpdate(row)"
           >
-            <Icon icon="ep:edit" class="mr-5px" /> {{ t('action.edit') }}
+            <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
           </el-button>
           <el-button
             link
@@ -197,7 +197,7 @@ onMounted(async () => {
             v-hasPermi="['system:dict:delete']"
             @click="handleTypeDelete(row)"
           >
-            <Icon icon="ep:delete" class="mr-5px" /> {{ t('action.del') }}
+            <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
           </el-button>
         </template>
       </Table>
@@ -221,7 +221,7 @@ onMounted(async () => {
         <!-- 操作工具栏 -->
         <div class="mb-10px">
           <el-button type="primary" v-hasPermi="['system:dict:create']" @click="handleDataCreate">
-            <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+            <Icon icon="ep:zoom-in" class="mr-1px" /> {{ t('action.add') }}
           </el-button>
         </div>
         <Table
@@ -246,7 +246,7 @@ onMounted(async () => {
               v-hasPermi="['system:dict:update']"
               @click="handleDataUpdate(row)"
             >
-              <Icon icon="ep:edit" class="mr-5px" /> {{ t('action.edit') }}
+              <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
             </el-button>
             <el-button
               link
@@ -254,7 +254,7 @@ onMounted(async () => {
               v-hasPermi="['system:dict:delete']"
               @click="handleDataDelete(row)"
             >
-              <Icon icon="ep:delete" class="mr-5px" /> {{ t('action.del') }}
+              <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
             </el-button>
           </template>
         </Table>

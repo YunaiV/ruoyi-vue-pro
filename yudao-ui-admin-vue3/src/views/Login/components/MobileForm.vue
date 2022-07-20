@@ -67,27 +67,21 @@ const redirect = ref<string>('')
 const getSmsCode = async () => {
   await getTenantId()
   smsVO.smsCode.mobile = loginData.loginForm.mobileNumber
-  console.log('getSmsCode begin:', smsVO.smsCode)
-  await sendSmsCodeApi(smsVO.smsCode)
-    .then(async (res) => {
-      // 提示验证码发送成功
-      ElMessage({
-        type: 'success',
-        message: t('login.SmsSendMsg')
-      })
-      console.log('res', res)
-      // 设置倒计时
-      mobileCodeTimer.value = 60
-      let msgTimer = setInterval(() => {
-        mobileCodeTimer.value = mobileCodeTimer.value - 1
-        if (mobileCodeTimer.value <= 0) {
-          clearInterval(msgTimer)
-        }
-      }, 1000)
+  await sendSmsCodeApi(smsVO.smsCode).then(async () => {
+    // 提示验证码发送成功
+    ElMessage({
+      type: 'success',
+      message: t('login.SmsSendMsg')
     })
-    .catch(() => {
-      console.log('error')
-    })
+    // 设置倒计时
+    mobileCodeTimer.value = 60
+    let msgTimer = setInterval(() => {
+      mobileCodeTimer.value = mobileCodeTimer.value - 1
+      if (mobileCodeTimer.value <= 0) {
+        clearInterval(msgTimer)
+      }
+    }, 1000)
+  })
 }
 watch(
   () => currentRoute.value,
@@ -126,7 +120,6 @@ const signIn = async () => {
 // 获取路由
 const getRoutes = async () => {
   // 后端过滤菜单
-  // TODO @jinz：这块 getRoutes 的代码，是不是可以统一到 store 里，类似 ruoyi-vue 的做法，可能要找作者沟通下
   const routers = await getAsyncRoutesApi()
   wsCache.set('roleRouters', routers)
   await permissionStore.generateRoutes(routers).catch(() => {})
