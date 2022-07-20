@@ -32,7 +32,7 @@
     "@zxcvbn-ts/core": "^2.0.3",
     "animate.css": "^4.1.1",
     "axios": "^0.27.2",
-    "dayjs": "^1.11.3",
+    "dayjs": "^1.11.4",
     "echarts": "^5.3.3",
     "echarts-wordcloud": "^2.0.0",
     "element-plus": "2.2.9",
@@ -99,7 +99,7 @@
     "vite-plugin-style-import": "^1.4.1",
     "vite-plugin-svg-icons": "^2.0.1",
     "vite-plugin-windicss": "^1.8.7",
-    "vue-tsc": "^0.38.8",
+    "vue-tsc": "^0.38.9",
     "windicss": "^3.5.6",
     "windicss-analysis": "^0.3.5"
   },
