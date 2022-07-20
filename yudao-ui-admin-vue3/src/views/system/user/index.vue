@@ -30,9 +30,8 @@ import { listSimplePostsApi } from '@/api/system/post'
 import { rules, allSchemas } from './user.data'
 import * as UserApi from '@/api/system/user'
 import download from '@/utils/download'
-import { useCache } from '@/hooks/web/useCache'
 import { CommonStatusEnum } from '@/utils/constants'
-const { wsCache } = useCache()
+import { getAccessToken, getTenantId } from '@/utils/auth'
 interface Tree {
   id: number
   name: string
@@ -216,8 +215,8 @@ const beforeExcelUpload = (file: UploadRawFile) => {
 const uploadRef = ref<UploadInstance>()
 const submitFileForm = () => {
   uploadHeaders.value = {
-    Authorization: 'Bearer ' + wsCache.get('ACCESS_TOKEN'),
-    'tenant-id': wsCache.get('tenantId')
+    Authorization: 'Bearer ' + getAccessToken(),
+    'tenant-id': getTenantId()
   }
   uploadDisabled.value = true
   uploadRef.value!.submit()
