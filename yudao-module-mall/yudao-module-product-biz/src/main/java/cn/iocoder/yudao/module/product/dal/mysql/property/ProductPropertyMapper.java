@@ -21,7 +21,7 @@ public interface ProductPropertyMapper extends BaseMapperX<ProductPropertyDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<ProductPropertyDO>()
                 .likeIfPresent(ProductPropertyDO::getName, reqVO.getName())
                 .eqIfPresent(ProductPropertyDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(ProductPropertyDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(ProductPropertyDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ProductPropertyDO::getId));
     }
 
@@ -29,7 +29,7 @@ public interface ProductPropertyMapper extends BaseMapperX<ProductPropertyDO> {
         return selectList(new LambdaQueryWrapperX<ProductPropertyDO>()
                 .likeIfPresent(ProductPropertyDO::getName, reqVO.getName())
                 .eqIfPresent(ProductPropertyDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(ProductPropertyDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(ProductPropertyDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ProductPropertyDO::getId));
     }
 

@@ -22,7 +22,7 @@ public interface ConfigMapper extends BaseMapperX<ConfigDO> {
                 .likeIfPresent(ConfigDO::getName, reqVO.getName())
                 .likeIfPresent(ConfigDO::getConfigKey, reqVO.getKey())
                 .eqIfPresent(ConfigDO::getType, reqVO.getType())
-                .betweenIfPresent(ConfigDO::getCreateTime, reqVO.getBeginTime(), reqVO.getEndTime()));
+                .betweenIfPresent(ConfigDO::getCreateTime, reqVO.getCreateTime()));
     }
 
     default List<ConfigDO> selectList(ConfigExportReqVO reqVO) {
@@ -30,7 +30,7 @@ public interface ConfigMapper extends BaseMapperX<ConfigDO> {
                 .likeIfPresent(ConfigDO::getName, reqVO.getName())
                 .likeIfPresent(ConfigDO::getConfigKey, reqVO.getKey())
                 .eqIfPresent(ConfigDO::getType, reqVO.getType())
-                .betweenIfPresent(ConfigDO::getCreateTime, reqVO.getBeginTime(), reqVO.getEndTime()));
+                .betweenIfPresent(ConfigDO::getCreateTime, reqVO.getCreateTime()));
     }
 
 }

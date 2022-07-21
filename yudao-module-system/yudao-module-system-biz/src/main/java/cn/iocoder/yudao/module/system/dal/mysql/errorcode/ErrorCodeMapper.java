@@ -22,7 +22,7 @@ public interface ErrorCodeMapper extends BaseMapperX<ErrorCodeDO> {
                 .likeIfPresent("application_name", reqVO.getApplicationName())
                 .eqIfPresent("code", reqVO.getCode())
                 .likeIfPresent("message", reqVO.getMessage())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("code"));
     }
 
@@ -32,7 +32,7 @@ public interface ErrorCodeMapper extends BaseMapperX<ErrorCodeDO> {
                 .likeIfPresent("application_name", reqVO.getApplicationName())
                 .eqIfPresent("code", reqVO.getCode())
                 .likeIfPresent("message", reqVO.getMessage())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByAsc("application_name", "code"));
     }
 

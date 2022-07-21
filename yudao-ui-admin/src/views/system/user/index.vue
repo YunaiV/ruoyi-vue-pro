@@ -31,9 +31,9 @@
               <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
             </el-select>
           </el-form-item>
-          <el-form-item label="创建时间">
-            <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
-              range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
+          <el-form-item label="创建时间" prop="createTime">
+            <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+              range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -237,7 +237,6 @@ import {
   resetUserPwd,
   updateUser
 } from "@/api/system/user";
-import {getAccessToken} from "@/utils/auth";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
@@ -275,8 +274,6 @@ export default {
       deptName: undefined,
       // 默认密码
       initPassword: undefined,
-      // 日期范围
-      dateRange: [],
       // 状态数据字典
       statusOptions: [],
       // 性别状态字典
@@ -313,7 +310,8 @@ export default {
         username: undefined,
         mobile: undefined,
         status: undefined,
-        deptId: undefined
+        deptId: undefined,
+        createTime: []
       },
       // 列信息
       columns: [
@@ -345,7 +343,7 @@ export default {
         ],
         mobile: [
           {
-            pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
+            pattern: /^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-79])|(?:5[0-35-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[189]))\d{8}$/,
             message: "请输入正确的手机号码",
             trigger: "blur"
           }
@@ -397,10 +395,7 @@ export default {
     /** 查询用户列表 */
     getList() {
       this.loading = true;
-      listUser(this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ])).then(response => {
+      listUser(this.queryParams).then(response => {
           this.userList = response.data.list;
           this.total = response.data.total;
           this.loading = false;
@@ -477,7 +472,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -581,13 +575,13 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ]);
       this.$modal.confirm('是否确认导出所有用户数据项?').then(() => {
+          // 处理查询参数
+          let params = {...this.queryParams};
+          params.pageNo = undefined;
+          params.pageSize = undefined;
           this.exportLoading = true;
-          return exportUser(queryParams);
+          return exportUser(params);
         }).then(response => {
           this.$download.excel(response, '用户数据.xls');
           this.exportLoading = false;

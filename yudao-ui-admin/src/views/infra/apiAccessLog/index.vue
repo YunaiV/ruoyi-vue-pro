@@ -18,9 +18,9 @@
       <el-form-item label="请求地址" prop="requestUrl">
         <el-input v-model="queryParams.requestUrl" placeholder="请输入请求地址" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="请求时间">
-        <el-date-picker v-model="dateRangeBeginTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+      <el-form-item label="请求时间" prop="beginTime">
+        <el-date-picker v-model="queryParams.beginTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item label="执行时长" prop="duration">
         <el-input v-model="queryParams.duration" placeholder="请输入执行时长" clearable @keyup.enter.native="handleQuery"/>
@@ -135,7 +135,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      dateRangeBeginTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -146,6 +145,7 @@ export default {
         requestUrl: null,
         duration: null,
         resultCode: null,
+        beginTime: []
       },
       // 表单参数
       form: {},
@@ -158,11 +158,8 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeBeginTime, 'beginTime');
       // 执行查询
-      getApiAccessLogPage(params).then(response => {
+      getApiAccessLogPage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -185,7 +182,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeBeginTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -200,7 +196,6 @@ export default {
       let params = {...this.queryParams};
       params.pageNo = undefined;
       params.pageSize = undefined;
-      this.addBeginAndEndTime(params, this.dateRangeBeginTime, 'beginTime');
       // 执行导出
       this.$modal.confirm('是否确认导出所有API 访问日志数据项?').then(() => {
         this.exportLoading = true;

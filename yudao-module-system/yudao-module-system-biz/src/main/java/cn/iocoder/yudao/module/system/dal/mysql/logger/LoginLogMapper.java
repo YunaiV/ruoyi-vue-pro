@@ -18,7 +18,7 @@ public interface LoginLogMapper extends BaseMapperX<LoginLogDO> {
         QueryWrapperX<LoginLogDO> query = new QueryWrapperX<LoginLogDO>()
                 .likeIfPresent("user_ip", reqVO.getUserIp())
                 .likeIfPresent("username", reqVO.getUsername())
-                .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime());
+                .betweenIfPresent("create_time", reqVO.getCreateTime());
         if (Boolean.TRUE.equals(reqVO.getStatus())) {
             query.eq("result", LoginResultEnum.SUCCESS.getResult());
         } else if (Boolean.FALSE.equals(reqVO.getStatus())) {
@@ -32,7 +32,7 @@ public interface LoginLogMapper extends BaseMapperX<LoginLogDO> {
         QueryWrapperX<LoginLogDO> query = new QueryWrapperX<LoginLogDO>()
                 .likeIfPresent("user_ip", reqVO.getUserIp())
                 .likeIfPresent("username", reqVO.getUsername())
-                .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime());
+                .betweenIfPresent("create_time", reqVO.getCreateTime());
         if (Boolean.TRUE.equals(reqVO.getStatus())) {
             query.eq("result", LoginResultEnum.SUCCESS.getResult());
         } else if (Boolean.FALSE.equals(reqVO.getStatus())) {

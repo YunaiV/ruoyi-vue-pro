@@ -22,13 +22,13 @@ public interface ActivityMapper extends BaseMapperX<ActivityDO> {
                 .eqIfPresent(ActivityDO::getTitle, reqVO.getTitle())
                 .eqIfPresent(ActivityDO::getActivityType, reqVO.getActivityType())
                 .eqIfPresent(ActivityDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(ActivityDO::getStartTime, reqVO.getBeginStartTime(), reqVO.getEndStartTime())
-                .betweenIfPresent(ActivityDO::getEndTime, reqVO.getBeginEndTime(), reqVO.getEndEndTime())
-                .betweenIfPresent(ActivityDO::getInvalidTime, reqVO.getBeginInvalidTime(), reqVO.getEndInvalidTime())
-                .betweenIfPresent(ActivityDO::getDeleteTime, reqVO.getBeginDeleteTime(), reqVO.getEndDeleteTime())
+                .betweenIfPresent(ActivityDO::getStartTime, reqVO.getStartTime())
+                .betweenIfPresent(ActivityDO::getEndTime, reqVO.getEndTime())
+                .betweenIfPresent(ActivityDO::getInvalidTime, reqVO.getInvalidTime())
+                .betweenIfPresent(ActivityDO::getDeleteTime, reqVO.getDeleteTime())
                 .eqIfPresent(ActivityDO::getTimeLimitedDiscount, reqVO.getTimeLimitedDiscount())
                 .eqIfPresent(ActivityDO::getFullPrivilege, reqVO.getFullPrivilege())
-                .betweenIfPresent(ActivityDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(ActivityDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ActivityDO::getId));
     }
 

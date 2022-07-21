@@ -23,7 +23,7 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
                 .eqIfPresent("type", reqVO.getType())
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("notify_status", reqVO.getNotifyStatus())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("id"));
     }
 
@@ -36,7 +36,7 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
                 .eqIfPresent("type", reqVO.getType())
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("notify_status", reqVO.getNotifyStatus())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("id"));
     }
 

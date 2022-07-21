@@ -26,7 +26,7 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
                 .likeIfPresent(TenantDO::getContactName, reqVO.getContactName())
                 .likeIfPresent(TenantDO::getContactMobile, reqVO.getContactMobile())
                 .eqIfPresent(TenantDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(TenantDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(TenantDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(TenantDO::getId));
     }
 
@@ -36,7 +36,7 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
                 .likeIfPresent(TenantDO::getContactName, reqVO.getContactName())
                 .likeIfPresent(TenantDO::getContactMobile, reqVO.getContactMobile())
                 .eqIfPresent(TenantDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(TenantDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(TenantDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(TenantDO::getId));
     }
 

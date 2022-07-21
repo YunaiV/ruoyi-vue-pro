@@ -1,7 +1,5 @@
 import Vue from 'vue'
 
-import Cookies from 'js-cookie'
-
 import Element from 'element-ui'
 import './assets/styles/element-variables.scss'
 
@@ -18,7 +16,7 @@ import './permission' // permission control
 import './tongji' // 百度统计
 import { getDicts } from "@/api/system/dict/data";
 import { getConfigKey } from "@/api/infra/config";
-import { parseTime, resetForm, addDateRange, addBeginAndEndTime, handleTree} from "@/utils/ruoyi";
+import { parseTime, resetForm, handleTree} from "@/utils/ruoyi";
 import Pagination from "@/components/Pagination";
 // 自定义表格工具扩展
 import RightToolbar from "@/components/RightToolbar"
@@ -32,8 +30,6 @@ Vue.prototype.getDicts = getDicts
 Vue.prototype.getConfigKey = getConfigKey
 Vue.prototype.parseTime = parseTime
 Vue.prototype.resetForm = resetForm
-Vue.prototype.addDateRange = addDateRange
-Vue.prototype.addBeginAndEndTime = addBeginAndEndTime
 Vue.prototype.getDictDatas = getDictDatas
 Vue.prototype.getDictDatas2 = getDictDatas2
 Vue.prototype.getDictDataLabel = getDictDataLabel
@@ -84,8 +80,8 @@ import '@/styles/index.scss'
  */
 
 Vue.use(Element, {
-  size: Cookies.get('size') || 'medium' // set element-ui default size
-})
+  size: localStorage.getItem("size") || "medium", // set element-ui default size
+});
 
 Vue.config.productionTip = false
 

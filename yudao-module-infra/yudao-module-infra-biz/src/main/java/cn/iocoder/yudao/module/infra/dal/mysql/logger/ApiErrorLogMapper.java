@@ -24,7 +24,7 @@ public interface ApiErrorLogMapper extends BaseMapperX<ApiErrorLogDO> {
                 .eqIfPresent("user_type", reqVO.getUserType())
                 .eqIfPresent("application_name", reqVO.getApplicationName())
                 .likeIfPresent("request_url", reqVO.getRequestUrl())
-                .betweenIfPresent("exception_time", reqVO.getBeginExceptionTime(), reqVO.getEndExceptionTime())
+                .betweenIfPresent("exception_time", reqVO.getExceptionTime())
                 .eqIfPresent("process_status", reqVO.getProcessStatus())
                 .orderByDesc("id")
         );
@@ -36,7 +36,7 @@ public interface ApiErrorLogMapper extends BaseMapperX<ApiErrorLogDO> {
                 .eqIfPresent("user_type", reqVO.getUserType())
                 .eqIfPresent("application_name", reqVO.getApplicationName())
                 .likeIfPresent("request_url", reqVO.getRequestUrl())
-                .betweenIfPresent("exception_time", reqVO.getBeginExceptionTime(), reqVO.getEndExceptionTime())
+                .betweenIfPresent("exception_time", reqVO.getExceptionTime())
                 .eqIfPresent("process_status", reqVO.getProcessStatus())
 				.orderByDesc("id")
         );

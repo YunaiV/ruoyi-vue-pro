@@ -22,7 +22,7 @@ public interface FileConfigMapper extends BaseMapperX<FileConfigDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<FileConfigDO>()
                 .likeIfPresent(FileConfigDO::getName, reqVO.getName())
                 .eqIfPresent(FileConfigDO::getStorage, reqVO.getStorage())
-                .betweenIfPresent(FileConfigDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(FileConfigDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(FileConfigDO::getId));
     }
 

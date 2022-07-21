@@ -19,9 +19,9 @@ public interface SmsLogMapper extends BaseMapperX<SmsLogDO> {
                 .eqIfPresent("template_id", reqVO.getTemplateId())
                 .likeIfPresent("mobile", reqVO.getMobile())
                 .eqIfPresent("send_status", reqVO.getSendStatus())
-                .betweenIfPresent("send_time", reqVO.getBeginSendTime(), reqVO.getEndSendTime())
+                .betweenIfPresent("send_time", reqVO.getSendTime())
                 .eqIfPresent("receive_status", reqVO.getReceiveStatus())
-                .betweenIfPresent("receive_time", reqVO.getBeginReceiveTime(), reqVO.getEndReceiveTime())
+                .betweenIfPresent("receive_time", reqVO.getReceiveTime())
                 .orderByDesc("id"));
     }
 
@@ -31,9 +31,9 @@ public interface SmsLogMapper extends BaseMapperX<SmsLogDO> {
                 .eqIfPresent("template_id", reqVO.getTemplateId())
                 .likeIfPresent("mobile", reqVO.getMobile())
                 .eqIfPresent("send_status", reqVO.getSendStatus())
-                .betweenIfPresent("send_time", reqVO.getBeginSendTime(), reqVO.getEndSendTime())
+                .betweenIfPresent("send_time", reqVO.getSendTime())
                 .eqIfPresent("receive_status", reqVO.getReceiveStatus())
-                .betweenIfPresent("receive_time", reqVO.getBeginReceiveTime(), reqVO.getEndReceiveTime())
+                .betweenIfPresent("receive_time", reqVO.getReceiveTime())
                 .orderByDesc("id"));
     }
 

@@ -25,9 +25,9 @@
           <el-option label="下架" value="1"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -193,7 +193,7 @@
               label="条形码"
               width="250" v-if="skuTags.length">
               <template slot-scope="scope">
-                <el-input v-model="scope.row.barCode" type="textarea" :disabled="scope.row.status==1"></el-input>
+                <el-input v-model="scope.row.barCode" type="textarea" :disabled="scope.row.status===1"></el-input>
               </template>
             </el-table-column>
             <el-table-column
@@ -207,7 +207,7 @@
                   :precision="2"
                   :max="1000000000"
                   :min="0.01"
-                  :disabled="scope.row.status==1">
+                  :disabled="scope.row.status===1">
                 </el-input-number>
               </template>
             </el-table-column>
@@ -222,7 +222,7 @@
                   :precision="2"
                   :max="1000000000"
                   :min="0.01"
-                  :disabled="scope.row.status==1">
+                  :disabled="scope.row.status===1">
                 </el-input-number>
               </template>
             </el-table-column>
@@ -237,7 +237,7 @@
                   :precision="2"
                   :max="1000000000"
                   :min="0.01"
-                  :disabled="scope.row.status==1">
+                  :disabled="scope.row.status===1">
                 </el-input-number>
               </template>
             </el-table-column>
@@ -341,7 +341,6 @@
                 title: "",
                 // 是否显示弹出层
                 open: false,
-                dateRangeCreateTime: [],
                 // 查询参数
                 queryParams: {
                     pageNo: 1,
@@ -356,6 +355,7 @@
                     price: null,
                     quantity: null,
                     status: null,
+                    createTime: []
                 },
                 // 表单参数
                 form: {
@@ -398,7 +398,7 @@
 
             },
             changeSkuStatus(tagIndex) {
-                if(this.form.skus[tagIndex].status == 0){
+                if(this.form.skus[tagIndex].status === 0){
                     this.form.skus[tagIndex].status = 1 ;
                 }else {
                     this.form.skus[tagIndex].status = 0 ;
@@ -426,11 +426,9 @@
                 this.$emit('input', skuList)
             },
             handleTagClose(tagIndex, tagItemIndex) {
-
             },
             //确定添加sku规格
             addTag() {
-
                 let skus = this.unUseTags.map(function (item, index) {
                     return item.name
                 });
@@ -572,9 +570,6 @@
             /** 查询列表 */
             getList() {
                 this.loading = true;
-                // 处理查询参数
-                let params = {...this.queryParams};
-                this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
                 // 执行查询
                 getSpuPage(params).then(response => {
                     this.list = response.data.list;
@@ -631,8 +626,7 @@
             /** 修改按钮操作 */
             handleUpdate(row) {
                 this.reset();
-                const id = row.id;
-                getSpu(id).then(response => {
+                getSpu(row.id).then(response => {
                   console.log(">>>>>> response.data:" + JSON.stringify(response.data))
                     let dataSpu = response.data;
                     this.form = {
@@ -660,7 +654,6 @@
             /** 提交按钮 */
             submitForm() {
                 console.log(this.form.picUrls.split(','));
-
                 this.$refs["form"].validate(valid => {
                     if (!valid) {
                         return;
@@ -702,7 +695,6 @@
                 let params = {...this.queryParams};
                 params.pageNo = undefined;
                 params.pageSize = undefined;
-                this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
                 // 执行导出
                 this.$modal.confirm('是否确认导出所有商品spu数据项?').then(() => {
                     this.exportLoading = true;
