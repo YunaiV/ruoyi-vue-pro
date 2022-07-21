@@ -79,23 +79,13 @@ const crudSchemas = reactive<CrudSchema[]>([
     field: 'createTime',
     form: {
       show: false
-    }
-  },
-  {
-    label: '接收时间',
-    field: 'daterange',
-    table: {
-      show: false
-    },
-    form: {
-      show: false
     },
     search: {
       show: true,
       component: 'DatePicker',
       componentProps: {
-        type: 'daterange',
-        valueFormat: 'YYYY-MM-DD'
+        type: 'datetimerange',
+        valueFormat: 'YYYY-MM-DD HH:mm:ss'
       }
     }
   },

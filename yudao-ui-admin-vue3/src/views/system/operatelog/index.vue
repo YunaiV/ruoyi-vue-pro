@@ -68,7 +68,7 @@ getList()
         <span>{{ row.resultCode === 0 ? '成功' : '失败' }}</span>
       </template>
       <template #startTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
+        <span>{{ dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
       </template>
       <template #action="{ row }">
         <el-button link type="primary" @click="handleDetail(row)">

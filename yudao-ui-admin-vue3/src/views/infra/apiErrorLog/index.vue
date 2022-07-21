@@ -8,7 +8,8 @@ import type { ApiErrorLogVO } from '@/api/infra/apiErrorLog/types'
 import { allSchemas } from './apiErrorLog.data'
 import * as ApiErrorLogApi from '@/api/infra/apiErrorLog'
 import { InfraApiErrorLogProcessStatusEnum } from '@/utils/constants'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { useMessage } from '@/hooks/web/useMessage'
+const message = useMessage()
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
@@ -36,14 +37,11 @@ const handleDetail = (row: ApiErrorLogVO) => {
 }
 // 异常处理操作
 const handleProcessClick = (row: ApiErrorLogVO, processSttatus: number, type: string) => {
-  ElMessageBox.confirm('确认标记为' + type + '?', t('common.reminder'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel'),
-    type: 'warning'
-  })
+  message
+    .confirm('确认标记为' + type + '?', t('common.reminder'))
     .then(async () => {
       ApiErrorLogApi.updateApiErrorLogPageApi(row.id, processSttatus).then(() => {
-        ElMessage.success(t('common.updateSuccess'))
+        message.success(t('common.updateSuccess'))
         getList()
       })
     })

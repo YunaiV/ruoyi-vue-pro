@@ -16,16 +16,16 @@ import {
   ElInput,
   ElInputNumber,
   ElSelect,
+  ElTreeSelect,
   ElOption,
-  ElMessageBox,
-  ElMessage,
-  ElCascader,
   ElRadioGroup,
   ElRadioButton
 } from 'element-plus'
 import { MenuVO } from '@/api/system/menu/types'
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useMessage } from '@/hooks/web/useMessage'
+const message = useMessage()
 const { t } = useI18n() // 国际化
 // ========== 创建菜单树结构 ==========
 const loading = ref(true)
@@ -41,10 +41,13 @@ const menuProps = {
   label: 'name',
   value: 'id'
 }
-const menuOptions = ref([]) // 树形结构
+const menuOptions = ref() // 树形结构
 const getTree = async () => {
   const res = await MenuApi.listSimpleMenusApi()
-  menuOptions.value = handleTree(res)
+  const menu = { id: 0, name: '主类目', children: [] }
+  menu.children = handleTree(res)
+  console.info(menu)
+  menuOptions.value = menu
 }
 // ========== 查询 ==========
 const queryParams = reactive({
@@ -108,14 +111,11 @@ const handleUpdate = async (row: MenuVO) => {
 }
 // 删除操作
 const handleDelete = async (row: MenuVO) => {
-  ElMessageBox.confirm(t('common.delDataMessage'), t('common.confirmTitle'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel'),
-    type: 'warning'
-  })
+  message
+    .confirm(t('common.delDataMessage'), t('common.confirmTitle'))
     .then(async () => {
       await MenuApi.deleteMenuApi(row.id)
-      ElMessage.success(t('common.delSuccess'))
+      message.success(t('common.delSuccess'))
     })
     .catch(() => {})
   await getList()
@@ -134,20 +134,20 @@ const submitForm = async () => {
     ) {
       if (!isExternal(menuForm.value.path)) {
         if (menuForm.value.parentId === 0 && menuForm.value.path.charAt(0) !== '/') {
-          ElMessage.error('路径必须以 / 开头')
+          message.error('路径必须以 / 开头')
           return
         } else if (menuForm.value.parentId !== 0 && menuForm.value.path.charAt(0) === '/') {
-          ElMessage.error('路径不能以 / 开头')
+          message.error('路径不能以 / 开头')
           return
         }
       }
     }
     if (actionType.value === 'create') {
       await MenuApi.createMenuApi(menuForm.value)
-      ElMessage.success(t('common.createSuccess'))
+      message.success(t('common.createSuccess'))
     } else {
       await MenuApi.updateMenuApi(menuForm.value)
-      ElMessage.success(t('common.updateSuccess'))
+      message.success(t('common.updateSuccess'))
     }
     // 操作成功，重新加载列表
     dialogVisible.value = false
@@ -264,13 +264,12 @@ onMounted(async () => {
       <el-row :gutter="24">
         <el-col :span="24">
           <el-form-item label="上级菜单">
-            <el-cascader
-              :options="menuData"
-              :props="menuProps"
-              placeholder="请选择上级菜单"
+            <el-tree-select
+              node-key="id"
               v-model="menuForm.parentId"
-              class="w-100"
-              clearable
+              :props="menuProps"
+              :data="menuData"
+              check-strictly
             />
           </el-form-item>
         </el-col>

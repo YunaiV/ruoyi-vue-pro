@@ -65,12 +65,15 @@ const crudSchemas = reactive<CrudSchema[]>([
     form: {
       show: false
     },
+    detail: {
+      show: false
+    },
     search: {
       show: true,
       component: 'DatePicker',
       componentProps: {
-        type: 'daterange',
-        valueFormat: 'YYYY-MM-DD'
+        type: 'datetimerange',
+        valueFormat: 'YYYY-MM-DD HH:mm:ss'
       }
     }
   },

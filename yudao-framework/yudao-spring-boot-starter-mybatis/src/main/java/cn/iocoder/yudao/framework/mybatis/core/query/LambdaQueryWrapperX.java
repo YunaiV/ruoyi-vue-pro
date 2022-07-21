@@ -94,6 +94,19 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
         return this;
     }
 
+    public LambdaQueryWrapperX<T> betweenIfPresent(SFunction<T, ?> column, Object[] values) {
+        if (values!= null && values.length >0 && values[0] != null && values[1] != null) {
+            return (LambdaQueryWrapperX<T>) super.between(column, values[0], values[1]);
+        }
+        if (values != null && values[0] != null) {
+            return (LambdaQueryWrapperX<T>) ge(column, values[0]);
+        }
+        if (values != null && values[1] != null) {
+            return (LambdaQueryWrapperX<T>) le(column, values[2]);
+        }
+        return this;
+    }
+
     // ========== 重写父类方法，方便链式调用 ==========
 
     @Override

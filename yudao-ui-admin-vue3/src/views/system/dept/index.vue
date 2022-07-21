@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElInput, ElCard, ElTree, ElTreeSelect, ElMessage, ElMessageBox } from 'element-plus'
+import { ElInput, ElCard, ElTree, ElTreeSelect } from 'element-plus'
 import { handleTree } from '@/utils/tree'
 import { onMounted, ref, unref, watch } from 'vue'
 import * as DeptApi from '@/api/system/dept'
 import { Form, FormExpose } from '@/components/Form'
 import { modelSchema } from './dept.data'
 import { DeptVO } from '@/api/system/dept/types'
+import { useMessage } from '@/hooks/web/useMessage'
+const message = useMessage()
 interface Tree {
   id: number
   name: string
@@ -29,10 +31,10 @@ const formRef = ref<FormExpose>()
 
 // ========== 创建部门树结构 ==========
 const filterText = ref('')
-const deptOptions = ref([]) // 树形结构
+const deptOptions = ref() // 树形结构
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const getTree = async () => {
-  const res = await DeptApi.listSimpleDeptApi()
+  const res = await DeptApi.getDeptPageApi(null)
   deptOptions.value = handleTree(res)
 }
 const filterNode = (value: string, data: Tree) => {
@@ -60,14 +62,11 @@ const handleUpdate = async (data: { id: number }) => {
 }
 // 删除
 const handleDelete = async (data: { id: number }) => {
-  ElMessageBox.confirm(t('common.delDataMessage'), t('common.confirmTitle'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel'),
-    type: 'warning'
-  })
+  message
+    .confirm(t('common.delDataMessage'), t('common.confirmTitle'))
     .then(async () => {
       await DeptApi.deleteDeptApi(data.id)
-      ElMessage.success(t('common.delSuccess'))
+      message.success(t('common.delSuccess'))
     })
     .catch(() => {})
   await getTree()
@@ -118,6 +117,7 @@ onMounted(async () => {
           :highlight-current="true"
           default-expand-all
           :filter-node-method="filterNode"
+          :expand-on-click-node="false"
         >
           <template #default="{ node, data }">
             <span class="custom-tree-node">

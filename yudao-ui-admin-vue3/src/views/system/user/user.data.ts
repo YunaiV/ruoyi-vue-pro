@@ -101,7 +101,7 @@ const crudSchemas = reactive<CrudSchema[]>([
   },
   {
     label: t('common.createTime'),
-    field: 'daterange',
+    field: 'createTime',
     table: {
       show: false
     },
@@ -115,7 +115,7 @@ const crudSchemas = reactive<CrudSchema[]>([
       show: true,
       component: 'DatePicker',
       componentProps: {
-        type: 'daterange',
+        type: 'datetimerange',
         valueFormat: 'YYYY-MM-DD HH:mm:ss'
       }
     }

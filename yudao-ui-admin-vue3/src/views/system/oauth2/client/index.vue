@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, unref } from 'vue'
 import dayjs from 'dayjs'
-import { ElMessage, ElImage } from 'element-plus'
+import { ElMessage, ElImage, ElTag } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -117,6 +117,16 @@ getList()
       </template>
       <template #status="{ row }">
         <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+      </template>
+      <template #authorizedGrantTypes="{ row }">
+        <el-tag
+          :disable-transitions="true"
+          :key="index"
+          v-for="(authorizedGrantType, index) in row.authorizedGrantTypes"
+          :index="index"
+        >
+          {{ authorizedGrantType }}
+        </el-tag>
       </template>
       <template #createTime="{ row }">
         <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
