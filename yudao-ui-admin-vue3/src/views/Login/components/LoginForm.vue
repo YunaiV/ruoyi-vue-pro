@@ -131,6 +131,17 @@ const getRoutes = async () => {
   permissionStore.setIsAddRouters(true)
   push({ path: redirect.value || permissionStore.addRouters[0].path })
 }
+
+// 社交登录
+const doSocialLogin = async (type: string) => {
+  loginLoading.value = true
+  // 计算 redirectUri
+  const redirectUri =
+    location.origin + '/social-login?type=' + type + '&redirect=' + (redirect.value || '/')
+  // 进行跳转
+  const res = await LoginApi.socialAuthRedirectApi(type, encodeURIComponent(redirectUri))
+  window.open = res
+}
 watch(
   () => currentRoute.value,
   (route: RouteLocationNormalizedLoaded) => {
@@ -267,24 +278,28 @@ onMounted(async () => {
               :size="iconSize"
               class="cursor-pointer anticon"
               :color="iconColor"
+              @click="doSocialLogin('github')"
             />
             <Icon
               icon="ant-design:wechat-filled"
               :size="iconSize"
               class="cursor-pointer anticon"
               :color="iconColor"
+              @click="doSocialLogin('wechat')"
             />
             <Icon
               icon="ant-design:alipay-circle-filled"
               :size="iconSize"
               :color="iconColor"
               class="cursor-pointer anticon"
+              @click="doSocialLogin('alipay')"
             />
             <Icon
               icon="ant-design:dingtalk-circle-filled"
               :size="iconSize"
               :color="iconColor"
               class="cursor-pointer anticon"
+              @click="doSocialLogin('dingtalk')"
             />
           </div>
         </el-form-item>
