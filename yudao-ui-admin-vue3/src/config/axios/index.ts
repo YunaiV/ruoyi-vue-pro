@@ -5,7 +5,6 @@ import { config } from '@/config/axios/config'
 import { getAccessToken, getRefreshToken, getTenantId } from '@/utils/auth'
 import errorCode from './errorCode'
 import { useI18n } from '@/hooks/web/useI18n'
-const { t } = useI18n()
 
 const tenantEnable = import.meta.env.VITE_APP_TENANT_ENABLE
 const BASE_URL = import.meta.env.VITE_BASE_URL
@@ -46,25 +45,27 @@ service.interceptors.request.use(
       const tenantId = getTenantId()
       if (tenantId) (config as Recordable).headers.common['tenant-id'] = tenantId
     }
+    const params = config.params || {}
+    const data = config.data || false
     if (
-      config.method === 'post' &&
+      config.method?.toUpperCase() === 'POST' &&
       config!.headers!['Content-Type'] === 'application/x-www-form-urlencoded'
     ) {
-      config.data = qs.stringify(config.data)
+      config.data = qs.stringify(data)
     }
     // get参数编码
-    if (config.method === 'get' && config.params) {
+    if (config.method?.toUpperCase() === 'GET' && config.params) {
       let url = config.url as string
-      url += '?'
-      const keys = Object.keys(config.params)
-      for (const key of keys) {
-        if (config.params[key] !== void 0 && config.params[key] !== null) {
-          url += `${key}=${encodeURIComponent(config.params[key])}&`
-        }
-      }
       // 给 get 请求加上时间戳参数，避免从缓存中拿数据
       // const now = new Date().getTime()
-      // url = url.substring(0, url.length - 1) + `?_t=${now}`
+      // params = params.substring(0, url.length - 1) + `?_t=${now}`
+      url += '?'
+      const keys = Object.keys(params)
+      for (const key of keys) {
+        if (params[key] !== void 0 && params[key] !== null) {
+          url += `${key}=${encodeURIComponent(params[key])}&`
+        }
+      }
       config.params = {}
       config.url = url
     }
@@ -85,6 +86,7 @@ service.interceptors.response.use(
       // 返回“[HTTP]请求没有返回值”;
       throw new Error()
     }
+    const { t } = useI18n()
     // 未设置状态码则默认成功状态
     const code = data.code || result_code
     // 获取错误信息
@@ -134,6 +136,7 @@ service.interceptors.response.use(
   (error: AxiosError) => {
     console.log('err' + error) // for debug
     let { message } = error
+    const { t } = useI18n()
     if (message === 'Network Error') {
       message = t('sys.api.errorMessage')
     } else if (message.includes('timeout')) {
@@ -146,6 +149,7 @@ service.interceptors.response.use(
   }
 )
 function handleAuthorized() {
+  const { t } = useI18n()
   if (!isRelogin.show) {
     isRelogin.show = true
     ElMessageBox.confirm(t('sys.api.timeoutMessage'), t('common.confirmTitle'), {

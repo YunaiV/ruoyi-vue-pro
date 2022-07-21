@@ -1,9 +1,7 @@
-// import { useI18n } from '@/hooks/web/useI18n'
+import { useI18n } from '@/hooks/web/useI18n'
 import type { Slots } from 'vue'
 import { getSlot } from '@/utils/tsxHelper'
 import { PlaceholderMoel } from './types'
-
-// const { t } = useI18n()
 
 /**
  *
@@ -12,12 +10,12 @@ import { PlaceholderMoel } from './types'
  * @description 用于自动设置placeholder
  */
 export const setTextPlaceholder = (schema: FormSchema): PlaceholderMoel => {
+  const { t } = useI18n()
   const textMap = ['Input', 'Autocomplete', 'InputNumber', 'InputPassword']
   const selectMap = ['Select', 'TimePicker', 'DatePicker', 'TimeSelect', 'TimeSelect']
   if (textMap.includes(schema?.component as string)) {
     return {
-      // placeholder: t('common.inputText')
-      placeholder: '请输入'
+      placeholder: t('common.inputText')
     }
   }
   if (selectMap.includes(schema?.component as string)) {
@@ -29,16 +27,13 @@ export const setTextPlaceholder = (schema: FormSchema): PlaceholderMoel => {
       )
     ) {
       return {
-        // startPlaceholder: t('common.startTimeText'),
-        // endPlaceholder: t('common.endTimeText'),
-        startPlaceholder: '开始时间',
-        endPlaceholder: '结束时间',
+        startPlaceholder: t('common.startTimeText'),
+        endPlaceholder: t('common.endTimeText'),
         rangeSeparator: '-'
       }
     } else {
       return {
-        // placeholder: t('common.selectText')
-        placeholder: '请选择'
+        placeholder: t('common.selectText')
       }
     }
   }
