@@ -29,10 +29,10 @@ const formRef = ref<FormExpose>()
 
 // ========== 创建部门树结构 ==========
 const filterText = ref('')
-const deptOptions = ref([]) // 树形结构
+const deptOptions = ref() // 树形结构
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const getTree = async () => {
-  const res = await DeptApi.listSimpleDeptApi()
+  const res = await DeptApi.getDeptPageApi(null)
   deptOptions.value = handleTree(res)
 }
 const filterNode = (value: string, data: Tree) => {
@@ -118,6 +118,7 @@ onMounted(async () => {
           :highlight-current="true"
           default-expand-all
           :filter-node-method="filterNode"
+          :expand-on-click-node="false"
         >
           <template #default="{ node, data }">
             <span class="custom-tree-node">

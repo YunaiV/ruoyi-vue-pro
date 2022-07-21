@@ -16,10 +16,10 @@ import {
   ElInput,
   ElInputNumber,
   ElSelect,
+  ElTreeSelect,
   ElOption,
   ElMessageBox,
   ElMessage,
-  ElCascader,
   ElRadioGroup,
   ElRadioButton
 } from 'element-plus'
@@ -41,10 +41,13 @@ const menuProps = {
   label: 'name',
   value: 'id'
 }
-const menuOptions = ref([]) // 树形结构
+const menuOptions = ref() // 树形结构
 const getTree = async () => {
   const res = await MenuApi.listSimpleMenusApi()
-  menuOptions.value = handleTree(res)
+  const menu = { id: 0, name: '主类目', children: [] }
+  menu.children = handleTree(res)
+  console.info(menu)
+  menuOptions.value = menu
 }
 // ========== 查询 ==========
 const queryParams = reactive({
@@ -264,13 +267,12 @@ onMounted(async () => {
       <el-row :gutter="24">
         <el-col :span="24">
           <el-form-item label="上级菜单">
-            <el-cascader
-              :options="menuData"
-              :props="menuProps"
-              placeholder="请选择上级菜单"
+            <el-tree-select
+              node-key="id"
               v-model="menuForm.parentId"
-              class="w-100"
-              clearable
+              :props="menuProps"
+              :data="menuData"
+              check-strictly
             />
           </el-form-item>
         </el-col>
