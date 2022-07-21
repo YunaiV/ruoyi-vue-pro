@@ -37,6 +37,10 @@ public class UserPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private Date endTime;
 
+    @ApiModelProperty(value = "开始时间", example = "2020-10-24")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private Date[] createTime;
+
     @ApiModelProperty(value = "部门编号", example = "1024", notes = "同时筛选子部门")
     private Long deptId;
 
