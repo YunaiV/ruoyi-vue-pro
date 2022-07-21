@@ -25,7 +25,7 @@ public interface SensitiveWordMapper extends BaseMapperX<SensitiveWordDO> {
                 .likeIfPresent(SensitiveWordDO::getName, reqVO.getName())
                 .likeIfPresent(SensitiveWordDO::getTags, reqVO.getTag())
                 .eqIfPresent(SensitiveWordDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(SensitiveWordDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(SensitiveWordDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SensitiveWordDO::getId));
     }
 
@@ -34,7 +34,7 @@ public interface SensitiveWordMapper extends BaseMapperX<SensitiveWordDO> {
                 .likeIfPresent(SensitiveWordDO::getName, reqVO.getName())
                 .likeIfPresent(SensitiveWordDO::getTags, reqVO.getTag())
                 .eqIfPresent(SensitiveWordDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(SensitiveWordDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(SensitiveWordDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SensitiveWordDO::getId));
     }
 

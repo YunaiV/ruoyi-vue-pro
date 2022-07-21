@@ -33,7 +33,6 @@ public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
                 .likeIfPresent(AdminUserDO::getUsername, reqVO.getUsername())
                 .likeIfPresent(AdminUserDO::getMobile, reqVO.getMobile())
                 .eqIfPresent(AdminUserDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(AdminUserDO::getCreateTime, reqVO.getBeginTime(),reqVO.getEndTime())
                 .betweenIfPresent(AdminUserDO::getCreateTime, reqVO.getCreateTime())
                 .inIfPresent(AdminUserDO::getDeptId, deptIds)
                 .orderByDesc(AdminUserDO::getId));
@@ -45,7 +44,7 @@ public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
                 .likeIfPresent(AdminUserDO::getUsername, reqVO.getUsername())
                 .likeIfPresent(AdminUserDO::getMobile, reqVO.getMobile())
                 .eqIfPresent(AdminUserDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(AdminUserDO::getCreateTime, reqVO.getBeginTime(), reqVO.getEndTime())
+                .betweenIfPresent(AdminUserDO::getCreateTime, reqVO.getCreateTime())
                 .inIfPresent(AdminUserDO::getDeptId, deptIds));
     }
 

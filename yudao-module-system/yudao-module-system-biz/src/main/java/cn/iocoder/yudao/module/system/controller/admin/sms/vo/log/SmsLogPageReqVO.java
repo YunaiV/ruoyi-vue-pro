@@ -31,22 +31,14 @@ public class SmsLogPageReqVO extends PageParam {
     private Integer sendStatus;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始发送时间")
-    private Date beginSendTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束发送时间")
-    private Date endSendTime;
+    @ApiModelProperty(value = "发送时间")
+    private Date[] sendTime;
 
     @ApiModelProperty(value = "接收状态", example = "0", notes = "参见 SmsReceiveStatusEnum 枚举类")
     private Integer receiveStatus;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始接收时间")
-    private Date beginReceiveTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束接收时间")
-    private Date endReceiveTime;
+    @ApiModelProperty(value = "接收时间")
+    private Date[] receiveTime;
 
 }

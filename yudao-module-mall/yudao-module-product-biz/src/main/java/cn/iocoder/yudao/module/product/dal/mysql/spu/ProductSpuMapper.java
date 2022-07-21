@@ -29,7 +29,7 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .eqIfPresent(ProductSpuDO::getPrice, reqVO.getPrice())
                 .eqIfPresent(ProductSpuDO::getQuantity, reqVO.getQuantity())
                 .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ProductSpuDO::getId));
     }
 
@@ -45,7 +45,7 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .eqIfPresent(ProductSpuDO::getPrice, reqVO.getPrice())
                 .eqIfPresent(ProductSpuDO::getQuantity, reqVO.getQuantity())
                 .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ProductSpuDO::getId));
     }
 

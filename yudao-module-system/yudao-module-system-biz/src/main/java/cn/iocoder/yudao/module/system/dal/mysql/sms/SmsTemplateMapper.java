@@ -30,7 +30,7 @@ public interface SmsTemplateMapper extends BaseMapperX<SmsTemplateDO> {
                 .likeIfPresent(SmsTemplateDO::getContent, reqVO.getContent())
                 .likeIfPresent(SmsTemplateDO::getApiTemplateId, reqVO.getApiTemplateId())
                 .eqIfPresent(SmsTemplateDO::getChannelId, reqVO.getChannelId())
-                .betweenIfPresent(SmsTemplateDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(SmsTemplateDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SmsTemplateDO::getId));
     }
 
@@ -42,7 +42,7 @@ public interface SmsTemplateMapper extends BaseMapperX<SmsTemplateDO> {
                 .likeIfPresent(SmsTemplateDO::getContent, reqVO.getContent())
                 .likeIfPresent(SmsTemplateDO::getApiTemplateId, reqVO.getApiTemplateId())
                 .eqIfPresent(SmsTemplateDO::getChannelId, reqVO.getChannelId())
-                .betweenIfPresent(SmsTemplateDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(SmsTemplateDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SmsTemplateDO::getId));
     }
 

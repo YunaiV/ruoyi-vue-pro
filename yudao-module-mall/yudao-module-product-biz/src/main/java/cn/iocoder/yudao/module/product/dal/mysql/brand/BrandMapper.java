@@ -22,7 +22,7 @@ public interface BrandMapper extends BaseMapperX<BrandDO> {
                 .eqIfPresent(BrandDO::getCategoryId, reqVO.getCategoryId())
                 .likeIfPresent(BrandDO::getName, reqVO.getName())
                 .eqIfPresent(BrandDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(BrandDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(BrandDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(BrandDO::getId));
     }
 
@@ -31,7 +31,7 @@ public interface BrandMapper extends BaseMapperX<BrandDO> {
                 .eqIfPresent(BrandDO::getCategoryId, reqVO.getCategoryId())
                 .likeIfPresent(BrandDO::getName, reqVO.getName())
                 .eqIfPresent(BrandDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(BrandDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(BrandDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(BrandDO::getId));
     }
 

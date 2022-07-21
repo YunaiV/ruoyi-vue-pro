@@ -19,7 +19,7 @@ public interface BpmProcessInstanceExtMapper extends BaseMapperX<BpmProcessInsta
                 .eqIfPresent("category", reqVO.getCategory())
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("result", reqVO.getResult())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("id"));
     }
 
