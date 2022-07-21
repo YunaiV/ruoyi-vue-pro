@@ -1,7 +1,5 @@
 import Vue from 'vue'
 
-import Cookies from 'js-cookie'
-
 import Element from 'element-ui'
 import './assets/styles/element-variables.scss'
 
@@ -84,8 +82,8 @@ import '@/styles/index.scss'
  */
 
 Vue.use(Element, {
-  size: Cookies.get('size') || 'medium' // set element-ui default size
-})
+  size: localStorage.getItem("size") || "medium", // set element-ui default size
+});
 
 Vue.config.productionTip = false
 
