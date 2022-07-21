@@ -9,8 +9,9 @@ import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
 import { FormExpose } from '@/components/Form'
 import { rules, allSchemas } from './job.data'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
+import { useMessage } from '@/hooks/web/useMessage'
+const message = useMessage()
 const { t } = useI18n() // 国际化
 const { push } = useRouter()
 // ========== 列表相关 ==========
@@ -64,18 +65,11 @@ const handleJobLog = (row: JobVO) => {
 }
 // 执行一次
 const handleRun = (row: JobVO) => {
-  ElMessageBox.confirm('确认要立即执行一次' + row.name + '?', t('common.reminder'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel'),
-    type: 'warning'
+  message.confirm('确认要立即执行一次' + row.name + '?', t('common.reminder')).then(async () => {
+    await JobApi.runJobApi(row.id)
+    message.success('执行成功')
+    getList()
   })
-    .then(async () => {
-      JobApi.runJobApi(row.id).then(() => {
-        ElMessage.success('执行成功')
-        getList()
-      })
-    })
-    .catch(() => {})
 }
 // 提交按钮
 const submitForm = async () => {
@@ -85,10 +79,10 @@ const submitForm = async () => {
     const data = unref(formRef)?.formModel as JobVO
     if (actionType.value === 'create') {
       await JobApi.createJobApi(data)
-      ElMessage.success(t('common.createSuccess'))
+      message.success(t('common.createSuccess'))
     } else {
       await JobApi.updateJobApi(data)
-      ElMessage.success(t('common.updateSuccess'))
+      message.success(t('common.updateSuccess'))
     }
     // 操作成功，重新加载列表
     dialogVisible.value = false

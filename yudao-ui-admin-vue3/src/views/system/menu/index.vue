@@ -18,14 +18,14 @@ import {
   ElSelect,
   ElTreeSelect,
   ElOption,
-  ElMessageBox,
-  ElMessage,
   ElRadioGroup,
   ElRadioButton
 } from 'element-plus'
 import { MenuVO } from '@/api/system/menu/types'
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useMessage } from '@/hooks/web/useMessage'
+const message = useMessage()
 const { t } = useI18n() // 国际化
 // ========== 创建菜单树结构 ==========
 const loading = ref(true)
@@ -111,14 +111,11 @@ const handleUpdate = async (row: MenuVO) => {
 }
 // 删除操作
 const handleDelete = async (row: MenuVO) => {
-  ElMessageBox.confirm(t('common.delDataMessage'), t('common.confirmTitle'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel'),
-    type: 'warning'
-  })
+  message
+    .confirm(t('common.delDataMessage'), t('common.confirmTitle'))
     .then(async () => {
       await MenuApi.deleteMenuApi(row.id)
-      ElMessage.success(t('common.delSuccess'))
+      message.success(t('common.delSuccess'))
     })
     .catch(() => {})
   await getList()
@@ -137,20 +134,20 @@ const submitForm = async () => {
     ) {
       if (!isExternal(menuForm.value.path)) {
         if (menuForm.value.parentId === 0 && menuForm.value.path.charAt(0) !== '/') {
-          ElMessage.error('路径必须以 / 开头')
+          message.error('路径必须以 / 开头')
           return
         } else if (menuForm.value.parentId !== 0 && menuForm.value.path.charAt(0) === '/') {
-          ElMessage.error('路径不能以 / 开头')
+          message.error('路径不能以 / 开头')
           return
         }
       }
     }
     if (actionType.value === 'create') {
       await MenuApi.createMenuApi(menuForm.value)
-      ElMessage.success(t('common.createSuccess'))
+      message.success(t('common.createSuccess'))
     } else {
       await MenuApi.updateMenuApi(menuForm.value)
-      ElMessage.success(t('common.updateSuccess'))
+      message.success(t('common.updateSuccess'))
     }
     // 操作成功，重新加载列表
     dialogVisible.value = false

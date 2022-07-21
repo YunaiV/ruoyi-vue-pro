@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElInput, ElCard, ElTree, ElTreeSelect, ElMessage, ElMessageBox } from 'element-plus'
+import { ElInput, ElCard, ElTree, ElTreeSelect } from 'element-plus'
 import { handleTree } from '@/utils/tree'
 import { onMounted, ref, unref, watch } from 'vue'
 import * as DeptApi from '@/api/system/dept'
 import { Form, FormExpose } from '@/components/Form'
 import { modelSchema } from './dept.data'
 import { DeptVO } from '@/api/system/dept/types'
+import { useMessage } from '@/hooks/web/useMessage'
+const message = useMessage()
 interface Tree {
   id: number
   name: string
@@ -60,14 +62,11 @@ const handleUpdate = async (data: { id: number }) => {
 }
 // 删除
 const handleDelete = async (data: { id: number }) => {
-  ElMessageBox.confirm(t('common.delDataMessage'), t('common.confirmTitle'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel'),
-    type: 'warning'
-  })
+  message
+    .confirm(t('common.delDataMessage'), t('common.confirmTitle'))
     .then(async () => {
       await DeptApi.deleteDeptApi(data.id)
-      ElMessage.success(t('common.delSuccess'))
+      message.success(t('common.delSuccess'))
     })
     .catch(() => {})
   await getTree()

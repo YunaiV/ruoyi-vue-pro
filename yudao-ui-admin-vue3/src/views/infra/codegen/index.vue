@@ -10,7 +10,8 @@ import ImportTable from './components/ImportTable.vue'
 import Preview from './components/Preview.vue'
 import download from '@/utils/download'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { useMessage } from '@/hooks/web/useMessage'
+const message = useMessage()
 const { t } = useI18n() // 国际化
 const { push } = useRouter()
 // ========== 列表相关 ==========
@@ -37,14 +38,12 @@ const handleEditTable = (row: CodegenTableVO) => {
 const handleSynchDb = (row: CodegenTableVO) => {
   // 基于 DB 同步
   const tableName = row.tableName
-  ElMessageBox.confirm('确认要强制同步' + tableName + '表结构吗?', t('common.reminder'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel'),
-    type: 'warning'
-  }).then(async () => {
-    await CodegenApi.syncCodegenFromDBApi(row.id)
-    ElMessage.success('同步成功')
-  })
+  message
+    .confirm('确认要强制同步' + tableName + '表结构吗?', t('common.reminder'))
+    .then(async () => {
+      await CodegenApi.syncCodegenFromDBApi(row.id)
+      message.success('同步成功')
+    })
 }
 // 生成代码操作
 const handleGenTable = (row: CodegenTableVO) => {
