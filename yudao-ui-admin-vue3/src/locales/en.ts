@@ -171,15 +171,16 @@ export default {
     sunday: 'Sunday'
   },
   workplace: {
-    goodMorning: 'Good morning',
+    welcome: 'Hello',
     happyDay: 'Wish you happy every day!',
     toady: `It's sunny today`,
+    notice: 'Announcement',
     project: 'Project',
     access: 'Project access',
     toDo: 'To do',
     introduction: 'A serious introduction',
     more: 'More',
-    shortcutOperation: 'Shortcut operation',
+    shortcutOperation: 'Quick entry',
     operation: 'Operation',
     index: 'Index',
     personal: 'Personal',

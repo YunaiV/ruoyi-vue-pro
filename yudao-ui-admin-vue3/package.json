@@ -6,7 +6,7 @@
   "private": false,
   "scripts": {
     "i": "pnpm install",
-    "dev": "vite --mode base",
+    "dev": "vite --mode base --open",
     "ts:check": "vue-tsc --noEmit",
     "build:pro": "vite build --mode pro",
     "build:dev": "vite build --mode dev",

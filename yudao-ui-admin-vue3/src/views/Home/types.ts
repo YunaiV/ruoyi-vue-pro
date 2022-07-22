@@ -12,14 +12,15 @@ export type Project = {
   time: Date | number | string
 }
 
-export type Dynamic = {
+export type Notice = {
   keys: string[]
   time: Date | number | string
 }
 
-export type Team = {
+export type Shortcut = {
   name: string
   icon: string
+  url: string
 }
 
 export type RadarData = {

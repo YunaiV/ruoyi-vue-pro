@@ -1,38 +1,187 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { set } from 'lodash-es'
-import { EChartsOption } from 'echarts'
-import { Echart } from '@/components/Echart'
+import { ElRow, ElCol, ElSkeleton, ElCard, ElDivider, ElLink } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
+import { ref, reactive } from 'vue'
 import { CountTo } from '@/components/CountTo'
-import type { AnalysisTotalTypes } from './types'
-import { useDesign } from '@/hooks/web/useDesign'
-import { ElRow, ElCol, ElCard, ElSkeleton } from 'element-plus'
+import { formatTime } from '@/utils'
+import { Echart } from '@/components/Echart'
+import { EChartsOption } from 'echarts'
+import { radarOption } from './echarts-data'
+import { Highlight } from '@/components/Highlight'
+import type { WorkplaceTotal, Project, Notice, Shortcut } from './types'
+import { set } from 'lodash-es'
+import { useCache } from '@/hooks/web/useCache'
 import { pieOptions, barOptions, lineOptions } from './echarts-data'
 
 const { t } = useI18n()
+const { wsCache } = useCache()
 const loading = ref(true)
-const { getPrefixCls } = useDesign()
-const prefixCls = getPrefixCls('panel')
+const avatar = wsCache.get('user').user.avatar
+const username = wsCache.get('user').user.nickname
 const pieOptionsData = reactive<EChartsOption>(pieOptions) as EChartsOption
-
-let totalState = reactive<AnalysisTotalTypes>({
-  users: 0,
-  messages: 0,
-  moneys: 0,
-  shoppings: 0
+// 获取统计数
+let totalSate = reactive<WorkplaceTotal>({
+  project: 0,
+  access: 0,
+  todo: 0
 })
 
 const getCount = async () => {
   const data = {
-    users: 102400,
-    messages: 81212,
-    moneys: 9280,
-    shoppings: 13600
+    project: 40,
+    access: 2340,
+    todo: 10
   }
-  totalState = Object.assign(totalState, data)
+  totalSate = Object.assign(totalSate, data)
 }
 
+// 获取项目数
+let projects = reactive<Project[]>([])
+const getProject = async () => {
+  const data = [
+    {
+      name: 'Github',
+      icon: 'akar-icons:github-fill',
+      message: 'workplace.introduction',
+      personal: 'Archer',
+      time: new Date()
+    },
+    {
+      name: 'Vue',
+      icon: 'logos:vue',
+      message: 'workplace.introduction',
+      personal: 'Archer',
+      time: new Date()
+    },
+    {
+      name: 'Angular',
+      icon: 'logos:angular-icon',
+      message: 'workplace.introduction',
+      personal: 'Archer',
+      time: new Date()
+    },
+    {
+      name: 'React',
+      icon: 'logos:react',
+      message: 'workplace.introduction',
+      personal: 'Archer',
+      time: new Date()
+    },
+    {
+      name: 'Webpack',
+      icon: 'logos:webpack',
+      message: 'workplace.introduction',
+      personal: 'Archer',
+      time: new Date()
+    },
+    {
+      name: 'Vite',
+      icon: 'vscode-icons:file-type-vite',
+      message: 'workplace.introduction',
+      personal: 'Archer',
+      time: new Date()
+    }
+  ]
+  projects = Object.assign(projects, data)
+}
+
+// 获取通知公告
+let notice = reactive<Notice[]>([])
+const getNotice = async () => {
+  const data = [
+    {
+      keys: ['workplace.push', 'Github'],
+      time: new Date()
+    },
+    {
+      keys: ['workplace.push', 'Github'],
+      time: new Date()
+    },
+    {
+      keys: ['workplace.push', 'Github'],
+      time: new Date()
+    }
+  ]
+  notice = Object.assign(notice, data)
+}
+
+// 获取快捷入口
+let shortcut = reactive<Shortcut[]>([])
+
+const getShortcut = async () => {
+  const data = [
+    {
+      name: 'Github',
+      icon: 'akar-icons:github-fill',
+      url: 'github.io'
+    },
+    {
+      name: 'Vue',
+      icon: 'logos:vue',
+      url: 'vuejs.org'
+    },
+    {
+      name: 'Vite',
+      icon: 'vscode-icons:file-type-vite',
+      url: 'https://vitejs.dev/'
+    },
+    {
+      name: 'Angular',
+      icon: 'logos:angular-icon',
+      url: 'github.io'
+    },
+    {
+      name: 'React',
+      icon: 'logos:react',
+      url: 'github.io'
+    },
+    {
+      name: 'Webpack',
+      icon: 'logos:webpack',
+      url: 'github.io'
+    }
+  ]
+  shortcut = Object.assign(shortcut, data)
+}
+
+// 获取指数
+let radarOptionData = reactive<EChartsOption>(radarOption) as EChartsOption
+
+const getRadar = async () => {
+  const data = [
+    { name: 'workplace.quote', max: 65, personal: 42, team: 50 },
+    { name: 'workplace.contribution', max: 160, personal: 30, team: 140 },
+    { name: 'workplace.hot', max: 300, personal: 20, team: 28 },
+    { name: 'workplace.yield', max: 130, personal: 35, team: 35 },
+    { name: 'workplace.follow', max: 100, personal: 80, team: 90 }
+  ]
+  set(
+    radarOptionData,
+    'radar.indicator',
+    data.map((v) => {
+      return {
+        name: t(v.name),
+        max: v.max
+      }
+    })
+  )
+  set(radarOptionData, 'series', [
+    {
+      name: '指数',
+      type: 'radar',
+      data: [
+        {
+          value: data.map((v) => v.personal),
+          name: t('workplace.personal')
+        },
+        {
+          value: data.map((v) => v.team),
+          name: t('workplace.team')
+        }
+      ]
+    }
+  ])
+}
 // 用户来源
 const getUserAccessSource = async () => {
   const data = [
@@ -121,7 +270,16 @@ const getMonthlySales = async () => {
 }
 
 const getAllApi = async () => {
-  await Promise.all([getCount(), getUserAccessSource(), getWeeklyUserActivity(), getMonthlySales()])
+  await Promise.all([
+    getCount(),
+    getProject(),
+    getNotice(),
+    getShortcut(),
+    getRadar(),
+    getUserAccessSource(),
+    getWeeklyUserActivity(),
+    getMonthlySales()
+  ])
   loading.value = false
 }
 
@@ -129,188 +287,177 @@ getAllApi()
 </script>
 
 <template>
-  <el-row :gutter="20" justify="space-between" :class="prefixCls">
-    <el-col :xl="6" :lg="6" :md="12" :sm="12" :xs="24">
-      <el-card shadow="hover" class="mb-20px">
-        <el-skeleton :loading="loading" animated :rows="2">
-          <template #default>
-            <div :class="`${prefixCls}__item flex justify-between`">
+  <div>
+    <el-card shadow="never">
+      <el-skeleton :loading="loading" animated>
+        <el-row :gutter="20" justify="space-between">
+          <el-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
+            <div class="flex items-center">
+              <img :src="avatar" alt="" class="w-70px h-70px rounded-[50%] mr-20px" />
               <div>
-                <div
-                  :class="`${prefixCls}__item--icon ${prefixCls}__item--peoples p-16px inline-block rounded-6px`"
-                >
-                  <Icon icon="svg-icon:peoples" :size="40" />
+                <div class="text-20px text-700">
+                  {{ t('workplace.welcome') }} {{ username }} {{ t('workplace.happyDay') }}
+                </div>
+                <div class="mt-10px text-14px text-gray-500">
+                  {{ t('workplace.toady') }}，20℃ - 32℃！
                 </div>
               </div>
-              <div class="flex flex-col justify-between">
-                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">{{
-                  t('analysis.newUser')
-                }}</div>
+            </div>
+          </el-col>
+          <el-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
+            <div class="flex h-70px items-center justify-end <sm:mt-20px">
+              <div class="px-8px text-right">
+                <div class="text-14px text-gray-400 mb-20px">{{ t('workplace.project') }}</div>
                 <CountTo
-                  class="text-20px font-700 text-right"
+                  class="text-20px"
                   :start-val="0"
-                  :end-val="102400"
+                  :end-val="totalSate.project"
+                  :duration="2600"
+                />
+              </div>
+              <el-divider direction="vertical" />
+              <div class="px-8px text-right">
+                <div class="text-14px text-gray-400 mb-20px">{{ t('workplace.toDo') }}</div>
+                <CountTo
+                  class="text-20px"
+                  :start-val="0"
+                  :end-val="totalSate.todo"
+                  :duration="2600"
+                />
+              </div>
+              <el-divider direction="vertical" border-style="dashed" />
+              <div class="px-8px text-right">
+                <div class="text-14px text-gray-400 mb-20px">{{ t('workplace.access') }}</div>
+                <CountTo
+                  class="text-20px"
+                  :start-val="0"
+                  :end-val="totalSate.access"
                   :duration="2600"
                 />
               </div>
             </div>
-          </template>
-        </el-skeleton>
-      </el-card>
-    </el-col>
+          </el-col>
+        </el-row>
+      </el-skeleton>
+    </el-card>
+  </div>
 
-    <el-col :xl="6" :lg="6" :md="12" :sm="12" :xs="24">
-      <el-card shadow="hover" class="mb-20px">
-        <el-skeleton :loading="loading" animated :rows="2">
-          <template #default>
-            <div :class="`${prefixCls}__item flex justify-between`">
-              <div>
-                <div
-                  :class="`${prefixCls}__item--icon ${prefixCls}__item--message p-16px inline-block rounded-6px`"
-                >
-                  <Icon icon="svg-icon:message" :size="40" />
-                </div>
-              </div>
-              <div class="flex flex-col justify-between">
-                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">{{
-                  t('analysis.unreadInformation')
-                }}</div>
-                <CountTo
-                  class="text-20px font-700 text-right"
-                  :start-val="0"
-                  :end-val="81212"
-                  :duration="2600"
-                />
-              </div>
-            </div>
-          </template>
-        </el-skeleton>
-      </el-card>
-    </el-col>
-
-    <el-col :xl="6" :lg="6" :md="12" :sm="12" :xs="24">
-      <el-card shadow="hover" class="mb-20px">
-        <el-skeleton :loading="loading" animated :rows="2">
-          <template #default>
-            <div :class="`${prefixCls}__item flex justify-between`">
-              <div>
-                <div
-                  :class="`${prefixCls}__item--icon ${prefixCls}__item--money p-16px inline-block rounded-6px`"
-                >
-                  <Icon icon="svg-icon:money" :size="40" />
-                </div>
-              </div>
-              <div class="flex flex-col justify-between">
-                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">{{
-                  t('analysis.transactionAmount')
-                }}</div>
-                <CountTo
-                  class="text-20px font-700 text-right"
-                  :start-val="0"
-                  :end-val="9280"
-                  :duration="2600"
-                />
-              </div>
-            </div>
-          </template>
-        </el-skeleton>
-      </el-card>
-    </el-col>
-
-    <el-col :xl="6" :lg="6" :md="12" :sm="12" :xs="24">
-      <el-card shadow="hover" class="mb-20px">
-        <el-skeleton :loading="loading" animated :rows="2">
-          <template #default>
-            <div :class="`${prefixCls}__item flex justify-between`">
-              <div>
-                <div
-                  :class="`${prefixCls}__item--icon ${prefixCls}__item--shopping p-16px inline-block rounded-6px`"
-                >
-                  <Icon icon="svg-icon:shopping" :size="40" />
-                </div>
-              </div>
-              <div class="flex flex-col justify-between">
-                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">{{
-                  t('analysis.totalShopping')
-                }}</div>
-                <CountTo
-                  class="text-20px font-700 text-right"
-                  :start-val="0"
-                  :end-val="13600"
-                  :duration="2600"
-                />
-              </div>
-            </div>
-          </template>
-        </el-skeleton>
-      </el-card>
-    </el-col>
-  </el-row>
-  <el-row :gutter="20" justify="space-between">
-    <el-col :xl="10" :lg="10" :md="24" :sm="24" :xs="24">
-      <el-card shadow="hover" class="mb-20px">
+  <el-row class="mt-20px" :gutter="20" justify="space-between">
+    <el-col :xl="16" :lg="16" :md="24" :sm="24" :xs="24" class="mb-20px">
+      <el-card shadow="never">
+        <template #header>
+          <div class="flex justify-between">
+            <span>{{ t('workplace.project') }}</span>
+            <el-link type="primary" :underline="false">{{ t('workplace.more') }}</el-link>
+          </div>
+        </template>
         <el-skeleton :loading="loading" animated>
-          <Echart :options="pieOptionsData" :height="300" />
+          <el-row>
+            <el-col
+              v-for="(item, index) in projects"
+              :key="`card-${index}`"
+              :xl="8"
+              :lg="8"
+              :md="12"
+              :sm="24"
+              :xs="24"
+            >
+              <el-card shadow="hover">
+                <div class="flex items-center">
+                  <Icon :icon="item.icon" :size="25" class="mr-10px" />
+                  <span class="text-16px">{{ item.name }}</span>
+                </div>
+                <div class="mt-15px text-14px text-gray-400">{{ t(item.message) }}</div>
+                <div class="mt-20px text-12px text-gray-400 flex justify-between">
+                  <span>{{ item.personal }}</span>
+                  <span>{{ formatTime(item.time, 'yyyy-MM-dd') }}</span>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
         </el-skeleton>
       </el-card>
-    </el-col>
-    <el-col :xl="14" :lg="14" :md="24" :sm="24" :xs="24">
-      <el-card shadow="hover" class="mb-20px">
+
+      <el-card shadow="never" class="mt-20px">
         <el-skeleton :loading="loading" animated>
-          <Echart :options="barOptionsData" :height="300" />
+          <el-row :gutter="20" justify="space-between">
+            <el-col :xl="10" :lg="10" :md="24" :sm="24" :xs="24">
+              <el-card shadow="hover" class="mb-20px">
+                <el-skeleton :loading="loading" animated>
+                  <Echart :options="pieOptionsData" :height="300" />
+                </el-skeleton>
+              </el-card>
+            </el-col>
+            <el-col :xl="14" :lg="14" :md="24" :sm="24" :xs="24">
+              <el-card shadow="hover" class="mb-20px">
+                <el-skeleton :loading="loading" animated>
+                  <Echart :options="barOptionsData" :height="300" />
+                </el-skeleton>
+              </el-card>
+            </el-col>
+            <el-col :span="24">
+              <el-card shadow="hover" class="mb-20px">
+                <el-skeleton :loading="loading" animated :rows="4">
+                  <Echart :options="lineOptionsData" :height="350" />
+                </el-skeleton>
+              </el-card>
+            </el-col>
+          </el-row>
         </el-skeleton>
       </el-card>
     </el-col>
-    <el-col :span="24">
-      <el-card shadow="hover" class="mb-20px">
-        <el-skeleton :loading="loading" animated :rows="4">
-          <Echart :options="lineOptionsData" :height="350" />
+    <el-col :xl="8" :lg="8" :md="24" :sm="24" :xs="24" class="mb-20px">
+      <el-card shadow="never">
+        <template #header>
+          <span>{{ t('workplace.shortcutOperation') }}</span>
+        </template>
+        <el-skeleton :loading="loading" animated>
+          <el-row>
+            <el-col v-for="item in shortcut" :key="`team-${item.name}`" :span="12" class="mb-20px">
+              <div class="flex items-center">
+                <Icon :icon="item.icon" class="mr-10px" />
+                <el-link type="default" :underline="false" :href="item.url">
+                  {{ item.name }}
+                </el-link>
+              </div>
+            </el-col>
+          </el-row>
+        </el-skeleton>
+      </el-card>
+      <el-card shadow="never" class="mt-20px">
+        <template #header>
+          <div class="flex justify-between">
+            <span>{{ t('workplace.notice') }}</span>
+            <el-link type="primary" :underline="false">{{ t('workplace.more') }}</el-link>
+          </div>
+        </template>
+        <el-skeleton :loading="loading" animated>
+          <div v-for="(item, index) in notice" :key="`dynamics-${index}`">
+            <div class="flex items-center">
+              <img :src="avatar" alt="" class="w-35px h-35px rounded-[50%] mr-20px" />
+              <div>
+                <div class="text-14px">
+                  <Highlight :keys="item.keys.map((v) => t(v))">
+                    {{ username }} {{ t('workplace.pushCode') }}
+                  </Highlight>
+                </div>
+                <div class="mt-15px text-12px text-gray-400">
+                  {{ formatTime(item.time, 'yyyy-MM-dd') }}
+                </div>
+              </div>
+            </div>
+            <el-divider />
+          </div>
+        </el-skeleton>
+      </el-card>
+      <el-card shadow="never" class="mt-20px">
+        <template #header>
+          <span>{{ t('workplace.index') }}</span>
+        </template>
+        <el-skeleton :loading="loading" animated>
+          <Echart :options="radarOptionData" :height="400" />
         </el-skeleton>
       </el-card>
     </el-col>
   </el-row>
 </template>
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-panel';
-
-.@{prefix-cls} {
-  &__item {
-    &--peoples {
-      color: #40c9c6;
-    }
-
-    &--message {
-      color: #36a3f7;
-    }
-
-    &--money {
-      color: #f4516c;
-    }
-
-    &--shopping {
-      color: #34bfa3;
-    }
-
-    &:hover {
-      :deep(.@{namespace}-icon) {
-        color: #fff !important;
-      }
-      .@{prefix-cls}__item--icon {
-        transition: all 0.38s ease-out;
-      }
-      .@{prefix-cls}__item--peoples {
-        background: #40c9c6;
-      }
-      .@{prefix-cls}__item--message {
-        background: #36a3f7;
-      }
-      .@{prefix-cls}__item--money {
-        background: #f4516c;
-      }
-      .@{prefix-cls}__item--shopping {
-        background: #34bfa3;
-      }
-    }
-  }
-}
-</style>
