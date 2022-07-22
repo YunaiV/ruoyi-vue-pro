@@ -139,18 +139,13 @@ public class ActivityServiceImplTest extends BaseDbUnitTest {
        reqVO.setTitle(null);
        reqVO.setActivityType(null);
        reqVO.setStatus(null);
-       reqVO.setBeginStartTime(null);
-       reqVO.setEndStartTime(null);
-       reqVO.setBeginEndTime(null);
-       reqVO.setEndEndTime(null);
-       reqVO.setBeginInvalidTime(null);
-       reqVO.setEndInvalidTime(null);
-       reqVO.setBeginDeleteTime(null);
-       reqVO.setEndDeleteTime(null);
+       reqVO.setStartTime(null);
+       reqVO.setEndTime(null);
+       reqVO.setInvalidTime(null);
+       reqVO.setDeleteTime(null);
        reqVO.setTimeLimitedDiscount(null);
        reqVO.setFullPrivilege(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+       reqVO.setCreateTime(null);
 
        // 调用
        PageResult<ActivityDO> pageResult = activityService.getActivityPage(reqVO);

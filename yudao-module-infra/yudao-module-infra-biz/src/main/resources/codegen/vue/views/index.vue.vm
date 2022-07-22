@@ -30,9 +30,9 @@
         <el-date-picker clearable v-model="queryParams.${javaField}" type="date" value-format="yyyy-MM-dd" placeholder="选择${comment}" />
       </el-form-item>
     #else## 范围
-      <el-form-item label="${comment}">
-        <el-date-picker v-model="dateRange${AttrName}" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker v-model="queryParams.${javaField}" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
     #end
 #end
@@ -234,6 +234,9 @@ export default {
         #foreach ($column in $columns)
         #if ($column.listOperation && $column.listOperationCondition != 'BETWEEN')
         $column.javaField: null,
+        #else if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+        $column.javaField: [],
+        #end
         #end
         #end
       },
@@ -257,18 +260,8 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      #foreach ($column in $columns)
-      #if ($column.listOperation)
-      #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
-      #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-      this.addBeginAndEndTime(params, this.dateRange${AttrName}, '${column.javaField}');
-      #end
-      #end
-      #end
       // 执行查询
-      get${simpleClassName}Page(params).then(response => {
+      get${simpleClassName}Page(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -301,14 +294,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      #foreach ($column in $columns)
-      #if ($column.listOperation)
-      #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
-      #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-      this.dateRange${AttrName} = [];
-      #end
-      #end
-      #end
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -377,15 +362,6 @@ export default {
       let params = {...this.queryParams};
       params.pageNo = undefined;
       params.pageSize = undefined;
-      #foreach ($column in $columns)
-      #if ($column.listOperation)
-      #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
-      #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-      this.addBeginAndEndTime(params, this.dateRange${AttrName}, '${column.javaField}');
-      #end
-      #end
-      #end
-      // 执行导出
       this.#[[$modal]]#.confirm('是否确认导出所有${table.classComment}数据项?').then(() => {
           this.exportLoading = true;
           return export${simpleClassName}Excel(params);

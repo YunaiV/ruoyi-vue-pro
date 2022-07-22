@@ -8,7 +8,7 @@ import com.ctrip.framework.apollo.tracer.Tracer;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.util.factory.DefaultPropertiesFactory;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
-import com.ctrip.framework.apollo.util.http.HttpUtil;
+import com.ctrip.framework.apollo.util.http.DefaultHttpClient;
 import com.ctrip.framework.apollo.util.yaml.YamlParser;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -63,7 +63,7 @@ public class DefaultXInjector implements Injector {
             bind(ConfigFactory.class).to(DBConfigFactory.class).in(Singleton.class);
 
             bind(ConfigUtil.class).in(Singleton.class);
-            bind(HttpUtil.class).in(Singleton.class);
+            bind(DefaultHttpClient.class).in(Singleton.class);
             bind(ConfigServiceLocator.class).in(Singleton.class);
             bind(RemoteConfigLongPollService.class).in(Singleton.class);
             bind(YamlParser.class).in(Singleton.class);

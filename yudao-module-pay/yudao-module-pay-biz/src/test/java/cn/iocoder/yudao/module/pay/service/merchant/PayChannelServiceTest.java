@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
+import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
@@ -263,8 +264,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         reqVO.setMerchantId(1L);
         reqVO.setAppId(1L);
         reqVO.setConfig(JSON.toJSONString(payClientConfig));
-        reqVO.setBeginCreateTime(buildTime(2021,11,19));
-        reqVO.setEndCreateTime(buildTime(2021,11,21));
+        reqVO.setCreateTime((new Date[]{buildTime(2021,11,19),buildTime(2021,11,21)}));
 
         // 调用
         PageResult<PayChannelDO> pageResult = channelService.getChannelPage(reqVO);
@@ -337,8 +337,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         reqVO.setMerchantId(1L);
         reqVO.setAppId(1L);
         reqVO.setConfig(JSON.toJSONString(payClientConfig));
-        reqVO.setBeginCreateTime(buildTime(2021,11,19));
-        reqVO.setEndCreateTime(buildTime(2021,11,21));
+        reqVO.setCreateTime((new Date[]{buildTime(2021,11,19),buildTime(2021,11,21)}));
 
         // 调用
         List<PayChannelDO> list = channelService.getChannelList(reqVO);

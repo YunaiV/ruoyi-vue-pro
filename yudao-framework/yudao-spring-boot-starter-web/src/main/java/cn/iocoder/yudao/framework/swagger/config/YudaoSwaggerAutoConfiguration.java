@@ -95,7 +95,7 @@ public class YudaoSwaggerAutoConfiguration {
         return Collections.singletonList(SecurityContext.builder()
                 .securityReferences(securityReferences())
                 // 通过 PathSelectors.regex("^(?!auth).*$")，排除包含 "auth" 的接口不需要使用securitySchemes
-                .forPaths(PathSelectors.regex("^(?!auth).*$"))
+                .operationSelector(o -> o.requestMappingPattern().matches("^(?!auth).*$"))
                 .build());
     }
 

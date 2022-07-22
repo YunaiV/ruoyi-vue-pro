@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
+import java.util.Date;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -58,8 +60,7 @@ public class FileServiceTest extends BaseDbUnitTest {
         FilePageReqVO reqVO = new FilePageReqVO();
         reqVO.setPath("yunai");
         reqVO.setType("jp");
-        reqVO.setBeginCreateTime(buildTime(2021, 1, 10));
-        reqVO.setEndCreateTime(buildTime(2021, 1, 20));
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 10),buildTime(2021, 1, 20)}));
 
         // 调用
         PageResult<FileDO> pageResult = fileService.getFilePage(reqVO);
