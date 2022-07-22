@@ -13,8 +13,10 @@ export type Project = {
 }
 
 export type Notice = {
+  title: string
+  type: string
   keys: string[]
-  time: Date | number | string
+  date: Date | number | string
 }
 
 export type Shortcut = {

@@ -90,16 +90,28 @@ let notice = reactive<Notice[]>([])
 const getNotice = async () => {
   const data = [
     {
-      keys: ['workplace.push', 'Github'],
-      time: new Date()
+      title: '系统升级版本',
+      type: '通知',
+      keys: ['通知', '升级'],
+      date: new Date()
     },
     {
-      keys: ['workplace.push', 'Github'],
-      time: new Date()
+      title: '系统凌晨维护',
+      type: '公告',
+      keys: ['公告', '维护'],
+      date: new Date()
     },
     {
-      keys: ['workplace.push', 'Github'],
-      time: new Date()
+      title: '系统升级版本',
+      type: '通知',
+      keys: ['通知', '升级'],
+      date: new Date()
+    },
+    {
+      title: '系统凌晨维护',
+      type: '公告',
+      keys: ['公告', '维护'],
+      date: new Date()
     }
   ]
   notice = Object.assign(notice, data)
@@ -413,7 +425,7 @@ getAllApi()
         </template>
         <el-skeleton :loading="loading" animated>
           <el-row>
-            <el-col v-for="item in shortcut" :key="`team-${item.name}`" :span="12" class="mb-20px">
+            <el-col v-for="item in shortcut" :key="`team-${item.name}`" :span="8" class="mb-20px">
               <div class="flex items-center">
                 <Icon :icon="item.icon" class="mr-10px" />
                 <el-link type="default" :underline="false" :href="item.url">
@@ -438,11 +450,11 @@ getAllApi()
               <div>
                 <div class="text-14px">
                   <Highlight :keys="item.keys.map((v) => t(v))">
-                    {{ username }} {{ t('workplace.pushCode') }}
+                    {{ item.type }} : {{ item.title }}
                   </Highlight>
                 </div>
                 <div class="mt-15px text-12px text-gray-400">
-                  {{ formatTime(item.time, 'yyyy-MM-dd') }}
+                  {{ formatTime(item.date, 'yyyy-MM-dd') }}
                 </div>
               </div>
             </div>
