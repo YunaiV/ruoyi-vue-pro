@@ -17,6 +17,9 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
+import java.util.Date;
+
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.USER_GROUP_NOT_EXISTS;
 
@@ -116,8 +119,7 @@ public class BpmUserGroupServiceTest extends BaseDbUnitTest {
        BpmUserGroupPageReqVO reqVO = new BpmUserGroupPageReqVO();
        reqVO.setName("源码");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setBeginCreateTime(DateUtils.buildTime(2021, 11, 10));
-       reqVO.setEndCreateTime(DateUtils.buildTime(2021, 11, 12));
+       reqVO.setCreateTime((new Date[]{buildTime(2021, 11, 10),buildTime(2021, 11, 12)}));
 
        // 调用
        PageResult<BpmUserGroupDO> pageResult = userGroupService.getUserGroupPage(reqVO);

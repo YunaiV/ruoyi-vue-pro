@@ -172,8 +172,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
        SmsChannelPageReqVO reqVO = new SmsChannelPageReqVO();
        reqVO.setSignature("芋道");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setBeginCreateTime(buildTime(2020, 12, 1));
-       reqVO.setEndCreateTime(buildTime(2020, 12, 24));
+       reqVO.setCreateTime((new Date[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)}));
 
        // 调用
        PageResult<SmsChannelDO> pageResult = smsChannelService.getSmsChannelPage(reqVO);

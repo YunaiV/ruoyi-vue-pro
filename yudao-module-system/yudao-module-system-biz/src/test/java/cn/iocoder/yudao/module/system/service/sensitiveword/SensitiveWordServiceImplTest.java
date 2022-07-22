@@ -18,8 +18,10 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -157,8 +159,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         reqVO.setName("笨");
         reqVO.setTag("论坛");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setBeginCreateTime(DateUtils.buildTime(2022, 2, 1));
-        reqVO.setEndCreateTime(DateUtils.buildTime(2022, 2, 12));
+        reqVO.setCreateTime((new Date[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
 
         // 调用
         PageResult<SensitiveWordDO> pageResult = sensitiveWordService.getSensitiveWordPage(reqVO);
@@ -189,8 +190,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         reqVO.setName("笨");
         reqVO.setTag("论坛");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setBeginCreateTime(DateUtils.buildTime(2022, 2, 1));
-        reqVO.setEndCreateTime(DateUtils.buildTime(2022, 2, 12));
+        reqVO.setCreateTime((new Date[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
 
         // 调用
         List<SensitiveWordDO> list = sensitiveWordService.getSensitiveWordList(reqVO);

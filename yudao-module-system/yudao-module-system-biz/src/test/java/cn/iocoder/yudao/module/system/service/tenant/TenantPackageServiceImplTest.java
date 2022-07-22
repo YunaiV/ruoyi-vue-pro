@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
+import java.util.Date;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -156,8 +158,7 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
        reqVO.setName("芋道");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
        reqVO.setRemark("源码");
-       reqVO.setBeginCreateTime(buildTime(2022, 10, 9));
-       reqVO.setEndCreateTime(buildTime(2022, 10, 11));
+       reqVO.setCreateTime((new Date[]{buildTime(2022, 10, 9),buildTime(2022, 10, 11)}));
 
        // 调用
        PageResult<TenantPackageDO> pageResult = tenantPackageService.getTenantPackagePage(reqVO);
