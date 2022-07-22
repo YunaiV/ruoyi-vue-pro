@@ -305,7 +305,7 @@ getAllApi()
             </div>
           </el-col>
           <el-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
-            <div class="flex h-70px items-center justify-end <sm:mt-20px">
+            <div class="flex h-70px items-center justify-end <sm:mt-10px">
               <div class="px-8px text-right">
                 <div class="text-14px text-gray-400 mb-20px">{{ t('workplace.project') }}</div>
                 <CountTo
@@ -342,7 +342,7 @@ getAllApi()
     </el-card>
   </div>
 
-  <el-row class="mt-20px" :gutter="20" justify="space-between">
+  <el-row class="mt-10px" :gutter="20" justify="space-between">
     <el-col :xl="16" :lg="16" :md="24" :sm="24" :xs="24" class="mb-20px">
       <el-card shadow="never">
         <template #header>
@@ -378,7 +378,7 @@ getAllApi()
         </el-skeleton>
       </el-card>
 
-      <el-card shadow="never" class="mt-20px">
+      <el-card shadow="never" class="mt-10px">
         <el-skeleton :loading="loading" animated>
           <el-row :gutter="20" justify="space-between">
             <el-col :xl="10" :lg="10" :md="24" :sm="24" :xs="24">
@@ -424,7 +424,7 @@ getAllApi()
           </el-row>
         </el-skeleton>
       </el-card>
-      <el-card shadow="never" class="mt-20px">
+      <el-card shadow="never" class="mt-10px">
         <template #header>
           <div class="flex justify-between">
             <span>{{ t('workplace.notice') }}</span>
@@ -450,7 +450,7 @@ getAllApi()
           </div>
         </el-skeleton>
       </el-card>
-      <el-card shadow="never" class="mt-20px">
+      <el-card shadow="never" class="mt-10px">
         <template #header>
           <span>{{ t('workplace.index') }}</span>
         </template>
