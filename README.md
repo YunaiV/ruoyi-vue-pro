@@ -23,8 +23,8 @@
 >
 > 😜 给项目点点 Star 吧，这对我们真的很重要！
 
-* 前端 vue2 版本采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)
-* 前端 vue3 版本采用 [vue-element-plus-admin](https://gitee.com/kailong110120130/vue-element-plus-admin)
+* 前端 Vue2 版本采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)
+* 前端 Vue3 版本采用 [vue-element-plus-admin](https://gitee.com/kailong110120130/vue-element-plus-admin)
 * 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson。
 * 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
 * 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统。
@@ -100,17 +100,6 @@
 
 ps：核心功能已经实现，正在对接微信小程序中...
 
-### 商城系统
-
-正在开发中，大体计划如下：
-* 2022 Q2 => 完成对 <https://github.com/YunaiV/onemall> 的迁移，作为 onemall 的 Spring Boot 单体版本。
-* 2022 Q4 => 完成对 <https://github.com/YunaiV/onemall>> 的重构，作为 onemall 的 Spring Cloud 微服务版本。
-
-### 会员中心
-
-正在开发中，大体计划如下：
-* 2021 Q1 =》完成对 <https://github.com/YunaiV/onemall> 的迁移 
-
 ### 基础设施
 
 |     | 功能       | 描述                                           |
@@ -134,6 +123,20 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | 🚀  | 服务保障     | 基于 Resilience4j 实现服务的稳定性，包括限流、熔断等功能          |
 | 🚀  | 日志服务     | 轻量级日志中心，查看远程服务器的日志                           |
 | 🚀  | 单元测试     | 基于 JUnit + Mockito 实现单元测试，保证功能的正确性、代码的质量等    |
+
+### 商城系统
+
+建设中...
+
+![功能图](http://static.iocoder.cn/mall%20%E5%8A%9F%E8%83%BD%E5%9B%BE-min.png)
+
+![GIF 图-耐心等待](https://raw.githubusercontent.com/YunaiV/Blog/master/Mall/onemall-admin-min.gif)
+
+![GIF 图-耐心等待](https://raw.githubusercontent.com/YunaiV/Blog/master/Mall/onemall-h5-min.gif)
+
+### 会员中心
+
+和「商城系统」一起开发
 
 ## 🐨 技术栈
 
@@ -177,14 +180,14 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架        | 5.8.2    | -                                                              |
 | [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架         | 4.0.0    | -                                                              |
 
-### vue2 前端
+### Vue2 前端
 
 | 框架                                                                           | 说明            | 版本     |
 |------------------------------------------------------------------------------|---------------|--------|
 | [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.6.12 |
 | [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -      |
 
-### vue3 前端
+### Vue3 前端
 
 | 框架                                                                  | 说明                 | 版本     |
 |----------------------------------------------------------------------|---------------------|--------|
