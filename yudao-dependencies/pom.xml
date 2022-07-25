@@ -22,7 +22,7 @@
         <swagger-annotations.version>1.6.6</swagger-annotations.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
-        <druid.version>1.2.8</druid.version>
+        <druid.version>1.2.11</druid.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.5.0</dynamic-datasource.version>
