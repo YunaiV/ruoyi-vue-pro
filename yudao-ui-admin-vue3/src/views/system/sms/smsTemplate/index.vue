@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { reactive, ref, unref } from 'vue'
+import { ref, unref } from 'vue'
 import dayjs from 'dayjs'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElForm, ElFormItem, ElInput } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -82,23 +82,45 @@ const handleDetail = async (row: SmsTemplateVO) => {
   detailRef.value = row
   setDialogTile('detail')
 }
-const sendSmsForm = reactive({
+// ========== 测试相关 ==========
+const sendSmsForm = ref({
   content: '',
-  params: '',
-  mobile: '',
+  params: {},
+  mobile: '141',
   templateCode: '',
   templateParams: {}
 })
-// TODO 发送短信
-// ========== 测试相关 ==========
+const sendSmsRules = ref({
+  mobile: [{ required: true, message: '手机不能为空', trigger: 'blur' }],
+  templateCode: [{ required: true, message: '手机不能为空', trigger: 'blur' }],
+  templateParams: {}
+})
+const sendVisible = ref(false)
+
 const handleSendSms = (row: any) => {
-  sendSmsForm.content = row.content
-  sendSmsForm.params = row.params
-  sendSmsForm.templateCode = row.code
-  sendSmsForm.templateParams = row.params.reduce(function (obj, item) {
+  sendSmsForm.value.content = row.content
+  sendSmsForm.value.params = row.params
+  sendSmsForm.value.templateCode = row.code
+  sendSmsForm.value.templateParams = row.params.reduce(function (obj, item) {
     obj[item] = undefined
     return obj
   }, {})
+  sendSmsRules.value.templateParams = row.params.reduce(function (obj, item) {
+    obj[item] = { required: true, message: '参数 ' + item + ' 不能为空', trigger: 'change' }
+    return obj
+  }, {})
+  sendVisible.value = true
+}
+
+const sendSmsTest = () => {
+  const data = {
+    mobile: sendSmsForm.value.mobile,
+    templateCode: sendSmsForm.value.templateCode,
+    templateParams: sendSmsForm.value.templateParams
+  }
+  SmsTemplateApi.sendSmsApi(data)
+  ElMessage.info('发送成功')
+  sendVisible.value = false
 }
 
 // ========== 初始化 ==========
@@ -211,6 +233,39 @@ getList()
         {{ t('action.save') }}
       </el-button>
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
+    </template>
+  </Dialog>
+  <Dialog v-model="sendVisible" title="测试">
+    <el-form :model="sendSmsForm" :rules="sendSmsRules" label-width="140px">
+      <el-form-item label="模板内容" prop="content">
+        <el-input
+          v-model="sendSmsForm.content"
+          type="textarea"
+          placeholder="请输入模板内容"
+          readonly
+        />
+      </el-form-item>
+      <el-form-item label="手机号" prop="mobile">
+        <el-input v-model="sendSmsForm.mobile" placeholder="请输入手机号" />
+      </el-form-item>
+      <el-form-item
+        v-for="param in sendSmsForm.params"
+        :key="param"
+        :label="'参数 {' + param + '}'"
+        :prop="'templateParams.' + param"
+      >
+        <el-input
+          v-model="sendSmsForm.templateParams[param]"
+          :placeholder="'请输入 ' + param + ' 参数'"
+        />
+      </el-form-item>
+    </el-form>
+    <!-- 操作按钮 -->
+    <template #footer>
+      <el-button type="primary" :loading="loading" @click="sendSmsTest">
+        {{ t('action.test') }}
+      </el-button>
+      <el-button @click="sendVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
   </Dialog>
 </template>
