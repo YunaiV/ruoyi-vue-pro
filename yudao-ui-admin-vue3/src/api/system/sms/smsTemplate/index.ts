@@ -1,5 +1,5 @@
 import { useAxios } from '@/hooks/web/useAxios'
-import type { SmsTemplateVO, SmsSendVO } from './types'
+import type { SmsTemplateVO } from './types'
 
 const request = useAxios()
 
@@ -29,7 +29,7 @@ export const deleteSmsTemplateApi = (id: number) => {
 }
 
 // 发送短信
-export function sendSms(data: SmsSendVO) {
+export const sendSmsApi = (data) => {
   return request.post({ url: '/system/sms-template/send-sms', data })
 }
 
