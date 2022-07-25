@@ -30,8 +30,6 @@ const editCropper = () => {
   state.dialogVisible = true
   state.cropperVisible = true
 }
-/** 覆盖默认上传行为 */
-const requestUpload = () => {}
 /** 向左旋转 */
 const rotateLeft = () => {
   cropper.value.rotateLeft()
@@ -121,12 +119,7 @@ watch(
     <template #footer>
       <el-row>
         <el-col :lg="2" :md="2">
-          <el-upload
-            action="#"
-            :http-request="requestUpload"
-            :show-file-list="false"
-            :before-upload="beforeUpload"
-          >
+          <el-upload action="#" :show-file-list="false" :before-upload="beforeUpload">
             <el-button size="small">
               <Icon icon="ep:upload-filled" class="mr-5px" />
               选择
