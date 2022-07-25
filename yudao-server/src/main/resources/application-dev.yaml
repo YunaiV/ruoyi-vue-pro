@@ -146,7 +146,7 @@ spring:
       client:
         url: http://127.0.0.1:${server.port}/${spring.boot.admin.context-path} # 设置 Spring Boot Admin Server 地址
         instance:
-          prefer-ip: true # 注册实例时，优先使用 IP
+          service-host-type: IP # 注册实例时，优先使用 IP [IP, HOST_NAME, CANONICAL_HOST_NAME]
       # Spring Boot Admin Server 服务端的相关配置
       context-path: /admin # 配置 Spring
 
