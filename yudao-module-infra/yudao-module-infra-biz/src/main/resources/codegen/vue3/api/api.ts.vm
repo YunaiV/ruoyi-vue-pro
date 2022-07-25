@@ -31,5 +31,5 @@ export const deletePostApi = async (id: number) => {
 
 // 导出${table.classComment} Excel
 export const exportPostApi = async (params: ${simpleClassName}ExcelReqVO) => {
-    return await request.get({ url: '${baseURL}/export-excel', params, responseType: 'blob' })
+    return await request.download({ url: '${baseURL}/export-excel', params })
 }
