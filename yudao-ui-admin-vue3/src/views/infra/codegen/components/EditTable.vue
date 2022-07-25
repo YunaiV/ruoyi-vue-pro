@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, unref, onMounted } from 'vue'
 import { ContentDetailWrap } from '@/components/ContentDetailWrap'
-import BasicInfoForm from './components/BasicInfoForm.vue'
-import CloumInfoFormVue from './components/CloumInfoForm.vue'
-import GenInfoFormVue from './components/GenInfoForm.vue'
+import BasicInfoForm from './BasicInfoForm.vue'
+import CloumInfoFormVue from './CloumInfoForm.vue'
+import GenInfoFormVue from './GenInfoForm.vue'
 import { ElTabs, ElTabPane, ElButton } from 'element-plus'
 import { getCodegenTableApi } from '@/api/infra/codegen'
 import { useRouter, useRoute } from 'vue-router'
@@ -38,7 +38,6 @@ const submitForm = async () => {
     console.info(basicInfoData)
     console.info(genInfoData)
   }
-  console.info(1)
 }
 onMounted(() => {
   getList()

@@ -47,6 +47,7 @@ const schema = reactive<FormSchema[]>([
     label: '模块名',
     field: 'moduleName',
     component: 'Input',
+    labelMessage: '模块名，即一级目录，例如 system、infra、tool 等等',
     colProps: {
       span: 12
     }
@@ -55,6 +56,7 @@ const schema = reactive<FormSchema[]>([
     label: '业务名',
     field: 'businessName',
     component: 'Input',
+    labelMessage: '业务名，即二级目录，例如 user、permission、dict 等等',
     colProps: {
       span: 12
     }
@@ -63,6 +65,7 @@ const schema = reactive<FormSchema[]>([
     label: '类名称',
     field: 'className',
     component: 'Input',
+    labelMessage: '类名称（首字母大写），例如SysUser、SysMenu、SysDictData 等等',
     colProps: {
       span: 12
     }
@@ -71,6 +74,7 @@ const schema = reactive<FormSchema[]>([
     label: '类描述',
     field: 'classComment',
     component: 'Input',
+    labelMessage: '用作类描述，例如 用户',
     colProps: {
       span: 12
     }
@@ -79,6 +83,7 @@ const schema = reactive<FormSchema[]>([
     label: '上级菜单',
     field: 'parentMenuId',
     component: 'Input',
+    labelMessage: '分配到指定菜单下，例如 系统管理',
     colProps: {
       span: 12
     }

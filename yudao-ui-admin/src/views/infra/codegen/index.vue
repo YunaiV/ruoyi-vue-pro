@@ -85,7 +85,7 @@
 
 <script>
 import { getCodegenTablePage, previewCodegen, downloadCodegen, deleteCodegen,
-  syncCodegenFromDB, syncCodegenFromSQL, createCodegenListFromSQL } from "@/api/infra/codegen";
+  syncCodegenFromDB } from "@/api/infra/codegen";
 
 import importTable from "./importTable";
 // 代码高亮插件
