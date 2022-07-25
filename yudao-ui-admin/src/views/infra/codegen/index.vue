@@ -85,7 +85,7 @@
 
 <script>
 import { getCodegenTablePage, previewCodegen, downloadCodegen, deleteCodegen,
-  syncCodegenFromDB, syncCodegenFromSQL, createCodegenListFromSQL } from "@/api/infra/codegen";
+  syncCodegenFromDB } from "@/api/infra/codegen";
 
 import importTable from "./importTable";
 // 代码高亮插件
@@ -98,7 +98,7 @@ hljs.registerLanguage("html", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("vue", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("javascript", require("highlight.js/lib/languages/javascript"));
 hljs.registerLanguage("sql", require("highlight.js/lib/languages/sql"));
-
+hljs.registerLanguage("typescript", require("highlight.js/lib/languages/typescript"));
 export default {
   name: "Codegen",
   components: { importTable },

@@ -16,5 +16,8 @@ export const updateApiErrorLogPageApi = (id: number, processStatus: number) => {
 
 // 导出API 访问日志
 export const exportApiErrorLogApi = (params) => {
-  return request.get({ url: '/infra/api-error-log/export-excel', params, responseType: 'blob' })
+  return request.download({
+    url: '/infra/api-error-log/export-excel',
+    params
+  })
 }

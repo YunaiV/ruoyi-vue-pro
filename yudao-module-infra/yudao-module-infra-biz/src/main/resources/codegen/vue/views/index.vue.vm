@@ -219,22 +219,16 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      #foreach ($column in $columns)## 时间范围
-      #if ($column.listOperation)
-      #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
-      #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-      dateRange${AttrName}: [],
-      #end
-      #end
-      #end
       // 查询参数
       queryParams: {
         pageNo: 1,
         pageSize: 10,
         #foreach ($column in $columns)
-        #if ($column.listOperation && $column.listOperationCondition != 'BETWEEN')
+        #if ($column.listOperation)
+        #if ($column.listOperationCondition != 'BETWEEN')
         $column.javaField: null,
-        #else if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+        #end
+        #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
         $column.javaField: [],
         #end
         #end

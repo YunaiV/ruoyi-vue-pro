@@ -8,5 +8,5 @@ export const getLoginLogPageApi = (params) => {
 }
 // 导出登录日志
 export const exportLoginLogApi = (params) => {
-  return request.get({ url: '/system/login-log/export', params, responseType: 'blob' })
+  return request.download({ url: '/system/login-log/export', params })
 }

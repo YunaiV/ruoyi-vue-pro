@@ -29,5 +29,5 @@ export const deleteErrorCodeApi = (id: number) => {
 }
 // 导出错误码
 export const excelErrorCodeApi = (params) => {
-  return request.get({ url: '/system/error-code/export-excel', params, responseType: 'blob' })
+  return request.download({ url: '/system/error-code/export-excel', params })
 }

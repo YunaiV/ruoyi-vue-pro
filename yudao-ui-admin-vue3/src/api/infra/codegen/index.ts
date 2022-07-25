@@ -40,7 +40,7 @@ export const previewCodegenApi = (id: number) => {
 
 // 下载生成代码
 export const downloadCodegenApi = (id: number) => {
-  return request.get({ url: '/infra/codegen/download?tableId=' + id, responseType: 'blob' })
+  return request.download({ url: '/infra/codegen/download?tableId=' + id })
 }
 
 // 获得表定义

@@ -386,7 +386,7 @@ getList()
         />
       </template>
       <template #postIds>
-        <el-select v-model="postIds" multiple placeholder="Select">
+        <el-select v-model="postIds" multiple :placeholder="t('common.selectText')">
           <el-option
             v-for="item in postOptions"
             :key="item.id"

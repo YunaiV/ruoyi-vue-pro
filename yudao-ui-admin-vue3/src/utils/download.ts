@@ -1,4 +1,4 @@
-const download0 = (data: any, fileName: string, mineType: string) => {
+const download0 = (data: Blob, fileName: string, mineType: string) => {
   // 创建 blob
   const blob = new Blob([data], { type: mineType })
   // 创建 href 超链接，点击进行下载
@@ -14,23 +14,23 @@ const download0 = (data: any, fileName: string, mineType: string) => {
 
 const download = {
   // 下载 Excel 方法
-  excel: (data: any, fileName: string) => {
+  excel: (data: Blob, fileName: string) => {
     download0(data, fileName, 'application/vnd.ms-excel')
   },
   // 下载 Word 方法
-  word: (data: any, fileName: string) => {
+  word: (data: Blob, fileName: string) => {
     download0(data, fileName, 'application/msword')
   },
   // 下载 Zip 方法
-  zip: (data: any, fileName: string) => {
+  zip: (data: Blob, fileName: string) => {
     download0(data, fileName, 'application/zip')
   },
   // 下载 Html 方法
-  html: (data: any, fileName: string) => {
+  html: (data: Blob, fileName: string) => {
     download0(data, fileName, 'text/html')
   },
   // 下载 Markdown 方法
-  markdown: (data: any, fileName: string) => {
+  markdown: (data: Blob, fileName: string) => {
     download0(data, fileName, 'text/markdown')
   }
 }

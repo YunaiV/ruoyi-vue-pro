@@ -35,5 +35,5 @@ export const deleteConfigApi = (id: number) => {
 
 // 导出参数
 export const exportConfigApi = (params) => {
-  return request.get({ url: '/infra/config/export', params, responseType: 'blob' })
+  return request.download({ url: '/infra/config/export', params })
 }

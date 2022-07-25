@@ -6,8 +6,7 @@ import { useTable } from '@/hooks/web/useTable'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
 import { allSchemas } from './codegen.data'
 import { useI18n } from '@/hooks/web/useI18n'
-import ImportTable from './components/ImportTable.vue'
-import Preview from './components/Preview.vue'
+import { ImportTable, Preview } from './components'
 import download from '@/utils/download'
 import { useRouter } from 'vue-router'
 import { useMessage } from '@/hooks/web/useMessage'
@@ -46,8 +45,8 @@ const handleSynchDb = (row: CodegenTableVO) => {
     })
 }
 // 生成代码操作
-const handleGenTable = (row: CodegenTableVO) => {
-  const res = CodegenApi.downloadCodegenApi(row.id)
+const handleGenTable = async (row: CodegenTableVO) => {
+  const res = await CodegenApi.downloadCodegenApi(row.id)
   download.zip(res, 'codegen-' + row.className + '.zip')
 }
 // 删除操作

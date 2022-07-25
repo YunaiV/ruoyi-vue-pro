@@ -30,5 +30,5 @@ export const deleteTenantApi = (id: number) => {
 
 // 导出租户
 export const exportTenantApi = (params) => {
-  return request.get({ url: '/system/tenant/export-excel', params, responseType: 'blob' })
+  return request.download({ url: '/system/tenant/export-excel', params })
 }

@@ -15,9 +15,6 @@ import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 #end
 ## 字段模板
 #macro(columnTpl $prefix $prefixStr)
-#if (${column.javaType} == "Date")## 时间类型
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-#end
     @ApiModelProperty(value = "${prefixStr}${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
     private ${column.javaType}#if ("$!prefix" != "") ${prefix}${JavaField}#else ${column.javaField}#end;
 #end
@@ -27,12 +24,11 @@ import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 public class ${sceneEnum.prefixClass}${table.className}ExportReqVO {
 
 #foreach ($column in $columns)
-#set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
 #if (${column.listOperation})##查询操作
 #if (${column.listOperationCondition} == "BETWEEN")## 情况一，Between 的时候
-    #columnTpl('begin', '开始')
-
-    #columnTpl('end', '结束')
+    @ApiModelProperty(value = "${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private ${column.javaType}[] ${column.javaField};
 #else##情况二，非 Between 的时间
     #columnTpl('', '')
 #end

@@ -30,7 +30,7 @@ export const deleteJobApi = (id: number) => {
 
 // 导出定时任务调度
 export const exportJobApi = (params) => {
-  return request.get({ url: '/infra/job/export-excel', params, responseType: 'blob' })
+  return request.download({ url: '/infra/job/export-excel', params })
 }
 
 // 任务状态修改
