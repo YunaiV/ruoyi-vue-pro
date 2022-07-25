@@ -30,5 +30,5 @@ export const deleteRefundApi = (id: number) => {
 
 // 导出退款订单
 export const exportRefundApi = (params) => {
-  return request.get({ url: '/pay/refund/export-excel', params, responseType: 'blob' })
+  return request.download({ url: '/pay/refund/export-excel', params })
 }

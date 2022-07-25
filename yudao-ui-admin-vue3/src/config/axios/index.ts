@@ -29,7 +29,8 @@ export const PATH_URL = base_url[import.meta.env.VITE_API_BASEPATH]
 // 创建axios实例
 const service: AxiosInstance = axios.create({
   baseURL: BASE_URL + BASE_API, // api 的 base_url
-  timeout: config.request_timeout // 请求超时时间
+  timeout: config.request_timeout, // 请求超时时间
+  withCredentials: false // 禁用 Cookie 等信息
 })
 
 // request拦截器

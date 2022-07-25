@@ -30,7 +30,7 @@ export const deleteSensitiveWordApi = (id: number) => {
 
 // 导出敏感词
 export const exportSensitiveWordApi = (params) => {
-  return request.get({ url: '/system/sensitive-word/export', params, responseType: 'blob' })
+  return request.download({ url: '/system/sensitive-word/export-excel', params })
 }
 
 // 获取所有敏感词的标签数组

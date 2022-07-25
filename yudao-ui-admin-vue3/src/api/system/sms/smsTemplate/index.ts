@@ -35,5 +35,8 @@ export const sendSmsApi = (data) => {
 
 // 导出短信模板
 export const exportPostApi = (params) => {
-  return request.get({ url: '/system/sms-template/export-excel', params, responseType: 'blob' })
+  return request.download({
+    url: '/system/sms-template/export-excel',
+    params
+  })
 }

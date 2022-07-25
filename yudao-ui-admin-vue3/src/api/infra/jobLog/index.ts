@@ -14,9 +14,8 @@ export const getJobLogApi = (id: number) => {
 
 // 导出定时任务日志
 export const exportJobLogApi = (params) => {
-  return request.get({
+  return request.download({
     url: '/infra/job-log/export-excel',
-    params,
-    responseType: 'blob'
+    params
   })
 }

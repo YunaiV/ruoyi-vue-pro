@@ -113,7 +113,7 @@ getList()
       @register="register"
     >
       <template #logo="{ row }">
-        <el-image :src="row.logo" />
+        <el-image :src="row.logo" :preview-src-list="[row.logo]" />
       </template>
       <template #status="{ row }">
         <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />

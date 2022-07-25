@@ -34,5 +34,5 @@ export const deletePostApi = async (id: number) => {
 
 // 导出岗位
 export const exportPostApi = async (params) => {
-  return await request.get({ url: '/system/post/export', params, responseType: 'blob' })
+  return await request.download({ url: '/system/post/export', params })
 }

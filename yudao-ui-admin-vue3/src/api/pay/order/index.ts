@@ -30,5 +30,5 @@ export const deleteOrderApi = async (id: number) => {
 
 // 导出支付订单
 export const exportOrderApi = async (params) => {
-  return await request.get({ url: '/pay/order/export-excel', params, responseType: 'blob' })
+  return await request.download({ url: '/pay/order/export-excel', params })
 }

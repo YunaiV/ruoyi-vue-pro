@@ -40,7 +40,7 @@ export const deleteMerchantApi = (id: number) => {
 
 // 导出支付商户
 export const exportMerchantApi = (params) => {
-  return request.get({ url: '/pay/merchant/export-excel', params, responseType: 'blob' })
+  return request.download({ url: '/pay/merchant/export-excel', params })
 }
 // 支付商户状态修改
 export const changeMerchantStatusApi = (id: number, status: number) => {

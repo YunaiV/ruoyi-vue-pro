@@ -30,12 +30,12 @@ export const deleteUserApi = (id: number) => {
 
 // 导出用户
 export const exportUserApi = (params) => {
-  return request.get({ url: '/system/user/export', params, responseType: 'blob' })
+  return request.download({ url: '/system/user/export', params })
 }
 
 // 下载用户导入模板
 export const importUserTemplateApi = () => {
-  return request.get({ url: '/system/user/get-import-template', responseType: 'blob' })
+  return request.download({ url: '/system/user/get-import-template' })
 }
 
 // 用户密码重置

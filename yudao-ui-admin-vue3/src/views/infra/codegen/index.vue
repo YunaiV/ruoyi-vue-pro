@@ -45,8 +45,8 @@ const handleSynchDb = (row: CodegenTableVO) => {
     })
 }
 // 生成代码操作
-const handleGenTable = (row: CodegenTableVO) => {
-  const res = CodegenApi.downloadCodegenApi(row.id)
+const handleGenTable = async (row: CodegenTableVO) => {
+  const res = await CodegenApi.downloadCodegenApi(row.id)
   download.zip(res, 'codegen-' + row.className + '.zip')
 }
 // 删除操作
