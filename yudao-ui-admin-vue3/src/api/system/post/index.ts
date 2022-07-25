@@ -1,10 +1,10 @@
 import { useAxios } from '@/hooks/web/useAxios'
-import type { PostVO } from './types'
+import type { PostVO, PostPageReqVO, PostExportReqVO } from './types'
 
 const request = useAxios()
 
 // 查询岗位列表
-export const getPostPageApi = async (params) => {
+export const getPostPageApi = async (params: PostPageReqVO) => {
   return await request.get({ url: '/system/post/page', params })
 }
 
@@ -33,6 +33,6 @@ export const deletePostApi = async (id: number) => {
 }
 
 // 导出岗位
-export const exportPostApi = async (params) => {
+export const exportPostApi = async (params: PostExportReqVO) => {
   return await request.download({ url: '/system/post/export', params })
 }

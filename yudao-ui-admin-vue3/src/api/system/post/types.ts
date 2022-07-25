@@ -7,3 +7,15 @@ export type PostVO = {
   remark: string
   createTime: string
 }
+
+export type PostPageReqVO = {
+  code: string
+  name: string
+  status: number
+}
+
+export type PostExportReqVO = {
+  code: string
+  name: string
+  status: number
+}

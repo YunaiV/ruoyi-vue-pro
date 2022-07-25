@@ -1,5 +1,5 @@
 import { useAxios } from '@/hooks/web/useAxios'
-import type { DeptVO } from './types'
+import type { DeptVO, DeptListReqVO } from './types'
 
 const request = useAxios()
 
@@ -9,7 +9,7 @@ export const listSimpleDeptApi = () => {
 }
 
 // 查询部门列表
-export const getDeptPageApi = (params) => {
+export const getDeptPageApi = (params: DeptListReqVO) => {
   return request.get({ url: '/system/dept/list', params })
 }
 
