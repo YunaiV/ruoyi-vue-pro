@@ -60,7 +60,7 @@ public class FileServiceTest extends BaseDbUnitTest {
         FilePageReqVO reqVO = new FilePageReqVO();
         reqVO.setPath("yunai");
         reqVO.setType("jp");
-        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 10),buildTime(2021, 1, 20)}));
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 10), buildTime(2021, 1, 20)}));
 
         // 调用
         PageResult<FileDO> pageResult = fileService.getFilePage(reqVO);

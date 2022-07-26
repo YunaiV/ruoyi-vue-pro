@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.framework.mybatis.core.query;
 
+import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import org.springframework.util.StringUtils;
@@ -33,7 +33,7 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     }
 
     public LambdaQueryWrapperX<T> inIfPresent(SFunction<T, ?> column, Object... values) {
-        if (!ArrayUtils.isEmpty(values)) {
+        if (!ArrayUtil.isEmpty(values)) {
             return (LambdaQueryWrapperX<T>) super.in(column, values);
         }
         return this;
@@ -95,16 +95,9 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     }
 
     public LambdaQueryWrapperX<T> betweenIfPresent(SFunction<T, ?> column, Object[] values) {
-        if (values!= null && values.length >0 && values[0] != null && values[1] != null) {
-            return (LambdaQueryWrapperX<T>) super.between(column, values[0], values[1]);
-        }
-        if (values != null && values.length >0 && values[0] != null) {
-            return (LambdaQueryWrapperX<T>) ge(column, values[0]);
-        }
-        if (values != null && values.length >0 && values[1] != null) {
-            return (LambdaQueryWrapperX<T>) le(column, values[2]);
-        }
-        return this;
+        Object val1 = ArrayUtils.get(values, 0);
+        Object val2 = ArrayUtils.get(values, 1);
+        return betweenIfPresent(column, val1, val2);
     }
 
     // ========== 重写父类方法，方便链式调用 ==========
