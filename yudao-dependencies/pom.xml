@@ -16,7 +16,7 @@
     <properties>
         <revision>1.6.2-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.6.9</spring.boot.version>
+        <spring.boot.version>2.6.10</spring.boot.version>
         <!-- Web 相关 -->
         <knife4j.version>3.0.3</knife4j.version>
         <swagger-annotations.version>1.6.6</swagger-annotations.version>
@@ -29,7 +29,6 @@
         <redisson.version>3.17.4</redisson.version>
         <!-- Config 配置中心相关 -->
         <apollo.version>1.9.2</apollo.version>
-        <!-- Job 定时任务相关 -->
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.0</lock4j.version>
         <resilience4j.version>1.7.1</resilience4j.version>
