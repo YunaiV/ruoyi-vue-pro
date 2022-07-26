@@ -5,3 +5,8 @@ export type DeptVO = {
   parentId: number
   createTime: string
 }
+
+export type DeptListReqVO = {
+  name: string
+  status: number
+}

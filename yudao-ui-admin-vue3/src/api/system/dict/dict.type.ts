@@ -1,5 +1,5 @@
 import { useAxios } from '@/hooks/web/useAxios'
-import type { DictTypeVO } from './types'
+import type { DictTypeVO, DictTypePageReqVO, DictTypeExportReqVO } from './types'
 
 const request = useAxios()
 
@@ -9,7 +9,7 @@ export const listSimpleDictTypeApi = () => {
 }
 
 // 查询字典列表
-export const getDictTypePageApi = (params) => {
+export const getDictTypePageApi = (params: DictTypePageReqVO) => {
   return request.get({ url: '/system/dict-type/page', params })
 }
 
@@ -33,6 +33,6 @@ export const deleteDictTypeApi = (id: number) => {
   return request.delete({ url: '/system/dict-type/delete?id=' + id })
 }
 // 导出字典类型
-export const exportDictTypeApi = (params: DictTypeVO) => {
+export const exportDictTypeApi = (params: DictTypeExportReqVO) => {
   return request.get({ url: '/system/dict-type/export', params })
 }
