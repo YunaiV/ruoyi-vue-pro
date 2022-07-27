@@ -25,12 +25,8 @@ public class OperateLogExportReqVO {
     @ApiModelProperty(value = "操作状态", example = "true")
     private Boolean success;
 
-    @ApiModelProperty(value = "开始时间", example = "2020-10-24")
+    @ApiModelProperty(value = "开始时间", example = "[2022-07-01 00:00:00,2022-07-01 23:59:59]")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date beginTime;
-
-    @ApiModelProperty(value = "结束时间", example = "2020-10-24")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date endTime;
+    private Date[] startTime;
 
 }

@@ -431,7 +431,6 @@ CREATE TABLE `bpm_task_ext`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
   `assignee_user_id` bigint NULL DEFAULT NULL COMMENT '任务的审批人',
   `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '任务的名字',
-  `task_def_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程任务key',
   `task_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '任务的编号',
   `result` tinyint NOT NULL COMMENT '任务的结果',
   `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '审批建议',

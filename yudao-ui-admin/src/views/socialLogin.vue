@@ -63,8 +63,6 @@
 </template>
 
 <script>
-import Cookies from "js-cookie";
-import { encrypt, decrypt } from '@/utils/jsencrypt'
 import {
   getPassword, getRememberMe,
   getUsername,

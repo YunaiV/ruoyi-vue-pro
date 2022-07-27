@@ -22,6 +22,7 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -178,8 +179,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
         reqVO.setName("土豆");
         reqVO.setCode("tu");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setBeginTime(DateUtils.buildTime(2022, 2, 1));
-        reqVO.setEndTime(DateUtils.buildTime(2022, 2, 12));
+        reqVO.setCreateTime((new Date[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
 
         // 调用
         List<RoleDO> list = roleService.getRoleList(reqVO);
@@ -209,8 +209,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
         reqVO.setName("土豆");
         reqVO.setCode("tu");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setBeginTime(DateUtils.buildTime(2022, 2, 1));
-        reqVO.setEndTime(DateUtils.buildTime(2022, 2, 12));
+        reqVO.setCreateTime((new Date[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
 
         // 调用
         PageResult<RoleDO> pageResult = roleService.getRolePage(reqVO);

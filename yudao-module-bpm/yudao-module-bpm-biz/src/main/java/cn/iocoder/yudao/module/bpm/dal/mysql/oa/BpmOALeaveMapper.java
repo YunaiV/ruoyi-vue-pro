@@ -22,7 +22,7 @@ public interface BpmOALeaveMapper extends BaseMapperX<BpmOALeaveDO> {
                 .eqIfPresent(BpmOALeaveDO::getResult, reqVO.getResult())
                 .eqIfPresent(BpmOALeaveDO::getType, reqVO.getType())
                 .likeIfPresent(BpmOALeaveDO::getReason, reqVO.getReason())
-                .betweenIfPresent(BpmOALeaveDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(BpmOALeaveDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(BpmOALeaveDO::getId));
     }
 

@@ -120,20 +120,21 @@ export default {
       this.bpmnModeler.getDefinitions().rootElements[0].flowElements?.forEach(n => {
         let activity = activityList.find(m => m.key === n.id) // 找到对应的活动
         if (n.$type === 'bpmn:UserTask') { // 用户任务
-          debugger
           if (!activity) {
             return;
           }
           // 处理用户任务的高亮
           const task = this.taskList.find(m => m.id === activity.taskId); // 找到活动对应的 taskId
-          if (task) {
-            canvas.addMarker(n.id, this.getResultCss(task.result));
-            // 如果非通过，就不走后面的线条了
-            if (task.result !== 2) {
-              return;
-            }
+          if (!task) {
+            return;
           }
+          // 高亮任务
+          canvas.addMarker(n.id, this.getResultCss(task.result));
 
+          // 如果非通过，就不走后面的线条了
+          if (task.result !== 2) {
+            return;
+          }
           // 处理 outgoing 出线
           const outgoing = this.getActivityOutgoing(activity);
           outgoing?.forEach(nn => {
@@ -219,13 +220,13 @@ export default {
       return activity.endTime ? 'highlight' : 'highlight-todo';
     },
     getResultCss(result) {
-      if (result === 1) {
+      if (result === 1) { // 审批中
         return 'highlight-todo';
-      } else if (result === 2) {
+      } else if (result === 2) { // 已通过
         return 'highlight';
-      } else if (result === 3) {
+      } else if (result === 3) { // 不通过
         return 'highlight-reject';
-      } else if (result === 4) {
+      } else if (result === 4) { // 已取消
         return 'highlight-cancel';
       }
       return '';

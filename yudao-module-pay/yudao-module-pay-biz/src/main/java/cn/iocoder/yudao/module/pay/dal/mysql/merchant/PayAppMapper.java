@@ -23,7 +23,7 @@ public interface PayAppMapper extends BaseMapperX<PayAppDO> {
                 .eqIfPresent("pay_notify_url", reqVO.getPayNotifyUrl())
                 .eqIfPresent("refund_notify_url", reqVO.getRefundNotifyUrl())
                 .inIfPresent("merchant_id", merchantIds)
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("id"));
     }
 
@@ -35,7 +35,7 @@ public interface PayAppMapper extends BaseMapperX<PayAppDO> {
                 .eqIfPresent("pay_notify_url", reqVO.getPayNotifyUrl())
                 .eqIfPresent("refund_notify_url", reqVO.getRefundNotifyUrl())
                 .inIfPresent("merchant_id", merchantIds)
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("id"));
     }
 

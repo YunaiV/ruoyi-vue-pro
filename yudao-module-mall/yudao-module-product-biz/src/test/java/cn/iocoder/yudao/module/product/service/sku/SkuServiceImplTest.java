@@ -147,8 +147,7 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
        reqVO.setBarCode(null);
        reqVO.setPicUrl(null);
        reqVO.setStatus(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+       reqVO.setCreateTime(null);
 
        // 调用
        PageResult<ProductSkuDO> pageResult = ProductSkuService.getSkuPage(reqVO);
@@ -202,8 +201,7 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
        reqVO.setBarCode(null);
        reqVO.setPicUrl(null);
        reqVO.setStatus(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+       reqVO.setCreateTime(null);
 
        // 调用
        List<ProductSkuDO> list = ProductSkuService.getSkuList(reqVO);

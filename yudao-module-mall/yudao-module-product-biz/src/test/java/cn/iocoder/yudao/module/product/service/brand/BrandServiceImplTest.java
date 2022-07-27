@@ -127,8 +127,7 @@ public class BrandServiceImplTest extends BaseDbUnitTest {
        reqVO.setCategoryId(null);
        reqVO.setName(null);
        reqVO.setStatus(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+       reqVO.setCreateTime((new Date[]{}));
 
        // 调用
        PageResult<BrandDO> pageResult = brandService.getBrandPage(reqVO);
@@ -162,8 +161,7 @@ public class BrandServiceImplTest extends BaseDbUnitTest {
        reqVO.setCategoryId(null);
        reqVO.setName(null);
        reqVO.setStatus(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+       reqVO.setCreateTime((new Date[]{}));
 
        // 调用
        List<BrandDO> list = brandService.getBrandList(reqVO);

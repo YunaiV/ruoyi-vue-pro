@@ -135,8 +135,7 @@ public class CategoryServiceImplTest extends BaseDbUnitTest {
         CategoryPageReqVO reqVO = new CategoryPageReqVO();
         reqVO.setName(null);
         reqVO.setStatus(null);
-        reqVO.setBeginCreateTime(null);
-        reqVO.setEndCreateTime(null);
+        reqVO.setCreateTime(null);
 
         // 调用
         PageResult<CategoryDO> pageResult = categoryService.getCategoryPage(reqVO);
@@ -181,8 +180,7 @@ public class CategoryServiceImplTest extends BaseDbUnitTest {
         CategoryExportReqVO reqVO = new CategoryExportReqVO();
         reqVO.setName(null);
         reqVO.setStatus(null);
-        reqVO.setBeginCreateTime(null);
-        reqVO.setEndCreateTime(null);
+        reqVO.setCreateTime(null);
 
         // 调用
         List<CategoryDO> list = categoryService.getCategoryList(reqVO);

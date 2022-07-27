@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * Bpm 流程任务的拓展表
- * 主要解决 Activiti Task 和 HistoricTaskInstance 不支持拓展字段，所以新建拓展表
+ * 主要解决 Flowable Task 和 HistoricTaskInstance 不支持拓展字段，所以新建拓展表
  *
  * @author 芋道源码
  */

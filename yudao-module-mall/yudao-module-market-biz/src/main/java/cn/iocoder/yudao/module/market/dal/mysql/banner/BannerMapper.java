@@ -19,8 +19,7 @@ public interface BannerMapper extends BaseMapperX<BannerDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<BannerDO>()
                 .likeIfPresent(BannerDO::getTitle, reqVO.getTitle())
                 .eqIfPresent(BannerDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(BannerDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .betweenIfPresent(BannerDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(BannerDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(BannerDO::getSort));
     }
 

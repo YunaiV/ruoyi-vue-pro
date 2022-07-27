@@ -25,7 +25,7 @@ public interface TestDemoMapper extends BaseMapperX<TestDemoDO> {
                 .eqIfPresent(TestDemoDO::getType, reqVO.getType())
                 .eqIfPresent(TestDemoDO::getCategory, reqVO.getCategory())
                 .eqIfPresent(TestDemoDO::getRemark, reqVO.getRemark())
-                .betweenIfPresent(TestDemoDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(TestDemoDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(TestDemoDO::getId));
     }
 
@@ -36,7 +36,7 @@ public interface TestDemoMapper extends BaseMapperX<TestDemoDO> {
                 .eqIfPresent(TestDemoDO::getType, reqVO.getType())
                 .eqIfPresent(TestDemoDO::getCategory, reqVO.getCategory())
                 .eqIfPresent(TestDemoDO::getRemark, reqVO.getRemark())
-                .betweenIfPresent(TestDemoDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(TestDemoDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(TestDemoDO::getId));
     }
 

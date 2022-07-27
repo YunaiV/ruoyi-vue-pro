@@ -29,36 +29,20 @@ public class ActivityPageReqVO extends PageParam {
     private Integer status;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始开始时间")
-    private Date beginStartTime;
+    @ApiModelProperty(value = "开始时间")
+    private Date[] startTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束开始时间")
-    private Date endStartTime;
+    @ApiModelProperty(value = "结束时间")
+    private Date[] endTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始结束时间")
-    private Date beginEndTime;
+    @ApiModelProperty(value = "失效时间")
+    private Date[] invalidTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束结束时间")
-    private Date endEndTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始失效时间")
-    private Date beginInvalidTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束失效时间")
-    private Date endInvalidTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始删除时间")
-    private Date beginDeleteTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束删除时间")
-    private Date endDeleteTime;
+    @ApiModelProperty(value = "删除时间")
+    private Date[] deleteTime;
 
     @ApiModelProperty(value = "限制折扣字符串，使用 JSON 序列化成字符串存储")
     private String timeLimitedDiscount;
@@ -67,11 +51,7 @@ public class ActivityPageReqVO extends PageParam {
     private String fullPrivilege;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始创建时间")
-    private Date beginCreateTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束创建时间")
-    private Date endCreateTime;
+    @ApiModelProperty(value = "创建时间")
+    private Date[] createTime;
 
 }

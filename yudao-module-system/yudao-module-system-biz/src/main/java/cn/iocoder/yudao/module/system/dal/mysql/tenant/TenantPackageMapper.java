@@ -22,7 +22,7 @@ public interface TenantPackageMapper extends BaseMapperX<TenantPackageDO> {
                 .likeIfPresent(TenantPackageDO::getName, reqVO.getName())
                 .eqIfPresent(TenantPackageDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(TenantPackageDO::getRemark, reqVO.getRemark())
-                .betweenIfPresent(TenantPackageDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(TenantPackageDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(TenantPackageDO::getId));
     }
 

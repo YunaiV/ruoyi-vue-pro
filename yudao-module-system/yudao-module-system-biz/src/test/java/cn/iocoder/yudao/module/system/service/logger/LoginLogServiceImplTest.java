@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
@@ -66,8 +67,7 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUsername("wangkai");
         reqVO.setUserIp("192.168.199");
         reqVO.setStatus(true);
-        reqVO.setBeginTime(buildTime(2021, 3, 5));
-        reqVO.setEndTime(buildTime(2021, 3, 7));
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 3, 5),buildTime(2021, 3, 5)}));
 
         // 调用service方法
         PageResult<LoginLogDO> pageResult = loginLogService.getLoginLogPage(reqVO);
@@ -105,15 +105,12 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
         // 构造一个早期时间 2021-02-06 00:00:00
         loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setCreateTime(buildTime(2021, 2, 6))));
 
-
         // 构造调用参数
         LoginLogExportReqVO reqVO = new LoginLogExportReqVO();
         reqVO.setUsername("wangxiaokai");
         reqVO.setUserIp("192.168.111");
         reqVO.setStatus(true);
-        reqVO.setBeginTime(buildTime(2021, 3, 5));
-        reqVO.setEndTime(buildTime(2021, 3, 7));
-
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 3, 5),buildTime(2021, 3, 5)}));
 
         // 调用service方法
         List<LoginLogDO> loginLogList = loginLogService.getLoginLogList(reqVO);

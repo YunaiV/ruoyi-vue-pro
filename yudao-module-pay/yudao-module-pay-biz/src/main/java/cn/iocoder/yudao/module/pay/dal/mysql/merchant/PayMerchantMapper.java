@@ -20,7 +20,7 @@ public interface PayMerchantMapper extends BaseMapperX<PayMerchantDO> {
                 .likeIfPresent("short_name", reqVO.getShortName())
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("remark", reqVO.getRemark())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("id"));
     }
 
@@ -31,7 +31,7 @@ public interface PayMerchantMapper extends BaseMapperX<PayMerchantDO> {
                 .likeIfPresent("short_name", reqVO.getShortName())
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("remark", reqVO.getRemark())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("id"));
     }
 
