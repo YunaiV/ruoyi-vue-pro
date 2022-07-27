@@ -53,6 +53,11 @@ public class ProjectReactor {
             log.info("[main][新项目目录检测 ({})已存在，请更改新的目录,程序退出]", projectBaseDirNew);
             return;
         }
+        //如果新目录中存在 PACKAGE_NAME， ARTIFACT_ID 等关键字，路径会被替换，导致生成的文件不在预期目录
+        if(StrUtil.containsAny(projectBaseDirNew, PACKAGE_NAME, ARTIFACT_ID, StrUtil.upperFirst(ARTIFACT_ID))) {
+            log.info("[main][新项目目录检测 ({}) 存在冲突名称「{}」或者「{}」，请更改新的目录,程序退出]", projectBaseDirNew, PACKAGE_NAME, ARTIFACT_ID);
+            return;
+        }
         log.info("[main][完成新项目目录检测，新项目路径地址 ({})]", projectBaseDirNew);
         // 获得需要复制的文件
         log.info("[main][开始获得需要重写的文件，预计需要 10-20 秒]");
