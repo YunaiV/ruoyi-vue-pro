@@ -51,7 +51,7 @@
         <easyexcel.verion>3.1.1</easyexcel.verion>
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
-		<fastjson.version>2.0.5</fastjson.version>
+		<fastjson.version>2.0.10</fastjson.version>
         <guava.version>30.1.1-jre</guava.version>
         <guice.version>5.1.0</guice.version>
         <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
@@ -65,7 +65,7 @@
         <tencentcloud-sdk-java.version>3.1.471</tencentcloud-sdk-java.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
-        <jimureport.version>1.4.32</jimureport.version>
+        <jimureport.version>1.5.2</jimureport.version>
     </properties>
 
     <dependencyManagement>
