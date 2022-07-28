@@ -82,11 +82,6 @@ const submitForm = async () => {
   }
 }
 
-// 删除操作
-const handleDelete = (row: UserGroupVO) => {
-  delList(row.id, false)
-}
-
 // 根据用户名获取用户真实名
 const getUserNickName = (userId: number) => {
   for (const user of userOptions.value) {
@@ -168,7 +163,7 @@ onMounted(async () => {
           link
           type="primary"
           v-hasPermi="['bpm:user-group:delete']"
-          @click="handleDelete(row)"
+          @click="delList(row.id, false)"
         >
           <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>

@@ -164,10 +164,6 @@ const handleResetPwd = (row: UserVO) => {
     })
   })
 }
-// 删除操作
-const handleDelete = (row: UserVO) => {
-  delList(row.id, false)
-}
 
 // 导出操作
 const handleExport = async () => {
@@ -360,7 +356,7 @@ getList()
             link
             type="primary"
             v-hasPermi="['system:user:delete']"
-            @click="handleDelete(row)"
+            @click="delList(row.id, false)"
           >
             <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
           </el-button>

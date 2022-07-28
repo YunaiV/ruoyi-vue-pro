@@ -49,10 +49,6 @@ const handleGenTable = async (row: CodegenTableVO) => {
   const res = await CodegenApi.downloadCodegenApi(row.id)
   download.zip(res, 'codegen-' + row.className + '.zip')
 }
-// 删除操作
-const handleDelete = (row: CodegenTableVO) => {
-  delList(row.id, false)
-}
 // 查询操作
 const handleQuery = () => {
   getList()
@@ -112,7 +108,7 @@ getList()
           link
           type="primary"
           v-hasPermi="['infra:codegen:delete']"
-          @click="handleDelete(row)"
+          @click="delList(row.id, false)"
         >
           <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>

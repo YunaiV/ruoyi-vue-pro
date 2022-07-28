@@ -26,11 +26,6 @@ const handleExport = async () => {
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 
-// 删除操作
-const handleDelete = (row: RefundVO) => {
-  delList(row.id, false)
-}
-
 // ========== 详情相关 ==========
 const detailRef = ref() // 详情 Ref
 
@@ -95,7 +90,7 @@ getList()
           link
           type="primary"
           v-hasPermi="['system:post:delete']"
-          @click="handleDelete(row)"
+          @click="delList(row.id, false)"
         >
           <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>

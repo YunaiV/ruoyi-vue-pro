@@ -45,7 +45,10 @@ const crudSchemas = reactive<CrudSchema[]>([
   },
   {
     label: '备注',
-    field: 'remark'
+    field: 'remark',
+    table: {
+      show: false
+    }
   },
   {
     label: t('common.createTime'),

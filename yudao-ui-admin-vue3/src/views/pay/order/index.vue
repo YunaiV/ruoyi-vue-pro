@@ -71,11 +71,6 @@ const submitForm = async () => {
   }
 }
 
-// 删除操作
-const handleDelete = (row: OrderVO) => {
-  delList(row.id, false)
-}
-
 // ========== 详情相关 ==========
 const detailRef = ref() // 详情 Ref
 
@@ -133,7 +128,12 @@ getList()
         <el-button link type="primary" v-hasPermi="['pay:order:update']" @click="handleDetail(row)">
           <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
         </el-button>
-        <el-button link type="primary" v-hasPermi="['pay:order:delete']" @click="handleDelete(row)">
+        <el-button
+          link
+          type="primary"
+          v-hasPermi="['pay:order:delete']"
+          @click="delList(row.id, false)"
+        >
           <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>
       </template>
