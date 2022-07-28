@@ -55,3 +55,8 @@ export const updateUserStatusApi = (id: number, status: number) => {
   }
   return request.put({ url: '/system/user/update-status', data: data })
 }
+
+// 获取用户精简信息列表
+export const getListSimpleUsersApi = () => {
+  return request.get({ url: '/system/user/list-all-simple' })
+}

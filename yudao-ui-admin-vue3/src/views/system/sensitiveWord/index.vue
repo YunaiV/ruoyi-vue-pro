@@ -19,10 +19,6 @@ const { register, tableObject, methods } = useTable<SensitiveWordVO>({
 })
 const { getList, setSearchParams, delList, exportList } = methods
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('敏感词数据.xls')
-}
 // 获取标签
 const tagsOptions = ref()
 const getTags = async () => {
@@ -79,11 +75,6 @@ const submitForm = async () => {
   }
 }
 
-// 删除操作
-const handleDelete = (row: SensitiveWordVO) => {
-  delList(row.id, false)
-}
-
 // ========== 详情相关 ==========
 const detailRef = ref() // 详情 Ref
 
@@ -116,7 +107,7 @@ onMounted(async () => {
         type="warning"
         v-hasPermi="['system:post:export']"
         :loading="tableObject.exportLoading"
-        @click="handleExport"
+        @click="exportList('敏感词数据.xls')"
       >
         <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
       </el-button>
@@ -171,7 +162,7 @@ onMounted(async () => {
           link
           type="primary"
           v-hasPermi="['system:post:delete']"
-          @click="handleDelete(row)"
+          @click="delList(row.id, false)"
         >
           <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>

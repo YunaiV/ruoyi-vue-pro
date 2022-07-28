@@ -47,11 +47,16 @@ const iconHouse = useIcon({ icon: 'ep:house' })
 const iconAvatar = useIcon({ icon: 'ep:avatar' })
 const iconLock = useIcon({ icon: 'ep:lock' })
 const iconCircleCheck = useIcon({ icon: 'ep:circle-check' })
-const LoginRules = {
+const LoginCaptchaRules = {
   tenantName: [required],
   username: [required],
   password: [required],
   code: [required]
+}
+const LoginRules = {
+  tenantName: [required],
+  username: [required],
+  password: [required]
 }
 const loginLoading = ref(false)
 const loginData = reactive({
@@ -76,8 +81,11 @@ const loginData = reactive({
 // 获取验证码
 const getCode = async () => {
   const res = await LoginApi.getCodeImgApi()
-  loginData.codeImg = 'data:image/gif;base64,' + res.img
-  loginData.loginForm.uuid = res.uuid
+  loginData.captchaEnable = res.enable
+  if (res.enable) {
+    loginData.codeImg = 'data:image/gif;base64,' + res.img
+    loginData.loginForm.uuid = res.uuid
+  }
 }
 //获取租户ID
 const getTenantId = async () => {
@@ -159,7 +167,7 @@ onMounted(async () => {
 <template>
   <el-form
     :model="loginData.loginForm"
-    :rules="LoginRules"
+    :rules="loginData.captchaEnable ? LoginCaptchaRules : LoginRules"
     label-position="top"
     class="login-form"
     label-width="120px"
@@ -205,7 +213,7 @@ onMounted(async () => {
         </el-form-item>
       </el-col>
       <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item prop="code">
+        <el-form-item prop="code" v-if="loginData.captchaEnable">
           <el-row justify="space-between" style="width: 100%">
             <el-col :span="14">
               <el-input

@@ -23,10 +23,6 @@ const { getList, setSearchParams, exportList } = methods
 const detailRef = ref() // 详情 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('') // 弹出层标题
-// 导出操作
-const handleExport = async () => {
-  await exportList('用户数据.xls')
-}
 
 // 详情操作
 const handleDetail = (row: ApiErrorLogVO) => {
@@ -57,7 +53,7 @@ getList()
     <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
   </ContentWrap>
   <ContentWrap>
-    <el-button v-hasPermi="['infra:api-error-log:export']" @click="handleExport">
+    <el-button v-hasPermi="['infra:api-error-log:export']" @click="exportList('错误数据.xls')">
       <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
     </el-button>
     <!-- 列表 -->

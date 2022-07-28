@@ -19,11 +19,6 @@ const { register, tableObject, methods } = useTable<PostVO>({
 })
 const { getList, setSearchParams, delList, exportList } = methods
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('岗位数据.xls')
-}
-
 // ========== CRUD 相关 ==========
 const actionLoading = ref(false) // 遮罩层
 const actionType = ref('') // 操作按钮的类型
@@ -74,11 +69,6 @@ const submitForm = async () => {
   }
 }
 
-// 删除操作
-const handleDelete = (row: PostVO) => {
-  delList(row.id, false)
-}
-
 // ========== 详情相关 ==========
 const detailRef = ref() // 详情 Ref
 
@@ -108,7 +98,7 @@ getList()
         type="warning"
         v-hasPermi="['system:post:export']"
         :loading="tableObject.exportLoading"
-        @click="handleExport"
+        @click="exportList('岗位数据.xls')"
       >
         <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
       </el-button>
@@ -153,7 +143,7 @@ getList()
           link
           type="primary"
           v-hasPermi="['system:post:delete']"
-          @click="handleDelete(row)"
+          @click="delList(row.id, false)"
         >
           <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>

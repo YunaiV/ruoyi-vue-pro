@@ -38,10 +38,6 @@ const handleTypeUpdate = async (row: DictTypeVO) => {
   const res = await DictTypeApi.getDictTypeApi(row.id)
   unref(typeFormRef)?.setValues(res)
 }
-// 字典分类删除操作
-const handleTypeDelete = async (row: DictTypeVO) => {
-  await delTypeList(row.id, false)
-}
 
 // ========== 字典数据列表相关 ==========
 const tableTypeSelect = ref(false)
@@ -70,10 +66,6 @@ const handleDataUpdate = async (row: DictDataVO) => {
   // 设置数据
   const res = await DictDataApi.getDictDataApi(row.id)
   unref(dataFormRef)?.setValues(res)
-}
-// 字典数据删除操作
-const handleDataDelete = async (row: DictTypeVO) => {
-  await delDataList(row.id, false)
 }
 // 字典分类点击行事件
 const parentType = ref('')
@@ -195,7 +187,7 @@ onMounted(async () => {
             link
             type="primary"
             v-hasPermi="['system:dict:delete']"
-            @click="handleTypeDelete(row)"
+            @click="delTypeList(row.id, false)"
           >
             <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
           </el-button>
@@ -252,7 +244,7 @@ onMounted(async () => {
               link
               type="primary"
               v-hasPermi="['system:dict:delete']"
-              @click="handleDataDelete(row)"
+              @click="delDataList(row.id, false)"
             >
               <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
             </el-button>

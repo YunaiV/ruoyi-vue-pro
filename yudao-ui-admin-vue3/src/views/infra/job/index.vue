@@ -22,11 +22,6 @@ const { register, tableObject, methods } = useTable<JobVO>({
 })
 const { getList, setSearchParams, delList, exportList } = methods
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('定时任务.xls')
-}
-
 // ========== CRUD 相关 ==========
 const actionLoading = ref(false) // 遮罩层
 const actionType = ref('') // 操作按钮的类型
@@ -92,11 +87,6 @@ const submitForm = async () => {
   }
 }
 
-// 删除操作
-const handleDelete = (row: JobVO) => {
-  delList(row.id, false)
-}
-
 // ========== 详情相关 ==========
 const detailRef = ref() // 详情 Ref
 
@@ -126,7 +116,7 @@ getList()
         type="warning"
         v-hasPermi="['infra:job:export']"
         :loading="tableObject.exportLoading"
-        @click="handleExport"
+        @click="exportList('定时任务.xls')"
       >
         <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
       </el-button>
@@ -157,7 +147,12 @@ getList()
         <el-button link type="primary" v-hasPermi="['infra:job:query']" @click="handleDetail(row)">
           <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
         </el-button>
-        <el-button link type="primary" v-hasPermi="['infra:job:delete']" @click="handleDelete(row)">
+        <el-button
+          link
+          type="primary"
+          v-hasPermi="['infra:job:delete']"
+          @click="delList(row.id, false)"
+        >
           <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>
         <el-button link type="primary" v-hasPermi="['infra:job:trigger']" @click="handleRun(row)">

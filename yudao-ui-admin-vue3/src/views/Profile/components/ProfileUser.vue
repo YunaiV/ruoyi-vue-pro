@@ -2,7 +2,7 @@
 import { getUserProfileApi } from '@/api/system/user/profile'
 import { onMounted, reactive } from 'vue'
 import dayjs from 'dayjs'
-import { UserAvatarVue } from './'
+import UserAvatar from './UserAvatar.vue'
 import { ProfileVO } from '@/api/system/user/profile/types'
 import { useI18n } from '@/hooks/web/useI18n'
 const { t } = useI18n()
@@ -43,7 +43,7 @@ onMounted(async () => {
 <template>
   <div>
     <div class="text-center">
-      <UserAvatarVue :img="userInfo.user.avatar" />
+      <UserAvatar :img="userInfo.user.avatar" />
     </div>
     <ul class="list-group list-group-striped">
       <li class="list-group-item">

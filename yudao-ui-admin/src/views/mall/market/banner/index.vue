@@ -165,7 +165,7 @@ export default {
     getList() {
       this.loading = true;
       // 执行查询
-      getBannerPage(params).then(response => {
+      getBannerPage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;

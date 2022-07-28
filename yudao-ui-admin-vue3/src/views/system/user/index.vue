@@ -164,15 +164,6 @@ const handleResetPwd = (row: UserVO) => {
     })
   })
 }
-// 删除操作
-const handleDelete = (row: UserVO) => {
-  delList(row.id, false)
-}
-
-// 导出操作
-const handleExport = async () => {
-  await exportList('用户数据.xls')
-}
 
 // ========== 详情相关 ==========
 const detailRef = ref()
@@ -300,7 +291,11 @@ getList()
         >
           <Icon icon="ep:upload" class="mr-5px" /> {{ t('action.import') }}
         </el-button>
-        <el-button type="warning" v-hasPermi="['system:user:export']" @click="handleExport">
+        <el-button
+          type="warning"
+          v-hasPermi="['system:user:export']"
+          @click="exportList('用户数据.xls')"
+        >
           <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
         </el-button>
       </div>
@@ -360,7 +355,7 @@ getList()
             link
             type="primary"
             v-hasPermi="['system:user:delete']"
-            @click="handleDelete(row)"
+            @click="delList(row.id, false)"
           >
             <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
           </el-button>

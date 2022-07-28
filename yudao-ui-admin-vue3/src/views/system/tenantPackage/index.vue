@@ -101,11 +101,6 @@ const submitForm = async () => {
   }
 }
 
-// 删除操作
-const handleDelete = (row: TenantPackageVO) => {
-  delList(row.id, false)
-}
-
 // ========== 初始化 ==========
 onMounted(async () => {
   await getList()
@@ -149,7 +144,7 @@ onMounted(async () => {
         <el-button link type="primary" @click="handleUpdate(row)">
           <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
         </el-button>
-        <el-button link type="primary" @click="handleDelete(row)">
+        <el-button link type="primary" @click="delList(row.id, false)">
           <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>
       </template>
