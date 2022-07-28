@@ -4,9 +4,9 @@ import { required } from '@/utils/formRules'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
 import { Form } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
-import { DICT_TYPE, getDictOptions } from '@/utils/dict'
+import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 const props = defineProps({
-  currentRow: {
+  genInfo: {
     type: Object as PropType<Nullable<CodegenTableVO>>,
     default: () => null
   }
@@ -20,13 +20,15 @@ const rules = reactive({
   className: [required],
   classComment: [required]
 })
+const templateTypeOptions = getIntDictOptions(DICT_TYPE.INFRA_CODEGEN_TEMPLATE_TYPE)
+const sceneOptions = getIntDictOptions(DICT_TYPE.INFRA_CODEGEN_SCENE)
 const schema = reactive<FormSchema[]>([
   {
     label: '生成模板',
     field: 'templateType',
     component: 'Select',
     componentProps: {
-      options: getDictOptions(DICT_TYPE.INFRA_CODEGEN_TEMPLATE_TYPE)
+      options: templateTypeOptions
     },
     colProps: {
       span: 12
@@ -37,7 +39,7 @@ const schema = reactive<FormSchema[]>([
     field: 'scene',
     component: 'Select',
     componentProps: {
-      options: getDictOptions(DICT_TYPE.INFRA_CODEGEN_SCENE)
+      options: sceneOptions
     },
     colProps: {
       span: 12
@@ -93,11 +95,11 @@ const { register, methods, elFormRef } = useForm({
   schema
 })
 watch(
-  () => props.currentRow,
-  (currentRow) => {
-    if (!currentRow) return
+  () => props.genInfo,
+  (genInfo) => {
+    if (!genInfo) return
     const { setValues } = methods
-    setValues(currentRow)
+    setValues(genInfo)
   },
   {
     deep: true,

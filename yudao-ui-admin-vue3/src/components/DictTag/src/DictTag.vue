@@ -1,46 +1,33 @@
-<script lang="ts">
-import { defineComponent, onMounted, onUpdated, PropType, ref } from 'vue'
+<script setup lang="ts">
+import { onMounted, onUpdated, PropType, ref } from 'vue'
 import { getDictOptions, DictDataType } from '@/utils/dict'
 import { ElTag } from 'element-plus'
-
-export default defineComponent({
-  name: 'DictTag',
-  components: {
-    ElTag
+const props = defineProps({
+  type: {
+    type: String as PropType<string>,
+    required: true
   },
-  props: {
-    type: {
-      type: String as PropType<string>,
-      required: true
-    },
-    value: {
-      type: [String, Number] as PropType<string | number>,
-      required: true
-    }
-  },
-  setup(props) {
-    const dictData = ref<DictDataType>()
-    function getDictObj(dictType: string, value: string) {
-      const dictOptions = getDictOptions(dictType)
-      dictOptions.forEach((dict: DictDataType) => {
-        if (dict.value === value) {
-          dictData.value = dict
-        }
-      })
-    }
-
-    onMounted(() => {
-      return getDictObj(props.type, props.value?.toString())
-    })
-
-    onUpdated(() => {
-      getDictObj(props.type, props.value?.toString())
-    })
-    return {
-      props,
-      dictData
-    }
+  value: {
+    type: [String, Number] as PropType<string | number>,
+    required: true
   }
+})
+const dictData = ref<DictDataType>()
+const getDictObj = (dictType: string, value: string) => {
+  const dictOptions = getDictOptions(dictType)
+  dictOptions.forEach((dict: DictDataType) => {
+    if (dict.value === value) {
+      dictData.value = dict
+    }
+  })
+}
+
+onMounted(() => {
+  return getDictObj(props.type, props.value?.toString())
+})
+
+onUpdated(() => {
+  getDictObj(props.type, props.value?.toString())
 })
 </script>
 <template>

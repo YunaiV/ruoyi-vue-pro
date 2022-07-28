@@ -1,126 +1,15 @@
-<template>
-  <div>
-    <el-tabs type="border-card">
-      <el-tab-pane label="秒" v-if="shouldHide('second')">
-        <CrontabSecond
-          @update="updateCrontabValue"
-          :check="checkNumber"
-          :cron="crontabValueObj"
-          ref="cronsecond"
-        />
-      </el-tab-pane>
-
-      <el-tab-pane label="分钟" v-if="shouldHide('min')">
-        <CrontabMin
-          @update="updateCrontabValue"
-          :check="checkNumber"
-          :cron="crontabValueObj"
-          ref="cronmin"
-        />
-      </el-tab-pane>
-
-      <el-tab-pane label="小时" v-if="shouldHide('hour')">
-        <CrontabHour
-          @update="updateCrontabValue"
-          :check="checkNumber"
-          :cron="crontabValueObj"
-          ref="cronhour"
-        />
-      </el-tab-pane>
-
-      <el-tab-pane label="日" v-if="shouldHide('day')">
-        <CrontabDay
-          @update="updateCrontabValue"
-          :check="checkNumber"
-          :cron="crontabValueObj"
-          ref="cronday"
-        />
-      </el-tab-pane>
-
-      <el-tab-pane label="月" v-if="shouldHide('month')">
-        <CrontabMonth
-          @update="updateCrontabValue"
-          :check="checkNumber"
-          :cron="crontabValueObj"
-          ref="cronmonth"
-        />
-      </el-tab-pane>
-
-      <el-tab-pane label="周" v-if="shouldHide('week')">
-        <CrontabWeek
-          @update="updateCrontabValue"
-          :check="checkNumber"
-          :cron="crontabValueObj"
-          ref="cronweek"
-        />
-      </el-tab-pane>
-
-      <el-tab-pane label="年" v-if="shouldHide('year')">
-        <CrontabYear
-          @update="updateCrontabValue"
-          :check="checkNumber"
-          :cron="crontabValueObj"
-          ref="cronyear"
-        />
-      </el-tab-pane>
-    </el-tabs>
-
-    <div class="popup-main">
-      <div class="popup-result">
-        <p class="title">时间表达式</p>
-        <table>
-          <thead>
-            <th v-for="item of tabTitles" width="40" :key="item">{{ item }}</th>
-            <th>Cron 表达式</th>
-          </thead>
-          <tbody>
-            <td>
-              <span>{{ crontabValueObj.second }}</span>
-            </td>
-            <td>
-              <span>{{ crontabValueObj.min }}</span>
-            </td>
-            <td>
-              <span>{{ crontabValueObj.hour }}</span>
-            </td>
-            <td>
-              <span>{{ crontabValueObj.day }}</span>
-            </td>
-            <td>
-              <span>{{ crontabValueObj.month }}</span>
-            </td>
-            <td>
-              <span>{{ crontabValueObj.week }}</span>
-            </td>
-            <td>
-              <span>{{ crontabValueObj.year }}</span>
-            </td>
-            <td>
-              <span>{{ crontabValueString }}</span>
-            </td>
-          </tbody>
-        </table>
-      </div>
-      <CrontabResult :ex="crontabValueString" />
-
-      <div class="pop_btn">
-        <el-button size="small" type="primary" @click="submitFill">确定</el-button>
-        <el-button size="small" type="warning" @click="clearCron">重置</el-button>
-        <el-button size="small" @click="hidePopup">取消</el-button>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script lang="ts" setup>
-import CrontabSecond from './second.vue'
-import CrontabMin from './min.vue'
-import CrontabHour from './hour.vue'
-import CrontabDay from './day.vue'
-import CrontabMonth from './month.vue'
-import CrontabWeek from './week.vue'
-import CrontabYear from './year.vue'
-import CrontabResult from './result.vue'
+<script setup lang="ts">
+import {
+  CrontabSecond,
+  CrontabMin,
+  CrontabHour,
+  CrontabDay,
+  CrontabMonth,
+  CrontabWeek,
+  CrontabYear,
+  CrontabResult
+} from './components'
+import { ElTabs, ElTabPane } from 'element-plus'
 import { computed, defineEmits, defineProps, onMounted, Ref, ref, watch } from 'vue'
 
 const cronsecond = ref(null)
@@ -208,7 +97,7 @@ function updateCrontabValue(name, value, from) {
     changeRadio(name, value)
   }
 }
-
+// 赋值到组件
 function changeRadio(name, value) {
   let arr = ['second', 'min', 'hour', 'month'],
     refName = 'cron' + name,
@@ -373,7 +262,119 @@ function clearCron() {
 
 watch(() => props.expression, resolveExp)
 </script>
+<template>
+  <div>
+    <el-tabs type="border-card">
+      <el-tab-pane label="秒" v-if="shouldHide('second')">
+        <CrontabSecond
+          @update="updateCrontabValue"
+          :check="checkNumber"
+          :cron="crontabValueObj"
+          ref="cronsecond"
+        />
+      </el-tab-pane>
 
+      <el-tab-pane label="分钟" v-if="shouldHide('min')">
+        <CrontabMin
+          @update="updateCrontabValue"
+          :check="checkNumber"
+          :cron="crontabValueObj"
+          ref="cronmin"
+        />
+      </el-tab-pane>
+
+      <el-tab-pane label="小时" v-if="shouldHide('hour')">
+        <CrontabHour
+          @update="updateCrontabValue"
+          :check="checkNumber"
+          :cron="crontabValueObj"
+          ref="cronhour"
+        />
+      </el-tab-pane>
+
+      <el-tab-pane label="日" v-if="shouldHide('day')">
+        <CrontabDay
+          @update="updateCrontabValue"
+          :check="checkNumber"
+          :cron="crontabValueObj"
+          ref="cronday"
+        />
+      </el-tab-pane>
+
+      <el-tab-pane label="月" v-if="shouldHide('month')">
+        <CrontabMonth
+          @update="updateCrontabValue"
+          :check="checkNumber"
+          :cron="crontabValueObj"
+          ref="cronmonth"
+        />
+      </el-tab-pane>
+
+      <el-tab-pane label="周" v-if="shouldHide('week')">
+        <CrontabWeek
+          @update="updateCrontabValue"
+          :check="checkNumber"
+          :cron="crontabValueObj"
+          ref="cronweek"
+        />
+      </el-tab-pane>
+
+      <el-tab-pane label="年" v-if="shouldHide('year')">
+        <CrontabYear
+          @update="updateCrontabValue"
+          :check="checkNumber"
+          :cron="crontabValueObj"
+          ref="cronyear"
+        />
+      </el-tab-pane>
+    </el-tabs>
+
+    <div class="popup-main">
+      <div class="popup-result">
+        <p class="title">时间表达式</p>
+        <table>
+          <thead>
+            <th v-for="item of tabTitles" width="40" :key="item">{{ item }}</th>
+            <th>Cron 表达式</th>
+          </thead>
+          <tbody>
+            <td>
+              <span>{{ crontabValueObj.second }}</span>
+            </td>
+            <td>
+              <span>{{ crontabValueObj.min }}</span>
+            </td>
+            <td>
+              <span>{{ crontabValueObj.hour }}</span>
+            </td>
+            <td>
+              <span>{{ crontabValueObj.day }}</span>
+            </td>
+            <td>
+              <span>{{ crontabValueObj.month }}</span>
+            </td>
+            <td>
+              <span>{{ crontabValueObj.week }}</span>
+            </td>
+            <td>
+              <span>{{ crontabValueObj.year }}</span>
+            </td>
+            <td>
+              <span>{{ crontabValueString }}</span>
+            </td>
+          </tbody>
+        </table>
+      </div>
+      <CrontabResult :ex="crontabValueString" />
+
+      <div class="pop_btn">
+        <el-button type="primary" @click="submitFill">确定</el-button>
+        <el-button type="warning" @click="clearCron">重置</el-button>
+        <el-button @click="hidePopup">取消</el-button>
+      </div>
+    </div>
+  </div>
+</template>
 <style scoped>
 .pop_btn {
   text-align: center;
