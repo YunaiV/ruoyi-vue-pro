@@ -14,7 +14,8 @@
 
     <name>${project.artifactId}</name>
     <description>
-        visualization 模块，主要实现数据可视化报表等功能。
+        visualization 模块，主要实现数据可视化报表等功能：
+        1. 基于「积木报表」实现，打印设计、报表设计、图形设计、大屏设计等。
     </description>
     <dependencies>
         <dependency>
@@ -62,6 +63,12 @@
         <dependency>
             <groupId>org.jeecgframework.jimureport</groupId>
             <artifactId>jimureport-spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mongodb-driver-sync</artifactId> <!-- 暂时不使用 MongoDB -->
+                    <groupId>org.mongodb</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>
