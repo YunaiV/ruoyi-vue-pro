@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import { ref, unref, onMounted } from 'vue'
 import { ContentDetailWrap } from '@/components/ContentDetailWrap'
-import BasicInfoForm from './BasicInfoForm.vue'
-import CloumInfoFormVue from './CloumInfoForm.vue'
-import GenInfoFormVue from './GenInfoForm.vue'
-import { ElTabs, ElTabPane, ElButton } from 'element-plus'
-import { getCodegenTableApi } from '@/api/infra/codegen'
+import { BasicInfoForm, CloumInfoForm, GenInfoForm } from './components'
+import { ElTabs, ElTabPane, ElButton, ElMessage } from 'element-plus'
+import { getCodegenTableApi, updateCodegenTableApi } from '@/api/infra/codegen'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
-import { CodegenColumnVO, CodegenTableVO } from '@/api/infra/codegen/types'
+import { CodegenTableVO, CodegenColumnVO, CodegenUpdateReqVO } from '@/api/infra/codegen/types'
 const { t } = useI18n()
 const { push } = useRouter()
 const { query } = useRoute()
-const tableCurrentRow = ref<Nullable<CodegenTableVO>>(null)
+const tableCurrentRow = ref<CodegenTableVO>()
 const cloumCurrentRow = ref<CodegenColumnVO[]>()
 const getList = async () => {
   const id = query.id as unknown as number
@@ -26,17 +24,23 @@ const getList = async () => {
 const loading = ref(false)
 const activeName = ref('cloum')
 const basicInfoRef = ref<ComponentRef<typeof BasicInfoForm>>()
-const genInfoRef = ref<ComponentRef<typeof GenInfoFormVue>>()
+const genInfoRef = ref<ComponentRef<typeof GenInfoForm>>()
+const cloumInfoRef = ref(null)
 const submitForm = async () => {
   const basicInfo = unref(basicInfoRef)
   const genInfo = unref(genInfoRef)
-  const basicValidate = await basicInfo?.elFormRef?.validate()?.catch(() => {})
-  const genValidate = await genInfo?.elFormRef?.validate()?.catch(() => {})
-  if (basicValidate && genValidate) {
+  const basicForm = await basicInfo?.elFormRef?.validate()?.catch(() => {})
+  const genForm = await genInfo?.elFormRef?.validate()?.catch(() => {})
+  if (basicForm && genForm) {
     const basicInfoData = (await basicInfo?.getFormData()) as CodegenTableVO
     const genInfoData = (await genInfo?.getFormData()) as CodegenTableVO
-    console.info(basicInfoData)
-    console.info(genInfoData)
+    const genTable: CodegenUpdateReqVO = {
+      table: Object.assign({}, basicInfoData, genInfoData),
+      columns: cloumCurrentRow.value
+    }
+    await updateCodegenTableApi(genTable)
+    ElMessage.success(t('common.updateSuccess'))
+    push('/infra/codegen')
   }
 }
 onMounted(() => {
@@ -46,14 +50,14 @@ onMounted(() => {
 <template>
   <ContentDetailWrap title="代码生成" @back="push('/infra/codegen')">
     <el-tabs v-model="activeName">
-      <el-tab-pane label="基本信息" name="basic">
-        <BasicInfoForm ref="basicInfoRef" :current-row="tableCurrentRow" />
+      <el-tab-pane label="基本信息" name="basicInfo">
+        <BasicInfoForm ref="basicInfoRef" :basicInfo="tableCurrentRow" />
       </el-tab-pane>
       <el-tab-pane label="字段信息" name="cloum">
-        <CloumInfoFormVue ref="cloumInfoRef" :current-row="cloumCurrentRow" />
+        <CloumInfoForm ref="cloumInfoRef" :info="cloumCurrentRow" />
       </el-tab-pane>
       <el-tab-pane label="生成信息" name="genInfo">
-        <GenInfoFormVue ref="basicInfoRef" :current-row="tableCurrentRow" />
+        <GenInfoForm ref="genInfoRef" :genInfo="tableCurrentRow" />
       </el-tab-pane>
     </el-tabs>
     <template #right>

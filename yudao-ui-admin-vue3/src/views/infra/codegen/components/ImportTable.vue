@@ -21,8 +21,8 @@ const emit = defineEmits(['ok'])
 const visible = ref(false)
 const dbLoading = ref(true)
 const queryParams = reactive({
-  tableName: undefined,
-  tableComment: undefined,
+  name: undefined,
+  comment: undefined,
   dataSourceConfigId: 0
 })
 const dataSourceConfigs = ref<DataSourceConfigVO[]>([])
@@ -49,8 +49,9 @@ const handleQuery = async () => {
 }
 // 重置操作
 const resetQuery = async () => {
-  queryParams.tableName = undefined
-  queryParams.tableComment = undefined
+  queryParams.name = undefined
+  queryParams.comment = undefined
+  queryParams.dataSourceConfigId = 0
   await getList()
 }
 /** 多选框选中数据 */
@@ -90,11 +91,11 @@ defineExpose({
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="表名称" prop="tableName">
-        <el-input v-model="queryParams.tableName" placeholder="请输入表名称" clearable />
+      <el-form-item label="表名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入表名称" clearable />
       </el-form-item>
-      <el-form-item label="表描述" prop="tableComment">
-        <el-input v-model="queryParams.tableComment" placeholder="请输入表描述" clearable />
+      <el-form-item label="表描述" prop="comment">
+        <el-input v-model="queryParams.comment" placeholder="请输入表描述" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleQuery">

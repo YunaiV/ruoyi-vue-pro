@@ -1,5 +1,5 @@
 import { useAxios } from '@/hooks/web/useAxios'
-import type { CodegenTableVO } from './types'
+import type { CodegenUpdateReqVO, CodegenCreateListReqVO } from './types'
 
 const request = useAxios()
 
@@ -14,12 +14,12 @@ export const getCodegenTableApi = (id: number) => {
 }
 
 // 新增代码生成表定义
-export const createCodegenTableApi = (data: CodegenTableVO) => {
+export const createCodegenTableApi = (data: CodegenCreateListReqVO) => {
   return request.post({ url: '/infra/codegen/create', data })
 }
 
 // 修改代码生成表定义
-export const updateCodegenTableApi = (data: CodegenTableVO) => {
+export const updateCodegenTableApi = (data: CodegenUpdateReqVO) => {
   return request.put({ url: '/infra/codegen/update', data })
 }
 

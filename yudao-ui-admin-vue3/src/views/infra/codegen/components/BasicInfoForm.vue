@@ -5,7 +5,7 @@ import { CodegenTableVO } from '@/api/infra/codegen/types'
 import { Form } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 const props = defineProps({
-  currentRow: {
+  basicInfo: {
     type: Object as PropType<Nullable<CodegenTableVO>>,
     default: () => null
   }
@@ -66,11 +66,11 @@ const { register, methods, elFormRef } = useForm({
   schema
 })
 watch(
-  () => props.currentRow,
-  (currentRow) => {
-    if (!currentRow) return
+  () => props.basicInfo,
+  (basicInfo) => {
+    if (!basicInfo) return
     const { setValues } = methods
-    setValues(currentRow)
+    setValues(basicInfo)
   },
   {
     deep: true,
