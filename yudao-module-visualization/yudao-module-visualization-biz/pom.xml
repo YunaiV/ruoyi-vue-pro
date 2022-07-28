@@ -26,7 +26,7 @@
 
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-system-biz</artifactId>
+            <artifactId>yudao-module-system-api</artifactId>
             <version>${revision}</version>
         </dependency>
 
@@ -34,6 +34,10 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
         </dependency>
 
         <!-- Web 相关 -->
@@ -63,12 +67,6 @@
         <dependency>
             <groupId>org.jeecgframework.jimureport</groupId>
             <artifactId>jimureport-spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>mongodb-driver-sync</artifactId> <!-- 暂时不使用 MongoDB -->
-                    <groupId>org.mongodb</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
     </dependencies>
