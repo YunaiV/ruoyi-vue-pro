@@ -21,10 +21,6 @@ const { register, tableObject, methods } = useTable<TenantVO>({
 })
 const { getList, setSearchParams, delList, exportList } = methods
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('租户数据.xls')
-}
 // ========== 套餐 ==========
 const tenantPackageId = ref() // 套餐
 const tenantPackageOptions = ref<TenantPackageVO[]>([]) //套餐列表
@@ -129,7 +125,7 @@ onMounted(async () => {
         type="warning"
         v-hasPermi="['system:tenant:export']"
         :loading="tableObject.exportLoading"
-        @click="handleExport"
+        @click="exportList('租户数据.xls')"
       >
         <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
       </el-button>

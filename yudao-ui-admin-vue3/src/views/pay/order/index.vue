@@ -17,10 +17,6 @@ const { register, tableObject, methods } = useTable<OrderVO>({
   exportListApi: OrderApi.exportOrderApi
 })
 const { getList, setSearchParams, delList, exportList } = methods
-// 导出操作
-const handleExport = async () => {
-  await exportList('订单数据.xls')
-}
 // ========== CRUD 相关 ==========
 const actionLoading = ref(false) // 遮罩层
 const actionType = ref('') // 操作按钮的类型
@@ -100,7 +96,7 @@ getList()
         type="warning"
         v-hasPermi="['pay:order:export']"
         :loading="tableObject.exportLoading"
-        @click="handleExport"
+        @click="exportList('订单数据.xls')"
       >
         <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
       </el-button>

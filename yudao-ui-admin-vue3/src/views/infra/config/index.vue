@@ -19,11 +19,6 @@ const { register, tableObject, methods } = useTable<ConfigVO>({
 })
 const { getList, setSearchParams, delList, exportList } = methods
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('参数配置.xls')
-}
-
 // ========== CRUD 相关 ==========
 const actionLoading = ref(false) // 遮罩层
 const actionType = ref('') // 操作按钮的类型
@@ -103,7 +98,7 @@ getList()
         type="warning"
         v-hasPermi="['infra:config:export']"
         :loading="tableObject.exportLoading"
-        @click="handleExport"
+        @click="exportList('参数配置.xls')"
       >
         <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
       </el-button>

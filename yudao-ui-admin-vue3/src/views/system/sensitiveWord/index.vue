@@ -19,10 +19,6 @@ const { register, tableObject, methods } = useTable<SensitiveWordVO>({
 })
 const { getList, setSearchParams, delList, exportList } = methods
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('敏感词数据.xls')
-}
 // 获取标签
 const tagsOptions = ref()
 const getTags = async () => {
@@ -111,7 +107,7 @@ onMounted(async () => {
         type="warning"
         v-hasPermi="['system:post:export']"
         :loading="tableObject.exportLoading"
-        @click="handleExport"
+        @click="exportList('敏感词数据.xls')"
       >
         <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
       </el-button>

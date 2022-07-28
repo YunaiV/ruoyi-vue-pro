@@ -17,11 +17,6 @@ const { register, tableObject, methods } = useTable<RefundVO>({
 })
 const { getList, setSearchParams, delList, exportList } = methods
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('退款订单.xls')
-}
-
 // ========== CRUD 相关 ==========
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
@@ -53,7 +48,7 @@ getList()
         type="warning"
         v-hasPermi="['system:post:export']"
         :loading="tableObject.exportLoading"
-        @click="handleExport"
+        @click="exportList('退款订单.xls')"
       >
         <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
       </el-button>
