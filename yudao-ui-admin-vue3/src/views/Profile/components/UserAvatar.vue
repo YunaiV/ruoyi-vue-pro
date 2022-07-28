@@ -2,7 +2,7 @@
 import { ref, reactive, watch } from 'vue'
 import 'vue-cropper/dist/index.css'
 import { VueCropper } from 'vue-cropper'
-import { ElRow, ElCol, ElUpload, ElMessage } from 'element-plus'
+import { ElRow, ElCol, ElUpload, ElMessage, ElDialog } from 'element-plus'
 import { propTypes } from '@/utils/propTypes'
 import { uploadAvatarApi } from '@/api/system/user/profile'
 const cropper = ref()
@@ -43,6 +43,8 @@ const changeScale = (num: number) => {
   num = num || 1
   cropper.value.changeScale(num)
 }
+// 覆盖默认的上传行为
+const requestUpload = () => {}
 /** 上传预处理 */
 const beforeUpload = (file: Blob) => {
   if (file.type.indexOf('image/') == -1) {
@@ -84,7 +86,7 @@ watch(
   <div class="user-info-head" @click="editCropper()">
     <img :src="state.options.img" title="点击上传头像" class="img-circle img-lg" alt="" />
   </div>
-  <Dialog
+  <el-dialog
     v-model="state.dialogVisible"
     :title="state.dialogTitle"
     width="50%"
@@ -92,7 +94,7 @@ watch(
     style="padding: 30px 20px"
   >
     <el-row>
-      <el-col :xs="24" :md="12" :style="{ height: '350px' }">
+      <el-col :xs="24" :md="12" style="height: 350px">
         <VueCropper
           ref="cropper"
           :img="state.options.img"
@@ -105,7 +107,7 @@ watch(
           v-if="state.cropperVisible"
         />
       </el-col>
-      <el-col :xs="24" :md="12" :style="{ height: '350px' }">
+      <el-col :xs="24" :md="12" style="height: 350px">
         <div class="avatar-upload-preview">
           <img
             :src="state.previews.url"
@@ -119,7 +121,12 @@ watch(
     <template #footer>
       <el-row>
         <el-col :lg="2" :md="2">
-          <el-upload action="#" :show-file-list="false" :before-upload="beforeUpload">
+          <el-upload
+            action="#"
+            :http-request="requestUpload"
+            :show-file-list="false"
+            :before-upload="beforeUpload"
+          >
             <el-button size="small">
               <Icon icon="ep:upload-filled" class="mr-5px" />
               选择
@@ -151,7 +158,7 @@ watch(
         </el-col>
       </el-row>
     </template>
-  </Dialog>
+  </el-dialog>
 </template>
 <style scoped>
 .user-info-head {
