@@ -72,7 +72,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
     children: [
       {
         path: 'edit',
-        component: () => import('@/views/infra/codegen/components/EditTable.vue'),
+        component: () => import('@/views/infra/codegen/EditTable.vue'),
         name: 'EditTable',
         meta: {
           noCache: true,

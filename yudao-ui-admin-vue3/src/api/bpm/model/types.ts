@@ -1,3 +1,10 @@
+export type ProcessDefinitionVO = {
+  id: string
+  version: number
+  deploymentTIme: string
+  suspensionState: number
+}
+
 export type ModelVO = {
   id: number
   formName: string
@@ -9,6 +16,7 @@ export type ModelVO = {
   formId: number
   formCustomCreatePath: string
   formCustomViewPath: string
+  processDefinition: ProcessDefinitionVO
   status: number
   remark: string
   createTime: string
