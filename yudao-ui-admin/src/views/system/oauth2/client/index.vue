@@ -206,10 +206,8 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
       // 执行查询
-      getOAuth2ClientPage(params).then(response => {
+      getOAuth2ClientPage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;

@@ -131,7 +131,7 @@ export default {
     getList() {
       this.loading = true;
       // 执行查询
-      getFilePage(params).then(response => {
+      getFilePage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;

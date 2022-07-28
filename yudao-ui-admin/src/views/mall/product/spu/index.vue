@@ -571,7 +571,7 @@
             getList() {
                 this.loading = true;
                 // 执行查询
-                getSpuPage(params).then(response => {
+                getSpuPage(this.queryParams).then(response => {
                     this.list = response.data.list;
                     this.total = response.data.total;
                     this.loading = false;
