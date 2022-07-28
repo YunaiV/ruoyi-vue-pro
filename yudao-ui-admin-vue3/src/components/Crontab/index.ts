@@ -1,3 +1,2 @@
-import Crontab from './src/index.vue'
-
+import Crontab from './src/Crontab.vue'
 export { Crontab }
