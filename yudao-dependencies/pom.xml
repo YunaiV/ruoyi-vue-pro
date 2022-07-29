@@ -41,7 +41,6 @@
         <jedis-mock.version>0.1.16</jedis-mock.version>
         <mockito-inline.version>4.0.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
-        <activiti.version>7.1.0.M6</activiti.version>
         <flowable.version>6.7.0</flowable.version>
         <!-- 工具类相关 -->
         <jasypt-spring-boot-starter.version>3.0.4</jasypt-spring-boot-starter.version>
@@ -376,41 +375,6 @@
             </dependency>
 
             <!-- 工作流相关 -->
-            <dependency>
-                <groupId>org.activiti</groupId>
-                <artifactId>activiti-spring-boot-starter</artifactId>
-                <version>${activiti.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>de.odysseus.juel</groupId>
-                        <artifactId>juel-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>de.odysseus.juel</groupId>
-                        <artifactId>juel-spi</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.mybatis</groupId>
-                        <artifactId>mybatis</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>el-api</artifactId>
-                        <groupId>javax.el</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.activiti</groupId>
-                <artifactId>activiti-image-generator</artifactId>
-                <version>${activiti.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-activiti</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <!-- 工作流相关 flowable -->
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-flowable</artifactId>

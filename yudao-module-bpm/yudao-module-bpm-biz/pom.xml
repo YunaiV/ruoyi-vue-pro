@@ -12,9 +12,9 @@
 
     <name>${project.artifactId}</name>
     <description>
-        bpm-base 模块，实现公用的工作流的逻辑，提供给 bpm-activiti 和 bpm-flowable 复用
+        bpm 包下，业务流程管理（Business Process Management），我们放工作流的功能，基于 Flowable 6 版本实现。
+        例如说：流程定义、表单配置、审核中心（我的申请、我的待办、我的已办）等等
     </description>
-
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
