@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, unref } from 'vue'
+import { onMounted, reactive, ref, unref } from 'vue'
 import dayjs from 'dayjs'
 import { DICT_TYPE, getDictOptions } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
@@ -18,7 +18,7 @@ import {
   ElMessage,
   ElTree,
   ElCard,
-  ElCheckbox
+  ElSwitch
 } from 'element-plus'
 import { listSimpleMenusApi } from '@/api/system/menu'
 import { listSimpleDeptApi } from '@/api/system/dept'
@@ -98,7 +98,6 @@ const dataScopeForm = reactive({
   name: '',
   code: '',
   dataScope: 0,
-  checkStrictly: true,
   checkList: []
 })
 const defaultProps = {
@@ -113,15 +112,18 @@ const dialogScopeTitle = ref('数据权限')
 const actionScopeType = ref('')
 const dataScopeDictDatas = ref()
 // 选项
+const checkStrictly = ref(true)
 const treeNodeAll = ref(false)
 // 权限操作
 const handleScope = async (type: string, row: RoleVO) => {
+  checkStrictly.value = true
+  treeNodeAll.value = false
+  dataScopeForm.dataScope = 0
   dataScopeForm.name = row.name
   dataScopeForm.code = row.code
   if (type === 'menu') {
     const menuRes = await listSimpleMenusApi()
     treeOptions.value = handleTree(menuRes)
-    dataScopeDictDatas.value = getDictOptions(DICT_TYPE.SYSTEM_DATA_SCOPE)
   } else if (type === 'dept') {
     const deptRes = await listSimpleDeptApi()
     treeOptions.value = handleTree(deptRes)
@@ -129,20 +131,22 @@ const handleScope = async (type: string, row: RoleVO) => {
   actionScopeType.value = type
   dialogScopeVisible.value = true
 }
-// 树权限（父子联动）
-const handleCheckedTreeConnect = (value) => {
-  dataScopeForm.checkStrictly = value ? true : false
-}
 // 全选/全不选
-const handleCheckedTreeNodeAll = (value) => {
-  treeRef.value?.setCheckedNodes(value ? dataScopeForm.checkList : [])
+const handleCheckedTreeNodeAll = () => {
+  treeRef.value?.setCheckedNodes(treeNodeAll.value ? treeOptions.value : [])
 }
 // TODO:保存
 const submitScope = () => {
   console.info()
 }
+const init = () => {
+  dataScopeDictDatas.value = getDictOptions(DICT_TYPE.SYSTEM_DATA_SCOPE)
+}
 // ========== 初始化 ==========
-getList()
+onMounted(() => {
+  getList()
+  init()
+})
 </script>
 
 <template>
@@ -261,7 +265,7 @@ getList()
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
   </Dialog>
-  <Dialog v-model="dialogScopeVisible" :title="dialogScopeTitle">
+  <Dialog v-model="dialogScopeVisible" :title="dialogScopeTitle" max-height="600px">
     <el-form :model="dataScopeForm">
       <el-form-item label="角色名称">
         <el-input v-model="dataScopeForm.name" :disabled="true" />
@@ -289,21 +293,23 @@ getList()
       >
         <el-card class="box-card">
           <template #header>
-            <el-checkbox
-              :checked="!dataScopeForm.checkStrictly"
-              @change="handleCheckedTreeConnect($event)"
-              >父子联动(选中父节点，自动选择子节点)
-            </el-checkbox>
-            <el-checkbox v-model="treeNodeAll" @change="handleCheckedTreeNodeAll($event)">
-              全选/全不选
-            </el-checkbox>
+            父子联动(选中父节点，自动选择子节点):
+            <el-switch v-model="checkStrictly" inline-prompt active-text="是" inactive-text="否" />
+            全选/全不选:
+            <el-switch
+              v-model="treeNodeAll"
+              inline-prompt
+              active-text="是"
+              inactive-text="否"
+              @change="handleCheckedTreeNodeAll()"
+            />
           </template>
           <el-tree
             ref="treeRef"
             node-key="id"
             show-checkbox
             default-expand-all
-            :check-strictly="dataScopeForm.checkStrictly"
+            :check-strictly="!checkStrictly"
             :props="defaultProps"
             :data="treeOptions"
             empty-text="加载中，请稍后"
