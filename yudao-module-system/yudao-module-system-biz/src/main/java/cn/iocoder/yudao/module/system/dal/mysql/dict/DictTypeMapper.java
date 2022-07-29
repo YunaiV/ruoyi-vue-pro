@@ -19,7 +19,7 @@ public interface DictTypeMapper extends BaseMapperX<DictTypeDO> {
                 .likeIfPresent(DictTypeDO::getName, reqVO.getName())
                 .likeIfPresent(DictTypeDO::getType, reqVO.getType())
                 .eqIfPresent(DictTypeDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(DictTypeDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(DictTypeDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(DictTypeDO::getId));
     }
 
@@ -28,7 +28,7 @@ public interface DictTypeMapper extends BaseMapperX<DictTypeDO> {
                 .likeIfPresent(DictTypeDO::getName, reqVO.getName())
                 .likeIfPresent(DictTypeDO::getType, reqVO.getType())
                 .eqIfPresent(DictTypeDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(DictTypeDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime()));
+                .betweenIfPresent(DictTypeDO::getCreateTime, reqVO.getCreateTime()));
     }
 
     default DictTypeDO selectByType(String type) {

@@ -171,15 +171,16 @@ export default {
     sunday: '周日'
   },
   workplace: {
-    goodMorning: '早安',
+    welcome: '你好',
     happyDay: '祝你开心每一天!',
     toady: '今日晴',
+    notice: '通知公告',
     project: '项目数',
     access: '项目访问',
     toDo: '待办',
     introduction: '一个正经的简介',
     more: '更多',
-    shortcutOperation: '快捷操作',
+    shortcutOperation: '快捷入口',
     operation: '操作',
     index: '指数',
     personal: '个人',

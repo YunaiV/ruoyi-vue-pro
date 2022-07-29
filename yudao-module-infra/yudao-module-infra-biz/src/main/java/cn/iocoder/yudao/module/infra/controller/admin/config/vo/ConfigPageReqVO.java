@@ -27,12 +27,8 @@ public class ConfigPageReqVO extends PageParam {
     @ApiModelProperty(value = "参数类型", example = "1", notes = "参见 SysConfigTypeEnum 枚举")
     private Integer type;
 
-    @ApiModelProperty(value = "开始时间", example = "2020-10-24 00:00:00")
+    @ApiModelProperty(value = "创建时间", example = "[2022-07-01 00:00:00,2022-07-01 23:59:59]")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date beginTime;
-
-    @ApiModelProperty(value = "结束时间", example = "2020-10-24 23:59:59")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date endTime;
+    private Date[] createTime;
 
 }

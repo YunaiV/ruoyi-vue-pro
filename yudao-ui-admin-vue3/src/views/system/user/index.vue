@@ -3,7 +3,6 @@ import { onMounted, ref, unref, watch } from 'vue'
 import dayjs from 'dayjs'
 import {
   ElInput,
-  ElMessage,
   ElCard,
   ElTree,
   ElTreeSelect,
@@ -14,7 +13,6 @@ import {
   ElUpload,
   ElSwitch,
   ElCheckbox,
-  ElMessageBox,
   UploadInstance,
   UploadRawFile
 } from 'element-plus'
@@ -32,6 +30,8 @@ import * as UserApi from '@/api/system/user'
 import download from '@/utils/download'
 import { CommonStatusEnum } from '@/utils/constants'
 import { getAccessToken, getTenantId } from '@/utils/auth'
+import { useMessage } from '@/hooks/web/useMessage'
+const message = useMessage()
 interface Tree {
   id: number
   name: string
@@ -127,10 +127,10 @@ const submitForm = async () => {
     data.postIds = postIds.value
     if (actionType.value === 'create') {
       await UserApi.createUserApi(data)
-      ElMessage.success(t('common.createSuccess'))
+      message.success(t('common.createSuccess'))
     } else {
       await UserApi.updateUserApi(data)
-      ElMessage.success(t('common.updateSuccess'))
+      message.success(t('common.updateSuccess'))
     }
     // 操作成功，重新加载列表
     dialogVisible.value = false
@@ -142,16 +142,13 @@ const submitForm = async () => {
 // 改变用户状态操作
 const handleStatusChange = async (row: UserVO) => {
   const text = row.status === CommonStatusEnum.ENABLE ? '启用' : '停用'
-  ElMessageBox.confirm('确认要"' + text + '""' + row.username + '"用户吗?', t('common.reminder'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel'),
-    type: 'warning'
-  })
+  message
+    .confirm('确认要"' + text + '""' + row.username + '"用户吗?', t('common.reminder'))
     .then(async () => {
       row.status =
         row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.ENABLE : CommonStatusEnum.DISABLE
       await UserApi.updateUserStatusApi(row.id, row.status)
-      ElMessage.success(text + '成功')
+      message.success(text + '成功')
       await getList()
     })
     .catch(() => {
@@ -161,23 +158,11 @@ const handleStatusChange = async (row: UserVO) => {
 }
 // 重置密码
 const handleResetPwd = (row: UserVO) => {
-  ElMessageBox.prompt('请输入"' + row.username + '"的新密码', t('common.reminder'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel')
-  }).then(({ value }) => {
+  message.prompt('请输入"' + row.username + '"的新密码', t('common.reminder')).then(({ value }) => {
     UserApi.resetUserPwdApi(row.id, value).then(() => {
-      ElMessage.success('修改成功，新密码是：' + value)
+      message.success('修改成功，新密码是：' + value)
     })
   })
-}
-// 删除操作
-const handleDelete = (row: UserVO) => {
-  delList(row.id, false)
-}
-
-// 导出操作
-const handleExport = async () => {
-  await exportList('用户数据.xls')
 }
 
 // ========== 详情相关 ==========
@@ -207,8 +192,8 @@ const beforeExcelUpload = (file: UploadRawFile) => {
     file.type === 'application/vnd.ms-excel' ||
     file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   const isLt5M = file.size / 1024 / 1024 < 5
-  if (!isExcel) ElMessage.error('上传文件只能是 xls / xlsx 格式!')
-  if (!isLt5M) ElMessage.error('上传文件大小不能超过 5MB!')
+  if (!isExcel) message.error('上传文件只能是 xls / xlsx 格式!')
+  if (!isLt5M) message.error('上传文件大小不能超过 5MB!')
   return isExcel && isLt5M
 }
 // 文件上传
@@ -224,7 +209,7 @@ const submitFileForm = () => {
 // 文件上传成功
 const handleFileSuccess = (response: any): void => {
   if (response.code !== 0) {
-    ElMessage.error(response.msg)
+    message.error(response.msg)
     return
   }
   importDialogVisible.value = false
@@ -242,15 +227,15 @@ const handleFileSuccess = (response: any): void => {
   for (const username in data.failureUsernames) {
     text += '< ' + username + ': ' + data.failureUsernames[username] + ' >'
   }
-  ElMessageBox.alert(text)
+  message.alert(text)
 }
 // 文件数超出提示
 const handleExceed = (): void => {
-  ElMessage.error('最多只能上传一个文件！')
+  message.error('最多只能上传一个文件！')
 }
 // 上传错误提示
 const excelUploadError = (): void => {
-  ElMessage.error('导入数据失败，请您重新上传！')
+  message.error('导入数据失败，请您重新上传！')
 }
 // ========== 初始化 ==========
 onMounted(async () => {
@@ -306,7 +291,11 @@ getList()
         >
           <Icon icon="ep:upload" class="mr-5px" /> {{ t('action.import') }}
         </el-button>
-        <el-button type="warning" v-hasPermi="['system:user:export']" @click="handleExport">
+        <el-button
+          type="warning"
+          v-hasPermi="['system:user:export']"
+          @click="exportList('用户数据.xls')"
+        >
           <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
         </el-button>
       </div>
@@ -366,7 +355,7 @@ getList()
             link
             type="primary"
             v-hasPermi="['system:user:delete']"
-            @click="handleDelete(row)"
+            @click="delList(row.id, false)"
           >
             <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
           </el-button>
@@ -392,7 +381,7 @@ getList()
         />
       </template>
       <template #postIds>
-        <el-select v-model="postIds" multiple placeholder="Select">
+        <el-select v-model="postIds" multiple :placeholder="t('common.selectText')">
           <el-option
             v-for="item in postOptions"
             :key="item.id"

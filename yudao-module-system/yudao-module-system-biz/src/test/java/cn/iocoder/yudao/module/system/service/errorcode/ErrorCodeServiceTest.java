@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -95,8 +96,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
        reqVO.setApplicationName("tu");
        reqVO.setCode(1);
        reqVO.setMessage("ma");
-       reqVO.setBeginCreateTime(buildTime(2020, 11, 1));
-       reqVO.setEndCreateTime(buildTime(2020, 11, 30));
+       reqVO.setCreateTime((new Date[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
 
        // 调用
        PageResult<ErrorCodeDO> pageResult = errorCodeService.getErrorCodePage(reqVO);
@@ -141,8 +141,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
         reqVO.setApplicationName("tu");
         reqVO.setCode(1);
         reqVO.setMessage("ma");
-        reqVO.setBeginCreateTime(buildTime(2020, 11, 1));
-        reqVO.setEndCreateTime(buildTime(2020, 11, 30));
+        reqVO.setCreateTime((new Date[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
 
         // 调用
         List<ErrorCodeDO> list = errorCodeService.getErrorCodeList(reqVO);

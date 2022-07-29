@@ -8,7 +8,8 @@ import type { ApiErrorLogVO } from '@/api/infra/apiErrorLog/types'
 import { allSchemas } from './apiErrorLog.data'
 import * as ApiErrorLogApi from '@/api/infra/apiErrorLog'
 import { InfraApiErrorLogProcessStatusEnum } from '@/utils/constants'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { useMessage } from '@/hooks/web/useMessage'
+const message = useMessage()
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
@@ -22,10 +23,6 @@ const { getList, setSearchParams, exportList } = methods
 const detailRef = ref() // 详情 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('') // 弹出层标题
-// 导出操作
-const handleExport = async () => {
-  await exportList('用户数据.xls')
-}
 
 // 详情操作
 const handleDetail = (row: ApiErrorLogVO) => {
@@ -36,14 +33,11 @@ const handleDetail = (row: ApiErrorLogVO) => {
 }
 // 异常处理操作
 const handleProcessClick = (row: ApiErrorLogVO, processSttatus: number, type: string) => {
-  ElMessageBox.confirm('确认标记为' + type + '?', t('common.reminder'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel'),
-    type: 'warning'
-  })
+  message
+    .confirm('确认标记为' + type + '?', t('common.reminder'))
     .then(async () => {
       ApiErrorLogApi.updateApiErrorLogPageApi(row.id, processSttatus).then(() => {
-        ElMessage.success(t('common.updateSuccess'))
+        message.success(t('common.updateSuccess'))
         getList()
       })
     })
@@ -59,7 +53,7 @@ getList()
     <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
   </ContentWrap>
   <ContentWrap>
-    <el-button v-hasPermi="['infra:api-error-log:export']" @click="handleExport">
+    <el-button v-hasPermi="['infra:api-error-log:export']" @click="exportList('错误数据.xls')">
       <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
     </el-button>
     <!-- 列表 -->

@@ -8,5 +8,5 @@ export const getOperateLogPageApi = (params) => {
 }
 // 导出操作日志
 export const exportOperateLogApi = (params) => {
-  return request.get({ url: '/system/operate-log/export', params, responseType: 'blob' })
+  return request.download({ url: '/system/operate-log/export', params })
 }

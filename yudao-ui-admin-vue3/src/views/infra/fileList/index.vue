@@ -69,10 +69,6 @@ const excelUploadError = (): void => {
 const detailRef = ref() // 详情 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('') // 弹出层标题
-// 删除操作
-const handleDelete = (row: FileVO) => {
-  delList(row.id, false)
-}
 // 详情操作
 const handleDetail = (row: FileVO) => {
   // 设置数据
@@ -128,7 +124,7 @@ getList()
           link
           type="primary"
           v-hasPermi="['infra:file:delete']"
-          @click="handleDelete(row)"
+          @click="delList(row.id, false)"
         >
           <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>

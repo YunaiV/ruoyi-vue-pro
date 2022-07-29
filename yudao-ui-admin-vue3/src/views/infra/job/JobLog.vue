@@ -25,10 +25,6 @@ const getTableList = async () => {
   }
   await getList()
 }
-// 导出操作
-const handleExport = async () => {
-  await exportList('定时任务日志.xls')
-}
 
 // ========== CRUD 相关 ==========
 const dialogVisible = ref(false) // 是否显示弹出层
@@ -63,7 +59,7 @@ onMounted(() => {
         type="warning"
         v-hasPermi="['infra:job:export']"
         :loading="tableObject.exportLoading"
-        @click="handleExport"
+        @click="exportList('定时任务日志.xls')"
       >
         <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
       </el-button>

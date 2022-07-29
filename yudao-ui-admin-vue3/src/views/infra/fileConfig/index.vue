@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, unref } from 'vue'
 import dayjs from 'dayjs'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -9,6 +8,8 @@ import { FormExpose } from '@/components/Form'
 import type { FileConfigVO } from '@/api/infra/fileConfig/types'
 import { rules, allSchemas } from './fileConfig.data'
 import * as FileConfigApi from '@/api/infra/fileConfig'
+import { useMessage } from '@/hooks/web/useMessage'
+const message = useMessage()
 const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
@@ -49,16 +50,12 @@ const handleUpdate = async (row: FileConfigVO) => {
 
 // 主配置操作
 const handleMaster = (row: FileConfigVO) => {
-  ElMessageBox.confirm('是否确认修改配置【 ' + row.name + ' 】为主配置?', t('common.reminder'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel'),
-    type: 'warning'
-  })
+  message
+    .confirm('是否确认修改配置【 ' + row.name + ' 】为主配置?', t('common.reminder'))
     .then(async () => {
       await FileConfigApi.updateFileConfigMasterApi(row.id)
       await getList()
     })
-    .catch(() => {})
 }
 
 // 提交按钮
@@ -69,10 +66,10 @@ const submitForm = async () => {
     const data = unref(formRef)?.formModel as FileConfigVO
     if (actionType.value === 'create') {
       await FileConfigApi.createFileConfigApi(data)
-      ElMessage.success(t('common.createSuccess'))
+      message.success(t('common.createSuccess'))
     } else {
       await FileConfigApi.updateFileConfigApi(data)
-      ElMessage.success(t('common.updateSuccess'))
+      message.success(t('common.updateSuccess'))
     }
     // 操作成功，重新加载列表
     dialogVisible.value = false
@@ -80,11 +77,6 @@ const submitForm = async () => {
   } finally {
     actionLoading.value = false
   }
-}
-
-// 删除操作
-const handleDelete = (row: FileConfigVO) => {
-  delList(row.id, false)
 }
 
 // ========== 详情相关 ==========
@@ -172,7 +164,7 @@ getList()
           link
           type="primary"
           v-hasPermi="['infra:file-config:delete']"
-          @click="handleDelete(row)"
+          @click="delList(row.id, false)"
         >
           <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>

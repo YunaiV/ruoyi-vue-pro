@@ -7,10 +7,7 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
-import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmTaskAssignRuleMapper;
-import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmActivityMapper;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
@@ -67,10 +64,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     private BpmTaskExtMapper taskExtMapper;
     @Resource
     private BpmMessageService messageService;
-    @Resource
-    private BpmTaskAssignRuleMapper taskAssignRuleMapper;
-    @Resource
-    private BpmActivityMapper bpmActivityMapper;
 
     @Override
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
@@ -194,10 +187,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskExtMapper.updateByTaskId(
             new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.APPROVE.getResult())
                 .setReason(reqVO.getReason()));
-        // 判断任务是否为或签，或签时删除其余不用审批的任务
-        List<BpmTaskAssignRuleDO> bpmTaskAssignRuleList =
-            taskAssignRuleMapper.selectListByProcessDefinitionId(task.getProcessDefinitionId(),
-                task.getTaskDefinitionKey());
     }
 
     @Override
@@ -216,7 +205,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 更新任务拓展表为不通过
         taskExtMapper.updateByTaskId(
             new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.REJECT.getResult())
-                .setReason(reqVO.getReason()));
+                    .setEndTime(new Date()).setReason(reqVO.getReason()));
     }
 
     @Override

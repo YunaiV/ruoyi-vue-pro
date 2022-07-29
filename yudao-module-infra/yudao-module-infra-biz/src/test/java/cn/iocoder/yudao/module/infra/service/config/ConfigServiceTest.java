@@ -19,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -180,8 +181,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         reqVO.setName("艿");
         reqVO.setKey("nai");
         reqVO.setType(ConfigTypeEnum.SYSTEM.getType());
-        reqVO.setBeginTime(buildTime(2021, 1, 15));
-        reqVO.setEndTime(buildTime(2021, 2, 15));
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 15),buildTime(2021, 2, 15)}));
 
         // 调用
         PageResult<ConfigDO> pageResult = configService.getConfigPage(reqVO);
@@ -214,8 +214,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         reqVO.setName("艿");
         reqVO.setKey("nai");
         reqVO.setType(ConfigTypeEnum.SYSTEM.getType());
-        reqVO.setBeginTime(buildTime(2021, 1, 15));
-        reqVO.setEndTime(buildTime(2021, 2, 15));
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 15),buildTime(2021, 2, 15)}));
 
         // 调用
         List<ConfigDO> list = configService.getConfigList(reqVO);

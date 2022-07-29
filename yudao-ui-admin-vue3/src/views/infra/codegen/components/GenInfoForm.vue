@@ -4,9 +4,9 @@ import { required } from '@/utils/formRules'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
 import { Form } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
-import { DICT_TYPE, getDictOptions } from '@/utils/dict'
+import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 const props = defineProps({
-  currentRow: {
+  genInfo: {
     type: Object as PropType<Nullable<CodegenTableVO>>,
     default: () => null
   }
@@ -20,13 +20,15 @@ const rules = reactive({
   className: [required],
   classComment: [required]
 })
+const templateTypeOptions = getIntDictOptions(DICT_TYPE.INFRA_CODEGEN_TEMPLATE_TYPE)
+const sceneOptions = getIntDictOptions(DICT_TYPE.INFRA_CODEGEN_SCENE)
 const schema = reactive<FormSchema[]>([
   {
     label: '生成模板',
     field: 'templateType',
     component: 'Select',
     componentProps: {
-      options: getDictOptions(DICT_TYPE.INFRA_CODEGEN_TEMPLATE_TYPE)
+      options: templateTypeOptions
     },
     colProps: {
       span: 12
@@ -37,7 +39,7 @@ const schema = reactive<FormSchema[]>([
     field: 'scene',
     component: 'Select',
     componentProps: {
-      options: getDictOptions(DICT_TYPE.INFRA_CODEGEN_SCENE)
+      options: sceneOptions
     },
     colProps: {
       span: 12
@@ -47,6 +49,7 @@ const schema = reactive<FormSchema[]>([
     label: '模块名',
     field: 'moduleName',
     component: 'Input',
+    labelMessage: '模块名，即一级目录，例如 system、infra、tool 等等',
     colProps: {
       span: 12
     }
@@ -55,6 +58,7 @@ const schema = reactive<FormSchema[]>([
     label: '业务名',
     field: 'businessName',
     component: 'Input',
+    labelMessage: '业务名，即二级目录，例如 user、permission、dict 等等',
     colProps: {
       span: 12
     }
@@ -63,6 +67,7 @@ const schema = reactive<FormSchema[]>([
     label: '类名称',
     field: 'className',
     component: 'Input',
+    labelMessage: '类名称（首字母大写），例如SysUser、SysMenu、SysDictData 等等',
     colProps: {
       span: 12
     }
@@ -71,6 +76,7 @@ const schema = reactive<FormSchema[]>([
     label: '类描述',
     field: 'classComment',
     component: 'Input',
+    labelMessage: '用作类描述，例如 用户',
     colProps: {
       span: 12
     }
@@ -79,6 +85,7 @@ const schema = reactive<FormSchema[]>([
     label: '上级菜单',
     field: 'parentMenuId',
     component: 'Input',
+    labelMessage: '分配到指定菜单下，例如 系统管理',
     colProps: {
       span: 12
     }
@@ -88,11 +95,11 @@ const { register, methods, elFormRef } = useForm({
   schema
 })
 watch(
-  () => props.currentRow,
-  (currentRow) => {
-    if (!currentRow) return
+  () => props.genInfo,
+  (genInfo) => {
+    if (!genInfo) return
     const { setValues } = methods
-    setValues(currentRow)
+    setValues(genInfo)
   },
   {
     deep: true,

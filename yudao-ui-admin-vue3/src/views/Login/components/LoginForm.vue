@@ -47,11 +47,16 @@ const iconHouse = useIcon({ icon: 'ep:house' })
 const iconAvatar = useIcon({ icon: 'ep:avatar' })
 const iconLock = useIcon({ icon: 'ep:lock' })
 const iconCircleCheck = useIcon({ icon: 'ep:circle-check' })
-const LoginRules = {
+const LoginCaptchaRules = {
   tenantName: [required],
   username: [required],
   password: [required],
   code: [required]
+}
+const LoginRules = {
+  tenantName: [required],
+  username: [required],
+  password: [required]
 }
 const loginLoading = ref(false)
 const loginData = reactive({
@@ -76,8 +81,11 @@ const loginData = reactive({
 // 获取验证码
 const getCode = async () => {
   const res = await LoginApi.getCodeImgApi()
-  loginData.codeImg = 'data:image/gif;base64,' + res.img
-  loginData.loginForm.uuid = res.uuid
+  loginData.captchaEnable = res.enable
+  if (res.enable) {
+    loginData.codeImg = 'data:image/gif;base64,' + res.img
+    loginData.loginForm.uuid = res.uuid
+  }
 }
 //获取租户ID
 const getTenantId = async () => {
@@ -131,6 +139,17 @@ const getRoutes = async () => {
   permissionStore.setIsAddRouters(true)
   push({ path: redirect.value || permissionStore.addRouters[0].path })
 }
+
+// 社交登录
+const doSocialLogin = async (type: string) => {
+  loginLoading.value = true
+  // 计算 redirectUri
+  const redirectUri =
+    location.origin + '/social-login?type=' + type + '&redirect=' + (redirect.value || '/')
+  // 进行跳转
+  const res = await LoginApi.socialAuthRedirectApi(type, encodeURIComponent(redirectUri))
+  window.open = res
+}
 watch(
   () => currentRoute.value,
   (route: RouteLocationNormalizedLoaded) => {
@@ -148,7 +167,7 @@ onMounted(async () => {
 <template>
   <el-form
     :model="loginData.loginForm"
-    :rules="LoginRules"
+    :rules="loginData.captchaEnable ? LoginCaptchaRules : LoginRules"
     label-position="top"
     class="login-form"
     label-width="120px"
@@ -194,7 +213,7 @@ onMounted(async () => {
         </el-form-item>
       </el-col>
       <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item prop="code">
+        <el-form-item prop="code" v-if="loginData.captchaEnable">
           <el-row justify="space-between" style="width: 100%">
             <el-col :span="14">
               <el-input
@@ -267,24 +286,28 @@ onMounted(async () => {
               :size="iconSize"
               class="cursor-pointer anticon"
               :color="iconColor"
+              @click="doSocialLogin('github')"
             />
             <Icon
               icon="ant-design:wechat-filled"
               :size="iconSize"
               class="cursor-pointer anticon"
               :color="iconColor"
+              @click="doSocialLogin('wechat')"
             />
             <Icon
               icon="ant-design:alipay-circle-filled"
               :size="iconSize"
               :color="iconColor"
               class="cursor-pointer anticon"
+              @click="doSocialLogin('alipay')"
             />
             <Icon
               icon="ant-design:dingtalk-circle-filled"
               :size="iconSize"
               :color="iconColor"
               class="cursor-pointer anticon"
+              @click="doSocialLogin('dingtalk')"
             />
           </div>
         </el-form-item>

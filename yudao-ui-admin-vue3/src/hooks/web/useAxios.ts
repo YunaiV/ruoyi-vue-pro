@@ -37,12 +37,24 @@ async function putFn<T = any>(option: AxiosConfig): Promise<T> {
   const res = await request({ method: 'PUT', ...option })
   return res.data
 }
+async function downloadFn<T = any>(option: AxiosConfig): Promise<T> {
+  const res = await request({ method: 'GET', responseType: 'blob', ...option })
+  return res as unknown as Promise<T>
+}
+
+async function uploadFn<T = any>(option: AxiosConfig): Promise<T> {
+  option.headersType = 'multipart/form-data'
+  const res = await request({ method: 'PUT', ...option })
+  return res as unknown as Promise<T>
+}
 
 export const useAxios = () => {
   return {
     get: getFn,
     post: postFn,
     delete: deleteFn,
-    put: putFn
+    put: putFn,
+    download: downloadFn,
+    upload: uploadFn
   }
 }

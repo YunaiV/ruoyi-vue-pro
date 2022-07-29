@@ -6,11 +6,11 @@ import { useTable } from '@/hooks/web/useTable'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
 import { allSchemas } from './codegen.data'
 import { useI18n } from '@/hooks/web/useI18n'
-import ImportTable from './components/ImportTable.vue'
-import Preview from './components/Preview.vue'
+import { ImportTable, Preview } from './components'
 import download from '@/utils/download'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { useMessage } from '@/hooks/web/useMessage'
+const message = useMessage()
 const { t } = useI18n() // 国际化
 const { push } = useRouter()
 // ========== 列表相关 ==========
@@ -37,23 +37,17 @@ const handleEditTable = (row: CodegenTableVO) => {
 const handleSynchDb = (row: CodegenTableVO) => {
   // 基于 DB 同步
   const tableName = row.tableName
-  ElMessageBox.confirm('确认要强制同步' + tableName + '表结构吗?', t('common.reminder'), {
-    confirmButtonText: t('common.ok'),
-    cancelButtonText: t('common.cancel'),
-    type: 'warning'
-  }).then(async () => {
-    await CodegenApi.syncCodegenFromDBApi(row.id)
-    ElMessage.success('同步成功')
-  })
+  message
+    .confirm('确认要强制同步' + tableName + '表结构吗?', t('common.reminder'))
+    .then(async () => {
+      await CodegenApi.syncCodegenFromDBApi(row.id)
+      message.success('同步成功')
+    })
 }
 // 生成代码操作
-const handleGenTable = (row: CodegenTableVO) => {
-  const res = CodegenApi.downloadCodegenApi(row.id)
+const handleGenTable = async (row: CodegenTableVO) => {
+  const res = await CodegenApi.downloadCodegenApi(row.id)
   download.zip(res, 'codegen-' + row.className + '.zip')
-}
-// 删除操作
-const handleDelete = (row: CodegenTableVO) => {
-  delList(row.id, false)
 }
 // 查询操作
 const handleQuery = () => {
@@ -114,7 +108,7 @@ getList()
           link
           type="primary"
           v-hasPermi="['infra:codegen:delete']"
-          @click="handleDelete(row)"
+          @click="delList(row.id, false)"
         >
           <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
         </el-button>

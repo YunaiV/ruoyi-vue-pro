@@ -19,8 +19,8 @@ export const createJobApi = (data: JobVO) => {
 }
 
 // 修改定时任务调度
-export const updateJobApi = (params: JobVO) => {
-  return request.put({ url: '/infra/job/update', params })
+export const updateJobApi = (data: JobVO) => {
+  return request.put({ url: '/infra/job/update', data })
 }
 
 // 删除定时任务调度
@@ -30,16 +30,16 @@ export const deleteJobApi = (id: number) => {
 
 // 导出定时任务调度
 export const exportJobApi = (params) => {
-  return request.get({ url: '/infra/job/export-excel', params, responseType: 'blob' })
+  return request.download({ url: '/infra/job/export-excel', params })
 }
 
 // 任务状态修改
 export const updateJobStatusApi = (id: number, status: number) => {
-  const data = {
+  const params = {
     id,
     status
   }
-  return request.put({ url: '/infra/job/update-status', data: data })
+  return request.put({ url: '/infra/job/update-status', params })
 }
 
 // 定时任务立即执行一次

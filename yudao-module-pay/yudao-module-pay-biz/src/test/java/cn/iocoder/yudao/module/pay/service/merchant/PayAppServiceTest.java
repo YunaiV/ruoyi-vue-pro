@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
@@ -162,8 +163,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         reqVO.setPayNotifyUrl("https://www.hc.com");
         reqVO.setRefundNotifyUrl("https://www.xm.com");
         reqVO.setMerchantName(dbMerchant.getName());
-        reqVO.setBeginCreateTime(buildTime(2021,11,19));
-        reqVO.setEndCreateTime(buildTime(2021,11,21));
+        reqVO.setCreateTime((new Date[]{buildTime(2021,11,19),buildTime(2021,11,21)}));
 
         // 调用
         PageResult<PayAppDO> pageResult = appService.getAppPage(reqVO);
@@ -226,8 +226,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         reqVO.setPayNotifyUrl("https://www.hc.com");
         reqVO.setRefundNotifyUrl("https://www.xm.com");
         reqVO.setMerchantName(dbMerchant.getName());
-        reqVO.setBeginCreateTime(buildTime(2021,11,19));
-        reqVO.setEndCreateTime(buildTime(2021,11,21));
+        reqVO.setCreateTime((new Date[]{buildTime(2021,11,19),buildTime(2021,11,21)}));
 
         // 调用
         List<PayAppDO> list = appService.getAppList(reqVO);

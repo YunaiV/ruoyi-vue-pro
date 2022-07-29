@@ -22,9 +22,9 @@
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="发送时间">
-        <el-date-picker v-model="dateRangeSendTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+      <el-form-item label="发送时间" prop="sendTime">
+        <el-date-picker v-model="queryParams.sendTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item label="接收状态" prop="receiveStatus">
         <el-select v-model="queryParams.receiveStatus" placeholder="请选择接收状态" clearable>
@@ -32,9 +32,9 @@
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="接收时间">
-        <el-date-picker v-model="dateRangeReceiveTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+      <el-form-item label="接收时间" prop="receiveTime">
+        <el-date-picker v-model="queryParams.receiveTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -208,8 +208,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      dateRangeSendTime: [],
-      dateRangeReceiveTime: [],
       // 表单参数
       form: {},
       // 查询参数
@@ -221,6 +219,8 @@ export default {
         mobile: null,
         sendStatus: null,
         receiveStatus: null,
+        sendTime: [],
+        receiveTime: []
       },
       // 短信渠道
       channelOptions: [],
@@ -237,12 +237,8 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeSendTime, 'sendTime');
-      this.addBeginAndEndTime(params, this.dateRangeReceiveTime, 'receiveTime');
       // 执行查询
-      getSmsLogPage(params).then(response => {
+      getSmsLogPage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -260,8 +256,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeSendTime = [];
-      this.dateRangeReceiveTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -271,8 +265,6 @@ export default {
       let params = {...this.queryParams};
       params.pageNo = undefined;
       params.pageSize = undefined;
-      this.addBeginAndEndTime(params, this.dateRangeSendTime, 'sendTime');
-      this.addBeginAndEndTime(params, this.dateRangeReceiveTime, 'receiveTime');
       // 执行导出
       this.$modal.confirm('是否确认导出所有短信日志数据项?').then(() => {
         this.exportLoading = true;

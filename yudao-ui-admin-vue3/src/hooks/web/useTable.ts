@@ -1,14 +1,14 @@
 import download from '@/utils/download'
 import { Table, TableExpose } from '@/components/Table'
-import { ElTable, ElMessageBox, ElMessage } from 'element-plus'
-import { ref, reactive, watch, computed, unref, nextTick } from 'vue'
+import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
+import { computed, nextTick, reactive, ref, unref, watch } from 'vue'
 import type { TableProps } from '@/components/Table/src/types'
 import { useI18n } from '@/hooks/web/useI18n'
 
 const { t } = useI18n()
 interface ResponseType<T = any> {
   list: T[]
-  total?: string
+  total?: number
 }
 
 interface UseTableConfig<T = any> {
@@ -114,15 +114,13 @@ export const useTable = <T = any>(config?: UseTableConfig<T>) => {
     ElMessage.success(t('common.delSuccess'))
 
     // 计算出临界点
-    const currentPage =
+    tableObject.currentPage =
       tableObject.total % tableObject.pageSize === idsLength || tableObject.pageSize === 1
         ? tableObject.currentPage > 1
           ? tableObject.currentPage - 1
           : tableObject.currentPage
         : tableObject.currentPage
-
-    tableObject.currentPage = currentPage
-    methods.getList()
+    await methods.getList()
   }
 
   const methods = {
@@ -132,8 +130,10 @@ export const useTable = <T = any>(config?: UseTableConfig<T>) => {
         tableObject.loading = false
       })
       if (res) {
-        tableObject.tableList = res?.list
-        tableObject.total = res?.total
+        tableObject.tableList = (res as unknown as ResponseType).list
+        if ((res as unknown as ResponseType).total) {
+          tableObject.total = (res as unknown as ResponseType).total as unknown as number
+        }
       }
     },
     setProps: async (props: TableProps = {}) => {
@@ -194,7 +194,7 @@ export const useTable = <T = any>(config?: UseTableConfig<T>) => {
         .then(async () => {
           const res = await config?.exportListApi?.(unref(paramsObj) as unknown as T)
           if (res) {
-            download.excel(res, fileName)
+            download.excel(res as unknown as Blob, fileName)
           }
         })
         .finally(() => {

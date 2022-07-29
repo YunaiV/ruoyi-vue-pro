@@ -8,20 +8,21 @@ import {
   ElForm,
   ElFormItem,
   ElInput,
-  ElEmpty
+  ElSelect,
+  ElOption
 } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useEmitt } from '@/hooks/web/useEmitt'
 import { getDataSourceConfigListApi } from '@/api/infra/dataSourceConfig'
 import type { DataSourceConfigVO } from '@/api/infra/dataSourceConfig/types'
 import type { DatabaseTableVO } from '@/api/infra/codegen/types'
 const { t } = useI18n() // 国际化
-const { emitter } = useEmitt()
+const emit = defineEmits(['ok'])
 // ======== 显示页面 ========
 const visible = ref(false)
+const dbLoading = ref(true)
 const queryParams = reactive({
-  tableName: undefined,
-  tableComment: undefined,
+  name: undefined,
+  comment: undefined,
   dataSourceConfigId: 0
 })
 const dataSourceConfigs = ref<DataSourceConfigVO[]>([])
@@ -37,8 +38,10 @@ const dbTableList = ref<DatabaseTableVO[]>([])
 
 /** 查询表数据 */
 const getList = async () => {
+  dbLoading.value = true
   const res = await getSchemaTableListApi(queryParams)
   dbTableList.value = res
+  dbLoading.value = false
 }
 // 查询操作
 const handleQuery = async () => {
@@ -46,8 +49,9 @@ const handleQuery = async () => {
 }
 // 重置操作
 const resetQuery = async () => {
-  queryParams.tableName = undefined
-  queryParams.tableComment = undefined
+  queryParams.name = undefined
+  queryParams.comment = undefined
+  queryParams.dataSourceConfigId = 0
   await getList()
 }
 /** 多选框选中数据 */
@@ -56,19 +60,18 @@ const handleSelectionChange = (val: DatabaseTableVO[]) => {
   tables.value = val.map((item) => item.name)
 }
 /** 导入按钮操作 */
-const handleImportTable = () => {
+const handleImportTable = async () => {
   if (tables.value.length === 0) {
     ElMessage.error('请选择要导入的表')
     return
   }
-  createCodegenListApi({
+  await createCodegenListApi({
     dataSourceConfigId: queryParams.dataSourceConfigId,
     tableNames: tables.value
-  }).then((res) => {
-    ElMessage.success(res.msg)
-    visible.value = false
-    emitter.emit('ok')
   })
+  ElMessage.success('导入成功')
+  visible.value = false
+  emit('ok')
 }
 defineExpose({
   show
@@ -78,7 +81,7 @@ defineExpose({
   <!-- 导入表 -->
   <Dialog title="导入表" v-model="visible" maxHeight="500px" width="50%">
     <el-form :model="queryParams" ref="queryRef" :inline="true">
-      <!-- <el-form-item label="数据源" prop="dataSourceConfigId">
+      <el-form-item label="数据源" prop="dataSourceConfigId">
         <el-select v-model="queryParams.dataSourceConfigId" placeholder="请选择数据源" clearable>
           <el-option
             v-for="config in dataSourceConfigs"
@@ -87,12 +90,12 @@ defineExpose({
             :value="config.id"
           />
         </el-select>
-      </el-form-item> -->
-      <el-form-item label="表名称" prop="tableName">
-        <el-input v-model="queryParams.tableName" placeholder="请输入表名称" clearable />
       </el-form-item>
-      <el-form-item label="表描述" prop="tableComment">
-        <el-input v-model="queryParams.tableComment" placeholder="请输入表描述" clearable />
+      <el-form-item label="表名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入表名称" clearable />
+      </el-form-item>
+      <el-form-item label="表描述" prop="comment">
+        <el-input v-model="queryParams.comment" placeholder="请输入表描述" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleQuery">
@@ -109,11 +112,9 @@ defineExpose({
       ref="table"
       :data="dbTableList"
       @selection-change="handleSelectionChange"
+      v-loading="dbLoading"
       height="400px"
     >
-      <template #empty>
-        <el-empty description="加载中" />
-      </template>
       <el-table-column type="selection" width="55" />
       <el-table-column prop="name" label="表名称" :show-overflow-tooltip="true" />
       <el-table-column prop="comment" label="表描述" :show-overflow-tooltip="true" />

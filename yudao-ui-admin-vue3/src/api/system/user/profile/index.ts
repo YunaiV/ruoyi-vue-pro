@@ -24,6 +24,6 @@ export const updateUserPwdApi = (oldPassword: string, newPassword: string) => {
 }
 
 // 用户头像上传
-export const uploadAvatarApi = (data) => {
-  return request.put({ url: '/system/user/profile/update-avatar', data: data })
+export const uploadAvatarApi = (params) => {
+  return request.upload({ url: '/system/user/profile/update-avatar', params })
 }

@@ -39,7 +39,7 @@ export const deleteAppApi = (id: number) => {
 
 // 导出支付应用
 export const exportAppApi = (params) => {
-  return request.get({ url: '/pay/app/export-excel', params, responseType: 'blob' })
+  return request.download({ url: '/pay/app/export-excel', params })
 }
 
 // 根据商ID称搜索应用列表

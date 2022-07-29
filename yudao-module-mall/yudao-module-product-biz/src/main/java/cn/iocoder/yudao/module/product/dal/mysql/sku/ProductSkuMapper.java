@@ -28,7 +28,7 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
                 .eqIfPresent(ProductSkuDO::getBarCode, reqVO.getBarCode())
                 .eqIfPresent(ProductSkuDO::getPicUrl, reqVO.getPicUrl())
                 .eqIfPresent(ProductSkuDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(ProductSkuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(ProductSkuDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ProductSkuDO::getId));
     }
 
@@ -42,7 +42,7 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
                 .eqIfPresent(ProductSkuDO::getBarCode, reqVO.getBarCode())
                 .eqIfPresent(ProductSkuDO::getPicUrl, reqVO.getPicUrl())
                 .eqIfPresent(ProductSkuDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(ProductSkuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(ProductSkuDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ProductSkuDO::getId));
     }
 

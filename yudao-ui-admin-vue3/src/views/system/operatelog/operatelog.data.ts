@@ -41,7 +41,10 @@ const crudSchemas = reactive<CrudSchema[]>([
   },
   {
     label: '操作人员',
-    field: 'userNickname'
+    field: 'userNickname',
+    search: {
+      show: true
+    }
   },
   {
     label: '操作明细',
@@ -63,29 +66,22 @@ const crudSchemas = reactive<CrudSchema[]>([
   },
   {
     label: '操作结果',
-    field: 'resultCode'
+    field: 'resultCode',
+    search: {
+      show: true,
+      component: 'Select',
+      componentProps: {
+        options: [
+          { label: '成功', value: true },
+          { label: '失败', value: false }
+        ]
+      }
+    }
   },
   {
     label: '操作日期',
     field: 'startTime',
     form: {
-      show: false
-    }
-  },
-  {
-    label: '执行时长',
-    field: 'duration'
-  },
-  {
-    label: '操作日期',
-    field: 'daterange',
-    table: {
-      show: false
-    },
-    form: {
-      show: false
-    },
-    detail: {
       show: false
     },
     search: {
@@ -93,9 +89,14 @@ const crudSchemas = reactive<CrudSchema[]>([
       component: 'DatePicker',
       componentProps: {
         type: 'daterange',
-        valueFormat: 'YYYY-MM-DD'
+        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]
       }
     }
+  },
+  {
+    label: '执行时长',
+    field: 'duration'
   },
   {
     label: t('table.action'),

@@ -21,7 +21,7 @@ public interface BpmUserGroupMapper extends BaseMapperX<BpmUserGroupDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<BpmUserGroupDO>()
                 .likeIfPresent(BpmUserGroupDO::getName, reqVO.getName())
                 .eqIfPresent(BpmUserGroupDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(BpmUserGroupDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(BpmUserGroupDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(BpmUserGroupDO::getId));
     }
 

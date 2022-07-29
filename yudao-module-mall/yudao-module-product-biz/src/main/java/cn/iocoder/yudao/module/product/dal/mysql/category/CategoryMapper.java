@@ -22,7 +22,7 @@ public interface CategoryMapper extends BaseMapperX<CategoryDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<CategoryDO>()
                 .likeIfPresent(CategoryDO::getName, reqVO.getName())
                 .eqIfPresent(CategoryDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(CategoryDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(CategoryDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(CategoryDO::getId));
     }
 
@@ -30,7 +30,7 @@ public interface CategoryMapper extends BaseMapperX<CategoryDO> {
         return selectList(new LambdaQueryWrapperX<CategoryDO>()
                 .likeIfPresent(CategoryDO::getName, reqVO.getName())
                 .eqIfPresent(CategoryDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(CategoryDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(CategoryDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(CategoryDO::getId));
     }
 

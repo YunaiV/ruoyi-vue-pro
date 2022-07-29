@@ -79,11 +79,20 @@ public class CodegenEngine {
                     javaModuleImplTestFilePath("service/${table.businessName}/${table.className}ServiceImplTest"))
             // Java module-api Main
             .put(javaTemplatePath("enums/errorcode"), javaModuleApiMainFilePath("enums/ErrorCodeConstants_手动操作"))
-            // Vue
+            // Vue2
             .put(vueTemplatePath("views/index.vue"),
                     vueFilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
             .put(vueTemplatePath("api/api.js"),
                     vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
+            // Vue3
+            .put(vue3TemplatePath("views/index.vue"),
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
+            .put(vue3TemplatePath("views/data.ts"),
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
+            .put(vue3TemplatePath("api/api.ts"),
+                    vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
+            .put(vue3TemplatePath("api/types.ts"),
+                    vue3FilePath("api/${table.moduleName}/${classNameVar}/types.ts"))
             // SQL
             .put("codegen/sql/sql.vm", "sql/sql.sql")
             .put("codegen/sql/h2.vm", "sql/h2.sql")
@@ -228,5 +237,12 @@ public class CodegenEngine {
         return "yudao-ui-${sceneEnum.basePackage}/" + // 顶级目录
                 "src/" + path;
     }
+    private static String vue3TemplatePath(String path) {
+        return "codegen/vue3/" + path + ".vm";
+    }
 
+    private static String vue3FilePath(String path) {
+        return "yudao-ui-${sceneEnum.basePackage}-vue3/" + // 顶级目录
+                "src/" + path;
+    }
 }

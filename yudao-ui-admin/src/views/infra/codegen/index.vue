@@ -12,9 +12,9 @@
         <el-input v-model="queryParams.tableComment" placeholder="请输入表描述" clearable
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
-                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -85,7 +85,7 @@
 
 <script>
 import { getCodegenTablePage, previewCodegen, downloadCodegen, deleteCodegen,
-  syncCodegenFromDB, syncCodegenFromSQL, createCodegenListFromSQL } from "@/api/infra/codegen";
+  syncCodegenFromDB } from "@/api/infra/codegen";
 
 import importTable from "./importTable";
 // 代码高亮插件
@@ -98,7 +98,7 @@ hljs.registerLanguage("html", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("vue", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("javascript", require("highlight.js/lib/languages/javascript"));
 hljs.registerLanguage("sql", require("highlight.js/lib/languages/sql"));
-
+hljs.registerLanguage("typescript", require("highlight.js/lib/languages/typescript"));
 export default {
   name: "Codegen",
   components: { importTable },
@@ -123,7 +123,8 @@ export default {
         pageNo: 1,
         pageSize: 10,
         tableName: undefined,
-        tableComment: undefined
+        tableComment: undefined,
+        createTime: []
       },
       // 预览参数
       preview: {
@@ -155,10 +156,7 @@ export default {
     /** 查询表集合 */
     getList() {
       this.loading = true;
-      getCodegenTablePage(this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ], 'CreateTime')).then(response => {
+      getCodegenTablePage(this.queryParams).then(response => {
             this.tableList = response.data.list;
             this.total = response.data.total;
             this.loading = false;
@@ -192,7 +190,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },

@@ -26,6 +26,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -124,9 +125,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
         reqVO.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
-        reqVO.setBeginCreateTime(DateUtils.buildTime(2018, 1, 1, 10, 1, 0));
-        reqVO.setEndCreateTime(DateUtils.buildTime(2018, 1, 1, 10, 1, 0));
-
+        reqVO.setCreateTime((new Date[]{buildTime(2018, 1, 1, 10, 1, 0),buildTime(2018, 1, 1, 10, 1, 0)}));
         // 调用
         PageResult<PayOrderDO> pageResult = orderService.getOrderPage(reqVO);
         // 断言
@@ -199,8 +198,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
         reqVO.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
-        reqVO.setBeginCreateTime(DateUtils.buildTime(2018, 1, 1, 10, 1, 0));
-        reqVO.setEndCreateTime(DateUtils.buildTime(2018, 1, 1, 10, 1, 0));
+        reqVO.setCreateTime((new Date[]{buildTime(2018, 1, 1, 10, 1, 0),buildTime(2018, 1, 1, 10, 1, 0)}));
 
         // 调用
         List<PayOrderDO> list = orderService.getOrderList(reqVO);

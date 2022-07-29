@@ -8,5 +8,4 @@ export type JobVO = {
   retryCount: number
   retryInterval: number
   monitorTimeout: number
-  createTime: string
 }

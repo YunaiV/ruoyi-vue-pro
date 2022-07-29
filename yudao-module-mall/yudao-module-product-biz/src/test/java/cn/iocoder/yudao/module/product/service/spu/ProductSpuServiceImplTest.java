@@ -155,8 +155,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
        reqVO.setPrice(null);
        reqVO.setQuantity(null);
        reqVO.setStatus(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+       reqVO.setCreateTime(null);
 
        // 调用
        PageResult<SpuRespVO> pageResult = spuService.getSpuPage(reqVO);
@@ -218,8 +217,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
        reqVO.setPrice(null);
        reqVO.setQuantity(null);
        reqVO.setStatus(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+       reqVO.setCreateTime(null);
 
        // 调用
        List<ProductSpuDO> list = spuService.getSpuList(reqVO);

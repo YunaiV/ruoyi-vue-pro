@@ -9,5 +9,5 @@ export const getSmsLogPageApi = (params) => {
 
 // 导出短信日志
 export const exportSmsLogApi = (params) => {
-  return request.get({ url: '/system/sms-log/export', params, responseType: 'blob' })
+  return request.download({ url: '/system/sms-log/export', params })
 }

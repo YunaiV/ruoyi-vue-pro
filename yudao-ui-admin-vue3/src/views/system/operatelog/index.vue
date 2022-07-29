@@ -18,10 +18,6 @@ const detailRef = ref() // 详情 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref(t('action.detail')) // 弹出层标题
 const { getList, setSearchParams, exportList } = methods
-// 导出操作
-const handleExport = async () => {
-  await exportList('操作日志.xls')
-}
 // 详情
 const handleDetail = (row: OperateLogVO) => {
   // 设置数据
@@ -41,7 +37,7 @@ getList()
         type="warning"
         v-hasPermi="['system:operate-log:export']"
         :loading="tableObject.exportLoading"
-        @click="handleExport"
+        @click="exportList('操作日志.xls')"
       >
         <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
       </el-button>
@@ -68,7 +64,7 @@ getList()
         <span>{{ row.resultCode === 0 ? '成功' : '失败' }}</span>
       </template>
       <template #startTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
+        <span>{{ dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
       </template>
       <template #action="{ row }">
         <el-button link type="primary" @click="handleDetail(row)">

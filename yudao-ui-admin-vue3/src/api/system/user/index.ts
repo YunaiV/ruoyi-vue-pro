@@ -30,12 +30,12 @@ export const deleteUserApi = (id: number) => {
 
 // 导出用户
 export const exportUserApi = (params) => {
-  return request.get({ url: '/system/user/export', params, responseType: 'blob' })
+  return request.download({ url: '/system/user/export', params })
 }
 
 // 下载用户导入模板
 export const importUserTemplateApi = () => {
-  return request.get({ url: '/system/user/get-import-template', responseType: 'blob' })
+  return request.download({ url: '/system/user/get-import-template' })
 }
 
 // 用户密码重置
@@ -54,4 +54,9 @@ export const updateUserStatusApi = (id: number, status: number) => {
     status
   }
   return request.put({ url: '/system/user/update-status', data: data })
+}
+
+// 获取用户精简信息列表
+export const getListSimpleUsersApi = () => {
+  return request.get({ url: '/system/user/list-all-simple' })
 }

@@ -24,11 +24,7 @@ public class BpmOALeavePageReqVO extends PageParam {
     private String reason;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始申请时间")
-    private Date beginCreateTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束申请时间")
-    private Date endCreateTime;
+    @ApiModelProperty(value = "申请时间")
+    private Date[] createTime;
 
 }

@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
@@ -103,8 +104,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserNickname("wangkai");
         reqVO.setModule("order");
         reqVO.setType(OperateTypeEnum.CREATE.getType());
-        reqVO.setBeginTime(buildTime(2021, 3, 5));
-        reqVO.setEndTime(buildTime(2021, 3, 7));
+        reqVO.setStartTime((new Date[]{buildTime(2021, 3, 5),buildTime(2021, 3, 7)}));
         reqVO.setSuccess(true);
 
         // 调用service方法
@@ -155,8 +155,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserNickname("wangkai");
         reqVO.setModule("order");
         reqVO.setType(OperateTypeEnum.CREATE.getType());
-        reqVO.setBeginTime(buildTime(2021, 3, 5));
-        reqVO.setEndTime(buildTime(2021, 3, 7));
+        reqVO.setStartTime((new Date[]{buildTime(2021, 3, 5),buildTime(2021, 3, 7)}));
         reqVO.setSuccess(true);
 
         // 调用 service 方法
