@@ -27,7 +27,7 @@
 * 前端 Vue3 版本采用 [vue-element-plus-admin](https://gitee.com/kailong110120130/vue-element-plus-admin)
 * 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson
 * 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
-* 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统
+* 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统，支持 SSO 单点登录
 * 支持加载动态权限菜单，按钮级别权限控制，本地缓存提升性能
 * 支持 SaaS 多租户系统，可自定义每个租户的权限，提供透明化的多租户底层封装
 * 工作流使用 Flowable，支持动态表单、在线设计流程、会签 / 或签、多种任务分配方式
@@ -78,6 +78,8 @@
 | ⭐️  | 登录日志  | 系统登录日志记录查询，包含登录异常               |
 | 🚀  | 错误码管理 | 系统所有错误码的管理，可在线修改错误提示，无需重启服务     |
 |     | 通知公告  | 系统通知公告信息发布维护                    |
+| 🚀  | 敏感词  | 配置系统敏感词，支持标签分组                    |
+| 🚀  | 应用管理  | 管理 SSO 单点登录的应用，支持多种 OAuth2 授权方式 |
 
 ### 工作流程
 
@@ -154,8 +156,9 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | `yudao-dependencies`  | Maven 依赖版本管理       |
 | `yudao-framework`     | Java 框架拓展          |
 | `yudao-server`        | 管理后台 + 用户 APP 的服务端 |
-| `yudao-admin-ui`      | 管理后台的 UI 界面        |
-| `yudao-user-ui`       | 用户 APP 的 UI 界面     |
+| `yudao-ui-admin`      | Vue2 管理后台的 UI 界面        |
+| `yudao-ui-admin-vue3`      | Vue3 管理后台的 UI 界面        |
+| `yudao-ui-app`       | 用户 APP 的 UI 界面     |
 | `yudao-module-system` | 系统功能的 Module 模块    |
 | `yudao-module-member` | 会员中心的 Module 模块    |
 | `yudao-module-infra`  | 基础设施的 Module 模块    |
@@ -216,13 +219,13 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | 模块       | biu                                                                | biu                                                              | biu                                                              |
 |----------|--------------------------------------------------------------------|------------------------------------------------------------------|------------------------------------------------------------------|
 | 登录 & 首页  | ![登录](https://static.iocoder.cn/images/ruoyi-vue-pro/登录.jpg?imageView2/2/format/webp/w/1280)       | ![首页](https://static.iocoder.cn/images/ruoyi-vue-pro/首页.jpg?imageView2/2/format/webp/w/1280)     | ![个人中心](https://static.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg?imageView2/2/format/webp/w/1280) |
-| 用户       | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg?imageView2/2/format/webp/w/1280)   | ![在线用户](https://static.iocoder.cn/images/ruoyi-vue-pro/在线用户.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
+| 用户 & 应用      | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg?imageView2/2/format/webp/w/1280)   | ![令牌管理](https://static.iocoder.cn/images/ruoyi-vue-pro/令牌管理.jpg?imageView2/2/format/webp/w/1280) | ![应用管理](https://static.iocoder.cn/images/ruoyi-vue-pro/应用管理.jpg?imageView2/2/format/webp/w/1280)                                                                |
 | 租户 & 套餐  | ![租户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/租户管理.jpg?imageView2/2/format/webp/w/1280)   | ![租户套餐](https://static.iocoder.cn/images/ruoyi-vue-pro/租户套餐.png) | -                                                                |
 | 部门 & 岗位  | ![部门管理](https://static.iocoder.cn/images/ruoyi-vue-pro/部门管理.jpg?imageView2/2/format/webp/w/1280)   | ![岗位管理](https://static.iocoder.cn/images/ruoyi-vue-pro/岗位管理.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 | 菜单 & 角色  | ![菜单管理](https://static.iocoder.cn/images/ruoyi-vue-pro/菜单管理.jpg?imageView2/2/format/webp/w/1280)   | ![角色管理](https://static.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 | 审计日志     | ![操作日志](https://static.iocoder.cn/images/ruoyi-vue-pro/操作日志.jpg?imageView2/2/format/webp/w/1280)   | ![登录日志](https://static.iocoder.cn/images/ruoyi-vue-pro/登录日志.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 | 短信       | ![短信渠道](https://static.iocoder.cn/images/ruoyi-vue-pro/短信渠道.jpg?imageView2/2/format/webp/w/1280)   | ![短信模板](https://static.iocoder.cn/images/ruoyi-vue-pro/短信模板.jpg?imageView2/2/format/webp/w/1280) | ![短信日志](https://static.iocoder.cn/images/ruoyi-vue-pro/短信日志.jpg?imageView2/2/format/webp/w/1280) |
-| 字典       | ![字典类型](https://static.iocoder.cn/images/ruoyi-vue-pro/字典类型.jpg?imageView2/2/format/webp/w/1280)   | ![字典数据](https://static.iocoder.cn/images/ruoyi-vue-pro/字典数据.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
+| 字典 & 敏感词      | ![字典类型](https://static.iocoder.cn/images/ruoyi-vue-pro/字典类型.jpg?imageView2/2/format/webp/w/1280)   | ![字典数据](https://static.iocoder.cn/images/ruoyi-vue-pro/字典数据.jpg?imageView2/2/format/webp/w/1280) | ![敏感词]()                                                                |
 | 错误码 & 通知 | ![错误码管理](https://static.iocoder.cn/images/ruoyi-vue-pro/错误码管理.jpg?imageView2/2/format/webp/w/1280) | ![通知公告](https://static.iocoder.cn/images/ruoyi-vue-pro/通知公告.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 
 ### 工作流程
