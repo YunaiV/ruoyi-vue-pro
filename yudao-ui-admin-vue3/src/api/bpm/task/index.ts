@@ -11,22 +11,22 @@ export const getDoneTaskPage = async (params) => {
 }
 
 export const completeTask = async (data) => {
-  return await request.put({ url: '/bpm/task/complete', data: data })
+  return await request.put({ url: '/bpm/task/complete', data })
 }
 
 export const approveTask = async (data) => {
-  return await request.put({ url: '/bpm/task/approve', data: data })
+  return await request.put({ url: '/bpm/task/approve', data })
 }
 
 export const rejectTask = async (data) => {
-  return await request.put({ url: '/bpm/task/reject', data: data })
+  return await request.put({ url: '/bpm/task/reject', data })
 }
 export const backTask = async (data) => {
-  return await request.put({ url: '/bpm/task/back', data: data })
+  return await request.put({ url: '/bpm/task/back', data })
 }
 
 export const updateTaskAssignee = async (data) => {
-  return await request.put({ url: '/bpm/task/update-assignee', data: data })
+  return await request.put({ url: '/bpm/task/update-assignee', data })
 }
 
 export const getTaskListByProcessInstanceId = async (processInstanceId) => {
