@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPcPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayQrPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayWapPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXLitePayClient;
@@ -69,7 +70,7 @@ public class PayClientFactoryImpl implements PayClientFactory {
             case ALIPAY_WAP: return (AbstractPayClient<Config>) new AlipayWapPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_QR: return (AbstractPayClient<Config>) new AlipayQrPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_APP: return (AbstractPayClient<Config>) new AlipayQrPayClient(channelId, (AlipayPayClientConfig) config);
-            case ALIPAY_PC: return (AbstractPayClient<Config>) new AlipayQrPayClient(channelId, (AlipayPayClientConfig) config);
+            case ALIPAY_PC: return (AbstractPayClient<Config>) new AlipayPcPayClient(channelId, (AlipayPayClientConfig) config);
         }
         // 创建失败，错误日志 + 抛出异常
         log.error("[createPayClient][配置({}) 找不到合适的客户端实现]", config);
