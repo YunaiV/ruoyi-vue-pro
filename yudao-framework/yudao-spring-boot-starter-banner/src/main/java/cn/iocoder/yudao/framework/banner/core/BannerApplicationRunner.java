@@ -4,6 +4,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.util.ClassUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +31,17 @@ public class BannerApplicationRunner implements ApplicationRunner {
                     "https://doc.iocoder.cn",
                     "https://t.zsxq.com/02Yf6M7Qn",
                     "https://t.zsxq.com/02B6ujIee");
+
+            // 数据报表
+            if (isNotPresent("cn.iocoder.yudao.module.visualization.framework.security.config.SecurityConfiguration")) {
+                System.out.println("[报表模块 yudao-module-visualization-biz - 已禁用][参考 https://doc.iocoder.cn/report/ 开启]");
+            }
+            // 支付模块
         });
+    }
+
+    private static boolean isNotPresent(String className) {
+        return !ClassUtils.isPresent(className, ClassUtils.getDefaultClassLoader());
     }
 
 }
