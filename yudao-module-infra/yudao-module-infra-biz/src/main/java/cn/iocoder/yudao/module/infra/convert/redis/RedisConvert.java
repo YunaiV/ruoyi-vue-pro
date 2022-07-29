@@ -22,7 +22,7 @@ public interface RedisConvert {
         commandStats.forEach((key, value) -> {
             respVO.getCommandStats().add(RedisMonitorRespVO.CommandStat.builder()
                     .command(StrUtil.subAfter((String) key, "cmdstat_", false))
-                    .calls(Integer.valueOf(StrUtil.subBetween((String) value, "calls=", ",")))
+                    .calls(Long.valueOf(StrUtil.subBetween((String) value, "calls=", ",")))
                     .usec(Long.valueOf(StrUtil.subBetween((String) value, "usec=", ",")))
                     .build());
         });
