@@ -43,7 +43,7 @@
     <u-popup :show="skuPopup" :round="10" :closeable="true" :closeOnClickOverlay="false" @close="skuPopup = false">
       <view class="sku-popup-slot">
         <view class="current-sku-info">
-          <u--image class="current-sku-img" :showLoading="true" :src="product.sku[currentSkuIndex].image" width="120rpx" height="120rpx"></u--image>
+          <u--image class="current-sku-img" :showLoading="true" :src="product.sku[currentSkuIndex].picUrl" width="120rpx" height="120rpx"></u--image>
           <view class="current-sku-desc">
             <view class="name">{{ product.sku[currentSkuIndex].desc }}</view>
             <custom-text-price color="red" size="12" intSize="18" :price="product.sku[currentSkuIndex].price"></custom-text-price>
@@ -178,6 +178,8 @@
 </template>
 
 <script>
+    import { productSpu } from '../../api/product';
+
 export default {
   data() {
     return {
@@ -194,19 +196,19 @@ export default {
         sku: [
           {
             id: 0,
-            image: 'https://cdn.uviewui.com/uview/album/1.jpg',
+            picUrl: 'https://cdn.uviewui.com/uview/album/1.jpg',
             price: 13.0,
             desc: '山不在高，有仙则名。'
           },
           {
             id: 1,
-            image: 'https://cdn.uviewui.com/uview/album/2.jpg',
+            picUrl: 'https://cdn.uviewui.com/uview/album/2.jpg',
             price: 11.0,
             desc: '水不在深，有龙则灵。'
           },
           {
             id: 2,
-            image: 'https://cdn.uviewui.com/uview/album/3.jpg',
+            picUrl: 'https://cdn.uviewui.com/uview/album/3.jpg',
             price: 10.0,
             desc: '斯是陋室，惟吾德馨。'
           }
@@ -302,7 +304,18 @@ export default {
     }
   },
   methods: {
-    loadProductData() {},
+    loadProductData() {
+      let param = {}
+      param.spuId =  this.product.id
+      productSpu(param).then(res => {
+        this.product.images = res.data.picUrls;
+        this.product.sku = res.data.skus;
+        this.product.desc = res.data.description.replace(/<[^>]*>/g,'');
+        this.product.price = res.data.price;
+        this.product.title = res.data.name;
+        console.log(res)
+      })
+    },
     handleSkuItemClick(index) {
       this.currentSkuIndex = index
     },

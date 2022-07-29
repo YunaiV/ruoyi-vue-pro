@@ -4,6 +4,8 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -39,6 +41,11 @@ public interface ProductSpuConvert {
     PageResult<SpuRespVO> convertPage(PageResult<ProductSpuDO> page);
 
     List<SpuExcelVO> convertList02(List<ProductSpuDO> list);
+
+    SpuPageReqVO convert(AppSpuPageReqVO bean);
+
+    @Mapping(source = "picUrls", target = "picUrls", qualifiedByName = "tokenizeToStringArray")
+    AppSpuPageRespVO convertAppResp(ProductSpuDO list);
 
     @Named("tokenizeToStringArray")
     default List<String> translatePicUrlsArrayFromString(String picUrls) {

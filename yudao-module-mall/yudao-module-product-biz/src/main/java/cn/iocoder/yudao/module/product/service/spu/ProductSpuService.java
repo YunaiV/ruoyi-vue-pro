@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.product.service.spu;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
@@ -66,5 +68,14 @@ public interface ProductSpuService {
      * @return 商品spu列表
      */
     List<ProductSpuDO> getSpuList(SpuExportReqVO exportReqVO);
+
+    /**
+     * 获得商品spu分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 商品spu分页
+     */
+    PageResult<AppSpuPageRespVO> getSpuPage(AppSpuPageReqVO pageReqVO);
+
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.service.category;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -13,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
@@ -105,5 +107,14 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryDO> getCategoryTreeList(CategoryTreeListReqVO treeListReqVO) {
         return categoryMapper.selectList(treeListReqVO);
     }
+
+    @Override
+    public List<CategoryDO> getCategoryList() {
+        return categoryMapper.selectList()
+                .stream()
+                .filter(v->v.getStatus().equals(CommonStatusEnum.ENABLE.getStatus()))
+                .collect(Collectors.toList());
+    }
+
 
 }
