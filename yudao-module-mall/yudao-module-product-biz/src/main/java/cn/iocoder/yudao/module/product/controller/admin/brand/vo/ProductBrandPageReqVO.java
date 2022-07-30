@@ -1,19 +1,22 @@
 package cn.iocoder.yudao.module.product.controller.admin.brand.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel(value = "管理后台 - 品牌 Excel 导出 Request VO", description = "参数和 BrandPageReqVO 是一致的")
+@ApiModel("管理后台 - 商品品牌分页 Request VO")
 @Data
-public class BrandExportReqVO {
-
-    @ApiModelProperty(value = "分类编号", example = "1")
-    private Long categoryId;
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class ProductBrandPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "品牌名称", example = "芋道")
     private String name;

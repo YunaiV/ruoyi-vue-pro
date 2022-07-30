@@ -17,7 +17,7 @@ public interface ErrorCodeConstants {
     ErrorCode PRODUCT_CATEGORY_DISABLED = new ErrorCode(1008001004, "商品分类({})已禁用，无法使用");
 
     // ========== 品牌相关编号 1008002000 ==========
-    ErrorCode BRAND_NOT_EXISTS = new ErrorCode(1008002000, "品牌不存在");
+    ErrorCode PRODUCT_BRAND_NOT_EXISTS = new ErrorCode(1008002000, "品牌不存在");
 
     // ========== 规格名称 1008003000 ==========
     ErrorCode PROPERTY_NOT_EXISTS = new ErrorCode(1008003000, "规格名称不存在");

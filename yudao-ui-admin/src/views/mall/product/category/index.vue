@@ -113,7 +113,7 @@ import ImageUpload from '@/components/ImageUpload';
 import {CommonStatusEnum} from "@/utils/constants";
 
 export default {
-  name: "Category",
+  name: "ProductCategory",
   components: {
     Editor, Treeselect, ImageUpload
   },

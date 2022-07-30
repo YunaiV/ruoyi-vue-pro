@@ -26,25 +26,18 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-                   v-hasPermi="['product:brand:create']">新增
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
-                   :loading="exportLoading"
-                   v-hasPermi="['product:brand:export']">导出
-        </el-button>
+                   v-hasPermi="['product:brand:create']">新增</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="商品分类" align="center" prop="categoryId"/>
+      <el-table-column label="品牌编号" align="center" prop="id"/>
       <el-table-column label="品牌名称" align="center" prop="name"/>
-      <el-table-column label="品牌图片" align="center" prop="bannerUrl">
+      <el-table-column label="品牌图片" align="center" prop="picUrl">
         <template slot-scope="scope">
-          <img v-if="scope.row.bannerUrl" :src="scope.row.bannerUrl" alt="分类图片" class="img-height"/>
+          <img v-if="scope.row.picUrl" :src="scope.row.picUrl" alt="分类图片" style="height: 100px;" />
         </template>
       </el-table-column>
       <el-table-column label="品牌排序" align="center" prop="sort"/>
@@ -77,15 +70,11 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="商品分类" prop="categoryId">
-          <Treeselect v-model="form.categoryId" :options="categoryOptions" :normalizer="normalizer" :show-count="true"
-                      placeholder="请选择商品分类"/>
-        </el-form-item>
         <el-form-item label="品牌名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入品牌名称"/>
         </el-form-item>
-        <el-form-item label="品牌图片" prop="bannerUrl">
-          <imageUpload v-model="form.bannerUrl" :limit="1"/>
+        <el-form-item label="品牌图片" prop="picUrl">
+          <imageUpload v-model="form.picUrl" :limit="1"/>
         </el-form-item>
         <el-form-item label="品牌排序" prop="sort">
           <el-input v-model="form.sort" placeholder="请输入品牌排序"/>
@@ -113,20 +102,18 @@
 import {
   createBrand,
   deleteBrand,
-  exportBrandExcel,
   getBrand,
   getBrandPage,
   updateBrand
 } from "@/api/mall/product/brand";
-import {getProductCategoryList} from "@/api/mall/product/category";
 import ImageUpload from '@/components/ImageUpload';
-import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+import {CommonStatusEnum} from "@/utils/constants";
 
 export default {
-  name: "Brand",
+  name: "ProductBrand",
   components: {
-    ImageUpload, Treeselect,
+    ImageUpload
   },
   data() {
     return {
@@ -153,21 +140,18 @@ export default {
         status: null,
         createTime: []
       },
-      // 商品分类树选项
-      categoryOptions: [],
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-        categoryId: [{required: true, message: "分类编号不能为空", trigger: "blur"}],
         name: [{required: true, message: "品牌名称不能为空", trigger: "blur"}],
-        bannerUrl: [{required: true, message: "品牌图片不能为空", trigger: "blur"}],
+        picUrl: [{required: true, message: "品牌图片不能为空", trigger: "blur"}],
+        sort: [{required: true, message: "品牌排序不能为空", trigger: "blur"}],
         status: [{required: true, message: "状态不能为空", trigger: "change"}],
       }
     };
   },
   created() {
-    this.getTreeselect();
     this.getList();
   },
   methods: {
@@ -181,26 +165,6 @@ export default {
         this.loading = false;
       });
     },
-    /** 转换菜单数据结构 */
-    normalizer(node) {
-      if (node.children && !node.children.length) {
-        delete node.children;
-      }
-      return {
-        id: node.id,
-        label: node.name,
-        children: node.children
-      };
-    },
-    /** 查询分类下拉树结构 */
-    getTreeselect() {
-      getProductCategoryList().then(response => {
-        this.categoryOptions = [];
-        const menu = {id: 0, name: '商品分类', children: []};
-        menu.children = this.handleTree(response.data, "id", "pid");
-        this.categoryOptions.push(menu);
-      });
-    },
     /** 取消按钮 */
     cancel() {
       this.open = false;
@@ -210,12 +174,11 @@ export default {
     reset() {
       this.form = {
         id: undefined,
-        categoryId: undefined,
         name: undefined,
-        bannerUrl: undefined,
-        sort: undefined,
+        picUrl: undefined,
+        sort: 0,
         description: undefined,
-        status: undefined,
+        status: CommonStatusEnum.ENABLE,
       };
       this.resetForm("form");
     },
@@ -232,14 +195,12 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
-      this.getTreeselect();
       this.open = true;
       this.title = "添加品牌";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      this.getTreeselect();
       const id = row.id;
       getBrand(id).then(response => {
         this.form = response.data;
@@ -280,30 +241,7 @@ export default {
         this.$modal.msgSuccess("删除成功");
       }).catch(() => {
       });
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      // 处理查询参数
-      let params = {...this.queryParams};
-      params.pageNo = undefined;
-      params.pageSize = undefined;
-      // 执行导出
-      this.$modal.confirm('是否确认导出所有品牌数据项?').then(() => {
-        this.exportLoading = true;
-        return exportBrandExcel(params);
-      }).then(response => {
-        this.$download.excel(response, "品牌.xls");
-        this.exportLoading = false;
-      }).catch(() => {
-      });
     }
   }
 };
 </script>
-
-<style scoped lang="scss">
-//
-.img-height {
-  height: 150px;
-}
-</style>

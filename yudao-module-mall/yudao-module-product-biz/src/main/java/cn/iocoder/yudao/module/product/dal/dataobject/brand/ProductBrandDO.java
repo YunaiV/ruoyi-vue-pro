@@ -6,9 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-// TODO @JeromeSoar：Product 前缀
 /**
- * 品牌 DO
+ * 商品品牌 DO
  *
  * @author 芋道源码
  */
@@ -19,7 +18,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BrandDO extends BaseDO {
+public class ProductBrandDO extends BaseDO {
 
     /**
      * 品牌编号
@@ -27,17 +26,13 @@ public class BrandDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 分类编号
-     */
-    private Long categoryId;
-    /**
      * 品牌名称
      */
     private String name;
     /**
      * 品牌图片
      */
-    private String bannerUrl;
+    private String picUrl;
     /**
      * 品牌排序
      */
