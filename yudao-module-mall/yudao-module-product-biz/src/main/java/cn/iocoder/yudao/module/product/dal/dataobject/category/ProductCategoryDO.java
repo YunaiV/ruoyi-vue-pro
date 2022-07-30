@@ -6,9 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-// TODO @JeromeSoar：Product 前缀
 /**
  * 商品分类 DO
+ *
+ * 商品分类一共两级：
+ * 1）一级分类：{@link #parentId} 等于 0
+ * 2）二级分类：{@link #parentId} 等于父分类
  *
  * @author 芋道源码
  */
@@ -19,7 +22,12 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDO extends BaseDO {
+public class ProductCategoryDO extends BaseDO {
+
+    /**
+     * 父分类编号 - 根分类
+     */
+    public static final Long PARENT_ID_NULL = 0L;
 
     /**
      * 分类编号
@@ -35,15 +43,12 @@ public class CategoryDO extends BaseDO {
      */
     private String name;
     /**
-     * 分类图标
-     */
-    private String icon;
-    /**
-     * 分类 Banner 图片
+     * 分类图片
      *
-     * 第一层的商品分类，会有该字段，用于用户 App 展示
+     * 一级分类：推荐 200 x 100 分辨率
+     * 二级分类：推荐 100 x 100 分辨率
      */
-    private String bannerUrl;
+    private String picUrl;
     /**
      * 分类排序
      */

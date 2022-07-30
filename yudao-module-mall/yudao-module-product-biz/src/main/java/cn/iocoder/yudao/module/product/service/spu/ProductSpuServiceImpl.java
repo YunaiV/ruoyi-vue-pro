@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
-import cn.iocoder.yudao.module.product.service.category.CategoryService;
+import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private ProductSpuMapper ProductSpuMapper;
 
     @Resource
-    private CategoryService categoryService;
+    private ProductCategoryService categoryService;
 
     @Resource
     private ProductSkuService productSkuService;
@@ -54,7 +54,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Transactional
     public Long createSpu(ProductSpuCreateReqVO createReqVO) {
         // 校验分类
-        categoryService.validatedCategoryById(createReqVO.getCategoryId());
+        categoryService.validateProductCategory(createReqVO.getCategoryId());
         // 校验SKU
         List<ProductSkuCreateReqVO> skuCreateReqList = createReqVO.getSkus();
         productSkuService.validateSkus(skuCreateReqList);
@@ -78,7 +78,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验 spu 是否存在
         this.validateSpuExists(updateReqVO.getId());
         // 校验分类
-        categoryService.validatedCategoryById(updateReqVO.getCategoryId());
+        categoryService.validateProductCategory(updateReqVO.getCategoryId());
         // 校验SKU
         List<ProductSkuCreateReqVO> skuCreateReqList = updateReqVO.getSkus();
         productSkuService.validateSkus(skuCreateReqList);
@@ -142,7 +142,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                 Long parentId = spuVO.getCategoryId();
                 categoryArray.addFirst(parentId);
                 while (parentId != 0) {
-                    parentId = categoryService.getCategory(parentId).getParentId();
+                    parentId = categoryService.getProductCategory(parentId).getParentId();
                     if (parentId > 0) {
                         categoryArray.addFirst(parentId);
                     }

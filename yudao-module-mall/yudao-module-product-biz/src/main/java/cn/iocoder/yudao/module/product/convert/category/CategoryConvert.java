@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.product.convert.category;
 
-import java.util.*;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.app.category.vo.AppCategoryListRespVO;
+import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
+
+import java.util.List;
 
 /**
  * 商品分类 Convert
@@ -20,17 +20,13 @@ public interface CategoryConvert {
 
     CategoryConvert INSTANCE = Mappers.getMapper(CategoryConvert.class);
 
-    CategoryDO convert(CategoryCreateReqVO bean);
+    ProductCategoryDO convert(ProductCategoryCreateReqVO bean);
 
-    CategoryDO convert(CategoryUpdateReqVO bean);
+    ProductCategoryDO convert(ProductCategoryUpdateReqVO bean);
 
-    CategoryRespVO convert(CategoryDO bean);
+    ProductCategoryRespVO convert(ProductCategoryDO bean);
 
-    List<CategoryRespVO> convertList(List<CategoryDO> list);
+    List<ProductCategoryRespVO> convertList(List<ProductCategoryDO> list);
 
-    PageResult<CategoryRespVO> convertPage(PageResult<CategoryDO> page);
-
-    List<CategoryExcelVO> convertList02(List<CategoryDO> list);
-
-    List<AppCategoryListRespVO> convertList03(List<CategoryDO> list);
+    List<AppCategoryListRespVO> convertList03(List<ProductCategoryDO> list);
 }

@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
 */
 @Data
-public class CategoryBaseVO {
+public class ProductCategoryBaseVO {
 
     @ApiModelProperty(value = "父分类编号", required = true, example = "1")
     @NotNull(message = "父分类编号不能为空")
@@ -21,13 +21,9 @@ public class CategoryBaseVO {
     @NotBlank(message = "分类名称不能为空")
     private String name;
 
-    @ApiModelProperty(value = "分类图标")
-    @NotBlank(message = "分类图标不能为空")
-    private String icon;
-
     @ApiModelProperty(value = "分类图片", required = true)
     @NotBlank(message = "分类图片不能为空")
-    private String bannerUrl;
+    private String picUrl;
 
     @ApiModelProperty(value = "分类排序", required = true, example = "1")
     private Integer sort;
