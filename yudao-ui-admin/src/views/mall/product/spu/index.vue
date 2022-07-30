@@ -283,12 +283,12 @@
 <script>
 import {createSpu, updateSpu, deleteSpu, getSpu, getSpuPage, exportSpuExcel} from "@/api/mall/product/spu";
 import {
-  createCategory,
-  deleteCategory,
+  createProductCategory,
+  deleteProductCategory,
   exportCategoryExcel,
-  getCategory,
-  listCategory,
-  updateCategory
+  getProductCategory,
+  getProductCategoryList,
+  updateProductCategory
 } from "@/api/mall/product/category";
 import {
   createProperty,
@@ -585,7 +585,7 @@ export default {
     /** 查询分类 */
     getListCategory() {
       // 执行查询
-      listCategory().then(response => {
+      getProductCategoryList().then(response => {
         this.categoryList = this.handleTree(response.data, "id", "parentId");
 
       });

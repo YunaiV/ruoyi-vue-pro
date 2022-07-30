@@ -35,6 +35,4 @@ public class AppCategoryController {
         return success(CategoryConvert.INSTANCE.convertList03(list));
     }
 
-
-
 }

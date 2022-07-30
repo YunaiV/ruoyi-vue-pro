@@ -118,7 +118,7 @@ import {
   getBrandPage,
   updateBrand
 } from "@/api/mall/product/brand";
-import {listCategory} from "@/api/mall/product/category";
+import {getProductCategoryList} from "@/api/mall/product/category";
 import ImageUpload from '@/components/ImageUpload';
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -194,7 +194,7 @@ export default {
     },
     /** 查询分类下拉树结构 */
     getTreeselect() {
-      listCategory().then(response => {
+      getProductCategoryList().then(response => {
         this.categoryOptions = [];
         const menu = {id: 0, name: '商品分类', children: []};
         menu.children = this.handleTree(response.data, "id", "pid");

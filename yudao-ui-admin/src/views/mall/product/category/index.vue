@@ -6,12 +6,6 @@
       <el-form-item label="分类名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入分类名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="开启状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择开启状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                     :key="dict.value" :label="dict.label" :value="dict.value"/>
-        </el-select>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -28,27 +22,16 @@
       <el-col :span="1.5">
         <el-button type="info" plain icon="el-icon-sort" size="mini" @click="toggleExpandAll">展开/折叠</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
-                   :loading="exportLoading"
-                   v-hasPermi="['product:category:export']">导出
-        </el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <!-- 列表 -->
     <el-table v-if="refreshTable" v-loading="loading" :data="list"  row-key="id" :default-expand-all="isExpandAll"
               :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
-      <el-table-column label="分类名称" align="center" prop="name"/>
-      <el-table-column label="分类图标" align="center" prop="icon">
+      <el-table-column label="分类名称" prop="name"/>
+      <el-table-column label="分类图片" align="center" prop="picUrl">
         <template slot-scope="scope">
-          <svg-icon :icon-class="scope.row.icon" />
-        </template>
-      </el-table-column>
-      <el-table-column label="分类图片" align="center" prop="bannerUrl">
-        <template slot-scope="scope">
-          <img v-if="scope.row.bannerUrl" :src="scope.row.bannerUrl" alt="分类图片" class="img-height"/>
+          <img v-if="scope.row.picUrl" :src="scope.row.picUrl" alt="分类图片" style="height: 100px"/>
         </template>
       </el-table-column>
       <el-table-column label="分类排序" align="center" prop="sort"/>
@@ -78,31 +61,21 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="上级分类" prop="parentId">
-          <Treeselect v-model="form.parentId" :options="parentCategoryOptions" :normalizer="normalizer"
-                      :show-count="true"
-                      placeholder="上级分类"/>
+          <el-select v-model="form.parentId" placeholder="请选择上级分类" clearable size="small">
+            <el-option :key="0" label="顶级分类" :value="0"/>
+            <el-option v-for="item in list.filter(v => v.parentId === 0)" :key="item.id" :label="item.name" :value="item.id"/>
+          </el-select>
         </el-form-item>
         <el-form-item label="分类名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入分类名称"/>
         </el-form-item>
-        <el-form-item label="分类图标" prop="icon">
-          <el-popover placement="bottom-start" width="460" trigger="click" @show="$refs['iconSelect'].reset()">
-            <IconSelect ref="iconSelect" @selected="iconSelected"/>
-            <el-input slot="reference" v-model="form.icon" placeholder="点击选择分类图标" readonly>
-              <svg-icon v-if="form.icon" slot="prefix" :icon-class="form.icon" class="el-input__icon"
-                        style="height: 32px;width: 16px;"/>
-              <i v-else slot="prefix" class="el-icon-search el-input__icon"/>
-            </el-input>
-          </el-popover>
-        </el-form-item>
         <el-form-item label="分类图片" prop="bannerUrl">
-          <ImageUpload v-model="form.bannerUrl" :limit="1"/>
+          <ImageUpload v-model="form.picUrl" :limit="1" :is-show-tip="false" />
+          <div v-if="form.parentId === 0" style="font-size: 10px">推荐 200x100 图片分辨率</div>
+          <div v-else style="font-size: 10px">推荐 100x100 图片分辨率</div>
         </el-form-item>
         <el-form-item label="分类排序" prop="sort">
           <el-input-number v-model="form.sort" controls-position="right" :min="0" />
-        </el-form-item>
-        <el-form-item label="分类描述">
-          <editor v-model="form.description" :min-height="192"/>
         </el-form-item>
         <el-form-item label="开启状态" prop="status">
           <el-radio-group v-model="form.status">
@@ -110,6 +83,9 @@
                       :key="dict.value" :label="parseInt(dict.value)">{{ dict.label }}
             </el-radio>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item label="分类描述">
+          <el-input v-model="form.description" type="textarea" placeholder="请输入分类描述" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -122,34 +98,31 @@
 
 <script>
 import {
-  createCategory,
-  deleteCategory,
+  createProductCategory,
+  deleteProductCategory,
   exportCategoryExcel,
-  getCategory,
-  listCategory,
-  updateCategory
+  getProductCategory,
+  getProductCategoryList,
+  updateProductCategory
 } from "@/api/mall/product/category";
 import Editor from '@/components/Editor';
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import IconSelect from "@/components/IconSelect";
 import ImageUpload from '@/components/ImageUpload';
+import {CommonStatusEnum} from "@/utils/constants";
 
 export default {
   name: "Category",
   components: {
-    Editor, Treeselect, IconSelect, ImageUpload
+    Editor, Treeselect, ImageUpload
   },
   data() {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
-      // 总条数
-      total: 0,
       // 商品分类列表
       list: [],
       // 商品分类树选项
@@ -164,10 +137,7 @@ export default {
       refreshTable: true,
       // 查询参数
       queryParams: {
-        pageNo: 1,
-        pageSize: 10,
         name: null,
-        status: null,
       },
       // 表单参数
       form: {},
@@ -175,8 +145,8 @@ export default {
       rules: {
         parentId: [{required: true, message: "请选择上级分类", trigger: "blur"}],
         name: [{required: true, message: "分类名称不能为空", trigger: "blur"}],
-        icon: [{required: true, message: "分类图标不能为空", trigger: "blur"}],
-        bannerUrl: [{required: true, message: "分类图片不能为空", trigger: "blur"}],
+        picUrl: [{required: true, message: "分类图片不能为空", trigger: "blur"}],
+        sort: [{required: true, message: "分类排序不能为空", trigger: "blur"}],
         status: [{required: true, message: "开启状态不能为空", trigger: "blur"}],
       }
     };
@@ -191,33 +161,9 @@ export default {
       // 处理查询参数
       let params = {...this.queryParams};
       // 执行查询
-      listCategory(params).then(response => {
+      getProductCategoryList(params).then(response => {
         this.list = this.handleTree(response.data, "id", "parentId");
         this.loading = false;
-      });
-    },
-    // 选择图标
-    iconSelected(name) {
-      this.form.icon = name;
-    },
-    /** 转换菜单数据结构 */
-    normalizer(node) {
-      if (node.children && !node.children.length) {
-        delete node.children;
-      }
-      return {
-        id: node.id,
-        label: node.name,
-        children: node.children
-      };
-    },
-    /** 查询分类下拉树结构 */
-    getTreeselect() {
-      listCategory().then(response => {
-        this.parentCategoryOptions = [];
-        const menu = {id: 0, name: '主分类', children: []};
-        menu.children = this.handleTree(response.data, "id", "parentId");
-        this.parentCategoryOptions.push(menu);
       });
     },
     /** 取消按钮 */
@@ -231,11 +177,10 @@ export default {
         id: undefined,
         parentId: undefined,
         name: undefined,
-        icon: undefined,
-        bannerUrl: undefined,
-        sort: undefined,
+        pirUrl: undefined,
+        sort: 0,
         description: undefined,
-        status: undefined,
+        status: CommonStatusEnum.ENABLE,
       };
       this.resetForm("form");
     },
@@ -260,16 +205,14 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
-      this.getTreeselect();
       this.open = true;
       this.title = "添加商品分类";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      this.getTreeselect();
       const id = row.id;
-      getCategory(id).then(response => {
+      getProductCategory(id).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改商品分类";
@@ -283,7 +226,7 @@ export default {
         }
         // 修改的提交
         if (this.form.id != null) {
-          updateCategory(this.form).then(response => {
+          updateProductCategory(this.form).then(response => {
             this.$modal.msgSuccess("修改成功");
             this.open = false;
             this.getList();
@@ -291,7 +234,7 @@ export default {
           return;
         }
         // 添加的提交
-        createCategory(this.form).then(response => {
+        createProductCategory(this.form).then(response => {
           this.$modal.msgSuccess("新增成功");
           this.open = false;
           this.getList();
@@ -302,36 +245,13 @@ export default {
     handleDelete(row) {
       const id = row.id;
       this.$modal.confirm('是否确认删除商品分类编号为"' + id + '"的数据项?').then(function () {
-        return deleteCategory(id);
+        return deleteProductCategory(id);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
-      }).catch(() => {
-      });
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      // 处理查询参数
-      let params = {...this.queryParams};
-      params.pageNo = undefined;
-      params.pageSize = undefined;
-      // 执行导出
-      this.$modal.confirm('是否确认导出所有商品分类数据项?').then(() => {
-        this.exportLoading = true;
-        return exportCategoryExcel(params);
-      }).then(response => {
-        this.$download.excel(response, '商品分类.xls');
-        this.exportLoading = false;
       }).catch(() => {
       });
     }
   }
 };
 </script>
-
-<style scoped lang="scss">
-//
-.img-height {
-  height: 150px;
-}
-</style>

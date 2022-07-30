@@ -20,25 +20,6 @@ SET NAMES utf8mb4;
 -- ----------------------------
 -- Table structure for product_category
 -- ----------------------------
-DROP TABLE IF EXISTS `product_category`;
-CREATE TABLE `product_category`
-(
-    `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT '分类编号',
-    `parent_id`   bigint       NOT NULL COMMENT '父分类编号',
-    `name`        varchar(255) NOT NULL COMMENT '分类名称',
-    `icon`        varchar(100) NOT NULL DEFAULT '#' COMMENT '分类图标',
-    `banner_url`  varchar(255) NOT NULL COMMENT '分类图片',
-    `sort`        int                   DEFAULT '0' COMMENT '分类排序',
-    `description` varchar(1024)         DEFAULT NULL COMMENT '分类描述',
-    `status`      tinyint      NOT NULL COMMENT '开启状态',
-    `creator`     varchar(64)           DEFAULT '' COMMENT '创建者',
-    `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updater`     varchar(64)           DEFAULT '' COMMENT '更新者',
-    `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted`     bit(1)       NOT NULL DEFAULT b'0' COMMENT '是否删除',
-    `tenant_id`   bigint       NOT NULL DEFAULT '0' COMMENT '租户编号',
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB COMMENT='商品分类';
 
 -- ----------------------------
 -- Table structure for product_brand
@@ -83,6 +64,7 @@ INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `pa
 VALUES ('分类删除', 'product:category:delete', 3, 4, @parentId, '', '', '', 0);
 INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`)
 VALUES ('分类导出', 'product:category:export', 3, 5, @parentId, '', '', '', 0);
+
 -- 品牌管理 菜单 SQL
 INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`)
 VALUES ('品牌管理', '', 2, 1, 2001, 'brand', '', 'mall/product/brand/index', 0);
