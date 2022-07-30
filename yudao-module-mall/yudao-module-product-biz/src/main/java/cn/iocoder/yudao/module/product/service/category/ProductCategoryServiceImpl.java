@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryUpdateReqVO;
-import cn.iocoder.yudao.module.product.convert.category.CategoryConvert;
+import cn.iocoder.yudao.module.product.convert.category.ProductCategoryConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.mysql.category.ProductCategoryMapper;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         validateParentProductCategory(createReqVO.getParentId());
 
         // 插入
-        ProductCategoryDO category = CategoryConvert.INSTANCE.convert(createReqVO);
+        ProductCategoryDO category = ProductCategoryConvert.INSTANCE.convert(createReqVO);
         productCategoryMapper.insert(category);
         // 返回
         return category.getId();
@@ -51,7 +51,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         validateParentProductCategory(updateReqVO.getParentId());
 
         // 更新
-        ProductCategoryDO updateObj = CategoryConvert.INSTANCE.convert(updateReqVO);
+        ProductCategoryDO updateObj = ProductCategoryConvert.INSTANCE.convert(updateReqVO);
         productCategoryMapper.updateById(updateObj);
     }
 

@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.product.controller.app.category;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.product.controller.app.category.vo.AppCategoryListRespVO;
-import cn.iocoder.yudao.module.product.convert.category.CategoryConvert;
+import cn.iocoder.yudao.module.product.controller.app.category.vo.AppCategoryRespVO;
+import cn.iocoder.yudao.module.product.convert.category.ProductCategoryConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import io.swagger.annotations.Api;
@@ -29,10 +29,10 @@ public class AppCategoryController {
 
     @GetMapping("/list")
     @ApiOperation("获得商品分类列表")
-    public CommonResult<List<AppCategoryListRespVO>> listByQuery() {
+    public CommonResult<List<AppCategoryRespVO>> getProductCategoryList() {
         List<ProductCategoryDO> list = categoryService.getEnableProductCategoryList();
         list.sort(Comparator.comparing(ProductCategoryDO::getSort));
-        return success(CategoryConvert.INSTANCE.convertList03(list));
+        return success(ProductCategoryConvert.INSTANCE.convertList03(list));
     }
 
 }

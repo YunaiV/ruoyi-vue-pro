@@ -20,7 +20,7 @@
       <!-- 右侧分类内容 -->
       <scroll-view scroll-y="true" class="box-right">
         <view class="category-image">
-          <image :showLoading="true" :src="categoryList[currentIndex].bannerUrl" mode='widthFix' @click="click"></image>
+          <image :showLoading="true" :src="categoryList[currentIndex].picUrl" mode='widthFix' @click="click"></image>
         </view>
 
         <view class="sub-category-box" v-for="(item, index) in categoryList[currentIndex].children" :key="item.id">
@@ -33,8 +33,8 @@
             <u-grid col="3">
               <u-grid-item v-for="(subItem, subIndex) in item.children" :key="subItem.id">
                 <view class="sub-category-item" @click="handleCategory(item, subIndex)">
-                  <u-icon name="photo" :size="80" v-if="subItem.bannerUrl === null"></u-icon>
-                  <image :src="item.bannerUrl" v-if="subItem.bannerUrl != null" mode='widthFix' />
+                  <u-icon name="photo" :size="80" v-if="subItem.picUrl === null"></u-icon>
+                  <image :src="item.picUrl" v-if="subItem.picUrl != null" mode='widthFix' />
                   <text class="sub-category-title">{{ subItem.name }}</text>
                 </view>
               </u-grid-item>

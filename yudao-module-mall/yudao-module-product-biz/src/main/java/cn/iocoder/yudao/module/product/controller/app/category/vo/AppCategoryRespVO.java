@@ -8,8 +8,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-@ApiModel(value = "App - 商品分类 Response VO")
-public class AppCategoryListRespVO {
+@ApiModel(value = "用户 APP - 商品分类 Response VO")
+public class AppCategoryRespVO {
 
     @ApiModelProperty(value = "分类编号", required = true, example = "2")
     private Long id;

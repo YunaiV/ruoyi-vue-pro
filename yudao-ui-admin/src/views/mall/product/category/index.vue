@@ -61,15 +61,15 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="上级分类" prop="parentId">
-          <el-select v-model="form.parentId" placeholder="请选择上级分类" clearable size="small">
-            <el-option :key="0" label="顶级分类" :value="0"/>
-            <el-option v-for="item in list.filter(v => v.parentId === 0)" :key="item.id" :label="item.name" :value="item.id"/>
-          </el-select>
+          <Treeselect v-model="form.parentId" :options="parentCategoryOptions" :normalizer="normalizer"
+                      :show-count="true"
+                      :defaultExpandLevel="1"
+                      placeholder="上级分类"/>
         </el-form-item>
         <el-form-item label="分类名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入分类名称"/>
         </el-form-item>
-        <el-form-item label="分类图片" prop="bannerUrl">
+        <el-form-item label="分类图片" prop="picUrl">
           <ImageUpload v-model="form.picUrl" :limit="1" :is-show-tip="false" />
           <div v-if="form.parentId === 0" style="font-size: 10px">推荐 200x100 图片分辨率</div>
           <div v-else style="font-size: 10px">推荐 100x100 图片分辨率</div>
@@ -164,6 +164,11 @@ export default {
       getProductCategoryList(params).then(response => {
         this.list = this.handleTree(response.data, "id", "parentId");
         this.loading = false;
+        // 属性下拉框
+        this.parentCategoryOptions = [];
+        const menu = {id: 0, name: '顶级分类', children: []};
+        menu.children = this.handleTree(response.data, "id", "parentId");
+        this.parentCategoryOptions.push(menu);
       });
     },
     /** 取消按钮 */
@@ -201,6 +206,17 @@ export default {
       this.$nextTick(() => {
         this.refreshTable = true;
       });
+    },
+    /** 转换菜单数据结构 */
+    normalizer(node) {
+      if (node.children && !node.children.length) {
+        delete node.children;
+      }
+      return {
+        id: node.id,
+        label: node.name,
+        children: node.children
+      };
     },
     /** 新增按钮操作 */
     handleAdd() {

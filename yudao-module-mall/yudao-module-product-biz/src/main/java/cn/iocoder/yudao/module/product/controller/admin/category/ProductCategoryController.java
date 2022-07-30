@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCateg
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryUpdateReqVO;
-import cn.iocoder.yudao.module.product.convert.category.CategoryConvert;
+import cn.iocoder.yudao.module.product.convert.category.ProductCategoryConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import io.swagger.annotations.Api;
@@ -61,7 +61,7 @@ public class ProductCategoryController {
     @PreAuthorize("@ss.hasPermission('product:category:query')")
     public CommonResult<ProductCategoryRespVO> getProductCategory(@RequestParam("id") Long id) {
         ProductCategoryDO category = categoryService.getProductCategory(id);
-        return success(CategoryConvert.INSTANCE.convert(category));
+        return success(ProductCategoryConvert.INSTANCE.convert(category));
     }
 
     @GetMapping("/list")
@@ -70,7 +70,7 @@ public class ProductCategoryController {
     public CommonResult<List<ProductCategoryRespVO>> getProductCategoryList(@Valid ProductCategoryListReqVO treeListReqVO) {
         List<ProductCategoryDO> list = categoryService.getEnableProductCategoryList(treeListReqVO);
         list.sort(Comparator.comparing(ProductCategoryDO::getSort));
-        return success(CategoryConvert.INSTANCE.convertList(list));
+        return success(ProductCategoryConvert.INSTANCE.convertList(list));
     }
 
 }

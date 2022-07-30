@@ -9,9 +9,9 @@ import lombok.*;
 /**
  * 商品分类 DO
  *
- * 商品分类一共两级：
+ * 商品分类一共两类：
  * 1）一级分类：{@link #parentId} 等于 0
- * 2）二级分类：{@link #parentId} 等于父分类
+ * 2）二级 + 三级分类：{@link #parentId} 不等于 0
  *
  * @author 芋道源码
  */
@@ -46,7 +46,7 @@ public class ProductCategoryDO extends BaseDO {
      * 分类图片
      *
      * 一级分类：推荐 200 x 100 分辨率
-     * 二级分类：推荐 100 x 100 分辨率
+     * 二级 + 三级分类：推荐 100 x 100 分辨率
      */
     private String picUrl;
     /**
