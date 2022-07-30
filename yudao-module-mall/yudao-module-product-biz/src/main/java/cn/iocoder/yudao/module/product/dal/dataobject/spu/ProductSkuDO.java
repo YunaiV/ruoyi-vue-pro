@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.dal.dataobject.sku;
+package cn.iocoder.yudao.module.product.dal.dataobject.spu;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;

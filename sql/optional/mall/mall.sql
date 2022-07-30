@@ -71,24 +71,6 @@ INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, com
 VALUES ('规格导出', 'product:property:export', 3, 5, @parentId, '', '', '', 0);
 
 
--- 商品菜单 SQL
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('商品管理', '', 2, 2, 2001, 'spu', '', 'mall/product/spu/index', 0);
-
--- 按钮父菜单ID
-SELECT @parentId := LAST_INSERT_ID();
-
--- 按钮 SQL
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('商品查询', 'product:spu:query', 3, 1, @parentId, '', '', '', 0);
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('商品创建', 'product:spu:create', 3, 2, @parentId, '', '', '', 0);
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('商品更新', 'product:spu:update', 3, 3, @parentId, '', '', '', 0);
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('商品删除', 'product:spu:delete', 3, 4, @parentId, '', '', '', 0);
-INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('商品导出', 'product:spu:export', 3, 5, @parentId, '', '', '', 0);
 
 
 -- 规格名称表
@@ -127,54 +109,6 @@ create table product_property_value
 ) comment '规格值' character set utf8mb4
                 collate utf8mb4_general_ci;
 
--- spu
-drop table if exists product_spu;
-create table product_spu
-(
-    id          bigint        NOT NULL AUTO_INCREMENT COMMENT '主键',
-    name        varchar(128) comment '商品名称',
-    sell_point  varchar(128)  not null comment '卖点',
-    description text          not null comment '描述',
-    category_id bigint        not null comment '分类id',
-    pic_urls    varchar(1024) not null default '' comment '商品主图地址\n     *\n     * 数组，以逗号分隔\n 最多上传15张',
-    sort        int           not null default 0 comment '排序字段',
-    like_count  int comment '点赞初始人数',
-    price       int comment '价格 单位使用：分',
-    quantity    int comment '库存数量',
-    status      bit(1) comment '上下架状态： 0 上架（开启） 1 下架（禁用）',
-    create_time datetime               default current_timestamp comment '创建时间',
-    update_time datetime               default current_timestamp on update current_timestamp comment '更新时间',
-    creator     varchar(64) comment '创建人',
-    updater     varchar(64) comment '更新人',
-    tenant_id   bigint        NOT NULL DEFAULT '0' COMMENT '租户编号',
-    deleted   bit(1)        NOT NULL DEFAULT b'0' COMMENT '是否删除',
-    primary key (id)
-) comment '商品spu' character set utf8mb4
-                  collate utf8mb4_general_ci;
-
-
--- sku
-drop table if exists product_sku;
-create table product_sku
-(
-    id             bigint       NOT NULL AUTO_INCREMENT COMMENT '主键',
-    spu_id         bigint       not null comment 'spu编号',
-    properties     varchar(64)  not null comment '规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]',
-    price          int          not null DEFAULT -1 comment '销售价格，单位：分',
-    original_price int          not null DEFAULT -1 comment '原价， 单位： 分',
-    cost_price     int          not null DEFAULT -1 comment '成本价，单位： 分',
-    bar_code       varchar(64)  not null comment '条形码',
-    pic_url        VARCHAR(128) not null comment '图片地址',
-    status         tinyint comment '状态： 0-正常 1-禁用',
-    create_time    datetime              default current_timestamp comment '创建时间',
-    update_time    datetime              default current_timestamp on update current_timestamp comment '更新时间',
-    creator        varchar(64) comment '创建人',
-    updater        varchar(64) comment '更新人',
-    tenant_id      bigint       NOT NULL DEFAULT '0' COMMENT '租户编号',
-    deleted      bit(1)       NOT NULL DEFAULT b'0' COMMENT '是否删除',
-    primary key (id)
-) comment '商品sku' character set utf8mb4
-                  collate utf8mb4_general_ci;
 
 
 ---Market-Banner管理SQL

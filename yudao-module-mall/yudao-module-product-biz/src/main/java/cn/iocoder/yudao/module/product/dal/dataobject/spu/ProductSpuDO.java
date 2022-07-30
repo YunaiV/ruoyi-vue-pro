@@ -1,13 +1,21 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.spu;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.group.ProductGroupDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
+import java.util.List;
+
 /**
- * 商品spu DO
+ * 商品 SPU DO
  *
  * @author 芋道源码
  */
@@ -22,7 +30,7 @@ import lombok.*;
 public class ProductSpuDO extends BaseDO {
 
     /**
-     * 主键
+     * 商品 SPU 编号，自增
      */
     @TableId
     private Long id;
@@ -31,41 +39,62 @@ public class ProductSpuDO extends BaseDO {
      */
     private String name;
     /**
-     * 卖点
+     * 商品卖点
      */
     private String sellPoint;
     /**
-     * 描述
+     * 商品详情
      */
     private String description;
     /**
-     * 分类id
+     * 商品分类编号
+     *
+     * 关联 {@link ProductCategoryDO#getId()}
      */
     private Long categoryId;
     /**
-     * 商品主图地址,* 数组，以逗号分隔,最多上传15张
+     * 商品品牌编号
+     *
+     * 关联 {@link ProductBrandDO#getId()}
      */
-    // TODO franky：List<String>。可以参考别的模块，怎么处理这种类型的哈
-    private String picUrls;
+    private Long brandId;
+    /**
+     * 商品分组编号数组
+     *
+     * 关联 {@link ProductGroupDO#getId()}
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<Long> groupIds;
+    /**
+     * 商品图片地址数组
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> picUrls;
     /**
      * 排序字段
      */
     private Integer sort;
     /**
-     * 点赞初始人数
+     * 商品状态
+     *
+     * 枚举 {@link CommonStatusEnum}
      */
-    private Integer likeCount;
+    private Integer status;
     /**
-     * 价格 单位使用：分
+     * 价格，单位使用：分
+     *
+     * 基于其对应的 {@link ProductSkuDO#getPrice()} 最小值
      */
     private Integer price;
     /**
      * 库存数量
+     *
+     * 基于其对应的 {@link ProductSkuDO#getPrice()} 求和
      */
     private Integer quantity;
-    /**
-     * 上下架状态： 0 上架（开启） 1 下架（禁用）
-     */
-    private Boolean status;
+
+
+    // TODO 芋艿：配送方式：商家配送、商家自提
+    // TODO 芋艿：运费设置；如果选择了 “商家配送” 配送方式，则选择「运费设置」编号
 
 }

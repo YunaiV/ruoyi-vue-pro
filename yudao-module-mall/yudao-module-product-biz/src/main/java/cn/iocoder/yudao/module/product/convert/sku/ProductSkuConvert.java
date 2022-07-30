@@ -10,8 +10,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
-import org.springframework.util.StringUtils;
+import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSkuDO;
 
 /**
  * 商品sku Convert
