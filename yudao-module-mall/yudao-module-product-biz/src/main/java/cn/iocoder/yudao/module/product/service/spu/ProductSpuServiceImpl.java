@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
-import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSkuDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;

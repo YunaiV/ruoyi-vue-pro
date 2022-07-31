@@ -4,7 +4,10 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.group.ProductGroupDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.delivery.DeliveryTemplateDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.shop.ShopDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
+import cn.iocoder.yudao.module.product.enums.delivery.DeliveryModeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -34,6 +37,16 @@ public class ProductSpuDO extends BaseDO {
      */
     @TableId
     private Long id;
+
+    /**
+     * 店铺编号
+     *
+     * 关联 {@link ShopDO#getId()}
+     */
+    private Long shopId;
+
+    // ========== 基本信息 =========
+
     /**
      * 商品名称
      */
@@ -59,13 +72,6 @@ public class ProductSpuDO extends BaseDO {
      */
     private Long brandId;
     /**
-     * 商品分组编号数组
-     *
-     * 关联 {@link ProductGroupDO#getId()}
-     */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Long> groupIds;
-    /**
      * 商品图片地址数组
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
@@ -80,6 +86,9 @@ public class ProductSpuDO extends BaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+
+    // ========== SKU 相关字段 =========
+
     /**
      * 价格，单位使用：分
      *
@@ -87,14 +96,29 @@ public class ProductSpuDO extends BaseDO {
      */
     private Integer price;
     /**
-     * 库存数量
+     * 总库存
      *
-     * 基于其对应的 {@link ProductSkuDO#getPrice()} 求和
+     * 基于其对应的 {@link ProductSkuDO#getActualStocks()} 求和
      */
-    private Integer quantity;
+    private Integer totalStocks;
+    /**
+     * 已销售数量
+     */
+    private Integer soldNum;
 
+    // ========== 物流相关字段 =========
 
-    // TODO 芋艿：配送方式：商家配送、商家自提
-    // TODO 芋艿：运费设置；如果选择了 “商家配送” 配送方式，则选择「运费设置」编号
+    /**
+     * 配送方式
+     *
+     * 枚举 {@link DeliveryModeEnum}
+     */
+    private Integer deliveryMode;
+    /**
+     * 配置模板编号
+     *
+     * 关联 {@link DeliveryTemplateDO#getId()}
+     */
+    private Long deliveryTemplateId;
 
 }

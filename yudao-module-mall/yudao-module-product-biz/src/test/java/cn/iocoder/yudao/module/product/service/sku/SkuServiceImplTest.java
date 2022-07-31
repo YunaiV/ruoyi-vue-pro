@@ -8,7 +8,7 @@ import javax.annotation.Resource;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSkuDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 

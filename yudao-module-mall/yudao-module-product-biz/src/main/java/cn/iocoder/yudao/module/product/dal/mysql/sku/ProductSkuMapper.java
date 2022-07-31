@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuExportReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
-import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSkuDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

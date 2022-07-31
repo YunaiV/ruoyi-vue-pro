@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
-import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSkuDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

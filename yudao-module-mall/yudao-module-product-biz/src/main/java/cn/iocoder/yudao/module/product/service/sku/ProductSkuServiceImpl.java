@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPrope
 import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
-import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSkuDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;

@@ -1,30 +1,30 @@
-package cn.iocoder.yudao.module.product.dal.dataobject.property;
+package cn.iocoder.yudao.module.product.dal.dataobject.group;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.shop.ShopDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 规格名称 DO
+ * 商品分组的绑定 DO
  *
  * @author 芋道源码
  */
-@TableName("product_property")
-@KeySequence("product_property_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("product_group_bind")
+@KeySequence("product_group_bind_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductPropertyDO extends BaseDO {
+public class ProductGroupBindDO extends BaseDO {
 
     /**
-     * 主键
+     * 编号，自增
      */
     @TableId
     private Long id;
@@ -35,16 +35,16 @@ public class ProductPropertyDO extends BaseDO {
      */
     private Long shopId;
     /**
-     * 规格名称
-     */
-    private String name;
-    /**
-     * 状态
+     * 商品分组编号
      *
-     * 枚举 {@link CommonStatusEnum}
+     * 关联 {@link ProductGroupDO#getId()}
      */
-    private Integer status;
-
-    // TODO 芋艿：rule；规格属性 (发布商品时，和 SKU 关联)；规格参数(搜索商品时，与 Category 关联搜索)
+    private Long groupId;
+    /**
+     * 商品 SPU 编号
+     *
+     * 关联 {@link ProductSpuDO#getId()}
+     */
+    private Long spuId;
 
 }

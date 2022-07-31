@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateR
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuExportReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
-import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSkuDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 
 import javax.validation.Valid;
 import java.util.Collection;
