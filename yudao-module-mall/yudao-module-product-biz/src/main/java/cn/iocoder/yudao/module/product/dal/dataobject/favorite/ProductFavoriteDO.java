@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.dal.dataobject.group;
+package cn.iocoder.yudao.module.product.dal.dataobject.favorite;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -8,37 +8,31 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 商品分组的绑定 DO
+ * 商品收藏 DO
  *
  * @author 芋道源码
  */
-@TableName("product_group_bind")
-@KeySequence("product_group_bind_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("product_favorite")
+@KeySequence("product_favorite_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductGroupBindDO extends BaseDO {
+public class ProductFavoriteDO extends BaseDO {
 
     /**
-     * 编号，自增
+     * 编号，主键自增
      */
     @TableId
     private Long id;
-//    /**
-//     * 店铺编号
-//     *
-//     * 关联 {@link ShopDO#getId()} TODO 芋艿：多店铺，暂不考虑
-//     */
-//    private Long shopId;
     /**
-     * 商品分组编号
+     * 用户编号
      *
-     * 关联 {@link ProductGroupDO#getId()}
+     * 关联 MemberUserDO 的 id 编号
      */
-    private Long groupId;
+    private Long userId;
     /**
      * 商品 SPU 编号
      *

@@ -69,4 +69,10 @@ public class MemberUserDO extends TenantBaseDO {
      */
     private Date loginDate;
 
+    // TODO 芋艿：name 真实名字；
+    // TODO 芋艿：email 邮箱；
+    // TODO 芋艿：gender 性别；
+    // TODO 芋艿：score 积分；
+    // TODO 芋艿：payPassword 支付密码；
+
 }
