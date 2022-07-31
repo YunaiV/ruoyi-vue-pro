@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.delivery.DeliveryTemplateDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.shop.ShopDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.enums.delivery.DeliveryModeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;

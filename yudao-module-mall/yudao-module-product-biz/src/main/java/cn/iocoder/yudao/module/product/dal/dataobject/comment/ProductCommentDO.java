@@ -41,11 +41,11 @@ public class ProductCommentDO extends BaseDO {
      */
     private Long spuId;
     /**
-     * 订单项编号
+     * 交易订单项编号
      *
      * 关联 OrderItemDO 的 id 编号
      */
-    private Long orderItemId;
+    private Long tradeOrderItemId;
 
     /**
      * 用户编号

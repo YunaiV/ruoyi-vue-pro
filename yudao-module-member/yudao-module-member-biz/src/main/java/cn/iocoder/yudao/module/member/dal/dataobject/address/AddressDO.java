@@ -31,7 +31,7 @@ public class AddressDO extends BaseDO {
     /**
      * 收件人名称
      */
-    private String receiver;
+    private String name;
     /**
      * 手机号
      */
