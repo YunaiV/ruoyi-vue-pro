@@ -69,7 +69,7 @@ public class ProductSpuController {
 
     @GetMapping("/list")
     @ApiOperation("获得商品spu列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<List<SpuRespVO>> getSpuList(@RequestParam("ids") Collection<Long> ids) {
         List<ProductSpuDO> list = spuService.getSpuList(ids);
