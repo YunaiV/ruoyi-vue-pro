@@ -97,7 +97,7 @@
     "vite-plugin-eslint": "^1.7.0",
     "vite-plugin-html": "^3.2.0",
     "vite-plugin-purge-icons": "^0.8.2",
-    "vite-plugin-style-import": "1.4.1",
+    "vite-plugin-style-import": "^2.0.0",
     "vite-plugin-svg-icons": "^2.0.1",
     "vite-plugin-windicss": "^1.8.7",
     "vue-tsc": "^0.39.4",
