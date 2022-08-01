@@ -152,7 +152,7 @@ const crudSchemas = reactive<CrudSchema[]>([
   },
   {
     field: 'action',
-    width: '340px',
+    width: '400px',
     label: t('table.action'),
     form: {
       show: false
