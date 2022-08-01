@@ -7,7 +7,7 @@ import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
 import { FormExpose } from '@/components/Form'
 import { TenantPackageVO } from '@/api/system/tenantPackage/types'
-import { ElMessage, ElCard, ElCheckbox, ElTree } from 'element-plus'
+import { ElMessage, ElCard, ElSwitch, ElTree } from 'element-plus'
 import { rules, allSchemas } from './tenantPackage.data'
 import * as TenantPackageApi from '@/api/system/tenantPackage'
 import { listSimpleMenusApi } from '@/api/system/menu'
@@ -21,11 +21,15 @@ const defaultProps = {
 // ========== 创建菜单树结构 ==========
 const menuOptions = ref([]) // 树形结构
 const treeRef = ref<InstanceType<typeof ElTree>>()
+const treeNodeAll = ref(false)
+// 全选/全不选
+const handleCheckedTreeNodeAll = () => {
+  treeRef.value!.setCheckedNodes(treeNodeAll.value ? menuOptions.value : [])
+}
 const getTree = async () => {
   const res = await listSimpleMenusApi()
   menuOptions.value = handleTree(res)
 }
-let menuCheckStrictly = true
 const menuExpand = ref(false)
 const menuNodeAll = ref(false)
 
@@ -42,7 +46,6 @@ const formRef = ref<FormExpose>() // 表单 Ref
 const actionType = ref('') // 操作按钮的类型
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
-const menuParentId = ref()
 
 // 设置标题
 const setDialogTile = (type: string) => {
@@ -58,7 +61,6 @@ const handleCreate = () => {
   unref(formRef)?.getElFormRef()?.resetFields()
   //重置菜单树
   unref(treeRef)?.setCheckedKeys([])
-  menuCheckStrictly = true
   menuExpand.value = false
   menuNodeAll.value = false
 }
@@ -69,13 +71,8 @@ const handleUpdate = async (row: any) => {
   // 设置数据
   const res = await TenantPackageApi.getTenantPackageApi(row.id)
   unref(formRef)?.setValues(res)
-  // 设置菜单项
-  // 设置为严格，避免设置父节点自动选中子节点，解决半选中问题
-  menuCheckStrictly = true
   // 设置选中
   unref(treeRef)?.setCheckedKeys(res.menuIds)
-  // 设置为非严格，继续使用半选中
-  menuCheckStrictly = false
 }
 // 提交按钮
 const submitForm = async () => {
@@ -163,20 +160,23 @@ onMounted(async () => {
         <el-card class="box-card">
           <template #header>
             <div class="card-header">
-              <el-checkbox>展开/折叠</el-checkbox>
-              <el-checkbox>全选/全不选</el-checkbox>
+              全选/全不选:
+              <el-switch
+                v-model="treeNodeAll"
+                inline-prompt
+                active-text="是"
+                inactive-text="否"
+                @change="handleCheckedTreeNodeAll()"
+              />
             </div>
           </template>
-          <!--            default-expand-all-->
           <el-tree
             ref="treeRef"
             node-key="id"
-            v-model="menuParentId"
+            show-checkbox
             :props="defaultProps"
             :data="menuOptions"
-            show-checkbox
-            :check-strictly="menuCheckStrictly"
-            empty-text="加载菜单中..."
+            empty-text="加载中，请稍后"
           />
         </el-card>
       </template>
