@@ -1,12 +1,17 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 商品spu Service 接口
@@ -60,14 +65,6 @@ public interface ProductSpuService {
      * @return 商品spu分页
      */
     PageResult<SpuRespVO> getSpuPage(SpuPageReqVO pageReqVO);
-
-    /**
-     * 获得商品spu列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 商品spu列表
-     */
-    List<ProductSpuDO> getSpuList(SpuExportReqVO exportReqVO);
 
     /**
      * 获得商品spu分页

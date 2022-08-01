@@ -84,11 +84,6 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         return productSkuMapper.selectPage(pageReqVO);
     }
 
-    @Override
-    public List<ProductSkuDO> getSkuList(ProductSkuExportReqVO exportReqVO) {
-        return productSkuMapper.selectList(exportReqVO);
-    }
-
     // TODO @franky：这个方法，貌似实现的还是有点问题哈。例如说，throw 异常，后面还执行逻辑~
     // TODO @艿艿 咳咳，throw 那里我是偷懒省略了{}，哈哈，我加上，然后我调试下，在优化下
     @Override

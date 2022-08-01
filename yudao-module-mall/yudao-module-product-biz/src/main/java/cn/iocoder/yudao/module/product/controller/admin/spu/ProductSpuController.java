@@ -2,9 +2,10 @@ package cn.iocoder.yudao.module.product.controller.admin.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
@@ -16,14 +17,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "管理后台 - 商品spu")
 @RestController
@@ -81,18 +79,6 @@ public class ProductSpuController {
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<PageResult<SpuRespVO>> getSpuPage(@Valid SpuPageReqVO pageVO) {
         return success(spuService.getSpuPage(pageVO));
-    }
-
-    @GetMapping("/export-excel")
-    @ApiOperation("导出商品spu Excel")
-    @PreAuthorize("@ss.hasPermission('product:spu:export')")
-    @OperateLog(type = EXPORT)
-    public void exportSpuExcel(@Valid SpuExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<ProductSpuDO> list = spuService.getSpuList(exportReqVO);
-        // 导出 Excel
-        List<SpuExcelVO> datas = ProductSpuConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "商品spu.xls", "数据", SpuExcelVO.class, datas);
     }
 
 }

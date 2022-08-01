@@ -1,24 +1,23 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
+import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
-import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import org.springframework.context.annotation.Import;
-import java.util.*;
-
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -107,7 +106,7 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
            o.setProperties(null);
            o.setPrice(null);
            o.setOriginalPrice(null);
-           o.setCostPrice(null);
+//           o.setCostPrice(null);
            o.setBarCode(null);
            o.setPicUrl(null);
            o.setStatus(null);
@@ -123,7 +122,7 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
        // 测试 originalPrice 不匹配
        ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setOriginalPrice(null)));
        // 测试 costPrice 不匹配
-       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setCostPrice(null)));
+//       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setCostPrice(null)));
        // 测试 barCode 不匹配
        ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setBarCode(null)));
        // 测试 picUrl 不匹配
@@ -150,59 +149,6 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());
        assertPojoEquals(dbSku, pageResult.getList().get(0));
-    }
-
-    @Test
-    @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
-    public void testGetSkuList() {
-       // mock 数据
-       ProductSkuDO dbSku = randomPojo(ProductSkuDO.class, o -> { // 等会查询到
-           o.setSpuId(null);
-           o.setProperties(null);
-           o.setPrice(null);
-           o.setOriginalPrice(null);
-           o.setCostPrice(null);
-           o.setBarCode(null);
-           o.setPicUrl(null);
-           o.setStatus(null);
-           o.setCreateTime(null);
-       });
-       ProductSkuMapper.insert(dbSku);
-       // 测试 spuId 不匹配
-       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setSpuId(null)));
-       // 测试 properties 不匹配
-       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setProperties(null)));
-       // 测试 price 不匹配
-       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setPrice(null)));
-       // 测试 originalPrice 不匹配
-       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setOriginalPrice(null)));
-       // 测试 costPrice 不匹配
-       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setCostPrice(null)));
-       // 测试 barCode 不匹配
-       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setBarCode(null)));
-       // 测试 picUrl 不匹配
-       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setPicUrl(null)));
-       // 测试 status 不匹配
-       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setStatus(null)));
-       // 测试 createTime 不匹配
-       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setCreateTime(null)));
-       // 准备参数
-        ProductSkuExportReqVO reqVO = new ProductSkuExportReqVO();
-       reqVO.setSpuId(null);
-       reqVO.setProperties(null);
-       reqVO.setPrice(null);
-       reqVO.setOriginalPrice(null);
-       reqVO.setCostPrice(null);
-       reqVO.setBarCode(null);
-       reqVO.setPicUrl(null);
-       reqVO.setStatus(null);
-       reqVO.setCreateTime(null);
-
-       // 调用
-       List<ProductSkuDO> list = ProductSkuService.getSkuList(reqVO);
-       // 断言
-       assertEquals(1, list.size());
-       assertPojoEquals(dbSku, list.get(0));
     }
 
 }

@@ -35,15 +35,15 @@ CREATE TABLE IF NOT EXISTS "member_address" (
     "user_id" bigint(20) NOT NULL,
     "name" varchar(10) NOT NULL,
     "mobile" varchar(20) NOT NULL,
-    "area_code" int(11) NOT NULL,
+    "area_id" bigint(20) NOT NULL,
+    "post_code" varchar(16) NOT NULL,
     "detail_address" varchar(250) NOT NULL,
-    "type" tinyint(4) NOT NULL,
+    "defaulted" bit NOT NULL,
     "create_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "creator" varchar(64) DEFAULT '',
     "update_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     "updater" varchar(64) DEFAULT '',
-    "tenant_id" bigint(20) NOT NULL,
     PRIMARY KEY ("id")
-    ) COMMENT '用户收件地址';
+) COMMENT '用户收件地址';
 

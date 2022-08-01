@@ -82,9 +82,14 @@ public class CartItemDO extends BaseDO {
 //     * 商品营销活动类型
 //     */
 //    private Integer activityType;
+    // TODO 芋艿：combination_id 拼团 ID
+    // TODO 芋艿：seckill_id 秒杀产品 ID
+    // TODO 芋艿：bargain_id 砍价 ID
 
     // ========= 优惠信息 END =========
 
-    // TODO 芋艿：distribution_card_no
+    // TODO 芋艿：distribution_card_no 推广员
+    // TODO 芋艿：is_pay 未购买、已购买
+    // TODO 芋艿：is_new 是否立即购买
 
 }

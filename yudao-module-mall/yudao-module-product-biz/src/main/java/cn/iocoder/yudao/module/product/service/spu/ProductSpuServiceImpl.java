@@ -172,11 +172,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public List<ProductSpuDO> getSpuList(SpuExportReqVO exportReqVO) {
-        return ProductSpuMapper.selectList(exportReqVO);
-    }
-
-    @Override
     public PageResult<AppSpuPageRespVO> getSpuPage(AppSpuPageReqVO pageReqVO) {
         PageResult<ProductSpuDO> productSpuDOPageResult = ProductSpuMapper.selectPage(ProductSpuConvert.INSTANCE.convert(pageReqVO));
         PageResult<AppSpuPageRespVO> pageResult = new PageResult<>();

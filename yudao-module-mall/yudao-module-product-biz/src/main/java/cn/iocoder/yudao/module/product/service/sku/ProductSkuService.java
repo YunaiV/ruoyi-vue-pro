@@ -65,14 +65,6 @@ public interface ProductSkuService {
     PageResult<ProductSkuDO> getSkuPage(ProductSkuPageReqVO pageReqVO);
 
     /**
-     * 获得商品sku列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 商品sku列表
-     */
-    List<ProductSkuDO> getSkuList(ProductSkuExportReqVO exportReqVO);
-
-    /**
      * 对 sku 的组合的属性等进行合法性校验
      *
      * @param list sku组合的集合

@@ -2,9 +2,10 @@ package cn.iocoder.yudao.module.product.controller.admin.sku;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
@@ -16,14 +17,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "管理后台 - 商品 sku")
 @RestController
@@ -82,18 +80,6 @@ public class ProductSkuController {
     public CommonResult<PageResult<ProductSkuRespVO>> getSkuPage(@Valid ProductSkuPageReqVO pageVO) {
         PageResult<ProductSkuDO> pageResult = ProductSkuService.getSkuPage(pageVO);
         return success(ProductSkuConvert.INSTANCE.convertPage(pageResult));
-    }
-
-    @GetMapping("/export-excel")
-    @ApiOperation("导出商品sku Excel")
-    @PreAuthorize("@ss.hasPermission('product:sku:export')")
-    @OperateLog(type = EXPORT)
-    public void exportSkuExcel(@Valid ProductSkuExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<ProductSkuDO> list = ProductSkuService.getSkuList(exportReqVO);
-        // 导出 Excel
-        List<ProductSkuExcelVO> datas = ProductSkuConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "商品sku.xls", "数据", ProductSkuExcelVO.class, datas);
     }
 
 }

@@ -47,6 +47,6 @@ public class AppSpuPageRespVO  {
     private Integer quantity;
 
     @ApiModelProperty(value = "上下架状态： 0 上架（开启） 1 下架（禁用）")
-    private Boolean status;
+    private Integer status;
 
 }

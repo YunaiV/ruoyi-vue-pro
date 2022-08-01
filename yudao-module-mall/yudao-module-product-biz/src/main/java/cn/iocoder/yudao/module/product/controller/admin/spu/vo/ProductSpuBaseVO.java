@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
 * 商品spu Base VO，提供给添加、修改、详细的子 VO 使用
@@ -45,6 +46,6 @@ public class ProductSpuBaseVO {
     private Integer quantity;
 
     @ApiModelProperty(value = "上下架状态： 0 上架（开启） 1 下架（禁用）")
-    private Boolean status;
+    private Integer status;
 
 }
