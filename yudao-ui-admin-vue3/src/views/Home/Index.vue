@@ -208,7 +208,12 @@ const getUserAccessSource = async () => {
     'legend.data',
     data.map((v) => t(v.name))
   )
-  set(pieOptionsData, 'series.data', data)
+  pieOptionsData!.series![0].data = data.map((v) => {
+    return {
+      name: t(v.name),
+      value: v.value
+    }
+  })
 }
 const barOptionsData = reactive<EChartsOption>(barOptions) as EChartsOption
 
