@@ -92,7 +92,6 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   async (response: AxiosResponse<Recordable>) => {
     const { data } = response
-    console.info(data)
     if (!data) {
       // 返回“[HTTP]请求没有返回值”;
       throw new Error()
