@@ -46,7 +46,7 @@
         <jasypt-spring-boot-starter.version>3.0.4</jasypt-spring-boot-starter.version>
         <lombok.version>1.18.20</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
-        <hutool.version>5.7.22</hutool.version>
+        <hutool.version>5.8.5</hutool.version>
         <easyexcel.verion>3.1.1</easyexcel.verion>
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
