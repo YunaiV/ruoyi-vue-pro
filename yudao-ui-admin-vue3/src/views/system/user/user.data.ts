@@ -7,8 +7,18 @@ import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
 const { t } = useI18n()
 // 表单校验
 export const rules = reactive({
+  username: [required],
   nickname: [required],
-  status: [required]
+  email: [required],
+  status: [required],
+  mobile: [
+    {
+      pattern:
+        /^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-79])|(?:5[0-35-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[189]))\d{8}$/,
+      trigger: 'blur',
+      message: '请输入正确的手机号码'
+    }
+  ]
 })
 // crudSchemas
 const crudSchemas = reactive<CrudSchema[]>([

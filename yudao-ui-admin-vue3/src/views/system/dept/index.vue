@@ -5,7 +5,7 @@ import { handleTree } from '@/utils/tree'
 import { onMounted, ref, unref, watch } from 'vue'
 import * as DeptApi from '@/api/system/dept'
 import { Form, FormExpose } from '@/components/Form'
-import { modelSchema } from './dept.data'
+import { modelSchema, rules } from './dept.data'
 import { DeptVO } from '@/api/system/dept/types'
 import { useMessage } from '@/hooks/web/useMessage'
 import { getListSimpleUsersApi } from '@/api/system/user'
@@ -159,7 +159,7 @@ onMounted(async () => {
       </div>
       <div v-if="showForm">
         <!-- 操作工具栏 -->
-        <Form :schema="modelSchema" ref="formRef">
+        <Form ref="formRef" :schema="modelSchema" :rules="rules">
           <template #parentId>
             <el-tree-select
               node-key="id"

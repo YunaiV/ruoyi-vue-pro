@@ -63,7 +63,7 @@ const { getList, setSearchParams, delList, exportList } = methods
 
 // ========== 创建部门树结构 ==========
 const filterText = ref('')
-const deptOptions = ref([]) // 树形结构
+const deptOptions = ref<any[]>([]) // 树形结构
 const searchForm = ref<FormExpose>()
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const getTree = async () => {
