@@ -75,18 +75,18 @@ aj:
     cache-number: 1000
     # local定时清除过期缓存(单位秒),设置为0代表不执行
     timing-clear: 180
-    # 验证码类型default两种都实例化。
-    type: default
-    # 右下角水印文字(我的水印)https://tool.chinaz.com/tools/unicode.aspx 中文转Unicode
+    # 验证码类型 default两种都实例化。 blockPuzzle 滑块拼图 clickWord 文字点选
+    type: blockPuzzle
+    # 右下角水印文字(我的水印)https://tool.chinaz.com/tools/unicode.aspx 中文转Unicode Linux可能需要转unicode
     water-mark: 芋道源码
     # 滑动干扰项(0/1/2)
     interference-options: 2
     # 接口请求次数一分钟限制是否开启 true|false
-    req-frequency-limit-enable: false
+    req-frequency-limit-enable: true
     # 验证失败5次，get接口锁定
     req-get-lock-limit: 5
     # 验证失败后，锁定时间间隔,s
-    req-get-lock-seconds: 360
+    req-get-lock-seconds: 10
     # get接口一分钟内请求数限制
     req-get-minute-limit: 30
     # check接口一分钟内请求数限制
