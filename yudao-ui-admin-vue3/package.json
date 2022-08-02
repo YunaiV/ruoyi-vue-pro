@@ -38,6 +38,7 @@
     "element-plus": "2.2.12",
     "intro.js": "^6.0.0",
     "jsencrypt": "^3.2.1",
+    "crypto-js": "^4.1.1",
     "lodash-es": "^4.17.21",
     "mitt": "^3.0.0",
     "nprogress": "^0.2.0",
