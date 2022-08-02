@@ -20,31 +20,37 @@ const request = (option: AxiosConfig) => {
 
 async function getFn<T = any>(option: AxiosConfig): Promise<T> {
   const res = await request({ method: 'GET', ...option })
+  console.info(res)
   return res.data
 }
 
 async function postFn<T = any>(option: AxiosConfig): Promise<T> {
   const res = await request({ method: 'POST', ...option })
+  console.info(res)
   return res.data
 }
 
 async function deleteFn<T = any>(option: AxiosConfig): Promise<T> {
   const res = await request({ method: 'DELETE', ...option })
+  console.info(res)
   return res.data
 }
 
 async function putFn<T = any>(option: AxiosConfig): Promise<T> {
   const res = await request({ method: 'PUT', ...option })
+  console.info(res)
   return res.data
 }
 async function downloadFn<T = any>(option: AxiosConfig): Promise<T> {
   const res = await request({ method: 'GET', responseType: 'blob', ...option })
+  console.info(res)
   return res as unknown as Promise<T>
 }
 
 async function uploadFn<T = any>(option: AxiosConfig): Promise<T> {
   option.headersType = 'multipart/form-data'
   const res = await request({ method: 'PUT', ...option })
+  console.info(res)
   return res as unknown as Promise<T>
 }
 
