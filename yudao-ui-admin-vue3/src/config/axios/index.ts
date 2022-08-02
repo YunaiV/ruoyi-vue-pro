@@ -55,17 +55,26 @@ service.interceptors.request.use(
       config.data = qs.stringify(data)
     }
     // get参数编码
-    if (config.method?.toUpperCase() === 'GET' && config.params) {
-      let url = config.url as string
+    if (config.method?.toUpperCase() === 'GET' && params) {
+      let url = config.url + '?'
+      for (const propName of Object.keys(params)) {
+        const value = params[propName]
+        if (value !== void 0 && value !== null && typeof value !== 'undefined') {
+          if (typeof value === 'object') {
+            for (const val of Object.keys(value)) {
+              const params = propName + '[' + val + ']'
+              const subPart = encodeURIComponent(params) + '='
+              url += subPart + encodeURIComponent(value[val]) + '&'
+            }
+          } else {
+            url += `${propName}=${encodeURIComponent(value)}&`
+          }
+        }
+      }
       // 给 get 请求加上时间戳参数，避免从缓存中拿数据
       // const now = new Date().getTime()
       // params = params.substring(0, url.length - 1) + `?_t=${now}`
-      url += '?'
-      for (const key of Object.keys(params)) {
-        if (params[key] !== void 0 && params[key] !== null) {
-          url += `${key}=${encodeURIComponent(params[key])}&`
-        }
-      }
+      url = url.slice(0, -1)
       config.params = {}
       config.url = url
     }

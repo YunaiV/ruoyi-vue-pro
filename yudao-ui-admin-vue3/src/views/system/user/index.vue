@@ -269,6 +269,7 @@ const handleFileSuccess = (response: any): void => {
     text += '< ' + username + ': ' + data.failureUsernames[username] + ' >'
   }
   message.alert(text)
+  getList()
 }
 // 文件数超出提示
 const handleExceed = (): void => {
@@ -282,8 +283,8 @@ const excelUploadError = (): void => {
 onMounted(async () => {
   await getTree()
   await getPostOptions()
+  await getList()
 })
-getList()
 </script>
 
 <template>
