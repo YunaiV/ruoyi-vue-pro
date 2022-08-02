@@ -90,7 +90,6 @@ service.interceptors.request.use(
 // response 拦截器
 service.interceptors.response.use(
   async (response: AxiosResponse<Recordable>) => {
-    console.info(response)
     const { data } = response
     if (!data) {
       // 返回“[HTTP]请求没有返回值”;

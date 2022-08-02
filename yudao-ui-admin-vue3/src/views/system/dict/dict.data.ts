@@ -29,6 +29,9 @@ export const crudSchemas = reactive<CrudSchema[]>([
     field: 'dictType',
     table: {
       show: false
+    },
+    form: {
+      show: false
     }
   },
   {
