@@ -30,6 +30,7 @@ import { required } from '@/utils/formRules'
 import { Icon } from '@/components/Icon'
 import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'
 import type { RouteLocationNormalizedLoaded, RouteRecordRaw } from 'vue-router'
+import { Verify } from '@/components/Verifition'
 
 const { currentRoute, addRoute, push } = useRouter()
 const permissionStore = usePermissionStore()
@@ -46,12 +47,10 @@ const { t } = useI18n()
 const iconHouse = useIcon({ icon: 'ep:house' })
 const iconAvatar = useIcon({ icon: 'ep:avatar' })
 const iconLock = useIcon({ icon: 'ep:lock' })
-const iconCircleCheck = useIcon({ icon: 'ep:circle-check' })
 const LoginCaptchaRules = {
   tenantName: [required],
   username: [required],
-  password: [required],
-  code: [required]
+  password: [required]
 }
 const LoginRules = {
   tenantName: [required],
@@ -60,7 +59,6 @@ const LoginRules = {
 }
 const loginLoading = ref(false)
 const loginData = reactive({
-  codeImg: '',
   isShowPassword: false,
   captchaEnable: true,
   tenantEnable: true,
@@ -72,20 +70,16 @@ const loginData = reactive({
     tenantName: '芋道源码',
     username: 'admin',
     password: 'admin123',
-    rememberMe: false,
-    code: '',
-    uuid: ''
+    rememberMe: false
   }
 })
+// blockPuzzle 滑块 clickWord 点击文字
+const verify = ref()
+const captchaType = ref('blockPuzzle')
 
 // 获取验证码
 const getCode = async () => {
-  const res = await LoginApi.getCodeImgApi()
-  loginData.captchaEnable = res.enable
-  if (res.enable) {
-    loginData.codeImg = 'data:image/gif;base64,' + res.img
-    loginData.loginForm.uuid = res.uuid
-  }
+  verify.value.show()
 }
 //获取租户ID
 const getTenantId = async () => {
@@ -112,19 +106,12 @@ const handleLogin = async () => {
   const data = await validForm()
   if (!data) return
   loginLoading.value = true
-  await LoginApi.loginApi(loginData.loginForm)
-    .then(async (res) => {
-      setToken(res)
-      const userInfo = await LoginApi.getInfoApi()
-      await userStore.getUserInfoAction(userInfo)
-      await getRoutes()
-    })
-    .catch(() => {
-      getCode()
-    })
-    .finally(() => {
-      loginLoading.value = false
-    })
+  const res = await LoginApi.loginApi(loginData.loginForm)
+  setToken(res)
+  const userInfo = await LoginApi.getInfoApi()
+  await userStore.getUserInfoAction(userInfo)
+  await getRoutes()
+  loginLoading.value = false
 }
 
 // 获取路由
@@ -159,8 +146,7 @@ watch(
     immediate: true
   }
 )
-onMounted(async () => {
-  await getCode()
+onMounted(() => {
   getCookie()
 })
 </script>
@@ -207,29 +193,9 @@ onMounted(async () => {
             type="password"
             :placeholder="t('login.passwordPlaceholder')"
             show-password
-            @keyup.enter="handleLogin"
+            @keyup.enter="getCode()"
             :prefix-icon="iconLock"
           />
-        </el-form-item>
-      </el-col>
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item prop="code" v-if="loginData.captchaEnable">
-          <el-row justify="space-between" style="width: 100%">
-            <el-col :span="14">
-              <el-input
-                v-model="loginData.loginForm.code"
-                :placeholder="t('login.codePlaceholder')"
-                @keyup.enter="handleLogin"
-                :prefix-icon="iconCircleCheck"
-                style="width: 90%"
-              />
-            </el-col>
-            <el-col :span="10">
-              <div class="login-code">
-                <img :src="loginData.codeImg" @click="getCode" class="login-code-img" alt="" />
-              </div>
-            </el-col>
-          </el-row>
         </el-form-item>
       </el-col>
       <el-col
@@ -251,11 +217,18 @@ onMounted(async () => {
       </el-col>
       <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
         <el-form-item>
-          <el-button :loading="loginLoading" type="primary" class="w-[100%]" @click="handleLogin">
+          <el-button :loading="loginLoading" type="primary" class="w-[100%]" @click="getCode()">
             {{ t('login.login') }}
           </el-button>
         </el-form-item>
       </el-col>
+      <Verify
+        ref="verify"
+        mode="pop"
+        :captchaType="captchaType"
+        :imgSize="{ width: '400px', height: '200px' }"
+        @success="handleLogin"
+      />
       <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
         <el-form-item>
           <el-row justify="space-between" style="width: 100%" :gutter="5">

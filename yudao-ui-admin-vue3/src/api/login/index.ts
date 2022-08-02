@@ -18,11 +18,6 @@ export interface SmsLoginVO {
   code: string
 }
 
-// 获取验证码
-export const getCodeImgApi = () => {
-  return request.get({ url: '/system/captcha/get-image' })
-}
-
 // 登录
 export const loginApi = (data: UserLoginVO) => {
   return request.post({ url: '/system/auth/login', data })
