@@ -1,8 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
-import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
+import { ElMessage, ElNotification } from 'element-plus'
 import qs from 'qs'
 import { config } from '@/config/axios/config'
-import { getAccessToken, getRefreshToken, getTenantId } from '@/utils/auth'
+import { getAccessToken, getTenantId, removeToken } from '@/utils/auth'
 import errorCode from './errorCode'
 import { useI18n } from '@/hooks/web/useI18n'
 
@@ -22,7 +22,7 @@ export const isRelogin = { show: false }
 // 请求队列
 // const requestList = []
 // 是否正在刷新中
-let isRefreshToken = false
+// const isRefreshToken = false
 
 export const PATH_URL = base_url[import.meta.env.VITE_API_BASEPATH]
 
@@ -55,18 +55,26 @@ service.interceptors.request.use(
       config.data = qs.stringify(data)
     }
     // get参数编码
-    if (config.method?.toUpperCase() === 'GET' && config.params) {
-      let url = config.url as string
+    if (config.method?.toUpperCase() === 'GET' && params) {
+      let url = config.url + '?'
+      for (const propName of Object.keys(params)) {
+        const value = params[propName]
+        if (value !== void 0 && value !== null && typeof value !== 'undefined') {
+          if (typeof value === 'object') {
+            for (const val of Object.keys(value)) {
+              const params = propName + '[' + val + ']'
+              const subPart = encodeURIComponent(params) + '='
+              url += subPart + encodeURIComponent(value[val]) + '&'
+            }
+          } else {
+            url += `${propName}=${encodeURIComponent(value)}&`
+          }
+        }
+      }
       // 给 get 请求加上时间戳参数，避免从缓存中拿数据
       // const now = new Date().getTime()
       // params = params.substring(0, url.length - 1) + `?_t=${now}`
-      url += '?'
-      const keys = Object.keys(params)
-      for (const key of keys) {
-        if (params[key] !== void 0 && params[key] !== null) {
-          url += `${key}=${encodeURIComponent(params[key])}&`
-        }
-      }
+      url = url.slice(0, -1)
       config.params = {}
       config.url = url
     }
@@ -90,6 +98,13 @@ service.interceptors.response.use(
     const { t } = useI18n()
     // 未设置状态码则默认成功状态
     const code = data.code || result_code
+    // 二进制数据则直接返回
+    if (
+      response.request.responseType === 'blob' ||
+      response.request.responseType === 'arraybuffer'
+    ) {
+      return response.data
+    }
     // 获取错误信息
     const msg = data.msg || errorCode[code] || errorCode['default']
     if (ignoreMsgs.indexOf(msg) !== -1) {
@@ -97,15 +112,16 @@ service.interceptors.response.use(
       return Promise.reject(msg)
     } else if (code === 401) {
       // 如果未认证，并且未进行刷新令牌，说明可能是访问令牌过期了
-      if (!isRefreshToken) {
-        isRefreshToken = true
-        // 1. 如果获取不到刷新令牌，则只能执行登出操作
-        if (!getRefreshToken()) {
-          return handleAuthorized()
-        }
-        // 2. 进行刷新访问令牌
-        // TODO: 引入refreshToken会循环依赖报错
-      }
+      return handleAuthorized()
+      // if (!isRefreshToken) {
+      //   isRefreshToken = true
+      //   // 1. 如果获取不到刷新令牌，则只能执行登出操作
+      //   if (!getRefreshToken()) {
+      //     return handleAuthorized()
+      //   }
+      //   // 2. 进行刷新访问令牌
+      //   // TODO: 引入refreshToken会循环依赖报错
+      // }
     } else if (code === 500) {
       ElMessage.error(t('sys.api.errMsg500'))
       return Promise.reject(new Error(msg))
@@ -149,21 +165,12 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-function handleAuthorized() {
+const handleAuthorized = () => {
   const { t } = useI18n()
   if (!isRelogin.show) {
+    removeToken()
     isRelogin.show = true
-    ElMessageBox.confirm(t('sys.api.timeoutMessage'), t('common.confirmTitle'), {
-      confirmButtonText: t('login.relogin'),
-      cancelButtonText: t('common.cancel'),
-      type: 'warning'
-    })
-      .then(() => {
-        isRelogin.show = false
-      })
-      .catch(() => {
-        isRelogin.show = false
-      })
+    ElNotification.error(t('sys.api.timeoutMessage'))
   }
   return Promise.reject(t('sys.api.timeoutMessage'))
 }

@@ -25,11 +25,12 @@ import { MenuVO } from '@/api/system/menu/types'
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { useMessage } from '@/hooks/web/useMessage'
+import { required } from '@/utils/formRules.js'
 const message = useMessage()
 const { t } = useI18n() // 国际化
 // ========== 创建菜单树结构 ==========
 const loading = ref(true)
-const menuData = ref([]) // 树形结构
+const menuData = ref<any[]>([]) // 树形结构
 const getList = async () => {
   const res = await MenuApi.getMenuListApi(queryParams)
   menuData.value = handleTree(res)
@@ -44,7 +45,7 @@ const menuProps = {
 const menuOptions = ref() // 树形结构
 const getTree = async () => {
   const res = await MenuApi.listSimpleMenusApi()
-  const menu = { id: 0, name: '主类目', children: [] }
+  const menu = { id: 0, name: '主类目', children: [] as any[] }
   menu.children = handleTree(res)
   console.info(menu)
   menuOptions.value = menu
@@ -85,12 +86,12 @@ const menuForm = ref<MenuVO>({
   createTime: ''
 })
 // 表单校验
-const rules = {
-  name: [{ required: true, message: '菜单名称不能为空', trigger: 'blur' }],
-  sort: [{ required: true, message: '菜单顺序不能为空', trigger: 'blur' }],
-  path: [{ required: true, message: '路由地址不能为空', trigger: 'blur' }],
-  status: [{ required: true, message: '状态不能为空', trigger: 'blur' }]
-}
+const rules = reactive({
+  name: [required],
+  sort: [required],
+  path: [required],
+  status: [required]
+})
 // 设置标题
 const setDialogTile = (type: string) => {
   dialogTitle.value = t('action.' + type)

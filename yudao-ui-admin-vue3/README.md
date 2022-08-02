@@ -22,6 +22,8 @@
 - node >=14.18.0(建议使用 16 版本) ,pnpm >=7
 - 开发建议使用 [谷歌浏览器-开发者版](https://www.google.cn/intl/zh-CN/chrome/dev/) 不支持 IE\QQ 等浏览器
 
+### 点击查看[使用说明](./use.md)
+
 ### 前端依赖
 
 | 框架 | 说明 | 版本     |

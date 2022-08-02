@@ -9,6 +9,7 @@ import {
   ElTreeSelect,
   ElSelect,
   ElOption,
+  ElTransfer,
   ElForm,
   ElFormItem,
   ElUpload,
@@ -62,7 +63,7 @@ const { getList, setSearchParams, delList, exportList } = methods
 
 // ========== 创建部门树结构 ==========
 const filterText = ref('')
-const deptOptions = ref([]) // 树形结构
+const deptOptions = ref<any[]>([]) // 树形结构
 const searchForm = ref<FormExpose>()
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const getTree = async () => {
@@ -268,6 +269,7 @@ const handleFileSuccess = (response: any): void => {
     text += '< ' + username + ': ' + data.failureUsernames[username] + ' >'
   }
   message.alert(text)
+  getList()
 }
 // 文件数超出提示
 const handleExceed = (): void => {
@@ -281,8 +283,8 @@ const excelUploadError = (): void => {
 onMounted(async () => {
   await getTree()
   await getPostOptions()
+  await getList()
 })
-getList()
 </script>
 
 <template>
@@ -482,7 +484,7 @@ getList()
     </template>
   </Dialog>
   <!-- 分配用户角色 -->
-  <Dialog v-model="roleDialogVisible" title="分配角色">
+  <Dialog v-model="roleDialogVisible" title="分配角色" maxHeight="450px">
     <el-form :model="userRole" label-width="80px">
       <el-form-item label="用户名称">
         <el-input v-model="userRole.username" :disabled="true" />
@@ -491,14 +493,15 @@ getList()
         <el-input v-model="userRole.nickname" :disabled="true" />
       </el-form-item>
       <el-form-item label="角色">
-        <el-select v-model="userRole.roleIds" multiple>
-          <el-option
-            v-for="item in roleOptions"
-            :key="parseInt(item.id)"
-            :label="item.name"
-            :value="parseInt(item.id)"
-          />
-        </el-select>
+        <el-transfer
+          v-model="userRole.roleIds"
+          :titles="['角色列表', '已选择']"
+          :props="{
+            key: 'id',
+            label: 'name'
+          }"
+          :data="roleOptions"
+        />
       </el-form-item>
     </el-form>
     <!-- 操作按钮 -->

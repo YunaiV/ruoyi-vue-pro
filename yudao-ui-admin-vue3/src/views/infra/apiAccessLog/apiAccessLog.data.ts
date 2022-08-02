@@ -50,7 +50,16 @@ const crudSchemas = reactive<CrudSchema[]>([
   },
   {
     label: '请求时间',
-    field: 'beginTime'
+    field: 'beginTime',
+    search: {
+      show: true,
+      component: 'DatePicker',
+      componentProps: {
+        type: 'datetimerange',
+        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]
+      }
+    }
   },
   {
     label: '执行时长',

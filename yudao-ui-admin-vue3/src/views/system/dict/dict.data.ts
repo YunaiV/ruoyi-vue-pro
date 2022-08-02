@@ -7,9 +7,9 @@ import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
 const { t } = useI18n()
 // 表单校验
 export const dictDataRules = reactive({
-  dictType: [required],
   label: [required],
-  value: [required]
+  value: [required],
+  sort: [required]
 })
 // crudSchemas
 export const crudSchemas = reactive<CrudSchema[]>([
@@ -28,6 +28,9 @@ export const crudSchemas = reactive<CrudSchema[]>([
     label: '字典类型',
     field: 'dictType',
     table: {
+      show: false
+    },
+    form: {
       show: false
     }
   },
