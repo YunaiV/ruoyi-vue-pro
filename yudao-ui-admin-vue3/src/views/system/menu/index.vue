@@ -47,7 +47,6 @@ const getTree = async () => {
   const res = await MenuApi.listSimpleMenusApi()
   const menu = { id: 0, name: '主类目', children: [] as any[] }
   menu.children = handleTree(res)
-  console.info(menu)
   menuOptions.value = menu
 }
 // ========== 查询 ==========

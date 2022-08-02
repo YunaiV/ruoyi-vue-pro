@@ -10,6 +10,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { useDictStoreWithOut } from '@/store/modules/dict'
 import { listSimpleDictDataApi } from '@/api/system/dict/dict.data'
+import { isRelogin } from '@/config/axios'
 
 const permissionStore = usePermissionStoreWithOut()
 
@@ -48,14 +49,14 @@ router.beforeEach(async (to, from, next) => {
       next({ path: '/' })
     } else {
       if (!dictStore.getIsSetDict) {
+        isRelogin.show = true
         // 获取所有字典
         const res = await listSimpleDictDataApi()
-        if (res) {
-          dictStore.setDictMap(res)
-          dictStore.setIsSetDict(true)
-        }
+        dictStore.setDictMap(res)
+        dictStore.setIsSetDict(true)
       }
       if (permissionStore.getIsAddRouters) {
+        isRelogin.show = false
         next()
         return
       }
@@ -77,7 +78,7 @@ router.beforeEach(async (to, from, next) => {
     if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
-      next(`/login?redirect=${to.path}`) // 否则全部重定向到登录页
+      next(`/login?redirect=${to.fullPath}`) // 否则全部重定向到登录页
     }
   }
 })

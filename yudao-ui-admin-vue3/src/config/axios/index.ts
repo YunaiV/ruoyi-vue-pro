@@ -1,10 +1,11 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
-import { ElMessage, ElNotification } from 'element-plus'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import qs from 'qs'
 import { config } from '@/config/axios/config'
-import { getAccessToken, getTenantId, removeToken } from '@/utils/auth'
+import { getAccessToken, getRefreshToken, getTenantId, removeToken, setToken } from '@/utils/auth'
 import errorCode from './errorCode'
 import { useI18n } from '@/hooks/web/useI18n'
+import { resetRouter } from '@/router'
 
 const tenantEnable = import.meta.env.VITE_APP_TENANT_ENABLE
 const BASE_URL = import.meta.env.VITE_BASE_URL
@@ -20,9 +21,9 @@ const ignoreMsgs = [
 export const isRelogin = { show: false }
 // Axios 无感知刷新令牌，参考 https://www.dashingdog.cn/article/11 与 https://segmentfault.com/a/1190000020210980 实现
 // 请求队列
-// const requestList = []
+let requestList: any[] = []
 // 是否正在刷新中
-// const isRefreshToken = false
+let isRefreshToken = false
 
 export const PATH_URL = base_url[import.meta.env.VITE_API_BASEPATH]
 
@@ -91,6 +92,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   async (response: AxiosResponse<Recordable>) => {
     const { data } = response
+    console.info(data)
     if (!data) {
       // 返回“[HTTP]请求没有返回值”;
       throw new Error()
@@ -112,16 +114,38 @@ service.interceptors.response.use(
       return Promise.reject(msg)
     } else if (code === 401) {
       // 如果未认证，并且未进行刷新令牌，说明可能是访问令牌过期了
-      return handleAuthorized()
-      // if (!isRefreshToken) {
-      //   isRefreshToken = true
-      //   // 1. 如果获取不到刷新令牌，则只能执行登出操作
-      //   if (!getRefreshToken()) {
-      //     return handleAuthorized()
-      //   }
-      //   // 2. 进行刷新访问令牌
-      //   // TODO: 引入refreshToken会循环依赖报错
-      // }
+      if (!isRefreshToken) {
+        isRefreshToken = true
+        // 1. 如果获取不到刷新令牌，则只能执行登出操作
+        if (!getRefreshToken()) {
+          return handleAuthorized()
+        }
+        // 2. 进行刷新访问令牌
+        try {
+          const refreshTokenRes = await refreshToken()
+          // 2.1 刷新成功，则回放队列的请求 + 当前请求
+          setToken(refreshTokenRes.data)
+          requestList.forEach((cb: any) => cb())
+          return service(response.config)
+        } catch (e) {
+          // 为什么需要 catch 异常呢？刷新失败时，请求因为 Promise.reject 触发异常。
+          // 2.2 刷新失败，只回放队列的请求
+          requestList.forEach((cb: any) => cb())
+          // 提示是否要登出。即不回放当前请求！不然会形成递归
+          return handleAuthorized()
+        } finally {
+          requestList = []
+          isRefreshToken = false
+        }
+      } else {
+        // 添加到队列，等待刷新获取到新的令牌
+        return new Promise((resolve) => {
+          requestList.push(() => {
+            ;(config as Recordable).headers.Authorization = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+            resolve(service(response.config))
+          })
+        })
+      }
     } else if (code === 500) {
       ElMessage.error(t('sys.api.errMsg500'))
       return Promise.reject(new Error(msg))
@@ -165,14 +189,32 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+const refreshToken = async () => {
+  return await service({
+    url: '/system/auth/refresh-token?refreshToken=' + getRefreshToken(),
+    method: 'post'
+  })
+}
 const handleAuthorized = () => {
   const { t } = useI18n()
   if (!isRelogin.show) {
-    removeToken()
     isRelogin.show = true
-    ElNotification.error(t('sys.api.timeoutMessage'))
+    ElMessageBox.confirm(t('sys.api.timeoutMessage'), t('common.confirmTitle'), {
+      confirmButtonText: t('login.relogin'),
+      cancelButtonText: t('common.cancel'),
+      type: 'warning'
+    })
+      .then(() => {
+        removeToken()
+        resetRouter() // 重置静态路由表
+        isRelogin.show = false
+        location.href = '/'
+      })
+      .catch(() => {
+        isRelogin.show = false
+      })
   }
-  location.href = '/'
   return Promise.reject(t('sys.api.timeoutMessage'))
 }
 export { service }

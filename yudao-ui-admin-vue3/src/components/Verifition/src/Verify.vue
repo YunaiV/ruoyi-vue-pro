@@ -102,7 +102,6 @@ export default {
      * @description 刷新
      * */
     const refresh = () => {
-      console.log(instance.value)
       if (instance.value.refresh) {
         instance.value.refresh()
       }
@@ -271,7 +270,6 @@ export default {
   -moz-box-sizing: content-box;
   box-sizing: content-box;
   border: 1px solid #ddd;
-  -webkit-border-radius: 4px;
 }
 
 .verify-bar-area .verify-move-block {
@@ -284,7 +282,6 @@ export default {
   -moz-box-sizing: content-box;
   box-sizing: content-box;
   box-shadow: 0 0 2px #888888;
-  -webkit-border-radius: 1px;
 }
 
 .verify-bar-area .verify-move-block:hover {
