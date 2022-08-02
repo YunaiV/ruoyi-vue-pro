@@ -138,6 +138,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         'vue-router',
         'vue-types',
         'vue-i18n',
+        'element-plus/es',
         'element-plus/es/locale/lang/zh-cn',
         'element-plus/es/locale/lang/en',
         '@iconify/iconify',
