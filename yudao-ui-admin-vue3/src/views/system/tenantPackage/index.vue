@@ -19,7 +19,7 @@ const defaultProps = {
   value: 'id'
 }
 // ========== 创建菜单树结构 ==========
-const menuOptions = ref([]) // 树形结构
+const menuOptions = ref<any[]>([]) // 树形结构
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const treeNodeAll = ref(false)
 // 全选/全不选
@@ -84,11 +84,9 @@ const submitForm = async () => {
     if (actionType.value === 'create') {
       await TenantPackageApi.createTenantPackageTypeApi(data)
       ElMessage.success(t('common.createSuccess'))
-      console.log('new data')
     } else {
       await TenantPackageApi.updateTenantPackageTypeApi(data)
       ElMessage.success(t('common.updateSuccess'))
-      console.log('edit data')
     }
     // 操作成功，重新加载列表
     dialogVisible.value = false

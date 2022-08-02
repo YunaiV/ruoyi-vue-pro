@@ -6,12 +6,12 @@ import { ElRow, ElCol, ElUpload, ElMessage, ElDialog } from 'element-plus'
 import { propTypes } from '@/utils/propTypes'
 import { uploadAvatarApi } from '@/api/system/user/profile'
 const cropper = ref()
+const dialogVisible = ref(false)
+const cropperVisible = ref(false)
 const props = defineProps({
   img: propTypes.string.def('')
 })
-const state = reactive({
-  dialogVisible: false,
-  cropperVisible: false,
+const options = reactive({
   dialogTitle: '编辑头像',
   options: {
     img: props.img, //裁剪图片的地址
@@ -27,8 +27,11 @@ const state = reactive({
 })
 /** 编辑头像 */
 const editCropper = () => {
-  state.dialogVisible = true
-  state.cropperVisible = true
+  dialogVisible.value = true
+}
+// 打开弹出层结束时的回调
+const modalOpened = () => {
+  cropperVisible.value = true
 }
 /** 向左旋转 */
 const rotateLeft = () => {
@@ -44,7 +47,7 @@ const changeScale = (num: number) => {
   cropper.value.changeScale(num)
 }
 // 覆盖默认的上传行为
-const requestUpload = () => {}
+const requestUpload: any = () => {}
 /** 上传预处理 */
 const beforeUpload = (file: Blob) => {
   if (file.type.indexOf('image/') == -1) {
@@ -54,64 +57,65 @@ const beforeUpload = (file: Blob) => {
     reader.readAsDataURL(file)
     reader.onload = () => {
       if (reader.result) {
-        state.options.img = reader.result as string
+        options.options.img = reader.result as string
       }
     }
   }
 }
 /** 上传图片 */
 const uploadImg = () => {
-  cropper.value.getCropBlob((data) => {
+  cropper.value.getCropBlob((data: any) => {
     let formData = new FormData()
     formData.append('avatarfile', data)
     uploadAvatarApi(formData)
   })
 }
 /** 实时预览 */
-const realTime = (data) => {
-  state.previews = data
+const realTime = (data: any) => {
+  options.previews = data
 }
 watch(
   () => props.img,
   () => {
     if (props.img) {
-      state.options.img = props.img
-      state.previews.img = props.img
-      state.previews.url = props.img
+      options.options.img = props.img
+      options.previews.img = props.img
+      options.previews.url = props.img
     }
   }
 )
 </script>
 <template>
   <div class="user-info-head" @click="editCropper()">
-    <img :src="state.options.img" title="点击上传头像" class="img-circle img-lg" alt="" />
+    <img :src="options.options.img" title="点击上传头像" class="img-circle img-lg" alt="" />
   </div>
   <el-dialog
-    v-model="state.dialogVisible"
-    :title="state.dialogTitle"
-    width="50%"
-    :maxHeight="350"
+    v-model="dialogVisible"
+    :title="options.dialogTitle"
+    width="800px"
+    append-to-body
     style="padding: 30px 20px"
+    @opened="modalOpened"
   >
     <el-row>
       <el-col :xs="24" :md="12" style="height: 350px">
         <VueCropper
           ref="cropper"
-          :img="state.options.img"
+          :img="options.options.img"
           :info="true"
-          :autoCrop="state.options.autoCrop"
-          :autoCropWidth="state.options.autoCropWidth"
-          :autoCropHeight="state.options.autoCropHeight"
-          :fixedBox="state.options.fixedBox"
+          :autoCrop="options.options.autoCrop"
+          :autoCropWidth="options.options.autoCropWidth"
+          :autoCropHeight="options.options.autoCropHeight"
+          :fixedBox="options.options.fixedBox"
           @real-time="realTime"
-          v-if="state.cropperVisible"
+          v-if="cropperVisible"
         />
       </el-col>
       <el-col :xs="24" :md="12" style="height: 350px">
         <div class="avatar-upload-preview">
           <img
-            :src="state.previews.url"
-            :style="state.previews.img"
+            :src="options.previews.url"
+            :style="options.previews.img"
             style="!max-width: 100%"
             alt=""
           />
