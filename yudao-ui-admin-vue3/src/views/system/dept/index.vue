@@ -133,14 +133,29 @@ onMounted(async () => {
             <span class="custom-tree-node">
               <span>{{ node.label }}</span>
               <span>
-                <el-button link v-hasPermi="['system:dept:create']" @click="handleAdd(data)">
-                  <Icon icon="ep:plus" class="mr-1px" />
+                <el-button
+                  link
+                  type="primary"
+                  v-hasPermi="['system:dept:create']"
+                  @click="handleAdd(data)"
+                >
+                  <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
                 </el-button>
-                <el-button link v-hasPermi="['system:dept:update']" @click="handleUpdate(data)">
-                  <Icon icon="ep:edit" class="mr-1px" />
+                <el-button
+                  link
+                  type="primary"
+                  v-hasPermi="['system:dept:update']"
+                  @click="handleUpdate(data)"
+                >
+                  <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
                 </el-button>
-                <el-button link v-hasPermi="['system:dept:delete']" @click="handleDelete(data)">
-                  <Icon icon="ep:delete" class="mr-1px" />
+                <el-button
+                  link
+                  type="primary"
+                  v-hasPermi="['system:dept:delete']"
+                  @click="handleDelete(data)"
+                >
+                  <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
                 </el-button>
               </span>
             </span>
