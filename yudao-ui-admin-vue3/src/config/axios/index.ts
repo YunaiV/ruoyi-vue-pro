@@ -172,6 +172,7 @@ const handleAuthorized = () => {
     isRelogin.show = true
     ElNotification.error(t('sys.api.timeoutMessage'))
   }
+  location.href = '/'
   return Promise.reject(t('sys.api.timeoutMessage'))
 }
 export { service }
