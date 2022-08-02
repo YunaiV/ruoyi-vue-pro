@@ -13,15 +13,18 @@
 
 - 目录结构与 vue2 版本基本保持一致
 - 一个页面(以post为例)由4部分组成
+  
 ```bash
 /src/api/system/post/ [index.ts | types.ts] 
 /src/views/system/post/ [index.vue | post.data.ts] 
 ```
+
 - 其中api内index.ts 与 vue2 基本一致，只不过axios封装了get post put delete upload download 等方法，不用写method: 'get' 了
 - api内types.ts，是接口中的类型声明，与java中vo等保持一致， java中long int => ts 中 number
 - views中，index.vue 与 vue2 基本一致，本框架封装了Search Table Form Descriptions等组件，也可以按照vue2方式去写，参考menu
 - post.data.ts 中主要是表单校验 rules 和表单 crudSchemas ，通过修改crudSchemas 就可以控制增删改查的字段、输入框还是下拉框等等
 - 本框架集成了国际化，不需要可以自己想办法移除，后期不会提供删减版 使用方式
+
 ```bash
 import { useI18n } from '@/hooks/web/useI18n'
 const { t } = useI18n()
