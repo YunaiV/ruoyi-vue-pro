@@ -103,7 +103,7 @@ const signIn = async () => {
     .then(async (res) => {
       setToken(res?.token)
       const userInfo = await getInfoApi()
-      await userStore.getUserInfoAction(userInfo)
+      await userStore.setUserInfoAction(userInfo)
       getRoutes()
     })
     .catch(() => {})

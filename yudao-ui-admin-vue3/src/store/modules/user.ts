@@ -39,7 +39,7 @@ export const useUserStore = defineStore({
     }
   },
   actions: {
-    async getUserInfoAction(userInfo: UserInfoVO) {
+    async setUserInfoAction(userInfo: UserInfoVO) {
       if (!getAccessToken()) {
         this.resetState()
         return null
