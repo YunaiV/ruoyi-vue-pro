@@ -2,13 +2,13 @@ import type { App } from 'vue'
 import { getAccessToken } from '@/utils/auth'
 import type { RouteRecordRaw } from 'vue-router'
 import remainingRouter from './modules/remaining'
-import { useCache } from '@/hooks/web/useCache'
 import { useTitle } from '@/hooks/web/useTitle'
 import { useNProgress } from '@/hooks/web/useNProgress'
 import { usePageLoading } from '@/hooks/web/usePageLoading'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { useDictStoreWithOut } from '@/store/modules/dict'
+import { useUserStoreWithOut } from '@/store/modules/user'
 import { listSimpleDictDataApi } from '@/api/system/dict/dict.data'
 import { isRelogin } from '@/config/axios'
 
@@ -16,7 +16,7 @@ const permissionStore = usePermissionStoreWithOut()
 
 const dictStore = useDictStoreWithOut()
 
-const { wsCache } = useCache()
+const userStore = useUserStoreWithOut()
 
 const { start, done } = useNProgress()
 
@@ -48,31 +48,27 @@ router.beforeEach(async (to, from, next) => {
     if (to.path === '/login') {
       next({ path: '/' })
     } else {
-      if (!dictStore.getIsSetDict) {
+      console.info(3)
+      // 获取所有字典
+      const res = await listSimpleDictDataApi()
+      dictStore.setDictMap(res)
+      if (userStore.getRoles.length === 0) {
         isRelogin.show = true
-        // 获取所有字典
-        const res = await listSimpleDictDataApi()
-        dictStore.setDictMap(res)
-        dictStore.setIsSetDict(true)
-      }
-      if (permissionStore.getIsAddRouters) {
         isRelogin.show = false
+        console.info(2)
+        // 后端过滤菜单
+        await permissionStore.generateRoutes()
+        permissionStore.getAddRouters.forEach((route) => {
+          router.addRoute(route as unknown as RouteRecordRaw) // 动态添加可访问路由表
+        })
+        const redirectPath = from.query.redirect || to.path
+        const redirect = decodeURIComponent(redirectPath as string)
+        const nextData = to.path === redirect ? { ...to, replace: true } : { path: redirect }
+        next(nextData)
+      } else {
+        console.info(3)
         next()
-        return
       }
-      // 开发者可根据实际情况进行修改
-      const roleRouters = wsCache.get('roleRouters') || []
-
-      await permissionStore.generateRoutes(roleRouters as AppCustomRouteRecordRaw[])
-
-      permissionStore.getAddRouters.forEach((route) => {
-        router.addRoute(route as unknown as RouteRecordRaw) // 动态添加可访问路由表
-      })
-      const redirectPath = from.query.redirect || to.path
-      const redirect = decodeURIComponent(redirectPath as string)
-      const nextData = to.path === redirect ? { ...to, replace: true } : { path: redirect }
-      permissionStore.setIsAddRouters(true)
-      next(nextData)
     }
   } else {
     if (whiteList.indexOf(to.path) !== -1) {

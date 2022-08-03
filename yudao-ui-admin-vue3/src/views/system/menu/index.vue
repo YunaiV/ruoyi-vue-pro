@@ -253,7 +253,7 @@ onMounted(async () => {
     </el-table>
   </ContentWrap>
   <!-- 添加或修改菜单对话框 -->
-  <Dialog v-model="dialogVisible" :title="dialogTitle" maxHeight="400px" width="40%">
+  <Dialog v-model="dialogVisible" :title="dialogTitle" maxHeight="400px" width="45%">
     <el-form
       :model="menuForm"
       :rules="rules"

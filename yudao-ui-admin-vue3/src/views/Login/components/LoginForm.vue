@@ -21,8 +21,7 @@ import {
   getPassword,
   getTenantName
 } from '@/utils/auth'
-import { useUserStoreWithOut } from '@/store/modules/user'
-import { useCache } from '@/hooks/web/useCache'
+import { useUserStore } from '@/store/modules/user'
 import { usePermissionStore } from '@/store/modules/permission'
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -34,10 +33,9 @@ import { Verify } from '@/components/Verifition'
 
 const { currentRoute, addRoute, push } = useRouter()
 const permissionStore = usePermissionStore()
-const userStore = useUserStoreWithOut()
+const userStore = useUserStore()
 const formLogin = ref()
 const { validForm } = useFormValid(formLogin)
-const { wsCache } = useCache()
 const { setLoginState, getLoginState } = useLoginState()
 const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN)
 const iconSize = 30
@@ -122,13 +120,14 @@ const handleLogin = async (params) => {
 // 获取路由
 const getRoutes = async () => {
   // 后端过滤菜单
-  const res = await LoginApi.getAsyncRoutesApi()
-  wsCache.set('roleRouters', res)
-  await permissionStore.generateRoutes(res)
+  await permissionStore.generateRoutes()
   permissionStore.getAddRouters.forEach((route) => {
     addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
   })
-  permissionStore.setIsAddRouters(true)
+  if (!redirect.value) {
+    redirect.value = '/'
+  }
+  console.info(redirect.value)
   push({ path: redirect.value || permissionStore.addRouters[0].path })
 }
 

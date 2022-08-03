@@ -6,6 +6,7 @@ import { getAccessToken, getRefreshToken, getTenantId, removeToken, setToken } f
 import errorCode from './errorCode'
 import { useI18n } from '@/hooks/web/useI18n'
 import { resetRouter } from '@/router'
+import { useCache } from '@/hooks/web/useCache'
 
 const tenantEnable = import.meta.env.VITE_APP_TENANT_ENABLE
 const BASE_URL = import.meta.env.VITE_BASE_URL
@@ -205,10 +206,12 @@ const handleAuthorized = () => {
       type: 'warning'
     })
       .then(() => {
-        removeToken()
+        const { wsCache } = useCache()
         resetRouter() // 重置静态路由表
+        wsCache.clear()
+        removeToken()
         isRelogin.show = false
-        location.href = '/'
+        location.href = '/login'
       })
       .catch(() => {
         isRelogin.show = false
