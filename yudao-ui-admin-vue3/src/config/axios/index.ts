@@ -9,9 +9,7 @@ import { resetRouter } from '@/router'
 import { useCache } from '@/hooks/web/useCache'
 
 const tenantEnable = import.meta.env.VITE_APP_TENANT_ENABLE
-const BASE_URL = import.meta.env.VITE_BASE_URL
-const BASE_API = import.meta.env.VITE_API_URL
-const { result_code, base_url } = config
+const { result_code, base_url, request_timeout } = config
 
 // 需要忽略的提示。忽略后，自动 Promise.reject('error')
 const ignoreMsgs = [
@@ -26,12 +24,10 @@ let requestList: any[] = []
 // 是否正在刷新中
 let isRefreshToken = false
 
-export const PATH_URL = base_url[import.meta.env.VITE_API_BASEPATH]
-
 // 创建axios实例
 const service: AxiosInstance = axios.create({
-  baseURL: BASE_URL + BASE_API, // api 的 base_url
-  timeout: config.request_timeout, // 请求超时时间
+  baseURL: base_url, // api 的 base_url
+  timeout: request_timeout, // 请求超时时间
   withCredentials: false // 禁用 Cookie 等信息
 })
 
@@ -211,7 +207,7 @@ const handleAuthorized = () => {
         wsCache.clear()
         removeToken()
         isRelogin.show = false
-        location.href = '/login'
+        window.location.href = '/'
       })
       .catch(() => {
         isRelogin.show = false

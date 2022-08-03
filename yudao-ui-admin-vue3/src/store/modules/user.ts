@@ -27,6 +27,9 @@ export const useUserStore = defineStore({
       nickname: ''
     }
   }),
+  persist: {
+    enabled: true
+  },
   getters: {
     getPermissions(): string[] {
       return this.permissions

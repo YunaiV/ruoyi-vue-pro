@@ -151,6 +151,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         'intro.js',
         'qrcode',
         'pinia',
+        'crypto-js',
         '@wangeditor/editor',
         '@wangeditor/editor-for-vue'
       ]

@@ -12,12 +12,6 @@ import { useUserStoreWithOut } from '@/store/modules/user'
 import { listSimpleDictDataApi } from '@/api/system/dict/dict.data'
 import { isRelogin } from '@/config/axios'
 
-const permissionStore = usePermissionStoreWithOut()
-
-const dictStore = useDictStoreWithOut()
-
-const userStore = useUserStoreWithOut()
-
 const { start, done } = useNProgress()
 
 const { loadStart, loadDone } = usePageLoading()
@@ -49,6 +43,9 @@ router.beforeEach(async (to, from, next) => {
       next({ path: '/' })
     } else {
       // 获取所有字典
+      const dictStore = useDictStoreWithOut()
+      const userStore = useUserStoreWithOut()
+      const permissionStore = usePermissionStoreWithOut()
       if (!dictStore.getHasDictData) {
         const res = await listSimpleDictDataApi()
         dictStore.setDictMap(res)
