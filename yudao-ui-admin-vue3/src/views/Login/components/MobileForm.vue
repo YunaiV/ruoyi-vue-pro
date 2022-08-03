@@ -5,13 +5,12 @@ import LoginFormTitle from './LoginFormTitle.vue'
 import { ElForm, ElFormItem, ElInput, ElRow, ElCol, ElMessage } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
-import { getTenantIdByNameApi, sendSmsCodeApi, smsLoginApi, getInfoApi } from '@/api/login'
+import { getTenantIdByNameApi, sendSmsCodeApi, smsLoginApi } from '@/api/login'
 import { useCache } from '@/hooks/web/useCache'
 import { usePermissionStore } from '@/store/modules/permission'
 import { useRouter } from 'vue-router'
 import { setToken } from '@/utils/auth'
-import { useUserStore } from '@/store/modules/user'
-import type { RouteLocationNormalizedLoaded, RouteRecordRaw } from 'vue-router'
+import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { useLoginState, LoginStateEnum, useFormValid } from './useLogin'
 const formSmsLogin = ref()
 const { validForm } = useFormValid(formSmsLogin)
@@ -21,9 +20,8 @@ const iconHouse = useIcon({ icon: 'ep:house' })
 const iconCellphone = useIcon({ icon: 'ep:cellphone' })
 const iconCircleCheck = useIcon({ icon: 'ep:circle-check' })
 const { wsCache } = useCache()
-const userStore = useUserStore()
 const permissionStore = usePermissionStore()
-const { currentRoute, addRoute, push } = useRouter()
+const { currentRoute, push } = useRouter()
 const loginLoading = ref(false)
 const { t } = useI18n()
 
@@ -102,23 +100,15 @@ const signIn = async () => {
   await smsLoginApi(smsVO.loginSms)
     .then(async (res) => {
       setToken(res?.token)
-      const userInfo = await getInfoApi()
-      await userStore.setUserInfoAction(userInfo)
-      getRoutes()
+      if (!redirect.value) {
+        redirect.value = '/'
+      }
+      push({ path: redirect.value || permissionStore.addRouters[0].path })
     })
     .catch(() => {})
     .finally(() => {
       loginLoading.value = false
     })
-}
-// 获取路由
-const getRoutes = async () => {
-  // 后端过滤菜单
-  await permissionStore.generateRoutes()
-  permissionStore.getAddRouters.forEach((route) => {
-    addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
-  })
-  push({ path: redirect.value || permissionStore.addRouters[0].path })
 }
 </script>
 <template>

@@ -11,6 +11,7 @@ import { useDictStoreWithOut } from '@/store/modules/dict'
 import { useUserStoreWithOut } from '@/store/modules/user'
 import { listSimpleDictDataApi } from '@/api/system/dict/dict.data'
 import { isRelogin } from '@/config/axios'
+import { getInfoApi } from '@/api/login'
 
 const { start, done } = useNProgress()
 
@@ -52,6 +53,8 @@ router.beforeEach(async (to, from, next) => {
       }
       if (userStore.getRoles.length === 0) {
         isRelogin.show = true
+        const res = await getInfoApi()
+        await userStore.setUserInfoAction(res)
         isRelogin.show = false
         // 后端过滤菜单
         await permissionStore.generateRoutes()

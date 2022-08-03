@@ -21,19 +21,17 @@ import {
   getPassword,
   getTenantName
 } from '@/utils/auth'
-import { useUserStore } from '@/store/modules/user'
 import { usePermissionStore } from '@/store/modules/permission'
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
 import { Icon } from '@/components/Icon'
 import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'
-import type { RouteLocationNormalizedLoaded, RouteRecordRaw } from 'vue-router'
+import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { Verify } from '@/components/Verifition'
 
-const { currentRoute, addRoute, push } = useRouter()
+const { currentRoute, push } = useRouter()
 const permissionStore = usePermissionStore()
-const userStore = useUserStore()
 const formLogin = ref()
 const { validForm } = useFormValid(formLogin)
 const { setLoginState, getLoginState } = useLoginState()
@@ -111,23 +109,11 @@ const handleLogin = async (params) => {
   loginData.loginForm.captchaVerification = params.captchaVerification
   const res = await LoginApi.loginApi(loginData.loginForm)
   setToken(res)
-  const userInfo = await LoginApi.getInfoApi()
-  await userStore.setUserInfoAction(userInfo)
-  await getRoutes()
-  loginLoading.value = false
-}
-
-// 获取路由
-const getRoutes = async () => {
-  // 后端过滤菜单
-  await permissionStore.generateRoutes()
-  permissionStore.getAddRouters.forEach((route) => {
-    addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
-  })
   if (!redirect.value) {
     redirect.value = '/'
   }
   push({ path: redirect.value || permissionStore.addRouters[0].path })
+  loginLoading.value = false
 }
 
 // 社交登录
