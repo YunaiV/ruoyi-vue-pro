@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.delivery.DeliveryTemplateDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.shop.ShopDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.enums.delivery.DeliveryModeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -101,10 +100,17 @@ public class ProductSpuDO extends BaseDO {
      * 基于其对应的 {@link ProductSkuDO#getActualStocks()} 求和
      */
     private Integer totalStocks;
+
+    // ========== 统计相关字段 =========
+
     /**
-     * 已销售数量
+     * 已销售数量（真实）
      */
-    private Integer soldNum;
+    private Integer soldCount;
+    /**
+     * 浏览量
+     */
+    private Integer visitCount;
 
     // ========== 物流相关字段 =========
 
@@ -120,5 +126,28 @@ public class ProductSpuDO extends BaseDO {
      * 关联 {@link DeliveryTemplateDO#getId()}
      */
     private Long deliveryTemplateId;
+
+    // TODO ========== 待定字段：yv =========
+    // TODO bar_code 条形码
+    // TODO vip_price 会员价格
+    // TODO postage 邮费
+    // TODO is_postage 是否包邮
+    // TODO unit_name 单位
+    // TODO is_new 商户是否代理
+    // TODO give_integral 获得积分
+    // TODO is_integral 是开启积分兑换
+    // TODO integral 所需积分
+    // TODO is_seckill 秒杀状态
+    // TODO is_bargain 砍价状态
+    // TODO ficti 虚拟销量
+    // TODO code_path 产品二维码地址
+    // TODO is_sub 是否分佣
+
+    // TODO ↓↓ 芋艿 ↓↓ 看起来走分组更合适？
+    // TODO is_hot 是否热卖
+    // TODO is_benefit 是否优惠
+    // TODO is_best 是否精品
+    // TODO is_new 是否新品
+    // TODO is_good 是否优品推荐
 
 }

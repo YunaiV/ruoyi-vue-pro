@@ -58,6 +58,10 @@ public class ProductSkuDO extends BaseDO {
      */
     private Integer originalPrice;
     /**
+     * 成本价，单位：分
+     */
+    private Integer costPrice;
+    /**
      * SKU 的条形码
      */
     private String barCode;
@@ -107,6 +111,15 @@ public class ProductSkuDO extends BaseDO {
         private Long valueId;
 
     }
+
+    // TODO ========== 待定字段：yv =========
+    // TODO brokerage：一级返佣
+    // TODO brokerage_two：二级返佣
+    // TODO pink_price：拼团价
+    // TODO pink_stock：拼团库存
+    // TODO seckill_price：秒杀价
+    // TODO seckill_stock：秒杀库存
+    // TODO integral：需要积分
 
 }
 
