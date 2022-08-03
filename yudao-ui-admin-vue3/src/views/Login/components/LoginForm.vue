@@ -112,7 +112,7 @@ const handleLogin = async (params) => {
   const res = await LoginApi.loginApi(loginData.loginForm)
   setToken(res)
   const userInfo = await LoginApi.getInfoApi()
-  await userStore.getUserInfoAction(userInfo)
+  await userStore.setUserInfoAction(userInfo)
   await getRoutes()
   loginLoading.value = false
 }
