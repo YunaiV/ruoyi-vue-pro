@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import { useDesign } from '@/hooks/web/useDesign'
 import avatarImg from '@/assets/imgs/avatar.gif'
 import { useUserStore } from '@/store/modules/user'
+import { useTagsViewStore } from '@/store/modules/tagsView'
 
 const { t } = useI18n()
 
@@ -14,6 +15,8 @@ const { wsCache } = useCache()
 const { push, replace } = useRouter()
 
 const userStore = useUserStore()
+
+const tagsViewStore = useTagsViewStore()
 
 const { getPrefixCls } = useDesign()
 
@@ -33,6 +36,7 @@ const loginOut = () => {
   })
     .then(async () => {
       userStore.loginOut()
+      tagsViewStore.delAllViews
       replace('/login')
     })
     .catch(() => {})

@@ -28,7 +28,7 @@ export const useDictStore = defineStore({
     getDictMap(): Recordable {
       return this.dictMap
     },
-    getHasDictData(): Boolean {
+    getHasDictData(): boolean {
       if (this.dictMap.length > 0) {
         return true
       } else {
