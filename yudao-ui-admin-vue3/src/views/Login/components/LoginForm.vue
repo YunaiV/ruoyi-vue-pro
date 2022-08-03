@@ -70,6 +70,7 @@ const loginData = reactive({
     tenantName: '芋道源码',
     username: 'admin',
     password: 'admin123',
+    captchaVerification: '',
     rememberMe: false
   }
 })
@@ -101,11 +102,15 @@ const getCookie = () => {
   }
 }
 // 登录
-const handleLogin = async () => {
+const handleLogin = async (params) => {
+  loginLoading.value = true
   await getTenantId()
   const data = await validForm()
-  if (!data) return
-  loginLoading.value = true
+  if (!data) {
+    loginLoading.value = false
+    return
+  }
+  loginData.loginForm.captchaVerification = params.captchaVerification
   const res = await LoginApi.loginApi(loginData.loginForm)
   setToken(res)
   const userInfo = await LoginApi.getInfoApi()
