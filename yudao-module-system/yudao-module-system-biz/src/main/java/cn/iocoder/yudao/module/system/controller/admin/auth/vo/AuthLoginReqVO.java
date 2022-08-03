@@ -33,6 +33,10 @@ public class AuthLoginReqVO {
     @Length(min = 4, max = 16, message = "密码长度为 4-16 位")
     private String password;
 
+    @ApiModelProperty(value = "验证码", required = true, example = "PfcH6mgr8tpXuMWFjvW6YVaqrswIuwmWI5dsVZSg7sGpWtDCUbHuDEXl3cFB1+VvCC/rAkSwK8Fad52FSuncVg==")
+    @NotEmpty(message = "验证码不能为空")
+    private String captchaVerification;
+
     // ========== 绑定社交登录时，需要传递如下参数 ==========
 
     @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 SysUserSocialTypeEnum 枚举值")
