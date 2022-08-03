@@ -132,6 +132,7 @@ export default {
         loginType: "uname",
         username: "admin",
         password: "admin123",
+        captchaVerification: "",
         mobile: "",
         mobileCode: "",
         rememberMe: false,
@@ -213,7 +214,8 @@ export default {
         tenantName: tenantName ? tenantName : this.loginForm.tenantName,
       };
     },
-    handleLogin() {
+    handleLogin(params) {
+      console.info(params)
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true;
@@ -229,6 +231,7 @@ export default {
             removeRememberMe()
             removeTenantName()
           }
+          this.loginForm.captchaVerification = params.captchaVerification
           // 发起登陆
           // console.log("发起登录", this.loginForm);
           this.$store.dispatch(this.loginForm.loginType === "sms" ? "SmsLogin" : "Login", this.loginForm).then(() => {
