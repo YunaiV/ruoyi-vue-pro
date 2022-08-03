@@ -40,7 +40,7 @@ import { VerifySlide, VerifyPoints } from './Verify'
 import { computed, ref, toRefs, watchEffect } from 'vue'
 
 export default {
-  name: 'Vue2Verify',
+  name: 'Vue3Verify',
   components: {
     VerifySlide,
     VerifyPoints
