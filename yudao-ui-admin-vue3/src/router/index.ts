@@ -48,14 +48,14 @@ router.beforeEach(async (to, from, next) => {
     if (to.path === '/login') {
       next({ path: '/' })
     } else {
-      console.info(3)
       // 获取所有字典
-      const res = await listSimpleDictDataApi()
-      dictStore.setDictMap(res)
+      if (!dictStore.getHasDictData) {
+        const res = await listSimpleDictDataApi()
+        dictStore.setDictMap(res)
+      }
       if (userStore.getRoles.length === 0) {
         isRelogin.show = true
         isRelogin.show = false
-        console.info(2)
         // 后端过滤菜单
         await permissionStore.generateRoutes()
         permissionStore.getAddRouters.forEach((route) => {
@@ -66,7 +66,6 @@ router.beforeEach(async (to, from, next) => {
         const nextData = to.path === redirect ? { ...to, replace: true } : { path: redirect }
         next(nextData)
       } else {
-        console.info(3)
         next()
       }
     }
