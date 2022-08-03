@@ -88,8 +88,13 @@ public class CartItemDO extends BaseDO {
 
     // ========= 优惠信息 END =========
 
+    // TODO 待确定字段：mf
     // TODO 芋艿：distribution_card_no 推广员
     // TODO 芋艿：is_pay 未购买、已购买
     // TODO 芋艿：is_new 是否立即购买
+
+    // TODO 待确定字段: yv
+    // TODO isPay: 是否购买
+    // TODO isNew：是否立即购买
 
 }
