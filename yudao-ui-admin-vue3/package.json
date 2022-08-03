@@ -57,7 +57,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.0.3",
     "@commitlint/config-conventional": "^17.0.3",
-    "@iconify/json": "^2.1.86",
+    "@iconify/json": "^2.1.87",
     "@intlify/vite-plugin-vue-i18n": "^5.0.1",
     "@purge-icons/generated": "^0.8.1",
     "@types/intro.js": "^5.1.0",
