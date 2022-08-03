@@ -3,10 +3,11 @@ import { getRefreshToken } from '@/utils/auth'
 import service from '@/utils/request'
 
 // 登录方法
-export function login(username, password, socialType, socialCode, socialState) {
+export function login(username, password, captchaVerification, socialType, socialCode, socialState) {
   const data = {
     username,
     password,
+    captchaVerification,
     // 社交相关
     socialType,
     socialCode,
