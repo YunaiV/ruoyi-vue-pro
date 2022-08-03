@@ -1,5 +1,5 @@
 import {login, logout, getInfo, socialLogin, socialBindLogin, smsLogin} from '@/api/login'
-import {getAccessToken, setToken, removeToken, getRefreshToken} from '@/utils/auth'
+import {setToken, removeToken} from '@/utils/auth'
 
 const user = {
   state: {
