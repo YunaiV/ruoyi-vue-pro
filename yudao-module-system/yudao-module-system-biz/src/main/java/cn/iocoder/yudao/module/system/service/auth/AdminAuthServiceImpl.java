@@ -21,6 +21,9 @@ import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import com.anji.captcha.model.common.ResponseModel;
+import com.anji.captcha.model.vo.CaptchaVO;
+import com.anji.captcha.service.CaptchaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -51,10 +54,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private SocialUserService socialUserService;
     @Resource
     private MemberService memberService;
-
     @Resource
     private Validator validator;
-
+    @Resource
+    private CaptchaService captchaService;
     @Resource
     private SmsCodeApi smsCodeApi;
 
@@ -81,16 +84,23 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public AuthLoginRespVO login(AuthLoginReqVO reqVO) {
-        // 使用账号密码，进行登录
-        AdminUserDO user = authenticate(reqVO.getUsername(), reqVO.getPassword());
+        CaptchaVO captchaVO = new CaptchaVO();
+        captchaVO.setCaptchaVerification(reqVO.getCaptchaVerification());
+        ResponseModel response = captchaService.verification(captchaVO);
+        if(response.isSuccess()){
+            // 使用账号密码，进行登录
+            AdminUserDO user = authenticate(reqVO.getUsername(), reqVO.getPassword());
 
-        // 如果 socialType 非空，说明需要绑定社交用户
-        if (reqVO.getSocialType() != null) {
-            socialUserService.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
-                    reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState()));
+            // 如果 socialType 非空，说明需要绑定社交用户
+            if (reqVO.getSocialType() != null) {
+                socialUserService.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
+                        reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState()));
+            }
+            // 创建 Token 令牌，记录登录日志
+            return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
+        }else{
+            throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR);
         }
-        // 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
     }
 
     @Override
