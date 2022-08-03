@@ -18,7 +18,7 @@ const { loadStart, loadDone } = usePageLoading()
 
 // 创建路由实例
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHashHistory(), // createWebHashHistory URL带#，createWebHistory URL不带#
   strict: true,
   routes: remainingRouter as RouteRecordRaw[],
   scrollBehavior: () => ({ left: 0, top: 0 })
