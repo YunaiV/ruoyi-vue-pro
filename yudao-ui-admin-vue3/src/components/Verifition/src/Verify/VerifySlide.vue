@@ -11,13 +11,13 @@
           alt=""
           style="width: 100%; height: 100%; display: block"
         />
-        <div class="verify-refresh" @click="refresh" v-show="showRefresh"
-          ><i class="iconfont icon-refresh"></i>
+        <div class="verify-refresh" @click="refresh" v-show="showRefresh">
+          <i class="iconfont icon-refresh"></i>
         </div>
         <transition name="tips">
-          <span class="verify-tips" v-if="tipWords" :class="passFlag ? 'suc-bg' : 'err-bg'">{{
-            tipWords
-          }}</span>
+          <span class="verify-tips" v-if="tipWords" :class="passFlag ? 'suc-bg' : 'err-bg'">
+            {{ tipWords }}
+          </span>
         </transition>
       </div>
     </div>

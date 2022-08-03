@@ -127,7 +127,6 @@ const getRoutes = async () => {
   if (!redirect.value) {
     redirect.value = '/'
   }
-  console.info(redirect.value)
   push({ path: redirect.value || permissionStore.addRouters[0].path })
 }
 
