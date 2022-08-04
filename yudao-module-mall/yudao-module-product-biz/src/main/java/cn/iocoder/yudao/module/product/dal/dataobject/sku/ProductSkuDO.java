@@ -54,9 +54,9 @@ public class ProductSkuDO extends BaseDO {
      */
     private Integer price;
     /**
-     * 原价，单位：分
+     * 市场价，单位：分
      */
-    private Integer originalPrice;
+    private Integer marketPrice;
     /**
      * 成本价，单位：分
      */
@@ -76,15 +76,9 @@ public class ProductSkuDO extends BaseDO {
      */
     private Integer status;
     /**
-     * 购买中的库存
-     *
-     * 商品 SKU 被下单时，未付款的商品 SKU 数量
+     * 库存
      */
-    private Integer stocks;
-    /**
-     * 实际库存
-     */
-    private Integer actualStocks;
+    private Integer stock;
     /**
      * 商品重量，单位：kg 千克
      */

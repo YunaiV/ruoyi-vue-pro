@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.product.dal.dataobject.comment;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.enums.comment.ProductCommentAuditStatusEnum;
-import cn.iocoder.yudao.module.product.enums.comment.ProductCommentEvaluateEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -41,11 +40,23 @@ public class ProductCommentDO extends BaseDO {
      */
     private Long spuId;
     /**
+     * 交易订单编号
+     *
+     * 关联 TradeOrderDO 的 id 编号
+     */
+    private Long orderId;
+    /**
      * 交易订单项编号
      *
-     * 关联 OrderItemDO 的 id 编号
+     * 关联 TradeOrderItemDO 的 id 编号
      */
-    private Long tradeOrderItemId;
+    private Long orderItemId;
+    /**
+     * 审核状态
+     *
+     * 枚举 {@link ProductCommentAuditStatusEnum}
+     */
+    private Integer auditStatus;
 
     /**
      * 用户编号
@@ -71,15 +82,29 @@ public class ProductCommentDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> picUrls;
     /**
-     * 得分，0-5 分
-     */
-    private Integer score;
-    /**
-     * 评价
+     * 描述相符星级
      *
-     * 枚举 {@link ProductCommentEvaluateEnum}
+     * 1-5 星
      */
-    private Integer evaluate;
+    private Integer descriptionScore;
+    /**
+     * 商品评论星级
+     *
+     * 1-5 星
+     */
+    private Integer productScore;
+    /**
+     * 服务评论星级
+     *
+     * 1-5 星
+     */
+    private Integer serviceScore;
+    /**
+     * 物流评论星级
+     *
+     * 1-5 星
+     */
+    private Integer expressComment;
 
     /**
      * 商家是否回复
@@ -93,12 +118,6 @@ public class ProductCommentDO extends BaseDO {
      * 商家回复时间
      */
     private Date replyTime;
-    /**
-     * 审核状态
-     *
-     * 枚举 {@link ProductCommentAuditStatusEnum}
-     */
-    private Integer auditStatus;
 
     /**
      * 有用的计数
