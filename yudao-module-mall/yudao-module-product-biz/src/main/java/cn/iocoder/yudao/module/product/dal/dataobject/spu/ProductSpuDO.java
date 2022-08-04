@@ -150,4 +150,9 @@ public class ProductSpuDO extends BaseDO {
     // TODO is_new 是否新品
     // TODO is_good 是否优品推荐
 
+    // TODO ========== 待定字段：cf =========
+    // TODO source_link 淘宝京东1688类型
+    // TODO video_link 主图视频链接
+    // TODO activity 活动显示排序 0=默认 1=秒 2=砍价 3=拼团
+
 }

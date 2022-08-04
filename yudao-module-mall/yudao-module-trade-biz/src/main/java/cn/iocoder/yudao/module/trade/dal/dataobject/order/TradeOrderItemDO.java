@@ -122,4 +122,11 @@ public class TradeOrderItemDO extends BaseDO {
 
     // TODO 芋艿：basket_date 加入购物车时间；
     // TODO 芋艿：distribution_card_no 推广员使用的推销卡号
+
+    // TODO 待确定：mf
+    // TODO give_integral：赠送积分
+    // TODO is_reply：是否评价，0-未评价，1-已评价
+    // TODO is_sub：是否单独分佣,0-否，1-是
+    // TODO vip_price：会员价
+    // TODO product_type：商品类型:0-普通，1-秒杀，2-砍价，3-拼团，4-视频号
 }

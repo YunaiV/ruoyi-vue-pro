@@ -40,4 +40,6 @@ public class ProductFavoriteDO extends BaseDO {
      */
     private Long spuId;
 
+    // TODO 芋艿：type 1 收藏；2 点赞
+
 }

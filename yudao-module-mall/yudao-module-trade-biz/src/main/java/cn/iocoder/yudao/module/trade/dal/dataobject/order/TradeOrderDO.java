@@ -226,4 +226,9 @@ public class TradeOrderDO extends BaseDO {
     // TODO verify_code：核销码
     // TODO store_id：门店id
 
+    // TODO ========== 待定字段：cf =========
+    // TODO before_pay_price：改价前支付金额
+    // TODO is_alter_price：是否改价
+    // TODO type：订单类型:0-普通订单，1-视频号订单
+    // TODO out_trade_no：商户系统内部的订单号 String
 }

@@ -121,5 +121,10 @@ public class ProductSkuDO extends BaseDO {
     // TODO seckill_stock：秒杀库存
     // TODO integral：需要积分
 
+    // TODO ========== 待定字段：cf =========
+    // TODO type 活动显示排序 0=默认 1=秒 2=砍价 3=拼团
+    // TODO quota 活动限购数量
+    // TODO quota_show 活动限购数量显示
+
 }
 
