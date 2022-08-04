@@ -1,26 +1,25 @@
-package cn.iocoder.yudao.module.trade.enums.refund;
+package cn.iocoder.yudao.module.trade.enums.order;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 交易退款 - 状态
+ * 交易订单 - 退款状态
  *
  * @author Sin
  */
 @RequiredArgsConstructor
 @Getter
-public enum TradeRefundStatusEnum {
+public enum TradeOrderRefundStatusEnum {
 
     NONE(0, "未退款"),
-    AUDIT(10, "审核中"),
-    APPROVE(30, "已通过"),
-    REJECT(40, "不通过"),;
+    PART(1, "部分退款"),
+    ALL(2, "全部退款");
 
     /**
      * 状态值
      */
-    private final Integer value;
+    private final Integer status;
     /**
      * 状态名
      */

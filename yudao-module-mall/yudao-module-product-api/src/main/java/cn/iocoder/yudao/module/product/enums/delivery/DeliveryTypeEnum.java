@@ -13,12 +13,13 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum DeliveryModeEnum implements IntArrayValuable {
+public enum DeliveryTypeEnum implements IntArrayValuable {
 
-    SHOP_DELIVERY(1, "商家配送"),
-    USER_PICK_UP(2, "用户自提");
+    // TODO 芋艿：英文单词，需要再想下；
+    EXPRESS(1, "快递发货"),
+    USER(2, "用户自提"),;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DeliveryModeEnum::getMode).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DeliveryTypeEnum::getMode).toArray();
 
     /**
      * 配送方式

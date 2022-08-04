@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
+import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.product.enums.delivery.DeliveryModeEnum;
+import cn.iocoder.yudao.module.product.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCloseTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.refund.TradeRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -38,6 +40,18 @@ public class TradeOrderDO extends BaseDO {
      */
     private String sn;
     // TODO 芋艿：order_type 订单类型
+    /**
+     * 订单类型
+     *
+     * 枚举 {@link TradeOrderTypeEnum}
+     */
+    private Integer type;
+    /**
+     * 订单来源终端
+     *
+     * 枚举 {@link TerminalEnum}
+     */
+    private Integer terminal;
 //    /**
 //     * 店铺编号
 //     *
@@ -72,11 +86,13 @@ public class TradeOrderDO extends BaseDO {
      */
     private String remark;
     /**
-     * 订单结束时间
-     *
-     * 即交易订单状态变成 {@link TradeOrderStatusEnum#COMPLETED} 或 {@link TradeOrderStatusEnum#CLOSED} 的时间
+     * 确认收获时间
      */
-    private Date endTime;
+    private Date confirmTakeTime;
+    /**
+     * 订单取消时间
+     */
+    private Date cancelTime;
 
     // ========== 价格 + 支付基本信息 ==========
     /**
@@ -85,7 +101,7 @@ public class TradeOrderDO extends BaseDO {
      * true - 已经支付过
      * false - 没有支付过
      */
-    private Boolean payed;
+    private Boolean payed; // TODO payStatus 0 - 待付款；1 - 已付款；2 - 已退款
     /**
      * 付款时间
      */
@@ -119,14 +135,6 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer payPrice;
     /**
-     * 退款金额，单位：分
-     *
-     * 注意，退款并不会影响 {@link #payPrice} 实际支付金额
-     * 也就说，一个订单最终产生多少金额的收入 = payPrice - refundPrice
-     */
-    @Deprecated
-    private Integer refundPrice;
-    /**
      * 支付订单编号
      *
      * 对接 pay-module-biz 支付服务的支付订单编号，即 PayOrderDO 的 id 编号
@@ -141,9 +149,9 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 配送方式
      *
-     * 枚举 {@link DeliveryModeEnum}
+     * 枚举 {@link DeliveryTypeEnum}
      */
-    private Integer deliveryMode;
+    private Integer deliveryType;
     /**
      * 配置模板的编号
      *
@@ -187,15 +195,22 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 退款状态
      *
-     * 枚举 {@link TradeRefundStatusEnum}
+     * 枚举 {@link TradeOrderRefundStatusEnum}
      */
     private Integer refundStatus;
+    /**
+     * 退款金额，单位：分
+     *
+     * 注意，退款并不会影响 {@link #payPrice} 实际支付金额
+     * 也就说，一个订单最终产生多少金额的收入 = payPrice - refundPrice
+     */
+    private Integer refundPrice;
 
     // ========== 营销基本信息 ==========
     /**
      * 优惠劵编号
      */
-    private Integer couponCardId;
+    private Integer couponId;
 
     // TODO 芋艿，这块还要结合营销和价格计算，在去优化下。
 
@@ -229,6 +244,20 @@ public class TradeOrderDO extends BaseDO {
     // TODO ========== 待定字段：cf =========
     // TODO before_pay_price：改价前支付金额
     // TODO is_alter_price：是否改价
-    // TODO type：订单类型:0-普通订单，1-视频号订单
     // TODO out_trade_no：商户系统内部的订单号 String
+
+    // TODO ========== 待定字段：lf =========
+    // TODO integral_amount：积分抵扣金额
+    // TODO shipping_status：发货状态
+    // TODO shipping_time：最后新发货时间
+
+    // TODO ========== 待定字段：lf =========
+    // TODO settle_id：未结算
+    // TODO settle_amount：结算金额
+    // TODO use_integral：使用的积分
+    // TODO team_found_id: 拼团id
+    // TODO team_id: 拼团活动id
+    // TODO delivery_id: 发货单ID
+    // TODO attach_values: 附带的值(赠送时机，赠送积分成长值什么的)Json格式
+
 }

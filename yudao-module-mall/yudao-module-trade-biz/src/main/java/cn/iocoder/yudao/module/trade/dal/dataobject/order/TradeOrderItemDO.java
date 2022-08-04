@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemRefundStatusEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.util.List;
 
 /**
  * 交易订单项 DO
@@ -54,6 +59,11 @@ public class TradeOrderItemDO extends BaseDO {
      * 关联 ProductSkuDO 的 id 编号
      */
     private Integer skuId;
+    /**
+     * 规格值数组，JSON 格式
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<Property> properties;
     /**
      * 商品名称
      */
@@ -106,6 +116,14 @@ public class TradeOrderItemDO extends BaseDO {
      * 所以，需要存储一个该字段。
      */
     private Integer presentTotal; // product_total_amount
+
+    // ========== 退款基本信息 ==========
+    /**
+     * 退款状态
+     *
+     * 枚举 {@link TradeOrderItemRefundStatusEnum}
+     */
+    private Integer refundStatus;
     // 如上字段，举个例子：
     // 假设购买三个，即 stock = 3 。
     // originPrice = 15
@@ -120,6 +138,27 @@ public class TradeOrderItemDO extends BaseDO {
      */
     private Integer refundTotal;
 
+    /**
+     * 商品属性
+     */
+    @Data
+    public static class Property {
+
+        /**
+         * 属性编号
+         *
+         * 关联 ProductPropertyDO 的 id 编号
+         */
+        private Long propertyId;
+        /**
+         * 属性值编号
+         *
+         * 关联 ProductPropertyValueDO 的 id 编号
+         */
+        private Long valueId;
+
+    }
+
     // TODO 芋艿：basket_date 加入购物车时间；
     // TODO 芋艿：distribution_card_no 推广员使用的推销卡号
 
@@ -129,4 +168,14 @@ public class TradeOrderItemDO extends BaseDO {
     // TODO is_sub：是否单独分佣,0-否，1-是
     // TODO vip_price：会员价
     // TODO product_type：商品类型:0-普通，1-秒杀，2-砍价，3-拼团，4-视频号
+
+    // TODO 待确定：lf
+    // TODO integral_price：积分抵扣的金额
+    // TODO member_price：会员价格
+    // TODO is_member：是否为会员折扣;0-不是;1-是
+    // TODO member_discount：会员折扣(百分比)
+
+    // TODO goods_info 商品信息
+
+    // TODO integral_price：积分抵扣的金额
 }

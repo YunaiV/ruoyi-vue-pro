@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.refund;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.enums.refund.TradeRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.refund.TradeRefundTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * 交易退款，用于处理 {@link TradeOrderDO} 交易订单的退货换流程
  */
-// TODO 芋艿：需要调整下每个字段的命名
+// TODO 芋艿：需要调整下每个字段的命名；未完全实现；
 @TableName(value = "trade_refund")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -39,7 +39,7 @@ public class TradeRefundDO extends BaseDO {
     /**
      * 退款状态
      *
-     * 枚举 {@link TradeRefundStatusEnum}
+     * 枚举 {@link TradeOrderRefundStatusEnum}
      */
     private Integer status;
 //    /**

@@ -4,19 +4,18 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 交易订单 - 状态
+ * 交易订单项 - 退款状态
  *
  * @author Sin
  */
 @RequiredArgsConstructor
 @Getter
-public enum TradeOrderStatusEnum {
+public enum TradeOrderItemRefundStatusEnum {
 
-    WAITING_PAYMENT(0, "待付款"),
-    WAIT_SHIPMENT(1, "待发货"),
-    ALREADY_SHIPMENT(2, "待收货"),
-    COMPLETED(3, "成功"),
-    CLOSED(4, "失败");
+    NONE(0, "未申请退款"),
+    APPLY(1, "申请退款"),
+    WAIT(2, "等待退款"),
+    SUCCESS(3, "退款成功");
 
     /**
      * 状态值

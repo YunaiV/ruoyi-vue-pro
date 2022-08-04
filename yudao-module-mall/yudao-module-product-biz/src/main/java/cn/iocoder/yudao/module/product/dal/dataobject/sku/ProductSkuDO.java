@@ -88,6 +88,9 @@ public class ProductSkuDO extends BaseDO {
      */
     private Double volume;
 
+    /**
+     * 商品属性
+     */
     @Data
     public static class Property {
 
