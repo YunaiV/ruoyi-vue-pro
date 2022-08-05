@@ -1,7 +1,7 @@
 // 应用全局配置
 module.exports = {
   // baseUrl: 'http://localhost:8080',
-  baseUrl: 'http://localhost:48080/admin-api',
+  baseUrl: 'http://localhost:48080',
   // 应用信息
   appInfo: {
     // 应用名称
