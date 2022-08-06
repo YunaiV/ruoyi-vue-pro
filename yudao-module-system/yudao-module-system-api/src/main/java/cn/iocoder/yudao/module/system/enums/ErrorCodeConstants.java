@@ -144,6 +144,7 @@ public interface ErrorCodeConstants {
 
     // ========== 站内信模版 1002023000 ==========
     ErrorCode NOTIFY_TEMPLATE_NOT_EXISTS = new ErrorCode(1002023000, "站内信模版不存在");
+    ErrorCode NOTIFY_TEMPLATE_CODE_DUPLICATE = new ErrorCode(1002023001, "已经存在编码为【{}】的站内信模板");
 
     // ========== 站内信 1002024000 ==========
     ErrorCode NOTIFY_MESSAGE_NOT_EXISTS = new ErrorCode(1002024000, "站内信不存在");

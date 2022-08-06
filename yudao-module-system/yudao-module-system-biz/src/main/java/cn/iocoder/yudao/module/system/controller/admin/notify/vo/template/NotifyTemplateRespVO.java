@@ -13,6 +13,9 @@ public class NotifyTemplateRespVO extends NotifyTemplateBaseVO {
     @ApiModelProperty(value = "ID", required = true)
     private Long id;
 
+    @ApiModelProperty(value = "参数数组", example = "name,code")
+    private List<String> params;
+
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;
 

@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.Notify
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 
 /**
  * 站内信模版 Service 接口
@@ -16,6 +17,29 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
  * @author xrcoder
  */
 public interface NotifyTemplateService {
+
+    /**
+     * 初始化站内信模板的本地缓存
+     */
+    void initLocalCache();
+
+    /**
+     * 获得站内信模板，从缓存中
+     *
+     * @param code 模板编码
+     * @return 站内信模板
+     */
+    NotifyTemplateDO getNotifyTemplateByCodeFromCache(String code);
+
+
+    /**
+     * 格式化站内信内容
+     *
+     * @param content 站内信模板的内容
+     * @param params 站内信内容的参数
+     * @return 格式化后的内容
+     */
+    String formatNotifyTemplateContent(String content, Map<String, Object> params);
 
     /**
      * 创建站内信模版
