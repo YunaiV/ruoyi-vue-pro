@@ -48,9 +48,9 @@ public class NotifyMessageDO extends BaseDO {
     /**
      * 是否已读 0-未读  1-已读
      *
-     * 枚举 {@link TODO system_notify_message_read_status 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.module.system.enums.notify.NotifyReadStatusEnum}
      */
-    private Boolean readStatus;
+    private Integer readStatus;
     /**
      * 阅读时间
      */

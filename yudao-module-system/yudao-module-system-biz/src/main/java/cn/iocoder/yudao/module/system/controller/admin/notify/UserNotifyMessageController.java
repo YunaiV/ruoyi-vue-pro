@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyM
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageRespVO;
 import cn.iocoder.yudao.module.system.convert.notify.NotifyMessageConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
+import cn.iocoder.yudao.module.system.enums.notify.NotifyReadStatusEnum;
 import cn.iocoder.yudao.module.system.service.notify.NotifyMessageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -77,7 +78,8 @@ public class UserNotifyMessageController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     public CommonResult<NotifyMessageRespVO> readNotifyMessage(@RequestParam("id") Long id) {
         NotifyMessageDO notifyMessage = notifyMessageService.getNotifyMessage(id);
-        // TODO 记录消息已读。
+        // 记录消息已读。
+        notifyMessageService.updateNotifyMessageReadStatus(id, NotifyReadStatusEnum.READ.getStatus());
         return success(NotifyMessageConvert.INSTANCE.convert(notifyMessage));
     }
 
@@ -85,13 +87,14 @@ public class UserNotifyMessageController {
     @ApiOperation("批量标记已读")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
     public CommonResult<Boolean> batchUpdateNotifyMessageReadStatus(@RequestParam("ids") Collection<Long> ids) {
+        notifyMessageService.batchUpdateNotifyMessageReadStatus(ids, getLoginUserId());
         return success(Boolean.TRUE);
     }
 
     @GetMapping("/read/all")
     @ApiOperation("所有未读消息标记已读")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    public CommonResult<Boolean> batchUpdateAllNotifyMessageReadStatus(@RequestParam("ids") Collection<Long> ids) {
+    public CommonResult<Boolean> batchUpdateAllNotifyMessageReadStatus() {
+        notifyMessageService.batchUpdateAllNotifyMessageReadStatus(getLoginUserId(), UserTypeEnum.ADMIN.getValue());
         return success(Boolean.TRUE);
     }
 }

@@ -18,7 +18,7 @@ public class NotifyMessagePageReqVO extends PageParam {
     private String title;
 
     @ApiModelProperty(value = "是否已读 0-未读  1-已读")
-    private Boolean readStatus;
+    private Integer readStatus;
 
     @ApiModelProperty(value = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

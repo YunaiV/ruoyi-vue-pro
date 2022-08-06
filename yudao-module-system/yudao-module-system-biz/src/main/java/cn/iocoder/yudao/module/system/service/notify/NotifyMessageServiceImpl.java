@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.system.service.notify;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessagePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageUpdateReqVO;
@@ -9,6 +12,7 @@ import cn.iocoder.yudao.module.system.convert.notify.NotifyMessageConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.notify.NotifyMessageMapper;
+import cn.iocoder.yudao.module.system.enums.notify.NotifyReadStatusEnum;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -124,5 +128,72 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
     @Override
     public Long getUnreadNotifyMessageCount(Long userId, Integer userType) {
         return notifyMessageMapper.selectUnreadCountByUserIdAndUserType(userId, userType);
+    }
+
+    /**
+     * 修改站内信阅读状态
+     *
+     * @param id     站内信编号
+     * @param status 状态
+     */
+    @Override
+    public void updateNotifyMessageReadStatus(Long id, Integer status) {
+        // 校验消息是否存在
+        this.validateNotifyMessageExists(id);
+        // 更新状态
+        batchUpdateReadStatus(CollectionUtils.singleton(id));
+    }
+
+    /**
+     * 批量修改站内信阅读状态
+     *
+     * @param ids    站内信编号集合
+     * @param userId 用户ID
+     */
+    @Override
+    public void batchUpdateNotifyMessageReadStatus(Collection<Long> ids, Long userId) {
+        List<NotifyMessageDO> list = getNotifyMessageList(ids);
+        if (CollUtil.isEmpty(list)) {
+            throw exception(NOTIFY_MESSAGE_NOT_EXISTS);
+        }
+        // 验证站内信是否是属于用户
+        for (NotifyMessageDO messageDO : list) {
+            checkNotifyMessageIdValid(messageDO, userId);
+        }
+        batchUpdateReadStatus(ids);
+    }
+
+    @VisibleForTesting
+    public void checkNotifyMessageIdValid(NotifyMessageDO notifyMessageDO, Long userId) {
+        if (!NumberUtil.equals(notifyMessageDO.getUserId(), userId)) {
+            throw exception(NOTIFY_MESSAGE_ID_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * 批量修改用户所有未读消息标记已读
+     *
+     * @param userId   用户ID
+     * @param userType 用户类型
+     */
+    @Override
+    public void batchUpdateAllNotifyMessageReadStatus(Long userId, Integer userType) {
+        List<NotifyMessageDO> list = notifyMessageMapper.selectUnreadListByUserIdAndUserType(userId, userType);
+        if (CollUtil.isNotEmpty(list)) {
+            batchUpdateReadStatus(CollectionUtils.convertList(list, NotifyMessageDO::getId));
+
+        }
+    }
+
+    private void batchUpdateReadStatus(Collection<Long> ids) {
+        if (CollUtil.isNotEmpty(ids)) {
+            for (Long id : ids) {
+                NotifyMessageDO updateObj = new NotifyMessageDO();
+                updateObj.setId(id);
+                updateObj.setReadStatus(NotifyReadStatusEnum.READ.getStatus());
+                notifyMessageMapper.updateById(updateObj);
+            }
+        }
+
     }
 }

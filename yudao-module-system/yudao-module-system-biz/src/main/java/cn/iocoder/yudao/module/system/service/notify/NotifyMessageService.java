@@ -71,4 +71,28 @@ public interface NotifyMessageService {
      * @return 返回未读站内信条数
      */
     Long getUnreadNotifyMessageCount(Long userId, Integer userType);
+
+    /**
+     * 修改站内信阅读状态
+     *
+     * @param id 站内信编号
+     * @param status 状态
+     */
+    void updateNotifyMessageReadStatus(Long id, Integer status);
+
+    /**
+     * 批量修改站内信阅读状态
+     *
+     * @param ids 站内信编号集合
+     * @param userId 用户ID
+     */
+    void batchUpdateNotifyMessageReadStatus(Collection<Long> ids, Long userId);
+
+    /**
+     * 批量修改用户所有未读消息标记已读
+     *
+     * @param userId 用户ID
+     * @param userType 用户类型
+     */
+    void batchUpdateAllNotifyMessageReadStatus(Long userId, Integer userType);
 }

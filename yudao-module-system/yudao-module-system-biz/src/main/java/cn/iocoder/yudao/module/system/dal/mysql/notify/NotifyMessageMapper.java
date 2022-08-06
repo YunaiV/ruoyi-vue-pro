@@ -34,4 +34,11 @@ public interface NotifyMessageMapper extends BaseMapperX<NotifyMessageDO> {
                 .eq(NotifyMessageDO::getUserId, userId)
                 .eq(NotifyMessageDO::getUserType, userType));
     }
+
+    default List<NotifyMessageDO> selectUnreadListByUserIdAndUserType(Long userId, Integer userType) {
+        return selectList(new LambdaQueryWrapperX<NotifyMessageDO>()
+                .eq(NotifyMessageDO::getReadStatus, NotifyReadStatusEnum.UNREAD.getStatus())
+                .eq(NotifyMessageDO::getUserId, userId)
+                .eq(NotifyMessageDO::getUserType, userType));
+    }
 }
