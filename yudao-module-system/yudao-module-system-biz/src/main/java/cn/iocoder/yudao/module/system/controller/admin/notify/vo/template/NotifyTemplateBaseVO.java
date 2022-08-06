@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.system.controller.admin.notify.vo.template;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 /**
 * 站内信模版 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -26,6 +28,7 @@ public class NotifyTemplateBaseVO {
 
     @ApiModelProperty(value = "状态：1-启用 0-禁用", required = true)
     @NotNull(message = "状态：1-启用 0-禁用不能为空")
+    @InEnum(value = CommonStatusEnum.class, message = "状态必须是 {value}")
     private String status;
 
     @ApiModelProperty(value = "备注")

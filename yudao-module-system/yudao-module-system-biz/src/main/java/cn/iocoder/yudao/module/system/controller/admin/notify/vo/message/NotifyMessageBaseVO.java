@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.system.controller.admin.notify.vo.message;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -21,6 +24,7 @@ public class NotifyMessageBaseVO {
 
     @ApiModelProperty(value = "用户类型", required = true)
     @NotNull(message = "用户类型不能为空")
+    @InEnum(value = UserTypeEnum.class, message = "用户类型必须是 {value}")
     private Integer userType;
 
     @ApiModelProperty(value = "标题")
