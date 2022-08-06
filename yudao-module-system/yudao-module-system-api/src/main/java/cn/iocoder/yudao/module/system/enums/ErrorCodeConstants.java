@@ -142,4 +142,10 @@ public interface ErrorCodeConstants {
     ErrorCode OAUTH2_CODE_NOT_EXISTS = new ErrorCode(1002022000, "code 不存在");
     ErrorCode OAUTH2_CODE_EXPIRE = new ErrorCode(1002022000, "code 已过期");
 
+    // ========== 站内信模版 1002023000 ==========
+    ErrorCode NOTIFY_TEMPLATE_NOT_EXISTS = new ErrorCode(1002023000, "站内信模版不存在");
+
+    // ========== 站内信 1002024000 ==========
+    ErrorCode NOTIFY_MESSAGE_NOT_EXISTS = new ErrorCode(1002024000, "站内信不存在");
+
 }
