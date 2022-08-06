@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.system.dal.mysql.notify;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessagePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
+import cn.iocoder.yudao.module.system.enums.notify.NotifyReadStatusEnum;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * 站内信 Mapper
@@ -20,6 +23,15 @@ public interface NotifyMessageMapper extends BaseMapperX<NotifyMessageDO> {
                 .likeIfPresent(NotifyMessageDO::getTitle, reqVO.getTitle())
                 .eqIfPresent(NotifyMessageDO::getReadStatus, reqVO.getReadStatus())
                 .betweenIfPresent(NotifyMessageDO::getCreateTime, reqVO.getCreateTime())
+                .eqIfPresent(NotifyMessageDO::getUserId, reqVO.getUserId())
+                .eqIfPresent(NotifyMessageDO::getUserType, reqVO.getUserType())
                 .orderByDesc(NotifyMessageDO::getId));
+    }
+
+    default Long selectUnreadCountByUserIdAndUserType(Long userId, Integer userType) {
+        return selectCount(new LambdaQueryWrapperX<NotifyMessageDO>()
+                .eq(NotifyMessageDO::getReadStatus, NotifyReadStatusEnum.UNREAD.getStatus())
+                .eq(NotifyMessageDO::getUserId, userId)
+                .eq(NotifyMessageDO::getUserType, userType));
     }
 }

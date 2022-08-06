@@ -24,4 +24,10 @@ public class NotifyMessagePageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private Date[] createTime;
 
+
+    @ApiModelProperty(value = "用户编号", hidden = true)
+    private Long userId;
+
+    @ApiModelProperty(value = "用户类型", hidden = true)
+    private Integer userType;
 }

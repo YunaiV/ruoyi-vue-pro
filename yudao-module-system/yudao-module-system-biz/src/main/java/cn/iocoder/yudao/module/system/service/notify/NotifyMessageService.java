@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.system.service.notify;
 
-import java.util.*;
-import javax.validation.*;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessagePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 站内信 Service 接口
@@ -62,4 +63,12 @@ public interface NotifyMessageService {
      */
     PageResult<NotifyMessageDO> getNotifyMessagePage(NotifyMessagePageReqVO pageReqVO);
 
+    /**
+     * 统计用户未读站内信条数
+     *
+     * @param userId 用户ID
+     * @param userType 用户类型
+     * @return 返回未读站内信条数
+     */
+    Long getUnreadNotifyMessageCount(Long userId, Integer userType);
 }

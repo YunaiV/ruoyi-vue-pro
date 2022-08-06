@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.system.controller.admin.notify;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessagePageReqVO;
@@ -23,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 /**
  * 管理后台 - 站内信-消息中心
@@ -42,6 +45,8 @@ public class UserNotifyMessageController {
     @GetMapping("/page")
     @ApiOperation("获得站内信分页")
     public CommonResult<PageResult<NotifyMessageRespVO>> getNotifyMessagePage(@Valid NotifyMessagePageReqVO pageVO) {
+        pageVO.setUserId(getLoginUserId());
+        pageVO.setUserType(UserTypeEnum.ADMIN.getValue());
         PageResult<NotifyMessageDO> pageResult = notifyMessageService.getNotifyMessagePage(pageVO);
         return success(NotifyMessageConvert.INSTANCE.convertPage(pageResult));
     }
@@ -49,13 +54,22 @@ public class UserNotifyMessageController {
     @GetMapping("/latest/list")
     @ApiOperation("获得最新10站内信列表")
     public CommonResult<List<NotifyMessageRespVO>> getNotifyLatestMessageList() {
+        NotifyMessagePageReqVO reqVO = new NotifyMessagePageReqVO();
+        reqVO.setUserId(getLoginUserId());
+        reqVO.setUserType(UserTypeEnum.ADMIN.getValue());
+        reqVO.setPageNo(1);
+        reqVO.setPageSize(10);
+        PageResult<NotifyMessageDO> pageResult = notifyMessageService.getNotifyMessagePage(reqVO);
+        if (CollUtil.isNotEmpty(pageResult.getList())) {
+            return success(NotifyMessageConvert.INSTANCE.convertList(pageResult.getList()));
+        }
         return success(Collections.emptyList());
     }
 
     @GetMapping("/unread/count")
     @ApiOperation("获得未读站内信数量")
     public CommonResult<Long> getUnreadNotifyMessageCount() {
-        return success(1L);
+        return success(notifyMessageService.getUnreadNotifyMessageCount(getLoginUserId(), UserTypeEnum.ADMIN.getValue()));
     }
 
     @GetMapping("/read")
