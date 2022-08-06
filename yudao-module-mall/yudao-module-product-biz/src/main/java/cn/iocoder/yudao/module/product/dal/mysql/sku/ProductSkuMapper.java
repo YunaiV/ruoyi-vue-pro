@@ -22,7 +22,7 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
                 .eqIfPresent(ProductSkuDO::getSpuId, reqVO.getSpuId())
                 .eqIfPresent(ProductSkuDO::getProperties, reqVO.getProperties())
                 .eqIfPresent(ProductSkuDO::getPrice, reqVO.getPrice())
-                .eqIfPresent(ProductSkuDO::getOriginalPrice, reqVO.getOriginalPrice())
+//                .eqIfPresent(ProductSkuDO::getOriginalPrice, reqVO.getOriginalPrice())
 //                .eqIfPresent(ProductSkuDO::getCostPrice, reqVO.getCostPrice())
                 .eqIfPresent(ProductSkuDO::getBarCode, reqVO.getBarCode())
                 .eqIfPresent(ProductSkuDO::getPicUrl, reqVO.getPicUrl())

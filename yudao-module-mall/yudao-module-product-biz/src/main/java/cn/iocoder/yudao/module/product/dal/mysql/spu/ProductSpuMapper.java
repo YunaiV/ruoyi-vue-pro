@@ -24,7 +24,7 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .eqIfPresent(ProductSpuDO::getPicUrls, reqVO.getPicUrls())
                 .eqIfPresent(ProductSpuDO::getSort, reqVO.getSort())
 //                .eqIfPresent(ProductSpuDO::getLikeCount, reqVO.getLikeCount())
-                .eqIfPresent(ProductSpuDO::getPrice, reqVO.getPrice())
+//                .eqIfPresent(ProductSpuDO::getPrice, reqVO.getPrice())
 //                .eqIfPresent(ProductSpuDO::getQuantity, reqVO.getQuantity())
                 .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime())

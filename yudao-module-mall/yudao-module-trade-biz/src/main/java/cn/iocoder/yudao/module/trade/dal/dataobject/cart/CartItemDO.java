@@ -36,12 +36,6 @@ public class CartItemDO extends BaseDO {
 
     // ========= 买家信息 BEGIN =========
 
-//    /**
-//     * 店铺编号
-//     *
-//     * 关联 {@link ShopDO#getId()} TODO 芋艿：多店铺，暂不考虑
-//     */
-//    private Long shopId;
     /**
      * 用户编号
      *

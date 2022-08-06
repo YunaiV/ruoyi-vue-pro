@@ -34,11 +34,5 @@ public class ProductHotSearchDO extends BaseDO {
      * 内容
      */
     private String content;
-//    /**
-//     * 店铺编号
-//     *
-//     * 关联 {@link ShopDO#getId()} TODO 芋艿：多店铺，暂不考虑
-//     */
-//    private Long shopId;
 
 }

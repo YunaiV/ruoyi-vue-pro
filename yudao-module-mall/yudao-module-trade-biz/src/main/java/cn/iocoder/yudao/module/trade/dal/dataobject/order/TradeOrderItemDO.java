@@ -26,13 +26,7 @@ public class TradeOrderItemDO extends BaseDO {
     /**
      * 编号
      */
-    private Integer id;
-//    /**
-//     * 店铺编号
-//     *
-//     * 关联 {@link ShopDO#getId()} TODO 芋艿：多店铺，暂不考虑
-//     */
-//    private Long shopId;
+    private Long id;
     /**
      * 用户编号
      *
@@ -47,12 +41,6 @@ public class TradeOrderItemDO extends BaseDO {
     private Long orderId;
 
     // ========== 商品基本信息 ==========
-    /**
-     * 商品 SPU 编号
-     *
-     * 关联 ProductSpuDO 的 id 编号
-     */
-    private Long spuId;
     /**
      * 商品 SKU 编号
      *
@@ -75,7 +63,7 @@ public class TradeOrderItemDO extends BaseDO {
     /**
      * 购买数量
      */
-    private Integer stock;
+    private Integer count;
     /**
      * 是否评论
      *
@@ -86,36 +74,46 @@ public class TradeOrderItemDO extends BaseDO {
 
     // ========== 价格 + 支付基本信息 ==========
     /**
-     * 原始单价，单位：分。
-     */
-    private Integer originPrice; // price
-    /**
      * 购买单价，单位：分
+     *
+     * 对应 ProductSkuDO 的 price 字段
      */
-    private Integer buyPrice;
+    private Integer buyPrice; // like - original_price；niu - costPrice
     /**
      * 最终单价，单位：分。
      */
-    private Integer presentPrice;
+    private Integer presentPrice; // like - goods_price；niu - price
     /**
      * 购买总金额，单位：分
-     *
-     * 用途类似 {@link #presentTotal}
      */
-    private Integer buyTotal;
-    /**
-     * 优惠总金额，单位：分。
-     */
-    private Integer discountTotal;
+    private Integer buyTotal; // like - total_price；niu - 暂无
     /**
      * 最终总金额，单位：分。
      *
-     * 注意，presentPrice * stock 不一定等于 presentTotal 。
+     * 注意，presentPrice * count 不一定等于 presentTotal 。
      * 因为，存在无法整除的情况。
      * 举个例子，presentPrice = 8.33 ，stock = 3 的情况，presentTotal 有可能是 24.99 ，也可能是 25 。
      * 所以，需要存储一个该字段。
      */
-    private Integer presentTotal; // product_total_amount
+    private Integer presentTotal; // like -  total_pay_price；niu - goods_money
+
+    // ========== 营销基本信息 ==========
+    /**
+     * 优惠劵满减金额，单位：分
+     */
+    private Integer couponTotal; // like - discount_price；niu - coupon_money
+    /**
+     * 营销减免金额，单位：分
+     */
+    private Integer marketTotal; // like - discount_price；niu - promotion_money
+    /**
+     * 积分抵扣的金额，单位：分
+     */
+    private Integer integralTotal; // like - integral_price；niu - point_money
+    /**
+     * 使用的积分
+     */
+    private Integer useIntegral; // niu - use_point
 
     // ========== 退款基本信息 ==========
     /**
@@ -123,7 +121,7 @@ public class TradeOrderItemDO extends BaseDO {
      *
      * 枚举 {@link TradeOrderItemRefundStatusEnum}
      */
-    private Integer refundStatus;
+    private Integer refundStatus; // TODO 芋艿：可以考虑去查
     // 如上字段，举个例子：
     // 假设购买三个，即 stock = 3 。
     // originPrice = 15
@@ -178,4 +176,22 @@ public class TradeOrderItemDO extends BaseDO {
     // TODO goods_info 商品信息
 
     // TODO integral_price：积分抵扣的金额
+
+    // TODO 待确定：niu
+    // TODO is_virtual '是否是虚拟商品'
+    // TODO goods_class '商品种类(1.实物 2.虚拟3.卡券)'
+    // TODO adjust_money ''调整金额''
+
+    // TODO is_fenxiao 是否分销,
+    // TODO adjust_money 是否分销,
+
+    // TODO delivery_status '配送状态'
+    // TODO delivery_no ''配送单号''
+    // TODO gift_flag '赠品标识'
+    // TODO gift_flag '赠品标识'
+
+    // TODO refund_status '退款状态'
+    // TODO refund_type '退款状态'
+    // TODO 一堆退款字段
 }
+

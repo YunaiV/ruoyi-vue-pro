@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Getter
-public enum TradeOrderCloseTypeEnum {
+public enum TradeOrderCancelTypeEnum {
 
     PAY_TIMEOUT(10, "超时未支付"),
     REFUND_CLOSE(20, "退款关闭"),

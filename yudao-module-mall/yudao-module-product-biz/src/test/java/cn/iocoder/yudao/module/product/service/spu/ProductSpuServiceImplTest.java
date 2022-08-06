@@ -110,7 +110,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
            o.setPicUrls(null);
            o.setSort(null);
 //           o.setLikeCount(null);
-           o.setPrice(null);
+//           o.setPrice(null);
 //           o.setQuantity(null);
            o.setStatus(null);
            o.setCreateTime(null);
@@ -131,7 +131,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
        // 测试 likeCount 不匹配
 //       ProductSpuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setLikeCount(null)));
        // 测试 price 不匹配
-       ProductSpuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setPrice(null)));
+//       ProductSpuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setPrice(null)));
        // 测试 quantity 不匹配
 //       ProductSpuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setQuantity(null)));
        // 测试 status 不匹配

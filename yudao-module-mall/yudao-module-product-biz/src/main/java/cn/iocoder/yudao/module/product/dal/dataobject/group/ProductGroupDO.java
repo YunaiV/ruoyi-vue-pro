@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.product.dal.dataobject.group;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.shop.ShopDO;
 import cn.iocoder.yudao.module.product.enums.group.ProductGroupStyleEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -29,12 +28,6 @@ public class ProductGroupDO extends BaseDO {
      */
     @TableId
     private Long id;
-//    /**
-//     * 店铺编号
-//     *
-//     * 关联 {@link ShopDO#getId()} TODO 芋艿：多店铺，暂不考虑
-//     */
-//    private Long shopId;
     /**
      * 分组名称
      */

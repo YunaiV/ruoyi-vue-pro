@@ -36,13 +36,6 @@ public class ProductSpuDO extends BaseDO {
     @TableId
     private Long id;
 
-//    /**
-//     * 店铺编号
-//     *
-//     * 关联 {@link ShopDO#getId()} TODO 芋艿：多店铺，暂不考虑
-//     */
-//    private Long shopId;
-
     // ========== 基本信息 =========
 
     /**
@@ -214,5 +207,10 @@ public class ProductSpuDO extends BaseDO {
     // TODO give_integral：赠送积分；
 
     // TODO poster：商品自定义海报
+
+    // TODO ========== 待定字段：laoji =========
+    // TODO productType 1 - 普通商品 2 - 预售商品；可能和 type 合并不错
+    // TODO productUnit 商品单位
+    // TODO extJson 扩展信息；例如说，预售商品的信息
 
 }
