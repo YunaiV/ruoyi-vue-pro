@@ -40,7 +40,7 @@ public class AppUserController {
         return success(true);
     }
 
-    @PutMapping("/update-avatar")
+    @PostMapping("/update-avatar")
     @ApiOperation("修改用户头像")
     @PreAuthenticated
     public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws Exception {

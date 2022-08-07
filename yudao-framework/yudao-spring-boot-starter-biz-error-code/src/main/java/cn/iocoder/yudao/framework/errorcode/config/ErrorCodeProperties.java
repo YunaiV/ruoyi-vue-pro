@@ -18,6 +18,10 @@ import java.util.List;
 public class ErrorCodeProperties {
 
     /**
+     * 是否开启
+     */
+    private Boolean enable = true;
+    /**
      * 错误码枚举类
      */
     @NotNull(message = "错误码枚举类不能为空")

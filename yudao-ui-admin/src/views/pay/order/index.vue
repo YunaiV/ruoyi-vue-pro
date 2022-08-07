@@ -47,12 +47,9 @@
                      :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="dateRangeCreateTime" style="width: 350px"
-          value-format="yyyy-MM-dd HH:mm:ss" type="datetimerange"  range-separator="-"
-          :default-time="['00:00:00','23:59:59']" start-placeholder="开始日期" end-placeholder="结束日期">
-        </el-date-picker>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -270,10 +267,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      dateRangeExpireTime: [],
-      dateRangeSuccessTime: [],
-      dateRangeNotifyTime: [],
-      dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -298,6 +291,10 @@ export default {
         refundAmount: null,
         channelUserId: null,
         channelOrderNo: null,
+        expireTime: [],
+        successTime: [],
+        notifyTime: [],
+        createTime: []
       },
       // 商户加载遮罩层
       merchantLoading: false,
@@ -324,32 +321,25 @@ export default {
   },
   methods: {
     initTime(){
-      this.dateRangeCreateTime = [getNowDateTime("00:00:00"), getNowDateTime("23:59:59")];
+      this.queryParams.createTime = [getNowDateTime("00:00:00"), getNowDateTime("23:59:59")];
     },
     /** 查询列表 */
     getList() {
       // 判断选择的日期是否超过了一个月
       let oneMonthTime = 31 * 24 * 3600 * 1000;
-      if (this.dateRangeCreateTime == null){
+      if (this.queryParams.createTime == null){
         this.initTime();
       } else {
-        let minDateTime = new Date(this.dateRangeCreateTime[0]).getTime();
-        let maxDateTime = new Date(this.dateRangeCreateTime[1]).getTime()
+        let minDateTime = new Date(this.queryParams.createTime[0]).getTime();
+        let maxDateTime = new Date(this.queryParams.createTime[1]).getTime()
         if (maxDateTime - minDateTime > oneMonthTime) {
           this.$message.error('时间范围最大为 31 天！');
           return false;
         }
       }
-
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeExpireTime, 'expireTime');
-      this.addBeginAndEndTime(params, this.dateRangeSuccessTime, 'successTime');
-      this.addBeginAndEndTime(params, this.dateRangeNotifyTime, 'notifyTime');
-      this.addDateRange(params, this.dateRangeCreateTime, 'CreateTime');
       // 执行查询
-      getOrderPage(params).then(response => {
+      getOrderPage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -366,9 +356,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeSuccessTime = [];
-      this.dateRangeNotifyTime = [];
-      this.dateRangeExpireTime = [];
       this.resetForm("queryForm");
       this.initTime();
       this.handleQuery();
@@ -393,10 +380,6 @@ export default {
       let params = {...this.queryParams};
       params.pageNo = undefined;
       params.pageSize = undefined;
-      this.addBeginAndEndTime(params, this.dateRangeExpireTime, 'expireTime');
-      this.addBeginAndEndTime(params, this.dateRangeSuccessTime, 'successTime');
-      this.addBeginAndEndTime(params, this.dateRangeNotifyTime, 'notifyTime');
-      this.addDateRange(params, this.dateRangeCreateTime, 'CreateTime');
       // 执行导出
       this.$modal.confirm('是否确认导出所有支付订单数据项?').then(function () {
         return exportOrderExcel(params);

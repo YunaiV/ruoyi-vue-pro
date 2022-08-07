@@ -44,7 +44,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
  * 满足如下任一条件，则会进行记录：
  * 1. 使用 @ApiOperation + 非 @GetMapping
  * 2. 使用 @OperateLog 注解
- *
+ * <p>
  * 但是，如果声明 @OperateLog 注解时，将 enable 属性设置为 false 时，强制不记录。
  *
  * @author 芋道源码
@@ -77,7 +77,8 @@ public class OperateLogAspect {
         return around0(joinPoint, operateLog, apiOperation);
     }
 
-    @Around("!@annotation(io.swagger.annotations.ApiOperation) && @annotation(operateLog)") // 兼容处理，只添加 @OperateLog 注解的情况
+    @Around("!@annotation(io.swagger.annotations.ApiOperation) && @annotation(operateLog)")
+    // 兼容处理，只添加 @OperateLog 注解的情况
     public Object around(ProceedingJoinPoint joinPoint,
                          cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog) throws Throwable {
         return around0(joinPoint, operateLog, null);
@@ -236,14 +237,12 @@ public class OperateLogAspect {
         }
         operateLogObj.setDuration((int) (System.currentTimeMillis() - startTime.getTime()));
         // （正常）处理 resultCode 和 resultMsg 字段
-        if (result != null) {
-            if (result instanceof CommonResult) {
-                CommonResult<?> commonResult = (CommonResult<?>) result;
-                operateLogObj.setResultCode(commonResult.getCode());
-                operateLogObj.setResultMsg(commonResult.getMsg());
-            } else {
-                operateLogObj.setResultCode(SUCCESS.getCode());
-            }
+        if (result instanceof CommonResult) {
+            CommonResult<?> commonResult = (CommonResult<?>) result;
+            operateLogObj.setResultCode(commonResult.getCode());
+            operateLogObj.setResultMsg(commonResult.getMsg());
+        } else {
+            operateLogObj.setResultCode(SUCCESS.getCode());
         }
         // （异常）处理 resultCode 和 resultMsg 字段
         if (exception != null) {
@@ -267,9 +266,9 @@ public class OperateLogAspect {
             return null;
         }
         return Arrays.stream(requestMethods).filter(requestMethod ->
-                        requestMethod == RequestMethod.POST
-                                || requestMethod == RequestMethod.PUT
-                                || requestMethod == RequestMethod.DELETE)
+                requestMethod == RequestMethod.POST
+                        || requestMethod == RequestMethod.PUT
+                        || requestMethod == RequestMethod.DELETE)
                 .findFirst().orElse(null);
     }
 

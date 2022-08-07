@@ -14,22 +14,21 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.6.2-snapshot</revision>
+        <revision>1.6.3-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.6.8</spring.boot.version>
+        <spring.boot.version>2.6.10</spring.boot.version>
         <!-- Web 相关 -->
         <knife4j.version>3.0.3</knife4j.version>
         <swagger-annotations.version>1.6.6</swagger-annotations.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
-        <druid.version>1.2.8</druid.version>
+        <druid.version>1.2.11</druid.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.5.0</dynamic-datasource.version>
-        <redisson.version>3.17.3</redisson.version>
+        <redisson.version>3.17.4</redisson.version>
         <!-- Config 配置中心相关 -->
         <apollo.version>1.9.2</apollo.version>
-        <!-- Job 定时任务相关 -->
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.0</lock4j.version>
         <resilience4j.version>1.7.1</resilience4j.version>
@@ -42,22 +41,22 @@
         <jedis-mock.version>0.1.16</jedis-mock.version>
         <mockito-inline.version>4.0.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
-        <activiti.version>7.1.0.M6</activiti.version>
         <flowable.version>6.7.0</flowable.version>
         <!-- 工具类相关 -->
         <jasypt-spring-boot-starter.version>3.0.4</jasypt-spring-boot-starter.version>
         <lombok.version>1.18.20</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
-        <hutool.version>5.6.1</hutool.version>
-        <easyexcel.verion>2.2.7</easyexcel.verion>
+        <hutool.version>5.7.22</hutool.version>
+        <easyexcel.verion>3.1.1</easyexcel.verion>
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
-		<fastjson.version>2.0.5</fastjson.version>
+		<fastjson.version>1.2.83</fastjson.version>
         <guava.version>30.1.1-jre</guava.version>
         <guice.version>5.1.0</guice.version>
         <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
+        <tika-core.version>2.4.1</tika-core.version>
         <!-- 三方云服务相关 -->
         <minio.version>8.2.2</minio.version>
         <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
@@ -65,6 +64,7 @@
         <tencentcloud-sdk-java.version>3.1.471</tencentcloud-sdk-java.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
+        <jimureport.version>1.5.2</jimureport.version>
     </properties>
 
     <dependencyManagement>
@@ -79,6 +79,11 @@
             </dependency>
 
             <!-- 业务组件 -->
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-banner</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
@@ -371,48 +376,13 @@
 
             <!-- 工作流相关 -->
             <dependency>
-                <groupId>org.activiti</groupId>
-                <artifactId>activiti-spring-boot-starter</artifactId>
-                <version>${activiti.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>de.odysseus.juel</groupId>
-                        <artifactId>juel-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>de.odysseus.juel</groupId>
-                        <artifactId>juel-spi</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.mybatis</groupId>
-                        <artifactId>mybatis</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>el-api</artifactId>
-                        <groupId>javax.el</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.activiti</groupId>
-                <artifactId>activiti-image-generator</artifactId>
-                <version>${activiti.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-activiti</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <!-- 工作流相关 flowable -->
-            <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-flowable</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
-                <artifactId>flowable-spring-boot-starter-basic</artifactId>
+                <artifactId>flowable-spring-boot-starter-process</artifactId>
                 <version>${flowable.version}</version>
             </dependency>
             <dependency>
@@ -473,6 +443,12 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
                 <version>${easyexcel.verion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId> <!-- 文件类型的识别 -->
+                <version>${tika-core.version}</version>
             </dependency>
 
             <dependency>
@@ -583,6 +559,12 @@
                 <version>${justauth.version}</version>
             </dependency>
 
+            <!-- 积木报表-->
+            <dependency>
+                <groupId>org.jeecgframework.jimureport</groupId>
+                <artifactId>jimureport-spring-boot-starter</artifactId>
+                <version>${jimureport.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

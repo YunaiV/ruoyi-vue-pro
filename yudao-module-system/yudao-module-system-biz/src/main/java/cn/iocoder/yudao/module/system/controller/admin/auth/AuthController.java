@@ -27,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
@@ -59,6 +60,7 @@ public class AuthController {
     private SecurityProperties securityProperties;
 
     @PostMapping("/login")
+    @PermitAll
     @ApiOperation("使用账号密码登录")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> login(@RequestBody @Valid AuthLoginReqVO reqVO) {
@@ -66,6 +68,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @PermitAll
     @ApiOperation("登出系统")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<Boolean> logout(HttpServletRequest request) {
@@ -77,6 +80,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
+    @PermitAll
     @ApiOperation("刷新令牌")
     @ApiImplicitParam(name = "refreshToken", value = "刷新令牌", required = true, dataTypeClass = String.class)
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
@@ -119,6 +123,7 @@ public class AuthController {
     // ========== 短信登录相关 ==========
 
     @PostMapping("/sms-login")
+    @PermitAll
     @ApiOperation("使用短信验证码登录")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> smsLogin(@RequestBody @Valid AuthSmsLoginReqVO reqVO) {
@@ -126,6 +131,7 @@ public class AuthController {
     }
 
     @PostMapping("/send-sms-code")
+    @PermitAll
     @ApiOperation(value = "发送手机验证码")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<Boolean> sendLoginSmsCode(@RequestBody @Valid AuthSmsSendReqVO reqVO) {
@@ -136,28 +142,23 @@ public class AuthController {
     // ========== 社交登录相关 ==========
 
     @GetMapping("/social-auth-redirect")
+    @PermitAll
     @ApiOperation("社交授权的跳转")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "社交类型", required = true, dataTypeClass = Integer.class),
             @ApiImplicitParam(name = "redirectUri", value = "回调路径", dataTypeClass = String.class)
     })
-    public CommonResult<String> socialAuthRedirect(@RequestParam("type") Integer type,
+    public CommonResult<String> socialLogin(@RequestParam("type") Integer type,
                                                     @RequestParam("redirectUri") String redirectUri) {
         return CommonResult.success(socialUserService.getAuthorizeUrl(type, redirectUri));
     }
 
-    @PostMapping("/social-quick-login")
-    @ApiOperation("社交快捷登录，使用 code 授权码")
+    @PostMapping("/social-login")
+    @PermitAll
+    @ApiOperation(value = "社交快捷登录，使用 code 授权码", notes = "适合未登录的用户，但是社交账号已绑定用户")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
-    public CommonResult<AuthLoginRespVO> socialQuickLogin(@RequestBody @Valid AuthSocialQuickLoginReqVO reqVO) {
-        return success(authService.socialQuickLogin(reqVO));
-    }
-
-    @PostMapping("/social-bind-login")
-    @ApiOperation("社交绑定登录，使用 code 授权码 + 账号密码")
-    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
-    public CommonResult<AuthLoginRespVO> socialBindLogin(@RequestBody @Valid AuthSocialBindLoginReqVO reqVO) {
-        return success(authService.socialBindLogin(reqVO));
+    public CommonResult<AuthLoginRespVO> socialQuickLogin(@RequestBody @Valid AuthSocialLoginReqVO reqVO) {
+        return success(authService.socialLogin(reqVO));
     }
 
 }

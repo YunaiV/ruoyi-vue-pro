@@ -32,17 +32,6 @@ spring:
     redis:
       time-to-live: 1h # 设置过期时间为 1 小时
 
-  # 工作流 Activiti 配置
-  activiti:
-    # 1. false: 默认值，activiti启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
-    # 2. true: 启动时会对数据库中所有表进行更新操作，如果表存在，不做处理，反之，自动创建表
-    # 3. create_drop: 启动时自动创建表，关闭时自动删除表
-    # 4. drop_create: 启动时，删除旧表，再创建新表
-    database-schema-update: true # 设置为 false，可通过 sql/activiti.sql 初始化
-    db-history-used: true # activiti7 默认 false 不生成历史信息表，需手动设置开启
-    check-process-definitions: false # 设置为 false，禁用 /resources/processes 自动部署 BPMN XML 流程
-    history-level: full # full：保存历史数据的最高级别，可保存全部流程相关细节，包括流程流转各节点参数
-
 # 工作流 Flowable 配置
 flowable:
   # 1. false: 默认值，Flowable 启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
@@ -77,6 +66,9 @@ yudao:
   web:
     admin-ui:
       url: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
+  security:
+    permit-all_urls:
+      - /admin-ui/** # /resources/admin-ui 目录下的静态资源
   swagger:
     title: 管理后台
     description: 提供管理员管理的所有功能
@@ -103,6 +95,9 @@ yudao:
       - /admin-api/system/captcha/get-image # 获取图片验证码，和租户无关
       - /admin-api/infra/file/*/get/** # 获取图片，和租户无关
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
+      - /app-api/pay/order/notify/* # 支付回调通知，不携带租户编号
+#      - /jmreport/list
+      - /jmreport/*
     ignore-tables:
       - system_tenant
       - system_tenant_package
@@ -126,6 +121,22 @@ yudao:
       - infra_job_log
       - infra_job_log
       - infra_data_source_config
+      - jimu_dict
+      - jimu_dict_item
+      - jimu_report
+      - jimu_report_data_source
+      - jimu_report_db
+      - jimu_report_db_field
+      - jimu_report_db_param
+      - jimu_report_link
+      - jimu_report_map
+      - jimu_report_share
+      - rep_demo_dxtj
+      - rep_demo_employee
+      - rep_demo_gongsi
+      - rep_demo_jianpiao
+      - tmp_report_data_1
+      - tmp_report_data_income
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
@@ -134,3 +145,8 @@ yudao:
     end-code: 9999 # 这里配置 9999 的原因是，测试方便。
 
 debug: false
+
+#积木报表配置
+minidao :
+  base-package: org.jeecg.modules.jmreport.desreport.dao*
+  db-type: mysql

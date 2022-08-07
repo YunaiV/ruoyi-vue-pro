@@ -51,8 +51,7 @@ import static org.mockito.Mockito.*;
        #if (${column.listOperation})
        #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
        #if (${column.listOperationCondition} == "BETWEEN")## BETWEEN 的情况
-       reqVO.setBegin${JavaField}(null);
-       reqVO.setEnd${JavaField}(null);
+       reqVO.set${JavaField}((new Date[]{}));
        #else
        reqVO.set$JavaField(null);
        #end

@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
@@ -216,8 +217,7 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
        FileConfigPageReqVO reqVO = new FileConfigPageReqVO();
        reqVO.setName("芋道");
        reqVO.setStorage(FileStorageEnum.LOCAL.getStorage());
-       reqVO.setBeginCreateTime(buildTime(2022, 11, 10));
-       reqVO.setEndCreateTime(buildTime(2022, 11, 12));
+       reqVO.setCreateTime((new Date[]{buildTime(2022, 11, 10),buildTime(2022, 11, 12)}));
 
        // 调用
        PageResult<FileConfigDO> pageResult = fileConfigService.getFileConfigPage(reqVO);

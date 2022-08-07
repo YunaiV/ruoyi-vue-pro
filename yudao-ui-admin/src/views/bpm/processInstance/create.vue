@@ -80,7 +80,7 @@ export default {
       // BPMN 数据
       bpmnXML: null,
       bpmnControlForm: {
-        prefix: "activiti"
+        prefix: "flowable"
       },
 
       // 流程表单

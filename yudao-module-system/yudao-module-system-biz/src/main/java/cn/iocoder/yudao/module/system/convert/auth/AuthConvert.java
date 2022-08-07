@@ -65,8 +65,7 @@ public interface AuthConvert {
         return CollectionUtils.filterList(treeNodeMap.values(), node -> MenuIdEnum.ROOT.getId().equals(node.getParentId()));
     }
 
-    SocialUserBindReqDTO convert(Long userId, Integer userType, AuthSocialBindLoginReqVO reqVO);
-    SocialUserBindReqDTO convert(Long userId, Integer userType, AuthSocialQuickLoginReqVO reqVO);
+    SocialUserBindReqDTO convert(Long userId, Integer userType, AuthSocialLoginReqVO reqVO);
 
     SmsCodeSendReqDTO convert(AuthSmsSendReqVO reqVO);
 

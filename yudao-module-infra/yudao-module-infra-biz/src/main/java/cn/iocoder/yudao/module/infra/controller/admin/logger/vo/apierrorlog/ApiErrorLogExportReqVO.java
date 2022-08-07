@@ -26,12 +26,8 @@ public class ApiErrorLogExportReqVO {
     private String requestUrl;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始异常发生时间")
-    private Date beginExceptionTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束异常发生时间")
-    private Date endExceptionTime;
+    @ApiModelProperty(value = "异常发生时间")
+    private Date[] exceptionTime;
 
     @ApiModelProperty(value = "处理状态", example = "0")
     private Integer processStatus;

@@ -36,7 +36,7 @@ import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePack
                 .likeIfPresent(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == "BETWEEN")##情况八，Between 的时候
-                .betweenIfPresent(${table.className}DO::get${JavaField}, reqVO.getBegin${JavaField}(), reqVO.getEnd${JavaField}())
+                .betweenIfPresent(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())
 #end
 #end
 #end

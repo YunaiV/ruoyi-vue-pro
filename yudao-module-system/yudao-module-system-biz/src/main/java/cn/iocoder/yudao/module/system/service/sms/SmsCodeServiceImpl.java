@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.sms;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeCheckReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
@@ -52,12 +53,13 @@ public class SmsCodeServiceImpl implements SmsCodeService {
         // 校验是否可以发送验证码，不用筛选场景
         SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, null,null);
         if (lastSmsCode != null) {
-            if (lastSmsCode.getTodayIndex() >= smsCodeProperties.getSendMaximumQuantityPerDay()) { // 超过当天发送的上限。
-                throw ServiceExceptionUtil.exception(SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
-            }
             if (System.currentTimeMillis() - lastSmsCode.getCreateTime().getTime()
                     < smsCodeProperties.getSendFrequency().toMillis()) { // 发送过于频繁
                 throw ServiceExceptionUtil.exception(SMS_CODE_SEND_TOO_FAST);
+            }
+            if (DateUtils.isToday(lastSmsCode.getCreateTime()) && // 必须是今天，才能计算超过当天的上限
+                    lastSmsCode.getTodayIndex() >= smsCodeProperties.getSendMaximumQuantityPerDay()) { // 超过当天发送的上限。
+                throw ServiceExceptionUtil.exception(SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
             }
             // TODO 芋艿：提升，每个 IP 每天可发送数量
             // TODO 芋艿：提升，每个 IP 每小时可发送数量
@@ -65,8 +67,8 @@ public class SmsCodeServiceImpl implements SmsCodeService {
 
         // 创建验证码记录
         String code = String.valueOf(randomInt(smsCodeProperties.getBeginCode(), smsCodeProperties.getEndCode() + 1));
-        SmsCodeDO newSmsCode = SmsCodeDO.builder().mobile(mobile).code(code)
-                .scene(scene).todayIndex(lastSmsCode != null ? lastSmsCode.getTodayIndex() + 1 : 1)
+        SmsCodeDO newSmsCode = SmsCodeDO.builder().mobile(mobile).code(code).scene(scene)
+                .todayIndex(lastSmsCode != null && DateUtils.isToday(lastSmsCode.getCreateTime()) ? lastSmsCode.getTodayIndex() + 1 : 1)
                 .createIp(ip).used(false).build();
         smsCodeMapper.insert(newSmsCode);
         return code;

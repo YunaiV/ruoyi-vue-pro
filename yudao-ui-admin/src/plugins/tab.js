@@ -55,10 +55,10 @@ export default {
     return store.dispatch('tagsView/delOthersViews', obj || router.currentRoute);
   },
   // 添加tab页签
-  openPage(title, url) {
+  openPage(title, url, params) {
     var obj = { path: url, meta: { title: title } }
     store.dispatch('tagsView/addView', obj);
-    return router.push(url);
+    return router.push({ path: url, query: params });
   },
   // 修改tab页签
   updatePage(obj) {

@@ -1,5 +1,5 @@
-import {login, logout, getInfo, socialQuickLogin, socialBindLogin, smsLogin} from '@/api/login'
-import {getAccessToken, setToken, removeToken, getRefreshToken} from '@/utils/auth'
+import {login, logout, getInfo, socialLogin, socialBindLogin, smsLogin} from '@/api/login'
+import {setToken, removeToken} from '@/utils/auth'
 
 const user = {
   state: {
@@ -38,8 +38,12 @@ const user = {
       const password = userInfo.password
       const code = userInfo.code
       const uuid = userInfo.uuid
+      const socialCode = userInfo.socialCode
+      const socialState = userInfo.socialState
+      const socialType = userInfo.socialType
       return new Promise((resolve, reject) => {
-        login(username, password, code, uuid).then(res => {
+        login(username, password, code, uuid,
+          socialType, socialCode, socialState).then(res => {
           res = res.data;
           // 设置 token
           setToken(res)
@@ -56,7 +60,7 @@ const user = {
       const state = userInfo.state
       const type = userInfo.type
       return new Promise((resolve, reject) => {
-        socialQuickLogin(type, code, state).then(res => {
+        socialLogin(type, code, state).then(res => {
           res = res.data;
           // 设置 token
           setToken(res)
@@ -67,25 +71,7 @@ const user = {
       })
     },
 
-    // 社交登录
-    SocialLogin2({ commit }, userInfo) {
-      const code = userInfo.code
-      const state = userInfo.state
-      const type = userInfo.type
-      const username = userInfo.username.trim()
-      const password = userInfo.password
-      return new Promise((resolve, reject) => {
-        socialBindLogin(type, code, state, username, password).then(res => {
-          res = res.data;
-          // 设置 token
-          setToken(res)
-          resolve()
-        }).catch(error => {
-          reject(error)
-        })
-      })
-    },
-    // 登录
+    // 短信登录
     SmsLogin({ commit }, userInfo) {
       const mobile = userInfo.mobile.trim()
       const mobileCode = userInfo.mobileCode
@@ -121,7 +107,7 @@ const user = {
 
           res = res.data; // 读取 data 数据
           const user = res.user
-          const avatar = user.avatar === "" ? require("@/assets/images/profile.jpg") : user.avatar;
+          const avatar = ( user.avatar === "" || user.avatar == null ) ? require("@/assets/images/profile.jpg") : user.avatar;
           if (res.roles && res.roles.length > 0) { // 验证返回的roles是否是一个非空数组
             commit('SET_ROLES', res.roles)
             commit('SET_PERMISSIONS', res.permissions)

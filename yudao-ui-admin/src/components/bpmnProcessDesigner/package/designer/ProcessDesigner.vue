@@ -118,6 +118,7 @@ export default {
   componentName: "MyProcessDesigner",
   props: {
     value: String, // xml 字符串
+    valueWatch: true, // xml 字符串的 watch 状态
     processId: String, // 流程 key 标识
     processName: String, // 流程 name 名字
     formId: Number, // 流程 form 表单编号
@@ -252,11 +253,6 @@ export default {
       this.bpmnModeler = null;
     });
   },
-  watch: {
-    value: function (newValue) { // 在 xmlString 发生变化时，重新创建，从而绘制流程图
-      this.createNewDiagram(newValue);
-    }
-  },
   methods: {
     initBpmnModeler() {
       if (this.bpmnModeler) return;
@@ -307,7 +303,7 @@ export default {
       let newName = this.processName || `业务流程_${new Date().getTime()}`;
       let xmlString = xml || DefaultEmptyXML(newId, newName, this.prefix);
       try {
-        console.log(this.bpmnModeler.importXML);
+        // console.log(this.bpmnModeler.importXML);
         let { warnings } = await this.bpmnModeler.importXML(xmlString);
         if (warnings && warnings.length) {
           warnings.forEach(warn => console.warn(warn));

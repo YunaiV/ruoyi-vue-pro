@@ -74,11 +74,9 @@ public class SmsLogServiceTest extends BaseDbUnitTest {
        reqVO.setTemplateId(10L);
        reqVO.setMobile("156");
        reqVO.setSendStatus(SmsSendStatusEnum.INIT.getStatus());
-       reqVO.setBeginSendTime(buildTime(2020, 11, 1));
-       reqVO.setEndSendTime(buildTime(2020, 11, 30));
+       reqVO.setSendTime((new Date[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
        reqVO.setReceiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
-       reqVO.setBeginReceiveTime(buildTime(2021, 11, 1));
-       reqVO.setEndReceiveTime(buildTime(2021, 11, 30));
+       reqVO.setReceiveTime((new Date[]{buildTime(2021, 11, 1),buildTime(2021, 11, 30)}));
 
        // 调用
        PageResult<SmsLogDO> pageResult = smsLogService.getSmsLogPage(reqVO);
@@ -121,11 +119,9 @@ public class SmsLogServiceTest extends BaseDbUnitTest {
         reqVO.setTemplateId(10L);
         reqVO.setMobile("156");
         reqVO.setSendStatus(SmsSendStatusEnum.INIT.getStatus());
-        reqVO.setBeginSendTime(buildTime(2020, 11, 1));
-        reqVO.setEndSendTime(buildTime(2020, 11, 30));
+        reqVO.setSendTime((new Date[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
         reqVO.setReceiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
-        reqVO.setBeginReceiveTime(buildTime(2021, 11, 1));
-        reqVO.setEndReceiveTime(buildTime(2021, 11, 30));
+        reqVO.setReceiveTime((new Date[]{buildTime(2021, 11, 1),buildTime(2021, 11, 30)}));
 
        // 调用
        List<SmsLogDO> list = smsLogService.getSmsLogList(reqVO);

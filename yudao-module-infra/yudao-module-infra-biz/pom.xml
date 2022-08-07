@@ -119,7 +119,6 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-file</artifactId>
         </dependency>
-
     </dependencies>
 
 </project>

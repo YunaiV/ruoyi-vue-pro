@@ -121,7 +121,7 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="110px">
         <el-form-item label="流程标识" prop="key">
-          <el-input v-model="form.key" placeholder="请输入流标标识" style="width: 330px;" :disabled="form.id" />
+          <el-input v-model="form.key" placeholder="请输入流标标识" style="width: 330px;" :disabled="!!form.id" />
           <el-tooltip v-if="!form.id" class="item" effect="light" content="新建后，流程标识不可修改！" placement="top">
             <i style="padding-left: 5px;" class="el-icon-question" />
           </el-tooltip>
@@ -130,7 +130,7 @@
           </el-tooltip>
         </el-form-item>
         <el-form-item label="流程名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入流程名称" :disabled="form.id" clearable />
+          <el-input v-model="form.name" placeholder="请输入流程名称" :disabled="!!form.id" clearable />
         </el-form-item>
         <el-form-item v-if="form.id" label="流程分类" prop="category">
           <el-select v-model="form.category" placeholder="请选择流程分类" clearable style="width: 100%">
@@ -259,7 +259,7 @@ export default {
       showBpmnOpen: false,
       bpmnXML: null,
       bpmnControlForm: {
-        prefix: "activiti"
+        prefix: "flowable"
       },
 
       // 流程表单详情
