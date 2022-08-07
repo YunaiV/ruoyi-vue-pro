@@ -5,7 +5,7 @@
       :style="{ 'max-width': parseInt(imgSize.width) + 30 + 'px' }"
     >
       <div class="verifybox-top" v-if="mode == 'pop'">
-        请完成安全验证
+        {{ t('captcha.verification') }}
         <span class="verifybox-close" @click="closeBox">
           <i class="iconfont icon-close"></i>
         </span>
@@ -38,6 +38,7 @@
  * */
 import { VerifySlide, VerifyPoints } from './Verify'
 import { computed, ref, toRefs, watchEffect } from 'vue'
+import { useI18n } from '@/hooks/web/useI18n'
 
 export default {
   name: 'Vue3Verify',
@@ -83,6 +84,7 @@ export default {
     }
   },
   setup(props) {
+    const { t } = useI18n()
     const { captchaType, mode } = toRefs(props)
     const clickShow = ref(false)
     const verifyType = ref(undefined)
@@ -129,6 +131,7 @@ export default {
     })
 
     return {
+      t,
       clickShow,
       verifyType,
       componentType,

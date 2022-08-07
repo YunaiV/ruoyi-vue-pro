@@ -79,6 +79,7 @@
 import { aesEncrypt } from './../utils/ase'
 import { resetSize } from './../utils/util'
 import { reqGet, reqCheck } from './../api/index'
+import { useI18n } from '@/hooks/web/useI18n'
 import {
   computed,
   onMounted,
@@ -111,7 +112,7 @@ export default {
     },
     explain: {
       type: String,
-      default: '向右滑动完成验证'
+      default: ''
     },
     imgSize: {
       type: Object,
@@ -142,6 +143,7 @@ export default {
     }
   },
   setup(props) {
+    const { t } = useI18n()
     const { mode, captchaType, type, blockSize, explain } = toRefs(props)
     const { proxy } = getCurrentInstance()
     let secretKey = ref(''), //后端返回的ase加密秘钥
@@ -181,7 +183,11 @@ export default {
       return proxy.$el.querySelector('.verify-bar-area')
     })
     function init() {
-      text.value = explain.value
+      if (explain.value === '') {
+        text.value = t('captcha.slide')
+      } else {
+        text.value = explain.value
+      }
       getPictrue()
       nextTick(() => {
         let { imgHeight, imgWidth, barHeight, barWidth } = resetSize(proxy)
@@ -311,9 +317,8 @@ export default {
               }, 1500)
             }
             passFlag.value = true
-            tipWords.value = `${((endMovetime.value - startMoveTime.value) / 1000).toFixed(
-              2
-            )}s验证成功`
+            tipWords.value = `${((endMovetime.value - startMoveTime.value) / 1000).toFixed(2)}s 
+            ${t('captcha.success')}`
             var captchaVerification = secretKey.value
               ? aesEncrypt(
                   backToken.value + '---' + JSON.stringify({ x: moveLeftDistance, y: 5.0 }),
@@ -335,7 +340,7 @@ export default {
               refresh()
             }, 1000)
             proxy.$parent.$emit('error', proxy)
-            tipWords.value = '验证失败'
+            tipWords.value = t('captcha.fail')
             setTimeout(() => {
               tipWords.value = ''
             }, 1000)
