@@ -43,11 +43,6 @@ const { t } = useI18n()
 const iconHouse = useIcon({ icon: 'ep:house' })
 const iconAvatar = useIcon({ icon: 'ep:avatar' })
 const iconLock = useIcon({ icon: 'ep:lock' })
-const LoginCaptchaRules = {
-  tenantName: [required],
-  username: [required],
-  password: [required]
-}
 const LoginRules = {
   tenantName: [required],
   username: [required],
@@ -142,7 +137,7 @@ onMounted(() => {
 <template>
   <el-form
     :model="loginData.loginForm"
-    :rules="loginData.captchaEnable ? LoginCaptchaRules : LoginRules"
+    :rules="LoginRules"
     label-position="top"
     class="login-form"
     label-width="120px"
