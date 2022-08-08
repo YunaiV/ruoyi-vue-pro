@@ -6,7 +6,7 @@ import WindiCSS from 'vite-plugin-windicss'
 import VueJsx from '@vitejs/plugin-vue-jsx'
 import EslintPlugin from 'vite-plugin-eslint'
 import VueI18n from '@intlify/vite-plugin-vue-i18n'
-import styleImport, { ElementPlusResolve } from 'vite-plugin-style-import'
+import { createStyleImportPlugin, ElementPlusResolve } from 'vite-plugin-style-import'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import PurgeIcons from 'vite-plugin-purge-icons'
 import DefineOptions from 'unplugin-vue-define-options/vite'
@@ -55,7 +55,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       Vue(),
       VueJsx(),
       WindiCSS(),
-      styleImport({
+      createStyleImportPlugin({
         resolves: [ElementPlusResolve()],
         libs: [{
           libraryName: 'element-plus',
@@ -138,6 +138,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         'vue-router',
         'vue-types',
         'vue-i18n',
+        'element-plus/es',
         'element-plus/es/locale/lang/zh-cn',
         'element-plus/es/locale/lang/en',
         '@iconify/iconify',

@@ -51,16 +51,17 @@
             <artifactId>yudao-module-product-biz</artifactId>
             <version>${revision}</version>
         </dependency>
-        <!-- 默认引入 yudao-module-bpm-biz-flowable 实现，可以替换为 yudao-module-bpm-biz-activiti 实现-->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-bpm-biz</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>cn.iocoder.boot</groupId>-->
-        <!--            <artifactId>yudao-module-bpm-biz-activiti</artifactId>-->
-        <!--            <version>${revision}</version>-->
+        <!-- 数据报表 -->
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-module-visualization-biz</artifactId>-->
+<!--            <version>${revision}</version>-->
+<!--        </dependency>-->
+        <!-- 工作流 -->
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-module-bpm-biz</artifactId>-->
+<!--            <version>${revision}</version>-->
 <!--        </dependency>-->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

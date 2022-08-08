@@ -134,3 +134,6 @@ export function authorize(responseType, clientId, redirectUri, state,
     method: 'post'
   })
 }
+
+export class socialBindLogin {
+}

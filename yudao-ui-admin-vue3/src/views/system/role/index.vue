@@ -1,14 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref, unref } from 'vue'
+import { onMounted, reactive, ref, unref } from 'vue'
 import dayjs from 'dayjs'
-import { DICT_TYPE, getDictOptions } from '@/utils/dict'
-import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
-import { FormExpose } from '@/components/Form'
-import type { RoleVO } from '@/api/system/role/types'
-import { rules, allSchemas } from './role.data'
-import * as RoleApi from '@/api/system/role'
-import Dialog from '@/components/Dialog/src/Dialog.vue'
 import {
   ElForm,
   ElFormItem,
@@ -18,8 +10,20 @@ import {
   ElMessage,
   ElTree,
   ElCard,
-  ElCheckbox
+  ElSwitch
 } from 'element-plus'
+import { DICT_TYPE, getDictOptions } from '@/utils/dict'
+import { useTable } from '@/hooks/web/useTable'
+import { useI18n } from '@/hooks/web/useI18n'
+import { FormExpose } from '@/components/Form'
+import { rules, allSchemas } from './role.data'
+import type { RoleVO } from '@/api/system/role/types'
+import type {
+  PermissionAssignRoleDataScopeReqVO,
+  PermissionAssignRoleMenuReqVO
+} from '@/api/system/permission/types'
+import * as RoleApi from '@/api/system/role'
+import * as PermissionApi from '@/api/system/permission'
 import { listSimpleMenusApi } from '@/api/system/menu'
 import { listSimpleDeptApi } from '@/api/system/dept'
 import { handleTree } from '@/utils/tree'
@@ -95,10 +99,10 @@ const handleDetail = async (row: RoleVO) => {
 
 // ========== 数据权限 ==========
 const dataScopeForm = reactive({
+  id: 0,
   name: '',
   code: '',
   dataScope: 0,
-  checkStrictly: true,
   checkList: []
 })
 const defaultProps = {
@@ -112,37 +116,71 @@ const dialogScopeVisible = ref(false)
 const dialogScopeTitle = ref('数据权限')
 const actionScopeType = ref('')
 const dataScopeDictDatas = ref()
+const defaultCheckedKeys = ref()
 // 选项
+const checkStrictly = ref(true)
 const treeNodeAll = ref(false)
+// 全选/全不选
+const handleCheckedTreeNodeAll = () => {
+  treeRef.value!.setCheckedNodes(treeNodeAll.value ? treeOptions.value : [])
+}
 // 权限操作
 const handleScope = async (type: string, row: RoleVO) => {
+  dataScopeForm.id = row.id
   dataScopeForm.name = row.name
   dataScopeForm.code = row.code
   if (type === 'menu') {
     const menuRes = await listSimpleMenusApi()
     treeOptions.value = handleTree(menuRes)
-    dataScopeDictDatas.value = getDictOptions(DICT_TYPE.SYSTEM_DATA_SCOPE)
-  } else if (type === 'dept') {
+    const role = await PermissionApi.listRoleMenusApi(row.id)
+    console.info(role)
+    if (role) {
+      // treeRef.value!.setCheckedKeys(role as unknown as Array<number>)
+      defaultCheckedKeys.value = role
+    }
+  } else if (type === 'data') {
     const deptRes = await listSimpleDeptApi()
     treeOptions.value = handleTree(deptRes)
+    const role = await RoleApi.getRoleApi(row.id)
+    console.info(role)
+    dataScopeForm.dataScope = role.dataScope
+    if (role.dataScopeDeptIds) {
+      // treeRef.value!.setCheckedKeys(role.dataScopeDeptIds as unknown as Array<number>, false)
+      defaultCheckedKeys.value = role.dataScopeDeptIds
+    }
   }
   actionScopeType.value = type
   dialogScopeVisible.value = true
 }
-// 树权限（父子联动）
-const handleCheckedTreeConnect = (value) => {
-  dataScopeForm.checkStrictly = value ? true : false
+// 保存权限
+const submitScope = async () => {
+  const keys = treeRef.value!.getCheckedKeys(false) as unknown as Array<number>
+  console.info(keys)
+  if ('data' === actionScopeType.value) {
+    const data = ref<PermissionAssignRoleDataScopeReqVO>({
+      roleId: dataScopeForm.id,
+      dataScope: dataScopeForm.dataScope,
+      dataScopeDeptIds: dataScopeForm.dataScope !== SystemDataScopeEnum.DEPT_CUSTOM ? [] : keys
+    })
+    await PermissionApi.assignRoleDataScopeApi(data.value)
+  } else if ('menu' === actionScopeType.value) {
+    const data = ref<PermissionAssignRoleMenuReqVO>({
+      roleId: dataScopeForm.id,
+      menuIds: keys
+    })
+    await PermissionApi.assignRoleMenuApi(data.value)
+  }
+  ElMessage.success(t('common.updateSuccess'))
+  dialogScopeVisible.value = false
 }
-// 全选/全不选
-const handleCheckedTreeNodeAll = (value) => {
-  treeRef.value?.setCheckedNodes(value ? dataScopeForm.checkList : [])
-}
-// TODO:保存
-const submitScope = () => {
-  console.info()
+const init = () => {
+  dataScopeDictDatas.value = getDictOptions(DICT_TYPE.SYSTEM_DATA_SCOPE)
 }
 // ========== 初始化 ==========
-getList()
+onMounted(() => {
+  getList()
+  init()
+})
 </script>
 
 <template>
@@ -261,7 +299,7 @@ getList()
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
   </Dialog>
-  <Dialog v-model="dialogScopeVisible" :title="dialogScopeTitle">
+  <Dialog v-model="dialogScopeVisible" :title="dialogScopeTitle" max-height="600px">
     <el-form :model="dataScopeForm">
       <el-form-item label="角色名称">
         <el-input v-model="dataScopeForm.name" :disabled="true" />
@@ -289,21 +327,23 @@ getList()
       >
         <el-card class="box-card">
           <template #header>
-            <el-checkbox
-              :checked="!dataScopeForm.checkStrictly"
-              @change="handleCheckedTreeConnect($event)"
-              >父子联动(选中父节点，自动选择子节点)
-            </el-checkbox>
-            <el-checkbox v-model="treeNodeAll" @change="handleCheckedTreeNodeAll($event)">
-              全选/全不选
-            </el-checkbox>
+            父子联动(选中父节点，自动选择子节点):
+            <el-switch v-model="checkStrictly" inline-prompt active-text="是" inactive-text="否" />
+            全选/全不选:
+            <el-switch
+              v-model="treeNodeAll"
+              inline-prompt
+              active-text="是"
+              inactive-text="否"
+              @change="handleCheckedTreeNodeAll()"
+            />
           </template>
           <el-tree
             ref="treeRef"
             node-key="id"
             show-checkbox
-            default-expand-all
-            :check-strictly="dataScopeForm.checkStrictly"
+            :default-checked-keys="defaultCheckedKeys"
+            :check-strictly="!checkStrictly"
             :props="defaultProps"
             :data="treeOptions"
             empty-text="加载中，请稍后"

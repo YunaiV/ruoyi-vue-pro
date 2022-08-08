@@ -213,7 +213,7 @@ export const eachTree = (treeDatas: any[], callBack: Fn, parentNode = {}) => {
  * @param {*} parentId 父节点字段 默认 'parentId'
  * @param {*} children 孩子节点字段 默认 'children'
  */
-export const handleTree = (data, id?: string, parentId?: string, children?: string) => {
+export const handleTree = (data: any[], id?: string, parentId?: string, children?: string) => {
   const config = {
     id: id || 'id',
     parentId: parentId || 'parentId',
@@ -222,7 +222,7 @@ export const handleTree = (data, id?: string, parentId?: string, children?: stri
 
   const childrenListMap = {}
   const nodeIds = {}
-  const tree = []
+  const tree: any[] = []
 
   for (const d of data) {
     const parentId = d[config.parentId]

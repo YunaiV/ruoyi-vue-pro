@@ -13,7 +13,8 @@ import {
   ElTableColumn,
   ElScrollbar,
   ElDescriptions,
-  ElDescriptionsItem
+  ElDescriptionsItem,
+  ElMessage
 } from 'element-plus'
 const cache = ref<RedisMonitorInfoVO>()
 const keyListLoad = ref(true)
@@ -121,7 +122,33 @@ const loadEchartOptions = (stats) => {
     ]
   })
 }
-
+const dialogVisible = ref(false)
+const keyTemplate = ref('')
+const cacheKeys = ref()
+const cacheForm = ref<{
+  key: string
+  value: string
+}>({
+  key: '',
+  value: ''
+})
+const openKeyTemplate = async (row: RedisKeyInfo) => {
+  keyTemplate.value = row.keyTemplate
+  cacheKeys.value = await RedisApi.getKeyListApi(row.keyTemplate)
+  dialogVisible.value = true
+}
+const handleDeleteKey = async (row) => {
+  RedisApi.deleteKeyApi(row)
+  ElMessage.success('删除成功')
+}
+const handleDeleteKeys = async (row) => {
+  RedisApi.deleteKeysApi(row)
+  ElMessage.success('删除成功')
+}
+const handleKeyValue = async (row) => {
+  const res = await RedisApi.getKeyValueApi(row)
+  cacheForm.value = res
+}
 onBeforeMount(() => {
   readRedisInfo()
 })
@@ -186,7 +213,12 @@ onBeforeMount(() => {
     <el-row style="margin-top: 10px">
       <el-col :span="24" class="card-box" shadow="hover">
         <el-card>
-          <el-table v-loading="keyListLoad" :data="keyList" row-key="id">
+          <el-table
+            v-loading="keyListLoad"
+            :data="keyList"
+            row-key="id"
+            @row-click="openKeyTemplate"
+          >
             <el-table-column prop="keyTemplate" label="Key 模板" width="200" />
             <el-table-column prop="keyType" label="Key 类型" width="100" />
             <el-table-column prop="valueType" label="Value 类型" />
@@ -202,4 +234,58 @@ onBeforeMount(() => {
       </el-col>
     </el-row>
   </el-scrollbar>
+  <Dialog v-model="dialogVisible" :title="keyTemplate + ' 模板'" width="60%" maxHeight="800px">
+    <el-row>
+      <el-col :span="14" style="margin-top: 10px">
+        <el-card shadow="always">
+          <template #header>
+            <div class="card-header">
+              <span>键名列表</span>
+            </div>
+          </template>
+          <el-table :data="cacheKeys" style="width: 100%" @row-click="handleKeyValue">
+            <el-table-column label="缓存键名" align="center" :show-overflow-tooltip="true">
+              <template #default="{ row }">
+                {{ row }}
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" align="right" width="60">
+              <template #default="{ row }">
+                <el-button link type="primary" @click="handleDeleteKey(row)">
+                  <Icon icon="ep:delete" />
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
+      <el-col :span="10" style="margin-top: 10px">
+        <el-card shadow="always">
+          <template #header>
+            <div class="card-header">
+              <span>缓存内容</span>
+              <el-button
+                link
+                type="primary"
+                @click="handleDeleteKeys(keyTemplate)"
+                style="float: right; padding: 3px 0"
+              >
+                <Icon icon="ep:refresh" />清理全部
+              </el-button>
+            </div>
+          </template>
+          <el-descriptions :column="1">
+            <el-descriptions-item label="缓存键名:">{{ cacheForm.key }}</el-descriptions-item>
+            <el-descriptions-item label="缓存内容:">{{ cacheForm.value }}</el-descriptions-item>
+          </el-descriptions>
+        </el-card>
+      </el-col>
+    </el-row>
+  </Dialog>
 </template>
+<style scoped>
+.redis {
+  height: 600px;
+  max-height: 860px;
+}
+</style>

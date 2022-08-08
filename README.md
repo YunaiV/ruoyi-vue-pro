@@ -23,17 +23,18 @@
 >
 > 😜 给项目点点 Star 吧，这对我们真的很重要！
 
-* 前端 Vue2 版本采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)
-* 前端 Vue3 版本采用 [vue-element-plus-admin](https://gitee.com/kailong110120130/vue-element-plus-admin)
-* 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson。
+* 管理后台的 Vue3 版本采用 [vue-element-plus-admin](https://gitee.com/kailong110120130/vue-element-plus-admin) ，Vue2 版本采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) 
+* 管理后台的移动端采用 [uni-app](https://github.com/dcloudio/uni-app) 方案，一份代码多终端适配，同时支持 APP、小程序、H5！
+* 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson
 * 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
-* 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统。
-* 支持加载动态权限菜单，按钮级别权限控制，本地缓存提升性能。
-* 支持 SaaS 多租户系统，可自定义每个租户的权限，提供透明化的多租户底层封装。
-* 工作流使用 Flowable，支持动态表单、在线设计流程、会签 / 或签、多种任务分配方式。
-* 高效率开发，使用代码生成器可以一键生成前后端代码 + 单元测试 + Swagger 接口文档 + Validator 参数校验。
-* 集成微信小程序、微信公众号、企业微信、钉钉等三方登陆，集成支付宝、微信等支付与退款。
-* 集成阿里云、腾讯云、云片等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务。
+* 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统，支持 SSO 单点登录
+* 支持加载动态权限菜单，按钮级别权限控制，本地缓存提升性能
+* 支持 SaaS 多租户系统，可自定义每个租户的权限，提供透明化的多租户底层封装
+* 工作流使用 Flowable，支持动态表单、在线设计流程、会签 / 或签、多种任务分配方式
+* 高效率开发，使用代码生成器可以一键生成前后端代码 + 单元测试 + Swagger 接口文档 + Validator 参数校验
+* 集成微信小程序、微信公众号、企业微信、钉钉等三方登陆，集成支付宝、微信等支付与退款
+* 集成阿里云、腾讯云、云片等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务
+* 集成报表设计器，支持数据报表、图形报表、打印设计等
 
 | 项目名                | 说明                     | 传说门                                                                                                                                 |
 |--------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
@@ -46,10 +47,11 @@
 
 分成多种内置功能：
 * 系统功能
+* 基础设施
 * 工作流程
 * 支付系统
 * 商城系统
-* 基础设施
+* 数据报表
 
 > 友情提示：本项目基于 RuoYi-Vue 修改，**重构优化**后端的代码，**美化**前端的界面。
 >
@@ -76,6 +78,8 @@
 | ⭐️  | 登录日志  | 系统登录日志记录查询，包含登录异常               |
 | 🚀  | 错误码管理 | 系统所有错误码的管理，可在线修改错误提示，无需重启服务     |
 |     | 通知公告  | 系统通知公告信息发布维护                    |
+| 🚀  | 敏感词  | 配置系统敏感词，支持标签分组                    |
+| 🚀  | 应用管理  | 管理 SSO 单点登录的应用，支持多种 OAuth2 授权方式 |
 
 ### 工作流程
 
@@ -124,6 +128,13 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | 🚀  | 日志服务     | 轻量级日志中心，查看远程服务器的日志                           |
 | 🚀  | 单元测试     | 基于 JUnit + Mockito 实现单元测试，保证功能的正确性、代码的质量等    |
 
+### 数据报表
+
+|     | 功能       | 描述                                           |
+|-----|----------|----------------------------------------------|
+| 🚀  | 报表设计器     | 支持数据报表、图形报表、打印设计等       |
+| 🚀  | 大屏设计器     | 建设中... 拖拽式实现可视化数据大屏          |
+
 ### 商城系统
 
 建设中...
@@ -145,8 +156,10 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | `yudao-dependencies`  | Maven 依赖版本管理       |
 | `yudao-framework`     | Java 框架拓展          |
 | `yudao-server`        | 管理后台 + 用户 APP 的服务端 |
-| `yudao-admin-ui`      | 管理后台的 UI 界面        |
-| `yudao-user-ui`       | 用户 APP 的 UI 界面     |
+| `yudao-ui-admin`      | 管理后台的 Vue2 前端项目        |
+| `yudao-ui-admin-vue3`      | 管理后台的 Vue3 前端项目        |
+| `yudao-ui-admin-uniapp`      | 管理后台的 uni-app 多端项目        |
+| `yudao-ui-app`       | 用户 APP 的 UI 界面     |
 | `yudao-module-system` | 系统功能的 Module 模块    |
 | `yudao-module-member` | 会员中心的 Module 模块    |
 | `yudao-module-infra`  | 基础设施的 Module 模块    |
@@ -180,25 +193,32 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架        | 5.8.2    | -                                                              |
 | [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架         | 4.0.0    | -                                                              |
 
-### Vue2 前端
+### [管理后台 Vue2 前端](./yudao-ui-admin)
 
 | 框架                                                                           | 说明            | 版本     |
 |------------------------------------------------------------------------------|---------------|--------|
 | [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.6.12 |
 | [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -      |
 
-### Vue3 前端
+### [管理后台 Vue3 前端](./yudao-ui-admin-vue3)
 
 | 框架                                                                  | 说明               | 版本     |
 |----------------------------------------------------------------------|------------------|--------|
 | [Vue](https://staging-cn.vuejs.org/)                                 | Vue 框架           | 3.2.37 |
-| [Vite](https://cn.vitejs.dev//)                                      | 开发与构建工具          | 3.0.3  |
-| [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus     | 2.2.9  |
+| [Vite](https://cn.vitejs.dev//)                                      | 开发与构建工具          | 3.0.4  |
+| [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus     | 2.2.12 |
 | [TypeScript](https://www.typescriptlang.org/docs/)                   | TypeScript       | 4.7.4  |
 | [pinia](https://pinia.vuejs.org/)                                    | Vue 存储库 替代 vuex5 | 2.0.17 |
-| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化              | 9.1.10 |
+| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化              | 9.2.0  |
 | [windicss](https://cn.windicss.org/)                                 | 下一代工具优先的 CSS 框架  | 3.5.6  |
 | [iconify](https://icon-sets.iconify.design/)                         | 在线图标库            | 2.2.1  |
+
+### [管理后台 uni-app 跨端](./yudao-ui-admin-uniapp)
+
+| 框架                                                                  | 说明               | 版本     |
+|----------------------------------------------------------------------|------------------|--------|
+| [uni-app](hhttps://github.com/dcloudio/uni-app)                                 | 跨平台框架           | 2.0.0 |
+| [uni-ui](https://github.com/dcloudio/uni-ui)                                      | 基于 uni-app 的 UI 框架          | 1.4.20  |
 
 ## 🐷 演示图
 
@@ -207,13 +227,13 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | 模块       | biu                                                                | biu                                                              | biu                                                              |
 |----------|--------------------------------------------------------------------|------------------------------------------------------------------|------------------------------------------------------------------|
 | 登录 & 首页  | ![登录](https://static.iocoder.cn/images/ruoyi-vue-pro/登录.jpg?imageView2/2/format/webp/w/1280)       | ![首页](https://static.iocoder.cn/images/ruoyi-vue-pro/首页.jpg?imageView2/2/format/webp/w/1280)     | ![个人中心](https://static.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg?imageView2/2/format/webp/w/1280) |
-| 用户       | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg?imageView2/2/format/webp/w/1280)   | ![在线用户](https://static.iocoder.cn/images/ruoyi-vue-pro/在线用户.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
+| 用户 & 应用      | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg?imageView2/2/format/webp/w/1280)   | ![令牌管理](https://static.iocoder.cn/images/ruoyi-vue-pro/令牌管理.jpg?imageView2/2/format/webp/w/1280) | ![应用管理](https://static.iocoder.cn/images/ruoyi-vue-pro/应用管理.jpg?imageView2/2/format/webp/w/1280)                                                                |
 | 租户 & 套餐  | ![租户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/租户管理.jpg?imageView2/2/format/webp/w/1280)   | ![租户套餐](https://static.iocoder.cn/images/ruoyi-vue-pro/租户套餐.png) | -                                                                |
 | 部门 & 岗位  | ![部门管理](https://static.iocoder.cn/images/ruoyi-vue-pro/部门管理.jpg?imageView2/2/format/webp/w/1280)   | ![岗位管理](https://static.iocoder.cn/images/ruoyi-vue-pro/岗位管理.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 | 菜单 & 角色  | ![菜单管理](https://static.iocoder.cn/images/ruoyi-vue-pro/菜单管理.jpg?imageView2/2/format/webp/w/1280)   | ![角色管理](https://static.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 | 审计日志     | ![操作日志](https://static.iocoder.cn/images/ruoyi-vue-pro/操作日志.jpg?imageView2/2/format/webp/w/1280)   | ![登录日志](https://static.iocoder.cn/images/ruoyi-vue-pro/登录日志.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 | 短信       | ![短信渠道](https://static.iocoder.cn/images/ruoyi-vue-pro/短信渠道.jpg?imageView2/2/format/webp/w/1280)   | ![短信模板](https://static.iocoder.cn/images/ruoyi-vue-pro/短信模板.jpg?imageView2/2/format/webp/w/1280) | ![短信日志](https://static.iocoder.cn/images/ruoyi-vue-pro/短信日志.jpg?imageView2/2/format/webp/w/1280) |
-| 字典       | ![字典类型](https://static.iocoder.cn/images/ruoyi-vue-pro/字典类型.jpg?imageView2/2/format/webp/w/1280)   | ![字典数据](https://static.iocoder.cn/images/ruoyi-vue-pro/字典数据.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
+| 字典 & 敏感词      | ![字典类型](https://static.iocoder.cn/images/ruoyi-vue-pro/字典类型.jpg?imageView2/2/format/webp/w/1280)   | ![字典数据](https://static.iocoder.cn/images/ruoyi-vue-pro/字典数据.jpg?imageView2/2/format/webp/w/1280) | ![敏感词](https://static.iocoder.cn/images/ruoyi-vue-pro/敏感词.jpg?imageView2/2/format/webp/w/1280)                                                                |
 | 错误码 & 通知 | ![错误码管理](https://static.iocoder.cn/images/ruoyi-vue-pro/错误码管理.jpg?imageView2/2/format/webp/w/1280) | ![通知公告](https://static.iocoder.cn/images/ruoyi-vue-pro/通知公告.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 
 ### 工作流程
@@ -244,3 +264,19 @@ ps：核心功能已经实现，正在对接微信小程序中...
 |---------|------------------------------------------------------------------|------------------------------------------------------------------------|------------------------------------------------------------------------|
 | 商家 & 应用 | ![商户信息](https://static.iocoder.cn/images/ruoyi-vue-pro/商户信息.jpg?imageView2/2/format/webp/w/1280) | ![应用信息-列表](https://static.iocoder.cn/images/ruoyi-vue-pro/应用信息-列表.jpg?imageView2/2/format/webp/w/1280) | ![应用信息-编辑](https://static.iocoder.cn/images/ruoyi-vue-pro/应用信息-编辑.jpg?imageView2/2/format/webp/w/1280) |
 | 支付 & 退款 | ![支付订单](https://static.iocoder.cn/images/ruoyi-vue-pro/支付订单.jpg?imageView2/2/format/webp/w/1280) | ![退款订单](https://static.iocoder.cn/images/ruoyi-vue-pro/退款订单.jpg?imageView2/2/format/webp/w/1280)       | ---                                                                    |
+
+### 数据报表
+
+| 模块      | biu                                                              | biu                                                                    | biu                                                                    |
+|---------|------------------------------------------------------------------|------------------------------------------------------------------------|------------------------------------------------------------------------|
+| 报表设计器 | ![数据报表](https://static.iocoder.cn/images/ruoyi-vue-pro/报表设计器-数据报表.jpg?imageView2/2/format/webp/w/1280) | ![图形报表](https://static.iocoder.cn/images/ruoyi-vue-pro/报表设计器-图形报表.jpg?imageView2/2/format/webp/w/1280) | ![报表设计器-打印设计](https://static.iocoder.cn/images/ruoyi-vue-pro/报表设计器-打印设计.jpg?imageView2/2/format/webp/w/1280) |
+
+### 移动端（管理后台）
+
+| biu                                                              | biu                                                                    | biu                                                                    |
+|------------------------------------------------------------------|------------------------------------------------------------------------|------------------------------------------------------------------------|
+| ![](https://static.iocoder.cn/images/ruoyi-vue-pro/admin-uniapp/01.png?imageView2/2/format/webp) | ![](https://static.iocoder.cn/images/ruoyi-vue-pro/admin-uniapp/02.png?imageView2/2/format/webp) | ![](https://static.iocoder.cn/images/ruoyi-vue-pro/admin-uniapp/03.png?imageView2/2/format/webp) |
+| ![](https://static.iocoder.cn/images/ruoyi-vue-pro/admin-uniapp/04.png?imageView2/2/format/webp) | ![](https://static.iocoder.cn/images/ruoyi-vue-pro/admin-uniapp/05.png?imageView2/2/format/webp) | ![](https://static.iocoder.cn/images/ruoyi-vue-pro/admin-uniapp/06.png?imageView2/2/format/webp) |
+| ![](https://static.iocoder.cn/images/ruoyi-vue-pro/admin-uniapp/07.png?imageView2/2/format/webp) | ![](https://static.iocoder.cn/images/ruoyi-vue-pro/admin-uniapp/08.png?imageView2/2/format/webp) | ![](https://static.iocoder.cn/images/ruoyi-vue-pro/admin-uniapp/09.png?imageView2/2/format/webp) |
+
+目前已经实现登录、我的、工作台、编辑资料、头像修改、密码修改、常见问题、关于我们等基础功能。

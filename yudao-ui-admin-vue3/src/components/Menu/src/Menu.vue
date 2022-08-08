@@ -94,8 +94,8 @@ export default defineComponent({
         >
           {{
             default: () => {
-              const { renderMenuItem } = useRenderMenuItem(unref(routers), unref(menuMode))
-              return renderMenuItem()
+              const { renderMenuItem } = useRenderMenuItem(unref(menuMode))
+              return renderMenuItem(unref(routers))
             }
           }}
         </ElMenu>

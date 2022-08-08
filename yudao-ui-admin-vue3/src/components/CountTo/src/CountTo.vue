@@ -157,7 +157,7 @@ const count = (timestamp: number) => {
   } else {
     state.printVal = state.printVal > endVal ? endVal : state.printVal
   }
-  state.displayValue = formatNumber(state.printVal)
+  state.displayValue = formatNumber(state.printVal!)
   if (progress < (state.localDuration as number)) {
     state.rAF = requestAnimationFrame(count)
   } else {
