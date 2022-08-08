@@ -5,7 +5,7 @@ import errorCode from '@/utils/errorCode'
 import { toast, showConfirm, tansParams } from '@/utils/common'
 
 let timeout = 10000
-const baseUrl = config.baseUrl + '/admin-api';
+const baseUrl = config.baseUrl + config.baseApi;
 
 const request = config => {
   // 是否需要设置 token
