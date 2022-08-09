@@ -24,6 +24,8 @@
         <module>yudao-module-product-biz</module>
         <module>yudao-module-trade-api</module>
         <module>yudao-module-trade-biz</module>
+        <module>yudao-module-coupon-api</module>
+        <module>yudao-module-coupon-biz</module>
     </modules>
 
 </project>
