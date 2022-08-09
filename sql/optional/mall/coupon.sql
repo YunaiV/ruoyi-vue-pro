@@ -3,7 +3,7 @@ CREATE TABLE `coupon`
 (
     `id`                        bigint                                                         NOT NULL AUTO_INCREMENT COMMENT '用户ID',
     `type`                      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL COMMENT '优惠券类型 reward-满减 discount-折扣 random-随机',
-    `name`               varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci   NOT NULL COMMENT '优惠券名称',
+    `name`                      varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci   NOT NULL COMMENT '优惠券名称',
     `coupon_type_id`            bigint UNSIGNED                                                         DEFAULT 0 COMMENT '优惠券类型id',
     `coupon_code`               varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL COMMENT '优惠券编码',
     `member_id`                 bigint UNSIGNED                                                NOT NULL DEFAULT 0 COMMENT '领用人',
@@ -41,7 +41,7 @@ CREATE TABLE `coupon_templete`
 (
     `id`                        bigint                                                       NOT NULL AUTO_INCREMENT COMMENT '用户ID',
     `type`                      varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '优惠券类型 reward-满减 discount-折扣 random-随机',
-    `name`               varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '优惠券名称',
+    `name`                      varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '优惠券名称',
     `coupon_name_remark`        varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '名称备注',
     `image`                     varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '优惠券图片',
     `count`                     int(11)                                                      NOT NULL DEFAULT 0 COMMENT '发放数量',
@@ -57,8 +57,8 @@ CREATE TABLE `coupon_templete`
     `min_money`                 decimal(10, 2) UNSIGNED                                      NOT NULL DEFAULT 0 COMMENT '最低金额 当type为radom时需要添加',
     `max_money`                 decimal(10, 2) UNSIGNED                                      NOT NULL DEFAULT 0 COMMENT '最大金额 当type为radom时需要添加',
     `validity_type`             tinyint(1) UNSIGNED                                          NOT NULL DEFAULT 0 COMMENT '过期类型1-时间范围过期 2-领取之日固定日期后过期 3-领取次日固定日期后过期',
-    `start_use_time`            int(11) UNSIGNED                                             NOT NULL DEFAULT 0 COMMENT '使用开始日期 过期类型1时必填',
-    `end_use_time`              int(11) UNSIGNED                                             NOT NULL DEFAULT 0 COMMENT '使用结束日期 过期类型1时必填',
+    `start_use_time`            datetime COMMENT '使用开始日期 过期类型1时必填',
+    `end_use_time`              datetime COMMENT '使用结束日期 过期类型1时必填',
     `fixed_term`                int(11) UNSIGNED                                             NOT NULL DEFAULT 0 COMMENT '当validity_type为2或者3时需要添加 领取之日起或者次日N天内有效',
     `whether_limitless`         tinyint(1) UNSIGNED                                          NOT NULL DEFAULT 0 COMMENT '是否无限制0-否 1是',
     `max_fetch`                 int(11) UNSIGNED                                             NOT NULL DEFAULT 0 COMMENT '每人最大领取个数',
@@ -70,8 +70,8 @@ CREATE TABLE `coupon_templete`
     `order_money`               decimal(10, 2) UNSIGNED                                      NOT NULL DEFAULT 0 COMMENT '用券总成交额',
     `whether_forbidden`         tinyint(1) UNSIGNED                                          NOT NULL DEFAULT 0 COMMENT '是否禁止发放0-否 1-是',
     `order_goods_num`           int(11) UNSIGNED                                             NOT NULL DEFAULT 0 COMMENT '使用优惠券购买的商品数量',
-    `status`                    int(11)                                                      NOT NULL DEFAULT 0 COMMENT '状态（1进行中2已结束-1已关闭）',
-    `end_time`                  int(11) UNSIGNED                                             NOT NULL DEFAULT 0 COMMENT '有效日期结束时间',
+    `status`                    tinyint(11)                                                  NOT NULL DEFAULT 0 COMMENT '状态（1进行中2已结束-1已关闭）',
+    `end_time`                  datetime COMMENT '有效日期结束时间',
     `creator`                   varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL     DEFAULT '' COMMENT '创建者',
     `create_time`               datetime                                                     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updater`                   varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL     DEFAULT '' COMMENT '更新者',
@@ -82,4 +82,4 @@ CREATE TABLE `coupon_templete`
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 119
   CHARACTER SET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT = '优惠券';
+  COLLATE = utf8mb4_unicode_ci COMMENT = '优惠券模板';
