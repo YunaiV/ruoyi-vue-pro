@@ -204,7 +204,7 @@ onMounted(async () => {
         >
           {{ t('action.save') }}
         </el-button>
-        <el-button type="danger" @click="showForm = false">取消</el-button>
+        <el-button type="danger" @click="showForm = false">{{ t('common.cancel') }}</el-button>
       </div>
     </el-card>
   </div>
