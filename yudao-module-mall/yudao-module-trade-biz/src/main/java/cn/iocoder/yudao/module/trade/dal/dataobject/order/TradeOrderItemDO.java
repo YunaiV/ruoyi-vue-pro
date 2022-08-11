@@ -42,11 +42,17 @@ public class TradeOrderItemDO extends BaseDO {
 
     // ========== 商品基本信息 ==========
     /**
+     * 商品 SPU 编号
+     *
+     * 关联 ProductSkuDO 的 spuId 编号
+     */
+    private Long spuId;
+    /**
      * 商品 SKU 编号
      *
      * 关联 ProductSkuDO 的 id 编号
      */
-    private Integer skuId;
+    private Long skuId;
     /**
      * 规格值数组，JSON 格式
      */
@@ -74,46 +80,51 @@ public class TradeOrderItemDO extends BaseDO {
 
     // ========== 价格 + 支付基本信息 ==========
     /**
-     * 购买单价，单位：分
+     * 商品原价（单），单位：分
      *
      * 对应 ProductSkuDO 的 price 字段
      */
-    private Integer buyPrice; // like - original_price；niu - costPrice
+    private Integer originalPrice; // like - original_price；niu - costPrice
     /**
-     * 最终单价，单位：分。
-     */
-    private Integer presentPrice; // like - goods_price；niu - price
-    /**
-     * 购买总金额，单位：分
-     */
-    private Integer buyTotal; // like - total_price；niu - 暂无
-    /**
-     * 最终总金额，单位：分。
+     * 商品原价（总），单位：分
      *
-     * 注意，presentPrice * count 不一定等于 presentTotal 。
-     * 因为，存在无法整除的情况。
-     * 举个例子，presentPrice = 8.33 ，stock = 3 的情况，presentTotal 有可能是 24.99 ，也可能是 25 。
-     * 所以，需要存储一个该字段。
+     * = {@link #originalPrice} * {@link #count}
      */
-    private Integer presentTotal; // like -  total_pay_price；niu - goods_money
+    private Integer totalOriginalPrice; // like - total_price；niu - 暂无
+    /**
+     * 商品级优惠（总），单位：分
+     *
+     * 例如说“限时折扣”：商品原价的 8 折；商品原价的减 50 元
+     */
+    private Integer totalPromotionPrice; // taobao - order.discount_fee（子订单商品优惠）
+    /**
+     * 最终购买金额（单），单位：分。
+     *
+     * = {@link #totalPresentPrice} / {@link #count}
+     */
+    private Integer presentPrice;
+    /**
+     * 最终购买金额（总），单位：分。
+     *
+     * = {@link #totalOriginalPrice}
+     * - {@link #totalPromotionPrice}
+     */
+    private Integer totalPresentPrice; // like -  total_pay_price；niu - goods_money; taobao - order.payment（子订单实付金额，不算主订单分摊金额） | order.total_fee（子订单应付金额，参考使用）
+    // TODO 芋艿：part_mjz_discount(子订单分摊金额)；本质上，totalOriginalPrice - totalPayPrice
+    /**
+     * 应付金额（总），单位：分
+     */
+    private Integer totalPayPrice; // taobao - divide_order_fee （分摊后子订单实付金额）；
 
     // ========== 营销基本信息 ==========
-    /**
-     * 优惠劵满减金额，单位：分
-     */
-    private Integer couponTotal; // like - discount_price；niu - coupon_money
-    /**
-     * 营销减免金额，单位：分
-     */
-    private Integer marketTotal; // like - discount_price；niu - promotion_money
-    /**
-     * 积分抵扣的金额，单位：分
-     */
-    private Integer integralTotal; // like - integral_price；niu - point_money
-    /**
-     * 使用的积分
-     */
-    private Integer useIntegral; // niu - use_point
+//    /**
+//     * 积分抵扣的金额，单位：分
+//     */
+//    private Integer integralTotal; // like - integral_price；niu - point_money
+//    /**
+//     * 使用的积分
+//     */
+//    private Integer useIntegral; // niu - use_point
 
     // ========== 退款基本信息 ==========
     /**
@@ -193,5 +204,6 @@ public class TradeOrderItemDO extends BaseDO {
     // TODO refund_status '退款状态'
     // TODO refund_type '退款状态'
     // TODO 一堆退款字段
+
 }
 

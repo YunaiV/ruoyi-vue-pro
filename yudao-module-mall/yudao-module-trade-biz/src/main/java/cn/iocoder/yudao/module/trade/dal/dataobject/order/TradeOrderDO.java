@@ -109,26 +109,43 @@ public class TradeOrderDO extends BaseDO {
     private Date payTime;
 
     // ========== 价格 + 支付基本信息 ==========
+    // 价格文档 - 淘宝：https://open.taobao.com/docV3.htm?docId=108471&docType=1
+
+//  TODO  promotion_details(订单优惠信息明细，商品和订单级优惠一般都在里面)
+
     /**
-     * 购买（商品）总金额，单位：分
+     * 商品原价（总），单位：分
+     *
+     * 基于 {@link TradeOrderItemDO#getTotalOriginalPrice()} 求和
      */
-    private Integer buyPrice; // niu - goods_money；
+    private Integer skuOriginalPrice; // niu - goods_money；
+    /**
+     * 商品优惠（总），单位：分
+     *
+     * 基于 {@link TradeOrderItemDO#getTotalPromotionPrice()} 求和
+     */
+    private Integer skuPromotionPrice;
+    /**
+     * 订单优惠（总），单位：分
+     *
+     * 例如说：满减折扣；不包括优惠劵、商品优惠
+     */
+    private Integer orderPromotionPrice; // niu - promotion_money；taobao - discount_fee（主订单优惠）
     /**
      * 运费金额，单位：分
      */
-    private Integer deliveryPrice; // niu - delivery_money；
+    private Integer deliveryPrice; // niu - delivery_money；taobao - post_fee（订单邮费）
+    // TODO 芋艿：taobao 的：trade.adjust_fee/order.adjust_fee（调整金额，如：卖家手动修改订单价格，官方数据修复等等）
     /**
-     * 最终金额，单位：分
+     * 应付金额（总），单位：分
      *
-     * presentPrice = buyPrice + deliveryPrice -  couponPrice - integralPrice - marketPrice
+     * = {@link #skuOriginalPrice}
+     * + {@link #deliveryPrice}
+     * - {@link #skuPromotionPrice}
+     * - {@link #orderPromotionPrice}
+     * - {@link #couponPrice}
      */
-    private Integer presentPrice; // niu - order_money；
-    /**
-     * 实际已支付金额，单位：分
-     *
-     * 初始时，金额为 0 。等到支付成功后，会进行更新。
-     */
-    private Integer payPrice; // niu - pay_money；
+    private Integer payPrice; // niu - pay_money；taobao - payment（主订单实付金额） | trade.total_fee（主订单应付金额，参考使用）；
     /**
      * 支付订单编号
      *
@@ -137,8 +154,10 @@ public class TradeOrderDO extends BaseDO {
     private Long payOrderId;
     /**
      * 支付成功的支付渠道
+     *
+     * 对应 PayChannelEnum 枚举
      */
-    private Integer payType;
+    private Integer payChannel;
 
     // ========== 收件 + 物流基本信息 ==========
     /**
@@ -226,20 +245,14 @@ public class TradeOrderDO extends BaseDO {
      * 优惠劵减免金额，单位：分
      */
     private Integer couponPrice; // niu - coupon_money；
-    /**
-     * 营销减免金额，单位：分
-     *
-     * 例如说：满减折扣
-     */
-    private Integer marketPrice; // niu - promotion_money；
-    /**
-     * 积分抵扣的金额，单位：分
-     */
-    private Integer integralPrice;
-    /**
-     * 使用的积分
-     */
-    private Integer useIntegral;
+//    /**
+//     * 积分抵扣的金额，单位：分
+//     */
+//    private Integer integralPrice;
+//    /**
+//     * 使用的积分
+//     */
+//    private Integer useIntegral;
 
     // TODO ========== 待定字段：yv =========
     // TODO cart_id：购物车 id
