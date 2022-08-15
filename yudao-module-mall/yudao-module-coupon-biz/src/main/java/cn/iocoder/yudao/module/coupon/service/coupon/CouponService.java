@@ -16,10 +16,10 @@ public interface CouponService {
     /**
      * 创建优惠券
      *
-     * @param createReqVO 创建信息
+     * @param templateId 优惠券模板id
      * @return 编号
      */
-    Long create(@Valid CouponCreateReqVO createReqVO);
+    Long create(Long templateId);
 
     /**
      * 更新优惠券
