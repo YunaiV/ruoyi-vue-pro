@@ -16,9 +16,8 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class CouponTempleteBaseVO {
 
-    @ApiModelProperty(value = "优惠券类型 reward-满减 discount-折扣 random-随机", required = true)
-    @NotNull(message = "优惠券类型 reward-满减 discount-折扣 random-随机不能为空")
-    private String type;
+
+    //基本信息
 
     @ApiModelProperty(value = "优惠券名称", required = true)
     @NotNull(message = "优惠券名称不能为空")
@@ -30,17 +29,8 @@ public class CouponTempleteBaseVO {
     @ApiModelProperty(value = "优惠券图片")
     private String image;
 
-    @ApiModelProperty(value = "发放数量", required = true)
-    @NotNull(message = "发放数量不能为空")
-    private Integer count;
+    /*  ============判断适用商品——开始=============  */
 
-    @ApiModelProperty(value = "已领取数量", required = true)
-    @NotNull(message = "已领取数量不能为空")
-    private Integer leadCount;
-
-    @ApiModelProperty(value = "已使用数量", required = true)
-    @NotNull(message = "已使用数量不能为空")
-    private Integer usedCount;
 
     @ApiModelProperty(value = "适用商品类型1-全部商品可用；2-指定商品可用；3-指定商品不可用", required = true)
     @NotNull(message = "适用商品类型1-全部商品可用；2-指定商品可用；3-指定商品不可用不能为空")
@@ -57,15 +47,22 @@ public class CouponTempleteBaseVO {
     @NotNull(message = "满多少元使用 0代表无限制不能为空")
     private BigDecimal atLeast;
 
-    @ApiModelProperty(value = "发放面额 当type为reward时需要添加", required = true)
+
+    /*  ============折扣类型——开始=============  */
+
+    @ApiModelProperty(value = "优惠券类型 reward-满减 discount-折扣 random-随机", required = true)
+    @NotNull(message = "优惠券类型 reward-满减 discount-折扣 random-随机不能为空")
+    private String type;
+
+    @ApiModelProperty(value = "发放面额 当type为reward时需要添加")
     @NotNull(message = "发放面额 当type为reward时需要添加不能为空")
     private BigDecimal money;
 
-    @ApiModelProperty(value = "1 =< 折扣 <= 9.9 当type为discount时需要添加", required = true)
+    @ApiModelProperty(value = "1 =< 折扣 <= 9.9 当type为discount时需要添加")
     @NotNull(message = "1 =< 折扣 <= 9.9 当type为discount时需要添加不能为空")
     private BigDecimal discount;
 
-    @ApiModelProperty(value = "最多折扣金额 当type为discount时可选择性添加", required = true)
+    @ApiModelProperty(value = "最多折扣金额 当type为discount时可选择性添加")
     @NotNull(message = "最多折扣金额 当type为discount时可选择性添加不能为空")
     private BigDecimal discountLimit;
 
@@ -77,9 +74,15 @@ public class CouponTempleteBaseVO {
     @NotNull(message = "最大金额 当type为radom时需要添加不能为空")
     private BigDecimal maxMoney;
 
+    /*  ============折扣类型——结束=============  */
+
+
+    /*  ============过期类型——开始=============  */
+
+
     @ApiModelProperty(value = "过期类型1-时间范围过期 2-领取之日固定日期后过期 3-领取次日固定日期后过期", required = true)
-    @NotNull(message = "过期类型1-时间范围过期 2-领取之日固定日期后过期 3-领取次日固定日期后过期不能为空")
-    private Boolean validityType;
+    @NotNull(message = "过期类型1-时间范围过期 2-领取之日固定日期后过期 3-领取次日固定日期后过期 不能为空")
+    private Integer validityType;
 
     @ApiModelProperty(value = "使用开始日期 过期类型1时必填")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
@@ -89,19 +92,26 @@ public class CouponTempleteBaseVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private Date endUseTime;
 
-    @ApiModelProperty(value = "当validity_type为2或者3时需要添加 领取之日起或者次日N天内有效", required = true)
+    @ApiModelProperty(value = "当validity_type为2或者3时需要添加 领取之日起或者次日N天内有效")
     @NotNull(message = "当validity_type为2或者3时需要添加 领取之日起或者次日N天内有效不能为空")
     private Integer fixedTerm;
 
-    @ApiModelProperty(value = "是否无限制0-否 1是", required = true)
-    @NotNull(message = "是否无限制0-否 1是不能为空")
+    @ApiModelProperty(value = "有效日期结束时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private Date endTime;
+
+    /*  ============过期类型——结束=============  */
+
+
+    @ApiModelProperty(value = "领取是否无限制0-否 1是", required = true)
+    @NotNull(message = "是否无限制0-否 1是 不能为空")
     private Boolean whetherLimitless;
 
     @ApiModelProperty(value = "每人最大领取个数", required = true)
     @NotNull(message = "每人最大领取个数不能为空")
     private Integer maxFetch;
 
-    @ApiModelProperty(value = "是否开启过期提醒0-不开启 1-开启", required = true)
+    @ApiModelProperty(value = "是否开启过期提醒 0-不开启 1-开启", required = true)
     @NotNull(message = "是否开启过期提醒0-不开启 1-开启不能为空")
     private Boolean whetherExpireNotice;
 
@@ -117,6 +127,18 @@ public class CouponTempleteBaseVO {
     @NotNull(message = "是否显示不能为空")
     private Integer whetherShow;
 
+    @ApiModelProperty(value = "是否禁止发放0-否 1-是", required = true)
+    @NotNull(message = "是否禁止发放0-否 1-是不能为空")
+    private Boolean whetherForbidden;
+
+    /*  ============汇总计算——开始=============  */
+
+
+
+    @ApiModelProperty(value = "使用优惠券购买的商品数量", required = true)
+    @NotNull(message = "使用优惠券购买的商品数量不能为空")
+    private Integer orderGoodsNum;
+
     @ApiModelProperty(value = "订单的优惠总金额", required = true)
     @NotNull(message = "订单的优惠总金额不能为空")
     private BigDecimal discountOrderMoney;
@@ -125,20 +147,26 @@ public class CouponTempleteBaseVO {
     @NotNull(message = "用券总成交额不能为空")
     private BigDecimal orderMoney;
 
-    @ApiModelProperty(value = "是否禁止发放0-否 1-是", required = true)
-    @NotNull(message = "是否禁止发放0-否 1-是不能为空")
-    private Boolean whetherForbidden;
+    @ApiModelProperty(value = "发放数量", required = true)
+    @NotNull(message = "发放数量不能为空")
+    private Integer count;
 
-    @ApiModelProperty(value = "使用优惠券购买的商品数量", required = true)
-    @NotNull(message = "使用优惠券购买的商品数量不能为空")
-    private Integer orderGoodsNum;
+    @ApiModelProperty(value = "已领取数量", required = true)
+    @NotNull(message = "已领取数量不能为空")
+    private Integer leadCount;
 
-    @ApiModelProperty(value = "状态（1进行中2已结束-1已关闭）", required = true)
+    @ApiModelProperty(value = "已使用数量", required = true)
+    @NotNull(message = "已使用数量不能为空")
+    private Integer usedCount;
+
+
+    /*  ============汇总计算——结束=============  */
+
+
+    @ApiModelProperty(value = "状态（1进行中2已结束3已关闭）", required = true)
     @NotNull(message = "状态（1进行中2已结束-1已关闭）不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "有效日期结束时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date endTime;
+
 
 }
