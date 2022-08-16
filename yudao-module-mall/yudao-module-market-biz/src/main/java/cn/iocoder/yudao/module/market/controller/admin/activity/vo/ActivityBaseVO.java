@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.market.controller.admin.activity.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.market.enums.activity.MarketActivityStatusEnum;
-import cn.iocoder.yudao.module.market.enums.activity.MarketActivityTypeEnum;
+import cn.iocoder.yudao.module.market.enums.common.PromotionTypeEnum;
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
@@ -24,7 +24,7 @@ public class ActivityBaseVO {
 
     @ApiModelProperty(value = "活动类型", required = true)
     @NotNull(message = "活动类型不能为空")
-    @InEnum(MarketActivityTypeEnum.class)
+    @InEnum(PromotionTypeEnum.class)
     private Integer activityType;
 
     @ApiModelProperty(value = "活动状态", required = true)

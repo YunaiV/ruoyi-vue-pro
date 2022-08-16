@@ -110,6 +110,8 @@ public class TradeOrderDO extends BaseDO {
 
     // ========== 价格 + 支付基本信息 ==========
     // 价格文档 - 淘宝：https://open.taobao.com/docV3.htm?docId=108471&docType=1
+    // 价格文档 - 京东到家：https://openo2o.jddj.com/api/getApiDetail/182/4d1494c5e7ac4679bfdaaed950c5bc7f.htm
+    // 价格文档 - 有赞：https://doc.youzanyun.com/detail/API/0/906
 
 //  TODO  promotion_details(订单优惠信息明细，商品和订单级优惠一般都在里面)
 
@@ -118,7 +120,8 @@ public class TradeOrderDO extends BaseDO {
      *
      * 基于 {@link TradeOrderItemDO#getTotalOriginalPrice()} 求和
      */
-    private Integer skuOriginalPrice; // niu - goods_money；
+    // niu - goods_money；
+    private Integer skuOriginalPrice;
     /**
      * 商品优惠（总），单位：分
      *
@@ -130,11 +133,13 @@ public class TradeOrderDO extends BaseDO {
      *
      * 例如说：满减折扣；不包括优惠劵、商品优惠
      */
-    private Integer orderPromotionPrice; // niu - promotion_money；taobao - discount_fee（主订单优惠）
+    // niu - promotion_money；taobao - discount_fee（主订单优惠）
+    private Integer orderPromotionPrice;
     /**
      * 运费金额，单位：分
      */
-    private Integer deliveryPrice; // niu - delivery_money；taobao - post_fee（订单邮费）
+    // niu - delivery_money；taobao - post_fee（订单邮费）
+    private Integer deliveryPrice;
     // TODO 芋艿：taobao 的：trade.adjust_fee/order.adjust_fee（调整金额，如：卖家手动修改订单价格，官方数据修复等等）
     /**
      * 应付金额（总），单位：分
@@ -145,7 +150,8 @@ public class TradeOrderDO extends BaseDO {
      * - {@link #orderPromotionPrice}
      * - {@link #couponPrice}
      */
-    private Integer payPrice; // niu - pay_money；taobao - payment（主订单实付金额） | trade.total_fee（主订单应付金额，参考使用）；
+    // niu - pay_money；taobao - payment（主订单实付金额） | trade.total_fee（主订单应付金额，参考使用）；
+    private Integer payPrice;
     /**
      * 支付订单编号
      *
@@ -244,7 +250,8 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 优惠劵减免金额，单位：分
      */
-    private Integer couponPrice; // niu - coupon_money；
+    // niu - coupon_money；
+    private Integer couponPrice;
 //    /**
 //     * 积分抵扣的金额，单位：分
 //     */

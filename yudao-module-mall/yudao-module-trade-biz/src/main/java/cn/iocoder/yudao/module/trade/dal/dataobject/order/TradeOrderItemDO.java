@@ -84,19 +84,22 @@ public class TradeOrderItemDO extends BaseDO {
      *
      * 对应 ProductSkuDO 的 price 字段
      */
-    private Integer originalPrice; // like - original_price；niu - costPrice
+    // like - original_price；niu - costPrice
+    private Integer originalPrice;
     /**
      * 商品原价（总），单位：分
      *
      * = {@link #originalPrice} * {@link #count}
      */
-    private Integer totalOriginalPrice; // like - total_price；niu - 暂无
+    // like - total_price；niu - 暂无
+    private Integer totalOriginalPrice;
     /**
      * 商品级优惠（总），单位：分
      *
      * 例如说“限时折扣”：商品原价的 8 折；商品原价的减 50 元
      */
-    private Integer totalPromotionPrice; // taobao - order.discount_fee（子订单商品优惠）
+    // taobao - order.discount_fee（子订单商品优惠）
+    private Integer totalPromotionPrice;
     /**
      * 最终购买金额（单），单位：分。
      *
@@ -109,12 +112,14 @@ public class TradeOrderItemDO extends BaseDO {
      * = {@link #totalOriginalPrice}
      * - {@link #totalPromotionPrice}
      */
-    private Integer totalPresentPrice; // like -  total_pay_price；niu - goods_money; taobao - order.payment（子订单实付金额，不算主订单分摊金额） | order.total_fee（子订单应付金额，参考使用）
+    // like -  total_pay_price；niu - goods_money; taobao - order.payment（子订单实付金额，不算主订单分摊金额） | order.total_fee（子订单应付金额，参考使用）
+    private Integer totalPresentPrice;
     // TODO 芋艿：part_mjz_discount(子订单分摊金额)；本质上，totalOriginalPrice - totalPayPrice
     /**
      * 应付金额（总），单位：分
      */
-    private Integer totalPayPrice; // taobao - divide_order_fee （分摊后子订单实付金额）；
+    // taobao - divide_order_fee （分摊后子订单实付金额）；
+    private Integer totalPayPrice;
 
     // ========== 营销基本信息 ==========
 //    /**
