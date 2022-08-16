@@ -7,19 +7,18 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * 营销类型枚举
+ * 营销的条件类型枚举
  *
  * @author 芋道源码
  */
-@Getter
 @AllArgsConstructor
-public enum PromotionTypeEnum implements IntArrayValuable {
+@Getter
+public enum PromotionConditionTypeEnum implements IntArrayValuable {
 
-    DISCOUNT(1, "限时折扣"),
-    REWARD(2, "满减送"),
-    ;
+    PRICE(10, "满 N 元"),
+    COUNT(20, "满 N 件");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PromotionTypeEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PromotionConditionTypeEnum::getType).toArray();
 
     /**
      * 类型值
@@ -34,4 +33,5 @@ public enum PromotionTypeEnum implements IntArrayValuable {
     public int[] array() {
         return ARRAYS;
     }
+
 }

@@ -7,26 +7,26 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * 营销类型枚举
+ * 营销的商品范围枚举
  *
  * @author 芋道源码
  */
 @Getter
 @AllArgsConstructor
-public enum PromotionTypeEnum implements IntArrayValuable {
+public enum PromotionProductScopeEnum implements IntArrayValuable {
 
-    DISCOUNT(1, "限时折扣"),
-    REWARD(2, "满减送"),
+    ALL(1, "全部商品参与"),
+    SPU(2, "指定商品参与"),
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PromotionTypeEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PromotionProductScopeEnum::getScope).toArray();
 
     /**
-     * 类型值
+     * 范围值
      */
-    private final Integer type;
+    private final Integer scope;
     /**
-     * 类型名
+     * 范围名
      */
     private final String name;
 
@@ -34,4 +34,5 @@ public enum PromotionTypeEnum implements IntArrayValuable {
     public int[] array() {
         return ARRAYS;
     }
+
 }
