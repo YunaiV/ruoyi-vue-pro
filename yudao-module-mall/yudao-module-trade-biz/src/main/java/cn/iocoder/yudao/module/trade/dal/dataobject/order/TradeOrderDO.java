@@ -148,9 +148,9 @@ public class TradeOrderDO extends BaseDO {
      * + {@link #deliveryPrice}
      * - {@link #skuPromotionPrice}
      * - {@link #orderPromotionPrice}
-     * - {@link #couponPrice}
      */
     // niu - pay_money；taobao - payment（主订单实付金额） | trade.total_fee（主订单应付金额，参考使用）；
+//     * - {@link #couponPrice}  // TODO 芋艿：靠营销表记录
     private Integer payPrice;
     /**
      * 支付订单编号
@@ -247,11 +247,11 @@ public class TradeOrderDO extends BaseDO {
      * 优惠劵编号
      */
     private Long couponId;
-    /**
-     * 优惠劵减免金额，单位：分
-     */
-    // niu - coupon_money；
-    private Integer couponPrice;
+//    /**
+//     * 优惠劵减免金额，单位：分  // TODO 芋艿：靠营销表记录
+//     */
+//    // niu - coupon_money；
+//    private Integer couponPrice;
 //    /**
 //     * 积分抵扣的金额，单位：分
 //     */

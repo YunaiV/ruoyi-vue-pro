@@ -66,8 +66,8 @@ public class PriceCalculateRespDTO {
          * + {@link #deliveryPrice}
          * - {@link #skuPromotionPrice}
          * - {@link #orderPromotionPrice}
-         * - {@link #couponPrice} // TODO 芋艿：需要再考虑一下它
          */
+        //         * - {@link #couponPrice}  // TODO 芋艿：靠营销表记录
         private Integer payPrice;
 
         // ========== 营销基本信息 ==========
@@ -75,10 +75,12 @@ public class PriceCalculateRespDTO {
          * 优惠劵编号
          */
         private Long couponId;
-        /**
-         * 优惠劵减免金额，单位：分
-         */
-        private Integer couponPrice;
+//        /**
+//         * 优惠劵减免金额，单位：分
+//         *
+//         *   // TODO 芋艿：靠营销表记录
+//         */
+//        private Integer couponPrice;
 
     }
 
@@ -162,8 +164,17 @@ public class PriceCalculateRespDTO {
          * 计算时的优惠（总），单位：分
          */
         private Integer totalPromotionPrice;
-        // TODO 芋艿：是否匹配，match ；不匹配的原因
-        // TODO 芋艿：描述
+        /**
+         * 是否满足优惠条件
+         */
+        private Boolean meet;
+        /**
+         * 满足条件的提示
+         *
+         * 如果 {@link #meet} = true 满足，则提示“圣诞价:省 150.00 元”
+         * 如果 {@link #meet} = false 不满足，则提示“购满 85 元，可减 40 元”
+         */
+        private String meetTip;
 
         /**
          * 匹配的商品 SKU
