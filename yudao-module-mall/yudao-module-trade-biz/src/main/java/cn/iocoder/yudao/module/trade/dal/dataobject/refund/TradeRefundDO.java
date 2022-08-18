@@ -42,12 +42,6 @@ public class TradeRefundDO extends BaseDO {
      * 枚举 {@link TradeOrderRefundStatusEnum}
      */
     private Integer status;
-//    /**
-//     * 店铺编号
-//     *
-//     * 关联 {@link ShopDO#getId()} TODO 芋艿：多店铺，暂不考虑
-//     */
-//    private Long shopId;
     /**
      * 用户编号
      *

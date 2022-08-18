@@ -38,12 +38,6 @@ public class ProductCategoryDO extends BaseDO {
      * 父分类编号
      */
     private Long parentId;
-//    /**
-//     * 店铺编号
-//     *
-//     * 关联 {@link ShopDO#getId()} TODO 芋艿：多店铺，暂不考虑
-//     */
-//    private Long shopId;
     /**
      * 分类名称
      */

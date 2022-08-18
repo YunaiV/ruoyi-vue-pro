@@ -15,8 +15,8 @@ public enum TradeOrderStatusEnum {
     WAITING_PAYMENT(0, "待付款"),
     WAIT_SHIPMENT(1, "待发货"),
     ALREADY_SHIPMENT(2, "待收货"),
-    COMPLETED(3, "成功"),
-    CLOSED(4, "失败");
+    COMPLETED(3, "已完成"),
+    CANCEL(4, "已关闭");
 
     /**
      * 状态值

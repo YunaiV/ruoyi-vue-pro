@@ -105,7 +105,7 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
            o.setSpuId(null);
            o.setProperties(null);
            o.setPrice(null);
-           o.setOriginalPrice(null);
+//           o.setOriginalPrice(null);
 //           o.setCostPrice(null);
            o.setBarCode(null);
            o.setPicUrl(null);
@@ -120,7 +120,7 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
        // 测试 price 不匹配
        ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setPrice(null)));
        // 测试 originalPrice 不匹配
-       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setOriginalPrice(null)));
+//       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setOriginalPrice(null)));
        // 测试 costPrice 不匹配
 //       ProductSkuMapper.insert(cloneIgnoreId(dbSku, o -> o.setCostPrice(null)));
        // 测试 barCode 不匹配

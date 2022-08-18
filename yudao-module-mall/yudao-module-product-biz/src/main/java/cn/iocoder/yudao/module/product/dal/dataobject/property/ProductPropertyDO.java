@@ -27,12 +27,6 @@ public class ProductPropertyDO extends BaseDO {
      */
     @TableId
     private Long id;
-//    /**
-//     * 店铺编号
-//     *
-//     * 关联 {@link ShopDO#getId()} TODO 芋艿：多店铺，暂不考虑
-//     */
-//    private Long shopId;
     /**
      * 规格名称
      */
