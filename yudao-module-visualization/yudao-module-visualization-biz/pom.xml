@@ -68,6 +68,11 @@
             <groupId>org.jeecgframework.jimureport</groupId>
             <artifactId>jimureport-spring-boot-starter</artifactId>
         </dependency>
+        <!-- 单独依赖升级版本，解决低版本validator失败问题 -->
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
 
     </dependencies>
 </project>
