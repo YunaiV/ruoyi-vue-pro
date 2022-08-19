@@ -300,7 +300,7 @@ export default {
           url
         }).then(resp => {
           this.setLoading(component, false)
-          this.setRespData(component, resp.data)
+          this.setRespData(component, resp)
         })
       }
     },
