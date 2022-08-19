@@ -67,8 +67,8 @@
       getCode() {
         getCodeImg().then(res => {
           res = res.data;
-          this.captchaEnable = res.enable;
-          if (this.captchaEnable) {
+          this.captchaEnabled = res.enable;
+          if (this.captchaEnabled) {
             this.codeUrl = "data:image/gif;base64," + res.img;
             this.loginForm.uuid = res.uuid;
           }
