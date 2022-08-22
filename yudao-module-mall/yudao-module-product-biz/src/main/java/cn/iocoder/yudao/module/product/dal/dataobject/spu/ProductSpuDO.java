@@ -67,11 +67,11 @@ public class ProductSpuDO extends BaseDO {
      */
     private Long brandId;
     /**
-     * 商品主图
-     */
-    private String bannerUrl;
-    /**
-     * 商品轮播图数组
+     * 商品图片的数组
+     *
+     * 1. 第一张图片将作为商品主图，支持同时上传多张图；
+     * 2. 建议使用尺寸 800x800 像素以上、大小不超过 1M 的正方形图片；
+     * 3. 至少 1 张，最多上传 10 张
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> picUrls;
@@ -123,10 +123,6 @@ public class ProductSpuDO extends BaseDO {
      * 基于其对应的 {@link ProductSkuDO#getStock()} 求和
      */
     private Integer totalStock;
-    /**
-     * 预警预存
-     */
-    private Integer warnStock;
     /**
      * 是否展示库存
      */

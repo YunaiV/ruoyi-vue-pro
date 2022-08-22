@@ -22,7 +22,7 @@ public interface ProductSpuConvert {
 
     ProductSpuDO convert(ProductSpuCreateReqVO bean);
 
-    ProductSpuDO convert(SpuUpdateReqVO bean);
+    ProductSpuDO convert(ProductSpuUpdateReqVO bean);
 
     SpuRespVO convert(ProductSpuDO bean);
 

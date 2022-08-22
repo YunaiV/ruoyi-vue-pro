@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.product.convert.sku;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuExcelVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
@@ -22,7 +22,7 @@ public interface ProductSkuConvert {
 
     ProductSkuConvert INSTANCE = Mappers.getMapper(ProductSkuConvert.class);
 
-    ProductSkuDO convert(ProductSkuCreateReqVO bean);
+    ProductSkuDO convert(ProductSkuCreateOrUpdateReqVO bean);
 
     ProductSkuDO convert(ProductSkuUpdateReqVO bean);
 
@@ -31,7 +31,7 @@ public interface ProductSkuConvert {
 
     List<ProductSkuRespVO> convertList(List<ProductSkuDO> list);
 
-    List<ProductSkuDO> convertSkuDOList(List<ProductSkuCreateReqVO> list);
+    List<ProductSkuDO> convertSkuDOList(List<ProductSkuCreateOrUpdateReqVO> list);
 
     PageResult<ProductSkuRespVO> convertPage(PageResult<ProductSkuDO> page);
 

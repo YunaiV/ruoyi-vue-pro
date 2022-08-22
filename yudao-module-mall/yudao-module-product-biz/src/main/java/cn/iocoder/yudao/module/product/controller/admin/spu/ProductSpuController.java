@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.product.controller.admin.spu;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
@@ -23,7 +23,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - 商品spu")
+@Api(tags = "管理后台 - 商品 SPU")
 @RestController
 @RequestMapping("/product/spu")
 @Validated
@@ -33,17 +33,16 @@ public class ProductSpuController {
     private ProductSpuService spuService;
 
     @PostMapping("/create")
-    @ApiOperation("创建商品spu")
+    @ApiOperation("创建商品 SPU")
     @PreAuthorize("@ss.hasPermission('product:spu:create')")
     public CommonResult<Long> createSpu(@Valid @RequestBody ProductSpuCreateReqVO createReqVO) {
         return success(spuService.createSpu(createReqVO));
     }
 
-    // TODO @franky：SpuUpdateReqVO 缺少前缀
     @PutMapping("/update")
-    @ApiOperation("更新商品spu")
+    @ApiOperation("更新商品 SPU")
     @PreAuthorize("@ss.hasPermission('product:spu:update')")
-    public CommonResult<Boolean> updateSpu(@Valid @RequestBody SpuUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateSpu(@Valid @RequestBody ProductSpuUpdateReqVO updateReqVO) {
         spuService.updateSpu(updateReqVO);
         return success(true);
     }

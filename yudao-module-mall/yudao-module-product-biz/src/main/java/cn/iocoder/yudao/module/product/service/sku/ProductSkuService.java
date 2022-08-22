@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuExportReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
@@ -24,7 +23,7 @@ public interface ProductSkuService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createSku(@Valid ProductSkuCreateReqVO createReqVO);
+    Long createSku(@Valid ProductSkuCreateOrUpdateReqVO createReqVO);
 
     /**
      * 更新商品sku
@@ -69,7 +68,7 @@ public interface ProductSkuService {
      *
      * @param list sku组合的集合
      */
-    void validateSkus(List<ProductSkuCreateReqVO> list);
+    void validateSkus(List<ProductSkuCreateOrUpdateReqVO> list);
 
     /**
      * 批量保存 sku
@@ -107,5 +106,5 @@ public interface ProductSkuService {
      * @param spuId spu 编码
      * @param skus sku 的集合
      */
-    void updateSkus(Long spuId, List<ProductSkuCreateReqVO> skus);
+    void updateSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus);
 }

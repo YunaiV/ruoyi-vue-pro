@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.product.controller.admin.sku;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
@@ -35,7 +35,7 @@ public class ProductSkuController {
     @PostMapping("/create")
     @ApiOperation("创建商品sku")
     @PreAuthorize("@ss.hasPermission('product:sku:create')")
-    public CommonResult<Long> createSku(@Valid @RequestBody ProductSkuCreateReqVO createReqVO) {
+    public CommonResult<Long> createSku(@Valid @RequestBody ProductSkuCreateOrUpdateReqVO createReqVO) {
         return success(ProductSkuService.createSku(createReqVO));
     }
 

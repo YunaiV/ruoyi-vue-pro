@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
@@ -37,7 +37,7 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateSku_success() {
         // 准备参数
-        ProductSkuCreateReqVO reqVO = randomPojo(ProductSkuCreateReqVO.class);
+        ProductSkuCreateOrUpdateReqVO reqVO = randomPojo(ProductSkuCreateOrUpdateReqVO.class);
 
         // 调用
         Long skuId = ProductSkuService.createSku(reqVO);

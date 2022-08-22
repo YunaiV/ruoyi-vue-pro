@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 商品spu Service 接口
+ * 商品 SPU Service 接口
  *
  * @author 芋道源码
  */
@@ -33,7 +33,7 @@ public interface ProductSpuService {
      *
      * @param updateReqVO 更新信息
      */
-    void updateSpu(@Valid SpuUpdateReqVO updateReqVO);
+    void updateSpu(@Valid ProductSpuUpdateReqVO updateReqVO);
 
     /**
      * 删除商品spu

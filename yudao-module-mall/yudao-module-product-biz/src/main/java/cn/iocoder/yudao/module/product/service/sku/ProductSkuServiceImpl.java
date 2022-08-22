@@ -38,7 +38,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     private ProductPropertyService productPropertyService;
 
     @Override
-    public Long createSku(ProductSkuCreateReqVO createReqVO) {
+    public Long createSku(ProductSkuCreateOrUpdateReqVO createReqVO) {
         // 插入
         ProductSkuDO sku = ProductSkuConvert.INSTANCE.convert(createReqVO);
         productSkuMapper.insert(sku);
@@ -87,7 +87,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     // TODO @franky：这个方法，貌似实现的还是有点问题哈。例如说，throw 异常，后面还执行逻辑~
     // TODO @艿艿 咳咳，throw 那里我是偷懒省略了{}，哈哈，我加上，然后我调试下，在优化下
     @Override
-    public void validateSkus(List<ProductSkuCreateReqVO> list) {
+    public void validateSkus(List<ProductSkuCreateOrUpdateReqVO> list) {
         List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> p.getProperties().stream()).collect(Collectors.toList());
         // 校验规格属性以及规格值是否存在
         List<Long> propertyIds = skuPropertyList.stream().map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toList());
@@ -139,7 +139,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     @Transactional
-    public void updateSkus(Long spuId, List<ProductSkuCreateReqVO> skus) {
+    public void updateSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
         List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertSkuDOList(skus);
         // 查询 spu 下已经存在的 sku 的集合
         List<ProductSkuDO> existsSkus = productSkuMapper.selectBySpuIds(Collections.singletonList(spuId));

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import org.junit.jupiter.api.Disabled;
@@ -55,7 +55,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         ProductSpuDO dbSpu = randomPojo(ProductSpuDO.class);
         ProductSpuMapper.insert(dbSpu);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        SpuUpdateReqVO reqVO = randomPojo(SpuUpdateReqVO.class, o -> {
+        ProductSpuUpdateReqVO reqVO = randomPojo(ProductSpuUpdateReqVO.class, o -> {
             o.setId(dbSpu.getId()); // 设置更新的 ID
         });
 
@@ -69,7 +69,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateSpu_notExists() {
         // 准备参数
-        SpuUpdateReqVO reqVO = randomPojo(SpuUpdateReqVO.class);
+        ProductSpuUpdateReqVO reqVO = randomPojo(ProductSpuUpdateReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> spuService.updateSpu(reqVO), SPU_NOT_EXISTS);

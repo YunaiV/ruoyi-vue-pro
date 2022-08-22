@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPrope
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyViewRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
@@ -30,7 +30,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 
 /**
- * 商品spu Service 实现类
+ * 商品 SPU Service 实现类
  *
  * @author 芋道源码
  */
@@ -56,15 +56,11 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验分类
         categoryService.validateProductCategory(createReqVO.getCategoryId());
         // 校验SKU
-        List<ProductSkuCreateReqVO> skuCreateReqList = createReqVO.getSkus();
+        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();
         productSkuService.validateSkus(skuCreateReqList);
         // 插入SPU
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
         ProductSpuMapper.insert(spu);
-        // sku关联SPU属性
-        skuCreateReqList.forEach(p -> {
-            p.setSpuId(spu.getId());
-        });
         List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertSkuDOList(skuCreateReqList);
         // 批量插入sku
         productSkuService.createSkus(skuDOList);
@@ -74,13 +70,13 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     @Transactional
-    public void updateSpu(SpuUpdateReqVO updateReqVO) {
+    public void updateSpu(ProductSpuUpdateReqVO updateReqVO) {
         // 校验 spu 是否存在
         this.validateSpuExists(updateReqVO.getId());
         // 校验分类
         categoryService.validateProductCategory(updateReqVO.getCategoryId());
         // 校验SKU
-        List<ProductSkuCreateReqVO> skuCreateReqList = updateReqVO.getSkus();
+        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = updateReqVO.getSkus();
         productSkuService.validateSkus(skuCreateReqList);
         // 更新
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
@@ -165,9 +161,10 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         List<Long> spuIds = spuVOs.getList().stream().map(SpuRespVO::getId).collect(Collectors.toList());
         List<ProductSkuRespVO> skus = ProductSkuConvert.INSTANCE.convertList(productSkuService.getSkusBySpuIds(spuIds));
         // TODO @franky：使用 CollUtil 里的方法替代哈
-        Map<Long, List<ProductSkuRespVO>> skuMap = skus.stream().collect(Collectors.groupingBy(ProductSkuRespVO::getSpuId));
-        // 将 spu 和 sku 进行组装
-        spuVOs.getList().forEach(p -> p.setSkus(skuMap.get(p.getId())));
+        // TODO 芋艿：临时注释
+//        Map<Long, List<ProductSkuRespVO>> skuMap = skus.stream().collect(Collectors.groupingBy(ProductSkuRespVO::getSpuId));
+//        // 将 spu 和 sku 进行组装
+//        spuVOs.getList().forEach(p -> p.setSkus(skuMap.get(p.getId())));
         return spuVOs;
     }
 
