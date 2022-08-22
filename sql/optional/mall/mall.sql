@@ -298,3 +298,27 @@ INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2027, 'Banner创建', 'market:banner:create', 3, 2, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2028, 'Banner更新', 'market:banner:update', 3, 3, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2029, 'Banner删除', 'market:banner:delete', 3, 4, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
+
+alter table product_spu add `code` varchar(128) COMMENT '商品编码';
+alter table product_spu add  total_stock int COMMENT '总库存';
+alter table product_spu add  warn_stock int COMMENT '预警预存';
+alter table product_spu add  show_stock int COMMENT '是否展示库存';
+alter table product_spu add  sales_count int COMMENT '商品销量';
+alter table product_spu add  virtual_sales_count int COMMENT '虚拟销量';
+alter table product_spu add  click_count int COMMENT '商品点击量';
+alter table product_spu add  banner_url  varchar(128) COMMENT '主图地址';
+alter table product_spu add  spec_type int COMMENT '规格类型';
+alter table product_spu add  brand_id int COMMENT '商品品牌编号';
+alter table product_spu add  video_url varchar(128) COMMENT '商品视频';
+alter table product_spu add  min_price int COMMENT '最小价格，单位使用：分';
+alter table product_spu add  max_price int COMMENT '最大价格，单位使用：分';
+alter table product_spu add  market_price int COMMENT '市场价，单位使用：分';
+
+
+alter table product_sku add `name` varchar(128) COMMENT '商品 SKU 名字';
+alter table product_sku add `stock` int COMMENT '库存';
+alter table product_sku add `weight` double COMMENT '商品重量';
+alter table product_sku add `volume` double COMMENT '商品体积';
+
+
+alter table product_sku DROP `original_price`;

@@ -56,8 +56,10 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验分类
         categoryService.validateProductCategory(createReqVO.getCategoryId());
         // 校验SKU
-        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();
-        productSkuService.validateSkus(skuCreateReqList);
+        List<ProductSkuCreateReqVO> skuCreateReqList = createReqVO.getSkus();
+        if(createReqVO.getSpecType() == 1) {
+            productSkuService.validateSkus(skuCreateReqList);
+        }
         // 插入SPU
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
         ProductSpuMapper.insert(spu);
@@ -76,8 +78,10 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验分类
         categoryService.validateProductCategory(updateReqVO.getCategoryId());
         // 校验SKU
-        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = updateReqVO.getSkus();
-        productSkuService.validateSkus(skuCreateReqList);
+        List<ProductSkuCreateReqVO> skuCreateReqList = updateReqVO.getSkus();
+        if(updateReqVO.getSpecType() == 1) {
+            productSkuService.validateSkus(skuCreateReqList);
+        }
         // 更新
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
         ProductSpuMapper.updateById(updateObj);

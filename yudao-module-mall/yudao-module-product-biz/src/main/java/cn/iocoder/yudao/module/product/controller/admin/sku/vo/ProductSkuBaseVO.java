@@ -38,7 +38,6 @@ public class ProductSkuBaseVO {
     private Integer costPrice;
 
     @ApiModelProperty(value = "条形码", example = "haha")
-    @NotNull(message = "条形码不能为空")
     private String barCode;
 
     @ApiModelProperty(value = "图片地址")
