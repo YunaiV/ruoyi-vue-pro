@@ -2,12 +2,10 @@ package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
@@ -90,7 +88,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public void validateSkus(List<ProductSkuCreateReqVO> list) {
+    public void validateSkus(List<ProductSkuCreateOrUpdateReqVO> list) {
         List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> Optional.of(p.getProperties()).orElse(new ArrayList<>()).stream()).collect(Collectors.toList());
         // 校验规格属性以及规格值是否存在
         List<Long> propertyIds = skuPropertyList.stream().map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toList());

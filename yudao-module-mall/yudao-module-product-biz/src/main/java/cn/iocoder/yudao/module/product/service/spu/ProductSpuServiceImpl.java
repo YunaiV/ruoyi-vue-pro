@@ -56,7 +56,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验分类
         categoryService.validateProductCategory(createReqVO.getCategoryId());
         // 校验SKU
-        List<ProductSkuCreateReqVO> skuCreateReqList = createReqVO.getSkus();
+        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();
         if(createReqVO.getSpecType() == 1) {
             productSkuService.validateSkus(skuCreateReqList);
         }
@@ -78,7 +78,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验分类
         categoryService.validateProductCategory(updateReqVO.getCategoryId());
         // 校验SKU
-        List<ProductSkuCreateReqVO> skuCreateReqList = updateReqVO.getSkus();
+        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = updateReqVO.getSkus();
         if(updateReqVO.getSpecType() == 1) {
             productSkuService.validateSkus(skuCreateReqList);
         }
