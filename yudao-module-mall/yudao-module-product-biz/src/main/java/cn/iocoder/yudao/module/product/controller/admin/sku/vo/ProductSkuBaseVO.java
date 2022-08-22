@@ -27,16 +27,16 @@ public class ProductSkuBaseVO {
     @NotNull(message = "销售价格，单位：分不能为空")
     private Integer price;
 
-    @ApiModelProperty(value = "原价， 单位： 分", required = true)
-    @NotNull(message = "原价， 单位： 分不能为空")
-    private Integer originalPrice;
+    @ApiModelProperty(value = "市场价， 单位： 分", required = true)
+    @NotNull(message = "市场价， 单位： 分不能为空")
+    private Integer marketPrice;
 
     @ApiModelProperty(value = "成本价，单位： 分", required = true)
     @NotNull(message = "成本价，单位： 分不能为空")
     private Integer costPrice;
 
-    @ApiModelProperty(value = "条形码", required = true)
-    @NotNull(message = "条形码不能为空")
+    @ApiModelProperty(value = "条形码")
+//    @NotNull(message = "条形码不能为空")
     private String barCode;
 
     @ApiModelProperty(value = "图片地址", required = true)
@@ -46,7 +46,15 @@ public class ProductSkuBaseVO {
     @ApiModelProperty(value = "状态： 0-正常 1-禁用")
     private Integer status;
 
-    // TODO @franky 要有 swagger 注解
+    @ApiModelProperty(value = "库存")
+    private Integer stock;
+
+    @ApiModelProperty(value = "商品重量，单位：kg 千克")
+    private Double weight;
+
+    @ApiModelProperty(value = "商品体积，单位：m^3 平米")
+    private Double volume;
+
     @Data
     public static class Property {
         @NotNull(message = "规格属性名id不能为空")

@@ -2,9 +2,14 @@ package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
@@ -84,8 +89,6 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         return productSkuMapper.selectPage(pageReqVO);
     }
 
-    // TODO @franky：这个方法，貌似实现的还是有点问题哈。例如说，throw 异常，后面还执行逻辑~
-    // TODO @艿艿 咳咳，throw 那里我是偷懒省略了{}，哈哈，我加上，然后我调试下，在优化下
     @Override
     public void validateSkus(List<ProductSkuCreateReqVO> list) {
         List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> p.getProperties().stream()).collect(Collectors.toList());
@@ -99,8 +102,9 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         skuPropertyList.forEach(p -> {
             ProductPropertyRespVO productPropertyRespVO = propertyMap.get(p.getPropertyId());
             // 如果对应的属性名不存在或属性名下的属性值集合为空，给出提示
-            if (null == productPropertyRespVO || productPropertyRespVO.getPropertyValueList().isEmpty())
+            if (null == productPropertyRespVO || productPropertyRespVO.getPropertyValueList().isEmpty()) {
                 throw ServiceExceptionUtil.exception(PROPERTY_NOT_EXISTS);
+            }
             // 判断改属性名对应的属性值是否存在,不存在，给出提示
             if (!productPropertyRespVO.getPropertyValueList().stream().map(ProductPropertyValueRespVO::getId).collect(Collectors.toSet()).contains(p.getValueId())) {
                 throw ServiceExceptionUtil.exception(ErrorCodeConstants.PROPERTY_VALUE_NOT_EXISTS);

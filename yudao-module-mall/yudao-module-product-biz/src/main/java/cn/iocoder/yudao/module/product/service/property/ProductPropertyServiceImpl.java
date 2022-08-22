@@ -49,7 +49,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         //插入属性值
         List<ProductPropertyValueCreateReqVO> propertyValueList = createReqVO.getPropertyValueList();
         List<ProductPropertyValueDO> productPropertyValueDOList = ProductPropertyValueConvert.INSTANCE.convertList03(propertyValueList);
-        productPropertyValueDOList.stream().forEach(x-> x.setPropertyId(property.getId()));
+        productPropertyValueDOList.forEach(x-> x.setPropertyId(property.getId()));
         productPropertyValueMapper.insertBatch(productPropertyValueDOList);
         // 返回
         return property.getId();
@@ -67,7 +67,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         productPropertyValueMapper.deletePropertyValueByPropertyId(updateReqVO.getId());
         List<ProductPropertyValueCreateReqVO> propertyValueList = updateReqVO.getPropertyValueList();
         List<ProductPropertyValueDO> productPropertyValueDOList = ProductPropertyValueConvert.INSTANCE.convertList03(propertyValueList);
-        productPropertyValueDOList.stream().forEach(x-> x.setPropertyId(updateReqVO.getId()));
+        productPropertyValueDOList.forEach(x-> x.setPropertyId(updateReqVO.getId()));
         productPropertyValueMapper.insertBatch(productPropertyValueDOList);
     }
 

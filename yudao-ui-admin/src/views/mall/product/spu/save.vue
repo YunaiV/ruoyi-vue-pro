@@ -1,26 +1,6 @@
 <template>
   <div class="container">
-    <el-dialog
-      title="请输入规格值，多个请换行"
-      :visible.sync="dialogForSpec"
-      append-to-body
-      width="400px"
-      @close="dialogForSpec = false; specValue = null"
-    >
-      <el-input
-        v-model="specValue"
-        type="textarea"
-        :autosize="{ minRows: 6, maxRows: 6}"
-        placeholder="请输入内容"
-      />
-
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogForSpec = false; specValue = null">取 消</el-button>
-        <el-button type="primary" @click="addSpecValue">确 定</el-button>
-      </div>
-    </el-dialog>
-
-    <el-tabs v-model="activeName"  class="tabs">
+    <el-tabs v-model="activeName" class="tabs">
       <!-- 基础设置 -->
       <el-tab-pane label="基础设置" name="base">
         <el-form ref="baseForm" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
@@ -40,11 +20,11 @@
               clearable
             ></el-cascader>
           </el-form-item>
-          <el-form-item label="商品主图" prop="picUrls">
-            <ImageUpload v-model="baseForm.picUrl" :limit="1" />
+          <el-form-item label="商品主图" prop="bannerUrl">
+            <ImageUpload v-model="baseForm.bannerUrl" :limit="1"/>
           </el-form-item>
-           <el-form-item label="商品轮播图" prop="picUrl">
-            <ImageUpload v-model="baseForm.picUrls" :limit="10" />
+          <el-form-item label="商品轮播图" prop="picUrls">
+            <ImageUpload v-model="baseForm.picUrls" :limit="10"/>
           </el-form-item>
           <el-form-item label="排序字段" prop="sort">
             <el-input v-model="baseForm.sort" placeholder="请输入排序字段"/>
@@ -80,29 +60,28 @@
 
               <div class="spec-header">
                 规格项：
-                <el-input
-                  v-model="specs.spec_name"
-                  placeholder="请填写规格项"
-                  class="spec-name"
-                ></el-input>
+                <el-select v-model="specs.specId" filterable placeholder="请选择" @change="changeSpec">
+                  <el-option
+                    v-for="item in propertyPageList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
+                  </el-option>
+                </el-select>
               </div>
               <div class="spec-values">
-                <template v-for="(specsValue, i) in specs.spec_values">
-                  <el-input
-                    v-model="specs.spec_values[i]"
-                    class="spec-value"
-                    :key="specsValue"
-                  ></el-input>
+                <template v-for="(v, i) in specs.specValue">
+                  <el-input v-model="v.name" class="spec-value" :key="i"/>
                 </template>
-                <el-button
+                <!-- <el-button
                   type="primary"
                   icon="el-icon-plus"
                   circle
                   @click="dialogForSpec = true; currentSpec = index"
-                ></el-button>
+                ></el-button> -->
               </div>
             </div>
-            <el-button type="primary" @click="dynamicSpec.push({spec_values: []}); ratesForm.rates = []"
+            <el-button type="primary" @click="dynamicSpec.push({specValue: []}); ratesForm.rates = []"
             >添加规格项目
             </el-button
             >
@@ -111,22 +90,24 @@
           <!-- 规格明细 -->
           <el-form-item label="规格明细">
             <el-table :data="ratesForm.rates" border style="width: 100%" ref="rates">
-              
-              <template v-if="ratesForm.spec == 1" > 
-                <el-table-column :key="index" v-for="(item, index) in dynamicSpec.filter(v=>v.spec_name != undefined)" :label="item.spec_name" >
-                <template slot-scope="scope">
-                  <el-input
-                    v-if="scope.row.spec"
-                    v-model="scope.row.spec[index]"
-                    disabled
-                  ></el-input>
-                </template>
-              </el-table-column>
+
+              <template v-if="ratesForm.spec == 1">
+                <el-table-column :key="index" v-for="(item, index) in dynamicSpec.filter(v=>v.specName != undefined)"
+                                 :label="item.specName">
+                  <template slot-scope="scope">
+                    <el-input
+                      v-if="scope.row.spec"
+                      v-model="scope.row.spec[index]"
+                      disabled
+                    ></el-input>
+                  </template>
+                </el-table-column>
               </template>
-             
+
               <el-table-column label="规格图片" width="120px">
                 <template slot-scope="scope">
-                  <ImageUpload v-model="scope.row.picUrl" :limit="1" :isShowTip="false" style="width: 100px; height: 50px" />
+                  <ImageUpload v-model="scope.row.picUrl" :limit="1" :isShowTip="false"
+                               style="width: 100px; height: 50px"/>
                 </template>
               </el-table-column>
               <el-table-column label="市场价(元)">
@@ -177,40 +158,40 @@
 
       <!-- 商品详情 -->
       <el-tab-pane label="商品描述" name="third">
-        <editor v-model="baseForm.description" :min-height="400" />
+        <editor v-model="baseForm.description" :min-height="400"/>
       </el-tab-pane>
 
       <!-- 销售设置 -->
       <el-tab-pane label="销售设置" name="fourth">
         <el-form ref="baseForm" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
-        <el-form-item label="库存数量" prop="quantity">
-          <el-input v-model="baseForm.quantity" placeholder="请输入库存数量" />
-        </el-form-item>
-        <el-form-item label="上下架状态" prop="status">
-          <el-radio-group v-model="baseForm.status">
-            <el-radio label="0">上架</el-radio>
-            <el-radio label="1">下架</el-radio>
-          </el-radio-group>
-        </el-form-item>
+          <el-form-item label="库存数量" prop="totalStock">
+            <el-input v-model="baseForm.totalStock" placeholder="请输入库存数量"/>
+          </el-form-item>
+          <el-form-item label="上下架状态" prop="status">
+            <el-radio-group v-model="baseForm.status">
+              <el-radio :label="0">上架</el-radio>
+              <el-radio :label="1">下架</el-radio>
+            </el-radio-group>
+          </el-form-item>
         </el-form>
       </el-tab-pane>
     </el-tabs>
 
-  <div class="buttons">
-  <el-button type="info" round @click="cancel">取消</el-button>
-   <el-button type="success" round @click="submit">确认</el-button>
-  </div>
+    <div class="buttons">
+      <el-button type="info" round @click="cancel">取消</el-button>
+      <el-button type="success" round @click="submit">确认</el-button>
+    </div>
 
   </div>
 </template>
 
 <script>
-import {
-  getProductCategoryList
-} from "@/api/mall/product/category";
-
+import {getProductCategoryList} from "@/api/mall/product/category";
+import {createSpu,} from "@/api/mall/product/spu";
+import {getPropertyPage,} from "@/api/mall/product/property";
 import Editor from "@/components/Editor";
 import ImageUpload from "@/components/ImageUpload";
+
 export default {
   components: {
     Editor,
@@ -231,12 +212,12 @@ export default {
         categoryIds: null,
         sort: null,
         description: null,
-        picUrl:null,
+        bannerUrl: null,
         picUrls: [],
-        quantity: null
+        totalStock: null,
+        status: 0
       },
       categoryList: [],
-
       // 价格库存
       ratesForm: {
         spec: 0,
@@ -245,15 +226,16 @@ export default {
       },
       dynamicSpec: [
         // {
-        //   spec_id: 86,
-        //   spec_name: "颜色",
-        //   spec_values: [],
-        //   spec_value_ids: [225],
+        //   specId: 86,
+        //   specName: "颜色",
+        //   specValue:[{
+        //      name: "红色",
+        //      id: 225,
+        //   }]
         // },
       ],
-      dialogForSpec: false,
+      propertyPageList: [],
       specValue: null,
-      currentSpec: null,
 
       // 表单校验
       rules: {
@@ -263,7 +245,7 @@ export default {
         categoryIds: [
           {required: true, message: "分类id不能为空", trigger: "blur"},
         ],
-        picUrls: [{required: true, message: "商品主图地址", trigger: "blur"}],
+        bannerUrl: [{required: true, message: "商品主图地址", trigger: "blur"}],
         sort: [
           {required: true, message: "排序字段不能为空", trigger: "blur"},
         ],
@@ -272,54 +254,44 @@ export default {
   },
   created() {
     this.getListCategory();
+    this.getPropertyPageList();
   },
   methods: {
     changeRadio() {
 
       this.$refs.rates.doLayout()
-      if(this.ratesForm.spec == 0){
+      if (this.ratesForm.spec == 0) {
         this.ratesForm.rates = [{}]
-      }else{
+      } else {
         this.ratesForm.rates = []
-        if(this.dynamicSpec.length > 0){
+        if (this.dynamicSpec.length > 0) {
           this.buildRatesFormRates()
         }
       }
     },
     // 构建规格明细笛卡尔积
-  buildRatesFormRates(){
+    buildRatesFormRates() {
       let rates = [];
-      this.dynamicSpec.map(v=>v.spec_values)
-      .reduce((last, current) => {
-        const array = [];
-        last.forEach(par1 => {
+      this.dynamicSpec.map(v => v.specValue.map(m => m.name))
+        .reduce((last, current) => {
+          const array = [];
+          last.forEach(par1 => {
             current.forEach(par2 => {
-              let v 
-              if(par1 instanceof Array){
+              let v
+              if (par1 instanceof Array) {
                 v = par1.concat(par2)
-              }else{
+              } else {
                 v = [par1, par2];
               }
               array.push(v)
             });
+          });
+          return array;
+        })
+        .forEach(v => {
+          rates.push({spec: v})
         });
-        return array;
-    })
-    .forEach(v=>{
-      rates.push({spec: v})
-    });
-    console.log(rates)
-    this.ratesForm.rates = rates
-  },
-    addSpecValue() {
-      this.dialogForSpec = false;
-      let specValue = this.dynamicSpec[this.currentSpec].spec_values
-        .concat(this.specValue.split(/[(\r\n)\r\n]+/))
-        .filter(v => v != "");
-      console.log(specValue)
-      this.dynamicSpec[this.currentSpec].spec_values = [...new Set(specValue)];
-      this.currentSpec = null;
-      this.buildRatesFormRates()
+      this.ratesForm.rates = rates
     },
     /** 查询分类 */
     getListCategory() {
@@ -328,9 +300,53 @@ export default {
         this.categoryList = this.handleTree(response.data, "id", "parentId");
       });
     },
-    cancel(){
-        this.$emit("closeDialog");
+    cancel() {
+      this.$emit("closeDialog");
     },
+    submit() {
+      let rates = this.ratesForm.rates;
+      // 动态规格调整字段
+      if (this.ratesForm.spec == 1) {
+        rates.forEach(r => {
+          let properties = []
+          r.spec.forEach((v, i) => {
+            let specValue = this.dynamicSpec[i].specValue.find(o => o.name == v);
+            let propertie = {};
+            propertie.propertyId = this.dynamicSpec[i].specId;
+            propertie.valueId = specValue.id;
+            properties.push(propertie);
+          })
+          r.properties = properties;
+        })
+      }
+      this.baseForm.skus = rates;
+      this.baseForm.specType = this.ratesForm.spec;
+      this.baseForm.categoryId = this.baseForm.categoryIds[this.baseForm.categoryIds.length - 1];
+      console.log(this.baseForm)
+      createSpu(this.baseForm).then((response) => {
+        this.$modal.msgSuccess("新增成功");
+        this.open = false;
+        this.getList();
+        this.$emit("closeDialog");
+      });
+    },
+    /** 查询规格 */
+    getPropertyPageList() {
+      // 执行查询
+      getPropertyPage().then((response) => {
+        this.propertyPageList = response.data.list;
+      });
+    },
+    changeSpec(val) {
+      let obj = this.propertyPageList.find(o => o.id == val);
+      let dynamicSpec = this.dynamicSpec;
+      let spec = dynamicSpec.find(o => o.specId == val)
+      spec.specId = obj.id;
+      spec.specName = obj.name;
+      spec.specValue = obj.propertyValueList;
+      this.dynamicSpec = dynamicSpec;
+      this.buildRatesFormRates();
+    }
   },
 };
 </script>
@@ -349,7 +365,7 @@ export default {
 
   .spec-header {
     padding: 30px;
-    padding-bottom: 0;
+    padding-bottom: 20px;
 
     .spec-name {
       display: inline;
@@ -364,6 +380,7 @@ export default {
     width: 84%;
     padding: 25px;
     margin: auto;
+    padding-top: 5px;
 
     .spec-value {
       display: inline-block;
@@ -381,35 +398,40 @@ export default {
   }
 }
 
-.tabs{
+.tabs {
   height: 500px;
   border-bottom: 2px solid #f2f2f2;
-  .el-tab-pane{
+
+  .el-tab-pane {
     height: 445px;
     overflow-y: auto;
   }
 }
 
 // 库存价格图片样式修改
-.rates{
-.component-upload-image{
-  margin: auto;
+.rates {
+  .component-upload-image {
+    margin: auto;
+  }
+
+  .el-upload--picture-card {
+    width: 100px;
+    height: 50px;
+    line-height: 60px;
+    margin: auto;
+  }
+
+  .el-upload-list__item {
+    width: 100px !important;
+    height: 50px !important;
+  }
 }
-.el-upload--picture-card{
-  width: 100px;
-  height: 50px;
-  line-height: 60px;
-  margin: auto;
-}
-.el-upload-list__item{
-   width: 100px !important;
-  height: 50px !important;
-}
-}
-.buttons{
+
+.buttons {
   margin-top: 20px;
   height: 36px;
-  button{
+
+  button {
     float: right;
     margin-left: 15px;
   }
