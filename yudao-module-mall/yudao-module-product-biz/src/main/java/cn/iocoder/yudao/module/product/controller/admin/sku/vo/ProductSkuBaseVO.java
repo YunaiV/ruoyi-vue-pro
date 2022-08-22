@@ -19,8 +19,7 @@ public class ProductSkuBaseVO {
 
     // TODO @franky：类似这种字段，有额外说明的。可以写成；    @ApiModelProperty(value = "规格值数组", required = true, notes = "json格式， [{propertyId: , valueId: }, {propertyId: , valueId: }]")
 
-    @ApiModelProperty(value = "规格值数组-json格式， [{propertyId: , valueId: }, {propertyId: , valueId: }]", required = true)
-    @NotNull(message = "规格值数组-json格式， [{propertyId: , valueId: }, {propertyId: , valueId: }]不能为空")
+    @ApiModelProperty(value = "规格值数组-json格式， [{propertyId: , valueId: }, {propertyId: , valueId: }]")
     private List<Property> properties;
 
     @ApiModelProperty(value = "销售价格，单位：分", required = true)

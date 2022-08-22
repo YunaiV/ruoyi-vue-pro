@@ -178,9 +178,9 @@
     />
 
 
-<el-dialog :title="title" :visible.sync="open" width="900px" append-to-body >
-  <save @closeDialog="open = false"/>
-</el-dialog>
+    <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body destroy-on-close>
+      <save @closeDialog="open = false; getList()"/>
+    </el-dialog>
   </div>
 </template>
 

@@ -91,7 +91,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     public void validateSkus(List<ProductSkuCreateReqVO> list) {
-        List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> p.getProperties().stream()).collect(Collectors.toList());
+        List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> Optional.of(p.getProperties()).orElse(new ArrayList<>()).stream()).collect(Collectors.toList());
         // 校验规格属性以及规格值是否存在
         List<Long> propertyIds = skuPropertyList.stream().map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toList());
         List<ProductPropertyRespVO> propertyAndValueList = productPropertyService.selectByIds(propertyIds);

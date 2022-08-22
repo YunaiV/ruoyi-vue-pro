@@ -309,26 +309,33 @@ export default {
       if (this.ratesForm.spec == 1) {
         rates.forEach(r => {
           let properties = []
-          r.spec.forEach((v, i) => {
-            let specValue = this.dynamicSpec[i].specValue.find(o => o.name == v);
-            let propertie = {};
-            propertie.propertyId = this.dynamicSpec[i].specId;
-            propertie.valueId = specValue.id;
-            properties.push(propertie);
-          })
+          if(r.spec instanceof Array){
+            r.spec.forEach((v, i) => {
+              let specValue = this.dynamicSpec[i].specValue.find(o => o.name == v);
+              let propertie = {};
+              propertie.propertyId = this.dynamicSpec[i].specId;
+              propertie.valueId = specValue.id;
+              properties.push(propertie);
+            })
+          }else{
+              let specValue = this.dynamicSpec[0].specValue.find(o => o.name == r.spec);
+              let propertie = {};
+              propertie.propertyId = this.dynamicSpec[0].specId;
+              propertie.valueId = specValue.id;
+              properties.push(propertie);
+          }
           r.properties = properties;
         })
       }
       this.baseForm.skus = rates;
       this.baseForm.specType = this.ratesForm.spec;
       this.baseForm.categoryId = this.baseForm.categoryIds[this.baseForm.categoryIds.length - 1];
-      console.log(this.baseForm)
       createSpu(this.baseForm).then((response) => {
+        console.log(response)
         this.$modal.msgSuccess("新增成功");
-        this.open = false;
-        this.getList();
         this.$emit("closeDialog");
       });
+
     },
     /** 查询规格 */
     getPropertyPageList() {
