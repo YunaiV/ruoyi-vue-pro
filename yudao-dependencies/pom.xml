@@ -66,6 +66,7 @@
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
         <jimureport.version>1.5.2</jimureport.version>
+        <xercesImpl.version>2.12.0</xercesImpl.version>
     </properties>
 
     <dependencyManagement>
@@ -576,6 +577,11 @@
                 <groupId>org.jeecgframework.jimureport</groupId>
                 <artifactId>jimureport-spring-boot-starter</artifactId>
                 <version>${jimureport.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xercesImpl.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

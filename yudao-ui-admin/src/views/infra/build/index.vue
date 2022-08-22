@@ -133,7 +133,7 @@ import {
   inputComponents, selectComponents, layoutComponents, formConf
 } from '@/components/generator/config'
 import {
-  exportDefault, beautifierConf, isNumberStr, titleCase, deepClone, isObjectObject
+  exportDefault, beautifierConf, isNumberStr, titleCase, deepClone
 } from '@/utils/index'
 import {
   makeUpHtml, vueTemplate, vueScript, cssStyle
@@ -272,7 +272,7 @@ export default {
       arr.reduce((pre, item, i) => {
         if (arr.length === i + 1) {
           pre[item] = data
-        } else if (!isObjectObject(pre[item])) {
+        } else if (pre[item]===undefined) {
           pre[item] = {}
         }
         return pre[item]
@@ -300,7 +300,7 @@ export default {
           url
         }).then(resp => {
           this.setLoading(component, false)
-          this.setRespData(component, resp.data)
+          this.setRespData(component, resp)
         })
       }
     },
