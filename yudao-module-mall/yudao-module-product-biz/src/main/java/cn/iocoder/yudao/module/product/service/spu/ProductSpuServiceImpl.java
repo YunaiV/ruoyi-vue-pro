@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
@@ -57,13 +58,18 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         categoryService.validateProductCategory(createReqVO.getCategoryId());
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();
-        if(createReqVO.getSpecType() == 1) {
+        // 多规格才需校验
+        if(Objects.equals(createReqVO.getSpecType(), ProductSpuSpecTypeEnum.DISABLE.getType())) {
             productSkuService.validateSkus(skuCreateReqList);
         }
         // 插入SPU
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
+        spu.setMarketPrice(skuCreateReqList.stream().map(ProductSkuCreateOrUpdateReqVO::getMarketPrice).max(Integer::compare).orElse(0));
+        spu.setMaxPrice(skuCreateReqList.stream().map(ProductSkuCreateOrUpdateReqVO::getPrice).max(Integer::compare).orElse(0));
+        spu.setMinPrice(skuCreateReqList.stream().map(ProductSkuCreateOrUpdateReqVO::getPrice).min(Integer::compare).orElse(0));
         ProductSpuMapper.insert(spu);
         List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertSkuDOList(skuCreateReqList);
+        skuDOList.forEach(v->v.setSpuId(spu.getId()));
         // 批量插入sku
         productSkuService.createSkus(skuDOList);
         // 返回
@@ -79,7 +85,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         categoryService.validateProductCategory(updateReqVO.getCategoryId());
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = updateReqVO.getSkus();
-        if(updateReqVO.getSpecType() == 1) {
+        // 多规格才需校验
+        if(updateReqVO.getSpecType().equals(ProductSpuSpecTypeEnum.DISABLE.getType())) {
             productSkuService.validateSkus(skuCreateReqList);
         }
         // 更新

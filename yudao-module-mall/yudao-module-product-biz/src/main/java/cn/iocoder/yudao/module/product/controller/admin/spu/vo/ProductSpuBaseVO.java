@@ -36,7 +36,7 @@ public class ProductSpuBaseVO {
     private Long categoryId;
 
     @ApiModelProperty(value = "商品品牌编号", required = true, example = "1")
-    @NotNull(message = "商品品牌编号不能为空")
+//    @NotNull(message = "商品品牌编号不能为空")
     private Long brandId;
 
     @ApiModelProperty(value = "商品图片的数组", required = true)
@@ -44,7 +44,6 @@ public class ProductSpuBaseVO {
     private List<String> picUrls;
 
     @ApiModelProperty(value = "商品视频", required = true)
-    @NotEmpty(message = "商品视频不能为空")
     private String videoUrl;
 
     @ApiModelProperty(value = "排序字段", required = true, example = "1")
