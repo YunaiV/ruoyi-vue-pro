@@ -182,8 +182,14 @@ public class MenuServiceImpl implements MenuService {
         if (menuMapper.selectById(menuId) == null) {
             throw ServiceExceptionUtil.exception(MENU_NOT_EXISTS);
         }
-        // 标记删除
-        menuMapper.deleteById(menuId);
+        /**
+         *  标记删除
+         *  {@link #LogicDeleteByIdWithFill}
+         *  注意入参是 entity !!! ,如果字段没有自动填充,就只是单纯的逻辑删除
+         */
+        MenuDO menuDO = new MenuDO();
+        menuDO.setId(menuId);
+        menuMapper.deleteById(menuDO);
         // 删除授予给角色的权限
         permissionService.processMenuDeleted(menuId);
         // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
