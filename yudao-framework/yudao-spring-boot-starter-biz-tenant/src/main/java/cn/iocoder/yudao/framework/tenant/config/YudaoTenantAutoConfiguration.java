@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.tenant.core.db.TenantDatabaseInterceptor;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJobHandlerDecorator;
 import cn.iocoder.yudao.framework.tenant.core.mq.TenantRedisMessageInterceptor;
+import cn.iocoder.yudao.framework.tenant.core.redis.TenantRedisCacheManager;
 import cn.iocoder.yudao.framework.tenant.core.security.TenantSecurityWebFilter;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkServiceImpl;
@@ -25,6 +26,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
+import org.springframework.data.redis.core.RedisTemplate;
+
+import java.util.Objects;
 
 @Configuration
 @ConditionalOnProperty(prefix = "yudao.tenant", value = "enable", matchIfMissing = true) // 允许使用 yudao.tenant.enable=false 禁用多租户
@@ -108,6 +116,17 @@ public class YudaoTenantAutoConfiguration {
             }
 
         };
+    }
+
+    @Bean
+    @Primary
+    public RedisCacheManager tenantRedisCacheManager(
+            RedisTemplate<String, Object> redisTemplate,
+            RedisCacheConfiguration redisCacheConfiguration) {
+        RedisCacheWriter cacheWriter =
+                RedisCacheWriter.nonLockingRedisCacheWriter(
+                        Objects.requireNonNull(redisTemplate.getConnectionFactory()));
+        return new TenantRedisCacheManager(cacheWriter, redisCacheConfiguration);
     }
 
 }
