@@ -52,9 +52,8 @@
                 icon="el-icon-delete"
                 circle
                 class="spec-delete"
-                @click="dynamicSpec.splice(index, 1)"
+                @click="removeSpec(index)"
               ></el-button>
-
               <div class="spec-header">
                 规格项：
                 <el-select v-model="specs.specId" filterable placeholder="请选择" @change="changeSpec">
@@ -286,10 +285,15 @@ export default {
   },
 
   created() {
+
     this.getListCategory();
     this.getPropertyPageList();
   },
   methods: {
+    removeSpec(index){
+        this.dynamicSpec.splice(index, 1);
+        this.changeRadio()
+    },
     async confirmLeave(active, old){
       await this.$refs[old].validate((valid) => {
         console.log(valid)
@@ -306,12 +310,13 @@ export default {
       ];
     },
     changeRadio() {
-      this.$refs.ratesTable.doLayout()
+      this.$refs.ratesTable.doLayout();
       if (this.ratesForm.spec == 1) {
         this.ratesForm.rates = [{}]
       } else {
         this.ratesForm.rates = []
         if (this.dynamicSpec.length > 0) {
+          console.log( this.dynamicSpec)
           this.buildRatesFormRates()
         }
       }
@@ -360,12 +365,16 @@ export default {
       if (this.ratesForm.spec == 2) {
         rates.forEach(r => {
           let properties = []
-            Array.of(r.spec).forEach((v, i) => {
-              let specValue = this.dynamicSpec[i].specValue.find(o => o.name == v);
-              let propertie = {};
-              propertie.propertyId = this.dynamicSpec[i].specId;
-              propertie.valueId = specValue.id;
-              properties.push(propertie);
+            Array.of(r.spec).forEach(s => {
+              Array.of(s).forEach((v, i) => {
+                console.log(this.dynamicSpec, r, s, v, i)
+                let specValue = this.dynamicSpec[i].specValue.find(o => o.name == v);
+                console.log(specValue)
+                let propertie = {};
+                propertie.propertyId = this.dynamicSpec[i].specId;
+                propertie.valueId = specValue.id;
+                properties.push(propertie);
+              })
             })
           r.properties = properties;
         })
