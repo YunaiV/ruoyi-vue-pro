@@ -57,6 +57,7 @@
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.4.1</tika-core.version>
+        <netty-all.version>4.1.75.Final</netty-all.version>
         <!-- 三方云服务相关 -->
         <minio.version>8.2.2</minio.version>
         <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
@@ -507,6 +508,12 @@
                 <groupId>com.jcraft</groupId>
                 <artifactId>jsch</artifactId> <!-- 解决 sftp 连接 -->
                 <version>${jsch.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty-all.version}</version>
             </dependency>
 
             <!-- 三方云服务相关 -->
