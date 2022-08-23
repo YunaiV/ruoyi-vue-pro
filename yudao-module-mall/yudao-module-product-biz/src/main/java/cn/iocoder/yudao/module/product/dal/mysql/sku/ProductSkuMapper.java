@@ -44,4 +44,5 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
                 .eqIfPresent(ProductSkuDO::getSpuId, spuId);
         delete(lambdaQueryWrapperX);
     }
+
 }

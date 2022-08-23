@@ -68,14 +68,22 @@ public interface ProductSkuService {
      *
      * @param list sku组合的集合
      */
-    void validateSkus(List<ProductSkuCreateOrUpdateReqVO> list);
+    void validateProductSkus(List<ProductSkuCreateOrUpdateReqVO> list);
 
     /**
-     * 批量保存 sku
+     * 批量创建 SKU
      *
-     * @param list sku对象集合
+     * @param list SKU 对象集合
      */
-    void createSkus(List<ProductSkuDO> list);
+    void createProductSkus(List<ProductSkuDO> list);
+
+    /**
+     * 根据 SPU 编号，批量更新它的 SKU 信息
+     *
+     * @param spuId SPU 编码
+     * @param skus SKU 的集合
+     */
+    void updateProductSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus);
 
     /**
      * 获得商品 sku 集合
@@ -100,11 +108,4 @@ public interface ProductSkuService {
      */
     void deleteSkuBySpuId(Long spuId);
 
-    /**
-     * 根据 spuId 更新 spu 下的 sku 信息
-     *
-     * @param spuId spu 编码
-     * @param skus sku 的集合
-     */
-    void updateSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus);
 }

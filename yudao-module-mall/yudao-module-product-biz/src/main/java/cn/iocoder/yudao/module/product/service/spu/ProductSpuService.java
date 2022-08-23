@@ -21,19 +21,19 @@ import java.util.List;
 public interface ProductSpuService {
 
     /**
-     * 创建商品spu
+     * 创建商品 SPU
      *
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createSpu(@Valid ProductSpuCreateReqVO createReqVO);
+    Long createProductSpu(@Valid ProductSpuCreateReqVO createReqVO);
 
     /**
-     * 更新商品spu
+     * 更新商品 SPU
      *
      * @param updateReqVO 更新信息
      */
-    void updateSpu(@Valid ProductSpuUpdateReqVO updateReqVO);
+    void updateProductSpu(@Valid ProductSpuUpdateReqVO updateReqVO);
 
     /**
      * 删除商品spu

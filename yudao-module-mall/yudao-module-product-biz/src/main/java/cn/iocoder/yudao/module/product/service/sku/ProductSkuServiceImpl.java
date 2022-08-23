@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
@@ -87,25 +86,30 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         return productSkuMapper.selectPage(pageReqVO);
     }
 
+    // TODO luowenfeng：参考下 yudao-cloud 的 checkProductAttr 方法，重构下
     @Override
-    public void validateSkus(List<ProductSkuCreateOrUpdateReqVO> list) {
+    public void validateProductSkus(List<ProductSkuCreateOrUpdateReqVO> list) {
         List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> Optional.of(p.getProperties()).orElse(new ArrayList<>()).stream()).collect(Collectors.toList());
-        // 校验规格属性以及规格值是否存在
+        // 校验规格属性存在
+        // TODO @luowenfeng：使用 CollectionUtils.convert
         List<Long> propertyIds = skuPropertyList.stream().map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toList());
         List<ProductPropertyRespVO> propertyAndValueList = productPropertyService.selectByIds(propertyIds);
+        // TODO @luowenfeng：校验数量一致；
         if (propertyAndValueList.isEmpty()) {
-            throw ServiceExceptionUtil.exception(PROPERTY_NOT_EXISTS);
+            throw exception(PROPERTY_NOT_EXISTS);
         }
+        // 校验规格属性值存在
+        // TODO @luowenfeng：使用 CollectionUtils.convert
         Map<Long, ProductPropertyRespVO> propertyMap = propertyAndValueList.stream().collect(Collectors.toMap(ProductPropertyRespVO::getId, p -> p));
         skuPropertyList.forEach(p -> {
             ProductPropertyRespVO productPropertyRespVO = propertyMap.get(p.getPropertyId());
             // 如果对应的属性名不存在或属性名下的属性值集合为空，给出提示
             if (null == productPropertyRespVO || productPropertyRespVO.getPropertyValueList().isEmpty()) {
-                throw ServiceExceptionUtil.exception(PROPERTY_NOT_EXISTS);
+                throw exception(PROPERTY_NOT_EXISTS);
             }
             // 判断改属性名对应的属性值是否存在,不存在，给出提示
             if (!productPropertyRespVO.getPropertyValueList().stream().map(ProductPropertyValueRespVO::getId).collect(Collectors.toSet()).contains(p.getValueId())) {
-                throw ServiceExceptionUtil.exception(ErrorCodeConstants.PROPERTY_VALUE_NOT_EXISTS);
+                throw exception(ErrorCodeConstants.PROPERTY_VALUE_NOT_EXISTS);
             }
         });
         // 校验是否有重复的sku组合
@@ -114,13 +118,13 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         skuProperties.forEach(p -> {
             // 组合属性值id为 1~2~3.... 形式的字符串，通过set的特性判断是否有重复的组合
             if (!skuPropertiesConvertSet.add(p.stream().map(pr -> String.valueOf(pr.getValueId())).sorted().collect(Collectors.joining("～")))) {
-                throw ServiceExceptionUtil.exception(ErrorCodeConstants.SKU_PROPERTIES_DUPLICATED);
+                throw exception(ErrorCodeConstants.SKU_PROPERTIES_DUPLICATED);
             }
         });
     }
 
     @Override
-    public void createSkus(List<ProductSkuDO> skuDOList) {
+    public void createProductSkus(List<ProductSkuDO> skuDOList) {
         productSkuMapper.insertBatch(skuDOList);
     }
 
@@ -141,21 +145,23 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     @Transactional
-    public void updateSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
-        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertSkuDOList(skus);
+    public void updateProductSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // 查询 spu 下已经存在的 sku 的集合
+        // TODO @luowenfeng：selectListBySpuId 搞个
         List<ProductSkuDO> existsSkus = productSkuMapper.selectBySpuIds(Collections.singletonList(spuId));
         // TODO @franky：使用 CollUtils 即可
         Map<Long, ProductSkuDO> existsSkuMap = existsSkus.stream().collect(Collectors.toMap(ProductSkuDO::getId, p -> p));
 
-        // 拆分三个集合， 新插入的， 需要更新的，需要删除的
+        // 拆分三个集合，新插入的、需要更新的、需要删除的
         List<ProductSkuDO> insertSkus = new ArrayList<>();
         List<ProductSkuDO> updateSkus = new ArrayList<>();
         List<ProductSkuDO> deleteSkus = new ArrayList<>();
 
         // TODO @芋艿：是不是基于规格匹配会比较好。
+        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertSkuDOList(skus);
         allUpdateSkus.forEach(p -> {
-            if (null != p.getId()) {
+            if (p.getId() != null) {
+                // TODO @luowenfeng：contains
                 if (existsSkuMap.get(p.getId()) != null) {
                     updateSkus.add(p);
                     return;
@@ -167,14 +173,13 @@ public class ProductSkuServiceImpl implements ProductSkuService {
             insertSkus.add(p);
         });
 
+        // TODO @luowenfeng：使用 CollUtil.isNotEmpty 判断
         if (insertSkus.size() > 0) {
             productSkuMapper.insertBatch(insertSkus);
         }
-
         if (updateSkus.size() > 0) {
             updateSkus.forEach(p -> productSkuMapper.updateById(p));
         }
-
         if (deleteSkus.size() > 0) {
             productSkuMapper.deleteBatchIds(deleteSkus.stream().map(ProductSkuDO::getId).collect(Collectors.toList()));
         }

@@ -7,7 +7,10 @@ import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.Product
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
@@ -53,47 +56,60 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     @Transactional
-    public Long createSpu(ProductSpuCreateReqVO createReqVO) {
+    public Long createProductSpu(ProductSpuCreateReqVO createReqVO) {
         // 校验分类
+        // TODO @luowenfeng：可以在这个类里加个方法，校验分类；商品必须挂在三级分类下；
         categoryService.validateProductCategory(createReqVO.getCategoryId());
+        // TODO @luowenfeng：校验品牌
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();
         // 多规格才需校验
+        // TODO @luowenfeng：可以把 type 传递到 productSkuService 里，通过它统一判断处理
         if(Objects.equals(createReqVO.getSpecType(), ProductSpuSpecTypeEnum.DISABLE.getType())) {
-            productSkuService.validateSkus(skuCreateReqList);
+            productSkuService.validateProductSkus(skuCreateReqList);
         }
-        // 插入SPU
+
+        // 插入 SPU
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
+        // TODO @luowenfeng：可以在 CollectionUtils 增加 getMaxValue 方法，增加一个 defaultValue 方法，如果为空，则返回 defaultValue
         spu.setMarketPrice(skuCreateReqList.stream().map(ProductSkuCreateOrUpdateReqVO::getMarketPrice).max(Integer::compare).orElse(0));
         spu.setMaxPrice(skuCreateReqList.stream().map(ProductSkuCreateOrUpdateReqVO::getPrice).max(Integer::compare).orElse(0));
         spu.setMinPrice(skuCreateReqList.stream().map(ProductSkuCreateOrUpdateReqVO::getPrice).min(Integer::compare).orElse(0));
+        // TODO @luowenfeng：库存求和
         ProductSpuMapper.insert(spu);
+
+        // 批量插入 SKU
+        // TODO @luowenfeng：convert 逻辑，交给 createProductSkus 一起处理
         List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertSkuDOList(skuCreateReqList);
         skuDOList.forEach(v->v.setSpuId(spu.getId()));
-        // 批量插入sku
-        productSkuService.createSkus(skuDOList);
+        productSkuService.createProductSkus(skuDOList);
         // 返回
         return spu.getId();
     }
 
     @Override
     @Transactional
-    public void updateSpu(ProductSpuUpdateReqVO updateReqVO) {
-        // 校验 spu 是否存在
-        this.validateSpuExists(updateReqVO.getId());
+    public void updateProductSpu(ProductSpuUpdateReqVO updateReqVO) {
+        // 校验 SPU 是否存在
+        validateSpuExists(updateReqVO.getId());
         // 校验分类
         categoryService.validateProductCategory(updateReqVO.getCategoryId());
+        // TODO @luowenfeng：校验品牌
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = updateReqVO.getSkus();
         // 多规格才需校验
+        // TODO @luowenfeng：可以把 type 传递到 productSkuService 里，通过它统一判断处理
         if(updateReqVO.getSpecType().equals(ProductSpuSpecTypeEnum.DISABLE.getType())) {
-            productSkuService.validateSkus(skuCreateReqList);
+            productSkuService.validateProductSkus(skuCreateReqList);
         }
-        // 更新
+
+        // 更新 SPU
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
+        // TODO @计算各种字段
         ProductSpuMapper.updateById(updateObj);
-        // 更新 sku
-        productSkuService.updateSkus(updateObj.getId(), updateReqVO.getSkus());
+
+        // 更新 SKU
+        productSkuService.updateProductSkus(updateObj.getId(), updateReqVO.getSkus());
     }
 
     @Override

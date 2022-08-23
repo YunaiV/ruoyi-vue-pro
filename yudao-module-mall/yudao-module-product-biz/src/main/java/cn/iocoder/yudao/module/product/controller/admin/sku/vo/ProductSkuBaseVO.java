@@ -21,7 +21,9 @@ public class ProductSkuBaseVO {
     @NotEmpty(message = "商品 SKU 名字不能为空")
     private String name;
 
-    @ApiModelProperty(value = "规格值数组-json格式 单规格中无此列表， [{propertyId: , valueId: }, {propertyId: , valueId: }]")
+    /**
+     * 规格值数组
+     */
     private List<Property> properties;
 
     @ApiModelProperty(value = "销售价格，单位：分", required = true, example = "1024", notes = "单位：分")
