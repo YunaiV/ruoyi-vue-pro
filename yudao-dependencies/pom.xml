@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.6.3-snapshot</revision>
+        <revision>1.6.4-snapshot</revision>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.6.10</spring.boot.version>
         <!-- Web 相关 -->
