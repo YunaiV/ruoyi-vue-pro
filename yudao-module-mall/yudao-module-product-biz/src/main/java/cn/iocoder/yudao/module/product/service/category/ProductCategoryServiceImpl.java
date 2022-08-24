@@ -93,6 +93,14 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public void validateProductCategory(Long id) {
+        Integer level = categoryLevel(id, 1);
+        if(level < 3){
+          throw exception(PRODUCT_CATEGORY_LEVEL);
+        }
+    }
+
+    // 校验分类级别
+    private Integer categoryLevel(Long id, int level){
         ProductCategoryDO category = productCategoryMapper.selectById(id);
         if (category == null) {
             throw exception(PRODUCT_CATEGORY_NOT_EXISTS);
@@ -100,6 +108,10 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         if (ObjectUtil.notEqual(category.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
             throw exception(PRODUCT_CATEGORY_DISABLED);
         }
+        if(category.getParentId() == 0) {
+            return level;
+        }
+        return categoryLevel(category.getParentId(), ++level);
     }
 
     @Override

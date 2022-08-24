@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
@@ -11,6 +12,7 @@ import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,45 +88,52 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         return productSkuMapper.selectPage(pageReqVO);
     }
 
-    // TODO luowenfeng：参考下 yudao-cloud 的 checkProductAttr 方法，重构下
     @Override
-    public void validateProductSkus(List<ProductSkuCreateOrUpdateReqVO> list) {
-        List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> Optional.of(p.getProperties()).orElse(new ArrayList<>()).stream()).collect(Collectors.toList());
-        // 校验规格属性存在
-        // TODO @luowenfeng：使用 CollectionUtils.convert
-        List<Long> propertyIds = skuPropertyList.stream().map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toList());
-        List<ProductPropertyRespVO> propertyAndValueList = productPropertyService.selectByIds(propertyIds);
-        // TODO @luowenfeng：校验数量一致；
-        if (propertyAndValueList.isEmpty()) {
-            throw exception(PROPERTY_NOT_EXISTS);
-        }
-        // 校验规格属性值存在
-        // TODO @luowenfeng：使用 CollectionUtils.convert
-        Map<Long, ProductPropertyRespVO> propertyMap = propertyAndValueList.stream().collect(Collectors.toMap(ProductPropertyRespVO::getId, p -> p));
-        skuPropertyList.forEach(p -> {
-            ProductPropertyRespVO productPropertyRespVO = propertyMap.get(p.getPropertyId());
-            // 如果对应的属性名不存在或属性名下的属性值集合为空，给出提示
-            if (null == productPropertyRespVO || productPropertyRespVO.getPropertyValueList().isEmpty()) {
+    public void validateProductSkus(List<ProductSkuCreateOrUpdateReqVO> list, Integer specType) {
+        // 多规格才需校验
+        if(specType.equals(ProductSpuSpecTypeEnum.DISABLE.getType())){
+            List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> Optional.of(p.getProperties()).orElse(new ArrayList<>()).stream()).collect(Collectors.toList());
+            // 1、校验规格属性存在
+            List<Long> propertyIds = CollectionUtils.convertList(skuPropertyList, ProductSkuBaseVO.Property::getPropertyId);
+            List<ProductPropertyRespVO> propertyAndValueList = productPropertyService.selectByIds(propertyIds);
+            if (propertyAndValueList.size() == propertyIds.size()){
                 throw exception(PROPERTY_NOT_EXISTS);
             }
-            // 判断改属性名对应的属性值是否存在,不存在，给出提示
-            if (!productPropertyRespVO.getPropertyValueList().stream().map(ProductPropertyValueRespVO::getId).collect(Collectors.toSet()).contains(p.getValueId())) {
-                throw exception(ErrorCodeConstants.PROPERTY_VALUE_NOT_EXISTS);
+            // 2. 校验，一个 Sku 下，没有重复的规格。校验方式是，遍历每个 Sku ，看看是否有重复的规格 attrId
+            List<ProductPropertyValueRespVO> collect = propertyAndValueList.stream()
+                            .flatMap(v -> Optional.of(v.getPropertyValueList())
+                            .orElse(new ArrayList<>()).stream()).collect(Collectors.toList());
+            Map<Long, ProductPropertyValueRespVO> propertyValueRespVOMap = CollectionUtils.convertMap(collect, ProductPropertyValueRespVO::getId);
+            list.forEach(v->{
+                Set<Long> keys = v.getProperties().stream().map(k -> propertyValueRespVOMap.get(k.getValueId()).getPropertyId()).collect(Collectors.toSet());
+                if(keys.size() != v.getProperties().size()){
+                    throw exception(ErrorCodeConstants.SKU_PROPERTIES_DUPLICATED);
+                }
+            });
+
+            // 3. 再校验，每个 Sku 的规格值的数量，是一致的。
+            int attrValueIdsSize = list.get(0).getProperties().size();
+            for (int i = 1; i < list.size(); i++) {
+                if (attrValueIdsSize != list.get(i).getProperties().size()) {
+                    throw exception(ErrorCodeConstants.PRODUCT_SPU_ATTR_NUMBERS_MUST_BE_EQUALS);
+                }
             }
-        });
-        // 校验是否有重复的sku组合
-        List<List<ProductSkuBaseVO.Property>> skuProperties = list.stream().map(ProductSkuBaseVO::getProperties).collect(Collectors.toList());
-        Set<String> skuPropertiesConvertSet = new HashSet<>();
-        skuProperties.forEach(p -> {
-            // 组合属性值id为 1~2~3.... 形式的字符串，通过set的特性判断是否有重复的组合
-            if (!skuPropertiesConvertSet.add(p.stream().map(pr -> String.valueOf(pr.getValueId())).sorted().collect(Collectors.joining("～")))) {
-                throw exception(ErrorCodeConstants.SKU_PROPERTIES_DUPLICATED);
+
+            // 4. 最后校验，每个 Sku 之间不是重复的
+            Set<Set<Long>> skuAttrValues = new HashSet<>(); // 每个元素，都是一个 Sku 的 attrValueId 集合。这样，通过最外层的 Set ，判断是否有重复的.
+            for (ProductSkuCreateOrUpdateReqVO sku : list) {
+                if (!skuAttrValues.add(sku.getProperties().stream().map(ProductSkuBaseVO.Property::getValueId).collect(Collectors.toSet()))) { // 添加失败，说明重复
+                    throw exception(ErrorCodeConstants.PRODUCT_SPU_SKU_NOT_DUPLICATE);
+                }
             }
-        });
+        }
     }
 
     @Override
-    public void createProductSkus(List<ProductSkuDO> skuDOList) {
+    public void createProductSkus(List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList, Long spuId) {
+        // 批量插入 SKU
+        List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertSkuDOList(skuCreateReqList);
+        skuDOList.forEach(v->v.setSpuId(spuId));
         productSkuMapper.insertBatch(skuDOList);
     }
 

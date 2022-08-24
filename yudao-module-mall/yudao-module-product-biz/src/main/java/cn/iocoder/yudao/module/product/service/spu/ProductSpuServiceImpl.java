@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyViewRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
@@ -58,31 +59,23 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Transactional
     public Long createProductSpu(ProductSpuCreateReqVO createReqVO) {
         // 校验分类
-        // TODO @luowenfeng：可以在这个类里加个方法，校验分类；商品必须挂在三级分类下；
         categoryService.validateProductCategory(createReqVO.getCategoryId());
         // TODO @luowenfeng：校验品牌
+
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();
-        // 多规格才需校验
-        // TODO @luowenfeng：可以把 type 传递到 productSkuService 里，通过它统一判断处理
-        if(Objects.equals(createReqVO.getSpecType(), ProductSpuSpecTypeEnum.DISABLE.getType())) {
-            productSkuService.validateProductSkus(skuCreateReqList);
-        }
+        productSkuService.validateProductSkus(skuCreateReqList, createReqVO.getSpecType());
 
         // 插入 SPU
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
-        // TODO @luowenfeng：可以在 CollectionUtils 增加 getMaxValue 方法，增加一个 defaultValue 方法，如果为空，则返回 defaultValue
-        spu.setMarketPrice(skuCreateReqList.stream().map(ProductSkuCreateOrUpdateReqVO::getMarketPrice).max(Integer::compare).orElse(0));
-        spu.setMaxPrice(skuCreateReqList.stream().map(ProductSkuCreateOrUpdateReqVO::getPrice).max(Integer::compare).orElse(0));
-        spu.setMinPrice(skuCreateReqList.stream().map(ProductSkuCreateOrUpdateReqVO::getPrice).min(Integer::compare).orElse(0));
-        // TODO @luowenfeng：库存求和
+        spu.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
+        spu.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
+        spu.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
+        spu.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
         ProductSpuMapper.insert(spu);
 
-        // 批量插入 SKU
-        // TODO @luowenfeng：convert 逻辑，交给 createProductSkus 一起处理
-        List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertSkuDOList(skuCreateReqList);
-        skuDOList.forEach(v->v.setSpuId(spu.getId()));
-        productSkuService.createProductSkus(skuDOList);
+        // 插入 SKU
+        productSkuService.createProductSkus(skuCreateReqList, spu.getId());
         // 返回
         return spu.getId();
     }
@@ -98,10 +91,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = updateReqVO.getSkus();
         // 多规格才需校验
-        // TODO @luowenfeng：可以把 type 传递到 productSkuService 里，通过它统一判断处理
-        if(updateReqVO.getSpecType().equals(ProductSpuSpecTypeEnum.DISABLE.getType())) {
-            productSkuService.validateProductSkus(skuCreateReqList);
-        }
+        productSkuService.validateProductSkus(skuCreateReqList, updateReqVO.getSpecType());
 
         // 更新 SPU
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);

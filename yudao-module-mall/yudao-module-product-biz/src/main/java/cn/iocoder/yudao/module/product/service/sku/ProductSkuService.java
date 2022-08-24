@@ -68,14 +68,14 @@ public interface ProductSkuService {
      *
      * @param list sku组合的集合
      */
-    void validateProductSkus(List<ProductSkuCreateOrUpdateReqVO> list);
+    void validateProductSkus(List<ProductSkuCreateOrUpdateReqVO> list, Integer specType);
 
     /**
      * 批量创建 SKU
      *
      * @param list SKU 对象集合
      */
-    void createProductSkus(List<ProductSkuDO> list);
+    void createProductSkus(List<ProductSkuCreateOrUpdateReqVO> list, Long spuId);
 
     /**
      * 根据 SPU 编号，批量更新它的 SKU 信息
