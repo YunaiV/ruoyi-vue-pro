@@ -60,7 +60,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public Long createProductSpu(ProductSpuCreateReqVO createReqVO) {
         // 校验分类
         categoryService.validateProductCategory(createReqVO.getCategoryId());
-        // TODO @luowenfeng：校验品牌
+        // TODO @：校验品牌
 
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();

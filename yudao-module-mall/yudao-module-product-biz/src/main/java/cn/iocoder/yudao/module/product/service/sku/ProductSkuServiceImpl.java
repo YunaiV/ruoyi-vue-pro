@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyRespVO;
@@ -91,22 +92,22 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     @Override
     public void validateProductSkus(List<ProductSkuCreateOrUpdateReqVO> list, Integer specType) {
         // 多规格才需校验
-        if(specType.equals(ProductSpuSpecTypeEnum.DISABLE.getType())){
+        if (specType.equals(ProductSpuSpecTypeEnum.DISABLE.getType())) {
             List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> Optional.of(p.getProperties()).orElse(new ArrayList<>()).stream()).collect(Collectors.toList());
             // 1、校验规格属性存在
             List<Long> propertyIds = CollectionUtils.convertList(skuPropertyList, ProductSkuBaseVO.Property::getPropertyId);
             List<ProductPropertyRespVO> propertyAndValueList = productPropertyService.selectByIds(propertyIds);
-            if (propertyAndValueList.size() == propertyIds.size()){
+            if (propertyAndValueList.size() == propertyIds.size()) {
                 throw exception(PROPERTY_NOT_EXISTS);
             }
             // 2. 校验，一个 Sku 下，没有重复的规格。校验方式是，遍历每个 Sku ，看看是否有重复的规格 attrId
             List<ProductPropertyValueRespVO> collect = propertyAndValueList.stream()
-                            .flatMap(v -> Optional.of(v.getPropertyValueList())
+                    .flatMap(v -> Optional.of(v.getPropertyValueList())
                             .orElse(new ArrayList<>()).stream()).collect(Collectors.toList());
             Map<Long, ProductPropertyValueRespVO> propertyValueRespVOMap = CollectionUtils.convertMap(collect, ProductPropertyValueRespVO::getId);
-            list.forEach(v->{
+            list.forEach(v -> {
                 Set<Long> keys = v.getProperties().stream().map(k -> propertyValueRespVOMap.get(k.getValueId()).getPropertyId()).collect(Collectors.toSet());
-                if(keys.size() != v.getProperties().size()){
+                if (keys.size() != v.getProperties().size()) {
                     throw exception(ErrorCodeConstants.SKU_PROPERTIES_DUPLICATED);
                 }
             });
@@ -133,7 +134,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     public void createProductSkus(List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList, Long spuId) {
         // 批量插入 SKU
         List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertSkuDOList(skuCreateReqList);
-        skuDOList.forEach(v->v.setSpuId(spuId));
+        skuDOList.forEach(v -> v.setSpuId(spuId));
         productSkuMapper.insertBatch(skuDOList);
     }
 
@@ -156,10 +157,8 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     @Transactional
     public void updateProductSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // 查询 spu 下已经存在的 sku 的集合
-        // TODO @luowenfeng：selectListBySpuId 搞个
-        List<ProductSkuDO> existsSkus = productSkuMapper.selectBySpuIds(Collections.singletonList(spuId));
-        // TODO @franky：使用 CollUtils 即可
-        Map<Long, ProductSkuDO> existsSkuMap = existsSkus.stream().collect(Collectors.toMap(ProductSkuDO::getId, p -> p));
+        List<ProductSkuDO> existsSkus = productSkuMapper.selectBySpuId(spuId);
+        Map<Long, ProductSkuDO> existsSkuMap = CollectionUtils.convertMap(existsSkus, ProductSkuDO::getId);
 
         // 拆分三个集合，新插入的、需要更新的、需要删除的
         List<ProductSkuDO> insertSkus = new ArrayList<>();
@@ -170,8 +169,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertSkuDOList(skus);
         allUpdateSkus.forEach(p -> {
             if (p.getId() != null) {
-                // TODO @luowenfeng：contains
-                if (existsSkuMap.get(p.getId()) != null) {
+                if (existsSkuMap.containsKey(p.getId())) {
                     updateSkus.add(p);
                     return;
                 }
@@ -182,8 +180,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
             insertSkus.add(p);
         });
 
-        // TODO @luowenfeng：使用 CollUtil.isNotEmpty 判断
-        if (insertSkus.size() > 0) {
+        if (CollectionUtil.isNotEmpty(insertSkus)) {
             productSkuMapper.insertBatch(insertSkus);
         }
         if (updateSkus.size() > 0) {

@@ -211,24 +211,29 @@ COMMIT;
 -- Table structure for product_sku
 -- ----------------------------
 DROP TABLE IF EXISTS `product_sku`;
-CREATE TABLE `product_sku`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `spu_id` bigint NOT NULL COMMENT 'spu编号',
-  `properties` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]',
-  `price` int NOT NULL DEFAULT -1 COMMENT '销售价格，单位：分',
-  `original_price` int NOT NULL DEFAULT -1 COMMENT '原价， 单位： 分',
-  `cost_price` int NOT NULL DEFAULT -1 COMMENT '成本价，单位： 分',
-  `bar_code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '条形码',
-  `pic_url` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '图片地址',
-  `status` tinyint NULL DEFAULT NULL COMMENT '状态： 0-正常 1-禁用',
-  `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
-  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品sku';
+CREATE TABLE `product_sku` (
+`id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+`spu_id` bigint NOT NULL COMMENT 'spu编号',
+`tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+`name` varchar(128)  DEFAULT NULL COMMENT '商品 SKU 名字',
+`properties` varchar(128)  DEFAULT NULL COMMENT '规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]',
+`price` int NOT NULL DEFAULT '-1' COMMENT '销售价格，单位：分',
+`market_price` int DEFAULT NULL COMMENT '市场价',
+`cost_price` int NOT NULL DEFAULT '-1' COMMENT '成本价，单位： 分',
+`pic_url` varchar(128)  NOT NULL COMMENT '图片地址',
+`stock` int DEFAULT NULL COMMENT '库存',
+`warn_stock` int DEFAULT NULL COMMENT '预警库存',
+`volume` double DEFAULT NULL COMMENT '商品体积',
+`weight` double DEFAULT NULL COMMENT '商品重量',
+`bar_code` varchar(64)  DEFAULT NULL COMMENT '条形码',
+`status` tinyint DEFAULT NULL COMMENT '状态： 0-正常 1-禁用',
+`create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+`creator` varchar(64) DEFAULT NULL COMMENT '创建人',
+`updater` double(64,0) DEFAULT NULL COMMENT '更新人',
+`deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='商品sku';
 
 -- ----------------------------
 -- Records of product_sku
@@ -240,26 +245,35 @@ COMMIT;
 -- Table structure for product_spu
 -- ----------------------------
 DROP TABLE IF EXISTS `product_spu`;
-CREATE TABLE `product_spu`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '商品名称',
-  `sell_point` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '卖点',
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '描述',
-  `category_id` bigint NOT NULL COMMENT '分类id',
-  `pic_urls` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '商品主图地址\n     *\n     * 数组，以逗号分隔\n 最多上传15张',
-  `sort` int NOT NULL DEFAULT 0 COMMENT '排序字段',
-  `like_count` int NULL DEFAULT NULL COMMENT '点赞初始人数',
-  `price` int NULL DEFAULT NULL COMMENT '价格 单位使用：分',
-  `quantity` int NULL DEFAULT NULL COMMENT '库存数量',
-  `status` bit(1) NULL DEFAULT NULL COMMENT '上下架状态： 0 上架（开启） 1 下架（禁用）',
-  `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
-  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品spu';
+CREATE TABLE `product_spu` (
+`id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+`tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+`brand_id` int DEFAULT NULL COMMENT '商品品牌编号',
+`category_id` bigint NOT NULL COMMENT '分类id',
+`spec_type` int NOT NULL COMMENT '规格类型：0 单规格 1 多规格',
+`code` varchar(128)  DEFAULT NULL COMMENT '商品编码',
+`name` varchar(128)  NOT NULL COMMENT '商品名称',
+`sell_point` varchar(128)  DEFAULT NULL COMMENT '卖点',
+`description` text  COMMENT '描述',
+`pic_urls` varchar(1024)  DEFAULT '' COMMENT '商品轮播图地址\n 数组，以逗号分隔\n 最多上传15张',
+`video_url` varchar(128)  DEFAULT NULL COMMENT '商品视频',
+`market_price` int DEFAULT NULL COMMENT '市场价，单位使用：分',
+`min_price` int DEFAULT NULL COMMENT '最小价格，单位使用：分',
+`max_price` int DEFAULT NULL COMMENT '最大价格，单位使用：分',
+`total_stock` int NOT NULL DEFAULT '0' COMMENT '总库存',
+`show_stock` int DEFAULT '0' COMMENT '是否展示库存',
+`sales_count` int DEFAULT '0' COMMENT '商品销量',
+`virtual_sales_count` int DEFAULT '0' COMMENT '虚拟销量',
+`click_count` int DEFAULT '0' COMMENT '商品点击量',
+`status` bit(1) DEFAULT NULL COMMENT '上下架状态： 0 上架（开启） 1 下架（禁用）-1 回收',
+`sort` int NOT NULL DEFAULT '0' COMMENT '排序字段',
+`create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+`creator` varchar(64)  DEFAULT NULL COMMENT '创建人',
+`updater` varchar(64)  DEFAULT NULL COMMENT '更新人',
+`deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='商品spu';
 
 -- ----------------------------
 -- Records of product_spu
@@ -299,26 +313,3 @@ INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2028, 'Banner更新', 'market:banner:update', 3, 3, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2029, 'Banner删除', 'market:banner:delete', 3, 4, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
 
-alter table product_spu add `code` varchar(128) COMMENT '商品编码';
-alter table product_spu add  total_stock int COMMENT '总库存';
-alter table product_spu add  warn_stock int COMMENT '预警预存';
-alter table product_spu add  show_stock int COMMENT '是否展示库存';
-alter table product_spu add  sales_count int COMMENT '商品销量';
-alter table product_spu add  virtual_sales_count int COMMENT '虚拟销量';
-alter table product_spu add  click_count int COMMENT '商品点击量';
-alter table product_spu add  banner_url  varchar(128) COMMENT '主图地址';
-alter table product_spu add  spec_type int COMMENT '规格类型';
-alter table product_spu add  brand_id int COMMENT '商品品牌编号';
-alter table product_spu add  video_url varchar(128) COMMENT '商品视频';
-alter table product_spu add  min_price int COMMENT '最小价格，单位使用：分';
-alter table product_spu add  max_price int COMMENT '最大价格，单位使用：分';
-alter table product_spu add  market_price int COMMENT '市场价，单位使用：分';
-
-
-alter table product_sku add `name` varchar(128) COMMENT '商品 SKU 名字';
-alter table product_sku add `stock` int COMMENT '库存';
-alter table product_sku add `weight` double COMMENT '商品重量';
-alter table product_sku add `volume` double COMMENT '商品体积';
-
-
-alter table product_sku DROP `original_price`;
