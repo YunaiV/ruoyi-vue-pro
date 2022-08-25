@@ -118,11 +118,18 @@ public class YudaoTenantAutoConfiguration {
         };
     }
 
-    @Bean
-    @Primary
-    public RedisCacheManager tenantRedisCacheManager(
-            RedisTemplate<String, Object> redisTemplate,
-            RedisCacheConfiguration redisCacheConfiguration) {
+  /**
+   * 引入租户时，tenantRedisCacheManager为主Bean
+   *
+   * @param redisTemplate
+   * @param redisCacheConfiguration
+   * @return
+   */
+  @Bean
+  @Primary
+  public RedisCacheManager tenantRedisCacheManager(
+      RedisTemplate<String, Object> redisTemplate,
+      RedisCacheConfiguration redisCacheConfiguration) {
         RedisCacheWriter cacheWriter =
                 RedisCacheWriter.nonLockingRedisCacheWriter(
                         Objects.requireNonNull(redisTemplate.getConnectionFactory()));
