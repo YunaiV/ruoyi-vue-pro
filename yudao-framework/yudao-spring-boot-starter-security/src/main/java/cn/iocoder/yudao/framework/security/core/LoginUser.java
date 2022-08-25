@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,6 +31,10 @@ public class LoginUser {
      * 租户编号
      */
     private Long tenantId;
+    /**
+     * 授权范围
+     */
+    private List<String> scopes;
 
     // ========== 上下文 ==========
     /**

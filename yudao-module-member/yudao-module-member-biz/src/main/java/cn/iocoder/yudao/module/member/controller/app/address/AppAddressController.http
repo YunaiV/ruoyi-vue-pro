@@ -1,0 +1,54 @@
+### 请求 /create 接口 => 成功
+POST {{appApi}}//member/address/create
+Content-Type: application/json
+tenant-id: {{appTenentId}}
+Authorization: Bearer 2510e2e4287346eb8e36353a55e27fd6
+
+{
+  "userId": "245",
+  "name": "yunai",
+  "mobile": "15601691300",
+  "areaCode": "610632",
+  "detailAddress": "芋道源码 233 号 666 室",
+  "type": "1"
+}
+
+### 请求 /update 接口 => 成功
+PUT {{appApi}}//member/address/update
+Content-Type: application/json
+tenant-id: {{appTenentId}}
+Authorization: Bearer 2510e2e4287346eb8e36353a55e27fd6
+
+{
+  "id": "1",
+  "userId": "245",
+  "name": "yunai888",
+  "mobile": "15601691300",
+  "areaCode": "610632",
+  "detailAddress": "芋道源码 233 号 666 室",
+  "type": "1"
+}
+
+### 请求 /delete 接口 => 成功
+DELETE {{appApi}}//member/address/delete?id=2
+Content-Type: application/json
+tenant-id: {{appTenentId}}
+Authorization: Bearer fa4848b001de4eae9faf516c0c8520f8
+
+### 请求 /get 接口 => 成功
+GET {{appApi}}//member/address/get?id=1
+Content-Type: application/json
+tenant-id: {{appTenentId}}
+Authorization: Bearer fa4848b001de4eae9faf516c0c8520f8
+
+### 请求 /get-default 接口 => 成功
+GET {{appApi}}//member/address/get-default
+Content-Type: application/json
+tenant-id: {{appTenentId}}
+Authorization: Bearer fa4848b001de4eae9faf516c0c8520f8
+
+### 请求 /list 接口 => 成功
+GET {{appApi}}//member/address/list
+Content-Type: application/json
+tenant-id: {{appTenentId}}
+Authorization: Bearer fa4848b001de4eae9faf516c0c8520f8

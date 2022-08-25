@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
@@ -137,8 +138,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
        reqVO.setShortName("灿灿子");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
        reqVO.setRemark("灿哥的杂货铺");
-       reqVO.setBeginCreateTime(buildTime(2021,11,2));
-       reqVO.setEndCreateTime(buildTime(2021,11,4));
+       reqVO.setCreateTime((new Date[]{buildTime(2021,11,2),buildTime(2021,11,4)}));
 
        // 调用
        PageResult<PayMerchantDO> pageResult = merchantService.getMerchantPage(reqVO);
@@ -179,8 +179,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
        reqVO.setShortName("灿灿子");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
        reqVO.setRemark("灿哥的杂货铺");
-       reqVO.setBeginCreateTime(buildTime(2021,11,2));
-       reqVO.setEndCreateTime(buildTime(2021,11,4));
+       reqVO.setCreateTime((new Date[]{buildTime(2021,11,2),buildTime(2021,11,4)}));
 
        // 调用
        List<PayMerchantDO> list = merchantService.getMerchantList(reqVO);

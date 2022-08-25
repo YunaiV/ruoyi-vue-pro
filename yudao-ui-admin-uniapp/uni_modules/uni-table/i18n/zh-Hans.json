@@ -1,0 +1,9 @@
+{
+	"filter-dropdown.reset": "重置",
+	"filter-dropdown.search": "搜索",
+	"filter-dropdown.submit": "确定",
+	"filter-dropdown.filter": "筛选",
+	"filter-dropdown.gt": "大于等于",
+	"filter-dropdown.lt": "小于等于",
+	"filter-dropdown.date": "日期范围"
+}

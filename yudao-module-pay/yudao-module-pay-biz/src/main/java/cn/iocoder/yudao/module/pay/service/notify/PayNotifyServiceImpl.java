@@ -36,6 +36,8 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static cn.iocoder.yudao.module.pay.framework.job.config.PayJobConfiguration.NOTIFY_THREAD_POOL_TASK_EXECUTOR;
+
 /**
  * 支付通知 Core Service 实现类
  *
@@ -67,8 +69,8 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     @Resource
     private PayNotifyLogCoreMapper payNotifyLogCoreMapper;
 
-    @Resource
-    private ThreadPoolTaskExecutor threadPoolTaskExecutor; // TODO 芋艿：未来提供独立的线程池
+    @Resource(name = NOTIFY_THREAD_POOL_TASK_EXECUTOR)
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Resource
     private PayNotifyLockRedisDAO payNotifyLockCoreRedisDAO;
@@ -119,7 +121,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             }
         }));
         // 等待完成
-        this.awaitExecuteNotify(latch);
+        awaitExecuteNotify(latch);
         // 返回执行完成的任务数（成功 + 失败)
         return tasks.size();
     }

@@ -51,6 +51,10 @@ public class JsonUtils {
         return objectMapper.writeValueAsBytes(object);
     }
 
+    @SneakyThrows
+    public static String toJsonPrettyString(Object object) {
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+    }
 
     public static <T> T parseObject(String text, Class<T> clazz) {
         if (StrUtil.isEmpty(text)) {
@@ -132,7 +136,7 @@ public class JsonUtils {
     }
 
     public static boolean isJson(String text) {
-        return JSONUtil.isJson(text);
+        return JSONUtil.isTypeJSON(text);
     }
 
 }

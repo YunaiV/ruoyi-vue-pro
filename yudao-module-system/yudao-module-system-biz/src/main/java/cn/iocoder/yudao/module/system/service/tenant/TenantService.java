@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.service.tenant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
-import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
@@ -20,12 +19,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-public interface TenantService extends TenantFrameworkService {
-
-    /**
-     * 初始化租户的本地缓存
-     */
-    void initLocalCache();
+public interface TenantService {
 
     /**
      * 创建租户
@@ -120,4 +114,18 @@ public interface TenantService extends TenantFrameworkService {
      * @param handler 处理器
      */
     void handleTenantMenu(TenantMenuHandler handler);
+
+    /**
+     * 获得所有租户
+     *
+     * @return 租户编号数组
+     */
+    List<Long> getTenantIds();
+
+    /**
+     * 校验租户是否合法
+     *
+     * @param id 租户编号
+     */
+    void validTenant(Long id);
 }

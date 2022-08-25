@@ -16,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -63,8 +64,7 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
        reqVO.setName("nai");
        reqVO.setType("艿");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setBeginCreateTime(buildTime(2021, 1, 10));
-       reqVO.setEndCreateTime(buildTime(2021, 1, 20));
+       reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 10),buildTime(2021, 1, 20)}));
 
        // 调用
        PageResult<DictTypeDO> pageResult = dictTypeService.getDictTypePage(reqVO);
@@ -97,8 +97,7 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
         reqVO.setName("nai");
         reqVO.setType("艿");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setBeginCreateTime(buildTime(2021, 1, 10));
-        reqVO.setEndCreateTime(buildTime(2021, 1, 20));
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 10),buildTime(2021, 1, 20)}));
 
         // 调用
         List<DictTypeDO> list = dictTypeService.getDictTypeList(reqVO);

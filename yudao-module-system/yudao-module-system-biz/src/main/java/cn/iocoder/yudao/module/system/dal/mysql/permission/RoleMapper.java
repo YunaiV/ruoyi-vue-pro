@@ -23,7 +23,7 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
                 .likeIfPresent(RoleDO::getName, reqVO.getName())
                 .likeIfPresent(RoleDO::getCode, reqVO.getCode())
                 .eqIfPresent(RoleDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(BaseDO::getCreateTime, reqVO.getBeginTime(), reqVO.getEndTime())
+                .betweenIfPresent(BaseDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(RoleDO::getId));
     }
 
@@ -32,7 +32,7 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
                 .likeIfPresent(RoleDO::getName, reqVO.getName())
                 .likeIfPresent(RoleDO::getCode, reqVO.getCode())
                 .eqIfPresent(RoleDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(BaseDO::getCreateTime, reqVO.getBeginTime(), reqVO.getEndTime()));
+                .betweenIfPresent(BaseDO::getCreateTime, reqVO.getCreateTime()));
     }
 
     default RoleDO selectByName(String name) {

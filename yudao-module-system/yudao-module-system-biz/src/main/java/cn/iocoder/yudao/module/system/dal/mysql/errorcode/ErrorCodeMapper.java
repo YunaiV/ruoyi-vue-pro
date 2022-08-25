@@ -2,11 +2,10 @@ package cn.iocoder.yudao.module.system.dal.mysql.errorcode;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.errorcode.ErrorCodeDO;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
@@ -17,36 +16,36 @@ import java.util.List;
 public interface ErrorCodeMapper extends BaseMapperX<ErrorCodeDO> {
 
     default PageResult<ErrorCodeDO> selectPage(ErrorCodePageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<ErrorCodeDO>()
-                .eqIfPresent("type", reqVO.getType())
-                .likeIfPresent("application_name", reqVO.getApplicationName())
-                .eqIfPresent("code", reqVO.getCode())
-                .likeIfPresent("message", reqVO.getMessage())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("code"));
+        return selectPage(reqVO, new LambdaQueryWrapperX<ErrorCodeDO>()
+                .eqIfPresent(ErrorCodeDO::getType, reqVO.getType())
+                .likeIfPresent(ErrorCodeDO::getApplicationName, reqVO.getApplicationName())
+                .eqIfPresent(ErrorCodeDO::getCode, reqVO.getCode())
+                .likeIfPresent(ErrorCodeDO::getMessage, reqVO.getMessage())
+                .betweenIfPresent(ErrorCodeDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(ErrorCodeDO::getCode));
     }
 
     default List<ErrorCodeDO> selectList(ErrorCodeExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<ErrorCodeDO>()
-                .eqIfPresent("type", reqVO.getType())
-                .likeIfPresent("application_name", reqVO.getApplicationName())
-                .eqIfPresent("code", reqVO.getCode())
-                .likeIfPresent("message", reqVO.getMessage())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByAsc("application_name", "code"));
+        return selectList(new LambdaQueryWrapperX<ErrorCodeDO>()
+                .eqIfPresent(ErrorCodeDO::getType, reqVO.getType())
+                .likeIfPresent(ErrorCodeDO::getApplicationName, reqVO.getApplicationName())
+                .eqIfPresent(ErrorCodeDO::getCode, reqVO.getCode())
+                .likeIfPresent(ErrorCodeDO::getMessage, reqVO.getMessage())
+                .betweenIfPresent(ErrorCodeDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(ErrorCodeDO::getCode));
     }
 
     default List<ErrorCodeDO> selectListByCodes(Collection<Integer> codes) {
-        return selectList(new QueryWrapper<ErrorCodeDO>().in("code", codes));
+        return selectList(new LambdaQueryWrapperX<ErrorCodeDO>().in(ErrorCodeDO::getCode, codes));
     }
 
     default ErrorCodeDO selectByCode(Integer code) {
-        return selectOne(new QueryWrapper<ErrorCodeDO>().eq("code", code));
+        return selectOne(new LambdaQueryWrapperX<ErrorCodeDO>().eq(ErrorCodeDO::getCode, code));
     }
 
     default List<ErrorCodeDO> selectListByApplicationNameAndUpdateTimeGt(String applicationName, Date minUpdateTime) {
-        return selectList(new QueryWrapperX<ErrorCodeDO>().eq("application_name", applicationName)
-                .gtIfPresent("update_time", minUpdateTime));
+        return selectList(new LambdaQueryWrapperX<ErrorCodeDO>().eq(ErrorCodeDO::getApplicationName, applicationName)
+                .gtIfPresent(ErrorCodeDO::getUpdateTime, minUpdateTime));
     }
 
 }

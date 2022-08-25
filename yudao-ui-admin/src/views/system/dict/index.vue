@@ -12,9 +12,9 @@
           <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
-          range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -120,15 +120,14 @@ export default {
       open: false,
       // 状态数据字典
       statusOptions: [],
-      // 日期范围
-      dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
         pageSize: 10,
         name: undefined,
         type: undefined,
-        status: undefined
+        status: undefined,
+        createTime: []
       },
       // 表单参数
       form: {},
@@ -155,11 +154,8 @@ export default {
     /** 查询字典类型列表 */
     getList() {
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
-      listType(params).then(response => {
+      listType(this.queryParams).then(response => {
         this.typeList = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -188,7 +184,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -244,7 +239,6 @@ export default {
       let params = {...this.queryParams};
       params.pageNo = undefined;
       params.pageSize = undefined;
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行导出
       this.$modal.confirm('是否确认导出所有字典类型数据项?').then(() => {
         this.exportLoading = true;

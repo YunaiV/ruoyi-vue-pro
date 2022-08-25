@@ -71,6 +71,16 @@
   padding: 10px 20px 0;
 }
 
+.el-dialog{
+  display: flex;
+  flex-direction: column;
+  max-width: calc(100% - 30px);
+  max-height: calc(100% - 70px);
+  .el-dialog__body {
+    overflow: auto;
+  }
+}
+
 .el-table {
   .el-table__header-wrapper, .el-table__fixed-header-wrapper {
     th {

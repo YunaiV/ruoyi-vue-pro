@@ -22,8 +22,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -110,9 +112,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
         reqVO.setType(PayRefundTypeEnum.SOME.getStatus());
-        reqVO.setBeginCreateTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 10));
-        reqVO.setEndCreateTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 12));
-
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 1, 10, 10, 10),buildTime(2021, 1, 1, 10, 10, 12)}));
 
         // 调用
         PageResult<PayRefundDO> pageResult = refundService.getRefundPage(reqVO);
@@ -182,8 +182,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
         reqVO.setType(PayRefundTypeEnum.SOME.getStatus());
-        reqVO.setBeginCreateTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 10));
-        reqVO.setEndCreateTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 12));
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 1, 10, 10, 10),buildTime(2021, 1, 1, 10, 10, 12)}));
 
         // 调用
         List<PayRefundDO> list = refundService.getRefundList(reqVO);

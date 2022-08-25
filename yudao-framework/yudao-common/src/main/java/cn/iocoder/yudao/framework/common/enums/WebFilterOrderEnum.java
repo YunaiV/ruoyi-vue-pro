@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.common.enums;
 /**
  * Web 过滤器顺序的枚举类，保证过滤器按照符合我们的预期
  *
- *  考虑到每个 starter 都需要用到该工具类，所以放到 common 模块下的 util 包下
+ *  考虑到每个 starter 都需要用到该工具类，所以放到 common 模块下的 enums 包下
  *
  * @author 芋道源码
  */

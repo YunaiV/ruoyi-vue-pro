@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 public class UserProfileUpdateReqVO {
 
     @ApiModelProperty(value = "用户昵称", required = true, example = "芋艿")
-    @Size(max = 30, message = "用户昵称长度不能超过30个字符")
+    @Size(max = 30, message = "用户昵称长度不能超过 30 个字符")
     private String nickname;
 
     @ApiModelProperty(value = "用户邮箱", example = "yudao@iocoder.cn")

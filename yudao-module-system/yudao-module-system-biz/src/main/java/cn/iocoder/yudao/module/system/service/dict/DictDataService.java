@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.system.service.dict;
 
-import cn.iocoder.yudao.framework.dict.core.service.DictDataFrameworkService;
-import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataUpdateReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,12 +15,7 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface DictDataService extends DictDataFrameworkService {
-
-    /**
-     * 初始化字典数据的本地缓存
-     */
-    void initLocalCache();
+public interface DictDataService {
 
     /**
      * 创建字典数据
@@ -94,4 +88,21 @@ public interface DictDataService extends DictDataFrameworkService {
      */
     void validDictDatas(String dictType, Collection<String> values);
 
+    /**
+     * 获得指定的字典数据
+     *
+     * @param dictType 字典类型
+     * @param value 字典数据值
+     * @return 字典数据
+     */
+    DictDataDO getDictData(String dictType, String value);
+
+    /**
+     * 解析获得指定的字典数据，从缓存中
+     *
+     * @param dictType 字典类型
+     * @param label 字典数据标签
+     * @return 字典数据
+     */
+    DictDataDO parseDictData(String dictType, String label);
 }

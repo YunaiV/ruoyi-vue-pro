@@ -26,7 +26,7 @@
         <!-- flowable 工作流相关 -->
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-spring-boot-starter-basic</artifactId>
+            <artifactId>flowable-spring-boot-starter-process</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>

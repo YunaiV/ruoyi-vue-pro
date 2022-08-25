@@ -10,9 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <modules>
         <module>yudao-module-bpm-api</module>
-        <module>yudao-module-bpm-base</module>
-        <module>yudao-module-bpm-biz-flowable</module>
-        <module>yudao-module-bpm-biz-activiti</module>
+        <module>yudao-module-bpm-biz</module>
     </modules>
     <artifactId>yudao-module-bpm</artifactId>
     <packaging>pom</packaging>
@@ -23,10 +21,7 @@
         例如说：流程定义、表单配置、审核中心（我的申请、我的待办、我的已办）等等
         bpm 解释：https://baike.baidu.com/item/BPM/1933
 
-        目前提供两套实现方案：
-            1. 基于 Activiti 7 实现的 yudao-module-bpm-biz-activiti
-            2. 基于 Flowable 6 实现的 yudao-module-bpm-biz-flowable
-        两套实现会存在共享的逻辑，所以会继承 yudao-module-bpm-base
+        工作流基于 Flowable 6 实现，分成流程定义、流程表单、流程实例、流程任务等功能模块。
     </description>
 
 </project>

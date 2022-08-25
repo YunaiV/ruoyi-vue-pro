@@ -1,0 +1,35 @@
+import { useAxios } from '@/hooks/web/useAxios'
+import { ${simpleClassName}VO,${simpleClassName}PageReqVO,${simpleClassName}ExcelReqVO } from './types'
+
+const request = useAxios()
+
+#set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
+// 查询${table.classComment}列表
+export const get${simpleClassName}PageApi = async (params: ${simpleClassName}PageReqVO) => {
+    return await request.get({ url: '${baseURL}/page', params })
+}
+
+// 查询${table.classComment}详情
+export const get${simpleClassName}Api = async (id: number) => {
+    return await request.get({ url: '${baseURL}/get?id=' + id })
+}
+
+// 新增${table.classComment}
+export const create${simpleClassName}Api = async (data: ${simpleClassName}VO) => {
+    return await request.post({ url: '${baseURL}/create', data })
+}
+
+// 修改${table.classComment}
+export const update${simpleClassName}Api = async (data: ${simpleClassName}VO) => {
+    return await request.put({ url: '${baseURL}/update', data })
+}
+
+// 删除${table.classComment}
+export const delete${simpleClassName}Api = async (id: number) => {
+    return await request.delete({ url: '${baseURL}/delete?id=' + id })
+}
+
+// 导出${table.classComment} Excel
+export const export${simpleClassName}Api = async (params: ${simpleClassName}ExcelReqVO) => {
+    return await request.download({ url: '${baseURL}/export-excel', params })
+}
