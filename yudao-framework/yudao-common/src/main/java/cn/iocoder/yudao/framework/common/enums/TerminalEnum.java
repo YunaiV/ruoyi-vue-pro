@@ -15,6 +15,7 @@ import java.util.Arrays;
 @Getter
 public enum TerminalEnum implements IntArrayValuable {
 
+    //TODO terminal 重复，请参考 '订单来源终端：[1:小程序 2:H5 3:iOS 4:安卓]'
     MINI_PROGRAM(1, "小程序"),
     H5(2, "H5"),
     IOS(3, "iOS"),
