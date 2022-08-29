@@ -2847,7 +2847,7 @@ CREATE TABLE "system_oauth2_access_token" (
   "updater" varchar(64) COLLATE "pg_catalog"."default",
   "update_time" timestamp(6) NOT NULL,
   "deleted" int2 NOT NULL DEFAULT 0,
-  "tenant_id" int8 NOT NULL,
+  "tenant_id" int8 NOT NULL DEFAULT 0,
   "scopes" varchar(255) COLLATE "pg_catalog"."default" DEFAULT ''::character varying
 )
 ;
@@ -3034,7 +3034,7 @@ CREATE TABLE "system_oauth2_refresh_token" (
   "updater" varchar(64) COLLATE "pg_catalog"."default",
   "update_time" timestamp(6) NOT NULL,
   "deleted" int2 NOT NULL DEFAULT 0,
-  "tenant_id" int8 NOT NULL,
+  "tenant_id" int8 NOT NULL DEFAULT 0,
   "scopes" varchar(255) COLLATE "pg_catalog"."default" DEFAULT ''::character varying
 )
 ;
@@ -3880,7 +3880,7 @@ CREATE TABLE "system_user_post" (
   "create_time" timestamp(6) NOT NULL,
   "updater" varchar(64) COLLATE "pg_catalog"."default",
   "update_time" timestamp(6) NOT NULL,
-  "tenant_id" int8 NOT NULL,
+  "tenant_id" int8 NOT NULL DEFAULT 0,
   "deleted" int2 NOT NULL DEFAULT 0
 )
 ;
