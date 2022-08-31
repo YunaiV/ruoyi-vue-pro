@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.sku;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
@@ -9,7 +10,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import lombok.*;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public class ProductSkuDO extends BaseDO {
     /**
      * 规格值数组，JSON 格式
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = PropertyTypeHandler.class)
     private List<Property> properties;
     /**
      * 销售价格，单位：分
@@ -110,6 +111,21 @@ public class ProductSkuDO extends BaseDO {
          * 关联 {@link ProductPropertyValueDO#getId()}
          */
         private Long valueId;
+
+    }
+
+    // TODO @芋艿：可以找一些新的思路
+    public static class PropertyTypeHandler extends AbstractJsonTypeHandler<Object> {
+
+        @Override
+        protected Object parse(String json) {
+            return JsonUtils.parseArray(json, Property.class);
+        }
+
+        @Override
+        protected String toJson(Object obj) {
+            return JsonUtils.toJsonString(obj);
+        }
 
     }
 
