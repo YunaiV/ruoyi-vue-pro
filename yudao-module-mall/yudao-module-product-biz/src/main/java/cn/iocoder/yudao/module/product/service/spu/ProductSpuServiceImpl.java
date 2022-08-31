@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
+import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
@@ -55,17 +56,19 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Resource
     private ProductPropertyService productPropertyService;
 
+    @Resource
+    private ProductBrandService brandService;
+
     @Override
     @Transactional
     public Long createProductSpu(ProductSpuCreateReqVO createReqVO) {
         // 校验分类
         categoryService.validateProductCategory(createReqVO.getCategoryId());
-        // TODO @：校验品牌
-
+        // 校验品牌
+        brandService.validateProductBrand(createReqVO.getBrandId());
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();
         productSkuService.validateProductSkus(skuCreateReqList, createReqVO.getSpecType());
-
         // 插入 SPU
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
         spu.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
@@ -73,7 +76,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         spu.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
         spu.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
         ProductSpuMapper.insert(spu);
-
         // 插入 SKU
         productSkuService.createProductSkus(skuCreateReqList, spu.getId());
         // 返回
@@ -128,27 +130,29 @@ public class ProductSpuServiceImpl implements ProductSpuService {
             spuVO.setSkus(skuReqs);
             List<ProductSkuRespVO.Property> properties = new ArrayList<>();
             // 组合 sku 规格属性
-            for (ProductSkuRespVO productSkuRespVO : skuReqs) {
-                properties.addAll(productSkuRespVO.getProperties());
-            }
-            Map<Long, List<ProductSkuBaseVO.Property>> propertyMaps = properties.stream().collect(Collectors.groupingBy(ProductSkuBaseVO.Property::getPropertyId));
-            List<ProductPropertyRespVO> propertyAndValueList = productPropertyService.selectByIds(new ArrayList<>(propertyMaps.keySet()));
-            // 装载组装过后的属性
-            List<ProductPropertyViewRespVO> productPropertyViews = new ArrayList<>();
-            propertyAndValueList.forEach(p -> {
-                ProductPropertyViewRespVO productPropertyViewRespVO = new ProductPropertyViewRespVO();
-                productPropertyViewRespVO.setPropertyId(p.getId());
-                productPropertyViewRespVO.setName(p.getName());
-                Set<ProductPropertyViewRespVO.Tuple2> propertyValues = new HashSet<>();
-                Map<Long, ProductPropertyValueRespVO> propertyValueMaps = p.getPropertyValueList().stream().collect(Collectors.toMap(ProductPropertyValueRespVO::getId, pv -> pv));
-                propertyMaps.get(p.getId()).forEach(pv -> {
-                    ProductPropertyViewRespVO.Tuple2 tuple2 = new ProductPropertyViewRespVO.Tuple2(pv.getValueId(), propertyValueMaps.get(pv.getValueId()).getName());
-                    propertyValues.add(tuple2);
+            if(spu.getSpecType().equals(ProductSpuSpecTypeEnum.DISABLE.getType())) {
+                for (ProductSkuRespVO productSkuRespVO : skuReqs) {
+                    properties.addAll(productSkuRespVO.getProperties());
+                }
+                Map<Long, List<ProductSkuBaseVO.Property>> propertyMaps = properties.stream().collect(Collectors.groupingBy(ProductSkuBaseVO.Property::getPropertyId));
+                List<ProductPropertyRespVO> propertyAndValueList = productPropertyService.selectByIds(new ArrayList<>(propertyMaps.keySet()));
+                // 装载组装过后的属性
+                List<ProductPropertyViewRespVO> productPropertyViews = new ArrayList<>();
+                propertyAndValueList.forEach(p -> {
+                    ProductPropertyViewRespVO productPropertyViewRespVO = new ProductPropertyViewRespVO();
+                    productPropertyViewRespVO.setPropertyId(p.getId());
+                    productPropertyViewRespVO.setName(p.getName());
+                    Set<ProductPropertyViewRespVO.Tuple2> propertyValues = new HashSet<>();
+                    Map<Long, ProductPropertyValueRespVO> propertyValueMaps = p.getPropertyValueList().stream().collect(Collectors.toMap(ProductPropertyValueRespVO::getId, pv -> pv));
+                    propertyMaps.get(p.getId()).forEach(pv -> {
+                        ProductPropertyViewRespVO.Tuple2 tuple2 = new ProductPropertyViewRespVO.Tuple2(pv.getValueId(), propertyValueMaps.get(pv.getValueId()).getName());
+                        propertyValues.add(tuple2);
+                    });
+                    productPropertyViewRespVO.setPropertyValues(propertyValues);
+                    productPropertyViews.add(productPropertyViewRespVO);
                 });
-                productPropertyViewRespVO.setPropertyValues(propertyValues);
-                productPropertyViews.add(productPropertyViewRespVO);
-            });
-            spuVO.setProductPropertyViews(productPropertyViews);
+                spuVO.setProductPropertyViews(productPropertyViews);
+            }
             // 组合分类
             if (null != spuVO.getCategoryId()) {
                 LinkedList<Long> categoryArray = new LinkedList<>();

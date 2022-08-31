@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.product.service.brand;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.brand.vo.*;
 import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
 
 import javax.validation.Valid;
@@ -54,6 +52,20 @@ public interface ProductBrandService {
      * @return 品牌列表
      */
     List<ProductBrandDO> getBrandList(Collection<Long> ids);
+
+    /**
+     * 获得品牌列表
+     * @param listVo 请求参数
+     * @return 品牌列表
+     */
+    List<ProductBrandDO> getBrandList(ProductBrandListReqVO listVo);
+
+    /**
+     * 验证选择的商品分类是否合法
+     *
+     * @param id 分类编号
+     */
+    void validateProductBrand(Long id);
 
     /**
      * 获得品牌分页

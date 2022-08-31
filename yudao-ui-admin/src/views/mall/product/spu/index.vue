@@ -179,7 +179,7 @@
 
 
     <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body destroy-on-close :close-on-click-modal="false" >
-      <save @closeDialog="open = false; getList()"/>
+      <save @closeDialog="closeDialog" :type="dialogType" :obj="dialogObj" v-if="open" />
     </el-dialog>
   </div>
 </template>
@@ -257,6 +257,10 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 弹出层类型
+      dialogType: "add",
+      // 弹出层参数
+      dialogObj:{},
       dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
@@ -570,75 +574,25 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.reset();
+      this.dialogType = "add";
+      this.dialogObj={};
       this.open = true;
       this.title = "添加商品spu";
-      this.getPropertyPageList();
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.reset();
-      const id = row.id;
-      getSpu(id).then((response) => {
-        let dataSpu = response.data;
-        this.form = {
-          id: dataSpu.id,
-          name: dataSpu.name,
-          sellPoint: dataSpu.sellPoint,
-          description: dataSpu.sellPoint,
-          categoryId: dataSpu.sellPoint,
-          categoryIds: dataSpu.categoryIds,
-          picUrls: dataSpu.picUrls,
-          sort: dataSpu.sort,
-          likeCount: dataSpu.likeCount,
-          price: dataSpu.price,
-          quantity: dataSpu.quantity,
-          status: dataSpu.status,
-          isShowTagInput: undefined,
-          skus: [],
-          skusList: dataSpu.skus,
-          productPropertyViews: dataSpu.productPropertyViews,
-          // skus:dataSpu.productSkuRespVOS,
-        };
-        this.getDataHandle();
-        this.open = true;
-        this.title = "修改商品spu";
-      });
+      this.dialogType = "upd";
+      this.dialogObj.id = row.id;
+      this.open = true;
+      console.log("修改")
+      this.title = "修改商品spu";
     },
-    getDataHandle() {
-      let that = this;
-      let productPropertyViews = JSON.parse(
-        JSON.stringify(this.form.productPropertyViews)
-      );
-      productPropertyViews = productPropertyViews.sort(
-        (a, b) => a.propertyId - b.propertyId
-      );
-      productPropertyViews.forEach((item) => {
-        item.propertyValues = item.propertyValues.sort((a, b) => a.v1 - b.v1);
-      });
-      let skuIds = [];
-      for (let i = 0; i < productPropertyViews.length; i++) {
-        let han = {
-          name: productPropertyViews[i].name,
-          propertyId: productPropertyViews[i].propertyId,
-          selectValues: [],
-          selectValueIds: [],
-        };
-        for (
-          let j = 0;
-          j < productPropertyViews[i].propertyValues.length;
-          j++
-        ) {
-          han.selectValues.push(productPropertyViews[i].propertyValues[j].v2);
-          han.selectValueIds.push(productPropertyViews[i].propertyValues[j].v1);
-        }
-        skuIds.push(han);
-      }
-      this.skuTags = skuIds;
-      this.unUseTags = this.allhistoryTags.filter((v) =>
-        skuIds.every((val) => val.name != v.name)
-      );
-      this.getHandleTable();
+    closeDialog(){
+      console.log("关闭")
+      this.dialogType = "add";
+      this.dialogObj={};
+      this.open = false;
+      this.getList()
     },
     getHandleTable() {
       this.form.skus = [];
@@ -697,33 +651,6 @@ export default {
             valueId: x.propertyChildIds[i],
           });
         }
-      });
-    },
-    /** 提交按钮 */
-    submitForm() {
-      this.$refs["form"].validate((valid) => {
-        if (!valid) {
-          return;
-        }
-        this.form.picUrls = this.form.picUrls.split(",");
-        this.form.categoryId =
-          this.form.categoryIds[this.form.categoryIds.length - 1];
-        this.form.status = Number(this.form.status);
-        // 修改的提交
-        if (this.form.id != null) {
-          updateSpu(this.form).then((response) => {
-            this.$modal.msgSuccess("修改成功");
-            this.open = false;
-            this.getList();
-          });
-          return;
-        }
-        // 添加的提交
-        createSpu(this.form).then((response) => {
-          this.$modal.msgSuccess("新增成功");
-          this.open = false;
-          this.getList();
-        });
       });
     },
     /** 删除按钮操作 */

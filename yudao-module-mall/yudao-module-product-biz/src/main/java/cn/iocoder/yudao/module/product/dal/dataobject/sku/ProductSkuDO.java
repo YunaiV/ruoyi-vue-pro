@@ -40,7 +40,7 @@ public class ProductSkuDO extends BaseDO {
     private String name;
     /**
      * SPU 编号
-     *
+     * <p>
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
@@ -71,7 +71,7 @@ public class ProductSkuDO extends BaseDO {
     private String picUrl;
     /**
      * SKU 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
@@ -100,13 +100,13 @@ public class ProductSkuDO extends BaseDO {
 
         /**
          * 属性编号
-         *
+         * <p>
          * 关联 {@link ProductPropertyDO#getId()}
          */
         private Long propertyId;
         /**
          * 属性值编号
-         *
+         * <p>
          * 关联 {@link ProductPropertyValueDO#getId()}
          */
         private Long valueId;

@@ -193,6 +193,16 @@
       <!-- 销售设置 -->
       <el-tab-pane label="销售设置" name="fourth">
         <el-form ref="fourth" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
+          <el-form-item label="所属品牌" prop="brandId">
+            <el-select v-model="baseForm.brandId" placeholder="请选择">
+                  <el-option
+                    v-for="item in brandList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
+                  </el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item label="虚拟销量" prop="virtualSalesCount">
             <el-input v-model="baseForm.virtualSalesCount" placeholder="请输入虚拟销量" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
           </el-form-item>
@@ -221,8 +231,10 @@
 </template>
 
 <script>
+
+import {getBrandList} from "@/api/mall/product/brand";
 import {getProductCategoryList} from "@/api/mall/product/category";
-import {createSpu,} from "@/api/mall/product/spu";
+import {createSpu, getSpu} from "@/api/mall/product/spu";
 import {getPropertyPage,} from "@/api/mall/product/property";
 import Editor from "@/components/Editor";
 import ImageUpload from "@/components/ImageUpload";
@@ -231,6 +243,13 @@ export default {
   components: {
     Editor,
     ImageUpload
+  },
+  props:{//props列表
+    type:{
+      type:String,
+      default:"add" //定义参数默认值
+    },
+    obj: Object
   },
   data() {
     return {
@@ -251,6 +270,7 @@ export default {
         status: 0,
         virtualSalesCount: 0,
         showStock: true,
+        brandId: null
       },
       categoryList: [],
       // 价格库存
@@ -270,6 +290,7 @@ export default {
         // },
       ],
       propertyPageList: [],
+      brandList: [],
       specValue: null,
 
       // 表单校验
@@ -283,11 +304,13 @@ export default {
       },
     };
   },
-
   created() {
-
+    this.getListBrand();
     this.getListCategory();
     this.getPropertyPageList();
+    if(this.type == 'upd'){
+      this.updateType(this.obj.id)
+    }
   },
   methods: {
     removeSpec(index){
@@ -352,6 +375,13 @@ export default {
         this.categoryList = this.handleTree(response.data, "id", "parentId");
       });
     },
+     /** 查询品牌列表 */
+    getListBrand() {
+      // 执行查询
+      getBrandList().then((response) => {
+        this.brandList = response.data;
+      });
+    },
     cancel() {
       this.$emit("closeDialog");
     },
@@ -366,7 +396,13 @@ export default {
         rates.forEach(r => {
           let properties = []
             Array.of(r.spec).forEach(s => {
-              Array.of(s).forEach((v, i) => {
+              let obj;
+               if (s instanceof Array) {
+                  obj = s;
+               }else{
+                  obj = Array.of(s);
+               }
+              obj.forEach((v, i) => {
                 console.log(this.dynamicSpec, r, s, v, i)
                 let specValue = this.dynamicSpec[i].specValue.find(o => o.name == v);
                 console.log(specValue)
@@ -382,9 +418,6 @@ export default {
         rates[0].name = this.baseForm.name;
         rates[0].status = this.baseForm.status;
       }
-
-      console.log(rates)
-
       let form = this.baseForm
       if(form.picUrls instanceof Array){
         form.picUrls = form.picUrls.flatMap(m=>m.split(','))
@@ -422,6 +455,24 @@ export default {
       spec.specValue = obj.propertyValueList;
       this.dynamicSpec = dynamicSpec;
       this.buildRatesFormRates();
+    },
+    updateType(id){
+        getSpu(id).then((response) =>{
+            console.log(response)
+            let data = response.data;
+            this.baseForm.name=data.name;
+            this.baseForm.sellPoint=data.sellPoint;
+            this.baseForm.categoryIds=data.categoryIds;
+            this.baseForm.sort=data.sort;
+            this.baseForm.description=data.description;
+            this.baseForm.picUrls=data.picUrls;
+            this.baseForm.status=data.status;
+            this.baseForm.virtualSalesCount=data.virtualSalesCount;
+            this.baseForm.showStock=data.showStock;
+            this.baseForm.brandId=data.brandId;
+            this.ratesForm.spec=data.specType;
+            this.ratesForm.rates=data.skus
+        })
     }
   },
 };
