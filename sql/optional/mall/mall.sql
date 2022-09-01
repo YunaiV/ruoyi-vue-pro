@@ -253,7 +253,7 @@ create table product_sku
                   collate utf8mb4_general_ci;
 
 
----Market-Banner管理SQL
+-- Market-Banner管理SQL
 drop table if exists market_banner;
 CREATE TABLE `market_banner` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Banner编号',
@@ -273,7 +273,7 @@ CREATE TABLE `market_banner` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='Banner管理';
 -- 菜单 SQL
 INSERT INTO `system_menu`(`id`,`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`)
-VALUES (2002, 'Banner管理', '', 2, 1, 2000, 'brand', '', 'mall/market/banner/index', 0);
+VALUES (2026, 'Banner管理', '', 2, 1, 2000, 'brand', '', 'mall/market/banner/index', 0);
 -- 按钮父菜单ID
 SELECT @parentId := LAST_INSERT_ID();
 -- 按钮 SQL
