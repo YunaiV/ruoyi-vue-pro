@@ -30,6 +30,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -142,7 +143,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                     ProductPropertyViewRespVO productPropertyViewRespVO = new ProductPropertyViewRespVO();
                     productPropertyViewRespVO.setPropertyId(p.getId());
                     productPropertyViewRespVO.setName(p.getName());
-                    Set<ProductPropertyViewRespVO.Tuple2> propertyValues = new HashSet<>();
+                    List<ProductPropertyViewRespVO.Tuple2> propertyValues = new ArrayList<>();
                     Map<Long, ProductPropertyValueRespVO> propertyValueMaps = p.getPropertyValueList().stream().collect(Collectors.toMap(ProductPropertyValueRespVO::getId, pv -> pv));
                     propertyMaps.get(p.getId()).forEach(pv -> {
                         ProductPropertyViewRespVO.Tuple2 tuple2 = new ProductPropertyViewRespVO.Tuple2(pv.getValueId(), propertyValueMaps.get(pv.getValueId()).getName());

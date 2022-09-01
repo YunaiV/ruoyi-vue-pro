@@ -471,6 +471,23 @@ export default {
             this.baseForm.showStock=data.showStock;
             this.baseForm.brandId=data.brandId;
             this.ratesForm.spec=data.specType;
+            if(this.ratesForm.spec == 2){
+              data.productPropertyViews.forEach(p=>{
+                let obj = {};
+                obj.specId = p.propertyId;
+                obj.specName = p.name;
+                obj.specValue = p.propertyValues;
+                this.dynamicSpec.push(obj);
+              })
+              data.skus.forEach(s=>{
+                s.spec = [];
+                s.properties.forEach(sp=>{
+                  let spec = data.productPropertyViews.find(o=>o.propertyId == sp.propertyId).propertyValues.find(v=>v.id == sp.valueId).name;
+                   s.spec.push(spec)
+                })
+              })
+            }
+            console.log(data.skus);
             this.ratesForm.rates=data.skus
         })
     }
