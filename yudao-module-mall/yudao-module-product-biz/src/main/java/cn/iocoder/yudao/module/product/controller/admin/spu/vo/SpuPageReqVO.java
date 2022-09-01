@@ -42,7 +42,7 @@ public class SpuPageReqVO extends PageParam {
     private Integer quantity;
 
     @ApiModelProperty(value = "上下架状态： 0 上架（开启） 1 下架（禁用）")
-    private Boolean status;
+    private Integer status;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "创建时间")

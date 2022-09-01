@@ -234,7 +234,7 @@
 
 import {getBrandList} from "@/api/mall/product/brand";
 import {getProductCategoryList} from "@/api/mall/product/category";
-import {createSpu, getSpu} from "@/api/mall/product/spu";
+import {createSpu, updateSpu, getSpu} from "@/api/mall/product/spu";
 import {getPropertyPage,} from "@/api/mall/product/property";
 import Editor from "@/components/Editor";
 import ImageUpload from "@/components/ImageUpload";
@@ -261,6 +261,7 @@ export default {
       },
       // 基础设置
       baseForm: {
+        id: null,
         name: null,
         sellPoint: null,
         categoryIds: null,
@@ -391,6 +392,14 @@ export default {
           return;
         }
       let rates = this.ratesForm.rates;
+
+      // 价格元转分
+      rates.forEach(r=>{
+        r.marketPrice = r.marketPrice*100;
+        r.price = r.price*100;
+        r.costPrice = r.costPrice*100;
+      })
+
       // 动态规格调整字段
       if (this.ratesForm.spec == 2) {
         rates.forEach(r => {
@@ -403,9 +412,7 @@ export default {
                   obj = Array.of(s);
                }
               obj.forEach((v, i) => {
-                console.log(this.dynamicSpec, r, s, v, i)
                 let specValue = this.dynamicSpec[i].specValue.find(o => o.name == v);
-                console.log(specValue)
                 let propertie = {};
                 propertie.propertyId = this.dynamicSpec[i].specId;
                 propertie.valueId = specValue.id;
@@ -419,6 +426,7 @@ export default {
         rates[0].status = this.baseForm.status;
       }
       let form = this.baseForm
+
       if(form.picUrls instanceof Array){
         form.picUrls = form.picUrls.flatMap(m=>m.split(','))
       }else if(form.picUrls.split(',') instanceof Array){
@@ -426,18 +434,23 @@ export default {
       }else{
         form.picUrls = Array.of(form.picUrls)
       }
-
+      console.log(rates)
       form.skus = rates;
       form.specType = this.ratesForm.spec;
       form.categoryId = form.categoryIds[this.baseForm.categoryIds.length - 1];
-      createSpu(form).then((response) => {
-        console.log(response)
-        this.$modal.msgSuccess("新增成功");
-        this.$emit("closeDialog");
-        }).catch((err) => {
-          console.log(this.baseForm.picUrls)
-        });
+
+
+      if(form.id == null){
+        createSpu(form).then((response) => {
+          this.$modal.msgSuccess("新增成功");
+        })
+      }else{
+        updateSpu(form).then((response) => {
+          this.$modal.msgSuccess("修改成功");
+        })
+      }
       });
+      this.$emit("closeDialog");
     },
     /** 查询规格 */
     getPropertyPageList() {
@@ -458,8 +471,8 @@ export default {
     },
     updateType(id){
         getSpu(id).then((response) =>{
-            console.log(response)
             let data = response.data;
+            this.baseForm.id=data.id;
             this.baseForm.name=data.name;
             this.baseForm.sellPoint=data.sellPoint;
             this.baseForm.categoryIds=data.categoryIds;
@@ -471,6 +484,11 @@ export default {
             this.baseForm.showStock=data.showStock;
             this.baseForm.brandId=data.brandId;
             this.ratesForm.spec=data.specType;
+            data.skus.forEach(r=>{
+              r.marketPrice = this.divide(r.marketPrice, 100)
+              r.price = this.divide(r.price, 100)
+              r.costPrice = this.divide(r.costPrice, 100)
+            })
             if(this.ratesForm.spec == 2){
               data.productPropertyViews.forEach(p=>{
                 let obj = {};
@@ -487,7 +505,6 @@ export default {
                 })
               })
             }
-            console.log(data.skus);
             this.ratesForm.rates=data.skus
         })
     }

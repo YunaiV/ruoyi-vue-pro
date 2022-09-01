@@ -90,17 +90,19 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         validateSpuExists(updateReqVO.getId());
         // 校验分类
         categoryService.validateProductCategory(updateReqVO.getCategoryId());
-        // TODO @luowenfeng：校验品牌
+        // 校验品牌
+        brandService.validateProductBrand(updateReqVO.getBrandId());
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = updateReqVO.getSkus();
         // 多规格才需校验
         productSkuService.validateProductSkus(skuCreateReqList, updateReqVO.getSpecType());
-
         // 更新 SPU
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
-        // TODO @计算各种字段
+        updateObj.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
+        updateObj.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
+        updateObj.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
+        updateObj.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
         ProductSpuMapper.updateById(updateObj);
-
         // 更新 SKU
         productSkuService.updateProductSkus(updateObj.getId(), updateReqVO.getSkus());
     }
@@ -149,7 +151,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                         ProductPropertyViewRespVO.Tuple2 tuple2 = new ProductPropertyViewRespVO.Tuple2(pv.getValueId(), propertyValueMaps.get(pv.getValueId()).getName());
                         propertyValues.add(tuple2);
                     });
-                    productPropertyViewRespVO.setPropertyValues(propertyValues);
+                    productPropertyViewRespVO.setPropertyValues(propertyValues.stream().distinct().collect(Collectors.toList()));
                     productPropertyViews.add(productPropertyViewRespVO);
                 });
                 spuVO.setProductPropertyViews(productPropertyViews);

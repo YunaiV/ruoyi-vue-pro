@@ -16,7 +16,7 @@ import './permission' // permission control
 import './tongji' // 百度统计
 import { getDicts } from "@/api/system/dict/data";
 import { getConfigKey } from "@/api/infra/config";
-import { parseTime, resetForm, handleTree, addBeginAndEndTime} from "@/utils/ruoyi";
+import { parseTime, resetForm, handleTree, addBeginAndEndTime, divide} from "@/utils/ruoyi";
 import Pagination from "@/components/Pagination";
 // 自定义表格工具扩展
 import RightToolbar from "@/components/RightToolbar"
@@ -36,6 +36,7 @@ Vue.prototype.getDictDataLabel = getDictDataLabel
 Vue.prototype.DICT_TYPE = DICT_TYPE
 Vue.prototype.handleTree = handleTree
 Vue.prototype.addBeginAndEndTime = addBeginAndEndTime
+Vue.prototype.divide = divide
 
 // 全局组件挂载
 Vue.component('DictTag', DictTag)
