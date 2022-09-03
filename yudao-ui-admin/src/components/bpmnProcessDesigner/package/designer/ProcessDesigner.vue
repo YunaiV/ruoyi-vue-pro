@@ -72,7 +72,7 @@
             <el-button :size="headerButtonSize" icon="el-icon-refresh" @click="processRestart" />
           </el-tooltip>
         </el-button-group>
-        <el-button :size="headerButtonSize" :type="headerButtonType" icon="el-icon-plus" @click="processSave">保存模型</el-button>
+        <el-button :size="headerButtonSize" :type="headerButtonType" icon="el-icon-plus" @click="processSave" :disabled = "simulationStatus">保存模型</el-button>
       </template>
       <!-- 用于打开本地文件-->
       <input type="file" id="files" ref="refFile" style="display: none" accept=".xml, .bpmn" @change="importLocalFile" />
