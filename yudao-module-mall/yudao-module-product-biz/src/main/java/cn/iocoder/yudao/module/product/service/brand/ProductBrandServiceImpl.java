@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.product.service.brand;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.brand.vo.*;
+import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandListReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.brand.ProductBrandConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
 import cn.iocoder.yudao.module.product.dal.mysql.brand.ProductBrandMapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -14,8 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PRODUCT_BRAND_NOT_EXISTS;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PRODUCT_CATEGORY_LEVEL;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.BRAND_NOT_EXISTS;
 
 /**
  * 品牌 Service 实现类
@@ -57,7 +58,7 @@ public class ProductBrandServiceImpl implements ProductBrandService {
 
     private void validateBrandExists(Long id) {
         if (brandMapper.selectById(id) == null) {
-            throw exception(PRODUCT_BRAND_NOT_EXISTS);
+            throw exception(BRAND_NOT_EXISTS);
         }
     }
 
@@ -72,14 +73,14 @@ public class ProductBrandServiceImpl implements ProductBrandService {
     }
 
     @Override
-    public List<ProductBrandDO> getBrandList(ProductBrandListReqVO listVo) {
-        return brandMapper.selectList(listVo);
+    public List<ProductBrandDO> getBrandList(ProductBrandListReqVO listReqVO) {
+        return brandMapper.selectList(listReqVO);
     }
 
     @Override
     public void validateProductBrand(Long id) {
         if(getBrand(id) == null){
-            throw exception(PRODUCT_BRAND_NOT_EXISTS);
+            throw exception(BRAND_NOT_EXISTS);
         }
     }
 

@@ -36,14 +36,14 @@ public class ProductSpuController {
     @ApiOperation("创建商品 SPU")
     @PreAuthorize("@ss.hasPermission('product:spu:create')")
     public CommonResult<Long> createProductSpu(@Valid @RequestBody ProductSpuCreateReqVO createReqVO) {
-        return success(spuService.createProductSpu(createReqVO));
+        return success(spuService.createSpu(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新商品 SPU")
     @PreAuthorize("@ss.hasPermission('product:spu:update')")
     public CommonResult<Boolean> updateSpu(@Valid @RequestBody ProductSpuUpdateReqVO updateReqVO) {
-        spuService.updateProductSpu(updateReqVO);
+        spuService.updateSpu(updateReqVO);
         return success(true);
     }
 

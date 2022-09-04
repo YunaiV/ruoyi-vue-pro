@@ -62,7 +62,7 @@ public class ProductPropertyController {
     @ApiOperation("获得规格名称")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:property:query')")
-    public CommonResult<ProductPropertyRespVO> getProperty(@RequestParam("id") Long id) {
+    public CommonResult<ProductPropertyAndValueRespVO> getProperty(@RequestParam("id") Long id) {
         return success(productPropertyService.getPropertyResp(id));
     }
 
@@ -70,7 +70,7 @@ public class ProductPropertyController {
     @ApiOperation("获得规格名称列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('product:property:query')")
-    public CommonResult<List<ProductPropertyRespVO>> getPropertyList(@RequestParam("ids") Collection<Long> ids) {
+    public CommonResult<List<ProductPropertyAndValueRespVO>> getPropertyList(@RequestParam("ids") Collection<Long> ids) {
         List<ProductPropertyDO> list = productPropertyService.getPropertyList(ids);
         return success(ProductPropertyConvert.INSTANCE.convertList(list));
     }
@@ -78,7 +78,7 @@ public class ProductPropertyController {
     @GetMapping("/page")
     @ApiOperation("获得规格名称分页")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
-    public CommonResult<PageResult<ProductPropertyRespVO>> getPropertyPage(@Valid ProductPropertyPageReqVO pageVO) {
+    public CommonResult<PageResult<ProductPropertyAndValueRespVO>> getPropertyPage(@Valid ProductPropertyPageReqVO pageVO) {
         return success(productPropertyService.getPropertyListPage(pageVO));
     }
 

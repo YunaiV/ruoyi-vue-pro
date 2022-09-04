@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyAndValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
@@ -24,11 +25,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_NOT_EXISTS;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
 /**
- * 商品sku Service 实现类
+ * 商品 SKU Service 实现类
  *
  * @author 芋道源码
  */
@@ -90,48 +90,51 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public void validateProductSkus(List<ProductSkuCreateOrUpdateReqVO> list, Integer specType) {
-        // 多规格才需校验
-        if (specType.equals(ProductSpuSpecTypeEnum.DISABLE.getType())) {
-            List<ProductSkuBaseVO.Property> skuPropertyList = list.stream().flatMap(p -> Optional.of(p.getProperties()).orElse(new ArrayList<>()).stream()).collect(Collectors.toList());
-            // 1、校验规格属性存在
-            List<Long> propertyIds = CollectionUtils.convertList(skuPropertyList, ProductSkuBaseVO.Property::getPropertyId);
-            List<ProductPropertyRespVO> propertyAndValueList = productPropertyService.selectByIds(propertyIds);
-            if (propertyAndValueList.size() == propertyIds.size()) {
-                throw exception(PROPERTY_NOT_EXISTS);
-            }
-            // 2. 校验，一个 Sku 下，没有重复的规格。校验方式是，遍历每个 Sku ，看看是否有重复的规格 attrId
-            List<ProductPropertyValueRespVO> collect = propertyAndValueList.stream()
-                    .flatMap(v -> Optional.of(v.getPropertyValueList())
-                            .orElse(new ArrayList<>()).stream()).collect(Collectors.toList());
-            Map<Long, ProductPropertyValueRespVO> propertyValueRespVOMap = CollectionUtils.convertMap(collect, ProductPropertyValueRespVO::getId);
-            list.forEach(v -> {
-                Set<Long> keys = v.getProperties().stream().map(k -> propertyValueRespVOMap.get(k.getValueId()).getPropertyId()).collect(Collectors.toSet());
-                if (keys.size() != v.getProperties().size()) {
-                    throw exception(ErrorCodeConstants.SKU_PROPERTIES_DUPLICATED);
-                }
-            });
+    public void validateSkus(List<ProductSkuCreateOrUpdateReqVO> skus, Integer specType) {
+        // 非多规格，不需要校验
+        if (ObjectUtil.notEqual(specType, ProductSpuSpecTypeEnum.DISABLE.getType())) {
+            return;
+        }
 
-            // 3. 再校验，每个 Sku 的规格值的数量，是一致的。
-            int attrValueIdsSize = list.get(0).getProperties().size();
-            for (int i = 1; i < list.size(); i++) {
-                if (attrValueIdsSize != list.get(i).getProperties().size()) {
-                    throw exception(ErrorCodeConstants.PRODUCT_SPU_ATTR_NUMBERS_MUST_BE_EQUALS);
-                }
-            }
+        // 1、校验规格属性存在
+        // TODO @Luowenfeng：stream 的写法；不用改哈，就是说下可以酱紫写；
+        Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null).flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
+                .map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toSet()); // 将每个 Property 转换成对应的 propertyId，最后形成集合
+        List<ProductPropertyAndValueRespVO> propertyAndValueList = productPropertyService.getPropertyAndValueList(propertyIds);
+        if (propertyAndValueList.size() == propertyIds.size()) {
+            throw exception(PROPERTY_NOT_EXISTS);
+        }
 
-            // 4. 最后校验，每个 Sku 之间不是重复的
-            Set<Set<Long>> skuAttrValues = new HashSet<>(); // 每个元素，都是一个 Sku 的 attrValueId 集合。这样，通过最外层的 Set ，判断是否有重复的.
-            for (ProductSkuCreateOrUpdateReqVO sku : list) {
-                if (!skuAttrValues.add(sku.getProperties().stream().map(ProductSkuBaseVO.Property::getValueId).collect(Collectors.toSet()))) { // 添加失败，说明重复
-                    throw exception(ErrorCodeConstants.PRODUCT_SPU_SKU_NOT_DUPLICATE);
-                }
+        // 2. 校验，一个 SKU 下，没有重复的规格。校验方式是，遍历每个 SKU ，看看是否有重复的规格 propertyId
+        Map<Long, ProductPropertyValueRespVO> propertyValueMap = propertyAndValueList.stream().filter(p -> p.getValues() != null).flatMap(p -> p.getValues().stream())
+                .collect(Collectors.toMap(ProductPropertyValueRespVO::getId, value -> value)); // KEY：规格属性值的编号
+        skus.forEach(sku -> {
+            Set<Long> skuPropertyIds = CollectionUtils.convertSet(sku.getProperties(), propertyItem -> propertyValueMap.get(propertyItem.getValueId()).getPropertyId());
+            if (skuPropertyIds.size() != sku.getProperties().size()) {
+                throw exception(SKU_PROPERTIES_DUPLICATED);
+            }
+        });
+
+        // 3. 再校验，每个 Sku 的规格值的数量，是一致的。
+        int attrValueIdsSize = skus.get(0).getProperties().size();
+        for (int i = 1; i < skus.size(); i++) {
+            if (attrValueIdsSize != skus.get(i).getProperties().size()) {
+                throw exception(ErrorCodeConstants.SPU_ATTR_NUMBERS_MUST_BE_EQUALS);
+            }
+        }
+
+        // 4. 最后校验，每个 Sku 之间不是重复的
+        Set<Set<Long>> skuAttrValues = new HashSet<>(); // 每个元素，都是一个 Sku 的 attrValueId 集合。这样，通过最外层的 Set ，判断是否有重复的.
+        for (ProductSkuCreateOrUpdateReqVO sku : skus) {
+            // TODO @Luowenfeng：可以使用 CollectionUtils.convertSet()，简化下面的 stream 操作
+            if (!skuAttrValues.add(sku.getProperties().stream().map(ProductSkuBaseVO.Property::getValueId).collect(Collectors.toSet()))) { // 添加失败，说明重复
+                throw exception(ErrorCodeConstants.SPU_SKU_NOT_DUPLICATE);
             }
         }
     }
 
     @Override
-    public void createProductSkus(List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList, Long spuId) {
+    public void createSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList) {
         // 批量插入 SKU
         List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertSkuDOList(skuCreateReqList);
         skuDOList.forEach(v -> v.setSpuId(spuId));
@@ -140,13 +143,12 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     public List<ProductSkuDO> getSkusBySpuId(Long spuId) {
-        List<ProductSkuDO> productSkuDOS = productSkuMapper.selectBySpuIds(Collections.singletonList(spuId));
-        return productSkuDOS;
+        return productSkuMapper.selectListBySpuIds(Collections.singletonList(spuId));
     }
 
     @Override
     public List<ProductSkuDO> getSkusBySpuIds(List<Long> spuIds) {
-        return productSkuMapper.selectBySpuIds(spuIds);
+        return productSkuMapper.selectListBySpuIds(spuIds);
     }
 
     @Override
@@ -157,16 +159,16 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     @Override
     @Transactional
     public void updateProductSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
-        // 查询 spu 下已经存在的 sku 的集合
-        List<ProductSkuDO> existsSkus = productSkuMapper.selectBySpuId(spuId);
+        // 查询 SPU 下已经存在的 SKU 的集合
+        List<ProductSkuDO> existsSkus = productSkuMapper.selectListBySpuId(spuId);
         Map<Long, ProductSkuDO> existsSkuMap = CollectionUtils.convertMap(existsSkus, ProductSkuDO::getId);
 
         // 拆分三个集合，新插入的、需要更新的、需要删除的
         List<ProductSkuDO> insertSkus = new ArrayList<>();
-        List<ProductSkuDO> updateSkus = new ArrayList<>();
+        List<ProductSkuDO> updateSkus = new ArrayList<>(); // TODO Luowenfeng：使用 Long 即可
         List<ProductSkuDO> deleteSkus = new ArrayList<>();
 
-        // TODO @芋艿：是不是基于规格匹配会比较好。
+        // TODO @Luowenfeng：是不是基于规格匹配会比较好。可以参考下 onemall 的 ProductSpuServiceImpl 的 updateProductSpu 逻辑
         List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertSkuDOList(skus);
         allUpdateSkus.forEach(p -> {
             if (p.getId() != null) {

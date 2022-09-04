@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.product.dal.mysql.brand;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandListReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
@@ -27,4 +26,5 @@ public interface ProductBrandMapper extends BaseMapperX<ProductBrandDO> {
         return selectList(new LambdaQueryWrapperX<ProductBrandDO>()
                 .likeIfPresent(ProductBrandDO::getName, reqVO.getName()));
     }
+
 }

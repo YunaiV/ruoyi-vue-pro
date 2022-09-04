@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReq
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,13 +33,12 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
 
 
     // TODO @franky：方法名 selectList; 可以直接调用 selectList
-    default List<ProductSkuDO> selectBySpuIds(List<Long> spuIds) {
-        return selectList(new LambdaQueryWrapperX<ProductSkuDO>()
-                .inIfPresent(ProductSkuDO::getSpuId, spuIds));
+    default List<ProductSkuDO> selectListBySpuIds(List<Long> spuIds) {
+        return selectList(ProductSkuDO::getSpuId, spuIds);
     }
 
-    default List<ProductSkuDO> selectBySpuId(Long spuIds) {
-        return selectBySpuIds(Collections.singletonList(spuIds));
+    default List<ProductSkuDO> selectListBySpuId(Long spuId) {
+        return selectList(ProductSkuDO::getSpuId, spuId);
     }
 
     default void deleteBySpuId(Long spuId) {

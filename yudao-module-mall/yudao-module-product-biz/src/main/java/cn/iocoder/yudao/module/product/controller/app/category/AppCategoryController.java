@@ -30,7 +30,7 @@ public class AppCategoryController {
     @GetMapping("/list")
     @ApiOperation("获得商品分类列表")
     public CommonResult<List<AppCategoryRespVO>> getProductCategoryList() {
-        List<ProductCategoryDO> list = categoryService.getEnableProductCategoryList();
+        List<ProductCategoryDO> list = categoryService.getEnableCategoryList();
         list.sort(Comparator.comparing(ProductCategoryDO::getSort));
         return success(ProductCategoryConvert.INSTANCE.convertList03(list));
     }

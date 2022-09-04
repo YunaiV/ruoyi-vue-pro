@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.product.service.property;
 
-import java.util.*;
-import javax.validation.*;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.*;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 规格名称 Service 接口
@@ -72,14 +74,16 @@ public interface ProductPropertyService {
      * @param pageReqVO
      * @return
      */
-    PageResult<ProductPropertyRespVO> getPropertyListPage(ProductPropertyPageReqVO pageReqVO);
+    PageResult<ProductPropertyAndValueRespVO> getPropertyListPage(ProductPropertyPageReqVO pageReqVO);
 
-    ProductPropertyRespVO getPropertyResp(Long id);
+    ProductPropertyAndValueRespVO getPropertyResp(Long id);
 
     /**
-     * 根据数据名id集合查询属性名以及属性值的集合
-     * @param propertyIds 属性名id集合
-     * @return
+     * 根据规格属性编号的集合，获得对应的规格 + 规格值的集合
+     *
+     * @param ids 规格编号的集合
+     * @return 对应的规格 + 规格值的集合
      */
-    List<ProductPropertyRespVO> selectByIds(List<Long> propertyIds);
+    List<ProductPropertyAndValueRespVO> getPropertyAndValueList(Collection<Long> ids);
+
 }

@@ -108,11 +108,11 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     }
 
     @Override
-    public PageResult<ProductPropertyRespVO> getPropertyListPage(ProductPropertyPageReqVO pageReqVO) {
+    public PageResult<ProductPropertyAndValueRespVO> getPropertyListPage(ProductPropertyPageReqVO pageReqVO) {
         //获取属性列表
         PageResult<ProductPropertyDO> pageResult = productPropertyMapper.selectPage(pageReqVO);
-        PageResult<ProductPropertyRespVO> propertyRespVOPageResult = ProductPropertyConvert.INSTANCE.convertPage(pageResult);
-        List<Long> propertyIds = propertyRespVOPageResult.getList().stream().map(ProductPropertyRespVO::getId).collect(Collectors.toList());
+        PageResult<ProductPropertyAndValueRespVO> propertyRespVOPageResult = ProductPropertyConvert.INSTANCE.convertPage(pageResult);
+        List<Long> propertyIds = propertyRespVOPageResult.getList().stream().map(ProductPropertyAndValueRespVO::getId).collect(Collectors.toList());
 
         //获取属性值列表
         List<ProductPropertyValueDO> productPropertyValueDOList = productPropertyValueMapper.getPropertyValueListByPropertyId(propertyIds);
@@ -121,7 +121,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         propertyRespVOPageResult.getList().forEach(x->{
             Long propertyId = x.getId();
             List<ProductPropertyValueRespVO> valueDOList = propertyValueRespVOList.stream().filter(v -> v.getPropertyId().equals(propertyId)).collect(Collectors.toList());
-            x.setPropertyValueList(valueDOList);
+            x.setValues(valueDOList);
         });
         return propertyRespVOPageResult;
     }
@@ -131,25 +131,25 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     }
 
     @Override
-    public ProductPropertyRespVO getPropertyResp(Long id) {
+    public ProductPropertyAndValueRespVO getPropertyResp(Long id) {
         //查询规格
         ProductPropertyDO property = getProperty(id);
-        ProductPropertyRespVO propertyRespVO = ProductPropertyConvert.INSTANCE.convert(property);
+        ProductPropertyAndValueRespVO propertyRespVO = ProductPropertyConvert.INSTANCE.convert(property);
         //查询属性值
         List<ProductPropertyValueDO> valueDOList = productPropertyValueMapper.getPropertyValueListByPropertyId(Arrays.asList(id));
         List<ProductPropertyValueRespVO> propertyValueRespVOS = ProductPropertyValueConvert.INSTANCE.convertList(valueDOList);
         //组装
-        propertyRespVO.setPropertyValueList(propertyValueRespVOS);
+        propertyRespVO.setValues(propertyValueRespVOS);
         return propertyRespVO;
     }
 
     @Override
-    public List<ProductPropertyRespVO> selectByIds(List<Long> propertyIds) {
-        List<ProductPropertyRespVO> productPropertyRespVO = ProductPropertyConvert.INSTANCE.convertList(productPropertyMapper.selectBatchIds(propertyIds));
+    public List<ProductPropertyAndValueRespVO> getPropertyAndValueList(Collection<Long> ids) {
+        List<ProductPropertyAndValueRespVO> productPropertyRespVO = ProductPropertyConvert.INSTANCE.convertList(productPropertyMapper.selectBatchIds(ids));
         //查询属性值
-        List<ProductPropertyValueDO> valueDOList = productPropertyValueMapper.getPropertyValueListByPropertyId(propertyIds);
+        List<ProductPropertyValueDO> valueDOList = productPropertyValueMapper.selectBatchIds(ids);
         Map<Long, List<ProductPropertyValueDO>> propertyValuesMap = valueDOList.stream().collect(Collectors.groupingBy(ProductPropertyValueDO::getPropertyId));
-        productPropertyRespVO.forEach(p -> p.setPropertyValueList(ProductPropertyValueConvert.INSTANCE.convertList(propertyValuesMap.get(p.getId()))));
+        productPropertyRespVO.forEach(p -> p.setValues(ProductPropertyValueConvert.INSTANCE.convertList(propertyValuesMap.get(p.getId()))));
         return productPropertyRespVO;
     }
 }

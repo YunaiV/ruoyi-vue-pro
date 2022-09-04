@@ -11,14 +11,14 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 商品sku Service 接口
+ * 商品 SKU Service 接口
  *
  * @author 芋道源码
  */
 public interface ProductSkuService {
 
     /**
-     * 创建商品sku
+     * 创建商品 SKU
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -68,14 +68,15 @@ public interface ProductSkuService {
      *
      * @param list sku组合的集合
      */
-    void validateProductSkus(List<ProductSkuCreateOrUpdateReqVO> list, Integer specType);
+    void validateSkus(List<ProductSkuCreateOrUpdateReqVO> list, Integer specType);
 
     /**
      * 批量创建 SKU
      *
+     * @param spuId 商品 SPU 编号
      * @param list SKU 对象集合
      */
-    void createProductSkus(List<ProductSkuCreateOrUpdateReqVO> list, Long spuId);
+    void createSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> list);
 
     /**
      * 根据 SPU 编号，批量更新它的 SKU 信息

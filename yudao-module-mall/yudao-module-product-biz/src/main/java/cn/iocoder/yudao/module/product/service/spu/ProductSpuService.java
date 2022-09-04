@@ -26,14 +26,14 @@ public interface ProductSpuService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createProductSpu(@Valid ProductSpuCreateReqVO createReqVO);
+    Long createSpu(@Valid ProductSpuCreateReqVO createReqVO);
 
     /**
      * 更新商品 SPU
      *
      * @param updateReqVO 更新信息
      */
-    void updateProductSpu(@Valid ProductSpuUpdateReqVO updateReqVO);
+    void updateSpu(@Valid ProductSpuUpdateReqVO updateReqVO);
 
     /**
      * 删除商品spu

@@ -41,7 +41,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         ProductSpuCreateReqVO reqVO = randomPojo(ProductSpuCreateReqVO.class);
 
         // 调用
-        Long spuId = spuService.createProductSpu(reqVO);
+        Long spuId = spuService.createSpu(reqVO);
         // 断言
         assertNotNull(spuId);
         // 校验记录的属性是否正确
@@ -60,7 +60,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         });
 
         // 调用
-        spuService.updateProductSpu(reqVO);
+        spuService.updateSpu(reqVO);
         // 校验是否更新正确
         ProductSpuDO spu = ProductSpuMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, spu);
@@ -72,7 +72,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         ProductSpuUpdateReqVO reqVO = randomPojo(ProductSpuUpdateReqVO.class);
 
         // 调用, 并断言异常
-        assertServiceException(() -> spuService.updateProductSpu(reqVO), SPU_NOT_EXISTS);
+        assertServiceException(() -> spuService.updateSpu(reqVO), SPU_NOT_EXISTS);
     }
 
     @Test

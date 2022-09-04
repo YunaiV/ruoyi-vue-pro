@@ -23,11 +23,11 @@ public interface ProductPropertyConvert {
 
     ProductPropertyDO convert(ProductPropertyUpdateReqVO bean);
 
-    ProductPropertyRespVO convert(ProductPropertyDO bean);
+    ProductPropertyAndValueRespVO convert(ProductPropertyDO bean);
 
-    List<ProductPropertyRespVO> convertList(List<ProductPropertyDO> list);
+    List<ProductPropertyAndValueRespVO> convertList(List<ProductPropertyDO> list);
 
-    PageResult<ProductPropertyRespVO> convertPage(PageResult<ProductPropertyDO> page);
+    PageResult<ProductPropertyAndValueRespVO> convertPage(PageResult<ProductPropertyDO> page);
 
     List<ProductPropertyExcelVO> convertList02(List<ProductPropertyDO> list);
 

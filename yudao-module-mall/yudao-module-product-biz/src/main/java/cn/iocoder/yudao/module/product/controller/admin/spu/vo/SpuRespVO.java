@@ -35,6 +35,8 @@ public class SpuRespVO extends ProductSpuBaseVO {
     @ApiModelProperty(value = "分类id数组，一直递归到一级父节点", example = "[1,2,4]")
     private LinkedList<Long> categoryIds;
 
+    // TODO @芋艿：再琢磨下 这个 VO 类，其实变成 SpuRespVO 内嵌的 VO 类会更好一点；然后把 SpuRespVO 改成 SpuDetailSpuVO
+
     @ApiModelProperty(value = "规格属性修改和详情展示组合", example = "[{\"propertyId\":2,\"name\":\"内存\",\"propertyValues\":[{\"v1\":11,\"v2\":\"64G\"},{\"v1\":10,\"v2\":\"32G\"}]},{\"propertyId\":3,\"name\":\"尺寸\",\"propertyValues\":[{\"v1\":16,\"v2\":\"6.1\"},{\"v1\":15,\"v2\":\"5.7\"}]}]")
     private List<ProductPropertyViewRespVO> productPropertyViews;
 

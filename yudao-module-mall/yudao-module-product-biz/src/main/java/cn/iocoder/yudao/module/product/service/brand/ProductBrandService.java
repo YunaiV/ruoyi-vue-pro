@@ -55,10 +55,11 @@ public interface ProductBrandService {
 
     /**
      * 获得品牌列表
-     * @param listVo 请求参数
+     *
+     * @param listReqVO 请求参数
      * @return 品牌列表
      */
-    List<ProductBrandDO> getBrandList(ProductBrandListReqVO listVo);
+    List<ProductBrandDO> getBrandList(ProductBrandListReqVO listReqVO);
 
     /**
      * 验证选择的商品分类是否合法
