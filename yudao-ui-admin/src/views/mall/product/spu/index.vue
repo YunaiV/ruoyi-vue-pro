@@ -1,57 +1,30 @@
 <template>
   <div class="app-container">
     <!-- 搜索工作栏 -->
-    <el-form
-      :model="queryParams"
-      ref="queryForm"
-      size="small"
-      :inline="true"
-      v-show="showSearch"
-      label-width="68px"
-    >
+    <!-- TODO @Luowenfeng：参考界面；https://v5.niuteam.cn/shop/goods/lists.html
+      商品名称、商品编码、商品分类、商品品牌
+      商品销量、商品价格
+     -->
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="商品名称" prop="name">
-        <el-input
-          v-model="queryParams.name"
-          placeholder="请输入商品名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.name" placeholder="请输入商品名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="分类id" prop="categoryId">
-        <el-input
-          v-model="queryParams.categoryId"
-          placeholder="请输入分类id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.categoryId" placeholder="请输入分类id" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select
-          v-model="queryParams.status"
-          placeholder="请选择上下架状态"
-          clearable
-          size="small"
-        >
+        <el-select v-model="queryParams.status" placeholder="请选择上下架状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
           <el-option label="上架" value="0" />
           <el-option label="下架" value="1" />
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="dateRangeCreateTime"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        />
+        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
+          range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery"
-          >搜索</el-button
-        >
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -59,36 +32,20 @@
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['product:spu:create']"
-          >新增
-        </el-button>
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
+                   v-hasPermi="['product:spu:create']">新增</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          :loading="exportLoading"
-          v-hasPermi="['product:spu:export']"
-          >导出
-        </el-button>
-      </el-col>
-      <right-toolbar
-        :showSearch.sync="showSearch"
-        @queryTable="getList"
-      ></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
     </el-row>
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
+      <!--
+      TODO @Luowenfeng：参考界面；
+       https://v5.niuteam.cn/shop/goods/lists.html
+       1. 字段：商品信息、价格、库存、销量、排序、创建时间、状态、操作；
+       2. tab 分成全部、销售中、仓库中、预警中
+       -->
       <el-table-column label="主键" align="center" prop="id" />
       <el-table-column label="商品名称" align="center" prop="name" />
       <el-table-column label="分类id" align="center" prop="categoryId" />
@@ -111,50 +68,23 @@
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
-      <el-table-column
-        label="创建时间"
-        align="center"
-        prop="createTime"
-        width="180"
-      >
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="操作"
-        align="center"
-        class-name="small-padding fixed-width"
-      >
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['product:spu:update']"
-            >修改
-          </el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['product:spu:delete']"
-            >删除
-          </el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+                     v-hasPermi="['product:spu:update']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+                     v-hasPermi="['product:spu:delete']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页组件 -->
-    <pagination
-      v-show="total > 0"
-      :total="total"
-      :page.sync="queryParams.pageNo"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
-
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                @pagination="getList"/>
 
     <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body destroy-on-close :close-on-click-modal="false" >
       <save @closeDialog="closeDialog" :type="dialogType" :obj="dialogObj" v-if="open" />
@@ -166,12 +96,14 @@
 import {
   deleteSpu,
   getSpuPage,
-  exportSpuExcel,
 } from "@/api/mall/product/spu";
 
 import Editor from "@/components/Editor";
 import ImageUpload from "@/components/ImageUpload";
 import save  from "./save";
+
+// 1. TODO @Luowenfeng：商品的添加、修改，走一个单独的页面，不走弹窗；https://v5.niuteam.cn/shop/goods/addgoods.html
+// 2. TODO
 
 export default {
   name: "Spu",
@@ -306,27 +238,7 @@ export default {
           this.$modal.msgSuccess("删除成功");
         })
         .catch(() => {});
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      // 处理查询参数
-      let params = { ...this.queryParams };
-      params.pageNo = undefined;
-      params.pageSize = undefined;
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, "createTime");
-      // 执行导出
-      this.$modal
-        .confirm("是否确认导出所有商品spu数据项?")
-        .then(() => {
-          this.exportLoading = true;
-          return exportSpuExcel(params);
-        })
-        .then((response) => {
-          this.$download.excel(response, "商品spu.xls");
-          this.exportLoading = false;
-        })
-        .catch(() => {});
-    },
+    }
   },
 };
 </script>

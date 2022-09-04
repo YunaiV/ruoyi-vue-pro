@@ -7,24 +7,28 @@
           <el-form-item label="商品名称" prop="name">
             <el-input v-model="baseForm.name" placeholder="请输入商品名称"/>
           </el-form-item>
-          <el-form-item label="卖点">
-            <el-input v-model="baseForm.sellPoint" placeholder="请输入卖点"/>
+          <el-form-item label="商品卖点">
+            <el-input type="textarea" v-model="baseForm.sellPoint" placeholder="请输入商品卖点"/>
           </el-form-item>
-          <el-form-item label="分类id" prop="categoryIds">
-            <el-cascader
-              v-model="baseForm.categoryIds"
-              placeholder="请输入分类id"
-              style="width: 100%"
-              :options="categoryList"
-              :props="propName"
-              clearable
-            ></el-cascader>
-          </el-form-item>
-          <el-form-item label="商品轮播图" prop="picUrls">
+          <!-- TODO @Luowenfeng：商品主图，80 x 80 即可 -->
+          <el-form-item label="商品主图" prop="picUrls">
             <ImageUpload v-model="baseForm.picUrls" :value="baseForm.picUrls" :limit="10"/>
           </el-form-item>
-          <el-form-item label="排序字段">
-            <el-input v-model="baseForm.sort" placeholder="请输入排序字段" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
+          <!-- TODO @Luowenfeng：商品视频 -->
+          <el-form-item label="商品品牌" prop="brandId">
+            <el-select v-model="baseForm.brandId" placeholder="请选择商品品牌">
+              <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="商品分类" prop="categoryIds">
+            <el-cascader v-model="baseForm.categoryIds" placeholder="商品分类" style="width: 100%"
+                         :options="categoryList" :props="propName" clearable />
+          </el-form-item>
+          <el-form-item label="是否上架" prop="status">
+            <el-radio-group v-model="baseForm.status">
+              <el-radio :label="0">立即上架</el-radio>
+              <el-radio :label="1">放入仓库</el-radio>
+            </el-radio-group>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -32,7 +36,8 @@
       <!-- 价格库存 -->
       <el-tab-pane label="价格库存" name="rates" class="rates">
         <el-form ref="rates" :model="ratesForm" :rules="rules">
-          <el-form-item label="商品规格">
+          <el-form-item label="启用多规格">
+            <!-- TODO @Luowenfeng：改成开关的按钮；关闭，单规格；开启，多规格 -->
             <el-radio-group v-model="ratesForm.spec" @change="changeRadio">
               <el-radio :label="1">单规格</el-radio>
               <el-radio :label="2">多规格</el-radio>
@@ -41,28 +46,13 @@
 
           <!-- 动态添加规格属性 -->
           <div v-show="ratesForm.spec === 2">
-            <div
-              v-for="(specs, index) in dynamicSpec"
-              :key="index"
-              class="dynamic-spec"
-            >
+            <div v-for="(specs, index) in dynamicSpec" :key="index" class="dynamic-spec">
               <!-- 删除按钮 -->
-              <el-button
-                type="danger"
-                icon="el-icon-delete"
-                circle
-                class="spec-delete"
-                @click="removeSpec(index)"
-              ></el-button>
+              <el-button type="danger" icon="el-icon-delete" circle class="spec-delete" @click="removeSpec(index)" />
               <div class="spec-header">
                 规格项：
                 <el-select v-model="specs.specId" filterable placeholder="请选择" @change="changeSpec">
-                  <el-option
-                    v-for="item in propertyPageList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id">
-                  </el-option>
+                  <el-option v-for="item in propertyPageList" :key="item.id" :label="item.name" :value="item.id" />
                 </el-select>
               </div>
               <div class="spec-values">
@@ -71,24 +61,17 @@
                 </template>
               </div>
             </div>
-            <el-button type="primary" @click="dynamicSpec.push({specValue: []}); ratesForm.rates = []"
-            >添加规格项目
-            </el-button
-            >
+            <el-button type="primary" @click="dynamicSpec.push({specValue: []}); ratesForm.rates = []">添加规格项目</el-button>
           </div>
 
           <!-- 规格明细 -->
           <el-form-item label="规格明细">
             <el-table :data="ratesForm.rates" border style="width: 100%" ref="ratesTable">
               <template v-if="ratesForm.spec == 2">
-                <el-table-column :key="index" v-for="(item, index) in dynamicSpec.filter(v=>v.specName != undefined)"
+                <el-table-column :key="index" v-for="(item, index) in dynamicSpec.filter(v => v.specName !== undefined)"
                                  :label="item.specName">
                   <template slot-scope="scope">
-                    <el-input
-                      v-if="scope.row.spec"
-                      v-model="scope.row.spec[index]"
-                      disabled
-                    ></el-input>
+                    <el-input v-if="scope.row.spec" v-model="scope.row.spec[index]" disabled />
                   </template>
                 </el-table-column>
               </template>
@@ -98,25 +81,20 @@
                                style="width: 100px; height: 50px"/>
                 </template>
               </el-table-column>
-              <template v-if="ratesForm.spec == 2">
+              <template v-if="ratesForm.spec === 2">
                <el-table-column label="sku名称" :render-header="addRedStar" key="91">
                   <template slot-scope="scope">
-                  <el-form-item :prop="'rates.'+ scope.$index + '.name'" :rules="[{required: true, trigger: 'change'}]">
-                      <el-input
-                        v-model="scope.row.name"
-                      ></el-input>
-                      </el-form-item>
+                    <el-form-item :prop="'rates.'+ scope.$index + '.name'" :rules="[{required: true, trigger: 'change'}]">
+                      <el-input v-model="scope.row.name" />
+                    </el-form-item>
                   </template>
                 </el-table-column>
-                </template>
-
+              </template>
               <el-table-column label="市场价(元)" :render-header="addRedStar" key="92">
                 <template slot-scope="scope">
                   <el-form-item :prop="'rates.'+ scope.$index + '.marketPrice'" :rules="[{required: true, trigger: 'change'}]">
-                    <el-input
-                      v-model="scope.row.marketPrice"
-                      oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''"
-                    ></el-input>
+                    <el-input v-model="scope.row.marketPrice"
+                      oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
                   </el-form-item>
                 </template>
               </el-table-column>
@@ -164,12 +142,8 @@
                   <el-input v-model="scope.row.barCode"></el-input>
                 </template>
               </el-table-column>
-               <template v-if="ratesForm.spec == 2">
-                <el-table-column
-                  fixed="right"
-                  label="操作"
-                  width="50"
-                  key="100">
+               <template v-if="ratesForm.spec === 2">
+                <el-table-column fixed="right" label="操作" width="50" key="100">
                   <template slot-scope="scope">
                     <el-button @click="scope.row.status = 1" type="text" size="small" v-show="scope.row.status == undefined || scope.row.status == 0 ">禁用</el-button>
                     <el-button @click="scope.row.status = 0" type="text" size="small" v-show="scope.row.status == 1">启用</el-button>
@@ -178,11 +152,15 @@
               </template>
             </el-table>
           </el-form-item>
+          <el-form-item label="虚拟销量" prop="virtualSalesCount">
+            <!-- TODO @Luowenfeng：使用 input 类型即可 -->
+            <el-input v-model="baseForm.virtualSalesCount" placeholder="请输入虚拟销量" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
+          </el-form-item>
         </el-form>
       </el-tab-pane>
 
       <!-- 商品详情 -->
-      <el-tab-pane label="商品描述" name="third">
+      <el-tab-pane label="商品详情" name="third">
       <el-form ref="third" :model="baseForm" :rules="rules">
         <el-form-item prop="description">
           <editor v-model="baseForm.description" :min-height="380"/>
@@ -191,31 +169,15 @@
       </el-tab-pane>
 
       <!-- 销售设置 -->
-      <el-tab-pane label="销售设置" name="fourth">
+      <el-tab-pane label="高级设置" name="fourth">
         <el-form ref="fourth" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
-          <el-form-item label="所属品牌" prop="brandId">
-            <el-select v-model="baseForm.brandId" placeholder="请选择">
-                  <el-option
-                    v-for="item in brandList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id">
-                  </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="虚拟销量" prop="virtualSalesCount">
-            <el-input v-model="baseForm.virtualSalesCount" placeholder="请输入虚拟销量" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
+          <el-form-item label="排序字段">
+            <el-input v-model="baseForm.sort" placeholder="请输入排序字段" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
           </el-form-item>
            <el-form-item label="是否展示库存" prop="showStock">
              <el-radio-group v-model="baseForm.showStock">
               <el-radio :label="true">是</el-radio>
               <el-radio :label="false">否</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="商品状态" prop="status">
-            <el-radio-group v-model="baseForm.status">
-              <el-radio :label="0">上架</el-radio>
-              <el-radio :label="1">下架</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-form>
@@ -253,7 +215,7 @@ export default {
   },
   data() {
     return {
-      activeName: "base",
+      activeName: "base", // TODO @Luowenfeng：切换时，不需要校验通过
       propName: {
         checkStrictly: true,
         label: "name",

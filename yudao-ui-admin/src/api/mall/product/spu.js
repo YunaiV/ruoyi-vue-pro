@@ -42,13 +42,3 @@ export function getSpuPage(query) {
     params: query
   })
 }
-
-// 导出商品spu Excel
-export function exportSpuExcel(query) {
-  return request({
-    url: '/product/spu/export-excel',
-    method: 'get',
-    params: query,
-    responseType: 'blob'
-  })
-}
