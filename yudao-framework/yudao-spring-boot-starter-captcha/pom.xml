@@ -13,7 +13,7 @@
 
     <name>${project.artifactId}</name>
     <description>验证码拓展
-        1. 基于 aj-captcha 实现图形验证码，文档：https://ajcaptcha.beliefteam.cn/captcha-doc/
+        1. 基于 aj-captcha 实现滑块验证码，文档：https://ajcaptcha.beliefteam.cn/captcha-doc/
     </description>
 
     <dependencies>
@@ -25,8 +25,8 @@
 
         <!-- DB 相关 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-redis</artifactId>
         </dependency>
 
         <!-- 验证码相关 -->

@@ -39,7 +39,7 @@
 		},
 		data() {
 			return {
-				captchaEnabled: true,
+				captchaEnabled: true, // 验证码开关 TODO 芋艿：需要抽到配置里
 				globalConfig: getApp().globalData.config,
 				loginForm: {
 					username: "admin",
@@ -66,14 +66,19 @@
 				} else if (this.loginForm.password === "") {
 					this.$modal.msgError("请输入您的密码")
 				} else {
-					this.$modal.loading("登录中，请耐心等待...")
-					// 显示验证码
-					this.$refs.verify.show()
+          // 显示验证码
+          if (this.captchaEnabled) {
+            this.$refs.verify.show()
+          } else { // 直接登录
+            await this.pwdLogin({})
+          }
 				}
 			},
 			// 密码登录
-			async pwdLogin(params) {
-				this.loginForm.captchaVerification = params.captchaVerification
+			async pwdLogin(captchaParams) {
+        this.$modal.loading("登录中，请耐心等待...")
+        // 执行登录
+        this.loginForm.captchaVerification = captchaParams.captchaVerification
 				this.$store.dispatch('Login', this.loginForm).then(() => {
 					this.$modal.closeLoading()
 					this.loginSuccess()

@@ -2,7 +2,7 @@
 module.exports = {
   // baseUrl: 'http://localhost:8080',
   baseUrl: 'http://localhost:48080',
-  baseApi: 'admin-api',
+  baseApi: '/admin-api',
   // 应用信息
   appInfo: {
     // 应用名称
