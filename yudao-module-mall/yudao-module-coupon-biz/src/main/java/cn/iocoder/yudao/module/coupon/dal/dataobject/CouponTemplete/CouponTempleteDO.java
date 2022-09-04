@@ -57,7 +57,7 @@ public class CouponTempleteDO extends BaseDO {
     /**
      * 适用商品类型1-全部商品可用；2-指定商品可用；3-指定商品不可用
      */
-    private Boolean goodsType;
+    private Integer goodsType;
     /**
      * 适用商品id
      */
@@ -93,7 +93,7 @@ public class CouponTempleteDO extends BaseDO {
     /**
      * 过期类型1-时间范围过期 2-领取之日固定日期后过期 3-领取次日固定日期后过期
      */
-    private Boolean validityType;
+    private Integer validityType;
     /**
      * 使用开始日期 过期类型1时必填
      */

@@ -3,19 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>yudao-module-mall</artifactId>
         <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao-module-mall</artifactId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>yudao-module-coupon-biz</artifactId>
     <packaging>jar</packaging>
-
+    <artifactId>yudao-module-coupon-biz</artifactId>
 
     <name>${project.artifactId}</name>
+
     <description>
-        trade 模块，主要实现交易相关功能
-        例如：订单、退款、购物车等功能。
+        coupon模块，主要负责优惠券的一些业务，含发布优惠券模板，分发优惠券等
     </description>
 
     <dependencies>

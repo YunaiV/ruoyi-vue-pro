@@ -1,20 +1,17 @@
-package cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo;
+package cn.iocoder.yudao.module.coupon.controller.admin.templete.vo;
 
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.*;
 import io.swagger.annotations.*;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel("管理后台 - 优惠券模板分页 Request VO")
+@ApiModel(value = "管理后台 - 优惠券模板 Excel 导出 Request VO", description = "参数和 CouponTempletePageReqVO 是一致的")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class CouponTempletePageReqVO extends PageParam {
+public class CouponTempleteExportReqVO {
 
     @ApiModelProperty(value = "优惠券类型 reward-满减 discount-折扣 random-随机")
     private String type;

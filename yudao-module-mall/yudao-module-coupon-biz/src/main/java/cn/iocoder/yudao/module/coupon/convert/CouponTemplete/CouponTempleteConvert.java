@@ -4,10 +4,10 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo.CouponTempleteCreateReqVO;
-import cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo.CouponTempleteExcelVO;
-import cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo.CouponTempleteRespVO;
-import cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo.CouponTempleteUpdateReqVO;
+import cn.iocoder.yudao.module.coupon.controller.admin.templete.vo.CouponTempleteCreateReqVO;
+import cn.iocoder.yudao.module.coupon.controller.admin.templete.vo.CouponTempleteExcelVO;
+import cn.iocoder.yudao.module.coupon.controller.admin.templete.vo.CouponTempleteRespVO;
+import cn.iocoder.yudao.module.coupon.controller.admin.templete.vo.CouponTempleteUpdateReqVO;
 import cn.iocoder.yudao.module.coupon.dal.dataobject.CouponTemplete.CouponTempleteDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

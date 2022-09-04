@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo;
+package cn.iocoder.yudao.module.coupon.controller.admin.templete.vo;
 
 import lombok.*;
 import java.util.*;
@@ -39,7 +39,7 @@ public class CouponTempleteExcelVO {
     private Integer usedCount;
 
     @ExcelProperty("适用商品类型1-全部商品可用；2-指定商品可用；3-指定商品不可用")
-    private Boolean goodsType;
+    private Integer goodsType;
 
     @ExcelProperty("适用商品id")
     private String productIds;
@@ -66,7 +66,7 @@ public class CouponTempleteExcelVO {
     private BigDecimal maxMoney;
 
     @ExcelProperty("过期类型1-时间范围过期 2-领取之日固定日期后过期 3-领取次日固定日期后过期")
-    private Boolean validityType;
+    private Integer validityType;
 
     @ExcelProperty("使用开始日期 过期类型1时必填")
     private Date startUseTime;

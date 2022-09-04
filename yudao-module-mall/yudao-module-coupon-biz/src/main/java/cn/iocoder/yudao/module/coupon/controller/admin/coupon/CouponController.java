@@ -21,7 +21,7 @@ import cn.iocoder.yudao.module.coupon.service.coupon.CouponService;
 
 @Api(tags = "管理后台 - 优惠券")
 @RestController
-@RequestMapping("/coupon/coupon/")
+@RequestMapping("/coupon/item")
 @Validated
 public class CouponController {
 
@@ -69,7 +69,7 @@ public class CouponController {
 
     @GetMapping("/list")
     @ApiOperation("获得优惠券列表")
-//    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
+    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('coupon::query')")
     public CommonResult<List<CouponRespVO>> getList(@RequestParam("ids") Collection<Long> ids) {
         List<CouponDO> list = couponService.getList(ids);

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 
 /**
- * 优惠券 - 优惠券类型
+ * 优惠券使用类型 - 优惠券使用类型类型
  *
  * @author Sin
  */
@@ -18,11 +18,11 @@ public enum CouponUseLimitEnum {
     NO_LIMIT(2,"有门槛"),;
 
     /**
-     * 优惠券类型
+     * 优惠券使用类型
      */
     private final Integer type;
     /**
-     * 优惠券类型名
+     * 优惠券使用类型名
      */
     private final String name;
 

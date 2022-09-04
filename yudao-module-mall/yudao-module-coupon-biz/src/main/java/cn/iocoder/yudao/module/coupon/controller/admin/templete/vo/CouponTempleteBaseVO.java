@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo;
+package cn.iocoder.yudao.module.coupon.controller.admin.templete.vo;
 
 import lombok.*;
 import java.util.*;
@@ -34,7 +34,7 @@ public class CouponTempleteBaseVO {
 
     @ApiModelProperty(value = "适用商品类型1-全部商品可用；2-指定商品可用；3-指定商品不可用", required = true)
     @NotNull(message = "适用商品类型1-全部商品可用；2-指定商品可用；3-指定商品不可用不能为空")
-    private Boolean goodsType;
+    private Integer goodsType;
 
     @ApiModelProperty(value = "适用商品id")
     private String productIds;
@@ -104,7 +104,7 @@ public class CouponTempleteBaseVO {
 
 
     @ApiModelProperty(value = "领取是否无限制0-否 1是", required = true)
-    @NotNull(message = "是否无限制0-否 1是 不能为空")
+    @NotNull(message = "是否无限制0-否 1是")
     private Boolean whetherLimitless;
 
     @ApiModelProperty(value = "每人最大领取个数", required = true)

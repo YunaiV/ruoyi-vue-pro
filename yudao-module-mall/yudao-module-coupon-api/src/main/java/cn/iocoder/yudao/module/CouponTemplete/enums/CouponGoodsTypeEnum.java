@@ -6,23 +6,24 @@ import lombok.RequiredArgsConstructor;
 
 
 /**
- * 优惠券 - 是否开启过期提醒
+ * 优惠券 - 优惠券商品使用类型
  *
  * @author Sin
  */
 @RequiredArgsConstructor
 @Getter
-public enum CouponExpireTimeTypeEnum {
+public enum CouponGoodsTypeEnum {
 
-    OPEN(1,"不开启"),
-    CLOSE(0,"开启"),;
+    ALL(1,"全部商品可用"),
+    POINT_PRODUCT(2,"指定商品可用"),
+    POINT_PRODUCT_NOT(3,"指定商品不可用"),;
 
     /**
-     * 是否开启过期提醒
+     * 优惠券商品使用类型
      */
     private final Integer type;
     /**
-     * 是否开启过期提醒
+     * 优惠券商品使用类型名
      */
     private final String name;
 

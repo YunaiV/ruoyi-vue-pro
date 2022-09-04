@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo;
+package cn.iocoder.yudao.module.coupon.controller.admin.templete.vo;
 
 import lombok.*;
 import java.util.*;

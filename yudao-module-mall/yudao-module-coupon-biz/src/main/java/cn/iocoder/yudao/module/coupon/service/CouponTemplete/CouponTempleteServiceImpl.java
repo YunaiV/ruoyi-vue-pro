@@ -2,14 +2,13 @@ package cn.iocoder.yudao.module.coupon.service.CouponTemplete;
 
 import cn.iocoder.yudao.module.CouponTemplete.enums.CouponTypeEnum;
 import cn.iocoder.yudao.module.CouponTemplete.enums.CouponValidityTypeEnum;
-import cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo.CouponTempleteCreateReqVO;
-import cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo.CouponTempleteExportReqVO;
-import cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo.CouponTempletePageReqVO;
-import cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo.CouponTempleteUpdateReqVO;
+import cn.iocoder.yudao.module.coupon.controller.admin.templete.vo.CouponTempleteCreateReqVO;
+import cn.iocoder.yudao.module.coupon.controller.admin.templete.vo.CouponTempleteExportReqVO;
+import cn.iocoder.yudao.module.coupon.controller.admin.templete.vo.CouponTempletePageReqVO;
+import cn.iocoder.yudao.module.coupon.controller.admin.templete.vo.CouponTempleteUpdateReqVO;
 import cn.iocoder.yudao.module.coupon.convert.CouponTemplete.CouponTempleteConvert;
 import cn.iocoder.yudao.module.coupon.dal.dataobject.CouponTemplete.CouponTempleteDO;
 import cn.iocoder.yudao.module.coupon.dal.mysql.CouponTemplete.CouponTempleteMapper;
-import cn.iocoder.yudao.module.coupon.service.CouponTemplete.CouponTempleteService;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +40,7 @@ public class CouponTempleteServiceImpl implements CouponTempleteService {
         /* 验证类型、判断必填*/
         checkCouponType(createReqVO);
 
-        /*todo 验证过期类型、判断必填*/
+        /*验证过期类型、判断必填*/
         checkValidityType(createReqVO);
 
 
