@@ -1,1 +1,1 @@
-cn.iocoder.yudao.captcha.core.service.CaptchaServiceImpl
+cn.iocoder.yudao.framework.captcha.core.service.RedisCaptchaServiceImpl

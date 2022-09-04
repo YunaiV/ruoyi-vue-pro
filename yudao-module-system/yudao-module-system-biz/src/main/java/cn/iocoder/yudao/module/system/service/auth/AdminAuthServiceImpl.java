@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
@@ -24,7 +25,9 @@ import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -61,6 +64,12 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Resource
     private SmsCodeApi smsCodeApi;
 
+    /**
+     * 验证码的开关，默认为 true
+     */
+    @Value("${yudao.captcha.enable:true}")
+    private Boolean captchaEnable;
+
     @Override
     public AdminUserDO authenticate(String username, String password) {
         final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_USERNAME;
@@ -84,23 +93,19 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public AuthLoginRespVO login(AuthLoginReqVO reqVO) {
-        CaptchaVO captchaVO = new CaptchaVO();
-        captchaVO.setCaptchaVerification(reqVO.getCaptchaVerification());
-        ResponseModel response = captchaService.verification(captchaVO);
-        if(response.isSuccess()){
-            // 使用账号密码，进行登录
-            AdminUserDO user = authenticate(reqVO.getUsername(), reqVO.getPassword());
+        // 校验验证码
+        verifyCaptcha(reqVO);
 
-            // 如果 socialType 非空，说明需要绑定社交用户
-            if (reqVO.getSocialType() != null) {
-                socialUserService.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
-                        reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState()));
-            }
-            // 创建 Token 令牌，记录登录日志
-            return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
-        }else{
-            throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR);
+        // 使用账号密码，进行登录
+        AdminUserDO user = authenticate(reqVO.getUsername(), reqVO.getPassword());
+
+        // 如果 socialType 非空，说明需要绑定社交用户
+        if (reqVO.getSocialType() != null) {
+            socialUserService.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
+                    reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState()));
         }
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
     }
 
     @Override
@@ -170,6 +175,25 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     public AuthLoginRespVO refreshToken(String refreshToken) {
         OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.refreshAccessToken(refreshToken, OAuth2ClientConstants.CLIENT_ID_DEFAULT);
         return AuthConvert.INSTANCE.convert(accessTokenDO);
+    }
+
+    @VisibleForTesting
+    void verifyCaptcha(AuthLoginReqVO reqVO) {
+        // 如果验证码关闭，则不进行校验
+        if (!captchaEnable) {
+            return;
+        }
+        // 校验验证码
+        ValidationUtils.validate(validator, reqVO, AuthLoginReqVO.CodeEnableGroup.class);
+        CaptchaVO captchaVO = new CaptchaVO();
+        captchaVO.setCaptchaVerification(reqVO.getCaptchaVerification());
+        ResponseModel response = captchaService.verification(captchaVO);
+        // 验证不通过
+        if (!response.isSuccess()) {
+            // 创建登录失败日志（验证码不正确)
+            createLoginLog(null, reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME, LoginResultEnum.CAPTCHA_CODE_ERROR);
+            throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR, response.getRepMsg());
+        }
     }
 
     private AuthLoginRespVO createTokenAfterLoginSuccess(Long userId, String username, LoginLogTypeEnum logType) {

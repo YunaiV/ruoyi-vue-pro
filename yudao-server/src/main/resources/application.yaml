@@ -61,38 +61,20 @@ mybatis-plus:
 
 aj:
   captcha:
-    # 滑动验证，底图路径，不配置将使用默认图片
-    # 支持全路径
-    # 支持项目路径,以classpath:开头,取resource目录下路径,例：classpath:images/jigsaw
-    jigsaw: classpath:images/jigsaw
-    #滑动验证，底图路径，不配置将使用默认图片
-    ##支持全路径
-    # 支持项目路径,以classpath:开头,取resource目录下路径,例：classpath:images/pic-click
-    pic-click: classpath:images/pic-click
-    # 缓存local/redis...
-    cache-type: redis
-    # local缓存的阈值,达到这个值，清除缓存
-    cache-number: 1000
-    # local定时清除过期缓存(单位秒),设置为0代表不执行
-    timing-clear: 180
-    # 验证码类型 default两种都实例化。 blockPuzzle 滑块拼图 clickWord 文字点选
-    type: blockPuzzle
-    # 右下角水印文字(我的水印)https://tool.chinaz.com/tools/unicode.aspx 中文转Unicode Linux可能需要转unicode
-    water-mark: 芋道源码
-    # 滑动干扰项(0/1/2)
-    interference-options: 2
-    # 接口请求次数一分钟限制是否开启 true|false
-    req-frequency-limit-enable: true
-    # 验证失败5次，get接口锁定
-    req-get-lock-limit: 5
-    # 验证失败后，锁定时间间隔,s
-    req-get-lock-seconds: 10
-    # get接口一分钟内请求数限制
-    req-get-minute-limit: 30
-    # check接口一分钟内请求数限制
-    req-check-minute-limit: 60
-    # verify接口一分钟内请求数限制
-    req-verify-minute-limit: 60
+    jigsaw: classpath:images/jigsaw # 滑动验证，底图路径，不配置将使用默认图片；以 classpath: 开头，取 resource 目录下路径
+    pic-click: classpath:images/pic-click # 滑动验证，底图路径，不配置将使用默认图片；以 classpath: 开头，取 resource 目录下路径
+    cache-type: redis # 缓存 local/redis...
+    cache-number: 1000 # local 缓存的阈值,达到这个值，清除缓存
+    timing-clear: 180 # local定时清除过期缓存(单位秒),设置为0代表不执行
+    type: blockPuzzle # 验证码类型 default两种都实例化。 blockPuzzle 滑块拼图 clickWord 文字点选
+    water-mark: 芋道源码 # 右下角水印文字(我的水印)，可使用 https://tool.chinaz.com/tools/unicode.aspx 中文转 Unicode，Linux 可能需要转 unicode
+    interference-options: 2 # 滑动干扰项(0/1/2)
+    req-frequency-limit-enable: false # 接口请求次数一分钟限制是否开启 true|false
+    req-get-lock-limit: 5 # 验证失败5次，get接口锁定
+    req-get-lock-seconds: 10 # 验证失败后，锁定时间间隔
+    req-get-minute-limit: 30 # get 接口一分钟内请求数限制
+    req-check-minute-limit: 60 # check 接口一分钟内请求数限制
+    req-verify-minute-limit: 60 # verify 接口一分钟内请求数限制
 
 --- #################### 芋道相关配置 ####################
 
@@ -112,9 +94,7 @@ yudao:
     version: ${yudao.info.version}
     base-package: ${yudao.info.base-package}
   captcha:
-    timeout: 5m
-    width: 160
-    height: 60
+    enable: true # 验证码的开关，默认为 true；注意，优先读取数据库 infra_config 的 yudao.captcha.enable，所以请从数据库修改，可能需要重启项目
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
@@ -134,8 +114,7 @@ yudao:
       - /admin-api/infra/file/*/get/** # 获取图片，和租户无关
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
       - /app-api/pay/order/notify/* # 支付回调通知，不携带租户编号
-#      - /jmreport/list
-      - /jmreport/*
+      - /jmreport/* # 积木报表，无法携带租户编号
     ignore-tables:
       - system_tenant
       - system_tenant_package

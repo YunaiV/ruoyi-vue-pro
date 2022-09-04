@@ -1,22 +1,30 @@
-package cn.iocoder.yudao.captcha.core.service;
+package cn.iocoder.yudao.framework.captcha.core.service;
 
 import com.anji.captcha.service.CaptchaCacheService;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
-@Service
-public class CaptchaServiceImpl implements CaptchaCacheService {
+/**
+ * 基于 Redis 实现验证码的存储
+ *
+ * @author 星语
+ */
+@NoArgsConstructor // 保证 aj-captcha 的 SPI 创建
+@AllArgsConstructor
+public class RedisCaptchaServiceImpl implements CaptchaCacheService {
+
+    @Resource // 保证 aj-captcha 的 SPI 创建时的注入
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public String type() {
         return "redis";
     }
-
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public void set(String key, String value, long expiresInSeconds) {
@@ -42,4 +50,5 @@ public class CaptchaServiceImpl implements CaptchaCacheService {
     public Long increment(String key, long val) {
         return stringRedisTemplate.opsForValue().increment(key,val);
     }
+
 }
