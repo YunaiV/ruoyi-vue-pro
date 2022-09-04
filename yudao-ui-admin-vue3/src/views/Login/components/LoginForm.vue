@@ -51,8 +51,8 @@ const LoginRules = {
 const loginLoading = ref(false)
 const loginData = reactive({
   isShowPassword: false,
-  captchaEnable: true,
-  tenantEnable: true,
+  captchaEnable: import.meta.env.VITE_APP_CAPTCHA_ENABLE,
+  tenantEnable: import.meta.env.VITE_APP_TENANT_ENABLE,
   token: '',
   loading: {
     signIn: false
@@ -71,6 +71,14 @@ const captchaType = ref('blockPuzzle')
 
 // 获取验证码
 const getCode = async () => {
+  // 情况一，未开启：则直接登录
+  if (!loginData.captchaEnable) {
+    await handleLogin({})
+    return
+  }
+
+  // 情况二，已开启：则展示验证码；只有完成验证码的情况，才进行登录
+  // 弹出验证码
   verify.value.show()
 }
 //获取租户ID
