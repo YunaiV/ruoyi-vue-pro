@@ -8,8 +8,7 @@ const { t } = useI18n() // 国际化
 // 表单校验
 export const rules = reactive({
   title: [required],
-  type: [required],
-  status: [required]
+  type: [required]
 })
 
 // CrudSchema

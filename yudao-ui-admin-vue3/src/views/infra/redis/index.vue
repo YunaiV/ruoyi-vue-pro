@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { onBeforeMount, ref } from 'vue'
 import * as RedisApi from '@/api/infra/redis'
-import DictTag from '@/components/DictTag/src/DictTag.vue'
 import { DICT_TYPE } from '@/utils/dict'
 import * as echarts from 'echarts'
 import { RedisKeyInfo, RedisMonitorInfoVO } from '@/api/infra/redis/types'

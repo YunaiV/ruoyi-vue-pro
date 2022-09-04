@@ -72,6 +72,10 @@ console.log(request)
 Vue.prototype.$axios = request
 import '@/styles/index.scss'
 
+// 默认点击背景不关闭弹窗
+import ElementUI from 'element-ui'
+ElementUI.Dialog.props.closeOnClickModal.default = false
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

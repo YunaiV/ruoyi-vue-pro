@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.6.3-snapshot</revision>
+        <revision>1.6.4-snapshot</revision>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.6.10</spring.boot.version>
         <!-- Web 相关 -->
@@ -41,14 +41,14 @@
         <jedis-mock.version>0.1.16</jedis-mock.version>
         <mockito-inline.version>4.0.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
-        <flowable.version>6.7.0</flowable.version>
+        <flowable.version>6.7.2</flowable.version>
         <!-- 工具类相关 -->
         <jasypt-spring-boot-starter.version>3.0.4</jasypt-spring-boot-starter.version>
         <lombok.version>1.18.20</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
-        <hutool.version>5.7.22</hutool.version>
+        <hutool.version>5.8.5</hutool.version>
         <easyexcel.verion>3.1.1</easyexcel.verion>
-        <velocity.version>2.2</velocity.version>
+        <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
 		<fastjson.version>1.2.83</fastjson.version>
         <guava.version>30.1.1-jre</guava.version>
@@ -57,14 +57,16 @@
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.4.1</tika-core.version>
+        <aj-captcha.version>1.3.0</aj-captcha.version>
         <!-- 三方云服务相关 -->
         <minio.version>8.2.2</minio.version>
-        <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
-        <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
-        <tencentcloud-sdk-java.version>3.1.471</tencentcloud-sdk-java.version>
+        <aliyun-java-sdk-core.version>4.6.0</aliyun-java-sdk-core.version>
+        <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
+        <tencentcloud-sdk-java.version>3.1.561</tencentcloud-sdk-java.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
         <jimureport.version>1.5.2</jimureport.version>
+        <xercesImpl.version>2.12.0</xercesImpl.version>
     </properties>
 
     <dependencyManagement>
@@ -127,6 +129,11 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-error-code</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-captcha</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -452,6 +459,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.anji-plus</groupId>
+                <artifactId>spring-boot-starter-captcha</artifactId>
+                <version>${aj-captcha.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.apache.velocity</groupId>
                 <artifactId>velocity-engine-core</artifactId>
                 <version>${velocity.version}</version>
@@ -564,6 +577,11 @@
                 <groupId>org.jeecgframework.jimureport</groupId>
                 <artifactId>jimureport-spring-boot-starter</artifactId>
                 <version>${jimureport.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xercesImpl.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

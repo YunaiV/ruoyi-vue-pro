@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, unref } from 'vue'
 import dayjs from 'dayjs'
 import { ElMessage, ElUpload, UploadInstance, UploadRawFile, ElImage } from 'element-plus'
 import { useTable } from '@/hooks/web/useTable'
@@ -8,6 +8,7 @@ import type { FileVO } from '@/api/infra/fileList/types'
 import { allSchemas } from './fileList.data'
 import * as FileApi from '@/api/infra/fileList'
 import { getAccessToken, getTenantId } from '@/utils/auth'
+import { useClipboard } from '@vueuse/core'
 
 const { t } = useI18n() // 国际化
 
@@ -76,6 +77,18 @@ const handleDetail = (row: FileVO) => {
   dialogTitle.value = t('action.detail')
   dialogVisible.value = true
 }
+// ========== 复制相关 ==========
+const handleCopy = async (text: string) => {
+  const { copy, copied, isSupported } = useClipboard({ source: text })
+  if (!isSupported) {
+    ElMessage.error(t('common.copyError'))
+  } else {
+    await copy()
+    if (unref(copied)) {
+      ElMessage.success(t('common.copySuccess'))
+    }
+  }
+}
 // ========== 初始化 ==========
 getList()
 </script>
@@ -117,6 +130,9 @@ getList()
         <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
       </template>
       <template #action="{ row }">
+        <el-button link type="primary" @click="handleCopy(row.url)">
+          <Icon icon="ep:copy-document" class="mr-1px" /> {{ t('common.copy') }}
+        </el-button>
         <el-button link type="primary" @click="handleDetail(row)">
           <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
         </el-button>

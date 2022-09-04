@@ -119,10 +119,10 @@ export default {
       // console.log(this.bpmnModeler.getDefinitions().rootElements[0].flowElements);
       this.bpmnModeler.getDefinitions().rootElements[0].flowElements?.forEach(n => {
         let activity = activityList.find(m => m.key === n.id) // 找到对应的活动
+        if (!activity) {
+          return;
+        }
         if (n.$type === 'bpmn:UserTask') { // 用户任务
-          if (!activity) {
-            return;
-          }
           // 处理用户任务的高亮
           const task = this.taskList.find(m => m.id === activity.taskId); // 找到活动对应的 taskId
           if (!task) {
@@ -158,9 +158,6 @@ export default {
             }
           });
         } else if (n.$type === 'bpmn:ExclusiveGateway') { // 排它网关
-          if (!activity) {
-            return
-          }
           // 设置【bpmn:ExclusiveGateway】排它网关的高亮
           canvas.addMarker(n.id, this.getActivityHighlightCss(activity));
           // 查找需要高亮的连线
@@ -185,9 +182,6 @@ export default {
             canvas.addMarker(matchNN.id, this.getActivityHighlightCss(matchActivity));
           }
         } else if (n.$type === 'bpmn:ParallelGateway') { // 并行网关
-          if (!activity) {
-            return
-          }
           // 设置【bpmn:ParallelGateway】并行网关的高亮
           canvas.addMarker(n.id, this.getActivityHighlightCss(activity));
           n.outgoing?.forEach(nn => {
@@ -213,6 +207,17 @@ export default {
             return;
           }
           canvas.addMarker(n.id, this.getResultCss(this.processInstance.result));
+        } else if (n.$type === 'bpmn:ServiceTask'){ //服务任务
+          if(activity.startTime>0 && activity.endTime===0){//进入执行，标识进行色
+            canvas.addMarker(n.id, this.getResultCss(1));
+          }
+          if(activity.endTime>0){// 执行完成，节点标识完成色, 所有outgoing标识完成色。
+            canvas.addMarker(n.id, this.getResultCss(2));
+            const outgoing = this.getActivityOutgoing(activity)
+            outgoing?.forEach(out=>{
+              canvas.addMarker(out.id,this.getResultCss(2))
+            })
+          }
         }
       })
     },
@@ -268,6 +273,10 @@ export default {
       !this.elementOverlayIds && (this.elementOverlayIds = {});
       !this.overlays && (this.overlays = this.bpmnModeler.get("overlays"));
       // 展示信息
+      const activity = this.activityList.find(m => m.key === element.id);
+      if (!activity) {
+        return;
+      }
       if (!this.elementOverlayIds[element.id] && element.type !== "bpmn:Process") {
         let html = `<div class="element-overlays">
             <p>Elemet id: ${element.id}</p>
@@ -279,10 +288,6 @@ export default {
                   <p>创建时间：${this.parseTime(this.processInstance.createTime)}`;
         } else if (element.type === 'bpmn:UserTask') {
           // debugger
-          const activity = this.activityList.find(m => m.key === element.id);
-          if (!activity) {
-            return;
-          }
           let task = this.taskList.find(m => m.id === activity.taskId); // 找到活动对应的 taskId
           if (!task) {
             return;
@@ -297,6 +302,14 @@ export default {
           if (task.reason) {
             html += `<p>审批建议：${task.reason}</p>`
           }
+        } else if (element.type === 'bpmn:ServiceTask' && this.processInstance) {
+          if(activity.startTime>0){
+            html = `<p>创建时间：${this.parseTime(activity.startTime)}</p>`;
+          }
+          if(activity.endTime>0){
+            html += `<p>结束时间：${this.parseTime(activity.endTime)}</p>`
+          }
+          console.log(html)
         } else if (element.type === 'bpmn:EndEvent' && this.processInstance) {
           html = `<p>结果：${this.getDictDataLabel(this.DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, this.processInstance.result)}</p>`;
           if (this.processInstance.endTime) {

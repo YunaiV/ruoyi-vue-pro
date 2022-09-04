@@ -10,7 +10,6 @@
     <img src="https://img.shields.io/badge/-Prettier-ef9421?logo=Prettier&logoColor=white" alt="Prettier">
     <img src="https://img.shields.io/badge/-Less-1D365D?logo=less&logoColor=white" alt="Less">
     <img src="https://img.shields.io/badge/-Wind%20CSS-06B6D4?logo=Tailwind%20CSS&logoColor=white" alt="Taiwind">
-    <img src="" alt="">
 </p>
 ## 介绍
 
@@ -22,20 +21,22 @@
 - node >=14.18.0(建议使用 16 版本) ,pnpm >=7
 - 开发建议使用 [谷歌浏览器-开发者版](https://www.google.cn/intl/zh-CN/chrome/dev/) 不支持 IE\QQ 等浏览器
 
+### 点击查看[使用说明](./use.md)
+
 ### 前端依赖
 
 | 框架 | 说明 | 版本     |
 | --- | --- |--------|
 | [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.37 |
-| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.0.3  |
-| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.11 |
-| [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.7.4  |
+| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.0.4 |
+| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.12 |
+| [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.7.4 |
 | [pinia](https://pinia.vuejs.org/) | Vue 存储库 替代 vuex5 | 2.0.17 |
-| [vueuse](https://vueuse.org//) | 常用工具集 | 9.0.0  |
-| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化 | 9.1.10 |
-| [vue-router](https://router.vuejs.org/) | vue 路由 | 4.1.3  |
-| [windicss](https://cn.windicss.org/) | 下一代工具优先的 CSS 框架 | 3.5.6  |
-| [iconify](https://icon-sets.iconify.design/) | 在线图标库 | 2.2.1  |
+| [vueuse](https://vueuse.org//) | 常用工具集 | 9.0.2 |
+| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化 | 9.2.0 |
+| [vue-router](https://router.vuejs.org/) | vue 路由 | 4.1.3 |
+| [windicss](https://cn.windicss.org/) | 下一代工具优先的 CSS 框架 | 3.5.6 |
+| [iconify](https://icon-sets.iconify.design/) | 在线图标库 | 2.2.1 |
 | [wangeditor](https://www.wangeditor.com/) | 富文本编辑器 | 5.1.14 |
 
 ### 推荐 VScode 开发，插件如下

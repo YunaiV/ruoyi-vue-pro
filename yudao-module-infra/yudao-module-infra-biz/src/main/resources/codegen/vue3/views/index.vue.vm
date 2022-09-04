@@ -6,9 +6,9 @@
   import { useTable } from '@/hooks/web/useTable'
   import { useI18n } from '@/hooks/web/useI18n'
   import { FormExpose } from '@/components/Form'
-  import type { ${simpleClassName}VO } from '@/api/system/post/types'
-  import { rules, allSchemas } from './post.data'
-  import * as ${simpleClassName}Api from '@/api/system/post'
+  import type { ${simpleClassName}VO } from '@/api/${table.moduleName}/${simpleClassName}/types'
+  import { rules, allSchemas } from './${simpleClassName}.data'
+  import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${simpleClassName}'
   const { t } = useI18n() // 国际化
 
   // ========== 列表相关 ==========

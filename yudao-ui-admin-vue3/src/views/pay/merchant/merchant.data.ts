@@ -7,9 +7,9 @@ const { t } = useI18n() // 国际化
 
 // 表单校验
 export const rules = reactive({
+  no: [required],
   name: [required],
-  code: [required],
-  sort: [required],
+  shortName: [required],
   status: [required]
 })
 
@@ -77,6 +77,15 @@ const crudSchemas = reactive<CrudSchema[]>([
     field: 'createTime',
     form: {
       show: false
+    },
+    search: {
+      show: true,
+      component: 'DatePicker',
+      componentProps: {
+        type: 'datetimerange',
+        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]
+      }
     }
   },
   {

@@ -128,6 +128,13 @@ export default {
     btnRegister: 'Sign up',
     SmsSendMsg: 'code has been sent'
   },
+  captcha: {
+    verification: 'Please complete security verification',
+    slide: 'Swipe right to complete verification',
+    point: 'Please click',
+    success: 'Verification succeeded',
+    fail: 'verification failed'
+  },
   router: {
     login: 'Login',
     home: 'Home',
@@ -191,7 +198,6 @@ export default {
     yield: 'Yield',
     dynamic: 'Dynamic',
     push: 'push',
-    pushCode: 'push code to Github',
     follow: 'Follow'
   },
   form: {

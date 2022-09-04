@@ -1,9 +1,12 @@
 export type DeptVO = {
   id: number
   name: string
-  status: number
   parentId: number
-  createTime: string
+  status: number
+  sort: number
+  leaderUserId: number
+  phone: string
+  email: string
 }
 
 export type DeptListReqVO = {
