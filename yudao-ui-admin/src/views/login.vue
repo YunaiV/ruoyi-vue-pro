@@ -87,12 +87,11 @@
         </div>
       </div>
     </div>
-    <Verify
-      ref="verify"
-      :captcha-type="'blockPuzzle'"
-      :img-size="{width:'400px',height:'200px'}"
-      @success="handleLogin"
-    />
+
+    <!-- 图形验证码 -->
+    <Verify ref="verify" :captcha-type="'blockPuzzle'" :img-size="{width:'400px',height:'200px'}"
+            @success="handleLogin" />
+
     <!-- footer -->
     <div class="footer">
       Copyright © 2020-2022 iocoder.cn All Rights Reserved.
@@ -104,7 +103,7 @@
 import {sendSmsCode, socialAuthRedirect} from "@/api/login";
 import {getTenantIdByName} from "@/api/system/tenant";
 import {SystemUserSocialTypeEnum} from "@/utils/constants";
-import {getTenantEnable} from "@/utils/ruoyi";
+import {getCaptchaEnable, getTenantEnable} from "@/utils/ruoyi";
 import {
   getPassword,
   getRememberMe, getTenantName,
@@ -188,16 +187,21 @@ export default {
   created() {
     // 租户开关
     this.tenantEnable = getTenantEnable();
+    // 验证码开关
+    this.captchaEnable = getCaptchaEnable();
     // 重定向地址
     this.redirect = this.$route.query.redirect;
     this.getCookie();
   },
   methods: {
     getCode() {
-      // 只有开启的状态，才加载验证码。默认开启
+      // 情况一，未开启：则直接登录
       if (!this.captchaEnable) {
+        this.handleLogin({})
         return;
       }
+
+      // 情况二，已开启：则展示验证码；只有完成验证码的情况，才进行登录
       // 弹出验证码
       this.$refs.verify.show()
     },
@@ -214,7 +218,7 @@ export default {
         tenantName: tenantName ? tenantName : this.loginForm.tenantName,
       };
     },
-    handleLogin(params) {
+    handleLogin(captchaParams) {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true;
@@ -230,7 +234,7 @@ export default {
             removeRememberMe()
             removeTenantName()
           }
-          this.loginForm.captchaVerification = params.captchaVerification
+          this.loginForm.captchaVerification = captchaParams.captchaVerification
           // 发起登陆
           // console.log("发起登录", this.loginForm);
           this.$store.dispatch(this.loginForm.loginType === "sms" ? "SmsLogin" : "Login", this.loginForm).then(() => {
