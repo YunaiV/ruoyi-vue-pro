@@ -2,20 +2,16 @@ import type { App } from 'vue'
 import { getAccessToken } from '@/utils/auth'
 import type { RouteRecordRaw } from 'vue-router'
 import remainingRouter from './modules/remaining'
-import { useCache } from '@/hooks/web/useCache'
 import { useTitle } from '@/hooks/web/useTitle'
 import { useNProgress } from '@/hooks/web/useNProgress'
 import { usePageLoading } from '@/hooks/web/usePageLoading'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { useDictStoreWithOut } from '@/store/modules/dict'
+import { useUserStoreWithOut } from '@/store/modules/user'
 import { listSimpleDictDataApi } from '@/api/system/dict/dict.data'
-
-const permissionStore = usePermissionStoreWithOut()
-
-const dictStore = useDictStoreWithOut()
-
-const { wsCache } = useCache()
+import { isRelogin } from '@/config/axios'
+import { getInfoApi } from '@/api/login'
 
 const { start, done } = useNProgress()
 
@@ -23,7 +19,7 @@ const { loadStart, loadDone } = usePageLoading()
 
 // 创建路由实例
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHashHistory(), // createWebHashHistory URL带#，createWebHistory URL不带#
   strict: true,
   routes: remainingRouter as RouteRecordRaw[],
   scrollBehavior: () => ({ left: 0, top: 0 })
@@ -47,37 +43,37 @@ router.beforeEach(async (to, from, next) => {
     if (to.path === '/login') {
       next({ path: '/' })
     } else {
-      if (!dictStore.getIsSetDict) {
-        // 获取所有字典
+      // 获取所有字典
+      const dictStore = useDictStoreWithOut()
+      const userStore = useUserStoreWithOut()
+      const permissionStore = usePermissionStoreWithOut()
+      if (!dictStore.getHasDictData) {
         const res = await listSimpleDictDataApi()
-        if (res) {
-          dictStore.setDictMap(res)
-          dictStore.setIsSetDict(true)
-        }
+        dictStore.setDictMap(res)
       }
-      if (permissionStore.getIsAddRouters) {
+      if (userStore.getRoles.length === 0) {
+        isRelogin.show = true
+        const res = await getInfoApi()
+        await userStore.setUserInfoAction(res)
+        isRelogin.show = false
+        // 后端过滤菜单
+        await permissionStore.generateRoutes()
+        permissionStore.getAddRouters.forEach((route) => {
+          router.addRoute(route as unknown as RouteRecordRaw) // 动态添加可访问路由表
+        })
+        const redirectPath = from.query.redirect || to.path
+        const redirect = decodeURIComponent(redirectPath as string)
+        const nextData = to.path === redirect ? { ...to, replace: true } : { path: redirect }
+        next(nextData)
+      } else {
         next()
-        return
       }
-      // 开发者可根据实际情况进行修改
-      const roleRouters = wsCache.get('roleRouters') || []
-
-      await permissionStore.generateRoutes(roleRouters as AppCustomRouteRecordRaw[])
-
-      permissionStore.getAddRouters.forEach((route) => {
-        router.addRoute(route as unknown as RouteRecordRaw) // 动态添加可访问路由表
-      })
-      const redirectPath = from.query.redirect || to.path
-      const redirect = decodeURIComponent(redirectPath as string)
-      const nextData = to.path === redirect ? { ...to, replace: true } : { path: redirect }
-      permissionStore.setIsAddRouters(true)
-      next(nextData)
     }
   } else {
     if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
-      next(`/login?redirect=${to.path}`) // 否则全部重定向到登录页
+      next(`/login?redirect=${to.fullPath}`) // 否则全部重定向到登录页
     }
   }
 })

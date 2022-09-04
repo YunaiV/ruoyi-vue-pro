@@ -186,6 +186,19 @@ export function getTenantEnable() {
 }
 
 /**
+ * 获得验证码功能是否开启
+ */
+export function getCaptchaEnable() {
+  if (process.env.VUE_APP_CAPTCHA_ENABLE === "true") {
+    return true;
+  }
+  if (process.env.VUE_APP_CAPTCHA_ENABLE === "false") {
+    return false;
+  }
+  return process.env.VUE_APP_CAPTCHA_ENABLE || true;
+}
+
+/**
  * 获得文档是否开启
  */
 export function getDocEnable() {

@@ -8,7 +8,7 @@ const props = defineProps({
     required: true
   },
   value: {
-    type: [String, Number] as PropType<string | number>,
+    type: [String, Number, Boolean] as PropType<string | number | boolean>,
     required: true
   }
 })

@@ -48,7 +48,7 @@ export const getRawRoute = (route: RouteLocationNormalized): RouteLocationNormal
 }
 
 // 后端控制路由生成
-export const generateRoutes = (routes: AppCustomRouteRecordRaw[]): AppRouteRecordRaw[] => {
+export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecordRaw[] => {
   const res: AppRouteRecordRaw[] = []
   const modulesRoutesKeys = Object.keys(modules)
   for (const route of routes) {
@@ -88,7 +88,7 @@ export const generateRoutes = (routes: AppCustomRouteRecordRaw[]): AppRouteRecor
       data.component = modules[modulesRoutesKeys[index]]
     }
     if (route.children) {
-      data.children = generateRoutes(route.children)
+      data.children = generateRoute(route.children)
     }
     res.push(data)
   }

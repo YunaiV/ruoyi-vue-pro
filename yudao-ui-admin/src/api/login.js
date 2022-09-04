@@ -1,17 +1,17 @@
 import request from '@/utils/request'
-import {getRefreshToken} from "@/utils/auth";
-import service from "@/utils/request";
+import { getRefreshToken } from '@/utils/auth'
+import service from '@/utils/request'
 
 // 登录方法
-export function login(username, password, code, uuid,
-                      socialType, socialCode, socialState) {
+export function login(username, password, captchaVerification, socialType, socialCode, socialState) {
   const data = {
     username,
     password,
-    code,
-    uuid,
+    captchaVerification,
     // 社交相关
-    socialType, socialCode, socialState
+    socialType,
+    socialCode,
+    socialState
   }
   return request({
     url: '/system/auth/login',
@@ -33,15 +33,6 @@ export function logout() {
   return request({
     url: '/system/auth/logout',
     method: 'post'
-  })
-}
-
-// 获取验证码
-export function getCodeImg() {
-  return request({
-    url: '/system/captcha/get-image',
-    method: 'get',
-    timeout: 20000
   })
 }
 
@@ -108,20 +99,20 @@ export function getAuthorize(clientId) {
 }
 
 export function authorize(responseType, clientId, redirectUri, state,
-                          autoApprove, checkedScopes, uncheckedScopes) {
+  autoApprove, checkedScopes, uncheckedScopes) {
   // 构建 scopes
-  const scopes = {};
+  const scopes = {}
   for (const scope of checkedScopes) {
-    scopes[scope] = true;
+    scopes[scope] = true
   }
   for (const scope of uncheckedScopes) {
-    scopes[scope] = false;
+    scopes[scope] = false
   }
   // 发起请求
   return service({
     url: '/system/oauth2/authorize',
-    headers:{
-      'Content-type': 'application/x-www-form-urlencoded',
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded'
     },
     params: {
       response_type: responseType,

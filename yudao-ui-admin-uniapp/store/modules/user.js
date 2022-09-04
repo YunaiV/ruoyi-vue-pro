@@ -42,10 +42,9 @@ const user = {
     Login({ commit }, userInfo) {
       const username = userInfo.username.trim()
       const password = userInfo.password
-      const code = userInfo.code
-      const uuid = userInfo.uuid
+      const captchaVerification = userInfo.captchaVerification
       return new Promise((resolve, reject) => {
-        login(username, password, code, uuid).then(res => {
+        login(username, password, captchaVerification).then(res => {
           res = res.data;
           // 设置 token
           setToken(res)
@@ -83,7 +82,6 @@ const user = {
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
-          commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           commit('SET_PERMISSIONS', [])
           removeToken()

@@ -2,24 +2,25 @@
 import { ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useCache } from '@/hooks/web/useCache'
-import { removeToken } from '@/utils/auth'
-import { resetRouter } from '@/router'
 import { useRouter } from 'vue-router'
 import { useDesign } from '@/hooks/web/useDesign'
-import { useTagsViewStore } from '@/store/modules/tagsView'
 import avatarImg from '@/assets/imgs/avatar.gif'
-
-const tagsViewStore = useTagsViewStore()
-
-const { getPrefixCls } = useDesign()
-
-const prefixCls = getPrefixCls('user-info')
+import { useUserStore } from '@/store/modules/user'
+import { useTagsViewStore } from '@/store/modules/tagsView'
 
 const { t } = useI18n()
 
 const { wsCache } = useCache()
 
 const { push, replace } = useRouter()
+
+const userStore = useUserStore()
+
+const tagsViewStore = useTagsViewStore()
+
+const { getPrefixCls } = useDesign()
+
+const prefixCls = getPrefixCls('user-info')
 
 const user = wsCache.get('user')
 
@@ -34,10 +35,8 @@ const loginOut = () => {
     type: 'warning'
   })
     .then(async () => {
-      resetRouter() // 重置静态路由表
-      wsCache.clear()
-      removeToken()
-      tagsViewStore.delAllViews()
+      userStore.loginOut()
+      tagsViewStore.delAllViews
       replace('/login')
     })
     .catch(() => {})

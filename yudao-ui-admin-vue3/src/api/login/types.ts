@@ -1,8 +1,7 @@
 export type UserLoginVO = {
   username: string
   password: string
-  code: string
-  uuid: string
+  captchaVerification: string
 }
 
 export type TokenType = {
