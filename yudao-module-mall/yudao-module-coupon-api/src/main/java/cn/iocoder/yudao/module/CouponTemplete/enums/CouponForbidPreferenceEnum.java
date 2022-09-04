@@ -6,17 +6,16 @@ import lombok.RequiredArgsConstructor;
 
 
 /**
- * 优惠券 - 优惠券类型
+ * 优惠券 - 优惠叠加类型
  *
  * @author Sin
  */
 @RequiredArgsConstructor
 @Getter
-public enum CouponProductTypeEnum {
+public enum CouponForbidPreferenceEnum {
 
-    PROCESSING(1,"进行中"),
-    END(2,"已结束"),
-    CLOSE(3,"已关闭"),;
+    UN_FORBID(0,"不限制"),
+    FORBID(1,"优惠券仅原价购买商品时可用");
 
     /**
      * 优惠券类型

@@ -14,7 +14,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum CouponFetchTypeEnum {
 
-    LIMIT(0,"否"),NOT_LIMIT(0,"开启"),;
+    LIMIT(1,"限制"),
+    NOT_LIMIT(0,"不限制"),;
 
     /**
      * 是否开启过期提醒
