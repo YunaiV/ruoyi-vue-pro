@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo;
+package cn.iocoder.yudao.module.product.controller.admin.property.vo.value;
 
 import lombok.*;
 import io.swagger.annotations.*;

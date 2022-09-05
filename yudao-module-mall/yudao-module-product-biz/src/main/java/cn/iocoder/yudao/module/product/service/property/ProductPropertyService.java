@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.product.service.property;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.*;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyAndValueRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.*;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 
 import javax.validation.Valid;
@@ -60,14 +61,6 @@ public interface ProductPropertyService {
      * @return 规格名称分页
      */
     PageResult<ProductPropertyDO> getPropertyPage(ProductPropertyPageReqVO pageReqVO);
-
-    /**
-     * 获得规格名称列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 规格名称列表
-     */
-    List<ProductPropertyDO> getPropertyList(ProductPropertyExportReqVO exportReqVO);
 
     /**
      * 获取属性及属性值列表 分页

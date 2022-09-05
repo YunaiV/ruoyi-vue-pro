@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.dal.mysql.propertyvalue;
+package cn.iocoder.yudao.module.product.dal.mysql.property;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;

@@ -1,15 +1,16 @@
 package cn.iocoder.yudao.module.product.service.property;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.*;
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyAndValueRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.*;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.convert.property.ProductPropertyConvert;
 import cn.iocoder.yudao.module.product.convert.propertyvalue.ProductPropertyValueConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.mysql.property.ProductPropertyMapper;
-import cn.iocoder.yudao.module.product.dal.mysql.propertyvalue.ProductPropertyValueMapper;
+import cn.iocoder.yudao.module.product.dal.mysql.property.ProductPropertyValueMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -100,11 +101,6 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     @Override
     public PageResult<ProductPropertyDO> getPropertyPage(ProductPropertyPageReqVO pageReqVO) {
         return productPropertyMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<ProductPropertyDO> getPropertyList(ProductPropertyExportReqVO exportReqVO) {
-        return productPropertyMapper.selectList(exportReqVO);
     }
 
     @Override

@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.product.controller.admin.property.vo;
+package cn.iocoder.yudao.module.product.controller.admin.property.vo.property;
 
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
