@@ -20,7 +20,8 @@ public class ProductBrandBaseVO {
     @NotNull(message = "品牌图片不能为空")
     private String picUrl;
 
-    @ApiModelProperty(value = "品牌排序", example = "1")
+    @ApiModelProperty(value = "品牌排序", required = true, example = "1")
+    @NotNull(message = "品牌排序不能为空")
     private Integer sort;
 
     @ApiModelProperty(value = "品牌描述", example = "描述")

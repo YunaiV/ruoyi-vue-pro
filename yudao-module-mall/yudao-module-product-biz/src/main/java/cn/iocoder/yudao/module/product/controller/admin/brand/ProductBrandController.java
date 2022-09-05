@@ -33,7 +33,7 @@ public class ProductBrandController {
     @ApiOperation("创建品牌")
     @PreAuthorize("@ss.hasPermission('product:brand:create')")
     public CommonResult<Long> createBrand(@Valid @RequestBody ProductBrandCreateReqVO createReqVO) {
-        return success(brandService.createProductBrand(createReqVO));
+        return success(brandService.createBrand(createReqVO));
     }
 
     @PutMapping("/update")
@@ -73,7 +73,7 @@ public class ProductBrandController {
     @GetMapping("/list")
     @ApiOperation("获得品牌列表")
     @PreAuthorize("@ss.hasPermission('product:brand:query')")
-    public CommonResult<List<ProductBrandRespVO>> getProductCategoryList(@Valid ProductBrandListReqVO listVO) {
+    public CommonResult<List<ProductBrandRespVO>> getBrandList(@Valid ProductBrandListReqVO listVO) {
         List<ProductBrandDO> list = brandService.getBrandList(listVO);
         list.sort(Comparator.comparing(ProductBrandDO::getSort));
         return success(ProductBrandConvert.INSTANCE.convertList(list));

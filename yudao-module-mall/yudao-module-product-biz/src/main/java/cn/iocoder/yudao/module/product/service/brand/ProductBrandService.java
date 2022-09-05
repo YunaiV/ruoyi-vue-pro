@@ -21,7 +21,7 @@ public interface ProductBrandService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createProductBrand(@Valid ProductBrandCreateReqVO createReqVO);
+    Long createBrand(@Valid ProductBrandCreateReqVO createReqVO);
 
     /**
      * 更新品牌

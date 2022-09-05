@@ -63,7 +63,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         if (productCategoryMapper.selectCountByParentId(id) > 0) {
             throw exception(CATEGORY_EXISTS_CHILDREN);
         }
-
+        // TODO 芋艿 补充只有不存在商品才可以删除
         // 删除
         productCategoryMapper.deleteById(id);
     }
@@ -94,8 +94,8 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     @Override
     public void validateCategoryLevel(Long id) {
         Integer level = getProductCategoryLevel(id, 1);
-        if(level < 3){
-          throw exception(CATEGORY_LEVEL_ERROR);
+        if (level < 3){
+            throw exception(CATEGORY_LEVEL_ERROR);
         }
     }
 

@@ -19,6 +19,8 @@ public interface ErrorCodeConstants {
 
     // ========== 商品品牌相关编号 1008002000 ==========
     ErrorCode BRAND_NOT_EXISTS = new ErrorCode(1008002000, "品牌不存在");
+    ErrorCode BRAND_DISABLED = new ErrorCode(1008002001, "品牌不存在");
+    ErrorCode BRAND_NAME_EXISTS = new ErrorCode(1008002002, "品牌名称已存在");
 
     // ========== 商品规格名称 1008003000 ==========
     ErrorCode PROPERTY_NOT_EXISTS = new ErrorCode(1008003000, "规格名称不存在");

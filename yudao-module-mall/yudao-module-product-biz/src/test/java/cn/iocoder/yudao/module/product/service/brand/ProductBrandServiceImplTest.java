@@ -43,7 +43,7 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
         ProductBrandCreateReqVO reqVO = randomPojo(ProductBrandCreateReqVO.class);
 
         // 调用
-        Long brandId = brandService.createProductBrand(reqVO);
+        Long brandId = brandService.createBrand(reqVO);
         // 断言
         assertNotNull(brandId);
         // 校验记录的属性是否正确

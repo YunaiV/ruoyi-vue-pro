@@ -34,14 +34,14 @@ public class ProductCategoryController {
     @PostMapping("/create")
     @ApiOperation("创建商品分类")
     @PreAuthorize("@ss.hasPermission('product:category:create')")
-    public CommonResult<Long> createProductCategory(@Valid @RequestBody ProductCategoryCreateReqVO createReqVO) {
+    public CommonResult<Long> createCategory(@Valid @RequestBody ProductCategoryCreateReqVO createReqVO) {
         return success(categoryService.createCategory(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新商品分类")
     @PreAuthorize("@ss.hasPermission('product:category:update')")
-    public CommonResult<Boolean> updateProductCategory(@Valid @RequestBody ProductCategoryUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateCategory(@Valid @RequestBody ProductCategoryUpdateReqVO updateReqVO) {
         categoryService.updateCategory(updateReqVO);
         return success(true);
     }
@@ -50,7 +50,7 @@ public class ProductCategoryController {
     @ApiOperation("删除商品分类")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:category:delete')")
-    public CommonResult<Boolean> deleteProductCategory(@RequestParam("id") Long id) {
+    public CommonResult<Boolean> deleteCategory(@RequestParam("id") Long id) {
         categoryService.deleteCategory(id);
         return success(true);
     }
@@ -59,7 +59,7 @@ public class ProductCategoryController {
     @ApiOperation("获得商品分类")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:category:query')")
-    public CommonResult<ProductCategoryRespVO> getProductCategory(@RequestParam("id") Long id) {
+    public CommonResult<ProductCategoryRespVO> getCategory(@RequestParam("id") Long id) {
         ProductCategoryDO category = categoryService.getCategory(id);
         return success(ProductCategoryConvert.INSTANCE.convert(category));
     }
@@ -67,7 +67,7 @@ public class ProductCategoryController {
     @GetMapping("/list")
     @ApiOperation("获得商品分类列表")
     @PreAuthorize("@ss.hasPermission('product:category:query')")
-    public CommonResult<List<ProductCategoryRespVO>> getProductCategoryList(@Valid ProductCategoryListReqVO treeListReqVO) {
+    public CommonResult<List<ProductCategoryRespVO>> getCategoryList(@Valid ProductCategoryListReqVO treeListReqVO) {
         List<ProductCategoryDO> list = categoryService.getEnableCategoryList(treeListReqVO);
         list.sort(Comparator.comparing(ProductCategoryDO::getSort));
         return success(ProductCategoryConvert.INSTANCE.convertList(list));

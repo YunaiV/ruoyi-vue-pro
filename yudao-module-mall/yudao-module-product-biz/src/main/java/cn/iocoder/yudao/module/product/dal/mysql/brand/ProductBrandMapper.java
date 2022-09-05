@@ -27,4 +27,8 @@ public interface ProductBrandMapper extends BaseMapperX<ProductBrandDO> {
                 .likeIfPresent(ProductBrandDO::getName, reqVO.getName()));
     }
 
+    default ProductBrandDO selectByName(String name) {
+        return selectOne(ProductBrandDO::getName, name);
+    }
+
 }
