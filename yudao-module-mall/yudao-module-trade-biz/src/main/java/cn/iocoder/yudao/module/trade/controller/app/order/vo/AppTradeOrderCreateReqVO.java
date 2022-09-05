@@ -38,7 +38,7 @@ public class AppTradeOrderCreateReqVO {
 
         @ApiModelProperty(name = "商品 SKU 编号", required = true, example = "111")
         @NotNull(message = "商品 SKU 编号不能为空")
-        private Integer skuId;
+        private Long skuId;
 
         @ApiModelProperty(name = "商品 SKU 购买数量", required = true, example = "1024")
         @NotNull(message = "商品 SKU 购买数量不能为空")
