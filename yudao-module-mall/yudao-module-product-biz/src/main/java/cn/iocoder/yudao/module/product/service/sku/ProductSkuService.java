@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 
 import javax.validation.Valid;
@@ -16,21 +13,6 @@ import java.util.List;
  * @author 芋道源码
  */
 public interface ProductSkuService {
-
-    /**
-     * 创建商品 SKU
-     *
-     * @param createReqVO 创建信息
-     * @return 编号
-     */
-    Long createSku(@Valid ProductSkuCreateOrUpdateReqVO createReqVO);
-
-    /**
-     * 更新商品sku
-     *
-     * @param updateReqVO 更新信息
-     */
-    void updateSku(@Valid ProductSkuUpdateReqVO updateReqVO);
 
     /**
      * 删除商品sku
@@ -54,14 +36,6 @@ public interface ProductSkuService {
      * @return 商品sku列表
      */
     List<ProductSkuDO> getSkuList(Collection<Long> ids);
-
-    /**
-     * 获得商品sku分页
-     *
-     * @param pageReqVO 分页查询
-     * @return 商品sku分页
-     */
-    PageResult<ProductSkuDO> getSkuPage(ProductSkuPageReqVO pageReqVO);
 
     /**
      * 对 sku 的组合的属性等进行合法性校验

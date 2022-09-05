@@ -9,16 +9,14 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
-@ApiModel("管理后台 - 商品spu Response VO")
+// TODO @Luowenfeng：这个类只返回 SPU 相关的信息，删除 skus、categoryIds、productPropertyViews；明细使用 SpuDetailRespVO 替代
+@ApiModel("管理后台 - 商品 SPU Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SpuRespVO extends ProductSpuBaseVO {
-
-    // TODO @franky：注解要完整
+public class ProductSpuRespVO extends ProductSpuBaseVO {
 
     @ApiModelProperty(value = "主键", required = true, example = "1")
     private Long id;
@@ -33,7 +31,7 @@ public class SpuRespVO extends ProductSpuBaseVO {
     private List<ProductSkuRespVO> skus;
 
     @ApiModelProperty(value = "分类id数组，一直递归到一级父节点", example = "[1,2,4]")
-    private LinkedList<Long> categoryIds;
+    private List<Long> categoryIds;
 
     // TODO @芋艿：再琢磨下 这个 VO 类，其实变成 SpuRespVO 内嵌的 VO 类会更好一点；然后把 SpuRespVO 改成 SpuDetailSpuVO
 

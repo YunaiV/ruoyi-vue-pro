@@ -9,9 +9,9 @@ import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
@@ -125,9 +125,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     // TODO @芋艿：需要再 review 下
-    public SpuRespVO getSpu(Long id) {
+    public ProductSpuRespVO getSpu(Long id) {
         ProductSpuDO spu = ProductSpuMapper.selectById(id);
-        SpuRespVO spuVO = ProductSpuConvert.INSTANCE.convert(spu);
+        ProductSpuRespVO spuVO = ProductSpuConvert.INSTANCE.convert(spu);
         if (null != spuVO) {
             List<ProductSkuRespVO> skuReqs = ProductSkuConvert.INSTANCE.convertList(productSkuService.getSkusBySpuId(id));
             spuVO.setSkus(skuReqs);
@@ -179,10 +179,10 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public PageResult<SpuRespVO> getSpuPage(SpuPageReqVO pageReqVO) {
-        PageResult<SpuRespVO> spuVOs = ProductSpuConvert.INSTANCE.convertPage(ProductSpuMapper.selectPage(pageReqVO));
+    public PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
+        PageResult<ProductSpuRespVO> spuVOs = ProductSpuConvert.INSTANCE.convertPage(ProductSpuMapper.selectPage(pageReqVO));
         // 查询 sku 的信息
-        List<Long> spuIds = spuVOs.getList().stream().map(SpuRespVO::getId).collect(Collectors.toList());
+        List<Long> spuIds = spuVOs.getList().stream().map(ProductSpuRespVO::getId).collect(Collectors.toList());
         List<ProductSkuRespVO> skus = ProductSkuConvert.INSTANCE.convertList(productSkuService.getSkusBySpuIds(spuIds));
         // TODO @franky：使用 CollUtil 里的方法替代哈
         // TODO 芋艿：临时注释

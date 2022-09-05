@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.product.service.spu;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
@@ -139,7 +139,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
        // 测试 createTime 不匹配
        ProductSpuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setCreateTime(null)));
        // 准备参数
-       SpuPageReqVO reqVO = new SpuPageReqVO();
+       ProductSpuPageReqVO reqVO = new ProductSpuPageReqVO();
        reqVO.setName(null);
        reqVO.setSellPoint(null);
        reqVO.setDescription(null);
@@ -153,7 +153,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
        reqVO.setCreateTime(null);
 
        // 调用
-       PageResult<SpuRespVO> pageResult = spuService.getSpuPage(reqVO);
+       PageResult<ProductSpuRespVO> pageResult = spuService.getSpuPage(reqVO);
        // 断言
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());

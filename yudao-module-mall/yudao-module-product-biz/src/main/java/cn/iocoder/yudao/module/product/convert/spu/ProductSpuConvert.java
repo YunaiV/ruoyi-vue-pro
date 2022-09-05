@@ -24,13 +24,13 @@ public interface ProductSpuConvert {
 
     ProductSpuDO convert(ProductSpuUpdateReqVO bean);
 
-    SpuRespVO convert(ProductSpuDO bean);
+    ProductSpuRespVO convert(ProductSpuDO bean);
 
-    List<SpuRespVO> convertList(List<ProductSpuDO> list);
+    List<ProductSpuRespVO> convertList(List<ProductSpuDO> list);
 
-    PageResult<SpuRespVO> convertPage(PageResult<ProductSpuDO> page);
+    PageResult<ProductSpuRespVO> convertPage(PageResult<ProductSpuDO> page);
 
-    SpuPageReqVO convert(AppSpuPageReqVO bean);
+    ProductSpuPageReqVO convert(AppSpuPageReqVO bean);
 
     AppSpuPageRespVO convertAppResp(ProductSpuDO list);
 

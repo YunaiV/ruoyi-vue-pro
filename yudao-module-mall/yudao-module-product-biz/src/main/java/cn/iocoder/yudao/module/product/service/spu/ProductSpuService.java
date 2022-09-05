@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -48,7 +48,7 @@ public interface ProductSpuService {
      * @param id 编号
      * @return 商品spu
      */
-    SpuRespVO getSpu(Long id);
+    ProductSpuRespVO getSpu(Long id);
 
     /**
      * 获得商品spu列表
@@ -64,7 +64,7 @@ public interface ProductSpuService {
      * @param pageReqVO 分页查询
      * @return 商品spu分页
      */
-    PageResult<SpuRespVO> getSpuPage(SpuPageReqVO pageReqVO);
+    PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO);
 
     /**
      * 获得商品spu分页

@@ -35,8 +35,7 @@ public class ProductSpuBaseVO {
     @NotNull(message = "商品分类编号不能为空")
     private Long categoryId;
 
-    @ApiModelProperty(value = "商品品牌编号", required = true, example = "1")
-//    @NotNull(message = "商品品牌编号不能为空")
+    @ApiModelProperty(value = "商品品牌编号", example = "1")
     private Long brandId;
 
     @ApiModelProperty(value = "商品图片的数组", required = true)

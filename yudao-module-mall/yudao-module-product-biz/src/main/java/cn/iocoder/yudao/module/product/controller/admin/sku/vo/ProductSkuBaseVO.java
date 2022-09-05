@@ -8,7 +8,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
 * 商品 SKU Base VO，提供给添加、修改、详细的子 VO 使用
@@ -20,11 +19,6 @@ public class ProductSkuBaseVO {
     @ApiModelProperty(value = "商品 SKU 名字", required = true, example = "芋道")
     @NotEmpty(message = "商品 SKU 名字不能为空")
     private String name;
-
-    /**
-     * 规格值数组
-     */
-    private List<Property> properties;
 
     @ApiModelProperty(value = "销售价格，单位：分", required = true, example = "1024", notes = "单位：分")
     @NotNull(message = "销售价格，单位：分不能为空")

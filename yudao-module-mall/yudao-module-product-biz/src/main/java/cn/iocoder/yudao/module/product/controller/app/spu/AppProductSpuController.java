@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.product.controller.app.spu;
 import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuRespVO;

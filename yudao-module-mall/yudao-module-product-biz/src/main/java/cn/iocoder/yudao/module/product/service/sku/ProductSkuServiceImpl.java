@@ -2,14 +2,11 @@ package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyAndValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
@@ -43,24 +40,6 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     private ProductPropertyService productPropertyService;
 
     @Override
-    public Long createSku(ProductSkuCreateOrUpdateReqVO createReqVO) {
-        // 插入
-        ProductSkuDO sku = ProductSkuConvert.INSTANCE.convert(createReqVO);
-        productSkuMapper.insert(sku);
-        // 返回
-        return sku.getId();
-    }
-
-    @Override
-    public void updateSku(ProductSkuUpdateReqVO updateReqVO) {
-        // 校验存在
-        this.validateSkuExists(updateReqVO.getId());
-        // 更新
-        ProductSkuDO updateObj = ProductSkuConvert.INSTANCE.convert(updateReqVO);
-        productSkuMapper.updateById(updateObj);
-    }
-
-    @Override
     public void deleteSku(Long id) {
         // 校验存在
         this.validateSkuExists(id);
@@ -82,11 +61,6 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     @Override
     public List<ProductSkuDO> getSkuList(Collection<Long> ids) {
         return productSkuMapper.selectBatchIds(ids);
-    }
-
-    @Override
-    public PageResult<ProductSkuDO> getSkuPage(ProductSkuPageReqVO pageReqVO) {
-        return productSkuMapper.selectPage(pageReqVO);
     }
 
     @Override

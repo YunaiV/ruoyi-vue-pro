@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.product.dal.mysql.spu;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.SpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -15,7 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
 
-    default PageResult<ProductSpuDO> selectPage(SpuPageReqVO reqVO) {
+    default PageResult<ProductSpuDO> selectPage(ProductSpuPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ProductSpuDO>()
                 .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
                 .eqIfPresent(ProductSpuDO::getSellPoint, reqVO.getSellPoint())
