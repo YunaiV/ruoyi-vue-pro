@@ -132,6 +132,11 @@
                 <artifactId>yudao-spring-boot-starter-biz-error-code</artifactId>
                 <version>${revision}</version>
             </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-captcha</artifactId>
+                <version>${revision}</version>
+            </dependency>
 
             <!-- Spring 核心 -->
             <dependency>
@@ -452,6 +457,12 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId> <!-- 文件类型的识别 -->
                 <version>${tika-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.anji-plus</groupId>
+                <artifactId>spring-boot-starter-captcha</artifactId>
+                <version>${aj-captcha.version}</version>
             </dependency>
 
             <dependency>
