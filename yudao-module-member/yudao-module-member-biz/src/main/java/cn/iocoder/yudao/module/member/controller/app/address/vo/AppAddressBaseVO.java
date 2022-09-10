@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.member.controller.app.address.vo;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.member.enums.AddressTypeEnum;
-import lombok.*;
-import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
 * 用户收件地址 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -21,17 +21,20 @@ public class AppAddressBaseVO {
     @NotNull(message = "手机号不能为空")
     private String mobile;
 
-    @ApiModelProperty(value = "地区编码", required = true)
-    @NotNull(message = "地区编码不能为空")
-    private Integer areaCode;
+    @ApiModelProperty(value = "地区编号", required = true)
+    @NotNull(message = "地区编号不能为空")
+    private Long areaId;
+
+    @ApiModelProperty(value = "邮编", required = true)
+    @NotEmpty(message = "邮编不能为空")
+    private String postCode;
 
     @ApiModelProperty(value = "收件详细地址", required = true)
     @NotNull(message = "收件详细地址不能为空")
     private String detailAddress;
 
-    @ApiModelProperty(value = "地址类型", required = true)
-    @NotNull(message = "地址类型不能为空")
-    @InEnum(AddressTypeEnum.class)
-    private Integer type;
+    @ApiModelProperty(value = "是否默认地址", required = true)
+    @NotNull(message = "是否默认地址不能为空")
+    private Boolean defaulted;
 
 }

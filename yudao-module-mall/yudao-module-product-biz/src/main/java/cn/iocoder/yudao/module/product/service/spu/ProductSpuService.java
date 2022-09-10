@@ -1,20 +1,27 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
+import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * 商品spu Service 接口
+ * 商品 SPU Service 接口
  *
  * @author 芋道源码
  */
 public interface ProductSpuService {
 
     /**
-     * 创建商品spu
+     * 创建商品 SPU
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -22,11 +29,11 @@ public interface ProductSpuService {
     Long createSpu(@Valid ProductSpuCreateReqVO createReqVO);
 
     /**
-     * 更新商品spu
+     * 更新商品 SPU
      *
      * @param updateReqVO 更新信息
      */
-    void updateSpu(@Valid SpuUpdateReqVO updateReqVO);
+    void updateSpu(@Valid ProductSpuUpdateReqVO updateReqVO);
 
     /**
      * 删除商品spu
@@ -41,7 +48,7 @@ public interface ProductSpuService {
      * @param id 编号
      * @return 商品spu
      */
-    SpuRespVO getSpu(Long id);
+    ProductSpuRespVO getSpu(Long id);
 
     /**
      * 获得商品spu列表
@@ -57,14 +64,15 @@ public interface ProductSpuService {
      * @param pageReqVO 分页查询
      * @return 商品spu分页
      */
-    PageResult<SpuRespVO> getSpuPage(SpuPageReqVO pageReqVO);
+    PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO);
 
     /**
-     * 获得商品spu列表, 用于 Excel 导出
+     * 获得商品spu分页
      *
-     * @param exportReqVO 查询条件
-     * @return 商品spu列表
+     * @param pageReqVO 分页查询
+     * @return 商品spu分页
      */
-    List<ProductSpuDO> getSpuList(SpuExportReqVO exportReqVO);
+    PageResult<AppSpuPageRespVO> getSpuPage(AppSpuPageReqVO pageReqVO);
+
 
 }

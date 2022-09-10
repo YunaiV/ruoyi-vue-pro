@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.member.dal.dataobject.address;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.member.enums.AddressTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -38,18 +37,22 @@ public class AddressDO extends BaseDO {
      */
     private String mobile;
     /**
-     * 地区编码
+     * 地区编号
      */
-    private Integer areaCode;
+    private Long areaId;
+    /**
+     * 邮编
+     */
+    private String postCode;
     /**
      * 收件详细地址
      */
     private String detailAddress;
     /**
-     * 地址类型
+     * 是否默认
      *
-     * 枚举 {@link AddressTypeEnum}
+     * true - 默认收件地址
      */
-    private Integer type;
+    private Boolean defaulted;
 
 }

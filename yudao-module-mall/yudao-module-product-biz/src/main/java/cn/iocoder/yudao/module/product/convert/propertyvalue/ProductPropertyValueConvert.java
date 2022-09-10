@@ -4,10 +4,12 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.*;
 
 /**
  * 规格值 Convert

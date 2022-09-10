@@ -235,3 +235,17 @@ export function getPath(path) {
   }
   return basePath + path;
 }
+
+/**
+ * 除法保留两位小数
+ *
+ * @param {*} divisor 除数
+ * @param {*} dividend 被除数
+ * @returns
+ */
+ export function divide(divisor, dividend) {
+  if(divisor == null || dividend == null || dividend == 0){
+    return null;
+  }
+  return Math.floor(divisor/dividend*100)/100;
+}

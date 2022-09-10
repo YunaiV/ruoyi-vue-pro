@@ -32,10 +32,12 @@ public class ProductPropertyDO extends BaseDO {
      */
     private String name;
     /**
-     * 状态： 0 开启 ，1 禁用
+     * 状态
      *
-     * {@link CommonStatusEnum}
+     * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+
+    // TODO 芋艿：rule；规格属性 (发布商品时，和 SKU 关联)；规格参数(搜索商品时，与 Category 关联搜索)
 
 }

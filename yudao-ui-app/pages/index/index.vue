@@ -169,8 +169,8 @@ export default {
     }
   },
   onLoad() {
-    //this.loadBannerData();
-    //this.loadNoticeData();
+    this.loadBannerData();
+    this.loadNoticeData();
   },
   methods: {
     loadBannerData() {
@@ -302,7 +302,7 @@ export default {
       margin: 10rpx;
       background: #ffffff;
       border-radius: 10rpx;
-      box-shadow: -1rpx 1rpx 2rpx #afd3f5, 1rpx 1rpx 0rpx #afd3f5;
+      box-shadow: 0rpx 6rpx 8rpx rgba(58,134,185,0.2);
       .prod-image {
         width: 224rpx;
         height: 224rpx;
