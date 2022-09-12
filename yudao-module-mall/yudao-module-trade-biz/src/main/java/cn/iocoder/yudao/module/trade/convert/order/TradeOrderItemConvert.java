@@ -29,7 +29,7 @@ public interface TradeOrderItemConvert {
             @Mapping(source = "tradeOrder.userId", target = "userId"),
             @Mapping(source = "tradeOrder.orderId", target = "orderId")
     })
-    default List<TradeOrderItemDO> convertList(TradeOrderDO tradeOrder, List<PriceCalculateRespDTO.Item> items) {
+    default List<TradeOrderItemDO> convertList(TradeOrderDO tradeOrder, List<PriceCalculateRespDTO.OrderItem> items) {
         // TODO @Com: Mapstruct 生成会报错
         throw new UnsupportedOperationException("无法实现");
     }

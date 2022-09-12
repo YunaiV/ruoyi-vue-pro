@@ -33,7 +33,7 @@ public class ProductSkuBaseVO {
     @ApiModelProperty(value = "条形码", example = "haha")
     private String barCode;
 
-    @ApiModelProperty(value = "图片地址")
+    @ApiModelProperty(value = "图片地址", required = true, example = "https://www.iocoder.cn/xx.png")
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
 

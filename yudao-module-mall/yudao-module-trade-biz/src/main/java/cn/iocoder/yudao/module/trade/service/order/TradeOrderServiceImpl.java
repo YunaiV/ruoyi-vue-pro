@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderDataCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.SkuDecrementStockBatchReqDTO;
-import cn.iocoder.yudao.module.product.api.sku.dto.SkuInfoRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.SpuInfoRespDTO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
@@ -26,7 +26,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.orderitem.TradeOrderItemMapper;
-import cn.iocoder.yudao.module.trade.enums.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,12 +62,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
         List<Item> items = createReqVO.getItems();
         //  商品SKU检查 sku可售状态,库存
-        List<SkuInfoRespDTO> skuInfos = productSkuApi.getSkusByIds(CollectionUtils.convertSet(items, Item::getSkuId));
-        Map<Long, SkuInfoRespDTO> skuInfoMap = CollectionUtils.convertMap(skuInfos, SkuInfoRespDTO::getId);
+        List<ProductSkuRespDTO> skuInfos = productSkuApi.getSkuList(CollectionUtils.convertSet(items, Item::getSkuId));
+        Map<Long, ProductSkuRespDTO> skuInfoMap = CollectionUtils.convertMap(skuInfos, ProductSkuRespDTO::getId);
         checkSaleableAndStockFromSpu(skuInfoMap, items);
 
         //  商品SPU检查 sku可售状态,库存
-        List<SpuInfoRespDTO> spuInfos = productSpuApi.getSpusByIds(CollectionUtils.convertSet(skuInfos, SkuInfoRespDTO::getSpuId));
+        List<SpuInfoRespDTO> spuInfos = productSpuApi.getSpuList(CollectionUtils.convertSet(skuInfos, ProductSkuRespDTO::getSpuId));
         checkSaleableFromSpu(spuInfos);
 
         // 价格计算
@@ -79,7 +79,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         tradeOrderMapper.insert(tradeOrderDO);
 
         // 订单项信息记录
-        List<TradeOrderItemDO> tradeOrderItems = TradeOrderItemConvert.INSTANCE.convertList(tradeOrderDO, priceResp.getItems());
+        List<TradeOrderItemDO> tradeOrderItems = TradeOrderItemConvert.INSTANCE.convertList(tradeOrderDO, priceResp.getOrder().getItems());
         //-填充订单项-SKU信息
         fillItemsInfoFromSku(tradeOrderItems, skuInfoMap);
         tradeOrderItemMapper.insertBatch(tradeOrderItems);
@@ -94,10 +94,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     private void fillItemsInfoFromSku(List<TradeOrderItemDO> tradeOrderItems,
-                                      Map<Long, SkuInfoRespDTO> spuInfos) {
+                                      Map<Long, ProductSkuRespDTO> spuInfos) {
         for (TradeOrderItemDO tradeOrderItem : tradeOrderItems) {
             // 填充SKU信息
-            SkuInfoRespDTO skuInfoRespDTO = spuInfos.get(tradeOrderItem.getSkuId());
+            ProductSkuRespDTO skuInfoRespDTO = spuInfos.get(tradeOrderItem.getSkuId());
             tradeOrderItem.setSpuId(skuInfoRespDTO.getSpuId());
             tradeOrderItem.setPicUrl(skuInfoRespDTO.getPicUrl());
             tradeOrderItem.setName(skuInfoRespDTO.getName());
@@ -116,14 +116,14 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         }
     }
 
-    private void checkSaleableAndStockFromSpu(Map<Long, SkuInfoRespDTO> skuInfoMap,
+    private void checkSaleableAndStockFromSpu(Map<Long, ProductSkuRespDTO> skuInfoMap,
                                               List<Item> items) {
         // sku 不存在
         if (items.size() != skuInfoMap.size()) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.ORDER_SKU_NOT_FOUND);
         }
         for (Item item : items) {
-            SkuInfoRespDTO skuInfoDTO = skuInfoMap.get(item.getSkuId());
+            ProductSkuRespDTO skuInfoDTO = skuInfoMap.get(item.getSkuId());
             // sku禁用
             if (!Objects.equals(CommonStatusEnum.ENABLE.getStatus(), skuInfoDTO.getStatus())) {
                 throw ServiceExceptionUtil.exception(ErrorCodeConstants.ORDER_SKU_NOT_SALE);

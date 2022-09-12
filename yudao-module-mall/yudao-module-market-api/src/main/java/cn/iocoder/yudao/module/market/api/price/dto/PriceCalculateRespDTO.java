@@ -20,14 +20,9 @@ public class PriceCalculateRespDTO {
     private Order order;
 
     /**
-     * 商品 SKU 数组
-     */
-    private List<Item> items;
-
-    /**
      * 营销活动数组
      *
-     * 只对应 {@link #items} 商品匹配的活动
+     * 只对应 {@link Order#items} 商品匹配的活动
      */
     private List<Promotion> promotions;
 
@@ -40,13 +35,13 @@ public class PriceCalculateRespDTO {
         /**
          * 商品原价（总），单位：分
          *
-         * 基于 {@link Item#getTotalOriginalPrice()} 求和
+         * 基于 {@link OrderItem#getTotalOriginalPrice()} 求和
          */
         private Integer skuOriginalPrice;
         /**
          * 商品优惠（总），单位：分
          *
-         * 基于 {@link Item#getTotalPromotionPrice()} 求和
+         * 基于 {@link OrderItem#getTotalPromotionPrice()} 求和
          */
         private Integer skuPromotionPrice;
         /**
@@ -69,6 +64,10 @@ public class PriceCalculateRespDTO {
          */
         //         * - {@link #couponPrice}  // TODO 芋艿：靠营销表记录
         private Integer payPrice;
+        /**
+         * 商品 SKU 数组
+         */
+        private List<OrderItem> items;
 
         // ========== 营销基本信息 ==========
         /**
@@ -85,10 +84,15 @@ public class PriceCalculateRespDTO {
     }
 
     /**
-     * 商品 SKU
+     * 订单商品 SKU
      */
     @Data
-    public static class Item extends PriceCalculateReqDTO.Item {
+    public static class OrderItem extends PriceCalculateReqDTO.Item {
+
+        /**
+         * 购买数量
+         */
+        private Integer count;
 
         /**
          * 商品原价（单），单位：分
@@ -141,6 +145,10 @@ public class PriceCalculateRespDTO {
          */
         private Long id;
         /**
+         * 营销名字
+         */
+        private String name;
+        /**
          * 营销类型
          *
          * 枚举 {@link PromotionTypeEnum}
@@ -153,10 +161,6 @@ public class PriceCalculateRespDTO {
          */
         private Integer level;
         /**
-         * 匹配的商品 SKU 数组
-         */
-        private List<Item> items;
-        /**
          * 计算时的原价（总），单位：分
          */
         private Integer totalOriginalPrice;
@@ -164,6 +168,13 @@ public class PriceCalculateRespDTO {
          * 计算时的优惠（总），单位：分
          */
         private Integer totalPromotionPrice;
+        /**
+         * 匹配的商品 SKU 数组
+         */
+        private List<PromotionItem> items;
+
+        // ========== 匹配情况 ==========
+
         /**
          * 是否满足优惠条件
          */
@@ -176,26 +187,26 @@ public class PriceCalculateRespDTO {
          */
         private String meetTip;
 
+    }
+
+    /**
+     * 营销匹配的商品 SKU
+     */
+    @Data
+    public static class PromotionItem {
+
         /**
-         * 匹配的商品 SKU
+         * 商品 SKU 编号
          */
-        @Data
-        public static class Item {
-
-            /**
-             * 商品 SKU 编号
-             */
-            private Long skuId;
-            /**
-             * 计算时的原价（总），单位：分
-             */
-            private Integer totalOriginalPrice;
-            /**
-             * 计算时的优惠（总），单位：分
-             */
-            private Integer totalPromotionPrice;
-
-        }
+        private Long skuId;
+        /**
+         * 计算时的原价（总），单位：分
+         */
+        private Integer totalOriginalPrice;
+        /**
+         * 计算时的优惠（总），单位：分
+         */
+        private Integer totalPromotionPrice;
 
     }
 

@@ -6,11 +6,13 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * 商品 SKU 信息 Response DTO
+ *
  * @author LeeYan9
  * @since 2022-08-26
  */
 @Data
-public class SkuInfoRespDTO {
+public class ProductSkuRespDTO {
 
     /**
      * 商品 SKU 编号，自增

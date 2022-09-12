@@ -7,13 +7,16 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * todo 注释
+ * 商品 SPU API 实现类
+ *
+ * @author LeeYan9
+ * @since 2022-08-26
  */
 @Service
 public class ProductSpuApiImpl implements ProductSpuApi {
 
     @Override
-    public List<SpuInfoRespDTO> getSpusByIds(Collection<Long> spuIds) {
+    public List<SpuInfoRespDTO> getSpuList(Collection<Long> spuIds) {
         return null;
     }
 

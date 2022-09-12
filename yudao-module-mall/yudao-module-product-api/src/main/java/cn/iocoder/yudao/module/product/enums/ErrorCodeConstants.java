@@ -36,5 +36,6 @@ public interface ErrorCodeConstants {
     ErrorCode SKU_PROPERTIES_DUPLICATED = new ErrorCode(1008006001, "商品 SKU 的属性组合存在重复");
     ErrorCode SPU_ATTR_NUMBERS_MUST_BE_EQUALS = new ErrorCode(1008006002, "一个 SPU 下的每个 SKU，其规格数必须一致");
     ErrorCode SPU_SKU_NOT_DUPLICATE = new ErrorCode(1008006003, "一个 SPU 下的每个 SKU，必须不重复");
+    ErrorCode SKU_STOCK_NOT_ENOUGH = new ErrorCode(1008006004, "商品 SKU 库存不足");
 
 }

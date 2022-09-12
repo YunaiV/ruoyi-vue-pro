@@ -6,16 +6,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.util.Date;
-
 /**
  * 购物车的商品信息 DO
+ *
+ * @author 芋道源码
  */
 @TableName("trade_cart_item")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-public class CartItemDO extends BaseDO {
+public class TradeCartItemDO extends BaseDO {
 
     // ========= 基础字段 BEGIN =========
 
@@ -27,10 +27,6 @@ public class CartItemDO extends BaseDO {
      * 是否选中
      */
     private Boolean selected;
-    /**
-     * 购物时间
-     */
-    private Date buyTime; // basket_date
 
     // ========= 基础字段 END =========
 
@@ -62,7 +58,7 @@ public class CartItemDO extends BaseDO {
     /**
      * 商品购买数量
      */
-    private Integer stock;
+    private Integer count;
 
     // ========= 商品信息 END =========
 
