@@ -9,20 +9,22 @@
       <el-form-item label="商品名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入商品名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="分类id" prop="categoryId">
-        <el-input v-model="queryParams.categoryId" placeholder="请输入分类id" clearable @keyup.enter.native="handleQuery"/>
+
+      <el-form-item label="商品编码" prop="code">
+        <el-input v-model="queryParams.code" placeholder="请输入商品名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择上下架状态" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-          <el-option label="上架" value="0" />
-          <el-option label="下架" value="1" />
+
+      <el-form-item label="商品分类" prop="categoryId">
+        <el-cascader v-model="queryParams.categoryIds" placeholder="请输入商品分类"
+                         :options="categoryList" :props="propName" clearable ref="category" />
+      </el-form-item>
+
+      <el-form-item label="商品品牌" prop="brandId">
+        <el-select v-model="queryParams.brandId" placeholder="请输入商品品牌" clearable @keyup.enter.native="handleQuery">
+          <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
-          range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
-      </el-form-item>
+
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -46,33 +48,35 @@
        1. 字段：商品信息、价格、库存、销量、排序、创建时间、状态、操作；
        2. tab 分成全部、销售中、仓库中、预警中
        -->
-      <el-table-column label="主键" align="center" prop="id" />
-      <el-table-column label="商品名称" align="center" prop="name" />
-      <el-table-column label="分类id" align="center" prop="categoryId" />
-      <el-table-column label="商品主图地址" align="center" prop="picUrls">
-        <template slot-scope="scope">
-          <img
-            v-if="scope.row.picUrls"
-            :src="scope.row.picUrls[0]"
-            alt="分类图片"
-            class="img-height"
-          />
+      <el-table-column label="商品信息" align="center" width="260">
+
+        <template slot-scope="scope" >
+          <div class="product-info">
+            <img
+              v-if="scope.row.picUrls"
+              :src="scope.row.picUrls[0]"
+              alt="分类图片"
+              class="img-height"
+            />
+            <div class="message">{{scope.row.name}}</div>
+          </div>
         </template>
       </el-table-column>
-      <el-table-column label="排序字段" align="center" prop="sort" />
-      <el-table-column label="点击量" align="center" prop="clickCount" />
-      <el-table-column label="价格区间" align="center" prop="price" />
-      <el-table-column label="总库存" align="center" prop="totalStock" />
-      <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
-        </template>
-      </el-table-column>
+      <el-table-column label="价格" align="center" prop="marketPrice" :formatter="unitConversion"/>
+      <el-table-column label="库存" align="center" prop="totalStock" />
+      <el-table-column label="销量" align="center" prop="salesCount" />
+      <el-table-column label="排序" align="center" prop="sort" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="状态" align="center" prop="status">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
+
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -87,7 +91,7 @@
                 @pagination="getList"/>
 
     <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body destroy-on-close :close-on-click-modal="false" >
-      <save @closeDialog="closeDialog" :type="dialogType" :obj="dialogObj" v-if="open" />
+      <save @closeDialog="closeDialog" :obj="dialogObj" v-if="open" />
     </el-dialog>
   </div>
 </template>
@@ -97,7 +101,8 @@ import {
   deleteSpu,
   getSpuPage,
 } from "@/api/mall/product/spu";
-
+import {getProductCategoryList} from "@/api/mall/product/category";
+import {getBrandList} from "@/api/mall/product/brand";
 import Editor from "@/components/Editor";
 import ImageUpload from "@/components/ImageUpload";
 import save  from "./save";
@@ -114,20 +119,12 @@ export default {
   },
   data() {
     return {
-      tableLeftTitles: [],
-      dbTagValues: [],
-      allhistoryTags: [],
-      unUseTags: [],
-      propertyPageList: [],
-      isShowTagInput: false,
-      addTagInput: {
-        name: "",
-        propertyId: "",
-        selectValues: [],
-        selectValueIds: [],
-        selectObect: [],
+      propName: {
+        checkStrictly: true,
+        label: "name",
+        value: "id",
       },
-      skuTags: [],
+      brandList: [],
       categoryList: [],
       // 遮罩层
       loading: true,
@@ -143,8 +140,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 弹出层类型
-      dialogType: "add",
       // 弹出层参数
       dialogObj:{},
       dateRangeCreateTime: [],
@@ -153,14 +148,10 @@ export default {
         pageNo: 1,
         pageSize: 10,
         name: null,
-        sellPoint: null,
-        description: null,
+        code: null,
+        categoryIds: [],
         categoryId: null,
-        picUrls: null,
-        sort: null,
-        likeCount: null,
-        price: null,
-        quantity: null,
+        brandId: null,
         status: null,
       },
       tagIndex: 0,
@@ -168,13 +159,30 @@ export default {
   },
   created() {
     this.getList();
+    this.getListCategory()
+    this.getListBrand()
   },
   methods: {
+    /** 查询分类列表 */
+    getListCategory() {
+      // 执行查询
+      getProductCategoryList().then((response) => {
+        this.categoryList = this.handleTree(response.data, "id", "parentId");
+      });
+    },
+    /** 查询品牌列表 */
+    getListBrand() {
+      // 执行查询
+      getBrandList().then((response) => {
+        this.brandList = response.data;
+      });
+    },
     /** 查询列表 */
     getList() {
       this.loading = true;
       // 处理查询参数
       let params = { ...this.queryParams };
+      params.categoryId =  this.queryParams.categoryIds[ this.queryParams.categoryIds.length - 1];
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, "createTime");
       // 执行查询
       getSpuPage(params).then((response) => {
@@ -200,27 +208,26 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.dateRangeCreateTime = [];
+      this.$refs.category.$refs.panel.checkedValue = [];//也可以是指定的值，默认返回值是数组，也可以返回单个值
+  　　this.$refs.category.$refs.panel.activePath = [];
+  　　this.$refs.category.$refs.panel.syncActivePath();
+      this.queryParams.categoryIds = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.dialogType = "add";
       this.dialogObj={};
       this.open = true;
       this.title = "添加商品spu";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.dialogType = "upd";
       this.dialogObj.id = row.id;
       this.open = true;
-      console.log("修改")
       this.title = "修改商品spu";
     },
     closeDialog(){
-      console.log("关闭")
-      this.dialogType = "add";
       this.dialogObj={};
       this.open = false;
       this.getList()
@@ -238,6 +245,9 @@ export default {
           this.$modal.msgSuccess("删除成功");
         })
         .catch(() => {});
+    },
+    unitConversion(row, column, cellValue){
+      return this.divide(cellValue, 100);
     }
   },
 };
@@ -262,8 +272,25 @@ export default {
     vertical-align: bottom;
   }
 
-  .img-height {
-    height: 65px;
+  .product-info{
+    display: flex;
+    .img-height {
+      height: 50px;
+      width: 50px;
+    }
+    .message{
+      margin-left: 10px;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      word-break: break-all;
+      -webkit-box-orient: vertical;
+      white-space: normal;
+      overflow: hidden;
+      height: 50px;
+      line-height: 25px;
+    }
   }
+
 }
 </style>

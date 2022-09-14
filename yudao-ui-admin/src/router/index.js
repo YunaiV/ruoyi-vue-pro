@@ -97,6 +97,17 @@ export const constantRoutes = [
       }
     ]
   }, {
+    path: '/property',
+    component: Layout,
+    hidden: true,
+    children: [{
+        path: 'value/:propertyId(\\d+)',
+        component: (resolve) => require(['@/views/mall/product/property/value'], resolve),
+        name: 'PropertyValue',
+        meta: {title: '规格数据', icon: '', activeMenu: '/mall/property'}
+      }
+    ]
+  }, {
     path: '/job',
     component: Layout,
     hidden: true,

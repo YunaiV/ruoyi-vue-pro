@@ -18,11 +18,8 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
     default PageResult<ProductSpuDO> selectPage(ProductSpuPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ProductSpuDO>()
                 .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
-                .eqIfPresent(ProductSpuDO::getSellPoint, reqVO.getSellPoint())
                 .eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId())
-                .eqIfPresent(ProductSpuDO::getPicUrls, reqVO.getPicUrls())
                 .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ProductSpuDO::getSort));
     }
 

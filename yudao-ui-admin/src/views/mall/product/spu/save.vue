@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <el-tabs v-model="activeName" class="tabs"  :before-leave="confirmLeave">
+    <el-tabs v-model="activeName" class="tabs"  >
       <!-- 基础设置 -->
       <el-tab-pane label="基础设置" name="base">
         <el-form ref="base" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
@@ -12,7 +12,7 @@
           </el-form-item>
           <!-- TODO @Luowenfeng：商品主图，80 x 80 即可 -->
           <el-form-item label="商品主图" prop="picUrls">
-            <ImageUpload v-model="baseForm.picUrls" :value="baseForm.picUrls" :limit="10"/>
+            <ImageUpload v-model="baseForm.picUrls" :value="baseForm.picUrls" :limit="10" />
           </el-form-item>
           <!-- TODO @Luowenfeng：商品视频 -->
           <el-form-item label="商品品牌" prop="brandId">
@@ -38,10 +38,7 @@
         <el-form ref="rates" :model="ratesForm" :rules="rules">
           <el-form-item label="启用多规格">
             <!-- TODO @Luowenfeng：改成开关的按钮；关闭，单规格；开启，多规格 -->
-            <el-radio-group v-model="ratesForm.spec" @change="changeRadio">
-              <el-radio :label="1">单规格</el-radio>
-              <el-radio :label="2">多规格</el-radio>
-            </el-radio-group>
+            <el-switch v-model="activeSwitch" @change="changeRadio"></el-switch>
           </el-form-item>
 
           <!-- 动态添加规格属性 -->
@@ -67,7 +64,7 @@
           <!-- 规格明细 -->
           <el-form-item label="规格明细">
             <el-table :data="ratesForm.rates" border style="width: 100%" ref="ratesTable">
-              <template v-if="ratesForm.spec == 2">
+              <template v-if="this.activeSwitch">
                 <el-table-column :key="index" v-for="(item, index) in dynamicSpec.filter(v => v.specName !== undefined)"
                                  :label="item.specName">
                   <template slot-scope="scope">
@@ -81,7 +78,7 @@
                                style="width: 100px; height: 50px"/>
                 </template>
               </el-table-column>
-              <template v-if="ratesForm.spec === 2">
+              <template v-if="this.activeSwitch">
                <el-table-column label="sku名称" :render-header="addRedStar" key="91">
                   <template slot-scope="scope">
                     <el-form-item :prop="'rates.'+ scope.$index + '.name'" :rules="[{required: true, trigger: 'change'}]">
@@ -142,7 +139,7 @@
                   <el-input v-model="scope.row.barCode"></el-input>
                 </template>
               </el-table-column>
-               <template v-if="ratesForm.spec === 2">
+               <template v-if="this.activeSwitch">
                 <el-table-column fixed="right" label="操作" width="50" key="100">
                   <template slot-scope="scope">
                     <el-button @click="scope.row.status = 1" type="text" size="small" v-show="scope.row.status == undefined || scope.row.status == 0 ">禁用</el-button>
@@ -153,7 +150,6 @@
             </el-table>
           </el-form-item>
           <el-form-item label="虚拟销量" prop="virtualSalesCount">
-            <!-- TODO @Luowenfeng：使用 input 类型即可 -->
             <el-input v-model="baseForm.virtualSalesCount" placeholder="请输入虚拟销量" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
           </el-form-item>
         </el-form>
@@ -196,8 +192,8 @@
 
 import {getBrandList} from "@/api/mall/product/brand";
 import {getProductCategoryList} from "@/api/mall/product/category";
-import {createSpu, updateSpu, getSpu} from "@/api/mall/product/spu";
-import {getPropertyPage,} from "@/api/mall/product/property";
+import {createSpu, updateSpu, getSpuDetail} from "@/api/mall/product/spu";
+import {getPropertyListAndValue,} from "@/api/mall/product/property";
 import Editor from "@/components/Editor";
 import ImageUpload from "@/components/ImageUpload";
 
@@ -206,16 +202,13 @@ export default {
     Editor,
     ImageUpload
   },
-  props:{//props列表
-    type:{
-      type:String,
-      default:"add" //定义参数默认值
-    },
+  props:{
     obj: Object
   },
   data() {
     return {
-      activeName: "base", // TODO @Luowenfeng：切换时，不需要校验通过
+      activeSwitch: false,
+      activeName: "base",
       propName: {
         checkStrictly: true,
         label: "name",
@@ -271,7 +264,7 @@ export default {
     this.getListBrand();
     this.getListCategory();
     this.getPropertyPageList();
-    if(this.type == 'upd'){
+    if(this.obj.id != null){
       this.updateType(this.obj.id)
     }
   },
@@ -279,14 +272,6 @@ export default {
     removeSpec(index){
         this.dynamicSpec.splice(index, 1);
         this.changeRadio()
-    },
-    async confirmLeave(active, old){
-      await this.$refs[old].validate((valid) => {
-        console.log(valid)
-        if (!valid) {
-          return reject();
-        }
-      });
     },
     // 必选标识
     addRedStar(h, { column }) {
@@ -296,13 +281,13 @@ export default {
       ];
     },
     changeRadio() {
+      this.activeSwitch ? this.ratesForm.spec = 2:  this.ratesForm.spec = 1;
       this.$refs.ratesTable.doLayout();
       if (this.ratesForm.spec == 1) {
         this.ratesForm.rates = [{}]
       } else {
         this.ratesForm.rates = []
         if (this.dynamicSpec.length > 0) {
-          console.log( this.dynamicSpec)
           this.buildRatesFormRates()
         }
       }
@@ -316,6 +301,7 @@ export default {
           last.forEach(par1 => {
             current.forEach(par2 => {
               let v
+              // 当两个对象合并时，需使用[1,2]方式生成数组，而当数组和对象合并时，需使用concat
               if (par1 instanceof Array) {
                 v = par1.concat(par2)
               } else {
@@ -327,7 +313,12 @@ export default {
           return array;
         })
         .forEach(v => {
-          rates.push({spec: v, status: 0, name: Array.of(v).join()})
+          let spec = v;
+          // 当v为单个规格项时，会变成字符串。造成表格只截取第一个字符串，而不是数组的第一个元素
+          if (typeof v == 'string') {
+            spec = Array.of(v)
+          }
+          rates.push({spec: spec, status: 0, name: Array.of(v).join()})
         });
       this.ratesForm.rates = rates
     },
@@ -363,7 +354,7 @@ export default {
       })
 
       // 动态规格调整字段
-      if (this.ratesForm.spec == 2) {
+      if (this.activeSwitch) {
         rates.forEach(r => {
           let properties = []
             Array.of(r.spec).forEach(s => {
@@ -396,43 +387,42 @@ export default {
       }else{
         form.picUrls = Array.of(form.picUrls)
       }
-      console.log(rates)
       form.skus = rates;
       form.specType = this.ratesForm.spec;
       form.categoryId = form.categoryIds[this.baseForm.categoryIds.length - 1];
 
-
       if(form.id == null){
         createSpu(form).then((response) => {
           this.$modal.msgSuccess("新增成功");
+          this.$emit("closeDialog");
         })
       }else{
         updateSpu(form).then((response) => {
           this.$modal.msgSuccess("修改成功");
+          this.$emit("closeDialog");
         })
       }
       });
-      this.$emit("closeDialog");
+
     },
     /** 查询规格 */
     getPropertyPageList() {
       // 执行查询
-      getPropertyPage().then((response) => {
-        this.propertyPageList = response.data.list;
+      getPropertyListAndValue().then((response) => {
+        this.propertyPageList = response.data;
       });
     },
+    // 添加规格项目
     changeSpec(val) {
       let obj = this.propertyPageList.find(o => o.id == val);
-      let dynamicSpec = this.dynamicSpec;
-      let spec = dynamicSpec.find(o => o.specId == val)
+      let spec = this.dynamicSpec.find(o => o.specId == val)
       spec.specId = obj.id;
       spec.specName = obj.name;
-      spec.specValue = obj.propertyValueList;
-      this.dynamicSpec = dynamicSpec;
+      spec.specValue = obj.values;
       this.buildRatesFormRates();
     },
     updateType(id){
-        getSpu(id).then((response) =>{
+      getSpuDetail(id).then((response) =>{
             let data = response.data;
             this.baseForm.id=data.id;
             this.baseForm.name=data.name;
@@ -452,6 +442,7 @@ export default {
               r.costPrice = this.divide(r.costPrice, 100)
             })
             if(this.ratesForm.spec == 2){
+              this.activeSwitch = true;
               data.productPropertyViews.forEach(p=>{
                 let obj = {};
                 obj.specId = p.propertyId;

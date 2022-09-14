@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.product.service.property;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyAndValueRespVO;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.*;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
@@ -46,12 +49,6 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         // 插入
         ProductPropertyDO property = ProductPropertyConvert.INSTANCE.convert(createReqVO);
         productPropertyMapper.insert(property);
-
-        //插入属性值
-        List<ProductPropertyValueCreateReqVO> propertyValueList = createReqVO.getPropertyValueList();
-        List<ProductPropertyValueDO> productPropertyValueDOList = ProductPropertyValueConvert.INSTANCE.convertList03(propertyValueList);
-        productPropertyValueDOList.forEach(x-> x.setPropertyId(property.getId()));
-        productPropertyValueMapper.insertBatch(productPropertyValueDOList);
         // 返回
         return property.getId();
     }
@@ -64,12 +61,6 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         // 更新
         ProductPropertyDO updateObj = ProductPropertyConvert.INSTANCE.convert(updateReqVO);
         productPropertyMapper.updateById(updateObj);
-        //更新属性值，先删后加
-        productPropertyValueMapper.deletePropertyValueByPropertyId(updateReqVO.getId());
-        List<ProductPropertyValueCreateReqVO> propertyValueList = updateReqVO.getPropertyValueList();
-        List<ProductPropertyValueDO> productPropertyValueDOList = ProductPropertyValueConvert.INSTANCE.convertList03(propertyValueList);
-        productPropertyValueDOList.forEach(x-> x.setPropertyId(updateReqVO.getId()));
-        productPropertyValueMapper.insertBatch(productPropertyValueDOList);
     }
 
     @Override
@@ -94,31 +85,28 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     }
 
     @Override
-    public List<ProductPropertyDO> getPropertyList(Collection<Long> ids) {
-        return productPropertyMapper.selectBatchIds(ids);
+    public List<ProductPropertyRespVO> getPropertyList(ProductPropertyListReqVO listReqVO) {
+        return ProductPropertyConvert.INSTANCE.convertList(productPropertyMapper.selectList(new LambdaQueryWrapperX<ProductPropertyDO>()
+                .likeIfPresent(ProductPropertyDO::getName, listReqVO.getName())
+                .eqIfPresent(ProductPropertyDO::getStatus, listReqVO.getStatus())));
     }
 
     @Override
-    public PageResult<ProductPropertyDO> getPropertyPage(ProductPropertyPageReqVO pageReqVO) {
-        return productPropertyMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public PageResult<ProductPropertyAndValueRespVO> getPropertyListPage(ProductPropertyPageReqVO pageReqVO) {
+    public PageResult<ProductPropertyRespVO> getPropertyPage(ProductPropertyPageReqVO pageReqVO) {
         //获取属性列表
         PageResult<ProductPropertyDO> pageResult = productPropertyMapper.selectPage(pageReqVO);
-        PageResult<ProductPropertyAndValueRespVO> propertyRespVOPageResult = ProductPropertyConvert.INSTANCE.convertPage(pageResult);
-        List<Long> propertyIds = propertyRespVOPageResult.getList().stream().map(ProductPropertyAndValueRespVO::getId).collect(Collectors.toList());
-
-        //获取属性值列表
-        List<ProductPropertyValueDO> productPropertyValueDOList = productPropertyValueMapper.getPropertyValueListByPropertyId(propertyIds);
-        List<ProductPropertyValueRespVO> propertyValueRespVOList = ProductPropertyValueConvert.INSTANCE.convertList(productPropertyValueDOList);
-        //组装一对多
-        propertyRespVOPageResult.getList().forEach(x->{
-            Long propertyId = x.getId();
-            List<ProductPropertyValueRespVO> valueDOList = propertyValueRespVOList.stream().filter(v -> v.getPropertyId().equals(propertyId)).collect(Collectors.toList());
-            x.setValues(valueDOList);
-        });
+        PageResult<ProductPropertyRespVO> propertyRespVOPageResult = ProductPropertyConvert.INSTANCE.convertPage(pageResult);
+//        List<Long> propertyIds = propertyRespVOPageResult.getList().stream().map(ProductPropertyAndValueRespVO::getId).collect(Collectors.toList());
+//
+//        //获取属性值列表
+//        List<ProductPropertyValueDO> productPropertyValueDOList = productPropertyValueMapper.getPropertyValueListByPropertyId(propertyIds);
+//        List<ProductPropertyValueRespVO> propertyValueRespVOList = ProductPropertyValueConvert.INSTANCE.convertList(productPropertyValueDOList);
+//        //组装一对多
+//        propertyRespVOPageResult.getList().forEach(x->{
+//            Long propertyId = x.getId();
+//            List<ProductPropertyValueRespVO> valueDOList = propertyValueRespVOList.stream().filter(v -> v.getPropertyId().equals(propertyId)).collect(Collectors.toList());
+//            x.setValues(valueDOList);
+//        });
         return propertyRespVOPageResult;
     }
 
@@ -127,25 +115,31 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     }
 
     @Override
-    public ProductPropertyAndValueRespVO getPropertyResp(Long id) {
+    public ProductPropertyRespVO getPropertyResp(Long id) {
         //查询规格
         ProductPropertyDO property = getProperty(id);
-        ProductPropertyAndValueRespVO propertyRespVO = ProductPropertyConvert.INSTANCE.convert(property);
-        //查询属性值
-        List<ProductPropertyValueDO> valueDOList = productPropertyValueMapper.getPropertyValueListByPropertyId(Arrays.asList(id));
-        List<ProductPropertyValueRespVO> propertyValueRespVOS = ProductPropertyValueConvert.INSTANCE.convertList(valueDOList);
-        //组装
-        propertyRespVO.setValues(propertyValueRespVOS);
-        return propertyRespVO;
+        return ProductPropertyConvert.INSTANCE.convert(property);
     }
 
     @Override
-    public List<ProductPropertyAndValueRespVO> getPropertyAndValueList(Collection<Long> ids) {
-        List<ProductPropertyAndValueRespVO> productPropertyRespVO = ProductPropertyConvert.INSTANCE.convertList(productPropertyMapper.selectBatchIds(ids));
+    public List<ProductPropertyRespVO> getPropertyList(Collection<Long> ids) {
+        return ProductPropertyConvert.INSTANCE.convertList(productPropertyMapper.selectBatchIds(ids));
+    }
+
+    @Override
+    public List<ProductPropertyAndValueRespVO> getPropertyAndValueList(ProductPropertyListReqVO listReqVO) {
+        List<ProductPropertyRespVO> propertyList = getPropertyList(listReqVO);
+
         //查询属性值
-        List<ProductPropertyValueDO> valueDOList = productPropertyValueMapper.selectBatchIds(ids);
-        Map<Long, List<ProductPropertyValueDO>> propertyValuesMap = valueDOList.stream().collect(Collectors.groupingBy(ProductPropertyValueDO::getPropertyId));
-        productPropertyRespVO.forEach(p -> p.setValues(ProductPropertyValueConvert.INSTANCE.convertList(propertyValuesMap.get(p.getId()))));
-        return productPropertyRespVO;
+        List<ProductPropertyValueDO> valueDOList = productPropertyValueMapper.getPropertyValueListByPropertyId(CollectionUtils.convertList(propertyList, ProductPropertyRespVO::getId));
+        Map<Long, List<ProductPropertyValueRespVO>> valueDOMap = valueDOList.stream()
+                .map(ProductPropertyValueConvert.INSTANCE::convert)
+                .collect(Collectors.groupingBy(ProductPropertyValueRespVO::getPropertyId));
+        //组装
+        return propertyList.stream().map(m -> {
+            ProductPropertyAndValueRespVO productPropertyAndValueRespVO = BeanUtil.copyProperties(m, ProductPropertyAndValueRespVO.class);
+            productPropertyAndValueRespVO.setValues(valueDOMap.get(m.getId()));
+            return productPropertyAndValueRespVO;
+        }).collect(Collectors.toList());
     }
 }

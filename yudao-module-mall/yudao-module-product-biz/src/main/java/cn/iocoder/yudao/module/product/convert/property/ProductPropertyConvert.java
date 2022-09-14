@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.product.convert.property;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyAndValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import org.mapstruct.Mapper;
@@ -24,10 +24,10 @@ public interface ProductPropertyConvert {
 
     ProductPropertyDO convert(ProductPropertyUpdateReqVO bean);
 
-    ProductPropertyAndValueRespVO convert(ProductPropertyDO bean);
+    ProductPropertyRespVO convert(ProductPropertyDO bean);
 
-    List<ProductPropertyAndValueRespVO> convertList(List<ProductPropertyDO> list);
+    List<ProductPropertyRespVO> convertList(List<ProductPropertyDO> list);
 
-    PageResult<ProductPropertyAndValueRespVO> convertPage(PageResult<ProductPropertyDO> page);
+    PageResult<ProductPropertyRespVO> convertPage(PageResult<ProductPropertyDO> page);
 
 }

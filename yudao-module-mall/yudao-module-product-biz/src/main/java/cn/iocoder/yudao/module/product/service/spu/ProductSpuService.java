@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -41,6 +38,14 @@ public interface ProductSpuService {
      * @param id 编号
      */
     void deleteSpu(Long id);
+
+    /**
+     * 获得商品spu详情
+     *
+     * @param id 编号
+     * @return 商品spu
+     */
+    ProductSpuDetailRespVO getSpuDetail(Long id);
 
     /**
      * 获得商品spu

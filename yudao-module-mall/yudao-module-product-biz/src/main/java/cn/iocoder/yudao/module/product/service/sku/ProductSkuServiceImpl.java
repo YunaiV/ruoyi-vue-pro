@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.product.service.sku;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyAndValueRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
+import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -38,6 +39,9 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Resource
     private ProductPropertyService productPropertyService;
+
+    @Resource
+    private ProductPropertyValueService productPropertyValueService;
 
     @Override
     public void deleteSku(Long id) {
@@ -71,17 +75,15 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         }
 
         // 1、校验规格属性存在
-        // TODO @Luowenfeng：stream 的写法；不用改哈，就是说下可以酱紫写；
         Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null).flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
                 .map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toSet()); // 将每个 Property 转换成对应的 propertyId，最后形成集合
-        List<ProductPropertyAndValueRespVO> propertyAndValueList = productPropertyService.getPropertyAndValueList(propertyIds);
-        if (propertyAndValueList.size() == propertyIds.size()) {
+        List<ProductPropertyRespVO> propertyList = productPropertyService.getPropertyList(propertyIds);
+        if (propertyList.size() != propertyIds.size()) {
             throw exception(PROPERTY_NOT_EXISTS);
         }
 
         // 2. 校验，一个 SKU 下，没有重复的规格。校验方式是，遍历每个 SKU ，看看是否有重复的规格 propertyId
-        Map<Long, ProductPropertyValueRespVO> propertyValueMap = propertyAndValueList.stream().filter(p -> p.getValues() != null).flatMap(p -> p.getValues().stream())
-                .collect(Collectors.toMap(ProductPropertyValueRespVO::getId, value -> value)); // KEY：规格属性值的编号
+        Map<Long, ProductPropertyValueRespVO> propertyValueMap = CollectionUtils.convertMap(productPropertyValueService.getPropertyValueListByPropertyId(new ArrayList<>(propertyIds)), ProductPropertyValueRespVO::getId);
         skus.forEach(sku -> {
             Set<Long> skuPropertyIds = CollectionUtils.convertSet(sku.getProperties(), propertyItem -> propertyValueMap.get(propertyItem.getValueId()).getPropertyId());
             if (skuPropertyIds.size() != sku.getProperties().size()) {
@@ -100,8 +102,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         // 4. 最后校验，每个 Sku 之间不是重复的
         Set<Set<Long>> skuAttrValues = new HashSet<>(); // 每个元素，都是一个 Sku 的 attrValueId 集合。这样，通过最外层的 Set ，判断是否有重复的.
         for (ProductSkuCreateOrUpdateReqVO sku : skus) {
-            // TODO @Luowenfeng：可以使用 CollectionUtils.convertSet()，简化下面的 stream 操作
-            if (!skuAttrValues.add(sku.getProperties().stream().map(ProductSkuBaseVO.Property::getValueId).collect(Collectors.toSet()))) { // 添加失败，说明重复
+            if (!skuAttrValues.add(CollectionUtils.convertSet(sku.getProperties(), ProductSkuBaseVO.Property::getValueId))) { // 添加失败，说明重复
                 throw exception(ErrorCodeConstants.SPU_SKU_NOT_DUPLICATE);
             }
         }
