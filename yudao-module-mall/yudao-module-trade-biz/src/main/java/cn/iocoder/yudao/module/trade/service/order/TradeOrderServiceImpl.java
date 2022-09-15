@@ -30,7 +30,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.orderitem.TradeOrderItemMapper;
-import cn.iocoder.yudao.module.trade.enums.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
@@ -82,12 +82,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
         List<Item> items = createReqVO.getItems();
         // 商品SKU检查 sku可售状态,库存
-        List<SkuInfoRespDTO> skuInfos = productSkuApi.getSkusByIds(CollectionUtils.convertSet(items, Item::getSkuId));
-        Map<Long, SkuInfoRespDTO> skuInfoMap = CollectionUtils.convertMap(skuInfos, SkuInfoRespDTO::getId);
+        List<ProductSkuRespDTO> skuInfos = productSkuApi.getSkuList(CollectionUtils.convertSet(items, Item::getSkuId));
+        Map<Long, ProductSkuRespDTO> skuInfoMap = CollectionUtils.convertMap(skuInfos, ProductSkuRespDTO::getId);
         checkSaleableAndStockFromSpu(skuInfoMap, items);
 
         // 商品SPU检查 sku可售状态,库存
-        List<SpuInfoRespDTO> spuInfos = productSpuApi.getSpusByIds(CollectionUtils.convertSet(skuInfos, SkuInfoRespDTO::getSpuId));
+        List<SpuInfoRespDTO> spuInfos = productSpuApi.getSpuList(CollectionUtils.convertSet(skuInfos, ProductSkuRespDTO::getSpuId));
         checkSaleableFromSpu(spuInfos);
 
         // 价格计算
@@ -99,7 +99,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         tradeOrderMapper.insert(tradeOrderDO);
 
         // 订单项信息记录
-        List<TradeOrderItemDO> tradeOrderItems = TradeOrderItemConvert.INSTANCE.convertList(priceResp.getItems());
+        List<TradeOrderItemDO> tradeOrderItems = TradeOrderItemConvert.INSTANCE.convertList(priceResp.getOrder().getItems());
         //-填充订单项-SKU信息
         fillItemsInfoFromSkuAndOrder(tradeOrderDO, tradeOrderItems, skuInfoMap);
         tradeOrderItemMapper.insertBatch(tradeOrderItems);
@@ -156,13 +156,13 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     private void fillItemsInfoFromSkuAndOrder(TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItems,
-                                              Map<Long, SkuInfoRespDTO> spuInfos) {
+                                              Map<Long, ProductSkuRespDTO> spuInfos) {
         for (TradeOrderItemDO tradeOrderItem : tradeOrderItems) {
             // 填充订单信息
             tradeOrderItem.setOrderId(tradeOrderDO.getId());
             tradeOrderItem.setUserId(tradeOrderDO.getUserId());
             // 填充SKU信息
-            SkuInfoRespDTO skuInfoRespDTO = spuInfos.get(tradeOrderItem.getSkuId());
+            ProductSkuRespDTO skuInfoRespDTO = spuInfos.get(tradeOrderItem.getSkuId());
             tradeOrderItem.setSpuId(skuInfoRespDTO.getSpuId());
             tradeOrderItem.setPicUrl(skuInfoRespDTO.getPicUrl());
             tradeOrderItem.setName(skuInfoRespDTO.getName());
@@ -182,14 +182,14 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         }
     }
 
-    private void checkSaleableAndStockFromSpu(Map<Long, SkuInfoRespDTO> skuInfoMap,
+    private void checkSaleableAndStockFromSpu(Map<Long, ProductSkuRespDTO> skuInfoMap,
                                               List<Item> items) {
         // sku 不存在
         if (items.size() != skuInfoMap.size()) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.ORDER_SKU_NOT_FOUND);
         }
         for (Item item : items) {
-            SkuInfoRespDTO skuInfoDTO = skuInfoMap.get(item.getSkuId());
+            ProductSkuRespDTO skuInfoDTO = skuInfoMap.get(item.getSkuId());
             // sku禁用
             if (!Objects.equals(CommonStatusEnum.ENABLE.getStatus(), skuInfoDTO.getStatus())) {
                 throw ServiceExceptionUtil.exception(ErrorCodeConstants.ORDER_SKU_NOT_SALE);

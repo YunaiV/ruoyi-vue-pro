@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.market.api.price.PriceApi;
 import cn.iocoder.yudao.module.market.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
-import cn.iocoder.yudao.module.product.api.sku.dto.SkuInfoRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.SpuInfoRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
@@ -60,21 +60,21 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
             spuInfo.setId(1L);
             spuInfo.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
-        when(productSpuApi.getSpusByIds(Collections.singleton(1L))).thenReturn(Lists.newArrayList(spuInfoRespDTO));
+        when(productSpuApi.getSpuList(Collections.singleton(1L))).thenReturn(Lists.newArrayList(spuInfoRespDTO));
         // mock 商品SkU数据
-        SkuInfoRespDTO skuInfoRespDTO = randomPojo(SkuInfoRespDTO.class, skuInfo -> {
+        ProductSkuRespDTO skuInfoRespDTO = randomPojo(ProductSkuRespDTO.class, skuInfo -> {
             skuInfo.setId(1L);
             skuInfo.setStatus(CommonStatusEnum.ENABLE.getStatus());
             skuInfo.setStock(randomInteger());
             skuInfo.setSpuId(1L);
         });
-        when(productSkuApi.getSkusByIds(Collections.singleton(1L))).thenReturn(Lists.newArrayList(skuInfoRespDTO));
+        when(productSkuApi.getSkuList(Collections.singleton(1L))).thenReturn(Lists.newArrayList(skuInfoRespDTO));
         // mock 价格信息
         PriceCalculateRespDTO calculateRespDTO = randomPojo(PriceCalculateRespDTO.class, priceCalculateRespDTO -> {
-            PriceCalculateRespDTO.Item item = priceCalculateRespDTO.getItems().get(0);
+            PriceCalculateRespDTO.OrderItem item = priceCalculateRespDTO.getOrder().getItems().get(0);
             item.setSkuId(1L);
             item.setCount(2);
-            priceCalculateRespDTO.setItems(Collections.singletonList(item));
+            priceCalculateRespDTO.getOrder().setItems(Collections.singletonList(item));
         });
         when(priceApi.calculatePrice(any())).thenReturn(calculateRespDTO);
         //mock 支付订单信息
@@ -103,7 +103,7 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(skuInfoRespDTO.getId(), tradeOrderItemDO.getSkuId());
         assertEquals(1L, tradeOrderItemDO.getUserId());
         //价格
-        assertEquals(calculateRespDTO.getItems().get(0).getPresentPrice(), tradeOrderItemDO.getPresentPrice());
+        assertEquals(calculateRespDTO.getOrder().getItems().get(0).getPresentPrice(), tradeOrderItemDO.getPresentPrice());
     }
 
 }

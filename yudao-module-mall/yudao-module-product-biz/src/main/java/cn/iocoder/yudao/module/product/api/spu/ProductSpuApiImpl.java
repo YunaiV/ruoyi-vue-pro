@@ -25,7 +25,7 @@ public class ProductSpuApiImpl implements ProductSpuApi {
     private ProductSpuMapper productSpuMapper;
 
     @Override
-    public List<SpuInfoRespDTO> getSpusByIds(Collection<Long> spuIds) {
+    public List<SpuInfoRespDTO> getSpuList(Collection<Long> spuIds) {
         if (CollectionUtils.isAnyEmpty(spuIds)) {
             return Collections.emptyList();
         }

@@ -20,5 +20,5 @@ public interface TradeOrderItemConvert {
      * @param items sku列表价格
      * @return 订单项
      */
-    List<TradeOrderItemDO> convertList(List<PriceCalculateRespDTO.Item> items);
+    List<TradeOrderItemDO> convertList(List<PriceCalculateRespDTO.OrderItem> items);
 }
