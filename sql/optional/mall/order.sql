@@ -1,4 +1,5 @@
 /**todo cancelType 设置默认值 0?*/
+DROP TABLE IF EXISTS `trade_order`;
 CREATE TABLE `trade_order`
 (
     `id`                      bigint          NOT NULL AUTO_INCREMENT COMMENT '用户ID',
@@ -10,9 +11,10 @@ CREATE TABLE `trade_order`
     `user_remark`             varchar(200)             DEFAULT NULL COMMENT '用户备注',
     `status`                  int             NOT NULL DEFAULT '0' COMMENT '订单状态：[0:待付款 1:待发货 2:待收货 3:已完成 4:已关闭]',
     `product_count`           int             NOT NULL COMMENT '购买的商品数量',
-    `cancel_type`             int             NOT NULL COMMENT '取消类型：[10:超时未支付 20:退款关闭 30:买家取消 40:已通过货到付款交易]',
+    `cancel_type`             int             DEFAULT NULL COMMENT '取消类型：[10:超时未支付 20:退款关闭 30:买家取消 40:已通过货到付款交易]',
     `remark`                  varchar(200)             DEFAULT NULL COMMENT '商家备注',
     `payed`                   bit(1)          NOT NULL DEFAULT b'0' COMMENT '是否已支付：[0:未支付 1:已经支付过]',
+    `pay_time`                datetime                 DEFAULT NULL COMMENT '订单支付时间',
     `finish_time`             datetime                 DEFAULT NULL COMMENT '订单完成时间',
     `cancel_time`             datetime                 DEFAULT NULL COMMENT '订单取消时间',
     `sku_original_price`      int             NOT NULL DEFAULT '0' COMMENT '商品原价（总），单位：分',
@@ -20,11 +22,11 @@ CREATE TABLE `trade_order`
     `order_promotion_price`   int             NOT NULL DEFAULT '0' COMMENT '订单优惠（总），单位：分',
     `delivery_price`          int             NOT NULL DEFAULT '0' COMMENT '运费金额，单位：分',
     `pay_price`               int             NOT NULL DEFAULT '0' COMMENT '应付金额（总），单位：分',
-    `pay_order_id`            int             NOT NULL COMMENT '支付订单编号',
-    `pay_channel`             int             NOT NULL COMMENT '支付成功的支付渠道',
-    `delivery_type`           int             NOT NULL DEFAULT '1' COMMENT '配送方式:[1:快递发货 2:自提]',
-    `actual_delivery_type`    int             NOT NULL DEFAULT '1' COMMENT '实际的配送方式:[1:快递发货 2:自提]',
-    `delivery_templateid`     int                      DEFAULT NULL COMMENT '配置模板的编号',
+    `pay_order_id`            int             DEFAULT NULL COMMENT '支付订单编号',
+    `pay_channel`             int             DEFAULT NULL COMMENT '支付成功的支付渠道',
+    `delivery_type`           int             DEFAULT NULL DEFAULT '1' COMMENT '配送方式:[1:快递发货 2:自提]',
+    `actual_delivery_type`    int             DEFAULT NULL DEFAULT '1' COMMENT '实际的配送方式:[1:快递发货 2:自提]',
+    `delivery_template_id`     int                      DEFAULT NULL COMMENT '配置模板的编号',
     `express_no`              int                      DEFAULT NULL COMMENT '物流公司单号',
     `delivery_status`         bit(1)          NOT NULL DEFAULT b'0' COMMENT '发货状态[0:未发货 1:已发货]',
     `delivery_time`           datetime                 DEFAULT NULL COMMENT '发货时间',

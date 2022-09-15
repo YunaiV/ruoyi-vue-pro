@@ -15,6 +15,6 @@ public interface PayOrderApi {
      * @param reqDTO 创建请求
      * @return 支付单编号
      */
-    Long createPayOrder(@Valid PayOrderDataCreateReqDTO reqDTO);
+    Long createPayOrder(@Valid PayOrderInfoCreateReqDTO reqDTO);
 
 }

@@ -78,6 +78,10 @@ yudao:
     timeout: 5m
     width: 160
     height: 60
+  trade:
+    order:
+      app-id: 1
+      merchant-order-id: 1
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}

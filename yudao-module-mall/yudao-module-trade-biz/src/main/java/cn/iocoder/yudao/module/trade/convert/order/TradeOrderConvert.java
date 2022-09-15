@@ -4,6 +4,8 @@ import cn.iocoder.yudao.module.market.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 /**
@@ -16,5 +18,11 @@ public interface TradeOrderConvert {
     TradeOrderConvert INSTANCE = Mappers.getMapper(TradeOrderConvert.class);
 
 
-    TradeOrderDO convert(AppTradeOrderCreateReqVO createReqVO, PriceCalculateRespDTO.Order order);
+    @Mappings({
+            @Mapping(source = "order.couponId", target = "couponId"),
+            @Mapping(target = "remark", ignore = true),
+            @Mapping(source = "createVO.remark", target = "userRemark"),
+            @Mapping(source = "createVO.addressId", target = "receiverAreaId")
+    })
+    TradeOrderDO convert(AppTradeOrderCreateReqVO createVO, PriceCalculateRespDTO.Order order);
 }

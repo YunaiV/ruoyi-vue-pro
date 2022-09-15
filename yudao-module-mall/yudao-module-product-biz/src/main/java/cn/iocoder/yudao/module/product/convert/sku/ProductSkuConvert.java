@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.convert.sku;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.api.sku.dto.SkuInfoRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuExcelVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
@@ -36,5 +37,8 @@ public interface ProductSkuConvert {
     PageResult<ProductSkuRespVO> convertPage(PageResult<ProductSkuDO> page);
 
     List<ProductSkuExcelVO> convertList02(List<ProductSkuDO> list);
+
+    List<SkuInfoRespDTO> convertList03(List<ProductSkuDO> list);
+
 
 }

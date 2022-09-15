@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.api.spu;
 
-import cn.iocoder.yudao.module.product.api.sku.dto.SkuInfoRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.SpuInfoRespDTO;
 
 import java.util.Collection;
