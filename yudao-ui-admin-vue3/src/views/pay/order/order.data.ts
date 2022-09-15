@@ -158,6 +158,22 @@ const crudSchemas = reactive<CrudSchema[]>([
     field: 'channelOrderNo'
   },
   {
+    label: t('common.createTime'),
+    field: 'createTime',
+    form: {
+      show: false
+    },
+    search: {
+      show: true,
+      component: 'DatePicker',
+      componentProps: {
+        type: 'datetimerange',
+        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]
+      }
+    }
+  },
+  {
     label: t('table.action'),
     field: 'action',
     width: '270px',

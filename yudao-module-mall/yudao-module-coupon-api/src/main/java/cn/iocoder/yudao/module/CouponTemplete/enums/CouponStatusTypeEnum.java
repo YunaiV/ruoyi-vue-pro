@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 
 /**
- * 优惠券 - 优惠券类型
+ * 优惠券 - 优惠券状态类型
  *
  * @author Sin
  */
@@ -14,9 +14,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum CouponStatusTypeEnum {
 
-    ALL(1,"全部商品可用"),
-    POINT_PRODUCT(2,"指定商品可用"),
-    POINT_PRODUCT_NOT(3,"指定商品不可用不能为空"),;
+    PROCESSING(1,"进行中"),
+    END(2,"已结束"),
+    CLOSE(3,"已关闭"),;
 
     /**
      * 优惠券类型

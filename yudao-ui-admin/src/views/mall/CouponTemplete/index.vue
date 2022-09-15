@@ -43,7 +43,6 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="用户ID" align="center" prop="id" />
 
     <!--      todo 优惠券类型-->
       <el-table-column label="优惠券类型" align="center" prop="type" />
@@ -229,6 +228,7 @@
 
 <script>
 import { create, update, deleteCouponTemplete, get, getPage, exportExcel } from "@/api/mall/CouponTemplete/CouponTemplete.js";
+import {getDictDatas} from "@/utils/dict";
 
 export default {
   name: "",
@@ -288,6 +288,9 @@ export default {
         endTime: [],
         createTime: [],
       },
+      //数据字典
+      datas:getDictDatas(),
+
       // 表单参数
       form: {},
       // 表单校验

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
@@ -35,8 +36,7 @@ public class ProductSpuBaseVO {
     @NotNull(message = "商品分类编号不能为空")
     private Long categoryId;
 
-    @ApiModelProperty(value = "商品品牌编号", required = true, example = "1")
-//    @NotNull(message = "商品品牌编号不能为空")
+    @ApiModelProperty(value = "商品品牌编号", example = "1")
     private Long brandId;
 
     @ApiModelProperty(value = "商品图片的数组", required = true)
@@ -65,10 +65,28 @@ public class ProductSpuBaseVO {
     @NotNull(message = "是否展示库存不能为空")
     private Boolean showStock;
 
+    @ApiModelProperty(value = "库存", required = true, example = "true")
+    private Integer totalStock;
+
+    @ApiModelProperty(value = "市场价", example = "1024")
+    private Integer marketPrice;
+
+    @ApiModelProperty(value = " 最小价格，单位使用：分", required = true, example = "1024")
+    private Integer minPrice;
+
+    @ApiModelProperty(value = "最大价格，单位使用：分", required = true, example = "1024")
+    private Integer maxPrice;
+
     // ========== 统计相关字段 =========
+
+    @ApiModelProperty(value = "商品销量", example = "1024")
+    private Integer salesCount;
 
     @ApiModelProperty(value = "虚拟销量", required = true, example = "1024")
     @NotNull(message = "虚拟销量不能为空")
     private Integer virtualSalesCount;
+
+    @ApiModelProperty(value = "点击量", example = "1024")
+    private Integer clickCount;
 
 }

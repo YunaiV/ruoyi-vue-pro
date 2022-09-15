@@ -6,7 +6,7 @@
       <el-form-item label="规格名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入规格名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="开启状态" prop="status">
+      <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择开启状态" clearable size="small">
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
@@ -33,12 +33,14 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="规格名称" align="center" prop="name" />
-       <el-table-column label="规格名称" align="center" prop="propertyValueList">
+      <el-table-column label="规格id" align="center" prop="id" />
+      <el-table-column label="规格名称" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <span>{{formatList(scope.row.propertyValueList)}}</span>
+          <router-link :to="'/property/value/' + scope.row.id" class="link-type">
+            <span>{{ scope.row.name }}</span>
+          </router-link>
         </template>
-       </el-table-column>
+      </el-table-column>
       <el-table-column label="开启状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
@@ -49,6 +51,7 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="备注" align="center" prop="left" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -65,6 +68,9 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="规格id" prop="id" v-if="form.id != null">
+          <el-input v-model="form.id" disabled />
+        </el-form-item>
         <el-form-item label="规格名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入规格名称" />
         </el-form-item>
@@ -75,26 +81,9 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="属性值">
-          <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="addPropertyValue()">添加</el-button>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" placeholder="备注" />
         </el-form-item>
-        <el-form-item
-            v-for="(domain, index) in form.propertyValueList"
-            :key="domain.key"
-            :prop="'propertyValueList.' + index + '.name'"
-            :rules="{
-              required: true, message: '属性值不能为空', trigger: 'blur'
-            }"
-          >
-            <el-row>
-              <el-col :span="18">
-                <el-input v-model="domain.name" size="mini"></el-input>
-              </el-col>
-              <el-col :span="6">
-                <el-button style="margin-left: 20px;" size="mini" @click.prevent="removePropertyValue(domain)">删除</el-button>
-              </el-col>
-            </el-row>
-          </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -139,12 +128,17 @@ export default {
       form: {
         name:'',
         status:'',
-        propertyValueList: [{
-          name: ''
-        }],
+        remark:"",
+        id: null,
       },
       // 表单校验
       rules: {
+        name: [
+          { required: true, message: "规格不能为空", trigger: "blur" }
+        ],
+        status: [
+          { required: true, message: "状态不能为空", trigger: "blur" }
+        ]
       }
     };
   },
@@ -170,12 +164,10 @@ export default {
     /** 表单重置 */
     reset() {
       this.form = {
-        id: undefined,
-        name: undefined,
-        status: undefined,
-        propertyValueList: [{
-          name: ''
-        }]
+        name:'',
+        status:'',
+        remark:"",
+        id: null,
       };
       this.resetForm("form");
     },
@@ -253,27 +245,6 @@ export default {
           this.exportLoading = false;
         }).catch(() => {});
     },
-    removePropertyValue(item) {
-      var index = this.form.propertyValueList.indexOf(item)
-      if (index !== -1) {
-        this.form.propertyValueList.splice(index, 1)
-      }
-    },
-    addPropertyValue() {
-      this.form.propertyValueList.push({
-        name: ''
-      });
-    },
-    formatList(list) {
-      let str = ''
-      for (var i = 0; i < list.length; i++) {
-        str += list[i].name;
-        if(i != list.length-1){
-          str+="/";
-        }
-      }
-      return str
-    }
   }
 };
 </script>

@@ -1,4 +1,5 @@
 export type CodegenTableVO = {
+  id: number
   tableId: number
   isParentMenuIdValid: boolean
   dataSourceConfigId: number

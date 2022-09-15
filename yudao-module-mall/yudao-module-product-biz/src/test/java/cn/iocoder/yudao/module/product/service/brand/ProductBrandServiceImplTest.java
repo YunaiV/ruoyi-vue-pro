@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PRODUCT_BRAND_NOT_EXISTS;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.BRAND_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -43,7 +43,7 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
         ProductBrandCreateReqVO reqVO = randomPojo(ProductBrandCreateReqVO.class);
 
         // 调用
-        Long brandId = brandService.createProductBrand(reqVO);
+        Long brandId = brandService.createBrand(reqVO);
         // 断言
         assertNotNull(brandId);
         // 校验记录的属性是否正确
@@ -74,7 +74,7 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
         ProductBrandUpdateReqVO reqVO = randomPojo(ProductBrandUpdateReqVO.class);
 
         // 调用, 并断言异常
-        assertServiceException(() -> brandService.updateBrand(reqVO), PRODUCT_BRAND_NOT_EXISTS);
+        assertServiceException(() -> brandService.updateBrand(reqVO), BRAND_NOT_EXISTS);
     }
 
     @Test
@@ -97,7 +97,7 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
         Long id = randomLongId();
 
         // 调用, 并断言异常
-        assertServiceException(() -> brandService.deleteBrand(id), PRODUCT_BRAND_NOT_EXISTS);
+        assertServiceException(() -> brandService.deleteBrand(id), BRAND_NOT_EXISTS);
     }
 
     @Test

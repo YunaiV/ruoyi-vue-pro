@@ -154,12 +154,12 @@ public class CodegenServiceImpl implements CodegenService {
         // 构建 CodegenColumnDO 数组，只同步新增的字段
         List<CodegenColumnDO> codegenColumns = codegenColumnMapper.selectListByTableId(tableId);
         Set<String> codegenColumnNames = CollectionUtils.convertSet(codegenColumns, CodegenColumnDO::getColumnName);
-        // 移除已经存在的字段
-        tableFields.removeIf(column -> codegenColumnNames.contains(column.getColumnName()));
         // 计算需要删除的字段
         Set<String> tableFieldNames = CollectionUtils.convertSet(tableFields, TableField::getName);
         Set<Long> deleteColumnIds = codegenColumns.stream().filter(column -> !tableFieldNames.contains(column.getColumnName()))
                 .map(CodegenColumnDO::getId).collect(Collectors.toSet());
+        // 移除已经存在的字段
+        tableFields.removeIf(column -> codegenColumnNames.contains(column.getColumnName()));
         if (CollUtil.isEmpty(tableFields) && CollUtil.isEmpty(deleteColumnIds)) {
             throw exception(CODEGEN_SYNC_NONE_CHANGE);
         }

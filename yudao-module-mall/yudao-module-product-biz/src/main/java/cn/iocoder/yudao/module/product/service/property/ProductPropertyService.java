@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.product.service.property;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.*;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 规格名称 Service 接口
@@ -45,41 +48,35 @@ public interface ProductPropertyService {
 
     /**
      * 获得规格名称列表
-     *
-     * @param ids 编号
-     * @return 规格名称列表
+     * @param listReqVO 集合查询
+     * @return 规格名称集合
      */
-    List<ProductPropertyDO> getPropertyList(Collection<Long> ids);
-
-    /**
-     * 获得规格名称分页
-     *
-     * @param pageReqVO 分页查询
-     * @return 规格名称分页
-     */
-    PageResult<ProductPropertyDO> getPropertyPage(ProductPropertyPageReqVO pageReqVO);
-
-    /**
-     * 获得规格名称列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 规格名称列表
-     */
-    List<ProductPropertyDO> getPropertyList(ProductPropertyExportReqVO exportReqVO);
+    List<ProductPropertyRespVO> getPropertyList(ProductPropertyListReqVO listReqVO);
 
     /**
      * 获取属性及属性值列表 分页
      * @param pageReqVO
      * @return
      */
-    PageResult<ProductPropertyRespVO> getPropertyListPage(ProductPropertyPageReqVO pageReqVO);
+    PageResult<ProductPropertyRespVO> getPropertyPage(ProductPropertyPageReqVO pageReqVO);
+
 
     ProductPropertyRespVO getPropertyResp(Long id);
 
     /**
-     * 根据数据名id集合查询属性名以及属性值的集合
-     * @param propertyIds 属性名id集合
-     * @return
+     * 根据规格属性编号的集合，获得对应的规格 + 规格值的集合
+     *
+     * @param ids 规格编号的集合
+     * @return 对应的规格
      */
-    List<ProductPropertyRespVO> selectByIds(List<Long> propertyIds);
+    List<ProductPropertyRespVO> getPropertyList(Collection<Long> ids);
+
+
+    /**
+     * 获得规格名称列表
+     * @param listReqVO 集合查询
+     * @return 规格名称集合
+     */
+    List<ProductPropertyAndValueRespVO> getPropertyAndValueList(ProductPropertyListReqVO listReqVO);
+
 }

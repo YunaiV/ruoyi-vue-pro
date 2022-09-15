@@ -1,10 +1,8 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
-import DictTag from '@/components/DictTag/src/DictTag.vue'
 import * as JobLogApi from '@/api/infra/jobLog'
 import { JobLogVO } from '@/api/infra/jobLog/types'
-import Icon from '@/components/Icon/src/Icon.vue'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'

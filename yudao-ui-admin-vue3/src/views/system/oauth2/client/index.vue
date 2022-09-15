@@ -155,7 +155,7 @@ getList()
     </Table>
   </ContentWrap>
 
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
+  <Dialog v-model="dialogVisible" :title="dialogTitle" width="60%" maxHeight="420px">
     <!-- 对话框(添加 / 修改) -->
     <Form
       v-if="['create', 'update'].includes(actionType)"

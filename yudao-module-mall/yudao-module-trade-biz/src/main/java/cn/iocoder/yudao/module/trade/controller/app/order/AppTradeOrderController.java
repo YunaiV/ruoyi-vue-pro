@@ -60,8 +60,8 @@ public class AppTradeOrderController {
 
     @GetMapping("/get")
     @ApiOperation("获得交易订单")
-    @ApiImplicitParam(name = "tradeOrderId", value = "交易订单编号", required = true)
-    public CommonResult<TradeOrderRespVO> getTradeOrder(@RequestParam("tradeOrderId") Integer tradeOrderId) {
+    @ApiImplicitParam(name = "id", value = "交易订单编号", required = true, dataTypeClass = Long.class)
+    public CommonResult<TradeOrderRespVO> getTradeOrder(@RequestParam("id") Integer id) {
 //        return success(tradeOrderService.getTradeOrder(tradeOrderId));
         return null;
     }

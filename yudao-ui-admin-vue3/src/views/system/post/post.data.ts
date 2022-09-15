@@ -9,8 +9,7 @@ const { t } = useI18n() // 国际化
 export const rules = reactive({
   name: [required],
   code: [required],
-  sort: [required],
-  status: [required]
+  sort: [required]
 })
 
 // CrudSchema

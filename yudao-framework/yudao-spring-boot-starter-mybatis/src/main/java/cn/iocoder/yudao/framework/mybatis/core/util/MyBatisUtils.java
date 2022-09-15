@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -78,7 +79,10 @@ public class MyBatisUtils {
      * @return Column 对象
      */
     public static Column buildColumn(String tableName, Alias tableAlias, String column) {
-        return new Column(tableAlias != null ? tableAlias.getName() + "." + column : column);
+        if (tableAlias != null) {
+            tableName = tableAlias.getName();
+        }
+        return new Column(tableName + StringPool.DOT + column);
     }
 
 }

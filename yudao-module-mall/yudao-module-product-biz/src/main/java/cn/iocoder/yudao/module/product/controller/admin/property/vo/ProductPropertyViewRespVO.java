@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.ToString;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * @Description: ProductPropertyViewRespVO
@@ -25,16 +25,17 @@ public class ProductPropertyViewRespVO {
     public String name;
 
     @ApiModelProperty(value = "规格属性值集合", example = "[{\"v1\":11,\"v2\":\"64G\"},{\"v1\":10,\"v2\":\"32G\"}]")
-    public Set<Tuple2> propertyValues;
+    public List<Tuple2> propertyValues;
 
     @Data
     @ApiModel(value = "规格属性值元组")
     public static class Tuple2 {
-        private final long v1;
-        private final String v2;
-        public Tuple2(Long v1, String v2) {
-            this.v1 = v1;
-            this.v2 = v2;
+        private final long id;
+        private final String name;
+
+        public Tuple2(Long id, String name) {
+            this.id = id;
+            this.name = name;
         }
 
     }

@@ -68,7 +68,7 @@ public class CouponBaseVO {
     private Boolean whetherForbidPreference;
 
     @ApiModelProperty(value = "是否开启过期提醒0-不开启 1-开启", required = true)
-    @NotNull(message = "是否开启过期提醒0-不开启 1-开启不能为空")
+    @NotNull(message = "是否开启过期提醒0-不开启 1-开启")
     private Boolean whetherExpireNotice;
 
     @ApiModelProperty(value = "过期前N天提醒", required = true)

@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderInfoCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.SkuDecrementStockBatchReqDTO;
-import cn.iocoder.yudao.module.product.api.sku.dto.SkuInfoRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.SpuInfoRespDTO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;

@@ -492,15 +492,12 @@ watch(
     }
   }
 
-  &__item + &__item {
-    margin-left: 4px;
-  }
-
   &__item {
     position: relative;
     top: 2px;
     height: calc(~'100% - 4px');
     padding-right: 25px;
+    margin-left: 4px;
     font-size: 12px;
     cursor: pointer;
     border: 1px solid #d9d9d9;
@@ -528,6 +525,7 @@ watch(
   &__item.is-active {
     color: var(--el-color-white);
     background-color: var(--el-color-primary);
+    border: 1px solid var(--el-color-primary);
     .@{prefix-cls}__item--close {
       :deep(span) {
         color: var(--el-color-white) !important;

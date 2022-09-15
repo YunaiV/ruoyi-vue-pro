@@ -14,7 +14,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum CouponExpireTimeTypeEnum {
 
-    OPEN(1,"不开启"),CLOSE(0,"开启"),;
+    OPEN(1,"不开启"),
+    CLOSE(0,"开启"),;
 
     /**
      * 是否开启过期提醒

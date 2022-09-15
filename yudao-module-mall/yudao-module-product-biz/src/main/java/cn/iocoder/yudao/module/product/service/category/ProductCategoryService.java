@@ -22,21 +22,21 @@ public interface ProductCategoryService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createProductCategory(@Valid ProductCategoryCreateReqVO createReqVO);
+    Long createCategory(@Valid ProductCategoryCreateReqVO createReqVO);
 
     /**
      * 更新商品分类
      *
      * @param updateReqVO 更新信息
      */
-    void updateProductCategory(@Valid ProductCategoryUpdateReqVO updateReqVO);
+    void updateCategory(@Valid ProductCategoryUpdateReqVO updateReqVO);
 
     /**
      * 删除商品分类
      *
      * @param id 编号
      */
-    void deleteProductCategory(Long id);
+    void deleteCategory(Long id);
 
     /**
      * 获得商品分类
@@ -44,7 +44,7 @@ public interface ProductCategoryService {
      * @param id 编号
      * @return 商品分类
      */
-    ProductCategoryDO getProductCategory(Long id);
+    ProductCategoryDO getCategory(Long id);
 
     /**
      * 获得商品分类列表
@@ -52,7 +52,7 @@ public interface ProductCategoryService {
      * @param ids 编号
      * @return 商品分类列表
      */
-    List<ProductCategoryDO> getEnableProductCategoryList(Collection<Long> ids);
+    List<ProductCategoryDO> getEnableCategoryList(Collection<Long> ids);
 
     /**
      * 获得商品分类列表
@@ -60,20 +60,21 @@ public interface ProductCategoryService {
      * @param listReqVO 查询条件
      * @return 商品分类列表
      */
-    List<ProductCategoryDO> getEnableProductCategoryList(ProductCategoryListReqVO listReqVO);
+    List<ProductCategoryDO> getEnableCategoryList(ProductCategoryListReqVO listReqVO);
 
     /**
-     * 验证选择的商品分类是否合法
+     * 验证选择的商品分类的级别是否合法
+     * 例如说，商品发布的时候，必须在第 3 级别
      *
      * @param id 分类编号
      */
-    void validateProductCategory(Long id);
+    void validateCategoryLevel(Long id);
 
     /**
      * 获得开启状态的商品分类列表
      *
      * @return 商品分类列表
      */
-    List<ProductCategoryDO> getEnableProductCategoryList();
+    List<ProductCategoryDO> getEnableCategoryList();
 
 }

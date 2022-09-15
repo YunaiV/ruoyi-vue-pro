@@ -17,7 +17,7 @@ public class AppTradeOrderCreateReqVO {
     private Integer addressId;
 
     @ApiModelProperty(name = "优惠劵编号", example = "1024")
-    private Integer couponId;
+    private Long couponId;
 
     @ApiModelProperty(name = "备注", example = "1024")
     private String remark;

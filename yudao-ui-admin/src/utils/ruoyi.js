@@ -186,6 +186,19 @@ export function getTenantEnable() {
 }
 
 /**
+ * 获得验证码功能是否开启
+ */
+export function getCaptchaEnable() {
+  if (process.env.VUE_APP_CAPTCHA_ENABLE === "true") {
+    return true;
+  }
+  if (process.env.VUE_APP_CAPTCHA_ENABLE === "false") {
+    return false;
+  }
+  return process.env.VUE_APP_CAPTCHA_ENABLE || true;
+}
+
+/**
  * 获得文档是否开启
  */
 export function getDocEnable() {
@@ -221,4 +234,18 @@ export function getPath(path) {
     path = path.substring(1);
   }
   return basePath + path;
+}
+
+/**
+ * 除法保留两位小数
+ *
+ * @param {*} divisor 除数
+ * @param {*} dividend 被除数
+ * @returns
+ */
+ export function divide(divisor, dividend) {
+  if(divisor == null || dividend == null || dividend == 0){
+    return null;
+  }
+  return Math.floor(divisor/dividend*100)/100;
 }

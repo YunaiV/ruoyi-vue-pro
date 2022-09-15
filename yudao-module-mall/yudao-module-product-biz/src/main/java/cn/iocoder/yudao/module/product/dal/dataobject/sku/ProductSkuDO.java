@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.sku;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
@@ -9,7 +10,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import lombok.*;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@TableName("product_sku")
+@TableName(value = "product_sku",autoResultMap = true)
 @KeySequence("product_sku_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -40,14 +41,14 @@ public class ProductSkuDO extends BaseDO {
     private String name;
     /**
      * SPU 编号
-     *
+     * <p>
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
     /**
      * 规格值数组，JSON 格式
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = PropertyTypeHandler.class)
     private List<Property> properties;
     /**
      * 销售价格，单位：分
@@ -71,7 +72,7 @@ public class ProductSkuDO extends BaseDO {
     private String picUrl;
     /**
      * SKU 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
@@ -100,16 +101,31 @@ public class ProductSkuDO extends BaseDO {
 
         /**
          * 属性编号
-         *
+         * <p>
          * 关联 {@link ProductPropertyDO#getId()}
          */
         private Long propertyId;
         /**
          * 属性值编号
-         *
+         * <p>
          * 关联 {@link ProductPropertyValueDO#getId()}
          */
         private Long valueId;
+
+    }
+
+    // TODO @芋艿：可以找一些新的思路
+    public static class PropertyTypeHandler extends AbstractJsonTypeHandler<Object> {
+
+        @Override
+        protected Object parse(String json) {
+            return JsonUtils.parseArray(json, Property.class);
+        }
+
+        @Override
+        protected String toJson(Object obj) {
+            return JsonUtils.toJsonString(obj);
+        }
 
     }
 

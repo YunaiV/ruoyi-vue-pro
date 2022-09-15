@@ -34,21 +34,19 @@ export function getSpu(id) {
   })
 }
 
+// 获得商品spu详情
+export function getSpuDetail(id) {
+  return request({
+    url: '/product/spu/get/detail?id=' + id,
+    method: 'get'
+  })
+}
+
 // 获得商品spu分页
 export function getSpuPage(query) {
   return request({
     url: '/product/spu/page',
     method: 'get',
     params: query
-  })
-}
-
-// 导出商品spu Excel
-export function exportSpuExcel(query) {
-  return request({
-    url: '/product/spu/export-excel',
-    method: 'get',
-    params: query,
-    responseType: 'blob'
   })
 }

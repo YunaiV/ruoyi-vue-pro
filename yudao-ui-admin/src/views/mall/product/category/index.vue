@@ -61,10 +61,8 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="上级分类" prop="parentId">
-          <Treeselect v-model="form.parentId" :options="parentCategoryOptions" :normalizer="normalizer"
-                      :show-count="true"
-                      :defaultExpandLevel="1"
-                      placeholder="上级分类"/>
+          <Treeselect v-model="form.parentId" :options="parentCategoryOptions" :normalizer="normalizer" :show-count="true"
+                      :defaultExpandLevel="1" placeholder="上级分类"/>
         </el-form-item>
         <el-form-item label="分类名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入分类名称"/>

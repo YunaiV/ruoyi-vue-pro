@@ -2,14 +2,14 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } f
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import qs from 'qs'
 import { config } from '@/config/axios/config'
-import { getAccessToken, getRefreshToken, getTenantId } from '@/utils/auth'
+import { getAccessToken, getRefreshToken, getTenantId, removeToken, setToken } from '@/utils/auth'
 import errorCode from './errorCode'
 import { useI18n } from '@/hooks/web/useI18n'
+import { resetRouter } from '@/router'
+import { useCache } from '@/hooks/web/useCache'
 
 const tenantEnable = import.meta.env.VITE_APP_TENANT_ENABLE
-const BASE_URL = import.meta.env.VITE_BASE_URL
-const BASE_API = import.meta.env.VITE_API_URL
-const { result_code, base_url } = config
+const { result_code, base_url, request_timeout } = config
 
 // 需要忽略的提示。忽略后，自动 Promise.reject('error')
 const ignoreMsgs = [
@@ -20,16 +20,14 @@ const ignoreMsgs = [
 export const isRelogin = { show: false }
 // Axios 无感知刷新令牌，参考 https://www.dashingdog.cn/article/11 与 https://segmentfault.com/a/1190000020210980 实现
 // 请求队列
-// const requestList = []
+let requestList: any[] = []
 // 是否正在刷新中
 let isRefreshToken = false
 
-export const PATH_URL = base_url[import.meta.env.VITE_API_BASEPATH]
-
 // 创建axios实例
 const service: AxiosInstance = axios.create({
-  baseURL: BASE_URL + BASE_API, // api 的 base_url
-  timeout: config.request_timeout, // 请求超时时间
+  baseURL: base_url, // api 的 base_url
+  timeout: request_timeout, // 请求超时时间
   withCredentials: false // 禁用 Cookie 等信息
 })
 
@@ -55,18 +53,26 @@ service.interceptors.request.use(
       config.data = qs.stringify(data)
     }
     // get参数编码
-    if (config.method?.toUpperCase() === 'GET' && config.params) {
-      let url = config.url as string
+    if (config.method?.toUpperCase() === 'GET' && params) {
+      let url = config.url + '?'
+      for (const propName of Object.keys(params)) {
+        const value = params[propName]
+        if (value !== void 0 && value !== null && typeof value !== 'undefined') {
+          if (typeof value === 'object') {
+            for (const val of Object.keys(value)) {
+              const params = propName + '[' + val + ']'
+              const subPart = encodeURIComponent(params) + '='
+              url += subPart + encodeURIComponent(value[val]) + '&'
+            }
+          } else {
+            url += `${propName}=${encodeURIComponent(value)}&`
+          }
+        }
+      }
       // 给 get 请求加上时间戳参数，避免从缓存中拿数据
       // const now = new Date().getTime()
       // params = params.substring(0, url.length - 1) + `?_t=${now}`
-      url += '?'
-      const keys = Object.keys(params)
-      for (const key of keys) {
-        if (params[key] !== void 0 && params[key] !== null) {
-          url += `${key}=${encodeURIComponent(params[key])}&`
-        }
-      }
+      url = url.slice(0, -1)
       config.params = {}
       config.url = url
     }
@@ -90,6 +96,13 @@ service.interceptors.response.use(
     const { t } = useI18n()
     // 未设置状态码则默认成功状态
     const code = data.code || result_code
+    // 二进制数据则直接返回
+    if (
+      response.request.responseType === 'blob' ||
+      response.request.responseType === 'arraybuffer'
+    ) {
+      return response.data
+    }
     // 获取错误信息
     const msg = data.msg || errorCode[code] || errorCode['default']
     if (ignoreMsgs.indexOf(msg) !== -1) {
@@ -104,7 +117,30 @@ service.interceptors.response.use(
           return handleAuthorized()
         }
         // 2. 进行刷新访问令牌
-        // TODO: 引入refreshToken会循环依赖报错
+        try {
+          const refreshTokenRes = await refreshToken()
+          // 2.1 刷新成功，则回放队列的请求 + 当前请求
+          setToken(refreshTokenRes.data)
+          requestList.forEach((cb: any) => cb())
+          return service(response.config)
+        } catch (e) {
+          // 为什么需要 catch 异常呢？刷新失败时，请求因为 Promise.reject 触发异常。
+          // 2.2 刷新失败，只回放队列的请求
+          requestList.forEach((cb: any) => cb())
+          // 提示是否要登出。即不回放当前请求！不然会形成递归
+          return handleAuthorized()
+        } finally {
+          requestList = []
+          isRefreshToken = false
+        }
+      } else {
+        // 添加到队列，等待刷新获取到新的令牌
+        return new Promise((resolve) => {
+          requestList.push(() => {
+            ;(config as Recordable).headers.Authorization = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+            resolve(service(response.config))
+          })
+        })
       }
     } else if (code === 500) {
       ElMessage.error(t('sys.api.errMsg500'))
@@ -149,7 +185,14 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-function handleAuthorized() {
+
+const refreshToken = async () => {
+  return await service({
+    url: '/system/auth/refresh-token?refreshToken=' + getRefreshToken(),
+    method: 'post'
+  })
+}
+const handleAuthorized = () => {
   const { t } = useI18n()
   if (!isRelogin.show) {
     isRelogin.show = true
@@ -159,7 +202,12 @@ function handleAuthorized() {
       type: 'warning'
     })
       .then(() => {
+        const { wsCache } = useCache()
+        resetRouter() // 重置静态路由表
+        wsCache.clear()
+        removeToken()
         isRelogin.show = false
+        window.location.href = '/'
       })
       .catch(() => {
         isRelogin.show = false

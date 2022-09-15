@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.product.api.spu.dto;
 
-import cn.iocoder.yudao.module.product.api.sku.dto.SkuInfoRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import lombok.Data;
@@ -80,25 +80,25 @@ public class SpuInfoRespDTO {
     /**
      * 最小价格，单位使用：分
      * <p>
-     * 基于其对应的 {@link SkuInfoRespDTO#getPrice()} 最小值
+     * 基于其对应的 {@link ProductSkuRespDTO#getPrice()} 最小值
      */
     private Integer minPrice;
     /**
      * 最大价格，单位使用：分
      * <p>
-     * 基于其对应的 {@link SkuInfoRespDTO#getPrice()} 最大值
+     * 基于其对应的 {@link ProductSkuRespDTO#getPrice()} 最大值
      */
     private Integer maxPrice;
     /**
      * 市场价，单位使用：分
      * <p>
-     * 基于其对应的 {@link SkuInfoRespDTO#getMarketPrice()} 最大值
+     * 基于其对应的 {@link ProductSkuRespDTO#getMarketPrice()} 最大值
      */
     private Integer marketPrice;
     /**
      * 总库存
      * <p>
-     * 基于其对应的 {@link SkuInfoRespDTO#getStock()} 求和
+     * 基于其对应的 {@link ProductSkuRespDTO#getStock()} 求和
      */
     private Integer totalStock;
     /**

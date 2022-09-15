@@ -2,13 +2,12 @@ package cn.iocoder.yudao.module.product.convert.sku;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.sku.dto.SkuInfoRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuExcelVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuDetailRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -25,18 +24,17 @@ public interface ProductSkuConvert {
 
     ProductSkuDO convert(ProductSkuCreateOrUpdateReqVO bean);
 
-    ProductSkuDO convert(ProductSkuUpdateReqVO bean);
-
-    @Mapping(source = "properties", target = "properties")
     ProductSkuRespVO convert(ProductSkuDO bean);
 
     List<ProductSkuRespVO> convertList(List<ProductSkuDO> list);
 
     List<ProductSkuDO> convertSkuDOList(List<ProductSkuCreateOrUpdateReqVO> list);
 
-    PageResult<ProductSkuRespVO> convertPage(PageResult<ProductSkuDO> page);
+    ProductSkuRespDTO convert02(ProductSkuDO bean);
 
-    List<ProductSkuExcelVO> convertList02(List<ProductSkuDO> list);
+    List<ProductSkuRespDTO> convertList02(List<ProductSkuDO> list);
+
+    List<ProductSpuDetailRespVO.Sku> convertList03(List<ProductSkuDO> list);
 
     List<SkuInfoRespDTO> convertList03(List<ProductSkuDO> list);
 

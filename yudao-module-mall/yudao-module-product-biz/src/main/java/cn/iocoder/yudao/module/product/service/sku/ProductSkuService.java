@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 
 import javax.validation.Valid;
@@ -11,26 +8,11 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 商品sku Service 接口
+ * 商品 SKU Service 接口
  *
  * @author 芋道源码
  */
 public interface ProductSkuService {
-
-    /**
-     * 创建商品sku
-     *
-     * @param createReqVO 创建信息
-     * @return 编号
-     */
-    Long createSku(@Valid ProductSkuCreateOrUpdateReqVO createReqVO);
-
-    /**
-     * 更新商品sku
-     *
-     * @param updateReqVO 更新信息
-     */
-    void updateSku(@Valid ProductSkuUpdateReqVO updateReqVO);
 
     /**
      * 删除商品sku
@@ -56,26 +38,19 @@ public interface ProductSkuService {
     List<ProductSkuDO> getSkuList(Collection<Long> ids);
 
     /**
-     * 获得商品sku分页
-     *
-     * @param pageReqVO 分页查询
-     * @return 商品sku分页
-     */
-    PageResult<ProductSkuDO> getSkuPage(ProductSkuPageReqVO pageReqVO);
-
-    /**
      * 对 sku 的组合的属性等进行合法性校验
      *
      * @param list sku组合的集合
      */
-    void validateProductSkus(List<ProductSkuCreateOrUpdateReqVO> list, Integer specType);
+    void validateSkus(List<ProductSkuCreateOrUpdateReqVO> list, Integer specType);
 
     /**
      * 批量创建 SKU
      *
+     * @param spuId 商品 SPU 编号
      * @param list SKU 对象集合
      */
-    void createProductSkus(List<ProductSkuCreateOrUpdateReqVO> list, Long spuId);
+    void createSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> list);
 
     /**
      * 根据 SPU 编号，批量更新它的 SKU 信息

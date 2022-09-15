@@ -17,7 +17,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PRODUCT_CATEGORY_NOT_EXISTS;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.CATEGORY_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -43,7 +43,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
         productCategoryMapper.insert(parentProductCategory);
 
         // 调用
-        Long categoryId = productCategoryService.createProductCategory(reqVO);
+        Long categoryId = productCategoryService.createCategory(reqVO);
         // 断言
         assertNotNull(categoryId);
         // 校验记录的属性是否正确
@@ -65,7 +65,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
         productCategoryMapper.insert(parentProductCategory);
 
         // 调用
-        productCategoryService.updateProductCategory(reqVO);
+        productCategoryService.updateCategory(reqVO);
         // 校验是否更新正确
         ProductCategoryDO category = productCategoryMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, category);
@@ -77,7 +77,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
         ProductCategoryUpdateReqVO reqVO = randomPojo(ProductCategoryUpdateReqVO.class);
 
         // 调用, 并断言异常
-        assertServiceException(() -> productCategoryService.updateProductCategory(reqVO), PRODUCT_CATEGORY_NOT_EXISTS);
+        assertServiceException(() -> productCategoryService.updateCategory(reqVO), CATEGORY_NOT_EXISTS);
     }
 
     @Test
@@ -89,7 +89,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
         Long id = dbCategory.getId();
 
         // 调用
-        productCategoryService.deleteProductCategory(id);
+        productCategoryService.deleteCategory(id);
         // 校验数据不存在了
         assertNull(productCategoryMapper.selectById(id));
     }
@@ -100,7 +100,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
         Long id = randomLongId();
 
         // 调用, 并断言异常
-        assertServiceException(() -> productCategoryService.deleteProductCategory(id), PRODUCT_CATEGORY_NOT_EXISTS);
+        assertServiceException(() -> productCategoryService.deleteCategory(id), CATEGORY_NOT_EXISTS);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
         reqVO.setName("特曼");
 
         // 调用
-        List<ProductCategoryDO> list = productCategoryService.getEnableProductCategoryList(reqVO);
+        List<ProductCategoryDO> list = productCategoryService.getEnableCategoryList(reqVO);
         // 断言
         assertEquals(1, list.size());
         assertPojoEquals(dbCategory, list.get(0));

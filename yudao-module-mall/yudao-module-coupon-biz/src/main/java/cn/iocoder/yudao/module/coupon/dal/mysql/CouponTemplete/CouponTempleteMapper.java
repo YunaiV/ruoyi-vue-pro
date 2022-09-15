@@ -5,8 +5,8 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo.CouponTempleteExportReqVO;
-import cn.iocoder.yudao.module.coupon.controller.admin.coupontemplete.vo.CouponTempletePageReqVO;
+import cn.iocoder.yudao.module.coupon.controller.admin.templete.vo.CouponTempleteExportReqVO;
+import cn.iocoder.yudao.module.coupon.controller.admin.templete.vo.CouponTempletePageReqVO;
 import cn.iocoder.yudao.module.coupon.dal.dataobject.CouponTemplete.CouponTempleteDO;
 import org.apache.ibatis.annotations.Mapper;
 
