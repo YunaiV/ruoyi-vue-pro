@@ -32,20 +32,11 @@
                   <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
                 </el-input>
               </el-form-item>
-              <el-form-item prop="code" v-if="captchaEnable">
-                <el-input v-model="loginForm.code" auto-complete="off" placeholder="验证码" style="width: 63%"
-                          @keyup.enter.native="handleLogin">
-                  <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon"/>
-                </el-input>
-                <div class="login-code">
-                  <img :src="codeUrl" @click="getCode" class="login-code-img"/>
-                </div>
-              </el-form-item>
               <el-checkbox v-model="loginForm.rememberMe" style="margin:0 0 25px 0;">记住密码</el-checkbox>
               <!-- 下方的登录按钮 -->
               <el-form-item style="width:100%;">
                 <el-button :loading="loading" size="medium" type="primary" style="width:100%;"
-                           @click.native.prevent="handleLogin">
+                           @click.native.prevent="getCode">
                   <span v-if="!loading">登 录</span>
                   <span v-else>登 录 中...</span>
                 </el-button>
@@ -55,6 +46,11 @@
         </div>
       </div>
     </div>
+
+    <!-- 图形验证码 -->
+    <Verify ref="verify" :captcha-type="'blockPuzzle'" :img-size="{width:'400px',height:'200px'}"
+            @success="handleLogin" />
+
     <!-- footer -->
     <div class="footer">
       Copyright © 2020-2022 iocoder.cn All Rights Reserved.
@@ -72,10 +68,15 @@ import {
   setRememberMe,
   setUsername
 } from "@/utils/auth";
-import {getCodeImg} from "@/api/login";
+
+import Verify from '@/components/Verifition/Verify';
+import {getCaptchaEnable} from "@/utils/ruoyi";
 
 export default {
   name: "ThirdLogin",
+  components: {
+    Verify
+  },
   data() {
     return {
       codeUrl: "",
@@ -85,8 +86,7 @@ export default {
         username: "admin",
         password: "admin123",
         rememberMe: false,
-        code: "",
-        uuid: "",
+        captchaVerification: "",
       },
       loginRules: {
         username: [
@@ -114,9 +114,10 @@ export default {
   // },
   created() {
     this.getCookie();
+    // 验证码开关
+    this.captchaEnable = getCaptchaEnable();
     // 重定向地址
     this.redirect = this.$route.query.redirect;
-    this.getCode();
     // 社交登录相关
     this.type = this.$route.query.type;
     this.code = this.$route.query.code;
@@ -133,19 +134,15 @@ export default {
   },
   methods: {
     getCode() {
-      // 只有开启的状态，才加载验证码。默认开启
+      // 情况一，未开启：则直接登录
       if (!this.captchaEnable) {
+        this.handleLogin({})
         return;
       }
-      // 请求远程，获得验证码
-      getCodeImg().then(res => {
-        res = res.data;
-        this.captchaEnable = res.enable;
-        if (this.captchaEnable) {
-          this.codeUrl = "data:image/gif;base64," + res.img;
-          this.loginForm.uuid = res.uuid;
-        }
-      });
+
+      // 情况二，已开启：则展示验证码；只有完成验证码的情况，才进行登录
+      // 弹出验证码
+      this.$refs.verify.show()
     },
     getCookie() {
       const username = getUsername();
@@ -158,7 +155,7 @@ export default {
         loginType: this.loginForm.loginType,
       };
     },
-    handleLogin() {
+    handleLogin(captchaParams) {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true;
@@ -177,8 +174,7 @@ export default {
             // 账号密码登录
             username: this.loginForm.username,
             password: this.loginForm.password,
-            code: this.loginForm.code,
-            uuid: this.loginForm.uuid,
+            captchaVerification: captchaParams.captchaVerification
           }).then(() => {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
           }).catch(() => {

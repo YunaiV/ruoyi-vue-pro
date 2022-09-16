@@ -12,6 +12,14 @@
 				"navigationBarTitleText": "分类"
 			}
 		},
+    {
+    	"path": "pages/category/product-list",
+    	"style": {
+        "navigationBarTitleText": "",
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white"
+    	}
+    },
 		{
 			"path": "pages/cart/cart",
 			"style": {
@@ -112,7 +120,7 @@
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "yudao-ui-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#FFFFFF"
+		"navigationBarBackgroundColor": "#ffffff",
+		"backgroundColor": "#ffffff"
 	}
 }

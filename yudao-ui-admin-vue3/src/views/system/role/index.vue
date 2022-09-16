@@ -110,7 +110,7 @@ const defaultProps = {
   label: 'name',
   value: 'id'
 }
-const treeOptions = ref([]) // 菜单树形结构
+const treeOptions = ref<any[]>([]) // 菜单树形结构
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const dialogScopeVisible = ref(false)
 const dialogScopeTitle = ref('数据权限')
@@ -133,7 +133,6 @@ const handleScope = async (type: string, row: RoleVO) => {
     const menuRes = await listSimpleMenusApi()
     treeOptions.value = handleTree(menuRes)
     const role = await PermissionApi.listRoleMenusApi(row.id)
-    console.info(role)
     if (role) {
       // treeRef.value!.setCheckedKeys(role as unknown as Array<number>)
       defaultCheckedKeys.value = role
@@ -142,7 +141,6 @@ const handleScope = async (type: string, row: RoleVO) => {
     const deptRes = await listSimpleDeptApi()
     treeOptions.value = handleTree(deptRes)
     const role = await RoleApi.getRoleApi(row.id)
-    console.info(role)
     dataScopeForm.dataScope = role.dataScope
     if (role.dataScopeDeptIds) {
       // treeRef.value!.setCheckedKeys(role.dataScopeDeptIds as unknown as Array<number>, false)
@@ -155,7 +153,6 @@ const handleScope = async (type: string, row: RoleVO) => {
 // 保存权限
 const submitScope = async () => {
   const keys = treeRef.value!.getCheckedKeys(false) as unknown as Array<number>
-  console.info(keys)
   if ('data' === actionScopeType.value) {
     const data = ref<PermissionAssignRoleDataScopeReqVO>({
       roleId: dataScopeForm.id,

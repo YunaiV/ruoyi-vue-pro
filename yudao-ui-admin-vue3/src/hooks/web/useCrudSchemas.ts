@@ -80,6 +80,8 @@ const filterSearchSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
       const options: ComponentOptions[] = []
       let comonentProps = {}
       if (schemaItem.dictType) {
+        const allOptions: ComponentOptions = { label: '全部', value: '' }
+        options.push(allOptions)
         getIntDictOptions(schemaItem.dictType).forEach((dict) => {
           options.push(dict)
         })

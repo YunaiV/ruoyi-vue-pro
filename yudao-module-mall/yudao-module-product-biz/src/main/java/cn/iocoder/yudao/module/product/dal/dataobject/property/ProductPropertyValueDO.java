@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.property;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -28,9 +29,9 @@ public class ProductPropertyValueDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 规格键 id
+     * 规格键编号
      *
-     * TODO @franky：加个 关联 {@link ProductPropertyDO#getId()} ，这样就能更好的知道
+     * 关联 {@link ProductPropertyDO#getId()}
      */
     private Long propertyId;
     /**
@@ -38,7 +39,9 @@ public class ProductPropertyValueDO extends BaseDO {
      */
     private String name;
     /**
-     * 状态： 1 开启 ，2 禁用
+     * 状态
+     *
+     * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
 

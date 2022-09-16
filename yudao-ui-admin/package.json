@@ -51,6 +51,7 @@
     "highlight.js": "9.18.5",
     "js-beautify": "1.13.0",
     "jsencrypt": "3.0.0-rc.1",
+    "crypto-js": "^4.0.0",
     "nprogress": "0.2.0",
     "quill": "1.3.7",
     "screenfull": "5.0.2",

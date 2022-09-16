@@ -2,9 +2,10 @@ package cn.iocoder.yudao.module.product.controller.admin.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
@@ -16,16 +17,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "管理后台 - 商品spu")
+@Api(tags = "管理后台 - 商品 SPU")
 @RestController
 @RequestMapping("/product/spu")
 @Validated
@@ -35,23 +33,22 @@ public class ProductSpuController {
     private ProductSpuService spuService;
 
     @PostMapping("/create")
-    @ApiOperation("创建商品spu")
+    @ApiOperation("创建商品 SPU")
     @PreAuthorize("@ss.hasPermission('product:spu:create')")
-    public CommonResult<Long> createSpu(@Valid @RequestBody ProductSpuCreateReqVO createReqVO) {
+    public CommonResult<Long> createProductSpu(@Valid @RequestBody ProductSpuCreateReqVO createReqVO) {
         return success(spuService.createSpu(createReqVO));
     }
 
-    // TODO @franky：SpuUpdateReqVO 缺少前缀
     @PutMapping("/update")
-    @ApiOperation("更新商品spu")
+    @ApiOperation("更新商品 SPU")
     @PreAuthorize("@ss.hasPermission('product:spu:update')")
-    public CommonResult<Boolean> updateSpu(@Valid @RequestBody SpuUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateSpu(@Valid @RequestBody ProductSpuUpdateReqVO updateReqVO) {
         spuService.updateSpu(updateReqVO);
         return success(true);
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除商品spu")
+    @ApiOperation("删除商品 SPU")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:spu:delete')")
     public CommonResult<Boolean> deleteSpu(@RequestParam("id") Long id) {
@@ -60,39 +57,29 @@ public class ProductSpuController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得商品spu")
+    @ApiOperation("获得商品 SPU")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<SpuRespVO> getSpu(@RequestParam("id") Long id) {
+    public CommonResult<ProductSpuRespVO> getSpu(@RequestParam("id") Long id) {
         return success(spuService.getSpu(id));
     }
 
+    // TODO @luowenfeng：新增 get-detail，返回 SpuDetailRespVO
+
     @GetMapping("/list")
-    @ApiOperation("获得商品spu列表")
+    @ApiOperation("获得商品 SPU 列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<List<SpuRespVO>> getSpuList(@RequestParam("ids") Collection<Long> ids) {
+    public CommonResult<List<ProductSpuRespVO>> getSpuList(@RequestParam("ids") Collection<Long> ids) {
         List<ProductSpuDO> list = spuService.getSpuList(ids);
         return success(ProductSpuConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得商品spu分页")
+    @ApiOperation("获得商品 SPU 分页")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<PageResult<SpuRespVO>> getSpuPage(@Valid SpuPageReqVO pageVO) {
+    public CommonResult<PageResult<ProductSpuRespVO>> getSpuPage(@Valid ProductSpuPageReqVO pageVO) {
         return success(spuService.getSpuPage(pageVO));
-    }
-
-    @GetMapping("/export-excel")
-    @ApiOperation("导出商品spu Excel")
-    @PreAuthorize("@ss.hasPermission('product:spu:export')")
-    @OperateLog(type = EXPORT)
-    public void exportSpuExcel(@Valid SpuExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<ProductSpuDO> list = spuService.getSpuList(exportReqVO);
-        // 导出 Excel
-        List<SpuExcelVO> datas = ProductSpuConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "商品spu.xls", "数据", SpuExcelVO.class, datas);
     }
 
 }

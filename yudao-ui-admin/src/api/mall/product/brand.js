@@ -34,6 +34,15 @@ export function getBrand(id) {
   })
 }
 
+// 获得品牌list
+export function getBrandList() {
+  return request({
+    url: '/product/brand/list',
+    method: 'get'
+  })
+}
+
+
 // 获得品牌分页
 export function getBrandPage(query) {
   return request({

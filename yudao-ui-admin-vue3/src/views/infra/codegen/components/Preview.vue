@@ -135,7 +135,7 @@ defineExpose({
             :name="item.filePath"
             :key="item.filePath"
           >
-            <el-button text style="float: right" @click="copy(item.code)">
+            <el-button link style="float: right" @click="copy(item.code)">
               {{ t('common.copy') }}
             </el-button>
             <pre>{{ item.code }}</pre>

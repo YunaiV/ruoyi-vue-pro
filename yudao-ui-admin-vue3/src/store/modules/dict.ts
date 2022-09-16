@@ -13,14 +13,12 @@ export interface DictTypeType {
   dictValue: DictValueType[]
 }
 export interface DictState {
-  isSetDict: boolean
   dictMap: Recordable
 }
 
 export const useDictStore = defineStore({
   id: 'dict',
   state: (): DictState => ({
-    isSetDict: false,
     dictMap: {}
   }),
   persist: {
@@ -30,8 +28,12 @@ export const useDictStore = defineStore({
     getDictMap(): Recordable {
       return this.dictMap
     },
-    getIsSetDict(): boolean {
-      return this.isSetDict
+    getHasDictData(): boolean {
+      if (this.dictMap.length > 0) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   actions: {
@@ -53,9 +55,6 @@ export const useDictStore = defineStore({
         })
       })
       this.dictMap = dictMap
-    },
-    setIsSetDict(isSetDict: boolean) {
-      this.isSetDict = isSetDict
     }
   }
 })

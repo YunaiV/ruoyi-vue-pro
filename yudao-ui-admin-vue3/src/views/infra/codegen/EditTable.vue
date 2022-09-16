@@ -11,7 +11,7 @@ const { t } = useI18n()
 const { push } = useRouter()
 const { query } = useRoute()
 const tableCurrentRow = ref<CodegenTableVO>()
-const cloumCurrentRow = ref<CodegenColumnVO[]>()
+const cloumCurrentRow = ref<CodegenColumnVO[]>([])
 const getList = async () => {
   const id = query.id as unknown as number
   if (id) {

@@ -47,7 +47,6 @@ const getTree = async () => {
   const res = await MenuApi.listSimpleMenusApi()
   const menu = { id: 0, name: '主类目', children: [] as any[] }
   menu.children = handleTree(res)
-  console.info(menu)
   menuOptions.value = menu
 }
 // ========== 查询 ==========
@@ -254,7 +253,7 @@ onMounted(async () => {
     </el-table>
   </ContentWrap>
   <!-- 添加或修改菜单对话框 -->
-  <Dialog v-model="dialogVisible" :title="dialogTitle" maxHeight="400px" width="40%">
+  <Dialog v-model="dialogVisible" :title="dialogTitle" maxHeight="400px" width="45%">
     <el-form
       :model="menuForm"
       :rules="rules"

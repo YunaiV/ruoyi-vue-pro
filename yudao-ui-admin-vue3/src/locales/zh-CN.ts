@@ -128,6 +128,13 @@ export default {
     btnRegister: '注册',
     SmsSendMsg: '验证码已发送'
   },
+  captcha: {
+    verification: '请完成安全验证',
+    slide: '向右滑动完成验证',
+    point: '请依次点击',
+    success: '验证成功',
+    fail: '验证失败'
+  },
   router: {
     login: '登录',
     home: '首页',
@@ -191,7 +198,6 @@ export default {
     yield: '产量',
     dynamic: '动态',
     push: '推送',
-    pushCode: '推送 代码到 Github',
     follow: '关注'
   },
   form: {
