@@ -35,8 +35,8 @@
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <!-- 看看咋放到 bom 里 -->
-        <lombok.version>1.18.20</lombok.version>
-        <mapstruct.version>1.4.1.Final</mapstruct.version>
+        <lombok.version>1.18.24</lombok.version>
+        <mapstruct.version>1.5.2.Final</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
