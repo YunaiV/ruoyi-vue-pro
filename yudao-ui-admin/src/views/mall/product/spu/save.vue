@@ -361,7 +361,7 @@ export default {
         if (!valid) {
           return;
         }
-        let rates = this.ratesForm.rates;
+        let rates = JSON.parse(JSON.stringify(this.ratesForm.rates));
 
         // 价格元转分
         rates.forEach(r => {

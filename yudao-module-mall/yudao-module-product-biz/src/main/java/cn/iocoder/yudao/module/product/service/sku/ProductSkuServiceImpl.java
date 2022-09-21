@@ -144,36 +144,52 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     public void updateProductSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // 查询 SPU 下已经存在的 SKU 的集合
         List<ProductSkuDO> existsSkus = productSkuMapper.selectListBySpuId(spuId);
-        Map<Long, ProductSkuDO> existsSkuMap = CollectionUtils.convertMap(existsSkus, ProductSkuDO::getId);
+
+        Map<String, Long> existsSkuMap = existsSkus.stream()
+                .map(v -> {
+                    String collect = v.getProperties() == null? "null": v.getProperties()
+                            .stream()
+                            .map(m -> String.valueOf(m.getValueId()))
+                            .collect(Collectors.joining());
+                    return String.join("-", collect, String.valueOf(v.getId()));
+                })
+                .collect(Collectors.toMap(v -> v.split("-")[0], v -> Long.valueOf(v.split("-")[1])));
+
 
         // 拆分三个集合，新插入的、需要更新的、需要删除的
         List<ProductSkuDO> insertSkus = new ArrayList<>();
-        List<ProductSkuDO> updateSkus = new ArrayList<>(); // TODO Luowenfeng：使用 Long 即可
-        List<ProductSkuDO> deleteSkus = new ArrayList<>();
+        List<ProductSkuDO> updateSkus = new ArrayList<>();
+        List<Long> deleteSkus = new ArrayList<>();
 
-        // TODO @Luowenfeng：是不是基于规格匹配会比较好。可以参考下 onemall 的 ProductSpuServiceImpl 的 updateProductSpu 逻辑
         List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertSkuDOList(skus);
         allUpdateSkus.forEach(p -> {
-            if (p.getId() != null) {
-                if (existsSkuMap.containsKey(p.getId())) {
-                    updateSkus.add(p);
-                    return;
-                }
-                deleteSkus.add(p);
+            String propertiesKey = p.getProperties() == null? "null": p.getProperties().stream().map(m -> String.valueOf(m.getValueId())).collect(Collectors.joining());
+            // 1、找得到的，进行更新
+            if (existsSkuMap.containsKey(propertiesKey)) {
+                updateSkus.add(p);
+                existsSkuMap.remove(propertiesKey);
                 return;
             }
+            // 2、找不到，进行插入
             p.setSpuId(spuId);
             insertSkus.add(p);
         });
+        // 3、多余的，删除
+        if(!existsSkuMap.isEmpty()){
+            deleteSkus = new ArrayList<>(existsSkuMap.values());
+        }
 
-        if (CollectionUtil.isNotEmpty(insertSkus)) {
+        // 4、执行修改 Sku
+        if (!insertSkus.isEmpty()) {
             productSkuMapper.insertBatch(insertSkus);
         }
-        if (updateSkus.size() > 0) {
+        if (!updateSkus.isEmpty()) {
             updateSkus.forEach(p -> productSkuMapper.updateById(p));
         }
-        if (deleteSkus.size() > 0) {
-            productSkuMapper.deleteBatchIds(deleteSkus.stream().map(ProductSkuDO::getId).collect(Collectors.toList()));
+        if (!deleteSkus.isEmpty()) {
+            productSkuMapper.deleteBatchIds(deleteSkus);
         }
     }
+
+
 }
