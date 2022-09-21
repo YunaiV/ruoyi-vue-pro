@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.product.service.spu;
 import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyViewRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
@@ -190,16 +190,15 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
-        PageResult<ProductSpuRespVO> spuVOs = ProductSpuConvert.INSTANCE.convertPage(ProductSpuMapper.selectPage(pageReqVO));
-        // 查询 sku 的信息
-//        List<Long> spuIds = spuVOs.getList().stream().map(ProductSpuRespVO::getId).collect(Collectors.toList());
-//        List<ProductSkuRespVO> skus = ProductSkuConvert.INSTANCE.convertList(productSkuService.getSkusBySpuIds(spuIds));
-        // TODO @franky：使用 CollUtil 里的方法替代哈
-        // TODO 芋艿：临时注释
-//        Map<Long, List<ProductSkuRespVO>> skuMap = skus.stream().collect(Collectors.groupingBy(ProductSkuRespVO::getSpuId));
-//        // 将 spu 和 sku 进行组装
-//        spuVOs.getList().forEach(p -> p.setSkus(skuMap.get(p.getId())));
-        return spuVOs;
+        List<Long> remindSpuIds= null;
+        // todo @yunai 预警类型的判断应该可以优化，看下怎么处理
+        if(pageReqVO.getTabStatus() != null && pageReqVO.getTabStatus() == 2){
+            remindSpuIds= productSkuService.getRemindSpuIds();
+            if(remindSpuIds.isEmpty()){
+                remindSpuIds.add(null);
+            }
+        }
+        return ProductSpuConvert.INSTANCE.convertPage(ProductSpuMapper.selectPage(pageReqVO, remindSpuIds));
     }
 
     @Override

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.product.service.sku;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
@@ -14,6 +15,7 @@ import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -129,6 +131,12 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     @Override
     public void deleteSkuBySpuId(Long spuId) {
         productSkuMapper.deleteBySpuId(spuId);
+    }
+
+    @Override
+    public List<Long> getRemindSpuIds() {
+        List<ProductSkuDO> productSkuDOS = productSkuMapper.selectList(new QueryWrapper<ProductSkuDO>().apply("stock <= warn_stock"));
+        return productSkuDOS.stream().map(ProductSkuDO::getSpuId).distinct().collect(Collectors.toList());
     }
 
     @Override

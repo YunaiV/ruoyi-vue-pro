@@ -83,4 +83,11 @@ public interface ProductSkuService {
      */
     void deleteSkuBySpuId(Long spuId);
 
+    /**
+     * 获得商品预警中的spu集合
+     *
+     * @return 商品spuId集合
+     */
+    List<Long> getRemindSpuIds();
+
 }
