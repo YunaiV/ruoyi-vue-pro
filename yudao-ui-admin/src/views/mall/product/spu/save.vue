@@ -10,11 +10,13 @@
           <el-form-item label="商品卖点">
             <el-input type="textarea" v-model="baseForm.sellPoint" placeholder="请输入商品卖点"/>
           </el-form-item>
-          <!-- TODO @Luowenfeng：商品主图，80 x 80 即可 -->
           <el-form-item label="商品主图" prop="picUrls">
-            <ImageUpload v-model="baseForm.picUrls" :value="baseForm.picUrls" :limit="10" />
+            <ImageUpload v-model="baseForm.picUrls" :value="baseForm.picUrls" :limit="10" class="mall-image" />
           </el-form-item>
-          <!-- TODO @Luowenfeng：商品视频 -->
+          <el-form-item label="商品视频" prop="videoUrl">
+            <VideoUpload v-model="baseForm.videoUrl" :value="baseForm.videoUrl" />
+          </el-form-item>
+
           <el-form-item label="商品品牌" prop="brandId">
             <el-select v-model="baseForm.brandId" placeholder="请选择商品品牌">
               <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id" />
@@ -37,7 +39,6 @@
       <el-tab-pane label="价格库存" name="rates" class="rates">
         <el-form ref="rates" :model="ratesForm" :rules="rules">
           <el-form-item label="启用多规格">
-            <!-- TODO @Luowenfeng：改成开关的按钮；关闭，单规格；开启，多规格 -->
             <el-switch v-model="activeSwitch" @change="changeRadio"></el-switch>
           </el-form-item>
 
@@ -149,7 +150,7 @@
               </template>
             </el-table>
           </el-form-item>
-          <el-form-item label="虚拟销量" prop="virtualSalesCount">
+          <el-form-item label="虚拟销量" prop="virtualSalesCount" >
             <el-input v-model="baseForm.virtualSalesCount" placeholder="请输入虚拟销量" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
           </el-form-item>
         </el-form>
@@ -196,11 +197,13 @@ import {createSpu, updateSpu, getSpuDetail} from "@/api/mall/product/spu";
 import {getPropertyListAndValue,} from "@/api/mall/product/property";
 import Editor from "@/components/Editor";
 import ImageUpload from "@/components/ImageUpload";
+import VideoUpload from "@/components/VideoUpload";
 
 export default {
   components: {
     Editor,
-    ImageUpload
+    ImageUpload,
+    VideoUpload
   },
   props:{
     obj: Object
@@ -223,11 +226,13 @@ export default {
         sort: null,
         description: null,
         picUrls: null,
+        videoUrl: null,
         status: 0,
         virtualSalesCount: 0,
         showStock: true,
-        brandId: null
+        brandId: null,
       },
+
       categoryList: [],
       // 价格库存
       ratesForm: {
@@ -255,8 +260,8 @@ export default {
         description: [{required: true, message: "描述不能为空", trigger: "blur"},],
         categoryIds: [{required: true, message: "分类id不能为空", trigger: "blur"},],
         status: [{required: true, message: "商品状态不能为空", trigger: "blur"}],
+        brandId: [{required: true, message: "商品品牌不能为空", trigger: "blur"}],
         picUrls: [{required: true, message: "商品轮播图地址不能为空", trigger: "blur"}],
-        virtualSalesCount: [{required: true, message: "虚拟销量不能为空", trigger: "blur"}],
       },
     };
   },
@@ -379,7 +384,6 @@ export default {
         rates[0].status = this.baseForm.status;
       }
       let form = this.baseForm
-
       if(form.picUrls instanceof Array){
         form.picUrls = form.picUrls.flatMap(m=>m.split(','))
       }else if(form.picUrls.split(',') instanceof Array){
@@ -428,6 +432,7 @@ export default {
             this.baseForm.name=data.name;
             this.baseForm.sellPoint=data.sellPoint;
             this.baseForm.categoryIds=data.categoryIds;
+            this.baseForm.videoUrl = data.videoUrl;
             this.baseForm.sort=data.sort;
             this.baseForm.description=data.description;
             this.baseForm.picUrls=data.picUrls;
@@ -460,7 +465,8 @@ export default {
             }
             this.ratesForm.rates=data.skus
         })
-    }
+    },
+
   },
 };
 </script>
@@ -550,4 +556,17 @@ export default {
     margin-left: 15px;
   }
 }
+
+.mall-image{
+  .el-upload--picture-card{
+    width: 80px;
+    height: 80px;
+    line-height: 90px;
+  }
+  .el-upload-list__item{
+    width: 80px;
+    height: 80px;
+  }
+}
+
 </style>
