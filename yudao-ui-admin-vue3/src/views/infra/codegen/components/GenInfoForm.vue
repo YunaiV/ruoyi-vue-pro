@@ -1,16 +1,24 @@
 <script setup lang="ts">
-import { PropType, reactive, watch } from 'vue'
+import { onMounted, PropType, reactive, ref, watch } from 'vue'
 import { required } from '@/utils/formRules'
-import { CodegenTableVO } from '@/api/infra/codegen/types'
 import { Form } from '@/components/Form'
+import { handleTree } from '@/utils/tree'
+import { ElTreeSelect } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { listSimpleMenusApi } from '@/api/system/menu'
+import { CodegenTableVO } from '@/api/infra/codegen/types'
 const props = defineProps({
   genInfo: {
     type: Object as PropType<Nullable<CodegenTableVO>>,
     default: () => null
   }
 })
+const defaultProps = {
+  children: 'children',
+  label: 'name',
+  value: 'id'
+}
 const rules = reactive({
   templateType: [required],
   scene: [required],
@@ -22,6 +30,13 @@ const rules = reactive({
 })
 const templateTypeOptions = getIntDictOptions(DICT_TYPE.INFRA_CODEGEN_TEMPLATE_TYPE)
 const sceneOptions = getIntDictOptions(DICT_TYPE.INFRA_CODEGEN_SCENE)
+const parentMenuId = ref()
+const treeRef = ref<InstanceType<typeof ElTreeSelect>>()
+const menuOptions = ref<any>([]) // 树形结构
+const getTree = async () => {
+  const res = await listSimpleMenusApi()
+  menuOptions.value = handleTree(res)
+}
 const schema = reactive<FormSchema[]>([
   {
     label: '生成模板',
@@ -84,7 +99,9 @@ const schema = reactive<FormSchema[]>([
   {
     label: '上级菜单',
     field: 'parentMenuId',
-    component: 'Input',
+    componentProps: {
+      optionsSlot: true
+    },
     labelMessage: '分配到指定菜单下，例如 系统管理',
     colProps: {
       span: 12
@@ -93,6 +110,13 @@ const schema = reactive<FormSchema[]>([
 ])
 const { register, methods, elFormRef } = useForm({
   schema
+})
+const handleNodeClick = () => {
+  console.log(parentMenuId.value)
+}
+// ========== 初始化 ==========
+onMounted(async () => {
+  await getTree()
 })
 watch(
   () => props.genInfo,
@@ -106,12 +130,24 @@ watch(
     immediate: true
   }
 )
-
 defineExpose({
   elFormRef,
   getFormData: methods.getFormData
 })
 </script>
 <template>
-  <Form :rules="rules" @register="register" />
+  <Form :rules="rules" @register="register">
+    <template #parentMenuId>
+      <el-tree-select
+        v-model="parentMenuId"
+        ref="treeRef"
+        node-key="id"
+        check-on-click-node
+        expand-on-click-node="false"
+        :props="defaultProps"
+        :data="menuOptions"
+        @node-click="handleNodeClick"
+      />
+    </template>
+  </Form>
 </template>
