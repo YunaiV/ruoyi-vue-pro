@@ -104,7 +104,7 @@ export const constantRoutes = [
         path: 'value/:propertyId(\\d+)',
         component: (resolve) => require(['@/views/mall/product/property/value'], resolve),
         name: 'PropertyValue',
-        meta: {title: '规格数据', icon: '', activeMenu: '/mall/property'}
+        meta: {title: '规格数据', icon: '', activeMenu: '/product/property'}
       }
     ]
   }, {
@@ -127,6 +127,23 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/infra/codegen/editTable'], resolve),
         name: 'GenEdit',
         meta: {title: '修改生成配置', activeMenu: '/infra/codegen'}
+      }
+    ]
+  }, {
+    path: '/spu',
+    component: Layout,
+    hidden: true,
+    children: [{
+        path: 'edit/:spuId(\\d+)',
+        component: (resolve) => require(['@/views/mall/product/spu/save'], resolve),
+        name: 'SpuEdit',
+        meta: {title: '修改商品', activeMenu: '/product/spu'}
+      },
+      {
+        path: 'add',
+        component: (resolve) => require(['@/views/mall/product/spu/save'], resolve),
+        name: 'SpuAdd',
+        meta: {title: '添加商品', activeMenu: '/product/spu'}
       }
     ]
   }, {

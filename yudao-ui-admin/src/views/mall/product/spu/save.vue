@@ -217,9 +217,6 @@ export default {
     ImageUpload,
     VideoUpload
   },
-  props: {
-    obj: Object
-  },
   data() {
     return {
       activeSwitch: false,
@@ -281,8 +278,9 @@ export default {
     this.getListBrand();
     this.getListCategory();
     this.getPropertyPageList();
-    if (this.obj.id != null) {
-      this.updateType(this.obj.id)
+    const spuId = this.$route.params && this.$route.params.spuId;
+    if (spuId != null) {
+      this.updateType(spuId)
     }
   },
   methods: {
@@ -353,8 +351,18 @@ export default {
         this.brandList = response.data;
       });
     },
+    // 取消按钮
     cancel() {
-      this.$emit("closeDialog");
+      var currentView = this.$store.state.tagsView.visitedViews[0]
+      for (currentView of this.$store.state.tagsView.visitedViews) {
+        if (currentView.path === this.$route.path) {
+          break
+        }
+      }
+      this.$store.dispatch('tagsView/delView', currentView)
+        .then(() => {
+          this.$router.push("/product/spu")
+        })
     },
     submit() {
       this.$refs[this.activeName].validate((valid) => {
@@ -410,12 +418,16 @@ export default {
         if (form.id == null) {
           createSpu(form).then((response) => {
             this.$modal.msgSuccess("新增成功");
-            this.$emit("closeDialog");
+          })
+          .then(()=>{
+            this.cancel();
           })
         } else {
           updateSpu(form).then((response) => {
             this.$modal.msgSuccess("修改成功");
-            this.$emit("closeDialog");
+          })
+          .then(()=>{
+            this.cancel();
           })
         }
       });
@@ -484,9 +496,8 @@ export default {
 </script>
 
 <style lang="scss">
-.spec-dialog {
-  width: 400px;
-  height: 300px;
+.container{
+  padding: 20px;
 }
 
 .dynamic-spec {
@@ -531,11 +542,9 @@ export default {
 }
 
 .tabs {
-  height: 500px;
   border-bottom: 2px solid #f2f2f2;
 
   .el-tab-pane {
-    height: 445px;
     overflow-y: auto;
   }
 }

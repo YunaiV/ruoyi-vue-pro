@@ -273,10 +273,6 @@
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
-    <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body destroy-on-close
-               :close-on-click-modal="false">
-      <save @closeDialog="closeDialog" :obj="dialogObj" v-if="open"/>
-    </el-dialog>
   </div>
 </template>
 
@@ -284,20 +280,9 @@
 import {deleteSpu, getSpuPage,} from "@/api/mall/product/spu";
 import {getProductCategoryList} from "@/api/mall/product/category";
 import {getBrandList} from "@/api/mall/product/brand";
-import Editor from "@/components/Editor";
-import ImageUpload from "@/components/ImageUpload";
-import save from "./save";
-
-// 1. TODO @Luowenfeng：商品的添加、修改，走一个单独的页面，不走弹窗；https://v5.niuteam.cn/shop/goods/addgoods.html
-// 2. TODO
 
 export default {
   name: "Spu",
-  components: {
-    Editor,
-    ImageUpload,
-    save,
-  },
   data() {
     return {
       activeTabs: "all",
@@ -318,12 +303,6 @@ export default {
       total: 0,
       // 商品spu列表
       list: [],
-      // 弹出层标题
-      title: "",
-      // 是否显示弹出层
-      open: false,
-      // 弹出层参数
-      dialogObj: {},
       dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
@@ -341,7 +320,6 @@ export default {
         marketPriceMax: null,
         tabStatus: null,
       },
-      tagIndex: 0,
     };
   },
   created() {
@@ -383,12 +361,6 @@ export default {
         this.loading = false;
       });
     },
-
-    /** 取消按钮 */
-    cancel() {
-      this.open = false;
-      this.reset();
-    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNo = 1;
@@ -405,20 +377,11 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.dialogObj = {};
-      this.open = true;
-      this.title = "添加商品spu";
+      this.$router.push({ name: 'SpuAdd'})
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.dialogObj.id = row.id;
-      this.open = true;
-      this.title = "修改商品spu";
-    },
-    closeDialog() {
-      this.dialogObj = {};
-      this.open = false;
-      this.getList()
+      this.$router.push({ name: 'SpuEdit', params: { spuId: row.id }})
     },
     /** 删除按钮操作 */
     handleDelete(row) {
@@ -460,20 +423,6 @@ export default {
 .app-container {
   .el-tag + .el-tag {
     margin-left: 10px;
-  }
-
-  .button-new-tag {
-    margin-left: 10px;
-    height: 32px;
-    line-height: 30px;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .input-new-tag {
-    width: 90px;
-    margin-left: 10px;
-    vertical-align: bottom;
   }
 
   .product-info {
