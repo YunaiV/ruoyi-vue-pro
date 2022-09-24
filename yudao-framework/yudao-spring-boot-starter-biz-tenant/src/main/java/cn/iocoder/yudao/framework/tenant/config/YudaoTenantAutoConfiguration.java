@@ -119,6 +119,8 @@ public class YudaoTenantAutoConfiguration {
         };
     }
 
+    // ========== Redis ==========
+
     @Bean
     @Primary // 引入租户时，tenantRedisCacheManager 为主 Bean
     public RedisCacheManager tenantRedisCacheManager(RedisTemplate<String, Object> redisTemplate,
