@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Objects;
@@ -118,21 +119,14 @@ public class YudaoTenantAutoConfiguration {
         };
     }
 
-  /**
-   * 引入租户时，tenantRedisCacheManager为主Bean
-   *
-   * @param redisTemplate
-   * @param redisCacheConfiguration
-   * @return
-   */
-  @Bean
-  @Primary
-  public RedisCacheManager tenantRedisCacheManager(
-      RedisTemplate<String, Object> redisTemplate,
-      RedisCacheConfiguration redisCacheConfiguration) {
-        RedisCacheWriter cacheWriter =
-                RedisCacheWriter.nonLockingRedisCacheWriter(
-                        Objects.requireNonNull(redisTemplate.getConnectionFactory()));
+    @Bean
+    @Primary // 引入租户时，tenantRedisCacheManager 为主 Bean
+    public RedisCacheManager tenantRedisCacheManager(RedisTemplate<String, Object> redisTemplate,
+                                                     RedisCacheConfiguration redisCacheConfiguration) {
+        // 创建 RedisCacheWriter 对象
+        RedisConnectionFactory connectionFactory = Objects.requireNonNull(redisTemplate.getConnectionFactory());
+        RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory);
+        // 创建 TenantRedisCacheManager 对象
         return new TenantRedisCacheManager(cacheWriter, redisCacheConfiguration);
     }
 
