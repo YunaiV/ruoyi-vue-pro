@@ -10,9 +10,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeRequests()
+        httpSecurity.csrf().disable() // 禁用 CSRF 保护
+                .authorizeRequests()
                 // 1. 静态资源，可匿名访问
                 .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
+                // 2. 登录相关的接口，可匿名访问
+                .antMatchers("/auth/login-by-code").permitAll()
                 // last. 兜底规则，必须认证
                 .and().authorizeRequests()
                 .anyRequest().authenticated();

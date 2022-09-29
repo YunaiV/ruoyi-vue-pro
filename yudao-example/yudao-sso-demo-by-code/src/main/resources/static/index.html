@@ -5,8 +5,6 @@
 	<title>首页</title>
 	<!-- jQuery：操作 dom、发起请求等 -->
 	<script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/2.1.2/jquery.min.js" type="application/javascript"></script>
-	<!-- jQuery Cookie：操作 cookie 等 -->
-	<script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery-cookie/1.4.1/jquery.cookie.min.js" type="application/javascript"/></script>
 
 	<script type="application/javascript">
 
@@ -15,7 +13,7 @@
      */
 		function ssoLogin() {
 			const clientId = 'yudao-sso-demo-by-code'; // 可以改写成，你的 clientId
-      const redirectUri = encodeURIComponent('http://127.0.0.1:18080/callback'); // 注意，需要使用 encodeURIComponent 编码地址
+      const redirectUri = encodeURIComponent('http://127.0.0.1:18080/callback.html'); // 注意，需要使用 encodeURIComponent 编码地址
       const responseType = 'code'; // 1）授权码模式，对应 code；2）简化模式，对应 token
       window.location.href = 'http://127.0.0.1:1024/sso?client_id=' + clientId
 				+ '&redirect_uri=' + redirectUri
