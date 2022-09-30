@@ -95,6 +95,10 @@ yudao:
     base-package: ${yudao.info.base-package}
   captcha:
     enable: true # 验证码的开关，默认为 true；注意，优先读取数据库 infra_config 的 yudao.captcha.enable，所以请从数据库修改，可能需要重启项目
+  trade:
+    order:
+      app-id: 1
+      merchant-order-id: 1
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}

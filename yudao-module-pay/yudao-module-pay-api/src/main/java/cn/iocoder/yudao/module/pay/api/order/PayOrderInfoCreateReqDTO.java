@@ -14,7 +14,7 @@ import java.util.Date;
  * @author LeeYan9
  */
 @Data
-public class PayOrderDataCreateReqDTO implements Serializable {
+public class PayOrderInfoCreateReqDTO implements Serializable {
 
     /**
      * 应用编号
