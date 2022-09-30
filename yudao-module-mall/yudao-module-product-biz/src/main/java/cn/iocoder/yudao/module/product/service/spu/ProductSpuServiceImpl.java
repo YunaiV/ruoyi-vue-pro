@@ -192,6 +192,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
         List<Long> remindSpuIds= null;
         // todo @yunai 预警类型的判断应该可以优化，看下怎么处理
+        // TODO @luowenfeng: 先这么简单处理; 性能应该影响不大的;
         if(pageReqVO.getTabStatus() != null && pageReqVO.getTabStatus() == 2){
             remindSpuIds= productSkuService.getRemindSpuIds();
             if(remindSpuIds.isEmpty()){

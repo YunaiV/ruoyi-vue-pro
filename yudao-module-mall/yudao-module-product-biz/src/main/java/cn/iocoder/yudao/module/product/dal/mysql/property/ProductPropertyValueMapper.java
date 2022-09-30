@@ -17,7 +17,7 @@ import java.util.List;
 @Mapper
 public interface ProductPropertyValueMapper extends BaseMapperX<ProductPropertyValueDO> {
 
-    // TODO @franky：方法名，selectListByXXX。mapper 的操作都是 crud
+    // TODO @luowenfeng：方法名，selectListByXXX。mapper 的操作都是 crud
     default List<ProductPropertyValueDO> getPropertyValueListByPropertyId(List<Long> propertyIds) {
         // TODO @franky：调用父类的 selectList
         return selectList(new LambdaQueryWrapperX<ProductPropertyValueDO>()
@@ -25,7 +25,7 @@ public interface ProductPropertyValueMapper extends BaseMapperX<ProductPropertyV
     }
 
     default void deletePropertyValueByPropertyId(Long propertyId) {
-        // TODO @franky：delete(new ) 即可
+        // TODO @luowenfeng：delete(new ) 即可
         LambdaQueryWrapperX<ProductPropertyValueDO> queryWrapperX = new LambdaQueryWrapperX<>();
         queryWrapperX.eq(ProductPropertyValueDO::getPropertyId, propertyId)
                 .eq(ProductPropertyValueDO::getDeleted, false);
@@ -39,4 +39,5 @@ public interface ProductPropertyValueMapper extends BaseMapperX<ProductPropertyV
                 .eqIfPresent(ProductPropertyValueDO::getStatus, reqVO.getStatus())
                 .orderByDesc(ProductPropertyValueDO::getId));
     }
+
 }

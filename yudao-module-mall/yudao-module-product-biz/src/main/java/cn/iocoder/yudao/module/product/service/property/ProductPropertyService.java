@@ -54,13 +54,14 @@ public interface ProductPropertyService {
     List<ProductPropertyRespVO> getPropertyList(ProductPropertyListReqVO listReqVO);
 
     /**
-     * 获取属性及属性值列表 分页
-     * @param pageReqVO
-     * @return
+     * 获取属性名称分页
+     *
+     * @param pageReqVO 分页条件
+     * @return 规格名称分页
      */
     PageResult<ProductPropertyRespVO> getPropertyPage(ProductPropertyPageReqVO pageReqVO);
 
-
+    // TODO luowenfeng: getProperty 就可以拉, 不用到 Resp
     ProductPropertyRespVO getPropertyResp(Long id);
 
     /**
@@ -71,11 +72,11 @@ public interface ProductPropertyService {
      */
     List<ProductPropertyRespVO> getPropertyList(Collection<Long> ids);
 
-
     /**
-     * 获得规格名称列表
-     * @param listReqVO 集合查询
-     * @return 规格名称集合
+     * 获得规格名称 + 值的列表
+     *
+     * @param listReqVO 列表查询
+     * @return 规格名称 + 值的列表
      */
     List<ProductPropertyAndValueRespVO> getPropertyAndValueList(ProductPropertyListReqVO listReqVO);
 

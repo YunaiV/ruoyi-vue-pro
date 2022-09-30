@@ -83,8 +83,9 @@ public interface ProductSkuService {
      */
     void deleteSkuBySpuId(Long spuId);
 
+    // TODO @luowenfeng: 可以改成返回 ProductSkuDO 列表; 然后, 上层业务在做处理;
     /**
-     * 获得商品预警中的spu集合
+     * 获得商品预警中的 SPU 集合
      *
      * @return 商品spuId集合
      */

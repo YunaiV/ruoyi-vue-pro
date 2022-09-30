@@ -39,7 +39,7 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .leIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMax())
                 .geIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMin())
                 .orderByDesc(ProductSpuDO::getSort);
-
+        // TODO @芋艿: 需要优化下这里的代码
         if(reqVO.getTabStatus()!= null && reqVO.getTabStatus() == 2){
             productSpuDOLambdaQueryWrapperX.inIfPresent(ProductSpuDO::getId, spuIds);
         }else{

@@ -135,6 +135,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     public List<Long> getRemindSpuIds() {
+        // TODO @luowenfeng: mybatis plus 不能出现在 Service 哈; 把这个查询, 下沉一个方法到 mapper 里
         List<ProductSkuDO> productSkuDOS = productSkuMapper.selectList(new QueryWrapper<ProductSkuDO>().apply("stock <= warn_stock"));
         return productSkuDOS.stream().map(ProductSkuDO::getSpuId).distinct().collect(Collectors.toList());
     }

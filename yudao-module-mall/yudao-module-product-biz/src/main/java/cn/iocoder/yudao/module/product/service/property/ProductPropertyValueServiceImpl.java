@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * <p>
+ * <p> TODO @luowenfeng: 类注释
  *
  * </p>
  *
@@ -31,6 +31,7 @@ public class ProductPropertyValueServiceImpl implements ProductPropertyValueServ
 
     @Override
     public Long createPropertyValue(ProductPropertyValueCreateReqVO createReqVO) {
+        // TODO @luowenfeng: 需要校验下在这个 propertyId, 新增和更新, name 都要唯一
         ProductPropertyValueDO convert = ProductPropertyValueConvert.INSTANCE.convert(createReqVO);
         productPropertyValueMapper.insert(convert);
         return convert.getId();

@@ -33,38 +33,38 @@ public interface ProductSpuService {
     void updateSpu(@Valid ProductSpuUpdateReqVO updateReqVO);
 
     /**
-     * 删除商品spu
+     * 删除商品 SPU
      *
      * @param id 编号
      */
     void deleteSpu(Long id);
 
     /**
-     * 获得商品spu详情
+     * 获得商品 SPU 详情
      *
      * @param id 编号
-     * @return 商品spu
+     * @return 商品 SPU
      */
     ProductSpuDetailRespVO getSpuDetail(Long id);
 
     /**
-     * 获得商品spu
+     * 获得商品 SPU
      *
      * @param id 编号
-     * @return 商品spu
+     * @return 商品 SPU
      */
     ProductSpuRespVO getSpu(Long id);
 
     /**
-     * 获得商品spu列表
+     * 获得商品 SPU 列表
      *
-     * @param ids 编号
-     * @return 商品spu列表
+     * @param ids 编号数组
+     * @return 商品 SPU 列表
      */
     List<ProductSpuDO> getSpuList(Collection<Long> ids);
 
     /**
-     * 获得商品spu分页
+     * 获得商品 SPU 分页
      *
      * @param pageReqVO 分页查询
      * @return 商品spu分页
@@ -72,12 +72,11 @@ public interface ProductSpuService {
     PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO);
 
     /**
-     * 获得商品spu分页
+     * 获得商品 SPU 分页 // TODO @luowenfeng: 中文和英文之间, 要有一个空格; 这样, 阅读起来会更清晰; 我已经都改啦
      *
      * @param pageReqVO 分页查询
      * @return 商品spu分页
      */
     PageResult<AppSpuPageRespVO> getSpuPage(AppSpuPageReqVO pageReqVO);
-
 
 }

@@ -46,6 +46,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createProperty(ProductPropertyCreateReqVO createReqVO) {
+        // TODO @luowenfeng: 插入和更新的时候, 要校验 name 的唯一性;
         // 插入
         ProductPropertyDO property = ProductPropertyConvert.INSTANCE.convert(createReqVO);
         productPropertyMapper.insert(property);
@@ -96,6 +97,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         //获取属性列表
         PageResult<ProductPropertyDO> pageResult = productPropertyMapper.selectPage(pageReqVO);
         PageResult<ProductPropertyRespVO> propertyRespVOPageResult = ProductPropertyConvert.INSTANCE.convertPage(pageResult);
+        // TODO @luofengwen: 下面的代码, 如果不要,可以删除哈; git 可以拿到记录的
 //        List<Long> propertyIds = propertyRespVOPageResult.getList().stream().map(ProductPropertyAndValueRespVO::getId).collect(Collectors.toList());
 //
 //        //获取属性值列表
@@ -116,7 +118,6 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
 
     @Override
     public ProductPropertyRespVO getPropertyResp(Long id) {
-        //查询规格
         ProductPropertyDO property = getProperty(id);
         return ProductPropertyConvert.INSTANCE.convert(property);
     }
@@ -130,13 +131,15 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     public List<ProductPropertyAndValueRespVO> getPropertyAndValueList(ProductPropertyListReqVO listReqVO) {
         List<ProductPropertyRespVO> propertyList = getPropertyList(listReqVO);
 
-        //查询属性值
+        // 查询属性值
         List<ProductPropertyValueDO> valueDOList = productPropertyValueMapper.getPropertyValueListByPropertyId(CollectionUtils.convertList(propertyList, ProductPropertyRespVO::getId));
+//        CollectionUtils.convertMultiMap() // TODO @luofengwen: 可以使用这个方法哈
         Map<Long, List<ProductPropertyValueRespVO>> valueDOMap = valueDOList.stream()
                 .map(ProductPropertyValueConvert.INSTANCE::convert)
                 .collect(Collectors.groupingBy(ProductPropertyValueRespVO::getPropertyId));
-        //组装
+        // 组装 TODO @luowenfeng: CollectionUtils 转换哈;
         return propertyList.stream().map(m -> {
+            // TODO @luowenfeng: 使用 mapstruct convert 哈
             ProductPropertyAndValueRespVO productPropertyAndValueRespVO = BeanUtil.copyProperties(m, ProductPropertyAndValueRespVO.class);
             productPropertyAndValueRespVO.setValues(valueDOMap.get(m.getId()));
             return productPropertyAndValueRespVO;

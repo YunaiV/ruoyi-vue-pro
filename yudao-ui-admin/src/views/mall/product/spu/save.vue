@@ -39,6 +39,7 @@
       <el-tab-pane label="价格库存" name="rates" class="rates">
         <el-form ref="rates" :model="ratesForm" :rules="rules">
           <el-form-item label="启用多规格">
+            <!-- TODO @luowenfeng: 1) activeSwitch 可以考虑改成; specSwitch, 更清晰一点, activeSwitch 太通用了; changeRadio 改成 changeSpecSwitch  -->
             <el-switch v-model="activeSwitch" @change="changeRadio"></el-switch>
           </el-form-item>
 

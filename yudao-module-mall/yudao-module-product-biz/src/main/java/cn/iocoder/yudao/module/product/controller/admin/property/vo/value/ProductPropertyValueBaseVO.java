@@ -27,4 +27,5 @@ public class ProductPropertyValueBaseVO {
 
     @ApiModelProperty(value = "备注", example = "颜色")
     private String remark;
+
 }

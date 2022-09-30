@@ -14,7 +14,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSkuCreateOrUpdateReqVO extends ProductSkuBaseVO {
 
-    @ApiModelProperty(value = "商品 id", example = "1")
+    @ApiModelProperty(value = "商品 SKU 编号", example = "1")
     private Long id;
 
     /**
