@@ -11,10 +11,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.Date;
 
-/**
- * @author LeeYan9
- * @since 2022-08-26
- */
 @Mapper
 public interface PayOrderConvert {
 
@@ -30,4 +26,5 @@ public interface PayOrderConvert {
     default Date convertCreateTimeToPayExpireTime(Date cancelTime) {
         return DateUtil.offsetMinute(new Date(), 30);
     }
+    
 }

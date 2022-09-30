@@ -9,8 +9,10 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
+// TODO @LeeYan9: 1) 新建一个 dto 包, 然后挪进去哈; 2) 在 order下; Info 可以去掉;
 /**
  * 支付单创建 Request DTO
+ *
  * @author LeeYan9
  */
 @Data
@@ -53,6 +55,7 @@ public class PayOrderInfoCreateReqDTO implements Serializable {
      * 支付金额，单位：分
      */
     @NotNull(message = "支付金额不能为空")
+    // TODO @LeeYan9: 是不是 @Min 注解呀, 是 Integer 哈
     @DecimalMin(value = "0", inclusive = false, message = "支付金额必须大于零")
     private Integer amount;
 

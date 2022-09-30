@@ -7,18 +7,11 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-/**
- * @author LeeYan9
- * @since 2022-08-26
- */
 @Mapper
 public interface TradeOrderItemConvert {
 
     TradeOrderItemConvert INSTANCE = Mappers.getMapper(TradeOrderItemConvert.class);
 
-    /**
-     * @param items sku列表价格
-     * @return 订单项
-     */
     List<TradeOrderItemDO> convertList(List<PriceCalculateRespDTO.OrderItem> items);
+
 }

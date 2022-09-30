@@ -31,10 +31,11 @@ public interface ProductSkuApi {
     List<ProductSkuRespDTO> getSkuList(Collection<Long> ids);
 
     /**
-     * 批量扣减sku库存
+     * 批量扣减 SKU 库存
      *
      * @param batchReqDTO sku库存信息列表
      */
+    // TODO @LeeYan9: decrementSkuStockBatch? 啊哈, 动名词;
     void decrementStockBatch(SkuDecrementStockBatchReqDTO batchReqDTO);
 
 }

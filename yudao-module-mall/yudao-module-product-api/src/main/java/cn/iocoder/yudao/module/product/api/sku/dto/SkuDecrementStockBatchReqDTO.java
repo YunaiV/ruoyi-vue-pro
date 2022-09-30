@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
+ * TODO @LeeYan9: 1) 类注释; 2) Product 开头哈;
  * @author LeeYan9
  * @since 2022-08-26
  */
@@ -15,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class SkuDecrementStockBatchReqDTO {
 
-
+    // TODO @LeeYan9: 参数校验
     private List<Item> items;
 
     @Data
@@ -24,6 +25,7 @@ public class SkuDecrementStockBatchReqDTO {
         /**
          * 商品 SPU 编号，自增
          */
+        // TODO @LeeYan9: 是不是不用传递哈
         private Long productId;
 
         /**
@@ -38,6 +40,7 @@ public class SkuDecrementStockBatchReqDTO {
 
     }
 
+    // TODO @LeeYan9: 构造方法, 是不是可以满足啦
     public static SkuDecrementStockBatchReqDTO of(List<Item> items) {
         return new SkuDecrementStockBatchReqDTO(items);
     }

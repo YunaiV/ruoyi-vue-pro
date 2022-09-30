@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * TODO LeeYan9: 类注释;
  * @author LeeYan9
  * @since 2022-09-06
  */
@@ -28,6 +29,7 @@ public class ProductSkuApiImpl implements ProductSkuApi {
 
     @Override
     public List<SkuInfoRespDTO> getSkusByIds(Collection<Long> skuIds) {
+        // TODO TODO LeeYan9: AllEmpty?
         if (CollectionUtils.isAnyEmpty(skuIds)) {
             return Collections.emptyList();
         }
@@ -38,6 +40,7 @@ public class ProductSkuApiImpl implements ProductSkuApi {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void decrementStockBatch(SkuDecrementStockBatchReqDTO batchReqDTO) {
+        // TODO @LeeYan9: 最好 Service 去 for 循环;
         productSkuMapper.decrementStockBatch(batchReqDTO.getItems());
     }
 }

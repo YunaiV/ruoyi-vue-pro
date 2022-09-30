@@ -17,5 +17,6 @@ public interface ProductSkuConvert {
 
     ProductSkuConvert INSTANCE = Mappers.getMapper(ProductSkuConvert.class);
 
-    List<SkuDecrementStockBatchReqDTO.Item> convert(List<TradeOrderItemDO> tradeOrderItems);
+    List<SkuDecrementStockBatchReqDTO.Item> convert(List<TradeOrderItemDO> list);
+
 }

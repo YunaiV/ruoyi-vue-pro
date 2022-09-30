@@ -38,5 +38,4 @@ public interface ProductSkuConvert {
 
     List<SkuInfoRespDTO> convertList03(List<ProductSkuDO> list);
 
-
 }

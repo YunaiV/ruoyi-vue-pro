@@ -7,10 +7,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
-/**
- * @author LeeYan9
- * @since 2022-08-26
- */
 @Mapper
 public interface PriceConvert {
 
@@ -19,5 +15,6 @@ public interface PriceConvert {
     @Mappings(
             @Mapping(source = "userId" , target = "userId")
     )
-    PriceCalculateReqDTO convert(AppTradeOrderCreateReqVO createReqVO , Long userId);
+    PriceCalculateReqDTO convert(AppTradeOrderCreateReqVO createReqVO, Long userId);
+
 }

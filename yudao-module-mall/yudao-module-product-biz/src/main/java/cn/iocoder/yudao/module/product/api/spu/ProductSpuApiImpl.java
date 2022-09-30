@@ -14,6 +14,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * TODO LeeYan9: 类注释;
+ *
  * @author LeeYan9
  * @since 2022-09-06
  */
@@ -26,6 +28,7 @@ public class ProductSpuApiImpl implements ProductSpuApi {
 
     @Override
     public List<SpuInfoRespDTO> getSpuList(Collection<Long> spuIds) {
+        // TODO TODO LeeYan9: AllEmpty?
         if (CollectionUtils.isAnyEmpty(spuIds)) {
             return Collections.emptyList();
         }
