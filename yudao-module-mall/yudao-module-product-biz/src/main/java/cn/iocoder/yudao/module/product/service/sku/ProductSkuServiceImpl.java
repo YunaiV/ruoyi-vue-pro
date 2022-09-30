@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
@@ -22,9 +24,11 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
 /**
@@ -145,7 +149,8 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     public void updateProductSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // 查询 SPU 下已经存在的 SKU 的集合
         List<ProductSkuDO> existsSkus = productSkuMapper.selectListBySpuId(spuId);
-
+        // 构建规格与 SKU 的映射关系;
+        // TODO @luowenfeng: 可以下 existsSkuMap2; 会简洁一点; 另外, 可以考虑抽一个小方法, 用于 Properties 生成一个串; 这样 177 也可以复用了
         Map<String, Long> existsSkuMap = existsSkus.stream()
                 .map(v -> {
                     String collect = v.getProperties() == null? "null": v.getProperties()
@@ -155,7 +160,12 @@ public class ProductSkuServiceImpl implements ProductSkuService {
                     return String.join("-", collect, String.valueOf(v.getId()));
                 })
                 .collect(Collectors.toMap(v -> v.split("-")[0], v -> Long.valueOf(v.split("-")[1])));
-
+//        Map<String, Long> existsSkuMap2 = CollectionUtils.convertMap(existsSkus, productSkuDO -> {
+//            if (CollUtil.isEmpty(productSkuDO.getProperties())) {
+//                return "";
+//            }
+//            return StrUtil.join("-", convertList(productSkuDO.getProperties(), ProductSkuDO.Property::getValueId));
+//        }, ProductSkuDO::getId);
 
         // 拆分三个集合，新插入的、需要更新的、需要删除的
         List<ProductSkuDO> insertSkus = new ArrayList<>();
@@ -192,5 +202,14 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         }
     }
 
+    public static void main(String[] args) {
+        List<Integer> ids = new ArrayList<>();
+        ids.add(1);
+
+        List<Integer> ids2 = new ArrayList<>();
+        ids2.add(2);
+
+        System.out.println(ids.equals(ids2));
+    }
 
 }
