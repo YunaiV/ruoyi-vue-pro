@@ -47,6 +47,33 @@
       });
 		}
 
+    /**
+		 * 刷新令牌
+     */
+    function refreshToken() {
+      const refreshToken = localStorage.getItem('REFRESH-TOKEN');
+      if (!refreshToken) {
+        alert("获取不到刷新令牌");
+        return;
+			}
+      $.ajax({
+        url: "http://127.0.0.1:18080/auth/refresh-token?refreshToken=" + refreshToken,
+        method: 'POST',
+        success: function (result) {
+          if (result.code !== 0) {
+            alert('刷新访问令牌失败，原因：' + result.msg)
+            return;
+          }
+          alert('更新访问令牌成功！');
+          $('#accessTokenSpan').html(result.data.access_token);
+
+          // 设置到 localStorage 中
+          localStorage.setItem('ACCESS-TOKEN', result.data.access_token);
+          localStorage.setItem('REFRESH-TOKEN', result.data.refresh_token);
+        }
+      });
+		}
+
     $(function () {
       const accessToken = localStorage.getItem('ACCESS-TOKEN');
       // 情况一：未登录
@@ -86,7 +113,7 @@
 	<div id="yesLoginDiv" style="display: none">
 		您已登录！<button>退出登录</button> <br />
 		昵称：<span id="nicknameSpan"> 加载中... </span> <button onclick="updateNickname()">修改昵称</button> <br />
-		访问令牌：<span id="accessTokenSpan"> 加载中... </span> <br />
+		访问令牌：<span id="accessTokenSpan"> 加载中... </span> <button onclick="refreshToken()">刷新令牌</button> <br />
 	</div>
 </body>
 <style>

@@ -19,7 +19,7 @@
             </el-tab-pane>
           </el-tabs>
           <div>
-            <el-form ref="loginForm" :model="loginForm" :rules="LoginRules" class="login-form">
+            <el-form ref="loginForm" :model="loginForm" class="login-form">
               <!-- 授权范围的选择 -->
               此第三方应用请求获得以下权限：
               <el-form-item prop="scopes">

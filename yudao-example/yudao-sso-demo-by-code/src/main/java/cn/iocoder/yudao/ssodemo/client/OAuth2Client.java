@@ -68,6 +68,12 @@ public class OAuth2Client {
         return exchange.getBody();
     }
 
+    /**
+     * 校验访问令牌，并返回它的基本信息
+     *
+     * @param token 访问令牌
+     * @return 访问令牌的基本信息
+     */
     public CommonResult<OAuth2CheckTokenRespDTO> checkToken(String token) {
         // 1.1 构建请求头
         HttpHeaders headers = new HttpHeaders();
@@ -84,6 +90,33 @@ public class OAuth2Client {
                 HttpMethod.POST,
                 new HttpEntity<>(body, headers),
                 new ParameterizedTypeReference<CommonResult<OAuth2CheckTokenRespDTO>>() {}); // 解决 CommonResult 的泛型丢失
+        Assert.isTrue(exchange.getStatusCode().is2xxSuccessful(), "响应必须是 200 成功");
+        return exchange.getBody();
+    }
+
+    /**
+     * 使用刷新令牌，获得（刷新）访问令牌
+     *
+     * @param refreshToken 刷新令牌
+     * @return 访问令牌
+     */
+    public CommonResult<OAuth2AccessTokenRespDTO> refreshToken(String refreshToken) {
+        // 1.1 构建请求头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("tenant-id", TENANT_ID.toString());
+        addClientHeader(headers);
+        // 1.2 构建请求参数
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "refresh_token");
+        body.add("refresh_token", refreshToken);
+
+        // 2. 执行请求
+        ResponseEntity<CommonResult<OAuth2AccessTokenRespDTO>> exchange = restTemplate.exchange(
+                BASE_URL + "/token",
+                HttpMethod.POST,
+                new HttpEntity<>(body, headers),
+                new ParameterizedTypeReference<CommonResult<OAuth2AccessTokenRespDTO>>() {}); // 解决 CommonResult 的泛型丢失
         Assert.isTrue(exchange.getStatusCode().is2xxSuccessful(), "响应必须是 200 成功");
         return exchange.getBody();
     }

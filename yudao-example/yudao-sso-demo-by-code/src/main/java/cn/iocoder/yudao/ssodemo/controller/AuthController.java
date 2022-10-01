@@ -30,4 +30,15 @@ public class AuthController {
         return oauth2Client.postAccessToken(code, redirectUri);
     }
 
+    /**
+     * 使用刷新令牌，获得（刷新）访问令牌
+     *
+     * @param refreshToken 刷新令牌
+     * @return 访问令牌；注意，实际项目中，最好创建对应的 ResponseVO 类，只返回必要的字段
+     */
+    @PostMapping("/refresh-token")
+    public CommonResult<OAuth2AccessTokenRespDTO> refreshToken(@RequestParam("refreshToken") String refreshToken) {
+        return oauth2Client.refreshToken(refreshToken);
+    }
+
 }
