@@ -2,7 +2,7 @@ package cn.iocoder.yudao.ssodemo.controller;
 
 import cn.iocoder.yudao.ssodemo.client.OAuth2Client;
 import cn.iocoder.yudao.ssodemo.client.dto.CommonResult;
-import cn.iocoder.yudao.ssodemo.client.dto.OAuth2AccessTokenRespDTO;
+import cn.iocoder.yudao.ssodemo.client.dto.oauth2.OAuth2AccessTokenRespDTO;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

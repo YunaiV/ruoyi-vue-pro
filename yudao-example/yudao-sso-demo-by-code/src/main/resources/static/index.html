@@ -19,14 +19,57 @@
 				+ '&redirect_uri=' + redirectUri
 				+ '&response_type=' + responseType;
     }
+
+    $(function () {
+      const accessToken = localStorage.getItem('ACCESS-TOKEN');
+      // 情况一：未登录
+			if (!accessToken) {
+        $('#noLoginDiv').css("display", "block");
+        return;
+			}
+
+      // 情况二：已登录
+      $('#yesLoginDiv').css("display", "block");
+      $('#accessTokenSpan').html(accessToken);
+      // 获得登录用户的信息
+      $.ajax({
+        url: "http://127.0.0.1:18080/user/get",
+        method: 'GET',
+        headers: {
+          'Authentication': 'Bearer ' + accessToken
+        },
+        success: function (result) {
+          if (result.code !== 0) {
+            alert('获得个人信息失败，原因：' + result.msg)
+            return;
+          }
+          $('nicknameSpan').html(result.data.nickname);
+        }
+      });
+    })
 	</script>
 </head>
 <body>
-<!-- 情况一：未登录：1）跳转 ruoyi-vue-pro 的 SSO 登录页 -->
-<div>
-	您未登录，点击 <a href="#" onclick="ssoLogin()">跳转 </a> SSO 单点登录
-</div>
+	<!-- 情况一：未登录：1）跳转 ruoyi-vue-pro 的 SSO 登录页 -->
+	<div id="noLoginDiv" style="display: none">
+		您未登录，点击 <a href="#" onclick="ssoLogin()">跳转 </a> SSO 单点登录
+	</div>
 
-<!-- 情况二：已登录：1）展示用户信息；2）刷新访问令牌；3）退出登录 -->
+	<!-- 情况二：已登录：1）展示用户信息；2）刷新访问令牌；3）退出登录 -->
+	<div id="yesLoginDiv" style="display: none">
+		您已登录！点击 <a href="#" onclick="ssoLogin()">退出 </a> 系统 <br />
+		昵称：<span id="nicknameSpan"> 加载中... </span> <br />
+		访问令牌：<span id="accessTokenSpan"> 加载中... </span> <br />
+	</div>
 </body>
+<style>
+    body { /** 页面居中 */
+        border-radius: 20px;
+        height: 350px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+    }
+</style>
 </html>

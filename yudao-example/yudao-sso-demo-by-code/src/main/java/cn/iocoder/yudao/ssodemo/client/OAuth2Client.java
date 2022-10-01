@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.ssodemo.client;
 
 import cn.iocoder.yudao.ssodemo.client.dto.CommonResult;
-import cn.iocoder.yudao.ssodemo.client.dto.OAuth2AccessTokenRespDTO;
+import cn.iocoder.yudao.ssodemo.client.dto.oauth2.OAuth2AccessTokenRespDTO;
+import cn.iocoder.yudao.ssodemo.client.dto.oauth2.OAuth2CheckTokenRespDTO;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -61,6 +62,26 @@ public class OAuth2Client {
                 HttpMethod.POST,
                 new HttpEntity<>(body, headers),
                 new ParameterizedTypeReference<CommonResult<OAuth2AccessTokenRespDTO>>() {}); // 解决 CommonResult 的泛型丢失
+        Assert.isTrue(exchange.getStatusCode().is2xxSuccessful(), "响应必须是 200 成功");
+        return exchange.getBody();
+    }
+
+    public CommonResult<OAuth2CheckTokenRespDTO> checkToken(String token) {
+        // 1.1 构建请求头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("tenant-id", TENANT_ID.toString());
+        addClientHeader(headers);
+        // 1.2 构建请求参数
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("token", token);
+
+        // 2. 执行请求
+        ResponseEntity<CommonResult<OAuth2CheckTokenRespDTO>> exchange = restTemplate.exchange(
+                BASE_URL + "/check-token",
+                HttpMethod.POST,
+                new HttpEntity<>(body, headers),
+                new ParameterizedTypeReference<CommonResult<OAuth2CheckTokenRespDTO>>() {}); // 解决 CommonResult 的泛型丢失
         Assert.isTrue(exchange.getStatusCode().is2xxSuccessful(), "响应必须是 200 成功");
         return exchange.getBody();
     }

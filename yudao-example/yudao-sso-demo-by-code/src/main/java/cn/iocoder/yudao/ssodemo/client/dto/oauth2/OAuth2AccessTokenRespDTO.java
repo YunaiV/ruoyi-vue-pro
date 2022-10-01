@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.ssodemo.client.dto;
+package cn.iocoder.yudao.ssodemo.client.dto.oauth2;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
