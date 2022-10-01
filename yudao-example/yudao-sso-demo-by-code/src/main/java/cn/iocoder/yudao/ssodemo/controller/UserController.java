@@ -3,9 +3,8 @@ package cn.iocoder.yudao.ssodemo.controller;
 import cn.iocoder.yudao.ssodemo.client.UserClient;
 import cn.iocoder.yudao.ssodemo.client.dto.CommonResult;
 import cn.iocoder.yudao.ssodemo.client.dto.user.UserInfoRespDTO;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import cn.iocoder.yudao.ssodemo.client.dto.user.UserUpdateReqDTO;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -24,6 +23,18 @@ public class UserController {
     @GetMapping("/get")
     public CommonResult<UserInfoRespDTO> getUser() {
         return userClient.getUser();
+    }
+
+    /**
+     * 更新当前登录用户的昵称
+     *
+     * @param nickname 昵称
+     * @return 成功
+     */
+    @PutMapping("/update")
+    public CommonResult<Boolean> updateUser(@RequestParam("nickname") String nickname) {
+        UserUpdateReqDTO updateReqDTO = new UserUpdateReqDTO(nickname, null, null, null);
+        return userClient.updateUser(updateReqDTO);
     }
 
 }

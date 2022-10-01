@@ -1,5 +1,6 @@
-package cn.iocoder.yudao.ssodemo.framework.core;
+package cn.iocoder.yudao.ssodemo.framework.core.util;
 
+import cn.iocoder.yudao.ssodemo.framework.core.LoginUser;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

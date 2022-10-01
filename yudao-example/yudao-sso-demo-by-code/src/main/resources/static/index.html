@@ -20,6 +20,33 @@
 				+ '&response_type=' + responseType;
     }
 
+    /**
+		 * 修改昵称
+     */
+    function updateNickname() {
+      const nickname = prompt("请输入新的昵称", "");
+      if (!nickname) {
+        return;
+      }
+      // 更新用户的昵称
+      const accessToken = localStorage.getItem('ACCESS-TOKEN');
+      $.ajax({
+        url: "http://127.0.0.1:18080/user/update?nickname=" + nickname,
+        method: 'PUT',
+        headers: {
+          'Authentication': 'Bearer ' + accessToken
+        },
+        success: function (result) {
+          if (result.code !== 0) {
+            alert('更新昵称失败，原因：' + result.msg)
+            return;
+          }
+          alert('更新昵称成功！');
+          $('#nicknameSpan').html(nickname);
+        }
+      });
+		}
+
     $(function () {
       const accessToken = localStorage.getItem('ACCESS-TOKEN');
       // 情况一：未登录
@@ -58,7 +85,7 @@
 	<!-- 情况二：已登录：1）展示用户信息；2）刷新访问令牌；3）退出登录 -->
 	<div id="yesLoginDiv" style="display: none">
 		您已登录！<button>退出登录</button> <br />
-		昵称：<span id="nicknameSpan"> 加载中... </span> <button>修改昵称</button> <br />
+		昵称：<span id="nicknameSpan"> 加载中... </span> <button onclick="updateNickname()">修改昵称</button> <br />
 		访问令牌：<span id="accessTokenSpan"> 加载中... </span> <br />
 	</div>
 </body>

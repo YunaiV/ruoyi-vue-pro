@@ -16,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * OAuth 2.0 客户端
+ *
+ * 对应调用 OAuth2OpenController 接口
  */
 @Component
 public class OAuth2Client {

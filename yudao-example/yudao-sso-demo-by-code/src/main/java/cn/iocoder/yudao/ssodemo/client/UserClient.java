@@ -2,8 +2,9 @@ package cn.iocoder.yudao.ssodemo.client;
 
 import cn.iocoder.yudao.ssodemo.client.dto.CommonResult;
 import cn.iocoder.yudao.ssodemo.client.dto.user.UserInfoRespDTO;
+import cn.iocoder.yudao.ssodemo.client.dto.user.UserUpdateReqDTO;
 import cn.iocoder.yudao.ssodemo.framework.core.LoginUser;
-import cn.iocoder.yudao.ssodemo.framework.core.SecurityUtils;
+import cn.iocoder.yudao.ssodemo.framework.core.util.SecurityUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * OAuth 2.0 客户端
+ * 用户 User 信息的客户端
+ *
+ * 对应调用 OAuth2UserController 接口
  */
 @Component
 public class UserClient {
@@ -41,6 +44,26 @@ public class UserClient {
         Assert.isTrue(exchange.getStatusCode().is2xxSuccessful(), "响应必须是 200 成功");
         return exchange.getBody();
     }
+
+    public CommonResult<Boolean> updateUser(UserUpdateReqDTO updateReqDTO) {
+        // 1.1 构建请求头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("tenant-id", OAuth2Client.TENANT_ID.toString());
+        addTokenHeader(headers);
+        // 1.2 构建请求参数
+        // 使用 updateReqDTO 即可
+
+        // 2. 执行请求
+        ResponseEntity<CommonResult<Boolean>> exchange = restTemplate.exchange(
+                BASE_URL + "/update",
+                HttpMethod.PUT,
+                new HttpEntity<>(updateReqDTO, headers),
+                new ParameterizedTypeReference<CommonResult<Boolean>>() {}); // 解决 CommonResult 的泛型丢失
+        Assert.isTrue(exchange.getStatusCode().is2xxSuccessful(), "响应必须是 200 成功");
+        return exchange.getBody();
+    }
+
 
     private static void addTokenHeader(HttpHeaders headers) {
         LoginUser loginUser = SecurityUtils.getLoginUser();

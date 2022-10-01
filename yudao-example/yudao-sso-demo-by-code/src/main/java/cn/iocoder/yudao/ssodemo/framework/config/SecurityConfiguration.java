@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.ssodemo.framework.config;
 
-import cn.iocoder.yudao.ssodemo.framework.core.TokenAuthenticationFilter;
+import cn.iocoder.yudao.ssodemo.framework.core.filter.TokenAuthenticationFilter;
+import cn.iocoder.yudao.ssodemo.framework.core.handler.AccessDeniedHandlerImpl;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.annotation.Resource;
@@ -12,16 +14,13 @@ import javax.annotation.Resource;
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-//    /**
-//     * Token 认证过滤器 Bean
-//     */
-//    @Bean
-//    public TokenAuthenticationFilter authenticationTokenFilter(OAuth2Client oauth2Client) {
-//        return new TokenAuthenticationFilter(oauth2Client);
-//    }
-
     @Resource
     private TokenAuthenticationFilter tokenAuthenticationFilter;
+
+    @Resource
+    private AccessDeniedHandlerImpl accessDeniedHandler;
+    @Resource
+    private AuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
@@ -36,7 +35,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and().authorizeRequests()
                 .anyRequest().authenticated();
 
+        // 设置处理器
+        httpSecurity.exceptionHandling().accessDeniedHandler(accessDeniedHandler)
+                .authenticationEntryPoint(authenticationEntryPoint);
+
         // 添加 Token Filter
         httpSecurity.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
+
 }
