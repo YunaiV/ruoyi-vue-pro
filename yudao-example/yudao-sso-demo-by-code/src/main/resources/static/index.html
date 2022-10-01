@@ -43,7 +43,7 @@
             alert('获得个人信息失败，原因：' + result.msg)
             return;
           }
-          $('nicknameSpan').html(result.data.nickname);
+          $('#nicknameSpan').html(result.data.nickname);
         }
       });
     })
@@ -57,8 +57,8 @@
 
 	<!-- 情况二：已登录：1）展示用户信息；2）刷新访问令牌；3）退出登录 -->
 	<div id="yesLoginDiv" style="display: none">
-		您已登录！点击 <a href="#" onclick="ssoLogin()">退出 </a> 系统 <br />
-		昵称：<span id="nicknameSpan"> 加载中... </span> <br />
+		您已登录！<button>退出登录</button> <br />
+		昵称：<span id="nicknameSpan"> 加载中... </span> <button>修改昵称</button> <br />
 		访问令牌：<span id="accessTokenSpan"> 加载中... </span> <br />
 	</div>
 </body>

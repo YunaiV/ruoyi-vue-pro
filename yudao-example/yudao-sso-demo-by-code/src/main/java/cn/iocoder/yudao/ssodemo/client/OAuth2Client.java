@@ -20,14 +20,14 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class OAuth2Client {
 
-    private static final String BASE_URL = "http://127.0.0.1:48080/admin-api/system/oauth2/";
+    private static final String BASE_URL = "http://127.0.0.1:48080/admin-api/system/oauth2";
 
     /**
      * 租户编号
      *
      * 默认使用 1；如果使用别的租户，可以调整
      */
-    private static final Long TENANT_ID = 1L;
+    public static final Long TENANT_ID = 1L;
 
     private static final String CLIENT_ID = "yudao-sso-demo-by-code";
     private static final String CLIENT_SECRET = "test";

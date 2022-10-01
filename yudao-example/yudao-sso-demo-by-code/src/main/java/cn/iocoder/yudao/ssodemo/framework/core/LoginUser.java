@@ -29,4 +29,9 @@ public class LoginUser {
      */
     private List<String> scopes;
 
+    /**
+     * 访问令牌
+     */
+    private String accessToken;
+
 }
