@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.ssodemo.controller;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.ssodemo.client.OAuth2Client;
 import cn.iocoder.yudao.ssodemo.client.dto.CommonResult;
 import cn.iocoder.yudao.ssodemo.client.dto.oauth2.OAuth2AccessTokenRespDTO;
+import cn.iocoder.yudao.ssodemo.framework.core.util.SecurityUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/auth")
@@ -39,6 +42,22 @@ public class AuthController {
     @PostMapping("/refresh-token")
     public CommonResult<OAuth2AccessTokenRespDTO> refreshToken(@RequestParam("refreshToken") String refreshToken) {
         return oauth2Client.refreshToken(refreshToken);
+    }
+
+    /**
+     * 退出登录
+     *
+     * @param request 请求
+     * @return 成功
+     */
+    @PostMapping("/logout")
+    public CommonResult<Boolean> logout(HttpServletRequest request) {
+        String token = SecurityUtils.obtainAuthorization(request, "Authentication");
+        if (StrUtil.isNotBlank(token)) {
+            return oauth2Client.revokeToken(token);
+        }
+        // 返回成功
+        return new CommonResult<>();
     }
 
 }

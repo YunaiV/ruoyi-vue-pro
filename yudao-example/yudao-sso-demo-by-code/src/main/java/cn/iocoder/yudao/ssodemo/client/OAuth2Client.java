@@ -121,6 +121,32 @@ public class OAuth2Client {
         return exchange.getBody();
     }
 
+    /**
+     * 删除访问令牌
+     *
+     * @param token 访问令牌
+     * @return 成功
+     */
+    public CommonResult<Boolean> revokeToken(String token) {
+        // 1.1 构建请求头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("tenant-id", TENANT_ID.toString());
+        addClientHeader(headers);
+        // 1.2 构建请求参数
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("token", token);
+
+        // 2. 执行请求
+        ResponseEntity<CommonResult<Boolean>> exchange = restTemplate.exchange(
+                BASE_URL + "/token",
+                HttpMethod.DELETE,
+                new HttpEntity<>(body, headers),
+                new ParameterizedTypeReference<CommonResult<Boolean>>() {}); // 解决 CommonResult 的泛型丢失
+        Assert.isTrue(exchange.getStatusCode().is2xxSuccessful(), "响应必须是 200 成功");
+        return exchange.getBody();
+    }
+
     private static void addClientHeader(HttpHeaders headers) {
         // client 拼接，需要 BASE64 编码
         String client = CLIENT_ID + ":" + CLIENT_SECRET;

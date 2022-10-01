@@ -74,6 +74,36 @@
       });
 		}
 
+    /**
+     * 刷新令牌
+     */
+    function logout() {
+      const accessToken = localStorage.getItem('ACCESS-TOKEN');
+      if (!accessToken) {
+        location.reload();
+        return;
+      }
+      $.ajax({
+        url: "http://127.0.0.1:18080/auth/logout",
+        method: 'POST',
+        headers: {
+          'Authentication': 'Bearer ' + accessToken
+        },
+        success: function (result) {
+          if (result.code !== 0) {
+            alert('退出登录失败，原因：' + result.msg)
+            return;
+          }
+          alert('退出登录成功！');
+          // 删除 localStorage 中
+          localStorage.removeItem('ACCESS-TOKEN');
+          localStorage.removeItem('REFRESH-TOKEN');
+
+          location.reload();
+        }
+      });
+    }
+
     $(function () {
       const accessToken = localStorage.getItem('ACCESS-TOKEN');
       // 情况一：未登录
@@ -111,7 +141,7 @@
 
 	<!-- 情况二：已登录：1）展示用户信息；2）刷新访问令牌；3）退出登录 -->
 	<div id="yesLoginDiv" style="display: none">
-		您已登录！<button>退出登录</button> <br />
+		您已登录！<button onclick="logout()">退出登录</button> <br />
 		昵称：<span id="nicknameSpan"> 加载中... </span> <button onclick="updateNickname()">修改昵称</button> <br />
 		访问令牌：<span id="accessTokenSpan"> 加载中... </span> <button onclick="refreshToken()">刷新令牌</button> <br />
 	</div>
