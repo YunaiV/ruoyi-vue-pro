@@ -9,8 +9,8 @@
 	<script type="application/javascript">
     (function ($) {
       /**
-			 * 获得 URL 的指定参数的值
-			 *
+       * 获得 URL 的指定参数的值
+       *
        * @param name 参数名
        * @returns 参数值
        */
@@ -25,17 +25,17 @@
 	<script type="application/javascript">
     $(function () {
       // 获得 code 授权码
-			const code = $.getUrlParam('code');
+      const code = $.getUrlParam('code');
       if (!code) {
         alert('获取不到 code 参数，请排查！')
         return;
-			}
+      }
 
       // 提交
-			const redirectUri = 'http://127.0.0.1:18080/callback.html'; // 需要修改成，你回调的地址，就是在 index.html 拼接的 redirectUri
+      const redirectUri = 'http://127.0.0.1:18080/callback.html'; // 需要修改成，你回调的地址，就是在 index.html 拼接的 redirectUri
       $.ajax({
         url:  "http://127.0.0.1:18080/auth/login-by-code?code=" + code
-					+ '&redirectUri=' + redirectUri,
+          + '&redirectUri=' + redirectUri,
         method: 'POST',
         success: function( result ) {
           if (result.code !== 0) {
@@ -52,7 +52,7 @@
           window.location.href = '/index.html';
         }
       })
-		})
+    })
 	</script>
 </head>
 <body>

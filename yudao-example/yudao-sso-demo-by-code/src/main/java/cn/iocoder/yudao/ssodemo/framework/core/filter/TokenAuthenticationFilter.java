@@ -32,7 +32,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         // 1. 获得访问令牌
-        String token = SecurityUtils.obtainAuthorization(request, "Authentication");
+        String token = SecurityUtils.obtainAuthorization(request, "Authorization");
         if (StringUtils.hasText(token)) {
             // 2. 基于 token 构建登录用户
             LoginUser loginUser = buildLoginUserByToken(token);

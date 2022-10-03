@@ -8,20 +8,20 @@
 
 	<script type="application/javascript">
 
-		/**
-		 * 跳转单点登录
+    /**
+     * 跳转单点登录
      */
-		function ssoLogin() {
-			const clientId = 'yudao-sso-demo-by-code'; // 可以改写成，你的 clientId
+    function ssoLogin() {
+      const clientId = 'yudao-sso-demo-by-code'; // 可以改写成，你的 clientId
       const redirectUri = encodeURIComponent('http://127.0.0.1:18080/callback.html'); // 注意，需要使用 encodeURIComponent 编码地址
       const responseType = 'code'; // 1）授权码模式，对应 code；2）简化模式，对应 token
       window.location.href = 'http://127.0.0.1:1024/sso?client_id=' + clientId
-				+ '&redirect_uri=' + redirectUri
-				+ '&response_type=' + responseType;
+        + '&redirect_uri=' + redirectUri
+        + '&response_type=' + responseType;
     }
 
     /**
-		 * 修改昵称
+     * 修改昵称
      */
     function updateNickname() {
       const nickname = prompt("请输入新的昵称", "");
@@ -34,7 +34,7 @@
         url: "http://127.0.0.1:18080/user/update?nickname=" + nickname,
         method: 'PUT',
         headers: {
-          'Authentication': 'Bearer ' + accessToken
+          'Authorization': 'Bearer ' + accessToken
         },
         success: function (result) {
           if (result.code !== 0) {
@@ -45,17 +45,17 @@
           $('#nicknameSpan').html(nickname);
         }
       });
-		}
+    }
 
     /**
-		 * 刷新令牌
+     * 刷新令牌
      */
     function refreshToken() {
       const refreshToken = localStorage.getItem('REFRESH-TOKEN');
       if (!refreshToken) {
         alert("获取不到刷新令牌");
         return;
-			}
+      }
       $.ajax({
         url: "http://127.0.0.1:18080/auth/refresh-token?refreshToken=" + refreshToken,
         method: 'POST',
@@ -72,7 +72,7 @@
           localStorage.setItem('REFRESH-TOKEN', result.data.refresh_token);
         }
       });
-		}
+    }
 
     /**
      * 刷新令牌
@@ -87,7 +87,7 @@
         url: "http://127.0.0.1:18080/auth/logout",
         method: 'POST',
         headers: {
-          'Authentication': 'Bearer ' + accessToken
+          'Authorization': 'Bearer ' + accessToken
         },
         success: function (result) {
           if (result.code !== 0) {
@@ -107,10 +107,10 @@
     $(function () {
       const accessToken = localStorage.getItem('ACCESS-TOKEN');
       // 情况一：未登录
-			if (!accessToken) {
+      if (!accessToken) {
         $('#noLoginDiv').css("display", "block");
         return;
-			}
+      }
 
       // 情况二：已登录
       $('#yesLoginDiv').css("display", "block");
@@ -120,7 +120,7 @@
         url: "http://127.0.0.1:18080/user/get",
         method: 'GET',
         headers: {
-          'Authentication': 'Bearer ' + accessToken
+          'Authorization': 'Bearer ' + accessToken
         },
         success: function (result) {
           if (result.code !== 0) {
@@ -134,17 +134,17 @@
 	</script>
 </head>
 <body>
-	<!-- 情况一：未登录：1）跳转 ruoyi-vue-pro 的 SSO 登录页 -->
-	<div id="noLoginDiv" style="display: none">
-		您未登录，点击 <a href="#" onclick="ssoLogin()">跳转 </a> SSO 单点登录
-	</div>
+<!-- 情况一：未登录：1）跳转 ruoyi-vue-pro 的 SSO 登录页 -->
+<div id="noLoginDiv" style="display: none">
+	您未登录，点击 <a href="#" onclick="ssoLogin()">跳转 </a> SSO 单点登录
+</div>
 
-	<!-- 情况二：已登录：1）展示用户信息；2）刷新访问令牌；3）退出登录 -->
-	<div id="yesLoginDiv" style="display: none">
-		您已登录！<button onclick="logout()">退出登录</button> <br />
-		昵称：<span id="nicknameSpan"> 加载中... </span> <button onclick="updateNickname()">修改昵称</button> <br />
-		访问令牌：<span id="accessTokenSpan"> 加载中... </span> <button onclick="refreshToken()">刷新令牌</button> <br />
-	</div>
+<!-- 情况二：已登录：1）展示用户信息；2）刷新访问令牌；3）退出登录 -->
+<div id="yesLoginDiv" style="display: none">
+	您已登录！<button onclick="logout()">退出登录</button> <br />
+	昵称：<span id="nicknameSpan"> 加载中... </span> <button onclick="updateNickname()">修改昵称</button> <br />
+	访问令牌：<span id="accessTokenSpan"> 加载中... </span> <button onclick="refreshToken()">刷新令牌</button> <br />
+</div>
 </body>
 <style>
     body { /** 页面居中 */

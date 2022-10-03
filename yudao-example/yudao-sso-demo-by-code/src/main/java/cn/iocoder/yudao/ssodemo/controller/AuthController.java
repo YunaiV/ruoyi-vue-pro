@@ -52,7 +52,7 @@ public class AuthController {
      */
     @PostMapping("/logout")
     public CommonResult<Boolean> logout(HttpServletRequest request) {
-        String token = SecurityUtils.obtainAuthorization(request, "Authentication");
+        String token = SecurityUtils.obtainAuthorization(request, "Authorization");
         if (StrUtil.isNotBlank(token)) {
             return oauth2Client.revokeToken(token);
         }
