@@ -31,7 +31,7 @@ public class OAuth2Client {
      */
     public static final Long TENANT_ID = 1L;
 
-    private static final String CLIENT_ID = "yudao-sso-demo-by-code";
+    private static final String CLIENT_ID = "yudao-sso-demo-by-password";
     private static final String CLIENT_SECRET = "test";
 
 
