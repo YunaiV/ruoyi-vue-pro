@@ -11,13 +11,8 @@
     /**
      * 跳转单点登录
      */
-    function ssoLogin() {
-      const clientId = 'yudao-sso-demo-by-code'; // 可以改写成，你的 clientId
-      const redirectUri = encodeURIComponent('http://127.0.0.1:18080/callback.html'); // 注意，需要使用 encodeURIComponent 编码地址
-      const responseType = 'code'; // 1）授权码模式，对应 code；2）简化模式，对应 token
-      window.location.href = 'http://127.0.0.1:1024/sso?client_id=' + clientId
-        + '&redirect_uri=' + redirectUri
-        + '&response_type=' + responseType;
+    function passwordLogin() {
+      window.location.href = '/login.html'
     }
 
     /**
@@ -136,7 +131,7 @@
 <body>
 <!-- 情况一：未登录：1）跳转 ruoyi-vue-pro 的 SSO 登录页 -->
 <div id="noLoginDiv" style="display: none">
-	您未登录，点击 <a href="#" onclick="ssoLogin()">跳转 </a> SSO 单点登录
+	您未登录，点击 <a href="#" onclick="passwordLogin()">跳转 </a> 账号密码登录
 </div>
 
 <!-- 情况二：已登录：1）展示用户信息；2）刷新访问令牌；3）退出登录 -->

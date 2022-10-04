@@ -12,6 +12,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>yudao-sso-demo-by-code</module>
+        <module>yudao-sso-demo-by-password</module>
     </modules>
 
     <name>${project.artifactId}</name>
