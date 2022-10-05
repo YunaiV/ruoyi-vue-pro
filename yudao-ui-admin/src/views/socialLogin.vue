@@ -117,7 +117,7 @@ export default {
     // 验证码开关
     this.captchaEnable = getCaptchaEnable();
     // 重定向地址
-    this.redirect = this.$route.query.redirect;
+    this.redirect = this.$route.query.redirect ? decodeURIComponent(this.$route.query.redirect) : undefined;
     // 社交登录相关
     this.type = this.$route.query.type;
     this.code = this.$route.query.code;

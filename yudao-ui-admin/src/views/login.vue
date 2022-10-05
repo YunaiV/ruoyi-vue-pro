@@ -190,7 +190,7 @@ export default {
     // 验证码开关
     this.captchaEnable = getCaptchaEnable();
     // 重定向地址
-    this.redirect = this.$route.query.redirect;
+    this.redirect = this.$route.query.redirect ? decodeURIComponent(this.$route.query.redirect) : undefined;
     this.getCookie();
   },
   methods: {

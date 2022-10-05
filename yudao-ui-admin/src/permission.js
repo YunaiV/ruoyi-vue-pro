@@ -48,7 +48,8 @@ router.beforeEach((to, from, next) => {
       // 在免登录白名单，直接进入
       next()
     } else {
-      next(`/login?redirect=${to.fullPath}`) // 否则全部重定向到登录页
+      const redirect = encodeURIComponent(to.fullPath) // 编码 URI，保证参数跳转回去后，可以继续带上
+      next(`/login?redirect=${redirect}`) // 否则全部重定向到登录页
       NProgress.done()
     }
   }
