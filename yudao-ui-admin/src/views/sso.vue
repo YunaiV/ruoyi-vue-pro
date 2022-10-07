@@ -57,7 +57,6 @@ export default {
   name: "Login",
   data() {
     return {
-      tenantEnable: true,
       loginForm: {
         scopes: [], // 已选中的 scope 数组
       },
