@@ -19,14 +19,14 @@
         <spring.boot.version>2.6.11</spring.boot.version>
         <!-- Web 相关 -->
         <knife4j.version>3.0.3</knife4j.version>
-        <swagger-annotations.version>1.6.6</swagger-annotations.version>
+        <swagger-annotations.version>1.6.7</swagger-annotations.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
         <druid.version>1.2.13-SNSAPSHOT</druid.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.5.2</dynamic-datasource.version>
-        <redisson.version>3.17.6</redisson.version>
+        <redisson.version>3.17.7</redisson.version>
         <!-- Config 配置中心相关 -->
         <apollo.version>1.9.2</apollo.version>
         <!-- 服务保障相关 -->
@@ -34,11 +34,11 @@
         <resilience4j.version>1.7.1</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>8.12.0</skywalking.version>
-        <spring-boot-admin.version>2.6.7</spring-boot-admin.version>
-        <opentracing.version>0.31.0</opentracing.version>
+        <spring-boot-admin.version>2.6.9</spring-boot-admin.version>
+        <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>7.2.9.RELEASE</podam.version>
-        <jedis-mock.version>1.0.3</jedis-mock.version>
+        <jedis-mock.version>1.0.4</jedis-mock.version>
         <mockito-inline.version>4.8.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.7.2</flowable.version>
@@ -56,7 +56,7 @@
         <transmittable-thread-local.version>2.14.0</transmittable-thread-local.version>
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
-        <tika-core.version>2.4.1</tika-core.version>
+        <tika-core.version>2.5.0</tika-core.version>
         <aj-captcha.version>1.3.0</aj-captcha.version>
         <netty-all.version>4.1.82.Final</netty-all.version>
         <!-- 三方云服务相关 -->
@@ -66,7 +66,7 @@
         <tencentcloud-sdk-java.version>3.1.561</tencentcloud-sdk-java.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
-        <jimureport.version>1.5.2</jimureport.version>
+        <jimureport.version>1.5.3</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
     </properties>
 

@@ -16,14 +16,10 @@ export interface DictState {
   dictMap: Recordable
 }
 
-export const useDictStore = defineStore({
-  id: 'dict',
+export const useDictStore = defineStore('dict', {
   state: (): DictState => ({
     dictMap: {}
   }),
-  persist: {
-    enabled: true
-  },
   getters: {
     getDictMap(): Recordable {
       return this.dictMap

@@ -1,4 +1,10 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosRequestHeaders,
+  AxiosResponse,
+  AxiosError
+} from 'axios'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import qs from 'qs'
 import { config } from '@/config/axios/config'
@@ -48,7 +54,8 @@ service.interceptors.request.use(
     const data = config.data || false
     if (
       config.method?.toUpperCase() === 'POST' &&
-      config!.headers!['Content-Type'] === 'application/x-www-form-urlencoded'
+      (config.headers as AxiosRequestHeaders)['Content-Type'] ===
+        'application/x-www-form-urlencoded'
     ) {
       config.data = qs.stringify(data)
     }

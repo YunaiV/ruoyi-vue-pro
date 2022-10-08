@@ -16,8 +16,7 @@ interface UserInfoVO {
   user: UserVO
 }
 
-export const useUserStore = defineStore({
-  id: 'admin-user',
+export const useUserStore = defineStore('admin-user', {
   state: (): UserInfoVO => ({
     permissions: [],
     roles: [],
