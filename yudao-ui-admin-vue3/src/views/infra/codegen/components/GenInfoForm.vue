@@ -8,6 +8,7 @@ import { useForm } from '@/hooks/web/useForm'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { listSimpleMenusApi } from '@/api/system/menu'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
+import { FormSchema } from '@/types/form'
 const props = defineProps({
   genInfo: {
     type: Object as PropType<Nullable<CodegenTableVO>>,
