@@ -208,7 +208,7 @@ const clear = () => {
     <Icon icon="ep:setting" color="#fff" />
   </div>
 
-  <ElDrawer v-model="drawer" direction="rtl" size="350px">
+  <ElDrawer v-model="drawer" direction="rtl" size="350px" :z-index="4000">
     <template #header>
       <span class="text-16px font-700">{{ t('setting.projectSetting') }}</span>
     </template>
