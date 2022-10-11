@@ -9,9 +9,9 @@ import VueI18n from '@intlify/vite-plugin-vue-i18n'
 import { createStyleImportPlugin, ElementPlusResolve } from 'vite-plugin-style-import'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import PurgeIcons from 'vite-plugin-purge-icons'
-import DefineOptions from 'unplugin-vue-define-options/vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import viteCompression from 'vite-plugin-compression'
+import VueMarcos from 'unplugin-vue-macros/vite'
 
 // 当前执行node命令时文件夹的地址（工作目录）
 const root = process.cwd()
@@ -80,7 +80,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         svgoOptions: true
       }),
       PurgeIcons(),
-      DefineOptions(),
+      VueMarcos(),
       viteCompression({
         verbose: true, // 是否在控制台输出压缩结果
         disable: true, // 是否禁用
