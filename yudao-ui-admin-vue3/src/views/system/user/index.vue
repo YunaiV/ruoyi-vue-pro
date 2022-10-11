@@ -112,20 +112,20 @@ const setDialogTile = async (type: string) => {
 
 // 新增操作
 const handleAdd = () => {
-  setDialogTile('create')
   // 重置表单
   deptId.value = 0
   unref(formRef)?.getElFormRef()?.resetFields()
+  setDialogTile('create')
 }
 
 // 修改操作
 const handleUpdate = async (row: UserVO) => {
-  await setDialogTile('update')
   // 设置数据
   const res = await UserApi.getUserApi(row.id)
   deptId.value = res.deptId
   postIds.value = res.postIds
   unref(formRef)?.setValues(res)
+  await setDialogTile('update')
 }
 
 // 提交按钮
@@ -281,9 +281,9 @@ const excelUploadError = (): void => {
 }
 // ========== 初始化 ==========
 onMounted(async () => {
-  await getTree()
   await getPostOptions()
   await getList()
+  await getTree()
 })
 </script>
 

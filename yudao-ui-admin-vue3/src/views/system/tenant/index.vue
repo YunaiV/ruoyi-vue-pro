@@ -199,7 +199,7 @@ onMounted(async () => {
       ref="formRef"
     >
       <template #packageId>
-        <el-select v-model="tenantPackageId" placeholder="Select">
+        <el-select v-model="tenantPackageId">
           <el-option
             v-for="item in tenantPackageOptions"
             :key="item.id"
