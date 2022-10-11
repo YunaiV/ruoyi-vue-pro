@@ -3,27 +3,12 @@ import { store } from '../index'
 import { setCssVar, humpToUnderline } from '@/utils'
 import { ElMessage } from 'element-plus'
 import { useCache } from '@/hooks/web/useCache'
+import { ElementPlusSize } from '@/types/elementPlus'
+import { LayoutType } from '@/types/layout'
+import { ThemeTypes } from '@/types/theme'
 
 const { wsCache } = useCache()
 
-type LayoutType = 'classic' | 'topLeft' | 'top' | 'cutMenu'
-
-type ThemeTypes = {
-  elColorPrimary?: string
-  leftMenuBorderColor?: string
-  leftMenuBgColor?: string
-  leftMenuBgLightColor?: string
-  leftMenuBgActiveColor?: string
-  leftMenuCollapseBgActiveColor?: string
-  leftMenuTextColor?: string
-  leftMenuTextActiveColor?: string
-  logoTitleTextColor?: string
-  logoBorderColor?: string
-  topHeaderBgColor?: string
-  topHeaderTextColor?: string
-  topHeaderHoverColor?: string
-  topToolBorderColor?: string
-}
 interface AppState {
   breadcrumb: boolean
   breadcrumbIcon: boolean
@@ -43,11 +28,12 @@ interface AppState {
   title: string
   userInfo: string
   isDark: boolean
-  currentSize: ElememtPlusSize
-  sizeMap: ElememtPlusSize[]
+  currentSize: ElementPlusSize
+  sizeMap: ElementPlusSize[]
   mobile: boolean
   footer: boolean
   theme: ThemeTypes
+  fixedMenu: boolean
 }
 
 export const useAppStore = defineStore('app', {
@@ -73,6 +59,7 @@ export const useAppStore = defineStore('app', {
       fixedHeader: true, // 固定toolheader
       footer: true, // 显示页脚
       greyMode: false, // 是否开始灰色模式，用于特殊悼念日
+      fixedMenu: wsCache.get('fixedMenu') || false, // 是否固定菜单
 
       layout: wsCache.get('layout') || 'classic', // layout布局
       isDark: wsCache.get('isDark') || false, // 是否是暗黑模式
@@ -149,6 +136,9 @@ export const useAppStore = defineStore('app', {
     getGreyMode(): boolean {
       return this.greyMode
     },
+    getFixedMenu(): boolean {
+      return this.fixedMenu
+    },
     getPageLoading(): boolean {
       return this.pageLoading
     },
@@ -164,10 +154,10 @@ export const useAppStore = defineStore('app', {
     getIsDark(): boolean {
       return this.isDark
     },
-    getCurrentSize(): ElememtPlusSize {
+    getCurrentSize(): ElementPlusSize {
       return this.currentSize
     },
-    getSizeMap(): ElememtPlusSize[] {
+    getSizeMap(): ElementPlusSize[] {
       return this.sizeMap
     },
     getMobile(): boolean {
@@ -220,6 +210,10 @@ export const useAppStore = defineStore('app', {
     setGreyMode(greyMode: boolean) {
       this.greyMode = greyMode
     },
+    setFixedMenu(fixedMenu: boolean) {
+      wsCache.set('fixedMenu', fixedMenu)
+      this.fixedMenu = fixedMenu
+    },
     setPageLoading(pageLoading: boolean) {
       this.pageLoading = pageLoading
     },
@@ -245,7 +239,7 @@ export const useAppStore = defineStore('app', {
       }
       wsCache.set('isDark', this.isDark)
     },
-    setCurrentSize(currentSize: ElememtPlusSize) {
+    setCurrentSize(currentSize: ElementPlusSize) {
       this.currentSize = currentSize
       wsCache.set('currentSize', this.currentSize)
     },

@@ -5,6 +5,7 @@ import { useAppStore } from '@/store/modules/app'
 import { useI18n } from '@/hooks/web/useI18n'
 import { propTypes } from '@/utils/propTypes'
 import { useDesign } from '@/hooks/web/useDesign'
+import { ElementPlusSize } from '@/types/elementPlus'
 
 const { getPrefixCls } = useDesign()
 
@@ -20,7 +21,7 @@ const appStore = useAppStore()
 
 const sizeMap = computed(() => appStore.sizeMap)
 
-const setCurrentSize = (size: ElememtPlusSize) => {
+const setCurrentSize = (size: ElementPlusSize) => {
   appStore.setCurrentSize(size)
 }
 </script>

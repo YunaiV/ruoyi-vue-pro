@@ -1,3 +1,5 @@
+import { FormSchema } from '@/types/form'
+
 export interface PlaceholderMoel {
   placeholder?: string
   startPlaceholder?: string

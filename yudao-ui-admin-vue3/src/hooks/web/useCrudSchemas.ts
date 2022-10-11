@@ -1,6 +1,9 @@
 import { reactive } from 'vue'
 import { eachTree, treeMap, filter } from '@/utils/tree'
 import { getIntDictOptions } from '@/utils/dict'
+import { FormSchema } from '@/types/form'
+import { TableColumn } from '@/types/table'
+import { DescriptionsSchema } from '@/types/descriptions'
 
 export type CrudSchema = Omit<TableColumn, 'children'> & {
   search?: CrudSearchParams

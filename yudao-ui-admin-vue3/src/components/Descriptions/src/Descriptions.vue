@@ -4,6 +4,7 @@ import { useDesign } from '@/hooks/web/useDesign'
 import { propTypes } from '@/utils/propTypes'
 import { ref, unref, PropType, computed, useAttrs } from 'vue'
 import { useAppStore } from '@/store/modules/app'
+import { DescriptionsSchema } from '@/types/descriptions'
 
 const appStore = useAppStore()
 
