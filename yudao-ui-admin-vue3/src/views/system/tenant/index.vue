@@ -150,7 +150,6 @@ onMounted(async () => {
         <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
       </template>
       <template #packageId="{ row }">
-        <!--        <DictTag :type="DICT_TYPE.SYSTEM_TENANT_PACKAGE_ID" :value="row.packageId" />-->
         <el-tag v-if="row.packageId === 0" type="danger">系统租户</el-tag>
         <el-tag v-else type="success"> {{ getPackageName(row.packageId) }} </el-tag>
       </template>
@@ -161,7 +160,6 @@ onMounted(async () => {
         <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
       </template>
       <template #action="{ row }">
-        <!-- <el-button type="text" v-hasPermi="['system:tenant:update']" @click="handleUpdate(row)">-->
         <el-button
           link
           type="primary"

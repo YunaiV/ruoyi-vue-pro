@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, defineEmits } from 'vue'
 import { getSchemaTableListApi, createCodegenListApi } from '@/api/infra/codegen'
 import {
   ElMessage,
