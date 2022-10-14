@@ -23,6 +23,8 @@
 >
 > 😜 给项目点点 Star 吧，这对我们真的很重要！
 
+![架构图](https://static.iocoder.cn/ruoyi-vue-pro-architecture.png)
+
 * 管理后台的 Vue3 版本采用 [vue-element-plus-admin](https://gitee.com/kailong110120130/vue-element-plus-admin) ，Vue2 版本采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) 
 * 管理后台的移动端采用 [uni-app](https://github.com/dcloudio/uni-app) 方案，一份代码多终端适配，同时支持 APP、小程序、H5！
 * 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson
@@ -42,16 +44,19 @@
 | `yudao-cloud`  | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)         |
 | `Spring-Boot-Labs` | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/zhijiantianya/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/SpringBoot-Labs) |
 
-
 ## 🐼 内置功能
 
-分成多种内置功能：
+系统内置多种多种业务功能，可以用于快速你的业务系统：
+
+![功能分层](https://static.iocoder.cn/ruoyi-vue-pro-biz.png)
+
 * 系统功能
 * 基础设施
 * 工作流程
 * 支付系统
-* 商城系统
+* 会员中心
 * 数据报表
+* 商城系统
 
 > 友情提示：本项目基于 RuoYi-Vue 修改，**重构优化**后端的代码，**美化**前端的界面。
 >
