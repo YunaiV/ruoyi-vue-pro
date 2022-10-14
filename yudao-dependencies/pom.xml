@@ -28,7 +28,7 @@
         <dynamic-datasource.version>3.5.2</dynamic-datasource.version>
         <redisson.version>3.17.7</redisson.version>
         <!-- Config 配置中心相关 -->
-        <apollo.version>1.9.2</apollo.version>
+        <apollo.version>2.0.1</apollo.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.2</lock4j.version>
         <resilience4j.version>1.7.1</resilience4j.version>
