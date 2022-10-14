@@ -42,12 +42,18 @@ const menuProps = {
   label: 'name',
   value: 'id'
 }
-const menuOptions = ref() // 树形结构
+interface Tree {
+  id: number
+  name: string
+  children?: Tree[] | any[]
+}
+const menuOptions = ref<any[]>([]) // 树形结构
 const getTree = async () => {
+  menuOptions.value = []
   const res = await MenuApi.listSimpleMenusApi()
-  const menu = { id: 0, name: '主类目', children: [] as any[] }
+  let menu: Tree = { id: 0, name: '主类目', children: [] }
   menu.children = handleTree(res)
-  menuOptions.value = menu
+  menuOptions.value.push(menu)
 }
 // ========== 查询 ==========
 const queryParams = reactive({
@@ -268,7 +274,7 @@ onMounted(async () => {
               node-key="id"
               v-model="menuForm.parentId"
               :props="menuProps"
-              :data="menuData"
+              :data="menuOptions"
               check-strictly
             />
           </el-form-item>
