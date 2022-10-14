@@ -114,18 +114,19 @@ const setDialogTile = async (type: string) => {
 const handleAdd = () => {
   // 重置表单
   deptId.value = 0
-  unref(formRef)?.getElFormRef()?.resetFields()
   setDialogTile('create')
+  unref(formRef)?.getElFormRef()?.resetFields()
 }
 
 // 修改操作
 const handleUpdate = async (row: UserVO) => {
+  await setDialogTile('update')
   // 设置数据
   const res = await UserApi.getUserApi(row.id)
+  console.info(res)
   deptId.value = res.deptId
   postIds.value = res.postIds
   unref(formRef)?.setValues(res)
-  await setDialogTile('update')
 }
 
 // 提交按钮
