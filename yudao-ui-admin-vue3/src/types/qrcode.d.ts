@@ -1,4 +1,4 @@
-declare interface QrcodeLogo {
+export interface QrcodeLogo {
   src?: string
   logoSize?: number
   bgColor?: string

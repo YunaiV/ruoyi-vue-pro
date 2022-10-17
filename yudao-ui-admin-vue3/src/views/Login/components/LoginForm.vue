@@ -103,20 +103,25 @@ const getCookie = () => {
 // 登录
 const handleLogin = async (params) => {
   loginLoading.value = true
-  await getTenantId()
-  const data = await validForm()
-  if (!data) {
+  try {
+    await getTenantId()
+    const data = await validForm()
+    if (!data) {
+      return
+    }
+    loginData.loginForm.captchaVerification = params.captchaVerification
+    const res = await LoginApi.loginApi(loginData.loginForm)
+    if (!res) {
+      return
+    }
+    setToken(res)
+    if (!redirect.value) {
+      redirect.value = '/'
+    }
+    push({ path: redirect.value || permissionStore.addRouters[0].path })
+  } finally {
     loginLoading.value = false
-    return
   }
-  loginData.loginForm.captchaVerification = params.captchaVerification
-  const res = await LoginApi.loginApi(loginData.loginForm)
-  setToken(res)
-  if (!redirect.value) {
-    redirect.value = '/'
-  }
-  push({ path: redirect.value || permissionStore.addRouters[0].path })
-  loginLoading.value = false
 }
 
 // 社交登录

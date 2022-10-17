@@ -92,43 +92,55 @@ const setDialogTile = (type: string) => {
 }
 // 提交按钮
 const submitTypeForm = async () => {
-  actionLoading.value = true
-  // 提交请求
-  try {
-    const data = unref(typeFormRef)?.formModel as DictTypeVO
-    if (actionType.value === 'typeCreate') {
-      await DictTypeApi.createDictTypeApi(data)
-      ElMessage.success(t('common.createSuccess'))
-    } else if (actionType.value === 'typeUpdate') {
-      await DictTypeApi.updateDictTypeApi(data)
-      ElMessage.success(t('common.updateSuccess'))
+  const elForm = unref(typeFormRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
+    if (valid) {
+      actionLoading.value = true
+      // 提交请求
+      try {
+        const data = unref(typeFormRef)?.formModel as DictTypeVO
+        if (actionType.value === 'typeCreate') {
+          await DictTypeApi.createDictTypeApi(data)
+          ElMessage.success(t('common.createSuccess'))
+        } else if (actionType.value === 'typeUpdate') {
+          await DictTypeApi.updateDictTypeApi(data)
+          ElMessage.success(t('common.updateSuccess'))
+        }
+        // 操作成功，重新加载列表
+        await getTypeList()
+        dialogVisible.value = false
+      } finally {
+        actionLoading.value = false
+      }
     }
-    // 操作成功，重新加载列表
-    await getTypeList()
-    dialogVisible.value = false
-  } finally {
-    actionLoading.value = false
-  }
+  })
 }
 const submitDataForm = async () => {
-  actionLoading.value = true
-  // 提交请求
-  try {
-    const data = unref(dataFormRef)?.formModel as DictDataVO
-    if (actionType.value === 'dataCreate') {
-      data.dictType = parentType.value
-      await DictDataApi.createDictDataApi(data)
-      ElMessage.success(t('common.createSuccess'))
-    } else if (actionType.value === 'dataUpdate') {
-      await DictDataApi.updateDictDataApi(data)
-      ElMessage.success(t('common.updateSuccess'))
+  const elForm = unref(dataFormRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
+    if (valid) {
+      actionLoading.value = true
+      // 提交请求
+      try {
+        const data = unref(dataFormRef)?.formModel as DictDataVO
+        if (actionType.value === 'dataCreate') {
+          data.dictType = parentType.value
+          await DictDataApi.createDictDataApi(data)
+          ElMessage.success(t('common.createSuccess'))
+        } else if (actionType.value === 'dataUpdate') {
+          await DictDataApi.updateDictDataApi(data)
+          ElMessage.success(t('common.updateSuccess'))
+        }
+        await getDataList()
+        // 操作成功，重新加载列表
+        dialogVisible.value = false
+      } finally {
+        actionLoading.value = false
+      }
     }
-    await getDataList()
-    // 操作成功，重新加载列表
-    dialogVisible.value = false
-  } finally {
-    actionLoading.value = false
-  }
+  })
 }
 // 初始化查询
 onMounted(async () => {

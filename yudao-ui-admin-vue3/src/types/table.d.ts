@@ -1,16 +1,16 @@
-declare type TableColumn = {
+export type TableColumn = {
   field: string
   label?: string
   children?: TableColumn[]
 } & Recordable
 
-declare type TableSlotDefault = {
+export type TableSlotDefault = {
   row: Recordable
   column: TableColumn
   $index: number
 } & Recordable
 
-declare interface Pagination {
+export interface Pagination {
   small?: boolean
   background?: boolean
   pageSize?: number
@@ -29,7 +29,7 @@ declare interface Pagination {
   hideOnSinglePage?: boolean
 }
 
-declare interface TableSetPropsType {
+export interface TableSetPropsType {
   field: string
   path: string
   value: any

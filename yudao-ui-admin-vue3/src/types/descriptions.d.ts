@@ -1,4 +1,4 @@
-declare interface DescriptionsSchema {
+export interface DescriptionsSchema {
   span?: number // 占多少分
   field: string // 字段名
   label?: string // label名

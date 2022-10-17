@@ -71,26 +71,32 @@ const handleUpdate = async (row: any) => {
 
 // 提交按钮
 const submitForm = async () => {
-  actionLoading.value = true
-  // 提交请求 unix()
-  try {
-    const data = unref(formRef)?.formModel as TenantVO
-    data.packageId = tenantPackageId.value
-    if (actionType.value === 'create') {
-      data.expireTime = dayjs(data.expireTime).valueOf().toString()
-      await TenantApi.createTenantApi(data)
-      ElMessage.success(t('common.createSuccess'))
-    } else {
-      data.expireTime = dayjs(data.expireTime).valueOf().toString()
-      await TenantApi.updateTenantApi(data)
-      ElMessage.success(t('common.updateSuccess'))
+  const elForm = unref(formRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
+    if (valid) {
+      actionLoading.value = true
+      // 提交请求
+      try {
+        const data = unref(formRef)?.formModel as TenantVO
+        data.packageId = tenantPackageId.value
+        if (actionType.value === 'create') {
+          data.expireTime = dayjs(data.expireTime).valueOf().toString()
+          await TenantApi.createTenantApi(data)
+          ElMessage.success(t('common.createSuccess'))
+        } else {
+          data.expireTime = dayjs(data.expireTime).valueOf().toString()
+          await TenantApi.updateTenantApi(data)
+          ElMessage.success(t('common.updateSuccess'))
+        }
+        // 操作成功，重新加载列表
+        dialogVisible.value = false
+        await getList()
+      } finally {
+        actionLoading.value = false
+      }
     }
-    // 操作成功，重新加载列表
-    dialogVisible.value = false
-    await getList()
-  } finally {
-    actionLoading.value = false
-  }
+  })
 }
 
 // ========== 详情相关 ==========
@@ -150,7 +156,6 @@ onMounted(async () => {
         <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
       </template>
       <template #packageId="{ row }">
-        <!--        <DictTag :type="DICT_TYPE.SYSTEM_TENANT_PACKAGE_ID" :value="row.packageId" />-->
         <el-tag v-if="row.packageId === 0" type="danger">系统租户</el-tag>
         <el-tag v-else type="success"> {{ getPackageName(row.packageId) }} </el-tag>
       </template>
@@ -161,7 +166,6 @@ onMounted(async () => {
         <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
       </template>
       <template #action="{ row }">
-        <!-- <el-button type="text" v-hasPermi="['system:tenant:update']" @click="handleUpdate(row)">-->
         <el-button
           link
           type="primary"
@@ -199,7 +203,7 @@ onMounted(async () => {
       ref="formRef"
     >
       <template #packageId>
-        <el-select v-model="tenantPackageId" placeholder="Select">
+        <el-select v-model="tenantPackageId">
           <el-option
             v-for="item in tenantPackageOptions"
             :key="item.id"

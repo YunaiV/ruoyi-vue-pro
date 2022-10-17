@@ -24,7 +24,7 @@ import {
   ElRadioButton,
   ElMessage
 } from 'element-plus'
-import { ref, computed, onMounted, reactive, watch, PropType } from 'vue'
+import { ref, computed, onMounted, reactive, watch, PropType, defineEmits } from 'vue'
 interface shortcutsType {
   text: string
   value: string
