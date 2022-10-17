@@ -39,8 +39,7 @@
       <el-tab-pane label="价格库存" name="rates" class="rates">
         <el-form ref="rates" :model="ratesForm" :rules="rules">
           <el-form-item label="启用多规格">
-            <!-- TODO @luowenfeng: 1) activeSwitch 可以考虑改成; specSwitch, 更清晰一点, activeSwitch 太通用了; changeRadio 改成 changeSpecSwitch  -->
-            <el-switch v-model="activeSwitch" @change="changeRadio"></el-switch>
+            <el-switch v-model="specSwitch" @change="changeSpecSwitch"></el-switch>
           </el-form-item>
 
           <!-- 动态添加规格属性 -->
@@ -67,7 +66,7 @@
           <!-- 规格明细 -->
           <el-form-item label="规格明细">
             <el-table :data="ratesForm.rates" border style="width: 100%" ref="ratesTable">
-              <template v-if="this.activeSwitch">
+              <template v-if="this.specSwitch">
                 <el-table-column :key="index" v-for="(item, index) in dynamicSpec.filter(v => v.specName !== undefined)"
                                  :label="item.specName">
                   <template slot-scope="scope">
@@ -81,7 +80,7 @@
                                style="width: 100px; height: 50px"/>
                 </template>
               </el-table-column>
-              <template v-if="this.activeSwitch">
+              <template v-if="this.specSwitch">
                 <el-table-column label="sku名称" :render-header="addRedStar" key="91">
                   <template slot-scope="scope">
                     <el-form-item :prop="'rates.'+ scope.$index + '.name'"
@@ -148,13 +147,13 @@
                   <el-input v-model="scope.row.barCode"></el-input>
                 </template>
               </el-table-column>
-              <template v-if="this.activeSwitch">
+              <template v-if="this.specSwitch">
                 <el-table-column fixed="right" label="操作" width="50" key="100">
                   <template slot-scope="scope">
                     <el-button @click="scope.row.status = 1" type="text" size="small"
-                               v-show="scope.row.status == undefined || scope.row.status == 0 ">禁用
+                               v-show="scope.row.status === undefined || scope.row.status === 0 ">禁用
                     </el-button>
-                    <el-button @click="scope.row.status = 0" type="text" size="small" v-show="scope.row.status == 1">
+                    <el-button @click="scope.row.status = 0" type="text" size="small" v-show="scope.row.status === 1">
                       启用
                     </el-button>
                   </template>
@@ -220,7 +219,7 @@ export default {
   },
   data() {
     return {
-      activeSwitch: false,
+      specSwitch: false,
       activeName: "base",
       propName: {
         checkStrictly: true,
@@ -287,7 +286,7 @@ export default {
   methods: {
     removeSpec(index) {
       this.dynamicSpec.splice(index, 1);
-      this.changeRadio()
+      this.changeSpecSwitch()
     },
     // 必选标识
     addRedStar(h, {column}) {
@@ -296,10 +295,10 @@ export default {
         h('span', ' ' + column.label)
       ];
     },
-    changeRadio() {
-      this.activeSwitch ? this.ratesForm.spec = 2 : this.ratesForm.spec = 1;
+    changeSpecSwitch() {
+      this.specSwitch ? this.ratesForm.spec = 2 : this.ratesForm.spec = 1;
       this.$refs.ratesTable.doLayout();
-      if (this.ratesForm.spec == 1) {
+      if (this.ratesForm.spec === 1) {
         this.ratesForm.rates = [{}]
       } else {
         this.ratesForm.rates = []
@@ -380,7 +379,7 @@ export default {
         })
 
         // 动态规格调整字段
-        if (this.activeSwitch) {
+        if (this.specSwitch) {
           rates.forEach(r => {
             let properties = []
             Array.of(r.spec).forEach(s => {
@@ -391,7 +390,7 @@ export default {
                 obj = Array.of(s);
               }
               obj.forEach((v, i) => {
-                let specValue = this.dynamicSpec[i].specValue.find(o => o.name == v);
+                let specValue = this.dynamicSpec[i].specValue.find(o => o.name === v);
                 let propertie = {};
                 propertie.propertyId = this.dynamicSpec[i].specId;
                 propertie.valueId = specValue.id;
@@ -414,17 +413,20 @@ export default {
         }
         form.skus = rates;
         form.specType = this.ratesForm.spec;
-        form.categoryId = form.categoryIds[this.baseForm.categoryIds.length - 1];
+
+        let category = form.categoryIds instanceof Array ? form.categoryIds: Array.of(form.categoryIds)
+        console.log(category)
+        form.categoryId = category[category.length - 1];
 
         if (form.id == null) {
-          createSpu(form).then((response) => {
+          createSpu(form).then(() => {
             this.$modal.msgSuccess("新增成功");
           })
           .then(()=>{
             this.cancel();
           })
         } else {
-          updateSpu(form).then((response) => {
+          updateSpu(form).then(() => {
             this.$modal.msgSuccess("修改成功");
           })
           .then(()=>{
@@ -443,8 +445,8 @@ export default {
     },
     // 添加规格项目
     changeSpec(val) {
-      let obj = this.propertyPageList.find(o => o.id == val);
-      let spec = this.dynamicSpec.find(o => o.specId == val)
+      let obj = this.propertyPageList.find(o => o.id === val);
+      let spec = this.dynamicSpec.find(o => o.specId === val)
       spec.specId = obj.id;
       spec.specName = obj.name;
       spec.specValue = obj.values;
@@ -471,8 +473,8 @@ export default {
           r.price = this.divide(r.price, 100)
           r.costPrice = this.divide(r.costPrice, 100)
         })
-        if (this.ratesForm.spec == 2) {
-          this.activeSwitch = true;
+        if (this.ratesForm.spec === 2) {
+          this.specSwitch = true;
           data.productPropertyViews.forEach(p => {
             let obj = {};
             obj.specId = p.propertyId;
@@ -483,7 +485,7 @@ export default {
           data.skus.forEach(s => {
             s.spec = [];
             s.properties.forEach(sp => {
-              let spec = data.productPropertyViews.find(o => o.propertyId == sp.propertyId).propertyValues.find(v => v.id == sp.valueId).name;
+              let spec = data.productPropertyViews.find(o => o.propertyId === sp.propertyId).propertyValues.find(v => v.id === sp.valueId).name;
               s.spec.push(spec)
             })
           })

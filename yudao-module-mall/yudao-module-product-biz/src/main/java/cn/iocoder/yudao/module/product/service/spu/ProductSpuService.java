@@ -72,7 +72,7 @@ public interface ProductSpuService {
     PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO);
 
     /**
-     * 获得商品 SPU 分页 // TODO @luowenfeng: 中文和英文之间, 要有一个空格; 这样, 阅读起来会更清晰; 我已经都改啦
+     * 获得商品 SPU 分页
      *
      * @param pageReqVO 分页查询
      * @return 商品spu分页

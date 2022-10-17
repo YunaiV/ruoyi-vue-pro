@@ -39,14 +39,6 @@ public interface ProductPropertyService {
     void deleteProperty(Long id);
 
     /**
-     * 获得规格名称
-     *
-     * @param id 编号
-     * @return 规格名称
-     */
-    ProductPropertyDO getProperty(Long id);
-
-    /**
      * 获得规格名称列表
      * @param listReqVO 集合查询
      * @return 规格名称集合
@@ -61,8 +53,12 @@ public interface ProductPropertyService {
      */
     PageResult<ProductPropertyRespVO> getPropertyPage(ProductPropertyPageReqVO pageReqVO);
 
-    // TODO luowenfeng: getProperty 就可以拉, 不用到 Resp
-    ProductPropertyRespVO getPropertyResp(Long id);
+    /**
+     *
+     * @param id 编号
+     * @return 规格名称
+     */
+    ProductPropertyRespVO getProperty(Long id);
 
     /**
      * 根据规格属性编号的集合，获得对应的规格 + 规格值的集合

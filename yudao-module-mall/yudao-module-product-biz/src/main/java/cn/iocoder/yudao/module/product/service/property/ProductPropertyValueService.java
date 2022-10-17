@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * <p>
- *
+ * 规格值 Service 接口
  * </p>
  *
  * @author LuoWenFeng

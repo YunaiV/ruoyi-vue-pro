@@ -15,9 +15,12 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_VALUE_EXISTS;
+
 /**
- * <p> TODO @luowenfeng: 类注释
- *
+ * <p>
+ *  规格值 Service 实现类
  * </p>
  *
  * @author LuoWenFeng
@@ -31,7 +34,9 @@ public class ProductPropertyValueServiceImpl implements ProductPropertyValueServ
 
     @Override
     public Long createPropertyValue(ProductPropertyValueCreateReqVO createReqVO) {
-        // TODO @luowenfeng: 需要校验下在这个 propertyId, 新增和更新, name 都要唯一
+        if (productPropertyValueMapper.selectByName(createReqVO.getPropertyId(), createReqVO.getName()) != null) {
+            throw exception(PROPERTY_VALUE_EXISTS);
+        }
         ProductPropertyValueDO convert = ProductPropertyValueConvert.INSTANCE.convert(createReqVO);
         productPropertyValueMapper.insert(convert);
         return convert.getId();
@@ -39,6 +44,9 @@ public class ProductPropertyValueServiceImpl implements ProductPropertyValueServ
 
     @Override
     public void updatePropertyValue(ProductPropertyValueUpdateReqVO updateReqVO) {
+        if (productPropertyValueMapper.selectByName(updateReqVO.getPropertyId(), updateReqVO.getName()) != null) {
+            throw exception(PROPERTY_VALUE_EXISTS);
+        }
         ProductPropertyValueDO convert = ProductPropertyValueConvert.INSTANCE.convert(updateReqVO);
         productPropertyValueMapper.updateById(convert);
     }

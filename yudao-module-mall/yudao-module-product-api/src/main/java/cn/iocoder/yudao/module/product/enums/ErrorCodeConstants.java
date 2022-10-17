@@ -24,9 +24,11 @@ public interface ErrorCodeConstants {
 
     // ========== 商品规格名称 1008003000 ==========
     ErrorCode PROPERTY_NOT_EXISTS = new ErrorCode(1008003000, "规格名称不存在");
+    ErrorCode PROPERTY_EXISTS = new ErrorCode(1008003001, "规格名称已存在");
 
     // ========== 规格值 1008004000 ==========
     ErrorCode PROPERTY_VALUE_NOT_EXISTS = new ErrorCode(1008004000, "规格值不存在");
+    ErrorCode PROPERTY_VALUE_EXISTS = new ErrorCode(1008004001, "规格值已存在");
 
     // ========== 商品 SPU 1008005000 ==========
     ErrorCode SPU_NOT_EXISTS = new ErrorCode(1008005000, "商品 SPU 不存在");

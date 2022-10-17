@@ -93,18 +93,15 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     @Override
     public void validateCategoryLevel(Long id) {
         Long parentId = id;
-        for (int i = 0; i < 3; i++) { // TODO @luowenfeng: 建议还是先获得 level; 然后判断 level 是不是满足; 这样逻辑会更清晰一些;
-            if (Objects.equals(parentId, ProductCategoryDO.PARENT_ID_NULL)) {
-                throw exception(CATEGORY_LEVEL_ERROR);
-            }
+        int i = 2;
+        for (; i >= 0; --i) {
             ProductCategoryDO category = productCategoryMapper.selectById(parentId);
-            if (category == null) {
-                // TODO @luowenfeng: 应该抛出 CATEGORY_LEVEL_ERROR
-                throw exception(CATEGORY_NOT_EXISTS);
-            }
             parentId = category.getParentId();
+            if(Objects.equals(parentId, ProductCategoryDO.PARENT_ID_NULL)){
+                break;
+            }
         }
-        if (!Objects.equals(parentId, ProductCategoryDO.PARENT_ID_NULL)) {
+        if (!Objects.equals(parentId, ProductCategoryDO.PARENT_ID_NULL) || i != 0) {
             throw exception(CATEGORY_LEVEL_ERROR);
         }
     }

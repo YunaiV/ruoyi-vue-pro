@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
@@ -134,7 +135,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
             List<ProductSpuDetailRespVO.Sku> skuReqs = ProductSkuConvert.INSTANCE.convertList03(productSkuService.getSkusBySpuId(id));
             respVO.setSkus(skuReqs);
             // 组合 sku 规格属性
-            if(spu.getSpecType().equals(ProductSpuSpecTypeEnum.DISABLE.getType())) {
+            if (spu.getSpecType().equals(ProductSpuSpecTypeEnum.DISABLE.getType())) {
                 List<ProductSkuRespVO.Property> properties = new ArrayList<>();
                 for (ProductSpuDetailRespVO.Sku productSkuRespVO : skuReqs) {
                     properties.addAll(productSkuRespVO.getProperties());
@@ -162,18 +163,19 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                 respVO.setProductPropertyViews(productPropertyViews);
             }
             // 组合分类
-            if (null != respVO.getCategoryId()) {
-                LinkedList<Long> categoryArray = new LinkedList<>();
-                Long parentId = respVO.getCategoryId();
-                categoryArray.addFirst(parentId);
-                while (parentId != 0) {
-                    parentId = categoryService.getCategory(parentId).getParentId();
-                    if (parentId > 0) {
-                        categoryArray.addFirst(parentId);
-                    }
-                }
-                respVO.setCategoryIds(categoryArray);
-            }
+//            if (null != respVO.getCategoryId()) {
+//                LinkedList<Long> categoryArray = new LinkedList<>();
+//                Long parentId = respVO.getCategoryId();
+//                categoryArray.addFirst(parentId);
+//                while (parentId != 0) {
+//                    parentId = categoryService.getCategory(parentId).getParentId();
+//                    if (parentId > 0) {
+//                        categoryArray.addFirst(parentId);
+//                    }
+//                }
+//
+//            }
+            respVO.setCategoryIds(respVO.getCategoryId());
         }
         return respVO;
     }
@@ -190,12 +192,10 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
-        List<Long> remindSpuIds= null;
-        // todo @yunai 预警类型的判断应该可以优化，看下怎么处理
-        // TODO @luowenfeng: 先这么简单处理; 性能应该影响不大的;
-        if(pageReqVO.getTabStatus() != null && pageReqVO.getTabStatus() == 2){
-            remindSpuIds= productSkuService.getRemindSpuIds();
-            if(remindSpuIds.isEmpty()){
+        List<Long> remindSpuIds = null;
+        if (pageReqVO.getTabStatus() != null && pageReqVO.getTabStatus() == 2) {
+            remindSpuIds = productSkuService.getRemindSpuIds().stream().map(ProductSkuDO::getSpuId).distinct().collect(Collectors.toList());
+            if (remindSpuIds.isEmpty()) {
                 remindSpuIds.add(null);
             }
         }

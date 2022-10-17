@@ -56,7 +56,7 @@ public class ProductPropertyController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<ProductPropertyRespVO> getProperty(@RequestParam("id") Long id) {
-        return success(productPropertyService.getPropertyResp(id));
+        return success(productPropertyService.getProperty(id));
     }
 
     @GetMapping("/list")

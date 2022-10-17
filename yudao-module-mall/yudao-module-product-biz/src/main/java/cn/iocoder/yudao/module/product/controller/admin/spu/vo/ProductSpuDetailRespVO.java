@@ -55,9 +55,8 @@ public class ProductSpuDetailRespVO extends ProductSpuBaseVO {
 
     }
 
-    // TODO @luowenfeng: 只返回 categoryId 可以么? 如果是为了前端修改时使用, 会拿到下拉列表, 自动选中合适的. 可以微信讨论下, 我也不完全确定哈;
     @ApiModelProperty(value = "分类 id 数组，一直递归到一级父节点", example = "[1,2,4]")
-    private List<Long> categoryIds;
+    private Long categoryIds;
 
     @ApiModelProperty(value = "规格属性修改和详情展示组合", example = "[{\"propertyId\":2,\"name\":\"内存\",\"propertyValues\":[{\"v1\":11,\"v2\":\"64G\"},{\"v1\":10,\"v2\":\"32G\"}]},{\"propertyId\":3,\"name\":\"尺寸\",\"propertyValues\":[{\"v1\":16,\"v2\":\"6.1\"},{\"v1\":15,\"v2\":\"5.7\"}]}]")
     private List<ProductPropertyViewRespVO> productPropertyViews;

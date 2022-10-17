@@ -17,19 +17,20 @@ import java.util.List;
 @Mapper
 public interface ProductPropertyValueMapper extends BaseMapperX<ProductPropertyValueDO> {
 
-    // TODO @luowenfeng：方法名，selectListByXXX。mapper 的操作都是 crud
-    default List<ProductPropertyValueDO> getPropertyValueListByPropertyId(List<Long> propertyIds) {
-        // TODO @franky：调用父类的 selectList
+    default List<ProductPropertyValueDO> selectListByPropertyValueListByPropertyId(List<Long> propertyIds) {
         return selectList(new LambdaQueryWrapperX<ProductPropertyValueDO>()
                 .inIfPresent(ProductPropertyValueDO::getPropertyId, propertyIds));
     }
 
+    default ProductPropertyValueDO selectByName(Long propertyId, String name) {
+        return selectOne(new LambdaQueryWrapperX<ProductPropertyValueDO>()
+                .eq(ProductPropertyValueDO::getPropertyId, propertyId)
+                .eq(ProductPropertyValueDO::getName, name));
+    }
+
     default void deletePropertyValueByPropertyId(Long propertyId) {
-        // TODO @luowenfeng：delete(new ) 即可
-        LambdaQueryWrapperX<ProductPropertyValueDO> queryWrapperX = new LambdaQueryWrapperX<>();
-        queryWrapperX.eq(ProductPropertyValueDO::getPropertyId, propertyId)
-                .eq(ProductPropertyValueDO::getDeleted, false);
-        delete(queryWrapperX);
+        delete(new LambdaQueryWrapperX<ProductPropertyValueDO>().eq(ProductPropertyValueDO::getPropertyId, propertyId)
+                .eq(ProductPropertyValueDO::getDeleted, false));
     }
 
     default PageResult<ProductPropertyValueDO> selectPage(ProductPropertyValuePageReqVO reqVO) {

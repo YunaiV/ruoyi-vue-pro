@@ -124,12 +124,12 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     public List<ProductSkuDO> getSkusBySpuId(Long spuId) {
-        return productSkuMapper.selectListBySpuIds(Collections.singletonList(spuId));
+        return productSkuMapper.selectList(ProductSkuDO::getSpuId, spuId);
     }
 
     @Override
     public List<ProductSkuDO> getSkusBySpuIds(List<Long> spuIds) {
-        return productSkuMapper.selectListBySpuIds(spuIds);
+        return productSkuMapper.selectList(ProductSkuDO::getSpuId, spuIds);
     }
 
     @Override
@@ -138,10 +138,8 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public List<Long> getRemindSpuIds() {
-        // TODO @luowenfeng: mybatis plus 不能出现在 Service 哈; 把这个查询, 下沉一个方法到 mapper 里
-        List<ProductSkuDO> productSkuDOS = productSkuMapper.selectList(new QueryWrapper<ProductSkuDO>().apply("stock <= warn_stock"));
-        return productSkuDOS.stream().map(ProductSkuDO::getSpuId).distinct().collect(Collectors.toList());
+    public List<ProductSkuDO> getRemindSpuIds() {
+        return productSkuMapper.selectRemindSpuIds();
     }
 
     @Override
@@ -160,12 +158,6 @@ public class ProductSkuServiceImpl implements ProductSkuService {
                     return String.join("-", collect, String.valueOf(v.getId()));
                 })
                 .collect(Collectors.toMap(v -> v.split("-")[0], v -> Long.valueOf(v.split("-")[1])));
-//        Map<String, Long> existsSkuMap2 = CollectionUtils.convertMap(existsSkus, productSkuDO -> {
-//            if (CollUtil.isEmpty(productSkuDO.getProperties())) {
-//                return "";
-//            }
-//            return StrUtil.join("-", convertList(productSkuDO.getProperties(), ProductSkuDO.Property::getValueId));
-//        }, ProductSkuDO::getId);
 
         // 拆分三个集合，新插入的、需要更新的、需要删除的
         List<ProductSkuDO> insertSkus = new ArrayList<>();
