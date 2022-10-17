@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.product.api.sku;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.SkuDecrementStockBatchReqDTO;
-import cn.iocoder.yudao.module.product.api.sku.dto.SkuInfoRespDTO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
@@ -28,13 +28,19 @@ public class ProductSkuApiImpl implements ProductSkuApi {
     private ProductSkuMapper productSkuMapper;
 
     @Override
-    public List<SkuInfoRespDTO> getSkusByIds(Collection<Long> skuIds) {
+    public ProductSkuRespDTO getSku(Long id) {
+        // TODO TODO LeeYan9: 需要实现
+        return null;
+    }
+
+    @Override
+    public List<ProductSkuRespDTO> getSkuList(Collection<Long> ids) {
         // TODO TODO LeeYan9: AllEmpty?
-        if (CollectionUtils.isAnyEmpty(skuIds)) {
+        if (CollectionUtils.isAnyEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<ProductSkuDO> productSkuDOList = productSkuMapper.selectBatchIds(skuIds);
-        return ProductSkuConvert.INSTANCE.convertList03(productSkuDOList);
+        List<ProductSkuDO> productSkuDOList = productSkuMapper.selectBatchIds(ids);
+        return ProductSkuConvert.INSTANCE.convertList04(productSkuDOList);
     }
 
     @Override
