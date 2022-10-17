@@ -111,6 +111,10 @@ const handleLogin = async (params) => {
   }
   loginData.loginForm.captchaVerification = params.captchaVerification
   const res = await LoginApi.loginApi(loginData.loginForm)
+  if (!res) {
+    loginLoading.value = false
+    return
+  }
   setToken(res)
   if (!redirect.value) {
     redirect.value = '/'

@@ -51,23 +51,29 @@ const handleUpdate = async (row: ModelVO) => {
 
 // 提交按钮
 const submitForm = async () => {
-  actionLoading.value = true
-  // 提交请求
-  try {
-    const data = unref(formRef)?.formModel as ModelVO
-    if (actionType.value === 'create') {
-      await ModelApi.createModelApi(data)
-      message.success(t('common.createSuccess'))
-    } else {
-      await ModelApi.updateModelApi(data)
-      message.success(t('common.updateSuccess'))
+  const elForm = unref(formRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
+    if (valid) {
+      actionLoading.value = true
+      // 提交请求
+      try {
+        const data = unref(formRef)?.formModel as ModelVO
+        if (actionType.value === 'create') {
+          await ModelApi.createModelApi(data)
+          message.success(t('common.createSuccess'))
+        } else {
+          await ModelApi.updateModelApi(data)
+          message.success(t('common.updateSuccess'))
+        }
+        // 操作成功，重新加载列表
+        dialogVisible.value = false
+        await getList()
+      } finally {
+        actionLoading.value = false
+      }
     }
-    // 操作成功，重新加载列表
-    dialogVisible.value = false
-    await getList()
-  } finally {
-    actionLoading.value = false
-  }
+  })
 }
 
 /** 流程表单的详情按钮操作 */

@@ -128,12 +128,18 @@ service.interceptors.response.use(
           const refreshTokenRes = await refreshToken()
           // 2.1 刷新成功，则回放队列的请求 + 当前请求
           setToken(refreshTokenRes.data)
-          requestList.forEach((cb: any) => cb())
+          ;(config as Recordable).headers.Authorization = 'Bearer ' + getAccessToken()
+          requestList.forEach((cb: any) => {
+            cb()
+          })
+          requestList = []
           return service(response.config)
         } catch (e) {
           // 为什么需要 catch 异常呢？刷新失败时，请求因为 Promise.reject 触发异常。
           // 2.2 刷新失败，只回放队列的请求
-          requestList.forEach((cb: any) => cb())
+          requestList.forEach((cb: any) => {
+            cb()
+          })
           // 提示是否要登出。即不回放当前请求！不然会形成递归
           return handleAuthorized()
         } finally {
@@ -194,10 +200,7 @@ service.interceptors.response.use(
 )
 
 const refreshToken = async () => {
-  return await service({
-    url: '/system/auth/refresh-token?refreshToken=' + getRefreshToken(),
-    method: 'post'
-  })
+  return await axios.post(base_url + '/system/auth/refresh-token?refreshToken=' + getRefreshToken())
 }
 const handleAuthorized = () => {
   const { t } = useI18n()

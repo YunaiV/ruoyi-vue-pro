@@ -68,23 +68,29 @@ const handleUpdate = async (row: RoleVO) => {
 
 // 提交按钮
 const submitForm = async () => {
-  loading.value = true
-  // 提交请求
-  try {
-    const data = unref(formRef)?.formModel as RoleVO
-    if (actionType.value === 'create') {
-      await RoleApi.createRoleApi(data)
-      ElMessage.success(t('common.createSuccess'))
-    } else {
-      await RoleApi.updateRoleApi(data)
-      ElMessage.success(t('common.updateSuccess'))
+  const elForm = unref(formRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
+    if (valid) {
+      loading.value = true
+      // 提交请求
+      try {
+        const data = unref(formRef)?.formModel as RoleVO
+        if (actionType.value === 'create') {
+          await RoleApi.createRoleApi(data)
+          ElMessage.success(t('common.createSuccess'))
+        } else {
+          await RoleApi.updateRoleApi(data)
+          ElMessage.success(t('common.updateSuccess'))
+        }
+        // 操作成功，重新加载列表
+        dialogVisible.value = false
+        await getList()
+      } finally {
+        loading.value = false
+      }
     }
-    // 操作成功，重新加载列表
-    dialogVisible.value = false
-    await getList()
-  } finally {
-    loading.value = false
-  }
+  })
 }
 
 // ========== 详情相关 ==========

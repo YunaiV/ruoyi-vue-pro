@@ -127,7 +127,7 @@ const handleDelete = async (row: MenuVO) => {
   await getList()
 }
 // 保存操作
-function isExternal(path: string) {
+const isExternal = (path: string) => {
   return /^(https?:|mailto:|tel:)/.test(path)
 }
 const submitForm = async () => {
