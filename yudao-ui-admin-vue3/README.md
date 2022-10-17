@@ -27,12 +27,12 @@
 
 | 框架 | 说明 | 版本     |
 | --- | --- |--------|
-| [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.40 |
-| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.1.7 |
-| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.17 |
+| [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.41 |
+| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.1.8 |
+| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.18 |
 | [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.8.4 |
 | [pinia](https://pinia.vuejs.org/) | Vue 存储库 替代 vuex5 | 2.0.23 |
-| [vueuse](https://vueuse.org//) | 常用工具集 | 9.3.0 |
+| [vueuse](https://vueuse.org//) | 常用工具集 | 9.3.1 |
 | [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化 | 9.2.2 |
 | [vue-router](https://router.vuejs.org/) | vue 路由 | 4.1.5 |
 | [windicss](https://cn.windicss.org/) | 下一代工具优先的 CSS 框架 | 3.5.6 |
