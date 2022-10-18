@@ -1,6 +1,6 @@
 {
   "name": "ruoyi-vue-pro-vue3",
-  "version": "1.6.4.1811",
+  "version": "1.6.4.1821",
   "description": "基于vue3、element-plus、typesScript、vite3",
   "author": "xingyu",
   "private": false,
@@ -22,7 +22,8 @@
     "lint:style": "stylelint --fix \"**/*.{vue,less,postcss,css,scss}\" --cache --cache-location node_modules/.cache/stylelint/",
     "lint:lint-staged": "lint-staged -c ",
     "lint:pretty": "pretty-quick --staged",
-    "p": "plop"
+    "p": "plop",
+    "analysis": "windicss-analysis"
   },
   "dependencies": {
     "@iconify/iconify": "^3.0.0",
