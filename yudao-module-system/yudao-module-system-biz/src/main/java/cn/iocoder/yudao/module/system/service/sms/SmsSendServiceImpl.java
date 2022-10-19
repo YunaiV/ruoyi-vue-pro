@@ -180,7 +180,7 @@ public class SmsSendServiceImpl implements SmsSendService {
         }
         // 更新短信日志的接收结果. 因为量一般不大，所以先使用 for 循环更新
         receiveResults.forEach(result -> smsLogService.updateSmsReceiveResult(result.getLogId(),
-                result.getSuccess(), result.getReceiveTime(), result.getErrorCode(), result.getErrorCode()));
+                result.getSuccess(), result.getReceiveTime(), result.getErrorCode(), result.getErrorMsg()));
     }
 
 }
