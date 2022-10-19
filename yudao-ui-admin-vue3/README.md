@@ -2,7 +2,7 @@
 <p align="center">
     <img src="https://img.shields.io/badge/-Vue3.2-34495e?logo=vue.j" />
     <img src="https://img.shields.io/badge/-Vite3-646cff?logo=vite&logoColor=white" />
-    <img src="https://img.shields.io/badge/-TypeScript4.7-blue?logo=typescript&logoColor=white" />
+    <img src="https://img.shields.io/badge/-TypeScript4.8-blue?logo=typescript&logoColor=white" />
     <img src="https://img.shields.io/badge/-Pinia2-yellow?logo=picpay&logoColor=white" />
     <img src="https://img.shields.io/badge/-ESLint-4b32c3?logo=eslint&logoColor=white" />
     <img src="https://img.shields.io/badge/-pnpm7-F69220?logo=pnpm&logoColor=white" />

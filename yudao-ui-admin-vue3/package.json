@@ -22,8 +22,7 @@
     "lint:style": "stylelint --fix \"**/*.{vue,less,postcss,css,scss}\" --cache --cache-location node_modules/.cache/stylelint/",
     "lint:lint-staged": "lint-staged -c ",
     "lint:pretty": "pretty-quick --staged",
-    "p": "plop",
-    "analysis": "windicss-analysis"
+    "p": "plop"
   },
   "dependencies": {
     "@iconify/iconify": "^3.0.0",
@@ -102,8 +101,7 @@
     "vite-plugin-svg-icons": "^2.0.1",
     "vite-plugin-windicss": "^1.8.8",
     "vue-tsc": "^1.0.8",
-    "windicss": "^3.5.6",
-    "windicss-analysis": "^0.3.5"
+    "windicss": "^3.5.6"
   },
   "engines": {
     "node": ">= 14.18.0"
