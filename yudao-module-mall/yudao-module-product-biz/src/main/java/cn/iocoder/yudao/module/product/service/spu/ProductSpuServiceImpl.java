@@ -28,7 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -44,7 +47,7 @@ import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_E
 public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Resource
-    private ProductSpuMapper ProductSpuMapper;
+    private ProductSpuMapper productSpuMapper;
 
     @Resource
     private ProductCategoryService categoryService;
@@ -77,7 +80,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         spu.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
         spu.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
         spu.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
-        ProductSpuMapper.insert(spu);
+        productSpuMapper.insert(spu);
         // 插入 SKU
         productSkuService.createSkus(spu.getId(), skuCreateReqList);
         // 返回
@@ -95,7 +98,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         brandService.validateProductBrand(updateReqVO.getBrandId());
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = updateReqVO.getSkus();
-        // 多规格才需校验
         productSkuService.validateSkus(skuCreateReqList, updateReqVO.getSpecType());
 
         // 更新 SPU
@@ -104,7 +106,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         updateObj.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
         updateObj.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
         updateObj.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
-        ProductSpuMapper.updateById(updateObj);
+        productSpuMapper.updateById(updateObj);
         // 批量更新 SKU
         productSkuService.updateProductSkus(updateObj.getId(), updateReqVO.getSkus());
     }
@@ -115,13 +117,13 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验存在
         validateSpuExists(id);
         // 删除 SPU
-        ProductSpuMapper.deleteById(id);
+        productSpuMapper.deleteById(id);
         // 删除关联的 SKU
         productSkuService.deleteSkuBySpuId(id);
     }
 
     private void validateSpuExists(Long id) {
-        if (ProductSpuMapper.selectById(id) == null) {
+        if (productSpuMapper.selectById(id) == null) {
             throw exception(SPU_NOT_EXISTS);
         }
     }
@@ -129,7 +131,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Override
     // TODO @芋艿：需要再 review 下
     public ProductSpuDetailRespVO getSpuDetail(Long id) {
-        ProductSpuDO spu = ProductSpuMapper.selectById(id);
+        ProductSpuDO spu = productSpuMapper.selectById(id);
         ProductSpuDetailRespVO respVO = BeanUtil.copyProperties(spu, ProductSpuDetailRespVO.class);
         if (null != spu) {
             List<ProductSpuDetailRespVO.Sku> skuReqs = ProductSkuConvert.INSTANCE.convertList03(productSkuService.getSkusBySpuId(id));
@@ -162,19 +164,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                 });
                 respVO.setProductPropertyViews(productPropertyViews);
             }
-            // 组合分类
-//            if (null != respVO.getCategoryId()) {
-//                LinkedList<Long> categoryArray = new LinkedList<>();
-//                Long parentId = respVO.getCategoryId();
-//                categoryArray.addFirst(parentId);
-//                while (parentId != 0) {
-//                    parentId = categoryService.getCategory(parentId).getParentId();
-//                    if (parentId > 0) {
-//                        categoryArray.addFirst(parentId);
-//                    }
-//                }
-//
-//            }
             respVO.setCategoryIds(respVO.getCategoryId());
         }
         return respVO;
@@ -182,12 +171,12 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public ProductSpuRespVO getSpu(Long id) {
-        return ProductSpuConvert.INSTANCE.convert(ProductSpuMapper.selectById(id));
+        return ProductSpuConvert.INSTANCE.convert(productSpuMapper.selectById(id));
     }
 
     @Override
     public List<ProductSpuDO> getSpuList(Collection<Long> ids) {
-        return ProductSpuMapper.selectBatchIds(ids);
+        return productSpuMapper.selectBatchIds(ids);
     }
 
     @Override
@@ -199,13 +188,14 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                 remindSpuIds.add(null);
             }
         }
-        return ProductSpuConvert.INSTANCE.convertPage(ProductSpuMapper.selectPage(pageReqVO, remindSpuIds));
+        return ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(pageReqVO, remindSpuIds));
     }
 
     @Override
     public PageResult<AppSpuPageRespVO> getSpuPage(AppSpuPageReqVO pageReqVO) {
-        PageResult<ProductSpuDO> productSpuDOPageResult = ProductSpuMapper.selectPage(ProductSpuConvert.INSTANCE.convert(pageReqVO));
+        PageResult<ProductSpuDO> productSpuDOPageResult = productSpuMapper.selectPage(ProductSpuConvert.INSTANCE.convert(pageReqVO));
         PageResult<AppSpuPageRespVO> pageResult = new PageResult<>();
+        // TODO @芋艿 这里用convert如何解决
         List<AppSpuPageRespVO> collect = productSpuDOPageResult.getList()
                 .stream()
                 .map(ProductSpuConvert.INSTANCE::convertAppResp)

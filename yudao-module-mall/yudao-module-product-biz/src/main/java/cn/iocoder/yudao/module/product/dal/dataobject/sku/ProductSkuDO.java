@@ -97,6 +97,7 @@ public class ProductSkuDO extends BaseDO {
      * 商品属性
      */
     @Data
+    @AllArgsConstructor
     public static class Property {
 
         /**
