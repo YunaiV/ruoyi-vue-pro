@@ -4,6 +4,8 @@ import { required } from '@/utils/formRules'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
 import { Form } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
+import { FormSchema } from '@/types/form'
+
 const props = defineProps({
   basicInfo: {
     type: Object as PropType<Nullable<CodegenTableVO>>,

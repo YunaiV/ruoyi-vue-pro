@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { PropType, nextTick, ref, watch, computed, unref } from 'vue'
+import { PropType, nextTick, ref, watch, computed, unref, defineEmits } from 'vue'
 import QRCode from 'qrcode'
 import { QRCodeRenderersOptions } from 'qrcode'
 import { cloneDeep } from 'lodash-es'
 import { propTypes } from '@/utils/propTypes'
 import { useDesign } from '@/hooks/web/useDesign'
 import { isString } from '@/utils/is'
+import { QrcodeLogo } from '@/types/qrcode'
 
 const props = defineProps({
   // img 或者 canvas,img不支持logo嵌套

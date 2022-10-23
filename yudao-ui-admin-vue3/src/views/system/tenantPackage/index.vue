@@ -76,24 +76,30 @@ const handleUpdate = async (row: any) => {
 }
 // 提交按钮
 const submitForm = async () => {
-  loading.value = true
-  // 提交请求
-  try {
-    const data = unref(formRef)?.formModel as TenantPackageVO
-    data.menuIds = treeRef.value!.getCheckedKeys(false) as string[]
-    if (actionType.value === 'create') {
-      await TenantPackageApi.createTenantPackageTypeApi(data)
-      ElMessage.success(t('common.createSuccess'))
-    } else {
-      await TenantPackageApi.updateTenantPackageTypeApi(data)
-      ElMessage.success(t('common.updateSuccess'))
+  const elForm = unref(formRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
+    if (valid) {
+      loading.value = true
+      // 提交请求
+      try {
+        const data = unref(formRef)?.formModel as TenantPackageVO
+        data.menuIds = treeRef.value!.getCheckedKeys(false) as string[]
+        if (actionType.value === 'create') {
+          await TenantPackageApi.createTenantPackageTypeApi(data)
+          ElMessage.success(t('common.createSuccess'))
+        } else {
+          await TenantPackageApi.updateTenantPackageTypeApi(data)
+          ElMessage.success(t('common.updateSuccess'))
+        }
+        // 操作成功，重新加载列表
+        dialogVisible.value = false
+        await getList()
+      } finally {
+        loading.value = false
+      }
     }
-    // 操作成功，重新加载列表
-    dialogVisible.value = false
-    await getList()
-  } finally {
-    loading.value = false
-  }
+  })
 }
 
 // ========== 初始化 ==========

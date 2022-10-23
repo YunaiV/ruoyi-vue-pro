@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { usePermissionStore } from '@/store/modules/permission'
 import { useAppStore } from '@/store/modules/app'
-import { computed, unref, defineComponent, watch, ref } from 'vue'
+import { computed, unref, defineComponent, watch, ref, onMounted } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { ElScrollbar } from 'element-plus'
 import { Icon } from '@/components/Icon'
@@ -28,6 +28,8 @@ export default defineComponent({
 
     const collapse = computed(() => appStore.getCollapse)
 
+    const fixedMenu = computed(() => appStore.getFixedMenu)
+
     const permissionStore = usePermissionStore()
 
     const routers = computed(() => permissionStore.getRouters)
@@ -37,6 +39,27 @@ export default defineComponent({
     const setCollapse = () => {
       appStore.setCollapse(!unref(collapse))
     }
+
+    onMounted(() => {
+      if (unref(fixedMenu)) {
+        const path = `/${unref(currentRoute).path.split('/')[1]}`
+        const children = unref(tabRouters).find(
+          (v) =>
+            (v.meta?.alwaysShow || (v?.children?.length && v?.children?.length > 1)) &&
+            v.path === path
+        )?.children
+
+        tabActive.value = path
+        if (children) {
+          permissionStore.setMenuTabRouters(
+            cloneDeep(children).map((v) => {
+              v.path = pathResolve(unref(tabActive), v.path)
+              return v
+            })
+          )
+        }
+      }
+    })
 
     watch(
       () => routers.value,
@@ -66,7 +89,7 @@ export default defineComponent({
     )
 
     // 是否显示菜单
-    const showMenu = ref(false)
+    const showMenu = ref(unref(fixedMenu) ? true : false)
 
     // tab高亮
     const tabActive = ref('')
@@ -77,9 +100,13 @@ export default defineComponent({
         window.open(item.path)
         return
       }
+      const newPath = item.children ? item.path : item.path.split('/')[0]
+      const oldPath = unref(tabActive)
       tabActive.value = item.children ? item.path : item.path.split('/')[0]
       if (item.children) {
-        showMenu.value = !unref(showMenu)
+        if (newPath === oldPath || !unref(showMenu)) {
+          showMenu.value = unref(fixedMenu) ? true : !unref(showMenu)
+        }
         if (unref(showMenu)) {
           permissionStore.setMenuTabRouters(
             cloneDeep(item.children).map((v) => {
@@ -96,7 +123,7 @@ export default defineComponent({
     }
 
     // 设置高亮
-    const isActice = (currentPath: string) => {
+    const isActive = (currentPath: string) => {
       const { path } = unref(currentRoute)
       if (tabPathMap[currentPath].includes(path)) {
         return true
@@ -105,7 +132,7 @@ export default defineComponent({
     }
 
     const mouseleave = () => {
-      if (!unref(showMenu)) return
+      if (!unref(showMenu) || unref(fixedMenu)) return
       showMenu.value = false
     }
 
@@ -114,7 +141,7 @@ export default defineComponent({
         id={`${variables.namespace}-menu`}
         class={[
           prefixCls,
-          'relative bg-[var(--left-menu-bg-color)] top-1px z-999',
+          'relative bg-[var(--left-menu-bg-color)] top-1px z-3000',
           {
             'w-[var(--tab-menu-max-width)]': !unref(collapse),
             'w-[var(--tab-menu-min-width)]': unref(collapse)
@@ -140,7 +167,7 @@ export default defineComponent({
                       `${prefixCls}__item`,
                       'text-center text-12px relative py-12px cursor-pointer',
                       {
-                        'is-active': isActice(v.path)
+                        'is-active': isActive(v.path)
                       }
                     ]}
                     onClick={() => {
@@ -174,8 +201,8 @@ export default defineComponent({
             {
               '!left-[var(--tab-menu-min-width)]': unref(collapse),
               '!left-[var(--tab-menu-max-width)]': !unref(collapse),
-              '!w-[calc(var(--left-menu-max-width)+1px)]': unref(showMenu),
-              '!w-0': !unref(showMenu)
+              '!w-[calc(var(--left-menu-max-width)+1px)]': unref(showMenu) || unref(fixedMenu),
+              '!w-0': !unref(showMenu) && !unref(fixedMenu)
             }
           ]}
           style="transition: width var(--transition-time-02), left var(--transition-time-02);"

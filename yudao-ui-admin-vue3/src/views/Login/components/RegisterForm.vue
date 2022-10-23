@@ -7,6 +7,7 @@ import { ElInput, FormRules } from 'element-plus'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useLoginState, LoginStateEnum } from './useLogin'
 import LoginFormTitle from './LoginFormTitle.vue'
+import { FormSchema } from '@/types/form'
 
 const { register, elFormRef } = useForm()
 const { handleBackLogin, getLoginState } = useLoginState()
