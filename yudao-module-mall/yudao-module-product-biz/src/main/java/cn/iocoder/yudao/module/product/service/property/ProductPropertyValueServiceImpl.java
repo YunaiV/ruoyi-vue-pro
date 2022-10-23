@@ -19,9 +19,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_VALUE_EXISTS;
 
 /**
- * <p>
- *  规格值 Service 实现类
- * </p>
+ * 规格值 Service 实现类
  *
  * @author LuoWenFeng
  */
@@ -44,6 +42,7 @@ public class ProductPropertyValueServiceImpl implements ProductPropertyValueServ
 
     @Override
     public void updatePropertyValue(ProductPropertyValueUpdateReqVO updateReqVO) {
+        // TODO @luowenfeng：如果是自己的情况下，名字相同也是 ok 的呀~
         if (productPropertyValueMapper.selectByName(updateReqVO.getPropertyId(), updateReqVO.getName()) != null) {
             throw exception(PROPERTY_VALUE_EXISTS);
         }

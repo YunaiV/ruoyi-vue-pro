@@ -54,6 +54,7 @@ public interface ProductPropertyService {
     PageResult<ProductPropertyRespVO> getPropertyPage(ProductPropertyPageReqVO pageReqVO);
 
     /**
+     * 获得指定编号的规格名称
      *
      * @param id 编号
      * @return 规格名称

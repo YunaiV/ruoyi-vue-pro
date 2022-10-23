@@ -26,8 +26,8 @@ public interface ProductPropertyConvert {
     ProductPropertyDO convert(ProductPropertyCreateReqVO bean);
 
     ProductPropertyDO convert(ProductPropertyUpdateReqVO bean);
-    ProductPropertyAndValueRespVO convert(ProductPropertyRespVO bean);
 
+    ProductPropertyAndValueRespVO convert(ProductPropertyRespVO bean);
 
     ProductPropertyRespVO convert(ProductPropertyDO bean);
 

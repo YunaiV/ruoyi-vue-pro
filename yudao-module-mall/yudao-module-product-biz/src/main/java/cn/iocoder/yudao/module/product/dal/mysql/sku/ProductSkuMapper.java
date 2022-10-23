@@ -39,7 +39,10 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
             this.update(null, lambdaUpdateWrapper);
         }
     }
+
+    // TODO @luowenfeng: selectListByRemind，虽然不是很好，但是感觉会更清晰一些
     default List<ProductSkuDO> selectRemindSpuIds(){
        return selectList(new QueryWrapper<ProductSkuDO>().apply("stock <= warn_stock"));
     }
+
 }

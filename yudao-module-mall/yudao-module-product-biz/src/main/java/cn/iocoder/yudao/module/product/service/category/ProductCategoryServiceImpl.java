@@ -92,6 +92,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public void validateCategoryLevel(Long id) {
+        // TODO @芋艿：在看看，杂能优化下
         Long parentId = id;
         int i = 2;
         for (; i >= 0; --i) {

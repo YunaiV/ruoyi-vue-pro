@@ -43,7 +43,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     @Transactional(rollbackFor = Exception.class)
     public Long createProperty(ProductPropertyCreateReqVO createReqVO) {
         // 校验存在
-        if(productPropertyMapper.selectByName(createReqVO.getName()) != null){
+        if (productPropertyMapper.selectByName(createReqVO.getName()) != null) {
             throw exception(PROPERTY_EXISTS);
         }
         // 插入
@@ -58,7 +58,8 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     public void updateProperty(ProductPropertyUpdateReqVO updateReqVO) {
         // 校验存在
         this.validatePropertyExists(updateReqVO.getId());
-        if(productPropertyMapper.selectByName(updateReqVO.getName()) != null){
+        // TODO @luowenfeng：如果是自己的情况下，名字相同也是 ok 的呀~
+        if (productPropertyMapper.selectByName(updateReqVO.getName()) != null) {
             throw exception(PROPERTY_EXISTS);
         }
         // 更新

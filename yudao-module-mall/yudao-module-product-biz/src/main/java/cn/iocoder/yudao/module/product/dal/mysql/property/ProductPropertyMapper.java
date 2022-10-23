@@ -25,6 +25,7 @@ public interface ProductPropertyMapper extends BaseMapperX<ProductPropertyDO> {
                 .orderByDesc(ProductPropertyDO::getId));
     }
 
+    // TODO @luowenfeng: selectByNameLike，这样更清晰哈。
     default ProductPropertyDO selectByName(String name) {
         return selectOne(new LambdaQueryWrapperX<ProductPropertyDO>()
                 .likeIfPresent(ProductPropertyDO::getName, name));
