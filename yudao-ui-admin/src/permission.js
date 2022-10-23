@@ -24,11 +24,11 @@ router.beforeEach((to, from, next) => {
         isRelogin.show = true
         // 获取字典数据 add by 芋艿
         store.dispatch('dict/loadDictDatas')
-        // 判断当前用户是否已拉取完user_info信息
+        // 判断当前用户是否已拉取完 user_info 信息
         store.dispatch('GetInfo').then(() => {
           isRelogin.show = false
           store.dispatch('GenerateRoutes').then(accessRoutes => {
-            // 根据roles权限生成可访问的路由表
+            // 根据 roles 权限生成可访问的路由表
             router.addRoutes(accessRoutes) // 动态添加可访问路由表
             next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
           })
