@@ -4,74 +4,48 @@
       <el-form-item label="商品名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入商品名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-
       <el-form-item label="商品编码" prop="code">
         <el-input v-model="queryParams.code" placeholder="请输入商品编码" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-
       <el-form-item label="商品分类" prop="categoryIds">
         <el-cascader v-model="queryParams.categoryIds" placeholder="请输入商品分类"
                      :options="categoryList" :props="propName" clearable ref="category"/>
       </el-form-item>
-
       <el-form-item label="商品品牌" prop="brandId">
         <el-select v-model="queryParams.brandId" placeholder="请输入商品品牌" clearable @keyup.enter.native="handleQuery">
           <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id"/>
         </el-select>
       </el-form-item>
-
+      <!-- TODO 待实现：商品类型 -->
+      <!-- TODO 待实现：商品标签 -->
+      <!-- TODO 待实现：营销活动 -->
+      <!-- TODO 前端优化：商品销量、商品价格，排的整齐一点 -->
       <el-form-item label="商品销量">
-        <el-col
-          :span="6"
-          style="padding-left:0"
-        >
+        <el-col :span="7" style="padding-left:0">
           <el-form-item prop="salesCountMin">
-            <el-input v-model="queryParams.salesCountMin" placeholder="最小值" clearable
-                      @keyup.enter.native="handleQuery"/>
+            <el-input v-model="queryParams.salesCountMin" placeholder="最低销量" clearable @keyup.enter.native="handleQuery"/>
           </el-form-item>
         </el-col>
-        <el-col
-          :span="1"
-        >
-          -
-        </el-col>
-        <el-col
-          :span="6"
-          style="padding-left:0"
-        >
+        <el-col :span="1">-</el-col>
+        <el-col :span="7" style="padding-left:0">
           <el-form-item prop="salesCountMax">
-            <el-input v-model="queryParams.salesCountMax" placeholder="最大值" clearable
-                      @keyup.enter.native="handleQuery"/>
+            <el-input v-model="queryParams.salesCountMax" placeholder="最高销量" clearable @keyup.enter.native="handleQuery"/>
           </el-form-item>
         </el-col>
       </el-form-item>
-
       <el-form-item label="商品价格" prop="code">
-        <el-col
-          :span="6"
-          style="padding-left:0"
-        >
+        <el-col :span="7" style="padding-left:0">
           <el-form-item prop="marketPriceMin">
-            <el-input v-model="queryParams.marketPriceMin" placeholder="最小值" clearable
-                      @keyup.enter.native="handleQuery"/>
+            <el-input v-model="queryParams.marketPriceMin" placeholder="最低价格" clearable @keyup.enter.native="handleQuery"/>
           </el-form-item>
         </el-col>
-        <el-col
-          :span="1"
-        >
-          -
-        </el-col>
-        <el-col
-          :span="6"
-          style="padding-left:0"
-        >
+        <el-col :span="1">-</el-col>
+        <el-col :span="7" style="padding-left:0">
           <el-form-item prop="marketPriceMax">
-            <el-input v-model="queryParams.marketPriceMax" placeholder="最大值" clearable
-                      @keyup.enter.native="handleQuery"/>
+            <el-input v-model="queryParams.marketPriceMax" placeholder="最高价格" clearable @keyup.enter.native="handleQuery"/>
           </el-form-item>
         </el-col>
       </el-form-item>
-
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -82,8 +56,7 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-                   v-hasPermi="['product:spu:create']">新增
-        </el-button>
+                   v-hasPermi="['product:spu:create']">添加商品</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"/>
     </el-row>
@@ -96,17 +69,13 @@
           <el-table-column label="商品信息" align="center" width="260">
             <template slot-scope="scope">
               <div class="product-info">
-                <img
-                  v-if="scope.row.picUrls"
-                  :src="scope.row.picUrls[0]"
-                  alt="分类图片"
-                  class="img-height"
-                />
+                <img v-if="scope.row.picUrls" :src="scope.row.picUrls[0]" alt="分类图片" class="img-height" />
                 <div class="message">{{ scope.row.name }}</div>
               </div>
             </template>
+            <!-- TODO 前端优化：可以有个 + 号，点击后，展示每个 sku -->
           </el-table-column>
-          <el-table-column label="价格" align="center" prop="marketPrice" :formatter="unitConversion"/>
+          <el-table-column label="价格" align="center" prop="marketPrice" :formatter="formatPrice"/>
           <el-table-column label="库存" align="center" prop="totalStock"/>
           <el-table-column label="销量" align="center" prop="salesCount"/>
           <el-table-column label="排序" align="center" prop="sort"/>
@@ -117,18 +86,15 @@
           </el-table-column>
           <el-table-column label="状态" align="center" prop="status">
             <template slot-scope="scope">
-              <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+              <dict-tag :type="DICT_TYPE.PRODUCT_SPU_STATUS" :value="scope.row.status"/>
             </template>
           </el-table-column>
-
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                         v-hasPermi="['product:spu:update']">修改
-              </el-button>
+                         v-hasPermi="['product:spu:update']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                         v-hasPermi="['product:spu:delete']">删除
-              </el-button>
+                         v-hasPermi="['product:spu:delete']">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -141,17 +107,12 @@
           <el-table-column label="商品信息" align="center" width="260">
             <template slot-scope="scope">
               <div class="product-info">
-                <img
-                  v-if="scope.row.picUrls"
-                  :src="scope.row.picUrls[0]"
-                  alt="分类图片"
-                  class="img-height"
-                />
+                <img v-if="scope.row.picUrls" :src="scope.row.picUrls[0]" alt="分类图片" class="img-height"/>
                 <div class="message">{{ scope.row.name }}</div>
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="价格" align="center" prop="marketPrice" :formatter="unitConversion"/>
+          <el-table-column label="价格" align="center" prop="marketPrice" :formatter="formatPrice"/>
           <el-table-column label="库存" align="center" prop="totalStock"/>
           <el-table-column label="销量" align="center" prop="salesCount"/>
           <el-table-column label="排序" align="center" prop="sort"/>
@@ -162,18 +123,15 @@
           </el-table-column>
           <el-table-column label="状态" align="center" prop="status">
             <template slot-scope="scope">
-              <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+              <dict-tag :type="DICT_TYPE.PRODUCT_SPU_STATUS" :value="scope.row.status"/>
             </template>
           </el-table-column>
-
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                         v-hasPermi="['product:spu:update']">修改
-              </el-button>
+                         v-hasPermi="['product:spu:update']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                         v-hasPermi="['product:spu:delete']">删除
-              </el-button>
+                         v-hasPermi="['product:spu:delete']">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -186,17 +144,12 @@
           <el-table-column label="商品信息" align="center" width="260">
             <template slot-scope="scope">
               <div class="product-info">
-                <img
-                  v-if="scope.row.picUrls"
-                  :src="scope.row.picUrls[0]"
-                  alt="分类图片"
-                  class="img-height"
-                />
+                <img v-if="scope.row.picUrls" :src="scope.row.picUrls[0]" alt="分类图片" class="img-height"/>
                 <div class="message">{{ scope.row.name }}</div>
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="价格" align="center" prop="marketPrice" :formatter="unitConversion"/>
+          <el-table-column label="价格" align="center" prop="marketPrice" :formatter="formatPrice"/>
           <el-table-column label="库存" align="center" prop="totalStock"/>
           <el-table-column label="销量" align="center" prop="salesCount"/>
           <el-table-column label="排序" align="center" prop="sort"/>
@@ -207,18 +160,15 @@
           </el-table-column>
           <el-table-column label="状态" align="center" prop="status">
             <template slot-scope="scope">
-              <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+              <dict-tag :type="DICT_TYPE.PRODUCT_SPU_STATUS" :value="scope.row.status"/>
             </template>
           </el-table-column>
-
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                         v-hasPermi="['product:spu:update']">修改
-              </el-button>
+                         v-hasPermi="['product:spu:update']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                         v-hasPermi="['product:spu:delete']">删除
-              </el-button>
+                         v-hasPermi="['product:spu:delete']">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -231,17 +181,12 @@
           <el-table-column label="商品信息" align="center" width="260">
             <template slot-scope="scope">
               <div class="product-info">
-                <img
-                  v-if="scope.row.picUrls"
-                  :src="scope.row.picUrls[0]"
-                  alt="分类图片"
-                  class="img-height"
-                />
+                <img v-if="scope.row.picUrls" :src="scope.row.picUrls[0]" alt="分类图片" class="img-height"/>
                 <div class="message">{{ scope.row.name }}</div>
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="价格" align="center" prop="marketPrice" :formatter="unitConversion"/>
+          <el-table-column label="价格" align="center" prop="marketPrice" :formatter="formatPrice"/>
           <el-table-column label="库存" align="center" prop="totalStock"/>
           <el-table-column label="销量" align="center" prop="salesCount"/>
           <el-table-column label="排序" align="center" prop="sort"/>
@@ -252,27 +197,24 @@
           </el-table-column>
           <el-table-column label="状态" align="center" prop="status">
             <template slot-scope="scope">
-              <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+              <dict-tag :type="DICT_TYPE.PRODUCT_SPU_STATUS" :value="scope.row.status"/>
             </template>
           </el-table-column>
-
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                         v-hasPermi="['product:spu:update']">修改
-              </el-button>
+                         v-hasPermi="['product:spu:update']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                         v-hasPermi="['product:spu:delete']">删除
-              </el-button>
+                         v-hasPermi="['product:spu:delete']">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
       </el-tab-pane>
     </el-tabs>
+
     <!-- 分页组件 -->
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
-
   </div>
 </template>
 
@@ -353,9 +295,6 @@ export default {
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, "createTime");
       // 执行查询
       getSpuPage(params).then((response) => {
-        response.data.list.forEach(element => {
-          element.price = this.divide(element.minPrice, 100) + "~" + this.divide(element.maxPrice, 100)
-        });
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -390,18 +329,16 @@ export default {
         .confirm('是否确认删除商品spu编号为"' + id + '"的数据项?')
         .then(function () {
           return deleteSpu(id);
-        })
-        .then(() => {
+        }).then(() => {
           this.getList();
           this.$modal.msgSuccess("删除成功");
-        })
-        .catch(() => {
+        }).catch(() => {
         });
     },
-    unitConversion(row, column, cellValue) {
-      return this.divide(cellValue, 100);
+    formatPrice(row, column, cellValue) {
+      return '￥' + this.divide(cellValue, 100);
     },
-    // 选中tab
+    // 选中 tab
     handleClick(val) {
       if (val.name === "all") {
         this.queryParams.tabStatus = null;

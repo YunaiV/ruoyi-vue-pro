@@ -31,7 +31,7 @@ public class SpuInfoRespDTO {
      */
     private String code;
     /**
-     * 商品卖点
+     * 促销语
      */
     private String sellPoint;
     /**
