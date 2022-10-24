@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @ApiModel("管理后台 - 商品 SPU 分页 Request VO")
 @Data
@@ -26,7 +25,7 @@ public class ProductSpuPageReqVO extends PageParam {
     @ApiModelProperty(value = "商品品牌编号", example = "1")
     private Long brandId;
 
-    @ApiModelProperty(value = "上下架状态", example = "1", notes = "参见 CommonStatusEnum 枚举值")
+    @ApiModelProperty(value = "上下架状态", example = "1", notes = "参见 ProductSpuStatusEnum 枚举值")
     private Integer status;
 
     @ApiModelProperty(value = "销量最小值", example = "1")
@@ -41,8 +40,7 @@ public class ProductSpuPageReqVO extends PageParam {
     @ApiModelProperty(value = "市场价最大值", example = "1024")
     private Integer marketPriceMax;
 
-    // TODO @luowenfeng: 这个可以改成前端基于 tab, 传递不同的条件么?
-    @ApiModelProperty(value = "tab 状态 null 全部， 0：销售中（上架） 1：仓库中（下架） 2：预警中", example = "1")
-    private Integer tabStatus;
+    @ApiModelProperty(value = "是否库存告警", example = "true")
+    private Boolean alarmStock;
 
 }

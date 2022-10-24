@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyViewRespVO;
@@ -28,10 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -181,18 +179,21 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
-        List<Long> remindSpuIds = null;
-        if (pageReqVO.getTabStatus() != null && pageReqVO.getTabStatus() == 2) {
-            remindSpuIds = productSkuService.getRemindSpuIds().stream().map(ProductSkuDO::getSpuId).distinct().collect(Collectors.toList());
-            if (remindSpuIds.isEmpty()) {
-                remindSpuIds.add(null);
+        // 库存告警的 SPU 编号的集合
+        Set<Long> alarmStockSpuIds = null;
+        if (Boolean.TRUE.equals(pageReqVO.getAlarmStock())) {
+            alarmStockSpuIds = CollectionUtils.convertSet(productSkuService.getSkusByAlarmStock(), ProductSkuDO::getSpuId);
+            if (CollUtil.isEmpty(alarmStockSpuIds)) {
+                return PageResult.empty();
             }
         }
-        return ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(pageReqVO, remindSpuIds));
+        // 分页查询
+        return ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(pageReqVO, alarmStockSpuIds));
     }
 
     @Override
     public PageResult<AppSpuPageRespVO> getSpuPage(AppSpuPageReqVO pageReqVO) {
+        // TODO 芋艿：貌似实现不太合理
         PageResult<ProductSpuDO> productSpuDOPageResult = productSpuMapper.selectPage(ProductSpuConvert.INSTANCE.convert(pageReqVO));
         PageResult<AppSpuPageRespVO> pageResult = new PageResult<>();
         // TODO @芋艿 这里用convert如何解决

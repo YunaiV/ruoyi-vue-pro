@@ -222,6 +222,7 @@
 import {deleteSpu, getSpuPage,} from "@/api/mall/product/spu";
 import {getProductCategoryList} from "@/api/mall/product/category";
 import {getBrandList} from "@/api/mall/product/brand";
+import {ProductSpuStatusEnum} from "@/utils/constants";
 
 export default {
   name: "Spu",
@@ -260,7 +261,6 @@ export default {
         salesCountMax: null,
         marketPriceMin: null,
         marketPriceMax: null,
-        tabStatus: null,
       },
     };
   },
@@ -341,15 +341,17 @@ export default {
     // 选中 tab
     handleClick(val) {
       if (val.name === "all") {
-        this.queryParams.tabStatus = null;
+        this.queryParams.status = undefined;
+        this.queryParams.alarmStock = undefined;
       } else if (val.name === "on") {
-        this.queryParams.tabStatus = 0;
+        this.queryParams.status = ProductSpuStatusEnum.ENABLE.status;
+        this.queryParams.alarmStock = undefined;
       } else if (val.name === "off") {
-        this.queryParams.tabStatus = 1;
+        this.queryParams.status = ProductSpuStatusEnum.DISABLE.status;
+        this.queryParams.alarmStock = undefined;
       } else if (val.name === "remind") {
-        this.queryParams.tabStatus = 2;
-      } else {
-        this.queryParams.tabStatus = null;
+        this.queryParams.status = undefined;
+        this.queryParams.alarmStock = true;
       }
       this.getList();
     }
