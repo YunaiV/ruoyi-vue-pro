@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_VALUE_EXISTS;
@@ -42,8 +43,8 @@ public class ProductPropertyValueServiceImpl implements ProductPropertyValueServ
 
     @Override
     public void updatePropertyValue(ProductPropertyValueUpdateReqVO updateReqVO) {
-        // TODO @luowenfeng：如果是自己的情况下，名字相同也是 ok 的呀~
-        if (productPropertyValueMapper.selectByName(updateReqVO.getPropertyId(), updateReqVO.getName()) != null) {
+        ProductPropertyValueDO productPropertyValueDO = productPropertyValueMapper.selectByName(updateReqVO.getPropertyId(), updateReqVO.getName());
+        if (productPropertyValueDO != null && !productPropertyValueDO.getId().equals(updateReqVO.getId())) {
             throw exception(PROPERTY_VALUE_EXISTS);
         }
         ProductPropertyValueDO convert = ProductPropertyValueConvert.INSTANCE.convert(updateReqVO);

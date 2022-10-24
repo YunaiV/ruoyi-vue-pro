@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_EXISTS;
@@ -58,8 +59,8 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     public void updateProperty(ProductPropertyUpdateReqVO updateReqVO) {
         // 校验存在
         this.validatePropertyExists(updateReqVO.getId());
-        // TODO @luowenfeng：如果是自己的情况下，名字相同也是 ok 的呀~
-        if (productPropertyMapper.selectByName(updateReqVO.getName()) != null) {
+        ProductPropertyDO productPropertyDO = productPropertyMapper.selectByName(updateReqVO.getName());
+        if (productPropertyDO != null && !productPropertyDO.getId().equals(updateReqVO.getId())) {
             throw exception(PROPERTY_EXISTS);
         }
         // 更新
@@ -97,10 +98,6 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         return ProductPropertyConvert.INSTANCE.convertPage(pageResult);
     }
 
-    private List<ProductPropertyValueDO> getPropertyValueListByPropertyId(List<Long> propertyIds) {
-        return productPropertyValueMapper.selectListByPropertyValueListByPropertyId(propertyIds);
-    }
-
     @Override
     public ProductPropertyRespVO getProperty(Long id) {
         ProductPropertyDO property = productPropertyMapper.selectById(id);
@@ -117,7 +114,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         List<ProductPropertyRespVO> propertyList = getPropertyList(listReqVO);
 
         // 查询属性值
-        List<ProductPropertyValueDO> valueDOList = productPropertyValueMapper.selectListByPropertyValueListByPropertyId(CollectionUtils.convertList(propertyList, ProductPropertyRespVO::getId));
+        List<ProductPropertyValueDO> valueDOList = productPropertyValueMapper.selectListByPropertyId(CollectionUtils.convertList(propertyList, ProductPropertyRespVO::getId));
         Map<Long, List<ProductPropertyValueDO>> valueDOMap = CollectionUtils.convertMultiMap(valueDOList, ProductPropertyValueDO::getPropertyId);
         return CollectionUtils.convertList(propertyList, m -> {
             ProductPropertyAndValueRespVO productPropertyAndValueRespVO = ProductPropertyConvert.INSTANCE.convert(m);

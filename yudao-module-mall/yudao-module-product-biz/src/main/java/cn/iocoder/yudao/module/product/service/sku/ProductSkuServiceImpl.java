@@ -139,7 +139,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     public List<ProductSkuDO> getRemindSpuIds() {
-        return productSkuMapper.selectRemindSpuIds();
+        return productSkuMapper.selectListByRemind();
     }
 
     @Override

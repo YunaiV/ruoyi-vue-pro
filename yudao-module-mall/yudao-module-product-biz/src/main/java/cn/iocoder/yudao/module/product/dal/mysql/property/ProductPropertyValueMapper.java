@@ -17,8 +17,7 @@ import java.util.List;
 @Mapper
 public interface ProductPropertyValueMapper extends BaseMapperX<ProductPropertyValueDO> {
 
-    // TODO @luowenfeng: selectListByPropertyId 是不是就可以啦
-    default List<ProductPropertyValueDO> selectListByPropertyValueListByPropertyId(List<Long> propertyIds) {
+    default List<ProductPropertyValueDO> selectListByPropertyId(List<Long> propertyIds) {
         return selectList(new LambdaQueryWrapperX<ProductPropertyValueDO>()
                 .inIfPresent(ProductPropertyValueDO::getPropertyId, propertyIds));
     }
