@@ -64,6 +64,4 @@ public class ProductCategoryDO extends BaseDO {
      */
     private Integer status;
 
-    // TODO 芋艿：is_recommend 是否首页推荐：1-是；0-否
-
 }

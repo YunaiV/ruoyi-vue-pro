@@ -38,7 +38,7 @@ public class TradeOrderDO extends BaseDO {
      *
      * 例如说，1146347329394184195
      */
-    private String sn;
+    private String no;
     /**
      * 订单类型
      *
