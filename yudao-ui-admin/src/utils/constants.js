@@ -185,37 +185,54 @@ export const PayOrderRefundStatusEnum = {
  * 支付退款订单状态枚举
  */
 export const PayRefundStatusEnum = {
-  CREATE:{
-    status:0,
+  CREATE: {
+    status: 0,
     name: '退款订单生成'
   },
-  SUCCESS:{
-    status:1,
+  SUCCESS: {
+    status: 1,
     name: '退款成功'
   },
-  FAILURE:{
-    status:2,
+  FAILURE: {
+    status: 2,
     name: '退款失败'
   },
-  PROCESSING_NOTIFY:{
-    status:3,
+  PROCESSING_NOTIFY: {
+    status: 3,
     name: '退款中，渠道通知结果'
   },
-  PROCESSING_QUERY:{
-    status:4,
+  PROCESSING_QUERY: {
+    status: 4,
     name: '退款中，系统查询结果'
   },
-  UNKNOWN_RETRY:{
-    status:5,
+  UNKNOWN_RETRY: {
+    status: 5,
     name: '状态未知，请重试'
   },
-  UNKNOWN_QUERY:{
-    status:6,
+  UNKNOWN_QUERY: {
+    status: 6,
     name: '状态未知，系统查询结果'
   },
-  CLOSE:{
-    status:99,
+  CLOSE: {
+    status: 99,
     name: '退款关闭'
   }
 }
 
+/**
+ * 商品 SPU 状态
+ */
+export const ProductSpuStatusEnum = {
+  RECYCLE: {
+    status: -1,
+    name: '回收站'
+  },
+  DISABLE: {
+    status: 0,
+    name: '下架'
+  },
+  ENABLE: {
+    status: 1,
+    name: '上架'
+  },
+}

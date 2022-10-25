@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.product.service.sku;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -84,10 +83,10 @@ public interface ProductSkuService {
     void deleteSkuBySpuId(Long spuId);
 
     /**
-     * 获得商品预警中的 SPU 集合
+     * 获得库存预警的 SKU 数组
      *
-     * @return 商品spuId集合
+     * @return SKU 数组
      */
-    List<ProductSkuDO> getRemindSpuIds();
+    List<ProductSkuDO> getSkusByAlarmStock();
 
 }

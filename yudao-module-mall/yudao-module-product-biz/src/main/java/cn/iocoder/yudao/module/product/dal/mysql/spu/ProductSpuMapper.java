@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReq
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * 商品spu Mapper
@@ -29,8 +29,8 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .orderByDesc(ProductSpuDO::getSort));
     }
 
-    default PageResult<ProductSpuDO> selectPage(ProductSpuPageReqVO reqVO, List<Long> spuIds) {
-        LambdaQueryWrapperX<ProductSpuDO> productSpuDOLambdaQueryWrapperX = new LambdaQueryWrapperX<ProductSpuDO>()
+    default PageResult<ProductSpuDO> selectPage(ProductSpuPageReqVO reqVO, Set<Long> alarmStockSpuIds) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<ProductSpuDO>()
                 .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
                 .eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId())
                 .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
@@ -38,16 +38,9 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .geIfPresent(ProductSpuDO::getSalesCount, reqVO.getSalesCountMin())
                 .leIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMax())
                 .geIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMin())
-                .orderByDesc(ProductSpuDO::getSort);
-        // TODO @芋艿: 需要优化下这里的代码
-        if(reqVO.getTabStatus()!= null && reqVO.getTabStatus() == 2){
-            productSpuDOLambdaQueryWrapperX.inIfPresent(ProductSpuDO::getId, spuIds);
-        }else{
-            productSpuDOLambdaQueryWrapperX.eqIfPresent(ProductSpuDO::getStatus, reqVO.getTabStatus());
-        }
-
-        return selectPage(reqVO, productSpuDOLambdaQueryWrapperX);
+                .inIfPresent(ProductSpuDO::getId, alarmStockSpuIds) // 库存告警
+                .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
+                .orderByDesc(ProductSpuDO::getSort));
     }
-
 
 }

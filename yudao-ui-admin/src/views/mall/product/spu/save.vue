@@ -7,8 +7,8 @@
           <el-form-item label="商品名称" prop="name">
             <el-input v-model="baseForm.name" placeholder="请输入商品名称"/>
           </el-form-item>
-          <el-form-item label="商品卖点">
-            <el-input type="textarea" v-model="baseForm.sellPoint" placeholder="请输入商品卖点"/>
+          <el-form-item label="促销语">
+            <el-input type="textarea" v-model="baseForm.sellPoint" placeholder="请输入促销语"/>
           </el-form-item>
           <el-form-item label="商品主图" prop="picUrls">
             <ImageUpload v-model="baseForm.picUrls" :value="baseForm.picUrls" :limit="10" class="mall-image"/>

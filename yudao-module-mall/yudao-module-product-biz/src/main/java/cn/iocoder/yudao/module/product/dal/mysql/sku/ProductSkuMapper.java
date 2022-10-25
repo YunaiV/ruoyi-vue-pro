@@ -40,7 +40,7 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
         }
     }
 
-    default List<ProductSkuDO> selectListByRemind(){
+    default List<ProductSkuDO> selectListByAlarmStock(){
        return selectList(new QueryWrapper<ProductSkuDO>().apply("stock <= warn_stock"));
     }
 

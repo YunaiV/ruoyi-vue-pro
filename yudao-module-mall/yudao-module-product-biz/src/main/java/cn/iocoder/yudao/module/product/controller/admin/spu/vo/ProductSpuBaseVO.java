@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,7 +24,7 @@ public class ProductSpuBaseVO {
     @ApiModelProperty(value = "商品编码", example = "yudaoyuanma")
     private String code;
 
-    @ApiModelProperty(value = "商品卖点", example = "好吃！")
+    @ApiModelProperty(value = "促销语", example = "好吃！")
     private String sellPoint;
 
     @ApiModelProperty(value = "商品详情", required = true, example = "我是商品描述")

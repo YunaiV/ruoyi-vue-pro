@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.trade.service.order;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
@@ -15,8 +14,8 @@ import cn.iocoder.yudao.module.market.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderInfoCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
-import cn.iocoder.yudao.module.product.api.sku.dto.SkuDecrementStockBatchReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.SkuDecrementStockBatchReqDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.SpuInfoRespDTO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
@@ -181,7 +180,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     private void checkSaleableFromSpu(List<SpuInfoRespDTO> spuInfos) {
         SpuInfoRespDTO spu = CollectionUtils.findFirst(spuInfos,
-                spuInfoDTO -> !Objects.equals(ProductSpuStatusEnum.ENABLE.getStyle(), spuInfoDTO.getStatus()));
+                spuInfoDTO -> !Objects.equals(ProductSpuStatusEnum.ENABLE.getStatus(), spuInfoDTO.getStatus()));
         if (Objects.isNull(spu)) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.ORDER_SPU_NOT_SALE);
         }

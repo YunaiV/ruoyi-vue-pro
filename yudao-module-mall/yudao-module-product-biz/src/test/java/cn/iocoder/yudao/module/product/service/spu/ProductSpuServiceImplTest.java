@@ -208,6 +208,8 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         Assertions.assertIterableEquals(createReqVO, spuList);
     }
 
+    // TODO @luowenfeng：单测要分情况；类似你这个，可以分 2 个单测；一个是有预存预警的；一个是没库存预警的；
+    // 然后，参考其它模块的 getPage 类型的方法的单测。
     @Test
     void getSpuPage() {
         // 准备参数
