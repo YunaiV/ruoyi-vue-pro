@@ -67,7 +67,7 @@ export default {
     },
     // 设置子路由
     childrenMenus() {
-      var childrenMenus = [];
+      const childrenMenus = [];
       this.routers.map((router) => {
         for (var item in router.children) {
           if (router.children[item].parentPath === undefined) {

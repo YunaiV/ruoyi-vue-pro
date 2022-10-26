@@ -12,6 +12,7 @@
         :collapse-transition="false"
         mode="vertical"
       >
+        <!-- 根据 sidebarRouters 路由，生成菜单 -->
         <sidebar-item
           v-for="(route, index) in sidebarRouters"
           :key="route.path  + index"

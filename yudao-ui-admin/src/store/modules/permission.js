@@ -8,7 +8,8 @@ const permission = {
   state: {
     routes: [],
     addRoutes: [],
-    sidebarRouters: []
+    sidebarRouters: [], // 左侧边菜单的路由，被 Sidebar/index.vue 使用
+    topbarRouters: [], // 顶部菜单的路由，被 TopNav/index.vue 使用
   },
   mutations: {
     SET_ROUTES: (state, routes) => {
@@ -29,10 +30,10 @@ const permission = {
     // 生成路由
     GenerateRoutes({ commit }) {
       return new Promise(resolve => {
-        // 向后端请求路由数据
+        // 向后端请求路由数据（菜单）
         getRouters().then(res => {
-          const sdata = JSON.parse(JSON.stringify(res.data))
-          const rdata = JSON.parse(JSON.stringify(res.data))
+          const sdata = JSON.parse(JSON.stringify(res.data)) // 【重要】用于菜单中的数据
+          const rdata = JSON.parse(JSON.stringify(res.data)) // 用于最后添加到 Router 中的数据
           const sidebarRoutes = filterAsyncRouter(sdata)
           const rewriteRoutes = filterAsyncRouter(rdata, false, true)
           rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })
@@ -57,7 +58,7 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
       icon: route.icon,
       noCache: !route.keepAlive,
     }
-    // 路由地址转首字母大写驼峰，作为路由名称，适配keepAlive
+    // 路由地址转首字母大写驼峰，作为路由名称，适配 keepAlive
     route.name = toCamelCase(route.path, true)
     route.hidden = !route.visible
     // 处理 component 属性
