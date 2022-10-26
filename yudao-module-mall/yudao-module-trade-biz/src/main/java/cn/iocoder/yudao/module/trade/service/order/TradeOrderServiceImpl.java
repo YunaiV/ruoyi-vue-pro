@@ -123,7 +123,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                                                Long loginUserId, String clientIp) {
         tradeOrderDO.setUserId(loginUserId);
         tradeOrderDO.setUserIp(clientIp);
-        tradeOrderDO.setSn(IdUtil.getSnowflakeNextId() + ""); // TODO @LeeYan9: 思考下, 怎么生成好点哈; 这个是会展示给用户的;
+        tradeOrderDO.setNo(IdUtil.getSnowflakeNextId() + ""); // TODO @LeeYan9: 思考下, 怎么生成好点哈; 这个是会展示给用户的;
         tradeOrderDO.setStatus(TradeOrderStatusEnum.WAITING_PAYMENT.getStatus());
         tradeOrderDO.setType(TradeOrderTypeEnum.NORMAL.getType());
         tradeOrderDO.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());

@@ -29,9 +29,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -221,15 +219,15 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 //                randomPojo(ProductSkuDO.class, o -> o.setSpuId(createReqVO.getId()))
         );
 
-        Mockito.when(productSkuService.getRemindSpuIds()).thenReturn(remindSpuIds);
+//        Mockito.when(productSkuService.getRemindSpuIds()).thenReturn(remindSpuIds);
 
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
-        productSpuPageReqVO.setTabStatus(2);
+//        productSpuPageReqVO.setTabStatus(2);
 
         PageResult<ProductSpuRespVO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
-        ArrayList<Long> resultRemindSpuIds = new ArrayList<>();
+        Set<Long> resultRemindSpuIds = new HashSet<>();
         resultRemindSpuIds.add(null);
         PageResult<ProductSpuRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, resultRemindSpuIds));
         Assertions.assertIterableEquals(result.getList(), spuPage.getList());
@@ -249,7 +247,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 //                randomPojo(ProductSkuDO.class, o -> o.setSpuId(createReqVO.getId()))
         );
 
-        Mockito.when(productSkuService.getRemindSpuIds()).thenReturn(remindSpuIds);
+//        Mockito.when(productSkuService.getRemindSpuIds()).thenReturn(remindSpuIds);
 
         // 调用
         AppSpuPageReqVO appSpuPageReqVO = new AppSpuPageReqVO();

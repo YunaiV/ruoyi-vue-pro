@@ -1,11 +1,14 @@
 <template>
   <div class="container">
+    <!-- TODO 样式优化：表单宽度、表单项对齐、hr 粗细； -->
     <el-tabs v-model="activeName" class="tabs">
       <!-- 基础设置 -->
+      <!-- TODO @luowenfeng：基础设置，分成商品类型、基础信息、配送信息 -->
+      <!-- TODO @luowenfeng：base=》basic 会更好哈 -->
       <el-tab-pane label="基础设置" name="base">
         <el-form ref="base" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
           <el-form-item label="商品名称" prop="name">
-            <el-input v-model="baseForm.name" placeholder="请输入商品名称"/>
+            <el-input v-model="baseForm.name" placeholder="请输入商品名称" />
           </el-form-item>
           <el-form-item label="促销语">
             <el-input type="textarea" v-model="baseForm.sellPoint" placeholder="请输入促销语"/>
@@ -16,7 +19,6 @@
           <el-form-item label="商品视频" prop="videoUrl">
             <VideoUpload v-model="baseForm.videoUrl" :value="baseForm.videoUrl"/>
           </el-form-item>
-
           <el-form-item label="商品品牌" prop="brandId">
             <el-select v-model="baseForm.brandId" placeholder="请选择商品品牌">
               <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id"/>
@@ -28,20 +30,20 @@
           </el-form-item>
           <el-form-item label="是否上架" prop="status">
             <el-radio-group v-model="baseForm.status">
-              <el-radio :label="0">立即上架</el-radio>
-              <el-radio :label="1">放入仓库</el-radio>
+              <el-radio :label="1">立即上架</el-radio>
+              <el-radio :label="0">放入仓库</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-form>
       </el-tab-pane>
 
       <!-- 价格库存 -->
+      <!-- TODO @luowenfeng：rates=》priceStack 会更好哈 -->
       <el-tab-pane label="价格库存" name="rates" class="rates">
         <el-form ref="rates" :model="ratesForm" :rules="rules">
           <el-form-item label="启用多规格">
-            <el-switch v-model="specSwitch" @change="changeSpecSwitch"></el-switch>
+            <el-switch v-model="specSwitch" @change="changeSpecSwitch"/>
           </el-form-item>
-
           <!-- 动态添加规格属性 -->
           <div v-show="ratesForm.spec === 2">
             <div v-for="(specs, index) in dynamicSpec" :key="index" class="dynamic-spec">
@@ -59,8 +61,7 @@
                 </template>
               </div>
             </div>
-            <el-button type="primary" @click="dynamicSpec.push({specValue: []}); ratesForm.rates = []">添加规格项目
-            </el-button>
+            <el-button type="primary" @click="dynamicSpec.push({specValue: []}); ratesForm.rates = []">添加规格项目</el-button>
           </div>
 
           <!-- 规格明细 -->
@@ -76,15 +77,13 @@
               </template>
               <el-table-column label="规格图片" width="120px" :render-header="addRedStar" key="90">
                 <template slot-scope="scope">
-                  <ImageUpload v-model="scope.row.picUrl" :limit="1" :isShowTip="false"
-                               style="width: 100px; height: 50px"/>
+                  <ImageUpload v-model="scope.row.picUrl" :limit="1" :isShowTip="false" style="width: 100px; height: 50px"/>
                 </template>
               </el-table-column>
               <template v-if="this.specSwitch">
                 <el-table-column label="sku名称" :render-header="addRedStar" key="91">
                   <template slot-scope="scope">
-                    <el-form-item :prop="'rates.'+ scope.$index + '.name'"
-                                  :rules="[{required: true, trigger: 'change'}]">
+                    <el-form-item :prop="'rates.'+ scope.$index + '.name'" :rules="[{required: true, trigger: 'change'}]">
                       <el-input v-model="scope.row.name"/>
                     </el-form-item>
                   </template>
@@ -92,8 +91,7 @@
               </template>
               <el-table-column label="市场价(元)" :render-header="addRedStar" key="92">
                 <template slot-scope="scope">
-                  <el-form-item :prop="'rates.'+ scope.$index + '.marketPrice'"
-                                :rules="[{required: true, trigger: 'change'}]">
+                  <el-form-item :prop="'rates.'+ scope.$index + '.marketPrice'" :rules="[{required: true, trigger: 'change'}]">
                     <el-input v-model="scope.row.marketPrice"
                               oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
                   </el-form-item>
@@ -104,7 +102,7 @@
                   <el-form-item :prop="'rates.'+ scope.$index + '.price'"
                                 :rules="[{required: true, trigger: 'change'}]">
                     <el-input v-model="scope.row.price"
-                              oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''"></el-input>
+                              oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''" />
                   </el-form-item>
                 </template>
               </el-table-column>
@@ -112,17 +110,14 @@
                 <template slot-scope="scope">
                   <el-form-item :prop="'rates.'+ scope.$index + '.costPrice'"
                                 :rules="[{required: true, trigger: 'change'}]">
-                    <el-input
-                      v-model="scope.row.costPrice"
-                      oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''"
-                    ></el-input>
+                    <el-input v-model="scope.row.costPrice"
+                              oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''" />
                   </el-form-item>
                 </template>
               </el-table-column>
               <el-table-column label="库存" :render-header="addRedStar" key="95">
                 <template slot-scope="scope">
-                  <el-form-item :prop="'rates.'+ scope.$index + '.stock'"
-                                :rules="[{required: true, trigger: 'change'}]">
+                  <el-form-item :prop="'rates.'+ scope.$index + '.stock'" :rules="[{required: true, trigger: 'change'}]">
                     <el-input v-model="scope.row.stock" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"></el-input>
                   </el-form-item>
                 </template>
@@ -134,17 +129,17 @@
               </el-table-column>
               <el-table-column label="体积" key="97">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.volume"></el-input>
+                  <el-input v-model="scope.row.volume" />
                 </template>
               </el-table-column>
               <el-table-column label="重量" key="98">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.weight"></el-input>
+                  <el-input v-model="scope.row.weight" />
                 </template>
               </el-table-column>
               <el-table-column label="条码" key="99">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.barCode"></el-input>
+                  <el-input v-model="scope.row.barCode" />
                 </template>
               </el-table-column>
               <template v-if="this.specSwitch">
@@ -169,6 +164,7 @@
       </el-tab-pane>
 
       <!-- 商品详情 -->
+      <!-- TODO @luowenfeng：third=》detail 会更好哈 -->
       <el-tab-pane label="商品详情" name="third">
         <el-form ref="third" :model="baseForm" :rules="rules">
           <el-form-item prop="description">
@@ -178,6 +174,7 @@
       </el-tab-pane>
 
       <!-- 销售设置 -->
+      <!-- TODO @luowenfeng：fourth=》senior 会更好哈 -->
       <el-tab-pane label="高级设置" name="fourth">
         <el-form ref="fourth" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
           <el-form-item label="排序字段">
@@ -421,15 +418,13 @@ export default {
         if (form.id == null) {
           createSpu(form).then(() => {
             this.$modal.msgSuccess("新增成功");
-          })
-          .then(()=>{
+          }).then(()=>{
             this.cancel();
           })
         } else {
           updateSpu(form).then(() => {
             this.$modal.msgSuccess("修改成功");
-          })
-          .then(()=>{
+          }).then(()=>{
             this.cancel();
           })
         }
