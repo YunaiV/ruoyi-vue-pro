@@ -121,9 +121,10 @@ const handleAdd = () => {
 // 修改操作
 const handleUpdate = async (row: UserVO) => {
   await setDialogTile('update')
+  unref(formRef)?.delSchema('username')
+  unref(formRef)?.delSchema('password')
   // 设置数据
   const res = await UserApi.getUserApi(row.id)
-  console.info(res)
   deptId.value = res.deptId
   postIds.value = res.postIds
   unref(formRef)?.setValues(res)
@@ -358,9 +359,6 @@ onMounted(async () => {
         v-model:currentPage="tableObject.currentPage"
         @register="register"
       >
-        <template #sex="{ row }">
-          <DictTag :type="DICT_TYPE.SYSTEM_USER_SEX" :value="row.sex" />
-        </template>
         <template #status="{ row }">
           <el-switch
             v-model="row.status"
@@ -460,9 +458,6 @@ onMounted(async () => {
             {{ post === postObj.id ? postObj.name : '' }}
           </template>
         </el-tag>
-      </template>
-      <template #sex="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_USER_SEX" :value="row.sex" />
       </template>
       <template #status="{ row }">
         <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
