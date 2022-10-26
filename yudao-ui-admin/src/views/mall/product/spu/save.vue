@@ -3,7 +3,7 @@
     <!-- TODO 样式优化：表单宽度、表单项对齐、hr 粗细； -->
     <el-tabs v-model="activeName" class="tabs">
       <!-- 基础设置 -->
-      <!-- TODO @luowenfeng：基础设置，分成商品类型、基础信息、配送信息 -->
+      <!-- TODO @luowenfeng：基础设置，分成基础信息、配送信息 -->
       <!-- TODO @luowenfeng：base=》basic 会更好哈 -->
       <el-tab-pane label="基础设置" name="base">
         <el-form ref="base" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
