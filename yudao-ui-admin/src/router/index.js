@@ -196,6 +196,21 @@ export const constantRoutes = [
         meta: {title: '流程详情', activeMenu: '/bpm/task/my'}
       }
     ]
+  },
+  {
+    path: '/order',
+    component: Layout,
+    name: '订单管理',
+    meta: { title: '订单管理' },
+    alwaysShow: true,
+    children: [
+      {
+        path: '/order/goods-order',
+        name: '商品订单',
+        meta: { title: '商品订单' },
+        component: (resolve) => require(['@/views/order/goodsOrder'], resolve)
+      }
+    ]
   }
 ]
 
