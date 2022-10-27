@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
@@ -29,16 +32,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 
 // TODO @芋艿：review 下单元测试
+
 /**
  * {@link ProductSpuServiceImpl} 的单元测试类
  *
@@ -69,6 +72,13 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     @MockBean
     private ProductPropertyValueService productPropertyValueService;
 
+    public String generateNo() {
+        return DateUtil.format(new Date(), "yyyyMMddHHmmss") + RandomUtil.randomInt(100000, 999999);
+    }
+
+    public Long generateId() {
+        return RandomUtil.randomLong(100000, 999999);
+    }
 
     @Test
     public void testCreateSpu_success() {
@@ -208,32 +218,117 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         Assertions.assertIterableEquals(createReqVO, spuList);
     }
 
-    // TODO @luowenfeng：单测要分情况；类似你这个，可以分 2 个单测；一个是有预存预警的；一个是没库存预警的；
-    // 然后，参考其它模块的 getPage 类型的方法的单测。
     @Test
-    void getSpuPage() {
-        // 准备参数
-        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class);
-        productSpuMapper.insert(createReqVO);
-
-        ArrayList<ProductSkuDO> remindSpuIds = Lists.newArrayList(
-//                randomPojo(ProductSkuDO.class, o -> o.setSpuId(createReqVO.getId())),
-//                randomPojo(ProductSkuDO.class, o -> o.setSpuId(createReqVO.getId()))
-        );
-
-        Mockito.when(productSkuService.getRemindSpuIds()).thenReturn(remindSpuIds);
-
+    void getSpuPage_alarmStock_empty() {
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
-        productSpuPageReqVO.setTabStatus(2);
+        productSpuPageReqVO.setAlarmStock(true);
 
         PageResult<ProductSpuRespVO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
-        ArrayList<Long> resultRemindSpuIds = new ArrayList<>();
-        resultRemindSpuIds.add(null);
-        PageResult<ProductSpuRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, resultRemindSpuIds));
+        PageResult<Object> result = PageResult.empty();
         Assertions.assertIterableEquals(result.getList(), spuPage.getList());
         Assertions.assertEquals(spuPage.getTotal(), result.getTotal());
+    }
+
+    @Test
+    void getSpuPage_alarmStock() {
+        // mock 数据
+        Long brandId = generateId();
+        Long categoryId = generateId();
+        String code = generateNo();
+
+        // 准备参数
+        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o->{
+            o.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
+            o.setTotalStock(500);
+            o.setMinPrice(1);
+            o.setMaxPrice(50);
+            o.setMarketPrice(25);
+            o.setSpecType(ProductSpuSpecTypeEnum.RECYCLE.getType());
+            o.setBrandId(brandId);
+            o.setCategoryId(categoryId);
+            o.setClickCount(100);
+            o.setCode(code);
+            o.setDescription("测试商品");
+            o.setPicUrls(new ArrayList<>());
+            o.setName("测试");
+            o.setSalesCount(100);
+            o.setSellPoint("超级加倍");
+            o.setShowStock(true);
+            o.setVideoUrl("");
+        });
+        productSpuMapper.insert(createReqVO);
+
+        Set<Long> alarmStockSpuIds = SetUtils.asSet(createReqVO.getId());
+
+        List<ProductSkuDO> productSpuDOS = Arrays.asList(randomPojo(ProductSkuDO.class, o -> {
+            o.setSpuId(createReqVO.getId());
+        }), randomPojo(ProductSkuDO.class, o -> {
+            o.setSpuId(createReqVO.getId());
+        }));
+
+        Mockito.when(productSkuService.getSkusByAlarmStock()).thenReturn(productSpuDOS);
+
+        // 调用
+        ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
+        productSpuPageReqVO.setAlarmStock(true);
+        PageResult<ProductSpuRespVO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
+
+        PageResult<ProductSpuRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, alarmStockSpuIds));
+        Assertions.assertIterableEquals(result.getList(), spuPage.getList());
+        Assertions.assertEquals(spuPage.getTotal(), result.getTotal());
+    }
+
+    @Test
+    void getSpuPage() {
+        // mock 数据
+        Long brandId = generateId();
+        Long categoryId = generateId();
+
+        // 准备参数
+        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o->{
+            o.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
+            o.setTotalStock(1);
+            o.setMinPrice(1);
+            o.setMaxPrice(1);
+            o.setMarketPrice(1);
+            o.setSpecType(ProductSpuSpecTypeEnum.RECYCLE.getType());
+            o.setBrandId(brandId);
+            o.setCategoryId(categoryId);
+            o.setClickCount(1);
+            o.setCode(generateNo());
+            o.setDescription("测试商品");
+            o.setPicUrls(new ArrayList<>());
+            o.setName("测试");
+            o.setSalesCount(1);
+            o.setSellPoint("卖点");
+            o.setShowStock(true);
+        });
+
+        // 准备参数
+        productSpuMapper.insert(createReqVO);
+        // 测试 status 不匹配
+        productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setStatus(ProductSpuStatusEnum.DISABLE.getStatus())));
+        productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setStatus(ProductSpuStatusEnum.RECYCLE.getStatus())));
+        // 测试 SpecType 不匹配
+        productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setSpecType(ProductSpuSpecTypeEnum.DISABLE.getType())));
+        // 测试 BrandId 不匹配
+        productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setBrandId(generateId())));
+        // 测试 CategoryId 不匹配
+        productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setCategoryId(generateId())));
+
+        // 调用
+        ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
+        productSpuPageReqVO.setAlarmStock(false);
+        productSpuPageReqVO.setBrandId(brandId);
+        productSpuPageReqVO.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
+        productSpuPageReqVO.setCategoryId(categoryId);
+
+        PageResult<ProductSpuRespVO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
+
+        PageResult<ProductSpuRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, (Set<Long>) null));
+        Assertions.assertEquals(result, spuPage);
     }
 
     @Test
@@ -243,13 +338,6 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setCategoryId(2L);
         });
         productSpuMapper.insert(createReqVO);
-
-        ArrayList<ProductSkuDO> remindSpuIds = Lists.newArrayList(
-//                randomPojo(ProductSkuDO.class, o -> o.setSpuId(createReqVO.getId())),
-//                randomPojo(ProductSkuDO.class, o -> o.setSpuId(createReqVO.getId()))
-        );
-
-        Mockito.when(productSkuService.getRemindSpuIds()).thenReturn(remindSpuIds);
 
         // 调用
         AppSpuPageReqVO appSpuPageReqVO = new AppSpuPageReqVO();
