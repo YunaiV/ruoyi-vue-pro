@@ -162,7 +162,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                 });
                 respVO.setProductPropertyViews(productPropertyViews);
             }
-            respVO.setCategoryIds(respVO.getCategoryId());
         }
         return respVO;
     }

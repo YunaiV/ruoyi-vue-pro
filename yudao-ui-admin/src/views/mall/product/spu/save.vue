@@ -453,7 +453,7 @@ export default {
         this.baseForm.id = data.id;
         this.baseForm.name = data.name;
         this.baseForm.sellPoint = data.sellPoint;
-        this.baseForm.categoryIds = data.categoryIds;
+        this.baseForm.categoryIds = data.categoryId;
         this.baseForm.videoUrl = data.videoUrl;
         this.baseForm.sort = data.sort;
         this.baseForm.description = data.description;
