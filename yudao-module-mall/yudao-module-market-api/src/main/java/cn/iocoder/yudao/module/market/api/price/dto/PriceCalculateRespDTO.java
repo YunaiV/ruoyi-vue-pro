@@ -9,6 +9,18 @@ import java.util.List;
 /**
  * 价格计算 Response DTO
  *
+ * 整体设计，参考 taobao 的技术文档：
+ * 1. <a href="https://developer.alibaba.com/docs/doc.htm?treeId=1&articleId=1029&docType=1">订单管理</a>
+ * 2. <a href="https://open.taobao.com/docV3.htm?docId=108471&docType=1">常用订单金额说明</a>
+ *
+ * 举个例子：<a href="https://img.alicdn.com/top/i1/LB1mALAi4HI8KJjy1zbXXaxdpXa">订单图</a>
+ * 输入：
+ * 1. 订单实付： trade.payment = 198.00；订单邮费：5 元；
+ * 2. 商品级优惠 圣诞价: 省 29.00 元 和 圣诞价:省 150.00 元； 订单级优惠，圣诞 2:省 5.00 元；
+ * 分摊：
+ * 1. 商品 1：原价 108 元，优惠 29 元，子订单实付 79 元，分摊主订单优惠 1.99 元；
+ * 2. 商品 2：原价 269 元，优惠 150 元，子订单实付 119 元，分摊主订单优惠 3.01 元；
+ *
  * @author 芋道源码
  */
 @Data
@@ -36,32 +48,29 @@ public class PriceCalculateRespDTO {
          * 商品原价（总），单位：分
          *
          * 基于 {@link OrderItem#getOriginalPrice()} 求和
+         * 对应 taobao 的 trade.total_fee 字段
          */
         private Integer originalPrice;
         /**
-         * 活动减免优惠（总），单位：分
+         * 商品优惠（总），单位：分
          *
-         * 基于 {@link OrderItem#getActivityPrice()} 求和
+         * 订单级优惠：对主订单的优惠，常见如：订单满 200 元减 10 元；订单满 80 包邮。
+         *
+         * 对应 taobao 的 order.discount_fee 字段
          */
-        private Integer activityPrice;
+        private Integer discountPrice;
         /**
          * 优惠劵减免金额（总），单位：分
          *
-         * 基于 {@link OrderItem#getCouponPrice()} 求和
+         * 对应 taobao 的 trade.coupon_fee 字段
          */
         private Integer couponPrice;
         /**
          * 积分减免金额（总），单位：分
          *
-         * 基于 {@link OrderItem#getPointPrice()} 求和
+         * 对应 taobao 的 trade.point_fee 字段
          */
         private Integer pointPrice;
-        /**
-         * 会员减免金额（总），单位：分
-         *
-         * 基于 {@link OrderItem#getMemberPrice()} 求和
-         */
-        private Integer memberPrice;
         /**
          * 运费金额，单位：分
          */
@@ -70,6 +79,8 @@ public class PriceCalculateRespDTO {
          * 最终购买金额（总），单位：分
          *
          * = {@link OrderItem#getPayPrice()} 求和
+         * - {@link #couponPrice}
+         * - {@link #pointPrice}
          * + {@link #deliveryPrice}
          */
         private Integer payPrice;
@@ -107,44 +118,40 @@ public class PriceCalculateRespDTO {
          * 商品原价（单），单位：分
          *
          * 对应 ProductSkuDO 的 price 字段
+         * 对应 taobao 的 order.price 字段
          */
         private Integer originalUnitPrice;
         /**
-         * 活动减免优惠（总），单位：分
+         * 商品优惠（总），单位：分
          *
-         * 例如说，限时折扣、满减送等营销活动
-         */
-        private Integer activityPrice;
-        /**
-         * 优惠劵减免金额（总），单位：分
+         * 商品级优惠：对单个商品的，常见如：商品原价的 8 折；商品原价的减 50 元
          *
-         * 一个优惠劵会作用到的多个 SKU 商品，按照计算时的 {@link #payPrice} 的比例分摊
+         * 对应 taobao 的 order.discount_fee 字段
          */
-        private Integer couponPrice;
+        private Integer discountPrice;
         /**
-         * 积分减免金额（总），单位：分
-         */
-        private Integer pointPrice;
-        /**
-         * 会员减免金额（总），单位：分
-         */
-        private Integer memberPrice;
-        /**
-         * 最终购买金额（总），单位：分。
+         * 子订单实付金额，不算主订单分摊金额，单位：分
          *
          * = {@link #originalPrice}
-         * - {@link #activityPrice}
-         * - {@link #couponPrice}
-         * - {@link #pointPrice}
-         * - {@link #memberPrice}
+         * - {@link #discountPrice}
+         *
+         * 对应 taobao 的 order.payment 字段
          */
         private Integer payPrice;
+
         /**
-         * 最终购买金额（单），单位：分。
+         * 子订单分摊金额（总），单位：分
+         * 需要分摊 {@link Order#discountPrice}、{@link Order#couponPrice}
          *
-         * = {@link #payPrice} / {@link #getCount()}
+         * 对应 taobao 的 order.part_mjz_discount 字段
          */
-        private Integer payUnitPrice;
+        private Integer orderPartPrice;
+        /**
+         * 分摊后子订单实付金额（总），单位：分
+         *
+         * 对应 taobao 的 divide_order_fee 字段
+         */
+        private Integer orderDividePrice;
 
     }
 
@@ -179,11 +186,11 @@ public class PriceCalculateRespDTO {
         /**
          * 计算时的原价（总），单位：分
          */
-        private Integer totalOriginalPrice;
+        private Integer beforePrice;
         /**
          * 计算时的优惠（总），单位：分
          */
-        private Integer totalPromotionPrice;
+        private Integer afterPrice;
         /**
          * 匹配的商品 SKU 数组
          */
@@ -218,11 +225,11 @@ public class PriceCalculateRespDTO {
         /**
          * 计算时的原价（总），单位：分
          */
-        private Integer totalOriginalPrice;
+        private Integer beforePrice;
         /**
          * 计算时的优惠（总），单位：分
          */
-        private Integer totalPromotionPrice;
+        private Integer afterPrice;
 
     }
 
