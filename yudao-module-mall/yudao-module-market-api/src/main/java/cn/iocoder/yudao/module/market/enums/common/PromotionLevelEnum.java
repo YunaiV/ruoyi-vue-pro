@@ -15,8 +15,8 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum PromotionLevelEnum implements IntArrayValuable {
 
-    ORDER(1, "订单级"),
-    SKU(2, "商品级"),
+    ORDER(1, "订单级"), // 多个商品，进行组合后优惠
+    SKU(2, "商品级"), // 单个商品，直接优惠
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PromotionLevelEnum::getLevel).toArray();

@@ -15,8 +15,8 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum PromotionTypeEnum implements IntArrayValuable {
 
-    DISCOUNT(1, "限时折扣"),
-    REWARD(2, "满减送"),
+    DISCOUNT_ACTIVITY(1, "限时折扣"),
+    REWARD_ACTIVITY(2, "满减送"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PromotionTypeEnum::getType).toArray();

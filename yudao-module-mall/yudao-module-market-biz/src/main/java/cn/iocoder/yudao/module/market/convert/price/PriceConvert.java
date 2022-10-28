@@ -19,8 +19,8 @@ public interface PriceConvert {
     default PriceCalculateRespDTO convert(PriceCalculateReqDTO calculateReqDTO, List<ProductSkuRespDTO> skuList) {
         // 创建 PriceCalculateRespDTO 对象
         PriceCalculateRespDTO priceCalculate = new PriceCalculateRespDTO();
-        priceCalculate.setOrder(new PriceCalculateRespDTO.Order().setSkuOriginalPrice(0).setSkuPromotionPrice(0)
-                .setOrderPromotionPrice(0).setDeliveryPrice(0).setPayPrice(0).setItems(new ArrayList<>())
+        priceCalculate.setOrder(new PriceCalculateRespDTO.Order().setOriginalPrice(0).setActivityPrice(0)
+                .setDeliveryPrice(0).setPayPrice(0).setItems(new ArrayList<>())
                 .setCouponId(calculateReqDTO.getCouponId()));
         priceCalculate.setPromotions(new ArrayList<>());
         // 创建它的 OrderItem 属性
@@ -29,9 +29,9 @@ public interface PriceConvert {
         skuList.forEach(sku -> {
             Integer count = skuIdCountMap.get(sku.getId());
             PriceCalculateRespDTO.OrderItem orderItem = new PriceCalculateRespDTO.OrderItem().setCount(count)
-                    .setOriginalPrice(sku.getPrice()).setTotalOriginalPrice(sku.getPrice() * count).setTotalPromotionPrice(0);
-            orderItem.setTotalPresentPrice(orderItem.getTotalPresentPrice()).setPresentPrice(orderItem.getOriginalPrice())
-                    .setTotalPayPrice(orderItem.getTotalPayPrice());
+                    .setOriginalUnitPrice(sku.getPrice()).setOriginalPrice(sku.getPrice() * count).setActivityPrice(0);
+            orderItem.setPayPrice(orderItem.getPayPrice()).setPayUnitPrice(orderItem.getOriginalUnitPrice())
+                    .setPayPrice(orderItem.getPayPrice());
             priceCalculate.getOrder().getItems().add(orderItem);
         });
         return priceCalculate;

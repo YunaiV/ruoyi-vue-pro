@@ -35,34 +35,43 @@ public class PriceCalculateRespDTO {
         /**
          * 商品原价（总），单位：分
          *
-         * 基于 {@link OrderItem#getTotalOriginalPrice()} 求和
+         * 基于 {@link OrderItem#getOriginalPrice()} 求和
          */
-        private Integer skuOriginalPrice;
+        private Integer originalPrice;
         /**
-         * 商品优惠（总），单位：分
+         * 活动减免优惠（总），单位：分
          *
-         * 基于 {@link OrderItem#getTotalPromotionPrice()} 求和
+         * 基于 {@link OrderItem#getActivityPrice()} 求和
          */
-        private Integer skuPromotionPrice;
+        private Integer activityPrice;
         /**
-         * 订单优惠（总），单位：分
+         * 优惠劵减免金额（总），单位：分
          *
-         * 例如说：满减折扣；不包括优惠劵、商品优惠
+         * 基于 {@link OrderItem#getCouponPrice()} 求和
          */
-        private Integer orderPromotionPrice;
+        private Integer couponPrice;
+        /**
+         * 积分减免金额（总），单位：分
+         *
+         * 基于 {@link OrderItem#getPointPrice()} 求和
+         */
+        private Integer pointPrice;
+        /**
+         * 会员减免金额（总），单位：分
+         *
+         * 基于 {@link OrderItem#getMemberPrice()} 求和
+         */
+        private Integer memberPrice;
         /**
          * 运费金额，单位：分
          */
         private Integer deliveryPrice;
         /**
-         * 应付金额（总），单位：分
+         * 最终购买金额（总），单位：分
          *
-         * = {@link #skuOriginalPrice}
+         * = {@link OrderItem#getPayPrice()} 求和
          * + {@link #deliveryPrice}
-         * - {@link #skuPromotionPrice}
-         * - {@link #orderPromotionPrice}
          */
-        //         * - {@link #couponPrice}  // TODO 芋艿：靠营销表记录
         private Integer payPrice;
         /**
          * 商品 SKU 数组
@@ -74,12 +83,6 @@ public class PriceCalculateRespDTO {
          * 优惠劵编号
          */
         private Long couponId;
-//        /**
-//         * 优惠劵减免金额，单位：分
-//         *
-//         *   // TODO 芋艿：靠营销表记录
-//         */
-//        private Integer couponPrice;
 
     }
 
@@ -95,40 +98,53 @@ public class PriceCalculateRespDTO {
         private Integer count;
 
         /**
+         * 商品原价（总），单位：分
+         *
+         * = {@link #originalUnitPrice} * {@link #getCount()}
+         */
+        private Integer originalPrice;
+        /**
          * 商品原价（单），单位：分
          *
          * 对应 ProductSkuDO 的 price 字段
          */
-        private Integer originalPrice;
+        private Integer originalUnitPrice;
         /**
-         * 商品原价（总），单位：分
+         * 活动减免优惠（总），单位：分
          *
-         * = {@link #originalPrice} * {@link #getCount()}
+         * 例如说，限时折扣、满减送等营销活动
          */
-        private Integer totalOriginalPrice;
+        private Integer activityPrice;
         /**
-         * 商品级优惠（总），单位：分
+         * 优惠劵减免金额（总），单位：分
          *
-         * 例如说“限时折扣”：商品原价的 8 折；商品原价的减 50 元
+         * 一个优惠劵会作用到的多个 SKU 商品，按照计算时的 {@link #payPrice} 的比例分摊
          */
-        private Integer totalPromotionPrice;
+        private Integer couponPrice;
+        /**
+         * 积分减免金额（总），单位：分
+         */
+        private Integer pointPrice;
+        /**
+         * 会员减免金额（总），单位：分
+         */
+        private Integer memberPrice;
         /**
          * 最终购买金额（总），单位：分。
          *
-         * = {@link #totalOriginalPrice}
-         * - {@link #totalPromotionPrice}
+         * = {@link #originalPrice}
+         * - {@link #activityPrice}
+         * - {@link #couponPrice}
+         * - {@link #pointPrice}
+         * - {@link #memberPrice}
          */
-        private Integer totalPresentPrice;
+        private Integer payPrice;
         /**
          * 最终购买金额（单），单位：分。
          *
-         * = {@link #totalPresentPrice} / {@link #getCount()}
+         * = {@link #payPrice} / {@link #getCount()}
          */
-        private Integer presentPrice;
-        /**
-         * 应付金额（总），单位：分
-         */
-        private Integer totalPayPrice;
+        private Integer payUnitPrice;
 
     }
 

@@ -15,7 +15,6 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_STOCK_NOT_ENOUGH;
 
 /**
  * 价格计算 Service 实现类
@@ -54,9 +53,7 @@ public class PriceServiceImpl implements PriceService {
             if (count == null) {
                 throw exception(SKU_NOT_EXISTS);
             }
-            if (count > sku.getStock()) {
-                throw exception(SKU_STOCK_NOT_ENOUGH);
-            }
+            // 不校验库存不足，避免购物车场景，商品无货的情况
         });
         return skus;
     }
