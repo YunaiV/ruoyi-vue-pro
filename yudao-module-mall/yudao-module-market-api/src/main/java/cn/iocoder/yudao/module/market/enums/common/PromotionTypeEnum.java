@@ -17,6 +17,8 @@ public enum PromotionTypeEnum implements IntArrayValuable {
 
     DISCOUNT_ACTIVITY(1, "限时折扣"),
     REWARD_ACTIVITY(2, "满减送"),
+
+    MEMBER(3, "会员折扣"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PromotionTypeEnum::getType).toArray();

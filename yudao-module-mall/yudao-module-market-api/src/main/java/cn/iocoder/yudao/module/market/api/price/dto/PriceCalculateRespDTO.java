@@ -52,7 +52,7 @@ public class PriceCalculateRespDTO {
          */
         private Integer originalPrice;
         /**
-         * 商品优惠（总），单位：分
+         * 订单优惠（总），单位：分
          *
          * 订单级优惠：对主订单的优惠，常见如：订单满 200 元减 10 元；订单满 80 包邮。
          *
@@ -101,8 +101,12 @@ public class PriceCalculateRespDTO {
      * 订单商品 SKU
      */
     @Data
-    public static class OrderItem extends PriceCalculateReqDTO.Item {
+    public static class OrderItem {
 
+        /**
+         * SKU 编号
+         */
+        private Long skuId;
         /**
          * 购买数量
          */
@@ -141,13 +145,17 @@ public class PriceCalculateRespDTO {
 
         /**
          * 子订单分摊金额（总），单位：分
-         * 需要分摊 {@link Order#discountPrice}、{@link Order#couponPrice}
+         * 需要分摊 {@link Order#discountPrice}、{@link Order#couponPrice}、{@link Order#pointPrice}
          *
          * 对应 taobao 的 order.part_mjz_discount 字段
+         * 淘宝说明：子订单分摊优惠基础逻辑：一般正常优惠券和满减优惠按照子订单的金额进行分摊，特殊情况如果优惠券是指定商品使用的，只会分摊到对应商品子订单上不分摊。
          */
         private Integer orderPartPrice;
         /**
          * 分摊后子订单实付金额（总），单位：分
+         *
+         * = {@link #payPrice}
+         * - {@link #orderPartPrice}
          *
          * 对应 taobao 的 divide_order_fee 字段
          */
@@ -156,7 +164,7 @@ public class PriceCalculateRespDTO {
     }
 
     /**
-     * 营销活动
+     * 营销明细
      */
     @Data
     public static class Promotion {
@@ -186,11 +194,11 @@ public class PriceCalculateRespDTO {
         /**
          * 计算时的原价（总），单位：分
          */
-        private Integer beforePrice;
+        private Integer originalPrice;
         /**
          * 计算时的优惠（总），单位：分
          */
-        private Integer afterPrice;
+        private Integer discountPrice;
         /**
          * 匹配的商品 SKU 数组
          */
@@ -225,11 +233,11 @@ public class PriceCalculateRespDTO {
         /**
          * 计算时的原价（总），单位：分
          */
-        private Integer beforePrice;
+        private Integer originalPrice;
         /**
          * 计算时的优惠（总），单位：分
          */
-        private Integer afterPrice;
+        private Integer discountPrice;
 
     }
 

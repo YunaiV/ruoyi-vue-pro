@@ -19,20 +19,23 @@ public interface PriceConvert {
     default PriceCalculateRespDTO convert(PriceCalculateReqDTO calculateReqDTO, List<ProductSkuRespDTO> skuList) {
         // 创建 PriceCalculateRespDTO 对象
         PriceCalculateRespDTO priceCalculate = new PriceCalculateRespDTO();
-        priceCalculate.setOrder(new PriceCalculateRespDTO.Order().setOriginalPrice(0).setActivityPrice(0)
-                .setDeliveryPrice(0).setPayPrice(0).setItems(new ArrayList<>())
-                .setCouponId(calculateReqDTO.getCouponId()));
-        priceCalculate.setPromotions(new ArrayList<>());
+        // 创建它的 Order 属性
+        PriceCalculateRespDTO.Order order = new PriceCalculateRespDTO.Order().setOriginalPrice(0).setDiscountPrice(0)
+                .setCouponPrice(0).setPointPrice(0).setDeliveryPrice(0).setPayPrice(0)
+                .setItems(new ArrayList<>()).setCouponId(calculateReqDTO.getCouponId());
+        priceCalculate.setOrder(order).setPromotions(new ArrayList<>());
         // 创建它的 OrderItem 属性
         Map<Long, Integer> skuIdCountMap = CollectionUtils.convertMap(calculateReqDTO.getItems(),
                 PriceCalculateReqDTO.Item::getSkuId, PriceCalculateReqDTO.Item::getCount);
         skuList.forEach(sku -> {
             Integer count = skuIdCountMap.get(sku.getId());
-            PriceCalculateRespDTO.OrderItem orderItem = new PriceCalculateRespDTO.OrderItem().setCount(count)
-                    .setOriginalUnitPrice(sku.getPrice()).setOriginalPrice(sku.getPrice() * count).setActivityPrice(0);
-            orderItem.setPayPrice(orderItem.getPayPrice()).setPayUnitPrice(orderItem.getOriginalUnitPrice())
-                    .setPayPrice(orderItem.getPayPrice());
+            PriceCalculateRespDTO.OrderItem orderItem = new PriceCalculateRespDTO.OrderItem()
+                    .setSkuId(sku.getId()).setCount(count).setOriginalUnitPrice(sku.getPrice())
+                    .setOriginalPrice(sku.getPrice() * count).setDiscountPrice(0).setOrderPartPrice(0);
+            orderItem.setPayPrice(orderItem.getOriginalPrice()).setOrderDividePrice(orderItem.getOrderDividePrice());
             priceCalculate.getOrder().getItems().add(orderItem);
+            // 补充价格信息到 Order 中
+            order.setOriginalPrice(order.getOriginalPrice() + orderItem.getOriginalPrice()).setPayPrice(order.getOriginalPrice());
         });
         return priceCalculate;
     }
