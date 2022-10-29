@@ -32,6 +32,12 @@ public class DiscountProductDO extends BaseDO {
      */
     private Long activityId;
     /**
+     * 限时折扣活动的名字
+     *
+     * 冗余 {@link DiscountActivityDO#getName()}
+     */
+    private String activityName;
+    /**
      * 商品 SPU 编号
      *
      * 关联 ProductSpuDO 的 id 编号

@@ -107,33 +107,35 @@ public class PriceServiceImpl implements PriceService {
             Integer memberPrice = memberDiscount != null ? (int) (orderItem.getPayPrice() * memberDiscount / 100) : null;
             Integer promotionPrice = discountProduct != null ? discountProduct.getPromotionPrice() * orderItem.getCount() : null;
             if (memberPrice == null) {
-
+                calculatePriceByDiscountActivity(priceCalculate, orderItem, discountProduct, promotionPrice);
             } else if (promotionPrice == null) {
-                calculatePriceByMemberDiscount(orderItem, memberDiscount, memberPrice, priceCalculate);
+                calculatePriceByMemberDiscount(priceCalculate, orderItem, memberPrice);
             } else if (memberPrice < promotionPrice) {
-
+                calculatePriceByDiscountActivity(priceCalculate, orderItem, discountProduct, promotionPrice);
             } else {
-                calculatePriceByMemberDiscount(orderItem, memberDiscount, memberPrice, priceCalculate);
+                calculatePriceByMemberDiscount(priceCalculate, orderItem, memberPrice);
             }
         });
     }
 
-    private void calculatePriceByMemberDiscount(PriceCalculateRespDTO.OrderItem orderItem,
-                                                Double memberDiscount, Integer memberPrice,
-                                                PriceCalculateRespDTO priceCalculate) {
+    private void calculatePriceByMemberDiscount(PriceCalculateRespDTO priceCalculate, PriceCalculateRespDTO.OrderItem orderItem,
+                                                Integer memberPrice) {
         // 记录优惠明细
-        addPromotion(priceCalculate, orderItem, null,
-                PromotionTypeEnum.MEMBER.getName(),
+        addPromotion(priceCalculate, orderItem, null, PromotionTypeEnum.MEMBER.getName(),
                 PromotionTypeEnum.MEMBER.getType(), PromotionLevelEnum.SKU.getLevel(), memberPrice,
                 true, StrUtil.format("会员折扣：省 {} 元", formatPrice(orderItem.getPayPrice() - memberPrice)));
         // 修改 SKU 的优惠
         modifyOrderItemPayPrice(orderItem, memberPrice, priceCalculate);
     }
 
-    private void calculatePriceByDiscountActivity(PriceCalculateRespDTO.OrderItem orderItem,
-                                                  DiscountProductDO discountProduct, Integer promotionPrice,
-                                                  PriceCalculateRespDTO priceCalculate) {
-
+    private void calculatePriceByDiscountActivity(PriceCalculateRespDTO priceCalculate, PriceCalculateRespDTO.OrderItem orderItem,
+                                                  DiscountProductDO discountProduct, Integer promotionPrice) {
+        // 记录优惠明细
+        addPromotion(priceCalculate, orderItem, discountProduct.getActivityId(), discountProduct.getActivityName(),
+                PromotionTypeEnum.DISCOUNT_ACTIVITY.getType(), PromotionLevelEnum.SKU.getLevel(), promotionPrice,
+                true, StrUtil.format("限时折扣：省 {} 元", formatPrice(orderItem.getPayPrice() - promotionPrice)));
+        // 修改 SKU 的优惠
+        modifyOrderItemPayPrice(orderItem, promotionPrice, priceCalculate);
     }
 
     private void addPromotion(PriceCalculateRespDTO priceCalculate, PriceCalculateRespDTO.OrderItem orderItem,
