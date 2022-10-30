@@ -30,9 +30,10 @@ public interface PriceConvert {
         skuList.forEach(sku -> {
             Integer count = skuIdCountMap.get(sku.getId());
             PriceCalculateRespDTO.OrderItem orderItem = new PriceCalculateRespDTO.OrderItem()
-                    .setSkuId(sku.getId()).setCount(count).setOriginalUnitPrice(sku.getPrice())
-                    .setOriginalPrice(sku.getPrice() * count).setDiscountPrice(0).setOrderPartPrice(0);
-            orderItem.setPayPrice(orderItem.getOriginalPrice()).setOrderDividePrice(orderItem.getOrderDividePrice());
+                    .setSpuId(sku.getSpuId()).setSkuId(sku.getId()).setCount(count)
+                    .setOriginalUnitPrice(sku.getPrice()).setOriginalPrice(sku.getPrice() * count)
+                    .setDiscountPrice(0).setOrderPartPrice(0);
+            orderItem.setPayPrice(orderItem.getOriginalPrice()).setOrderDividePrice(orderItem.getOriginalPrice());
             priceCalculate.getOrder().getItems().add(orderItem);
             // 补充价格信息到 Order 中
             order.setOriginalPrice(order.getOriginalPrice() + orderItem.getOriginalPrice()).setPayPrice(order.getOriginalPrice());

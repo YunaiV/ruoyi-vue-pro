@@ -104,6 +104,10 @@ public class PriceCalculateRespDTO {
     public static class OrderItem {
 
         /**
+         * SPU 编号
+         */
+        private Long spuId;
+        /**
          * SKU 编号
          */
         private Long skuId;

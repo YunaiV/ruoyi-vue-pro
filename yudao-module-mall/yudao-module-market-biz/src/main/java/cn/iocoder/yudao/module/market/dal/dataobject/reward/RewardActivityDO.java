@@ -92,7 +92,7 @@ public class RewardActivityDO extends BaseDO {
         /**
          * 优惠价格，单位：分
          */
-        private Integer promotionPrice;
+        private Integer discountPrice;
         /**
          * 是否包邮
          */
@@ -100,7 +100,7 @@ public class RewardActivityDO extends BaseDO {
         /**
          * 赠送的积分
          */
-        private Integer integral;
+        private Integer point;
         /**
          * 赠送的优惠劵编号的数组
          */
