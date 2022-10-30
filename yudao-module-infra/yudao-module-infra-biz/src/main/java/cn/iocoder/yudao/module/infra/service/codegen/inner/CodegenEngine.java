@@ -187,6 +187,7 @@ public class CodegenEngine {
         CodegenTableDO table = (CodegenTableDO) bindingMap.get("table");
         filePath = StrUtil.replace(filePath, "${table.moduleName}", table.getModuleName());
         filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName());
+        filePath = StrUtil.replace(filePath, "${table.businessPath}", table.getBusinessName().replaceAll("\\.", "/"));
         filePath = StrUtil.replace(filePath, "${table.className}", table.getClassName());
         return filePath;
     }
@@ -196,12 +197,12 @@ public class CodegenEngine {
     }
 
     private static String javaModuleImplVOFilePath(String path) {
-        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
+        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessPath}/" +
                 "vo/${sceneEnum.prefixClass}${table.className}" + path, "biz", "main");
     }
 
     private static String javaModuleImplControllerFilePath() {
-        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
+        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessPath}/" +
                 "${sceneEnum.prefixClass}${table.className}Controller", "biz", "main");
     }
 
@@ -226,7 +227,7 @@ public class CodegenEngine {
     private static String mapperXmlFilePath() {
         return "yudao-module-${table.moduleName}/" + // 顶级模块
                 "yudao-module-${table.moduleName}-biz/" + // 子模块
-                "src/main/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
+                "src/main/resources/mapper/${table.businessPath}/${table.className}Mapper.xml";
     }
 
     private static String vueTemplatePath(String path) {
