@@ -7,11 +7,14 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.market.api.price.dto.PriceCalculateReqDTO;
 import cn.iocoder.yudao.module.market.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.market.convert.price.PriceConvert;
+import cn.iocoder.yudao.module.market.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.market.dal.dataobject.discount.DiscountProductDO;
 import cn.iocoder.yudao.module.market.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.market.enums.common.PromotionConditionTypeEnum;
 import cn.iocoder.yudao.module.market.enums.common.PromotionLevelEnum;
+import cn.iocoder.yudao.module.market.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.market.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.market.service.coupon.CouponService;
 import cn.iocoder.yudao.module.market.service.discount.DiscountService;
 import cn.iocoder.yudao.module.market.service.reward.RewardService;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
@@ -30,6 +33,8 @@ import java.util.function.Supplier;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
+import static cn.iocoder.yudao.module.market.enums.ErrorCodeConstants.COUPON_NO_MATCH_MIN_PRICE;
+import static cn.iocoder.yudao.module.market.enums.ErrorCodeConstants.COUPON_NO_MATCH_SPU;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static java.util.Collections.singletonList;
 
@@ -43,7 +48,7 @@ import static java.util.Collections.singletonList;
  * TODO 芋艿：进一步完善
  * 1. 限时折扣：指定金额、减免金额、折扣
  * 2. 满减送：循环、折扣
- * 3.
+ * 3. 优惠劵：待定
  *
  * @author 芋道源码
  */
@@ -55,6 +60,8 @@ public class PriceServiceImpl implements PriceService {
     private DiscountService discountService;
     @Resource
     private RewardService rewardService;
+    @Resource
+    private CouponService couponService;
 
     @Resource
     private ProductSkuApi productSkuApi;
@@ -70,6 +77,8 @@ public class PriceServiceImpl implements PriceService {
         calculatePriceForSkuLevel(calculateReqDTO.getUserId(), priceCalculate);
         // 计算订单级别的价格
         calculatePriceForOrderLevel(calculateReqDTO.getUserId(), priceCalculate);
+        // 计算优惠劵级别的价格
+        calculatePriceForCouponLevel(calculateReqDTO.getUserId(), calculateReqDTO.getCouponId(), priceCalculate);
         // 计算【优惠劵】促销 TODO 待实现
         return priceCalculate;
     }
@@ -228,9 +237,9 @@ public class PriceServiceImpl implements PriceService {
      */
     private RewardActivityDO.Rule getLastMatchRewardActivityRule(RewardActivityDO rewardActivity,
                                                                  List<PriceCalculateRespDTO.OrderItem> orderItems) {
-        Integer count = CollectionUtils.getSumValue(orderItems, PriceCalculateRespDTO.OrderItem::getCount, Integer::sum);
+        Integer count = getSumValue(orderItems, PriceCalculateRespDTO.OrderItem::getCount, Integer::sum);
         // price 的计算逻辑，使用 orderDividePrice 的原因，主要考虑分摊后，这个才是该 SKU 当前真实的支付总价
-        Integer price = CollectionUtils.getSumValue(orderItems, PriceCalculateRespDTO.OrderItem::getOrderDividePrice, Integer::sum);
+        Integer price = getSumValue(orderItems, PriceCalculateRespDTO.OrderItem::getOrderDividePrice, Integer::sum);
         assert count != null && price != null;
         for (int i = rewardActivity.getRules().size() - 1; i >= 0; i--) {
             RewardActivityDO.Rule rule = rewardActivity.getRules().get(i);
@@ -254,6 +263,65 @@ public class PriceServiceImpl implements PriceService {
      */
     private String getRewardActivityNotMeetTip(RewardActivityDO rewardActivity) {
         return "TODO"; // TODO 芋艿：后面再想想
+    }
+
+    // ========== 计算优惠劵级别的价格 ==========
+
+    private void calculatePriceForCouponLevel(Long userId, Long couponId, PriceCalculateRespDTO priceCalculate) {
+        // 校验优惠劵
+        if (couponId == null) {
+            return;
+        }
+        CouponDO coupon = couponService.validCoupon(couponId, userId);
+
+        // 获得匹配的商品 SKU 数组
+        List<PriceCalculateRespDTO.OrderItem> orderItems = getMatchCouponOrderItems(priceCalculate, coupon);
+        if (CollUtil.isEmpty(orderItems)) {
+            throw exception(COUPON_NO_MATCH_SPU);
+        }
+
+        // 计算是否满足优惠劵的使用金额
+        Integer originPrice = getSumValue(orderItems, PriceCalculateRespDTO.OrderItem::getOrderDividePrice, Integer::sum);
+        assert originPrice != null;
+        if (originPrice < coupon.getPriceAvailable()) {
+            throw exception(COUPON_NO_MATCH_MIN_PRICE);
+        }
+
+        // 计算可以优惠的金额
+        priceCalculate.getOrder().setCouponId(couponId);
+        Integer couponPrice = getCouponPrice(coupon, originPrice);
+        // 分摊金额
+        // TODO 芋艿：limit 不能超过最大价格
+        List<Integer> couponPartPrices = dividePrice(orderItems, couponPrice);
+        // 记录优惠明细
+        addPromotion(priceCalculate, orderItems, coupon.getId(), coupon.getTitle(),
+                PromotionTypeEnum.COUPON.getType(), PromotionLevelEnum.COUPON.getLevel(), couponPartPrices,
+                true, StrUtil.format("优惠劵：省 {} 元", formatPrice(couponPrice)));
+        // 修改 SKU 的分摊
+        for (int i = 0; i < orderItems.size(); i++) {
+            modifyOrderItemOrderPartPriceFromCouponPrice(orderItems.get(i), couponPartPrices.get(i), priceCalculate);
+        }
+    }
+
+    private List<PriceCalculateRespDTO.OrderItem> getMatchCouponOrderItems(PriceCalculateRespDTO priceCalculate,
+                                                                           CouponDO coupon) {
+        if (PromotionProductScopeEnum.ALL.getScope().equals(coupon.getProductScope())) {
+            return priceCalculate.getOrder().getItems();
+        }
+        return CollectionUtils.filterList(priceCalculate.getOrder().getItems(),
+                orderItem -> coupon.getSpuIds().contains(orderItem.getSpuId()));
+    }
+
+    private Integer getCouponPrice(CouponDO coupon, Integer originPrice) {
+        // TODO 芋艿 getPreferentialType 的枚举判断
+        if (coupon.getPreferentialType().equals(1)) { // 减价
+            return coupon.getPriceOff();
+        } else if (coupon.getPreferentialType().equals(2)) { // 打折
+            Integer couponPrice = originPrice * coupon.getPercentOff() / 100;
+            return coupon.getDiscountPriceLimit() == null ? couponPrice
+                    : Math.min(couponPrice, coupon.getDiscountPriceLimit()); // 优惠上限
+        }
+        throw new IllegalArgumentException(String.format("优惠劵(%s) 的优惠类型不正确", coupon.toString()));
     }
 
     // ========== 其它相对通用的方法 ==========
@@ -325,7 +393,7 @@ public class PriceServiceImpl implements PriceService {
                 orderItem -> new PriceCalculateRespDTO.PromotionItem().setSkuId(orderItem.getSkuId())
                         .setOriginalPrice(orderItem.getOrderDividePrice()).setDiscountPrice(0));
         // 创建营销明细
-        Integer originalPrice = CollectionUtils.getSumValue(orderItems, PriceCalculateRespDTO.OrderItem::getOrderDividePrice, Integer::sum);
+        Integer originalPrice = getSumValue(orderItems, PriceCalculateRespDTO.OrderItem::getOrderDividePrice, Integer::sum);
         PriceCalculateRespDTO.Promotion promotion = new PriceCalculateRespDTO.Promotion()
                 .setId(id).setName(name).setType(type).setLevel(level)
                 .setOriginalPrice(originalPrice).setDiscountPrice(0)
@@ -357,7 +425,7 @@ public class PriceServiceImpl implements PriceService {
      * 本质：分摊 Order 的 discountPrice 价格，到对应的 OrderItem 的 orderPartPrice 价格中
      *
      * @param orderItem 订单商品 SKU
-     * @param addOrderPartPrice 新增的
+     * @param addOrderPartPrice 新增的 discountPrice 价格
      * @param priceCalculate 价格计算结果
      */
     private void modifyOrderItemOrderPartPriceFromDiscountPrice(PriceCalculateRespDTO.OrderItem orderItem, Integer addOrderPartPrice,
@@ -368,6 +436,26 @@ public class PriceServiceImpl implements PriceService {
         // 设置 Order 相关相关字段
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
         order.setDiscountPrice(order.getDiscountPrice() + addOrderPartPrice);
+        order.setPayPrice(order.getPayPrice() - addOrderPartPrice);
+    }
+
+    /**
+     * 修改 OrderItem 的 orderPartPrice 价格，同时会修改 Order 的 couponPrice 价格
+     *
+     * 本质：分摊 Order 的 couponPrice 价格，到对应的 OrderItem 的 orderPartPrice 价格中
+     *
+     * @param orderItem 订单商品 SKU
+     * @param addOrderPartPrice 新增的 couponPrice 价格
+     * @param priceCalculate 价格计算结果
+     */
+    private void modifyOrderItemOrderPartPriceFromCouponPrice(PriceCalculateRespDTO.OrderItem orderItem, Integer addOrderPartPrice,
+                                                              PriceCalculateRespDTO priceCalculate) {
+        // 设置 OrderItem 价格相关字段
+        orderItem.setOrderPartPrice(orderItem.getOrderPartPrice() + addOrderPartPrice);
+        orderItem.setOrderDividePrice(orderItem.getPayPrice() - orderItem.getOrderPartPrice());
+        // 设置 Order 相关相关字段
+        PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
+        order.setCouponPrice(order.getCouponPrice() + addOrderPartPrice);
         order.setPayPrice(order.getPayPrice() - addOrderPartPrice);
     }
 

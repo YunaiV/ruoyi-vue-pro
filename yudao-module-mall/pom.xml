@@ -18,8 +18,8 @@
         商城大模块，由 product 商品、market 营销、trade 交易 coupon等组成
     </description>
     <modules>
-        <module>yudao-module-coupon-api</module>
-        <module>yudao-module-coupon-biz</module>
+<!--        <module>yudao-module-coupon-api</module>-->
+<!--        <module>yudao-module-coupon-biz</module>-->
         <module>yudao-module-market-api</module>
         <module>yudao-module-market-biz</module>
         <module>yudao-module-product-api</module>

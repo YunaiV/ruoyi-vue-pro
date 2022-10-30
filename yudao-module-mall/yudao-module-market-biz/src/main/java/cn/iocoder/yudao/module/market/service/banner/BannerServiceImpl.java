@@ -17,7 +17,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.market.enums.ErrorCodeConstants.BANNER_NOT_EXISTS;
 
 /**
- * 首页banner 实现类
+ * 首页 banner 实现类
  *
  * @author xia
  */

@@ -4,11 +4,14 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.market.api.price.dto.PriceCalculateReqDTO;
 import cn.iocoder.yudao.module.market.api.price.dto.PriceCalculateRespDTO;
+import cn.iocoder.yudao.module.market.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.market.dal.dataobject.discount.DiscountProductDO;
 import cn.iocoder.yudao.module.market.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.market.enums.common.PromotionConditionTypeEnum;
 import cn.iocoder.yudao.module.market.enums.common.PromotionLevelEnum;
+import cn.iocoder.yudao.module.market.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.market.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.market.service.coupon.CouponService;
 import cn.iocoder.yudao.module.market.service.discount.DiscountService;
 import cn.iocoder.yudao.module.market.service.reward.RewardService;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
@@ -44,6 +47,8 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
     private DiscountService discountService;
     @Mock
     private RewardService rewardService;
+    @Mock
+    private CouponService couponService;
     @Mock
     private ProductSkuApi productSkuApi;
 
@@ -352,6 +357,90 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotionItem012.getSkuId(), 20L);
         assertEquals(promotionItem012.getOriginalPrice(), 150);
         assertEquals(promotionItem012.getDiscountPrice(), 0);
+    }
+
+    @Test
+    public void testCalculatePrice_coupon() {
+        // 准备参数
+        PriceCalculateReqDTO calculateReqDTO = new PriceCalculateReqDTO().setUserId(randomLongId())
+                .setItems(asList(new PriceCalculateReqDTO.Item().setSkuId(10L).setCount(2),
+                        new PriceCalculateReqDTO.Item().setSkuId(20L).setCount(3),
+                        new PriceCalculateReqDTO.Item().setSkuId(30L).setCount(4)))
+                .setCouponId(1024L);
+        // mock 方法(商品 SKU 信息)
+        ProductSkuRespDTO productSku01 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(10L).setPrice(100).setSpuId(1L));
+        ProductSkuRespDTO productSku02 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(20L).setPrice(50).setSpuId(2L));
+        ProductSkuRespDTO productSku03 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(30L).setPrice(30).setSpuId(3L));
+        when(productSkuApi.getSkuList(eq(asSet(10L, 20L, 30L)))).thenReturn(asList(productSku01, productSku02, productSku03));
+        // mock 方法（优惠劵 Coupon 信息）
+        CouponDO coupon = randomPojo(CouponDO.class, o -> o.setId(1024L).setTitle("程序员节")
+                .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setSpuIds(asList(1L, 2L))
+                .setPriceAvailable(350).setPreferentialType(2).setPercentOff(50).setDiscountPriceLimit(70));
+        when(couponService.validCoupon(eq(1024L), eq(calculateReqDTO.getUserId()))).thenReturn(coupon);
+
+        // 200 + 150; 350
+        //
+
+        // 调用
+        PriceCalculateRespDTO priceCalculate = priceService.calculatePrice(calculateReqDTO);
+        // 断言 Order 部分
+        PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
+        assertEquals(order.getOriginalPrice(), 470);
+        assertEquals(order.getDiscountPrice(), 0);
+        assertEquals(order.getPointPrice(), 0);
+        assertEquals(order.getDeliveryPrice(), 0);
+        assertEquals(order.getPayPrice(), 400);
+        assertEquals(order.getCouponId(), 1024L);
+        assertEquals(order.getCouponPrice(), 70);
+        // 断言 OrderItem 部分
+        assertEquals(order.getItems().size(), 3);
+        PriceCalculateRespDTO.OrderItem orderItem01 = order.getItems().get(0);
+        assertEquals(orderItem01.getSkuId(), 10L);
+        assertEquals(orderItem01.getCount(), 2);
+        assertEquals(orderItem01.getOriginalPrice(), 200);
+        assertEquals(orderItem01.getOriginalUnitPrice(), 100);
+        assertEquals(orderItem01.getDiscountPrice(), 0);
+        assertEquals(orderItem01.getPayPrice(), 200);
+        assertEquals(orderItem01.getOrderPartPrice(), 40);
+        assertEquals(orderItem01.getOrderDividePrice(), 160);
+        PriceCalculateRespDTO.OrderItem orderItem02 = order.getItems().get(1);
+        assertEquals(orderItem02.getSkuId(), 20L);
+        assertEquals(orderItem02.getCount(), 3);
+        assertEquals(orderItem02.getOriginalPrice(), 150);
+        assertEquals(orderItem02.getOriginalUnitPrice(), 50);
+        assertEquals(orderItem02.getDiscountPrice(), 0);
+        assertEquals(orderItem02.getPayPrice(), 150);
+        assertEquals(orderItem02.getOrderPartPrice(), 30);
+        assertEquals(orderItem02.getOrderDividePrice(), 120);
+        PriceCalculateRespDTO.OrderItem orderItem03 = order.getItems().get(2);
+        assertEquals(orderItem03.getSkuId(), 30L);
+        assertEquals(orderItem03.getCount(), 4);
+        assertEquals(orderItem03.getOriginalPrice(), 120);
+        assertEquals(orderItem03.getOriginalUnitPrice(), 30);
+        assertEquals(orderItem03.getDiscountPrice(), 0);
+        assertEquals(orderItem03.getPayPrice(), 120);
+        assertEquals(orderItem03.getOrderPartPrice(), 0);
+        assertEquals(orderItem03.getOrderDividePrice(), 120);
+        // 断言 Promotion 部分
+        assertEquals(priceCalculate.getPromotions().size(), 1);
+        PriceCalculateRespDTO.Promotion promotion01 = priceCalculate.getPromotions().get(0);
+        assertEquals(promotion01.getId(), 1024L);
+        assertEquals(promotion01.getName(), "程序员节");
+        assertEquals(promotion01.getType(), PromotionTypeEnum.COUPON.getType());
+        assertEquals(promotion01.getLevel(), PromotionLevelEnum.COUPON.getLevel());
+        assertEquals(promotion01.getOriginalPrice(), 350);
+        assertEquals(promotion01.getDiscountPrice(), 70);
+        assertTrue(promotion01.getMeet());
+        assertEquals(promotion01.getMeetTip(), "优惠劵：省 0.70 元");
+        assertEquals(promotion01.getItems().size(), 2);
+        PriceCalculateRespDTO.PromotionItem promotionItem011 = promotion01.getItems().get(0);
+        assertEquals(promotionItem011.getSkuId(), 10L);
+        assertEquals(promotionItem011.getOriginalPrice(), 200);
+        assertEquals(promotionItem011.getDiscountPrice(), 40);
+        PriceCalculateRespDTO.PromotionItem promotionItem012 = promotion01.getItems().get(1);
+        assertEquals(promotionItem012.getSkuId(), 20L);
+        assertEquals(promotionItem012.getOriginalPrice(), 150);
+        assertEquals(promotionItem012.getDiscountPrice(), 30);
     }
 
 }
