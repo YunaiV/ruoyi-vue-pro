@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.market.api.price.PriceApi;
-import cn.iocoder.yudao.module.market.api.price.dto.PriceCalculateRespDTO;
+import cn.iocoder.yudao.module.promotion.api.price.PriceApi;
+import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;

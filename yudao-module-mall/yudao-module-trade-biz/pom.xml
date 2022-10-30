@@ -38,7 +38,7 @@
 
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-market-api</artifactId>
+            <artifactId>yudao-module-promotion-api</artifactId>
             <version>${revision}</version>
         </dependency>
 

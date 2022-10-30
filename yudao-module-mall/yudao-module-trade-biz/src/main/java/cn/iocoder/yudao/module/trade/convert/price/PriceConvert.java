@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.convert.price;
 
-import cn.iocoder.yudao.module.market.api.price.dto.PriceCalculateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

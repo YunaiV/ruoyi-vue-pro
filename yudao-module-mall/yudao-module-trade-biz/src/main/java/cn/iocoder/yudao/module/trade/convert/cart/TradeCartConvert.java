@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.trade.convert.cart;
 
-import cn.iocoder.yudao.module.market.api.price.dto.PriceCalculateReqDTO;
-import cn.iocoder.yudao.module.market.api.price.dto.PriceCalculateRespDTO;
+import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartDetailRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartItemDO;
 import org.mapstruct.Mapper;
