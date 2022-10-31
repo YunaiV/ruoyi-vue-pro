@@ -22,6 +22,7 @@
         <module>yudao-module-visualization</module>
         <!-- 示例项目 -->
         <module>yudao-example</module>
+        <module>yudao-module-demo</module>
     </modules>
 
     <name>${project.artifactId}</name>
