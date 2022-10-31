@@ -64,19 +64,19 @@ public class CodegenEngine {
             .put(javaTemplatePath("controller/vo/excelVO"), javaModuleImplVOFilePath("ExcelVO"))
             .put(javaTemplatePath("controller/controller"), javaModuleImplControllerFilePath())
             .put(javaTemplatePath("convert/convert"),
-                    javaModuleImplMainFilePath("convert/${table.businessName}/${table.className}Convert"))
+                    javaModuleImplMainFilePath("convert/${table.businessPath}/${table.className}Convert"))
             .put(javaTemplatePath("dal/do"),
-                    javaModuleImplMainFilePath("dal/dataobject/${table.businessName}/${table.className}DO"))
+                    javaModuleImplMainFilePath("dal/dataobject/${table.businessPath}/${table.className}DO"))
             .put(javaTemplatePath("dal/mapper"),
-                    javaModuleImplMainFilePath("dal/mysql/${table.businessName}/${table.className}Mapper"))
+                    javaModuleImplMainFilePath("dal/mysql/${table.businessPath}/${table.className}Mapper"))
             .put(javaTemplatePath("dal/mapper.xml"), mapperXmlFilePath())
             .put(javaTemplatePath("service/serviceImpl"),
-                    javaModuleImplMainFilePath("service/${table.businessName}/${table.className}ServiceImpl"))
+                    javaModuleImplMainFilePath("service/${table.businessPath}/${table.className}ServiceImpl"))
             .put(javaTemplatePath("service/service"),
-                    javaModuleImplMainFilePath("service/${table.businessName}/${table.className}Service"))
+                    javaModuleImplMainFilePath("service/${table.businessPath}/${table.className}Service"))
             // Java module-biz Test
             .put(javaTemplatePath("test/serviceTest"),
-                    javaModuleImplTestFilePath("service/${table.businessName}/${table.className}ServiceImplTest"))
+                    javaModuleImplTestFilePath("service/${table.businessPath}/${table.className}ServiceImplTest"))
             // Java module-api Main
             .put(javaTemplatePath("enums/errorcode"), javaModuleApiMainFilePath("enums/ErrorCodeConstants_手动操作"))
             // Vue2
