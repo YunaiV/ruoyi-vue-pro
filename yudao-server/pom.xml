@@ -61,7 +61,6 @@
             <artifactId>yudao-module-coupon-biz</artifactId>
             <version>${revision}</version>
         </dependency>
-
         <!-- 数据报表 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->

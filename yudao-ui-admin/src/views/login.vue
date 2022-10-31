@@ -129,13 +129,13 @@ export default {
       mobileCodeTimer: 0,
       loginForm: {
         loginType: "uname",
-        username: "",
-        password: "",
+        username: "admin",
+        password: "admin123",
         captchaVerification: "",
         mobile: "",
         mobileCode: "",
         rememberMe: false,
-        tenantName: "",
+        tenantName: "芋道源码",
       },
       scene: 21,
 
