@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityTypeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -92,48 +93,56 @@ public class CouponTemplateBaseVO {
     private Integer discountPriceLimit;
 
     @AssertTrue(message = "商品 SPU 编号的数组不能为空")
+    @JsonIgnore
     public boolean isProductSpuIdsValid() {
         return Objects.equals(productScope, PromotionProductScopeEnum.ALL.getScope()) // 全部范围时，可以为空
                 || CollUtil.isNotEmpty(productSpuIds);
     }
 
     @AssertTrue(message = "生效开始时间不能为空")
+    @JsonIgnore
     public boolean isValidStartTimeValid() {
         return ObjectUtil.notEqual(validityType, CouponTemplateValidityTypeEnum.DATE.getType())
                 || validStartTime != null;
     }
 
     @AssertTrue(message = "生效结束时间不能为空")
+    @JsonIgnore
     public boolean isValidEndTimeValid() {
         return ObjectUtil.notEqual(validityType, CouponTemplateValidityTypeEnum.DATE.getType())
                 || validEndTime != null;
     }
 
     @AssertTrue(message = "开始天数不能为空")
+    @JsonIgnore
     public boolean isFixedStartTermValid() {
         return ObjectUtil.notEqual(validityType, CouponTemplateValidityTypeEnum.TERM.getType())
                 || fixedStartTerm != null;
     }
 
     @AssertTrue(message = "结束天数不能为空")
+    @JsonIgnore
     public boolean isFixedEndTermValid() {
         return ObjectUtil.notEqual(validityType, CouponTemplateValidityTypeEnum.TERM.getType())
                 || fixedEndTerm != null;
     }
 
     @AssertTrue(message = "折扣百分比不能为空")
+    @JsonIgnore
     public boolean isDiscountPercentValid() {
         return ObjectUtil.notEqual(discountType, PromotionDiscountTypeEnum.PERCENT.getType())
                 || discountPercent != null;
     }
 
     @AssertTrue(message = "优惠金额不能为空")
+    @JsonIgnore
     public boolean isDiscountPriceValid() {
         return ObjectUtil.notEqual(discountType, PromotionDiscountTypeEnum.PRICE.getType())
                 || discountPrice != null;
     }
 
     @AssertTrue(message = "折扣上限不能为空")
+    @JsonIgnore
     public boolean isDiscountPriceLimit() {
         return ObjectUtil.notEqual(discountType, PromotionDiscountTypeEnum.PERCENT.getType())
                 || discountPriceLimit != null;

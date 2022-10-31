@@ -3,7 +3,10 @@ package cn.iocoder.yudao.framework.common.util.string;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 字符串工具类
@@ -35,6 +38,11 @@ public class StrUtils {
             }
         }
         return false;
+    }
+
+    public static List<Long> splitToLong(String value,  CharSequence separator) {
+        long[] longs = StrUtil.splitToLong(value, separator);
+        return Arrays.stream(longs).boxed().collect(Collectors.toList());
     }
 
 }
