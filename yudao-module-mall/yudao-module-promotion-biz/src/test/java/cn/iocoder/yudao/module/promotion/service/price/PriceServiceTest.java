@@ -198,10 +198,10 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         when(productSkuApi.getSkuList(eq(asSet(10L, 20L, 30L)))).thenReturn(asList(productSku01, productSku02, productSku03));
         // mock 方法（限时折扣 DiscountActivity 信息）
         RewardActivityDO rewardActivity01 = randomPojo(RewardActivityDO.class, o -> o.setId(1000L).setName("活动 1000 号")
-                .setSpuIds(asList(10L, 20L)).setConditionType(PromotionConditionTypeEnum.PRICE.getType())
+                .setProductSpuIds(asList(10L, 20L)).setConditionType(PromotionConditionTypeEnum.PRICE.getType())
                 .setRules(singletonList(new RewardActivityDO.Rule().setLimit(200).setDiscountPrice(70))));
         RewardActivityDO rewardActivity02 = randomPojo(RewardActivityDO.class, o -> o.setId(2000L).setName("活动 2000 号")
-                .setSpuIds(singletonList(30L)).setConditionType(PromotionConditionTypeEnum.COUNT.getType())
+                .setProductSpuIds(singletonList(30L)).setConditionType(PromotionConditionTypeEnum.COUNT.getType())
                 .setRules(asList(new RewardActivityDO.Rule().setLimit(1).setDiscountPrice(10),
                         new RewardActivityDO.Rule().setLimit(2).setDiscountPrice(60), // 最大可满足，因为是 4 个
                         new RewardActivityDO.Rule().setLimit(10).setDiscountPrice(100))));
@@ -301,7 +301,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         when(productSkuApi.getSkuList(eq(asSet(10L, 20L)))).thenReturn(asList(productSku01, productSku02));
         // mock 方法（限时折扣 DiscountActivity 信息）
         RewardActivityDO rewardActivity01 = randomPojo(RewardActivityDO.class, o -> o.setId(1000L).setName("活动 1000 号")
-                .setSpuIds(asList(10L, 20L)).setConditionType(PromotionConditionTypeEnum.PRICE.getType())
+                .setProductSpuIds(asList(10L, 20L)).setConditionType(PromotionConditionTypeEnum.PRICE.getType())
                 .setRules(singletonList(new RewardActivityDO.Rule().setLimit(351).setDiscountPrice(70))));
         Map<RewardActivityDO, Set<Long>> matchRewardActivities = new LinkedHashMap<>();
         matchRewardActivities.put(rewardActivity01, asSet(1L, 2L));

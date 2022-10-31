@@ -114,24 +114,24 @@ public class PriceServiceImpl implements PriceService {
      */
     private void calculatePriceForSkuLevel(Long userId, PriceCalculateRespDTO priceCalculate) {
         // 获取 SKU 级别的所有优惠信息
-        Supplier<Double> memberDiscountSupplier = getMemberDiscountSupplier(userId);
+        Supplier<Double> memberDiscountPercentSupplier = getMemberDiscountPercentSupplier(userId);
         Map<Long, DiscountProductDO> discountProducts = discountService.getMatchDiscountProducts(
                 convertSet(priceCalculate.getOrder().getItems(), PriceCalculateRespDTO.OrderItem::getSkuId));
 
         // 处理每个 SKU 的优惠
         priceCalculate.getOrder().getItems().forEach(orderItem -> {
             // 获取该 SKU 的优惠信息
-            Double memberDiscount = memberDiscountSupplier.get();
+            Double memberDiscountPercent = memberDiscountPercentSupplier.get();
             DiscountProductDO discountProduct = discountProducts.get(orderItem.getSkuId());
             if (discountProduct != null // 假设优惠价格更贵，则认为没优惠
                     && discountProduct.getPromotionPrice() >= orderItem.getOriginalUnitPrice()) {
                 discountProduct = null;
             }
-            if (memberDiscount == null && discountProduct == null) {
+            if (memberDiscountPercent == null && discountProduct == null) {
                 return;
             }
             // 计算价格，判断选择哪个折扣
-            Integer memberPrice = memberDiscount != null ? (int) (orderItem.getPayPrice() * memberDiscount / 100) : null;
+            Integer memberPrice = memberDiscountPercent != null ? (int) (orderItem.getPayPrice() * memberDiscountPercent / 100) : null;
             Integer promotionPrice = discountProduct != null ? discountProduct.getPromotionPrice() * orderItem.getCount() : null;
             if (memberPrice == null) {
                 calculatePriceByDiscountActivity(priceCalculate, orderItem, discountProduct, promotionPrice);
@@ -166,7 +166,7 @@ public class PriceServiceImpl implements PriceService {
     }
 
     // TODO 芋艿：提前实现
-    private Supplier<Double> getMemberDiscountSupplier(Long userId) {
+    private Supplier<Double> getMemberDiscountPercentSupplier(Long userId) {
         return Suppliers.memoize(() -> {
             if (userId == 1) {
                 return 90d;

@@ -2,24 +2,23 @@ package cn.iocoder.yudao.module.promotion.dal.dataobject.coupon;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 import java.util.Date;
 import java.util.List;
 
-// TODO 芋艿：待完善该实体
 /**
  * 优惠劵 DO
  */
-@TableName("coupon")
+@TableName(value = "promotion_coupon", autoResultMap = true)
+@KeySequence("promotion_coupo_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 public class CouponDO extends BaseDO {
 
     // ========== 基本信息 BEGIN ==========
@@ -28,7 +27,9 @@ public class CouponDO extends BaseDO {
      */
     private Long id;
     /**
-     * 优惠劵（码）分组编号，{@link CouponTemplateDO} 的 id
+     * 优惠劵模板编号
+     *
+     * 关联 {@link CouponTemplateDO#getId()}
      */
     private Integer templateId;
     /**
