@@ -19,4 +19,8 @@ public interface ErrorCodeConstants {
     ErrorCode COUPON_NO_MATCH_SPU = new ErrorCode(1003003000, "优惠劵没有可使用的商品！");
     ErrorCode COUPON_NO_MATCH_MIN_PRICE = new ErrorCode(1003003000, "不满足优惠劵使用的最低金额");
 
+    // ========== 优惠劵模板 1003004000 ==========
+    ErrorCode COUPON_TEMPLATE_NOT_EXISTS = new ErrorCode(1003004000, "优惠劵模板不存在");
+    ErrorCode COUPON_TEMPLATE_TOTAL_COUNT_TOO_SMALL = new ErrorCode(1003004001, "发放数量不能小于已领取数量({})");
+
 }

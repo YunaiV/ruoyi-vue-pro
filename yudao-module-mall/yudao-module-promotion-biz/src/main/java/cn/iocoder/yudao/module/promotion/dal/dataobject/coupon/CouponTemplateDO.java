@@ -73,7 +73,7 @@ public class CouponTemplateDO extends BaseDO {
      * 是否设置满多少金额可用，单位：分
      *
      * 0 - 不限制
-     * 大于0 - 多少金额可用
+     * 大于 0 - 多少金额可用
      */
     private Integer usePrice;
     /**
@@ -96,19 +96,19 @@ public class CouponTemplateDO extends BaseDO {
     /**
      * 固定日期 - 生效开始时间
      *
-     * 当 {@link #validityType} 为 {@link CouponTemplateValidityTypeEnum#FIXED_DATE}
+     * 当 {@link #validityType} 为 {@link CouponTemplateValidityTypeEnum#DATE}
      */
     private Date validStartTime;
     /**
      * 固定日期 - 生效结束时间
      *
-     * 当 {@link #validityType} 为 {@link CouponTemplateValidityTypeEnum#FIXED_DATE}
+     * 当 {@link #validityType} 为 {@link CouponTemplateValidityTypeEnum#DATE}
      */
     private Date validEndTime;
     /**
      * 领取日期 - 结束天数
      *
-     * 当 {@link #validityType} 为 {@link CouponTemplateValidityTypeEnum#FIXED_TERM_TODAY}
+     * 当 {@link #validityType} 为 {@link CouponTemplateValidityTypeEnum#TERM}
      */
     private Integer fixedEndTerm;
     // ========== 使用规则 END ==========
@@ -129,11 +129,11 @@ public class CouponTemplateDO extends BaseDO {
     /**
      * 优惠金额，单位：分
      *
-     * 当 {@link #discountType} 为 {@link PromotionDiscountTypeEnum#PRICE}
+     * 当 {@link #discountType} 为 {@link PromotionDiscountTypeEnum#PRICE} 生效
      */
     private Integer discountPrice;
     /**
-     * 折扣上限，仅在 {@link #discountType} 等于 {@link PromotionDiscountTypeEnum#PRICE} 时生效
+     * 折扣上限，仅在 {@link #discountType} 等于 {@link PromotionDiscountTypeEnum#PERCENT} 时生效
      *
      * 例如，折扣上限为 20 元，当使用 8 折优惠券，订单金额为 1000 元时，最高只可折扣 20 元，而非 80  元。
      */
