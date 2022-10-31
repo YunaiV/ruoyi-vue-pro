@@ -1,5 +1,10 @@
 <template>
+  <!-- TODO：挪到 mall/trade/order/index.vue -->
+  <!-- TODO：咱的一些 html 标签，是不是可以按照一行，紧凑一点，嘿嘿，这样阅读起来方便一些 -->
   <div class="app-container">
+
+    <!-- 搜索工作栏 -->
+    <!-- TODO: inline 看看是不是需要; v-show= 那块逻辑还是要的 -->
     <el-row :gutter="20">
       <el-form
         :model="queryParams"
@@ -133,6 +138,7 @@
       :row-class-name="rowClassName"
       border
     >
+      <!-- TODO: 多选，咱先去掉哈 -->
       <el-table-column type="selection" :selectable="(row, index) => index % 2"/>
       <el-table-column label="商品" prop="goods" width="360">
         <template slot-scope="{ row, $index }">
@@ -162,6 +168,7 @@
               <el-button type="text">详情</el-button>
               <el-button type="text">备注</el-button>
             </el-col>
+            <!-- TODO：关闭订单、修改地址、调整价格 -->
           </el-row>
           <div v-else class="goods-info">
             <img :src="row.picture"/>
@@ -169,6 +176,7 @@
           </div>
         </template>
       </el-table-column>
+      <!-- TODO：需要考虑下，一个订单下，有多个商品的情况 -->
       <el-table-column label="单价(元)/数量" prop="fee" align="center" width="115">
         <template slot-scope="{ row }">
           <div>{{row.price}}</div>
