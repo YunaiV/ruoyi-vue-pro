@@ -236,3 +236,31 @@ export const ProductSpuStatusEnum = {
     name: '上架'
   },
 }
+
+/**
+ * 优惠类型枚举
+ */
+export const PromotionDiscountTypeEnum = {
+  PRICE: {
+    type: 1,
+    name: '满减'
+  },
+  PERCENT: {
+    type: 2,
+    name: '折扣'
+  }
+}
+
+/**
+ * 优惠劵模板的有限期类型的枚举
+ */
+export const CouponTemplateValidityTypeEnum = {
+  DATE: {
+    type: 1,
+    name: '固定日期可用'
+  },
+  TERM: {
+    type: 2,
+    name: '领取之后可用'
+  }
+}

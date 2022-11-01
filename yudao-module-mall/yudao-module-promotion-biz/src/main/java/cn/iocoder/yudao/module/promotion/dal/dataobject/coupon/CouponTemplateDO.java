@@ -106,6 +106,12 @@ public class CouponTemplateDO extends BaseDO {
      */
     private Date validEndTime;
     /**
+     * 领取日期 - 开始天数
+     *
+     * 当 {@link #validityType} 为 {@link CouponTemplateValidityTypeEnum#TERM}
+     */
+    private Integer fixedStartTerm;
+    /**
      * 领取日期 - 结束天数
      *
      * 当 {@link #validityType} 为 {@link CouponTemplateValidityTypeEnum#TERM}

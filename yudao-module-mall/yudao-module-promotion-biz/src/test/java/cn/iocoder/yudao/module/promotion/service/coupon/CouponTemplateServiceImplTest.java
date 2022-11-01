@@ -1,30 +1,26 @@
 package cn.iocoder.yudao.module.promotion.service.coupon;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import javax.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.*;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplateCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplatePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.coupon.CouponTemplateMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import org.springframework.context.annotation.Import;
-import java.util.*;
+import java.util.Date;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_TEMPLATE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
 * {@link CouponTemplateServiceImpl} 的单元测试类
@@ -110,7 +106,7 @@ public class CouponTemplateServiceImplTest extends BaseDbUnitTest {
        CouponTemplateDO dbCouponTemplate = randomPojo(CouponTemplateDO.class, o -> { // 等会查询到
            o.setName(null);
            o.setStatus(null);
-           o.setType(null);
+           o.setDiscountType(null);
            o.setCreateTime(null);
        });
        couponTemplateMapper.insert(dbCouponTemplate);
@@ -119,14 +115,14 @@ public class CouponTemplateServiceImplTest extends BaseDbUnitTest {
        // 测试 status 不匹配
        couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setStatus(null)));
        // 测试 type 不匹配
-       couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setType(null)));
+       couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setDiscountType(null)));
        // 测试 createTime 不匹配
        couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setCreateTime(null)));
        // 准备参数
        CouponTemplatePageReqVO reqVO = new CouponTemplatePageReqVO();
        reqVO.setName(null);
        reqVO.setStatus(null);
-       reqVO.setType(null);
+       reqVO.setDiscountType(null);
        reqVO.setCreateTime((new Date[]{}));
 
        // 调用
@@ -135,39 +131,6 @@ public class CouponTemplateServiceImplTest extends BaseDbUnitTest {
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());
        assertPojoEquals(dbCouponTemplate, pageResult.getList().get(0));
-    }
-
-    @Test
-    @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
-    public void testGetCouponTemplateList() {
-       // mock 数据
-       CouponTemplateDO dbCouponTemplate = randomPojo(CouponTemplateDO.class, o -> { // 等会查询到
-           o.setName(null);
-           o.setStatus(null);
-           o.setType(null);
-           o.setCreateTime(null);
-       });
-       couponTemplateMapper.insert(dbCouponTemplate);
-       // 测试 name 不匹配
-       couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setName(null)));
-       // 测试 status 不匹配
-       couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setStatus(null)));
-       // 测试 type 不匹配
-       couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setType(null)));
-       // 测试 createTime 不匹配
-       couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setCreateTime(null)));
-       // 准备参数
-       CouponTemplateExportReqVO reqVO = new CouponTemplateExportReqVO();
-       reqVO.setName(null);
-       reqVO.setStatus(null);
-       reqVO.setType(null);
-       reqVO.setCreateTime((new Date[]{}));
-
-       // 调用
-       List<CouponTemplateDO> list = couponTemplateService.getCouponTemplateList(reqVO);
-       // 断言
-       assertEquals(1, list.size());
-       assertPojoEquals(dbCouponTemplate, list.get(0));
     }
 
 }

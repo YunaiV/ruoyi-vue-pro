@@ -15,8 +15,8 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum PromotionDiscountTypeEnum implements IntArrayValuable {
 
-    PRICE(1, "减价"), // 具体金额
-    PERCENT(2, "打折"), // 百分比
+    PRICE(1, "满减"), // 具体金额
+    PERCENT(2, "折扣"), // 百分比
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PromotionDiscountTypeEnum::getType).toArray();

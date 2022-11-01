@@ -2,25 +2,19 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="优惠劵名" prop="name">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="82px">
+      <el-form-item label="优惠券名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入优惠劵名" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+      <el-form-item label="优惠券类型" prop="discountType">
+        <el-select v-model="queryParams.discountType" placeholder="请选择优惠券类型" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.PROMOTION_DISCOUNT_TYPE)"
+                     :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="类型
-     *
-     * 1-优惠劵
-     * 2-优惠码" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择类型
-     *
-     * 1-优惠劵
-     * 2-优惠码" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.PRODUCT_SPU_STATUS)"
+      <el-form-item label="优惠券状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择优惠券状态" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                        :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
@@ -48,43 +42,22 @@
       <el-table-column label="优惠券名称" align="center" prop="name" />
       <el-table-column label="优惠券类型" align="center" prop="discountType">
         <template slot-scope="scope">
-          <dict-tag :type="DICT_TYPE.PRODUCT_SPU_STATUS" :value="scope.row.type" />
+          <dict-tag :type="DICT_TYPE.PROMOTION_DISCOUNT_TYPE" :value="scope.row.discountType" />
         </template>
       </el-table-column>
-      <el-table-column label="发行总量" align="center" prop="totalCount" />
-      <el-table-column label="每人限领个数
-     *
-     * null - 则表示不限制" align="center" prop="takeLimitCount" />
-      <el-table-column label="领取方式" align="center" prop="takeType" />
-      <el-table-column label="是否设置满多少金额可用，单位：分" align="center" prop="usePrice" />
-      <el-table-column label="商品范围" align="center" prop="productScope" />
-      <el-table-column label="商品 SPU 编号的数组" align="center" prop="productSpuIds" />
-      <el-table-column label="生效日期类型" align="center" prop="validityType" />
-      <el-table-column label="固定日期-生效开始时间" align="center" prop="validStartTime" width="180">
+      <el-table-column label="优惠金额 / 折扣" align="center" prop="discount" :formatter="discountFormat" />
+      <el-table-column label="发放数量" align="center" prop="totalCount" />
+      <el-table-column label="剩余数量" align="center" prop="totalCount" :formatter="row => (row.totalCount - row.takeCount)" />
+      <el-table-column label="领取上限" align="center" prop="takeLimitCount" :formatter="takeLimitCountFormat" />
+      <el-table-column label="有效期限" align="center" prop="validityType" width="180" :formatter="validityTypeFormat" />
+      <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.validStartTime) }}</span>
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column label="固定日期-生效结束时间" align="center" prop="validEndTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.validEndTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="领取日期-开始天数" align="center" prop="fixedStartTerm" />
-      <el-table-column label="领取日期-结束天数" align="center" prop="fixedEndTerm" />
-      <el-table-column label="折扣百分比" align="center" prop="discountPercent" />
-      <el-table-column label="优惠金额，单位：分" align="center" prop="discountPrice" />
-      <el-table-column label="折扣上限" />
-      <el-table-column label="领取优惠券的数量" align="center" prop="takeNum" />
-      <el-table-column label="使用优惠券的次数" align="center" prop="useCount" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="优惠券类型" align="center" prop="status">
-        <template slot-scope="scope">
-          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -185,7 +158,8 @@
 </template>
 
 <script>
-import { createCouponTemplate, updateCouponTemplate, deleteCouponTemplate, getCouponTemplate, getCouponTemplatePage, exportCouponTemplateExcel } from "@/api/promotion/couponTemplate";
+import { createCouponTemplate, updateCouponTemplate, deleteCouponTemplate, getCouponTemplate, getCouponTemplatePage } from "@/api/promotion/couponTemplate";
+import {CouponTemplateValidityTypeEnum, PromotionDiscountTypeEnum} from "@/utils/constants";
 
 export default {
   name: "CouponTemplate",
@@ -340,6 +314,33 @@ export default {
           this.$modal.msgSuccess("删除成功");
         }).catch(() => {});
     },
+    // 格式化【优惠金额/折扣】
+    discountFormat(row, column) {
+      if (row.discountType === PromotionDiscountTypeEnum.PRICE.type) {
+        return `￥${(row.discountPrice / 100.0).toFixed(2)}`;
+      }
+      if (row.discountType === PromotionDiscountTypeEnum.PERCENT.type) {
+        return `￥${(row.discountPrice / 100.0).toFixed(2)}`;
+      }
+      return '未知【' + row.discountType + '】';
+    },
+    // 格式化【领取上限】
+    takeLimitCountFormat(row, column) {
+      if (row.takeLimitCount === -1) {
+        return '无领取限制';
+      }
+      return `${row.takeLimitCount} 张/人`
+    },
+    // 格式化【有效期限】
+    validityTypeFormat(row, column) {
+      if (row.validityType === CouponTemplateValidityTypeEnum.DATE.type) {
+        return `${parseTime(row.validStartTime)} 至 ${parseTime(row.validEndTime)}`
+      }
+      if (row.validityType === CouponTemplateValidityTypeEnum.TERM.type) {
+        return `领取后第 ${row.fixedStartTerm} - ${row.fixedEndTerm} 天内可用`
+      }
+      return '未知【' + row.validityType + '】';
+    }
   }
 };
 </script>
