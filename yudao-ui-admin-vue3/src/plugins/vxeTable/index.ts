@@ -53,14 +53,46 @@ VXETable.setup({
   version: 0, // 版本号，对于某些带数据缓存的功能有用到，上升版本号可以用于重置数据
   zIndex: 1008, // 全局 zIndex 起始值，如果项目的的 z-index 样式值过大时就需要跟随设置更大，避免被遮挡
   loadingText: '加载中...', // 全局loading提示内容，如果为null则不显示文本
+  height: 600,
   table: {
+    border: 'inner',
     // 自动监听父元素的变化去重新计算表格
     autoResize: true,
     emptyText: '暂无数据',
     // 鼠标移到行是否要高亮显示
     highlightHoverRow: true
   },
+  grid: {
+    toolbarConfig: {
+      refresh: true,
+      import: true,
+      export: true,
+      print: true,
+      zoom: true,
+      custom: true
+    },
+    pagerConfig: {
+      border: false,
+      background: true,
+      autoHidden: true,
+      perfect: true,
+      pageSize: 10,
+      pagerCount: 7,
+      pageSizes: [5, 10, 15, 20, 50, 100, 200, 500],
+      layouts: [
+        'PrevJump',
+        'PrevPage',
+        'Jump',
+        'PageCount',
+        'NextPage',
+        'NextJump',
+        'Sizes',
+        'Total'
+      ]
+    }
+  },
   pager: {
+    background: true,
     autoHidden: false,
     perfect: true,
     pageSize: 10,
