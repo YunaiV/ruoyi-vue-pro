@@ -103,6 +103,9 @@ VXETable.setup({
   input: {
     clearable: true
   },
+  form: {
+    titleColon: true // 是否显示标题冒号
+  },
   modal: {
     width: 600, // 窗口的宽度
     height: 400, // 窗口的高度
@@ -123,6 +126,14 @@ VXETable.setup({
       ? XEUtils.toFormatString(XEUtils.get(zhCN, key), args)
       : XEUtils.toFormatString(XEUtils.get(enUS, key), args)
   }
+})
+// 格式金额，默认2位数
+VXETable.formats.add('formatAmount', ({ cellValue }, digits = 2) => {
+  return XEUtils.commafy(XEUtils.toNumber(cellValue), { digits })
+})
+// 格式日期，默认 yyyy-MM-dd HH:mm:ss
+VXETable.formats.add('formatDate', ({ cellValue }, format = 'yyyy-MM-dd HH:mm:ss') => {
+  return XEUtils.toDateString(cellValue, format)
 })
 export const setupVxeTable = (app: App<Element>) => {
   // 表格功能

@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import dayjs from 'dayjs'
-import XEUtils from 'xe-utils'
 import { useI18n } from '@/hooks/web/useI18n'
-import { VxeFormEvents, VxeFormItemProps, VxeGrid, VxeGridInstance, VxeGridProps } from 'vxe-table'
+import {
+  VxeFormEvents,
+  VxeFormInstance,
+  VxeFormItemProps,
+  VxeGrid,
+  VxeGridInstance,
+  VxeGridProps
+} from 'vxe-table'
 import * as PostApi from '@/api/system/post'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { ContentWrap } from '@/components/ContentWrap'
@@ -14,6 +20,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 const { t } = useI18n() // 国际化
 
 const xGrid = ref<VxeGridInstance>()
+const xForm = ref<VxeFormInstance>()
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const actionType = ref('') // 操作按钮的类型
@@ -93,9 +100,7 @@ const gridOptions = reactive<VxeGridProps>({
       title: t('common.createTime'),
       width: 160,
       sortable: true,
-      formatter({ cellValue }) {
-        return XEUtils.toDateString(cellValue, 'yyyy-MM-dd HH:ss:mm')
-      }
+      formatter: 'formatDate'
     },
     {
       field: 'action',
@@ -203,6 +208,8 @@ const handleDetail = (row: PostVO) => {
 }
 // 新增操作
 const handleCreate = () => {
+  const $form = xForm.value
+  $form?.reset()
   setDialogTile('create')
 }
 
@@ -308,11 +315,11 @@ const submitForm: VxeFormEvents.Submit = async () => {
     <template #default>
       <!-- 对话框(添加 / 修改) -->
       <vxe-form
+        ref="xForm"
         v-if="['create', 'update'].includes(actionType)"
         :data="formData"
         :items="formItems"
         :rules="rules"
-        titleColon
         @submit="submitForm"
       />
       <Descriptions
