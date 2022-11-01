@@ -62,6 +62,8 @@ export const DICT_TYPE = {
 
   // ========== MALL - PROMOTION 模块 ==========
   PROMOTION_DISCOUNT_TYPE: 'promotion_discount_type', // 优惠类型
+  PROMOTION_PRODUCT_SCOPE: 'promotion_product_scope', // 营销的商品范围
+  COUPON_TEMPLATE_VALIDITY_TYPE: 'coupon_template_validity_type', // 优惠劵模板的有限期类型
 }
 
 /**

@@ -264,3 +264,17 @@ export const CouponTemplateValidityTypeEnum = {
     name: '领取之后可用'
   }
 }
+
+/**
+ * 营销的商品范围枚举
+ */
+export const PromotionProductScopeEnum = {
+  ALL: {
+    scope: 1,
+    name: '全部商品参与'
+  },
+  SPU: {
+    scope: 2,
+    name: '指定商品参与'
+  }
+}
