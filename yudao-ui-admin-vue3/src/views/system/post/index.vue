@@ -26,7 +26,10 @@ const gridOptions = reactive<VxeGridProps>({
     isHover: true
   },
   toolbarConfig: {
-    buttons: [{ code: 'insert_actived', name: '新增' }]
+    custom: true,
+    slots: {
+      buttons: 'toolbar_buttons'
+    }
   },
   printConfig: {
     columns: [
@@ -44,19 +47,19 @@ const gridOptions = reactive<VxeGridProps>({
       {
         field: 'name',
         title: '岗位名称',
-        span: 8,
+        span: 6,
         itemRender: { name: '$input', props: { placeholder: '请输入岗位名称' } }
       },
       {
         field: 'code',
         title: '岗位编码',
-        span: 8,
+        span: 6,
         itemRender: { name: '$input', props: { placeholder: '请输入岗位编码' } }
       },
       {
         field: 'status',
         title: t('common.status'),
-        span: 8,
+        span: 6,
         itemRender: { name: '$select', options: getIntDictOptions(DICT_TYPE.COMMON_STATUS) }
       },
       {
@@ -139,7 +142,7 @@ const formData = ref<PostVO>({
   remark: '',
   createTime: ''
 })
-const formItems = reactive<VxeFormItemProps[]>([
+const formItems = ref<VxeFormItemProps[]>([
   {
     field: 'id',
     title: 'id',
@@ -148,25 +151,25 @@ const formItems = reactive<VxeFormItemProps[]>([
   {
     field: 'name',
     title: '岗位名称',
-    span: 8,
+    span: 12,
     itemRender: { name: '$input', props: { placeholder: '请输入岗位名称' } }
   },
   {
     field: 'code',
     title: '岗位编码',
-    span: 8,
+    span: 12,
     itemRender: { name: '$input', props: { placeholder: '请输入岗位编码' } }
   },
   {
     field: 'sort',
     title: '岗位顺序',
-    span: 8,
+    span: 12,
     itemRender: { name: '$input', props: { type: 'number', placeholder: '请输入岗位顺序' } }
   },
   {
     field: 'status',
     title: t('common.status'),
-    span: 8,
+    span: 12,
     itemRender: {
       name: '$select',
       options: getIntDictOptions(DICT_TYPE.COMMON_STATUS),
@@ -290,6 +293,7 @@ const submitForm: VxeFormEvents.Submit = async () => {
   <vxe-modal
     v-model="dialogVisible"
     id="myModal6"
+    :title="dialogTitle"
     width="800"
     height="400"
     min-width="460"
@@ -301,9 +305,6 @@ const submitForm: VxeFormEvents.Submit = async () => {
     transfer
     show-footer
   >
-    <template #title>
-      <span>{{ dialogTitle }}</span>
-    </template>
     <template #default>
       <!-- 对话框(添加 / 修改) -->
       <vxe-form

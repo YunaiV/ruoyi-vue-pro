@@ -41,10 +41,10 @@ const handleCreate = () => {
 }
 
 // 修改操作
-const handleUpdate = async (row: PostVO) => {
+const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
-  const res = await PostApi.getPostApi(row.id)
+  const res = await PostApi.getPostApi(rowId)
   unref(formRef)?.setValues(res)
 }
 
@@ -133,7 +133,7 @@ getList()
           link
           type="primary"
           v-hasPermi="['system:post:update']"
-          @click="handleUpdate(row)"
+          @click="handleUpdate(row.id)"
         >
           <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
         </el-button>
