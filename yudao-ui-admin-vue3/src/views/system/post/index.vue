@@ -123,6 +123,7 @@ const gridOptions = reactive<VxeGridProps>({
   },
   proxyConfig: {
     seq: true, // 启用动态序号代理（分页之后索引自动计算为当前页的起始序号）
+    form: true, // 启用表单代理，当点击表单提交按钮时会自动触发 reload 行为
     props: {
       result: 'list',
       total: 'total'
@@ -139,14 +140,7 @@ const gridOptions = reactive<VxeGridProps>({
     }
   }
 })
-const formData = ref<PostVO>({
-  name: '',
-  code: '',
-  sort: 0,
-  status: 0,
-  remark: '',
-  createTime: ''
-})
+const formData = ref<PostVO>()
 const formItems = ref<VxeFormItemProps[]>([
   {
     field: 'id',
@@ -208,9 +202,8 @@ const handleDetail = (row: PostVO) => {
 }
 // 新增操作
 const handleCreate = () => {
-  const $form = xForm.value
-  $form?.reset()
   setDialogTile('create')
+  xForm.value?.reset()
 }
 
 // 修改操作
@@ -232,8 +225,7 @@ const handleDelete = (rowId: number) => {
     })
     .finally(() => {
       ElMessage.success(t('common.delSuccess'))
-      const $grid = xGrid.value
-      $grid?.commitProxy('query')
+      xGrid.value?.commitProxy('query')
     })
 }
 // 提交按钮
@@ -253,8 +245,7 @@ const submitForm: VxeFormEvents.Submit = async () => {
     dialogVisible.value = false
   } finally {
     actionLoading.value = false
-    const $grid = xGrid.value
-    $grid?.commitProxy('query')
+    xGrid.value?.commitProxy('query')
   }
 }
 </script>
