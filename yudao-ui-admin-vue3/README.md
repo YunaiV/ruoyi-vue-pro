@@ -28,7 +28,7 @@
 | 框架 | 说明 | 版本     |
 | --- | --- |--------|
 | [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.41 |
-| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.1.8  |
+| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.2.2  |
 | [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.19 |
 | [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.8.4  |
 | [pinia](https://pinia.vuejs.org/) | Vue 存储库 替代 vuex5 | 2.0.23 |
