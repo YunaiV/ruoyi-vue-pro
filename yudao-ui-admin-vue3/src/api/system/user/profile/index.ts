@@ -16,7 +16,7 @@ export const updateUserProfileApi = (params) => {
 export const updateUserPwdApi = (oldPassword: string, newPassword: string) => {
   return request.put({
     url: '/system/user/profile/update-password',
-    params: {
+    data: {
       oldPassword: oldPassword,
       newPassword: newPassword
     }
