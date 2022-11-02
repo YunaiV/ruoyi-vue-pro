@@ -10,10 +10,7 @@ import cn.iocoder.yudao.module.promotion.convert.price.PriceConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionLevelEnum;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.promotion.enums.common.*;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
 import cn.iocoder.yudao.module.promotion.service.discount.DiscountService;
 import cn.iocoder.yudao.module.promotion.service.reward.RewardService;
@@ -283,7 +280,7 @@ public class PriceServiceImpl implements PriceService {
         // 计算是否满足优惠劵的使用金额
         Integer originPrice = getSumValue(orderItems, PriceCalculateRespDTO.OrderItem::getOrderDividePrice, Integer::sum);
         assert originPrice != null;
-        if (originPrice < coupon.getPriceAvailable()) {
+        if (originPrice < coupon.getUsePrice()) {
             throw exception(COUPON_NO_MATCH_MIN_PRICE);
         }
 
@@ -294,7 +291,7 @@ public class PriceServiceImpl implements PriceService {
         // TODO 芋艿：limit 不能超过最大价格
         List<Integer> couponPartPrices = dividePrice(orderItems, couponPrice);
         // 记录优惠明细
-        addPromotion(priceCalculate, orderItems, coupon.getId(), coupon.getTitle(),
+        addPromotion(priceCalculate, orderItems, coupon.getId(), coupon.getName(),
                 PromotionTypeEnum.COUPON.getType(), PromotionLevelEnum.COUPON.getLevel(), couponPartPrices,
                 true, StrUtil.format("优惠劵：省 {} 元", formatPrice(couponPrice)));
         // 修改 SKU 的分摊
@@ -309,19 +306,18 @@ public class PriceServiceImpl implements PriceService {
             return priceCalculate.getOrder().getItems();
         }
         return CollectionUtils.filterList(priceCalculate.getOrder().getItems(),
-                orderItem -> coupon.getSpuIds().contains(orderItem.getSpuId()));
+                orderItem -> coupon.getProductSpuIds().contains(orderItem.getSpuId()));
     }
 
     private Integer getCouponPrice(CouponDO coupon, Integer originPrice) {
-        // TODO 芋艿 getPreferentialType 的枚举判断
-        if (coupon.getPreferentialType().equals(1)) { // 减价
-            return coupon.getPriceOff();
-        } else if (coupon.getPreferentialType().equals(2)) { // 打折
-            Integer couponPrice = originPrice * coupon.getPercentOff() / 100;
-            return coupon.getDiscountPriceLimit() == null ? couponPrice
-                    : Math.min(couponPrice, coupon.getDiscountPriceLimit()); // 优惠上限
+        if (PromotionDiscountTypeEnum.PRICE.getType().equals(coupon.getDiscountType())) { // 减价
+            return coupon.getDiscountPrice();
+        } else if (PromotionDiscountTypeEnum.PERCENT.getType().equals(coupon.getDiscountType())) { // 打折
+            int couponPrice = originPrice * coupon.getDiscountPercent() / 100;
+            return coupon.getDiscountLimitPrice() == null ? couponPrice
+                    : Math.min(couponPrice, coupon.getDiscountLimitPrice()); // 优惠上限
         }
-        throw new IllegalArgumentException(String.format("优惠劵(%s) 的优惠类型不正确", coupon.toString()));
+        throw new IllegalArgumentException(String.format("优惠劵(%s) 的优惠类型不正确", coupon));
     }
 
     // ========== 其它相对通用的方法 ==========

@@ -373,7 +373,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         ProductSkuRespDTO productSku03 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(30L).setPrice(30).setSpuId(3L));
         when(productSkuApi.getSkuList(eq(asSet(10L, 20L, 30L)))).thenReturn(asList(productSku01, productSku02, productSku03));
         // mock 方法（优惠劵 Coupon 信息）
-        CouponDO coupon = randomPojo(CouponDO.class, o -> o.setId(1024L).setTitle("程序员节")
+        CouponDO coupon = randomPojo(CouponDO.class, o -> o.setId(1024L).setName("程序员节")
                 .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setSpuIds(asList(1L, 2L))
                 .setPriceAvailable(350).setPreferentialType(2).setPercentOff(50).setDiscountPriceLimit(70));
         when(couponService.validCoupon(eq(1024L), eq(calculateReqDTO.getUserId()))).thenReturn(coupon);

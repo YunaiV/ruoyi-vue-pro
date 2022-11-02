@@ -21,6 +21,8 @@ import java.util.List;
  * 优惠劵模板 DO
  *
  * 当用户领取时，会生成 {@link CouponDO} 优惠劵
+ *
+ * @author 芋道源码
  */
 @TableName(value = "promotion_coupon_template", autoResultMap = true)
 @KeySequence("promotion_coupon_template_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

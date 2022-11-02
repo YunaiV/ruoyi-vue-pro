@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.coupon;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
+import cn.iocoder.yudao.module.promotion.enums.coupon.CouponStatusEnum;
+import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,9 +17,11 @@ import java.util.List;
 
 /**
  * 优惠劵 DO
+ *
+ * @author 芋道源码
  */
 @TableName(value = "promotion_coupon", autoResultMap = true)
-@KeySequence("promotion_coupo_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@KeySequence("promotion_coupon_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class CouponDO extends BaseDO {
@@ -35,21 +40,13 @@ public class CouponDO extends BaseDO {
     /**
      * 优惠劵名
      *
-     * 冗余自 {@link CouponTemplateDO} 的 title
-     *
-     * TODO 芋艿，暂时不考虑冗余的更新
+     * 冗余 {@link CouponTemplateDO#getName()}
      */
-    private String title;
-//    /**
-//     * 核销码
-//     */
-//    private String verifyCode;
+    private String name;
     /**
      * 优惠码状态
      *
-     * 1-未使用
-     * 2-已使用
-     * 3-已失效
+     * 枚举 {@link CouponStatusEnum}
      */
     private Integer status;
 
@@ -58,13 +55,14 @@ public class CouponDO extends BaseDO {
     // ========== 领取情况 BEGIN ==========
     /**
      * 用户编号
+     *
+     * 关联 MemberUserDO 的 id 字段
      */
-    private Integer userId;
+    private Long userId;
     /**
      * 领取类型
      *
-     * 1 - 用户主动领取
-     * 2 - 后台自动发放
+     * 枚举 {@link CouponTakeTypeEnum}
      */
     private Integer takeType;
     // ========== 领取情况 END ==========
@@ -72,8 +70,10 @@ public class CouponDO extends BaseDO {
     // ========== 使用规则 BEGIN ==========
     /**
      * 是否设置满多少金额可用，单位：分
+     *
+     * 冗余 {@link CouponTemplateDO#getUsePrice()}
      */
-    private Integer priceAvailable;
+    private Integer usePrice;
     /**
      * 生效开始时间
      */
@@ -90,50 +90,49 @@ public class CouponDO extends BaseDO {
     private Integer productScope;
     /**
      * 商品 SPU 编号的数组
+     *
+     * 冗余 {@link CouponTemplateDO#getProductSpuIds()}
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Long> spuIds;
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> productSpuIds;
     // ========== 使用规则 END ==========
 
     // ========== 使用效果 BEGIN ==========
     /**
-     * 优惠类型
+     * 折扣类型
      *
-     * 1-代金卷
-     * 2-折扣卷
+     * 冗余 {@link CouponTemplateDO#getDiscountType()}
      */
-    private Integer preferentialType;
+    private Integer discountType;
     /**
-     * 折扣
-     */
-    private Integer percentOff;
-    /**
-     * 优惠金额，单位：分。
-     */
-    private Integer priceOff;
-    /**
-     * 折扣上限，仅在 {@link #preferentialType} 等于 2 时生效。
+     * 折扣百分比
      *
-     * 例如，折扣上限为 20 元，当使用 8 折优惠券，订单金额为 1000 元时，最高只可折扣 20 元，而非 80  元。
+     * 冗余 {@link CouponTemplateDO#getDiscountPercent()}
      */
-    private Integer discountPriceLimit;
+    private Integer discountPercent;
+    /**
+     * 优惠金额，单位：分
+     *
+     * 冗余 {@link CouponTemplateDO#getDiscountPrice()}
+     */
+    private Integer discountPrice;
+    /**
+     * 折扣上限，仅在 {@link #discountType} 等于 {@link PromotionDiscountTypeEnum#PERCENT} 时生效
+     *
+     * 冗余 {@link CouponTemplateDO#getDiscountLimitPrice()}
+     */
+    private Integer discountLimitPrice;
     // ========== 使用效果 END ==========
 
     // ========== 使用情况 BEGIN ==========
-//    /**
-//     * 使用订单号
-//     */
-//    private Integer usedOrderId; // TODO 芋艿，暂时不考虑这个字段
-//    /**
-//     * 订单中优惠面值，单位：分
-//     */
-//    private Integer usedPrice; // TODO 芋艿，暂时不考虑这个字段
+    /**
+     * 使用订单号
+     */
+    private Long useOrderId;
     /**
      * 使用时间
      */
-    private Date usedTime;
-
-    // TODO 芋艿，后续要加优惠劵的使用日志，因为下单后，可能会取消。
+    private Date useTime;
 
     // ========== 使用情况 END ==========
 
