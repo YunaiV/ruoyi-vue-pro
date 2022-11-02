@@ -39,5 +39,6 @@
   "i18n-ally.sourceLanguage": "en",
   "i18n-ally.displayLanguage": "zh-CN",
   "i18n-ally.enabledFrameworks": ["vue", "react"],
-  "god.tsconfig": "./tsconfig.json"
+  "god.tsconfig": "./tsconfig.json",
+  "vue-i18n.i18nPaths": "src/locales"
 }
