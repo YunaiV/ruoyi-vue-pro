@@ -69,7 +69,7 @@ public class RewardActivityDO extends BaseDO {
      * 商品 SPU 编号的数组
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Long> spuIds;
+    private List<Long> productSpuIds;
     /**
      * 优惠规则的数组
      */
