@@ -50,3 +50,11 @@ export function getSpuPage(query) {
     params: query
   })
 }
+
+// 获得商品 SPU 精简列表
+export function getSpuSimpleList() {
+  return request({
+    url: '/product/spu/get-simple-list',
+    method: 'get',
+  })
+}

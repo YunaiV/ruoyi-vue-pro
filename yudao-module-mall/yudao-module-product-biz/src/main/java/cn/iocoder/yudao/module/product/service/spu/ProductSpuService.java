@@ -64,6 +64,13 @@ public interface ProductSpuService {
     List<ProductSpuDO> getSpuList(Collection<Long> ids);
 
     /**
+     * 获得所有商品 SPU 列表
+     *
+     * @return 商品 SPU 列表
+     */
+    List<ProductSpuDO> getSpuList();
+
+    /**
      * 获得商品 SPU 分页
      *
      * @param pageReqVO 分页查询

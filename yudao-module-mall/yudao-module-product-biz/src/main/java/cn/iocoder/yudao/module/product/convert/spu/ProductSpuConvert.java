@@ -36,5 +36,7 @@ public interface ProductSpuConvert {
     AppSpuPageRespVO convertAppResp(ProductSpuDO list);
 
     List<SpuInfoRespDTO> convertList2(List<ProductSpuDO> list);
-    
+
+    List<ProductSpuSimpleRespVO> convertList02(List<ProductSpuDO> list);
+
 }

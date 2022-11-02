@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.service.coupon;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplateCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplatePageReqVO;
@@ -30,7 +31,8 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     @Override
     public Long createCouponTemplate(CouponTemplateCreateReqVO createReqVO) {
         // 插入
-        CouponTemplateDO couponTemplate = CouponTemplateConvert.INSTANCE.convert(createReqVO);
+        CouponTemplateDO couponTemplate = CouponTemplateConvert.INSTANCE.convert(createReqVO)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         couponTemplateMapper.insert(couponTemplate);
         // 返回
         return couponTemplate.getId();

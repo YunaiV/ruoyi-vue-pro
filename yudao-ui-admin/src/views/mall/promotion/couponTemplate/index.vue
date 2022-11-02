@@ -108,7 +108,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="form.takeType === 1" label="发放数量" prop="totalCount">
-          <el-input-number v-model="form.usePrice" placeholder="发放数量，没有之后不能领取或发放，-1 为不限制"
+          <el-input-number v-model="form.totalCount" placeholder="发放数量，没有之后不能领取或发放，-1 为不限制"
                            style="width: 400px" :precision="0" :min="-1" /> 张
         </el-form-item>
         <el-form-item v-if="form.takeType === 1" label="每人限领个数" prop="takeLimitCount">
@@ -122,8 +122,8 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="form.validityType === CouponTemplateValidityTypeEnum.DATE.type" label="固定日期" prop="validTimes">
-          <el-date-picker v-model="queryParams.validTimes" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
-                          range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+          <el-date-picker v-model="form.validTimes" style="width: 240px"  value-format="yyyy-MM-dd HH:mm:ss" type="datetimerange"
+                          :default-time="['00:00:00', '23:59:59']" />
         </el-form-item>
         <el-form-item v-if="form.validityType === CouponTemplateValidityTypeEnum.TERM.type" label="领取日期" prop="fixedStartTerm">
           第 <el-input-number v-model="form.fixedStartTerm" placeholder="0 为今天生效"
@@ -138,7 +138,13 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="form.productScope === PromotionProductScopeEnum.SPU.scope" prop="productSpuIds">
-          <el-input v-model="form.productSpuIds" placeholder="请输入商品 SPU 编号的数组" />
+          <el-select v-model="form.productSpuIds" placeholder="请选择活动商品" clearable size="small"
+                     multiple filterable style="width: 400px">
+            <el-option v-for="item in productSpus" :key="item.id" :label="item.name" :value="item.id">
+              <span style="float: left">{{ item.name }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">￥{{ (item.minPrice / 100.0).toFixed(2) }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -150,8 +156,10 @@
 </template>
 
 <script>
-import { createCouponTemplate, updateCouponTemplate, deleteCouponTemplate, getCouponTemplate, getCouponTemplatePage } from "@/api/promotion/couponTemplate";
-import { CommonStatusEnum, CouponTemplateValidityTypeEnum, PromotionDiscountTypeEnum, PromotionProductScopeEnum} from "@/utils/constants";
+import { createCouponTemplate, updateCouponTemplate, deleteCouponTemplate, getCouponTemplate, getCouponTemplatePage } from "@/api/mall/promotion/couponTemplate";
+import { CouponTemplateValidityTypeEnum, PromotionDiscountTypeEnum, PromotionProductScopeEnum} from "@/utils/constants";
+import { getSpuSimpleList } from "@/api/mall/product/spu";
+import { parseTime } from "@/utils/ruoyi";
 
 export default {
   name: "CouponTemplate",
@@ -202,6 +210,8 @@ export default {
         productScope: [{ required: true, message: "商品范围不能为空", trigger: "blur" }],
         productSpuIds: [{ required: true, message: "商品范围不能为空", trigger: "blur" }],
       },
+      // 商品列表
+      productSpus: [],
       // 如下的变量，主要为了 v-if 判断可以使用到
       PromotionProductScopeEnum: PromotionProductScopeEnum,
       CouponTemplateValidityTypeEnum: CouponTemplateValidityTypeEnum,
@@ -221,6 +231,10 @@ export default {
         this.total = response.data.total;
         this.loading = false;
       });
+      // 查询商品列表
+      getSpuSimpleList().then(response => {
+        this.productSpus = response.data
+      })
     },
     /** 取消按钮 */
     cancel() {
@@ -233,7 +247,7 @@ export default {
         id: undefined,
         name: undefined,
         discountType: PromotionDiscountTypeEnum.PRICE.type,
-        discountPrice: 0,
+        discountPrice: undefined,
         discountPercent: undefined,
         discountLimitPrice: undefined,
         usePrice: undefined,
@@ -274,9 +288,11 @@ export default {
       getCouponTemplate(id).then(response => {
         this.form = {
           ...response.data,
-          discountPrice: response.data.discountPrice ? response.data.discountPrice / 100.0 : undefined,
-          discountPercent: response.data.discountPercent ? response.data.discountPercent / 10.0 : undefined,
-          usePrice: response.data.usePrice ? response.data.usePrice / 100.0 : undefined,
+          discountPrice: response.data.discountPrice !== undefined ? response.data.discountPrice / 100.0 : undefined,
+          discountPercent: response.data.discountPercent !== undefined ? response.data.discountPercent / 10.0 : undefined,
+          discountLimitPrice: response.data.discountLimitPrice !== undefined ? response.data.discountLimitPrice / 100.0 : undefined,
+          usePrice: response.data.usePrice !== undefined ? response.data.usePrice / 100.0 : undefined,
+          validTimes: [response.data.validStartTime, response.data.validEndTime]
         }
         this.open = true;
         this.title = "修改优惠劵";
@@ -291,9 +307,12 @@ export default {
         // 金额相关字段的缩放
         let data = {
           ...this.form,
-          discountPrice: this.form.discountPrice ? this.form.discountPrice * 100 : undefined,
-          discountPercent: this.form.discountPercent ? this.form.discountPercent * 10 : undefined,
-          usePrice: this.form.usePrice ? this.form.usePrice * 100 : undefined,
+          discountPrice: this.form.discountPrice !== undefined ? this.form.discountPrice * 100 : undefined,
+          discountPercent: this.form.discountPercent !== undefined ? this.form.discountPercent * 10 : undefined,
+          discountLimitPrice: this.form.discountLimitPrice !== undefined ? this.form.discountLimitPrice * 100 : undefined,
+          usePrice: this.form.usePrice !== undefined ? this.form.usePrice * 100 : undefined,
+          validStartTime: this.form.validTimes && this.form.validTimes.length === 2 ? this.form.validTimes[0] : undefined,
+          validEndTime: this.form.validTimes && this.form.validTimes.length === 2 ? this.form.validTimes[1] : undefined,
         }
         // 修改的提交
         if (this.form.id != null) {

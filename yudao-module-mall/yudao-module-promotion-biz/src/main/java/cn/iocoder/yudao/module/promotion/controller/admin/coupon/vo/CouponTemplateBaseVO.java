@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityTypeEnum;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DEFAULT;
 
 /**
 * 优惠劵模板 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -62,10 +64,12 @@ public class CouponTemplateBaseVO {
 
     @ApiModelProperty(value = "固定日期 - 生效开始时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
     private Date validStartTime;
 
     @ApiModelProperty(value = "固定日期 - 生效结束时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
     private Date validEndTime;
 
     @ApiModelProperty(value = "领取日期 - 开始天数")
@@ -82,15 +86,14 @@ public class CouponTemplateBaseVO {
     private Integer discountType;
 
     @ApiModelProperty(value = "折扣百分比", example = "80", notes = "例如说，80% 为 80")
-    @Min(value = 1)
     private Integer discountPercent;
 
     @ApiModelProperty(value = "优惠金额", example = "10", notes = "单位：分")
-    @Min(value = 1)
+    @Min(value = 0, message = "优惠金额需要大于等于 0")
     private Integer discountPrice;
 
     @ApiModelProperty(value = "折扣上限", example = "100", notes = "单位：分，仅在 discountType 为 PERCENT 使用")
-    private Integer discountPriceLimit;
+    private Integer discountLimitPrice;
 
     @AssertTrue(message = "商品 SPU 编号的数组不能为空")
     @JsonIgnore
@@ -127,11 +130,11 @@ public class CouponTemplateBaseVO {
                 || fixedEndTerm != null;
     }
 
-    @AssertTrue(message = "折扣百分比不能为空")
+    @AssertTrue(message = "折扣百分比需要大于等于 1")
     @JsonIgnore
     public boolean isDiscountPercentValid() {
         return ObjectUtil.notEqual(discountType, PromotionDiscountTypeEnum.PERCENT.getType())
-                || discountPercent != null;
+                || (discountPercent != null && discountPercent >= 1);
     }
 
     @AssertTrue(message = "优惠金额不能为空")
@@ -143,9 +146,9 @@ public class CouponTemplateBaseVO {
 
     @AssertTrue(message = "折扣上限不能为空")
     @JsonIgnore
-    public boolean isDiscountPriceLimit() {
+    public boolean isDiscountLimitPriceValid() {
         return ObjectUtil.notEqual(discountType, PromotionDiscountTypeEnum.PERCENT.getType())
-                || discountPriceLimit != null;
+                || discountLimitPrice != null;
     }
 
 }
