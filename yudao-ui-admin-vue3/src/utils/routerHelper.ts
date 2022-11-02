@@ -65,30 +65,49 @@ export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecord
       redirect: route.redirect,
       meta: meta
     }
-    // 目录
-    if (route.children) {
+    //处理顶级非目录路由
+    if (!route.children && route.parentId == 0 && route.component) {
       data.component = Layout
-      data.redirect = getRedirect(route.path, route.children)
-      // 外链
-    } else if (isUrl(route.path)) {
-      data = {
-        path: '/external-link',
-        component: Layout,
-        meta: {
-          name: route.name
-        },
-        children: [data]
-      } as AppRouteRecordRaw
-      // 菜单
-    } else {
-      // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会根path保持一致）
+      data.meta = {}
+      data.name = toCamelCase(route.path, true) + 'Parent'
+      data.redirect = ''
+      const childrenData: AppRouteRecordRaw = {
+        path: '',
+        name: toCamelCase(route.path, true),
+        redirect: route.redirect,
+        meta: meta
+      }
       const index = route?.component
         ? modulesRoutesKeys.findIndex((ev) => ev.includes(route.component))
         : modulesRoutesKeys.findIndex((ev) => ev.includes(route.path))
-      data.component = modules[modulesRoutesKeys[index]]
-    }
-    if (route.children) {
-      data.children = generateRoute(route.children)
+      childrenData.component = modules[modulesRoutesKeys[index]]
+      data.children = [childrenData]
+    } else {
+      // 目录
+      if (route.children) {
+        data.component = Layout
+        data.redirect = getRedirect(route.path, route.children)
+        // 外链
+      } else if (isUrl(route.path)) {
+        data = {
+          path: '/external-link',
+          component: Layout,
+          meta: {
+            name: route.name
+          },
+          children: [data]
+        } as AppRouteRecordRaw
+        // 菜单
+      } else {
+        // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会根path保持一致）
+        const index = route?.component
+          ? modulesRoutesKeys.findIndex((ev) => ev.includes(route.component))
+          : modulesRoutesKeys.findIndex((ev) => ev.includes(route.path))
+        data.component = modules[modulesRoutesKeys[index]]
+      }
+      if (route.children) {
+        data.children = generateRoute(route.children)
+      }
     }
     res.push(data)
   }
