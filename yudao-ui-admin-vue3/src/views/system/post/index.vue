@@ -34,9 +34,7 @@ const gridOptions = reactive<VxeGridProps>({
   },
   toolbarConfig: {
     custom: true,
-    slots: {
-      buttons: 'toolbar_buttons'
-    }
+    slots: { buttons: 'toolbar_buttons' }
   },
   printConfig: {
     columns: [
@@ -124,10 +122,7 @@ const gridOptions = reactive<VxeGridProps>({
   proxyConfig: {
     seq: true, // 启用动态序号代理（分页之后索引自动计算为当前页的起始序号）
     form: true, // 启用表单代理，当点击表单提交按钮时会自动触发 reload 行为
-    props: {
-      result: 'list',
-      total: 'total'
-    },
+    props: { result: 'list', total: 'total' },
     ajax: {
       query: ({ page, form }) => {
         const queryParams: PostPageReqVO = Object.assign({}, form)
@@ -142,11 +137,7 @@ const gridOptions = reactive<VxeGridProps>({
 })
 const formData = ref<PostVO>()
 const formItems = ref<VxeFormItemProps[]>([
-  {
-    field: 'id',
-    title: 'id',
-    visible: false
-  },
+  { field: 'id', title: 'id', visible: false },
   {
     field: 'name',
     title: '岗位名称',
