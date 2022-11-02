@@ -205,10 +205,10 @@ export const constantRoutes = [
     alwaysShow: true,
     children: [
       {
-        path: '/order/goods-order',
+        path: '/mall/trade/order',
         name: '商品订单',
         meta: { title: '商品订单' },
-        component: (resolve) => require(['@/views/order/goodsOrder'], resolve)
+        component: (resolve) => require(['@/views/mall/trade/order'], resolve)
       }
     ]
   }
