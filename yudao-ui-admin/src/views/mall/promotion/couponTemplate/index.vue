@@ -52,7 +52,7 @@
       <el-table-column label="有效期限" align="center" prop="validityType" width="180" :formatter="validityTypeFormat" />
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
-          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
+          <el-switch v-model="scope.row.status" :active-value="0" :inactive-value="1" @change="handleStatusChange(scope.row)"/>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -156,10 +156,23 @@
 </template>
 
 <script>
-import { createCouponTemplate, updateCouponTemplate, deleteCouponTemplate, getCouponTemplate, getCouponTemplatePage } from "@/api/mall/promotion/couponTemplate";
-import { CouponTemplateValidityTypeEnum, PromotionDiscountTypeEnum, PromotionProductScopeEnum} from "@/utils/constants";
+import {
+  createCouponTemplate,
+  updateCouponTemplate,
+  deleteCouponTemplate,
+  getCouponTemplate,
+  getCouponTemplatePage,
+  updateCouponTemplateStatus
+} from "@/api/mall/promotion/couponTemplate";
+import {
+  CommonStatusEnum,
+  CouponTemplateValidityTypeEnum,
+  PromotionDiscountTypeEnum,
+  PromotionProductScopeEnum
+} from "@/utils/constants";
 import { getSpuSimpleList } from "@/api/mall/product/spu";
 import { parseTime } from "@/utils/ruoyi";
+import {changeRoleStatus} from "@/api/system/role";
 
 export default {
   name: "CouponTemplate",
@@ -329,6 +342,20 @@ export default {
           this.open = false;
           this.getList();
         });
+      });
+    },
+    /** 优惠劵模板状态修改 */
+    handleStatusChange(row) {
+      // 此时，row 已经变成目标状态了，所以可以直接提交请求和提示
+      let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
+      this.$modal.confirm('确认要"' + text + '""' + row.name + '"优惠劵吗?').then(function() {
+        return updateCouponTemplateStatus(row.id, row.status);
+      }).then(() => {
+        this.$modal.msgSuccess(text + "成功");
+      }).catch(function() {
+        // 异常时，需要将 row.status 状态重置回之前的
+        row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
+            : CommonStatusEnum.ENABLE;
       });
     },
     /** 删除按钮操作 */

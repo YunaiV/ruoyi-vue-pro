@@ -53,6 +53,14 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     }
 
     @Override
+    public void updateCouponTemplateStatus(Long id, Integer status) {
+        // 校验存在
+        validateCouponTemplateExists(id);
+        // 更新
+        couponTemplateMapper.updateById(new CouponTemplateDO().setId(id).setStatus(status));
+    }
+
+    @Override
     public void deleteCouponTemplate(Long id) {
         // 校验存在
         validateCouponTemplateExists(id);

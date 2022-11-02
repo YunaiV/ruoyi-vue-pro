@@ -31,6 +31,14 @@ public interface CouponTemplateService {
     void updateCouponTemplate(@Valid CouponTemplateUpdateReqVO updateReqVO);
 
     /**
+     * 更新优惠劵模板的状态
+     *
+     * @param id 编号
+     * @param status 状态
+     */
+    void updateCouponTemplateStatus(Long id, Integer status);
+
+    /**
      * 删除优惠劵模板
      *
      * @param id 编号
