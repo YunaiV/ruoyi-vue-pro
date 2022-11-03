@@ -123,7 +123,7 @@ const submitForm: VxeFormEvents.Submit = async () => {
   </ContentWrap>
   <vxe-modal
     v-model="dialogVisible"
-    id="myModal6"
+    id="postModel"
     :title="dialogTitle"
     width="800"
     height="400"

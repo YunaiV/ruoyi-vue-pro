@@ -60,7 +60,14 @@ VXETable.setup({
     autoResize: true, // 自动监听父元素的变化去重新计算表格
     resizable: true, // 列是否允许拖动列宽调整大小
     emptyText: '暂无数据', // 空表单
-    highlightHoverRow: true // 自动监听父元素的变化去重新计算表格
+    highlightHoverRow: true, // 自动监听父元素的变化去重新计算表格
+    treeConfig: {
+      rowField: 'id',
+      parentField: 'parentId',
+      children: 'children',
+      indent: 20,
+      showIcon: true
+    }
   },
   grid: {
     toolbarConfig: {
@@ -127,13 +134,28 @@ VXETable.setup({
       : XEUtils.toFormatString(XEUtils.get(enUS, key), args)
   }
 })
-// 格式金额，默认2位数
-VXETable.formats.add('formatAmount', ({ cellValue }, digits = 2) => {
-  return XEUtils.commafy(XEUtils.toNumber(cellValue), { digits })
-})
-// 格式日期，默认 yyyy-MM-dd HH:mm:ss
-VXETable.formats.add('formatDate', ({ cellValue }, format = 'yyyy-MM-dd HH:mm:ss') => {
-  return XEUtils.toDateString(cellValue, format)
+// 自定义全局的格式化处理函数
+VXETable.formats.mixin({
+  // 格式日期，默认 yyyy-MM-dd HH:mm:ss
+  formatDate({ cellValue }, format) {
+    return XEUtils.toDateString(cellValue, format || 'yyyy-MM-dd HH:mm:ss')
+  },
+  // 四舍五入金额，每隔3位逗号分隔，默认2位数
+  formatAmount({ cellValue }, digits = 2) {
+    return XEUtils.commafy(Number(cellValue), { digits })
+  },
+  // 格式化银行卡，默认每4位空格隔开
+  formatBankcard({ cellValue }) {
+    return XEUtils.commafy(XEUtils.toValueString(cellValue), { spaceNumber: 4, separator: ' ' })
+  },
+  // 四舍五入,默认两位数
+  formatFixedNumber({ cellValue }, digits = 2) {
+    return XEUtils.toFixed(XEUtils.round(cellValue, digits), digits)
+  },
+  // 向下舍入,默认两位数
+  formatCutNumber({ cellValue }, digits = 2) {
+    return XEUtils.toFixed(XEUtils.floor(cellValue, digits), digits)
+  }
 })
 export const setupVxeTable = (app: App<Element>) => {
   // 表格功能
