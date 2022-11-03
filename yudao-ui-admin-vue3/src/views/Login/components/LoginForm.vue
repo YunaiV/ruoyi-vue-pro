@@ -138,7 +138,7 @@ const doSocialLogin = async (type: string) => {
     location.origin + '/social-login?type=' + type + '&redirect=' + (redirect.value || '/')
   // 进行跳转
   const res = await LoginApi.socialAuthRedirectApi(type, encodeURIComponent(redirectUri))
-  window.open = res
+  window.location.href = res
 }
 watch(
   () => currentRoute.value,

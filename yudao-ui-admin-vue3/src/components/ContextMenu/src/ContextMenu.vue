@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
-import { PropType, ref, defineEmits } from 'vue'
+import { PropType, ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useDesign } from '@/hooks/web/useDesign'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
