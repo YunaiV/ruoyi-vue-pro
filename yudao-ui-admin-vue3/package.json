@@ -38,7 +38,7 @@
     "echarts-wordcloud": "^2.0.0",
     "element-plus": "2.2.19",
     "intro.js": "^6.0.0",
-    "jsencrypt": "^3.3.0",
+    "jsencrypt": "^3.3.1",
     "js-cookie": "^3.0.1",
     "lodash-es": "^4.17.21",
     "mitt": "^3.0.0",
