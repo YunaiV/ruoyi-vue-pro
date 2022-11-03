@@ -1,6 +1,4 @@
-import { useAxios } from '@/hooks/web/useAxios'
-
-const request = useAxios()
+import request from '@/config/axios'
 
 export const getTodoTaskPage = async (params) => {
   return await request.get({ url: '/bpm/task/todo-page', params })

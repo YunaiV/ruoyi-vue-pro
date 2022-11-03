@@ -1,6 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import { UserGroupVO } from './types'
-const request = useAxios()
 
 // 创建用户组
 export const createUserGroupApi = async (data: UserGroupVO) => {

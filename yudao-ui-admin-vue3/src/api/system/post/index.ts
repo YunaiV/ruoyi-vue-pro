@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { PostVO, PostPageReqVO, PostExportReqVO } from './types'
-
-const request = useAxios()
 
 // 查询岗位列表
 export const getPostPageApi = async (params: PostPageReqVO) => {

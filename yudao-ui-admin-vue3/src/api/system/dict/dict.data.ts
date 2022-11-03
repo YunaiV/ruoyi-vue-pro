@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { DictDataVO, DictDataPageReqVO, DictDataExportReqVO } from './types'
-
-const request = useAxios()
 
 // 查询字典数据（精简)列表
 export const listSimpleDictDataApi = () => {

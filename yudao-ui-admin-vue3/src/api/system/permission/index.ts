@@ -1,11 +1,9 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type {
   PermissionAssignRoleDataScopeReqVO,
   PermissionAssignRoleMenuReqVO,
   PermissionAssignUserRoleReqVO
 } from './types'
-
-const request = useAxios()
 
 // 查询角色拥有的菜单权限
 export const listRoleMenusApi = async (roleId: number) => {

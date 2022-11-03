@@ -1,6 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import { ModelVO } from './types'
-const request = useAxios()
 
 export const getModelPageApi = async (params) => {
   return await request.get({ url: '/bpm/model/page', params })

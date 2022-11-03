@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { SmsChannelVO } from './types'
-
-const request = useAxios()
 
 // 查询短信渠道列表
 export const getSmsChannelPageApi = (params) => {
