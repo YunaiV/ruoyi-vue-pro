@@ -1,5 +1,7 @@
 import { required } from '@/utils/formRules'
 import { reactive } from 'vue'
+import { FormSchema } from '@/types/form'
+
 // 表单校验
 export const rules = reactive({
   name: [required],

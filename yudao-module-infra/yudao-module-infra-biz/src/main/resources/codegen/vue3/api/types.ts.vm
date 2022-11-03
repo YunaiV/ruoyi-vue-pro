@@ -2,9 +2,11 @@ export type ${simpleClassName}VO = {
 #foreach ($column in $columns)
 #if ($column.createOperation || $column.updateOperation)
 #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
-    ${column.javaField}: number
+  ${column.javaField}: number
+#elseif(${column.javaType.toLowerCase()} == "date")
+  ${column.javaField}: string
 #else
-    ${column.javaField}: ${column.javaType.toLowerCase()}
+  ${column.javaField}: ${column.javaType.toLowerCase()}
 #end
 #end
 #end
@@ -14,9 +16,11 @@ export type ${simpleClassName}PageReqVO = {
 #foreach ($column in $columns)
 #if (${column.listOperation})##查询操作
 #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
-    ${column.javaField}: number
+  ${column.javaField}: number
+#elseif(${column.javaType.toLowerCase()} == "date")
+  ${column.javaField}: string
 #else
-    ${column.javaField}: ${column.javaType.toLowerCase()}
+  ${column.javaField}: ${column.javaType.toLowerCase()}
 #end
 #end
 #end
@@ -26,9 +30,11 @@ export type ${simpleClassName}ExcelReqVO = {
 #foreach ($column in $columns)
 #if (${column.listOperation})##查询操作
 #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
-    ${column.javaField}: number
+  ${column.javaField}: number
+#elseif(${column.javaType.toLowerCase()} == "date")
+  ${column.javaField}: string
 #else
-    ${column.javaField}: ${column.javaType.toLowerCase()}
+  ${column.javaField}: ${column.javaType.toLowerCase()}
 #end
 #end
 #end

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>登录</title>
+	<!-- jQuery：操作 dom、发起请求等 -->
+	<script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/2.1.2/jquery.min.js" type="application/javascript"></script>
+
+	<script type="application/javascript">
+
+    /**
+     * 账号密码登录
+     */
+    function login() {
+      const clientId = 'yudao-sso-demo-by-password'; // 可以改写成，你的 clientId
+      const clientSecret = 'test'; // 可以改写成，你的 clientSecret
+      const grantType = 'password'; // 密码模式
+
+      // 账号 + 密码
+      const username = $('#username').val();
+      const password = $('#password').val();
+      if (username.length === 0 || password.length === 0) {
+        alert('账号或密码未输入');
+        return;
+      }
+
+      // 发起请求
+      $.ajax({
+        url: "http://127.0.0.1:48080/admin-api/system/oauth2/token?"
+          // 客户端
+          + "client_id=" + clientId
+          + "&client_secret=" + clientSecret
+          // 密码模式的参数
+          + "&grant_type=" + grantType
+          + "&username=" + username
+          + "&password=" + password
+          + '&scope=user.read user.write',
+        method: 'POST',
+        headers: {
+          'tenant-id': '1', // 多租户编号，写死
+        },
+        success: function (result) {
+          if (result.code !== 0) {
+            alert('登录失败，原因：' + result.msg)
+            return;
+          }
+          // 设置到 localStorage 中
+          localStorage.setItem('ACCESS-TOKEN', result.data.access_token);
+          localStorage.setItem('REFRESH-TOKEN', result.data.refresh_token);
+
+          // 提示登录成功
+          alert('登录成功！点击确认，跳转回首页');
+          window.location.href = '/index.html';
+        }
+      });
+    }
+	</script>
+</head>
+<body>
+账号：<input id="username" value="admin" /> <br />
+密码：<input id="password" value="admin123" > <br />
+<button style="float: right; margin-top: 5px;" onclick="login()">登录</button>
+</body>
+<style>
+    body { /** 页面居中 */
+        border-radius: 20px;
+        height: 350px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+    }
+</style>
+</html>

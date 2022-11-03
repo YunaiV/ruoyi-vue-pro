@@ -29,10 +29,6 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
         </dependency>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
-        </dependency>
 
         <!-- Web 相关 -->
         <dependency>
@@ -41,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-excel</artifactId>
+            <artifactId>yudao-spring-boot-starter-security</artifactId>
         </dependency>
 
         <!-- DB 相关 -->
@@ -56,6 +52,11 @@
             <artifactId>yudao-spring-boot-starter-test</artifactId>
         </dependency>
 
+        <!-- 工具类相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-excel</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

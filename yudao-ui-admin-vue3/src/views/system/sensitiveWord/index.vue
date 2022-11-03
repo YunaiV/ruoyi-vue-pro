@@ -56,23 +56,29 @@ const handleUpdate = async (row: SensitiveWordVO) => {
 
 // 提交按钮
 const submitForm = async () => {
-  actionLoading.value = true
-  // 提交请求
-  try {
-    const data = unref(formRef)?.formModel as SensitiveWordVO
-    if (actionType.value === 'create') {
-      await SensitiveWordApi.createSensitiveWordApi(data)
-      ElMessage.success(t('common.createSuccess'))
-    } else {
-      await SensitiveWordApi.updateSensitiveWordApi(data)
-      ElMessage.success(t('common.updateSuccess'))
+  const elForm = unref(formRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
+    if (valid) {
+      actionLoading.value = true
+      // 提交请求
+      try {
+        const data = unref(formRef)?.formModel as SensitiveWordVO
+        if (actionType.value === 'create') {
+          await SensitiveWordApi.createSensitiveWordApi(data)
+          ElMessage.success(t('common.createSuccess'))
+        } else {
+          await SensitiveWordApi.updateSensitiveWordApi(data)
+          ElMessage.success(t('common.updateSuccess'))
+        }
+        // 操作成功，重新加载列表
+        dialogVisible.value = false
+        await getList()
+      } finally {
+        actionLoading.value = false
+      }
     }
-    // 操作成功，重新加载列表
-    dialogVisible.value = false
-    await getList()
-  } finally {
-    actionLoading.value = false
-  }
+  })
 }
 
 // ========== 详情相关 ==========

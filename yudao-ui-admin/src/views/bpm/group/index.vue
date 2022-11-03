@@ -127,7 +127,6 @@ export default {
         pageSize: 10,
         name: null,
         status: null,
-        tenantId: null,
         createTime: []
       },
       // 表单参数

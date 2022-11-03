@@ -20,6 +20,7 @@ import { findIndex } from '@/utils'
 import { set } from 'lodash-es'
 import { FormProps } from './types'
 import { Icon } from '@/components/Icon'
+import { FormSchema, FormSetPropsType } from '@/types/form'
 
 const { getPrefixCls } = useDesign()
 

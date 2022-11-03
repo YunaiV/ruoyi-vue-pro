@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.validation.Mobile;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**

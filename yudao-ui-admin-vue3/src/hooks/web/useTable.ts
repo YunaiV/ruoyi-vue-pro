@@ -4,6 +4,7 @@ import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
 import { computed, nextTick, reactive, ref, unref, watch } from 'vue'
 import type { TableProps } from '@/components/Table/src/types'
 import { useI18n } from '@/hooks/web/useI18n'
+import { TableSetPropsType } from '@/types/table'
 
 const { t } = useI18n()
 interface ResponseType<T = any> {
@@ -150,13 +151,17 @@ export const useTable = <T = any>(config?: UseTableConfig<T>) => {
     },
     // 与Search组件结合
     setSearchParams: (data: Recordable) => {
-      tableObject.currentPage = 1
       tableObject.params = Object.assign(tableObject.params, {
         pageSize: tableObject.pageSize,
-        pageNo: tableObject.currentPage,
+        pageNo: 1,
         ...data
       })
-      methods.getList()
+      // 页码不等于1时更新页码重新获取数据，页码等于1时重新获取数据
+      if (tableObject.currentPage !== 1) {
+        tableObject.currentPage = 1
+      } else {
+        methods.getList()
+      }
     },
     // 删除数据
     delList: async (

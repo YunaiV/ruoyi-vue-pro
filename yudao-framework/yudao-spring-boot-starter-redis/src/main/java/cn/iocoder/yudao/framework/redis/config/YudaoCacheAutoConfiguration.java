@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.redis.config;
 
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  * Cache 配置类，基于 Redis 实现
  */
 @Configuration
+@EnableConfigurationProperties({CacheProperties.class})
 @EnableCaching
 public class YudaoCacheAutoConfiguration {
 

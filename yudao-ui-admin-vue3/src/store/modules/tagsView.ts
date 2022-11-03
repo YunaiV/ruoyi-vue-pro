@@ -10,8 +10,7 @@ export interface TagsViewState {
   cachedViews: Set<string>
 }
 
-export const useTagsViewStore = defineStore({
-  id: 'tagsView',
+export const useTagsViewStore = defineStore('tagsView', {
   state: (): TagsViewState => ({
     visitedViews: [],
     cachedViews: new Set()

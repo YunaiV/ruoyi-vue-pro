@@ -1,4 +1,10 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosRequestHeaders,
+  AxiosResponse,
+  AxiosError
+} from 'axios'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import qs from 'qs'
 import { config } from '@/config/axios/config'
@@ -48,7 +54,8 @@ service.interceptors.request.use(
     const data = config.data || false
     if (
       config.method?.toUpperCase() === 'POST' &&
-      config!.headers!['Content-Type'] === 'application/x-www-form-urlencoded'
+      (config.headers as AxiosRequestHeaders)['Content-Type'] ===
+        'application/x-www-form-urlencoded'
     ) {
       config.data = qs.stringify(data)
     }
@@ -89,6 +96,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   async (response: AxiosResponse<Recordable>) => {
     const { data } = response
+    const config = response.config
     if (!data) {
       // 返回“[HTTP]请求没有返回值”;
       throw new Error()
@@ -120,13 +128,19 @@ service.interceptors.response.use(
         try {
           const refreshTokenRes = await refreshToken()
           // 2.1 刷新成功，则回放队列的请求 + 当前请求
-          setToken(refreshTokenRes.data)
-          requestList.forEach((cb: any) => cb())
-          return service(response.config)
+          setToken(refreshTokenRes.data.data)
+          config.headers!.Authorization = 'Bearer ' + getAccessToken()
+          requestList.forEach((cb: any) => {
+            cb()
+          })
+          requestList = []
+          return service(config)
         } catch (e) {
           // 为什么需要 catch 异常呢？刷新失败时，请求因为 Promise.reject 触发异常。
           // 2.2 刷新失败，只回放队列的请求
-          requestList.forEach((cb: any) => cb())
+          requestList.forEach((cb: any) => {
+            cb()
+          })
           // 提示是否要登出。即不回放当前请求！不然会形成递归
           return handleAuthorized()
         } finally {
@@ -137,8 +151,8 @@ service.interceptors.response.use(
         // 添加到队列，等待刷新获取到新的令牌
         return new Promise((resolve) => {
           requestList.push(() => {
-            ;(config as Recordable).headers.Authorization = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token 请根据实际情况自行修改
-            resolve(service(response.config))
+            config.headers!.Authorization = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+            resolve(service(config))
           })
         })
       }
@@ -187,10 +201,7 @@ service.interceptors.response.use(
 )
 
 const refreshToken = async () => {
-  return await service({
-    url: '/system/auth/refresh-token?refreshToken=' + getRefreshToken(),
-    method: 'post'
-  })
+  return await axios.post(base_url + '/system/auth/refresh-token?refreshToken=' + getRefreshToken())
 }
 const handleAuthorized = () => {
   const { t } = useI18n()

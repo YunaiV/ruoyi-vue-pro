@@ -26,6 +26,10 @@ const activeName = ref('cloum')
 const basicInfoRef = ref<ComponentRef<typeof BasicInfoForm>>()
 const genInfoRef = ref<ComponentRef<typeof GenInfoForm>>()
 const cloumInfoRef = ref(null)
+const parentMenuId = ref<number>()
+const menu = (id: number) => {
+  parentMenuId.value = id
+}
 const submitForm = async () => {
   const basicInfo = unref(basicInfoRef)
   const genInfo = unref(genInfoRef)
@@ -34,6 +38,11 @@ const submitForm = async () => {
   if (basicForm && genForm) {
     const basicInfoData = (await basicInfo?.getFormData()) as CodegenTableVO
     const genInfoData = (await genInfo?.getFormData()) as CodegenTableVO
+    if (parentMenuId.value) {
+      genInfoData.parentMenuId = parentMenuId.value
+    } else {
+      genInfoData.parentMenuId = 0
+    }
     const genTable: CodegenUpdateReqVO = {
       table: Object.assign({}, basicInfoData, genInfoData),
       columns: cloumCurrentRow.value
@@ -57,7 +66,7 @@ onMounted(() => {
         <CloumInfoForm ref="cloumInfoRef" :info="cloumCurrentRow" />
       </el-tab-pane>
       <el-tab-pane label="生成信息" name="genInfo">
-        <GenInfoForm ref="genInfoRef" :genInfo="tableCurrentRow" />
+        <GenInfoForm ref="genInfoRef" :genInfo="tableCurrentRow" @menu="menu" />
       </el-tab-pane>
     </el-tabs>
     <template #right>

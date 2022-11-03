@@ -82,22 +82,28 @@ const handleDelete = async (data: { id: number }) => {
 }
 // 提交按钮
 const submitForm = async () => {
-  loading.value = true
-  // 提交请求
-  try {
-    const data = unref(formRef)?.formModel as DeptVO
-    data.parentId = deptParentId.value
-    data.leaderUserId = leaderUserId.value
-    if (formTitle.value.startsWith('新增')) {
-      await DeptApi.createDeptApi(data)
-    } else if (formTitle.value.startsWith('修改')) {
-      await DeptApi.updateDeptApi(data)
+  const elForm = unref(formRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
+    if (valid) {
+      loading.value = true
+      // 提交请求
+      try {
+        const data = unref(formRef)?.formModel as DeptVO
+        data.parentId = deptParentId.value
+        data.leaderUserId = leaderUserId.value
+        if (formTitle.value.startsWith('新增')) {
+          await DeptApi.createDeptApi(data)
+        } else if (formTitle.value.startsWith('修改')) {
+          await DeptApi.updateDeptApi(data)
+        }
+        // 操作成功，重新加载列表
+        dialogVisible.value = false
+      } finally {
+        loading.value = false
+      }
     }
-    // 操作成功，重新加载列表
-    dialogVisible.value = false
-  } finally {
-    loading.value = false
-  }
+  })
 }
 onMounted(async () => {
   await getTree()

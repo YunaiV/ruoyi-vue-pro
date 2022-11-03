@@ -7,13 +7,14 @@ import { useWindowSize } from '@vueuse/core'
 import { useAppStore } from '@/store/modules/app'
 import { setCssVar } from '@/utils'
 import { useDesign } from '@/hooks/web/useDesign'
+import { ElementPlusSize } from '@/types/elementPlus'
 
 const { variables } = useDesign()
 
 const appStore = useAppStore()
 
 const props = defineProps({
-  size: propTypes.oneOf<ElememtPlusSize[]>(['default', 'small', 'large']).def('default')
+  size: propTypes.oneOf<ElementPlusSize[]>(['default', 'small', 'large']).def('default')
 })
 
 provide('configGlobal', props)

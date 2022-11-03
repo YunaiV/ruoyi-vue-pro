@@ -52,7 +52,7 @@
         <dependency>
             <groupId>com.alipay.sdk</groupId>
             <artifactId>alipay-sdk-java</artifactId>
-            <version>4.31.72.ALL</version>
+            <version>4.33.44.ALL</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>com.github.binarywang</groupId>
             <artifactId>weixin-java-pay</artifactId>
-            <version>4.3.8.B</version>
+            <version>4.4.0</version>
         </dependency>
         <!-- TODO 芋艿：清理 -->
 

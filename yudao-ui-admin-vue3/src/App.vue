@@ -4,7 +4,7 @@ import { useAppStore } from '@/store/modules/app'
 import { ConfigGlobal } from '@/components/ConfigGlobal'
 import { isDark } from '@/utils/is'
 import { useDesign } from '@/hooks/web/useDesign'
-import { useCache } from '@/hooks/web/useCache'
+import Cookies from 'js-cookie'
 
 const { getPrefixCls } = useDesign()
 
@@ -16,18 +16,19 @@ const currentSize = computed(() => appStore.getCurrentSize)
 
 const greyMode = computed(() => appStore.getGreyMode)
 
-const { wsCache } = useCache()
-
 // 根据浏览器当前主题设置系统主题色
 const setDefaultTheme = () => {
-  if (wsCache.get('isDark')) {
-    appStore.setIsDark(wsCache.get('isDark'))
+  if (Cookies.get('isDark')) {
+    if (Cookies.get('isDark') === 'true') {
+      appStore.setIsDark(true)
+    } else {
+      appStore.setIsDark(false)
+    }
     return
   }
   const isDarkTheme = isDark()
   appStore.setIsDark(isDarkTheme)
 }
-
 setDefaultTheme()
 </script>
 

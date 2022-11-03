@@ -4,6 +4,8 @@ export type TenantVO = {
   packageId: number
   contactName: string
   contactMobile: string
+  username: string
+  password: string
   accountCount: number
   expireTime: string
   domain: string

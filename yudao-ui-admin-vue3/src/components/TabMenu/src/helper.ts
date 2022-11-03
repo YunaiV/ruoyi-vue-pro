@@ -28,9 +28,9 @@ export const filterMenusPath = (
     let data: Nullable<AppRouteRecordRaw> = null
     const meta = (v.meta ?? {}) as RouteMeta
     if (!meta.hidden || meta.canTo) {
-      const allParentPaht = getAllParentPath<AppRouteRecordRaw>(allRoutes, v.path)
+      const allParentPath = getAllParentPath<AppRouteRecordRaw>(allRoutes, v.path)
 
-      const fullPath = isUrl(v.path) ? v.path : allParentPaht.join('/')
+      const fullPath = isUrl(v.path) ? v.path : allParentPath.join('/')
 
       data = cloneDeep(v)
       data.path = fullPath
@@ -42,8 +42,8 @@ export const filterMenusPath = (
         res.push(data)
       }
 
-      if (allParentPaht.length && Reflect.has(tabPathMap, allParentPaht[0])) {
-        tabPathMap[allParentPaht[0]].push(fullPath)
+      if (allParentPath.length && Reflect.has(tabPathMap, allParentPath[0])) {
+        tabPathMap[allParentPath[0]].push(fullPath)
       }
     }
   }

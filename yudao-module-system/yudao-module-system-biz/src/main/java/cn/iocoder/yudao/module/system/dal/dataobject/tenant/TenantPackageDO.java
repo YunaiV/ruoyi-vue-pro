@@ -34,7 +34,7 @@ public class TenantPackageDO extends BaseDO {
      */
     private String name;
     /**
-     * 租户状态
+     * 租户套餐状态
      *
      * 枚举 {@link CommonStatusEnum}
      */

@@ -19,12 +19,7 @@
             </el-tab-pane>
           </el-tabs>
           <div>
-            <el-form ref="loginForm" :model="loginForm" :rules="LoginRules" class="login-form">
-              <el-form-item prop="tenantName" v-if="tenantEnable">
-                <el-input v-model="loginForm.tenantName" type="text" auto-complete="off" placeholder='租户'>
-                  <svg-icon slot="prefix" icon-class="tree" class="el-input__icon input-icon"/>
-                </el-input>
-              </el-form-item>
+            <el-form ref="loginForm" :model="loginForm" class="login-form">
               <!-- 授权范围的选择 -->
               此第三方应用请求获得以下权限：
               <el-form-item prop="scopes">
@@ -56,18 +51,13 @@
 </template>
 
 <script>
-import {getTenantIdByName} from "@/api/system/tenant";
-import {getTenantEnable} from "@/utils/ruoyi";
 import {authorize, getAuthorize} from "@/api/login";
-import {getTenantName, setTenantId} from "@/utils/auth";
 
 export default {
   name: "Login",
   data() {
     return {
-      tenantEnable: true,
       loginForm: {
-        tenantName: "芋道源码",
         scopes: [], // 已选中的 scope 数组
       },
       params: { // URL 上的 client_id、scope 等参数
@@ -81,35 +71,10 @@ export default {
         name: '',
         logo: '',
       },
-      LoginRules: {
-        tenantName: [
-          {required: true, trigger: "blur", message: "租户不能为空"},
-          {
-            validator: (rule, value, callback) => {
-              // debugger
-              getTenantIdByName(value).then(res => {
-                const tenantId = res.data;
-                if (tenantId && tenantId >= 0) {
-                  // 设置租户
-                  setTenantId(tenantId)
-                  callback();
-                } else {
-                  callback('租户不存在');
-                }
-              });
-            },
-            trigger: 'blur'
-          }
-        ]
-      },
       loading: false
     };
   },
   created() {
-    // 租户开关
-    this.tenantEnable = getTenantEnable();
-    this.getCookie();
-
     // 解析参数
     // 例如说【自动授权不通过】：client_id=default&redirect_uri=https%3A%2F%2Fwww.iocoder.cn&response_type=code&scope=user.read%20user.write
     // 例如说【自动授权通过】：client_id=default&redirect_uri=https%3A%2F%2Fwww.iocoder.cn&response_type=code&scope=user.read
@@ -162,13 +127,6 @@ export default {
     })
   },
   methods: {
-    getCookie() {
-      const tenantName = getTenantName();
-      this.loginForm = {
-        ...this.loginForm,
-        tenantName: tenantName ? tenantName : this.loginForm.tenantName,
-      };
-    },
     handleAuthorize(approved) {
       this.$refs.loginForm.validate(valid => {
         if (!valid) {

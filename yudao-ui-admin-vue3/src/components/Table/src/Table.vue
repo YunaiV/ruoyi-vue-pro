@@ -6,6 +6,7 @@ import { setIndex } from './helper'
 import { getSlot } from '@/utils/tsxHelper'
 import type { TableProps } from './types'
 import { set } from 'lodash-es'
+import { Pagination, TableColumn, TableSetPropsType, TableSlotDefault } from '@/types/table'
 
 export default defineComponent({
   name: 'Table',

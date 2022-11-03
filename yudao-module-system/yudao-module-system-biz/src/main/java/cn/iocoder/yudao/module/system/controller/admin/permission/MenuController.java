@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.*;
 import cn.iocoder.yudao.module.system.convert.permission.MenuConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.service.permission.MenuService;
-import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -29,8 +28,6 @@ public class MenuController {
 
     @Resource
     private MenuService menuService;
-    @Resource
-    private TenantService tenantService;
 
     @PostMapping("/create")
     @ApiOperation("创建菜单")

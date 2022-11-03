@@ -56,6 +56,29 @@ const crudSchemas = reactive<CrudSchema[]>([
     }
   },
   {
+    label: '用户名称',
+    field: 'username',
+    table: {
+      show: false
+    },
+    detail: {
+      show: false
+    }
+  },
+  {
+    label: '用户密码',
+    field: 'password',
+    table: {
+      show: false
+    },
+    detail: {
+      show: false
+    },
+    form: {
+      component: 'InputPassword'
+    }
+  },
+  {
     label: '账号额度',
     field: 'accountCount',
     form: {
@@ -71,7 +94,7 @@ const crudSchemas = reactive<CrudSchema[]>([
       component: 'DatePicker',
       componentProps: {
         type: 'datetime',
-        valueFormat: 'YYYY-MM-DD HH:mm:ss'
+        valueFormat: 'x'
       }
     }
   },
