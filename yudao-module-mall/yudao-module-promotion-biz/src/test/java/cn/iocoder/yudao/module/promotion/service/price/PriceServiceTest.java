@@ -7,10 +7,7 @@ import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionLevelEnum;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.promotion.enums.common.*;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
 import cn.iocoder.yudao.module.promotion.service.discount.DiscountService;
 import cn.iocoder.yudao.module.promotion.service.reward.RewardService;
@@ -374,12 +371,10 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         when(productSkuApi.getSkuList(eq(asSet(10L, 20L, 30L)))).thenReturn(asList(productSku01, productSku02, productSku03));
         // mock 方法（优惠劵 Coupon 信息）
         CouponDO coupon = randomPojo(CouponDO.class, o -> o.setId(1024L).setName("程序员节")
-                .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setSpuIds(asList(1L, 2L))
-                .setPriceAvailable(350).setPreferentialType(2).setPercentOff(50).setDiscountPriceLimit(70));
+                .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductSpuIds(asList(1L, 2L))
+                .setUsePrice(350).setDiscountType(PromotionDiscountTypeEnum.PERCENT.getType())
+                .setDiscountPercent(50).setDiscountLimitPrice(70));
         when(couponService.validCoupon(eq(1024L), eq(calculateReqDTO.getUserId()))).thenReturn(coupon);
-
-        // 200 + 150; 350
-        //
 
         // 调用
         PriceCalculateRespDTO priceCalculate = priceService.calculatePrice(calculateReqDTO);

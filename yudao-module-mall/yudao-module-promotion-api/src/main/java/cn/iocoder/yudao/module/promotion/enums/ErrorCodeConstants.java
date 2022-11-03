@@ -23,4 +23,7 @@ public interface ErrorCodeConstants {
     ErrorCode COUPON_TEMPLATE_NOT_EXISTS = new ErrorCode(1003004000, "优惠劵模板不存在");
     ErrorCode COUPON_TEMPLATE_TOTAL_COUNT_TOO_SMALL = new ErrorCode(1003004001, "发放数量不能小于已领取数量({})");
 
+    // ========== 优惠劵模板 1003005000 ==========
+    ErrorCode COUPON_NOT_EXISTS = new ErrorCode(1003005000, "优惠劵不存在");
+
 }
