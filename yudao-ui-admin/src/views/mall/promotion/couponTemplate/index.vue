@@ -117,7 +117,7 @@
         </el-form-item>
         <el-form-item label="有效期类型" prop="validityType">
           <el-radio-group v-model="form.validityType">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COUPON_TEMPLATE_VALIDITY_TYPE)"
+            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.PROMOTION_COUPON_TEMPLATE_VALIDITY_TYPE)"
                       :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
