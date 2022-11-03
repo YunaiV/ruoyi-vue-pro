@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
+import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 import { DICT_TYPE } from '@/utils/dict'
 const { t } = useI18n() // 国际化
 
@@ -13,9 +13,9 @@ export const rules = reactive({
 })
 
 // CrudSchema
-const crudSchemas = reactive<CrudSchema[]>([
+const crudSchemas = reactive<VxeCrudSchema[]>([
   {
-    label: t('common.index'),
+    title: t('common.index'),
     field: 'id',
     type: 'index',
     form: {
@@ -26,42 +26,54 @@ const crudSchemas = reactive<CrudSchema[]>([
     }
   },
   {
-    label: '岗位名称',
+    title: '岗位名称',
     field: 'name',
     search: {
       show: true
     }
   },
   {
-    label: '岗位编码',
+    title: '岗位编码',
     field: 'code',
     search: {
       show: true
     }
   },
   {
-    label: '岗位顺序',
+    title: '岗位顺序',
     field: 'sort'
   },
   {
-    label: t('common.status'),
+    title: t('common.status'),
     field: 'status',
     dictType: DICT_TYPE.COMMON_STATUS,
+    table: {
+      slots: {
+        default: 'status_default'
+      }
+    },
     search: {
       show: true
     }
   },
   {
-    label: t('common.createTime'),
+    title: t('common.createTime'),
     field: 'createTime',
     form: {
       show: false
     }
   },
   {
-    label: t('table.action'),
+    title: t('table.action'),
     field: 'action',
     width: '240px',
+    table: {
+      width: '240px',
+      showOverflow: true,
+      slots: {
+        default: 'action_default'
+      }
+    },
     form: {
       show: false
     },
@@ -70,4 +82,4 @@ const crudSchemas = reactive<CrudSchema[]>([
     }
   }
 ])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)
