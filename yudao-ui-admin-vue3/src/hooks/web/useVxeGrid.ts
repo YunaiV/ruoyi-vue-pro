@@ -4,6 +4,7 @@ import { VxeGridProps } from 'vxe-table'
 export const useVxeGrid = (allSchemas, getPageApi) => {
   const gridOptions = reactive<VxeGridProps>({
     loading: false,
+    height: 800,
     rowConfig: {
       keyField: 'id',
       isHover: true

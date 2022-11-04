@@ -1,3 +1,244 @@
+<template>
+  <ContentWrap>
+    <el-form :model="queryParams" ref="queryForm" :inline="true">
+      <el-form-item label="菜单名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入菜单名称" />
+      </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择菜单状态">
+          <el-option
+            v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="handleQuery">
+          <Icon icon="ep:search" class="mr-5px" />
+          {{ t('common.query') }}
+        </el-button>
+        <el-button @click="resetQuery">
+          <Icon icon="ep:refresh-right" class="mr-5px" />
+          {{ t('common.reset') }}
+        </el-button>
+      </el-form-item>
+    </el-form>
+    <vxe-toolbar>
+      <template #buttons>
+        <vxe-button status="primary" v-hasPermi="['system:post:create']" @click="handleCreate">
+          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        </vxe-button>
+        <vxe-button @click="xTable?.setAllTreeExpand(true)">展开所有</vxe-button>
+        <vxe-button @click="xTable?.clearTreeExpand()">关闭所有</vxe-button>
+      </template>
+    </vxe-toolbar>
+    <vxe-table
+      show-overflow
+      keep-source
+      ref="xTable"
+      :loading="tableLoading"
+      :row-config="{ keyField: 'id' }"
+      :column-config="{ resizable: true }"
+      :tree-config="{ transform: true, rowField: 'id', parentField: 'parentId' }"
+      :print-config="{}"
+      :export-config="{}"
+      :data="tableData"
+      class="xtable"
+    >
+      <vxe-column title="菜单名称" field="name" width="200" tree-node>
+        <template #default="{ row }">
+          <Icon :icon="row.icon" />
+          <span class="ml-3">{{ row.name }}</span>
+        </template>
+      </vxe-column>
+      <vxe-column title="菜单类型" field="type">
+        <template #default="{ row }">
+          <DictTag :type="DICT_TYPE.SYSTEM_MENU_TYPE" :value="row.type" />
+        </template>
+      </vxe-column>
+      <vxe-column title="路由地址" field="path" />
+      <vxe-column title="组件路径" field="component" />
+      <vxe-column title="权限标识" field="permission" />
+      <vxe-column title="排序" field="sort" />
+      <vxe-column title="状态" field="status">
+        <template #default="{ row }">
+          <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+        </template>
+      </vxe-column>
+      <vxe-column title="创建时间" field="createTime" formatter="formatDate" />
+      <vxe-column title="操作" width="200">
+        <template #default="{ row }">
+          <vxe-button
+            type="text"
+            status="primary"
+            v-hasPermi="['system:menu:update']"
+            @click="handleUpdate(row)"
+          >
+            <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
+          </vxe-button>
+          <vxe-button
+            type="text"
+            status="primary"
+            v-hasPermi="['system:menu:delete']"
+            @click="handleDelete(row)"
+          >
+            <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
+          </vxe-button>
+        </template>
+      </vxe-column>
+    </vxe-table>
+  </ContentWrap>
+  <XModal v-model="dialogVisible" id="menuModel" :title="dialogTitle">
+    <template #default>
+      <!-- 对话框(添加 / 修改) -->
+      <el-form
+        :model="menuForm"
+        :rules="rules"
+        :inline="true"
+        label-width="120px"
+        label-position="right"
+      >
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-form-item label="上级菜单">
+              <el-tree-select
+                node-key="id"
+                v-model="menuForm.parentId"
+                :props="menuProps"
+                :data="menuOptions"
+                check-strictly
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="菜单类型" prop="type">
+              <el-radio-group v-model="menuForm.type">
+                <el-radio-button
+                  v-for="dict in getIntDictOptions(DICT_TYPE.SYSTEM_MENU_TYPE)"
+                  :key="dict.value"
+                  :label="dict.value"
+                >
+                  {{ dict.label }}
+                </el-radio-button>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="菜单名称" prop="name">
+              <el-input v-model="menuForm.name" placeholder="请输入菜单名称" clearable />
+            </el-form-item>
+          </el-col>
+          <template v-if="menuForm.type !== 3">
+            <el-col :span="12">
+              <el-form-item label="菜单图标">
+                <IconSelect v-model="menuForm.icon" clearable />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="路由地址" prop="path">
+                <template #label>
+                  <Tooltip
+                    titel="路由地址"
+                    message="访问的路由地址，如：`user`。如需外网地址时，则以 `http(s)://` 开头"
+                  />
+                </template>
+                <el-input v-model="menuForm.path" placeholder="请输入路由地址" clearable />
+              </el-form-item>
+            </el-col>
+          </template>
+          <template v-if="menuForm.type === 2">
+            <el-col :span="12">
+              <el-form-item label="路由地址" prop="component">
+                <el-input v-model="menuForm.component" placeholder="请输入组件地址" clearable />
+              </el-form-item>
+            </el-col>
+          </template>
+          <template v-if="menuForm.type !== 1">
+            <el-col :span="12">
+              <el-form-item label="权限标识" prop="permission">
+                <template #label>
+                  <Tooltip
+                    titel="权限标识"
+                    message="Controller 方法上的权限字符，如：@PreAuthorize(`@ss.hasPermission('system:user:list')`)"
+                  />
+                </template>
+                <el-input v-model="menuForm.permission" placeholder="请输入权限标识" clearable />
+              </el-form-item>
+            </el-col>
+          </template>
+          <el-col :span="12">
+            <el-form-item label="显示排序" prop="sort">
+              <el-input-number
+                v-model="menuForm.sort"
+                controls-position="right"
+                :min="0"
+                clearable
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="菜单状态" prop="status">
+              <el-radio-group v-model="menuForm.status">
+                <el-radio-button
+                  v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
+                  :key="dict.value"
+                  :label="dict.value"
+                >
+                  {{ dict.label }}
+                </el-radio-button>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <template v-if="menuForm.type !== 3">
+            <el-col :span="12">
+              <el-form-item label="显示状态" prop="status">
+                <template #label>
+                  <Tooltip
+                    titel="显示状态"
+                    message="选择隐藏时，路由将不会出现在侧边栏，但仍然可以访问"
+                  />
+                </template>
+                <el-radio-group v-model="menuForm.visible">
+                  <el-radio-button key="true" :label="true">显示</el-radio-button>
+                  <el-radio-button key="false" :label="false">隐藏</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+          </template>
+          <template v-if="menuForm.type === 2">
+            <el-col :span="12">
+              <el-form-item label="缓存状态" prop="keepAlive">
+                <template #label>
+                  <Tooltip
+                    titel="缓存状态"
+                    message="选择缓存时，则会被 `keep-alive` 缓存，需要匹配组件的 `name` 和路由地址保持一致"
+                  />
+                </template>
+                <el-radio-group v-model="menuForm.keepAlive">
+                  <el-radio-button key="true" :label="true">缓存</el-radio-button>
+                  <el-radio-button key="false" :label="false">不缓存</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+          </template>
+        </el-row>
+      </el-form>
+    </template>
+    <template #footer>
+      <!-- 操作按钮 -->
+      <el-button
+        v-if="['create', 'update'].includes(actionType)"
+        type="primary"
+        :loading="actionLoading"
+        @click="submitForm"
+        :content="t('action.save')"
+      />
+      <el-button @click="dialogVisible = false" :content="t('dialog.close')" />
+    </template>
+  </XModal>
+</template>
 <script setup lang="ts">
 import * as MenuApi from '@/api/system/menu'
 import { MenuVO } from '@/api/system/menu/types'
@@ -164,256 +405,3 @@ onMounted(async () => {
   getTree()
 })
 </script>
-<template>
-  <ContentWrap>
-    <el-form :model="queryParams" ref="queryForm" :inline="true">
-      <el-form-item label="菜单名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入菜单名称" />
-      </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择菜单状态">
-          <el-option
-            v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleQuery">
-          <Icon icon="ep:search" class="mr-5px" />
-          {{ t('common.query') }}
-        </el-button>
-        <el-button @click="resetQuery">
-          <Icon icon="ep:refresh-right" class="mr-5px" />
-          {{ t('common.reset') }}
-        </el-button>
-      </el-form-item>
-    </el-form>
-    <vxe-toolbar>
-      <template #buttons>
-        <vxe-button status="primary" v-hasPermi="['system:post:create']" @click="handleCreate">
-          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-        </vxe-button>
-        <vxe-button @click="xTable?.setAllTreeExpand(true)">展开所有</vxe-button>
-        <vxe-button @click="xTable?.clearTreeExpand()">关闭所有</vxe-button>
-      </template>
-    </vxe-toolbar>
-    <vxe-table
-      show-overflow
-      keep-source
-      ref="xTable"
-      :loading="tableLoading"
-      :row-config="{ keyField: 'id' }"
-      :column-config="{ resizable: true }"
-      :tree-config="{ transform: true, rowField: 'id', parentField: 'parentId' }"
-      :print-config="{}"
-      :export-config="{}"
-      :data="tableData"
-    >
-      <vxe-column title="菜单名称" field="name" width="200" tree-node>
-        <template #default="{ row }">
-          <Icon :icon="row.icon" />
-          <span class="ml-3">{{ row.name }}</span>
-        </template>
-      </vxe-column>
-      <vxe-column title="菜单类型" field="type">
-        <template #default="{ row }">
-          <DictTag :type="DICT_TYPE.SYSTEM_MENU_TYPE" :value="row.type" />
-        </template>
-      </vxe-column>
-      <vxe-column title="路由地址" field="path" />
-      <vxe-column title="组件路径" field="component" />
-      <vxe-column title="权限标识" field="permission" />
-      <vxe-column title="排序" field="sort" />
-      <vxe-column title="状态" field="status">
-        <template #default="{ row }">
-          <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-        </template>
-      </vxe-column>
-      <vxe-column title="创建时间" field="createTime" formatter="formatDate" />
-      <vxe-column title="操作" width="200">
-        <template #default="{ row }">
-          <vxe-button
-            type="text"
-            status="primary"
-            v-hasPermi="['system:menu:update']"
-            @click="handleUpdate(row)"
-          >
-            <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-          </vxe-button>
-          <vxe-button
-            type="text"
-            status="primary"
-            v-hasPermi="['system:menu:delete']"
-            @click="handleDelete(row)"
-          >
-            <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-          </vxe-button>
-        </template>
-      </vxe-column>
-    </vxe-table>
-  </ContentWrap>
-  <vxe-modal
-    v-model="dialogVisible"
-    id="menuModel"
-    :title="dialogTitle"
-    width="800"
-    height="6f00"
-    min-width="460"
-    min-height="320"
-    show-zoom
-    resize
-    transfer
-    show-footer
-  >
-    <template #default>
-      <!-- 对话框(添加 / 修改) -->
-      <el-form
-        :model="menuForm"
-        :rules="rules"
-        :inline="true"
-        label-width="120px"
-        label-position="right"
-      >
-        <el-row :gutter="24">
-          <el-col :span="24">
-            <el-form-item label="上级菜单">
-              <el-tree-select
-                node-key="id"
-                v-model="menuForm.parentId"
-                :props="menuProps"
-                :data="menuOptions"
-                check-strictly
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="菜单类型" prop="type">
-              <el-radio-group v-model="menuForm.type">
-                <el-radio-button
-                  v-for="dict in getIntDictOptions(DICT_TYPE.SYSTEM_MENU_TYPE)"
-                  :key="dict.value"
-                  :label="dict.value"
-                >
-                  {{ dict.label }}
-                </el-radio-button>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="菜单名称" prop="name">
-              <el-input v-model="menuForm.name" placeholder="请输入菜单名称" clearable />
-            </el-form-item>
-          </el-col>
-          <template v-if="menuForm.type !== 3">
-            <el-col :span="12">
-              <el-form-item label="菜单图标">
-                <IconSelect v-model="menuForm.icon" clearable />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="路由地址" prop="path">
-                <template #label>
-                  <Tooltip
-                    titel="路由地址"
-                    message="访问的路由地址，如：`user`。如需外网地址时，则以 `http(s)://` 开头"
-                  />
-                </template>
-                <el-input v-model="menuForm.path" placeholder="请输入路由地址" clearable />
-              </el-form-item>
-            </el-col>
-          </template>
-          <template v-if="menuForm.type === 2">
-            <el-col :span="12">
-              <el-form-item label="路由地址" prop="component">
-                <el-input v-model="menuForm.component" placeholder="请输入组件地址" clearable />
-              </el-form-item>
-            </el-col>
-          </template>
-          <template v-if="menuForm.type !== 1">
-            <el-col :span="12">
-              <el-form-item label="权限标识" prop="permission">
-                <template #label>
-                  <Tooltip
-                    titel="权限标识"
-                    message="Controller 方法上的权限字符，如：@PreAuthorize(`@ss.hasPermission('system:user:list')`)"
-                  />
-                </template>
-                <el-input v-model="menuForm.permission" placeholder="请输入权限标识" clearable />
-              </el-form-item>
-            </el-col>
-          </template>
-          <el-col :span="12">
-            <el-form-item label="显示排序" prop="sort">
-              <el-input-number
-                v-model="menuForm.sort"
-                controls-position="right"
-                :min="0"
-                clearable
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="菜单状态" prop="status">
-              <el-radio-group v-model="menuForm.status">
-                <el-radio-button
-                  v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
-                  :key="dict.value"
-                  :label="dict.value"
-                >
-                  {{ dict.label }}
-                </el-radio-button>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <template v-if="menuForm.type !== 3">
-            <el-col :span="12">
-              <el-form-item label="显示状态" prop="status">
-                <template #label>
-                  <Tooltip
-                    titel="显示状态"
-                    message="选择隐藏时，路由将不会出现在侧边栏，但仍然可以访问"
-                  />
-                </template>
-                <el-radio-group v-model="menuForm.visible">
-                  <el-radio-button key="true" :label="true">显示</el-radio-button>
-                  <el-radio-button key="false" :label="false">隐藏</el-radio-button>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
-          </template>
-          <template v-if="menuForm.type === 2">
-            <el-col :span="12">
-              <el-form-item label="缓存状态" prop="keepAlive">
-                <template #label>
-                  <Tooltip
-                    titel="缓存状态"
-                    message="选择缓存时，则会被 `keep-alive` 缓存，需要匹配组件的 `name` 和路由地址保持一致"
-                  />
-                </template>
-                <el-radio-group v-model="menuForm.keepAlive">
-                  <el-radio-button key="true" :label="true">缓存</el-radio-button>
-                  <el-radio-button key="false" :label="false">不缓存</el-radio-button>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
-          </template>
-        </el-row>
-      </el-form>
-    </template>
-    <template #footer>
-      <!-- 操作按钮 -->
-      <el-button
-        v-if="['create', 'update'].includes(actionType)"
-        type="primary"
-        :loading="actionLoading"
-        @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </vxe-modal>
-</template>

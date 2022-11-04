@@ -114,8 +114,10 @@ VXETable.setup({
     titleColon: true // 是否显示标题冒号
   },
   modal: {
-    width: 600, // 窗口的宽度
-    height: 400, // 窗口的高度
+    width: 800, // 窗口的宽度
+    height: 600, // 窗口的高度
+    minWidth: 460,
+    minHeight: 320,
     showZoom: true, // 标题是否标显示最大化与还原按钮
     resize: true, // 是否允许窗口边缘拖动调整窗口大小
     marginSize: 0, // 只对 resize 启用后有效，用于设置可拖动界限范围，如果为负数则允许拖动超出屏幕边界

@@ -1,3 +1,76 @@
+<template>
+  <ContentWrap>
+    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+      <template #toolbar_buttons>
+        <el-button type="primary" v-hasPermi="['system:post:create']" @click="handleCreate">
+          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        </el-button>
+      </template>
+      <template #status_default="{ row }">
+        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+      </template>
+      <template #action_default="{ row }">
+        <el-button
+          link
+          type="primary"
+          v-hasPermi="['system:post:update']"
+          @click="handleUpdate(row.id)"
+        >
+          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
+        </el-button>
+        <el-button
+          link
+          type="primary"
+          v-hasPermi="['system:post:update']"
+          @click="handleDetail(row)"
+        >
+          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
+        </el-button>
+        <el-button
+          link
+          type="primary"
+          v-hasPermi="['system:post:delete']"
+          @click="handleDelete(row.id)"
+        >
+          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
+        </el-button>
+      </template>
+    </vxe-grid>
+  </ContentWrap>
+  <XModal id="postModel" v-model="dialogVisible" :title="dialogTitle">
+    <template #default>
+      <!-- 对话框(添加 / 修改) -->
+      <vxe-form
+        ref="xForm"
+        v-if="['create', 'update'].includes(actionType)"
+        :data="formData"
+        :items="formItems"
+        :rules="rules"
+      />
+      <Descriptions
+        v-if="actionType === 'detail'"
+        :schema="allSchemas.detailSchema"
+        :data="detailRef"
+      >
+        <template #status="{ row }">
+          <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+        </template>
+        <template #createTime="{ row }">
+          <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
+        </template>
+      </Descriptions>
+    </template>
+    <template #footer>
+      <vxe-button
+        v-if="['create', 'update'].includes(actionType)"
+        status="primary"
+        @click="submitForm"
+        :content="t('action.save')"
+      />
+      <vxe-button @click="dialogVisible = false" :content="t('dialog.close')" />
+    </template>
+  </XModal>
+</template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import dayjs from 'dayjs'
@@ -82,89 +155,3 @@ const submitForm: VxeFormEvents.Submit = async () => {
   }
 }
 </script>
-<template>
-  <ContentWrap>
-    <vxe-grid ref="xGrid" v-bind="gridOptions">
-      <template #toolbar_buttons>
-        <el-button type="primary" v-hasPermi="['system:post:create']" @click="handleCreate">
-          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-        </el-button>
-      </template>
-      <template #status_default="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #action_default="{ row }">
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:post:update']"
-          @click="handleUpdate(row.id)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:post:update']"
-          @click="handleDetail(row)"
-        >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:post:delete']"
-          @click="handleDelete(row.id)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
-      </template>
-    </vxe-grid>
-  </ContentWrap>
-  <vxe-modal
-    v-model="dialogVisible"
-    id="postModel"
-    :title="dialogTitle"
-    width="800"
-    height="400"
-    min-width="460"
-    min-height="320"
-    show-zoom
-    resize
-    transfer
-    show-footer
-  >
-    <template #default>
-      <!-- 对话框(添加 / 修改) -->
-      <vxe-form
-        ref="xForm"
-        v-if="['create', 'update'].includes(actionType)"
-        :data="formData"
-        :items="formItems"
-        :rules="rules"
-      />
-      <Descriptions
-        v-if="actionType === 'detail'"
-        :schema="allSchemas.detailSchema"
-        :data="detailRef"
-      >
-        <template #status="{ row }">
-          <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-        </template>
-        <template #createTime="{ row }">
-          <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-        </template>
-      </Descriptions>
-    </template>
-    <template #footer>
-      <vxe-button
-        v-if="['create', 'update'].includes(actionType)"
-        status="primary"
-        @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </vxe-button>
-      <vxe-button @click="dialogVisible = false">{{ t('dialog.close') }}</vxe-button>
-    </template>
-  </vxe-modal>
-</template>
