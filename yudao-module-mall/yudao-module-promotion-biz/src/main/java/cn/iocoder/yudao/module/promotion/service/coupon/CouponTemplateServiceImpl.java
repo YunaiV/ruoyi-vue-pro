@@ -86,4 +86,9 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
         return couponTemplateMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public void updateCouponTemplateTakeCount(Long id, int incrCount) {
+        couponTemplateMapper.updateTakeCount(id, incrCount);
+    }
+
 }

@@ -61,4 +61,12 @@ public interface CouponTemplateService {
      */
     PageResult<CouponTemplateDO> getCouponTemplatePage(CouponTemplatePageReqVO pageReqVO);
 
+    /**
+     * 更新优惠劵模板的领取数量
+     *
+     * @param id 优惠劵模板编号
+     * @param incrCount 增加数量
+     */
+    void updateCouponTemplateTakeCount(Long id, int incrCount);
+
 }

@@ -57,7 +57,7 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                     v-hasPermi="['promotion:coupon:delete']">删除</el-button>
+                     v-hasPermi="['promotion:coupon:delete']">回收</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -145,11 +145,11 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$modal.confirm('是否确认删除优惠劵编号为"' + id + '"的数据项?').then(function() {
+      this.$modal.confirm('回收将会收回会员领取的待使用的优惠券，已使用的将无法回收，确定要回收所选优惠券吗？').then(function() {
           return deleteCoupon(id);
         }).then(() => {
           this.getList();
-          this.$modal.msgSuccess("删除成功");
+          this.$modal.msgSuccess("回收成功");
         }).catch(() => {});
     },
     /** tab 切换 */

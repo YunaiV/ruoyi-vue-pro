@@ -31,4 +31,11 @@ public interface CouponService {
      */
     PageResult<CouponDO> getCouponPage(CouponPageReqVO pageReqVO);
 
+    /**
+     * 回收优惠劵
+     *
+     * @param id 优惠劵编号
+     */
+    void deleteCoupon(Long id);
+
 }

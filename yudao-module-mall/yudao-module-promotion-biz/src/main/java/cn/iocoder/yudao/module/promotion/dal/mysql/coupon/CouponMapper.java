@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
@@ -24,6 +25,12 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
                 .inIfPresent(CouponDO::getUserId, userIds)
                 .betweenIfPresent(CouponDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(CouponDO::getId));
+    }
+
+    default int delete(Long id, Collection<Integer> whereStatuses) {
+        return update(null, new LambdaUpdateWrapper<CouponDO>()
+                .eq(CouponDO::getId, id).in(CouponDO::getStatus, whereStatuses)
+                .set(CouponDO::getDeleted, 1));
     }
 
 }

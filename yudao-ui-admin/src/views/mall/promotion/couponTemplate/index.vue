@@ -33,6 +33,9 @@
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
                    v-hasPermi="['promotion:coupon-template:create']">新增</el-button>
+        <el-button type="info" plain icon="el-icon-s-operation" size="mini"
+                   @click="() => this.$router.push('/promotion/coupon')"
+                   v-hasPermi="['promotion:coupon:query']">会员优惠劵</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>

@@ -20,12 +20,12 @@ public enum CouponStatusEnum implements IntArrayValuable {
     EXPIRE(3, "已过期"),
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CouponStatusEnum::getValue).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CouponStatusEnum::getStatus).toArray();
 
     /**
      * 值
      */
-    private final Integer value;
+    private final Integer status;
     /**
      * 名字
      */

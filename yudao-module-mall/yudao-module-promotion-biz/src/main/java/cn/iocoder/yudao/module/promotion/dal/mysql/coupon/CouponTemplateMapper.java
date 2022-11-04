@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplatePageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 优惠劵模板 Mapper
@@ -23,5 +24,7 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
                 .betweenIfPresent(CouponTemplateDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(CouponTemplateDO::getId));
     }
+
+    void updateTakeCount(@Param("id") Long id, @Param("incrCount") Integer incrCount);
 
 }

@@ -25,5 +25,6 @@ public interface ErrorCodeConstants {
 
     // ========== 优惠劵模板 1003005000 ==========
     ErrorCode COUPON_NOT_EXISTS = new ErrorCode(1003005000, "优惠劵不存在");
+    ErrorCode COUPON_DELETE_FAIL_USED = new ErrorCode(1003005001, "回收优惠劵失败，优惠劵已被使用");
 
 }
