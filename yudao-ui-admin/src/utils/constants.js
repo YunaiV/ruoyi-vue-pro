@@ -278,3 +278,17 @@ export const PromotionProductScopeEnum = {
     name: '指定商品参与'
   }
 }
+
+/**
+ * 营销的条件类型枚举
+ */
+export const PromotionConditionTypeEnum = {
+  PRICE: {
+    type: 10,
+    name: '满 N 元'
+  },
+  COUNT: {
+    type: 20,
+    name: '满 N 件'
+  }
+}
