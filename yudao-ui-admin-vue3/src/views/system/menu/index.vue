@@ -3,12 +3,27 @@ import * as MenuApi from '@/api/system/menu'
 import { MenuVO } from '@/api/system/menu/types'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
+import { IconSelect } from '@/components/Icon'
+import { Tooltip } from '@/components/Tooltip'
 import { required } from '@/utils/formRules.js'
 import { onMounted, reactive, ref } from 'vue'
 import { VxeTableInstance } from 'vxe-table'
-import { DICT_TYPE } from '@/utils/dict'
+import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
-
+import {
+  ElRow,
+  ElCol,
+  ElForm,
+  ElFormItem,
+  ElInput,
+  ElInputNumber,
+  ElSelect,
+  ElTreeSelect,
+  ElOption,
+  ElRadioGroup,
+  ElRadioButton
+} from 'element-plus'
+import { handleTree } from '@/utils/tree'
 const { t } = useI18n() // 国际化
 const message = useMessage()
 const xTable = ref<VxeTableInstance>()
@@ -18,6 +33,7 @@ const actionLoading = ref(false) // 遮罩层
 const actionType = ref('') // 操作按钮的类型
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
+const statusOption = ref() // 状态选项
 const menuForm = ref<MenuVO>({
   id: 0,
   name: '',
@@ -33,12 +49,32 @@ const menuForm = ref<MenuVO>({
   keepAlive: true,
   createTime: ''
 })
+const menuProps = {
+  checkStrictly: true,
+  children: 'children',
+  label: 'name',
+  value: 'id'
+}
+interface Tree {
+  id: number
+  name: string
+  children?: Tree[] | any[]
+}
+const menuOptions = ref<any[]>([]) // 树形结构
+const getTree = async () => {
+  menuOptions.value = []
+  const res = await MenuApi.listSimpleMenusApi()
+  let menu: Tree = { id: 0, name: '主类目', children: [] }
+  menu.children = handleTree(res)
+  menuOptions.value.push(menu)
+}
 // ========== 查询 ==========
 const queryParams = reactive({
-  name: undefined,
-  status: undefined
+  name: null,
+  status: null
 })
 const getList = async () => {
+  statusOption.value = getIntDictOptions(DICT_TYPE.COMMON_STATUS)
   tableLoading.value = true
   const res = await MenuApi.getMenuListApi(queryParams)
   tableData.value = res
@@ -49,6 +85,10 @@ const setDialogTile = (type: string) => {
   dialogTitle.value = t('action.' + type)
   actionType.value = type
   dialogVisible.value = true
+}
+// 新建操作
+const handleCreate = () => {
+  setDialogTile('create')
 }
 // 修改操作
 const handleUpdate = async (row: MenuVO) => {
@@ -73,6 +113,16 @@ const rules = reactive({
   path: [required],
   status: [required]
 })
+// 查询操作
+const handleQuery = async () => {
+  await getList()
+}
+// 重置操作
+const resetQuery = async () => {
+  queryParams.name = null
+  queryParams.status = null
+  await getList()
+}
 // 保存操作
 const isExternal = (path: string) => {
   return /^(https?:|mailto:|tel:)/.test(path)
@@ -111,12 +161,41 @@ const submitForm = async () => {
 }
 onMounted(async () => {
   await getList()
+  getTree()
 })
 </script>
 <template>
   <ContentWrap>
+    <el-form :model="queryParams" ref="queryForm" :inline="true">
+      <el-form-item label="菜单名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入菜单名称" />
+      </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择菜单状态">
+          <el-option
+            v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="handleQuery">
+          <Icon icon="ep:search" class="mr-5px" />
+          {{ t('common.query') }}
+        </el-button>
+        <el-button @click="resetQuery">
+          <Icon icon="ep:refresh-right" class="mr-5px" />
+          {{ t('common.reset') }}
+        </el-button>
+      </el-form-item>
+    </el-form>
     <vxe-toolbar>
       <template #buttons>
+        <vxe-button status="primary" v-hasPermi="['system:post:create']" @click="handleCreate">
+          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        </vxe-button>
         <vxe-button @click="xTable?.setAllTreeExpand(true)">展开所有</vxe-button>
         <vxe-button @click="xTable?.clearTreeExpand()">关闭所有</vxe-button>
       </template>
@@ -181,31 +260,160 @@ onMounted(async () => {
     id="menuModel"
     :title="dialogTitle"
     width="800"
-    height="400"
+    height="6f00"
     min-width="460"
     min-height="320"
     show-zoom
     resize
-    remember
-    storage
     transfer
     show-footer
   >
     <template #default>
       <!-- 对话框(添加 / 修改) -->
-      <vxe-form
-        ref="xForm"
-        v-if="['create', 'update'].includes(actionType)"
-        :data="menuForm"
+      <el-form
+        :model="menuForm"
         :rules="rules"
-        @submit="submitForm"
+        :inline="true"
+        label-width="120px"
+        label-position="right"
       >
-        <vxe-form-item title="菜单名称" field="name" :item-render="{}">
-          <template #default="{ data }">
-            <vxe-input v-model="data.name" placeholder="请输入菜单名称" clearable />
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-form-item label="上级菜单">
+              <el-tree-select
+                node-key="id"
+                v-model="menuForm.parentId"
+                :props="menuProps"
+                :data="menuOptions"
+                check-strictly
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="菜单类型" prop="type">
+              <el-radio-group v-model="menuForm.type">
+                <el-radio-button
+                  v-for="dict in getIntDictOptions(DICT_TYPE.SYSTEM_MENU_TYPE)"
+                  :key="dict.value"
+                  :label="dict.value"
+                >
+                  {{ dict.label }}
+                </el-radio-button>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="菜单名称" prop="name">
+              <el-input v-model="menuForm.name" placeholder="请输入菜单名称" clearable />
+            </el-form-item>
+          </el-col>
+          <template v-if="menuForm.type !== 3">
+            <el-col :span="12">
+              <el-form-item label="菜单图标">
+                <IconSelect v-model="menuForm.icon" clearable />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="路由地址" prop="path">
+                <template #label>
+                  <Tooltip
+                    titel="路由地址"
+                    message="访问的路由地址，如：`user`。如需外网地址时，则以 `http(s)://` 开头"
+                  />
+                </template>
+                <el-input v-model="menuForm.path" placeholder="请输入路由地址" clearable />
+              </el-form-item>
+            </el-col>
           </template>
-        </vxe-form-item>
-      </vxe-form>
+          <template v-if="menuForm.type === 2">
+            <el-col :span="12">
+              <el-form-item label="路由地址" prop="component">
+                <el-input v-model="menuForm.component" placeholder="请输入组件地址" clearable />
+              </el-form-item>
+            </el-col>
+          </template>
+          <template v-if="menuForm.type !== 1">
+            <el-col :span="12">
+              <el-form-item label="权限标识" prop="permission">
+                <template #label>
+                  <Tooltip
+                    titel="权限标识"
+                    message="Controller 方法上的权限字符，如：@PreAuthorize(`@ss.hasPermission('system:user:list')`)"
+                  />
+                </template>
+                <el-input v-model="menuForm.permission" placeholder="请输入权限标识" clearable />
+              </el-form-item>
+            </el-col>
+          </template>
+          <el-col :span="12">
+            <el-form-item label="显示排序" prop="sort">
+              <el-input-number
+                v-model="menuForm.sort"
+                controls-position="right"
+                :min="0"
+                clearable
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="菜单状态" prop="status">
+              <el-radio-group v-model="menuForm.status">
+                <el-radio-button
+                  v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
+                  :key="dict.value"
+                  :label="dict.value"
+                >
+                  {{ dict.label }}
+                </el-radio-button>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <template v-if="menuForm.type !== 3">
+            <el-col :span="12">
+              <el-form-item label="显示状态" prop="status">
+                <template #label>
+                  <Tooltip
+                    titel="显示状态"
+                    message="选择隐藏时，路由将不会出现在侧边栏，但仍然可以访问"
+                  />
+                </template>
+                <el-radio-group v-model="menuForm.visible">
+                  <el-radio-button key="true" :label="true">显示</el-radio-button>
+                  <el-radio-button key="false" :label="false">隐藏</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+          </template>
+          <template v-if="menuForm.type === 2">
+            <el-col :span="12">
+              <el-form-item label="缓存状态" prop="keepAlive">
+                <template #label>
+                  <Tooltip
+                    titel="缓存状态"
+                    message="选择缓存时，则会被 `keep-alive` 缓存，需要匹配组件的 `name` 和路由地址保持一致"
+                  />
+                </template>
+                <el-radio-group v-model="menuForm.keepAlive">
+                  <el-radio-button key="true" :label="true">缓存</el-radio-button>
+                  <el-radio-button key="false" :label="false">不缓存</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+          </template>
+        </el-row>
+      </el-form>
+    </template>
+    <template #footer>
+      <!-- 操作按钮 -->
+      <el-button
+        v-if="['create', 'update'].includes(actionType)"
+        type="primary"
+        :loading="actionLoading"
+        @click="submitForm"
+      >
+        {{ t('action.save') }}
+      </el-button>
+      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
   </vxe-modal>
 </template>

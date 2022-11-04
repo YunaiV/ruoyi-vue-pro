@@ -131,8 +131,6 @@ const submitForm: VxeFormEvents.Submit = async () => {
     min-height="320"
     show-zoom
     resize
-    remember
-    storage
     transfer
     show-footer
   >
@@ -144,7 +142,6 @@ const submitForm: VxeFormEvents.Submit = async () => {
         :data="formData"
         :items="formItems"
         :rules="rules"
-        @submit="submitForm"
       />
       <Descriptions
         v-if="actionType === 'detail'"
@@ -158,6 +155,16 @@ const submitForm: VxeFormEvents.Submit = async () => {
           <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
         </template>
       </Descriptions>
+    </template>
+    <template #footer>
+      <vxe-button
+        v-if="['create', 'update'].includes(actionType)"
+        status="primary"
+        @click="submitForm"
+      >
+        {{ t('action.save') }}
+      </vxe-button>
+      <vxe-button @click="dialogVisible = false">{{ t('dialog.close') }}</vxe-button>
     </template>
   </vxe-modal>
 </template>
