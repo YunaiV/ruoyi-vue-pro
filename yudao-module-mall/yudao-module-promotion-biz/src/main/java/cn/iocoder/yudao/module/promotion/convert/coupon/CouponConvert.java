@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.convert.coupon;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponPageItemRespVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageItemRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

@@ -65,6 +65,7 @@ export const DICT_TYPE = {
   PROMOTION_PRODUCT_SCOPE: 'promotion_product_scope', // 营销的商品范围
   PROMOTION_COUPON_TEMPLATE_VALIDITY_TYPE: 'promotion_coupon_template_validity_type', // 优惠劵模板的有限期类型
   PROMOTION_COUPON_STATUS: 'promotion_coupon_status', // 优惠劵的状态
+  PROMOTION_COUPON_TAKE_TYPE: 'promotion_coupon_take_type', // 优惠劵的领取方式
 }
 
 /**

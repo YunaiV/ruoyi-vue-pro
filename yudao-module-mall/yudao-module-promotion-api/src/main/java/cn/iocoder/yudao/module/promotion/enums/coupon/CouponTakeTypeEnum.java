@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.promotion.enums.coupon;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.Arrays;
 
@@ -9,6 +11,8 @@ import java.util.Arrays;
  *
  * @author 芋道源码
  */
+@AllArgsConstructor
+@Getter
 public enum CouponTakeTypeEnum implements IntArrayValuable {
 
     BY_USER(1, "直接领取"), // 用户可在首页、每日领劵直接领取
@@ -25,19 +29,6 @@ public enum CouponTakeTypeEnum implements IntArrayValuable {
      * 名字
      */
     private final String name;
-
-    CouponTakeTypeEnum(Integer value, String name) {
-        this.value = value;
-        this.name = name;
-    }
-
-    public Integer getValue() {
-        return value;
-    }
-
-    public String getName() {
-        return name;
-    }
 
     @Override
     public int[] array() {

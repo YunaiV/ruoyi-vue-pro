@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;

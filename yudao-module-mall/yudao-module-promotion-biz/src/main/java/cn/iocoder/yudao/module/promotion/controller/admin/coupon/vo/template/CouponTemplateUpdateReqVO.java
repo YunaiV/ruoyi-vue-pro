@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

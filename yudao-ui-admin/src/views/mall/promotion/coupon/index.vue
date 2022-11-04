@@ -29,25 +29,29 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="会员信息" align="center" prop="nickname" /> <!-- TODO 芋艿：以后支持头像，支持跳转 -->
       <el-table-column label="优惠劵" align="center" prop="name" />
-      <el-table-column label="优惠码状态" align="center" prop="status" />
-      <el-table-column label="生效开始时间" align="center" prop="validStartTime" width="180">
+      <el-table-column label="优惠券类型" align="center" prop="discountType">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.validStartTime) }}</span>
+          <dict-tag :type="DICT_TYPE.PROMOTION_DISCOUNT_TYPE" :value="scope.row.discountType" />
         </template>
       </el-table-column>
-      <el-table-column label="生效结束时间" align="center" prop="validEndTime" width="180">
+      <el-table-column label="领取方式" align="center" prop="takeType">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.validEndTime) }}</span>
+          <dict-tag :type="DICT_TYPE.PROMOTION_COUPON_TAKE_TYPE" :value="scope.row.takeType" />
+        </template>
+      </el-table-column>
+      <el-table-column label="状态" align="center" prop="status">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.PROMOTION_COUPON_STATUS" :value="scope.row.status" />
+        </template>
+      </el-table-column>
+      <el-table-column label="领取时间" align="center" prop="createTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="使用时间" align="center" prop="useTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.useTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -94,7 +98,7 @@ export default {
         createTime: [],
         status: undefined,
       },
-      // Tab 想选
+      // Tab 筛选
       activeTab: 'all',
       statusTabs: [{
         label: '全部',
@@ -148,9 +152,9 @@ export default {
           this.$modal.msgSuccess("删除成功");
         }).catch(() => {});
     },
+    /** tab 切换 */
     tabClick(tab) {
       this.queryParams.status = tab.name === 'all' ? undefined : tab.name;
-      this.list = [];
       this.getList();
     }
   }

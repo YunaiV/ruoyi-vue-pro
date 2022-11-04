@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.promotion.controller.admin.coupon;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.*;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.*;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponTemplateConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponTemplateService;

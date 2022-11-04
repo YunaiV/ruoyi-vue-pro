@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
@@ -20,6 +20,9 @@ public class CouponPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "优惠劵模板编号", example = "2048")
     private Long templateId;
+
+    @ApiModelProperty(value = "优惠码状态", example = "1", notes = "参见 CouponStatusEnum 枚举")
+    private Integer status;
 
     @ApiModelProperty(value = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
