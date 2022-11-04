@@ -2,38 +2,38 @@
   <ContentWrap>
     <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
       <template #toolbar_buttons>
-        <el-button type="primary" v-hasPermi="['system:post:create']" @click="handleCreate">
-          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-        </el-button>
+        <XButton
+          preIcon="ep:zoom-in"
+          iTitle="action.add"
+          v-hasPermi="['system:post:create']"
+          @click="handleCreate()"
+        />
       </template>
       <template #status_default="{ row }">
         <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
       </template>
       <template #action_default="{ row }">
-        <el-button
+        <XButton
           link
-          type="primary"
+          preIcon="ep:edit"
+          iTitle="action.edit"
           v-hasPermi="['system:post:update']"
           @click="handleUpdate(row.id)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button
+        />
+        <XButton
           link
-          type="primary"
+          preIcon="ep:view"
+          iTitle="action.detail"
           v-hasPermi="['system:post:update']"
           @click="handleDetail(row)"
-        >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-        <el-button
+        />
+        <XButton
           link
-          type="primary"
+          preIcon="ep:delete"
+          iTitle="action.del"
           v-hasPermi="['system:post:delete']"
           @click="handleDelete(row.id)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
+        />
       </template>
     </vxe-grid>
   </ContentWrap>
@@ -61,13 +61,18 @@
       </Descriptions>
     </template>
     <template #footer>
-      <vxe-button
+      <XButton
         v-if="['create', 'update'].includes(actionType)"
-        status="primary"
+        :loading="actionLoading"
+        iTitle="action.save"
         @click="submitForm"
-        :content="t('action.save')"
       />
-      <vxe-button @click="dialogVisible = false" :content="t('dialog.close')" />
+      <XButton
+        v-if="['create', 'update'].includes(actionType)"
+        :loading="actionLoading"
+        iTitle="dialog.close"
+        @click="dialogVisible = false"
+      />
     </template>
   </XModal>
 </template>

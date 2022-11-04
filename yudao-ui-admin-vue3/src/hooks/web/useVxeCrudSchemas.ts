@@ -189,6 +189,7 @@ const filterFormSchema = (crudSchema: VxeCrudSchema[]): VxeFormItemProps[] => {
         // 默认为 input
         itemRender: itemRender,
         ...schemaItem.form,
+        span: schemaItem.form?.span || 12,
         field: schemaItem.field,
         title: schemaItem.form?.title || schemaItem.title
       }

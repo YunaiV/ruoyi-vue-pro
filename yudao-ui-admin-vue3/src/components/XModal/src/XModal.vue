@@ -18,34 +18,14 @@ const props = defineProps({
 })
 
 const getBindValue = computed(() => {
-  const delArr: string[] = ['title']
   const attrs = useAttrs()
   const obj = { ...attrs, ...props }
-  for (const key in obj) {
-    if (delArr.indexOf(key) !== -1) {
-      delete obj[key]
-    }
-  }
   return obj
 })
 </script>
 
 <template>
-  <vxe-modal
-    v-bind="getBindValue"
-    :width="width"
-    :height="height"
-    :title="title"
-    min-width="460"
-    min-height="320"
-    :loading="loading"
-    :fullscreen="fullscreen"
-    destroy-on-close
-    show-zoom
-    resize
-    transfer
-    :show-footer="showFooter"
-  >
+  <vxe-modal v-bind="getBindValue" destroy-on-close show-zoom resize transfer>
     <template v-if="slots.header" #header>
       <slot name="header"></slot>
     </template>
