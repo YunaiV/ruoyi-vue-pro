@@ -3,8 +3,9 @@
     <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
       <template #toolbar_buttons>
         <XButton
+          type="primary"
           preIcon="ep:zoom-in"
-          iTitle="action.add"
+          :title="t('action.add')"
           v-hasPermi="['system:post:create']"
           @click="handleCreate()"
         />
@@ -15,22 +16,25 @@
       <template #action_default="{ row }">
         <XButton
           link
+          type="primary"
           preIcon="ep:edit"
-          iTitle="action.edit"
+          :title="t('action.edit')"
           v-hasPermi="['system:post:update']"
           @click="handleUpdate(row.id)"
         />
         <XButton
           link
+          type="primary"
           preIcon="ep:view"
-          iTitle="action.detail"
+          :title="t('action.detail')"
           v-hasPermi="['system:post:update']"
           @click="handleDetail(row)"
         />
         <XButton
           link
+          type="primary"
           preIcon="ep:delete"
-          iTitle="action.del"
+          :title="t('action.del')"
           v-hasPermi="['system:post:delete']"
           @click="handleDelete(row.id)"
         />
@@ -64,13 +68,13 @@
       <XButton
         v-if="['create', 'update'].includes(actionType)"
         :loading="actionLoading"
-        iTitle="action.save"
+        :title="t('action.save')"
         @click="submitForm"
       />
       <XButton
         v-if="['create', 'update'].includes(actionType)"
         :loading="actionLoading"
-        iTitle="dialog.close"
+        :title="t('dialog.close')"
         @click="dialogVisible = false"
       />
     </template>

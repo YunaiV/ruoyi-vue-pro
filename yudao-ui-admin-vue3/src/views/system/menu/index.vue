@@ -15,23 +15,26 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="handleQuery">
-          <Icon icon="ep:search" class="mr-5px" />
-          {{ t('common.query') }}
-        </el-button>
-        <el-button @click="resetQuery">
-          <Icon icon="ep:refresh-right" class="mr-5px" />
-          {{ t('common.reset') }}
-        </el-button>
+        <XButton
+          type="primary"
+          preIcon="ep:search"
+          :title="t('common.query')"
+          @click="handleQuery()"
+        />
+        <XButton preIcon="ep:refresh-right" :title="t('common.reset')" @click="resetQuery()" />
       </el-form-item>
     </el-form>
     <vxe-toolbar>
       <template #buttons>
-        <vxe-button status="primary" v-hasPermi="['system:post:create']" @click="handleCreate">
-          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-        </vxe-button>
-        <vxe-button @click="xTable?.setAllTreeExpand(true)">展开所有</vxe-button>
-        <vxe-button @click="xTable?.clearTreeExpand()">关闭所有</vxe-button>
+        <XButton
+          type="primary"
+          preIcon="ep:zoom-in"
+          :title="t('action.add')"
+          v-hasPermi="['system:menu:create']"
+          @click="handleCreate()"
+        />
+        <XButton title="展开所有" @click="xTable?.setAllTreeExpand(true)" />
+        <XButton title="关闭所有" @click="xTable?.clearTreeExpand()" />
       </template>
     </vxe-toolbar>
     <vxe-table
@@ -70,22 +73,22 @@
       <vxe-column title="创建时间" field="createTime" formatter="formatDate" />
       <vxe-column title="操作" width="200">
         <template #default="{ row }">
-          <vxe-button
-            type="text"
-            status="primary"
+          <XButton
+            link
+            type="primary"
+            preIcon="ep:edit"
+            :title="t('action.edit')"
             v-hasPermi="['system:menu:update']"
-            @click="handleUpdate(row)"
-          >
-            <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-          </vxe-button>
-          <vxe-button
-            type="text"
-            status="primary"
+            @click="handleUpdate(row.id)"
+          />
+          <XButton
+            link
+            type="primary"
+            preIcon="ep:delete"
+            :title="t('action.del')"
             v-hasPermi="['system:menu:delete']"
             @click="handleDelete(row)"
-          >
-            <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-          </vxe-button>
+          />
         </template>
       </vxe-column>
     </vxe-table>
@@ -228,14 +231,14 @@
     </template>
     <template #footer>
       <!-- 操作按钮 -->
-      <el-button
+      <XButton
         v-if="['create', 'update'].includes(actionType)"
         type="primary"
         :loading="actionLoading"
         @click="submitForm"
-        :content="t('action.save')"
+        :title="t('action.save')"
       />
-      <el-button @click="dialogVisible = false" :content="t('dialog.close')" />
+      <XButton :loading="actionLoading" @click="dialogVisible = false" :title="t('dialog.close')" />
     </template>
   </XModal>
 </template>
