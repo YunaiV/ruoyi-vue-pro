@@ -13,9 +13,9 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.enums.common.*;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
 import cn.iocoder.yudao.module.promotion.service.discount.DiscountService;
-import cn.iocoder.yudao.module.promotion.service.reward.RewardService;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.promotion.service.reward.RewardActivityService;
 import com.google.common.base.Suppliers;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -56,7 +56,7 @@ public class PriceServiceImpl implements PriceService {
     @Resource
     private DiscountService discountService;
     @Resource
-    private RewardService rewardService;
+    private RewardActivityService rewardActivityService;
     @Resource
     private CouponService couponService;
 
@@ -188,7 +188,7 @@ public class PriceServiceImpl implements PriceService {
     private void calculatePriceForOrderLevel(Long userId, PriceCalculateRespDTO priceCalculate) {
         // 获取 SKU 级别的所有优惠信息
         Set<Long> spuIds = convertSet(priceCalculate.getOrder().getItems(), PriceCalculateRespDTO.OrderItem::getSpuId);
-        Map<RewardActivityDO, Set<Long>> rewardActivities = rewardService.getMatchRewardActivities(spuIds);
+        Map<RewardActivityDO, Set<Long>> rewardActivities = rewardActivityService.getMatchRewardActivities(spuIds);
 
         // 处理满减送活动
         if (CollUtil.isNotEmpty(rewardActivities)) {

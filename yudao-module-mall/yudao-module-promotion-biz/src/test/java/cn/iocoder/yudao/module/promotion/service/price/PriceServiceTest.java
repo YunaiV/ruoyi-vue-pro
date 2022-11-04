@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.promotion.service.price;
 
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
@@ -10,9 +12,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.enums.common.*;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
 import cn.iocoder.yudao.module.promotion.service.discount.DiscountService;
-import cn.iocoder.yudao.module.promotion.service.reward.RewardService;
-import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.promotion.service.reward.RewardActivityService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -43,7 +43,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
     @Mock
     private DiscountService discountService;
     @Mock
-    private RewardService rewardService;
+    private RewardActivityService rewardActivityService;
     @Mock
     private CouponService couponService;
     @Mock
@@ -205,7 +205,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         Map<RewardActivityDO, Set<Long>> matchRewardActivities = new LinkedHashMap<>();
         matchRewardActivities.put(rewardActivity01, asSet(1L, 2L));
         matchRewardActivities.put(rewardActivity02, asSet(3L));
-        when(rewardService.getMatchRewardActivities(eq(asSet(1L, 2L, 3L)))).thenReturn(matchRewardActivities);
+        when(rewardActivityService.getMatchRewardActivities(eq(asSet(1L, 2L, 3L)))).thenReturn(matchRewardActivities);
 
         // 调用
         PriceCalculateRespDTO priceCalculate = priceService.calculatePrice(calculateReqDTO);
@@ -302,7 +302,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
                 .setRules(singletonList(new RewardActivityDO.Rule().setLimit(351).setDiscountPrice(70))));
         Map<RewardActivityDO, Set<Long>> matchRewardActivities = new LinkedHashMap<>();
         matchRewardActivities.put(rewardActivity01, asSet(1L, 2L));
-        when(rewardService.getMatchRewardActivities(eq(asSet(1L, 2L)))).thenReturn(matchRewardActivities);
+        when(rewardActivityService.getMatchRewardActivities(eq(asSet(1L, 2L)))).thenReturn(matchRewardActivities);
 
         // 调用
         PriceCalculateRespDTO priceCalculate = priceService.calculatePrice(calculateReqDTO);
