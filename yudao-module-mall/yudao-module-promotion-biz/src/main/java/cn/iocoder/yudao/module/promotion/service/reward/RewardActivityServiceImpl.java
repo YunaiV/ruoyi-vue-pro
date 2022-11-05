@@ -14,13 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
+import static java.util.Arrays.asList;
 
 /**
  * 满减送活动 Service 实现类
@@ -54,6 +52,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         if (dbRewardActivity.getStatus().equals(PromotionActivityStatusEnum.CLOSE.getStatus())) { // 已关闭的活动，不能修改噢
             throw exception(REWARD_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED);
         }
+        // 校验商品是否冲突
         validateRewardActivitySpuConflicts(updateReqVO.getId(), updateReqVO.getProductSpuIds());
 
         // 更新
@@ -109,8 +108,9 @@ public class RewardActivityServiceImpl implements RewardActivityService {
             return;
         }
         // 查询商品参加的活动
-        List<RewardActivityDO> rewardActivityList = getRewardActivityListBySpuIds(spuIds);
-        if (id != null) { // 排除活动
+        List<RewardActivityDO> rewardActivityList = getRewardActivityListBySpuIds(spuIds,
+                asList(PromotionActivityStatusEnum.WAIT.getStatus(), PromotionActivityStatusEnum.RUN.getStatus()));
+        if (id != null) { // 排除自己这个活动
             rewardActivityList.removeIf(activity -> id.equals(activity.getId()));
         }
         // 如果非空，则说明冲突
@@ -123,10 +123,12 @@ public class RewardActivityServiceImpl implements RewardActivityService {
      * 获得商品参加的满减送活动的数组
      *
      * @param spuIds 商品 SPU 编号数组
+     * @param statuses 活动状态数组
      * @return 商品参加的满减送活动的数组
      */
-    private List<RewardActivityDO> getRewardActivityListBySpuIds(Collection<Long> spuIds) {
-        List<RewardActivityDO> list = rewardActivityMapper.selectList();
+    private List<RewardActivityDO> getRewardActivityListBySpuIds(Collection<Long> spuIds,
+                                                                 Collection<Integer> statuses) {
+        List<RewardActivityDO> list = rewardActivityMapper.selectListByStatus(statuses);
         return CollUtil.filter(list, activity -> CollUtil.containsAny(activity.getProductSpuIds(), spuIds));
     }
 

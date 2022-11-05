@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProduct
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.enums.common.*;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
-import cn.iocoder.yudao.module.promotion.service.discount.DiscountService;
+import cn.iocoder.yudao.module.promotion.service.discount.DiscountActivityService;
 import cn.iocoder.yudao.module.promotion.service.reward.RewardActivityService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -41,7 +41,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
     private PriceServiceImpl priceService;
 
     @Mock
-    private DiscountService discountService;
+    private DiscountActivityService discountService;
     @Mock
     private RewardActivityService rewardActivityService;
     @Mock
@@ -109,10 +109,10 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         ProductSkuRespDTO productSku02 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(20L).setPrice(50));
         when(productSkuApi.getSkuList(eq(asSet(10L, 20L)))).thenReturn(asList(productSku01, productSku02));
         // mock 方法（限时折扣 DiscountActivity 信息）
-        DiscountProductDO discountProduct01 = randomPojo(DiscountProductDO.class, o -> o.setActivityId(1000L).setActivityName("活动 1000 号")
-                .setSkuId(10L).setPromotionPrice(80));
-        DiscountProductDO discountProduct02 = randomPojo(DiscountProductDO.class, o -> o.setActivityId(2000L).setActivityName("活动 2000 号")
-                .setSkuId(20L).setPromotionPrice(40));
+        DiscountProductDO discountProduct01 = randomPojo(DiscountProductDO.class, o -> o.setActivityId(1000L)/*.setActsivityName("活动 1000 号") TODO 芋艿：待完善 */
+                .setSkuId(10L).setDiscountPrice(80));
+        DiscountProductDO discountProduct02 = randomPojo(DiscountProductDO.class, o -> o.setActivityId(2000L)/*.setActivityName("活动 2000 号") TODO 芋艿：待完善 */
+                .setSkuId(20L).setDiscountPrice(80));
         when(discountService.getMatchDiscountProducts(eq(asSet(10L, 20L)))).thenReturn(
                 MapUtil.builder(10L, discountProduct01).put(20L, discountProduct02).map());
 

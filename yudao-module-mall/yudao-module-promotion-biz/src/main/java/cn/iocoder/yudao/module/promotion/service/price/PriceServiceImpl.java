@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProduct
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.enums.common.*;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
-import cn.iocoder.yudao.module.promotion.service.discount.DiscountService;
+import cn.iocoder.yudao.module.promotion.service.discount.DiscountActivityService;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.promotion.service.reward.RewardActivityService;
@@ -54,7 +54,7 @@ import static java.util.Collections.singletonList;
 public class PriceServiceImpl implements PriceService {
 
     @Resource
-    private DiscountService discountService;
+    private DiscountActivityService discountService;
     @Resource
     private RewardActivityService rewardActivityService;
     @Resource
@@ -121,7 +121,7 @@ public class PriceServiceImpl implements PriceService {
             Double memberDiscountPercent = memberDiscountPercentSupplier.get();
             DiscountProductDO discountProduct = discountProducts.get(orderItem.getSkuId());
             if (discountProduct != null // 假设优惠价格更贵，则认为没优惠
-                    && discountProduct.getPromotionPrice() >= orderItem.getOriginalUnitPrice()) {
+                    && discountProduct.getDiscountPrice() >= orderItem.getOriginalUnitPrice()) {
                 discountProduct = null;
             }
             if (memberDiscountPercent == null && discountProduct == null) {
@@ -129,7 +129,7 @@ public class PriceServiceImpl implements PriceService {
             }
             // 计算价格，判断选择哪个折扣
             Integer memberPrice = memberDiscountPercent != null ? (int) (orderItem.getPayPrice() * memberDiscountPercent / 100) : null;
-            Integer promotionPrice = discountProduct != null ? discountProduct.getPromotionPrice() * orderItem.getCount() : null;
+            Integer promotionPrice = discountProduct != null ? discountProduct.getDiscountPrice() * orderItem.getCount() : null;
             if (memberPrice == null) {
                 calculatePriceByDiscountActivity(priceCalculate, orderItem, discountProduct, promotionPrice);
             } else if (promotionPrice == null) {
@@ -155,7 +155,8 @@ public class PriceServiceImpl implements PriceService {
     private void calculatePriceByDiscountActivity(PriceCalculateRespDTO priceCalculate, PriceCalculateRespDTO.OrderItem orderItem,
                                                   DiscountProductDO discountProduct, Integer promotionPrice) {
         // 记录优惠明细
-        addPromotion(priceCalculate, orderItem, discountProduct.getActivityId(), discountProduct.getActivityName(),
+        addPromotion(priceCalculate, orderItem, discountProduct.getActivityId(), null
+                /* TODO 芋艿：修复下 discountProduct.getActivityName()*/,
                 PromotionTypeEnum.DISCOUNT_ACTIVITY.getType(), PromotionLevelEnum.SKU.getLevel(), promotionPrice,
                 true, StrUtil.format("限时折扣：省 {} 元", formatPrice(orderItem.getPayPrice() - promotionPrice)));
         // 修改 SKU 的优惠

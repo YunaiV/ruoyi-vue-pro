@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
 /**
  * 限时折扣商品 DO
  *
@@ -32,12 +30,6 @@ public class DiscountProductDO extends BaseDO {
      */
     private Long activityId;
     /**
-     * 限时折扣活动的名字
-     *
-     * 冗余 {@link DiscountActivityDO#getName()}
-     */
-    private String activityName;
-    /**
      * 商品 SPU 编号
      *
      * 关联 ProductSpuDO 的 id 编号
@@ -50,22 +42,8 @@ public class DiscountProductDO extends BaseDO {
      */
     private Long skuId;
     /**
-     * 开始时间
-     */
-    private Date startTime;
-    /**
-     * 结束时间
-     */
-    private Date endTime;
-    /**
-     * 销售价格，单位：分
-     *
-     * 冗余 ProductSkuDO 的 price 字段
-     */
-    private Integer originalPrice;
-    /**
      * 优惠价格，单位：分
      */
-    private Integer promotionPrice;
+    private Integer discountPrice;
 
 }

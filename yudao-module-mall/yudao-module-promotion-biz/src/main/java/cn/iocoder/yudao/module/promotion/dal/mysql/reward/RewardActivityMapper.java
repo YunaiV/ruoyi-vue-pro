@@ -7,6 +7,9 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * 满减送活动 Mapper
  *
@@ -20,6 +23,10 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
                 .likeIfPresent(RewardActivityDO::getName, reqVO.getName())
                 .eqIfPresent(RewardActivityDO::getStatus, reqVO.getStatus())
                 .orderByDesc(RewardActivityDO::getId));
+    }
+
+    default List<RewardActivityDO> selectListByStatus(Collection<Integer> statuses) {
+        return selectList(RewardActivityDO::getStatus, statuses);
     }
 
 }
