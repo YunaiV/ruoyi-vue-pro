@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.convert.discount;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityUpdateReqVO;
@@ -46,4 +47,7 @@ public interface DiscountActivityConvert {
             return detail;
         });
     }
+
+    DiscountProductDO convert(DiscountActivityBaseVO.Product bean);
+
 }

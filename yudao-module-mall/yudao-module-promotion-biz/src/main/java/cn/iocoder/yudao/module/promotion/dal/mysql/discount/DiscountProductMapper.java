@@ -19,4 +19,8 @@ public interface DiscountProductMapper extends BaseMapperX<DiscountProductDO> {
         return selectList(DiscountProductDO::getSkuId, skuIds);
     }
 
+    default List<DiscountProductDO> selectListByActivityId(Long activityId) {
+        return selectList(DiscountProductDO::getActivityId, activityId);
+    }
+
 }

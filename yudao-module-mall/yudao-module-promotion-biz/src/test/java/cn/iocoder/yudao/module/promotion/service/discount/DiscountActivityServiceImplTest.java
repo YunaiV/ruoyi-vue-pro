@@ -2,11 +2,14 @@ package cn.iocoder.yudao.module.promotion.service.discount;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.discount.DiscountActivityMapper;
+import cn.iocoder.yudao.module.promotion.dal.mysql.discount.DiscountProductMapper;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -14,6 +17,7 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import java.time.Duration;
 import java.util.Date;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
@@ -23,6 +27,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.DISCOUNT_ACTIVITY_NOT_EXISTS;
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -38,6 +43,8 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private DiscountActivityMapper discountActivityMapper;
+    @Resource
+    private DiscountProductMapper discountProductMapper;
 
     @Test
     public void testCreateDiscountActivity_success() {
@@ -45,32 +52,87 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
         DiscountActivityCreateReqVO reqVO = randomPojo(DiscountActivityCreateReqVO.class, o -> {
             // 用于触发进行中的状态
             o.setStartTime(addTime(Duration.ofDays(1))).setEndTime(addTime(Duration.ofDays(2)));
+            // 设置商品
+            o.setProducts(asList(new DiscountActivityBaseVO.Product().setSpuId(1L).setSkuId(2L).setDiscountPrice(3),
+                    new DiscountActivityBaseVO.Product().setSpuId(10L).setSkuId(20L).setDiscountPrice(30)));
         });
 
         // 调用
         Long discountActivityId = discountActivityService.createDiscountActivity(reqVO);
         // 断言
         assertNotNull(discountActivityId);
-        // 校验记录的属性是否正确
+        // 校验活动
         DiscountActivityDO discountActivity = discountActivityMapper.selectById(discountActivityId);
         assertPojoEquals(reqVO, discountActivity);
+        assertEquals(discountActivity.getStatus(), PromotionActivityStatusEnum.WAIT.getStatus());
+        // 校验商品
+        List<DiscountProductDO> discountProducts = discountProductMapper.selectList(DiscountProductDO::getActivityId, discountActivity.getId());
+        assertEquals(discountProducts.size(), reqVO.getProducts().size());
+        for (int i = 0; i < reqVO.getProducts().size(); i++) {
+            DiscountActivityBaseVO.Product product = reqVO.getProducts().get(i);
+            DiscountProductDO discountProduct = discountProducts.get(i);
+            assertEquals(discountProduct.getActivityId(), discountActivity.getId());
+            assertEquals(discountProduct.getSpuId(), product.getSpuId());
+            assertEquals(discountProduct.getSkuId(), product.getSkuId());
+            assertEquals(discountProduct.getDiscountPrice(), product.getDiscountPrice());
+        }
     }
 
     @Test
     public void testUpdateDiscountActivity_success() {
-        // mock 数据
+        // mock 数据(商品)
         DiscountActivityDO dbDiscountActivity = randomPojo(DiscountActivityDO.class);
         discountActivityMapper.insert(dbDiscountActivity);// @Sql: 先插入出一条存在的数据
+        // mock 数据(活动)
+        DiscountProductDO dbDiscountProduct01 = randomPojo(DiscountProductDO.class, o -> o.setActivityId(dbDiscountActivity.getId())
+                .setSpuId(1L).setSkuId(2L));
+        DiscountProductDO dbDiscountProduct02 = randomPojo(DiscountProductDO.class, o -> o.setActivityId(dbDiscountActivity.getId())
+                .setSpuId(10L).setSkuId(20L));
+        discountProductMapper.insert(dbDiscountProduct01);
+        discountProductMapper.insert(dbDiscountProduct02);
         // 准备参数
         DiscountActivityUpdateReqVO reqVO = randomPojo(DiscountActivityUpdateReqVO.class, o -> {
             o.setId(dbDiscountActivity.getId()); // 设置更新的 ID
+            // 用于触发进行中的状态
+            o.setStartTime(addTime(Duration.ofDays(1))).setEndTime(addTime(Duration.ofDays(2)));
+            // 设置商品
+            o.setProducts(asList(new DiscountActivityBaseVO.Product().setSpuId(1L).setSkuId(2L).setDiscountPrice(3),
+                    new DiscountActivityBaseVO.Product().setSpuId(100L).setSkuId(200L).setDiscountPrice(30)));
         });
 
         // 调用
         discountActivityService.updateDiscountActivity(reqVO);
-        // 校验是否更新正确
+        // 校验活动
         DiscountActivityDO discountActivity = discountActivityMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, discountActivity);
+        assertEquals(discountActivity.getStatus(), PromotionActivityStatusEnum.WAIT.getStatus());
+        // 校验商品
+        List<DiscountProductDO> discountProducts = discountProductMapper.selectList(DiscountProductDO::getActivityId, discountActivity.getId());
+        assertEquals(discountProducts.size(), reqVO.getProducts().size());
+        for (int i = 0; i < reqVO.getProducts().size(); i++) {
+            DiscountActivityBaseVO.Product product = reqVO.getProducts().get(i);
+            DiscountProductDO discountProduct = discountProducts.get(i);
+            assertEquals(discountProduct.getActivityId(), discountActivity.getId());
+            assertEquals(discountProduct.getSpuId(), product.getSpuId());
+            assertEquals(discountProduct.getSkuId(), product.getSkuId());
+            assertEquals(discountProduct.getDiscountPrice(), product.getDiscountPrice());
+        }
+    }
+
+    @Test
+    public void testCloseDiscountActivity() {
+        // mock 数据
+        DiscountActivityDO dbDiscountActivity = randomPojo(DiscountActivityDO.class,
+                o -> o.setStatus(PromotionActivityStatusEnum.WAIT.getStatus()));
+        discountActivityMapper.insert(dbDiscountActivity);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbDiscountActivity.getId();
+
+        // 调用
+        discountActivityService.closeRewardActivity(id);
+        // 校验状态
+        DiscountActivityDO discountActivity = discountActivityMapper.selectById(id);
+        assertEquals(discountActivity.getStatus(), PromotionActivityStatusEnum.CLOSE.getStatus());
     }
 
     @Test
@@ -85,7 +147,8 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteDiscountActivity_success() {
         // mock 数据
-        DiscountActivityDO dbDiscountActivity = randomPojo(DiscountActivityDO.class);
+        DiscountActivityDO dbDiscountActivity = randomPojo(DiscountActivityDO.class,
+                o -> o.setStatus(PromotionActivityStatusEnum.CLOSE.getStatus()));
         discountActivityMapper.insert(dbDiscountActivity);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbDiscountActivity.getId();

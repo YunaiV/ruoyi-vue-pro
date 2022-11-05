@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.discount;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityBaseVO;
@@ -22,6 +23,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
@@ -54,10 +56,14 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         // 校验商品是否冲突
         validateDiscountActivityProductConflicts(null, createReqVO.getProducts());
 
-        // 插入
+        // 插入活动
         DiscountActivityDO discountActivity = DiscountActivityConvert.INSTANCE.convert(createReqVO)
                 .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getStartTime(), createReqVO.getEndTime()));
         discountActivityMapper.insert(discountActivity);
+        // 插入商品
+        List<DiscountProductDO> discountProducts = convertList(createReqVO.getProducts(),
+                product -> DiscountActivityConvert.INSTANCE.convert(product).setActivityId(discountActivity.getId()));
+        discountProductMapper.insertBatch(discountProducts);
         // 返回
         return discountActivity.getId();
     }
@@ -72,12 +78,34 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         // 校验商品是否冲突
         validateDiscountActivityProductConflicts(updateReqVO.getId(), updateReqVO.getProducts());
 
-        // 更新
+        // 更新活动
         DiscountActivityDO updateObj = DiscountActivityConvert.INSTANCE.convert(updateReqVO)
                 .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getStartTime(), updateReqVO.getEndTime()));
         discountActivityMapper.updateById(updateObj);
+        // 更新商品
+        updateDiscountProduct(updateReqVO);
     }
 
+    private void updateDiscountProduct(DiscountActivityUpdateReqVO updateReqVO) {
+        List<DiscountProductDO> dbDiscountProducts = discountProductMapper.selectListByActivityId(updateReqVO.getId());
+        // 计算要删除的记录
+        List<Long> deleteIds = convertList(dbDiscountProducts, DiscountProductDO::getId,
+                discountProductDO -> updateReqVO.getProducts().stream()
+                        .noneMatch(product -> product.getSkuId().equals(discountProductDO.getSkuId())
+                            && product.getDiscountPrice().equals(discountProductDO.getDiscountPrice())));
+        if (CollUtil.isNotEmpty(deleteIds)) {
+            discountProductMapper.deleteBatchIds(deleteIds);
+        }
+        // 计算新增的记录
+        List<DiscountProductDO> newDiscountProducts = convertList(updateReqVO.getProducts(),
+                product -> DiscountActivityConvert.INSTANCE.convert(product).setActivityId(updateReqVO.getId()));
+        newDiscountProducts.removeIf(product -> dbDiscountProducts.stream().anyMatch(
+                dbProduct -> dbProduct.getSkuId().equals(product.getSkuId())
+                        && dbProduct.getDiscountPrice().equals(product.getDiscountPrice()))); // 如果匹配到，说明是更新的
+        if (CollectionUtil.isNotEmpty(newDiscountProducts)) {
+            discountProductMapper.insertBatch(newDiscountProducts);
+        }
+    }
 
     /**
      * 校验商品是否冲突
