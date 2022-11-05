@@ -47,18 +47,18 @@ public class RewardActivityController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除满减送活动")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Integer.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('promotion:reward-activity:delete')")
-    public CommonResult<Boolean> deleteRewardActivity(@RequestParam("id") Integer id) {
+    public CommonResult<Boolean> deleteRewardActivity(@RequestParam("id") Long id) {
         rewardActivityService.deleteRewardActivity(id);
         return success(true);
     }
 
     @GetMapping("/get")
     @ApiOperation("获得满减送活动")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Integer.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('promotion:reward-activity:query')")
-    public CommonResult<RewardActivityRespVO> getRewardActivity(@RequestParam("id") Integer id) {
+    public CommonResult<RewardActivityRespVO> getRewardActivity(@RequestParam("id") Long id) {
         RewardActivityDO rewardActivity = rewardActivityService.getRewardActivity(id);
         return success(RewardActivityConvert.INSTANCE.convert(rewardActivity));
     }

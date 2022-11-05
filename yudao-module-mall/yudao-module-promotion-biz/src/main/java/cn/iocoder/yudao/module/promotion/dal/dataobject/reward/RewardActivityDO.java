@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.reward;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
@@ -8,10 +10,11 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -68,19 +71,19 @@ public class RewardActivityDO extends BaseDO {
     /**
      * 商品 SPU 编号的数组
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> productSpuIds;
     /**
      * 优惠规则的数组
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = RuleTypeHandler.class)
     private List<Rule> rules;
 
     /**
      * 优惠规则
      */
     @Data
-    public static class Rule {
+    public static class Rule implements Serializable {
 
         /**
          * 优惠门槛
@@ -112,5 +115,19 @@ public class RewardActivityDO extends BaseDO {
 
     }
 
+    // TODO @芋艿：可以找一些新的思路
+    public static class RuleTypeHandler extends AbstractJsonTypeHandler<List<Rule>> {
+
+        @Override
+        protected List<Rule> parse(String json) {
+            return JsonUtils.parseArray(json, Rule.class);
+        }
+
+        @Override
+        protected String toJson(List<Rule> obj) {
+            return JsonUtils.toJsonString(obj);
+        }
+
+    }
 
 }

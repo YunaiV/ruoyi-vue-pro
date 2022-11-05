@@ -7,8 +7,6 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,7 +37,7 @@ public interface RewardActivityService {
      *
      * @param id 编号
      */
-    void deleteRewardActivity(Integer id);
+    void deleteRewardActivity(Long id);
 
     /**
      * 获得满减送活动
@@ -47,15 +45,7 @@ public interface RewardActivityService {
      * @param id 编号
      * @return 满减送活动
      */
-    RewardActivityDO getRewardActivity(Integer id);
-
-    /**
-     * 获得满减送活动列表
-     *
-     * @param ids 编号
-     * @return 满减送活动列表
-     */
-    List<RewardActivityDO> getRewardActivityList(Collection<Integer> ids);
+    RewardActivityDO getRewardActivity(Long id);
 
     /**
      * 获得满减送活动分页

@@ -29,5 +29,6 @@ public interface ErrorCodeConstants {
 
     // ========== 满减送活动 1003006000 ==========
     ErrorCode REWARD_ACTIVITY_NOT_EXISTS = new ErrorCode(1003006000, "满减送活动不存在");
+    ErrorCode REWARD_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1003006001, "商品({}) 已经参加满减送活动({})");
 
 }
