@@ -62,6 +62,11 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
+    public List<ProductSkuDO> getSkuList() {
+        return productSkuMapper.selectList();
+    }
+
+    @Override
     public List<ProductSkuDO> getSkuList(Collection<Long> ids) {
         return productSkuMapper.selectBatchIds(ids);
     }

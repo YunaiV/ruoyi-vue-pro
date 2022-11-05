@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.discount;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -41,8 +42,23 @@ public class DiscountProductDO extends BaseDO {
      * 关联 ProductSkuDO 的 id 编号
      */
     private Long skuId;
+
     /**
-     * 优惠价格，单位：分
+     * 折扣类型
+     *
+     * 枚举 {@link PromotionDiscountTypeEnum}
+     */
+    private Integer discountType;
+    /**
+     * 折扣百分比
+     *
+     * 例如，80% 为 80
+     */
+    private Integer discountPercent;
+    /**
+     * 优惠金额，单位：分
+     *
+     * 当 {@link #discountType} 为 {@link PromotionDiscountTypeEnum#PRICE} 生效
      */
     private Integer discountPrice;
 

@@ -70,7 +70,7 @@
                 @pagination="getList"/>
 
     <!-- 对话框(添加 / 修改) -->
-    <el-dialog :title="title" :visible.sync="open" width="600px" v-dialogDrag append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="1000px" v-dialogDrag append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="活动名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入活动名称" />
@@ -80,7 +80,54 @@
         </el-form-item>
         <el-form-item label="活动时间" prop="startAndEndTime">
           <el-date-picker clearable v-model="form.startAndEndTime" type="datetimerange" :default-time="['00:00:00', '23:59:59']"
-                          value-format="timestamp" placeholder="选择开始时间" style="width: 480px" />
+                          value-format="timestamp" placeholder="选择开始时间" style="width: 880px" />
+        </el-form-item>
+        <el-form-item label="商品选择">
+          <el-select v-model="form.skuIds" placeholder="请选择活动商品" clearable size="small"
+                     multiple filterable style="width: 400px" @change="changeFormSku">
+            <el-option v-for="item in productSkus" :key="item.id" :label="item.name" :value="item.id">
+              <span style="float: left">{{ item.spuName }} &nbsp; {{ item.name}}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">￥{{ (item.price / 100.0).toFixed(2) }}</span>
+            </el-option>
+          </el-select>
+          <el-table v-loading="loading" :data="form.products">
+            <el-table-column label="商品名称" align="center" width="200">
+              <template slot-scope="scope">
+                {{ scope.row.spuName }} &nbsp; {{ scope.row.name}}
+              </template>
+            </el-table-column>
+            <el-table-column label="商品价格" align="center" prop="price">
+              <template slot-scope="scope">
+                ￥{{ (scope.row.price / 100.0).toFixed(2) }}
+              </template>
+            </el-table-column>
+            <el-table-column label="库存" align="center" prop="stock" />
+            <el-table-column label="优惠类型" align="center">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.discountType" placeholder="请选择优惠类型">
+                  <el-option v-for="dict in getDictDatas(DICT_TYPE.PROMOTION_DISCOUNT_TYPE)"
+                             :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"/>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="优惠" align="center" prop="startTime" width="250">
+              <template slot-scope="scope">
+                <el-form-item v-if="scope.row.discountType === PromotionDiscountTypeEnum.PRICE.type" prop="discountPrice">
+                  减 <el-input-number v-model="scope.row.discountPrice" placeholder="请输入优惠金额"
+                                      style="width: 190px" :precision="2" :min="0" /> 元
+                </el-form-item>
+                <el-form-item v-if="scope.row.discountType === PromotionDiscountTypeEnum.PERCENT.type" prop="discountPercent">
+                  打 <el-input-number v-model="scope.row.discountPercent" placeholder="请输入优惠折扣"
+                                      style="width: 190px" :precision="1" :min="1" :max="9.9" /> 折
+                </el-form-item>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+              <template slot-scope="scope">
+                <el-button size="mini" type="text" icon="el-icon-delete" @click="removeFormSku(scope.row.skuId)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -93,8 +140,11 @@
 
 <script>
 import { createDiscountActivity, updateDiscountActivity, deleteDiscountActivity, getDiscountActivity, getDiscountActivityPage } from "@/api/mall/promotion/discountActivity";
-import {PromotionActivityStatusEnum, PromotionProductScopeEnum} from "@/utils/constants";
-import {closeRewardActivity} from "@/api/mall/promotion/rewardActivity";
+import {
+  PromotionActivityStatusEnum, PromotionDiscountTypeEnum,
+  PromotionProductScopeEnum
+} from "@/utils/constants";
+import { getSkuOptionList } from "@/api/mall/product/sku";
 
 export default {
   name: "DiscountActivity",
@@ -115,7 +165,7 @@ export default {
       // 弹出层名称
       title: "",
       // 是否显示弹出层
-      open: false,
+      open: true,
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -125,17 +175,38 @@ export default {
         createTime: [],
       },
       // 表单参数
-      form: {},
+      form: {
+        skuIds: [], // 选中的 SKU
+        products: [], // 商品信息
+        // products: [{
+        //   id: 2,
+        //   name: '白色',
+        //   price: 500,
+        //   stock: 20,
+        //   spuId: 1,
+        //   spuName: 'iPhone 14 Pro',
+        //   discountType: 1,
+        // }, {
+        //   id: 10,
+        //   name: '蓝色',
+        //   price: 1000,
+        //   stock: 100,
+        //   spuId: 20,
+        //   spuName: 'iPhone 14 Pro',
+        //   discountType: 2,
+        // }]
+      },
       // 表单校验
       rules: {
         name: [{ required: true, message: "活动名称不能为空", trigger: "blur" }],
         startAndEndTime: [{ required: true, message: "活动时间不能为空", trigger: "blur" }],
       },
-      // 商品列表
-      productSpus: [], // TODO 芋艿：需要重新写下
+      // 商品 SKU 列表
+      productSkus: [],
       // 如下的变量，主要为了 v-if 判断可以使用到
       PromotionProductScopeEnum: PromotionProductScopeEnum,
       PromotionActivityStatusEnum: PromotionActivityStatusEnum,
+      PromotionDiscountTypeEnum: PromotionDiscountTypeEnum,
     };
   },
   created() {
@@ -150,6 +221,10 @@ export default {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
+      });
+      // 获得 SKU 商品列表
+      getSkuOptionList().then(response => {
+        this.productSkus = response.data;
       });
     },
     /** 取消按钮 */
@@ -166,6 +241,8 @@ export default {
         startTime: undefined,
         endTime: undefined,
         remark: undefined,
+        skuIds: [],
+        products: [],
       };
       this.resetForm("form");
     },
@@ -240,7 +317,49 @@ export default {
         this.getList();
         this.$modal.msgSuccess("关闭成功");
       }).catch(() => {});
-    }
+    },
+    /** 当 Form 的 SKU 发生变化时 */
+    changeFormSku(skuIds) {
+      // 处理【新增】
+      skuIds.forEach(skuId => {
+        // 获得对应的 SKU 信息
+        const sku = this.productSkus.find(item => item.id === skuId);
+        if (!sku) {
+          // debugger
+          return;
+        }
+        // 判断已存在，直接跳过
+        const product = this.form.products.find(item => item.skuId === skuId);
+        if (product) {
+          // debugger
+          return;
+        }
+        this.form.products.push({
+          skuId: sku.id,
+          name: sku.name,
+          price: sku.price,
+          stock: sku.stock,
+          spuId: sku.spuId,
+          spuName: sku.spuName,
+          discountType: PromotionDiscountTypeEnum.PRICE.type,
+        });
+      });
+      // 处理【移除】
+      this.form.products.map((product, index) => {
+        if (!skuIds.includes(product.skuId)) {
+          this.form.products.splice(index, 1);
+        }
+      });
+    },
+    /** 移除 Form 的 SKU */
+    removeFormSku(skuId) {
+      this.form.skuIds.map((id, index) => {
+        if (skuId === id) {
+          this.form.skuIds.splice(index, 1);
+        }
+      });
+      this.changeFormSku(this.form.skuIds);
+    },
   }
-};
+}
 </script>

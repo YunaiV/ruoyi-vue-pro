@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.discount.vo;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -47,10 +52,31 @@ public class DiscountActivityBaseVO {
         @NotNull(message = "商品 SKU 编号不能为空")
         private Long skuId;
 
-        @ApiModelProperty(value = "折扣价格，单位：分", required = true, example = "1000")
-        @NotNull(message = "折扣价格不能为空")
-        @Min(value = 1, message = "折扣价格必须大于 0")
+        @ApiModelProperty(value = "优惠类型", required = true, example = "1", notes = "参见 PromotionDiscountTypeEnum 枚举")
+        @NotNull(message = "优惠类型不能为空")
+        @InEnum(PromotionDiscountTypeEnum.class)
+        private Integer discountType;
+
+        @ApiModelProperty(value = "折扣百分比", example = "80", notes = "例如说，80% 为 80")
+        private Integer discountPercent;
+
+        @ApiModelProperty(value = "优惠金额", example = "10", notes = "单位：分")
+        @Min(value = 0, message = "优惠金额需要大于等于 0")
         private Integer discountPrice;
+
+        @AssertTrue(message = "折扣百分比需要大于等于 1，小于等于 99")
+        @JsonIgnore
+        public boolean isDiscountPercentValid() {
+            return ObjectUtil.notEqual(discountType, PromotionDiscountTypeEnum.PERCENT.getType())
+                    || (discountPercent != null && discountPercent >= 1 && discountPercent<= 99);
+        }
+
+        @AssertTrue(message = "优惠金额不能为空")
+        @JsonIgnore
+        public boolean isDiscountPriceValid() {
+            return ObjectUtil.notEqual(discountType, PromotionDiscountTypeEnum.PRICE.getType())
+                    || discountPrice != null;
+        }
 
     }
 }

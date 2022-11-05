@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.product.convert.sku;
 
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuOptionRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuDetailRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
@@ -11,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 
 /**
- * 商品sku Convert
+ * 商品 SKU Convert
  *
  * @author 芋道源码
  */
@@ -35,5 +36,7 @@ public interface ProductSkuConvert {
     List<ProductSpuDetailRespVO.Sku> convertList03(List<ProductSkuDO> list);
 
     List<ProductSkuRespDTO> convertList04(List<ProductSkuDO> list);
+
+    List<ProductSkuOptionRespVO> convertList05(List<ProductSkuDO> skus);
 
 }

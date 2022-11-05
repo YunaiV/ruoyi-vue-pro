@@ -9,6 +9,9 @@ import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 商品 SPU Service 接口
@@ -62,6 +65,16 @@ public interface ProductSpuService {
      * @return 商品 SPU 列表
      */
     List<ProductSpuDO> getSpuList(Collection<Long> ids);
+
+    /**
+     * 获得商品 SPU 映射
+     *
+     * @param ids 编号数组
+     * @return 商品 SPU 映射
+     */
+    default Map<Long, ProductSpuDO> getSpuMap(Collection<Long> ids) {
+        return convertMap(getSpuList(ids), ProductSpuDO::getId);
+    }
 
     /**
      * 获得所有商品 SPU 列表

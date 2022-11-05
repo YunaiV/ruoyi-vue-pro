@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -22,7 +24,8 @@ public class DiscountActivityUpdateReqVO extends DiscountActivityBaseVO {
     /**
      * 商品列表
      */
-    @NotNull(message = "商品列表不能为空")
+    @NotEmpty(message = "商品列表不能为空")
+    @Valid
     private List<DiscountActivityCreateReqVO.Product> products;
 
 }

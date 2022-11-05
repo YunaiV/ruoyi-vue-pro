@@ -5,7 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @ApiModel("管理后台 - 限时折扣活动创建 Request VO")
@@ -17,7 +18,8 @@ public class DiscountActivityCreateReqVO extends DiscountActivityBaseVO {
     /**
      * 商品列表
      */
-    @NotNull(message = "商品列表不能为空")
+    @NotEmpty(message = "商品列表不能为空")
+    @Valid
     private List<Product> products;
 
 }
