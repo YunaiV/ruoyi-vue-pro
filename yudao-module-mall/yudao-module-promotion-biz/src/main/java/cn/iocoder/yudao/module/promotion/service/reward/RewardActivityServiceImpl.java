@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import cn.iocoder.yudao.module.promotion.convert.reward.RewardActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.reward.RewardActivityMapper;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -19,8 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.REWARD_ACTIVITY_NOT_EXISTS;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.REWARD_ACTIVITY_SPU_CONFLICTS;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
 /**
  * 满减送活动 Service 实现类
@@ -50,7 +50,10 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     @Override
     public void updateRewardActivity(RewardActivityUpdateReqVO updateReqVO) {
         // 校验存在
-        validateRewardActivityExists(updateReqVO.getId());
+        RewardActivityDO dbRewardActivity = validateRewardActivityExists(updateReqVO.getId());
+        if (dbRewardActivity.getStatus().equals(PromotionActivityStatusEnum.CLOSE.getStatus())) { // 已关闭的活动，不能修改噢
+            throw exception(REWARD_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED);
+        }
         validateRewardActivitySpuConflicts(updateReqVO.getId(), updateReqVO.getProductSpuIds());
 
         // 更新
@@ -60,17 +63,39 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     }
 
     @Override
+    public void closeRewardActivity(Long id) {
+        // 校验存在
+        RewardActivityDO dbRewardActivity = validateRewardActivityExists(id);
+        if (dbRewardActivity.getStatus().equals(PromotionActivityStatusEnum.CLOSE.getStatus())) { // 已关闭的活动，不能关闭噢
+            throw exception(REWARD_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED);
+        }
+        if (dbRewardActivity.getStatus().equals(PromotionActivityStatusEnum.END.getStatus())) { // 已关闭的活动，不能关闭噢
+            throw exception(REWARD_ACTIVITY_CLOSE_FAIL_STATUS_END);
+        }
+
+        // 更新
+        RewardActivityDO updateObj = new RewardActivityDO().setId(id).setStatus(PromotionActivityStatusEnum.CLOSE.getStatus());
+        rewardActivityMapper.updateById(updateObj);
+    }
+
+    @Override
     public void deleteRewardActivity(Long id) {
         // 校验存在
-        validateRewardActivityExists(id);
+        RewardActivityDO dbRewardActivity = validateRewardActivityExists(id);
+        if (!dbRewardActivity.getStatus().equals(PromotionActivityStatusEnum.CLOSE.getStatus())) { // 未关闭的活动，不能删除噢
+            throw exception(REWARD_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED);
+        }
+
         // 删除
         rewardActivityMapper.deleteById(id);
     }
 
-    private void validateRewardActivityExists(Long id) {
-        if (rewardActivityMapper.selectById(id) == null) {
+    private RewardActivityDO validateRewardActivityExists(Long id) {
+        RewardActivityDO activity = rewardActivityMapper.selectById(id);
+        if (activity == null) {
             throw exception(REWARD_ACTIVITY_NOT_EXISTS);
         }
+        return activity;
     }
 
     /**

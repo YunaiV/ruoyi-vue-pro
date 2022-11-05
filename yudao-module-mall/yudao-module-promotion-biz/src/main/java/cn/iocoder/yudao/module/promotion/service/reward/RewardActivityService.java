@@ -33,6 +33,13 @@ public interface RewardActivityService {
     void updateRewardActivity(@Valid RewardActivityUpdateReqVO updateReqVO);
 
     /**
+     * 关闭满减送活动
+     *
+     * @param id 活动编号
+     */
+    void closeRewardActivity(Long id);
+
+    /**
      * 删除满减送活动
      *
      * @param id 编号

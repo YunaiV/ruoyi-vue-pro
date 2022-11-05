@@ -66,7 +66,7 @@ public class RewardActivityServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateRewardActivity_success() {
         // mock 数据
-        RewardActivityDO dbRewardActivity = randomPojo(RewardActivityDO.class);
+        RewardActivityDO dbRewardActivity = randomPojo(RewardActivityDO.class, o -> o.setStatus(PromotionActivityStatusEnum.WAIT.getStatus()));
         rewardActivityMapper.insert(dbRewardActivity);// @Sql: 先插入出一条存在的数据
         // 准备参数
         RewardActivityUpdateReqVO reqVO = randomPojo(RewardActivityUpdateReqVO.class, o -> {
@@ -89,6 +89,21 @@ public class RewardActivityServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testCloseRewardActivity() {
+        // mock 数据
+        RewardActivityDO dbRewardActivity = randomPojo(RewardActivityDO.class, o -> o.setStatus(PromotionActivityStatusEnum.WAIT.getStatus()));
+        rewardActivityMapper.insert(dbRewardActivity);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbRewardActivity.getId();
+
+        // 调用
+        rewardActivityService.closeRewardActivity(id);
+        // 校验状态
+        RewardActivityDO rewardActivity = rewardActivityMapper.selectById(id);
+        assertEquals(rewardActivity.getStatus(), PromotionActivityStatusEnum.CLOSE.getStatus());
+    }
+
+    @Test
     public void testUpdateRewardActivity_notExists() {
         // 准备参数
         RewardActivityUpdateReqVO reqVO = randomPojo(RewardActivityUpdateReqVO.class);
@@ -100,7 +115,7 @@ public class RewardActivityServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteRewardActivity_success() {
         // mock 数据
-        RewardActivityDO dbRewardActivity = randomPojo(RewardActivityDO.class);
+        RewardActivityDO dbRewardActivity = randomPojo(RewardActivityDO.class, o -> o.setStatus(PromotionActivityStatusEnum.CLOSE.getStatus()));
         rewardActivityMapper.insert(dbRewardActivity);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbRewardActivity.getId();

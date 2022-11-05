@@ -30,5 +30,9 @@ public interface ErrorCodeConstants {
     // ========== 满减送活动 1003006000 ==========
     ErrorCode REWARD_ACTIVITY_NOT_EXISTS = new ErrorCode(1003006000, "满减送活动不存在");
     ErrorCode REWARD_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1003006001, "商品({}) 已经参加满减送活动({})");
+    ErrorCode REWARD_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1003006002, "满减送活动已关闭，不能修改");
+    ErrorCode REWARD_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED = new ErrorCode(1003006003, "满减送活动未关闭，不能删除");
+    ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1003006004, "满减送活动已关闭，不能重复关闭");
+    ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_END = new ErrorCode(1003006004, "满减送活动已结束，不能关闭");
 
 }

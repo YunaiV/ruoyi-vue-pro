@@ -292,3 +292,25 @@ export const PromotionConditionTypeEnum = {
     name: '满 N 件'
   }
 }
+
+/**
+ * 促销活动的状态枚举
+ */
+export const PromotionActivityStatusEnum = {
+  WAIT: {
+    type: 10,
+    name: '未开始'
+  },
+  RUN: {
+    type: 20,
+    name: '进行中'
+  },
+  END: {
+    type: 30,
+    name: '已结束'
+  },
+  CLOSE: {
+    type: 40,
+    name: '已关闭'
+  }
+}

@@ -45,6 +45,15 @@ public class RewardActivityController {
         return success(true);
     }
 
+    @PutMapping("/close")
+    @ApiOperation("关闭满减送活动")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @PreAuthorize("@ss.hasPermission('promotion:reward-activity:close')")
+    public CommonResult<Boolean> closeRewardActivity(@RequestParam("id") Long id) {
+        rewardActivityService.closeRewardActivity(id);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @ApiOperation("删除满减送活动")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
