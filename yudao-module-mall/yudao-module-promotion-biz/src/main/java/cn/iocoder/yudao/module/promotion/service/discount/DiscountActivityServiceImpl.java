@@ -23,8 +23,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 
@@ -42,13 +41,10 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
     @Resource
     private DiscountProductMapper discountProductMapper;
 
-    // TODO 芋艿：待实现
     @Override
-    public Map<Long, DiscountProductDO> getMatchDiscountProducts(Collection<Long> skuIds) {
-        Map<Long, DiscountProductDO> products = new HashMap<>();
-        products.put(1L, new DiscountProductDO().setDiscountPrice(100));
-        products.put(2L, new DiscountProductDO().setDiscountPrice(50));
-        return products;
+    public Map<Long, DiscountProductDetailBO> getMatchDiscountProducts(Collection<Long> skuIds) {
+        List<DiscountProductDetailBO> discountProducts = getRewardProductListBySkuIds(skuIds, singleton(PromotionActivityStatusEnum.RUN.getStatus()));
+        return convertMap(discountProducts, DiscountProductDetailBO::getSkuId);
     }
 
     @Override
@@ -116,7 +112,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
             return;
         }
         // 查询商品参加的活动
-        List<DiscountProductDetailBO> discountActivityProductList = getRewardActivityListBySkuIds(
+        List<DiscountProductDetailBO> discountActivityProductList = getRewardProductListBySkuIds(
                 convertSet(products, DiscountActivityBaseVO.Product::getSkuId),
                 asList(PromotionActivityStatusEnum.WAIT.getStatus(), PromotionActivityStatusEnum.RUN.getStatus()));
         if (id != null) { // 排除自己这个活动
@@ -128,8 +124,8 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         }
     }
 
-    private List<DiscountProductDetailBO> getRewardActivityListBySkuIds(Collection<Long> skuIds,
-                                                                        Collection<Integer> statuses) {
+    private List<DiscountProductDetailBO> getRewardProductListBySkuIds(Collection<Long> skuIds,
+                                                                       Collection<Integer> statuses) {
         // 查询商品
         List<DiscountProductDO> products = discountProductMapper.selectListBySkuId(skuIds);
         if (CollUtil.isEmpty(products)) {

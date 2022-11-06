@@ -40,4 +40,7 @@ public interface ErrorCodeConstants {
     ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1003006004, "满减送活动已关闭，不能重复关闭");
     ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_END = new ErrorCode(1003006004, "满减送活动已结束，不能关闭");
 
+    // ========== Price 相关 1003007000 ============
+    ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1003007000, "支付价格计算异常，原因：价格小于等于 0");
+
 }

@@ -29,7 +29,15 @@ public class DiscountProductDetailBO {
      */
     private Long skuId;
     /**
-     * 优惠价格，单位：分
+     * 折扣类型
+     */
+    private Integer discountType;
+    /**
+     * 折扣百分比
+     */
+    private Integer discountPercent;
+    /**
+     * 优惠金额，单位：分
      */
     private Integer discountPrice;
 

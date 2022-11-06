@@ -4,19 +4,20 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.promotion.convert.price.PriceConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.enums.common.*;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
 import cn.iocoder.yudao.module.promotion.service.discount.DiscountActivityService;
-import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.promotion.service.discount.bo.DiscountProductDetailBO;
 import cn.iocoder.yudao.module.promotion.service.reward.RewardActivityService;
 import com.google.common.base.Suppliers;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -30,9 +31,8 @@ import java.util.function.Supplier;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_NO_MATCH_MIN_PRICE;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_NO_MATCH_SPU;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Collections.singletonList;
 
 /**
@@ -51,6 +51,7 @@ import static java.util.Collections.singletonList;
  */
 @Service
 @Validated
+@Slf4j
 public class PriceServiceImpl implements PriceService {
 
     @Resource
@@ -76,6 +77,13 @@ public class PriceServiceImpl implements PriceService {
         calculatePriceForOrderLevel(calculateReqDTO.getUserId(), priceCalculate);
         // 计算优惠劵级别的价格
         calculatePriceForCouponLevel(calculateReqDTO.getUserId(), calculateReqDTO.getCouponId(), priceCalculate);
+
+        // 如果最终支付金额小于等于 0，则抛出业务异常
+        if (priceCalculate.getOrder().getPayPrice() <= 0) {
+            log.error("[calculatePrice][价格计算不正确，请求 calculateReqDTO({})，结果 priceCalculate({})]",
+                    calculateReqDTO, priceCalculate);
+            throw exception(PRICE_CALCULATE_PAY_PRICE_ILLEGAL);
+        }
         return priceCalculate;
     }
 
@@ -111,24 +119,20 @@ public class PriceServiceImpl implements PriceService {
     private void calculatePriceForSkuLevel(Long userId, PriceCalculateRespDTO priceCalculate) {
         // 获取 SKU 级别的所有优惠信息
         Supplier<Double> memberDiscountPercentSupplier = getMemberDiscountPercentSupplier(userId);
-        Map<Long, DiscountProductDO> discountProducts = discountService.getMatchDiscountProducts(
+        Map<Long, DiscountProductDetailBO> discountProducts = discountService.getMatchDiscountProducts(
                 convertSet(priceCalculate.getOrder().getItems(), PriceCalculateRespDTO.OrderItem::getSkuId));
 
         // 处理每个 SKU 的优惠
         priceCalculate.getOrder().getItems().forEach(orderItem -> {
             // 获取该 SKU 的优惠信息
             Double memberDiscountPercent = memberDiscountPercentSupplier.get();
-            DiscountProductDO discountProduct = discountProducts.get(orderItem.getSkuId());
-            if (discountProduct != null // 假设优惠价格更贵，则认为没优惠
-                    && discountProduct.getDiscountPrice() >= orderItem.getOriginalUnitPrice()) {
-                discountProduct = null;
-            }
+            DiscountProductDetailBO discountProduct = discountProducts.get(orderItem.getSkuId());
             if (memberDiscountPercent == null && discountProduct == null) {
                 return;
             }
             // 计算价格，判断选择哪个折扣
             Integer memberPrice = memberDiscountPercent != null ? (int) (orderItem.getPayPrice() * memberDiscountPercent / 100) : null;
-            Integer promotionPrice = discountProduct != null ? discountProduct.getDiscountPrice() * orderItem.getCount() : null;
+            Integer promotionPrice = discountProduct != null ? getDiscountProductPrice(discountProduct, orderItem) : null;
             if (memberPrice == null) {
                 calculatePriceByDiscountActivity(priceCalculate, orderItem, discountProduct, promotionPrice);
             } else if (promotionPrice == null) {
@@ -139,6 +143,19 @@ public class PriceServiceImpl implements PriceService {
                 calculatePriceByMemberDiscount(priceCalculate, orderItem, memberPrice);
             }
         });
+    }
+
+    private Integer getDiscountProductPrice(DiscountProductDetailBO discountProduct,
+                                            PriceCalculateRespDTO.OrderItem orderItem) {
+        Integer price = orderItem.getPayPrice();
+        if (PromotionDiscountTypeEnum.PRICE.getType().equals(discountProduct.getDiscountType())) { // 减价
+            price -= discountProduct.getDiscountPrice() * orderItem.getCount();
+        } else if (PromotionDiscountTypeEnum.PERCENT.getType().equals(discountProduct.getDiscountType())) { // 打折
+            price = price * discountProduct.getDiscountPercent() / 100;
+        } else {
+            throw new IllegalArgumentException(String.format("优惠活动的商品(%s) 的优惠类型不正确", discountProduct));
+        }
+        return price;
     }
 
     private void calculatePriceByMemberDiscount(PriceCalculateRespDTO priceCalculate, PriceCalculateRespDTO.OrderItem orderItem,
@@ -152,10 +169,9 @@ public class PriceServiceImpl implements PriceService {
     }
 
     private void calculatePriceByDiscountActivity(PriceCalculateRespDTO priceCalculate, PriceCalculateRespDTO.OrderItem orderItem,
-                                                  DiscountProductDO discountProduct, Integer promotionPrice) {
+                                                  DiscountProductDetailBO discountProduct, Integer promotionPrice) {
         // 记录优惠明细
-        addPromotion(priceCalculate, orderItem, discountProduct.getActivityId(), null
-                /* TODO 芋艿：修复下 discountProduct.getActivityName()*/,
+        addPromotion(priceCalculate, orderItem, discountProduct.getActivityId(), discountProduct.getActivityName(),
                 PromotionTypeEnum.DISCOUNT_ACTIVITY.getType(), PromotionLevelEnum.SKU.getLevel(), promotionPrice,
                 true, StrUtil.format("限时折扣：省 {} 元", formatPrice(orderItem.getPayPrice() - promotionPrice)));
         // 修改 SKU 的优惠
@@ -213,7 +229,6 @@ public class PriceServiceImpl implements PriceService {
         }
 
         // 分摊金额
-        // TODO 芋艿：limit 不能超过最大价格
         List<Integer> discountPartPrices = dividePrice(orderItems, rule.getDiscountPrice());
         // 记录优惠明细
         addPromotion(priceCalculate, orderItems, rewardActivity.getId(), rewardActivity.getName(),
@@ -288,7 +303,6 @@ public class PriceServiceImpl implements PriceService {
         priceCalculate.getOrder().setCouponId(couponId);
         Integer couponPrice = getCouponPrice(coupon, originPrice);
         // 分摊金额
-        // TODO 芋艿：limit 不能超过最大价格
         List<Integer> couponPartPrices = dividePrice(orderItems, couponPrice);
         // 记录优惠明细
         addPromotion(priceCalculate, orderItems, coupon.getId(), coupon.getName(),
