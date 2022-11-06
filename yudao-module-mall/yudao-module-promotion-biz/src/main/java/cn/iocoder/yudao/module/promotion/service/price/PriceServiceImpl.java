@@ -76,7 +76,6 @@ public class PriceServiceImpl implements PriceService {
         calculatePriceForOrderLevel(calculateReqDTO.getUserId(), priceCalculate);
         // 计算优惠劵级别的价格
         calculatePriceForCouponLevel(calculateReqDTO.getUserId(), calculateReqDTO.getCouponId(), priceCalculate);
-        // 计算【优惠劵】促销 TODO 待实现
         return priceCalculate;
     }
 

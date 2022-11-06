@@ -29,4 +29,10 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
         return selectList(RewardActivityDO::getStatus, statuses);
     }
 
+    default List<RewardActivityDO> selectListByProductScopeAndStatus(Integer productScope, Integer status) {
+        return selectList(new LambdaQueryWrapperX<RewardActivityDO>()
+                .eq(RewardActivityDO::getProductScope, productScope)
+                .eq(RewardActivityDO::getStatus, status));
+    }
+
 }

@@ -15,8 +15,11 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.time.Duration;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -24,6 +27,8 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.REWARD_ACTIVITY_NOT_EXISTS;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -158,6 +163,56 @@ public class RewardActivityServiceImplTest extends BaseDbUnitTest {
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());
        assertPojoEquals(dbRewardActivity, pageResult.getList().get(0), "rules");
+    }
+
+    @Test
+    public void testGetRewardActivities_all() {
+        // mock 数据
+        RewardActivityDO allActivity = randomPojo(RewardActivityDO.class, o -> o.setStatus(PromotionActivityStatusEnum.RUN.getStatus())
+                .setProductScope(PromotionProductScopeEnum.ALL.getScope()));
+        rewardActivityMapper.insert(allActivity);
+        RewardActivityDO productActivity = randomPojo(RewardActivityDO.class, o -> o.setStatus(PromotionActivityStatusEnum.RUN.getStatus())
+                .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductSpuIds(asList(1L, 2L)));
+        rewardActivityMapper.insert(productActivity);
+        // 准备参数
+        Set<Long> spuIds = asSet(1L, 2L);
+
+        // 调用
+        Map<RewardActivityDO, Set<Long>> matchRewardActivities = rewardActivityService.getMatchRewardActivities(spuIds);
+        // 断言
+        assertEquals(matchRewardActivities.size(), 1);
+        Map.Entry<RewardActivityDO, Set<Long>> next = matchRewardActivities.entrySet().iterator().next();
+        assertPojoEquals(next.getKey(), allActivity);
+        assertEquals(next.getValue(), spuIds);
+    }
+
+    @Test
+    public void testGetRewardActivities_product() {
+        // mock 数据
+        RewardActivityDO productActivity01 = randomPojo(RewardActivityDO.class, o -> o.setStatus(PromotionActivityStatusEnum.RUN.getStatus())
+                .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductSpuIds(asList(1L, 2L)));
+        rewardActivityMapper.insert(productActivity01);
+        RewardActivityDO productActivity02 = randomPojo(RewardActivityDO.class, o -> o.setStatus(PromotionActivityStatusEnum.RUN.getStatus())
+                .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductSpuIds(singletonList(3L)));
+        rewardActivityMapper.insert(productActivity02);
+        // 准备参数
+        Set<Long> spuIds = asSet(1L, 2L, 3L);
+
+        // 调用
+        Map<RewardActivityDO, Set<Long>> matchRewardActivities = rewardActivityService.getMatchRewardActivities(spuIds);
+        // 断言
+        assertEquals(matchRewardActivities.size(), 2);
+        matchRewardActivities.forEach((activity, activitySpuIds) -> {
+            if (activity.getId().equals(productActivity01.getId())) {
+                assertPojoEquals(activity, productActivity01);
+                assertEquals(activitySpuIds, asSet(1L, 2L));
+            } else if (activity.getId().equals(productActivity02.getId())) {
+                assertPojoEquals(activity, productActivity02);
+                assertEquals(activitySpuIds, asSet(3L));
+            } else {
+                fail();
+            }
+        });
     }
 
 }
