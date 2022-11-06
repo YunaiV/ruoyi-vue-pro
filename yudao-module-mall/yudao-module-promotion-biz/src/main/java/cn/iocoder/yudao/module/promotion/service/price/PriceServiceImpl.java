@@ -420,13 +420,16 @@ public class PriceServiceImpl implements PriceService {
      */
     private void modifyOrderItemPayPrice(PriceCalculateRespDTO.OrderItem orderItem, Integer newPayPrice,
                                          PriceCalculateRespDTO priceCalculate) {
+        // diffPayPrice 等于额外增加的商品级的优惠
         int diffPayPrice = orderItem.getPayPrice() - newPayPrice;
         // 设置 OrderItem 价格相关字段
         orderItem.setDiscountPrice(orderItem.getDiscountPrice() + diffPayPrice);
         orderItem.setPayPrice(newPayPrice);
         orderItem.setOrderDividePrice(orderItem.getPayPrice() - orderItem.getOrderPartPrice());
         // 设置 Order 相关相关字段
-        priceCalculate.getOrder().setPayPrice(priceCalculate.getOrder().getPayPrice() - diffPayPrice);
+        PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
+        order.setPayPrice(order.getPayPrice() - diffPayPrice);
+        order.setOrderPrice(order.getOrderPrice() - diffPayPrice);
     }
 
     /**

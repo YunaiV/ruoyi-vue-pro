@@ -64,6 +64,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         // 断言 Order 部分
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
         assertEquals(order.getOriginalPrice(), 200);
+        assertEquals(order.getOrderPrice(), 180);
         assertEquals(order.getDiscountPrice(), 0);
         assertEquals(order.getPointPrice(), 0);
         assertEquals(order.getDeliveryPrice(), 0);
@@ -126,6 +127,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         // 断言 Order 部分
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
         assertEquals(order.getOriginalPrice(), 350);
+        assertEquals(order.getOrderPrice(), 210);
         assertEquals(order.getDiscountPrice(), 0);
         assertEquals(order.getPointPrice(), 0);
         assertEquals(order.getDeliveryPrice(), 0);
@@ -217,6 +219,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         // 断言 Order 部分
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
         assertEquals(order.getOriginalPrice(), 470);
+        assertEquals(order.getOrderPrice(), 470);
         assertEquals(order.getDiscountPrice(), 130);
         assertEquals(order.getPointPrice(), 0);
         assertEquals(order.getDeliveryPrice(), 0);
@@ -314,6 +317,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         // 断言 Order 部分
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
         assertEquals(order.getOriginalPrice(), 350);
+        assertEquals(order.getOrderPrice(), 350);
         assertEquals(order.getDiscountPrice(), 0);
         assertEquals(order.getPointPrice(), 0);
         assertEquals(order.getDeliveryPrice(), 0);
@@ -386,6 +390,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         // 断言 Order 部分
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
         assertEquals(order.getOriginalPrice(), 470);
+        assertEquals(order.getOrderPrice(), 470);
         assertEquals(order.getDiscountPrice(), 0);
         assertEquals(order.getPointPrice(), 0);
         assertEquals(order.getDeliveryPrice(), 0);

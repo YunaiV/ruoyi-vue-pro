@@ -36,7 +36,8 @@ public interface PriceConvert {
             orderItem.setPayPrice(orderItem.getOriginalPrice()).setOrderDividePrice(orderItem.getOriginalPrice());
             priceCalculate.getOrder().getItems().add(orderItem);
             // 补充价格信息到 Order 中
-            order.setOriginalPrice(order.getOriginalPrice() + orderItem.getOriginalPrice()).setPayPrice(order.getOriginalPrice());
+            order.setOriginalPrice(order.getOriginalPrice() + orderItem.getOriginalPrice())
+                    .setOrderPrice(order.getOriginalPrice()).setPayPrice(order.getOriginalPrice());
         });
         return priceCalculate;
     }

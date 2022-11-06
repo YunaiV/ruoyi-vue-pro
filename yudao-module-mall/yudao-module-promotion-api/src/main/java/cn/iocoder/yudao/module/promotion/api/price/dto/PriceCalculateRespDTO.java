@@ -48,9 +48,17 @@ public class PriceCalculateRespDTO {
          * 商品原价（总），单位：分
          *
          * 基于 {@link OrderItem#getOriginalPrice()} 求和
+         *
          * 对应 taobao 的 trade.total_fee 字段
          */
         private Integer originalPrice;
+        /**
+         * 订单原价（总），单位：分
+         *
+         * 基于 {@link OrderItem#getPayPrice()} 求和
+         * 和 {@link #originalPrice} 的差异：去除商品级优惠
+         */
+        private Integer orderPrice;
         /**
          * 订单优惠（总），单位：分
          *
@@ -82,6 +90,7 @@ public class PriceCalculateRespDTO {
          * - {@link #couponPrice}
          * - {@link #pointPrice}
          * + {@link #deliveryPrice}
+         * - {@link #discountPrice}
          */
         private Integer payPrice;
         /**
