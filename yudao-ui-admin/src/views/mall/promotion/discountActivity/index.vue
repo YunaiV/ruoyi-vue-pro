@@ -84,8 +84,8 @@
         </el-form-item>
         <el-form-item label="商品选择">
           <el-select v-model="form.skuIds" placeholder="请选择活动商品" clearable size="small"
-                     multiple filterable style="width: 400px" @change="changeFormSku">
-            <el-option v-for="item in productSkus" :key="item.id" :label="item.name" :value="item.id">
+                     multiple filterable style="width: 880px" @change="changeFormSku">
+            <el-option v-for="item in productSkus" :key="item.id" :label="item.spuName + ' ' + item.name" :value="item.id">
               <span style="float: left">{{ item.spuName }} &nbsp; {{ item.name}}</span>
               <span style="float: right; color: #8492a6; font-size: 13px">￥{{ (item.price / 100.0).toFixed(2) }}</span>
             </el-option>
@@ -102,7 +102,7 @@
               </template>
             </el-table-column>
             <el-table-column label="库存" align="center" prop="stock" />
-            <el-table-column label="优惠类型" align="center">
+            <el-table-column label="优惠类型" align="center" property="discountType">
               <template slot-scope="scope">
                 <el-select v-model="scope.row.discountType" placeholder="请选择优惠类型">
                   <el-option v-for="dict in getDictDatas(DICT_TYPE.PROMOTION_DISCOUNT_TYPE)"
@@ -114,7 +114,7 @@
               <template slot-scope="scope">
                 <el-form-item v-if="scope.row.discountType === PromotionDiscountTypeEnum.PRICE.type" prop="discountPrice">
                   减 <el-input-number v-model="scope.row.discountPrice" placeholder="请输入优惠金额"
-                                      style="width: 190px" :precision="2" :min="0" /> 元
+                                      style="width: 190px" :precision="2" :min="0" :max="scope.row.price / 100.0 - 0.01" /> 元
                 </el-form-item>
                 <el-form-item v-if="scope.row.discountType === PromotionDiscountTypeEnum.PERCENT.type" prop="discountPercent">
                   打 <el-input-number v-model="scope.row.discountPercent" placeholder="请输入优惠折扣"
@@ -139,12 +139,20 @@
 </template>
 
 <script>
-import { createDiscountActivity, updateDiscountActivity, deleteDiscountActivity, getDiscountActivity, getDiscountActivityPage } from "@/api/mall/promotion/discountActivity";
+import {
+  createDiscountActivity,
+  updateDiscountActivity,
+  deleteDiscountActivity,
+  getDiscountActivity,
+  getDiscountActivityPage,
+  closeDiscountActivity
+} from "@/api/mall/promotion/discountActivity";
 import {
   PromotionActivityStatusEnum, PromotionDiscountTypeEnum,
   PromotionProductScopeEnum
 } from "@/utils/constants";
 import { getSkuOptionList } from "@/api/mall/product/sku";
+import { deepClone } from "@/utils";
 
 export default {
   name: "DiscountActivity",
@@ -165,7 +173,7 @@ export default {
       // 弹出层名称
       title: "",
       // 是否显示弹出层
-      open: true,
+      open: false,
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -178,28 +186,12 @@ export default {
       form: {
         skuIds: [], // 选中的 SKU
         products: [], // 商品信息
-        // products: [{
-        //   id: 2,
-        //   name: '白色',
-        //   price: 500,
-        //   stock: 20,
-        //   spuId: 1,
-        //   spuName: 'iPhone 14 Pro',
-        //   discountType: 1,
-        // }, {
-        //   id: 10,
-        //   name: '蓝色',
-        //   price: 1000,
-        //   stock: 100,
-        //   spuId: 20,
-        //   spuName: 'iPhone 14 Pro',
-        //   discountType: 2,
-        // }]
       },
       // 表单校验
       rules: {
         name: [{ required: true, message: "活动名称不能为空", trigger: "blur" }],
         startAndEndTime: [{ required: true, message: "活动时间不能为空", trigger: "blur" }],
+        skuIds: [{ required: true, message: "选择商品不能为空", trigger: "blur" }],
       },
       // 商品 SKU 列表
       productSkus: [],
@@ -268,7 +260,24 @@ export default {
       const id = row.id;
       getDiscountActivity(id).then(response => {
         this.form = response.data;
+        // 修改数据
         this.form.startAndEndTime = [response.data.startTime, response.data.endTime];
+        this.form.skuIds = response.data.products.map(item => item.skuId);
+        this.form.products.forEach(product => {
+          // 获得对应的 SKU 信息
+          const sku = this.productSkus.find(item => item.id === product.skuId);
+          if (!sku) {
+            return;
+          }
+          // 设置商品信息
+          product.name = sku.name;
+          product.spuName = sku.spuName;
+          product.price = sku.price;
+          product.stock = sku.stock;
+          product.discountPrice = product.discountPrice !== undefined ? product.discountPrice / 100.0 : undefined;
+          product.discountPercent = product.discountPercent !== undefined ? product.discountPercent / 10.0 : undefined;
+        });
+        // 打开弹窗
         this.open = true;
         this.title = "修改限时折扣活动";
       });
@@ -279,11 +288,21 @@ export default {
         if (!valid) {
           return;
         }
-        this.form.startTime = this.form.startAndEndTime[0];
-        this.form.endTime = this.form.startAndEndTime[1];
+        // 处理数据
+        const data = deepClone(this.form); // 必须深拷贝，不然后面的 products 操作会有影响
+        data.startTime = this.form.startAndEndTime[0];
+        data.endTime = this.form.startAndEndTime[1];
+        data.products.forEach(product => {
+          product.discountPrice = product.discountPrice !== undefined ? product.discountPrice * 100 : undefined;
+          product.discountPercent = product.discountPercent !== undefined ? product.discountPercent * 10 : undefined;
+        });
+        if (!valid) {
+          return;
+        }
+
         // 修改的提交
         if (this.form.id != null) {
-          updateDiscountActivity(this.form).then(response => {
+          updateDiscountActivity(data).then(response => {
             this.$modal.msgSuccess("修改成功");
             this.open = false;
             this.getList();
@@ -291,7 +310,7 @@ export default {
           return;
         }
         // 添加的提交
-        createDiscountActivity(this.form).then(response => {
+        createDiscountActivity(data).then(response => {
           this.$modal.msgSuccess("新增成功");
           this.open = false;
           this.getList();
@@ -312,7 +331,7 @@ export default {
     handleClose(row) {
       const id = row.id;
       this.$modal.confirm('是否确认关闭限时折扣活动编号为"' + id + '"的数据项?').then(function() {
-        return closeRewardActivity(id);
+        return closeDiscountActivity(id);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("关闭成功");
@@ -325,13 +344,11 @@ export default {
         // 获得对应的 SKU 信息
         const sku = this.productSkus.find(item => item.id === skuId);
         if (!sku) {
-          // debugger
           return;
         }
         // 判断已存在，直接跳过
         const product = this.form.products.find(item => item.skuId === skuId);
         if (product) {
-          // debugger
           return;
         }
         this.form.products.push({

@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProduct
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,5 +73,13 @@ public interface DiscountActivityService {
      * @return 限时折扣活动分页
      */
     PageResult<DiscountActivityDO> getDiscountActivityPage(DiscountActivityPageReqVO pageReqVO);
+
+    /**
+     * 获得活动编号，对应对应的商品列表
+     *
+     * @param activityId 活动编号
+     * @return 活动的商品列表
+     */
+    List<DiscountProductDO> getDiscountProductsByActivityId(Long activityId);
 
 }

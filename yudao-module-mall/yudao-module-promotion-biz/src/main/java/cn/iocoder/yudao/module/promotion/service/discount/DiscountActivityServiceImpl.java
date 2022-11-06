@@ -91,8 +91,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         // 计算要删除的记录
         List<Long> deleteIds = convertList(dbDiscountProducts, DiscountProductDO::getId,
                 discountProductDO -> updateReqVO.getProducts().stream()
-                        .noneMatch(product -> product.getSkuId().equals(discountProductDO.getSkuId())
-                            && product.getDiscountPrice().equals(discountProductDO.getDiscountPrice())));
+                        .noneMatch(product -> DiscountActivityConvert.INSTANCE.isEquals(discountProductDO, product)));
         if (CollUtil.isNotEmpty(deleteIds)) {
             discountProductMapper.deleteBatchIds(deleteIds);
         }
@@ -100,8 +99,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         List<DiscountProductDO> newDiscountProducts = convertList(updateReqVO.getProducts(),
                 product -> DiscountActivityConvert.INSTANCE.convert(product).setActivityId(updateReqVO.getId()));
         newDiscountProducts.removeIf(product -> dbDiscountProducts.stream().anyMatch(
-                dbProduct -> dbProduct.getSkuId().equals(product.getSkuId())
-                        && dbProduct.getDiscountPrice().equals(product.getDiscountPrice()))); // 如果匹配到，说明是更新的
+                dbProduct -> DiscountActivityConvert.INSTANCE.isEquals(dbProduct, product))); // 如果匹配到，说明是更新的
         if (CollectionUtil.isNotEmpty(newDiscountProducts)) {
             discountProductMapper.insertBatch(newDiscountProducts);
         }
@@ -192,6 +190,11 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
     @Override
     public PageResult<DiscountActivityDO> getDiscountActivityPage(DiscountActivityPageReqVO pageReqVO) {
         return discountActivityMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<DiscountProductDO> getDiscountProductsByActivityId(Long activityId) {
+        return discountProductMapper.selectListByActivityId(activityId);
     }
 
 }

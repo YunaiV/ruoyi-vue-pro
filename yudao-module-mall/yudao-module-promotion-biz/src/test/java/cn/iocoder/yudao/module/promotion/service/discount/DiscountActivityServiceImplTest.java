@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProduct
 import cn.iocoder.yudao.module.promotion.dal.mysql.discount.DiscountActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.discount.DiscountProductMapper;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -53,8 +54,10 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
             // 用于触发进行中的状态
             o.setStartTime(addTime(Duration.ofDays(1))).setEndTime(addTime(Duration.ofDays(2)));
             // 设置商品
-            o.setProducts(asList(new DiscountActivityBaseVO.Product().setSpuId(1L).setSkuId(2L).setDiscountPrice(3),
-                    new DiscountActivityBaseVO.Product().setSpuId(10L).setSkuId(20L).setDiscountPrice(30)));
+            o.setProducts(asList(new DiscountActivityBaseVO.Product().setSpuId(1L).setSkuId(2L)
+                            .setDiscountType(PromotionDiscountTypeEnum.PRICE.getType()).setDiscountPrice(3),
+                    new DiscountActivityBaseVO.Product().setSpuId(10L).setSkuId(20L)
+                            .setDiscountType(PromotionDiscountTypeEnum.PERCENT.getType()).setDiscountPercent(30)));
         });
 
         // 调用
@@ -74,7 +77,9 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
             assertEquals(discountProduct.getActivityId(), discountActivity.getId());
             assertEquals(discountProduct.getSpuId(), product.getSpuId());
             assertEquals(discountProduct.getSkuId(), product.getSkuId());
+            assertEquals(discountProduct.getDiscountType(), product.getDiscountType());
             assertEquals(discountProduct.getDiscountPrice(), product.getDiscountPrice());
+            assertEquals(discountProduct.getDiscountPercent(), product.getDiscountPercent());
         }
     }
 
@@ -85,9 +90,9 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
         discountActivityMapper.insert(dbDiscountActivity);// @Sql: 先插入出一条存在的数据
         // mock 数据(活动)
         DiscountProductDO dbDiscountProduct01 = randomPojo(DiscountProductDO.class, o -> o.setActivityId(dbDiscountActivity.getId())
-                .setSpuId(1L).setSkuId(2L));
+                .setSpuId(1L).setSkuId(2L).setDiscountType(PromotionDiscountTypeEnum.PRICE.getType()).setDiscountPrice(3).setDiscountPercent(null));
         DiscountProductDO dbDiscountProduct02 = randomPojo(DiscountProductDO.class, o -> o.setActivityId(dbDiscountActivity.getId())
-                .setSpuId(10L).setSkuId(20L));
+                .setSpuId(10L).setSkuId(20L).setDiscountType(PromotionDiscountTypeEnum.PERCENT.getType()).setDiscountPercent(30).setDiscountPrice(null));
         discountProductMapper.insert(dbDiscountProduct01);
         discountProductMapper.insert(dbDiscountProduct02);
         // 准备参数
@@ -96,8 +101,10 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
             // 用于触发进行中的状态
             o.setStartTime(addTime(Duration.ofDays(1))).setEndTime(addTime(Duration.ofDays(2)));
             // 设置商品
-            o.setProducts(asList(new DiscountActivityBaseVO.Product().setSpuId(1L).setSkuId(2L).setDiscountPrice(3),
-                    new DiscountActivityBaseVO.Product().setSpuId(100L).setSkuId(200L).setDiscountPrice(30)));
+            o.setProducts(asList(new DiscountActivityBaseVO.Product().setSpuId(1L).setSkuId(2L)
+                            .setDiscountType(PromotionDiscountTypeEnum.PRICE.getType()).setDiscountPrice(3).setDiscountPercent(null),
+                    new DiscountActivityBaseVO.Product().setSpuId(100L).setSkuId(200L)
+                            .setDiscountType(PromotionDiscountTypeEnum.PERCENT.getType()).setDiscountPercent(30).setDiscountPrice(null)));
         });
 
         // 调用
@@ -115,7 +122,9 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
             assertEquals(discountProduct.getActivityId(), discountActivity.getId());
             assertEquals(discountProduct.getSpuId(), product.getSpuId());
             assertEquals(discountProduct.getSkuId(), product.getSkuId());
+            assertEquals(discountProduct.getDiscountType(), product.getDiscountType());
             assertEquals(discountProduct.getDiscountPrice(), product.getDiscountPrice());
+            assertEquals(discountProduct.getDiscountPercent(), product.getDiscountPercent());
         }
     }
 

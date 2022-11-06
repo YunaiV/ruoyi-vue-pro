@@ -2,12 +2,10 @@ package cn.iocoder.yudao.module.promotion.controller.admin.discount;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.*;
 import cn.iocoder.yudao.module.promotion.convert.discount.DiscountActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
 import cn.iocoder.yudao.module.promotion.service.discount.DiscountActivityService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -67,9 +66,14 @@ public class DiscountActivityController {
     @ApiOperation("获得限时折扣活动")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('promotion:discount-activity:query')")
-    public CommonResult<DiscountActivityRespVO> getDiscountActivity(@RequestParam("id") Long id) {
+    public CommonResult<DiscountActivityDetailRespVO> getDiscountActivity(@RequestParam("id") Long id) {
         DiscountActivityDO discountActivity = discountActivityService.getDiscountActivity(id);
-        return success(DiscountActivityConvert.INSTANCE.convert(discountActivity));
+        if (discountActivity == null) {
+            return success(null);
+        }
+        // 拼接结果
+        List<DiscountProductDO> discountProducts = discountActivityService.getDiscountProductsByActivityId(id);
+        return success(DiscountActivityConvert.INSTANCE.convert(discountActivity, discountProducts));
     }
 
     @GetMapping("/page")
