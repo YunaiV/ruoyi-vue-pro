@@ -61,9 +61,11 @@ export const useVxeGrid = (allSchemas, getPageApi) => {
       props: { result: 'list', total: 'total' },
       ajax: {
         query: ({ page, form }) => {
+          gridOptions.loading = true
           const queryParams = Object.assign({}, form)
           queryParams.pageSize = page.pageSize
           queryParams.pageNo = page.currentPage
+          gridOptions.loading = false
           return new Promise(async (resolve) => {
             resolve(await getPageApi(queryParams))
           })
