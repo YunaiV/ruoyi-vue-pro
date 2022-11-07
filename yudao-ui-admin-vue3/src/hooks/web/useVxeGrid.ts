@@ -1,12 +1,27 @@
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { VxeGridProps } from 'vxe-table'
+import { useAppStore } from '@/store/modules/app'
+
+const appStore = useAppStore()
+
+const currentSize = computed(() => {
+  if (appStore.getCurrentSize === 'small') {
+    return 'small'
+  } else if (appStore.getCurrentSize === 'large') {
+    return 'mini'
+  } else {
+    return 'medium'
+  }
+})
 
 export const useVxeGrid = (allSchemas, getPageApi) => {
   const gridOptions = reactive<VxeGridProps>({
     loading: false,
+    size: currentSize.value,
     height: 800,
     rowConfig: {
       keyField: 'id',
+      isCurrent: true,
       isHover: true
     },
     toolbarConfig: {
