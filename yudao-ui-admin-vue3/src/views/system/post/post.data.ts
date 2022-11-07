@@ -57,8 +57,16 @@ const crudSchemas = reactive<VxeCrudSchema[]>([
     }
   },
   {
+    title: '备注',
+    field: 'remark',
+    table: {
+      show: false
+    }
+  },
+  {
     title: t('common.createTime'),
     field: 'createTime',
+    formatter: 'formatDate',
     form: {
       show: false
     }
@@ -66,10 +74,8 @@ const crudSchemas = reactive<VxeCrudSchema[]>([
   {
     title: t('table.action'),
     field: 'action',
-    width: '240px',
     table: {
       width: '240px',
-      showOverflow: true,
       slots: {
         default: 'action_default'
       }
