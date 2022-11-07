@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { DeptVO, DeptListReqVO } from './types'
-
-const request = useAxios()
 
 // 查询部门（精简)列表
 export const listSimpleDeptApi = () => {

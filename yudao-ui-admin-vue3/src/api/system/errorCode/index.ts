@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { ErrorCodeVO } from './types'
-
-const request = useAxios()
 
 // 查询错误码列表
 export const getErrorCodePageApi = (params) => {
