@@ -79,24 +79,23 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import dayjs from 'dayjs'
-import { useI18n } from '@/hooks/web/useI18n'
-import { VxeFormEvents, VxeFormInstance, VxeFormItemProps, VxeGridInstance } from 'vxe-table'
-import * as PostApi from '@/api/system/post'
 import { DICT_TYPE } from '@/utils/dict'
-import { ContentWrap } from '@/components/ContentWrap'
+import * as PostApi from '@/api/system/post'
 import { PostVO } from '@/api/system/post/types'
 import { rules, allSchemas } from './post.data'
+import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { VxeFormEvents, VxeFormInstance, VxeFormItemProps, VxeGridInstance } from 'vxe-table'
 
 const { t } = useI18n() // 国际化
-const message = useMessage()
+const message = useMessage() // 消息弹窗
 const xGrid = ref<VxeGridInstance>()
 const xForm = ref<VxeFormInstance>()
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const actionType = ref('') // 操作按钮的类型
-const actionLoading = ref(false) // 遮罩层
+const actionLoading = ref(false) // 按钮Loading
 
 const gridOptions = useVxeGrid(allSchemas, PostApi.getPostPageApi)
 const formData = ref<PostVO>()
@@ -130,7 +129,7 @@ const handleUpdate = async (rowId: number) => {
 // 删除操作
 const handleDelete = (rowId: number) => {
   message
-    .confirm(t('common.delMessage'), t('common.confirmTitle'))
+    .delConfirm()
     .then(async () => {
       await PostApi.deletePostApi(rowId)
       message.success(t('common.delSuccess'))

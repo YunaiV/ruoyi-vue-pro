@@ -18,7 +18,7 @@ export type VxeCrudSchema = Omit<VxeTableColumn, 'children'> & {
   table?: CrudTableParams
   form?: CrudFormParams
   detail?: CrudDescriptionsParams
-  print?: boolean
+  print?: CrudPrintParams
   children?: VxeCrudSchema[]
   dictType?: string
 }
@@ -41,6 +41,11 @@ type CrudDescriptionsParams = {
   // 是否显示表单项
   show?: boolean
 } & Omit<DescriptionsSchema, 'field'>
+
+type CrudPrintParams = {
+  // 是否显示表单项
+  show?: boolean
+} & Omit<VxeTableDefines.ColumnInfo[], 'field'>
 
 interface VxeAllSchemas {
   searchSchema: VxeFormItemProps[]
@@ -233,7 +238,7 @@ const filterPrintSchema = (crudSchema: VxeCrudSchema[]): any[] => {
 
   eachTree(crudSchema, (schemaItem: VxeCrudSchema) => {
     // 判断是否显示
-    if (schemaItem?.detail?.show !== false) {
+    if (schemaItem?.print?.show !== false) {
       const printSchemaItem = {
         field: schemaItem.field
       }
