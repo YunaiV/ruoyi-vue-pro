@@ -31,6 +31,8 @@ public interface ErrorCodeConstants {
     // ========== 优惠劵模板 1003005000 ==========
     ErrorCode COUPON_NOT_EXISTS = new ErrorCode(1003005000, "优惠劵不存在");
     ErrorCode COUPON_DELETE_FAIL_USED = new ErrorCode(1003005001, "回收优惠劵失败，优惠劵已被使用");
+    ErrorCode COUPON_STATUS_NOT_UNUSED = new ErrorCode(1006003003, "优惠劵不处于待使用状态");
+    ErrorCode COUPON_VALID_TIME_NOT_NOW = new ErrorCode(1006003004, "优惠劵不在有效期内");
 
     // ========== 满减送活动 1003006000 ==========
     ErrorCode REWARD_ACTIVITY_NOT_EXISTS = new ErrorCode(1003006000, "满减送活动不存在");

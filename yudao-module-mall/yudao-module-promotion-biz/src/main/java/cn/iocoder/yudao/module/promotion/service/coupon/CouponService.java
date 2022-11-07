@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 
+import java.util.List;
+
 /**
  * 优惠劵 Service 接口
  *
@@ -24,6 +26,15 @@ public interface CouponService {
     CouponDO validCoupon(Long id, Long userId);
 
     /**
+     * 校验优惠劵，包括状态、有限期
+     *
+     * @see #validCoupon(Long, Long) 逻辑相同，只是入参不同
+     *
+     * @param coupon 优惠劵
+     */
+    void validCoupon(CouponDO coupon);
+
+    /**
      * 获得优惠劵分页
      *
      * @param pageReqVO 分页查询
@@ -32,10 +43,27 @@ public interface CouponService {
     PageResult<CouponDO> getCouponPage(CouponPageReqVO pageReqVO);
 
     /**
+     * 使用优惠劵
+     *
+     * @param id 优惠劵编号
+     * @param userId 用户编号
+     */
+    void useCoupon(Long id, Long userId);
+
+    /**
      * 回收优惠劵
      *
      * @param id 优惠劵编号
      */
     void deleteCoupon(Long id);
+
+    /**
+     * 获得用户的优惠劵列表
+     *
+     * @param userId 用户编号
+     * @param status 优惠劵状态
+     * @return 优惠劵列表
+     */
+    List<CouponDO> getCouponList(Long userId, Integer status);
 
 }

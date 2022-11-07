@@ -135,4 +135,19 @@ public class DateUtils {
         return DateUtil.isSameDay(date, new Date());
     }
 
+    /**
+     * 判断当前时间是否在该时间范围内
+     *
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return 是否
+     */
+    public static boolean isBetween(Date startTime, Date endTime) {
+        if (startTime == null || endTime == null) {
+            return false;
+        }
+        return startTime.getTime() <= System.currentTimeMillis()
+                && endTime.getTime() >= System.currentTimeMillis();
+    }
+
 }

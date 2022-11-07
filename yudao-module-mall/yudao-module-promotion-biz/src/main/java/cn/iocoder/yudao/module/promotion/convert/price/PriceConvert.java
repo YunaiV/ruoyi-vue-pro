@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.promotion.convert.price;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.promotion.api.price.dto.CouponMeetRespDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -41,5 +43,7 @@ public interface PriceConvert {
         });
         return priceCalculate;
     }
+
+    CouponMeetRespDTO convert(CouponDO coupon);
 
 }
