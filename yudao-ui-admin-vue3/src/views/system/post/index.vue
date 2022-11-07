@@ -69,14 +69,10 @@
         v-if="['create', 'update'].includes(actionType)"
         :loading="actionLoading"
         :title="t('action.save')"
+        type="primary"
         @click="submitForm"
       />
-      <XButton
-        v-if="['create', 'update'].includes(actionType)"
-        :loading="actionLoading"
-        :title="t('dialog.close')"
-        @click="dialogVisible = false"
-      />
+      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
   </XModal>
 </template>
