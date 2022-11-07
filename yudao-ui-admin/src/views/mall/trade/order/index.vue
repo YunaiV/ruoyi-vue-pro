@@ -90,7 +90,7 @@
                 </el-button>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item><el-button type="text">打印发货单</el-button></el-dropdown-item>
-                  <el-dropdown-item><el-button type="text">详情</el-button></el-dropdown-item>
+                  <el-dropdown-item><el-button type="text" @click="goToDetail(row)">详情</el-button></el-dropdown-item>
                   <el-dropdown-item><el-button type="text">备注</el-button></el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -321,6 +321,11 @@
             ]
           }
         ]
+      }
+    },
+    methods: {
+      goToDetail (row) {
+        this.$router.push({ path: '/mall/trade/order/detail', query: { orderNo: row.orderNo }})
       }
     }
   }

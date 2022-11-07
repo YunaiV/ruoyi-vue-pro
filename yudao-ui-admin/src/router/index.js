@@ -209,6 +209,13 @@ export const constantRoutes = [
         name: '商品订单',
         meta: { title: '商品订单' },
         component: (resolve) => require(['@/views/mall/trade/order'], resolve)
+      },
+      {
+        path: '/mall/trade/order/detail',
+        name: '订单详情',
+        hidden: true,
+        meta: { title: '订单详情' },
+        component: (resolve) => require(['@/views/mall/trade/order/detail'], resolve)
       }
     ]
   }
