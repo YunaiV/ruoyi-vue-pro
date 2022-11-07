@@ -121,7 +121,7 @@ const handleDetail = (row: PostVO) => {
 // 新增操作
 const handleCreate = () => {
   setDialogTile('create')
-  xForm.value?.reset()
+  formData.value = undefined
 }
 
 // 修改操作
