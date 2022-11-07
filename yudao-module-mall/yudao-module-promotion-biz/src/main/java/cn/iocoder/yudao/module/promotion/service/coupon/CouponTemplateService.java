@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.promotion.service.coupon;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplateCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplatePageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplateUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplateCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplatePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 
 import javax.validation.Valid;
@@ -31,6 +31,14 @@ public interface CouponTemplateService {
     void updateCouponTemplate(@Valid CouponTemplateUpdateReqVO updateReqVO);
 
     /**
+     * 更新优惠劵模板的状态
+     *
+     * @param id 编号
+     * @param status 状态
+     */
+    void updateCouponTemplateStatus(Long id, Integer status);
+
+    /**
      * 删除优惠劵模板
      *
      * @param id 编号
@@ -52,5 +60,13 @@ public interface CouponTemplateService {
      * @return 优惠劵模板分页
      */
     PageResult<CouponTemplateDO> getCouponTemplatePage(CouponTemplatePageReqVO pageReqVO);
+
+    /**
+     * 更新优惠劵模板的领取数量
+     *
+     * @param id 优惠劵模板编号
+     * @param incrCount 增加数量
+     */
+    void updateCouponTemplateTakeCount(Long id, int incrCount);
 
 }

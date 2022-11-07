@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.promotion.controller.admin.coupon;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplateCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplatePageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplateRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.CouponTemplateUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.*;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponTemplateConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponTemplateService;
@@ -42,6 +39,14 @@ public class CouponTemplateController {
     @PreAuthorize("@ss.hasPermission('promotion:coupon-template:update')")
     public CommonResult<Boolean> updateCouponTemplate(@Valid @RequestBody CouponTemplateUpdateReqVO updateReqVO) {
         couponTemplateService.updateCouponTemplate(updateReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-status")
+    @ApiOperation("更新优惠劵模板状态")
+    @PreAuthorize("@ss.hasPermission('promotion:coupon-template:update')")
+    public CommonResult<Boolean> updateCouponTemplateStatus(@Valid @RequestBody CouponTemplateUpdateStatusReqVO reqVO) {
+        couponTemplateService.updateCouponTemplateStatus(reqVO.getId(), reqVO.getStatus());
         return success(true);
     }
 

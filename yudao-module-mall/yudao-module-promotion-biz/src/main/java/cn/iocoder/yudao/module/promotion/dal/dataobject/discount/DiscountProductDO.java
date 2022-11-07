@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.discount;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.Date;
 
 /**
  * 限时折扣商品 DO
@@ -32,12 +31,6 @@ public class DiscountProductDO extends BaseDO {
      */
     private Long activityId;
     /**
-     * 限时折扣活动的名字
-     *
-     * 冗余 {@link DiscountActivityDO#getName()}
-     */
-    private String activityName;
-    /**
      * 商品 SPU 编号
      *
      * 关联 ProductSpuDO 的 id 编号
@@ -49,23 +42,24 @@ public class DiscountProductDO extends BaseDO {
      * 关联 ProductSkuDO 的 id 编号
      */
     private Long skuId;
+
     /**
-     * 开始时间
-     */
-    private Date startTime;
-    /**
-     * 结束时间
-     */
-    private Date endTime;
-    /**
-     * 销售价格，单位：分
+     * 折扣类型
      *
-     * 冗余 ProductSkuDO 的 price 字段
+     * 枚举 {@link PromotionDiscountTypeEnum}
      */
-    private Integer originalPrice;
+    private Integer discountType;
     /**
-     * 优惠价格，单位：分
+     * 折扣百分比
+     *
+     * 例如，80% 为 80
      */
-    private Integer promotionPrice;
+    private Integer discountPercent;
+    /**
+     * 优惠金额，单位：分
+     *
+     * 当 {@link #discountType} 为 {@link PromotionDiscountTypeEnum#PRICE} 生效
+     */
+    private Integer discountPrice;
 
 }

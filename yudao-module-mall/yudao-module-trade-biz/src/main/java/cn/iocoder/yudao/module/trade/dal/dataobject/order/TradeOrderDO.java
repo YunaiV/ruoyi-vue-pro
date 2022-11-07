@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO.OrderItem;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
@@ -74,7 +75,7 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 购买的商品数量
      */
-    private Integer productCount; // total_num
+    private Integer productCount;
     /**
      * 订单完成时间
      */
@@ -116,14 +117,25 @@ public class TradeOrderDO extends BaseDO {
      * 商品原价（总），单位：分
      *
      * 基于 {@link TradeOrderItemDO#getTotalOriginalPrice()} 求和
+     *
+     * 对应 taobao 的 trade.total_fee 字段
      */
     private Integer originalPrice;
     /**
+     * 订单原价（总），单位：分
+     *
+     * 基于 {@link OrderItem#getPayPrice()} 求和
+     * 和 {@link #originalPrice} 的差异：去除商品级优惠
+     */
+    private Integer orderPrice;
+    /**
      * 订单优惠（总），单位：分
      *
-     * 例如说：满减折扣；不包括优惠劵、商品优惠（TODO）
+     * 订单级优惠：对主订单的优惠，常见如：订单满 200 元减 10 元；订单满 80 包邮。
+     *
+     * 对应 taobao 的 order.discount_fee 字段
      */
-    private Integer promotionPrice;
+    private Integer discountPrice;
     /**
      * 运费金额，单位：分
      */
@@ -137,12 +149,12 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 应付金额（总），单位：分
      *
-     * = {@link #originalPrice}
-     * + {@link #deliveryPrice}
-     * + {@link #adjustPrice}
-     * - {@link #promotionPrice}
+     * = {@link OrderItem#getPayPrice()} 求和
      * - {@link #couponPrice}
      * - {@link #pointPrice}
+     * + {@link #deliveryPrice}
+     * - {@link #discountPrice}
+     * + {@link #adjustPrice}
      */
     private Integer payPrice;
     /**
@@ -164,11 +176,11 @@ public class TradeOrderDO extends BaseDO {
      *
      * 关联 DeliveryTemplateDO 的 id 编号
      */
-    private Long deliveryTemplateId; // dvy_id
+    private Long deliveryTemplateId;
     /**
      * 物流公司单号
      */
-    private String expressNo; // dvy_flow_id
+    private String expressNo;
     /**
      * 发货状态
      *
@@ -227,10 +239,14 @@ public class TradeOrderDO extends BaseDO {
     private Long couponId;
     /**
      * 优惠劵减免金额，单位：分
+     *
+     * 对应 taobao 的 trade.coupon_fee 字段
      */
     private Integer couponPrice;
     /**
      * 积分抵扣的金额，单位：分
+     *
+     * 对应 taobao 的 trade.point_fee 字段
      */
     private Integer pointPrice;
 

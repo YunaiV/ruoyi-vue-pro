@@ -14,22 +14,29 @@ import java.util.List;
 public interface ProductSkuService {
 
     /**
-     * 删除商品sku
+     * 删除商品 SKU
      *
      * @param id 编号
      */
     void deleteSku(Long id);
 
     /**
-     * 获得商品sku
+     * 获得商品 SKU 信息
      *
      * @param id 编号
-     * @return 商品sku
+     * @return 商品 SKU 信息
      */
     ProductSkuDO getSku(Long id);
 
     /**
-     * 获得商品sku列表
+     * 获得商品 SKU 列表
+     *
+     * @return 商品sku列表
+     */
+    List<ProductSkuDO> getSkuList();
+
+    /**
+     * 获得商品 SKU 列表
      *
      * @param ids 编号
      * @return 商品sku列表

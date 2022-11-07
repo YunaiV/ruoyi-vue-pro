@@ -53,6 +53,7 @@ public class ProductSpuController {
         return success(true);
     }
 
+    // TODO 芋艿：修改接口
     @GetMapping("/get/detail")
     @ApiOperation("获得商品 SPU")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
@@ -77,6 +78,14 @@ public class ProductSpuController {
     public CommonResult<List<ProductSpuRespVO>> getSpuList(@RequestParam("ids") Collection<Long> ids) {
         List<ProductSpuDO> list = spuService.getSpuList(ids);
         return success(ProductSpuConvert.INSTANCE.convertList(list));
+    }
+
+    @GetMapping("/get-simple-list")
+    @ApiOperation("获得商品 SPU 精简列表")
+    @PreAuthorize("@ss.hasPermission('product:spu:query')")
+    public CommonResult<List<ProductSpuSimpleRespVO>> getSpuSimpleList() {
+        List<ProductSpuDO> list = spuService.getSpuList();
+        return success(ProductSpuConvert.INSTANCE.convertList02(list));
     }
 
     @GetMapping("/page")

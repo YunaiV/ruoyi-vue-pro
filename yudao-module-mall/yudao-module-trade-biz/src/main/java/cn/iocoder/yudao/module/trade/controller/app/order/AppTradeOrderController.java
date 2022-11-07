@@ -43,13 +43,12 @@ public class AppTradeOrderController {
     @PreAuthenticated
     public CommonResult<Long> createTradeOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO,
                                                HttpServletRequest servletRequest) {
-        // 获取登录用户
+        // 获取登录用户、用户 IP 地址
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
-        // 获取用户ip地址
         String clientIp = ServletUtil.getClientIP(servletRequest);
         // 创建交易订单，预支付记录
-        Long result = tradeOrderService.createTradeOrder(loginUserId, clientIp, createReqVO);
-        return CommonResult.success(result);
+        Long orderId = tradeOrderService.createTradeOrder(loginUserId, clientIp, createReqVO);
+        return CommonResult.success(orderId);
     }
 
     @GetMapping("/get")

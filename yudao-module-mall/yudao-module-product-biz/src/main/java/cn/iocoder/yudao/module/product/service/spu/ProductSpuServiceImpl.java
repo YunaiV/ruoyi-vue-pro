@@ -177,6 +177,11 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
+    public List<ProductSpuDO> getSpuList() {
+        return productSpuMapper.selectList();
+    }
+
+    @Override
     public PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
         // 库存告警的 SPU 编号的集合
         Set<Long> alarmStockSpuIds = null;

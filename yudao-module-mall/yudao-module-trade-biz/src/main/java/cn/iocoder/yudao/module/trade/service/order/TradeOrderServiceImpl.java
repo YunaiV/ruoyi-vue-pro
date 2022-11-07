@@ -45,14 +45,17 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * TODO @LeeYan9: 注释
+ * 交易订单 Service 实现类
+ *
  * @author LeeYan9
  * @since 2022-08-26
  */
 @Service
 public class TradeOrderServiceImpl implements TradeOrderService {
 
-    // TODO @LeeYan9: 相同类型的, 可以放在一起,不用空行; 例如说 Mapper 和 API 和 Properties
+    // TODO LeeYan9: 静态变量, 需要在最前面哈; 另外, 静态变量的注释最好写下;
+    private static final String BLANK_PLACEHOLDER = " ";
+    private static final String MULTIPLIER_PLACEHOLDER = "x";
 
     @Resource
     private TradeOrderMapper tradeOrderMapper;
@@ -71,15 +74,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Resource
     private TradeOrderProperties tradeOrderProperties;
 
-    // TODO LeeYan9: 静态变量, 需要在最前面哈; 另外, 静态变量的注释最好写下;
-    private static final String BLANK_PLACEHOLDER = " ";
-    private static final String MULTIPLIER_PLACEHOLDER = "x";
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createTradeOrder(Long loginUserId, String clientIp, AppTradeOrderCreateReqVO createReqVO) {
-
-        List<Item> items = createReqVO.getItems(); // TODO @LeeYan9: 方法第一行, 不用空哈;
+        List<Item> items = createReqVO.getItems();
         // 商品SKU检查 sku可售状态,库存
         List<ProductSkuRespDTO> skuInfos = productSkuApi.getSkuList(CollectionUtils.convertSet(items, Item::getSkuId));
         Map<Long, ProductSkuRespDTO> skuInfoMap = CollectionUtils.convertMap(skuInfos, ProductSkuRespDTO::getId);

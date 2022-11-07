@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.coupon;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 
 /**
@@ -20,5 +22,20 @@ public interface CouponService {
      * @return 优惠劵信息
      */
     CouponDO validCoupon(Long id, Long userId);
+
+    /**
+     * 获得优惠劵分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 优惠劵分页
+     */
+    PageResult<CouponDO> getCouponPage(CouponPageReqVO pageReqVO);
+
+    /**
+     * 回收优惠劵
+     *
+     * @param id 优惠劵编号
+     */
+    void deleteCoupon(Long id);
 
 }
