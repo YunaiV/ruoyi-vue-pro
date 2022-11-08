@@ -11,7 +11,7 @@ export const useRenderRadio = () => {
       typeof defineComponent
     >
     return item?.componentProps?.options?.map((option) => {
-      const { value, ...other } = option
+      const { ...other } = option
       return (
         <Com label={option[labelAlias || 'value']} {...other}>
           {option[valueAlias || 'label']}
