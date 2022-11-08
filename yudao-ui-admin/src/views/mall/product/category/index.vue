@@ -98,7 +98,6 @@
 import {
   createProductCategory,
   deleteProductCategory,
-  exportCategoryExcel,
   getProductCategory,
   getProductCategoryList,
   updateProductCategory
@@ -106,7 +105,6 @@ import {
 import Editor from '@/components/Editor';
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
-import IconSelect from "@/components/IconSelect";
 import ImageUpload from '@/components/ImageUpload';
 import {CommonStatusEnum} from "@/utils/constants";
 

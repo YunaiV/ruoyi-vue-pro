@@ -50,7 +50,6 @@
 
 <script>
 import {getTodoTaskPage} from '@/api/bpm/task'
-import {listSimpleUsers} from "@/api/system/user";
 
 export default {
   name: "Todo",

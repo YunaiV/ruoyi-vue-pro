@@ -209,7 +209,7 @@ export default {
     highlightedCode(item) {
       // const vmName = key.substring(key.lastIndexOf("/") + 1, key.indexOf(".vm"));
       // var language = vmName.substring(vmName.indexOf(".") + 1, vmName.length);
-      var language = item.filePath.substring(item.filePath.lastIndexOf(".") + 1);
+      const language = item.filePath.substring(item.filePath.lastIndexOf('.') + 1)
       const result = hljs.highlight(language, item.code || "", true);
       return result.value || '&nbsp;';
     },

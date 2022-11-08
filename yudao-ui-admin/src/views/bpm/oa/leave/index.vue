@@ -159,7 +159,7 @@ export default {
         type: 'warning',
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        inputPattern: /^[\s\S]*.*[^\s][\s\S]*$/, // 判断非空，且非空格
+        inputPattern: /^[\s\S]*.*\S[\s\S]*$/, // 判断非空，且非空格
         inputErrorMessage: "取消原因不能为空",
       }).then(({ value }) => {
         return cancelProcessInstance(id, value);

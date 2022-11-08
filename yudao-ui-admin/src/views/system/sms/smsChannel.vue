@@ -107,8 +107,7 @@
 </template>
 
 <script>
-import { createSmsChannel, updateSmsChannel, deleteSmsChannel, getSmsChannel, getSmsChannelPage,
-  getSimpleSmsChannels } from "@/api/system/sms/smsChannel";
+import { createSmsChannel, updateSmsChannel, deleteSmsChannel, getSmsChannel, getSmsChannelPage } from "@/api/system/sms/smsChannel";
 
 export default {
   name: "SmsChannel",

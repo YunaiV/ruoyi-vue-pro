@@ -13,7 +13,7 @@
                   <td><div class="cell">Redis版本</div></td>
                   <td><div class="cell" v-if="cache.info">{{ cache.info.redis_version }}</div></td>
                   <td><div class="cell">运行模式</div></td>
-                  <td><div class="cell" v-if="cache.info">{{ cache.info.redis_mode == "standalone" ? "单机" : "集群" }}</div></td>
+                  <td><div class="cell" v-if="cache.info">{{ cache.info.redis_mode === "standalone" ? "单机" : "集群" }}</div></td>
                   <td><div class="cell">端口</div></td>
                   <td><div class="cell" v-if="cache.info">{{ cache.info.tcp_port }}</div></td>
                   <td><div class="cell">客户端数</div></td>

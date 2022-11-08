@@ -62,7 +62,7 @@ export default {
     },
     // 右侧列表元素变化
     dataChange(data) {
-      for (var item in this.columns) {
+      for (let item in this.columns) {
         const key = this.columns[item].key;
         this.columns[item].visible = !data.includes(key);
       }

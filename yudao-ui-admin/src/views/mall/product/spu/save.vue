@@ -67,7 +67,7 @@
           <!-- 规格明细 -->
           <el-form-item label="规格明细">
             <el-table :data="ratesForm.rates" border style="width: 100%" ref="ratesTable">
-              <template v-if="ratesForm.spec == 2">
+              <template v-if="ratesForm.spec === 2">
                 <el-table-column :key="index" v-for="(item, index) in dynamicSpec.filter(v => v.specName !== undefined)"
                                  :label="item.specName">
                   <template v-slot="scope">
@@ -118,13 +118,13 @@
               <el-table-column label="库存" :render-header="addRedStar" key="95">
                 <template v-slot="scope">
                   <el-form-item :prop="'rates.'+ scope.$index + '.stock'" :rules="[{required: true, trigger: 'change'}]">
-                    <el-input v-model="scope.row.stock" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"></el-input>
+                    <el-input v-model="scope.row.stock" oninput="value=value.replace(/^(0+)|\D+/g,'')"></el-input>
                   </el-form-item>
                 </template>
               </el-table-column>
               <el-table-column label="预警库存" key="96">
                 <template v-slot="scope">
-                  <el-input v-model="scope.row.warnStock" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"></el-input>
+                  <el-input v-model="scope.row.warnStock" oninput="value=value.replace(/^(0+)|\D+/g,'')"></el-input>
                 </template>
               </el-table-column>
               <el-table-column label="体积" key="97">
@@ -145,8 +145,8 @@
                <template v-if="ratesForm.spec === 2">
                 <el-table-column fixed="right" label="操作" width="50" key="100">
                   <template v-slot="scope">
-                    <el-button @click="scope.row.status = 1" type="text" size="small" v-show="scope.row.status == undefined || scope.row.status == 0 ">禁用</el-button>
-                    <el-button @click="scope.row.status = 0" type="text" size="small" v-show="scope.row.status == 1">启用</el-button>
+                    <el-button @click="scope.row.status = 1" type="text" size="small" v-show="scope.row.status == 0 ">禁用</el-button>
+                    <el-button @click="scope.row.status = 0" type="text" size="small" v-show="scope.row.status === 1">启用</el-button>
                   </template>
                 </el-table-column>
               </template>
@@ -154,7 +154,7 @@
           </el-form-item>
           <el-form-item label="虚拟销量" prop="virtualSalesCount">
             <!-- TODO @Luowenfeng：使用 input 类型即可 -->
-            <el-input v-model="baseForm.virtualSalesCount" placeholder="请输入虚拟销量" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
+            <el-input v-model="baseForm.virtualSalesCount" placeholder="请输入虚拟销量" oninput="value=value.replace(/^(0+)|\D+/g,'')"/>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -172,7 +172,7 @@
       <el-tab-pane label="高级设置" name="fourth">
         <el-form ref="fourth" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
           <el-form-item label="排序字段">
-            <el-input v-model="baseForm.sort" placeholder="请输入排序字段" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
+            <el-input v-model="baseForm.sort" placeholder="请输入排序字段" oninput="value=value.replace(/^(0+)|\D+/g,'')"/>
           </el-form-item>
            <el-form-item label="是否展示库存" prop="showStock">
              <el-radio-group v-model="baseForm.showStock">
@@ -271,7 +271,7 @@ export default {
     this.getListBrand();
     this.getListCategory();
     this.getPropertyPageList();
-    if(this.type == 'upd'){
+    if(this.type === 'upd'){
       this.updateType(this.obj.id)
     }
   },
@@ -297,7 +297,7 @@ export default {
     },
     changeRadio() {
       this.$refs.ratesTable.doLayout();
-      if (this.ratesForm.spec == 1) {
+      if (this.ratesForm.spec === 1) {
         this.ratesForm.rates = [{}]
       } else {
         this.ratesForm.rates = []
@@ -363,7 +363,7 @@ export default {
       })
 
       // 动态规格调整字段
-      if (this.ratesForm.spec == 2) {
+      if (this.ratesForm.spec === 2) {
         rates.forEach(r => {
           let properties = []
             Array.of(r.spec).forEach(s => {
@@ -374,7 +374,7 @@ export default {
                   obj = Array.of(s);
                }
               obj.forEach((v, i) => {
-                let specValue = this.dynamicSpec[i].specValue.find(o => o.name == v);
+                let specValue = this.dynamicSpec[i].specValue.find(o => o.name === v);
                 let propertie = {};
                 propertie.propertyId = this.dynamicSpec[i].specId;
                 propertie.valueId = specValue.id;
@@ -422,9 +422,9 @@ export default {
       });
     },
     changeSpec(val) {
-      let obj = this.propertyPageList.find(o => o.id == val);
+      let obj = this.propertyPageList.find(o => o.id === val);
       let dynamicSpec = this.dynamicSpec;
-      let spec = dynamicSpec.find(o => o.specId == val)
+      let spec = dynamicSpec.find(o => o.specId === val)
       spec.specId = obj.id;
       spec.specName = obj.name;
       spec.specValue = obj.propertyValueList;
@@ -451,7 +451,7 @@ export default {
               r.price = this.divide(r.price, 100)
               r.costPrice = this.divide(r.costPrice, 100)
             })
-            if(this.ratesForm.spec == 2){
+            if(this.ratesForm.spec === 2){
               data.productPropertyViews.forEach(p=>{
                 let obj = {};
                 obj.specId = p.propertyId;
@@ -462,7 +462,7 @@ export default {
               data.skus.forEach(s=>{
                 s.spec = [];
                 s.properties.forEach(sp=>{
-                  let spec = data.productPropertyViews.find(o=>o.propertyId == sp.propertyId).propertyValues.find(v=>v.id == sp.valueId).name;
+                  let spec = data.productPropertyViews.find(o=>o.propertyId === sp.propertyId).propertyValues.find(v=>v.id === sp.valueId).name;
                    s.spec.push(spec)
                 })
               })
@@ -483,12 +483,10 @@ export default {
 .dynamic-spec {
   background-color: #f2f2f2;
   width: 85%;
-  margin: auto;
-  margin-bottom: 10px;
+  margin: auto auto 10px;
 
   .spec-header {
-    padding: 30px;
-    padding-bottom: 20px;
+    padding: 30px 30px 20px;
 
     .spec-name {
       display: inline;
@@ -501,9 +499,8 @@ export default {
 
   .spec-values {
     width: 84%;
-    padding: 25px;
     margin: auto;
-    padding-top: 5px;
+    padding: 5px 25px 25px;
 
     .spec-value {
       display: inline-block;

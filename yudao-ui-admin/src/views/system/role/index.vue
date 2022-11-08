@@ -167,7 +167,6 @@
 import {
   addRole,
   changeRoleStatus,
-  dataScope,
   delRole,
   exportRole,
   getRole,

@@ -254,7 +254,7 @@ export default {
         }).catch(() => {});
     },
     removePropertyValue(item) {
-      var index = this.form.propertyValueList.indexOf(item)
+      const index = this.form.propertyValueList.indexOf(item)
       if (index !== -1) {
         this.form.propertyValueList.splice(index, 1)
       }
@@ -266,9 +266,9 @@ export default {
     },
     formatList(list) {
       let str = ''
-      for (var i = 0; i < list.length; i++) {
+      for (let i = 0; i < list.length; i++) {
         str += list[i].name;
-        if(i != list.length-1){
+        if(i !== list.length-1){
           str+="/";
         }
       }

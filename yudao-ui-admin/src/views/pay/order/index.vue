@@ -219,7 +219,6 @@ import {getOrder, getOrderPage, exportOrderExcel} from "@/api/pay/order";
 import {getMerchantListByName} from "@/api/pay/merchant";
 import {getAppListByMerchantId} from "@/api/pay/app";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {PayOrderNotifyStatusEnum, PayOrderRefundStatusEnum, PayOrderStatusEnum} from "@/utils/constants";
 import { getNowDateTime} from "@/utils/ruoyi";
 
 const defaultOrderDetail = {

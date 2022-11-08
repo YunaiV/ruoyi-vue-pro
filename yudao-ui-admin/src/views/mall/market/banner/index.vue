@@ -107,7 +107,6 @@
 import {
   createBanner,
   deleteBanner,
-  exportBannerExcel,
   getBanner,
   getBannerPage,
   updateBanner
