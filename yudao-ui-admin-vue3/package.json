@@ -1,6 +1,6 @@
 {
   "name": "ruoyi-vue-pro-vue3",
-  "version": "1.6.4.1831",
+  "version": "1.6.4.1841",
   "description": "基于vue3、vite3、element-plus、typesScript",
   "author": "xingyu",
   "private": false,
@@ -31,7 +31,7 @@
     "@wangeditor/editor-for-vue": "^5.1.10",
     "@zxcvbn-ts/core": "^2.1.0",
     "animate.css": "^4.1.1",
-    "axios": "^0.27.2",
+    "axios": "^1.1.3",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.6",
     "echarts": "^5.4.0",
