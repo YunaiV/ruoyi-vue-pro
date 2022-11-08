@@ -50,7 +50,7 @@
       <el-table-column label="商品名称" align="center" prop="name" />
       <el-table-column label="分类id" align="center" prop="categoryId" />
       <el-table-column label="商品主图地址" align="center" prop="picUrls">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <img
             v-if="scope.row.picUrls"
             :src="scope.row.picUrls[0]"
@@ -64,17 +64,17 @@
       <el-table-column label="价格区间" align="center" prop="price" />
       <el-table-column label="总库存" align="center" prop="totalStock" />
       <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['product:spu:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"

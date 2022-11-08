@@ -24,28 +24,28 @@
       <el-table-column label="所属流程" align="center" prop="processInstance.name" width="200" />
       <el-table-column label="流程发起人" align="center" prop="processInstance.startUserNickname" width="120" />
       <el-table-column label="结果" align="center" prop="result">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT" :value="scope.row.result"/>
         </template>
       </el-table-column>
       <el-table-column label="审批意见" align="center" prop="reason" width="200" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="审批时间" align="center" prop="endTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.endTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="耗时" align="center" prop="durationInMillis" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ getDateStar(scope.row.durationInMillis) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)"
                      v-hasPermi="['bpm:task:query']">详情</el-button>
         </template>

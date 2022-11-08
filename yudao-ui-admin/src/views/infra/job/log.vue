@@ -41,22 +41,22 @@
       <el-table-column label="处理器的参数" align="center" prop="handlerParam" />
       <el-table-column label="第几次执行" align="center" prop="executeIndex" />
       <el-table-column label="执行时间" align="center" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.beginTime) + ' ~ ' + parseTime(scope.row.endTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="执行时长" align="center" prop="duration">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ scope.row.duration + ' 毫秒' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="任务状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_JOB_LOG_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row)" :loading="exportLoading"
                      v-hasPermi="['infra:job:query']">详细</el-button>
         </template>

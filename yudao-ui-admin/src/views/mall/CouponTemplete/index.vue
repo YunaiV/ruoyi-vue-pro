@@ -66,17 +66,17 @@
       <!-- todo 1-时间范围过期 2-领取之日固定日期后过期 3-领取次日固定日期后过期 -->
       <el-table-column label="有效期限" align="center" prop="validityType" />
 <!--      <el-table-column label="使用开始日期 过期类型1时必填" align="center" prop="startUseTime" width="180">-->
-<!--        <template slot-scope="scope">-->
+<!--        <template v-slot="scope">-->
 <!--          <span>{{ parseTime(scope.row.startUseTime) }}</span>-->
 <!--        </template>-->
 <!--      </el-table-column>-->
 <!--      <el-table-column label="使用结束日期 过期类型1时必填" align="center" prop="endUseTime" width="180">-->
-<!--        <template slot-scope="scope">-->
+<!--        <template v-slot="scope">-->
 <!--          <span>{{ parseTime(scope.row.endUseTime) }}</span>-->
 <!--        </template>-->
 <!--      </el-table-column>-->
 <!--      <el-table-column label="有效日期结束时间" align="center" prop="endTime" width="180">-->
-<!--        <template slot-scope="scope">-->
+<!--        <template v-slot="scope">-->
 <!--          <span>{{ parseTime(scope.row.endTime) }}</span>-->
 <!--        </template>-->
 <!--      </el-table-column>-->

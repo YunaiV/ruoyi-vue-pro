@@ -70,20 +70,20 @@
               <template v-if="ratesForm.spec == 2">
                 <el-table-column :key="index" v-for="(item, index) in dynamicSpec.filter(v => v.specName !== undefined)"
                                  :label="item.specName">
-                  <template slot-scope="scope">
+                  <template v-slot="scope">
                     <el-input v-if="scope.row.spec" v-model="scope.row.spec[index]" disabled />
                   </template>
                 </el-table-column>
               </template>
               <el-table-column label="规格图片" width="120px" :render-header="addRedStar" key="90">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                     <ImageUpload v-model="scope.row.picUrl" :limit="1" :isShowTip="false"
                                style="width: 100px; height: 50px"/>
                 </template>
               </el-table-column>
               <template v-if="ratesForm.spec === 2">
                <el-table-column label="sku名称" :render-header="addRedStar" key="91">
-                  <template slot-scope="scope">
+                  <template v-slot="scope">
                     <el-form-item :prop="'rates.'+ scope.$index + '.name'" :rules="[{required: true, trigger: 'change'}]">
                       <el-input v-model="scope.row.name" />
                     </el-form-item>
@@ -91,7 +91,7 @@
                 </el-table-column>
               </template>
               <el-table-column label="市场价(元)" :render-header="addRedStar" key="92">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-form-item :prop="'rates.'+ scope.$index + '.marketPrice'" :rules="[{required: true, trigger: 'change'}]">
                     <el-input v-model="scope.row.marketPrice"
                       oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
@@ -99,14 +99,14 @@
                 </template>
               </el-table-column>
               <el-table-column label="销售价(元)" :render-header="addRedStar" key="93">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                  <el-form-item :prop="'rates.'+ scope.$index + '.price'" :rules="[{required: true, trigger: 'change'}]">
                   <el-input v-model="scope.row.price" oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''"></el-input>
                   </el-form-item>
                 </template>
               </el-table-column>
               <el-table-column label="成本价" :render-header="addRedStar" key="94">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                 <el-form-item :prop="'rates.'+ scope.$index + '.costPrice'" :rules="[{required: true, trigger: 'change'}]">
                   <el-input
                     v-model="scope.row.costPrice"
@@ -116,35 +116,35 @@
                 </template>
               </el-table-column>
               <el-table-column label="库存" :render-header="addRedStar" key="95">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-form-item :prop="'rates.'+ scope.$index + '.stock'" :rules="[{required: true, trigger: 'change'}]">
                     <el-input v-model="scope.row.stock" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"></el-input>
                   </el-form-item>
                 </template>
               </el-table-column>
               <el-table-column label="预警库存" key="96">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-input v-model="scope.row.warnStock" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"></el-input>
                 </template>
               </el-table-column>
               <el-table-column label="体积" key="97">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-input v-model="scope.row.volume" ></el-input>
                 </template>
               </el-table-column>
               <el-table-column label="重量" key="98">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-input v-model="scope.row.weight" ></el-input>
                 </template>
               </el-table-column>
               <el-table-column label="条码" key="99">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-input v-model="scope.row.barCode"></el-input>
                 </template>
               </el-table-column>
                <template v-if="ratesForm.spec === 2">
                 <el-table-column fixed="right" label="操作" width="50" key="100">
-                  <template slot-scope="scope">
+                  <template v-slot="scope">
                     <el-button @click="scope.row.status = 1" type="text" size="small" v-show="scope.row.status == undefined || scope.row.status == 0 ">禁用</el-button>
                     <el-button @click="scope.row.status = 0" type="text" size="small" v-show="scope.row.status == 1">启用</el-button>
                   </template>
