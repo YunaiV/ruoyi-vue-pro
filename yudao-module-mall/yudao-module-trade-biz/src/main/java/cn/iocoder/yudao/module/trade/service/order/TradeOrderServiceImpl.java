@@ -18,12 +18,10 @@ import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.promotion.api.price.PriceApi;
-import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO.Item;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
-import cn.iocoder.yudao.module.trade.convert.price.PriceConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
@@ -82,20 +80,19 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO) {
+    public Long createTradeOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
         // 商品 SKU 检查：可售状态、库存
         List<ProductSkuRespDTO> skus = validateSkuSaleable(createReqVO.getItems());
         // 商品 SPU 检查：可售状态
-        List<ProductSpuRespDTO> spus = validateSpuSaleable(convertSet(skus, ProductSkuRespDTO::getSpuId));
+        validateSpuSaleable(convertSet(skus, ProductSkuRespDTO::getSpuId));
         // 用户收件地址的校验
         AddressRespDTO address = validateAddress(userId, createReqVO.getAddressId());
 
         // 价格计算
-        PriceCalculateReqDTO priceCalculateReqDTO = PriceConvert.INSTANCE.convert(createReqVO, userId);
-        PriceCalculateRespDTO priceResp = priceApi.calculatePrice(priceCalculateReqDTO);
+        PriceCalculateRespDTO priceResp = priceApi.calculatePrice(TradeOrderConvert.INSTANCE.convert(createReqVO, userId));
 
         // 插入 TradeOrderDO 订单
-        TradeOrderDO tradeOrderDO = createTradeOrder(userId, clientIp, createReqVO, priceResp.getOrder(), address);
+        TradeOrderDO tradeOrderDO = createTradeOrder(userId, userIp, createReqVO, priceResp.getOrder(), address);
         // 插入 TradeOrderItemDO 订单项
         createTradeOrderItems(tradeOrderDO, priceResp.getOrder().getItems(), skus);
 
@@ -208,7 +205,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 校验是否存在禁用的 SPU
         ProductSpuRespDTO spu = CollectionUtils.findFirst(spus,
                 spuDTO -> ObjectUtil.notEqual(ProductSpuStatusEnum.ENABLE.getStatus(), spuDTO.getStatus()));
-        if (Objects.isNull(spu)) {
+        if (spu != null) {
             throw exception(ErrorCodeConstants.ORDER_CREATE_SPU_NOT_SALE);
         }
         return spus;
@@ -238,6 +235,9 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         tradeOrderDO.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         tradeOrderDO.setProductCount(getSumValue(order.getItems(),  PriceCalculateRespDTO.OrderItem::getCount, Integer::sum));
         tradeOrderDO.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
+        tradeOrderDO.setAdjustPrice(0).setPayed(false); // 支付信息
+        tradeOrderDO.setDeliveryStatus(false); // 物流信息
+        tradeOrderDO.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0); // 退款信息
         tradeOrderMapper.insert(tradeOrderDO);
         return tradeOrderDO;
     }

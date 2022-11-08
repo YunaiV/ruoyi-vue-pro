@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.convert.order;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -33,7 +34,7 @@ public interface TradeOrderConvert {
             @Mapping(source = "address.postCode", target = "receiverPostCode"),
             @Mapping(source = "address.detailAddress", target = "receiverDetailAddress"),
     })
-    TradeOrderDO convert(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
+    TradeOrderDO convert(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO,
                          PriceCalculateRespDTO.Order order, AddressRespDTO address);
 
     @Mappings({
@@ -49,10 +50,13 @@ public interface TradeOrderConvert {
             TradeOrderItemDO tradeOrderItemDO = convert(orderItem, skuMap.get(orderItem.getSkuId()));
             tradeOrderItemDO.setOrderId(tradeOrderDO.getId());
             tradeOrderItemDO.setUserId(tradeOrderDO.getUserId());
-            tradeOrderItemDO.setRefundStatus(TradeOrderItemRefundStatusEnum.NONE.getStatus());
+            tradeOrderItemDO.setRefundStatus(TradeOrderItemRefundStatusEnum.NONE.getStatus()).setRefundTotal(0); // 退款信息
 //            tradeOrderItemDO.setCommented(false);
             return tradeOrderItemDO;
         });
     }
+
+    @Mapping(source = "userId" , target = "userId")
+    PriceCalculateReqDTO convert(AppTradeOrderCreateReqVO createReqVO, Long userId);
 
 }
