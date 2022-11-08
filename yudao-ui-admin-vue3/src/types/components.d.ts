@@ -18,6 +18,7 @@ export type ComponentName =
   | 'Divider'
   | 'TimeSelect'
   | 'SelectV2'
+  | 'TreeSelect'
   | 'InputPassword'
   | 'Editor'
 

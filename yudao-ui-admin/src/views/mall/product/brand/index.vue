@@ -36,24 +36,24 @@
       <el-table-column label="品牌编号" align="center" prop="id"/>
       <el-table-column label="品牌名称" align="center" prop="name"/>
       <el-table-column label="品牌图片" align="center" prop="picUrl">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <img v-if="scope.row.picUrl" :src="scope.row.picUrl" alt="分类图片" style="height: 100px;" />
         </template>
       </el-table-column>
       <el-table-column label="品牌排序" align="center" prop="sort"/>
       <el-table-column label="品牌描述" align="center" prop="description"/>
       <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['product:brand:update']">修改
           </el-button>

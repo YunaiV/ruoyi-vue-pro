@@ -346,13 +346,13 @@ export default {
   fill-opacity: 0.2 !important;
 }
 
-/deep/.highlight-todo.djs-connection > .djs-visual > path {
+:deep(.highlight-todo.djs-connection > .djs-visual > path) {
   stroke: #1890ff !important;
   stroke-dasharray: 4px !important;
   fill-opacity: 0.2 !important;
   marker-end: url(#sequenceflow-end-_E7DFDF-_E7DFDF-803g1kf6zwzmcig1y2ulm5egr);
 }
-/deep/.highlight-todo.djs-shape .djs-visual > :nth-child(1) {
+:deep(.highlight-todo.djs-shape .djs-visual > :nth-child(1)) {
   fill: #1890ff !important;
   stroke: #1890ff !important;
   stroke-dasharray: 4px !important;
@@ -381,20 +381,20 @@ export default {
   fill: green !important; /* color elements as green */
 }
 
-/deep/.highlight.djs-shape .djs-visual > :nth-child(1) {
+:deep(.highlight.djs-shape .djs-visual > :nth-child(1)) {
   fill: green !important;
   stroke: green !important;
   fill-opacity: 0.2 !important;
 }
-/deep/.highlight.djs-shape .djs-visual > :nth-child(2) {
+:deep(.highlight.djs-shape .djs-visual > :nth-child(2)) {
   fill: green !important;
 }
-/deep/.highlight.djs-shape .djs-visual > path {
+:deep(.highlight.djs-shape .djs-visual > path) {
   fill: green !important;
   fill-opacity: 0.2 !important;
   stroke: green !important;
 }
-/deep/.highlight.djs-connection > .djs-visual > path {
+:deep(.highlight.djs-connection > .djs-visual > path) {
   stroke: green !important;
 }
 
@@ -420,20 +420,20 @@ export default {
   fill: red !important; /* color elements as green */
 }
 
-/deep/.highlight-reject.djs-shape .djs-visual > :nth-child(1) {
+:deep(.highlight-reject.djs-shape .djs-visual > :nth-child(1)) {
   fill: red !important;
   stroke: red !important;
   fill-opacity: 0.2 !important;
 }
-/deep/.highlight-reject.djs-shape .djs-visual > :nth-child(2) {
+:deep(.highlight-reject.djs-shape .djs-visual > :nth-child(2)) {
   fill: red !important;
 }
-/deep/.highlight-reject.djs-shape .djs-visual > path {
+:deep(.highlight-reject.djs-shape .djs-visual > path) {
   fill: red !important;
   fill-opacity: 0.2 !important;
   stroke: red !important;
 }
-/deep/.highlight-reject.djs-connection > .djs-visual > path {
+:deep(.highlight-reject.djs-connection > .djs-visual > path) {
   stroke: red !important;
 }
 
@@ -459,20 +459,20 @@ export default {
   fill: grey !important; /* color elements as green */
 }
 
-/deep/.highlight-cancel.djs-shape .djs-visual > :nth-child(1) {
+:deep(.highlight-cancel.djs-shape .djs-visual > :nth-child(1)) {
   fill: grey !important;
   stroke: grey !important;
   fill-opacity: 0.2 !important;
 }
-/deep/.highlight-cancel.djs-shape .djs-visual > :nth-child(2) {
+:deep(.highlight-cancel.djs-shape .djs-visual > :nth-child(2)) {
   fill: grey !important;
 }
-/deep/.highlight-cancel.djs-shape .djs-visual > path {
+:deep(.highlight-cancel.djs-shape .djs-visual > path) {
   fill: grey !important;
   fill-opacity: 0.2 !important;
   stroke: grey !important;
 }
-/deep/.highlight-cancel.djs-connection > .djs-visual > path {
+:deep(.highlight-cancel.djs-connection > .djs-visual > path) {
   stroke: grey !important;
 }
 

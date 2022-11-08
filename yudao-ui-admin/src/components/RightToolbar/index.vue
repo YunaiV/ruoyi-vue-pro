@@ -62,7 +62,7 @@ export default {
     },
     // 右侧列表元素变化
     dataChange(data) {
-      for (var item in this.columns) {
+      for (let item in this.columns) {
         const key = this.columns[item].key;
         this.columns[item].visible = !data.includes(key);
       }
@@ -75,13 +75,13 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-::v-deep .el-transfer__button {
+:deep(.el-transfer__button) {
   border-radius: 50%;
   padding: 12px;
   display: block;
-  margin-left: 0px;
+  margin-left: 0;
 }
-::v-deep .el-transfer__button:first-child {
+:deep(.el-transfer__button:first-child) {
   margin-bottom: 10px;
 }
 </style>

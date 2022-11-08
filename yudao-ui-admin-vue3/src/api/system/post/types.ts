@@ -5,7 +5,7 @@ export type PostVO = {
   sort: number
   status: number
   remark: string
-  createTime: string
+  createTime?: string
 }
 
 export type PostPageReqVO = {

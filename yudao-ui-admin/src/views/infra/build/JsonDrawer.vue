@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { beautifierConf } from '@/utils/index'
+import { beautifierConf } from '@/utils'
 import ClipboardJS from 'clipboard'
 import { saveAs } from 'file-saver'
 import loadMonaco from '@/utils/loadMonaco'
@@ -133,7 +133,7 @@ export default {
 <style lang="scss" scoped>
 @import '@/styles/mixin.scss';
 
-::v-deep .el-drawer__header {
+:deep(.el-drawer__header) {
   display: none;
 }
 @include action-bar;

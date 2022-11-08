@@ -48,7 +48,7 @@ service.interceptors.request.use(
     // 设置租户
     if (tenantEnable) {
       const tenantId = getTenantId()
-      if (tenantId) (config as Recordable).headers.common['tenant-id'] = tenantId
+      if (tenantId) service.defaults.headers.common['tenant-id'] = tenantId
     }
     const params = config.params || {}
     const data = config.data || false
@@ -94,7 +94,7 @@ service.interceptors.request.use(
 
 // response 拦截器
 service.interceptors.response.use(
-  async (response: AxiosResponse<Recordable>) => {
+  async (response: AxiosResponse<any>) => {
     const { data } = response
     const config = response.config
     if (!data) {
@@ -104,7 +104,6 @@ service.interceptors.response.use(
     const { t } = useI18n()
     // 未设置状态码则默认成功状态
     const code = data.code || result_code
-    // 二进制数据则直接返回
     if (
       response.request.responseType === 'blob' ||
       response.request.responseType === 'arraybuffer'
@@ -126,10 +125,11 @@ service.interceptors.response.use(
         }
         // 2. 进行刷新访问令牌
         try {
-          const refreshTokenRes = await refreshToken()
+          const refreshTokenRes = refreshToken()
           // 2.1 刷新成功，则回放队列的请求 + 当前请求
-          setToken(refreshTokenRes.data.data)
+          setToken((await refreshTokenRes).data.data)
           config.headers!.Authorization = 'Bearer ' + getAccessToken()
+          service.defaults.headers.Authorization = 'Bearer ' + getAccessToken()
           requestList.forEach((cb: any) => {
             cb()
           })

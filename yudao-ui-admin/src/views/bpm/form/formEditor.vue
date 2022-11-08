@@ -151,9 +151,7 @@ import RightPanel from '@/views/infra/build/RightPanel'
 import {
   inputComponents, selectComponents, layoutComponents, formConf
 } from '@/components/generator/config'
-import {
-  exportDefault, beautifierConf, isNumberStr, titleCase, deepClone, isObjectObject
-} from '@/utils/index'
+import {beautifierConf, titleCase, deepClone, isObjectObject} from '@/utils'
 import {
   makeUpHtml, vueTemplate, vueScript, cssStyle
 } from '@/components/generator/html'

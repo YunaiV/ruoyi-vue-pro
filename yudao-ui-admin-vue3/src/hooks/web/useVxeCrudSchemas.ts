@@ -3,6 +3,7 @@ import { getIntDictOptions } from '@/utils/dict'
 import { reactive } from 'vue'
 import {
   FormItemRenderOptions,
+  VxeColumnPropTypes,
   VxeFormItemProps,
   VxeGridPropTypes,
   VxeTableDefines
@@ -10,15 +11,18 @@ import {
 import { eachTree } from 'xe-utils'
 import { useI18n } from '@/hooks/web/useI18n'
 import { VxeTableColumn } from '@/types/table'
+import { FormSchema } from '@/types/form'
+import { ComponentOptions } from '@/types/components'
 
 export type VxeCrudSchema = Omit<VxeTableColumn, 'children'> & {
   field: string
   title?: string
+  formatter?: VxeColumnPropTypes.Formatter
   search?: CrudSearchParams
   table?: CrudTableParams
   form?: CrudFormParams
   detail?: CrudDescriptionsParams
-  print?: boolean
+  print?: CrudPrintParams
   children?: VxeCrudSchema[]
   dictType?: string
 }
@@ -35,17 +39,22 @@ type CrudTableParams = {
 type CrudFormParams = {
   // 是否显示表单项
   show?: boolean
-} & Omit<VxeFormItemProps, 'field'>
+} & Omit<FormSchema, 'field'>
 
 type CrudDescriptionsParams = {
   // 是否显示表单项
   show?: boolean
 } & Omit<DescriptionsSchema, 'field'>
 
-interface VxeAllSchemas {
+type CrudPrintParams = {
+  // 是否显示表单项
+  show?: boolean
+} & Omit<VxeTableDefines.ColumnInfo[], 'field'>
+
+export type VxeAllSchemas = {
   searchSchema: VxeFormItemProps[]
   tableSchema: VxeGridPropTypes.Columns
-  formSchema: VxeFormItemProps[]
+  formSchema: FormSchema[]
   detailSchema: DescriptionsSchema[]
   printSchema: VxeTableDefines.ColumnInfo[]
 }
@@ -155,6 +164,9 @@ const filterTableSchema = (crudSchema: VxeCrudSchema[]): VxeGridPropTypes.Column
         field: schemaItem.field,
         title: schemaItem.table?.title || schemaItem.title
       }
+      if (schemaItem?.formatter) {
+        tableSchemaItem.formatter = schemaItem.formatter
+      }
 
       // 删除不必要的字段
       delete tableSchemaItem.show
@@ -166,32 +178,31 @@ const filterTableSchema = (crudSchema: VxeCrudSchema[]): VxeGridPropTypes.Column
 }
 
 // 过滤 form 结构
-const filterFormSchema = (crudSchema: VxeCrudSchema[]): VxeFormItemProps[] => {
-  const formSchema: VxeFormItemProps[] = []
-  const { t } = useI18n()
+const filterFormSchema = (crudSchema: VxeCrudSchema[]): FormSchema[] => {
+  const formSchema: FormSchema[] = []
+
   eachTree(crudSchema, (schemaItem: VxeCrudSchema) => {
     // 判断是否显示
     if (schemaItem?.form?.show !== false) {
-      let itemRenderName = schemaItem?.form?.itemRender?.name || '$input'
-      let itemRender: FormItemRenderOptions = {
-        name: itemRenderName,
-        props: { placeholder: t('common.inputText') }
-      }
+      let component = schemaItem?.form?.component || 'Input'
+      const options: ComponentOptions[] = []
+      let comonentProps = {}
       if (schemaItem.dictType) {
-        if (!(schemaItem.form && schemaItem.form.itemRender?.name)) itemRenderName = '$select'
-        itemRender = {
-          name: itemRenderName,
-          options: getIntDictOptions(schemaItem.dictType),
-          props: { placeholder: t('common.selectText') }
+        getIntDictOptions(schemaItem.dictType).forEach((dict) => {
+          options.push(dict)
+        })
+        comonentProps = {
+          options: options
         }
+        if (!(schemaItem.form && schemaItem.form.component)) component = 'Select'
       }
       const formSchemaItem = {
         // 默认为 input
-        itemRender: itemRender,
+        component: component,
+        componentProps: comonentProps,
         ...schemaItem.form,
-        span: schemaItem.form?.span || 12,
         field: schemaItem.field,
-        title: schemaItem.form?.title || schemaItem.title
+        label: schemaItem.form?.label || schemaItem.title
       }
 
       // 删除不必要的字段
@@ -233,7 +244,7 @@ const filterPrintSchema = (crudSchema: VxeCrudSchema[]): any[] => {
 
   eachTree(crudSchema, (schemaItem: VxeCrudSchema) => {
     // 判断是否显示
-    if (schemaItem?.detail?.show !== false) {
+    if (schemaItem?.print?.show !== false) {
       const printSchemaItem = {
         field: schemaItem.field
       }

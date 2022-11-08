@@ -125,7 +125,7 @@ const handleLogin = async (params) => {
       redirect.value = '/'
     }
     push({ path: redirect.value || permissionStore.addRouters[0].path })
-  } finally {
+  } catch {
     loginLoading.value = false
   }
 }

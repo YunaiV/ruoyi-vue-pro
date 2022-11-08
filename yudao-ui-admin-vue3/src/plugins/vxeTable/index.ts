@@ -72,7 +72,6 @@ VXETable.setup({
   grid: {
     toolbarConfig: {
       refresh: true,
-      import: true,
       export: true,
       print: true,
       zoom: true,

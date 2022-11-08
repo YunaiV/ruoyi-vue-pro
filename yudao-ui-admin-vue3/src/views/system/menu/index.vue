@@ -318,8 +318,8 @@ const queryParams = reactive({
   status: null
 })
 const getList = async () => {
-  statusOption.value = getIntDictOptions(DICT_TYPE.COMMON_STATUS)
   tableLoading.value = true
+  statusOption.value = getIntDictOptions(DICT_TYPE.COMMON_STATUS)
   const res = await MenuApi.getMenuListApi(queryParams)
   tableData.value = res
   tableLoading.value = false
