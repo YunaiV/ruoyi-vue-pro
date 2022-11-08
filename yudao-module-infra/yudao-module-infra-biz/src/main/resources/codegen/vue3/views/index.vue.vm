@@ -97,17 +97,20 @@ getList()
   <ContentWrap>
     <!-- 操作工具栏 -->
     <div class="mb-10px">
-      <el-button type="primary" v-hasPermi="['${permissionPrefix}:create']" @click="handleCreate">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
-      <el-button
+      <XButton
+        type="primary"
+        preIcon="ep:zoom-in"
+        :title="t('action.add')"
+        v-hasPermi="['${permissionPrefix}:create']"
+        @click="handleCreate()"
+      />
+      <XButton
         type="warning"
+        preIcon="ep:download"
+        :title="t('action.export')"
         v-hasPermi="['${permissionPrefix}:export']"
-        :loading="tableObject.exportLoading"
         @click="exportList('数据.xls')"
-      >
-        <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
-      </el-button>
+      />
     </div>
     <!-- 列表 -->
     <Table
@@ -137,30 +140,30 @@ getList()
 #end
 #end
       <template #action="{ row }">
-        <el-button
+        <XButton
           link
           type="primary"
+          preIcon="ep:edit"
+          :title="t('action.edit')"
           v-hasPermi="['${permissionPrefix}:update']"
-          @click="handleUpdate(row)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button
+          @click="handleUpdate(row.id)"
+        />
+        <XButton
           link
           type="primary"
+          preIcon="ep:view"
+          :title="t('action.detail')"
           v-hasPermi="['${permissionPrefix}:update']"
           @click="handleDetail(row)"
-        >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-        <el-button
+        />
+        <XButton
           link
           type="primary"
+          preIcon="ep:delete"
+          :title="t('action.del')"
           v-hasPermi="['${permissionPrefix}:delete']"
-          @click="delList(row.id, false)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
+          @click="handleDelete(row.id)"
+        />
       </template>
     </Table>
   </ContentWrap>
@@ -196,15 +199,14 @@ getList()
     </Descriptions>
     <!-- 操作按钮 -->
     <template #footer>
-      <el-button
+      <XButton
         v-if="['create', 'update'].includes(actionType)"
-        type="primary"
         :loading="actionLoading"
+        :title="t('action.save')"
+        type="primary"
         @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
+      />
+      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
   </Dialog>
 </template>
