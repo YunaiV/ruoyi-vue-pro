@@ -70,13 +70,13 @@ public class TradeOrderItemDO extends BaseDO {
      * 购买数量
      */
     private Integer count;
-    /**
-     * 是否评论 TODO
-     *
-     * false - 未评论
-     * true - 已评论
-     */
-    private Boolean commented;
+//    /**
+//     * 是否评论 TODO
+//     *
+//     * false - 未评论
+//     * true - 已评论
+//     */
+//    private Boolean commented;
 
     // ========== 价格 + 支付基本信息 ==========
 
@@ -138,19 +138,19 @@ public class TradeOrderItemDO extends BaseDO {
      * 枚举 {@link TradeOrderItemRefundStatusEnum}
      */
     private Integer refundStatus; // TODO 芋艿：可以考虑去查
-    // 如上字段，举个例子：
-    // 假设购买三个，即 stock = 3 。
-    // originPrice = 15
-    // 使用限时折扣（单品优惠）8 折，buyPrice = 12
-    // 开始算总的价格
-    // buyTotal = buyPrice * stock = 12 * 3 = 36
-    // discountTotal ，假设有满减送（分组优惠）满 20 减 10 ，并且使用优惠劵满 1.01 减 1 ，则 discountTotal = 10 + 1 = 11
-    // presentTotal = buyTotal - discountTotal = 24 - 11 = 13
-    // 最终 presentPrice = presentTotal / stock = 13 / 3 = 4.33
-    /**
-     * 退款总金额，单位：分 TODO
-     */
-    private Integer refundTotal;
+//    // 如上字段，举个例子：
+//    // 假设购买三个，即 stock = 3 。
+//    // originPrice = 15
+//    // 使用限时折扣（单品优惠）8 折，buyPrice = 12
+//    // 开始算总的价格
+//    // buyTotal = buyPrice * stock = 12 * 3 = 36
+//    // discountTotal ，假设有满减送（分组优惠）满 20 减 10 ，并且使用优惠劵满 1.01 减 1 ，则 discountTotal = 10 + 1 = 11
+//    // presentTotal = buyTotal - discountTotal = 24 - 11 = 13
+//    // 最终 presentPrice = presentTotal / stock = 13 / 3 = 4.33
+//    /**
+//     * 退款总金额，单位：分 TODO
+//     */
+//    private Integer refundTotal;
 
     /**
      * 商品属性

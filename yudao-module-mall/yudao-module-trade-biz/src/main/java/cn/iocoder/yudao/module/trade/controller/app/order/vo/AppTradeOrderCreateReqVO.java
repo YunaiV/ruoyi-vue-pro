@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class AppTradeOrderCreateReqVO {
 
     @ApiModelProperty(name = "收件地址编号", required = true, example = "1")
     @NotNull(message = "收件地址不能为空")
-    private Integer addressId;
+    private Long addressId;
 
     @ApiModelProperty(name = "优惠劵编号", example = "1024")
     private Long couponId;
@@ -29,7 +30,7 @@ public class AppTradeOrderCreateReqVO {
     /**
      * 订单商品项列表
      */
-    @NotNull(message = "必须选择购买的商品")
+    @NotEmpty(message = "必须选择购买的商品")
     private List<Item> items;
 
     @ApiModel(value = "订单商品项")

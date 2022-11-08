@@ -116,7 +116,8 @@ public class PriceServiceImpl implements PriceService {
                 assert originPrice != null;
                 if (originPrice < coupon.getUsePrice()) {
                     return couponMeetRespDTO.setMeet(false)
-                            .setMeetTip(String.format("差 %s 元可用优惠劵", formatPrice(coupon.getUsePrice() - originPrice)));
+//                            .setMeetTip(String.format("差 %s 元可用优惠劵", formatPrice(coupon.getUsePrice() - originPrice)));
+                            .setMeetTip("所结算的商品中未满足使用的金额");
                 }
             } catch (ServiceException serviceException) {
                 couponMeetRespDTO.setMeet(false);

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.product.api.spu;
 
-import cn.iocoder.yudao.module.product.api.spu.dto.SpuInfoRespDTO;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +19,6 @@ public interface ProductSpuApi {
      * @param ids SPU 编号列表
      * @return SPU 数组
      */
-    List<SpuInfoRespDTO> getSpuList(Collection<Long> ids);
+    List<ProductSpuRespDTO> getSpuList(Collection<Long> ids);
 
 }

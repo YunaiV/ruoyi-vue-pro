@@ -22,17 +22,17 @@ public interface ErrorCodeConstants {
 
     // ========== Coupon 相关 1003003000 ============
     ErrorCode COUPON_NO_MATCH_SPU = new ErrorCode(1003003000, "优惠劵没有可使用的商品！");
-    ErrorCode COUPON_NO_MATCH_MIN_PRICE = new ErrorCode(1003003000, "不满足优惠劵使用的最低金额");
+    ErrorCode COUPON_NO_MATCH_MIN_PRICE = new ErrorCode(1003003000, "所结算的商品中未满足使用的金额");
 
     // ========== 优惠劵模板 1003004000 ==========
     ErrorCode COUPON_TEMPLATE_NOT_EXISTS = new ErrorCode(1003004000, "优惠劵模板不存在");
     ErrorCode COUPON_TEMPLATE_TOTAL_COUNT_TOO_SMALL = new ErrorCode(1003004001, "发放数量不能小于已领取数量({})");
 
     // ========== 优惠劵模板 1003005000 ==========
-    ErrorCode COUPON_NOT_EXISTS = new ErrorCode(1003005000, "优惠劵不存在");
+    ErrorCode COUPON_NOT_EXISTS = new ErrorCode(1003005000, "优惠券不存在");
     ErrorCode COUPON_DELETE_FAIL_USED = new ErrorCode(1003005001, "回收优惠劵失败，优惠劵已被使用");
     ErrorCode COUPON_STATUS_NOT_UNUSED = new ErrorCode(1006003003, "优惠劵不处于待使用状态");
-    ErrorCode COUPON_VALID_TIME_NOT_NOW = new ErrorCode(1006003004, "优惠劵不在有效期内");
+    ErrorCode COUPON_VALID_TIME_NOT_NOW = new ErrorCode(1006003004, "优惠券不在使用时间范围内");
 
     // ========== 满减送活动 1003006000 ==========
     ErrorCode REWARD_ACTIVITY_NOT_EXISTS = new ErrorCode(1003006000, "满减送活动不存在");

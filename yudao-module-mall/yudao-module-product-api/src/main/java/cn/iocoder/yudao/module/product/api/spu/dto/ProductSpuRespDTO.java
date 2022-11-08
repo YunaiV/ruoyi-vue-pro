@@ -9,11 +9,13 @@ import java.util.List;
 
 // TODO @LeeYan9: ProductSpuRespDTO
 /**
+ * 商品 SPU 信息 Response DTO
+ *
  * @author LeeYan9
  * @since 2022-08-26
  */
 @Data
-public class SpuInfoRespDTO {
+public class ProductSpuRespDTO {
 
     /**
      * 商品 SPU 编号，自增
