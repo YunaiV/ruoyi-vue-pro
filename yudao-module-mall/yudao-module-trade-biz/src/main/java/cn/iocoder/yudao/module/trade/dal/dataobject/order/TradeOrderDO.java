@@ -116,7 +116,7 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 商品原价（总），单位：分
      *
-     * 基于 {@link TradeOrderItemDO#getTotalOriginalPrice()} 求和
+     * 基于 {@link TradeOrderItemDO#getOriginalPrice()} 求和
      *
      * 对应 taobao 的 trade.total_fee 字段
      */
@@ -207,7 +207,7 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 收件人地区编号
      */
-    private Integer receiverAreaId;
+    private Long receiverAreaId;
     /**
      * 收件人邮编
      */

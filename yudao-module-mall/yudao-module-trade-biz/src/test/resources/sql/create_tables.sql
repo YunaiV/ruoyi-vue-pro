@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS "trade_order" (
      "pay_price" int NOT NULL,
      "pay_order_id" int,
      "pay_channel" int,
-     "delivery_templateid" int,
+     "delivery_template_id" int,
      "express_no" int,
      "delivery_status" bit NOT NULL,
      "delivery_time" datetime,

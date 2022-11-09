@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
@@ -13,8 +14,14 @@ import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.promotion.api.price.PriceApi;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.orderitem.TradeOrderItemMapper;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,10 +29,12 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -66,16 +75,18 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
     public void testCreateTradeOrder_success() {
         // 准备参数
         Long userId = 100L;
-        String clientIp = "127.0.0.1";
+        String userIp = "127.0.0.1";
         AppTradeOrderCreateReqVO reqVO = new AppTradeOrderCreateReqVO()
                 .setAddressId(10L).setCouponId(101L).setRemark("我是备注").setFromCart(true)
                 .setItems(Arrays.asList(new AppTradeOrderCreateReqVO.Item().setSkuId(1L).setCount(3),
                         new AppTradeOrderCreateReqVO.Item().setSkuId(2L).setCount(4)));
         // mock 方法（商品 SKU 检查）
         ProductSkuRespDTO sku01 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(1L).setSpuId(11L)
-                .setPrice(50).setStock(100).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+                .setPrice(50).setStock(100).setStatus(CommonStatusEnum.ENABLE.getStatus())
+                .setProperties(singletonList(new ProductSkuRespDTO.Property().setPropertyId(111L).setValueId(222L))));
         ProductSkuRespDTO sku02 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(2L).setSpuId(21L)
-                .setPrice(20).setStock(50).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+                .setPrice(20).setStock(50).setStatus(CommonStatusEnum.ENABLE.getStatus()))
+                .setProperties(singletonList(new ProductSkuRespDTO.Property().setPropertyId(333L).setValueId(444L)));
         when(productSkuApi.getSkuList(eq(asSet(1L, 2L)))).thenReturn(Arrays.asList(sku01, sku02));
         // mock 方法（商品 SPU 检查）
         ProductSpuRespDTO spu01 = randomPojo(ProductSpuRespDTO.class, o -> o.setId(11L)
@@ -109,35 +120,94 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         }))).thenReturn(new PriceCalculateRespDTO().setOrder(priceOrder));
 
         // 调用方法
-        Long tradeOrderId = tradeOrderService.createTradeOrder(userId, clientIp, reqVO);
-        System.out.println(tradeOrderId);
-
-//        // mock 价格信息
-//        PriceCalculateRespDTO calculateRespDTO = randomPojo(PriceCalculateRespDTO.class, priceCalculateRespDTO -> {
-//            PriceCalculateRespDTO.OrderItem item = priceCalculateRespDTO.getOrder().getItems().get(0);
-//            item.setSkuId(1L);
-//            item.setCount(2);
-//            priceCalculateRespDTO.getOrder().setItems(Collections.singletonList(item));
-//        });
-//        when(priceApi.calculatePrice(any())).thenReturn(calculateRespDTO);
+        Long tradeOrderId = tradeOrderService.createTradeOrder(userId, userIp, reqVO);
+        // 断言 TradeOrderDO 订单
+        List<TradeOrderDO> tradeOrderDOs = tradeOrderMapper.selectList();
+        assertEquals(tradeOrderDOs.size(), 1);
+        TradeOrderDO tradeOrderDO = tradeOrderDOs.get(0);
+        assertEquals(tradeOrderDO.getId(), tradeOrderId);
+        assertNotNull(tradeOrderDO.getNo());
+        assertEquals(tradeOrderDO.getType(), TradeOrderTypeEnum.NORMAL.getType());
+        assertEquals(tradeOrderDO.getTerminal(), TerminalEnum.H5.getTerminal());
+        assertEquals(tradeOrderDO.getUserId(), userId);
+        assertEquals(tradeOrderDO.getUserIp(), userIp);
+        assertEquals(tradeOrderDO.getStatus(), TradeOrderStatusEnum.WAITING_PAYMENT.getStatus());
+        assertEquals(tradeOrderDO.getProductCount(), 7);
+        assertNull(tradeOrderDO.getFinishTime());
+        assertNull(tradeOrderDO.getCancelTime());
+        assertNull(tradeOrderDO.getCancelType());
+        assertEquals(tradeOrderDO.getUserRemark(), "我是备注");
+        assertNull(tradeOrderDO.getRemark());
+        assertFalse(tradeOrderDO.getPayed());
+        assertNull(tradeOrderDO.getPayTime());
+        assertEquals(tradeOrderDO.getOriginalPrice(), 230);
+        assertEquals(tradeOrderDO.getOrderPrice(), 100);
+        assertEquals(tradeOrderDO.getDiscountPrice(), 0);
+        assertEquals(tradeOrderDO.getAdjustPrice(), 0);
+        assertEquals(tradeOrderDO.getPayPrice(), 80);
+        assertNull(tradeOrderDO.getPayOrderId());
+        assertNull(tradeOrderDO.getPayChannel());
+        assertNull(tradeOrderDO.getDeliveryTemplateId());
+        assertNull(tradeOrderDO.getExpressNo());
+        assertFalse(tradeOrderDO.getDeliveryStatus());
+        assertNull(tradeOrderDO.getDeliveryTime());
+        assertNull(tradeOrderDO.getReceiveTime());
+        assertEquals(tradeOrderDO.getReceiverName(), "芋艿");
+        assertEquals(tradeOrderDO.getReceiverMobile(), "15601691300");
+        assertEquals(tradeOrderDO.getReceiverAreaId(), 3306L);
+        assertEquals(tradeOrderDO.getReceiverPostCode(), 85757);
+        assertEquals(tradeOrderDO.getReceiverDetailAddress(), "土豆村");
+        assertEquals(tradeOrderDO.getRefundStatus(), TradeOrderRefundStatusEnum.NONE.getStatus());
+        assertEquals(tradeOrderDO.getRefundPrice(), 0);
+        assertEquals(tradeOrderDO.getCouponPrice(), 30);
+        assertEquals(tradeOrderDO.getPointPrice(), 10);
+        // 断言 TradeOrderItemDO 订单（第 1 个）
+        List<TradeOrderItemDO> tradeOrderItemDOs = tradeOrderItemMapper.selectList();
+        assertEquals(tradeOrderItemDOs.size(), 2);
+        TradeOrderItemDO tradeOrderItemDO01 = tradeOrderItemDOs.get(0);
+        assertNotNull(tradeOrderItemDO01.getId());
+        assertEquals(tradeOrderItemDO01.getUserId(), userId);
+        assertEquals(tradeOrderItemDO01.getOrderId(), tradeOrderId);
+        assertEquals(tradeOrderItemDO01.getSpuId(), 11L);
+        assertEquals(tradeOrderItemDO01.getSkuId(), 1L);
+        assertEquals(tradeOrderItemDO01.getProperties().size(), 1);
+        assertEquals(tradeOrderItemDO01.getProperties().get(0).getPropertyId(), 111L);
+        assertEquals(tradeOrderItemDO01.getProperties().get(0).getValueId(), 222L);
+        assertEquals(tradeOrderItemDO01.getName(), sku01.getName());
+        assertEquals(tradeOrderItemDO01.getPicUrl(), sku01.getPicUrl());
+        assertEquals(tradeOrderItemDO01.getCount(), 3);
+        assertEquals(tradeOrderItemDO01.getOriginalPrice(), 150);
+        assertEquals(tradeOrderItemDO01.getOriginalUnitPrice(), 50);
+        assertEquals(tradeOrderItemDO01.getDiscountPrice(), 20);
+        assertEquals(tradeOrderItemDO01.getPayPrice(), 130);
+        assertEquals(tradeOrderItemDO01.getOrderPartPrice(), 7);
+        assertEquals(tradeOrderItemDO01.getOrderDividePrice(), 35);
+        assertEquals(tradeOrderItemDO01.getRefundStatus(), TradeOrderItemRefundStatusEnum.NONE.getStatus());
+        assertEquals(tradeOrderItemDO01.getRefundTotal(), 0);
+        // 断言 TradeOrderItemDO 订单（第 2 个）
+        TradeOrderItemDO tradeOrderItemDO02 = tradeOrderItemDOs.get(1);
+        assertNotNull(tradeOrderItemDO02.getId());
+        assertEquals(tradeOrderItemDO02.getUserId(), userId);
+        assertEquals(tradeOrderItemDO02.getOrderId(), tradeOrderId);
+        assertEquals(tradeOrderItemDO02.getSpuId(), 21L);
+        assertEquals(tradeOrderItemDO02.getSkuId(), 2L);
+        assertEquals(tradeOrderItemDO02.getProperties().size(), 1);
+        assertEquals(tradeOrderItemDO02.getProperties().get(0).getPropertyId(), 333L);
+        assertEquals(tradeOrderItemDO02.getProperties().get(0).getValueId(), 444L);
+        assertEquals(tradeOrderItemDO02.getName(), sku02.getName());
+        assertEquals(tradeOrderItemDO02.getPicUrl(), sku02.getPicUrl());
+        assertEquals(tradeOrderItemDO02.getCount(), 4);
+        assertEquals(tradeOrderItemDO02.getOriginalPrice(), 80);
+        assertEquals(tradeOrderItemDO02.getOriginalUnitPrice(), 20);
+        assertEquals(tradeOrderItemDO02.getDiscountPrice(), 40);
+        assertEquals(tradeOrderItemDO02.getPayPrice(), 40);
+        assertEquals(tradeOrderItemDO02.getOrderPartPrice(), 15);
+        assertEquals(tradeOrderItemDO02.getOrderDividePrice(), 25);
+        assertEquals(tradeOrderItemDO02.getRefundStatus(), TradeOrderItemRefundStatusEnum.NONE.getStatus());
+        assertEquals(tradeOrderItemDO02.getRefundTotal(), 0);
 //        //mock 支付订单信息
 //        when(payOrderApi.createPayOrder(any())).thenReturn(1L);
 
-
-//        // 创建交易订单,支付订单记录
-//        Long payOrderId = tradeOrderService.createTradeOrder(1L, "127.0.0.1", tradeOrderCreateReqVO);
-//        //断言交易订单
-//        TradeOrderDO tradeOrderDO = tradeOrderMapper.selectOne(TradeOrderDO::getUserId, 1L);
-//        assertNotNull(tradeOrderDO);
-//        //价格&用户
-//        assertEquals(calculateRespDTO.getOrder().getPayPrice(), tradeOrderDO.getPayPrice());
-//        assertEquals(1L, tradeOrderDO.getUserId());
-//        //断言交易订单项
-//        TradeOrderItemDO tradeOrderItemDO = tradeOrderItemMapper.selectOne(TradeOrderItemDO::getOrderId, tradeOrderDO.getId());
-//        assertNotNull(tradeOrderDO);
-//        //商品&用户
-//        assertEquals(skuInfoRespDTO.getId(), tradeOrderItemDO.getSkuId());
-//        assertEquals(1L, tradeOrderItemDO.getUserId());
 //        //价格
 //        assertEquals(calculateRespDTO.getOrder().getItems().get(0).getPresentPrice(), tradeOrderItemDO.getPresentPrice());
     }
