@@ -181,10 +181,10 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件     | 1.2.14      | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包       | 3.5.2       | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
 | [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源               | 3.5.2       | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [Redis](https://redis.io/)                                                                  | key-value 数据库        | 5.0         |                                                                |
+| [Redis](https://redis.io/)                                                                  | key-value 数据库        | 5.0 / 6.0   |                                                                |
 | [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端            | 3.17.7      | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
-| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架               | 5.3.20      | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
-| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架         | 5.6.7       | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
+| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架               | 5.3.23      | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
+| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架         | 5.6.8       | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
 | [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件             | 6.2.3       | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
 | [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎               | 6.7.2       | [文档](https://doc.iocoder.cn/bpm/)                                                     |
 | [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件             | 2.3.2       | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
@@ -200,18 +200,18 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 ### [管理后台 Vue2 前端](./yudao-ui-admin)
 
-| 框架                                                                           | 说明            | 版本     |
-|------------------------------------------------------------------------------|---------------|--------|
-| [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.6.12 |
-| [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -      |
+| 框架                                                                           | 说明            | 版本    |
+|------------------------------------------------------------------------------|---------------|-------|
+| [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.7.0 |
+| [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -     |
 
 ### [管理后台 Vue3 前端](./yudao-ui-admin-vue3)
 
 | 框架                                                                  | 说明             | 版本     |
 |----------------------------------------------------------------------|-----------------|--------|
 | [Vue](https://staging-cn.vuejs.org/)                                 | Vue 框架         | 3.2.41 |
-| [Vite](https://cn.vitejs.dev//)                                      | 开发与构建工具     | 3.2.2  |
-| [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus    | 2.2.19 |
+| [Vite](https://cn.vitejs.dev//)                                      | 开发与构建工具     | 3.2.3  |
+| [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus    | 2.2.20 |
 | [TypeScript](https://www.typescriptlang.org/docs/)                   | TypeScript      | 4.8.4  |
 | [pinia](https://pinia.vuejs.org/)                                    | vuex5           | 2.0.23 |
 | [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化             | 9.2.2  |
