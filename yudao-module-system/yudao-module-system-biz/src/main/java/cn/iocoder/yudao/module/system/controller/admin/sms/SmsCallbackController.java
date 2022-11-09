@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -28,6 +29,7 @@ public class SmsCallbackController {
     private SmsSendService smsSendService;
 
     @PostMapping("/yunpian")
+    @PermitAll
     @ApiOperation(value = "云片短信的回调", notes = "参见 https://www.yunpian.com/official/document/sms/zh_cn/domestic_push_report 文档")
     @ApiImplicitParam(name = "sms_status", value = "发送状态", required = true, example = "[{具体内容}]", dataTypeClass = String.class)
     @OperateLog(enable = false)
@@ -38,6 +40,7 @@ public class SmsCallbackController {
     }
 
     @PostMapping("/aliyun")
+    @PermitAll
     @ApiOperation(value = "阿里云短信的回调", notes = "参见 https://help.aliyun.com/document_detail/120998.html 文档")
     @OperateLog(enable = false)
     public CommonResult<Boolean> receiveAliyunSmsStatus(HttpServletRequest request) throws Throwable {
@@ -47,6 +50,7 @@ public class SmsCallbackController {
     }
 
     @PostMapping("/tencent")
+    @PermitAll
     @ApiOperation(value = "腾讯云短信的回调", notes = "参见 https://cloud.tencent.com/document/product/382/52077 文档")
     @OperateLog(enable = false)
     public CommonResult<Boolean> receiveTencentSmsStatus(HttpServletRequest request) throws Throwable {

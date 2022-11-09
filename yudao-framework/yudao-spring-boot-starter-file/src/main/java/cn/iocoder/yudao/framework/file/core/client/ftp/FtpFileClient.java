@@ -10,7 +10,6 @@ import cn.iocoder.yudao.framework.file.core.client.AbstractFileClient;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 
 /**
  * Ftp 文件客户端

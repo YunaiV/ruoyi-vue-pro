@@ -14,8 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -132,8 +134,7 @@ public class TestDemoServiceImplTest extends BaseDbUnitTest {
         reqVO.setType(1);
         reqVO.setCategory(2);
         reqVO.setRemark("哈哈哈");
-        reqVO.setBeginCreateTime(DateUtils.buildTime(2021, 11, 10));
-        reqVO.setEndCreateTime(DateUtils.buildTime(2021, 11, 12));
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 11, 10),buildTime(2021, 11, 12)}));
 
         // 调用
         PageResult<TestDemoDO> pageResult = testDemoService.getTestDemoPage(reqVO);
@@ -174,8 +175,7 @@ public class TestDemoServiceImplTest extends BaseDbUnitTest {
         reqVO.setType(1);
         reqVO.setCategory(2);
         reqVO.setRemark("哈哈哈");
-        reqVO.setBeginCreateTime(DateUtils.buildTime(2021, 11, 10));
-        reqVO.setEndCreateTime(DateUtils.buildTime(2021, 11, 12));
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 11, 10),buildTime(2021, 11, 12)}));
 
         // 调用
         List<TestDemoDO> list = testDemoService.getTestDemoList(reqVO);

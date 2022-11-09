@@ -2,6 +2,12 @@ package ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.busines
 
 import lombok.*;
 import java.util.*;
+#foreach ($column in $columns)
+#if (${column.javaType} == "BigDecimal")
+import java.math.BigDecimal;
+#break
+#end
+#end
 import com.baomidou.mybatisplus.annotation.*;
 import ${BaseDOClassName};
 

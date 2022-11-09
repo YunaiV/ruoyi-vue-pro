@@ -230,8 +230,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
        reqVO.setContent("芋道");
        reqVO.setApiTemplateId("yu");
        reqVO.setChannelId(1L);
-       reqVO.setBeginCreateTime(buildTime(2021, 11, 1));
-       reqVO.setEndCreateTime(buildTime(2021, 12, 1));
+       reqVO.setCreateTime((new Date[]{buildTime(2021, 11, 1),buildTime(2021, 12, 1)}));
 
        // 调用
        PageResult<SmsTemplateDO> pageResult = smsTemplateService.getSmsTemplatePage(reqVO);
@@ -276,8 +275,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
         reqVO.setContent("芋道");
         reqVO.setApiTemplateId("yu");
         reqVO.setChannelId(1L);
-        reqVO.setBeginCreateTime(buildTime(2021, 11, 1));
-        reqVO.setEndCreateTime(buildTime(2021, 12, 1));
+        reqVO.setCreateTime((new Date[]{buildTime(2021, 11, 1),buildTime(2021, 12, 1)}));
 
        // 调用
        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplateList(reqVO);

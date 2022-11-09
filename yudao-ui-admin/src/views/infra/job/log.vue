@@ -77,7 +77,7 @@
             <el-form-item label="处理器的参数：">{{ form.handlerParam }}</el-form-item>
             <el-form-item label="第几次执行：">{{ form.executeIndex }}</el-form-item>
             <el-form-item label="执行时间：">{{ parseTime(form.beginTime) + ' ~ ' + parseTime(form.endTime) }}</el-form-item>
-            <el-form-item label="执行时长：">{{ parseTime(form.duration) + ' 毫秒' }}</el-form-item>
+            <el-form-item label="执行时长：">{{ form.duration + ' 毫秒' }}</el-form-item>
             <el-form-item label="任务状态：">
               <dict-tag :type="DICT_TYPE.INFRA_JOB_LOG_STATUS" :value="form.status" />
             </el-form-item>

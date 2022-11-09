@@ -12,8 +12,8 @@ import java.util.Set;
 @Data
 public class PermissionAssignUserRoleReqVO {
 
-    @ApiModelProperty(value = "角色编号", required = true, example = "1")
-    @NotNull(message = "角色编号不能为空")
+    @ApiModelProperty(value = "用户编号", required = true, example = "1")
+    @NotNull(message = "用户编号不能为空")
     private Long userId;
 
     @ApiModelProperty(value = "角色编号列表", example = "1,3,5")

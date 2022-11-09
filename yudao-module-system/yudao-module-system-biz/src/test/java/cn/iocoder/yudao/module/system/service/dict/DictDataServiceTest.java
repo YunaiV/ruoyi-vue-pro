@@ -1,36 +1,32 @@
 package cn.iocoder.yudao.module.system.service.dict;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataUpdateReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dict.DictDataMapper;
-import cn.iocoder.yudao.module.system.mq.producer.dict.DictDataProducer;
-import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import com.google.common.collect.ImmutableTable;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static cn.hutool.core.bean.BeanUtil.getFieldValue;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @Import(DictDataServiceImpl.class)
 public class DictDataServiceTest extends BaseDbUnitTest {
@@ -42,39 +38,6 @@ public class DictDataServiceTest extends BaseDbUnitTest {
     private DictDataMapper dictDataMapper;
     @MockBean
     private DictTypeService dictTypeService;
-    @MockBean
-    private DictDataProducer dictDataProducer;
-
-    /**
-     * 测试加载到新的字典数据的情况
-     */
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testInitLocalCache() {
-        // mock 数据
-        DictDataDO dictData01 = randomDictDataDO();
-        dictDataMapper.insert(dictData01);
-        DictDataDO dictData02 = randomDictDataDO();
-        dictDataMapper.insert(dictData02);
-
-        // 调用
-        dictDataService.initLocalCache();
-        // 断言 labelDictDataCache 缓存
-        ImmutableTable<String, String, DictDataDO> labelDictDataCache =
-                (ImmutableTable<String, String, DictDataDO>) getFieldValue(dictDataService, "labelDictDataCache");
-        assertEquals(2, labelDictDataCache.size());
-        assertPojoEquals(dictData01, labelDictDataCache.get(dictData01.getDictType(), dictData01.getLabel()));
-        assertPojoEquals(dictData02, labelDictDataCache.get(dictData02.getDictType(), dictData02.getLabel()));
-        // 断言 valueDictDataCache 缓存
-        ImmutableTable<String, String, DictDataDO> valueDictDataCache =
-                (ImmutableTable<String, String, DictDataDO>) getFieldValue(dictDataService, "valueDictDataCache");
-        assertEquals(2, valueDictDataCache.size());
-        assertPojoEquals(dictData01, valueDictDataCache.get(dictData01.getDictType(), dictData01.getValue()));
-        assertPojoEquals(dictData02, valueDictDataCache.get(dictData02.getDictType(), dictData02.getValue()));
-        // 断言 maxUpdateTime 缓存
-        Date maxUpdateTime = (Date) getFieldValue(dictDataService, "maxUpdateTime");
-        assertEquals(ObjectUtils.max(dictData01.getUpdateTime(), dictData02.getUpdateTime()), maxUpdateTime);
-    }
 
     @Test
     public void testGetDictDataPage() {
@@ -148,8 +111,6 @@ public class DictDataServiceTest extends BaseDbUnitTest {
         // 校验记录的属性是否正确
         DictDataDO dictData = dictDataMapper.selectById(dictDataId);
         assertPojoEquals(reqVO, dictData);
-        // 校验调用
-        verify(dictDataProducer, times(1)).sendDictDataRefreshMessage();
     }
 
     @Test
@@ -170,8 +131,6 @@ public class DictDataServiceTest extends BaseDbUnitTest {
         // 校验是否更新正确
         DictDataDO dictData = dictDataMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, dictData);
-        // 校验调用
-        verify(dictDataProducer, times(1)).sendDictDataRefreshMessage();
     }
 
     @Test
@@ -186,8 +145,6 @@ public class DictDataServiceTest extends BaseDbUnitTest {
         dictDataService.deleteDictData(id);
         // 校验数据不存在了
         assertNull(dictDataMapper.selectById(id));
-        // 校验调用
-        verify(dictDataProducer, times(1)).sendDictDataRefreshMessage();
     }
 
     @Test

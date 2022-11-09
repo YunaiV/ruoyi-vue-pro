@@ -17,9 +17,9 @@
           <el-option :key="false" label="失败" :value="false"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="登录时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd"
-          type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
+      <el-form-item label="登录时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -81,15 +81,14 @@ export default {
       list: [],
       // 状态数据字典
       statusOptions: [],
-      // 日期范围
-      dateRange: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
         pageSize: 10,
         userIp: undefined,
         username: undefined,
-        status: undefined
+        status: undefined,
+        createTime: []
       }
     };
   },
@@ -100,10 +99,7 @@ export default {
     /** 查询登录日志列表 */
     getList() {
       this.loading = true;
-      list(this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ])).then(response => {
+      list(this.queryParams).then(response => {
           this.list = response.data.list;
           this.total = response.data.total;
           this.loading = false;
@@ -117,16 +113,18 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.queryParams;
       this.$modal.confirm('是否确认导出所有操作日志数据项?').then(() => {
+          // 处理查询参数
+          let params = {...this.queryParams};
+          params.pageNo = undefined;
+          params.pageSize = undefined;
           this.exportLoading = true;
-          return exportLoginLog(queryParams);
+          return exportLoginLog(params);
         }).then(response => {
           this.$download.excel(response, '登录日志.xls');
           this.exportLoading = false;

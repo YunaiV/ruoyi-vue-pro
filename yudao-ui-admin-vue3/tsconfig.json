@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "useDefineForClassFields": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "jsx": "preserve",
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "lib": ["esnext", "dom"],
+    "baseUrl": ".",
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "strictFunctionTypes": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "types": [
+      "@intlify/vite-plugin-vue-i18n/client",
+      "vite/client",
+      "element-plus/global",
+      "@types/intro.js",
+      "@types/qrcode",
+      "vite-plugin-svg-icons/client",
+      "unplugin-vue-macros/macros-global"
+    ],
+    "typeRoots": ["./node_modules/@types/", "./types"]
+  },
+  "include": ["src/**/*", "types/**/*.d.ts"],
+  "exclude": ["dist", "node_modules"]
+}

@@ -28,6 +28,17 @@ tenant-id: {{appTenentId}}
   "code": 9999
 }
 
+### 请求 /weixin-mini-app-login 接口 => 成功
+POST {{appApi}}/member/auth/weixin-mini-app-login
+Content-Type: application/json
+tenant-id: {{appTenentId}}
+
+{
+  "phoneCode": "618e6412e0c728f5b8fc7164497463d0158a923c9e7fd86af8bba393b9decbc5",
+  "loginCode": "001frTkl21JUf94VGxol2hSlff1frTkR"
+}
+
+
 ### 请求 /logout 接口 => 成功
 POST {{appApi}}/member/auth/logout
 Content-Type: application/json

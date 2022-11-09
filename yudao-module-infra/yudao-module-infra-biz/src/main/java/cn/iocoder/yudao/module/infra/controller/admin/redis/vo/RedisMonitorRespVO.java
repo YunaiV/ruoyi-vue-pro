@@ -34,7 +34,7 @@ public class RedisMonitorRespVO {
         private String command;
 
         @ApiModelProperty(value = "调用次数", required = true, example = "1024")
-        private Integer calls;
+        private Long calls;
 
         @ApiModelProperty(value = "消耗 CPU 秒数", required = true, example = "666")
         private Long usec;

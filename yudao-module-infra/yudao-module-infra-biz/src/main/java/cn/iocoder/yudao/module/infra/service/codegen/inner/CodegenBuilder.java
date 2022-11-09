@@ -31,7 +31,7 @@ public class CodegenBuilder {
      * 字段名与 {@link CodegenColumnListConditionEnum} 的默认映射
      * 注意，字段的匹配以后缀的方式
      */
-    private static final Map<String, CodegenColumnListConditionEnum> columnListOperationConditionMappings =
+    private static final Map<String, CodegenColumnListConditionEnum> COLUMN_LIST_OPERATION_CONDITION_MAPPINGS =
             MapUtil.<String, CodegenColumnListConditionEnum>builder()
                     .put("name", CodegenColumnListConditionEnum.LIKE)
                     .put("time", CodegenColumnListConditionEnum.BETWEEN)
@@ -42,7 +42,7 @@ public class CodegenBuilder {
      * 字段名与 {@link CodegenColumnHtmlTypeEnum} 的默认映射
      * 注意，字段的匹配以后缀的方式
      */
-    private static final Map<String, CodegenColumnHtmlTypeEnum> columnHtmlTypeMappings =
+    private static final Map<String, CodegenColumnHtmlTypeEnum> COLUMN_HTML_TYPE_MAPPINGS =
             MapUtil.<String, CodegenColumnHtmlTypeEnum>builder()
                     .put("status", CodegenColumnHtmlTypeEnum.RADIO)
                     .put("sex", CodegenColumnHtmlTypeEnum.RADIO)
@@ -143,7 +143,7 @@ public class CodegenBuilder {
         column.setListOperation(!LIST_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField())
                 && !column.getPrimaryKey()); // 对于主键，列表过滤不需要传递
         // 处理 listOperationCondition 字段
-        columnListOperationConditionMappings.entrySet().stream()
+        COLUMN_LIST_OPERATION_CONDITION_MAPPINGS.entrySet().stream()
                 .filter(entry -> StrUtil.endWithIgnoreCase(column.getJavaField(), entry.getKey()))
                 .findFirst().ifPresent(entry -> column.setListOperationCondition(entry.getValue().getCondition()));
         if (column.getListOperationCondition() == null) {
@@ -155,7 +155,7 @@ public class CodegenBuilder {
 
     private void processColumnUI(CodegenColumnDO column) {
         // 基于后缀进行匹配
-        columnHtmlTypeMappings.entrySet().stream()
+        COLUMN_HTML_TYPE_MAPPINGS.entrySet().stream()
                 .filter(entry -> StrUtil.endWithIgnoreCase(column.getJavaField(), entry.getKey()))
                 .findFirst().ifPresent(entry -> column.setHtmlType(entry.getValue().getType()));
         // 如果是 Boolean 类型时，设置为 radio 类型.

@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -43,6 +44,7 @@ public class AppAuthController {
     }
 
     @PostMapping("/logout")
+    @PermitAll
     @ApiOperation("登出系统")
     public CommonResult<Boolean> logout(HttpServletRequest request) {
         String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
@@ -104,16 +106,16 @@ public class AppAuthController {
         return CommonResult.success(authService.getSocialAuthorizeUrl(type, redirectUri));
     }
 
-    @PostMapping("/social-quick-login")
+    @PostMapping("/social-login")
     @ApiOperation(value = "社交快捷登录，使用 code 授权码", notes = "适合未登录的用户，但是社交账号已绑定用户")
-    public CommonResult<AppAuthLoginRespVO> socialQuickLogin(@RequestBody @Valid AppAuthSocialQuickLoginReqVO reqVO) {
-        return success(authService.socialQuickLogin(reqVO));
+    public CommonResult<AppAuthLoginRespVO> socialLogin(@RequestBody @Valid AppAuthSocialLoginReqVO reqVO) {
+        return success(authService.socialLogin(reqVO));
     }
 
-    @PostMapping("/social-bind-login")
-    @ApiOperation(value = "社交绑定登录，使用 手机号 + 手机验证码", notes = "适合未登录的用户，进行登录 + 绑定")
-    public CommonResult<AppAuthLoginRespVO> socialBindLogin(@RequestBody @Valid AppAuthSocialBindLoginReqVO reqVO) {
-        return success(authService.socialBindLogin(reqVO));
+    @PostMapping("/weixin-mini-app-login")
+    @ApiOperation("微信小程序的一键登录")
+    public CommonResult<AppAuthLoginRespVO> weixinMiniAppLogin(@RequestBody @Valid AppAuthWeixinMiniAppLoginReqVO reqVO) {
+        return success(authService.weixinMiniAppLogin(reqVO));
     }
 
 }

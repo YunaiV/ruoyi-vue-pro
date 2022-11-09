@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.common.util.date;
 
+import cn.hutool.core.date.DateUtil;
+
 import java.time.Duration;
 import java.util.Calendar;
 import java.util.Date;
@@ -118,6 +120,19 @@ public class DateUtils {
         }
         c.add(field, amount);
         return c.getTime();
+    }
+
+    /**
+     * 是否今天
+     *
+     * @param date 日期
+     * @return 是否
+     */
+    public static boolean isToday(Date date) {
+        if (date == null) {
+            return false;
+        }
+        return DateUtil.isSameDay(date, new Date());
     }
 
 }

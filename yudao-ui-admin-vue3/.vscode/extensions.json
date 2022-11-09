@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "voorjaar.windicss-intellisense",
+    "vscode-icons-team.vscode-icons",
+    "davidanson.vscode-markdownlint",
+    "stylelint.vscode-stylelint",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "vue.volar",
+    "lokalise.i18n-ally",
+    "mikestead.dotenv",
+    "eamodio.gitlens",
+    "antfu.iconify"
+  ]
+}

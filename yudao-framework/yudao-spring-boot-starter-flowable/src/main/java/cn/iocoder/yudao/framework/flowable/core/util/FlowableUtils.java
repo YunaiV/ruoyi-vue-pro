@@ -9,7 +9,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Flowable 相关的工具方法
+ *
+ * @author 芋道源码
+ */
 public class FlowableUtils {
+
+    // ========== User 相关的工具方法 ==========
 
     public static void setAuthenticatedUserId(Long userId) {
         Authentication.setAuthenticatedUserId(String.valueOf(userId));
@@ -18,6 +25,8 @@ public class FlowableUtils {
     public static void clearAuthenticatedUserId() {
         Authentication.setAuthenticatedUserId(null);
     }
+
+    // ========== BPMN 相关的工具方法 ==========
 
     /**
      * 获得 BPMN 流程中，指定的元素们
@@ -59,4 +68,15 @@ public class FlowableUtils {
         BpmnXMLConverter converter = new BpmnXMLConverter();
         return converter.convertToXML(model);
     }
+
+    // ========== Execution 相关的工具方法 ==========
+
+    public static String formatCollectionVariable(String activityId) {
+        return activityId + "_assignees";
+    }
+
+    public static String formatCollectionElementVariable(String activityId) {
+        return activityId + "_assignee";
+    }
+
 }

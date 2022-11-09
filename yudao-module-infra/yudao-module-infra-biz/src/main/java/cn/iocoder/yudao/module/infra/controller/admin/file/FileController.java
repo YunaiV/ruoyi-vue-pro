@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -46,7 +47,7 @@ public class FileController {
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
     public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file,
                                            @RequestParam(value = "path", required = false) String path) throws Exception {
-        return success(fileService.createFile(path, IoUtil.readBytes(file.getInputStream())));
+        return success(fileService.createFile(file.getOriginalFilename(), path, IoUtil.readBytes(file.getInputStream())));
     }
 
     @DeleteMapping("/delete")
@@ -59,6 +60,7 @@ public class FileController {
     }
 
     @GetMapping("/{configId}/get/{path}")
+    @PermitAll
     @ApiOperation("下载文件")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "configId", value = "配置编号",  required = true, dataTypeClass = Long.class),
