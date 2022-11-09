@@ -46,7 +46,7 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
     public void testUpdateSkuStock_incrSuccess() {
         // 准备参数
         ProductSkuUpdateStockReqDTO updateStockReqDTO = new ProductSkuUpdateStockReqDTO()
-                .setItems(singletonList(new ProductSkuUpdateStockReqDTO.Item().setId(1L).setIncCount(10)));
+                .setItems(singletonList(new ProductSkuUpdateStockReqDTO.Item().setId(1L).setIncrCount(10)));
         // mock 数据
         productSkuMapper.insert(randomPojo(ProductSkuDO.class, o -> o.setId(1L).setSpuId(10L).setStock(20)));
 
@@ -66,7 +66,7 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
     public void testUpdateSkuStock_decrSuccess() {
         // 准备参数
         ProductSkuUpdateStockReqDTO updateStockReqDTO = new ProductSkuUpdateStockReqDTO()
-                .setItems(singletonList(new ProductSkuUpdateStockReqDTO.Item().setId(1L).setIncCount(-10)));
+                .setItems(singletonList(new ProductSkuUpdateStockReqDTO.Item().setId(1L).setIncrCount(-10)));
         // mock 数据
         productSkuMapper.insert(randomPojo(ProductSkuDO.class, o -> o.setId(1L).setSpuId(10L).setStock(20)));
 
@@ -86,7 +86,7 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
     public void testUpdateSkuStock_decrFail() {
         // 准备参数
         ProductSkuUpdateStockReqDTO updateStockReqDTO = new ProductSkuUpdateStockReqDTO()
-                .setItems(singletonList(new ProductSkuUpdateStockReqDTO.Item().setId(1L).setIncCount(-30)));
+                .setItems(singletonList(new ProductSkuUpdateStockReqDTO.Item().setId(1L).setIncrCount(-30)));
         // mock 数据
         productSkuMapper.insert(randomPojo(ProductSkuDO.class, o -> o.setId(1L).setSpuId(10L).setStock(20)));
 

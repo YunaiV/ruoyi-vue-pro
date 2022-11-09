@@ -8,9 +8,11 @@ import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
+import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.price.PriceApi;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
@@ -24,6 +26,7 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderConfig;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatcher;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
@@ -37,6 +40,7 @@ import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -66,10 +70,8 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
     private PayOrderApi payOrderApi;
     @MockBean
     private AddressApi addressApi;
-
-    // 1, 3 个，50 块;打折 20；总和 = 60；42;
-    // 2, 4 个，20 块；打折 10；总和 = 40；28;
-    // 优惠劵，满 100 减 30
+    @MockBean
+    private CouponApi couponApi;
 
     @Test
     public void testCreateTradeOrder_success() {
@@ -205,6 +207,26 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderItemDO02.getOrderDividePrice(), 25);
         assertEquals(tradeOrderItemDO02.getRefundStatus(), TradeOrderItemRefundStatusEnum.NONE.getStatus());
         assertEquals(tradeOrderItemDO02.getRefundTotal(), 0);
+        // 校验调用
+        verify(productSkuApi).updateSkuStock(argThat(new ArgumentMatcher<ProductSkuUpdateStockReqDTO>() {
+
+            @Override
+            public boolean matches(ProductSkuUpdateStockReqDTO updateStockReqDTO) {
+                assertEquals(updateStockReqDTO.getItems().size(), 2);
+                assertEquals(updateStockReqDTO.getItems().get(0).getId(), 1L);
+                assertEquals(updateStockReqDTO.getItems().get(0).getIncrCount(), 3);
+                assertEquals(updateStockReqDTO.getItems().get(1).getId(), 2L);
+                assertEquals(updateStockReqDTO.getItems().get(1).getIncrCount(), 4);
+                return true;
+            }
+
+        }));
+        verify(couponApi).useCoupon(argThat(reqDTO -> {
+            assertEquals(reqDTO.getId(), reqVO.getCouponId());
+            assertEquals(reqDTO.getUserId(), userId);
+            assertEquals(reqDTO.getOrderId(), tradeOrderId);
+            return true;
+        }));
 //        //mock 支付订单信息
 //        when(payOrderApi.createPayOrder(any())).thenReturn(1L);
 

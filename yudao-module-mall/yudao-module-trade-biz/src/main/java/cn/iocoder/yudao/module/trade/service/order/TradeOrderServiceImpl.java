@@ -14,9 +14,12 @@ import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderInfoCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
+import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
+import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.PriceApi;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
@@ -74,6 +77,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     private PayOrderApi payOrderApi;
     @Resource
     private AddressApi addressApi;
+    @Resource
+    private CouponApi couponApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -94,26 +99,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 插入 TradeOrderDO 订单
         TradeOrderDO tradeOrderDO = createTradeOrder(userId, userIp, createReqVO, priceResp.getOrder(), address);
         // 插入 TradeOrderItemDO 订单项
-        createTradeOrderItems(tradeOrderDO, priceResp.getOrder().getItems(), skus);
+        List<TradeOrderItemDO> tradeOrderItems = createTradeOrderItems(tradeOrderDO, priceResp.getOrder().getItems(), skus);
 
-        // 下单时扣减商品库存 TODO
-//        List<SkuDecrementStockBatchReqDTO.Item> skuDecrementStockItems = ProductSkuConvert.INSTANCE.convert(tradeOrderItems);
-//        productSkuApi.decrementStockBatch(SkuDecrementStockBatchReqDTO.of(skuDecrementStockItems));
-
-        // 删除购物车商品 TODO 芋艿：待实现
-
-        // 扣减积分，抵扣金额 TODO 芋艿：待实现
-
-        // 有使用优惠券时更新
-
-        // 增加订单日志 TODO 芋艿：待实现
-
-        // 构建预支付请求参数
-        // TODO @LeeYan9: 需要更新到订单上
-//        PayOrderInfoCreateReqDTO payOrderCreateReqDTO = PayOrderConvert.INSTANCE.convert(tradeOrderDO);
-//        fillPayOrderInfoFromItems(payOrderCreateReqDTO, tradeOrderItems);
-        // 生成预支付
-
+        // 订单创建完后的逻辑
+        afterCreateTradeOrder(userId, createReqVO, tradeOrderDO, tradeOrderItems);
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
         return tradeOrderDO.getId();
     }
@@ -242,10 +231,44 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return tradeOrderDO;
     }
 
-    private void createTradeOrderItems(TradeOrderDO tradeOrderDO,
-                                       List<PriceCalculateRespDTO.OrderItem> orderItems, List<ProductSkuRespDTO> skus) {
+    private List<TradeOrderItemDO> createTradeOrderItems(TradeOrderDO tradeOrderDO,
+                                                         List<PriceCalculateRespDTO.OrderItem> orderItems, List<ProductSkuRespDTO> skus) {
         List<TradeOrderItemDO> tradeOrderItemDOs = TradeOrderConvert.INSTANCE.convertList(tradeOrderDO, orderItems, skus);
         tradeOrderItemMapper.insertBatch(tradeOrderItemDOs);
+        return tradeOrderItemDOs;
+    }
+
+    /**
+     * 执行创建完创建完订单后的逻辑
+     *
+     * 例如说：优惠劵的扣减、积分的扣减、支付单的创建等等
+     *
+     * @param userId 用户编号
+     * @param createReqVO 创建订单请求
+     * @param tradeOrderDO 交易订单
+     */
+    private void afterCreateTradeOrder(Long userId, AppTradeOrderCreateReqVO createReqVO,
+                                       TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItemDOs) {
+        // 下单时扣减商品库存
+        productSkuApi.updateSkuStock(new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(tradeOrderItemDOs)));
+
+        // 删除购物车商品 TODO 芋艿：待实现
+
+        // 扣减积分，抵扣金额 TODO 芋艿：待实现
+
+        // 有使用优惠券时更新
+        if (createReqVO.getCouponId() != null) {
+            couponApi.useCoupon(new CouponUseReqDTO().setId(createReqVO.getCouponId()).setUserId(userId)
+                    .setOrderId(tradeOrderDO.getId()));
+        }
+
+        // 构建预支付请求参数
+        // TODO @LeeYan9: 需要更新到订单上
+//        PayOrderInfoCreateReqDTO payOrderCreateReqDTO = PayOrderConvert.INSTANCE.convert(tradeOrderDO);
+//        fillPayOrderInfoFromItems(payOrderCreateReqDTO, tradeOrderItems);
+        // 生成预支付
+
+        // 增加订单日志 TODO 芋艿：待实现
     }
 
 }

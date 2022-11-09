@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.convert.order;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
@@ -17,7 +18,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 @Mapper
 public interface TradeOrderConvert {
@@ -58,5 +59,12 @@ public interface TradeOrderConvert {
 
     @Mapping(source = "userId" , target = "userId")
     PriceCalculateReqDTO convert(AppTradeOrderCreateReqVO createReqVO, Long userId);
+
+    @Mappings({
+            @Mapping(source = "skuId", target = "id"),
+            @Mapping(source = "count", target = "incrCount"),
+    })
+    ProductSkuUpdateStockReqDTO.Item convert(TradeOrderItemDO bean);
+    List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
 
 }

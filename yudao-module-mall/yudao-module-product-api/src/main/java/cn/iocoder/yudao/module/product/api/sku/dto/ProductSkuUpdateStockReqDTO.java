@@ -40,7 +40,7 @@ public class ProductSkuUpdateStockReqDTO {
          * 负数：扣减库存
          */
         @NotNull(message = "库存变化数量不能为空")
-        private Integer incCount;
+        private Integer incrCount;
 
     }
 

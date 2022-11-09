@@ -203,10 +203,10 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     public void updateSkuStock(ProductSkuUpdateStockReqDTO updateStockReqDTO) {
         // 更新 SKU 库存
         updateStockReqDTO.getItems().forEach(item -> {
-            if (item.getIncCount() > 0) {
-                productSkuMapper.updateStockIncr(item.getId(), item.getIncCount());
-            } else if (item.getIncCount() < 0) {
-                int updateStockIncr = productSkuMapper.updateStockDecr(item.getId(), item.getIncCount());
+            if (item.getIncrCount() > 0) {
+                productSkuMapper.updateStockIncr(item.getId(), item.getIncrCount());
+            } else if (item.getIncrCount() < 0) {
+                int updateStockIncr = productSkuMapper.updateStockDecr(item.getId(), item.getIncrCount());
                 if (updateStockIncr == 0) {
                     throw exception(SKU_STOCK_NOT_ENOUGH);
                 }

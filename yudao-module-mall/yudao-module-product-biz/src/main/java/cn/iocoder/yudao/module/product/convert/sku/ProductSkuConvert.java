@@ -60,7 +60,7 @@ public interface ProductSkuConvert {
             if (spuId == null) {
                 return;
             }
-            Integer stock = spuIdAndStockMap.getOrDefault(spuId, 0) + item.getIncCount();
+            Integer stock = spuIdAndStockMap.getOrDefault(spuId, 0) + item.getIncrCount();
             spuIdAndStockMap.put(spuId, stock);
         });
         return spuIdAndStockMap;
