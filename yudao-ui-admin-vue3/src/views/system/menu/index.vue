@@ -73,17 +73,13 @@
       <vxe-column title="创建时间" field="createTime" formatter="formatDate" />
       <vxe-column title="操作" width="200">
         <template #default="{ row }">
-          <XButton
-            link
-            type="primary"
+          <XTextButton
             preIcon="ep:edit"
             :title="t('action.edit')"
             v-hasPermi="['system:menu:update']"
             @click="handleUpdate(row.id)"
           />
-          <XButton
-            link
-            type="primary"
+          <XTextButton
             preIcon="ep:delete"
             :title="t('action.del')"
             v-hasPermi="['system:menu:delete']"

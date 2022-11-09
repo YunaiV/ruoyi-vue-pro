@@ -7,7 +7,7 @@ const props = defineProps({
   loading: propTypes.bool.def(false),
   preIcon: propTypes.string.def(''),
   postIcon: propTypes.string.def(''),
-  title: propTypes.string.def('按钮'),
+  title: propTypes.string.def(''),
   type: propTypes.oneOf(['', 'primary', 'success', 'warning', 'danger', 'info']).def(''),
   link: propTypes.bool.def(false),
   circle: propTypes.bool.def(false),
@@ -31,7 +31,17 @@ const getBindValue = computed(() => {
 <template>
   <el-button v-bind="getBindValue" @click="onClick">
     <Icon :icon="preIcon" v-if="preIcon" class="mr-1px" />
-    {{ title }}
+    {{ title ? title : '' }}
     <Icon :icon="postIcon" v-if="postIcon" class="mr-1px" />
   </el-button>
 </template>
+<style lang="less" scoped>
+:deep(.el-button.is-text) {
+  margin-left: 0;
+  padding: 8px 4px;
+}
+:deep(.el-button.is-link) {
+  margin-left: 0;
+  padding: 8px 4px;
+}
+</style>
