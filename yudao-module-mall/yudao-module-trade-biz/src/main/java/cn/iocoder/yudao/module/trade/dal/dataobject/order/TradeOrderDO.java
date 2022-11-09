@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 交易订单 DO
@@ -79,11 +79,11 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 订单完成时间
      */
-    private Date finishTime;
+    private LocalDateTime finishTime;
     /**
      * 订单取消时间
      */
-    private Date cancelTime;
+    private LocalDateTime cancelTime;
     /**
      * 取消类型
      *
@@ -106,7 +106,7 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 付款时间
      */
-    private Date payTime;
+    private LocalDateTime payTime;
 
     // ========== 价格 + 支付基本信息 ==========
     // 价格文档 - 淘宝：https://open.taobao.com/docV3.htm?docId=108471&docType=1
@@ -201,11 +201,11 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 发货时间
      */
-    private Date deliveryTime;
+    private LocalDateTime deliveryTime;
     /**
      * 收货时间
      */
-    private Date receiveTime;
+    private LocalDateTime receiveTime;
     /**
      * 收件人名称
      */

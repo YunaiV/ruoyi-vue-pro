@@ -10,7 +10,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -41,7 +41,7 @@ public class ErrorCodeLoaderImpl implements ErrorCodeLoader {
     /**
      * 缓存错误码的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
-    private Date maxUpdateTime;
+    private LocalDateTime maxUpdateTime;
 
     @EventListener(ApplicationReadyEvent.class)
     public void loadErrorCodes() {
@@ -66,7 +66,7 @@ public class ErrorCodeLoaderImpl implements ErrorCodeLoader {
             // 写入到错误码的缓存
             putErrorCode(errorCodeRespDTO.getCode(), errorCodeRespDTO.getMessage());
             // 记录下更新时间，方便增量更新
-            maxUpdateTime = DateUtils.max(maxUpdateTime, errorCodeRespDTO.getUpdateTime());
+            maxUpdateTime = DateUtils.maxLocalDateTime(maxUpdateTime, errorCodeRespDTO.getUpdateTime());
         });
     }
 

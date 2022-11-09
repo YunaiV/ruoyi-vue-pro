@@ -28,8 +28,8 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -55,7 +55,7 @@ public class PayChannelServiceImpl implements PayChannelService {
     /**
      * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private PayClientFactory payClientFactory;
@@ -101,7 +101,7 @@ public class PayChannelServiceImpl implements PayChannelService {
      * @param maxUpdateTime 当前支付渠道的最大更新时间
      * @return 支付渠道列表
      */
-    private List<PayChannelDO> loadPayChannelIfUpdate(Date maxUpdateTime) {
+    private List<PayChannelDO> loadPayChannelIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadPayChannelIfUpdate][首次加载全量支付渠道]");

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @ApiModel("管理后台 - 短信模板 Response VO")
@@ -25,6 +25,6 @@ public class SmsTemplateRespVO extends SmsTemplateBaseVO {
     private List<String> params;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

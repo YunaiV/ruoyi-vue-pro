@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.market.controller.admin.banner.vo;
 
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import java.util.Date;
 
 /**
  * @author xia

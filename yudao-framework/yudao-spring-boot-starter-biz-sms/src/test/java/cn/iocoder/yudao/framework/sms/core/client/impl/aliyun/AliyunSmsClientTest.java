@@ -125,7 +125,7 @@ public class AliyunSmsClientTest extends BaseMockitoUnitTest {
         assertEquals("DELIVERED", statuses.get(0).getErrorCode());
         assertEquals("用户接收成功", statuses.get(0).getErrorMsg());
         assertEquals("13900000001", statuses.get(0).getMobile());
-        assertEquals(DateUtils.buildTime(2017, 2, 2, 22, 23, 24), statuses.get(0).getReceiveTime());
+        assertEquals(DateUtils.buildLocalDateTime(2017, 2, 2, 22, 23, 24), statuses.get(0).getReceiveTime());
         assertEquals("12345", statuses.get(0).getSerialNo());
         assertEquals(67890L, statuses.get(0).getLogId());
     }

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 购物车的商品信息 DO
@@ -30,7 +30,7 @@ public class CartItemDO extends BaseDO {
     /**
      * 购物时间
      */
-    private Date buyTime; // basket_date
+    private LocalDateTime buyTime; // basket_date
 
     // ========= 基础字段 END =========
 

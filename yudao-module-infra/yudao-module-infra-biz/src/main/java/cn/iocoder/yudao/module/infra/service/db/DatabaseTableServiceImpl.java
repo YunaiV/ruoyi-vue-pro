@@ -53,7 +53,7 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
         if (StrUtil.isNotEmpty(name)) {
             strategyConfig.addInclude(name);
         }
-        GlobalConfig globalConfig = new GlobalConfig.Builder().dateType(DateType.ONLY_DATE).build(); // 只使用 Date 类型，不使用 LocalDate
+        GlobalConfig globalConfig = new GlobalConfig.Builder().dateType(DateType.TIME_PACK).build(); // 只使用 Date 类型，不使用 LocalDate
         ConfigBuilder builder = new ConfigBuilder(null, dataSourceConfig, strategyConfig.build(),
                 null, globalConfig, null);
         // 按照名字排序

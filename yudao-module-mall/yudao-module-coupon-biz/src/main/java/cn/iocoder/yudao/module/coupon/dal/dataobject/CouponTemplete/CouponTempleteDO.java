@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.coupon.dal.dataobject.CouponTemplete;
 
 import lombok.*;
-import java.util.*;
+
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
@@ -97,11 +98,11 @@ public class CouponTempleteDO extends BaseDO {
     /**
      * 使用开始日期 过期类型1时必填
      */
-    private Date startUseTime;
+    private LocalDateTime startUseTime;
     /**
      * 使用结束日期 过期类型1时必填
      */
-    private Date endUseTime;
+    private LocalDateTime endUseTime;
     /**
      * 当validity_type为2或者3时需要添加 领取之日起或者次日N天内有效
      */
@@ -153,6 +154,6 @@ public class CouponTempleteDO extends BaseDO {
     /**
      * 有效日期结束时间
      */
-    private Date endTime;
+    private LocalDateTime endTime;
 
 }

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.infra.api.logger.dto;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * API 访问日志
@@ -61,12 +61,12 @@ public class ApiAccessLogCreateReqDTO {
      * 开始请求时间
      */
     @NotNull(message = "开始请求时间不能为空")
-    private Date beginTime;
+    private LocalDateTime beginTime;
     /**
      * 结束请求时间
      */
     @NotNull(message = "结束请求时间不能为空")
-    private Date endTime;
+    private LocalDateTime endTime;
     /**
      * 执行时长，单位：毫秒
      */

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.apollo.internals.dto;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 配置 Response DTO
@@ -28,6 +28,6 @@ public class ConfigRespDTO {
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
 }

@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * Bpm 流程任务的拓展表
@@ -67,7 +67,7 @@ public class BpmTaskExtDO extends BaseDO {
      *
      * 冗余 HistoricTaskInstance 的 endTime  属性
      */
-    private Date endTime;
+    private LocalDateTime endTime;
 
     /**
      * 流程实例的编号

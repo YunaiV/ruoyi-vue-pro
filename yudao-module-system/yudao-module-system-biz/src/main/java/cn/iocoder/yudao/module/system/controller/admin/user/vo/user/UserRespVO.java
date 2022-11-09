@@ -4,7 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 @ApiModel("管理后台 - 用户信息 Response VO")
 @Data
@@ -23,9 +24,9 @@ public class UserRespVO extends UserBaseVO {
     private String loginIp;
 
     @ApiModelProperty(value = "最后登录时间", required = true, example = "时间戳格式")
-    private Date loginDate;
+    private LocalDateTime loginDate;
 
     @ApiModelProperty(value = "创建时间", required = true, example = "时间戳格式")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

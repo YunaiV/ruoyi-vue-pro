@@ -7,7 +7,7 @@
     @NotNull(message = "${column.columnComment}不能为空")
 #end
 #end
-#if (${column.javaType} == "Date")## 时间类型
+#if (${column.javaType} == "LocalDateTime")## 时间类型
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
 #end
     private ${column.javaType} ${column.javaField};

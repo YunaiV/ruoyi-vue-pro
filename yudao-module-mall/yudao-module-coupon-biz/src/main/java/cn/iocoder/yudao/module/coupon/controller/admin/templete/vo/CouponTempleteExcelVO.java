@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.coupon.controller.admin.templete.vo;
 
 import lombok.*;
-import java.util.*;
+
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -69,10 +70,10 @@ public class CouponTempleteExcelVO {
     private Integer validityType;
 
     @ExcelProperty("使用开始日期 过期类型1时必填")
-    private Date startUseTime;
+    private LocalDateTime startUseTime;
 
     @ExcelProperty("使用结束日期 过期类型1时必填")
-    private Date endUseTime;
+    private LocalDateTime endUseTime;
 
     @ExcelProperty("当validity_type为2或者3时需要添加 领取之日起或者次日N天内有效")
     private Integer fixedTerm;
@@ -111,9 +112,9 @@ public class CouponTempleteExcelVO {
     private Integer status;
 
     @ExcelProperty("有效日期结束时间")
-    private Date endTime;
+    private LocalDateTime endTime;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

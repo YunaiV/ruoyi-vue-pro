@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.apilog.core.service;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * API 错误日志
@@ -61,7 +61,7 @@ public class ApiErrorLog {
      * 异常时间
      */
     @NotNull(message = "异常时间不能为空")
-    private Date exceptionTime;
+    private LocalDateTime exceptionTime;
     /**
      * 异常名
      */

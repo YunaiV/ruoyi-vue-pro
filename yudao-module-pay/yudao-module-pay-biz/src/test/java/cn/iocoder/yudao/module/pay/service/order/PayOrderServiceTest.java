@@ -23,10 +23,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -58,7 +58,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
     private PayNotifyService notifyService;
 
     public String generateNo() {
-        return DateUtil.format(new Date(), "yyyyMMddHHmmss") + RandomUtil.randomInt(100000, 999999);
+        return DateUtil.format(LocalDateTime.now(), "yyyyMMddHHmmss") + RandomUtil.randomInt(100000, 999999);
     }
 
     @Test
@@ -83,17 +83,17 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setChannelFeeAmount(1L);
             o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
             o.setUserIp("127.0.0.1");
-            o.setCreateTime(DateUtils.buildTime(2018, 1, 1, 10, 1, 0));
-            o.setExpireTime(DateUtils.buildTime(2018, 1, 1, 10, 30, 0));
-            o.setSuccessTime(DateUtils.buildTime(2018, 1, 1, 10, 10, 2));
-            o.setNotifyTime(DateUtils.buildTime(2018, 1, 1, 10, 10, 15));
+            o.setCreateTime(DateUtils.buildLocalDateTime(2018, 1, 1, 10, 1, 0));
+            o.setExpireTime(DateUtils.buildLocalDateTime(2018, 1, 1, 10, 30, 0));
+            o.setSuccessTime(DateUtils.buildLocalDateTime(2018, 1, 1, 10, 10, 2));
+            o.setNotifyTime(DateUtils.buildLocalDateTime(2018, 1, 1, 10, 10, 15));
             o.setSuccessExtensionId(1L);
             o.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
             o.setRefundTimes(0);
             o.setRefundAmount(0L);
             o.setChannelUserId("1008611");
             o.setChannelOrderNo(channelOrderId);
-            o.setUpdateTime(DateUtils.buildTime(2018, 1, 1, 10, 10, 15));
+            o.setUpdateTime(DateUtils.buildLocalDateTime(2018, 1, 1, 10, 10, 15));
         });
         orderMapper.insert(dbOrder);
         // 测试 merchantId 不匹配
@@ -113,7 +113,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         // 测试 refundStatus 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setRefundStatus(PayRefundTypeEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setCreateTime(DateUtils.buildTime(2019, 1, 1, 10, 10,
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setCreateTime(DateUtils.buildLocalDateTime(2019, 1, 1, 10, 10,
                 1))));
         // 准备参数
         PayOrderPageReqVO reqVO = new PayOrderPageReqVO();
@@ -125,7 +125,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
         reqVO.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
-        reqVO.setCreateTime((new Date[]{buildTime(2018, 1, 1, 10, 1, 0),buildTime(2018, 1, 1, 10, 1, 0)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2018, 1, 1, 10, 1, 0),buildLocalDateTime(2018, 1, 1, 10, 1, 0)}));
         // 调用
         PageResult<PayOrderDO> pageResult = orderService.getOrderPage(reqVO);
         // 断言
@@ -155,17 +155,17 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setChannelFeeAmount(1L);
             o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
             o.setUserIp("127.0.0.1");
-            o.setCreateTime(DateUtils.buildTime(2018, 1, 1, 10, 1, 0));
-            o.setExpireTime(DateUtils.buildTime(2018, 1, 1, 10, 30, 0));
-            o.setSuccessTime(DateUtils.buildTime(2018, 1, 1, 10, 10, 2));
-            o.setNotifyTime(DateUtils.buildTime(2018, 1, 1, 10, 10, 15));
+            o.setCreateTime(DateUtils.buildLocalDateTime(2018, 1, 1, 10, 1, 0));
+            o.setExpireTime(DateUtils.buildLocalDateTime(2018, 1, 1, 10, 30, 0));
+            o.setSuccessTime(DateUtils.buildLocalDateTime(2018, 1, 1, 10, 10, 2));
+            o.setNotifyTime(DateUtils.buildLocalDateTime(2018, 1, 1, 10, 10, 15));
             o.setSuccessExtensionId(1L);
             o.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
             o.setRefundTimes(0);
             o.setRefundAmount(0L);
             o.setChannelUserId("1008611");
             o.setChannelOrderNo(channelOrderId);
-            o.setUpdateTime(DateUtils.buildTime(2018, 1, 1, 10, 10, 15));
+            o.setUpdateTime(DateUtils.buildLocalDateTime(2018, 1, 1, 10, 10, 15));
 
         });
         orderMapper.insert(dbOrder);
@@ -186,7 +186,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         // 测试 refundStatus 不匹配
         orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setRefundStatus(PayRefundTypeEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
-        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setCreateTime(DateUtils.buildTime(2019, 1, 1, 10, 10,
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setCreateTime(DateUtils.buildLocalDateTime(2019, 1, 1, 10, 10,
                 1))));
         // 准备参数
         PayOrderExportReqVO reqVO = new PayOrderExportReqVO();
@@ -198,7 +198,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
         reqVO.setRefundStatus(PayRefundTypeEnum.NO.getStatus());
-        reqVO.setCreateTime((new Date[]{buildTime(2018, 1, 1, 10, 1, 0),buildTime(2018, 1, 1, 10, 1, 0)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2018, 1, 1, 10, 1, 0),buildLocalDateTime(2018, 1, 1, 10, 1, 0)}));
 
         // 调用
         List<PayOrderDO> list = orderService.getOrderList(reqVO);

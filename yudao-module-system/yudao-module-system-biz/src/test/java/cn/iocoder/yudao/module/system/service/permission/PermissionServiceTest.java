@@ -27,6 +27,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
@@ -87,7 +88,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         assertEquals(singletonList(1L), permissionService.getMenuRoleCache().get(10L));
         assertEquals(singletonList(1L), permissionService.getMenuRoleCache().get(20L));
         // 断言 maxUpdateTime 缓存
-        Date maxUpdateTime = permissionService.getRoleMenuMaxUpdateTime();
+        LocalDateTime maxUpdateTime = permissionService.getRoleMenuMaxUpdateTime();
         assertEquals(ObjectUtils.max(roleMenuDO01.getUpdateTime(), roleMenuDO02.getUpdateTime()), maxUpdateTime);
     }
 
@@ -105,7 +106,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         assertEquals(1, permissionService.getUserRoleCache().size());
         assertEquals(asSet(10L, 20L), permissionService.getUserRoleCache().get(1L));
         // 断言 maxUpdateTime 缓存
-        Date maxUpdateTime = permissionService.getUserRoleMaxUpdateTime();
+        LocalDateTime maxUpdateTime = permissionService.getUserRoleMaxUpdateTime();
         assertEquals(ObjectUtils.max(userRoleDO01.getUpdateTime(), roleMenuDO02.getUpdateTime()), maxUpdateTime);
     }
 

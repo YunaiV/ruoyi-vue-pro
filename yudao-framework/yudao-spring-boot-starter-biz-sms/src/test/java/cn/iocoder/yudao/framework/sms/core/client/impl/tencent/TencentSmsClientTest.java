@@ -146,7 +146,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
         assertEquals("DELIVRD", statuses.get(0).getErrorCode());
         assertEquals("用户短信送达成功", statuses.get(0).getErrorMsg());
         assertEquals("13900000001", statuses.get(0).getMobile());
-        assertEquals(DateUtils.buildTime(2015, 10, 17, 8, 3, 4), statuses.get(0).getReceiveTime());
+        assertEquals(DateUtils.buildLocalDateTime(2015, 10, 17, 8, 3, 4), statuses.get(0).getReceiveTime());
         assertEquals("12345", statuses.get(0).getSerialNo());
         assertEquals(67890L, statuses.get(0).getLogId());
     }

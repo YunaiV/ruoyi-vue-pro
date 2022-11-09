@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 限时折扣商品 DO
@@ -46,11 +46,11 @@ public class DiscountProductDO extends BaseDO {
     /**
      * 开始时间
      */
-    private Date startTime;
+    private LocalDateTime startTime;
     /**
      * 结束时间
      */
-    private Date endTime;
+    private LocalDateTime endTime;
     /**
      * 销售价格，单位：分
      *

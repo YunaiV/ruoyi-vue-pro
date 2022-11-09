@@ -115,7 +115,7 @@ public class YunpianSmsClientTest extends BaseMockitoUnitTest {
         assertEquals("", statuses.get(0).getErrorCode());
         assertNull(statuses.get(0).getErrorMsg());
         assertEquals("15205201314", statuses.get(0).getMobile());
-        assertEquals(DateUtils.buildTime(2014, 3, 17, 22, 55, 21), statuses.get(0).getReceiveTime());
+        assertEquals(DateUtils.buildLocalDateTime(2014, 3, 17, 22, 55, 21), statuses.get(0).getReceiveTime());
         assertEquals("9527", statuses.get(0).getSerialNo());
         assertEquals(1024L, statuses.get(0).getLogId());
     }

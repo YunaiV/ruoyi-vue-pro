@@ -23,6 +23,7 @@ import com.yunpian.sdk.model.Template;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -198,7 +199,7 @@ public class YunpianSmsClient extends AbstractSmsClient {
          */
         @JsonProperty("user_receive_time")
         @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-        private Date userReceiveTime;
+        private LocalDateTime userReceiveTime;
 
     }
 

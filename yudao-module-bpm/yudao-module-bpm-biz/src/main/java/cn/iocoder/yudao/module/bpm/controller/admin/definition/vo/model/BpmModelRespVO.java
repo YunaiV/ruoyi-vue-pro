@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 流程模型的创建 Request VO")
 @Data
@@ -21,6 +21,6 @@ public class BpmModelRespVO extends BpmModelBaseVO {
     private String bpmnXml;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

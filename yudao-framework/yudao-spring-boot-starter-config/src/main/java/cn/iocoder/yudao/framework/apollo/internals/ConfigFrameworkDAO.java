@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.apollo.internals;
 
 import cn.iocoder.yudao.framework.apollo.internals.dto.ConfigRespDTO;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -20,7 +20,7 @@ public interface ConfigFrameworkDAO {
      * @param maxUpdateTime 最大更新时间
      * @return 是否存在
      */
-    int selectCountByUpdateTimeGt(Date maxUpdateTime);
+    int selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
     /**
      * 查询配置列表

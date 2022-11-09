@@ -12,7 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -75,7 +75,7 @@ public class TradeRefundDO extends BaseDO {
     /**
      * 商家处理时间
      */
-    private Date handleTime; // handel_time
+    private LocalDateTime handleTime; // handel_time
     /**
      * 商家拒绝理由
      */
@@ -132,7 +132,7 @@ public class TradeRefundDO extends BaseDO {
     /**
      * 退货时间
      */
-    private Date returnDate; // ship_time
+    private LocalDateTime returnDate; // ship_time
 
     // ========== 收获相关 ==========
 
@@ -143,6 +143,6 @@ public class TradeRefundDO extends BaseDO {
     /**
      * 收货时间
      */
-    private Date receiveDate; // receive_time
+    private LocalDateTime receiveDate; // receive_time
 
 }

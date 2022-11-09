@@ -22,7 +22,7 @@ import com.tencentcloudapi.sms.v20210111.SmsClient;
 import com.tencentcloudapi.sms.v20210111.models.*;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -240,7 +240,7 @@ public class TencentSmsClient extends AbstractSmsClient {
          */
         @JsonProperty("user_receive_time")
         @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-        private Date receiveTime;
+        private LocalDateTime receiveTime;
 
         /**
          * 国家（或地区）码

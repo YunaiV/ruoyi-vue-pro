@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.coupon.controller.admin.coupon.vo;
 
 import lombok.*;
-import java.util.*;
+
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import io.swagger.annotations.*;
 import javax.validation.constraints.*;
@@ -90,21 +91,21 @@ public class CouponBaseVO {
     @ApiModelProperty(value = "领取时间", required = true)
     @NotNull(message = "领取时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date fetchTime;
+    private LocalDateTime fetchTime;
 
     @ApiModelProperty(value = "使用时间", required = true)
     @NotNull(message = "使用时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date useTime;
+    private LocalDateTime useTime;
 
     @ApiModelProperty(value = "可使用的开始时间", required = true)
     @NotNull(message = "可使用的开始时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date startTime;
+    private LocalDateTime startTime;
 
     @ApiModelProperty(value = "有效期结束时间", required = true)
     @NotNull(message = "有效期结束时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date endTime;
+    private LocalDateTime endTime;
 
 }

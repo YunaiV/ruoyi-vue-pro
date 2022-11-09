@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.member.api.user.dto;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 用户信息 Response DTO
@@ -47,6 +47,6 @@ public class UserInfoDTO {
     /**
      * 最后登录时间
      */
-    private Date loginDate;
+    private LocalDateTime loginDate;
 
 }

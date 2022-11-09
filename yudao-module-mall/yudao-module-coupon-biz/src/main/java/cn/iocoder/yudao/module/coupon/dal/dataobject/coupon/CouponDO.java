@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.coupon.dal.dataobject.coupon;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import lombok.*;
-import java.util.*;
+
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.*;
 
@@ -101,18 +102,18 @@ public class CouponDO extends BaseDO {
     /**
      * 领取时间
      */
-    private Date fetchTime;
+    private LocalDateTime fetchTime;
     /**
      * 使用时间
      */
-    private Date useTime;
+    private LocalDateTime useTime;
     /**
      * 可使用的开始时间
      */
-    private Date startTime;
+    private LocalDateTime startTime;
     /**
      * 有效期结束时间
      */
-    private Date endTime;
+    private LocalDateTime endTime;
 
 }

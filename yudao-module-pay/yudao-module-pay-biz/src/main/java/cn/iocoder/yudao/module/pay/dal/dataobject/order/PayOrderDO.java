@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 支付订单 DO
@@ -117,15 +117,15 @@ public class PayOrderDO extends BaseDO {
     /**
      * 订单失效时间
      */
-    private Date expireTime;
+    private LocalDateTime expireTime;
     /**
      * 订单支付成功时间
      */
-    private Date successTime;
+    private LocalDateTime successTime;
     /**
      * 订单支付通知时间，即支付渠道的通知时间
      */
-    private Date notifyTime;
+    private LocalDateTime notifyTime;
     /**
      * 支付成功的订单拓展单编号
      *

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -46,7 +47,7 @@ public class OAuth2ApproveServiceImpl implements OAuth2ApproveService {
             // gh-877 - if all scopes are auto approved, approvals still need to be added to the approval store.
             Date expireTime = DateUtils.addDate(Calendar.SECOND, TIMEOUT);
             for (String scope : requestedScopes) {
-                saveApprove(userId, userType, clientId, scope, true, expireTime);
+                saveApprove(userId, userType, clientId, scope, true, DateUtils.dateToLocalDateTime(expireTime));
             }
             return true;
         }
@@ -73,7 +74,7 @@ public class OAuth2ApproveServiceImpl implements OAuth2ApproveService {
             if (entry.getValue()) {
                 success = true;
             }
-            saveApprove(userId, userType, clientId, entry.getKey(), entry.getValue(), expireTime);
+            saveApprove(userId, userType, clientId, entry.getKey(), entry.getValue(), DateUtils.dateToLocalDateTime(expireTime));
         }
         return success;
     }
@@ -88,7 +89,7 @@ public class OAuth2ApproveServiceImpl implements OAuth2ApproveService {
 
     @VisibleForTesting
     void saveApprove(Long userId, Integer userType, String clientId,
-                     String scope, Boolean approved, Date expireTime) {
+                     String scope, Boolean approved, LocalDateTime expireTime) {
         // 先更新
         OAuth2ApproveDO approveDO = new OAuth2ApproveDO().setUserId(userId).setUserType(userType)
                 .setClientId(clientId).setScope(scope).setApproved(approved).setExpiresTime(expireTime);

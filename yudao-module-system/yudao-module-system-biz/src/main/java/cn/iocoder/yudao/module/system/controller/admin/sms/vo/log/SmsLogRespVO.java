@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @ApiModel("管理后台 - 短信日志 Response VO")
@@ -51,7 +51,7 @@ public class SmsLogRespVO {
     private Integer sendStatus;
 
     @ApiModelProperty(value = "发送时间")
-    private Date sendTime;
+    private LocalDateTime sendTime;
 
     @ApiModelProperty(value = "发送结果的编码", example = "0")
     private Integer sendCode;
@@ -75,7 +75,7 @@ public class SmsLogRespVO {
     private Integer receiveStatus;
 
     @ApiModelProperty(value = "接收时间")
-    private Date receiveTime;
+    private LocalDateTime receiveTime;
 
     @ApiModelProperty(value = "API 接收结果的编码", example = "DELIVRD")
     private String apiReceiveCode;
@@ -84,6 +84,6 @@ public class SmsLogRespVO {
     private String apiReceiveMsg;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

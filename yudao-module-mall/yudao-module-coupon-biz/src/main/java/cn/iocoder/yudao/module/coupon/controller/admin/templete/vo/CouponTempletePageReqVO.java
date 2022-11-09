@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.coupon.controller.admin.templete.vo;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.time.LocalDateTime;
 import io.swagger.annotations.*;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -69,11 +69,11 @@ public class CouponTempletePageReqVO extends PageParam {
 
     @ApiModelProperty(value = "使用开始日期 过期类型1时必填")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date[] startUseTime;
+    private LocalDateTime[] startUseTime;
 
     @ApiModelProperty(value = "使用结束日期 过期类型1时必填")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date[] endUseTime;
+    private LocalDateTime[] endUseTime;
 
     @ApiModelProperty(value = "当validity_type为2或者3时需要添加 领取之日起或者次日N天内有效")
     private Integer fixedTerm;
@@ -113,10 +113,10 @@ public class CouponTempletePageReqVO extends PageParam {
 
     @ApiModelProperty(value = "有效日期结束时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date[] endTime;
+    private LocalDateTime[] endTime;
 
     @ApiModelProperty(value = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date[] createTime;
+    private LocalDateTime[] createTime;
 
 }

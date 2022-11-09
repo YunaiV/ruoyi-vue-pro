@@ -128,7 +128,7 @@ getList()
 #foreach($column in $columns)
 #if ($column.listOperationResult)
   #set ($dictType=$column.dictType)
-  #if ($column.javaType == "Date")## 时间类型
+  #if ($column.javaType == "LocalDateTime")## 时间类型
       <template #${column.javaField}="{ row }">
         <span>{{ dayjs(row.${column.javaField}).format('YYYY-MM-DD HH:mm:ss') }}</span>
       </template>
@@ -185,7 +185,7 @@ getList()
 #foreach($column in $columns)
   #if ($column.listOperationResult)
     #set ($dictType=$column.dictType)
-    #if ($column.javaType == "Date")## 时间类型
+    #if ($column.javaType == "LocalDateTime")## 时间类型
       <template #${column.javaField}="{ row }">
         <span>{{ dayjs(row.${column.javaField}).format('YYYY-MM-DD HH:mm:ss') }}</span>
       </template>

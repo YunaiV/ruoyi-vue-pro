@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -83,18 +83,18 @@ public class PayRefundPageReqVO extends PageParam {
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "退款失效时间")
-    private Date[] expireTime;
+    private LocalDateTime[] expireTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "退款成功时间")
-    private Date[] successTime;
+    private LocalDateTime[] successTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "退款通知时间")
-    private Date[] notifyTime;
+    private LocalDateTime[] notifyTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "创建时间")
-    private Date[] createTime;
+    private LocalDateTime[] createTime;
 
 }

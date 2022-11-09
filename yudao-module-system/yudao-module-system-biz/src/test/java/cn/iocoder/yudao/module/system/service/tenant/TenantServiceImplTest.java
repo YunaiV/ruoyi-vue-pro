@@ -28,15 +28,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -112,7 +110,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
     public void testValidTenant_expired() {
         // mock 数据
         TenantDO tenant = randomPojo(TenantDO.class, o -> o.setId(1L).setStatus(CommonStatusEnum.ENABLE.getStatus())
-                .setExpireTime(buildTime(2020, 2, 2)));
+                .setExpireTime(buildLocalDateTime(2020, 2, 2)));
         tenantMapper.insert(tenant);
 
         // 调用，并断言业务异常
@@ -123,7 +121,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
     public void testValidTenant_success() {
         // mock 数据
         TenantDO tenant = randomPojo(TenantDO.class, o -> o.setId(1L).setStatus(CommonStatusEnum.ENABLE.getStatus())
-                .setExpireTime(addTime(Duration.ofDays(1))));
+                .setExpireTime(LocalDateTime.now().plusDays(1)));
         tenantMapper.insert(tenant);
 
         // 调用，并断言业务异常
@@ -293,7 +291,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
             o.setContactName("芋艿");
             o.setContactMobile("15601691300");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setCreateTime(buildTime(2020, 12, 12));
+            o.setCreateTime(buildLocalDateTime(2020, 12, 12));
         });
         tenantMapper.insert(dbTenant);
         // 测试 name 不匹配
@@ -305,14 +303,14 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         // 测试 status 不匹配
         tenantMapper.insert(cloneIgnoreId(dbTenant, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 测试 createTime 不匹配
-        tenantMapper.insert(cloneIgnoreId(dbTenant, o -> o.setCreateTime(buildTime(2021, 12, 12))));
+        tenantMapper.insert(cloneIgnoreId(dbTenant, o -> o.setCreateTime(buildLocalDateTime(2021, 12, 12))));
         // 准备参数
         TenantPageReqVO reqVO = new TenantPageReqVO();
         reqVO.setName("芋道");
         reqVO.setContactName("艿");
         reqVO.setContactMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime(new Date[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)});
+        reqVO.setCreateTime(new LocalDateTime[]{buildLocalDateTime(2020, 12, 1),buildLocalDateTime(2020, 12, 24)});
 
         // 调用
         PageResult<TenantDO> pageResult = tenantService.getTenantPage(reqVO);
@@ -330,7 +328,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
             o.setContactName("芋艿");
             o.setContactMobile("15601691300");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setCreateTime(buildTime(2020, 12, 12));
+            o.setCreateTime(buildLocalDateTime(2020, 12, 12));
         });
         tenantMapper.insert(dbTenant);
         // 测试 name 不匹配
@@ -342,14 +340,14 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         // 测试 status 不匹配
         tenantMapper.insert(cloneIgnoreId(dbTenant, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 测试 createTime 不匹配
-        tenantMapper.insert(cloneIgnoreId(dbTenant, o -> o.setCreateTime(buildTime(2021, 12, 12))));
+        tenantMapper.insert(cloneIgnoreId(dbTenant, o -> o.setCreateTime(buildLocalDateTime(2021, 12, 12))));
         // 准备参数
         TenantExportReqVO reqVO = new TenantExportReqVO();
         reqVO.setName("芋道");
         reqVO.setContactName("艿");
         reqVO.setContactMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime(new Date[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)});
+        reqVO.setCreateTime(new LocalDateTime[]{buildLocalDateTime(2020, 12, 1),buildLocalDateTime(2020, 12, 24)});
 
         // 调用
         List<TenantDO> list = tenantService.getTenantList(reqVO);

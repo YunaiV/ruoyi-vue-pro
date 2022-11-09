@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.coupon.controller.admin.templete.vo;
 
 import lombok.*;
-import java.util.*;
+
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import io.swagger.annotations.*;
 import javax.validation.constraints.*;
@@ -86,11 +87,11 @@ public class CouponTempleteBaseVO {
 
     @ApiModelProperty(value = "使用开始日期 过期类型1时必填")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date startUseTime;
+    private LocalDateTime startUseTime;
 
     @ApiModelProperty(value = "使用结束日期 过期类型1时必填")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date endUseTime;
+    private LocalDateTime endUseTime;
 
     @ApiModelProperty(value = "当validity_type为2或者3时需要添加 领取之日起或者次日N天内有效")
     @NotNull(message = "当validity_type为2或者3时需要添加 领取之日起或者次日N天内有效不能为空")
@@ -98,7 +99,7 @@ public class CouponTempleteBaseVO {
 
     @ApiModelProperty(value = "有效日期结束时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date endTime;
+    private LocalDateTime endTime;
 
     /*  ============过期类型——结束=============  */
 
