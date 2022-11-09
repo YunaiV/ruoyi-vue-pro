@@ -81,12 +81,13 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public void useCoupon(Long id, Long userId) {
+    public void useCoupon(Long id, Long userId, Long orderId) {
         // 校验优惠劵
         validCoupon(id, userId);
         // 更新状态
         int updateCount = couponMapper.updateByIdAndStatus(id, CouponStatusEnum.UNUSED.getStatus(),
-                new CouponDO().setStatus(CouponStatusEnum.USED.getStatus()).setUseTime(new Date()));
+                new CouponDO().setStatus(CouponStatusEnum.USED.getStatus())
+                        .setUseOrderId(orderId).setUseTime(new Date()));
         if (updateCount == 0) {
             throw exception(COUPON_STATUS_NOT_UNUSED);
         }

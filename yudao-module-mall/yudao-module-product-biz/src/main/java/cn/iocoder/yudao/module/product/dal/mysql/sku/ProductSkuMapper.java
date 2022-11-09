@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.product.dal.mysql.sku;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.product.api.sku.dto.SkuDecrementStockBatchReqDTO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -23,21 +23,37 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
     }
 
     default void deleteBySpuId(Long spuId) {
-        delete(new LambdaQueryWrapperX<ProductSkuDO>()
-                .eqIfPresent(ProductSkuDO::getSpuId, spuId));
+        delete(new LambdaQueryWrapperX<ProductSkuDO>().eq(ProductSkuDO::getSpuId, spuId));
     }
 
-    default void decrementStockBatch(List<SkuDecrementStockBatchReqDTO.Item> items) {
-        for (SkuDecrementStockBatchReqDTO.Item item : items) {
-            // 扣减库存 cas 逻辑
-            LambdaUpdateWrapper<ProductSkuDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<ProductSkuDO>()
-                    .setSql(" stock = stock-" + item.getCount())
-                    .eq(ProductSkuDO::getSpuId, item.getProductId())
-                    .eq(ProductSkuDO::getId, item.getSkuId())
-                    .ge(ProductSkuDO::getStock, item.getCount());
-            // 执行
-            this.update(null, lambdaUpdateWrapper);
-        }
+    /**
+     * 更新 SKU 库存（增加）
+     *
+     * @param id 编号
+     * @param incrCount 增加库存（正数）
+     */
+    default void updateStockIncr(Long id, Integer incrCount) {
+        Assert.isTrue(incrCount > 0);
+        LambdaUpdateWrapper<ProductSkuDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<ProductSkuDO>()
+                .setSql(" stock = stock + " + incrCount)
+                .eq(ProductSkuDO::getId, id);
+        update(null, lambdaUpdateWrapper);
+    }
+
+    /**
+     * 更新 SKU 库存（减少）
+     *
+     * @param id 编号
+     * @param incrCount 减少库存（负数）
+     * @return 更新条数
+     */
+    default int updateStockDecr(Long id, Integer incrCount) {
+        Assert.isTrue(incrCount < 0);
+        LambdaUpdateWrapper<ProductSkuDO> updateWrapper = new LambdaUpdateWrapper<ProductSkuDO>()
+                .setSql(" stock = stock + " + incrCount) // 负数，所以使用 + 号
+                .eq(ProductSkuDO::getId, id)
+                .ge(ProductSkuDO::getStock, -incrCount); // cas 逻辑
+        return update(null, updateWrapper);
     }
 
     default List<ProductSkuDO> selectListByAlarmStock(){

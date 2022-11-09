@@ -45,10 +45,11 @@ public interface CouponService {
     /**
      * 使用优惠劵
      *
-     * @param id 优惠劵编号
-     * @param userId 用户编号
+     * @param id      优惠劵编号
+     * @param userId  用户编号
+     * @param orderId 订单编号
      */
-    void useCoupon(Long id, Long userId);
+    void useCoupon(Long id, Long userId, Long orderId);
 
     /**
      * 回收优惠劵

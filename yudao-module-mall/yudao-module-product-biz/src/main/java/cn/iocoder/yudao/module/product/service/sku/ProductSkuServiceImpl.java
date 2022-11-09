@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
@@ -13,6 +14,8 @@ import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
+import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
 /**
@@ -37,15 +41,17 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     private ProductSkuMapper productSkuMapper;
 
     @Resource
+    @Lazy // 循环依赖，避免报错
+    private ProductSpuService productSpuService;
+    @Resource
     private ProductPropertyService productPropertyService;
-
     @Resource
     private ProductPropertyValueService productPropertyValueService;
 
     @Override
     public void deleteSku(Long id) {
         // 校验存在
-        this.validateSkuExists(id);
+        validateSkuExists(id);
         // 删除
         productSkuMapper.deleteById(id);
     }
@@ -89,7 +95,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         // 2. 校验，一个 SKU 下，没有重复的规格。校验方式是，遍历每个 SKU ，看看是否有重复的规格 propertyId
         Map<Long, ProductPropertyValueRespVO> propertyValueMap = CollectionUtils.convertMap(productPropertyValueService.getPropertyValueListByPropertyId(new ArrayList<>(propertyIds)), ProductPropertyValueRespVO::getId);
         skus.forEach(sku -> {
-            Set<Long> skuPropertyIds = CollectionUtils.convertSet(sku.getProperties(), propertyItem -> propertyValueMap.get(propertyItem.getValueId()).getPropertyId());
+            Set<Long> skuPropertyIds = convertSet(sku.getProperties(), propertyItem -> propertyValueMap.get(propertyItem.getValueId()).getPropertyId());
             if (skuPropertyIds.size() != sku.getProperties().size()) {
                 throw exception(SKU_PROPERTIES_DUPLICATED);
             }
@@ -106,7 +112,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         // 4. 最后校验，每个 Sku 之间不是重复的
         Set<Set<Long>> skuAttrValues = new HashSet<>(); // 每个元素，都是一个 Sku 的 attrValueId 集合。这样，通过最外层的 Set ，判断是否有重复的.
         for (ProductSkuCreateOrUpdateReqVO sku : skus) {
-            if (!skuAttrValues.add(CollectionUtils.convertSet(sku.getProperties(), ProductSkuBaseVO.Property::getValueId))) { // 添加失败，说明重复
+            if (!skuAttrValues.add(convertSet(sku.getProperties(), ProductSkuBaseVO.Property::getValueId))) { // 添加失败，说明重复
                 throw exception(ErrorCodeConstants.SPU_SKU_NOT_DUPLICATE);
             }
         }
@@ -142,7 +148,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     @Transactional
-    public void updateProductSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
+    public void updateSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // 查询 SPU 下已经存在的 SKU 的集合
         List<ProductSkuDO> existsSkus = productSkuMapper.selectListBySpuId(spuId);
         // 构建规格与 SKU 的映射关系;
@@ -192,14 +198,27 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         }
     }
 
-    public static void main(String[] args) {
-        List<Integer> ids = new ArrayList<>();
-        ids.add(1);
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSkuStock(ProductSkuUpdateStockReqDTO updateStockReqDTO) {
+        // 更新 SKU 库存
+        updateStockReqDTO.getItems().forEach(item -> {
+            if (item.getIncCount() > 0) {
+                productSkuMapper.updateStockIncr(item.getId(), item.getIncCount());
+            } else if (item.getIncCount() < 0) {
+                int updateStockIncr = productSkuMapper.updateStockDecr(item.getId(), item.getIncCount());
+                if (updateStockIncr == 0) {
+                    throw exception(SKU_STOCK_NOT_ENOUGH);
+                }
+            }
+        });
 
-        List<Integer> ids2 = new ArrayList<>();
-        ids2.add(2);
-
-        System.out.println(ids.equals(ids2));
+        // 更新 SPU 库存
+        List<ProductSkuDO> skus = productSkuMapper.selectBatchIds(
+                convertSet(updateStockReqDTO.getItems(), ProductSkuUpdateStockReqDTO.Item::getId));
+        Map<Long, Integer> spuStockIncrCounts = ProductSkuConvert.INSTANCE.convertSpuStockMap(
+                updateStockReqDTO.getItems(), skus);
+        productSpuService.updateSpuStock(spuStockIncrCounts);
     }
 
 }

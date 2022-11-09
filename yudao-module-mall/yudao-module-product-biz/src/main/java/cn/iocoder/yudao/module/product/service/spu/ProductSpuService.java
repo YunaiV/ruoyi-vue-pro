@@ -99,4 +99,11 @@ public interface ProductSpuService {
      */
     PageResult<AppSpuPageRespVO> getSpuPage(AppSpuPageReqVO pageReqVO);
 
+    /**
+     * 更新商品 SPU 库存（增量）
+     *
+     * @param stockIncrCounts SPU 编号与库存变化（增量）的映射
+     */
+    void updateSpuStock(Map<Long, Integer> stockIncrCounts);
+
 }

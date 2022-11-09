@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.product.api.sku;
 
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
-import cn.iocoder.yudao.module.product.api.sku.dto.SkuDecrementStockBatchReqDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
-import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
+import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -25,7 +24,7 @@ import java.util.List;
 public class ProductSkuApiImpl implements ProductSkuApi {
 
     @Resource
-    private ProductSkuMapper productSkuMapper;
+    private ProductSkuService productSkuService;
 
     @Override
     public ProductSkuRespDTO getSku(Long id) {
@@ -35,18 +34,16 @@ public class ProductSkuApiImpl implements ProductSkuApi {
 
     @Override
     public List<ProductSkuRespDTO> getSkuList(Collection<Long> ids) {
-        // TODO TODO LeeYan9: AllEmpty?
-        if (CollectionUtils.isAnyEmpty(ids)) {
+        if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<ProductSkuDO> productSkuDOList = productSkuMapper.selectBatchIds(ids);
-        return ProductSkuConvert.INSTANCE.convertList04(productSkuDOList);
+        List<ProductSkuDO> skus = productSkuService.getSkuList(ids);
+        return ProductSkuConvert.INSTANCE.convertList04(skus);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void decrementStockBatch(SkuDecrementStockBatchReqDTO batchReqDTO) {
-        // TODO @LeeYan9: 最好 Service 去 for 循环;
-        productSkuMapper.decrementStockBatch(batchReqDTO.getItems());
+    public void updateSkuStock(ProductSkuUpdateStockReqDTO updateStockReqDTO) {
+        productSkuService.updateSkuStock(updateStockReqDTO);
     }
+
 }
