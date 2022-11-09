@@ -5,6 +5,7 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -77,7 +78,7 @@ public class DateUtils {
     }
 
     public static LocalDateTime buildLocalDateTime(int year, int mouth, int day) {
-        return buildLocalDateTime(year, mouth, day, 0, 0, 0);
+        return LocalDateTime.of(year, mouth, day, 0, 0, 0);
     }
 
     /**
@@ -102,19 +103,6 @@ public class DateUtils {
         calendar.set(Calendar.SECOND, second);
         calendar.set(Calendar.MILLISECOND, 0); // 一般情况下，都是 0 毫秒
         return calendar.getTime();
-    }
-
-    public static LocalDateTime buildLocalDateTime(int year, int mouth, int day,
-                                                   int hour, int minute, int second) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, mouth - 1);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, second);
-        calendar.set(Calendar.MILLISECOND, 0); // 一般情况下，都是 0 毫秒
-        return dateToLocalDateTime(calendar.getTime());
     }
 
     public static Date max(Date a, Date b) {
