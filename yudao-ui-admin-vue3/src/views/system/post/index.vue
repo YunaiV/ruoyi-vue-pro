@@ -27,8 +27,6 @@
           @click="handleDetail(row)"
         />
         <XTextButton
-          link
-          type="primary"
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:post:delete']"
