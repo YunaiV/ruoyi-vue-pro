@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("交易订单项 Response VO")
 @Data
@@ -47,7 +47,7 @@ public class TradeOrderItemRespVO {
     @ApiModelProperty(value = "售后订单编号")
     private Integer afterSaleOrderId;
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 
 }

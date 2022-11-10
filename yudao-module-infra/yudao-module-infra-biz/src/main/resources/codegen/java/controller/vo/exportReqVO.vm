@@ -6,7 +6,8 @@ import io.swagger.annotations.*;
 import ${PageParamClassName};
 ## 处理 Date 字段的引入
 #foreach ($column in $columns)
-#if (${column.listOperation} && ${column.javaType} == "Date")## 时间类型
+#if (${column.listOperation} && ${column.javaType} == "LocalDateTime")## 时间类型
+import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;

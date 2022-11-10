@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 支付退款单 DO
@@ -183,15 +183,15 @@ public class PayRefundDO extends BaseDO {
      * TODO
      * 退款失效时间
      */
-    private Date expireTime;
+    private LocalDateTime expireTime;
     /**
      * 退款成功时间
      */
-    private Date successTime;
+    private LocalDateTime successTime;
     /**
      * 退款通知时间
      */
-    private Date notifyTime;
+    private LocalDateTime notifyTime;
 
 
 

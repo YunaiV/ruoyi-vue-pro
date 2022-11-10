@@ -3,9 +3,8 @@ package cn.iocoder.yudao.module.coupon.controller.admin.coupon.vo;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.time.LocalDateTime;
 import io.swagger.annotations.*;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -70,22 +69,22 @@ public class CouponExportReqVO {
 
     @ApiModelProperty(value = "领取时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date[] fetchTime;
+    private LocalDateTime[] fetchTime;
 
     @ApiModelProperty(value = "使用时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date[] useTime;
+    private LocalDateTime[] useTime;
 
     @ApiModelProperty(value = "可使用的开始时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date[] startTime;
+    private LocalDateTime[] startTime;
 
     @ApiModelProperty(value = "有效期结束时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date[] endTime;
+    private LocalDateTime[] endTime;
 
     @ApiModelProperty(value = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date[] createTime;
+    private LocalDateTime[] createTime;
 
 }

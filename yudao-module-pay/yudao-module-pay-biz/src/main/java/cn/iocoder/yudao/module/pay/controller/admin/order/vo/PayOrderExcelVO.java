@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.pay.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 支付订单Excel VO
@@ -58,16 +58,16 @@ public class PayOrderExcelVO {
     private String notifyUrl;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ExcelProperty("订单支付成功时间")
-    private Date successTime;
+    private LocalDateTime successTime;
 
     @ExcelProperty("订单失效时间")
-    private Date expireTime;
+    private LocalDateTime expireTime;
 
     @ExcelProperty("订单支付通知时间")
-    private Date notifyTime;
+    private LocalDateTime notifyTime;
 
     @ExcelProperty(value = "渠道编号名称")
     private String channelCodeName;

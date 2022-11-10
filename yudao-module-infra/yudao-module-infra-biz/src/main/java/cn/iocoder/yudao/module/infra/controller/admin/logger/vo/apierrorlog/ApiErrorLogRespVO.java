@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - API 错误日志 Response VO")
 @Data
@@ -18,10 +18,10 @@ public class ApiErrorLogRespVO extends ApiErrorLogBaseVO {
     private Integer id;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ApiModelProperty(value = "处理时间", required = true)
-    private Date processTime;
+    private LocalDateTime processTime;
 
     @ApiModelProperty(value = "处理用户编号", example = "233")
     private Integer processUserId;

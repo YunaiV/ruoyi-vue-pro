@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel(value = "管理后台 - 文件 Response VO", description = "不返回 content 字段，太大")
 @Data
@@ -32,6 +32,6 @@ public class FileRespVO {
     private Integer size;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

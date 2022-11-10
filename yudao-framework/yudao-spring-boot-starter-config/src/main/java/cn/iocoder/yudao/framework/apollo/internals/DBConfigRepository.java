@@ -18,8 +18,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Constructor;
+import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executors;
@@ -48,7 +48,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
     /**
      * 缓存配置的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     /**
      * 配置读取 DAO
@@ -166,7 +166,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
      * @param maxUpdateTime 当前配置的最大更新时间
      * @return 配置列表
      */
-    private List<ConfigRespDTO> loadConfigIfUpdate(Date maxUpdateTime) {
+    private List<ConfigRespDTO> loadConfigIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadConfigIfUpdate][首次加载全量配置]");

@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
@@ -267,7 +267,7 @@ public class GlobalExceptionHandler {
         errorLog.setRequestMethod(request.getMethod());
         errorLog.setUserAgent(ServletUtils.getUserAgent(request));
         errorLog.setUserIp(ServletUtil.getClientIP(request));
-        errorLog.setExceptionTime(new Date());
+        errorLog.setExceptionTime(LocalDateTime.now());
     }
 
 }

@@ -1,8 +1,13 @@
 package cn.iocoder.yudao.framework.common.util.date;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -25,12 +30,45 @@ public class DateUtils {
 
     public static final String FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND = "yyyy-MM-dd HH:mm:ss";
 
+    /**
+     * 将 LocalDateTime 转换成 Date
+     *
+     * @param date LocalDateTime
+     * @return LocalDateTime
+     */
+    public static Date of(LocalDateTime date) {
+        // 将此日期时间与时区相结合以创建 ZonedDateTime
+        ZonedDateTime zonedDateTime = date.atZone(ZoneId.systemDefault());
+        // 本地时间线 LocalDateTime 到即时时间线 Instant 时间戳
+        Instant instant = zonedDateTime.toInstant();
+        // UTC时间(世界协调时间,UTC + 00:00)转北京(北京,UTC + 8:00)时间
+        return Date.from(instant);
+    }
+
+    /**
+     * 将 Date 转换成 LocalDateTime
+     *
+     * @param date Date
+     * @return LocalDateTime
+     */
+    public static LocalDateTime of(Date date) {
+        // 转为时间戳
+        Instant instant = date.toInstant();
+        // UTC时间(世界协调时间,UTC + 00:00)转北京(北京,UTC + 8:00)时间
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+    }
+
     public static Date addTime(Duration duration) {
         return new Date(System.currentTimeMillis() + duration.toMillis());
     }
 
     public static boolean isExpired(Date time) {
         return System.currentTimeMillis() > time.getTime();
+    }
+
+    public static boolean isExpired(LocalDateTime time) {
+        LocalDateTime now = LocalDateTime.now();
+        return now.isAfter(time);
     }
 
     public static long diff(Date endTime, Date startTime) {
@@ -40,24 +78,28 @@ public class DateUtils {
     /**
      * 创建指定时间
      *
-     * @param year        年
-     * @param mouth       月
-     * @param day         日
+     * @param year  年
+     * @param mouth 月
+     * @param day   日
      * @return 指定时间
      */
     public static Date buildTime(int year, int mouth, int day) {
         return buildTime(year, mouth, day, 0, 0, 0);
     }
 
+    public static LocalDateTime buildLocalDateTime(int year, int mouth, int day) {
+        return LocalDateTime.of(year, mouth, day, 0, 0, 0);
+    }
+
     /**
      * 创建指定时间
      *
-     * @param year        年
-     * @param mouth       月
-     * @param day         日
-     * @param hour        小时
-     * @param minute      分钟
-     * @param second      秒
+     * @param year   年
+     * @param mouth  月
+     * @param day    日
+     * @param hour   小时
+     * @param minute 分钟
+     * @param second 秒
      * @return 指定时间
      */
     public static Date buildTime(int year, int mouth, int day,
@@ -83,12 +125,26 @@ public class DateUtils {
         return a.compareTo(b) > 0 ? a : b;
     }
 
+    public static LocalDateTime max(LocalDateTime a, LocalDateTime b) {
+        if (a == null) {
+            return b;
+        }
+        if (b == null) {
+            return a;
+        }
+        return a.isAfter(b) ? a : b;
+    }
+
     public static boolean beforeNow(Date date) {
         return date.getTime() < System.currentTimeMillis();
     }
 
     public static boolean afterNow(Date date) {
         return date.getTime() >= System.currentTimeMillis();
+    }
+
+    public static boolean afterNow(LocalDateTime localDateTime) {
+        return localDateTime.isAfter(LocalDateTime.now());
     }
 
     /**
@@ -133,6 +189,16 @@ public class DateUtils {
             return false;
         }
         return DateUtil.isSameDay(date, new Date());
+    }
+
+    /**
+     * 是否今天
+     *
+     * @param date 日期
+     * @return 是否
+     */
+    public static boolean isToday(LocalDateTime date) {
+        return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now());
     }
 
 }

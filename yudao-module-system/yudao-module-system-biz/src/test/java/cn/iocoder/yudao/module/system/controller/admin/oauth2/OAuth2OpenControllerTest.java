@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.controller.admin.oauth2;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -25,14 +26,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -77,7 +77,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
 
         // mock 方法（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(addTime(Duration.ofMillis(30050L))); // 多给 10 毫秒，保证可执行完
+                .setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), 10L, ChronoUnit.MILLIS)); // 多给 10 毫秒，保证可执行完
         when(oauth2GrantService.grantAuthorizationCodeForAccessToken(eq("test_client_id"),
                 eq(code), eq(redirectUri), eq(state))).thenReturn(accessTokenDO);
 
@@ -105,7 +105,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
 
         // mock 方法（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(addTime(Duration.ofMillis(30050L))); // 多给 10 毫秒，保证可执行完
+                .setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), 30050L, ChronoUnit.MILLIS)); // 多给 10 毫秒，保证可执行完
         when(oauth2GrantService.grantPassword(eq(username), eq(password), eq("test_client_id"),
                 eq(Lists.newArrayList("write", "read")))).thenReturn(accessTokenDO);
 
@@ -132,7 +132,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
 
         // mock 方法（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(addTime(Duration.ofMillis(30010L))); // 多给 10 毫秒，保证可执行完
+                .setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), 30050L, ChronoUnit.MILLIS)); // 多给 10 毫秒，保证可执行完
         when(oauth2GrantService.grantRefreshToken(eq(refreshToken), eq("test_client_id"))).thenReturn(accessTokenDO);
 
         // 调用
@@ -178,7 +178,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
         HttpServletRequest request = mockRequest("demo_client_id", "demo_client_secret");
         String token = randomString();
         // mock 方法
-        OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class).setUserType(UserTypeEnum.ADMIN.getValue()).setExpiresTime(new Date(1653485731195L));
+        OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class).setUserType(UserTypeEnum.ADMIN.getValue()).setExpiresTime(LocalDateTimeUtil.of(1653485731195L));
         when(oauth2TokenService.checkAccessToken(eq(token))).thenReturn(accessTokenDO);
 
         // 调用
@@ -279,7 +279,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
                 eq(clientId), eq(SetUtils.asSet("read", "write")))).thenReturn(true);
         // mock 方法（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setAccessToken("test_access_token").setExpiresTime(addTime(Duration.ofMillis(30010L)));
+                .setAccessToken("test_access_token").setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), 30010L, ChronoUnit.MILLIS));
         when(oauth2GrantService.grantImplicit(isNull(), eq(UserTypeEnum.ADMIN.getValue()),
                 eq(clientId), eq(ListUtil.toList("read")))).thenReturn(accessTokenDO);
 

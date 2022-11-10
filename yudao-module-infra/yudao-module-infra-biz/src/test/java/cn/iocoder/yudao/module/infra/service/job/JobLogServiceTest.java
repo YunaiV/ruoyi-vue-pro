@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -96,8 +96,8 @@ public class JobLogServiceTest extends BaseDbUnitTest {
             o.setExecuteIndex(1);
             o.setHandlerName("handlerName 单元测试");
             o.setStatus(JobLogStatusEnum.SUCCESS.getStatus());
-            o.setBeginTime(buildTime(2021, 1, 8));
-            o.setEndTime(buildTime(2021, 1, 8));
+            o.setBeginTime(buildLocalDateTime(2021, 1, 8));
+            o.setEndTime(buildLocalDateTime(2021, 1, 8));
         });
         jobLogMapper.insert(dbJobLog);
         // 测试 jobId 不匹配
@@ -105,9 +105,9 @@ public class JobLogServiceTest extends BaseDbUnitTest {
         // 测试 handlerName 不匹配
         jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setHandlerName(randomString())));
         // 测试 beginTime 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setBeginTime(buildTime(2021, 1, 7))));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setBeginTime(buildLocalDateTime(2021, 1, 7))));
         // 测试 endTime 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setEndTime(buildTime(2021, 1, 9))));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setEndTime(buildLocalDateTime(2021, 1, 9))));
         // 测试 status 不匹配
         jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setStatus(JobLogStatusEnum.FAILURE.getStatus())));
         // 准备参数
@@ -132,8 +132,8 @@ public class JobLogServiceTest extends BaseDbUnitTest {
             o.setExecuteIndex(1);
             o.setHandlerName("handlerName 单元测试");
             o.setStatus(JobLogStatusEnum.SUCCESS.getStatus());
-            o.setBeginTime(buildTime(2021, 1, 8));
-            o.setEndTime(buildTime(2021, 1, 8));
+            o.setBeginTime(buildLocalDateTime(2021, 1, 8));
+            o.setEndTime(buildLocalDateTime(2021, 1, 8));
         });
         jobLogMapper.insert(dbJobLog);
         // 测试 jobId 不匹配
@@ -141,9 +141,9 @@ public class JobLogServiceTest extends BaseDbUnitTest {
         // 测试 handlerName 不匹配
         jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setHandlerName(randomString())));
         // 测试 beginTime 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setBeginTime(buildTime(2021, 1, 7))));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setBeginTime(buildLocalDateTime(2021, 1, 7))));
         // 测试 endTime 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setEndTime(buildTime(2021, 1, 9))));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setEndTime(buildLocalDateTime(2021, 1, 9))));
         // 测试 status 不匹配
         jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setStatus(JobLogStatusEnum.FAILURE.getStatus())));
         // 准备参数

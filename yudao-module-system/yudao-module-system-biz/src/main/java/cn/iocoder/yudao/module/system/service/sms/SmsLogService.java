@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +56,7 @@ public interface SmsLogService {
      * @param apiReceiveCode API 接收结果的编码
      * @param apiReceiveMsg API 接收结果的说明
      */
-    void updateSmsReceiveResult(Long id, Boolean success, Date receiveTime, String apiReceiveCode, String apiReceiveMsg);
+    void updateSmsReceiveResult(Long id, Boolean success, LocalDateTime receiveTime, String apiReceiveCode, String apiReceiveMsg);
 
     /**
      * 获得短信日志分页

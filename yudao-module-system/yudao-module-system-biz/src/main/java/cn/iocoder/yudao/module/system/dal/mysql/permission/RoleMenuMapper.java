@@ -8,8 +8,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -37,6 +37,6 @@ public interface RoleMenuMapper extends BaseMapperX<RoleMenuDO> {
     }
 
     @Select("SELECT COUNT(*) FROM system_role_menu WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
+    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -73,15 +73,15 @@ public class PayOrderBaseVO {
     @ApiModelProperty(value = "订单失效时间", required = true)
     @NotNull(message = "订单失效时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date expireTime;
+    private LocalDateTime expireTime;
 
     @ApiModelProperty(value = "订单支付成功时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date successTime;
+    private LocalDateTime successTime;
 
     @ApiModelProperty(value = "订单支付通知时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date notifyTime;
+    private LocalDateTime notifyTime;
 
     @ApiModelProperty(value = "支付成功的订单拓展单编号")
     private Long successExtensionId;

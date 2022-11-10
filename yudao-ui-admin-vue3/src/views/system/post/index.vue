@@ -14,25 +14,19 @@
         <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
       </template>
       <template #action_default="{ row }">
-        <XButton
-          link
-          type="primary"
+        <XTextButton
           preIcon="ep:edit"
           :title="t('action.edit')"
           v-hasPermi="['system:post:update']"
           @click="handleUpdate(row.id)"
         />
-        <XButton
-          link
-          type="primary"
+        <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
           v-hasPermi="['system:post:update']"
           @click="handleDetail(row)"
         />
-        <XButton
-          link
-          type="primary"
+        <XTextButton
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:post:delete']"

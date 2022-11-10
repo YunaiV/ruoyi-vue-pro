@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.infra.dal.mysql.config;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.apollo.internals.ConfigFrameworkDAO;
 import cn.iocoder.yudao.framework.apollo.internals.dto.ConfigRespDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ public class ConfigDAOImpl implements ConfigFrameworkDAO {
     }
 
     @Override
-    public int selectCountByUpdateTimeGt(Date maxUpdateTime) {
+    public int selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime) {
         return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM infra_config WHERE update_time > ?",
                 Integer.class, maxUpdateTime);
     }
@@ -34,7 +35,7 @@ public class ConfigDAOImpl implements ConfigFrameworkDAO {
         return jdbcTemplate.query("SELECT config_key, value, update_time, deleted FROM infra_config",
                 (rs, rowNum) -> new ConfigRespDTO().setKey(rs.getString("config_key"))
                         .setValue(rs.getString("value"))
-                        .setUpdateTime(rs.getDate("update_time"))
+                        .setUpdateTime(LocalDateTimeUtil.of(rs.getDate("update_time")))
                         .setDeleted(rs.getBoolean("deleted")));
     }
 

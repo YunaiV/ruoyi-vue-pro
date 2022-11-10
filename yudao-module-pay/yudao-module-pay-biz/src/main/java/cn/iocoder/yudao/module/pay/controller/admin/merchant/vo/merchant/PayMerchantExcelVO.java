@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 支付商户信息 Excel VO
@@ -35,6 +35,6 @@ public class PayMerchantExcelVO {
     private String remark;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

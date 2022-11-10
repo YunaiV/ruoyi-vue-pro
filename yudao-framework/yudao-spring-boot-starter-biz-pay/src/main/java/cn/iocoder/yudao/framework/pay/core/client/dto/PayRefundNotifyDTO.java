@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 从渠道返回数据中解析得到的支付退款通知的Notify DTO
@@ -57,7 +57,7 @@ public class PayRefundNotifyDTO {
     /**
      * 退款成功时间
      */
-    private Date refundSuccessTime;
+    private LocalDateTime refundSuccessTime;
 
 
 }

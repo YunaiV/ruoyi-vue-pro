@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.operatelog.core.service;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -85,7 +85,7 @@ public class OperateLog {
     /**
      * 开始时间
      */
-    private Date startTime;
+    private LocalDateTime startTime;
 
     /**
      * 执行时长，单位：毫秒

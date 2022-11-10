@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.oa.vo;
 
 import lombok.*;
-import java.util.*;
+import java.time.LocalDateTime;
 import io.swagger.annotations.*;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,6 +25,6 @@ public class BpmOALeavePageReqVO extends PageParam {
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "申请时间")
-    private Date[] createTime;
+    private LocalDateTime[] createTime;
 
 }

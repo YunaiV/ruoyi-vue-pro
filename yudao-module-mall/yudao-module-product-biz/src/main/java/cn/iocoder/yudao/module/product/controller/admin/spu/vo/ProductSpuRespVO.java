@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 // TODO @Luowenfeng：这个类只返回 SPU 相关的信息，删除 skus、categoryIds、productPropertyViews；明细使用 SpuDetailRespVO 替代
@@ -22,7 +22,7 @@ public class ProductSpuRespVO extends ProductSpuBaseVO {
     private Long id;
 
     @ApiModelProperty(value = "创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * SKU 数组

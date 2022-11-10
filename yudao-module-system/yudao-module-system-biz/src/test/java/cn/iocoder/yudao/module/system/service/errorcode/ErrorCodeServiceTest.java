@@ -17,12 +17,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -96,7 +96,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
        reqVO.setApplicationName("tu");
        reqVO.setCode(1);
        reqVO.setMessage("ma");
-       reqVO.setCreateTime((new Date[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2020, 11, 1),buildLocalDateTime(2020, 11, 30)}));
 
        // 调用
        PageResult<ErrorCodeDO> pageResult = errorCodeService.getErrorCodePage(reqVO);
@@ -115,7 +115,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
             o.setApplicationName("tudou");
             o.setCode(1);
             o.setMessage("yuanma");
-            o.setCreateTime(buildTime(2020, 11, 11));
+            o.setCreateTime(buildLocalDateTime(2020, 11, 11));
         });
         errorCodeMapper.insert(dbErrorCode);
         // 测试 type 不匹配
@@ -127,7 +127,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
         // 测试 message 不匹配
         errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setMessage("nai")));
         // 测试 createTime 不匹配
-        errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setCreateTime(buildTime(2020, 12, 12))));
+        errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setCreateTime(buildLocalDateTime(2020, 12, 12))));
         return dbErrorCode;
     }
 
@@ -141,7 +141,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
         reqVO.setApplicationName("tu");
         reqVO.setCode(1);
         reqVO.setMessage("ma");
-        reqVO.setCreateTime((new Date[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2020, 11, 1),buildLocalDateTime(2020, 11, 30)}));
 
         // 调用
         List<ErrorCodeDO> list = errorCodeService.getErrorCodeList(reqVO);

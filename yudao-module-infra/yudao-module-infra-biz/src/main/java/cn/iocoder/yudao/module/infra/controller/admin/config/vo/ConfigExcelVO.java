@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 参数配置 Excel 导出响应 VO
@@ -41,6 +41,6 @@ public class ConfigExcelVO {
     private String remark;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

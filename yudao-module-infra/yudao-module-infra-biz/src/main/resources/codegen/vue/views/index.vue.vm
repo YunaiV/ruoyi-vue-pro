@@ -65,7 +65,7 @@
     #set ($javaField = $column.javaField)
     #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
     #set ($comment=$column.columnComment)
-#if ($column.javaType == "Date")## 时间类型
+#if ($column.javaType == "LocalDateTime")## 时间类型
       <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.${javaField}) }}</span>

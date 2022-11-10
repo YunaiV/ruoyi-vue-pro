@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -44,11 +44,11 @@ public class RewardActivityDO extends BaseDO {
     /**
      * 开始时间
      */
-    private Date startTime;
+    private LocalDateTime startTime;
     /**
      * 结束时间
      */
-    private Date endTime;
+    private LocalDateTime endTime;
     /**
      * 备注
      */

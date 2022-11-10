@@ -8,8 +8,7 @@ const props = defineProps({
   preIcon: propTypes.string.def(''),
   postIcon: propTypes.string.def(''),
   title: propTypes.string.def(''),
-  type: propTypes.oneOf(['', 'primary', 'success', 'warning', 'danger', 'info']).def(''),
-  link: propTypes.bool.def(false),
+  type: propTypes.oneOf(['', 'primary', 'success', 'warning', 'danger', 'info']).def('primary'),
   circle: propTypes.bool.def(false),
   round: propTypes.bool.def(false),
   plain: propTypes.bool.def(false),
@@ -29,7 +28,7 @@ const getBindValue = computed(() => {
 </script>
 
 <template>
-  <el-button v-bind="getBindValue" @click="onClick">
+  <el-button link v-bind="getBindValue" @click="onClick">
     <Icon :icon="preIcon" v-if="preIcon" class="mr-1px" />
     {{ title ? title : '' }}
     <Icon :icon="postIcon" v-if="postIcon" class="mr-1px" />

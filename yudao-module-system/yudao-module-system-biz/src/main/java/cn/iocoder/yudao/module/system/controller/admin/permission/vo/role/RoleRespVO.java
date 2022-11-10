@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @ApiModel("管理后台 - 角色信息 Response VO")
@@ -33,6 +33,6 @@ public class RoleRespVO extends RoleBaseVO {
     private Integer type;
 
     @ApiModelProperty(value = "创建时间", required = true, example = "时间戳格式")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

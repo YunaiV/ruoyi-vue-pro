@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.coupon.controller.admin.coupon.vo;
 
 import lombok.*;
-import java.util.*;
+
+import java.time.LocalDateTime;
 import io.swagger.annotations.*;
 
 @ApiModel("管理后台 - 优惠券 Response VO")
@@ -14,6 +15,6 @@ public class CouponRespVO extends CouponBaseVO {
     private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }
