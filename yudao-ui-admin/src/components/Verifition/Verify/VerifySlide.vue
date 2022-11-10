@@ -276,7 +276,7 @@ export default {
       const _this = this
       // 判断是否重合
       if (this.status && this.isEnd === false) {
-        const moveLeftDistance = parseInt((this.moveBlockLeft || '').replace('px', ''))
+        let moveLeftDistance = parseInt((this.moveBlockLeft || '').replace('px', ''))
         moveLeftDistance = moveLeftDistance * 310 / parseInt(this.setSize.imgWidth)
         const data = {
           captchaType: this.captchaType,
