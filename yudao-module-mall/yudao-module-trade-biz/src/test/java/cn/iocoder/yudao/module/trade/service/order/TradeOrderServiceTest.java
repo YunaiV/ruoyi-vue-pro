@@ -25,12 +25,15 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderConfig;
+import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -73,6 +76,15 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
     @MockBean
     private CouponApi couponApi;
 
+    @MockBean
+    private TradeOrderProperties tradeOrderProperties;
+
+    @BeforeEach
+    public void setUp() {
+        when(tradeOrderProperties.getAppId()).thenReturn(888L);
+        when(tradeOrderProperties.getExpireTime()).thenReturn(Duration.ofDays(1));
+    }
+
     @Test
     public void testCreateTradeOrder_success() {
         // 准备参数
@@ -92,7 +104,7 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         when(productSkuApi.getSkuList(eq(asSet(1L, 2L)))).thenReturn(Arrays.asList(sku01, sku02));
         // mock 方法（商品 SPU 检查）
         ProductSpuRespDTO spu01 = randomPojo(ProductSpuRespDTO.class, o -> o.setId(11L)
-                .setStatus(ProductSpuStatusEnum.ENABLE.getStatus()));
+                .setStatus(ProductSpuStatusEnum.ENABLE.getStatus()).setName("商品 1"));
         ProductSpuRespDTO spu02 = randomPojo(ProductSpuRespDTO.class, o -> o.setId(21L)
                 .setStatus(ProductSpuStatusEnum.ENABLE.getStatus()));
         when(productSpuApi.getSpuList(eq(asSet(11L, 21L)))).thenReturn(Arrays.asList(spu01, spu02));
@@ -120,6 +132,17 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
             assertEquals(priceCalculateReqDTO.getItems().get(1).getCount(), 4);
             return true;
         }))).thenReturn(new PriceCalculateRespDTO().setOrder(priceOrder));
+        // mock 方法（创建支付单）
+        when(payOrderApi.createPayOrder(argThat(createReqDTO -> {
+            assertEquals(createReqDTO.getAppId(), 888L);
+            assertEquals(createReqDTO.getUserIp(), userIp);
+            assertNotNull(createReqDTO.getMerchantOrderId()); // 由于 tradeOrderId 后生成，只能校验非空
+            assertEquals(createReqDTO.getSubject(), "商品 1 等多件");
+            assertNull(createReqDTO.getBody());
+            assertEquals(createReqDTO.getAmount(), 80);
+            assertNotNull(createReqDTO.getExpireTime());
+            return true;
+        }))).thenReturn(1000L);
 
         // 调用方法
         Long tradeOrderId = tradeOrderService.createTradeOrder(userId, userIp, reqVO);
@@ -147,7 +170,7 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderDO.getDiscountPrice(), 0);
         assertEquals(tradeOrderDO.getAdjustPrice(), 0);
         assertEquals(tradeOrderDO.getPayPrice(), 80);
-        assertNull(tradeOrderDO.getPayOrderId());
+        assertEquals(tradeOrderDO.getPayOrderId(), 1000L);
         assertNull(tradeOrderDO.getPayChannel());
         assertNull(tradeOrderDO.getDeliveryTemplateId());
         assertNull(tradeOrderDO.getExpressNo());

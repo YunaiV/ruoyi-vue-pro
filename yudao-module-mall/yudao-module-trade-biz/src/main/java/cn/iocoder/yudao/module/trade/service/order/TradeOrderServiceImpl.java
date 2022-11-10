@@ -1,13 +1,10 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -30,7 +27,6 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.orderitem.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
@@ -57,10 +53,6 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_CREAT
  */
 @Service
 public class TradeOrderServiceImpl implements TradeOrderService {
-
-    // TODO LeeYan9: 静态变量, 需要在最前面哈; 另外, 静态变量的注释最好写下;
-    private static final String BLANK_PLACEHOLDER = " ";
-    private static final String MULTIPLIER_PLACEHOLDER = "x";
 
     @Resource
     private TradeOrderMapper tradeOrderMapper;
@@ -89,7 +81,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 商品 SKU 检查：可售状态、库存
         List<ProductSkuRespDTO> skus = validateSkuSaleable(createReqVO.getItems());
         // 商品 SPU 检查：可售状态
-        validateSpuSaleable(convertSet(skus, ProductSkuRespDTO::getSpuId));
+        List<ProductSpuRespDTO> spus = validateSpuSaleable(convertSet(skus, ProductSkuRespDTO::getSpuId));
         // 用户收件地址的校验
         AddressRespDTO address = validateAddress(userId, createReqVO.getAddressId());
 
@@ -102,53 +94,9 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         List<TradeOrderItemDO> tradeOrderItems = createTradeOrderItems(tradeOrderDO, priceResp.getOrder().getItems(), skus);
 
         // 订单创建完后的逻辑
-        afterCreateTradeOrder(userId, createReqVO, tradeOrderDO, tradeOrderItems);
+        afterCreateTradeOrder(userId, createReqVO, tradeOrderDO, tradeOrderItems, spus);
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
         return tradeOrderDO.getId();
-    }
-
-    private void fillPayOrderInfoFromItems(PayOrderInfoCreateReqDTO payOrderInfoCreateReqDTO,
-                                           List<TradeOrderItemDO> tradeOrderItems) {
-        // 填写 商品&应用信息
-        payOrderInfoCreateReqDTO.setMerchantOrderId(tradeOrderProperties.getMerchantOrderId());
-        payOrderInfoCreateReqDTO.setAppId(tradeOrderProperties.getAppId());
-
-        // 填写商品信息
-        StrBuilder subject = new StrBuilder();
-        StrBuilder body = new StrBuilder();
-        for (TradeOrderItemDO tradeOrderItem : tradeOrderItems) {
-            // append subject
-            subject.append(BLANK_PLACEHOLDER);
-            subject.append(tradeOrderItem.getName());
-            // append body
-            body.append(BLANK_PLACEHOLDER);
-            body.append(tradeOrderItem.getName());
-            body.append(MULTIPLIER_PLACEHOLDER);
-            body.append(tradeOrderItem.getCount());
-        }
-        // 设置 subject & body
-        // TODO @LeeYan9: 可以抽象一个 StrUtils 方法; 或者看看 hutool 有没自带的哈
-        payOrderInfoCreateReqDTO.setSubject(StrUtils.maxLength(subject.subString(1), 32));
-        payOrderInfoCreateReqDTO.setBody(StrUtils.maxLength(body.subString(1), 128));
-    }
-
-    private void xfillItemsInfoFromSkuAndOrder(TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItems,
-                                              Map<Long, ProductSkuRespDTO> spuInfos) {
-        for (TradeOrderItemDO tradeOrderItem : tradeOrderItems) {
-            // 填充订单信息
-            tradeOrderItem.setOrderId(tradeOrderDO.getId());
-            tradeOrderItem.setUserId(tradeOrderDO.getUserId());
-            // 填充SKU信息
-            ProductSkuRespDTO skuInfoRespDTO = spuInfos.get(tradeOrderItem.getSkuId());
-            tradeOrderItem.setSpuId(skuInfoRespDTO.getSpuId());
-            tradeOrderItem.setPicUrl(skuInfoRespDTO.getPicUrl());
-            tradeOrderItem.setName(skuInfoRespDTO.getName());
-            tradeOrderItem.setRefundStatus(TradeOrderItemRefundStatusEnum.NONE.getStatus());
-            // todo
-            List<TradeOrderItemDO.Property> property =
-                    BeanUtil.copyToList(skuInfoRespDTO.getProperties(), TradeOrderItemDO.Property.class);
-            tradeOrderItem.setProperties(property);
-        }
     }
 
     /**
@@ -248,7 +196,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      * @param tradeOrderDO 交易订单
      */
     private void afterCreateTradeOrder(Long userId, AppTradeOrderCreateReqVO createReqVO,
-                                       TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItemDOs) {
+                                       TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItemDOs,
+                                       List<ProductSpuRespDTO> spus) {
         // 下单时扣减商品库存
         productSkuApi.updateSkuStock(new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(tradeOrderItemDOs)));
 
@@ -262,13 +211,21 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                     .setOrderId(tradeOrderDO.getId()));
         }
 
-        // 构建预支付请求参数
-        // TODO @LeeYan9: 需要更新到订单上
-//        PayOrderInfoCreateReqDTO payOrderCreateReqDTO = PayOrderConvert.INSTANCE.convert(tradeOrderDO);
-//        fillPayOrderInfoFromItems(payOrderCreateReqDTO, tradeOrderItems);
         // 生成预支付
+        createPayOrder(tradeOrderDO, tradeOrderItemDOs, spus);
 
         // 增加订单日志 TODO 芋艿：待实现
+    }
+
+    private void createPayOrder(TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItemDOs,
+                                List<ProductSpuRespDTO> spus) {
+        // 创建支付单，用于后续的支付
+        PayOrderInfoCreateReqDTO payOrderCreateReqDTO = TradeOrderConvert.INSTANCE.convert(
+                tradeOrderDO, tradeOrderItemDOs, spus, tradeOrderProperties);
+        Long payOrderId = payOrderApi.createPayOrder(payOrderCreateReqDTO);
+
+        // 更新到交易单上
+        tradeOrderMapper.updateById(new TradeOrderDO().setId(tradeOrderDO.getId()).setPayOrderId(payOrderId));
     }
 
 }

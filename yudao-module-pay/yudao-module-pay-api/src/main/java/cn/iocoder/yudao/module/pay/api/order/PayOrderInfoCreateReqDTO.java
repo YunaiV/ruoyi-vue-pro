@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pay.api.order;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -45,7 +45,7 @@ public class PayOrderInfoCreateReqDTO implements Serializable {
     /**
      * 商品描述
      */
-    @NotEmpty(message = "商品描述信息不能为空")
+//    @NotEmpty(message = "商品描述信息不能为空") // 允许空
     @Length(max = 128, message = "商品描述信息长度不能超过128")
     private String body;
 
@@ -55,8 +55,7 @@ public class PayOrderInfoCreateReqDTO implements Serializable {
      * 支付金额，单位：分
      */
     @NotNull(message = "支付金额不能为空")
-    // TODO @LeeYan9: 是不是 @Min 注解呀, 是 Integer 哈
-    @DecimalMin(value = "0", inclusive = false, message = "支付金额必须大于零")
+    @Min(value = 1, message = "支付金额必须大于零")
     private Integer amount;
 
     /**
