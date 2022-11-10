@@ -77,7 +77,7 @@
             preIcon="ep:edit"
             :title="t('action.edit')"
             v-hasPermi="['system:menu:update']"
-            @click="handleUpdate(row.id)"
+            @click="handleUpdate(row)"
           />
           <XTextButton
             preIcon="ep:delete"
