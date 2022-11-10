@@ -76,10 +76,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
         if (pageVO.getBeginCreateTime() != null) {
-            taskQuery.taskCreatedAfter(DateUtils.localDateTimeToDate(pageVO.getBeginCreateTime()));
+            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getBeginCreateTime()));
         }
         if (pageVO.getEndCreateTime() != null) {
-            taskQuery.taskCreatedBefore(DateUtils.localDateTimeToDate(pageVO.getEndCreateTime()));
+            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getEndCreateTime()));
         }
         // 执行查询
         List<Task> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
@@ -108,10 +108,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
         if (pageVO.getBeginCreateTime() != null) {
-            taskQuery.taskCreatedAfter(DateUtils.localDateTimeToDate(pageVO.getBeginCreateTime()));
+            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getBeginCreateTime()));
         }
         if (pageVO.getEndCreateTime() != null) {
-            taskQuery.taskCreatedBefore(DateUtils.localDateTimeToDate(pageVO.getEndCreateTime()));
+            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getEndCreateTime()));
         }
         // 执行查询
         List<HistoricTaskInstance> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());

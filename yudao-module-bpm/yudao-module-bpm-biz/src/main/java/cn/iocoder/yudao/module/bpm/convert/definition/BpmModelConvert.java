@@ -45,7 +45,7 @@ public interface BpmModelConvert {
     default BpmModelPageItemRespVO convert(Model model, BpmFormDO form, Deployment deployment, ProcessDefinition processDefinition) {
         BpmModelPageItemRespVO modelRespVO = new BpmModelPageItemRespVO();
         modelRespVO.setId(model.getId());
-        modelRespVO.setCreateTime(DateUtils.dateToLocalDateTime(model.getCreateTime()));
+        modelRespVO.setCreateTime(DateUtils.of(model.getCreateTime()));
         // 通用 copy
         copyTo(model, modelRespVO);
         // Form
@@ -58,7 +58,7 @@ public interface BpmModelConvert {
         if (modelRespVO.getProcessDefinition() != null) {
             modelRespVO.getProcessDefinition().setSuspensionState(processDefinition.isSuspended() ?
                     SuspensionState.SUSPENDED.getStateCode() : SuspensionState.ACTIVE.getStateCode());
-            modelRespVO.getProcessDefinition().setDeploymentTime(DateUtils.dateToLocalDateTime(deployment.getDeploymentTime()));
+            modelRespVO.getProcessDefinition().setDeploymentTime(DateUtils.of(deployment.getDeploymentTime()));
         }
         return modelRespVO;
     }
@@ -66,7 +66,7 @@ public interface BpmModelConvert {
     default BpmModelRespVO convert(Model model) {
         BpmModelRespVO modelRespVO = new BpmModelRespVO();
         modelRespVO.setId(model.getId());
-        modelRespVO.setCreateTime(DateUtils.dateToLocalDateTime(model.getCreateTime()));
+        modelRespVO.setCreateTime(DateUtils.of(model.getCreateTime()));
         // 通用 copy
         copyTo(model, modelRespVO);
         return modelRespVO;
