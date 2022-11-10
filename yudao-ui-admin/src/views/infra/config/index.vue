@@ -41,7 +41,7 @@
 
     <el-table v-loading="loading" :data="configList">
       <el-table-column label="参数主键" align="center" prop="id" />
-      <el-table-column label="参数分类" align="center" prop="group" />
+      <el-table-column label="参数分类" align="center" prop="category" />
       <el-table-column label="参数名称" align="center" prop="name" :show-overflow-tooltip="true" />
       <el-table-column label="参数键名" align="center" prop="key" :show-overflow-tooltip="true" />
       <el-table-column label="参数键值" align="center" prop="value" />
