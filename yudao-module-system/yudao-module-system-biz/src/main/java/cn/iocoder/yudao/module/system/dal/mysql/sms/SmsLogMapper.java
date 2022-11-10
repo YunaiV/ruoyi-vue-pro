@@ -20,7 +20,7 @@ public interface SmsLogMapper extends BaseMapperX<SmsLogDO> {
                 .likeIfPresent(SmsLogDO::getMobile, reqVO.getMobile())
                 .eqIfPresent(SmsLogDO::getSendStatus, reqVO.getSendStatus())
                 .betweenIfPresent(SmsLogDO::getSendTime, reqVO.getSendTime())
-                .eqIfPresent(SmsLogDO::getSendStatus, reqVO.getReceiveStatus())
+                .eqIfPresent(SmsLogDO::getReceiveStatus, reqVO.getReceiveStatus())
                 .betweenIfPresent(SmsLogDO::getReceiveTime, reqVO.getReceiveTime())
                 .orderByDesc(SmsLogDO::getId));
     }
@@ -32,7 +32,7 @@ public interface SmsLogMapper extends BaseMapperX<SmsLogDO> {
                 .likeIfPresent(SmsLogDO::getMobile, reqVO.getMobile())
                 .eqIfPresent(SmsLogDO::getSendStatus, reqVO.getSendStatus())
                 .betweenIfPresent(SmsLogDO::getSendTime, reqVO.getSendTime())
-                .eqIfPresent(SmsLogDO::getSendStatus, reqVO.getReceiveStatus())
+                .eqIfPresent(SmsLogDO::getReceiveStatus, reqVO.getReceiveStatus())
                 .betweenIfPresent(SmsLogDO::getReceiveTime, reqVO.getReceiveTime())
                 .orderByDesc(SmsLogDO::getId));
     }
