@@ -48,7 +48,7 @@ service.interceptors.request.use(
     // 设置租户
     if (tenantEnable && tenantEnable === 'true') {
       const tenantId = getTenantId()
-      if (tenantId) service.defaults.headers.common['tenant-id'] = tenantId
+      if (tenantId) (config as Recordable).headers.common['tenant-id'] = tenantId
     }
     const params = config.params || {}
     const data = config.data || false
