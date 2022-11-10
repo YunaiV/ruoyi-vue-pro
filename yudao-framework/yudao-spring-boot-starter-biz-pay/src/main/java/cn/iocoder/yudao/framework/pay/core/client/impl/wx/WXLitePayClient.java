@@ -50,7 +50,7 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
     @Override
     protected void doInit() {
         WxPayConfig payConfig = new WxPayConfig();
-        BeanUtil.copyProperties(config, payConfig, "keyContent");
+        BeanUtil.copyProperties(config, payConfig, "privateKeyContent","privateCertContent");
         payConfig.setTradeType(WxPayConstants.TradeType.JSAPI); // 设置使用 JS API 支付方式
 //        if (StrUtil.isNotEmpty(config.getKeyContent())) {
 //            payConfig.setKeyContent(config.getKeyContent().getBytes(StandardCharsets.UTF_8));
