@@ -60,9 +60,9 @@
     <template #footer>
       <XButton
         v-if="['create', 'update'].includes(actionType)"
-        :loading="actionLoading"
-        :title="t('action.save')"
         type="primary"
+        :title="t('action.save')"
+        :loading="actionLoading"
         @click="submitForm"
       />
       <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />

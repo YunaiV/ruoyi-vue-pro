@@ -38,7 +38,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
   const gridOptions = reactive<VxeGridProps>({
     loading: true,
     size: currentSize as any,
-    height: 800,
+    height: 700,
     rowConfig: {
       isCurrent: true, // 当鼠标点击行时，是否要高亮当前行
       isHover: true // 当鼠标移到行时，是否要高亮当前行
@@ -97,9 +97,11 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
     }
   })
   const delList = (ids: string | number | string[] | number[]) => {
-    message.delConfirm().then(() => {
-      config?.delListApi && config?.delListApi(ids)
-      message.success(t('common.delSuccess'))
+    return new Promise(async () => {
+      message.delConfirm().then(() => {
+        config?.delListApi && config?.delListApi(ids)
+        message.success(t('common.delSuccess'))
+      })
     })
   }
   return {

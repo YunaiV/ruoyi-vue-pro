@@ -17,7 +17,7 @@ const crudSchemas = reactive<VxeCrudSchema[]>([
   {
     title: t('common.index'),
     field: 'id',
-    type: 'index',
+    type: 'seq',
     form: {
       show: false
     },
