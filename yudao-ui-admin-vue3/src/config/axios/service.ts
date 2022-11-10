@@ -46,7 +46,7 @@ service.interceptors.request.use(
       ;(config as Recordable).headers.Authorization = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token
     }
     // 设置租户
-    if (tenantEnable) {
+    if (tenantEnable && tenantEnable === 'true') {
       const tenantId = getTenantId()
       if (tenantId) service.defaults.headers.common['tenant-id'] = tenantId
     }

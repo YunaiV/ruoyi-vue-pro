@@ -4,9 +4,9 @@
 
 import WebStorageCache from 'web-storage-cache'
 
-type CacheType = 'sessionStorage' | 'localStorage'
+type CacheType = 'localStorage' | 'sessionStorage'
 
-export const useCache = (type: CacheType = 'sessionStorage') => {
+export const useCache = (type: CacheType = 'localStorage') => {
   const wsCache: WebStorageCache = new WebStorageCache({
     storage: type
   })
