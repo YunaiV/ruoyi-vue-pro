@@ -111,7 +111,7 @@
         </template>
       </el-table-column>
       <el-table-column label="退款金额(元)" align="center" prop="refundAmount" width="100">
-        <template scope="scope">
+        <template v-slot="scope">
           ￥{{ parseFloat(scope.row.refundAmount / 100).toFixed(2) }}
         </template>
       </el-table-column>

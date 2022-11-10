@@ -66,7 +66,7 @@ public class ErrorCodeLoaderImpl implements ErrorCodeLoader {
             // 写入到错误码的缓存
             putErrorCode(errorCodeRespDTO.getCode(), errorCodeRespDTO.getMessage());
             // 记录下更新时间，方便增量更新
-            maxUpdateTime = DateUtils.maxLocalDateTime(maxUpdateTime, errorCodeRespDTO.getUpdateTime());
+            maxUpdateTime = DateUtils.max(maxUpdateTime, errorCodeRespDTO.getUpdateTime());
         });
     }
 

@@ -30,16 +30,28 @@ public class DateUtils {
 
     public static final String FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND = "yyyy-MM-dd HH:mm:ss";
 
-    public static Date localDateTimeToDate(LocalDateTime date){
+    /**
+     * 将 LocalDateTime 转换成 Date
+     *
+     * @param date LocalDateTime
+     * @return LocalDateTime
+     */
+    public static Date of(LocalDateTime date) {
         // 将此日期时间与时区相结合以创建 ZonedDateTime
         ZonedDateTime zonedDateTime = date.atZone(ZoneId.systemDefault());
-        // 本地时间线LocalDateTime到即时时间线Instant时间戳
+        // 本地时间线 LocalDateTime 到即时时间线 Instant 时间戳
         Instant instant = zonedDateTime.toInstant();
         // UTC时间(世界协调时间,UTC + 00:00)转北京(北京,UTC + 8:00)时间
         return Date.from(instant);
     }
 
-    public static LocalDateTime dateToLocalDateTime(Date date){
+    /**
+     * 将 Date 转换成 LocalDateTime
+     *
+     * @param date Date
+     * @return LocalDateTime
+     */
+    public static LocalDateTime of(Date date) {
         // 转为时间戳
         Instant instant = date.toInstant();
         // UTC时间(世界协调时间,UTC + 00:00)转北京(北京,UTC + 8:00)时间
@@ -113,14 +125,14 @@ public class DateUtils {
         return a.compareTo(b) > 0 ? a : b;
     }
 
-    public static LocalDateTime maxLocalDateTime(LocalDateTime a, LocalDateTime b) {
+    public static LocalDateTime max(LocalDateTime a, LocalDateTime b) {
         if (a == null) {
             return b;
         }
         if (b == null) {
             return a;
         }
-        return a.compareTo(b) > 0 ? a : b;
+        return a.isAfter(b) ? a : b;
     }
 
     public static boolean beforeNow(Date date) {
