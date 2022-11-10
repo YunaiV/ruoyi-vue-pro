@@ -79,40 +79,42 @@ import { rules, allSchemas } from './post.data'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeFormEvents, VxeGridInstance } from 'vxe-table'
+import { VxeGridInstance } from 'vxe-table'
 import { FormExpose } from '@/components/Form'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
-const xGrid = ref<VxeGridInstance>()
-const formRef = ref<FormExpose>() // 表单 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const actionType = ref('') // 操作按钮的类型
 const actionLoading = ref(false) // 按钮Loading
+const xGrid = ref<VxeGridInstance>() // grid Ref
+const formRef = ref<FormExpose>() // 表单 Ref
+const detailRef = ref() // 详情 Ref
 
 const { gridOptions } = useVxeGrid<PostVO>({
   allSchemas: allSchemas,
   getListApi: PostApi.getPostPageApi
 })
+
 // 设置标题
 const setDialogTile = (type: string) => {
   dialogTitle.value = t('action.' + type)
   actionType.value = type
   dialogVisible.value = true
 }
-// ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
-// 详情操作
-const handleDetail = (row: PostVO) => {
-  setDialogTile('detail')
-  detailRef.value = row
-}
+
 // 新增操作
 const handleCreate = () => {
   setDialogTile('create')
   // 重置表单
   unref(formRef)?.getElFormRef()?.resetFields()
+}
+
+// 详情操作
+const handleDetail = (row: PostVO) => {
+  setDialogTile('detail')
+  detailRef.value = row
 }
 
 // 修改操作
@@ -122,6 +124,7 @@ const handleUpdate = async (rowId: number) => {
   const res = await PostApi.getPostApi(rowId)
   unref(formRef)?.setValues(res)
 }
+
 // 删除操作
 const handleDelete = async (rowId: number) => {
   message
@@ -134,8 +137,9 @@ const handleDelete = async (rowId: number) => {
       xGrid.value?.commitProxy('query')
     })
 }
+
 // 提交按钮
-const submitForm: VxeFormEvents.Submit = async () => {
+const submitForm = async () => {
   const elForm = unref(formRef)?.getElFormRef()
   if (!elForm) return
   elForm.validate(async (valid) => {
@@ -151,7 +155,6 @@ const submitForm: VxeFormEvents.Submit = async () => {
           await PostApi.updatePostApi(data)
           message.success(t('common.updateSuccess'))
         }
-        // 操作成功，重新加载列表
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
