@@ -1,6 +1,9 @@
 -- ----------------------------
 -- Table structure for system_menu
 -- icon 不兼容
+-- 注意！！！只有在使用 yudao-ui-admin-vue3 才进行导入！！！
+-- 注意！！！只有在使用 yudao-ui-admin-vue3 才进行导入！！！
+-- 注意！！！只有在使用 yudao-ui-admin-vue3 才进行导入！！！
 -- ----------------------------
 DROP TABLE IF EXISTS `system_menu`;
 CREATE TABLE `system_menu`  (
