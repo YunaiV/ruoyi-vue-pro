@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenAccessTokenRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenAuthorizeInfoRespVO;
@@ -77,7 +78,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
 
         // mock 方法（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), 10L, ChronoUnit.MILLIS)); // 多给 10 毫秒，保证可执行完
+                .setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), 30000L, ChronoUnit.MILLIS));
         when(oauth2GrantService.grantAuthorizationCodeForAccessToken(eq("test_client_id"),
                 eq(code), eq(redirectUri), eq(state))).thenReturn(accessTokenDO);
 
@@ -87,7 +88,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
         // 断言
         assertEquals(0, result.getCode());
         assertPojoEquals(accessTokenDO, result.getData());
-        assertEquals(30L, result.getData().getExpiresIn()); // 执行过程会过去几毫秒
+        assertTrue(ObjectUtils.equalsAny(result.getData().getExpiresIn(), 29L, 30L));  // 执行过程会过去几毫秒
     }
 
     @Test
@@ -105,7 +106,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
 
         // mock 方法（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), 30050L, ChronoUnit.MILLIS)); // 多给 10 毫秒，保证可执行完
+                .setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), 30000L, ChronoUnit.MILLIS));
         when(oauth2GrantService.grantPassword(eq(username), eq(password), eq("test_client_id"),
                 eq(Lists.newArrayList("write", "read")))).thenReturn(accessTokenDO);
 
@@ -115,7 +116,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
         // 断言
         assertEquals(0, result.getCode());
         assertPojoEquals(accessTokenDO, result.getData());
-        assertEquals(30L, result.getData().getExpiresIn()); // 执行过程会过去几毫秒
+        assertTrue(ObjectUtils.equalsAny(result.getData().getExpiresIn(), 29L, 30L));  // 执行过程会过去几毫秒
     }
 
     @Test
@@ -132,7 +133,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
 
         // mock 方法（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), 30050L, ChronoUnit.MILLIS)); // 多给 10 毫秒，保证可执行完
+                .setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), 30000L, ChronoUnit.MILLIS));
         when(oauth2GrantService.grantRefreshToken(eq(refreshToken), eq("test_client_id"))).thenReturn(accessTokenDO);
 
         // 调用
@@ -141,7 +142,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
         // 断言
         assertEquals(0, result.getCode());
         assertPojoEquals(accessTokenDO, result.getData());
-        assertEquals(30L, result.getData().getExpiresIn()); // 执行过程会过去几毫秒
+        assertTrue(ObjectUtils.equalsAny(result.getData().getExpiresIn(), 29L, 30L));  // 执行过程会过去几毫秒
     }
 
     @Test

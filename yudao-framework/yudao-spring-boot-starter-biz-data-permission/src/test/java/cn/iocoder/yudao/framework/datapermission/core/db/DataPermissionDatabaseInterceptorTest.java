@@ -87,7 +87,7 @@ public class DataPermissionDatabaseInterceptorTest extends BaseMockitoUnitTest {
             interceptor.beforeQuery(null, mappedStatement, null, null, null, boundSql);
             // 断言
             verify(mpBs, times(1)).sql(
-                    eq("SELECT * FROM t_user WHERE id = 1 AND dept_id = 100"));
+                    eq("SELECT * FROM t_user WHERE id = 1 AND t_user.dept_id = 100"));
             // 断言缓存
             assertTrue(interceptor.getMappedStatementCache().getNoRewritableMappedStatements().isEmpty());
         }

@@ -214,12 +214,13 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
        // 测试 storage 不匹配
        fileConfigMapper.insert(cloneIgnoreId(dbFileConfig, o -> o.setStorage(FileStorageEnum.DB.getStorage())));
        // 测试 createTime 不匹配
-       fileConfigMapper.insert(cloneIgnoreId(dbFileConfig, o -> o.setCreateTime(LocalDateTimeUtil.parse("2020-01-23", DatePattern.NORM_DATE_PATTERN))));
+       fileConfigMapper.insert(cloneIgnoreId(dbFileConfig, o -> o.setCreateTime(LocalDateTimeUtil.parse("2020-11-23", DatePattern.NORM_DATE_PATTERN))));
        // 准备参数
        FileConfigPageReqVO reqVO = new FileConfigPageReqVO();
        reqVO.setName("芋道");
        reqVO.setStorage(FileStorageEnum.LOCAL.getStorage());
-       reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2022, 11, 10),buildLocalDateTime(2022, 11, 12)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2020, 1, 1),
+               buildLocalDateTime(2020, 1, 24)}));
 
        // 调用
        PageResult<FileConfigDO> pageResult = fileConfigService.getFileConfigPage(reqVO);

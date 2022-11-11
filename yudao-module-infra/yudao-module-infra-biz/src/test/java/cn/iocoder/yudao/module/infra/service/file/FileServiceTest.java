@@ -91,7 +91,7 @@ public class FileServiceTest extends BaseDbUnitTest {
         assertEquals(10L, file.getConfigId());
         assertEquals(path, file.getPath());
         assertEquals(url, file.getUrl());
-        assertEquals("image/jpg", file.getType());
+        assertEquals("image/jpeg", file.getType());
         assertEquals(content.length, file.getSize());
     }
 

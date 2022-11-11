@@ -18,7 +18,7 @@
 ## 注意事项
 
 - 项目路径请不要使用中文命名！！！会造成解析乱码！！！请使用全英文路径！！！
-- node >=14.18.0(建议使用 16 版本) ,pnpm >=7
+- node >=14.19.0(建议使用 16 版本) ,pnpm >=7
 - 开发建议使用 [谷歌浏览器-开发者版](https://www.google.cn/intl/zh-CN/chrome/dev/) 不支持 IE\QQ 等浏览器
 
 ### 点击查看[使用说明](./use.md)
@@ -27,9 +27,9 @@
 
 | 框架 | 说明 | 版本     |
 | --- | --- |--------|
-| [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.41 |
-| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.2.2  |
-| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.19 |
+| [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.44 |
+| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.2.3  |
+| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.20 |
 | [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.8.4  |
 | [pinia](https://pinia.vuejs.org/) | Vue 存储库 替代 vuex5 | 2.0.23 |
 | [vueuse](https://vueuse.org//) | 常用工具集 | 9.4.0  |

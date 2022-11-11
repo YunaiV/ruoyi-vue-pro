@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.mq.message.sms.SmsSendMessage;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
@@ -36,11 +37,14 @@ public class SmsSendServiceTest extends BaseMockitoUnitTest {
     private SmsSendServiceImpl smsService;
 
     @Mock
+    private SmsChannelService smsChannelService;
+    @Mock
     private SmsTemplateService smsTemplateService;
     @Mock
     private SmsLogService smsLogService;
     @Mock
     private SmsProducer smsProducer;
+
     @Mock
     private SmsClientFactory smsClientFactory;
 
@@ -66,6 +70,9 @@ public class SmsSendServiceTest extends BaseMockitoUnitTest {
         String content = randomString();
         when(smsTemplateService.formatSmsTemplateContent(eq(template.getContent()), eq(templateParams)))
                 .thenReturn(content);
+        // mock SmsChannelService 的方法
+        SmsChannelDO smsChannel = randomPojo(SmsChannelDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(smsChannelService.getSmsChannel(eq(template.getChannelId()))).thenReturn(smsChannel);
         // mock SmsLogService 的方法
         Long smsLogId = randomLongId();
         when(smsLogService.createSmsLog(eq(mobile), eq(userId), eq(userType), eq(Boolean.TRUE), eq(template),
@@ -103,6 +110,9 @@ public class SmsSendServiceTest extends BaseMockitoUnitTest {
         String content = randomString();
         when(smsTemplateService.formatSmsTemplateContent(eq(template.getContent()), eq(templateParams)))
                 .thenReturn(content);
+        // mock SmsChannelService 的方法
+        SmsChannelDO smsChannel = randomPojo(SmsChannelDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(smsChannelService.getSmsChannel(eq(template.getChannelId()))).thenReturn(smsChannel);
         // mock SmsLogService 的方法
         Long smsLogId = randomLongId();
         when(smsLogService.createSmsLog(eq(mobile), eq(userId), eq(userType), eq(Boolean.FALSE), eq(template),
