@@ -129,7 +129,6 @@ service.interceptors.response.use(
           // 2.1 刷新成功，则回放队列的请求 + 当前请求
           setToken((await refreshTokenRes).data.data)
           config.headers!.Authorization = 'Bearer ' + getAccessToken()
-          service.defaults.headers.Authorization = 'Bearer ' + getAccessToken()
           requestList.forEach((cb: any) => {
             cb()
           })
