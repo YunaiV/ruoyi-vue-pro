@@ -231,7 +231,7 @@
 						}
 						myRequest({
 							// url: `/captcha/check`,
-              url: '/admin-api/captcha/check', // 使用项目自定义的 /admin-api/ 前缀
+              url: '/admin-api/system/captcha/check', // 使用项目自定义的 /admin-api/ 前缀
               data,
 							method: "POST",
 						}).then((result) => {
@@ -319,7 +319,7 @@
 				}
 				myRequest({
 					// url: '/captcha/get', //仅为示例，并非真实接口地址。
-					url: '/admin-api/captcha/get', // 使用项目自定义的 /admin-api/ 前缀
+					url: '/admin-api/system/captcha/get', // 使用项目自定义的 /admin-api/ 前缀
 					data,
 					method: "POST",
 				}).then((result) => {

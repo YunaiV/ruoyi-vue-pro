@@ -9,7 +9,7 @@ import request from './../utils/axios' //组件内部封装的axios
 export function reqGet(data) {
   return request({
     // url: '/captcha/get',
-    url: '/admin-api/captcha/get', // 使用项目自定义的 /admin-api/ 前缀
+    url: '/admin-api/system/captcha/get', // 使用项目自定义的 /admin-api/ 前缀
     method: 'post',
     data
   })
@@ -19,7 +19,7 @@ export function reqGet(data) {
 export function reqCheck(data) {
   return request({
     // url: '/captcha/check',
-    url: '/admin-api/captcha/check', // 使用项目自定义的 /admin-api/ 前缀
+    url: '/admin-api/system/captcha/check', // 使用项目自定义的 /admin-api/ 前缀
     method: 'post',
     data
   })

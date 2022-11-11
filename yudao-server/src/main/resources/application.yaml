@@ -109,8 +109,8 @@ yudao:
     enable: true
     ignore-urls:
       - /admin-api/system/tenant/get-id-by-name # 基于名字获取租户，不许带租户编号
-      - /admin-api/captcha/get # 获取图片验证码，和租户无关
-      - /admin-api/captcha/check # 校验图片验证码，和租户无关
+      - /admin-api/system/captcha/get # 获取图片验证码，和租户无关
+      - /admin-api/system/captcha/check # 校验图片验证码，和租户无关
       - /admin-api/infra/file/*/get/** # 获取图片，和租户无关
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
       - /app-api/pay/order/notify/* # 支付回调通知，不携带租户编号
