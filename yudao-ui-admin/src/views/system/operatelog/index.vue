@@ -148,8 +148,6 @@ export default {
       open: false,
       // 类型数据字典
       typeOptions: [],
-      // 类型数据字典
-      statusOptions: [],
       // 表单参数
       form: {},
       // 查询参数

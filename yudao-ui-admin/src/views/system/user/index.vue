@@ -274,8 +274,6 @@ export default {
       deptName: undefined,
       // 默认密码
       initPassword: undefined,
-      // 状态数据字典
-      statusOptions: [],
       // 性别状态字典
       sexOptions: [],
       // 岗位选项
