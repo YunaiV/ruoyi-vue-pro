@@ -104,24 +104,19 @@ export default {
       state: undefined,
     };
   },
-  // watch: {
-  //   $route: {
-  //     handler: function(route) {
-  //       this.redirect = route.query && route.query.redirect;
-  //     },
-  //     immediate: true
-  //   }
-  // },
   created() {
     this.getCookie();
     // 验证码开关
     this.captchaEnable = getCaptchaEnable();
     // 重定向地址
-    this.redirect = this.$route.query.redirect ? decodeURIComponent(this.$route.query.redirect) : undefined;
+    this.redirect = this.getUrlValue('redirect');
     // 社交登录相关
-    this.type = this.$route.query.type;
+    this.type = this.getUrlValue('type');
     this.code = this.$route.query.code;
     this.state = this.$route.query.state;
+
+    // 尝试登录一下
+    this.loading = true;
     this.$store.dispatch("SocialLogin", {
       code: this.code,
       state: this.state,
@@ -183,6 +178,10 @@ export default {
           });
         }
       });
+    },
+    getUrlValue(key) {
+      const url = new URL(decodeURIComponent(location.href));
+      return url.searchParams.get(key);
     }
   }
 };
