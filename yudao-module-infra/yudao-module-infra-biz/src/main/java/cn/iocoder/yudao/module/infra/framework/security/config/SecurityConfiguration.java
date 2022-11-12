@@ -27,7 +27,7 @@ public class SecurityConfiguration {
                         .antMatchers("/swagger-resources/**").anonymous()
                         .antMatchers("/webjars/**").anonymous()
                         .antMatchers("/*/api-docs").anonymous();
-                //积木报表
+                // 积木报表
                 registry.antMatchers("/jmreport/**").permitAll();
                 // Spring Boot Actuator 的安全配置
                 registry.antMatchers("/actuator").anonymous()
@@ -37,6 +37,8 @@ public class SecurityConfiguration {
                 // Spring Boot Admin Server 的安全配置
                 registry.antMatchers(adminSeverContextPath).anonymous()
                         .antMatchers(adminSeverContextPath + "/**").anonymous();
+                // 文件读取
+                registry.antMatchers(buildAdminApi("/infra/file/*/get/**")).permitAll();
             }
 
         };
