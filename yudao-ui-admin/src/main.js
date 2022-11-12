@@ -66,7 +66,7 @@ import "bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css";
 // Form Generator 组件需要使用到 tinymce
 import Tinymce from '@/components/tinymce/index.vue'
 Vue.component('tinymce', Tinymce)
-import '@/icons'
+import '@/assets/icons'
 import request from "@/utils/request" // 实现 form generator 使用自己定义的 axios request 对象
 console.log(request)
 Vue.prototype.$axios = request
