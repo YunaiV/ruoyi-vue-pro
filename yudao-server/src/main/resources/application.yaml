@@ -17,6 +17,8 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER # 解决 SpringFox 与 SpringBoot 2.6.x 不兼容的问题，参见 SpringFoxHandlerProviderBeanPostProcessor 类
+    throw-exception-if-no-handler-found: true # 404 错误时抛出异常，方便统一处理
+    static-path-pattern: /static/** # 静态资源路径; 注意：如果不配置，则 throw-exception-if-no-handler-found 不生效！！！
 
   # Jackson 配置项
   jackson:
@@ -25,7 +27,6 @@ spring:
       write-date-timestamps-as-nanoseconds: false # 设置不使用 nanoseconds 的格式。例如说 1611460870.401，而是直接 1611460870401
       write-durations-as-timestamps: true # 设置 Duration 的格式，使用时间戳
       fail-on-empty-beans: false # 允许序列化无属性的 Bean
-
   # Cache 配置项
   cache:
     type: REDIS

@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.Filter;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @AutoConfigureAfter(YudaoWebAutoConfiguration.class)
 public class YudaoApiLogAutoConfiguration {
 

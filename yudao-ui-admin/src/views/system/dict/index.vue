@@ -118,8 +118,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 状态数据字典
-      statusOptions: [],
       // 查询参数
       queryParams: {
         pageNo: 1,

@@ -79,8 +79,6 @@ export default {
       total: 0,
       // 表格数据
       list: [],
-      // 状态数据字典
-      statusOptions: [],
       // 查询参数
       queryParams: {
         pageNo: 1,

@@ -141,8 +141,6 @@ export default {
       refreshTable: true,
       // 是否展开
       expand: false,
-      // 状态数据字典
-      statusOptions: [],
       // 查询参数
       queryParams: {
         name: undefined,
