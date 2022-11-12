@@ -489,7 +489,10 @@ export default {
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess(statusState + "成功");
-      }).catch(() => {});
+      }).catch(() => {
+        // 取消后，进行恢复按钮
+        row.processDefinition.suspensionState = (state === 1 ? 2 : 1);
+      });
     },
     /** 导入按钮操作 */
     handleImport() {
