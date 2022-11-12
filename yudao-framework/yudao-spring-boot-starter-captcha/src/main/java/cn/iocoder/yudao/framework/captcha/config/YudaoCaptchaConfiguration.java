@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class YudaoCaptchaConfiguration {
 
     static {

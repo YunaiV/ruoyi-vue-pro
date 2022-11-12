@@ -34,7 +34,7 @@ import java.util.Properties;
  *
  * @author 芋道源码
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @AutoConfigureAfter(YudaoRedisAutoConfiguration.class)
 @Slf4j
 public class YudaoMQAutoConfiguration {

@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 
+@Configuration(proxyBeanMethods = false)
 @Slf4j
-@Configuration
 public class YudaoJacksonAutoConfiguration {
 
     @Bean
