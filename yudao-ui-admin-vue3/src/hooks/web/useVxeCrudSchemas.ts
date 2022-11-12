@@ -26,33 +26,18 @@ type VxeCrudColumns = Omit<VxeTableColumn, 'children'> & {
   field: string
   title?: string
   formatter?: VxeColumnPropTypes.Formatter
-  search?: CrudSearchParams
-  table?: CrudTableParams
-  form?: CrudFormParams
-  detail?: CrudDescriptionsParams
+  isSearch?: boolean
+  search?: VxeFormItemProps
+  isTable?: boolean
+  table?: VxeTableDefines.ColumnOptions
+  isForm?: boolean
+  form?: FormSchema
+  isDetail?: boolean
+  detail?: DescriptionsSchema
   print?: CrudPrintParams
   children?: VxeCrudColumns[]
   dictType?: string
 }
-type CrudSearchParams = {
-  // 是否显示在查询项
-  show?: boolean
-} & Omit<VxeFormItemProps, 'field'>
-
-type CrudTableParams = {
-  // 是否显示表头
-  show?: boolean
-} & Omit<VxeTableDefines.ColumnOptions, 'field'>
-
-type CrudFormParams = {
-  // 是否显示表单项
-  show?: boolean
-} & Omit<FormSchema, 'field'>
-
-type CrudDescriptionsParams = {
-  // 是否显示表单项
-  show?: boolean
-} & Omit<DescriptionsSchema, 'field'>
 
 type CrudPrintParams = {
   // 是否显示表单项
@@ -108,7 +93,7 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
   const searchSchema: VxeFormItemProps[] = []
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.search?.show) {
+    if (schemaItem?.isSearch) {
       let itemRenderName = schemaItem?.search?.itemRender?.name || '$input'
       const options: any[] = []
       let itemRender: FormItemRenderOptions = {
@@ -122,7 +107,7 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
           options.push(dict)
         })
         itemRender.options = options
-        if (!schemaItem.search.itemRender?.name) itemRenderName = '$select'
+        if (!schemaItem?.search?.itemRender?.name) itemRenderName = '$select'
         itemRender = {
           name: itemRenderName,
           options: options,
@@ -174,7 +159,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
   }
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.table?.show !== false) {
+    if (schemaItem?.isTable !== false) {
       const tableSchemaItem = {
         ...schemaItem.table,
         field: schemaItem.field,
@@ -189,9 +174,6 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
           content: schemaItem.dictType
         }
       }
-
-      // 删除不必要的字段
-      delete tableSchemaItem.show
 
       tableSchema.push(tableSchemaItem)
     }
@@ -217,7 +199,7 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
 
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.form?.show !== false) {
+    if (schemaItem?.isForm !== false) {
       let component = schemaItem?.form?.component || 'Input'
       const options: ComponentOptions[] = []
       let comonentProps = {}
@@ -239,9 +221,6 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
         label: schemaItem.form?.label || schemaItem.title
       }
 
-      // 删除不必要的字段
-      delete formSchemaItem.show
-
       formSchema.push(formSchemaItem)
     }
   })
@@ -255,15 +234,12 @@ const filterDescriptionsSchema = (crudSchema: VxeCrudSchema): DescriptionsSchema
 
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.detail?.show !== false) {
+    if (schemaItem?.isDetail !== false) {
       const descriptionsSchemaItem = {
         ...schemaItem.detail,
         field: schemaItem.field,
         label: schemaItem.detail?.label || schemaItem.title
       }
-
-      // 删除不必要的字段
-      delete descriptionsSchemaItem.show
 
       descriptionsSchema.push(descriptionsSchemaItem)
     }

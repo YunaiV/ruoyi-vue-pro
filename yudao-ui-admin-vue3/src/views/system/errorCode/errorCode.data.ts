@@ -20,23 +20,17 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '错误码类型',
       field: 'type',
       dictType: DICT_TYPE.SYSTEM_ERROR_CODE_TYPE,
-      search: {
-        show: true
-      }
+      isSearch: true
     },
     {
       title: '应用名',
       field: 'applicationName',
-      search: {
-        show: true
-      }
+      isSearch: true
     },
     {
       title: '错误码编码',
       field: 'code',
-      search: {
-        show: true
-      }
+      isSearch: true
     },
     {
       title: '错误码错误提示',
@@ -46,11 +40,9 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: t('common.createTime'),
       field: 'createTime',
       formatter: 'formatDate',
-      form: {
-        show: false
-      },
+      isForm: false,
+      isSearch: true,
       search: {
-        show: true,
         itemRender: {
           name: 'XDataTimePicker'
         }

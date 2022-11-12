@@ -21,16 +21,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '岗位名称',
       field: 'name',
-      search: {
-        show: true
-      }
+      isSearch: true
     },
     {
       title: '岗位编码',
       field: 'code',
-      search: {
-        show: true
-      }
+      isSearch: true
     },
     {
       title: '岗位顺序',
@@ -40,24 +36,18 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: t('common.status'),
       field: 'status',
       dictType: DICT_TYPE.COMMON_STATUS,
-      search: {
-        show: true
-      }
+      isSearch: true
     },
     {
       title: '备注',
       field: 'remark',
-      table: {
-        show: false
-      }
+      isTable: false
     },
     {
       title: t('common.createTime'),
       field: 'createTime',
       formatter: 'formatDate',
-      form: {
-        show: false
-      }
+      isForm: false
     }
   ]
 })
