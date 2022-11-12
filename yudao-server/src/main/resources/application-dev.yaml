@@ -63,10 +63,6 @@ spring:
     database: 1 # 数据库索引
 #    password: 123456 # 密码，建议生产环境开启
 
-jasypt:
-  encryptor:
-    password: yuanma # 加解密的秘钥
-
 --- #################### 定时任务相关配置 ####################
 
 # Quartz 配置项，对应 QuartzProperties 配置类
