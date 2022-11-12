@@ -121,10 +121,10 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema[]): VxeFormItemProps[] => 
           props: { placeholder: t('common.selectText') }
         }
       }
-
       const searchSchemaItem = {
         // 默认为 input
-        span: 6,
+        span: 8,
+        folding: searchSchema.length > 2,
         itemRender: itemRender,
         ...schemaItem.search,
         field: schemaItem.field,
@@ -140,7 +140,7 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema[]): VxeFormItemProps[] => 
   const buttons: VxeFormItemProps = {
     span: 24,
     align: 'center',
-    collapseNode: true,
+    collapseNode: searchSchema.length > 3,
     itemRender: {
       name: '$buttons',
       children: [

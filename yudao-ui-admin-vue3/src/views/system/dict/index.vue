@@ -1,3 +1,154 @@
+<template>
+  <div class="flex">
+    <el-card class="w-1/2 dict" :gutter="12" shadow="always">
+      <template #header>
+        <div class="card-header">
+          <span>字典分类</span>
+        </div>
+      </template>
+      <Search
+        :schema="DictTypeSchemas.allSchemas.searchSchema"
+        @search="setTypeSearchParams"
+        @reset="setTypeSearchParams"
+      />
+      <!-- 操作工具栏 -->
+      <div class="mb-10px">
+        <XButton
+          type="primary"
+          preIcon="ep:zoom-in"
+          :title="t('action.add')"
+          v-hasPermi="['system:dict:create']"
+          @click="handleTypeCreate()"
+        />
+      </div>
+      <!-- 列表 -->
+      <Table
+        @row-click="onClickType"
+        :columns="DictTypeSchemas.allSchemas.tableColumns"
+        :selection="false"
+        :data="typeTableObject.tableList"
+        :loading="typeTableObject.loading"
+        :pagination="{
+          total: typeTableObject.total
+        }"
+        :highlight-current-row="true"
+        v-model:pageSize="typeTableObject.pageSize"
+        v-model:currentPage="typeTableObject.currentPage"
+        @register="typeRegister"
+      >
+        <template #status="{ row }">
+          <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+        </template>
+        <template #action="{ row }">
+          <XTextButton
+            preIcon="ep:edit"
+            :title="t('action.edit')"
+            v-hasPermi="['system:dict:update']"
+            @click="handleTypeUpdate(row)"
+          />
+          <XTextButton
+            preIcon="ep:delete"
+            :title="t('action.del')"
+            v-hasPermi="['system:dict:delete']"
+            @click="delTypeList(row.id, false)"
+          />
+        </template>
+      </Table>
+    </el-card>
+    <el-card class="w-1/2 dict" style="margin-left: 10px" :gutter="12" shadow="hover">
+      <template #header>
+        <div class="card-header">
+          <span>字典数据</span>
+        </div>
+      </template>
+      <!-- 列表 -->
+      <div v-if="!tableTypeSelect">
+        <span>请从左侧选择</span>
+      </div>
+      <div v-if="tableTypeSelect">
+        <Search
+          :schema="DictDataSchemas.allSchemas.searchSchema"
+          @search="setDataSearchParams"
+          @reset="setDataSearchParams"
+        />
+        <!-- 操作工具栏 -->
+        <div class="mb-10px">
+          <XButton
+            type="primary"
+            preIcon="ep:zoom-in"
+            :title="t('action.add')"
+            v-hasPermi="['system:dict:create']"
+            @click="handleDataCreate()"
+          />
+        </div>
+        <Table
+          :columns="DictDataSchemas.allSchemas.tableColumns"
+          :selection="false"
+          :data="dataTableObject.tableList"
+          :loading="dataTableObject.loading"
+          :pagination="{
+            total: dataTableObject.total
+          }"
+          v-model:pageSize="dataTableObject.pageSize"
+          v-model:currentPage="dataTableObject.currentPage"
+          @register="dataRegister"
+        >
+          <template #status="{ row }">
+            <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+          </template>
+          <template #action="{ row }">
+            <XTextButton
+              v-hasPermi="['system:dict:update']"
+              preIcon="ep:edit"
+              :title="t('action.edit')"
+              @click="handleDataUpdate(row)"
+            />
+            <XTextButton
+              v-hasPermi="['system:dict:delete']"
+              preIcon="ep:delete"
+              :title="t('action.del')"
+              @click="delDataList(row.id, false)"
+            />
+          </template>
+        </Table>
+      </div>
+    </el-card>
+    <XModal id="dictModel" v-model="dialogVisible" :title="dialogTitle">
+      <template #default>
+        <Form
+          v-if="['typeCreate', 'typeUpdate'].includes(actionType)"
+          :schema="DictTypeSchemas.allSchemas.formSchema"
+          :rules="DictTypeSchemas.dictTypeRules"
+          ref="typeFormRef"
+        />
+        <Form
+          v-if="['dataCreate', 'dataUpdate'].includes(actionType)"
+          :schema="DictDataSchemas.allSchemas.formSchema"
+          :rules="DictDataSchemas.dictDataRules"
+          ref="dataFormRef"
+        />
+      </template>
+      <!-- 操作按钮 -->
+      <template #footer>
+        <XButton
+          v-if="['typeCreate', 'typeUpdate'].includes(actionType)"
+          type="primary"
+          :title="t('action.save')"
+          :loading="actionLoading"
+          @click="submitTypeForm"
+        />
+        <XButton
+          v-if="['dataCreate', 'dataUpdate'].includes(actionType)"
+          type="primary"
+          :title="t('action.save')"
+          :loading="actionLoading"
+          @click="submitDataForm"
+        />
+        <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
+      </template>
+    </XModal>
+  </div>
+</template>
 <script setup lang="ts">
 import { ref, unref, onMounted } from 'vue'
 import { DICT_TYPE } from '@/utils/dict'
@@ -148,155 +299,3 @@ onMounted(async () => {
   typeTableObject.tableList[0] && onClickType(typeTableObject.tableList[0])
 })
 </script>
-
-<template>
-  <div class="flex">
-    <el-card class="w-1/2 dict" :gutter="12" shadow="always">
-      <template #header>
-        <div class="card-header">
-          <span>字典分类</span>
-        </div>
-      </template>
-      <Search
-        :schema="DictTypeSchemas.allSchemas.searchSchema"
-        @search="setTypeSearchParams"
-        @reset="setTypeSearchParams"
-      />
-      <!-- 操作工具栏 -->
-      <div class="mb-10px">
-        <el-button type="primary" v-hasPermi="['system:dict:create']" @click="handleTypeCreate">
-          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-        </el-button>
-      </div>
-      <!-- 列表 -->
-      <Table
-        @row-click="onClickType"
-        :columns="DictTypeSchemas.allSchemas.tableColumns"
-        :selection="false"
-        :data="typeTableObject.tableList"
-        :loading="typeTableObject.loading"
-        :pagination="{
-          total: typeTableObject.total
-        }"
-        :highlight-current-row="true"
-        v-model:pageSize="typeTableObject.pageSize"
-        v-model:currentPage="typeTableObject.currentPage"
-        @register="typeRegister"
-      >
-        <template #status="{ row }">
-          <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-        </template>
-        <template #action="{ row }">
-          <el-button
-            link
-            type="primary"
-            v-hasPermi="['system:dict:update']"
-            @click="handleTypeUpdate(row)"
-          >
-            <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-          </el-button>
-          <el-button
-            link
-            type="primary"
-            v-hasPermi="['system:dict:delete']"
-            @click="delTypeList(row.id, false)"
-          >
-            <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-          </el-button>
-        </template>
-      </Table>
-    </el-card>
-    <el-card class="w-1/2 dict" style="margin-left: 10px" :gutter="12" shadow="hover">
-      <template #header>
-        <div class="card-header">
-          <span>字典数据</span>
-        </div>
-      </template>
-      <!-- 列表 -->
-      <div v-if="!tableTypeSelect">
-        <span>请从左侧选择</span>
-      </div>
-      <div v-if="tableTypeSelect">
-        <Search
-          :schema="DictDataSchemas.allSchemas.searchSchema"
-          @search="setDataSearchParams"
-          @reset="setDataSearchParams"
-        />
-        <!-- 操作工具栏 -->
-        <div class="mb-10px">
-          <el-button type="primary" v-hasPermi="['system:dict:create']" @click="handleDataCreate">
-            <Icon icon="ep:zoom-in" class="mr-1px" /> {{ t('action.add') }}
-          </el-button>
-        </div>
-        <Table
-          :columns="DictDataSchemas.allSchemas.tableColumns"
-          :selection="false"
-          :data="dataTableObject.tableList"
-          :loading="dataTableObject.loading"
-          :pagination="{
-            total: dataTableObject.total
-          }"
-          v-model:pageSize="dataTableObject.pageSize"
-          v-model:currentPage="dataTableObject.currentPage"
-          @register="dataRegister"
-        >
-          <template #status="{ row }">
-            <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-          </template>
-          <template #action="{ row }">
-            <el-button
-              link
-              type="primary"
-              v-hasPermi="['system:dict:update']"
-              @click="handleDataUpdate(row)"
-            >
-              <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-            </el-button>
-            <el-button
-              link
-              type="primary"
-              v-hasPermi="['system:dict:delete']"
-              @click="delDataList(row.id, false)"
-            >
-              <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-            </el-button>
-          </template>
-        </Table>
-      </div>
-    </el-card>
-    <Dialog v-model="dialogVisible" :title="dialogTitle">
-      <Form
-        v-if="['typeCreate', 'typeUpdate'].includes(actionType)"
-        :schema="DictTypeSchemas.allSchemas.formSchema"
-        :rules="DictTypeSchemas.dictTypeRules"
-        ref="typeFormRef"
-      />
-      <Form
-        v-if="['dataCreate', 'dataUpdate'].includes(actionType)"
-        :schema="DictDataSchemas.allSchemas.formSchema"
-        :rules="DictDataSchemas.dictDataRules"
-        ref="dataFormRef"
-      />
-      <!-- 操作按钮 -->
-      <template #footer>
-        <el-button
-          v-if="['typeCreate', 'typeUpdate'].includes(actionType)"
-          type="primary"
-          :loading="actionLoading"
-          @click="submitTypeForm"
-        >
-          {{ t('action.save') }}
-        </el-button>
-        <el-button
-          v-if="['dataCreate', 'dataUpdate'].includes(actionType)"
-          type="primary"
-          :loading="actionLoading"
-          @click="submitDataForm"
-        >
-          {{ t('action.save') }}
-        </el-button>
-        <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
-      </template>
-    </Dialog>
-  </div>
-</template>

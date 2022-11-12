@@ -7,7 +7,6 @@ import enUS from 'vxe-table/lib/locale/lang/en-US'
 import {
   // 全局对象
   VXETable,
-
   // 表格功能
   Filter,
   Edit,
@@ -15,7 +14,6 @@ import {
   Export,
   Keyboard,
   Validator,
-
   // 可选组件
   Icon,
   Column,
@@ -42,7 +40,6 @@ import {
   Modal,
   List,
   Pulldown,
-
   // 表格
   Table
 } from 'vxe-table'
