@@ -10,9 +10,6 @@
           @click="handleCreate()"
         />
       </template>
-      <template #status_default="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
       <template #actionbtns_default="{ row }">
         <XTextButton
           preIcon="ep:edit"

@@ -10,18 +10,6 @@
           @click="handleCreate()"
         />
       </template>
-      <template #createTime_item="{ data }">
-        <el-date-picker
-          v-model="data.createTime"
-          type="datetimerange"
-          range-separator="-"
-          :start-placeholder="t('common.startTimeText')"
-          :end-placeholder="t('common.endTimeText')"
-        />
-      </template>
-      <template #type_default="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
       <template #actionbtns_default="{ row }">
         <XTextButton
           preIcon="ep:edit"
@@ -93,7 +81,6 @@ import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
 import { FormExpose } from '@/components/Form'
-import { ElDatePicker } from 'element-plus'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗

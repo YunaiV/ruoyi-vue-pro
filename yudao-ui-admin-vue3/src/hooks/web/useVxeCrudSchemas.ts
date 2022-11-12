@@ -104,8 +104,8 @@ export const useVxeCrudSchemas = (
 
 // 过滤 Search 结构
 const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
-  const searchSchema: VxeFormItemProps[] = []
   const { t } = useI18n()
+  const searchSchema: VxeFormItemProps[] = []
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
     if (schemaItem?.search?.show) {
@@ -132,14 +132,11 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
       const searchSchemaItem = {
         // 默认为 input
         folding: searchSchema.length > 2,
-        itemRender: itemRender,
-        ...schemaItem.search,
+        itemRender: schemaItem.itemRender ? schemaItem.itemRender : itemRender,
         field: schemaItem.field,
         title: schemaItem.search?.title || schemaItem.title,
         span: 8
       }
-      // 删除不必要的字段
-      delete searchSchemaItem.show
 
       searchSchema.push(searchSchemaItem)
     }
