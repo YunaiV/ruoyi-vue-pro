@@ -48,6 +48,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
       formatter: 'formatDate',
       form: {
         show: false
+      },
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
       }
     }
   ]

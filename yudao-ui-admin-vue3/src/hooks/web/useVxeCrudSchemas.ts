@@ -131,12 +131,12 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
       }
       const searchSchemaItem = {
         // 默认为 input
-        span: 8,
         folding: searchSchema.length > 2,
         itemRender: itemRender,
         ...schemaItem.search,
         field: schemaItem.field,
-        title: schemaItem.search?.title || schemaItem.title
+        title: schemaItem.search?.title || schemaItem.title,
+        span: 8
       }
       // 删除不必要的字段
       delete searchSchemaItem.show

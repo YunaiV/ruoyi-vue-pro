@@ -85,7 +85,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       props: { result: 'list', total: 'total' },
       ajax: {
         query: ({ page, form }) => {
-          const queryParams = Object.assign({}, form)
+          const queryParams = Object.assign({}, JSON.parse(JSON.stringify(form)))
           queryParams.pageSize = page.pageSize
           queryParams.pageNo = page.currentPage
           gridOptions.loading = false

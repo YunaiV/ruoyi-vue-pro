@@ -1,7 +1,7 @@
 import { DictTag } from '@/components/DictTag'
 import { VXETable } from 'vxe-table'
 
-// 创建一个简单的超链接渲染
+// 字典渲染
 VXETable.renderer.add('XDict', {
   // 默认显示模板
   renderDefault(renderOpts, params) {
