@@ -45,14 +45,7 @@
         v-if="actionType === 'detail'"
         :schema="allSchemas.detailSchema"
         :data="detailRef"
-      >
-        <template #status="{ row }">
-          <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-        </template>
-        <template #createTime="{ row }">
-          <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-        </template>
-      </Descriptions>
+      />
     </template>
     <template #footer>
       <XButton
@@ -68,8 +61,6 @@
 </template>
 <script setup lang="ts">
 import { ref, unref } from 'vue'
-import dayjs from 'dayjs'
-import { DICT_TYPE } from '@/utils/dict'
 import * as PostApi from '@/api/system/post'
 import { PostVO } from '@/api/system/post/types'
 import { rules, allSchemas } from './post.data'

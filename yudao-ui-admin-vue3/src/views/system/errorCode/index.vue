@@ -46,14 +46,7 @@
         v-if="actionType === 'detail'"
         :schema="allSchemas.detailSchema"
         :data="detailRef"
-      >
-        <template #type="{ row }">
-          <DictTag :type="DICT_TYPE.SYSTEM_ERROR_CODE_TYPE" :value="row.type" />
-        </template>
-        <template #createTime="{ row }">
-          <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-        </template>
-      </Descriptions>
+      />
     </template>
     <!-- 操作按钮 -->
     <template #footer>
@@ -71,8 +64,6 @@
 
 <script setup lang="ts">
 import { ref, unref } from 'vue'
-import dayjs from 'dayjs'
-import { DICT_TYPE } from '@/utils/dict'
 import type { ErrorCodeVO } from '@/api/system/errorCode/types'
 import { rules, allSchemas } from './errorCode.data'
 import * as ErrorCodeApi from '@/api/system/errorCode'

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import dayjs from 'dayjs'
 import { ElCollapseTransition, ElDescriptions, ElDescriptionsItem, ElTooltip } from 'element-plus'
 import { useDesign } from '@/hooks/web/useDesign'
 import { propTypes } from '@/utils/propTypes'
@@ -111,7 +112,13 @@ const toggleClick = () => {
             </template>
 
             <template #default>
-              <slot :name="item.field" :row="data">{{ data[item.field] }}</slot>
+              <slot v-if="item.dateFormat">
+                {{ dayjs(data[item.field]).format(item.dateFormat) }}
+              </slot>
+              <slot v-else-if="item.dictType">
+                <DictTag :type="item.dictType" :value="data[item.field]" />
+              </slot>
+              <slot v-else :name="item.field" :row="data">{{ data[item.field] }}</slot>
             </template>
           </ElDescriptionsItem>
         </ElDescriptions>

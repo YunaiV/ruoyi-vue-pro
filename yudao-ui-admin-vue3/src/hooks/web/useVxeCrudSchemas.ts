@@ -165,6 +165,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
         field: schemaItem.field,
         title: schemaItem.table?.title || schemaItem.title
       }
+      tableSchemaItem.showOverflow = 'tooltip'
       if (schemaItem?.formatter) {
         tableSchemaItem.formatter = schemaItem.formatter
       }
@@ -239,6 +240,15 @@ const filterDescriptionsSchema = (crudSchema: VxeCrudSchema): DescriptionsSchema
         ...schemaItem.detail,
         field: schemaItem.field,
         label: schemaItem.detail?.label || schemaItem.title
+      }
+      if (schemaItem.dictType) {
+        descriptionsSchemaItem.dictType = schemaItem.dictType
+      }
+      if (schemaItem.detail?.dateFormat || schemaItem.formatter == 'formatDate') {
+        // descriptionsSchemaItem.dateFormat = schemaItem.detail.dateFormat
+        //   ? schemaItem?.detail?.dateFormat
+        //   : 'YYYY-MM-DD HH:mm:ss'
+        descriptionsSchemaItem.dateFormat = 'YYYY-MM-DD HH:mm:ss'
       }
 
       descriptionsSchema.push(descriptionsSchemaItem)

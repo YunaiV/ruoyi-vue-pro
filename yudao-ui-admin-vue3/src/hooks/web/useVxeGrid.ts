@@ -43,10 +43,6 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       isCurrent: true, // 当鼠标点击行时，是否要高亮当前行
       isHover: true // 当鼠标移到行时，是否要高亮当前行
     },
-    showOverflow: 'tooltip', // 当内容溢出时显示为省略号
-    tooltipConfig: {
-      showAll: true // 开启全表工具提示
-    },
     toolbarConfig: {
       custom: true,
       slots: { buttons: 'toolbar_buttons' }
