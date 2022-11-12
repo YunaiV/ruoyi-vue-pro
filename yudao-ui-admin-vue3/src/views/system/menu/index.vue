@@ -107,6 +107,7 @@
                 v-model="menuForm.parentId"
                 :props="menuProps"
                 :data="menuOptions"
+                :default-expanded-keys="[0]"
                 check-strictly
               />
             </el-form-item>
