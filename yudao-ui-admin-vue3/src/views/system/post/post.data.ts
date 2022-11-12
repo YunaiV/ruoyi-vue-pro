@@ -1,8 +1,8 @@
 import { reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
-import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 import { DICT_TYPE } from '@/utils/dict'
+import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 
 // 表单校验
@@ -17,7 +17,7 @@ const crudSchemas = reactive<VxeCrudSchema[]>([
   {
     title: t('common.index'),
     field: 'id',
-    type: 'index',
+    type: 'seq',
     form: {
       show: false
     },
