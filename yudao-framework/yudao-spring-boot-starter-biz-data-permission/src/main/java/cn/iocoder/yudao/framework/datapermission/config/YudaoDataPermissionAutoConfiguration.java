@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class YudaoDataPermissionAutoConfiguration {
 
     @Bean
