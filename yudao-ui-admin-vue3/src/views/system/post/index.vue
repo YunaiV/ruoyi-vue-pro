@@ -99,18 +99,18 @@ const handleCreate = () => {
   unref(formRef)?.getElFormRef()?.resetFields()
 }
 
-// 详情操作
-const handleDetail = (row: PostVO) => {
-  setDialogTile('detail')
-  detailRef.value = row
-}
-
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
   const res = await PostApi.getPostApi(rowId)
   unref(formRef)?.setValues(res)
+}
+
+// 详情操作
+const handleDetail = (row: PostVO) => {
+  setDialogTile('detail')
+  detailRef.value = row
 }
 
 // 删除操作

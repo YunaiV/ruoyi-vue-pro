@@ -27,17 +27,37 @@ type VxeCrudColumns = Omit<VxeTableColumn, 'children'> & {
   title?: string
   formatter?: VxeColumnPropTypes.Formatter
   isSearch?: boolean
-  search?: VxeFormItemProps
+  search?: CrudSearchParams
   isTable?: boolean
-  table?: VxeTableDefines.ColumnOptions
+  table?: CrudTableParams
   isForm?: boolean
-  form?: FormSchema
+  form?: CrudFormParams
   isDetail?: boolean
-  detail?: DescriptionsSchema
+  detail?: CrudDescriptionsParams
   print?: CrudPrintParams
   children?: VxeCrudColumns[]
   dictType?: string
 }
+
+type CrudSearchParams = {
+  // 是否显示在查询项
+  show?: boolean
+} & Omit<VxeFormItemProps, 'field'>
+
+type CrudTableParams = {
+  // 是否显示表头
+  show?: boolean
+} & Omit<VxeTableDefines.ColumnOptions, 'field'>
+
+type CrudFormParams = {
+  // 是否显示表单项
+  show?: boolean
+} & Omit<FormSchema, 'field'>
+
+type CrudDescriptionsParams = {
+  // 是否显示表单项
+  show?: boolean
+} & Omit<DescriptionsSchema, 'field'>
 
 type CrudPrintParams = {
   // 是否显示表单项
