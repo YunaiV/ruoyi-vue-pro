@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileUploadReqVO;
 import cn.iocoder.yudao.module.infra.convert.file.FileConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.service.file.FileService;
@@ -40,13 +41,10 @@ public class FileController {
 
     @PostMapping("/upload")
     @ApiOperation("上传文件")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "file", value = "文件附件", required = true, dataTypeClass = MultipartFile.class),
-            @ApiImplicitParam(name = "path", value = "文件路径", example = "yudaoyuanma.png", dataTypeClass = String.class)
-    })
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
-    public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file,
-                                           @RequestParam(value = "path", required = false) String path) throws Exception {
+    public CommonResult<String> uploadFile(FileUploadReqVO uploadReqVO) throws Exception {
+        MultipartFile file = uploadReqVO.getFile();
+        String path = uploadReqVO.getPath();
         return success(fileService.createFile(file.getOriginalFilename(), path, IoUtil.readBytes(file.getInputStream())));
     }
 
