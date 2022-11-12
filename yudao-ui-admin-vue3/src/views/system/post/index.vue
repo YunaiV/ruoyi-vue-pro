@@ -13,7 +13,7 @@
       <template #status_default="{ row }">
         <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
       </template>
-      <template #action_default="{ row }">
+      <template #actionbtns_default="{ row }">
         <XTextButton
           preIcon="ep:edit"
           :title="t('action.edit')"

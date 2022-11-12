@@ -1,6 +1,7 @@
 import { App, unref } from 'vue'
 import 'xe-utils'
 import XEUtils from 'xe-utils'
+import './renderer'
 import { i18n } from '@/plugins/vueI18n'
 import zhCN from 'vxe-table/es/locale/lang/zh-CN'
 import enUS from 'vxe-table/lib/locale/lang/en-US'
@@ -137,6 +138,10 @@ VXETable.formats.mixin({
   // 格式日期，默认 yyyy-MM-dd HH:mm:ss
   formatDate({ cellValue }, format) {
     return XEUtils.toDateString(cellValue, format || 'yyyy-MM-dd HH:mm:ss')
+  },
+  // 格式字典
+  formatDict() {
+    return 'cellValue 123'
   },
   // 四舍五入金额，每隔3位逗号分隔，默认2位数
   formatAmount({ cellValue }, digits = 2) {
