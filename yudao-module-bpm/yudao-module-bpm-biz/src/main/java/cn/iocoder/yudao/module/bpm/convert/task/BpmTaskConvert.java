@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.convert.task;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskDonePageItemRespVO;
@@ -151,7 +152,7 @@ public interface BpmTaskConvert {
         BpmTaskExtDO taskExtDO = new BpmTaskExtDO().setTaskId(task.getId())
             .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee())).setName(task.getName())
             .setProcessDefinitionId(task.getProcessDefinitionId()).setProcessInstanceId(task.getProcessInstanceId());
-        taskExtDO.setCreateTime(task.getCreateTime());
+        taskExtDO.setCreateTime(LocalDateTimeUtil.of(task.getCreateTime()));
         return taskExtDO;
     }
 

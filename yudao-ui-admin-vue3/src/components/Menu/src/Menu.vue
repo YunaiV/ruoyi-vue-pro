@@ -220,10 +220,10 @@ export default defineComponent({
 
   // 水平菜单
   &__horizontal {
-    height: calc(~'var( - -top-tool-height)') !important;
+    height: calc(~'var(--top-tool-height)') !important;
 
     :deep(.@{elNamespace}-menu--horizontal) {
-      height: calc(~'var( - -top-tool-height)');
+      height: calc(~'var(--top-tool-height)');
       border-bottom: none;
       // 重新设置底部高亮颜色
       & > .@{elNamespace}-sub-menu.is-active {

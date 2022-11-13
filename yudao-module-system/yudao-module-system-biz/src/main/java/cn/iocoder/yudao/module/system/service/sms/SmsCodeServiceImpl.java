@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Date;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static cn.hutool.core.util.RandomUtil.randomInt;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
@@ -51,9 +54,9 @@ public class SmsCodeServiceImpl implements SmsCodeService {
 
     private String createSmsCode(String mobile, Integer scene, String ip) {
         // 校验是否可以发送验证码，不用筛选场景
-        SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, null,null);
+        SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, null, null);
         if (lastSmsCode != null) {
-            if (System.currentTimeMillis() - lastSmsCode.getCreateTime().getTime()
+            if (LocalDateTimeUtil.between(lastSmsCode.getCreateTime(), LocalDateTime.now()).toMillis()
                     < smsCodeProperties.getSendFrequency().toMillis()) { // 发送过于频繁
                 throw ServiceExceptionUtil.exception(SMS_CODE_SEND_TOO_FAST);
             }
@@ -80,7 +83,7 @@ public class SmsCodeServiceImpl implements SmsCodeService {
         SmsCodeDO lastSmsCode = this.checkSmsCode0(reqDTO.getMobile(), reqDTO.getCode(), reqDTO.getScene());
         // 使用验证码
         smsCodeMapper.updateById(SmsCodeDO.builder().id(lastSmsCode.getId())
-                .used(true).usedTime(new Date()).usedIp(reqDTO.getUsedIp()).build());
+                .used(true).usedTime(LocalDateTime.now()).usedIp(reqDTO.getUsedIp()).build());
     }
 
     @Override
@@ -90,13 +93,13 @@ public class SmsCodeServiceImpl implements SmsCodeService {
 
     public SmsCodeDO checkSmsCode0(String mobile, String code, Integer scene) {
         // 校验验证码
-        SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile,code,scene);
+        SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, code, scene);
         // 若验证码不存在，抛出异常
         if (lastSmsCode == null) {
             throw ServiceExceptionUtil.exception(SMS_CODE_NOT_FOUND);
         }
         // 超过时间
-        if (System.currentTimeMillis() - lastSmsCode.getCreateTime().getTime()
+        if (LocalDateTimeUtil.between(lastSmsCode.getCreateTime(), LocalDateTime.now()).toMillis()
                 >= smsCodeProperties.getExpireTimes().toMillis()) { // 验证码已过期
             throw ServiceExceptionUtil.exception(SMS_CODE_EXPIRED);
         }

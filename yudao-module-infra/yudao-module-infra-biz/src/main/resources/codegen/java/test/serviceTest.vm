@@ -16,6 +16,7 @@ import ${PageResultClassName};
 import javax.annotation.Resource;
 import org.springframework.context.annotation.Import;
 import java.util.*;
+import java.time.LocalDateTime;
 
 import static cn.hutool.core.util.RandomUtil.*;
 import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
@@ -51,7 +52,7 @@ import static org.mockito.Mockito.*;
        #if (${column.listOperation})
        #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
        #if (${column.listOperationCondition} == "BETWEEN")## BETWEEN 的情况
-       reqVO.set${JavaField}((new Date[]{}));
+       reqVO.set${JavaField}((new LocalDateTime[]{}));
        #else
        reqVO.set$JavaField(null);
        #end

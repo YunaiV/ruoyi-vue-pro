@@ -29,6 +29,7 @@ public interface GlobalErrorCodeConstants {
     // ========== 服务端错误段 ==========
 
     ErrorCode INTERNAL_SERVER_ERROR = new ErrorCode(500, "系统异常");
+    ErrorCode NOT_IMPLEMENTED = new ErrorCode(501, "功能未实现/未开启");
 
     // ========== 自定义错误段 ==========
     ErrorCode REPEATED_REQUESTS = new ErrorCode(900, "重复请求，请稍后重试"); // 重复请求

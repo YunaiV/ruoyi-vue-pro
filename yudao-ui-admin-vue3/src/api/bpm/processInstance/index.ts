@@ -1,6 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import { ProcessInstanceVO } from './types'
-const request = useAxios()
 
 export const getMyProcessInstancePageApi = async (params) => {
   return await request.get({ url: '/bpm/process-instance/my-page', params })

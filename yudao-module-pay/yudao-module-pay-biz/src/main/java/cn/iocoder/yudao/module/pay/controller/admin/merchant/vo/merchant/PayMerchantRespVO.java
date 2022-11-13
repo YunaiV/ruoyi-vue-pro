@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 支付商户信息 Response VO")
 @Data
@@ -18,7 +18,7 @@ public class PayMerchantRespVO extends PayMerchantBaseVO {
     private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ApiModelProperty(value = "商户号", required = true, example = "M233666999")
     private String no;

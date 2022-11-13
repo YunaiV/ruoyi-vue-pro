@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { UserVO } from './types'
-
-const request = useAxios()
 
 // 查询用户管理列表
 export const getUserPageApi = (params) => {

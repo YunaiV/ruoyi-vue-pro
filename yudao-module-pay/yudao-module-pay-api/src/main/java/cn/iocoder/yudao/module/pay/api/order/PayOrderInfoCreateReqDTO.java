@@ -7,7 +7,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 // TODO @LeeYan9: 1) 新建一个 dto 包, 然后挪进去哈; 2) 在 order下; Info 可以去掉;
 /**
@@ -62,6 +62,6 @@ public class PayOrderInfoCreateReqDTO implements Serializable {
      * 支付过期时间
      */
     @NotNull(message = "支付过期时间不能为空")
-    private Date expireTime;
+    private LocalDateTime expireTime;
 
 }

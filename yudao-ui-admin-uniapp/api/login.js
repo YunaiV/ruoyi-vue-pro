@@ -32,29 +32,3 @@ export function logout() {
 		'method': 'POST'
 	})
 }
-
-// 获取验证码
-export function getCaptcha(data) {
-	return request({
-		url: '/captcha/get',
-		headers: {
-			isToken: false,
-			isTenant: false
-		},
-		method: 'POST',
-		'data': data
-	})
-}
-
-// 验证验证码
-export function checkCaptcha(data) {
-	return request({
-		url: '/captcha/check',
-		headers: {
-			isToken: false,
-			isTenant: false
-		},
-		method: 'POST',
-		'data': data
-	})
-}

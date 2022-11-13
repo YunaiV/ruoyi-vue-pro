@@ -125,7 +125,7 @@
                 const query = uni.createSelectorQuery().in(this);
                 query.select('#image').boundingClientRect(data => {
                     this.imgLeft =Math.ceil(data.left)
-                    this.imgTop =Math.ceil(data.top) 
+                    this.imgTop =Math.ceil(data.top)
                     this.checkPosArr.push(this.getMousePos(this.$refs.canvas, e));
                     if (this.num == this.checkNum) {
                         this.num = this.createPoint(this.getMousePos(this.$refs.canvas, e));
@@ -141,7 +141,8 @@
                                 "token":this.backToken
                             }
                             myRequest({
-                                url: `/captcha/check`, 
+                                // url: `/captcha/check`,
+                                url: '/admin-api/system/captcha/check', // 使用项目自定义的 /admin-api/ 前缀
                                 data,
                                 method:"POST",
                             }).then(result => {
@@ -167,7 +168,7 @@
                                             this.refresh();
                                         }, 700);
                                     }
-                                })    
+                                })
                         }, 400);
                     }
                     if (this.num < this.checkNum) {
@@ -211,7 +212,8 @@
 					ts: Date.now(), // 现在的时间戳
                 }
                 myRequest({
-                    url: "/captcha/get", //仅为示例，并非真实接口地址。
+                    // url: "/captcha/get", //仅为示例，并非真实接口地址。
+                    url: '/admin-api/system/captcha/get', // 使用项目自定义的 /admin-api/ 前缀
                     data,
                     method:"POST",
                 }).then((result) => {
@@ -232,8 +234,8 @@
             //坐标转换函数
             pointTransfrom(pointArr,imgSize){
                 var newPointArr = pointArr.map(p=>{
-                    let x = Math.round(310 * p.x/parseInt(imgSize.width)) 
-                    let y =Math.round(155 * p.y/parseInt(imgSize.height)) 
+                    let x = Math.round(310 * p.x/parseInt(imgSize.width))
+                    let y =Math.round(155 * p.y/parseInt(imgSize.height))
                     return {x,y}
                 })
                 // console.log(newPointArr,"newPointArr");

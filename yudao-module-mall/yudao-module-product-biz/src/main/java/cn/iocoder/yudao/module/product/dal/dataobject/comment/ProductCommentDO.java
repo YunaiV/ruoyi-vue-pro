@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -117,7 +117,7 @@ public class ProductCommentDO extends BaseDO {
     /**
      * 商家回复时间
      */
-    private Date replyTime;
+    private LocalDateTime replyTime;
 
     /**
      * 有用的计数

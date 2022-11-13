@@ -6,19 +6,19 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="定义编号" align="center" prop="id" width="400" />
       <el-table-column label="定义名称" align="center" prop="name" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button type="text" @click="handleBpmnDetail(scope.row)">
             <span>{{ scope.row.name }}</span>
           </el-button>
         </template>
       </el-table-column>
       <el-table-column label="定义分类" align="center" prop="category" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.BPM_MODEL_CATEGORY" :value="scope.row.category" />
         </template>
       </el-table-column>
       <el-table-column label="表单信息" align="center" prop="formType" width="200">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button v-if="scope.row.formId" type="text" @click="handleFormDetail(scope.row)">
             <span>{{ scope.row.formName }}</span>
           </el-button>
@@ -29,25 +29,25 @@
         </template>
       </el-table-column>
       <el-table-column label="流程版本" align="center" prop="processDefinition.version" width="80">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-tag size="medium" v-if="scope.row">v{{ scope.row.version }}</el-tag>
           <el-tag size="medium" type="warning" v-else>未部署</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="version" width="80">
-        <template slot-scope="scope">
+        <template v-slot="scope">
             <el-tag type="success" v-if="scope.row.suspensionState === 1">激活</el-tag>
             <el-tag type="warning" v-if="scope.row.suspensionState === 2">挂起</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="部署时间" align="center" prop="deploymentTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.deploymentTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="定义描述" align="center" prop="description" width="300" show-overflow-tooltip />
       <el-table-column label="操作" align="center" width="150" fixed="right">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-s-custom" @click="handleAssignRule(scope.row)"
                      v-hasPermi="['bpm:task-assign-rule:update']">分配规则</el-button>
         </template>
@@ -76,7 +76,6 @@
 <script>
 import {getProcessDefinitionBpmnXML, getProcessDefinitionPage} from "@/api/bpm/definition";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
 import taskAssignRuleDialog from "../taskAssignRule/taskAssignRuleDialog";

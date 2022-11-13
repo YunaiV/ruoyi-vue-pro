@@ -43,7 +43,7 @@
       <el-table-column label="任务编号" align="center" prop="id" />
       <el-table-column label="任务名称" align="center" prop="name" />
       <el-table-column label="任务状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_JOB_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>>
@@ -51,7 +51,7 @@
       <el-table-column label="处理器的参数" align="center" prop="handlerParam" />
       <el-table-column label="CRON 表达式" align="center" prop="cronExpression" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['infra:job:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-check" @click="handleChangeStatus(scope.row, true)"
@@ -62,9 +62,7 @@
                      v-hasPermi="['infra:job:delete']">删除</el-button>
           <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)"
                        v-hasPermi="['infra:job:trigger', 'infra:job:query']">
-            <span class="el-dropdown-link">
-              <i class="el-icon-d-arrow-right el-icon--right"></i>更多
-            </span>
+            <el-button size="mini" type="text" icon="el-icon-d-arrow-right">更多</el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="handleRun" icon="el-icon-caret-right"
                                 v-hasPermi="['infra:job:trigger']">执行一次</el-dropdown-item>

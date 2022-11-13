@@ -1,6 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import { FormVO } from './types'
-const request = useAxios()
 
 // 创建工作流的表单定义
 export const createFormApi = async (data: FormVO) => {

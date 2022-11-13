@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { ChannelVO } from './types'
-
-const request = useAxios()
 
 // 查询列表支付渠道
 export const getChannelPageApi = (params) => {

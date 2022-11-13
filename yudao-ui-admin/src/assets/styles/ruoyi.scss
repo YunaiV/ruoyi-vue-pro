@@ -145,9 +145,8 @@
 }
 
 /** 表格更多操作下拉样式 */
-.el-table .el-dropdown-link {
+.el-table .el-dropdown-link,.el-table .el-dropdown-selfdefine {
   cursor: pointer;
-  color: #409EFF;
   margin-left: 5px;
 }
 

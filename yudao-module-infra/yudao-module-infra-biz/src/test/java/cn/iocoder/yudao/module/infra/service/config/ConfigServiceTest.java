@@ -12,26 +12,22 @@ import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigUpdateReqV
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.config.ConfigMapper;
 import cn.iocoder.yudao.module.infra.enums.config.ConfigTypeEnum;
-import cn.iocoder.yudao.module.infra.mq.producer.config.ConfigProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @Import(ConfigServiceImpl.class)
 public class ConfigServiceTest extends BaseDbUnitTest {
@@ -41,8 +37,6 @@ public class ConfigServiceTest extends BaseDbUnitTest {
 
     @Resource
     private ConfigMapper configMapper;
-    @MockBean
-    private ConfigProducer configProducer;
 
     @Test
     public void testCreateConfig_success() {
@@ -57,8 +51,6 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         ConfigDO config = configMapper.selectById(configId);
         assertPojoEquals(reqVO, config);
         Assertions.assertEquals(ConfigTypeEnum.CUSTOM.getType(), config.getType());
-        // 校验调用
-        verify(configProducer, times(1)).sendConfigRefreshMessage();
     }
 
     @Test
@@ -76,8 +68,6 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         // 校验是否更新正确
         ConfigDO config = configMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, config);
-        // 校验调用
-        verify(configProducer, times(1)).sendConfigRefreshMessage();
     }
 
     @Test
@@ -94,8 +84,6 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         configService.deleteConfig(id);
         // 校验数据不存在了
         assertNull(configMapper.selectById(id));
-        // 校验调用
-        verify(configProducer, times(1)).sendConfigRefreshMessage();
     }
 
     @Test
@@ -165,7 +153,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
             o.setName("芋艿");
             o.setConfigKey("yunai");
             o.setType(ConfigTypeEnum.SYSTEM.getType());
-            o.setCreateTime(buildTime(2021, 2, 1));
+            o.setCreateTime(buildLocalDateTime(2021, 2, 1));
         });
         configMapper.insert(dbConfig);
         // 测试 name 不匹配
@@ -175,13 +163,13 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         // 测试 type 不匹配
         configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setType(ConfigTypeEnum.CUSTOM.getType())));
         // 测试 createTime 不匹配
-        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setCreateTime(buildTime(2021, 1, 1))));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setCreateTime(buildLocalDateTime(2021, 1, 1))));
         // 准备参数
         ConfigPageReqVO reqVO = new ConfigPageReqVO();
         reqVO.setName("艿");
         reqVO.setKey("nai");
         reqVO.setType(ConfigTypeEnum.SYSTEM.getType());
-        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 15),buildTime(2021, 2, 15)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021, 1, 15),buildLocalDateTime(2021, 2, 15)}));
 
         // 调用
         PageResult<ConfigDO> pageResult = configService.getConfigPage(reqVO);
@@ -198,7 +186,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
             o.setName("芋艿");
             o.setConfigKey("yunai");
             o.setType(ConfigTypeEnum.SYSTEM.getType());
-            o.setCreateTime(buildTime(2021, 2, 1));
+            o.setCreateTime(buildLocalDateTime(2021, 2, 1));
         });
         configMapper.insert(dbConfig);
         // 测试 name 不匹配
@@ -208,13 +196,13 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         // 测试 type 不匹配
         configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setType(ConfigTypeEnum.CUSTOM.getType())));
         // 测试 createTime 不匹配
-        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setCreateTime(buildTime(2021, 1, 1))));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setCreateTime(buildLocalDateTime(2021, 1, 1))));
         // 准备参数
         ConfigExportReqVO reqVO = new ConfigExportReqVO();
         reqVO.setName("艿");
         reqVO.setKey("nai");
         reqVO.setType(ConfigTypeEnum.SYSTEM.getType());
-        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 15),buildTime(2021, 2, 15)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021, 1, 15),buildLocalDateTime(2021, 2, 15)}));
 
         // 调用
         List<ConfigDO> list = configService.getConfigList(reqVO);

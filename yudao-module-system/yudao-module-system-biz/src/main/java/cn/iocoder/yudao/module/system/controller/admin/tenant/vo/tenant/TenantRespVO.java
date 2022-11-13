@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant;
 
 import lombok.*;
-import java.util.*;
 import io.swagger.annotations.*;
+
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 租户 Response VO")
 @Data
@@ -14,6 +15,6 @@ public class TenantRespVO extends TenantBaseVO {
     private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

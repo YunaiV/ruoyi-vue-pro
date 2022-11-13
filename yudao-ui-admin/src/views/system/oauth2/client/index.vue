@@ -33,35 +33,35 @@
       <el-table-column label="客户端密钥" align="center" prop="secret" />
       <el-table-column label="应用名" align="center" prop="name" />
       <el-table-column label="应用图标" align="center" prop="logo">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <img width="40px" height="40px" :src="scope.row.logo">
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="访问令牌的有效期" align="center" prop="accessTokenValiditySeconds">
-        <template slot-scope="scope">{{ scope.row.accessTokenValiditySeconds }} 秒</template>
+        <template v-slot="scope">{{ scope.row.accessTokenValiditySeconds }} 秒</template>
       </el-table-column>
       <el-table-column label="刷新令牌的有效期" align="center" prop="refreshTokenValiditySeconds">
-        <template slot-scope="scope">{{ scope.row.refreshTokenValiditySeconds }} 秒</template>
+        <template v-slot="scope">{{ scope.row.refreshTokenValiditySeconds }} 秒</template>
       </el-table-column>
       <el-table-column label="授权类型" align="center" prop="authorizedGrantTypes">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-tag :disable-transitions="true" :key="index" v-for="(authorizedGrantType, index) in scope.row.authorizedGrantTypes" :index="index">
             {{ authorizedGrantType }}
           </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:oauth2-client:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"

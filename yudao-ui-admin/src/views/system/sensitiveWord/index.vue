@@ -47,25 +47,25 @@
       <el-table-column label="编号" align="center" prop="id"/>
       <el-table-column label="敏感词" align="center" prop="name"/>
       <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="描述" align="center" prop="description"/>
       <el-table-column label="标签" align="center" prop="tags">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-tag :disable-transitions="true" :key="index" v-for="(tag, index) in scope.row.tags" :index="index">
             {{ tag }}
           </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:sensitive-word:update']">修改
           </el-button>

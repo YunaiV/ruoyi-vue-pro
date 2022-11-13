@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.test.core.util;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -8,6 +9,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -74,6 +76,10 @@ public class RandomUtils {
 
     public static Date randomDate() {
         return RandomUtil.randomDay(0, RANDOM_DATE_MAX);
+    }
+
+    public static LocalDateTime randomLocalDateTime() {
+        return LocalDateTimeUtil.of(randomDate());
     }
 
     public static Short randomShort() {

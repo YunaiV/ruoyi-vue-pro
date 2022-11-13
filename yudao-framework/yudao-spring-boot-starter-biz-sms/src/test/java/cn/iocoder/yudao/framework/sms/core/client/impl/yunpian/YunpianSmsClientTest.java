@@ -10,7 +10,6 @@ import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import com.google.common.collect.Lists;
 import com.yunpian.sdk.YunpianClient;
 import com.yunpian.sdk.api.SmsApi;
@@ -23,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +115,7 @@ public class YunpianSmsClientTest extends BaseMockitoUnitTest {
         assertEquals("", statuses.get(0).getErrorCode());
         assertNull(statuses.get(0).getErrorMsg());
         assertEquals("15205201314", statuses.get(0).getMobile());
-        assertEquals(DateUtils.buildTime(2014, 3, 17, 22, 55, 21), statuses.get(0).getReceiveTime());
+        assertEquals(LocalDateTime.of(2014, 3, 17, 22, 55, 21), statuses.get(0).getReceiveTime());
         assertEquals("9527", statuses.get(0).getSerialNo());
         assertEquals(1024L, statuses.get(0).getLogId());
     }

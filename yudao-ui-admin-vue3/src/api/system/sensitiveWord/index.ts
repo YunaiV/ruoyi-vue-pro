@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { SensitiveWordVO } from './types'
-
-const request = useAxios()
 
 // 查询敏感词列表
 export const getSensitiveWordPageApi = (params) => {

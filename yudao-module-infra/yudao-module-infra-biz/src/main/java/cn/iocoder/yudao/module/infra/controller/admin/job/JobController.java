@@ -22,9 +22,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -133,8 +133,8 @@ public class JobController {
             @ApiImplicitParam(name = "count", value = "数量", example = "5", dataTypeClass = Long.class)
     })
     @PreAuthorize("@ss.hasPermission('infra:job:query')")
-    public CommonResult<List<Date>> getJobNextTimes(@RequestParam("id") Long id,
-                                                    @RequestParam(value = "count", required = false, defaultValue = "5") Integer count) {
+    public CommonResult<List<LocalDateTime>> getJobNextTimes(@RequestParam("id") Long id,
+                                                   @RequestParam(value = "count", required = false, defaultValue = "5") Integer count) {
         JobDO job = jobService.getJob(id);
         if (job == null) {
             return success(Collections.emptyList());

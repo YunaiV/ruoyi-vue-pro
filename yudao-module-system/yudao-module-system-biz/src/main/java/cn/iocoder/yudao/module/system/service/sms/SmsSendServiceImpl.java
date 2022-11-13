@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
@@ -55,6 +56,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     private SmsProducer smsProducer;
 
     @Override
+    @DataPermission(enable = false) // 发送短信时，无需考虑数据权限
     public Long sendSingleSmsToAdmin(String mobile, Long userId, String templateCode, Map<String, Object> templateParams) {
         // 如果 mobile 为空，则加载用户编号对应的手机号
         if (StrUtil.isEmpty(mobile)) {
@@ -180,7 +182,7 @@ public class SmsSendServiceImpl implements SmsSendService {
         }
         // 更新短信日志的接收结果. 因为量一般不大，所以先使用 for 循环更新
         receiveResults.forEach(result -> smsLogService.updateSmsReceiveResult(result.getLogId(),
-                result.getSuccess(), result.getReceiveTime(), result.getErrorCode(), result.getErrorCode()));
+                result.getSuccess(), result.getReceiveTime(), result.getErrorCode(), result.getErrorMsg()));
     }
 
 }

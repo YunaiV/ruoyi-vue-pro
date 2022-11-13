@@ -5,7 +5,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -55,7 +55,7 @@ public class ApiErrorLogBaseVO {
     @ApiModelProperty(value = "异常发生时间", required = true)
     @NotNull(message = "异常发生时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date exceptionTime;
+    private LocalDateTime exceptionTime;
 
     @ApiModelProperty(value = "异常名", required = true)
     @NotNull(message = "异常名不能为空")

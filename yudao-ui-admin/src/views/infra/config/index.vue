@@ -41,28 +41,28 @@
 
     <el-table v-loading="loading" :data="configList">
       <el-table-column label="参数主键" align="center" prop="id" />
-      <el-table-column label="参数分类" align="center" prop="group" />
+      <el-table-column label="参数分类" align="center" prop="category" />
       <el-table-column label="参数名称" align="center" prop="name" :show-overflow-tooltip="true" />
       <el-table-column label="参数键名" align="center" prop="key" :show-overflow-tooltip="true" />
       <el-table-column label="参数键值" align="center" prop="value" />
       <el-table-column label="系统内置" align="center" prop="type">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_CONFIG_TYPE" :value="scope.row.type" />
         </template>
       </el-table-column>
       <el-table-column label="是否可见" align="center" prop="visible">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ scope.row.visible ? '是' : '否' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['infra:config:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"

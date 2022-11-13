@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  *
  * @author 芋道源码
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableTransactionManagement(proxyTargetClass = true) // 启动事务管理
 @EnableConfigurationProperties(DruidStatProperties.class)
 public class YudaoDataSourceAutoConfiguration {

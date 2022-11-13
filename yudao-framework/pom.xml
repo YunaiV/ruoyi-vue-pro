@@ -20,7 +20,6 @@
         <module>yudao-spring-boot-starter-file</module>
         <module>yudao-spring-boot-starter-monitor</module>
         <module>yudao-spring-boot-starter-protection</module>
-        <module>yudao-spring-boot-starter-config</module>
         <module>yudao-spring-boot-starter-job</module>
         <module>yudao-spring-boot-starter-mq</module>
 

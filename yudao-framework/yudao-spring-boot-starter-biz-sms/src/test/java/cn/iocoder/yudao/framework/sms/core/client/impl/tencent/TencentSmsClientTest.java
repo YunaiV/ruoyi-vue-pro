@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
@@ -25,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,7 +146,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
         assertEquals("DELIVRD", statuses.get(0).getErrorCode());
         assertEquals("用户短信送达成功", statuses.get(0).getErrorMsg());
         assertEquals("13900000001", statuses.get(0).getMobile());
-        assertEquals(DateUtils.buildTime(2015, 10, 17, 8, 3, 4), statuses.get(0).getReceiveTime());
+        assertEquals(LocalDateTime.of(2015, 10, 17, 8, 3, 4), statuses.get(0).getReceiveTime());
         assertEquals("12345", statuses.get(0).getSerialNo());
         assertEquals(67890L, statuses.get(0).getLogId());
     }

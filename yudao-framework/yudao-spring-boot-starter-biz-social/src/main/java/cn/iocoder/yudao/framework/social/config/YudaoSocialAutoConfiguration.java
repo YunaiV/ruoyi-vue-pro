@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Primary;
  * @date 2021-10-30
  */
 @Slf4j
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(JustAuthProperties.class)
 public class YudaoSocialAutoConfiguration {
 

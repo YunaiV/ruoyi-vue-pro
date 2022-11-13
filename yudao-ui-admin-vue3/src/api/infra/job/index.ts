@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { JobVO } from './types'
-
-const request = useAxios()
 
 // 任务列表
 export const getJobPageApi = (params) => {

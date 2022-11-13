@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Mapper
 public interface SmsChannelMapper extends BaseMapperX<SmsChannelDO> {
@@ -22,6 +22,6 @@ public interface SmsChannelMapper extends BaseMapperX<SmsChannelDO> {
     }
 
     @Select("SELECT COUNT(*) FROM system_sms_channel WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
+    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

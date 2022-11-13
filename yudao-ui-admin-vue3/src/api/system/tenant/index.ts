@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { TenantVO } from './types'
-
-const request = useAxios()
 
 // 查询租户列表
 export const getTenantPageApi = (params) => {

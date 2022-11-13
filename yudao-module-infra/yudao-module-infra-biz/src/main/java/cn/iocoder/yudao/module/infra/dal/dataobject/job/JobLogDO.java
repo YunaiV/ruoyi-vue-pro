@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 定时任务的执行日志
@@ -56,11 +56,11 @@ public class JobLogDO extends BaseDO {
     /**
      * 开始执行时间
      */
-    private Date beginTime;
+    private LocalDateTime beginTime;
     /**
      * 结束执行时间
      */
-    private Date endTime;
+    private LocalDateTime endTime;
     /**
      * 执行时长，单位：毫秒
      */
