@@ -1,6 +1,8 @@
 <template>
   <ContentWrap>
+    <!-- 列表 -->
     <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+      <!-- 操作：新增 -->
       <template #toolbar_buttons>
         <XButton
           type="primary"
@@ -11,18 +13,21 @@
         />
       </template>
       <template #actionbtns_default="{ row }">
+        <!-- 操作：修改 -->
         <XTextButton
           preIcon="ep:edit"
           :title="t('action.edit')"
           v-hasPermi="['system:notice:update']"
           @click="handleUpdate(row.id)"
         />
+        <!-- 操作：详情 -->
         <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
           v-hasPermi="['system:notice:update']"
           @click="handleDetail(row.id)"
         />
+        <!-- 操作：删除 -->
         <XTextButton
           preIcon="ep:delete"
           :title="t('action.del')"
@@ -32,6 +37,7 @@
       </template>
     </vxe-grid>
   </ContentWrap>
+  <!-- 弹窗 -->
   <XModal id="noticeModel" v-model="dialogVisible" :title="dialogTitle">
     <template #default>
       <!-- 对话框(添加 / 修改) -->
@@ -48,8 +54,8 @@
         :data="detailRef"
       />
     </template>
-    <!-- 操作按钮 -->
     <template #footer>
+      <!-- 按钮：保存 -->
       <XButton
         v-if="['create', 'update'].includes(actionType)"
         type="primary"
@@ -57,34 +63,36 @@
         :loading="actionLoading"
         @click="submitForm"
       />
+      <!-- 按钮：关闭 -->
       <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
   </XModal>
 </template>
 <script setup lang="ts">
+// 全局相关的 import
 import { ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
 import { FormExpose } from '@/components/Form'
-
+// 业务相关的 import
 import * as NoticeApi from '@/api/system/notice'
 import { rules, allSchemas } from './notice.data'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
-
-const xGrid = ref<VxeGridInstance>() // grid Ref
+// 列表相关的变量
+const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
 const { gridOptions } = useVxeGrid<NoticeApi.NoticeVO>({
   allSchemas: allSchemas,
   getListApi: NoticeApi.getNoticePageApi
 })
-
+// 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const actionType = ref('') // 操作按钮的类型
-const actionLoading = ref(false) // 按钮Loading
+const actionLoading = ref(false) // 按钮 Loading
 const formRef = ref<FormExpose>() // 表单 Ref
 const detailRef = ref() // 详情 Ref
 
@@ -127,11 +135,12 @@ const handleDelete = async (rowId: number) => {
       message.success(t('common.delSuccess'))
     })
     .finally(() => {
+      // 刷新列表
       xGrid.value?.commitProxy('query')
     })
 }
 
-// 提交按钮
+// 提交新增/修改的表单
 const submitForm = async () => {
   const elForm = unref(formRef)?.getElFormRef()
   if (!elForm) return
@@ -151,6 +160,7 @@ const submitForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
+        // 刷新列表
         xGrid.value?.commitProxy('query')
       }
     }
