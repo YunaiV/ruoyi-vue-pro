@@ -61,6 +61,7 @@ const { gridOptions } = useVxeGrid<OperateLogApi.OperateLogVO>({
   allSchemas: allSchemas,
   getListApi: OperateLogApi.getOperateLogPageApi
 })
+
 // 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
@@ -74,10 +75,11 @@ const handleDetail = (row: OperateLogApi.OperateLogVO) => {
 }
 
 // 导出操作
+// TODO @星语：导出需要有二次确认哈
 const handleExport = async () => {
   const queryParams = Object.assign(
     {},
-    JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data))
+    JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data)) // TODO @星语：这个有没办法，封装个 util 获取哈？
   )
   const res = await OperateLogApi.exportOperateLogApi(queryParams)
   download.excel(res, '岗位列表.xls')
