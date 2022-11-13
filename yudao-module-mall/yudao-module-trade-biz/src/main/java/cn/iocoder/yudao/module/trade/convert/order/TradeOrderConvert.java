@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.trade.convert.order;
 
-import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderInfoCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
@@ -20,12 +18,11 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
 
 @Mapper
 public interface TradeOrderConvert {
