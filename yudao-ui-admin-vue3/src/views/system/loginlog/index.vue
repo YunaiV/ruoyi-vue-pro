@@ -1,80 +1,66 @@
+<template>
+  <ContentWrap>
+    <!-- 列表 -->
+    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+      <template #toolbar_buttons>
+        <XButton
+          type="primary"
+          preIcon="ep:download"
+          :title="t('action.export')"
+          @click="handleExport()"
+        />
+      </template>
+      <template #actionbtns_default="{ row }">
+        <!-- 操作：详情 -->
+        <XTextButton preIcon="ep:view" :title="t('action.detail')" @click="handleDetail(row)" />
+      </template>
+    </vxe-grid>
+  </ContentWrap>
+  <!-- 弹窗 -->
+  <XModal id="postModel" v-model="dialogVisible" :title="dialogTitle">
+    <template #default>
+      <!-- 表单：详情 -->
+      <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
+    </template>
+    <template #footer>
+      <!-- 按钮：关闭 -->
+      <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
+    </template>
+  </XModal>
+</template>
 <script setup lang="ts">
+// 全局相关的 import
 import { ref } from 'vue'
-import dayjs from 'dayjs'
-import { useTable } from '@/hooks/web/useTable'
-import { allSchemas } from './loginLog.data'
-import { DICT_TYPE } from '@/utils/dict'
-import type { LoginLogVO } from '@/api/system/loginLog/types'
-import { getLoginLogPageApi, exportLoginLogApi } from '@/api/system/loginLog'
 import { useI18n } from '@/hooks/web/useI18n'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { VxeGridInstance } from 'vxe-table'
+import { allSchemas } from './loginLog.data'
+import { getLoginLogPageApi, exportLoginLogApi, LoginLogVO } from '@/api/system/loginLog'
+import download from '@/utils/download'
 
 const { t } = useI18n() // 国际化
-// ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<LoginLogVO>({
-  getListApi: getLoginLogPageApi,
-  exportListApi: exportLoginLogApi
+// 列表相关的变量
+const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
+const { gridOptions } = useVxeGrid<LoginLogVO>({
+  allSchemas: allSchemas,
+  getListApi: getLoginLogPageApi
 })
-const { getList, setSearchParams } = methods
 // 详情操作
+const detailRef = ref() // 详情 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref(t('action.detail')) // 弹出层标题
-const detailRef = ref() // 详情 Ref
 const handleDetail = async (row: LoginLogVO) => {
   // 设置数据
   detailRef.value = row
   dialogVisible.value = true
 }
-getList()
+// 导出操作
+const handleExport = async () => {
+  const queryParams = Object.assign(
+    {},
+    JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data))
+  )
+  const res = await exportLoginLogApi(queryParams)
+  download.excel(res, '登录列表.xls')
+}
 </script>
-<template>
-  <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #logType="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_LOGIN_TYPE" :value="row.logType" />
-      </template>
-      <template #result="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_LOGIN_RESULT" :value="row.result" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
-        <el-button link type="primary" @click="handleDetail(row)">
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-      </template>
-    </Table>
-  </ContentWrap>
-  <Dialog v-model="dialogVisible" :title="dialogTitle" maxHeight="500px" width="50%">
-    <!-- 对话框(详情) -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
-      <template #logType="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_LOGIN_TYPE" :value="row.logType" />
-      </template>
-      <template #result="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_LOGIN_RESULT" :value="row.result" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-    </Descriptions>
-    <!-- 操作按钮 -->
-    <template #footer>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </Dialog>
-</template>
