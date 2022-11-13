@@ -61,7 +61,7 @@ const handleForceLogout = (rowId: number) => {
     .delConfirm()
     .then(async () => {
       await TokenApi.deleteAccessTokenApi(rowId)
-      message.success(t('common.delSuccess'))
+      message.success(t('common.delSuccess')) // TODO 星语：提示内容不对
     })
     .finally(() => {
       // 刷新列表
