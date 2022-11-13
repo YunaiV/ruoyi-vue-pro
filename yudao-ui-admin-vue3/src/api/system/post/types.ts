@@ -8,6 +8,7 @@ export type PostVO = {
   createTime?: string
 }
 
+// TODO @星语：要不要搞个 Page 基类呀？和后端对应
 export type PostPageReqVO = {
   code: string
   name: string

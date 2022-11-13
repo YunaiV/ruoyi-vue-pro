@@ -1,10 +1,11 @@
 import request from '@/config/axios'
 import type { MenuVO } from './types'
 
-// 查询菜单（精简)列表
+// 查询菜单（精简）列表
 export const listSimpleMenusApi = () => {
   return request.get({ url: '/system/menu/list-all-simple' })
 }
+
 // 查询菜单列表
 export const getMenuListApi = (params) => {
   return request.get({ url: '/system/menu/list', params })

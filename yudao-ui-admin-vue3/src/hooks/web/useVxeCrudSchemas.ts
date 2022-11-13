@@ -14,18 +14,31 @@ import { VxeTableColumn } from '@/types/table'
 import { FormSchema } from '@/types/form'
 import { ComponentOptions } from '@/types/components'
 
-export type VxeCrudSchema = Omit<VxeTableColumn, 'children'> & {
+export type VxeCrudSchema = {
+  // 主键ID
+  primaryKey?: string
+  primaryType?: VxeColumnPropTypes.Type
+  // 是否开启操作栏插槽
+  action?: boolean
+  columns: VxeCrudColumns[]
+}
+type VxeCrudColumns = Omit<VxeTableColumn, 'children'> & {
   field: string
   title?: string
   formatter?: VxeColumnPropTypes.Formatter
+  isSearch?: boolean
   search?: CrudSearchParams
+  isTable?: boolean
   table?: CrudTableParams
+  isForm?: boolean
   form?: CrudFormParams
+  isDetail?: boolean
   detail?: CrudDescriptionsParams
   print?: CrudPrintParams
-  children?: VxeCrudSchema[]
+  children?: VxeCrudColumns[]
   dictType?: string
 }
+
 type CrudSearchParams = {
   // 是否显示在查询项
   show?: boolean
@@ -61,7 +74,7 @@ export type VxeAllSchemas = {
 
 // 过滤所有结构
 export const useVxeCrudSchemas = (
-  crudSchema: VxeCrudSchema[]
+  crudSchema: VxeCrudSchema
 ): {
   allSchemas: VxeAllSchemas
 } => {
@@ -95,12 +108,12 @@ export const useVxeCrudSchemas = (
 }
 
 // 过滤 Search 结构
-const filterSearchSchema = (crudSchema: VxeCrudSchema[]): VxeFormItemProps[] => {
-  const searchSchema: VxeFormItemProps[] = []
+const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
   const { t } = useI18n()
-  eachTree(crudSchema, (schemaItem: VxeCrudSchema) => {
+  const searchSchema: VxeFormItemProps[] = []
+  eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.search?.show) {
+    if (schemaItem?.isSearch) {
       let itemRenderName = schemaItem?.search?.itemRender?.name || '$input'
       const options: any[] = []
       let itemRender: FormItemRenderOptions = {
@@ -114,7 +127,7 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema[]): VxeFormItemProps[] => 
           options.push(dict)
         })
         itemRender.options = options
-        if (!schemaItem.search.itemRender?.name) itemRenderName = '$select'
+        if (!schemaItem?.search?.itemRender?.name) itemRenderName = '$select'
         itemRender = {
           name: itemRenderName,
           options: options,
@@ -123,15 +136,12 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema[]): VxeFormItemProps[] => 
       }
       const searchSchemaItem = {
         // 默认为 input
-        span: 8,
         folding: searchSchema.length > 2,
-        itemRender: itemRender,
-        ...schemaItem.search,
+        itemRender: schemaItem.itemRender ? schemaItem.itemRender : itemRender,
         field: schemaItem.field,
-        title: schemaItem.search?.title || schemaItem.title
+        title: schemaItem.search?.title || schemaItem.title,
+        span: 8
       }
-      // 删除不必要的字段
-      delete searchSchemaItem.show
 
       searchSchema.push(searchSchemaItem)
     }
@@ -154,36 +164,63 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema[]): VxeFormItemProps[] => 
 }
 
 // 过滤 table 结构
-const filterTableSchema = (crudSchema: VxeCrudSchema[]): VxeGridPropTypes.Columns => {
+const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns => {
+  const { t } = useI18n()
   const tableSchema: VxeGridPropTypes.Columns = []
-  eachTree(crudSchema, (schemaItem: VxeCrudSchema) => {
+  // 主键ID
+  if (crudSchema.primaryKey) {
+    const tableSchemaItem = {
+      title: t('common.index'),
+      field: crudSchema.primaryKey,
+      type: crudSchema.primaryType ? crudSchema.primaryType : 'seq',
+      width: '50px'
+    }
+    tableSchema.push(tableSchemaItem)
+  }
+  eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.table?.show !== false) {
+    if (schemaItem?.isTable !== false) {
       const tableSchemaItem = {
         ...schemaItem.table,
         field: schemaItem.field,
         title: schemaItem.table?.title || schemaItem.title
       }
+      tableSchemaItem.showOverflow = 'tooltip'
       if (schemaItem?.formatter) {
         tableSchemaItem.formatter = schemaItem.formatter
       }
-
-      // 删除不必要的字段
-      delete tableSchemaItem.show
+      if (schemaItem?.dictType) {
+        tableSchemaItem.cellRender = {
+          name: 'XDict',
+          content: schemaItem.dictType
+        }
+      }
 
       tableSchema.push(tableSchemaItem)
     }
   })
+  // 操作栏插槽
+  if (crudSchema.action && crudSchema.action == true) {
+    const tableSchemaItem = {
+      title: t('table.action'),
+      field: 'actionbtns',
+      width: '240px',
+      slots: {
+        default: 'actionbtns_default'
+      }
+    }
+    tableSchema.push(tableSchemaItem)
+  }
   return tableSchema
 }
 
 // 过滤 form 结构
-const filterFormSchema = (crudSchema: VxeCrudSchema[]): FormSchema[] => {
+const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
   const formSchema: FormSchema[] = []
 
-  eachTree(crudSchema, (schemaItem: VxeCrudSchema) => {
+  eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.form?.show !== false) {
+    if (schemaItem?.isForm !== false) {
       let component = schemaItem?.form?.component || 'Input'
       const options: ComponentOptions[] = []
       let comonentProps = {}
@@ -205,9 +242,6 @@ const filterFormSchema = (crudSchema: VxeCrudSchema[]): FormSchema[] => {
         label: schemaItem.form?.label || schemaItem.title
       }
 
-      // 删除不必要的字段
-      delete formSchemaItem.show
-
       formSchema.push(formSchemaItem)
     }
   })
@@ -216,20 +250,26 @@ const filterFormSchema = (crudSchema: VxeCrudSchema[]): FormSchema[] => {
 }
 
 // 过滤 descriptions 结构
-const filterDescriptionsSchema = (crudSchema: VxeCrudSchema[]): DescriptionsSchema[] => {
+const filterDescriptionsSchema = (crudSchema: VxeCrudSchema): DescriptionsSchema[] => {
   const descriptionsSchema: DescriptionsSchema[] = []
 
-  eachTree(crudSchema, (schemaItem: VxeCrudSchema) => {
+  eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.detail?.show !== false) {
+    if (schemaItem?.isDetail !== false) {
       const descriptionsSchemaItem = {
         ...schemaItem.detail,
         field: schemaItem.field,
         label: schemaItem.detail?.label || schemaItem.title
       }
-
-      // 删除不必要的字段
-      delete descriptionsSchemaItem.show
+      if (schemaItem.dictType) {
+        descriptionsSchemaItem.dictType = schemaItem.dictType
+      }
+      if (schemaItem.detail?.dateFormat || schemaItem.formatter == 'formatDate') {
+        // descriptionsSchemaItem.dateFormat = schemaItem.detail.dateFormat
+        //   ? schemaItem?.detail?.dateFormat
+        //   : 'YYYY-MM-DD HH:mm:ss'
+        descriptionsSchemaItem.dateFormat = 'YYYY-MM-DD HH:mm:ss'
+      }
 
       descriptionsSchema.push(descriptionsSchemaItem)
     }
@@ -239,10 +279,10 @@ const filterDescriptionsSchema = (crudSchema: VxeCrudSchema[]): DescriptionsSche
 }
 
 // 过滤 打印 结构
-const filterPrintSchema = (crudSchema: VxeCrudSchema[]): any[] => {
+const filterPrintSchema = (crudSchema: VxeCrudSchema): any[] => {
   const printSchema: any[] = []
 
-  eachTree(crudSchema, (schemaItem: VxeCrudSchema) => {
+  eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
     if (schemaItem?.print?.show !== false) {
       const printSchemaItem = {

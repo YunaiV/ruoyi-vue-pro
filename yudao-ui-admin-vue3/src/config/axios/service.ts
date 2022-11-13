@@ -5,7 +5,7 @@ import axios, {
   AxiosResponse,
   AxiosError
 } from 'axios'
-import { useMessage } from '@/hooks/web/useMessage'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import qs from 'qs'
 import { config } from '@/config/axios/config'
 import { getAccessToken, getRefreshToken, getTenantId, removeToken, setToken } from '@/utils/auth'
@@ -17,7 +17,6 @@ import { useCache } from '@/hooks/web/useCache'
 const tenantEnable = import.meta.env.VITE_APP_TENANT_ENABLE
 const { result_code, base_url, request_timeout } = config
 
-const message = useMessage()
 // 需要忽略的提示。忽略后，自动 Promise.reject('error')
 const ignoreMsgs = [
   '无效的刷新令牌', // 刷新令牌被删除时，不用提示
@@ -30,6 +29,8 @@ export const isRelogin = { show: false }
 let requestList: any[] = []
 // 是否正在刷新中
 let isRefreshToken = false
+// 请求白名单，无须token的接口
+const whiteList: string[] = ['/login', '/refresh-token']
 
 // 创建axios实例
 const service: AxiosInstance = axios.create({
@@ -42,14 +43,20 @@ const service: AxiosInstance = axios.create({
 service.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     // 是否需要设置 token
-    const isToken = (config!.headers || {}).isToken === false
+    let isToken = (config!.headers || {}).isToken === false
+    whiteList.some((v) => {
+      if (config.url) {
+        config.url.indexOf(v) > -1
+        return (isToken = false)
+      }
+    })
     if (getAccessToken() && !isToken) {
       ;(config as Recordable).headers.Authorization = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token
     }
     // 设置租户
     if (tenantEnable && tenantEnable === 'true') {
       const tenantId = getTenantId()
-      if (tenantId) (config as Recordable).headers.common['tenant-id'] = tenantId
+      if (tenantId) (config as Recordable).headers['tenant-id'] = tenantId
     }
     const params = config.params || {}
     const data = config.data || false
@@ -157,10 +164,10 @@ service.interceptors.response.use(
         })
       }
     } else if (code === 500) {
-      message.error(t('sys.api.errMsg500'))
+      ElMessage.error(t('sys.api.errMsg500'))
       return Promise.reject(new Error(msg))
     } else if (code === 901) {
-      message.error(
+      ElMessage.error(
         '<div>' +
           t('sys.api.errMsg901') +
           '</div>' +
@@ -175,7 +182,7 @@ service.interceptors.response.use(
         // hard coding：忽略这个提示，直接登出
         console.log(msg)
       } else {
-        message.notifyError(msg)
+        ElNotification.error({ title: msg })
       }
       return Promise.reject('error')
     } else {
@@ -184,16 +191,16 @@ service.interceptors.response.use(
   },
   (error: AxiosError) => {
     console.log('err' + error) // for debug
-    let { message: msg } = error
+    let { message } = error
     const { t } = useI18n()
-    if (msg === 'Network Error') {
-      msg = t('sys.api.errorMessage')
-    } else if (msg.includes('timeout')) {
-      msg = t('sys.api.apiTimeoutMessage')
-    } else if (msg.includes('Request failed with status code')) {
-      msg = t('sys.api.apiRequestFailed') + msg.substr(msg.length - 3)
+    if (message === 'Network Error') {
+      message = t('sys.api.errorMessage')
+    } else if (message.includes('timeout')) {
+      message = t('sys.api.apiTimeoutMessage')
+    } else if (message.includes('Request failed with status code')) {
+      message = t('sys.api.apiRequestFailed') + message.substr(message.length - 3)
     }
-    message.error(msg)
+    ElMessage.error(message)
     return Promise.reject(error)
   }
 )
@@ -205,8 +212,11 @@ const handleAuthorized = () => {
   const { t } = useI18n()
   if (!isRelogin.show) {
     isRelogin.show = true
-    message
-      .confirm(t('sys.api.timeoutMessage'))
+    ElMessageBox.confirm(t('sys.api.timeoutMessage'), t('common.confirmTitle'), {
+      confirmButtonText: t('login.relogin'),
+      cancelButtonText: t('common.cancel'),
+      type: 'warning'
+    })
       .then(() => {
         const { wsCache } = useCache()
         resetRouter() // 重置静态路由表

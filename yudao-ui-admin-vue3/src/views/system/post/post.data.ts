@@ -13,79 +13,42 @@ export const rules = reactive({
 })
 
 // CrudSchema
-const crudSchemas = reactive<VxeCrudSchema[]>([
-  {
-    title: t('common.index'),
-    field: 'id',
-    type: 'seq',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: 'seq',
+  action: true,
+  columns: [
+    {
+      title: '岗位名称',
+      field: 'name',
+      isSearch: true
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    title: '岗位名称',
-    field: 'name',
-    search: {
-      show: true
-    }
-  },
-  {
-    title: '岗位编码',
-    field: 'code',
-    search: {
-      show: true
-    }
-  },
-  {
-    title: '岗位顺序',
-    field: 'sort'
-  },
-  {
-    title: t('common.status'),
-    field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS,
-    table: {
-      slots: {
-        default: 'status_default'
-      }
+    {
+      title: '岗位编码',
+      field: 'code',
+      isSearch: true
     },
-    search: {
-      show: true
-    }
-  },
-  {
-    title: '备注',
-    field: 'remark',
-    table: {
-      show: false
-    }
-  },
-  {
-    title: t('common.createTime'),
-    field: 'createTime',
-    formatter: 'formatDate',
-    form: {
-      show: false
-    }
-  },
-  {
-    title: t('table.action'),
-    field: 'action',
-    table: {
-      width: '240px',
-      slots: {
-        default: 'action_default'
-      }
+    {
+      title: '岗位顺序',
+      field: 'sort'
     },
-    form: {
-      show: false
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      isSearch: true
     },
-    detail: {
-      show: false
+    {
+      title: '备注',
+      field: 'remark',
+      isTable: false
+    },
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate',
+      isForm: false
     }
-  }
-])
+  ]
+})
 export const { allSchemas } = useVxeCrudSchemas(crudSchemas)
