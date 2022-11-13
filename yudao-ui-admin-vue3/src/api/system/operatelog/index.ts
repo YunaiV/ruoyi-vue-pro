@@ -22,7 +22,7 @@ export type OperateLogVO = {
   resultMsg: string
   resultData: string
 }
-export interface OperateLogPageReqVO extends BasePage {
+export interface OperateLogPageReqVO extends PageParam {
   module?: string
   userNickname?: string
   type?: number

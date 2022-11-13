@@ -10,7 +10,7 @@ export interface PostVO {
   createTime?: string
 }
 
-export interface PostPageReqVO extends BasePage {
+export interface PostPageReqVO extends PageParam {
   code?: string
   name?: string
   status?: number
@@ -31,6 +31,7 @@ export const getPostPageApi = async (params: PostPageReqVO) => {
 export const listSimplePostsApi = async () => {
   return await request.get({ url: '/system/post/list-all-simple' })
 }
+
 // 查询岗位详情
 export const getPostApi = async (id: number) => {
   return await request.get({ url: '/system/post/get?id=' + id })

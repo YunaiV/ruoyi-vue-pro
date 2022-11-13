@@ -12,7 +12,7 @@ export interface LoginLogVO {
   createTime: string
 }
 
-export interface LoginLogReqVO extends BasePage {
+export interface LoginLogReqVO extends PageParam {
   userIp?: string
   username?: string
   status?: boolean

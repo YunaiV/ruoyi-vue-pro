@@ -9,7 +9,7 @@ export interface ErrorCodeVO {
   createTime: string
 }
 
-export interface ErrorCodePageReqVO extends BasePage {
+export interface ErrorCodePageReqVO extends PageParam {
   type?: number
   applicationName?: string
   code?: number

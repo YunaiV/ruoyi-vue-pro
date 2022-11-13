@@ -12,7 +12,7 @@ export interface NoticeVO {
   updateTime: string
 }
 
-export interface NoticePageReqVO extends BasePage {
+export interface NoticePageReqVO extends PageParam {
   title?: string
   status?: number
 }

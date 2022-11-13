@@ -277,6 +277,7 @@ import { required } from '@/utils/formRules.js'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
 import { handleTree } from '@/utils/tree'
+import { deepCopy } from 'windicss/utils'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
@@ -291,7 +292,7 @@ const actionType = ref('') // 操作按钮的类型
 const actionLoading = ref(false) // 遮罩层
 // 新增和修改的表单值
 const formRef = ref<FormInstance>()
-const menuForm = ref<MenuApi.MenuVO>({
+const menuFormNull = {
   id: 0,
   name: '',
   permission: '',
@@ -305,7 +306,8 @@ const menuForm = ref<MenuApi.MenuVO>({
   visible: true,
   keepAlive: true,
   createTime: ''
-})
+}
+const menuForm = ref<MenuApi.MenuVO>(menuFormNull)
 // 新增和修改的表单校验
 const rules = reactive({
   name: [required],
@@ -323,6 +325,7 @@ const menuProps = {
   value: 'id'
 }
 const menuOptions = ref<any[]>([]) // 树形结构
+// 获取下拉框[上级菜单]的数据
 const getTree = async () => {
   menuOptions.value = []
   const res = await MenuApi.listSimpleMenusApi()
@@ -336,6 +339,7 @@ const queryParams = reactive<MenuApi.MenuPageReqVO>({
   name: undefined,
   status: undefined
 })
+// 执行查询
 const getList = async () => {
   tableLoading.value = true
   const res = await MenuApi.getMenuListApi(queryParams)
@@ -368,27 +372,14 @@ const setDialogTile = async (type: string) => {
 // 新增操作
 const handleCreate = () => {
   setDialogTile('create')
+  // 重置表单
   formRef.value?.resetFields()
-  menuForm.value = {
-    id: 0,
-    name: '',
-    permission: '',
-    type: SystemMenuTypeEnum.DIR,
-    sort: 1,
-    parentId: 0,
-    path: '',
-    icon: '',
-    component: '',
-    status: CommonStatusEnum.ENABLE,
-    visible: true,
-    keepAlive: true,
-    createTime: ''
-  }
+  menuForm.value = deepCopy(menuFormNull)
 }
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
-  setDialogTile('update')
+  await setDialogTile('update')
   // 设置数据
   const res = await MenuApi.getMenuApi(rowId)
   menuForm.value = res

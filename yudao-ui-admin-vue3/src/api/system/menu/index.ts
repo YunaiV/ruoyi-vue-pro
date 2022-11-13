@@ -20,6 +20,7 @@ export interface MenuPageReqVO {
   name?: string
   status?: number
 }
+
 // 查询菜单（精简）列表
 export const listSimpleMenusApi = () => {
   return request.get({ url: '/system/menu/list-all-simple' })

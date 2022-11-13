@@ -11,7 +11,7 @@ export interface OAuth2TokenVO {
   expiresTime: string
 }
 
-export interface OAuth2TokenPageReqVO extends BasePage {
+export interface OAuth2TokenPageReqVO extends PageParam {
   code?: string
   name?: string
   status?: number
