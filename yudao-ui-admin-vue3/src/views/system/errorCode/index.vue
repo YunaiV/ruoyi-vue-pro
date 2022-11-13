@@ -21,7 +21,7 @@
           preIcon="ep:view"
           :title="t('action.detail')"
           v-hasPermi="['system:error-code:update']"
-          @click="handleDetail(row)"
+          @click="handleDetail(row.id)"
         />
         <XTextButton
           preIcon="ep:delete"
@@ -64,7 +64,6 @@
 
 <script setup lang="ts">
 import { ref, unref } from 'vue'
-import type { ErrorCodeVO } from '@/api/system/errorCode/types'
 import { rules, allSchemas } from './errorCode.data'
 import * as ErrorCodeApi from '@/api/system/errorCode'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -83,7 +82,7 @@ const xGrid = ref<VxeGridInstance>() // grid Ref
 const formRef = ref<FormExpose>() // 表单 Ref
 const detailRef = ref() // 详情 Ref
 
-const { gridOptions } = useVxeGrid<ErrorCodeVO>({
+const { gridOptions } = useVxeGrid<ErrorCodeApi.ErrorCodeVO>({
   allSchemas: allSchemas,
   getListApi: ErrorCodeApi.getErrorCodePageApi
 })
@@ -101,19 +100,20 @@ const handleCreate = () => {
   unref(formRef)?.getElFormRef()?.resetFields()
 }
 
-// 详情操作
-const handleDetail = async (row: ErrorCodeVO) => {
-  // 设置数据
-  detailRef.value = row
-  setDialogTile('detail')
-}
-
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
   const res = await ErrorCodeApi.getErrorCodeApi(rowId)
   unref(formRef)?.setValues(res)
+}
+
+// 详情操作
+const handleDetail = async (rowId: number) => {
+  setDialogTile('detail')
+  // 设置数据
+  const res = await ErrorCodeApi.getErrorCodeApi(rowId)
+  detailRef.value = res
 }
 
 // 删除操作
@@ -138,7 +138,7 @@ const submitForm = async () => {
       actionLoading.value = true
       // 提交请求
       try {
-        const data = unref(formRef)?.formModel as ErrorCodeVO
+        const data = unref(formRef)?.formModel as ErrorCodeApi.ErrorCodeVO
         if (actionType.value === 'create') {
           await ErrorCodeApi.createErrorCodeApi(data)
           message.success(t('common.createSuccess'))

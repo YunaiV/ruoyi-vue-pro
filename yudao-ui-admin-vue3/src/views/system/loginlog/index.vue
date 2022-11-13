@@ -4,7 +4,7 @@
     <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
       <template #toolbar_buttons>
         <XButton
-          type="primary"
+          type="warning"
           preIcon="ep:download"
           :title="t('action.export')"
           @click="handleExport()"

@@ -12,11 +12,18 @@ export interface LoginLogVO {
   createTime: string
 }
 
+export interface LoginLogReqVO extends BasePage {
+  userIp?: string
+  username?: string
+  status?: boolean
+  createTime?: string[]
+}
+
 // 查询登录日志列表
-export const getLoginLogPageApi = (params) => {
+export const getLoginLogPageApi = (params: LoginLogReqVO) => {
   return request.get({ url: '/system/login-log/page', params })
 }
 // 导出登录日志
-export const exportLoginLogApi = (params) => {
+export const exportLoginLogApi = (params: LoginLogReqVO) => {
   return request.download({ url: '/system/login-log/export', params })
 }

@@ -34,7 +34,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '错误码错误提示',
-      field: 'message'
+      field: 'message',
+      isSearch: true
     },
     {
       title: t('common.createTime'),

@@ -13,8 +13,11 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '日志类型',
       field: 'logType',
-      dictType: DICT_TYPE.SYSTEM_LOGIN_TYPE,
-      isSearch: true
+      dictType: DICT_TYPE.SYSTEM_LOGIN_TYPE
+    },
+    {
+      title: '用户类型',
+      field: 'userType'
     },
     {
       title: '用户名称',
@@ -27,20 +30,24 @@ const crudSchemas = reactive<VxeCrudSchema>({
       isSearch: true
     },
     {
-      title: 'userAgent',
+      title: '浏览器',
       field: 'userAgent'
     },
     {
       title: '登陆结果',
       field: 'result',
-      dictType: DICT_TYPE.SYSTEM_LOGIN_RESULT,
-      isSearch: true
+      dictType: DICT_TYPE.SYSTEM_LOGIN_RESULT
     },
     {
       title: t('common.createTime'),
       field: 'createTime',
       formatter: 'formatDate',
-      isForm: false
+      isForm: false,
+      search: {
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
+      }
     }
   ]
 })

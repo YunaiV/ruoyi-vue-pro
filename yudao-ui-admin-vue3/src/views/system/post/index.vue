@@ -12,7 +12,7 @@
           @click="handleCreate()"
         />
         <XButton
-          type="primary"
+          type="warning"
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['system:post:export']"
