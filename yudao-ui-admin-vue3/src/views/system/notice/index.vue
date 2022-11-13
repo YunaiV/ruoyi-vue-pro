@@ -21,7 +21,7 @@
           preIcon="ep:view"
           :title="t('action.detail')"
           v-hasPermi="['system:notice:update']"
-          @click="handleDetail(row)"
+          @click="handleDetail(row.id)"
         />
         <XTextButton
           preIcon="ep:delete"
@@ -36,10 +36,10 @@
     <template #default>
       <!-- 对话框(添加 / 修改) -->
       <Form
+        ref="formRef"
         v-if="['create', 'update'].includes(actionType)"
         :schema="allSchemas.formSchema"
         :rules="rules"
-        ref="formRef"
       />
       <!-- 对话框(详情) -->
       <Descriptions
@@ -63,29 +63,30 @@
 </template>
 <script setup lang="ts">
 import { ref, unref } from 'vue'
-import * as NoticeApi from '@/api/system/notice'
-import { NoticeVO } from '@/api/system/notice/types'
-import { rules, allSchemas } from './notice.data'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
 import { FormExpose } from '@/components/Form'
 
+import * as NoticeApi from '@/api/system/notice'
+import { rules, allSchemas } from './notice.data'
+
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
+
+const xGrid = ref<VxeGridInstance>() // grid Ref
+const { gridOptions } = useVxeGrid<NoticeApi.NoticeVO>({
+  allSchemas: allSchemas,
+  getListApi: NoticeApi.getNoticePageApi
+})
+
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const actionType = ref('') // 操作按钮的类型
 const actionLoading = ref(false) // 按钮Loading
-const xGrid = ref<VxeGridInstance>() // grid Ref
 const formRef = ref<FormExpose>() // 表单 Ref
 const detailRef = ref() // 详情 Ref
-
-const { gridOptions } = useVxeGrid<NoticeVO>({
-  allSchemas: allSchemas,
-  getListApi: NoticeApi.getNoticePageApi
-})
 
 // 设置标题
 const setDialogTile = (type: string) => {
@@ -110,9 +111,11 @@ const handleUpdate = async (rowId: number) => {
 }
 
 // 详情操作
-const handleDetail = (row: NoticeVO) => {
+const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
-  detailRef.value = row
+  // 设置数据
+  const res = await NoticeApi.getNoticeApi(rowId)
+  detailRef.value = res
 }
 
 // 删除操作
@@ -137,7 +140,7 @@ const submitForm = async () => {
       actionLoading.value = true
       // 提交请求
       try {
-        const data = unref(formRef)?.formModel as NoticeVO
+        const data = unref(formRef)?.formModel as NoticeApi.NoticeVO
         if (actionType.value === 'create') {
           await NoticeApi.createNoticeApi(data)
           message.success(t('common.createSuccess'))

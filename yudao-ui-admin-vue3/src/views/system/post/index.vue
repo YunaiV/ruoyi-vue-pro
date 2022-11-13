@@ -11,6 +11,13 @@
           v-hasPermi="['system:post:create']"
           @click="handleCreate()"
         />
+        <XButton
+          type="primary"
+          preIcon="ep:download"
+          :title="t('action.export')"
+          v-hasPermi="['system:post:export']"
+          @click="handleExport()"
+        />
       </template>
       <template #actionbtns_default="{ row }">
         <!-- 操作：修改 -->
@@ -25,7 +32,7 @@
           preIcon="ep:view"
           :title="t('action.detail')"
           v-hasPermi="['system:post:update']"
-          @click="handleDetail(row)"
+          @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->
         <XTextButton
@@ -42,10 +49,10 @@
     <template #default>
       <!-- 表单：添加/修改 -->
       <Form
+        ref="formRef"
         v-if="['create', 'update'].includes(actionType)"
         :schema="allSchemas.formSchema"
         :rules="rules"
-        ref="formRef"
       />
       <!-- 表单：详情 -->
       <Descriptions
@@ -78,14 +85,14 @@ import { VxeGridInstance } from 'vxe-table'
 import { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as PostApi from '@/api/system/post'
-import { PostVO } from '@/api/system/post/types'
 import { rules, allSchemas } from './post.data'
+import download from '@/utils/download'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions } = useVxeGrid<PostVO>({
+const { gridOptions } = useVxeGrid<PostApi.PostVO>({
   allSchemas: allSchemas,
   getListApi: PostApi.getPostPageApi
 })
@@ -111,6 +118,16 @@ const handleCreate = () => {
   unref(formRef)?.getElFormRef()?.resetFields()
 }
 
+// 导出操作
+const handleExport = async () => {
+  const queryParams = Object.assign(
+    {},
+    JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data))
+  )
+  const res = await PostApi.exportPostApi(queryParams)
+  download.excel(res, '岗位列表.xls')
+}
+
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -120,10 +137,10 @@ const handleUpdate = async (rowId: number) => {
 }
 
 // 详情操作
-const handleDetail = (row: PostVO) => {
+const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
-  // TODO @星语：要不读取下后端？
-  detailRef.value = row
+  const res = await PostApi.getPostApi(rowId)
+  detailRef.value = res
 }
 
 // 删除操作
@@ -144,13 +161,12 @@ const handleDelete = async (rowId: number) => {
 const submitForm = async () => {
   const elForm = unref(formRef)?.getElFormRef()
   if (!elForm) return
-  // TODO @星语：这个告警，要不要解决下？
   elForm.validate(async (valid) => {
     if (valid) {
       actionLoading.value = true
       // 提交请求
       try {
-        const data = unref(formRef)?.formModel as PostVO
+        const data = unref(formRef)?.formModel as PostApi.PostVO
         if (actionType.value === 'create') {
           await PostApi.createPostApi(data)
           message.success(t('common.createSuccess'))

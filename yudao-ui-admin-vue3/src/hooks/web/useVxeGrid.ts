@@ -13,6 +13,7 @@ interface UseVxeGridConfig<T = any> {
   getListApi: (option: any) => Promise<T>
   delListApi?: (option: any) => Promise<T>
   exportListApi?: (option: any) => Promise<T>
+  exportName?: string
 }
 
 const appStore = useAppStore()
@@ -88,10 +89,29 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
           return new Promise(async (resolve) => {
             resolve(await config?.getListApi(queryParams))
           })
+        },
+        queryAll: ({ form }) => {
+          const queryParams = Object.assign({}, JSON.parse(JSON.stringify(form)))
+          return new Promise(async (resolve) => {
+            if (config?.exportListApi) {
+              resolve(await config?.exportListApi(queryParams))
+            } else {
+              resolve(await config?.getListApi(queryParams))
+            }
+          })
         }
       }
+    },
+    exportConfig: {
+      filename: config?.exportName,
+      // 默认选中类型
+      type: 'csv',
+      // 自定义数据量列表
+      modes: ['current', 'all'],
+      columns: config?.allSchemas.printSchema
     }
   })
+
   const delList = (ids: string | number | string[] | number[]) => {
     return new Promise(async () => {
       message.delConfirm().then(() => {

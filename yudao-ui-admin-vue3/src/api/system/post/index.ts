@@ -1,5 +1,26 @@
 import request from '@/config/axios'
-import type { PostVO, PostPageReqVO, PostExportReqVO } from './types'
+
+export interface PostVO {
+  id?: number
+  name: string
+  code: string
+  sort: number
+  status: number
+  remark: string
+  createTime?: string
+}
+
+export interface PostPageReqVO extends BasePage {
+  code?: string
+  name?: string
+  status?: number
+}
+
+export interface PostExportReqVO {
+  code?: string
+  name?: string
+  status?: number
+}
 
 // 查询岗位列表
 export const getPostPageApi = async (params: PostPageReqVO) => {
@@ -31,7 +52,6 @@ export const deletePostApi = async (id: number) => {
 }
 
 // 导出岗位
-// TODO @星语：导出这块，咱怎么弄哈
 export const exportPostApi = async (params: PostExportReqVO) => {
   return await request.download({ url: '/system/post/export', params })
 }

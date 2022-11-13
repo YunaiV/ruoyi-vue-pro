@@ -3,7 +3,7 @@ import { store } from '../index'
 import { DictDataVO } from '@/api/system/dict/types'
 
 export interface DictValueType {
-  value: string
+  value: string | number | boolean
   label: string
   clorType: string
   cssClass: string

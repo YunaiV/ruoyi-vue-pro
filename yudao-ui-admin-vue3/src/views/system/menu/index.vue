@@ -42,7 +42,6 @@
       </template>
     </vxe-toolbar>
     <!-- 列表 -->
-    <!-- TODO 星语：是不是也搞成 grid 会好点，后续代码就统一走 grid 风格？ -->
     <vxe-table
       show-overflow
       keep-source
@@ -84,14 +83,14 @@
             preIcon="ep:edit"
             :title="t('action.edit')"
             v-hasPermi="['system:menu:update']"
-            @click="handleUpdate(row)"
+            @click="handleUpdate(row.id)"
           />
           <!-- 操作：删除 -->
           <XTextButton
             preIcon="ep:delete"
             :title="t('action.del')"
             v-hasPermi="['system:menu:delete']"
-            @click="handleDelete(row)"
+            @click="handleDelete(row.id)"
           />
         </template>
       </vxe-column>
@@ -102,6 +101,7 @@
     <template #default>
       <!-- 对话框(添加 / 修改) -->
       <el-form
+        ref="formRef"
         :model="menuForm"
         :rules="rules"
         :inline="true"
@@ -254,7 +254,6 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-// TODO @星语：是不是 'element-plus' 和 '@/components/Tooltip' 和 '@/components/Icon' 全局直接引入
 import {
   ElRow,
   ElCol,
@@ -266,14 +265,14 @@ import {
   ElTreeSelect,
   ElOption,
   ElRadioGroup,
-  ElRadioButton
+  ElRadioButton,
+  FormInstance
 } from 'element-plus'
 import { Tooltip } from '@/components/Tooltip'
 import { IconSelect } from '@/components/Icon'
 import { VxeTableInstance } from 'vxe-table'
 // 业务相关的 import
 import * as MenuApi from '@/api/system/menu'
-import { MenuVO } from '@/api/system/menu/types'
 import { required } from '@/utils/formRules.js'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
@@ -291,7 +290,8 @@ const dialogTitle = ref('edit') // 弹出层标题
 const actionType = ref('') // 操作按钮的类型
 const actionLoading = ref(false) // 遮罩层
 // 新增和修改的表单值
-const menuForm = ref<MenuVO>({
+const formRef = ref<FormInstance>()
+const menuForm = ref<MenuApi.MenuVO>({
   id: 0,
   name: '',
   permission: '',
@@ -316,18 +316,11 @@ const rules = reactive({
 
 // ========== 下拉框[上级菜单] ==========
 // 下拉框[上级菜单]的配置项目
-// TODO @星语：menuProps 貌似也可以抽到全局？
 const menuProps = {
   checkStrictly: true,
   children: 'children',
   label: 'name',
   value: 'id'
-}
-// TODO @星语：Tree 可以是全局的
-interface Tree {
-  id: number
-  name: string
-  children?: Tree[] | any[]
 }
 const menuOptions = ref<any[]>([]) // 树形结构
 const getTree = async () => {
@@ -339,9 +332,9 @@ const getTree = async () => {
 }
 
 // ========== 查询 ==========
-const queryParams = reactive({
-  name: null,
-  status: null
+const queryParams = reactive<MenuApi.MenuPageReqVO>({
+  name: undefined,
+  status: undefined
 })
 const getList = async () => {
   tableLoading.value = true
@@ -357,31 +350,47 @@ const handleQuery = async () => {
 
 // 重置操作
 const resetQuery = async () => {
-  queryParams.name = null
-  queryParams.status = null
+  queryParams.name = undefined
+  queryParams.status = undefined
   await getList()
 }
 
 // ========== 新增/修改 ==========
 
 // 设置标题
-const setDialogTile = (type: string) => {
+const setDialogTile = async (type: string) => {
+  await getTree()
   dialogTitle.value = t('action.' + type)
   actionType.value = type
   dialogVisible.value = true
 }
 
-// 新建操作
+// 新增操作
 const handleCreate = () => {
   setDialogTile('create')
-  // TODO @星语：重置表单
+  formRef.value?.resetFields()
+  menuForm.value = {
+    id: 0,
+    name: '',
+    permission: '',
+    type: SystemMenuTypeEnum.DIR,
+    sort: 1,
+    parentId: 0,
+    path: '',
+    icon: '',
+    component: '',
+    status: CommonStatusEnum.ENABLE,
+    visible: true,
+    keepAlive: true,
+    createTime: ''
+  }
 }
 
 // 修改操作
-const handleUpdate = async (row: MenuVO) => {
+const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
-  const res = await MenuApi.getMenuApi(row.id)
+  const res = await MenuApi.getMenuApi(rowId)
   menuForm.value = res
 }
 
@@ -411,11 +420,11 @@ const submitForm = async () => {
       await MenuApi.updateMenuApi(menuForm.value)
       message.success(t('common.updateSuccess'))
     }
-    // 操作成功，重新加载列表
-    dialogVisible.value = false
-    await getList()
   } finally {
+    dialogVisible.value = false
     actionLoading.value = false
+    // 操作成功，重新加载列表
+    await getList()
   }
 }
 
@@ -426,9 +435,9 @@ const isExternal = (path: string) => {
 
 // ========== 删除 ==========
 // 删除操作
-const handleDelete = async (row: MenuVO) => {
-  message.confirm(t('common.delDataMessage'), t('common.confirmTitle')).then(async () => {
-    await MenuApi.deleteMenuApi(row.id)
+const handleDelete = async (rowId: number) => {
+  message.delConfirm().then(async () => {
+    await MenuApi.deleteMenuApi(rowId)
     message.success(t('common.delSuccess'))
     await getList()
   })
@@ -437,7 +446,5 @@ const handleDelete = async (row: MenuVO) => {
 // ========== 初始化 ==========
 onMounted(async () => {
   await getList()
-  // TODO @星语：这个告警解决下；是不是改成新增和修改点击的时候，去加载下好一点哈？
-  getTree()
 })
 </script>
