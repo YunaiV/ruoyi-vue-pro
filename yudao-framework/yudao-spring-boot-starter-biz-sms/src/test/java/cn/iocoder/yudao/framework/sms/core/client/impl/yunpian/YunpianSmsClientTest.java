@@ -124,7 +124,7 @@ public class YunpianSmsClientTest extends BaseMockitoUnitTest {
     @SuppressWarnings("unchecked")
     public void testDoGetSmsTemplate() throws Throwable {
         // 准备参数
-        String apiTemplateId = randomString();
+        String apiTemplateId = String.valueOf(randomLongId());
         // mock tpl 方法
         TplApi tplApi = mock(TplApi.class);
         when(client.tpl()).thenReturn(tplApi);

@@ -20,8 +20,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -183,7 +182,7 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
        DiscountActivityDO dbDiscountActivity = randomPojo(DiscountActivityDO.class, o -> { // 等会查询到
            o.setName("芋艿");
            o.setStatus(PromotionActivityStatusEnum.WAIT.getStatus());
-           o.setCreateTime(buildTime(2021, 1, 15));
+           o.setCreateTime(buildLocalDateTime(2021, 1, 15));
        });
        discountActivityMapper.insert(dbDiscountActivity);
        // 测试 name 不匹配
@@ -191,7 +190,7 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
        // 测试 status 不匹配
        discountActivityMapper.insert(cloneIgnoreId(dbDiscountActivity, o -> o.setStatus(PromotionActivityStatusEnum.END.getStatus())));
        // 测试 createTime 不匹配
-       discountActivityMapper.insert(cloneIgnoreId(dbDiscountActivity, o -> o.setCreateTime(buildTime(2021, 2, 10))));
+       discountActivityMapper.insert(cloneIgnoreId(dbDiscountActivity, o -> o.setCreateTime(buildLocalDateTime(2021, 2, 10))));
        // 准备参数
        DiscountActivityPageReqVO reqVO = new DiscountActivityPageReqVO();
        reqVO.setName("芋艿");
