@@ -495,7 +495,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         CouponMeetRespDTO couponMeetRespDTO03 = list.get(2);
         assertPojoEquals(couponMeetRespDTO03, coupon03);
         assertFalse(couponMeetRespDTO03.getMeet());
-        assertEquals(couponMeetRespDTO03.getMeetTip(), "差 1.00 元可用优惠劵");
+        assertEquals(couponMeetRespDTO03.getMeetTip(), "所结算的商品中未满足使用的金额");
         // 断言情况四：满足条件
         CouponMeetRespDTO couponMeetRespDTO04 = list.get(3);
         assertPojoEquals(couponMeetRespDTO04, coupon04);

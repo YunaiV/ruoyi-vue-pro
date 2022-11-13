@@ -1,13 +1,8 @@
 package cn.iocoder.yudao.framework.common.util.date;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -58,6 +53,7 @@ public class DateUtils {
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
 
+    @Deprecated
     public static Date addTime(Duration duration) {
         return new Date(System.currentTimeMillis() + duration.toMillis());
     }
@@ -87,6 +83,7 @@ public class DateUtils {
         return buildTime(year, mouth, day, 0, 0, 0);
     }
 
+    @Deprecated
     public static LocalDateTime buildLocalDateTime(int year, int mouth, int day) {
         return LocalDateTime.of(year, mouth, day, 0, 0, 0);
     }
@@ -135,14 +132,7 @@ public class DateUtils {
         return a.isAfter(b) ? a : b;
     }
 
-    public static boolean beforeNow(Date date) {
-        return date.getTime() < System.currentTimeMillis();
-    }
-
-    public static boolean afterNow(Date date) {
-        return date.getTime() >= System.currentTimeMillis();
-    }
-
+    @Deprecated
     public static boolean afterNow(LocalDateTime localDateTime) {
         return localDateTime.isAfter(LocalDateTime.now());
     }
@@ -184,36 +174,8 @@ public class DateUtils {
      * @param date 日期
      * @return 是否
      */
-    public static boolean isToday(Date date) {
-        if (date == null) {
-            return false;
-        }
-        return DateUtil.isSameDay(date, new Date());
-    }
-
-    /**
-     * 是否今天
-     *
-     * @param date 日期
-     * @return 是否
-     */
     public static boolean isToday(LocalDateTime date) {
         return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now());
-    }
-
-    /**
-     * 判断当前时间是否在该时间范围内
-     *
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return 是否
-     */
-    public static boolean isBetween(Date startTime, Date endTime) {
-        if (startTime == null || endTime == null) {
-            return false;
-        }
-        return startTime.getTime() <= System.currentTimeMillis()
-                && endTime.getTime() >= System.currentTimeMillis();
     }
 
 }

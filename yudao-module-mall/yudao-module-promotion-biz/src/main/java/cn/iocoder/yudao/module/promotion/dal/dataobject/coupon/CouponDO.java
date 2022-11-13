@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -77,11 +77,11 @@ public class CouponDO extends BaseDO {
     /**
      * 生效开始时间
      */
-    private Date validStartTime;
+    private LocalDateTime validStartTime;
     /**
      * 生效结束时间
      */
-    private Date validEndTime;
+    private LocalDateTime validEndTime;
     /**
      * 商品范围
      *
@@ -132,7 +132,7 @@ public class CouponDO extends BaseDO {
     /**
      * 使用时间
      */
-    private Date useTime;
+    private LocalDateTime useTime;
 
     // ========== 使用情况 END ==========
 

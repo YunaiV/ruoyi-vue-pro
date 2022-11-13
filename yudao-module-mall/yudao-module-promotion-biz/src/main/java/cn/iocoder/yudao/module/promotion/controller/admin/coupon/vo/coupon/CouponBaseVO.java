@@ -10,7 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -55,12 +55,12 @@ public class CouponBaseVO {
     @ApiModelProperty(value = "固定日期 - 生效开始时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-    private Date validStartTime;
+    private LocalDateTime validStartTime;
 
     @ApiModelProperty(value = "固定日期 - 生效结束时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-    private Date validEndTime;
+    private LocalDateTime validEndTime;
 
     @ApiModelProperty(value = "商品范围", required = true, example = "1", notes = "参见 PromotionProductScopeEnum 枚举类")
     @NotNull(message = "商品范围不能为空")
@@ -96,7 +96,7 @@ public class CouponBaseVO {
     @ApiModelProperty(value = "使用时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-    private Date useTime;
+    private LocalDateTime useTime;
 
     // ========== 使用情况 END ==========
 
