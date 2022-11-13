@@ -45,13 +45,13 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       isHover: true // 当鼠标移到行时，是否要高亮当前行
     },
     toolbarConfig: {
-      custom: true,
       slots: { buttons: 'toolbar_buttons' }
     },
     printConfig: {
       columns: config?.allSchemas.printSchema
     },
     formConfig: {
+      enabled: true,
       titleWidth: 100,
       titleAlign: 'right',
       items: config?.allSchemas.searchSchema
@@ -120,6 +120,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       })
     })
   }
+
   return {
     gridOptions,
     delList
