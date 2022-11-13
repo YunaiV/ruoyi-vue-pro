@@ -43,6 +43,7 @@ const { gridOptions } = useVxeGrid<TokenApi.OAuth2TokenVO>({
   allSchemas: allSchemas,
   getListApi: TokenApi.getAccessTokenPageApi
 })
+
 // ========== 详情相关 ==========
 const detailRef = ref() // 详情 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
@@ -53,6 +54,7 @@ const handleDetail = async (row: TokenApi.OAuth2TokenVO) => {
   detailRef.value = row
   dialogVisible.value = true
 }
+
 // 强退操作
 const handleForceLogout = (rowId: number) => {
   message
