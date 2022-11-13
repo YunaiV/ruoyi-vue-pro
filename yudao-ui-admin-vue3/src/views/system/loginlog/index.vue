@@ -34,6 +34,7 @@ import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
+// 业务相关的 import
 import { allSchemas } from './loginLog.data'
 import { getLoginLogPageApi, exportLoginLogApi, LoginLogVO } from '@/api/system/loginLog'
 import download from '@/utils/download'
@@ -50,6 +51,7 @@ const { gridOptions } = useVxeGrid<LoginLogVO>({
 const detailRef = ref() // 详情 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref(t('action.detail')) // 弹出层标题
+// 详情
 const handleDetail = async (row: LoginLogVO) => {
   // 设置数据
   detailRef.value = row
@@ -57,10 +59,11 @@ const handleDetail = async (row: LoginLogVO) => {
 }
 
 // 导出操作
+// TODO @星语：导出需要有二次确认哈
 const handleExport = async () => {
   const queryParams = Object.assign(
     {},
-    JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data))
+    JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data)) // TODO @星语：这个有没办法，封装个 util 获取哈？
   )
   const res = await exportLoginLogApi(queryParams)
   download.excel(res, '登录列表.xls')
