@@ -1,97 +1,85 @@
+<template>
+  <ContentWrap>
+    <!-- 列表 -->
+    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+      <!-- 操作：新增 -->
+      <template #toolbar_buttons>
+        <XButton
+          type="warning"
+          preIcon="ep:download"
+          :title="t('action.export')"
+          v-hasPermi="['system:operate-log:export']"
+          @click="handleExport()"
+        />
+      </template>
+      <template #duration="{ row }">
+        <span>{{ row.duration + 'ms' }}</span>
+      </template>
+      <template #resultCode="{ row }">
+        <span>{{ row.resultCode === 0 ? '成功' : '失败' }}</span>
+      </template>
+      <template #actionbtns_default="{ row }">
+        <!-- 操作：详情 -->
+        <XTextButton preIcon="ep:view" :title="t('action.detail')" @click="handleDetail(row)" />
+      </template>
+    </vxe-grid>
+  </ContentWrap>
+  <!-- 弹窗 -->
+  <XModal id="postModel" v-model="dialogVisible" :title="dialogTitle">
+    <template #default>
+      <!-- 对话框(详情) -->
+      <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
+        <template #resultCode="{ row }">
+          <span>{{ row.resultCode === 0 ? '成功' : '失败' }}</span>
+        </template>
+        <template #duration="{ row }">
+          <span>{{ row.duration + 'ms' }}</span>
+        </template>
+      </Descriptions>
+    </template>
+    <template #footer>
+      <!-- 按钮：关闭 -->
+      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
+    </template>
+  </XModal>
+</template>
 <script setup lang="ts">
-import dayjs from 'dayjs'
-import { useTable } from '@/hooks/web/useTable'
-import { allSchemas } from './operatelog.data'
-import { DICT_TYPE } from '@/utils/dict'
-import { useI18n } from '@/hooks/web/useI18n'
-import type { OperateLogVO } from '@/api/system/operatelog/types'
-import * as OperateLogApi from '@/api/system/operatelog'
+// 全局相关的 import
 import { ref } from 'vue'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { VxeGridInstance } from 'vxe-table'
+// 业务相关的 import
+import * as OperateLogApi from '@/api/system/operatelog'
+import { allSchemas } from './operatelog.data'
+import download from '@/utils/download'
+
 const { t } = useI18n() // 国际化
-// ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<OperateLogVO>({
-  getListApi: OperateLogApi.getOperateLogPageApi,
-  exportListApi: OperateLogApi.exportOperateLogApi
+// 列表相关的变量
+const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
+const { gridOptions } = useVxeGrid<OperateLogApi.OperateLogVO>({
+  allSchemas: allSchemas,
+  getListApi: OperateLogApi.getOperateLogPageApi
 })
-// ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
+// 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
-const dialogTitle = ref(t('action.detail')) // 弹出层标题
-const { getList, setSearchParams, exportList } = methods
+const dialogTitle = ref('edit') // 弹出层标题
+const actionLoading = ref(false) // 按钮 Loading
+const detailRef = ref() // 详情 Ref
 // 详情
-const handleDetail = (row: OperateLogVO) => {
+const handleDetail = (row: OperateLogApi.OperateLogVO) => {
   // 设置数据
   detailRef.value = row
   dialogVisible.value = true
 }
-getList()
+
+// 导出操作
+const handleExport = async () => {
+  const queryParams = Object.assign(
+    {},
+    JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data))
+  )
+  const res = await OperateLogApi.exportOperateLogApi(queryParams)
+  download.excel(res, '岗位列表.xls')
+}
 </script>
-<template>
-  <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <el-button
-        type="warning"
-        v-hasPermi="['system:operate-log:export']"
-        :loading="tableObject.exportLoading"
-        @click="exportList('操作日志.xls')"
-      >
-        <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
-      </el-button>
-    </div>
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #type="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_OPERATE_TYPE" :value="row.type" />
-      </template>
-      <template #duration="{ row }">
-        <span>{{ row.duration + 'ms' }}</span>
-      </template>
-      <template #resultCode="{ row }">
-        <span>{{ row.resultCode === 0 ? '成功' : '失败' }}</span>
-      </template>
-      <template #startTime="{ row }">
-        <span>{{ dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
-        <el-button link type="primary" @click="handleDetail(row)">
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-      </template>
-    </Table>
-  </ContentWrap>
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
-    <!-- 对话框(详情) -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
-      <template #resultCode="{ row }">
-        <span>{{ row.resultCode === 0 ? '成功' : '失败' }}</span>
-      </template>
-      <template #type="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_OPERATE_TYPE" :value="row.type" />
-      </template>
-      <template #duration="{ row }">
-        <span>{{ row.duration + 'ms' }}</span>
-      </template>
-      <template #startTime="{ row }">
-        <span>{{ dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-    </Descriptions>
-    <!-- 操作按钮 -->
-    <template #footer>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </Dialog>
-</template>

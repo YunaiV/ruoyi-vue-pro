@@ -10,11 +10,6 @@ import { DeptVO } from '@/api/system/dept/types'
 import { useMessage } from '@/hooks/web/useMessage'
 import { getListSimpleUsersApi } from '@/api/system/user'
 const message = useMessage()
-interface Tree {
-  id: number
-  name: string
-  children?: Tree[]
-}
 
 const defaultProps = {
   children: 'children',

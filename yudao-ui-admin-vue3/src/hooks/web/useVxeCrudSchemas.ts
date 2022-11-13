@@ -20,6 +20,7 @@ export type VxeCrudSchema = {
   primaryType?: VxeColumnPropTypes.Type
   // 是否开启操作栏插槽
   action?: boolean
+  actionWidth?: string
   columns: VxeCrudColumns[]
 }
 type VxeCrudColumns = Omit<VxeTableColumn, 'children'> & {
@@ -204,7 +205,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
     const tableSchemaItem = {
       title: t('table.action'),
       field: 'actionbtns',
-      width: '240px',
+      width: crudSchema.actionWidth ? crudSchema.actionWidth : '240px',
       slots: {
         default: 'actionbtns_default'
       }

@@ -39,11 +39,6 @@ import { getAccessToken, getTenantId } from '@/utils/auth'
 import { useMessage } from '@/hooks/web/useMessage'
 
 const message = useMessage()
-interface Tree {
-  id: number
-  name: string
-  children?: Tree[]
-}
 
 const defaultProps = {
   children: 'children',

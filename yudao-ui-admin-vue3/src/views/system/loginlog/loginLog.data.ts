@@ -9,6 +9,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
   primaryType: 'seq',
   action: true,
+  actionWidth: '80px',
   columns: [
     {
       title: '日志类型',
