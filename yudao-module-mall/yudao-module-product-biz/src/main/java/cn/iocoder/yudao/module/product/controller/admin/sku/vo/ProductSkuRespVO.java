@@ -9,7 +9,7 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@ApiModel("管理后台 - 商品sku Response VO")
+@ApiModel("管理后台 - 商品 SKU Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

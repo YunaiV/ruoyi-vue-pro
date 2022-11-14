@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 会员用户的 API 实现类
@@ -25,6 +27,16 @@ public class MemberUserApiImpl implements MemberUserApi {
     public UserRespDTO getUser(Long id) {
         MemberUserDO user = userService.getUser(id);
         return UserConvert.INSTANCE.convert2(user);
+    }
+
+    @Override
+    public List<UserRespDTO> getUsers(Collection<Long> ids) {
+        return UserConvert.INSTANCE.convertList2(userService.getUserList(ids));
+    }
+
+    @Override
+    public List<UserRespDTO> getUserListByNickname(String nickname) {
+        return UserConvert.INSTANCE.convertList2(userService.getUserListByNickname(nickname));
     }
 
 }

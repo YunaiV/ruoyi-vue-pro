@@ -16,8 +16,4 @@ public class ProductPropertyUpdateReqVO extends ProductPropertyBaseVO {
     @NotNull(message = "主键不能为空")
     private Long id;
 
-    @ApiModelProperty(value = "属性值")
-    @NotNull(message = "属性值不能为空")
-    List<ProductPropertyValueCreateReqVO> propertyValueList;
-
 }

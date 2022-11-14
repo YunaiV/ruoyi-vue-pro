@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.Pro
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 规格名称 Mapper
  *
@@ -21,6 +23,11 @@ public interface ProductPropertyMapper extends BaseMapperX<ProductPropertyDO> {
                 .eqIfPresent(ProductPropertyDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(ProductPropertyDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ProductPropertyDO::getId));
+    }
+
+    default ProductPropertyDO selectByName(String name) {
+        return selectOne(new LambdaQueryWrapperX<ProductPropertyDO>()
+                .eqIfPresent(ProductPropertyDO::getName, name));
     }
 
 }

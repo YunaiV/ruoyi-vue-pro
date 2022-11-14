@@ -14,8 +14,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSkuCreateOrUpdateReqVO extends ProductSkuBaseVO {
 
-    // TODO @Luowenfeng：可以不用哈，如果基于规格匹配
-    @ApiModelProperty(value = "商品 id 更新时须有", example = "1")
+    @ApiModelProperty(value = "商品 SKU 编号", example = "1")
     private Long id;
 
     /**

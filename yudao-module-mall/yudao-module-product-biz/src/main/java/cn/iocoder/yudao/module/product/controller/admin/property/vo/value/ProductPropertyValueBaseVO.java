@@ -22,7 +22,10 @@ public class ProductPropertyValueBaseVO {
     private String name;
 
     @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举")
-    @NotEmpty(message = "状态不能为空")
+    @NotNull(message = "状态不能为空")
     private Integer status;
+
+    @ApiModelProperty(value = "备注", example = "颜色")
+    private String remark;
 
 }

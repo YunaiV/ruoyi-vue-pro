@@ -14,6 +14,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+// TODO 芋艿：整合到 {@link ProductSkuServiceTest} 中
 /**
 * {@link ProductSkuServiceImpl} 的单元测试类
 *

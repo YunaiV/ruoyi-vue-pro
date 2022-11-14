@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.product.controller.admin.property;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyAndValueRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.*;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -16,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -56,15 +55,29 @@ public class ProductPropertyController {
     @ApiOperation("获得规格名称")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:property:query')")
-    public CommonResult<ProductPropertyAndValueRespVO> getProperty(@RequestParam("id") Long id) {
-        return success(productPropertyService.getPropertyResp(id));
+    public CommonResult<ProductPropertyRespVO> getProperty(@RequestParam("id") Long id) {
+        return success(productPropertyService.getProperty(id));
+    }
+
+    @GetMapping("/list")
+    @ApiOperation("获得规格名称列表")
+    @PreAuthorize("@ss.hasPermission('product:property:query')")
+    public CommonResult<List<ProductPropertyRespVO>> getPropertyList(@Valid ProductPropertyListReqVO listReqVO) {
+        return success(productPropertyService.getPropertyList(listReqVO));
     }
 
     @GetMapping("/page")
     @ApiOperation("获得规格名称分页")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
-    public CommonResult<PageResult<ProductPropertyAndValueRespVO>> getPropertyPage(@Valid ProductPropertyPageReqVO pageVO) {
-        return success(productPropertyService.getPropertyListPage(pageVO));
+    public CommonResult<PageResult<ProductPropertyRespVO>> getPropertyPage(@Valid ProductPropertyPageReqVO pageVO) {
+        return success(productPropertyService.getPropertyPage(pageVO));
+    }
+
+    @GetMapping("/listAndValue")
+    @ApiOperation("获得规格名称列表")
+    @PreAuthorize("@ss.hasPermission('product:property:query')")
+    public CommonResult<List<ProductPropertyAndValueRespVO>> getPropertyAndValueList(@Valid ProductPropertyListReqVO listReqVO) {
+        return success(productPropertyService.getPropertyAndValueList(listReqVO));
     }
 
 }

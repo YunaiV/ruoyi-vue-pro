@@ -17,4 +17,7 @@ public class AppUserInfoRespVO {
 
     @ApiModelProperty(value = "用户头像", required = true, example = "/infra/file/get/35a12e57-4297-4faa-bf7d-7ed2f211c952")
     private String avatar;
+
+    @ApiModelProperty(value = "用户手机号", required = true, example = "15601691300")
+    private String mobile;
 }

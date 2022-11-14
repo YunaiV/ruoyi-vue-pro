@@ -248,7 +248,7 @@ DROP TABLE IF EXISTS `product_spu`;
 CREATE TABLE `product_spu` (
                                `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
                                `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                               `brand_id` int DEFAULT NULL COMMENT '商品品牌编号',
+                               `brand_id` bigint DEFAULT NULL COMMENT '商品品牌编号',
                                `category_id` bigint NOT NULL COMMENT '分类id',
                                `spec_type` int NOT NULL COMMENT '规格类型：0 单规格 1 多规格',
                                `code` varchar(128)  DEFAULT NULL COMMENT '商品编码',

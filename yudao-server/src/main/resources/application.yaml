@@ -27,6 +27,7 @@ spring:
       write-date-timestamps-as-nanoseconds: false # 设置不使用 nanoseconds 的格式。例如说 1611460870.401，而是直接 1611460870401
       write-durations-as-timestamps: true # 设置 Duration 的格式，使用时间戳
       fail-on-empty-beans: false # 允许序列化无属性的 Bean
+
   # Cache 配置项
   cache:
     type: REDIS
@@ -163,6 +164,10 @@ yudao:
     send-maximum-quantity-per-day: 10
     begin-code: 9999 # 这里配置 9999 的原因是，测试方便。
     end-code: 9999 # 这里配置 9999 的原因是，测试方便。
+  trade:
+    order:
+      app-id: 1 # 商户编号
+      expire-time: 2h # 支付的过期时间
 
 debug: false
 
