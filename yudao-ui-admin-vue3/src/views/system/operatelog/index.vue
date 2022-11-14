@@ -25,23 +25,21 @@
     </vxe-grid>
   </ContentWrap>
   <!-- 弹窗 -->
-  <XModal id="postModel" v-model="dialogVisible" :title="dialogTitle">
-    <template #default>
-      <!-- 对话框(详情) -->
-      <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
-        <template #resultCode="{ row }">
-          <span>{{ row.resultCode === 0 ? '成功' : '失败' }}</span>
-        </template>
-        <template #duration="{ row }">
-          <span>{{ row.duration + 'ms' }}</span>
-        </template>
-      </Descriptions>
-    </template>
+  <Dialog id="postModel" v-model="dialogVisible" :title="dialogTitle">
+    <!-- 对话框(详情) -->
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
+      <template #resultCode="{ row }">
+        <span>{{ row.resultCode === 0 ? '成功' : '失败' }}</span>
+      </template>
+      <template #duration="{ row }">
+        <span>{{ row.duration + 'ms' }}</span>
+      </template>
+    </Descriptions>
     <template #footer>
       <!-- 按钮：关闭 -->
       <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
-  </XModal>
+  </Dialog>
 </template>
 <script setup lang="ts">
 // 全局相关的 import

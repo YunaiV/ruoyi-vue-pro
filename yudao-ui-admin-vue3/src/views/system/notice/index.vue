@@ -38,22 +38,20 @@
     </vxe-grid>
   </ContentWrap>
   <!-- 弹窗 -->
-  <XModal id="noticeModel" v-model="dialogVisible" :title="dialogTitle">
-    <template #default>
-      <!-- 对话框(添加 / 修改) -->
-      <Form
-        ref="formRef"
-        v-if="['create', 'update'].includes(actionType)"
-        :schema="allSchemas.formSchema"
-        :rules="rules"
-      />
-      <!-- 对话框(详情) -->
-      <Descriptions
-        v-if="actionType === 'detail'"
-        :schema="allSchemas.detailSchema"
-        :data="detailRef"
-      />
-    </template>
+  <Dialog id="noticeModel" v-model="dialogVisible" :title="dialogTitle">
+    <!-- 对话框(添加 / 修改) -->
+    <Form
+      ref="formRef"
+      v-if="['create', 'update'].includes(actionType)"
+      :schema="allSchemas.formSchema"
+      :rules="rules"
+    />
+    <!-- 对话框(详情) -->
+    <Descriptions
+      v-if="actionType === 'detail'"
+      :schema="allSchemas.detailSchema"
+      :data="detailRef"
+    />
     <template #footer>
       <!-- 按钮：保存 -->
       <XButton
@@ -66,7 +64,7 @@
       <!-- 按钮：关闭 -->
       <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
-  </XModal>
+  </Dialog>
 </template>
 <script setup lang="ts">
 // 全局相关的 import

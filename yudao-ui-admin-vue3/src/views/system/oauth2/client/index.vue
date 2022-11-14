@@ -48,23 +48,21 @@
     </vxe-grid>
   </ContentWrap>
   <!-- 弹窗 -->
-  <XModal id="postModel" v-model="dialogVisible" :title="dialogTitle">
-    <template #default>
-      <!-- 表单：添加/修改 -->
-      <Form
-        ref="formRef"
-        v-if="['create', 'update'].includes(actionType)"
-        :schema="allSchemas.formSchema"
-        :rules="rules"
-      />
-      <!-- 表单：详情 -->
-      <!-- TODO @星语：展示详情时，有点小丑，可额能得看看 -->
-      <Descriptions
-        v-if="actionType === 'detail'"
-        :schema="allSchemas.detailSchema"
-        :data="detailRef"
-      />
-    </template>
+  <Dialog id="postModel" v-model="dialogVisible" :title="dialogTitle">
+    <!-- 表单：添加/修改 -->
+    <Form
+      ref="formRef"
+      v-if="['create', 'update'].includes(actionType)"
+      :schema="allSchemas.formSchema"
+      :rules="rules"
+    />
+    <!-- 表单：详情 -->
+    <!-- TODO @星语：展示详情时，有点小丑，可额能得看看 -->
+    <Descriptions
+      v-if="actionType === 'detail'"
+      :schema="allSchemas.detailSchema"
+      :data="detailRef"
+    />
     <template #footer>
       <!-- 按钮：保存 -->
       <XButton
@@ -77,7 +75,7 @@
       <!-- 按钮：关闭 -->
       <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
-  </XModal>
+  </Dialog>
 </template>
 <script setup lang="ts">
 // 全局相关的 import

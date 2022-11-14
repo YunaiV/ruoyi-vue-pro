@@ -17,21 +17,20 @@
     </vxe-grid>
   </ContentWrap>
   <!-- 弹窗 -->
-  <XModal id="postModel" v-model="dialogVisible" :title="dialogTitle">
-    <template #default>
-      <!-- 表单：详情 -->
-      <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
-    </template>
+  <Dialog id="postModel" v-model="dialogVisible" :title="dialogTitle">
+    <!-- 表单：详情 -->
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
     <template #footer>
       <!-- 按钮：关闭 -->
       <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
-  </XModal>
+  </Dialog>
 </template>
 <script setup lang="ts">
 // 全局相关的 import
 import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
+import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
 // 业务相关的 import
@@ -40,6 +39,7 @@ import { getLoginLogPageApi, exportLoginLogApi, LoginLogVO } from '@/api/system/
 import download from '@/utils/download'
 
 const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
 const { gridOptions } = useVxeGrid<LoginLogVO>({
@@ -59,13 +59,14 @@ const handleDetail = async (row: LoginLogVO) => {
 }
 
 // 导出操作
-// TODO @星语：导出需要有二次确认哈
 const handleExport = async () => {
-  const queryParams = Object.assign(
-    {},
-    JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data)) // TODO @星语：这个有没办法，封装个 util 获取哈？
-  )
-  const res = await exportLoginLogApi(queryParams)
-  download.excel(res, '登录列表.xls')
+  message.exportConfirm().then(async () => {
+    const queryParams = Object.assign(
+      {},
+      JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data)) // TODO @星语：这个有没办法，封装个 util 获取哈？
+    )
+    const res = await exportLoginLogApi(queryParams)
+    download.excel(res, '登录列表.xls')
+  })
 }
 </script>

@@ -113,21 +113,19 @@
         </Table>
       </div>
     </el-card>
-    <XModal id="dictModel" v-model="dialogVisible" :title="dialogTitle">
-      <template #default>
-        <Form
-          v-if="['typeCreate', 'typeUpdate'].includes(actionType)"
-          :schema="DictTypeSchemas.allSchemas.formSchema"
-          :rules="DictTypeSchemas.dictTypeRules"
-          ref="typeFormRef"
-        />
-        <Form
-          v-if="['dataCreate', 'dataUpdate'].includes(actionType)"
-          :schema="DictDataSchemas.allSchemas.formSchema"
-          :rules="DictDataSchemas.dictDataRules"
-          ref="dataFormRef"
-        />
-      </template>
+    <Dialog id="dictModel" v-model="dialogVisible" :title="dialogTitle">
+      <Form
+        v-if="['typeCreate', 'typeUpdate'].includes(actionType)"
+        :schema="DictTypeSchemas.allSchemas.formSchema"
+        :rules="DictTypeSchemas.dictTypeRules"
+        ref="typeFormRef"
+      />
+      <Form
+        v-if="['dataCreate', 'dataUpdate'].includes(actionType)"
+        :schema="DictDataSchemas.allSchemas.formSchema"
+        :rules="DictDataSchemas.dictDataRules"
+        ref="dataFormRef"
+      />
       <!-- 操作按钮 -->
       <template #footer>
         <XButton
@@ -146,7 +144,7 @@
         />
         <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
       </template>
-    </XModal>
+    </Dialog>
   </div>
 </template>
 <script setup lang="ts">
