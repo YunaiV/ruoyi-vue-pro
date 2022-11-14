@@ -16,8 +16,8 @@ export interface DictDataType {
   dictType: string
   label: string
   value: string | number | boolean
-  colorType: ElementPlusInfoType | '' | 'default' | 'primary'
-  cssClass: string
+  colorType?: ElementPlusInfoType | '' | 'default' | 'primary'
+  cssClass?: string
 }
 
 export const getDictOptions = (dictType: string) => {
@@ -41,10 +41,11 @@ export const getIntDictOptions = (dictType: string) => {
       })
     }
   })
+  console.log(dictOptions)
   return dictOptions
 }
 
-export const getDictObj = (dictType: string, value: string) => {
+export const getDictObj = (dictType: string, value: string | number | boolean) => {
   const dictOptions: DictDataType[] = getDictOptions(dictType)
   dictOptions.forEach((dict: DictDataType) => {
     if (dict.value === value) {

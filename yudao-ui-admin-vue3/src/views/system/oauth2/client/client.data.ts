@@ -45,18 +45,24 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '访问令牌的有效期',
-      field: 'accessTokenValiditySeconds' // TODO @星语：数字输入框
+      field: 'accessTokenValiditySeconds',
+      form: {
+        component: 'InputNumber'
+      }
     },
     {
       title: '刷新令牌的有效期',
-      field: 'refreshTokenValiditySeconds' // TODO @星语：数字输入框
+      field: 'refreshTokenValiditySeconds',
+      form: {
+        component: 'InputNumber'
+      }
     },
     {
       title: '授权类型',
       field: 'authorizedGrantTypes',
       dictType: DICT_TYPE.SYSTEM_OAUTH2_GRANT_TYPE,
       form: {
-        component: 'Select' // TODO @星语：多选
+        component: 'SelectV2' // TODO @星语：多选
       }
     },
     {
@@ -102,7 +108,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: t('common.createTime'),
       field: 'createTime',
-      formatter: 'formatDate', // TODO @星语：宽度，保证时间可以展示出来
+      formatter: 'formatDate',
       isForm: false
     }
   ]

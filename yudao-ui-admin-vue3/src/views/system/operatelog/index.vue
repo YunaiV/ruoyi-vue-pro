@@ -45,6 +45,7 @@
 // 全局相关的 import
 import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
+import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
 // 业务相关的 import
@@ -53,6 +54,7 @@ import { allSchemas } from './operatelog.data'
 import download from '@/utils/download'
 
 const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
 const { gridOptions } = useVxeGrid<OperateLogApi.OperateLogVO>({
@@ -73,13 +75,14 @@ const handleDetail = (row: OperateLogApi.OperateLogVO) => {
 }
 
 // 导出操作
-// TODO @星语：导出需要有二次确认哈
 const handleExport = async () => {
-  const queryParams = Object.assign(
-    {},
-    JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data)) // TODO @星语：这个有没办法，封装个 util 获取哈？
-  )
-  const res = await OperateLogApi.exportOperateLogApi(queryParams)
-  download.excel(res, '岗位列表.xls')
+  message.exportConfirm().then(async () => {
+    const queryParams = Object.assign(
+      {},
+      JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data)) // TODO @星语：这个有没办法，封装个 util 获取哈？
+    )
+    const res = await OperateLogApi.exportOperateLogApi(queryParams)
+    download.excel(res, '岗位列表.xls')
+  })
 }
 </script>

@@ -57,7 +57,6 @@
       :rules="rules"
     />
     <!-- 表单：详情 -->
-    <!-- TODO @星语：展示详情时，有点小丑，可额能得看看 -->
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"

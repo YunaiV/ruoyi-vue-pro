@@ -58,10 +58,10 @@ const handleDetail = async (row: TokenApi.OAuth2TokenVO) => {
 // 强退操作
 const handleForceLogout = (rowId: number) => {
   message
-    .delConfirm()
+    .confirm('是否要强制退出用户')
     .then(async () => {
       await TokenApi.deleteAccessTokenApi(rowId)
-      message.success(t('common.delSuccess')) // TODO 星语：提示内容不对
+      message.success(t('common.success'))
     })
     .finally(() => {
       // 刷新列表

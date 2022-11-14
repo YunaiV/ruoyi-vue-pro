@@ -17,6 +17,7 @@ export default {
     cancel: 'Cancel',
     close: 'Close',
     reload: 'Reload current',
+    success: 'Success',
     closeTab: 'Close current',
     closeTheLeftTab: 'Close left',
     closeTheRightTab: 'Close right',

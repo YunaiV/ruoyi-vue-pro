@@ -24,20 +24,20 @@ export type VxeCrudSchema = {
   columns: VxeCrudColumns[]
 }
 type VxeCrudColumns = Omit<VxeTableColumn, 'children'> & {
-  field: string
-  title?: string
-  formatter?: VxeColumnPropTypes.Formatter
-  isSearch?: boolean
-  search?: CrudSearchParams
-  isTable?: boolean
-  table?: CrudTableParams
-  isForm?: boolean
-  form?: CrudFormParams
-  isDetail?: boolean
-  detail?: CrudDescriptionsParams
-  print?: CrudPrintParams
-  children?: VxeCrudColumns[]
-  dictType?: string
+  field: string // 字段名
+  title?: string // 标题名
+  formatter?: VxeColumnPropTypes.Formatter // vxe formatter格式化
+  isSearch?: boolean // 是否在查询显示
+  search?: CrudSearchParams // 查询的详细配置
+  isTable?: boolean // 是否在列表显示
+  table?: CrudTableParams // 列表的详细配置
+  isForm?: boolean // 是否在表单显示
+  form?: CrudFormParams // 表单的详细配置
+  isDetail?: boolean // 是否在详情显示
+  detail?: CrudDescriptionsParams // 详情的详细配置
+  print?: CrudPrintParams // vxe 打印的字段
+  children?: VxeCrudColumns[] // 子级
+  dictType?: string // 字典类型
 }
 
 type CrudSearchParams = {
@@ -189,6 +189,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
       tableSchemaItem.showOverflow = 'tooltip'
       if (schemaItem?.formatter) {
         tableSchemaItem.formatter = schemaItem.formatter
+        tableSchemaItem.width = 160
       }
       if (schemaItem?.dictType) {
         tableSchemaItem.cellRender = {
@@ -222,6 +223,7 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
     if (schemaItem?.isForm !== false) {
+      // 默认为 input
       let component = schemaItem?.form?.component || 'Input'
       const options: ComponentOptions[] = []
       let comonentProps = {}
@@ -232,15 +234,14 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
         comonentProps = {
           options: options
         }
-        if (!(schemaItem.form && schemaItem.form.component)) component = 'Select'
+        if (!(schemaItem.form && schemaItem.form.component)) component = 'SelectV2'
       }
       const formSchemaItem = {
-        // 默认为 input
-        component: component,
-        componentProps: comonentProps,
         ...schemaItem.form,
         field: schemaItem.field,
-        label: schemaItem.form?.label || schemaItem.title
+        label: schemaItem.form?.label || schemaItem.title,
+        component: component,
+        componentProps: comonentProps
       }
 
       formSchema.push(formSchemaItem)
