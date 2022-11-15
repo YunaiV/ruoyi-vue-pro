@@ -206,7 +206,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
     const tableSchemaItem = {
       title: t('table.action'),
       field: 'actionbtns',
-      width: crudSchema.actionWidth ? crudSchema.actionWidth : '240px',
+      width: crudSchema.actionWidth ? crudSchema.actionWidth : '200px',
       slots: {
         default: 'actionbtns_default'
       }
@@ -234,7 +234,7 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
         comonentProps = {
           options: options
         }
-        if (!(schemaItem.form && schemaItem.form.component)) component = 'SelectV2'
+        if (!(schemaItem.form && schemaItem.form.component)) component = 'Select'
       }
       const formSchemaItem = {
         ...schemaItem.form,
@@ -267,10 +267,9 @@ const filterDescriptionsSchema = (crudSchema: VxeCrudSchema): DescriptionsSchema
         descriptionsSchemaItem.dictType = schemaItem.dictType
       }
       if (schemaItem.detail?.dateFormat || schemaItem.formatter == 'formatDate') {
-        // descriptionsSchemaItem.dateFormat = schemaItem.detail.dateFormat
-        //   ? schemaItem?.detail?.dateFormat
-        //   : 'YYYY-MM-DD HH:mm:ss'
-        descriptionsSchemaItem.dateFormat = 'YYYY-MM-DD HH:mm:ss'
+        descriptionsSchemaItem.dateFormat = schemaItem.dateFormat
+          ? schemaItem?.detail?.dateFormat
+          : 'YYYY-MM-DD HH:mm:ss'
       }
 
       descriptionsSchema.push(descriptionsSchemaItem)

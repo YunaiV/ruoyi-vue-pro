@@ -35,12 +35,16 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '应用图标',
-      field: 'logo'
+      field: 'logo',
+      table: {
+        type: 'html',
+        formatter: 'formatImg'
+      }
     },
     {
       title: t('common.status'),
       field: 'status',
-      dictType: DICT_TYPE.COMMON_STATUS, // TODO @星语：编辑时，status 展示为 0 或者 1 了
+      dictType: DICT_TYPE.COMMON_STATUS,
       isSearch: true
     },
     {
@@ -60,9 +64,11 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '授权类型',
       field: 'authorizedGrantTypes',
-      dictType: DICT_TYPE.SYSTEM_OAUTH2_GRANT_TYPE,
-      form: {
-        component: 'SelectV2' // TODO @星语：多选
+      table: {
+        width: 300,
+        slots: {
+          default: 'authorizedGrantTypes_default'
+        }
       }
     },
     {

@@ -139,10 +139,6 @@ VXETable.formats.mixin({
   formatDate({ cellValue }, format) {
     return XEUtils.toDateString(cellValue, format || 'yyyy-MM-dd HH:mm:ss')
   },
-  // 格式字典
-  formatDict() {
-    return 'cellValue 123'
-  },
   // 四舍五入金额，每隔3位逗号分隔，默认2位数
   formatAmount({ cellValue }, digits = 2) {
     return XEUtils.commafy(Number(cellValue), { digits })
@@ -158,6 +154,10 @@ VXETable.formats.mixin({
   // 向下舍入,默认两位数
   formatCutNumber({ cellValue }, digits = 2) {
     return XEUtils.toFixed(XEUtils.floor(cellValue, digits), digits)
+  },
+  // 格式化图片，将图片链接转换为html标签
+  formatImg({ cellValue }) {
+    return '<img height="40" src="' + cellValue + '"> '
   }
 })
 export const setupVxeTable = (app: App<Element>) => {

@@ -15,19 +15,16 @@ const dictStore = useDictStoreWithOut()
 export interface DictDataType {
   dictType: string
   label: string
-  value: string | number | boolean
-  colorType?: ElementPlusInfoType | '' | 'default' | 'primary'
-  cssClass?: string
+  value: string | number
+  colorType: ElementPlusInfoType | '' | 'default' | 'primary'
+  cssClass: string
 }
 
 export const getDictOptions = (dictType: string) => {
   const dictOptions: DictDataType[] = []
   dictStore.getDictMap.forEach((dict: DictDataType) => {
-    if (dict.dictType.toString() === dictType) {
-      dictOptions.push({
-        ...dict,
-        value: dict.value
-      })
+    if (dict.dictType + '' === dictType) {
+      dictOptions.push(dict)
     }
   })
   return dictOptions

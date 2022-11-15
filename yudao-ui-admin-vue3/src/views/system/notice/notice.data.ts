@@ -36,6 +36,9 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '公告内容',
       field: 'content',
+      table: {
+        type: 'html'
+      },
       form: {
         component: 'Editor',
         colProps: {

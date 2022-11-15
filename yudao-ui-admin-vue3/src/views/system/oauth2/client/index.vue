@@ -12,7 +12,7 @@
           @click="handleCreate()"
         />
       </template>
-      <template #authorizedGrantTypes="{ row }">
+      <template #authorizedGrantTypes_default="{ row }">
         <el-tag
           :disable-transitions="true"
           :key="index"

@@ -249,6 +249,7 @@ export default defineComponent({
     const renderOptions = (item: FormSchema) => {
       switch (item.component) {
         case 'Select':
+        case 'SelectV2':
           const { renderSelectOptions } = useRenderSelect(slots)
           return renderSelectOptions(item)
         case 'Radio':
