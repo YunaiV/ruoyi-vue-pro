@@ -19,8 +19,8 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreate
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
-import cn.iocoder.yudao.module.trade.dal.mysql.orderitem.TradeOrderItemMapper;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
@@ -145,7 +145,7 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         }))).thenReturn(1000L);
 
         // 调用方法
-        Long tradeOrderId = tradeOrderService.createTradeOrder(userId, userIp, reqVO);
+        Long tradeOrderId = tradeOrderService.createOrder(userId, userIp, reqVO);
         // 断言 TradeOrderDO 订单
         List<TradeOrderDO> tradeOrderDOs = tradeOrderMapper.selectList();
         assertEquals(tradeOrderDOs.size(), 1);
@@ -156,7 +156,7 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderDO.getTerminal(), TerminalEnum.H5.getTerminal());
         assertEquals(tradeOrderDO.getUserId(), userId);
         assertEquals(tradeOrderDO.getUserIp(), userIp);
-        assertEquals(tradeOrderDO.getStatus(), TradeOrderStatusEnum.WAITING_PAYMENT.getStatus());
+        assertEquals(tradeOrderDO.getStatus(), TradeOrderStatusEnum.UNPAID.getStatus());
         assertEquals(tradeOrderDO.getProductCount(), 7);
         assertNull(tradeOrderDO.getFinishTime());
         assertNull(tradeOrderDO.getCancelTime());
@@ -207,7 +207,7 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderItemDO01.getPayPrice(), 130);
         assertEquals(tradeOrderItemDO01.getOrderPartPrice(), 7);
         assertEquals(tradeOrderItemDO01.getOrderDividePrice(), 35);
-        assertEquals(tradeOrderItemDO01.getRefundStatus(), TradeOrderItemRefundStatusEnum.NONE.getStatus());
+        assertEquals(tradeOrderItemDO01.getAfterSaleStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
         assertEquals(tradeOrderItemDO01.getRefundTotal(), 0);
         // 断言 TradeOrderItemDO 订单（第 2 个）
         TradeOrderItemDO tradeOrderItemDO02 = tradeOrderItemDOs.get(1);
@@ -228,7 +228,7 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderItemDO02.getPayPrice(), 40);
         assertEquals(tradeOrderItemDO02.getOrderPartPrice(), 15);
         assertEquals(tradeOrderItemDO02.getOrderDividePrice(), 25);
-        assertEquals(tradeOrderItemDO02.getRefundStatus(), TradeOrderItemRefundStatusEnum.NONE.getStatus());
+        assertEquals(tradeOrderItemDO02.getAfterSaleStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
         assertEquals(tradeOrderItemDO02.getRefundTotal(), 0);
         // 校验调用
         verify(productSkuApi).updateSkuStock(argThat(new ArgumentMatcher<ProductSkuUpdateStockReqDTO>() {

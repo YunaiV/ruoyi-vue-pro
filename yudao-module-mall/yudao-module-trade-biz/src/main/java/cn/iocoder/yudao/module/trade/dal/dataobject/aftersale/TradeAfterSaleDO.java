@@ -27,7 +27,7 @@ import java.util.List;
 public class TradeAfterSaleDO extends BaseDO {
 
     /**
-     * 售后编号，主键自增n
+     * 售后编号，主键自增
      */
     private Long id;
     /**
@@ -56,8 +56,10 @@ public class TradeAfterSaleDO extends BaseDO {
     private Long userId;
     /**
      * 申请原因
+     *
+     * 使用数据字典枚举，对应 trade_refund_apply_reason 类型
      */
-    private String applyReason;
+    private Integer applyReason;
     /**
      * 补充描述
      */

@@ -25,7 +25,7 @@ import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
-import cn.iocoder.yudao.module.trade.dal.mysql.orderitem.TradeOrderItemMapper;
+import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
@@ -77,7 +77,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createTradeOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
+    public Long createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
         // 商品 SKU 检查：可售状态、库存
         List<ProductSkuRespDTO> skus = validateSkuSaleable(createReqVO.getItems());
         // 商品 SPU 检查：可售状态
@@ -97,6 +97,26 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         afterCreateTradeOrder(userId, createReqVO, tradeOrderDO, tradeOrderItems, spus);
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
         return tradeOrderDO.getId();
+    }
+
+    @Override
+    public TradeOrderItemDO getOrderItem(Long userId, Long itemId) {
+        TradeOrderItemDO orderItem = tradeOrderItemMapper.selectById(itemId);
+        if (orderItem != null
+                && ObjectUtil.notEqual(orderItem.getUserId(), userId)) {
+            return null;
+        }
+        return orderItem;
+    }
+
+    @Override
+    public TradeOrderDO getOrder(Long userId, Long orderId) {
+        TradeOrderDO order = tradeOrderMapper.selectById(orderId);
+        if (order != null
+                && ObjectUtil.notEqual(order.getUserId(), userId)) {
+            return null;
+        }
+        return order;
     }
 
     /**
@@ -167,7 +187,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                                           PriceCalculateRespDTO.Order order, AddressRespDTO address) {
         TradeOrderDO tradeOrderDO = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, order, address);
         tradeOrderDO.setNo(IdUtil.getSnowflakeNextId() + ""); // TODO @LeeYan9: 思考下, 怎么生成好点哈; 这个是会展示给用户的;
-        tradeOrderDO.setStatus(TradeOrderStatusEnum.WAITING_PAYMENT.getStatus());
+        tradeOrderDO.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
         tradeOrderDO.setType(TradeOrderTypeEnum.NORMAL.getType());
         tradeOrderDO.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         tradeOrderDO.setProductCount(getSumValue(order.getItems(),  PriceCalculateRespDTO.OrderItem::getCount, Integer::sum));

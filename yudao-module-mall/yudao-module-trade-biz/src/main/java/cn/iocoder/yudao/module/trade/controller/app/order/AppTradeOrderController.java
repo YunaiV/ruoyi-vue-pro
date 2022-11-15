@@ -13,22 +13,22 @@ import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 @Api(tags = "用户 App - 交易订单")
 @RestController
 @RequestMapping("/trade/order")
-@RequiredArgsConstructor // TODO @LeeYan9: 先统一使用 @Resource 注入哈; 项目只有三层, 依赖注入会存在, 所以使用 @Resource; 也因此, 最好全局保持一致
 @Validated
 @Slf4j
 public class AppTradeOrderController {
 
-    private final TradeOrderService tradeOrderService;
+    @Resource
+    private TradeOrderService tradeOrderService;
 
     @GetMapping("/get-create-info")
     @ApiOperation("基于商品，确认创建订单")
@@ -47,7 +47,7 @@ public class AppTradeOrderController {
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         String clientIp = ServletUtil.getClientIP(servletRequest);
         // 创建交易订单，预支付记录
-        Long orderId = tradeOrderService.createTradeOrder(loginUserId, clientIp, createReqVO);
+        Long orderId = tradeOrderService.createOrder(loginUserId, clientIp, createReqVO);
         return CommonResult.success(orderId);
     }
 
