@@ -1,16 +1,16 @@
-package cn.iocoder.yudao.module.trade.enums.refund;
+package cn.iocoder.yudao.module.trade.enums.aftersale;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 交易退款 - 申请类型
+ * 交易售后 - 类型
  *
  * @author Sin
  */
 @RequiredArgsConstructor
 @Getter
-public enum TradeRefundTypeEnum {
+public enum TradeAfterSaleTypeEnum {
 
     REFUND(10, "退款"),
     RETURN_AND_REFUND(20, "退货退款");

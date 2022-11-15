@@ -1,10 +1,10 @@
-package cn.iocoder.yudao.module.trade.dal.dataobject.refund;
+package cn.iocoder.yudao.module.trade.dal.dataobject.aftersale;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.refund.TradeRefundTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -16,32 +16,38 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 交易退款，用于处理 {@link TradeOrderDO} 交易订单的退货换流程
+ * 交易售后，用于处理 {@link TradeOrderDO} 交易订单的退款退货流程
+ *
+ * @author 芋道源码
  */
-// TODO 芋艿：需要调整下每个字段的命名；未完全实现；
 @TableName(value = "trade_refund")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-public class TradeRefundDO extends BaseDO {
+public class TradeAfterSaleDO extends BaseDO {
 
     /**
-     * 交易退款编号，主键自增
+     * 售后编号，主键自增n
      */
-    @Deprecated
     private Long id;
     /**
-     * 退款流水号
+     * 售后流水号
      *
      * 例如说，1146347329394184195
      */
-    private String sn;
+    private String no;
     /**
      * 退款状态
      *
-     * 枚举 {@link TradeOrderRefundStatusEnum}
+     * 枚举 {@link TradeAfterSaleStatusEnum}
      */
     private Integer status;
+    /**
+     * 售后类型
+     *
+     * 枚举 {@link TradeAfterSaleTypeEnum}
+     */
+    private Integer type;
     /**
      * 用户编号
      *
@@ -49,69 +55,75 @@ public class TradeRefundDO extends BaseDO {
      */
     private Long userId;
     /**
-     * 用户手机
+     * 申请原因
      */
-    private String userMobile;
+    private String applyReason;
     /**
-     * 申请类型
-     *
-     * 枚举 {@link TradeRefundTypeEnum}
+     * 补充描述
      */
-    private Integer type;
+    private String applyDescription;
     /**
-     * 用户售后说明
-     */
-    private String reasonMemo; // buyer_msg
-    /**
-     * 用户售后凭证图片的地址数组
+     * 补充凭证图片
      *
      * 数组，以逗号分隔
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<String> reasonPicUrls; // photo_files
+    private List<String> applyPicUrls;
 
     // ========== 商家相关 ==========
 
     /**
-     * 商家处理时间
+     * 审批时间
      */
-    private LocalDateTime handleTime; // handel_time
+    private LocalDateTime auditTime;
     /**
-     * 商家拒绝理由
+     * 审批人
+     *
+     * 关联 AdminUserDO 的 id 编号
      */
-    private String rejectReasonMemo; // seller_msg
+    private Long auditUserId;
+    /**
+     * 审批备注
+     */
+    private String auditReason;
 
     // ========== 交易订单相关 ==========
     /**
      * 交易订单编号
      *
-     * 外键 {@link TradeOrderDO#getId()}
+     * 关联 {@link TradeOrderDO#getId()}
      */
-    private Long tradeOrderId;
+    private Long orderId;
     /**
      * 交易订单项编号
      *
      * 关联 {@link TradeOrderItemDO#getId()}
-     * 如果全部退款，则该值设置为 0 即可
      */
-    private Long tradeOrderItemId;
+    private Long orderItemId;
+    /**
+     * 商品 SPU 编号
+     *
+     * 关联 ProductSpuDO 的编号
+     */
+    private Long spuId;
     /**
      * 商品 SKU 编号
+     *
+     * 关联 ProductSkuDO 的编号
      */
-    @Deprecated
     private Integer skuId;
     /**
      * 退货商品数量
      */
-    private Integer stock; // goods_num
+    private Integer count;
 
     // ========== 退款相关 ==========
     /**
      * 退款金额，单位：分。
      */
-    private Integer refundPrice; // refund_amount
+    private Integer refundPrice;
     /**
-     * 支付退款编号
+     * 支付退款编号 TODO
      *
      * 对接 pay-module-biz 支付服务的退款订单编号，即 PayRefundDO 的 id 编号
      */
@@ -120,28 +132,25 @@ public class TradeRefundDO extends BaseDO {
 
     // ========== 退货相关 ==========
     /**
-     * 退货物流公司编号
+     * 退货物流公司编号 TODO
      *
      * 关联 ExpressDO 的 id 编号
      */
     private Long returnExpressId; // express_name
     /**
-     * 退货物流单号
+     * 退货物流单号 TODO
      */
     private String returnExpressNo; // express_no
     /**
-     * 退货时间
+     * 退货时间 TODO
      */
-    private LocalDateTime returnDate; // ship_time
-
-    // ========== 收获相关 ==========
-
+    private LocalDateTime deliveryTime; // ship_time
     /**
-     * 收获备注
+     * 收获备注 TODO
      */
     private String receiveMemo; // receive_message
     /**
-     * 收货时间
+     * 收货时间 TODO
      */
     private LocalDateTime receiveDate; // receive_time
 
