@@ -1,42 +1,18 @@
 <template>
-  <!-- 搜索工作区 -->
   <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <XButton
-        type="primary"
-        preIcon="ep:zoom-in"
-        :title="t('action.add')"
-        v-hasPermi="['system:sms-channel:create']"
-        @click="handleCreate()"
-      />
-    </div>
     <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #code="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE" :value="row.code" />
+    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+      <!-- 操作：新增 -->
+      <template #toolbar_buttons>
+        <XButton
+          type="primary"
+          preIcon="ep:zoom-in"
+          :title="t('action.add')"
+          v-hasPermi="['system:sms-channel:create']"
+          @click="handleCreate()"
+        />
       </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
+      <template #actionbtns_default="{ row }">
         <!-- 操作：修改 -->
         <XTextButton
           preIcon="ep:edit"
@@ -49,20 +25,20 @@
           preIcon="ep:view"
           :title="t('action.detail')"
           v-hasPermi="['system:sms-channel:update']"
-          @click="handleDetail(row)"
+          @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->
         <XTextButton
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:sms-channel:delete']"
-          @click="delList(row.id, false)"
+          @click="handleDelete(row.id)"
         />
       </template>
-    </Table>
+    </vxe-grid>
   </ContentWrap>
 
-  <XModal v-model="dialogVisible" :title="dialogTitle">
+  <XModal id="smsChannel" v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
     <Form
       v-if="['create', 'update'].includes(actionType)"
@@ -74,7 +50,7 @@
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
-      :data="detailRef"
+      :data="detailData"
     />
     <!-- 操作按钮 -->
     <template #footer>
@@ -83,41 +59,45 @@
         v-if="['create', 'update'].includes(actionType)"
         type="primary"
         :title="t('action.save')"
-        :loading="loading"
+        :loading="actionLoading"
         @click="submitForm()"
       />
       <!-- 按钮：关闭 -->
-      <XButton :loading="loading" :title="t('dialog.close')" @click="dialogVisible = false" />
+      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
   </XModal>
 </template>
 
 <script setup lang="ts">
+// 全局相关的 import
 import { ref, unref } from 'vue'
-import dayjs from 'dayjs'
-import { ElMessage } from 'element-plus'
-import { DICT_TYPE } from '@/utils/dict'
-import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
+import { useMessage } from '@/hooks/web/useMessage'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { VxeGridInstance } from 'vxe-table'
 import { FormExpose } from '@/components/Form'
-import type { SmsChannelVO } from '@/api/system/sms/smsChannel/types'
-import { rules, allSchemas } from './sms.channel.data'
+// 业务相关的 import
 import * as SmsChannelApi from '@/api/system/sms/smsChannel'
-const { t } = useI18n() // 国际化
+import { rules, allSchemas } from './sms.channel.data'
 
-// ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<SmsChannelVO>({
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
+
+// 列表相关的变量
+const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
+const { gridOptions, reloadList, delList } = useVxeGrid<SmsChannelApi.SmsChannelVO>({
+  allSchemas: allSchemas,
   getListApi: SmsChannelApi.getSmsChannelPageApi,
   delListApi: SmsChannelApi.deleteSmsChannelApi
 })
-const { getList, setSearchParams, delList } = methods
 
-// ========== CRUD 相关 ==========
-const loading = ref(false) // 遮罩层
-const actionType = ref('') // 操作按钮的类型
+// 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
+const actionType = ref('') // 操作按钮的类型
+const actionLoading = ref(false) // 按钮 Loading
 const formRef = ref<FormExpose>() // 表单 Ref
+const detailData = ref() // 详情 Ref
 
 // 设置标题
 const setDialogTile = (type: string) => {
@@ -139,43 +119,42 @@ const handleUpdate = async (rowId: number) => {
   unref(formRef)?.setValues(res)
 }
 
+// 详情操作
+const handleDetail = async (rowId: number) => {
+  setDialogTile('detail')
+  const res = await SmsChannelApi.getSmsChannelApi(rowId)
+  detailData.value = res
+}
+
+// 删除操作
+const handleDelete = async (rowId: number) => {
+  await delList(xGrid, rowId)
+}
+
 // 提交按钮
 const submitForm = async () => {
   const elForm = unref(formRef)?.getElFormRef()
   if (!elForm) return
   elForm.validate(async (valid) => {
     if (valid) {
-      loading.value = true
+      actionLoading.value = true
       // 提交请求
       try {
-        const data = unref(formRef)?.formModel as SmsChannelVO
+        const data = unref(formRef)?.formModel as SmsChannelApi.SmsChannelVO
         if (actionType.value === 'create') {
           await SmsChannelApi.createSmsChannelApi(data)
-          ElMessage.success(t('common.createSuccess'))
+          message.success(t('common.createSuccess'))
         } else {
           await SmsChannelApi.updateSmsChannelApi(data)
-          ElMessage.success(t('common.updateSuccess'))
+          message.success(t('common.updateSuccess'))
         }
-        // 操作成功，重新加载列表
         dialogVisible.value = false
-        await getList()
       } finally {
-        loading.value = false
+        actionLoading.value = false
+        // 刷新列表
+        reloadList(xGrid)
       }
     }
   })
 }
-
-// ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
-
-// 详情操作
-const handleDetail = async (row: SmsChannelVO) => {
-  // 设置数据
-  detailRef.value = row
-  setDialogTile('detail')
-}
-
-// ========== 初始化 ==========
-getList()
 </script>
