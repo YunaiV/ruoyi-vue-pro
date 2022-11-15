@@ -137,7 +137,7 @@ const handleDetail = async (rowId: number) => {
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  delList(xGrid, rowId)
+  await delList(xGrid, rowId)
 }
 
 // 提交新增/修改的表单

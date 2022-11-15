@@ -37,6 +37,9 @@ const currentSize = computed(() => {
 })
 
 export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
+  /**
+   * grid options 初始化
+   */
   const gridOptions = reactive<VxeGridProps>({
     loading: true,
     size: currentSize as any,
@@ -113,24 +116,49 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
     }
   })
 
-  // 刷新列表
+  /**
+   * 刷新列表
+   * @param ref
+   * @returns
+   */
   const reloadList = async (ref) => {
+    if (!ref) {
+      console.error('未传入gridRef')
+      return
+    }
     await nextTick()
-    ref.value?.commitProxy('query')
+    ref.value.commitProxy('query')
   }
 
   // 获取查询参数
   const getSearchData = async (ref) => {
+    if (!ref) {
+      console.error('未传入gridRef')
+      return
+    }
     await nextTick()
     const queryParams = Object.assign(
       {},
-      JSON.parse(JSON.stringify(ref.value?.getProxyInfo()?.form))
+      JSON.parse(JSON.stringify(ref.value.getProxyInfo()?.form))
     )
     return queryParams
   }
 
-  // 删除
+  /**
+   * 删除
+   * @param ref
+   * @param ids rowid
+   * @returns
+   */
   const delList = async (ref, ids: string | number | string[] | number[]) => {
+    if (!ref) {
+      console.error('未传入gridRef')
+      return
+    }
+    if (!config?.delListApi) {
+      console.error('未传入delListApi')
+      return
+    }
     await nextTick()
     return new Promise(async () => {
       message
@@ -141,12 +169,25 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
         })
         .finally(async () => {
           // 刷新列表
-          ref.value?.commitProxy('query')
+          ref.value.commitProxy('query')
         })
     })
   }
-  // 导出
+  /**
+   * 导出
+   * @param ref
+   * @param fileName 文件名，默认excel.xls
+   * @returns
+   */
   const exportList = async (ref, fileName?: string) => {
+    if (!ref) {
+      console.error('未传入gridRef')
+      return
+    }
+    if (!config?.exportListApi) {
+      console.error('未传入exportListApi')
+      return
+    }
     await nextTick()
     const queryParams = Object.assign(
       {},
@@ -157,12 +198,26 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       download.excel(res as unknown as Blob, fileName ? fileName : 'excel.xls')
     })
   }
+  /**
+   * 表格最大/最小化
+   * @param ref
+   * @returns
+   */
+  const zoom = async (ref) => {
+    if (!ref) {
+      console.error('未传入gridRef')
+      return
+    }
+    await nextTick()
+    ref.value.zoom(!ref.value.isMaximized())
+  }
 
   return {
     gridOptions,
     reloadList,
     getSearchData,
     delList,
-    exportList
+    exportList,
+    zoom
   }
 }
