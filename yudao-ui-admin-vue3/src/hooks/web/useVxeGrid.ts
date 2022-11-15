@@ -43,7 +43,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
   const gridOptions = reactive<VxeGridProps>({
     loading: true,
     size: currentSize as any,
-    height: 700,
+    height: 800,
     rowConfig: {
       isCurrent: true, // 当鼠标点击行时，是否要高亮当前行
       isHover: true // 当鼠标移到行时，是否要高亮当前行
@@ -68,7 +68,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       pageSize: 10, // 每页大小
       pagerCount: 7, // 显示页码按钮的数量
       autoHidden: true, // 当只有一页时自动隐藏
-      pageSizes: [5, 10, 15, 20, 50, 100, 200, 500], // 每页大小选项列表
+      pageSizes: [5, 10, 20, 30, 50, 100], // 每页大小选项列表
       layouts: [
         'PrevJump',
         'PrevPage',
