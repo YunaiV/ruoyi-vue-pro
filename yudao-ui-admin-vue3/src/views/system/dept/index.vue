@@ -48,7 +48,7 @@ const getUserList = async () => {
   userOption.value = res
 }
 // 新增
-const handleAdd = (data: { id: number }) => {
+const handleCreate = (data: { id: number }) => {
   // 重置表单
   deptParentId.value = data.id
   formTitle.value = '新增部门'
@@ -110,9 +110,13 @@ onMounted(async () => {
       <template #header>
         <div class="card-header">
           <span>部门列表</span>
-          <el-button type="primary" v-hasPermi="['system:dept:create']" @click="handleAdd">
-            新增根节点
-          </el-button>
+          <XButton
+            type="primary"
+            preIcon="ep:zoom-in"
+            title="新增根节点"
+            v-hasPermi="['system:dept:create']"
+            @click="handleCreate"
+          />
         </div>
       </template>
       <div class="custom-tree-container">
@@ -133,30 +137,24 @@ onMounted(async () => {
             <span class="custom-tree-node">
               <span>{{ node.label }}</span>
               <span>
-                <el-button
-                  link
-                  type="primary"
+                <XTextButton
+                  preIcon="ep:zoom-in"
+                  :title="t('action.add')"
                   v-hasPermi="['system:dept:create']"
-                  @click="handleAdd(data)"
-                >
-                  <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-                </el-button>
-                <el-button
-                  link
-                  type="primary"
+                  @click="handleCreate(data)"
+                />
+                <XTextButton
+                  preIcon="ep:edit"
+                  :title="t('action.edit')"
                   v-hasPermi="['system:dept:update']"
                   @click="handleUpdate(data)"
-                >
-                  <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-                </el-button>
-                <el-button
-                  link
-                  type="primary"
+                />
+                <XTextButton
+                  preIcon="ep:delete"
+                  :title="t('action.del')"
                   v-hasPermi="['system:dept:delete']"
                   @click="handleDelete(data)"
-                >
-                  <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-                </el-button>
+                />
               </span>
             </span>
           </template>
@@ -195,16 +193,16 @@ onMounted(async () => {
             </el-select>
           </template>
         </Form>
-        <!-- 操作按钮 -->
-        <el-button
+        <!-- 按钮：保存 -->
+        <XButton
           type="primary"
+          :title="t('action.save')"
           v-hasPermi="['system:dept:update']"
           :loading="loading"
-          @click="submitForm"
-        >
-          {{ t('action.save') }}
-        </el-button>
-        <el-button type="danger" @click="showForm = false">{{ t('common.cancel') }}</el-button>
+          @click="submitForm()"
+        />
+        <!-- 按钮：关闭 -->
+        <XButton :loading="loading" :title="t('dialog.close')" @click="showForm = false" />
       </div>
     </el-card>
   </div>

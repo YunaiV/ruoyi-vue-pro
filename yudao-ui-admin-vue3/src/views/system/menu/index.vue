@@ -234,7 +234,7 @@
         v-if="['create', 'update'].includes(actionType)"
         type="primary"
         :loading="actionLoading"
-        @click="submitForm"
+        @click="submitForm()"
         :title="t('action.save')"
       />
       <!-- 按钮：关闭 -->

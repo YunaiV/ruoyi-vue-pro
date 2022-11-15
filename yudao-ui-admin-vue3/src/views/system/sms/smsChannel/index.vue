@@ -1,3 +1,97 @@
+<template>
+  <!-- 搜索工作区 -->
+  <ContentWrap>
+    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
+  </ContentWrap>
+  <ContentWrap>
+    <!-- 操作工具栏 -->
+    <div class="mb-10px">
+      <XButton
+        type="primary"
+        preIcon="ep:zoom-in"
+        :title="t('action.add')"
+        v-hasPermi="['system:sms-channel:create']"
+        @click="handleCreate()"
+      />
+    </div>
+    <!-- 列表 -->
+    <Table
+      :columns="allSchemas.tableColumns"
+      :selection="false"
+      :data="tableObject.tableList"
+      :loading="tableObject.loading"
+      :pagination="{
+        total: tableObject.total
+      }"
+      v-model:pageSize="tableObject.pageSize"
+      v-model:currentPage="tableObject.currentPage"
+      @register="register"
+    >
+      <template #code="{ row }">
+        <DictTag :type="DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE" :value="row.code" />
+      </template>
+      <template #status="{ row }">
+        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+      </template>
+      <template #createTime="{ row }">
+        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
+      </template>
+      <template #action="{ row }">
+        <!-- 操作：修改 -->
+        <XTextButton
+          preIcon="ep:edit"
+          :title="t('action.edit')"
+          v-hasPermi="['system:sms-channel:update']"
+          @click="handleUpdate(row.id)"
+        />
+        <!-- 操作：详情 -->
+        <XTextButton
+          preIcon="ep:view"
+          :title="t('action.detail')"
+          v-hasPermi="['system:sms-channel:update']"
+          @click="handleDetail(row)"
+        />
+        <!-- 操作：删除 -->
+        <XTextButton
+          preIcon="ep:delete"
+          :title="t('action.del')"
+          v-hasPermi="['system:sms-channel:delete']"
+          @click="delList(row.id, false)"
+        />
+      </template>
+    </Table>
+  </ContentWrap>
+
+  <XModal v-model="dialogVisible" :title="dialogTitle">
+    <!-- 对话框(添加 / 修改) -->
+    <Form
+      v-if="['create', 'update'].includes(actionType)"
+      :schema="allSchemas.formSchema"
+      :rules="rules"
+      ref="formRef"
+    />
+    <!-- 对话框(详情) -->
+    <Descriptions
+      v-if="actionType === 'detail'"
+      :schema="allSchemas.detailSchema"
+      :data="detailRef"
+    />
+    <!-- 操作按钮 -->
+    <template #footer>
+      <!-- 按钮：保存 -->
+      <XButton
+        v-if="['create', 'update'].includes(actionType)"
+        type="primary"
+        :title="t('action.save')"
+        :loading="loading"
+        @click="submitForm()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :loading="loading" :title="t('dialog.close')" @click="dialogVisible = false" />
+    </template>
+  </XModal>
+</template>
+
 <script setup lang="ts">
 import { ref, unref } from 'vue'
 import dayjs from 'dayjs'
@@ -38,10 +132,10 @@ const handleCreate = () => {
 }
 
 // 修改操作
-const handleUpdate = async (row: SmsChannelVO) => {
+const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
-  const res = await SmsChannelApi.getSmsChannelApi(row.id)
+  const res = await SmsChannelApi.getSmsChannelApi(rowId)
   unref(formRef)?.setValues(res)
 }
 
@@ -85,95 +179,3 @@ const handleDetail = async (row: SmsChannelVO) => {
 // ========== 初始化 ==========
 getList()
 </script>
-
-<template>
-  <!-- 搜索工作区 -->
-  <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <el-button type="primary" v-hasPermi="['system:sms-channel:create']" @click="handleCreate">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
-    </div>
-    <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #code="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE" :value="row.code" />
-      </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:sms-channel:update']"
-          @click="handleUpdate(row)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:sms-channel:update']"
-          @click="handleDetail(row)"
-        >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:sms-channel:delete']"
-          @click="delList(row.id, false)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
-      </template>
-    </Table>
-  </ContentWrap>
-
-  <XModal v-model="dialogVisible" :title="dialogTitle">
-    <!-- 对话框(添加 / 修改) -->
-    <Form
-      v-if="['create', 'update'].includes(actionType)"
-      :schema="allSchemas.formSchema"
-      :rules="rules"
-      ref="formRef"
-    />
-    <!-- 对话框(详情) -->
-    <Descriptions
-      v-if="actionType === 'detail'"
-      :schema="allSchemas.detailSchema"
-      :data="detailRef"
-    />
-    <!-- 操作按钮 -->
-    <template #footer>
-      <el-button
-        v-if="['create', 'update'].includes(actionType)"
-        type="primary"
-        :loading="loading"
-        @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </XModal>
-</template>

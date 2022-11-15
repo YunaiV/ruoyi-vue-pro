@@ -1,3 +1,130 @@
+<template>
+  <!-- 搜索工作区 -->
+  <ContentWrap>
+    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
+  </ContentWrap>
+  <ContentWrap>
+    <!-- 操作工具栏 -->
+    <div class="mb-10px">
+      <el-button type="primary" v-hasPermi="['system:sms-channel:create']" @click="handleCreate">
+        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+      </el-button>
+    </div>
+    <!-- 列表 -->
+    <Table
+      :columns="allSchemas.tableColumns"
+      :selection="false"
+      :data="tableObject.tableList"
+      :loading="tableObject.loading"
+      :pagination="{
+        total: tableObject.total
+      }"
+      v-model:pageSize="tableObject.pageSize"
+      v-model:currentPage="tableObject.currentPage"
+      @register="register"
+    >
+      <template #type="{ row }">
+        <DictTag :type="DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE" :value="row.type" />
+      </template>
+      <template #status="{ row }">
+        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+      </template>
+      <template #createTime="{ row }">
+        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
+      </template>
+      <template #action="{ row }">
+        <XTextButton
+          preIcon="ep:cpu"
+          :title="t('action.test')"
+          v-hasPermi="['system:sms-template:send-sms']"
+          @click="handleSendSms(row)"
+        />
+        <!-- 操作：修改 -->
+        <XTextButton
+          preIcon="ep:edit"
+          :title="t('action.edit')"
+          v-hasPermi="['system:sms-template:update']"
+          @click="handleUpdate(row.id)"
+        />
+        <!-- 操作：详情 -->
+        <XTextButton
+          preIcon="ep:view"
+          :title="t('action.detail')"
+          v-hasPermi="['system:sms-template:update']"
+          @click="handleDetail(row)"
+        />
+        <!-- 操作：删除 -->
+        <XTextButton
+          preIcon="ep:delete"
+          :title="t('action.del')"
+          v-hasPermi="['system:sms-template:delete']"
+          @click="delList(row.id, false)"
+        />
+      </template>
+    </Table>
+  </ContentWrap>
+
+  <XModal v-model="dialogVisible" :title="dialogTitle">
+    <!-- 对话框(添加 / 修改) -->
+    <Form
+      v-if="['create', 'update'].includes(actionType)"
+      :schema="allSchemas.formSchema"
+      :rules="rules"
+      ref="formRef"
+    />
+    <!-- 对话框(详情) -->
+    <Descriptions
+      v-if="actionType === 'detail'"
+      :schema="allSchemas.detailSchema"
+      :data="detailRef"
+    />
+    <!-- 操作按钮 -->
+    <template #footer>
+      <!-- 按钮：保存 -->
+      <XButton
+        v-if="['create', 'update'].includes(actionType)"
+        type="primary"
+        :title="t('action.save')"
+        :loading="loading"
+        @click="submitForm()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :loading="loading" :title="t('dialog.close')" @click="dialogVisible = false" />
+    </template>
+  </XModal>
+  <XModal v-model="sendVisible" title="测试">
+    <el-form :model="sendSmsForm" :rules="sendSmsRules" label-width="140px">
+      <el-form-item label="模板内容" prop="content">
+        <el-input
+          v-model="sendSmsForm.content"
+          type="textarea"
+          placeholder="请输入模板内容"
+          readonly
+        />
+      </el-form-item>
+      <el-form-item label="手机号" prop="mobile">
+        <el-input v-model="sendSmsForm.mobile" placeholder="请输入手机号" />
+      </el-form-item>
+      <el-form-item
+        v-for="param in sendSmsForm.params"
+        :key="param"
+        :label="'参数 {' + param + '}'"
+        :prop="'templateParams.' + param"
+      >
+        <el-input
+          v-model="sendSmsForm.templateParams[param]"
+          :placeholder="'请输入 ' + param + ' 参数'"
+        />
+      </el-form-item>
+    </el-form>
+    <!-- 操作按钮 -->
+    <template #footer>
+      <XButton type="primary" :title="t('action.test')" :loading="loading" @click="sendSmsTest()" />
+      <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
+    </template>
+  </XModal>
+</template>
+
 <script setup lang="ts">
 import { ref, unref } from 'vue'
 import dayjs from 'dayjs'
@@ -38,10 +165,10 @@ const handleCreate = () => {
 }
 
 // 修改操作
-const handleUpdate = async (row: SmsTemplateVO) => {
+const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
-  const res = await SmsTemplateApi.getSmsTemplateApi(row.id)
+  const res = await SmsTemplateApi.getSmsTemplateApi(rowId)
   unref(formRef)?.setValues(res)
 }
 
@@ -125,136 +252,3 @@ const sendSmsTest = () => {
 // ========== 初始化 ==========
 getList()
 </script>
-
-<template>
-  <!-- 搜索工作区 -->
-  <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <el-button type="primary" v-hasPermi="['system:sms-channel:create']" @click="handleCreate">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
-    </div>
-    <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #type="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE" :value="row.type" />
-      </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:sms-template:send-sms']"
-          @click="handleSendSms(row)"
-        >
-          <Icon icon="ep:cpu" class="mr-1px" /> {{ t('action.test') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:sms-template:update']"
-          @click="handleUpdate(row)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:sms-template:update']"
-          @click="handleDetail(row)"
-        >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:sms-template:delete']"
-          @click="delList(row.id, false)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
-      </template>
-    </Table>
-  </ContentWrap>
-
-  <XModal v-model="dialogVisible" :title="dialogTitle">
-    <!-- 对话框(添加 / 修改) -->
-    <Form
-      v-if="['create', 'update'].includes(actionType)"
-      :schema="allSchemas.formSchema"
-      :rules="rules"
-      ref="formRef"
-    />
-    <!-- 对话框(详情) -->
-    <Descriptions
-      v-if="actionType === 'detail'"
-      :schema="allSchemas.detailSchema"
-      :data="detailRef"
-    />
-    <!-- 操作按钮 -->
-    <template #footer>
-      <el-button
-        v-if="['create', 'update'].includes(actionType)"
-        type="primary"
-        :loading="loading"
-        @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </XModal>
-  <XModal v-model="sendVisible" title="测试">
-    <el-form :model="sendSmsForm" :rules="sendSmsRules" label-width="140px">
-      <el-form-item label="模板内容" prop="content">
-        <el-input
-          v-model="sendSmsForm.content"
-          type="textarea"
-          placeholder="请输入模板内容"
-          readonly
-        />
-      </el-form-item>
-      <el-form-item label="手机号" prop="mobile">
-        <el-input v-model="sendSmsForm.mobile" placeholder="请输入手机号" />
-      </el-form-item>
-      <el-form-item
-        v-for="param in sendSmsForm.params"
-        :key="param"
-        :label="'参数 {' + param + '}'"
-        :prop="'templateParams.' + param"
-      >
-        <el-input
-          v-model="sendSmsForm.templateParams[param]"
-          :placeholder="'请输入 ' + param + ' 参数'"
-        />
-      </el-form-item>
-    </el-form>
-    <!-- 操作按钮 -->
-    <template #footer>
-      <el-button type="primary" :loading="loading" @click="sendSmsTest">
-        {{ t('action.test') }}
-      </el-button>
-      <el-button @click="sendVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </XModal>
-</template>

@@ -1,3 +1,116 @@
+<template>
+  <!-- 搜索工作区 -->
+  <ContentWrap>
+    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
+  </ContentWrap>
+  <ContentWrap>
+    <!-- 操作工具栏 -->
+    <div class="mb-10px">
+      <XButton
+        type="primary"
+        preIcon="ep:zoom-in"
+        :title="t('action.add')"
+        v-hasPermi="['system:sensitive-word:create']"
+        @click="handleCreate()"
+      />
+      <XButton
+        type="warning"
+        preIcon="ep:download"
+        :title="t('action.export')"
+        v-hasPermi="['system:sensitive-word:export']"
+        @click="exportList('敏感词数据.xls')"
+      />
+    </div>
+    <!-- 列表 -->
+    <Table
+      :columns="allSchemas.tableColumns"
+      :selection="false"
+      :data="tableObject.tableList"
+      :loading="tableObject.loading"
+      :pagination="{
+        total: tableObject.total
+      }"
+      v-model:pageSize="tableObject.pageSize"
+      v-model:currentPage="tableObject.currentPage"
+      @register="register"
+    >
+      <template #tags="{ row }">
+        <el-tag
+          :disable-transitions="true"
+          :key="index"
+          v-for="(tag, index) in row.tags"
+          :index="index"
+        >
+          {{ tag }}
+        </el-tag>
+      </template>
+      <template #status="{ row }">
+        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+      </template>
+      <template #createTime="{ row }">
+        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
+      </template>
+      <template #action="{ row }">
+        <!-- 操作：修改 -->
+        <XTextButton
+          preIcon="ep:edit"
+          :title="t('action.edit')"
+          v-hasPermi="['system:sensitive-word:update']"
+          @click="handleUpdate(row.id)"
+        />
+        <!-- 操作：详情 -->
+        <XTextButton
+          preIcon="ep:view"
+          :title="t('action.detail')"
+          v-hasPermi="['system:sensitive-word:update']"
+          @click="handleDetail(row)"
+        />
+        <!-- 操作：删除 -->
+        <XTextButton
+          preIcon="ep:delete"
+          :title="t('action.del')"
+          v-hasPermi="['system:sensitive-word:delete']"
+          @click="delList(row.id, false)"
+        />
+      </template>
+    </Table>
+  </ContentWrap>
+
+  <XModal v-model="dialogVisible" :title="dialogTitle">
+    <!-- 对话框(添加 / 修改) -->
+    <Form
+      v-if="['create', 'update'].includes(actionType)"
+      :schema="allSchemas.formSchema"
+      :rules="rules"
+      ref="formRef"
+    >
+      <template #tags>
+        <el-select v-model="tags" multiple placeholder="请选择">
+          <el-option v-for="item in tagsOptions" :key="item" :label="item" :value="item" />
+        </el-select>
+      </template>
+    </Form>
+    <!-- 对话框(详情) -->
+    <Descriptions
+      v-if="actionType === 'detail'"
+      :schema="allSchemas.detailSchema"
+      :data="detailRef"
+    />
+    <!-- 操作按钮 -->
+    <template #footer>
+      <!-- 按钮：保存 -->
+      <XButton
+        v-if="['create', 'update'].includes(actionType)"
+        type="primary"
+        :title="t('action.save')"
+        :loading="actionLoading"
+        @click="submitForm()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
+    </template>
+  </XModal>
+</template>
 <script setup lang="ts">
 import { onMounted, ref, unref } from 'vue'
 import dayjs from 'dayjs'
@@ -45,10 +158,10 @@ const handleCreate = () => {
 }
 
 // 修改操作
-const handleUpdate = async (row: SensitiveWordVO) => {
+const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
-  const res = await SensitiveWordApi.getSensitiveWordApi(row.id)
+  const res = await SensitiveWordApi.getSensitiveWordApi(rowId)
   unref(formRef)?.setValues(res)
 }
 
@@ -95,116 +208,3 @@ onMounted(async () => {
   await getList()
 })
 </script>
-
-<template>
-  <!-- 搜索工作区 -->
-  <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <el-button type="primary" v-hasPermi="['system:post:create']" @click="handleCreate">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
-      <el-button
-        type="warning"
-        v-hasPermi="['system:post:export']"
-        :loading="tableObject.exportLoading"
-        @click="exportList('敏感词数据.xls')"
-      >
-        <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
-      </el-button>
-    </div>
-    <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #tags="{ row }">
-        <el-tag
-          :disable-transitions="true"
-          :key="index"
-          v-for="(tag, index) in row.tags"
-          :index="index"
-        >
-          {{ tag }}
-        </el-tag>
-      </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:post:update']"
-          @click="handleUpdate(row)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:post:update']"
-          @click="handleDetail(row)"
-        >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:post:delete']"
-          @click="delList(row.id, false)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
-      </template>
-    </Table>
-  </ContentWrap>
-
-  <XModal v-model="dialogVisible" :title="dialogTitle">
-    <!-- 对话框(添加 / 修改) -->
-    <Form
-      v-if="['create', 'update'].includes(actionType)"
-      :schema="allSchemas.formSchema"
-      :rules="rules"
-      ref="formRef"
-    >
-      <template #tags>
-        <el-select v-model="tags" multiple placeholder="请选择">
-          <el-option v-for="item in tagsOptions" :key="item" :label="item" :value="item" />
-        </el-select>
-      </template>
-    </Form>
-    <!-- 对话框(详情) -->
-    <Descriptions
-      v-if="actionType === 'detail'"
-      :schema="allSchemas.detailSchema"
-      :data="detailRef"
-    />
-    <!-- 操作按钮 -->
-    <template #footer>
-      <el-button
-        v-if="['create', 'update'].includes(actionType)"
-        type="primary"
-        :loading="actionLoading"
-        @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </XModal>
-</template>

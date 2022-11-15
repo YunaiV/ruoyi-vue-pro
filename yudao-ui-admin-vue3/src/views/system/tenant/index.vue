@@ -1,3 +1,126 @@
+<template>
+  <!-- 搜索工作区 -->
+  <ContentWrap>
+    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
+  </ContentWrap>
+  <ContentWrap>
+    <!-- 操作工具栏 -->
+    <div class="mb-10px">
+      <XButton
+        type="primary"
+        preIcon="ep:zoom-in"
+        :title="t('action.add')"
+        v-hasPermi="['system:tenant:create']"
+        @click="handleCreate()"
+      />
+      <XButton
+        type="warning"
+        preIcon="ep:download"
+        :title="t('action.export')"
+        v-hasPermi="['system:tenant:export']"
+        @click="exportList('租户数据.xls')"
+      />
+    </div>
+    <!-- 列表 -->
+    <Table
+      :columns="allSchemas.tableColumns"
+      :selection="false"
+      :data="tableObject.tableList"
+      :loading="tableObject.loading"
+      :pagination="{
+        total: tableObject.total
+      }"
+      v-model:pageSize="tableObject.pageSize"
+      v-model:currentPage="tableObject.currentPage"
+      @register="register"
+    >
+      <template #accountCount="{ row }">
+        <el-tag> {{ row.accountCount }} </el-tag>
+      </template>
+      <template #status="{ row }">
+        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+      </template>
+      <template #packageId="{ row }">
+        <el-tag v-if="row.packageId === 0" type="danger">系统租户</el-tag>
+        <el-tag v-else type="success"> {{ getPackageName(row.packageId) }} </el-tag>
+      </template>
+      <template #expireTime="{ row }">
+        <span>{{ dayjs(row.expireTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
+      </template>
+      <template #createTime="{ row }">
+        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
+      </template>
+      <template #action="{ row }">
+        <!-- 操作：修改 -->
+        <XTextButton
+          preIcon="ep:edit"
+          :title="t('action.edit')"
+          v-hasPermi="['system:tenant:update']"
+          @click="handleUpdate(row)"
+        />
+        <!-- 操作：详情 -->
+        <XTextButton
+          preIcon="ep:view"
+          :title="t('action.detail')"
+          v-hasPermi="['system:tenant:update']"
+          @click="handleDetail(row)"
+        />
+        <!-- 操作：删除 -->
+        <XTextButton
+          preIcon="ep:delete"
+          :title="t('action.del')"
+          v-hasPermi="['system:tenant:delete']"
+          @click="delList(row.id, false)"
+        />
+      </template>
+    </Table>
+  </ContentWrap>
+
+  <XModal v-model="dialogVisible" :title="dialogTitle">
+    <!-- 对话框(添加 / 修改) -->
+    <Form
+      v-if="['create', 'update'].includes(actionType)"
+      :schema="allSchemas.formSchema"
+      :rules="rules"
+      ref="formRef"
+    >
+      <template #packageId>
+        <el-select v-model="tenantPackageId">
+          <el-option
+            v-for="item in tenantPackageOptions"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          />
+        </el-select>
+      </template>
+    </Form>
+    <!-- 对话框(详情) -->
+    <Descriptions
+      v-if="actionType === 'detail'"
+      :schema="allSchemas.detailSchema"
+      :data="detailRef"
+    >
+      <template #packageId="{ row }">
+        <el-tag v-if="row.packageId === 0" type="danger">系统租户</el-tag>
+        <el-tag v-else type="success"> {{ getPackageName(row.packageId) }} </el-tag>
+      </template>
+    </Descriptions>
+    <!-- 操作按钮 -->
+    <template #footer>
+      <!-- 按钮：保存 -->
+      <XButton
+        v-if="['create', 'update'].includes(actionType)"
+        type="primary"
+        :title="t('action.save')"
+        :loading="actionLoading"
+        @click="submitForm()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
+    </template>
+  </XModal>
+</template>
 <script setup lang="ts">
 import { ref, unref, onMounted } from 'vue'
 import dayjs from 'dayjs'
@@ -114,126 +237,3 @@ onMounted(async () => {
   await getTenantPackageOptions()
 })
 </script>
-
-<template>
-  <!-- 搜索工作区 -->
-  <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <el-button type="primary" v-hasPermi="['system:tenant:create']" @click="handleCreate">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
-      <el-button
-        type="warning"
-        v-hasPermi="['system:tenant:export']"
-        :loading="tableObject.exportLoading"
-        @click="exportList('租户数据.xls')"
-      >
-        <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
-      </el-button>
-    </div>
-    <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #accountCount="{ row }">
-        <el-tag> {{ row.accountCount }} </el-tag>
-      </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #packageId="{ row }">
-        <el-tag v-if="row.packageId === 0" type="danger">系统租户</el-tag>
-        <el-tag v-else type="success"> {{ getPackageName(row.packageId) }} </el-tag>
-      </template>
-      <template #expireTime="{ row }">
-        <span>{{ dayjs(row.expireTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:tenant:update']"
-          @click="handleUpdate(row)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:tenant:update']"
-          @click="handleDetail(row)"
-        >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:tenant:delete']"
-          @click="delList(row.id, false)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
-      </template>
-    </Table>
-  </ContentWrap>
-
-  <XModal v-model="dialogVisible" :title="dialogTitle">
-    <!-- 对话框(添加 / 修改) -->
-    <Form
-      v-if="['create', 'update'].includes(actionType)"
-      :schema="allSchemas.formSchema"
-      :rules="rules"
-      ref="formRef"
-    >
-      <template #packageId>
-        <el-select v-model="tenantPackageId">
-          <el-option
-            v-for="item in tenantPackageOptions"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          />
-        </el-select>
-      </template>
-    </Form>
-    <!-- 对话框(详情) -->
-    <Descriptions
-      v-if="actionType === 'detail'"
-      :schema="allSchemas.detailSchema"
-      :data="detailRef"
-    >
-      <template #packageId="{ row }">
-        <el-tag v-if="row.packageId === 0" type="danger">系统租户</el-tag>
-        <el-tag v-else type="success"> {{ getPackageName(row.packageId) }} </el-tag>
-      </template>
-    </Descriptions>
-    <!-- 操作按钮 -->
-    <template #footer>
-      <el-button
-        v-if="['create', 'update'].includes(actionType)"
-        type="primary"
-        :loading="actionLoading"
-        @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </XModal>
-</template>

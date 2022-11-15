@@ -192,15 +192,16 @@ getList()
     />
     <!-- 操作按钮 -->
     <template #footer>
-      <el-button
+      <!-- 按钮：保存 -->
+      <XButton
         v-if="['create', 'update'].includes(actionType)"
         type="primary"
+        :title="t('action.save')"
         :loading="actionLoading"
-        @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
+        @click="submitForm()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
   </XModal>
 </template>

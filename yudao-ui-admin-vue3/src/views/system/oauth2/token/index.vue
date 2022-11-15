@@ -20,7 +20,7 @@
     <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
     <!-- 操作按钮 -->
     <template #footer>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
+      <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
   </XModal>
 </template>

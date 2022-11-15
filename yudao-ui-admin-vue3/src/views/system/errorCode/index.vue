@@ -59,7 +59,7 @@
         type="primary"
         :title="t('action.save')"
         :loading="actionLoading"
-        @click="submitForm"
+        @click="submitForm()"
       />
       <!-- 按钮：关闭 -->
       <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />

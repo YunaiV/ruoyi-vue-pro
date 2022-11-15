@@ -113,7 +113,7 @@ getList()
   <ContentWrap>
     <!-- 操作工具栏 -->
     <div class="mb-10px">
-      <el-button type="primary" v-hasPermi="['bpm:model:create']" @click="handleCreate">
+      <el-button type="primary" v-hasPermi="['bpm:model:create']" @click="handleCreate()">
         <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
       </el-button>
     </div>
@@ -202,15 +202,16 @@ getList()
     />
     <!-- 操作按钮 -->
     <template #footer>
-      <el-button
+      <!-- 按钮：保存 -->
+      <XButton
         v-if="['create', 'update'].includes(actionType)"
         type="primary"
+        :title="t('action.save')"
         :loading="actionLoading"
-        @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
+        @click="submitForm()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
   </XModal>
 </template>

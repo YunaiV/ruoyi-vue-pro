@@ -1,35 +1,3 @@
-<script setup lang="ts">
-import { ref } from 'vue'
-import dayjs from 'dayjs'
-import { DICT_TYPE } from '@/utils/dict'
-import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
-import type { SmsLogVO } from '@/api/system/sms/smsLog/types'
-import { allSchemas } from './sms.log.data'
-import * as SmsLoglApi from '@/api/system/sms/smsLog'
-const { t } = useI18n() // 国际化
-
-// ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<SmsLogVO>({
-  getListApi: SmsLoglApi.getSmsLogPageApi
-})
-const { getList, setSearchParams } = methods
-
-// ========== CRUD 相关 ==========
-const actionType = ref('') // 操作按钮的类型
-const dialogVisible = ref(false) // 是否显示弹出层
-const dialogTitle = ref(t('action.detail')) // 弹出层标题
-// ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
-const handleDetail = (row: SmsLogVO) => {
-  // 设置数据
-  detailRef.value = row
-  dialogVisible.value = true
-}
-// ========== 初始化 ==========
-getList()
-</script>
-
 <template>
   <!-- 搜索工作区 -->
   <ContentWrap>
@@ -62,14 +30,7 @@ getList()
         <span>{{ dayjs(row.receiveTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
       </template>
       <template #action="{ row }">
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:sms-channel:update']"
-          @click="handleDetail(row)"
-        >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
+        <XTextButton preIcon="ep:view" :title="t('action.detail')" @click="handleDetail(row)" />
       </template>
     </Table>
   </ContentWrap>
@@ -83,7 +44,39 @@ getList()
     />
     <!-- 操作按钮 -->
     <template #footer>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
+      <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
   </XModal>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import dayjs from 'dayjs'
+import { DICT_TYPE } from '@/utils/dict'
+import { useTable } from '@/hooks/web/useTable'
+import { useI18n } from '@/hooks/web/useI18n'
+import type { SmsLogVO } from '@/api/system/sms/smsLog/types'
+import { allSchemas } from './sms.log.data'
+import * as SmsLoglApi from '@/api/system/sms/smsLog'
+const { t } = useI18n() // 国际化
+
+// ========== 列表相关 ==========
+const { register, tableObject, methods } = useTable<SmsLogVO>({
+  getListApi: SmsLoglApi.getSmsLogPageApi
+})
+const { getList, setSearchParams } = methods
+
+// ========== CRUD 相关 ==========
+const actionType = ref('') // 操作按钮的类型
+const dialogVisible = ref(false) // 是否显示弹出层
+const dialogTitle = ref(t('action.detail')) // 弹出层标题
+// ========== 详情相关 ==========
+const detailRef = ref() // 详情 Ref
+const handleDetail = (row: SmsLogVO) => {
+  // 设置数据
+  detailRef.value = row
+  dialogVisible.value = true
+}
+// ========== 初始化 ==========
+getList()
+</script>

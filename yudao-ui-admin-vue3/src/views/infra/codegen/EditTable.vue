@@ -2,7 +2,7 @@
 import { ref, unref, onMounted } from 'vue'
 import { ContentDetailWrap } from '@/components/ContentDetailWrap'
 import { BasicInfoForm, CloumInfoForm, GenInfoForm } from './components'
-import { ElTabs, ElTabPane, ElButton, ElMessage } from 'element-plus'
+import { ElTabs, ElTabPane, ElMessage } from 'element-plus'
 import { getCodegenTableApi, updateCodegenTableApi } from '@/api/infra/codegen'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -70,9 +70,7 @@ onMounted(() => {
       </el-tab-pane>
     </el-tabs>
     <template #right>
-      <el-button type="primary" :loading="loading" @click="submitForm">
-        {{ t('action.save') }}
-      </el-button>
+      <XButton type="primary" :title="t('action.save')" :loading="loading" @click="submitForm()" />
     </template>
   </ContentDetailWrap>
 </template>

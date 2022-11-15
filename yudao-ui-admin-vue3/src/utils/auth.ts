@@ -1,32 +1,36 @@
-import { useCache } from '@/hooks/web/useCache'
+import Cookies from 'js-cookie'
 import { TokenType } from '@/api/login/types'
 import { decrypt, encrypt } from '@/utils/jsencrypt'
 
-const { wsCache } = useCache()
 const AccessTokenKey = 'ACCESS_TOKEN'
 const RefreshTokenKey = 'REFRESH_TOKEN'
 
 // 获取token
 export const getAccessToken = () => {
   // 此处与TokenKey相同，此写法解决初始化时Cookies中不存在TokenKey报错
-  return wsCache.get('ACCESS_TOKEN')
+  return Cookies.get(AccessTokenKey) ? Cookies.get(AccessTokenKey) : Cookies.get('ACCESS_TOKEN')
 }
 
 // 刷新token
 export const getRefreshToken = () => {
-  return wsCache.get(RefreshTokenKey)
+  return Cookies.get(RefreshTokenKey)
 }
 
 // 设置token
 export const setToken = (token: TokenType) => {
-  wsCache.set(RefreshTokenKey, token.refreshToken, { exp: token.expiresTime })
-  wsCache.set(AccessTokenKey, token.accessToken)
+  Cookies.set(RefreshTokenKey, token.refreshToken, token.expiresTime)
+  Cookies.set(AccessTokenKey, token.accessToken)
 }
 
 // 删除token
 export const removeToken = () => {
-  wsCache.delete(AccessTokenKey)
-  wsCache.delete(RefreshTokenKey)
+  Cookies.remove(AccessTokenKey)
+  Cookies.remove(RefreshTokenKey)
+}
+
+/** 格式化token（jwt格式） */
+export const formatToken = (token: string): string => {
+  return 'Bearer ' + token
 }
 // ========== 账号相关 ==========
 
@@ -35,40 +39,40 @@ const PasswordKey = 'PASSWORD'
 const RememberMeKey = 'REMEMBER_ME'
 
 export const getUsername = () => {
-  return wsCache.get(UsernameKey)
+  return Cookies.get(UsernameKey)
 }
 
 export const setUsername = (username: string) => {
-  wsCache.set(UsernameKey, username)
+  Cookies.set(UsernameKey, username)
 }
 
 export const removeUsername = () => {
-  wsCache.delete(UsernameKey)
+  Cookies.remove(UsernameKey)
 }
 
 export const getPassword = () => {
-  const password = wsCache.get(PasswordKey)
+  const password = Cookies.get(PasswordKey)
   return password ? decrypt(password) : undefined
 }
 
 export const setPassword = (password: string) => {
-  wsCache.set(PasswordKey, encrypt(password))
+  Cookies.set(PasswordKey, encrypt(password))
 }
 
 export const removePassword = () => {
-  wsCache.delete(PasswordKey)
+  Cookies.remove(PasswordKey)
 }
 
 export const getRememberMe = () => {
-  return wsCache.get(RememberMeKey) === 'true'
+  return Cookies.get(RememberMeKey) === 'true'
 }
 
 export const setRememberMe = (rememberMe: string) => {
-  wsCache.set(RememberMeKey, rememberMe)
+  Cookies.set(RememberMeKey, rememberMe)
 }
 
 export const removeRememberMe = () => {
-  wsCache.delete(RememberMeKey)
+  Cookies.remove(RememberMeKey)
 }
 
 // ========== 租户相关 ==========
@@ -77,25 +81,25 @@ const TenantIdKey = 'TENANT_ID'
 const TenantNameKey = 'TENANT_NAME'
 
 export const getTenantName = () => {
-  return wsCache.get(TenantNameKey)
+  return Cookies.get(TenantNameKey)
 }
 
 export const setTenantName = (username: string) => {
-  wsCache.set(TenantNameKey, username)
+  Cookies.set(TenantNameKey, username)
 }
 
 export const removeTenantName = () => {
-  wsCache.delete(TenantNameKey)
+  Cookies.remove(TenantNameKey)
 }
 
 export const getTenantId = () => {
-  return wsCache.get(TenantIdKey)
+  return Cookies.get(TenantIdKey)
 }
 
 export const setTenantId = (username: string) => {
-  wsCache.set(TenantIdKey, username)
+  Cookies.set(TenantIdKey, username)
 }
 
 export const removeTenantId = () => {
-  wsCache.delete(TenantIdKey)
+  Cookies.remove(TenantIdKey)
 }
