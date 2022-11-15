@@ -84,16 +84,16 @@ import { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as PostApi from '@/api/system/post'
 import { rules, allSchemas } from './post.data'
-import download from '@/utils/download'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, reloadList, delList, getSearchData } = useVxeGrid<PostApi.PostVO>({
+const { gridOptions, reloadList, delList, exportList } = useVxeGrid<PostApi.PostVO>({
   allSchemas: allSchemas,
   getListApi: PostApi.getPostPageApi,
-  delListApi: PostApi.deletePostApi
+  delListApi: PostApi.deletePostApi,
+  exportListApi: PostApi.exportPostApi
 })
 // 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
@@ -117,9 +117,7 @@ const handleCreate = () => {
 
 // 导出操作
 const handleExport = async () => {
-  const queryParams = await getSearchData(xGrid)
-  const res = await PostApi.exportPostApi(queryParams)
-  download.excel(res, '岗位列表.xls')
+  await exportList(xGrid, '岗位列表.xls')
 }
 
 // 修改操作

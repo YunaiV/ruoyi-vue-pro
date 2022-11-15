@@ -4,6 +4,7 @@ import { useAppStore } from '@/store/modules/app'
 import { VxeAllSchemas } from './useVxeCrudSchemas'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
+import download from '@/utils/download'
 
 const { t } = useI18n()
 const message = useMessage() // 消息弹窗
@@ -144,11 +145,24 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
         })
     })
   }
+  // 导出
+  const exportList = async (ref, fileName?: string) => {
+    await nextTick()
+    const queryParams = Object.assign(
+      {},
+      JSON.parse(JSON.stringify(ref.value?.getProxyInfo()?.form))
+    )
+    message.exportConfirm().then(async () => {
+      const res = await (config?.exportListApi && config?.exportListApi(queryParams))
+      download.excel(res as unknown as Blob, fileName ? fileName : 'excel.xls')
+    })
+  }
 
   return {
     gridOptions,
     reloadList,
     getSearchData,
-    delList
+    delList,
+    exportList
   }
 }

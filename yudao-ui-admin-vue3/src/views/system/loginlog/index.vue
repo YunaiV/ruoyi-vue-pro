@@ -30,21 +30,19 @@
 // 全局相关的 import
 import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
 // 业务相关的 import
 import { allSchemas } from './loginLog.data'
 import { getLoginLogPageApi, exportLoginLogApi, LoginLogVO } from '@/api/system/loginLog'
-import download from '@/utils/download'
 
 const { t } = useI18n() // 国际化
-const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getSearchData } = useVxeGrid<LoginLogVO>({
+const { gridOptions, exportList } = useVxeGrid<LoginLogVO>({
   allSchemas: allSchemas,
-  getListApi: getLoginLogPageApi
+  getListApi: getLoginLogPageApi,
+  exportListApi: exportLoginLogApi
 })
 
 // 详情操作
@@ -60,10 +58,6 @@ const handleDetail = async (row: LoginLogVO) => {
 
 // 导出操作
 const handleExport = async () => {
-  message.exportConfirm().then(async () => {
-    const queryParams = await getSearchData(xGrid)
-    const res = await exportLoginLogApi(queryParams)
-    download.excel(res, '登录列表.xls')
-  })
+  exportList(xGrid, '登录列表.xls')
 }
 </script>

@@ -45,21 +45,19 @@
 // 全局相关的 import
 import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
 // 业务相关的 import
 import * as OperateLogApi from '@/api/system/operatelog'
 import { allSchemas } from './operatelog.data'
-import download from '@/utils/download'
 
 const { t } = useI18n() // 国际化
-const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getSearchData } = useVxeGrid<OperateLogApi.OperateLogVO>({
+const { gridOptions, exportList } = useVxeGrid<OperateLogApi.OperateLogVO>({
   allSchemas: allSchemas,
-  getListApi: OperateLogApi.getOperateLogPageApi
+  getListApi: OperateLogApi.getOperateLogPageApi,
+  exportListApi: OperateLogApi.exportOperateLogApi
 })
 
 // 弹窗相关的变量
@@ -76,10 +74,6 @@ const handleDetail = (row: OperateLogApi.OperateLogVO) => {
 
 // 导出操作
 const handleExport = async () => {
-  message.exportConfirm().then(async () => {
-    const queryParams = await getSearchData(xGrid)
-    const res = await OperateLogApi.exportOperateLogApi(queryParams)
-    download.excel(res, '岗位列表.xls')
-  })
+  exportList(xGrid, '岗位列表.xls')
 }
 </script>
