@@ -35,10 +35,11 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '用户密码',
       field: 'password',
+      isDetail: false,
+      isTable: false,
       form: {
         component: 'InputPassword'
-      },
-      isDetail: false
+      }
     },
     {
       title: '用户昵称',
