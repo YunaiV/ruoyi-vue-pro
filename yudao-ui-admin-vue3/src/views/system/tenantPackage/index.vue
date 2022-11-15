@@ -6,9 +6,12 @@
   <ContentWrap>
     <!-- 操作工具栏 -->
     <div class="mb-10px">
-      <el-button type="primary" @click="handleCreate">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
+      <XButton
+        type="primary"
+        preIcon="ep:zoom-in"
+        :title="t('action.add')"
+        @click="handleCreate()"
+      />
     </div>
     <!-- 列表 -->
     <Table
@@ -30,12 +33,8 @@
         <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
       </template>
       <template #action="{ row }">
-        <el-button link type="primary" @click="handleUpdate(row)">
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button link type="primary" @click="delList(row.id, false)">
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
+        <XTextButton preIcon="ep:edit" :title="t('action.edit')" @click="handleUpdate(row)" />
+        <XTextButton preIcon="ep:delete" :title="t('action.del')" @click="delList(row.id, false)" />
       </template>
     </Table>
   </ContentWrap>

@@ -4,9 +4,7 @@
       <template #header>
         <div class="card-header">
           <span>部门列表</span>
-          <el-button link class="button" type="primary" @click="handleDeptEdit">
-            修改部门
-          </el-button>
+          <XTextButton title="修改部门" @click="handleDeptEdit()" />
         </div>
       </template>
       <el-input v-model="filterText" placeholder="搜索部门" />
@@ -37,23 +35,27 @@
       />
       <!-- 操作工具栏 -->
       <div class="mb-10px">
-        <el-button type="primary" v-hasPermi="['system:user:create']" @click="handleAdd">
-          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-        </el-button>
-        <el-button
-          type="info"
+        <XButton
+          type="primary"
+          preIcon="ep:zoom-in"
+          :title="t('action.add')"
+          v-hasPermi="['system:user:create']"
+          @click="handleCreate()"
+        />
+        <XButton
+          type="warning"
+          preIcon="ep:upload"
+          :title="t('action.import')"
           v-hasPermi="['system:user:import']"
           @click="importDialogVisible = true"
-        >
-          <Icon icon="ep:upload" class="mr-5px" /> {{ t('action.import') }}
-        </el-button>
-        <el-button
+        />
+        <XButton
           type="warning"
+          preIcon="ep:download"
+          :title="t('action.export')"
           v-hasPermi="['system:user:export']"
           @click="exportList('用户数据.xls')"
-        >
-          <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
-        </el-button>
+        />
       </div>
       <!-- 列表 -->
       <Table
@@ -80,46 +82,38 @@
           <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
         </template>
         <template #action="{ row }">
-          <el-button
-            link
-            type="primary"
+          <XTextButton
+            preIcon="ep:edit"
+            :title="t('action.edit')"
             v-hasPermi="['system:user:update']"
-            @click="handleUpdate(row)"
-          >
-            <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-          </el-button>
-          <el-button
-            link
-            type="primary"
+            @click="handleUpdate(row.id)"
+          />
+          <!-- 操作：详情 -->
+          <XTextButton
+            preIcon="ep:view"
+            :title="t('action.detail')"
             v-hasPermi="['system:user:update']"
             @click="handleDetail(row)"
-          >
-            <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-          </el-button>
-          <el-button
-            link
-            type="primary"
+          />
+          <XTextButton
+            preIcon="ep:key"
+            title="重置密码"
             v-hasPermi="['system:user:update-password']"
             @click="handleResetPwd(row)"
-          >
-            <Icon icon="ep:key" class="mr-1px" /> 重置密码
-          </el-button>
-          <el-button
-            link
-            type="primary"
+          />
+          <XTextButton
+            preIcon="ep:key"
+            title="分配角色"
             v-hasPermi="['system:permission:assign-user-role']"
             @click="handleRole(row)"
-          >
-            <Icon icon="ep:key" class="mr-1px" /> 分配角色
-          </el-button>
-          <el-button
-            link
-            type="primary"
+          />
+          <!-- 操作：删除 -->
+          <XTextButton
+            preIcon="ep:delete"
+            :title="t('action.del')"
             v-hasPermi="['system:user:delete']"
             @click="delList(row.id, false)"
-          >
-            <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-          </el-button>
+          />
         </template>
       </Table>
     </el-card>
@@ -296,6 +290,7 @@ import { useRouter } from 'vue-router'
 import { CommonStatusEnum } from '@/utils/constants'
 import { getAccessToken, getTenantId } from '@/utils/auth'
 import { useMessage } from '@/hooks/web/useMessage'
+import { nextTick } from 'process'
 
 const message = useMessage()
 
@@ -365,23 +360,24 @@ const setDialogTile = async (type: string) => {
 }
 
 // 新增操作
-const handleAdd = async () => {
+const handleCreate = async () => {
   // 重置表单
   deptId.value = null
   postIds.value = []
   dialogVisible.value = true
   dialogTitle.value = t('action.create')
   actionType.value = 'create'
-  await unref(formRef)?.getElFormRef().resetFields()
+  await nextTick()
+  unref(formRef)?.getElFormRef().resetFields()
 }
 
 // 修改操作
-const handleUpdate = async (row: UserVO) => {
+const handleUpdate = async (rowId: number) => {
   await setDialogTile('update')
   unref(formRef)?.delSchema('username')
   unref(formRef)?.delSchema('password')
   // 设置数据
-  const res = await UserApi.getUserApi(row.id)
+  const res = await UserApi.getUserApi(rowId)
   deptId.value = res.deptId
   postIds.value = res.postIds
   unref(formRef)?.setValues(res)

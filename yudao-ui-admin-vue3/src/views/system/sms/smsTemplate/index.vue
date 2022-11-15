@@ -6,9 +6,13 @@
   <ContentWrap>
     <!-- 操作工具栏 -->
     <div class="mb-10px">
-      <el-button type="primary" v-hasPermi="['system:sms-channel:create']" @click="handleCreate">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
+      <XButton
+        type="primary"
+        preIcon="ep:zoom-in"
+        :title="t('action.add')"
+        v-hasPermi="['system:sms-channel:create']"
+        @click="handleCreate()"
+      />
     </div>
     <!-- 列表 -->
     <Table
