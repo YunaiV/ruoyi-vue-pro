@@ -253,7 +253,7 @@
   </XModal>
 </template>
 <script setup lang="ts">
-import { onMounted, reactive, ref, unref, watch } from 'vue'
+import { nextTick, onMounted, reactive, ref, unref, watch } from 'vue'
 import dayjs from 'dayjs'
 import {
   ElTag,
@@ -290,7 +290,6 @@ import { useRouter } from 'vue-router'
 import { CommonStatusEnum } from '@/utils/constants'
 import { getAccessToken, getTenantId } from '@/utils/auth'
 import { useMessage } from '@/hooks/web/useMessage'
-import { nextTick } from 'process'
 
 const message = useMessage()
 

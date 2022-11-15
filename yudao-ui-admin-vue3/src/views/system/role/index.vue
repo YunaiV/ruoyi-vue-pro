@@ -47,7 +47,7 @@
           preIcon="ep:view"
           :title="t('action.detail')"
           v-hasPermi="['system:role:update']"
-          @click="handleDetail(row.id)"
+          @click="handleDetail(row)"
         />
         <XTextButton
           preIcon="ep:basketball"
