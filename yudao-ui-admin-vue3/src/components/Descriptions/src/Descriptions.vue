@@ -94,7 +94,7 @@ const toggleClick = () => {
     <ElCollapseTransition>
       <div v-show="show" :class="[`${prefixCls}-content`, 'p-10px']">
         <ElDescriptions
-          :column="2"
+          :column="1"
           border
           :direction="mobile ? 'vertical' : 'horizontal'"
           v-bind="getBindValue"
@@ -105,6 +105,7 @@ const toggleClick = () => {
           <ElDescriptionsItem
             v-for="item in schema"
             :key="item.field"
+            min-width="80"
             v-bind="getBindItemValue(item)"
           >
             <template #label>
