@@ -23,8 +23,11 @@ export interface DictDataType {
 export const getDictOptions = (dictType: string) => {
   const dictOptions: DictDataType[] = []
   dictStore.getDictMap.forEach((dict: DictDataType) => {
-    if (dict.dictType + '' === dictType) {
-      dictOptions.push(dict)
+    if (dict.dictType.toString() === dictType) {
+      dictOptions.push({
+        ...dict,
+        value: dict.value
+      })
     }
   })
   return dictOptions
@@ -37,18 +40,17 @@ export const getIntDictOptions = (dictType: string) => {
     if (dict.dictType.toString() === dictType) {
       dictOptions.push({
         ...dict,
-        value: dict.value
+        value: parseInt(dict.value + '')
       })
     }
   })
-  console.log(dictOptions)
   return dictOptions
 }
 
 export const getDictObj = (dictType: string, value: string | number | boolean) => {
   const dictOptions: DictDataType[] = getDictOptions(dictType)
   dictOptions.forEach((dict: DictDataType) => {
-    if (dict.value === value) {
+    if (dict.value === value.toString()) {
       return dict
     }
   })

@@ -1,8 +1,6 @@
 import { reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
 import { DICT_TYPE } from '@/utils/dict'
 import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
-const { t } = useI18n() // 国际化
 
 // CrudSchema
 const crudSchemas = reactive<VxeCrudSchema>({
@@ -15,10 +13,6 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '日志类型',
       field: 'logType',
       dictType: DICT_TYPE.SYSTEM_LOGIN_TYPE
-    },
-    {
-      title: '用户类型',
-      field: 'userType'
     },
     {
       title: '用户名称',
@@ -40,10 +34,10 @@ const crudSchemas = reactive<VxeCrudSchema>({
       dictType: DICT_TYPE.SYSTEM_LOGIN_RESULT
     },
     {
-      title: t('common.createTime'),
+      title: '登录日期',
       field: 'createTime',
       formatter: 'formatDate',
-      isForm: false,
+      isSearch: true,
       search: {
         itemRender: {
           name: 'XDataTimePicker'
