@@ -193,14 +193,7 @@ onMounted(async () => {
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
       :data="detailRef"
-    >
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-    </Descriptions>
+    />
     <!-- 操作按钮 -->
     <template #footer>
       <el-button

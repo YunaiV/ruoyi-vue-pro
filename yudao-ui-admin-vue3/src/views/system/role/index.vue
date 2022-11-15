@@ -276,17 +276,7 @@ onMounted(() => {
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
       :data="detailRef"
-    >
-      <template #type="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_ROLE_TYPE" :value="row.type" />
-      </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-    </Descriptions>
+    />
     <!-- 操作按钮 -->
     <template #footer>
       <el-button
@@ -300,7 +290,7 @@ onMounted(() => {
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
   </XModal>
-  <XModal v-model="dialogScopeVisible" :title="dialogScopeTitle" max-height="600px">
+  <XModal v-model="dialogScopeVisible" :title="dialogScopeTitle">
     <el-form :model="dataScopeForm">
       <el-form-item label="角色名称">
         <el-input v-model="dataScopeForm.name" :disabled="true" />

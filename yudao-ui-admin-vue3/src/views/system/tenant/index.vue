@@ -218,18 +218,9 @@ onMounted(async () => {
       :schema="allSchemas.detailSchema"
       :data="detailRef"
     >
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
       <template #packageId="{ row }">
         <el-tag v-if="row.packageId === 0" type="danger">系统租户</el-tag>
         <el-tag v-else type="success"> {{ getPackageName(row.packageId) }} </el-tag>
-      </template>
-      <template #expireTime="{ row }">
-        <span>{{ dayjs(row.expireTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
       </template>
     </Descriptions>
     <!-- 操作按钮 -->

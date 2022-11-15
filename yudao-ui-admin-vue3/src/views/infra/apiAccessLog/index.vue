@@ -78,12 +78,6 @@ getList()
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
     <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
-      <template #userType="{ row }">
-        <DictTag :type="DICT_TYPE.USER_TYPE" :value="row.userType" />
-      </template>
-      <template #beginTime="{ row }">
-        <span>{{ dayjs(row.beginTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
       <template #duration="{ row }">
         <span>{{ row.duration + 'ms' }}</span>
       </template>

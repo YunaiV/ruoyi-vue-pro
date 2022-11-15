@@ -205,12 +205,6 @@ onMounted(async () => {
           {{ getUserNickName(userId) + ' ' }}
         </span>
       </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
     </Descriptions>
     <!-- 操作按钮 -->
     <template #footer>

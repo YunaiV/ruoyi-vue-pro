@@ -116,17 +116,7 @@ getList()
 
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
-      <template #userType="{ row }">
-        <DictTag :type="DICT_TYPE.USER_TYPE" :value="row.userType" />
-      </template>
-      <template #processStatus="{ row }">
-        <DictTag :type="DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS" :value="row.processStatus" />
-      </template>
-      <template #exceptionTime="{ row }">
-        <span>{{ dayjs(row.exceptionTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-    </Descriptions>
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
     <!-- 操作按钮 -->
     <template #footer>
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>

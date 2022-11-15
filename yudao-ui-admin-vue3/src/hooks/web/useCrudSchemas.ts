@@ -183,6 +183,14 @@ const filterDescriptionsSchema = (crudSchema: CrudSchema[]): DescriptionsSchema[
         field: schemaItem.field,
         label: schemaItem.detail?.label || schemaItem.label
       }
+      if (schemaItem.dictType) {
+        descriptionsSchemaItem.dictType = schemaItem.dictType
+      }
+      if (schemaItem.detail?.dateFormat || schemaItem.formatter == 'formatDate') {
+        descriptionsSchemaItem.dateFormat = schemaItem.dateFormat
+          ? schemaItem?.detail?.dateFormat
+          : 'YYYY-MM-DD HH:mm:ss'
+      }
 
       // 删除不必要的字段
       delete descriptionsSchemaItem.show

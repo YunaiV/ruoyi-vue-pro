@@ -175,12 +175,6 @@ getList()
       <template #visible="{ row }">
         <span>{{ row.visible ? '是' : '否' }} </span>
       </template>
-      <template #type="{ row }">
-        <DictTag :type="DICT_TYPE.INFRA_CONFIG_TYPE" :value="row.type" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
     </Descriptions>
     <!-- 操作按钮 -->
     <template #footer>

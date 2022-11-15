@@ -98,9 +98,6 @@ onMounted(() => {
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
     <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.INFRA_JOB_LOG_STATUS" :value="row.status" />
-      </template>
       <template #retryInterval="{ row }">
         <span>{{ row.retryInterval + '毫秒' }} </span>
       </template>

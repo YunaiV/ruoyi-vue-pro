@@ -189,17 +189,7 @@ getList()
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
       :data="detailRef"
-    >
-      <template #storage="{ row }">
-        <DictTag :type="DICT_TYPE.INFRA_FILE_STORAGE" :value="row.storage" />
-      </template>
-      <template #primary="{ row }">
-        <DictTag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="row.master" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-    </Descriptions>
+    />
     <!-- 操作按钮 -->
     <template #footer>
       <el-button

@@ -19,7 +19,6 @@ import {
   UploadRawFile
 } from 'element-plus'
 import { handleTree } from '@/utils/tree'
-import { DICT_TYPE } from '@/utils/dict'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useTable } from '@/hooks/web/useTable'
 import { FormExpose } from '@/components/Form'
@@ -457,12 +456,6 @@ onMounted(async () => {
           </template>
         </el-tag>
       </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #loginDate="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
     </Descriptions>
     <!-- 操作按钮 -->
     <template #footer>
@@ -478,7 +471,7 @@ onMounted(async () => {
     </template>
   </XModal>
   <!-- 分配用户角色 -->
-  <XModal v-model="roleDialogVisible" title="分配角色" maxHeight="450px">
+  <XModal v-model="roleDialogVisible" title="分配角色">
     <el-form :model="userRole" label-width="80px">
       <el-form-item label="用户名称">
         <el-input v-model="userRole.username" :disabled="true" />
@@ -507,12 +500,7 @@ onMounted(async () => {
     </template>
   </XModal>
   <!-- 导入 -->
-  <XModal
-    v-model="importDialogVisible"
-    :title="importDialogTitle"
-    :destroy-on-close="true"
-    maxHeight="350px"
-  >
+  <XModal v-model="importDialogVisible" :title="importDialogTitle">
     <el-form class="drawer-multiColumn-form" label-width="150px">
       <el-form-item label="模板下载 :">
         <el-button type="primary" @click="handleImportTemp">

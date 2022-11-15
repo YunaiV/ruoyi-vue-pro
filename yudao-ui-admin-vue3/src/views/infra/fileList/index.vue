@@ -161,9 +161,6 @@ getList()
         />
         <span>{{ row.url }}</span>
       </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
     </Descriptions>
     <!-- 操作按钮 -->
     <template #footer>
