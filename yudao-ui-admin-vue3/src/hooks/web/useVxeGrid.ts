@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue'
+import { computed, nextTick, reactive } from 'vue'
 import { SizeType, VxeGridProps } from 'vxe-table'
 import { useAppStore } from '@/store/modules/app'
 import { VxeAllSchemas } from './useVxeCrudSchemas'
@@ -112,17 +112,43 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
     }
   })
 
-  const delList = (ids: string | number | string[] | number[]) => {
+  // 刷新列表
+  const getList = async (ref) => {
+    await nextTick()
+    ref.value?.commitProxy('query')
+  }
+
+  // 获取查询参数
+  const getSearchData = async (ref) => {
+    await nextTick()
+    const queryParams = Object.assign(
+      {},
+      JSON.parse(JSON.stringify(ref.value?.getProxyInfo()?.form))
+    )
+    return queryParams
+  }
+
+  // 删除
+  const delList = async (ref, ids: string | number | string[] | number[]) => {
+    await nextTick()
     return new Promise(async () => {
-      message.delConfirm().then(() => {
-        config?.delListApi && config?.delListApi(ids)
-        message.success(t('common.delSuccess'))
-      })
+      message
+        .delConfirm()
+        .then(() => {
+          config?.delListApi && config?.delListApi(ids)
+          message.success(t('common.delSuccess'))
+        })
+        .finally(async () => {
+          // 刷新列表
+          ref.value?.commitProxy('query')
+        })
     })
   }
 
   return {
     gridOptions,
+    getList,
+    getSearchData,
     delList
   }
 }

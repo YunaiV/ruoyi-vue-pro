@@ -90,9 +90,10 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions } = useVxeGrid<PostApi.PostVO>({
+const { gridOptions, getList, delList, getSearchData } = useVxeGrid<PostApi.PostVO>({
   allSchemas: allSchemas,
-  getListApi: PostApi.getPostPageApi
+  getListApi: PostApi.getPostPageApi,
+  delListApi: PostApi.deletePostApi
 })
 // 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
@@ -116,10 +117,7 @@ const handleCreate = () => {
 
 // 导出操作
 const handleExport = async () => {
-  const queryParams = Object.assign(
-    {},
-    JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data))
-  )
+  const queryParams = await getSearchData(xGrid)
   const res = await PostApi.exportPostApi(queryParams)
   download.excel(res, '岗位列表.xls')
 }
@@ -141,16 +139,7 @@ const handleDetail = async (rowId: number) => {
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  message
-    .delConfirm()
-    .then(async () => {
-      await PostApi.deletePostApi(rowId)
-      message.success(t('common.delSuccess'))
-    })
-    .finally(() => {
-      // 刷新列表
-      xGrid.value?.commitProxy('query')
-    })
+  delList(xGrid, rowId)
 }
 
 // 提交新增/修改的表单
@@ -174,7 +163,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        xGrid.value?.commitProxy('query')
+        getList(xGrid)
       }
     }
   })
