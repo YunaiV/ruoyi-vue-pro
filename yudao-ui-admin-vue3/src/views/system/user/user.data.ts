@@ -2,7 +2,7 @@ import { reactive } from 'vue'
 import { required } from '@/utils/formRules'
 import { useI18n } from '@/hooks/web/useI18n'
 import { DICT_TYPE } from '@/utils/dict'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
+import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 // 国际化
 const { t } = useI18n()
 // 表单校验
@@ -21,157 +21,86 @@ export const rules = reactive({
   ]
 })
 // crudSchemas
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: 'seq',
+  action: true,
+  actionWidth: '400px',
+  columns: [
+    {
+      title: '用户账号',
+      field: 'username',
+      isSearch: true
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '用户账号',
-    field: 'username',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '用户密码',
-    field: 'password',
-    form: {
-      component: 'InputPassword'
+    {
+      title: '用户密码',
+      field: 'password',
+      form: {
+        component: 'InputPassword'
+      },
+      isDetail: false
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '用户昵称',
-    field: 'nickname'
-  },
-  {
-    label: '用户邮箱',
-    field: 'email'
-  },
-  {
-    label: '手机号码',
-    field: 'mobile',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '部门',
-    field: 'deptId',
-    table: {
-      show: false
-    }
-  },
-  {
-    label: '岗位',
-    field: 'postIds',
-    table: {
-      show: false
-    }
-  },
-  {
-    label: t('common.status'),
-    field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '最后登录时间',
-    field: 'loginDate',
-    form: {
-      show: false
-    }
-  },
-  {
-    label: '最后登录IP',
-    field: 'loginIp',
-    table: {
-      show: false
+    {
+      title: '用户昵称',
+      field: 'nickname'
     },
-    form: {
-      show: false
-    }
-  },
-  {
-    label: t('form.remark'),
-    field: 'remark',
-    table: {
-      show: false
-    }
-  },
-  {
-    label: t('common.createTime'),
-    field: 'createTime',
-    table: {
-      show: false
+    {
+      title: '用户邮箱',
+      field: 'email'
     },
-    form: {
-      show: false
+    {
+      title: '手机号码',
+      field: 'mobile',
+      isSearch: true
     },
-    detail: {
-      show: false
+    {
+      title: '部门',
+      field: 'deptId',
+      isTable: false,
+      search: {
+        visible: false
+      }
     },
-    search: {
-      show: true,
-      component: 'DatePicker',
-      componentProps: {
-        type: 'datetimerange',
-        valueFormat: 'YYYY-MM-DD HH:mm:ss',
-        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)],
-        shortcuts: [
-          {
-            text: '近一周',
-            value: () => {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              return [start, end]
-            }
-          },
-          {
-            text: '近一个月',
-            value: () => {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              return [start, end]
-            }
-          },
-          {
-            text: '近三个月',
-            value: () => {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              return [start, end]
-            }
-          }
-        ]
+    {
+      title: '岗位',
+      field: 'postIds',
+      isTable: false
+    },
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      isSearch: true
+    },
+    {
+      title: '最后登录时间',
+      field: 'loginDate',
+      isForm: false
+    },
+    {
+      title: '最后登录IP',
+      field: 'loginIp',
+      isTable: false,
+      isForm: false
+    },
+    {
+      title: t('form.remark'),
+      field: 'remark',
+      isTable: false
+    },
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate',
+      isTable: false,
+      isForm: false,
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
       }
     }
-  },
-  {
-    field: 'action',
-    width: '400px',
-    label: t('table.action'),
-    form: {
-      show: false
-    },
-    detail: {
-      show: false
-    }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

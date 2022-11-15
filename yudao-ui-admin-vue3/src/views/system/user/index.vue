@@ -20,56 +20,38 @@
         @node-click="handleDeptNodeClick"
       />
     </el-card>
-    <!-- 搜索工作区 -->
     <el-card class="w-4/5 user" style="margin-left: 10px" :gutter="12" shadow="hover">
       <template #header>
         <div class="card-header">
           <span>{{ tableTitle }}</span>
         </div>
       </template>
-      <Search
-        :schema="allSchemas.searchSchema"
-        @search="setSearchParams"
-        @reset="setSearchParams"
-        ref="searchForm"
-      />
-      <!-- 操作工具栏 -->
-      <div class="mb-10px">
-        <XButton
-          type="primary"
-          preIcon="ep:zoom-in"
-          :title="t('action.add')"
-          v-hasPermi="['system:user:create']"
-          @click="handleCreate()"
-        />
-        <XButton
-          type="warning"
-          preIcon="ep:upload"
-          :title="t('action.import')"
-          v-hasPermi="['system:user:import']"
-          @click="importDialogVisible = true"
-        />
-        <XButton
-          type="warning"
-          preIcon="ep:download"
-          :title="t('action.export')"
-          v-hasPermi="['system:user:export']"
-          @click="exportList('用户数据.xls')"
-        />
-      </div>
       <!-- 列表 -->
-      <Table
-        :columns="allSchemas.tableColumns"
-        :selection="false"
-        :data="tableObject.tableList"
-        :loading="tableObject.loading"
-        :pagination="{
-          total: tableObject.total
-        }"
-        v-model:pageSize="tableObject.pageSize"
-        v-model:currentPage="tableObject.currentPage"
-        @register="register"
-      >
+      <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+        <!-- 操作：新增 -->
+        <template #toolbar_buttons>
+          <XButton
+            type="primary"
+            preIcon="ep:zoom-in"
+            :title="t('action.add')"
+            v-hasPermi="['system:user:create']"
+            @click="handleCreate()"
+          />
+          <XButton
+            type="warning"
+            preIcon="ep:upload"
+            :title="t('action.import')"
+            v-hasPermi="['system:user:import']"
+            @click="importDialogVisible = true"
+          />
+          <XButton
+            type="warning"
+            preIcon="ep:download"
+            :title="t('action.export')"
+            v-hasPermi="['system:user:export']"
+            @click="exportList('用户数据.xls')"
+          />
+        </template>
         <template #status="{ row }">
           <el-switch
             v-model="row.status"
@@ -78,10 +60,7 @@
             @change="handleStatusChange(row)"
           />
         </template>
-        <template #loginDate="{ row }">
-          <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-        </template>
-        <template #action="{ row }">
+        <template #actionbtns_default="{ row }">
           <XTextButton
             preIcon="ep:edit"
             :title="t('action.edit')"
@@ -112,10 +91,10 @@
             preIcon="ep:delete"
             :title="t('action.del')"
             v-hasPermi="['system:user:delete']"
-            @click="delList(row.id, false)"
+            @click="handleDelete(row.id)"
           />
         </template>
-      </Table>
+      </vxe-grid>
     </el-card>
   </div>
   <XModal v-model="dialogVisible" :title="dialogTitle">
@@ -150,7 +129,7 @@
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
-      :data="detailRef"
+      :data="detailData"
     >
       <template #deptId="{ row }">
         <span>{{ row.dept?.name }}</span>
@@ -200,10 +179,16 @@
     </el-form>
     <!-- 操作按钮 -->
     <template #footer>
-      <el-button type="primary" :loading="loading" @click="submitRole">
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="roleDialogVisible = false">{{ t('dialog.close') }}</el-button>
+      <!-- 按钮：保存 -->
+      <XButton
+        v-if="['create', 'update'].includes(actionType)"
+        type="primary"
+        :title="t('action.save')"
+        :loading="loading"
+        @click="submitRole()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :title="t('dialog.close')" @click="roleDialogVisible = false" />
     </template>
   </XModal>
   <!-- 导入 -->
@@ -244,17 +229,20 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button type="primary" @click="submitFileForm">
-        <Icon icon="ep:upload-filled" />
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="importDialogVisible = false">{{ t('dialog.close') }}</el-button>
+      <!-- 按钮：保存 -->
+      <XButton
+        type="warning"
+        preIcon="ep:upload-filled"
+        :title="t('action.save')"
+        @click="submitFileForm()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :title="t('dialog.close')" @click="importDialogVisible = false" />
     </template>
   </XModal>
 </template>
 <script setup lang="ts">
-import { nextTick, onMounted, reactive, ref, unref, watch } from 'vue'
-import dayjs from 'dayjs'
+import { onMounted, reactive, ref, unref, watch } from 'vue'
 import {
   ElTag,
   ElInput,
@@ -274,9 +262,7 @@ import {
 } from 'element-plus'
 import { handleTree } from '@/utils/tree'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useTable } from '@/hooks/web/useTable'
 import { FormExpose } from '@/components/Form'
-import type { UserVO } from '@/api/system/user/types'
 import type { PostVO } from '@/api/system/post'
 import type { PermissionAssignUserRoleReqVO } from '@/api/system/permission/types'
 import { listSimpleDeptApi } from '@/api/system/dept'
@@ -290,29 +276,31 @@ import { useRouter } from 'vue-router'
 import { CommonStatusEnum } from '@/utils/constants'
 import { getAccessToken, getTenantId } from '@/utils/auth'
 import { useMessage } from '@/hooks/web/useMessage'
+import { VxeGridInstance } from 'vxe-table'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 
-const message = useMessage()
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
 
 const defaultProps = {
   children: 'children',
   label: 'name',
   value: 'id'
 }
-const { t } = useI18n() // 国际化
 
 // ========== 列表相关 ==========
 const tableTitle = ref('用户列表')
-const { register, tableObject, methods } = useTable<UserVO>({
+// 列表相关的变量
+const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
+const { gridOptions, reloadList, delList, exportList, getSearchData } = useVxeGrid<UserApi.UserVO>({
+  allSchemas: allSchemas,
   getListApi: UserApi.getUserPageApi,
   delListApi: UserApi.deleteUserApi,
   exportListApi: UserApi.exportUserApi
 })
-const { getList, setSearchParams, delList, exportList } = methods
-
 // ========== 创建部门树结构 ==========
 const filterText = ref('')
 const deptOptions = ref<any[]>([]) // 树形结构
-const searchForm = ref<FormExpose>()
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const getTree = async () => {
   const res = await listSimpleDeptApi()
@@ -322,12 +310,14 @@ const filterNode = (value: string, data: Tree) => {
   if (!value) return true
   return data.name.includes(value)
 }
-const handleDeptNodeClick = (data: { [key: string]: any }) => {
-  tableObject.params = {
-    deptId: data.id
-  }
-  tableTitle.value = data.name
-  methods.getList()
+const handleDeptNodeClick = async (row: { [key: string]: any }) => {
+  tableTitle.value = row.name
+  console.log(getSearchData(xGrid))
+  // gridOptions.formConfig?.data.push({
+  //   deptId: row.id
+  // })
+  // TODO 查询
+  await reloadList(xGrid)
 }
 const { push } = useRouter()
 const handleDeptEdit = () => {
@@ -366,8 +356,6 @@ const handleCreate = async () => {
   dialogVisible.value = true
   dialogTitle.value = t('action.create')
   actionType.value = 'create'
-  await nextTick()
-  unref(formRef)?.getElFormRef().resetFields()
 }
 
 // 修改操作
@@ -381,13 +369,24 @@ const handleUpdate = async (rowId: number) => {
   postIds.value = res.postIds
   unref(formRef)?.setValues(res)
 }
+const detailData = ref()
 
+// 详情操作
+const handleDetail = async (row: UserApi.UserVO) => {
+  // 设置数据
+  detailData.value = row
+  await setDialogTile('detail')
+}
+// 删除操作
+const handleDelete = async (rowId: number) => {
+  await delList(xGrid, rowId)
+}
 // 提交按钮
 const submitForm = async () => {
   loading.value = true
   // 提交请求
   try {
-    const data = unref(formRef)?.formModel as UserVO
+    const data = unref(formRef)?.formModel as UserApi.UserVO
     data.deptId = deptId.value
     data.postIds = postIds.value
     if (actionType.value === 'create') {
@@ -397,15 +396,15 @@ const submitForm = async () => {
       await UserApi.updateUserApi(data)
       message.success(t('common.updateSuccess'))
     }
-    // 操作成功，重新加载列表
     dialogVisible.value = false
-    await getList()
   } finally {
     loading.value = false
+    // 刷新列表
+    reloadList(xGrid)
   }
 }
 // 改变用户状态操作
-const handleStatusChange = async (row: UserVO) => {
+const handleStatusChange = async (row: UserApi.UserVO) => {
   const text = row.status === CommonStatusEnum.ENABLE ? '启用' : '停用'
   message
     .confirm('确认要"' + text + '""' + row.username + '"用户吗?', t('common.reminder'))
@@ -414,7 +413,8 @@ const handleStatusChange = async (row: UserVO) => {
         row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.ENABLE : CommonStatusEnum.DISABLE
       await UserApi.updateUserStatusApi(row.id, row.status)
       message.success(text + '成功')
-      await getList()
+      // 刷新列表
+      reloadList(xGrid)
     })
     .catch(() => {
       row.status =
@@ -422,7 +422,7 @@ const handleStatusChange = async (row: UserVO) => {
     })
 }
 // 重置密码
-const handleResetPwd = (row: UserVO) => {
+const handleResetPwd = (row: UserApi.UserVO) => {
   message.prompt('请输入"' + row.username + '"的新密码', t('common.reminder')).then(({ value }) => {
     UserApi.resetUserPwdApi(row.id, value).then(() => {
       message.success('修改成功，新密码是：' + value)
@@ -438,7 +438,7 @@ const userRole = reactive({
   nickname: '',
   roleIds: []
 })
-const handleRole = async (row: UserVO) => {
+const handleRole = async (row: UserApi.UserVO) => {
   userRole.id = row.id
   userRole.username = row.username
   userRole.nickname = row.nickname
@@ -459,15 +459,6 @@ const submitRole = async () => {
   await aassignUserRoleApi(data.value)
   message.success(t('common.updateSuccess'))
   roleDialogVisible.value = false
-}
-// ========== 详情相关 ==========
-const detailRef = ref()
-
-// 详情操作
-const handleDetail = async (row: UserVO) => {
-  // 设置数据
-  detailRef.value = row
-  await setDialogTile('detail')
 }
 // ========== 导入相关 ==========
 const importDialogVisible = ref(false)
@@ -523,7 +514,7 @@ const handleFileSuccess = (response: any): void => {
     text += '< ' + username + ': ' + data.failureUsernames[username] + ' >'
   }
   message.alert(text)
-  getList()
+  reloadList(xGrid)
 }
 // 文件数超出提示
 const handleExceed = (): void => {
@@ -536,7 +527,6 @@ const excelUploadError = (): void => {
 // ========== 初始化 ==========
 onMounted(async () => {
   await getPostOptions()
-  await getList()
   await getTree()
 })
 </script>

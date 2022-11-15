@@ -1,8 +1,38 @@
 import request from '@/config/axios'
-import type { UserVO } from './types'
+export type UserVO = {
+  id: number
+  username: string
+  nickname: string
+  deptId: number
+  postIds: string[]
+  email: string
+  mobile: string
+  sex: number
+  avatar: string
+  loginIp: string
+  status: number
+  remark: string
+  loginDate: string
+  createTime: string
+}
+
+export interface UserPageReqVO extends PageParam {
+  deptId?: number
+  username?: string
+  mobile?: string
+  status?: number
+  createTime?: string[]
+}
+
+export interface UserExportReqVO {
+  code?: string
+  name?: string
+  status?: number
+  createTime?: string[]
+}
 
 // 查询用户管理列表
-export const getUserPageApi = (params) => {
+export const getUserPageApi = (params: UserPageReqVO) => {
   return request.get({ url: '/system/user/page', params })
 }
 
@@ -27,7 +57,7 @@ export const deleteUserApi = (id: number) => {
 }
 
 // 导出用户
-export const exportUserApi = (params) => {
+export const exportUserApi = (params: UserExportReqVO) => {
   return request.download({ url: '/system/user/export', params })
 }
 
