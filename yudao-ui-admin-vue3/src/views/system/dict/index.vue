@@ -178,8 +178,6 @@ const {
 // 字典分类修改操作
 const handleTypeCreate = () => {
   setDialogTile('typeCreate')
-  // 重置表单
-  unref(typeFormRef)?.getElFormRef()?.resetFields()
 }
 const handleTypeUpdate = async (row: DictTypeVO) => {
   setDialogTile('typeUpdate')
@@ -207,8 +205,6 @@ const {
 // 字典数据修改操作
 const handleDataCreate = () => {
   setDialogTile('dataCreate')
-  // 重置表单
-  unref(dataFormRef)?.getElFormRef()?.resetFields()
 }
 const handleDataUpdate = async (row: DictDataVO) => {
   setDialogTile('dataUpdate')

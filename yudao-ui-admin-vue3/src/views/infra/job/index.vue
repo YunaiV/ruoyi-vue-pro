@@ -46,8 +46,6 @@ const setDialogTile = (type: string) => {
 const handleCreate = () => {
   cronExpression.value = ''
   setDialogTile('create')
-  // 重置表单
-  unref(formRef)?.getElFormRef()?.resetFields()
 }
 
 // 修改操作

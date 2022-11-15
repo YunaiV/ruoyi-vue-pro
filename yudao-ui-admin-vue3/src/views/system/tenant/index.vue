@@ -53,10 +53,9 @@ const setDialogTile = (type: string) => {
 
 // 新增操作
 const handleCreate = () => {
-  setDialogTile('create')
   // 重置表单
   tenantPackageId.value = ''
-  unref(formRef)?.getElFormRef()?.resetFields()
+  setDialogTile('create')
 }
 
 // 修改操作

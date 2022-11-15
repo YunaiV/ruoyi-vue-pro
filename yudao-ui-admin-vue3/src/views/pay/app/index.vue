@@ -36,8 +36,6 @@ const setDialogTile = (type: string) => {
 // 新增操作
 const handleCreate = () => {
   setDialogTile('create')
-  // 重置表单
-  unref(formRef)?.getElFormRef()?.resetFields()
 }
 
 // 修改操作

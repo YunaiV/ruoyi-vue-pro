@@ -47,8 +47,6 @@ const setDialogTile = (type: string) => {
 const handleCreate = () => {
   setDialogTile('create')
   userIds.value = []
-  // 重置表单
-  unref(formRef)?.getElFormRef()?.resetFields()
 }
 
 // 修改操作

@@ -57,7 +57,7 @@
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
-      :data="detailRef"
+      :data="detailData"
     />
     <template #footer>
       <!-- 按钮：保存 -->
@@ -100,7 +100,7 @@ const dialogTitle = ref('edit') // 弹出层标题
 const actionType = ref('') // 操作按钮的类型
 const actionLoading = ref(false) // 按钮 Loading
 const formRef = ref<FormExpose>() // 表单 Ref
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 
 // 设置标题
 const setDialogTile = (type: string) => {
@@ -112,8 +112,6 @@ const setDialogTile = (type: string) => {
 // 新增操作
 const handleCreate = () => {
   setDialogTile('create')
-  // 重置表单
-  unref(formRef)?.getElFormRef()?.resetFields()
 }
 
 // 导出操作
@@ -138,7 +136,7 @@ const handleUpdate = async (rowId: number) => {
 const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
   const res = await PostApi.getPostApi(rowId)
-  detailRef.value = res
+  detailData.value = res
 }
 
 // 删除操作

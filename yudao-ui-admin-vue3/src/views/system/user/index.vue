@@ -24,7 +24,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { useTable } from '@/hooks/web/useTable'
 import { FormExpose } from '@/components/Form'
 import type { UserVO } from '@/api/system/user/types'
-import type { PostVO } from '@/api/system/post/types'
+import type { PostVO } from '@/api/system/post'
 import type { PermissionAssignUserRoleReqVO } from '@/api/system/permission/types'
 import { listSimpleDeptApi } from '@/api/system/dept'
 import { listSimplePostsApi } from '@/api/system/post'
@@ -89,7 +89,7 @@ const actionType = ref('') // 操作按钮的类型
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormExpose>() // 表单 Ref
-const deptId = ref(0) // 部门ID
+const deptId = ref() // 部门ID
 const postIds = ref<string[]>([]) // 岗位ID
 const postOptions = ref<PostVO[]>([]) //岗位列表
 
@@ -106,11 +106,14 @@ const setDialogTile = async (type: string) => {
 }
 
 // 新增操作
-const handleAdd = () => {
+const handleAdd = async () => {
   // 重置表单
-  deptId.value = 0
-  setDialogTile('create')
-  unref(formRef)?.getElFormRef()?.resetFields()
+  deptId.value = null
+  postIds.value = []
+  dialogVisible.value = true
+  dialogTitle.value = t('action.create')
+  actionType.value = 'create'
+  await unref(formRef)?.getElFormRef().resetFields()
 }
 
 // 修改操作

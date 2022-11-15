@@ -52,7 +52,6 @@ const handleAdd = (data: { id: number }) => {
   // 重置表单
   deptParentId.value = data.id
   formTitle.value = '新增部门'
-  unref(formRef)?.getElFormRef()?.resetFields()
   showForm.value = true
 }
 // 编辑

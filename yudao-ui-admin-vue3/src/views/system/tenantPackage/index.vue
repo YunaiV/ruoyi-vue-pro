@@ -56,13 +56,11 @@ const setDialogTile = (type: string) => {
 
 // 新增操作
 const handleCreate = () => {
-  setDialogTile('create')
-  // 重置表单
-  unref(formRef)?.getElFormRef()?.resetFields()
   //重置菜单树
   unref(treeRef)?.setCheckedKeys([])
   menuExpand.value = false
   menuNodeAll.value = false
+  setDialogTile('create')
 }
 
 // 修改操作
