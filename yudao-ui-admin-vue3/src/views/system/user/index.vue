@@ -1,3 +1,263 @@
+<template>
+  <div class="flex">
+    <el-card class="w-1/5 user" :gutter="12" shadow="always">
+      <template #header>
+        <div class="card-header">
+          <span>部门列表</span>
+          <el-button link class="button" type="primary" @click="handleDeptEdit">
+            修改部门
+          </el-button>
+        </div>
+      </template>
+      <el-input v-model="filterText" placeholder="搜索部门" />
+      <el-tree
+        ref="treeRef"
+        node-key="id"
+        default-expand-all
+        :data="deptOptions"
+        :props="defaultProps"
+        :highlight-current="true"
+        :filter-node-method="filterNode"
+        :expand-on-click-node="false"
+        @node-click="handleDeptNodeClick"
+      />
+    </el-card>
+    <!-- 搜索工作区 -->
+    <el-card class="w-4/5 user" style="margin-left: 10px" :gutter="12" shadow="hover">
+      <template #header>
+        <div class="card-header">
+          <span>{{ tableTitle }}</span>
+        </div>
+      </template>
+      <Search
+        :schema="allSchemas.searchSchema"
+        @search="setSearchParams"
+        @reset="setSearchParams"
+        ref="searchForm"
+      />
+      <!-- 操作工具栏 -->
+      <div class="mb-10px">
+        <el-button type="primary" v-hasPermi="['system:user:create']" @click="handleAdd">
+          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+        </el-button>
+        <el-button
+          type="info"
+          v-hasPermi="['system:user:import']"
+          @click="importDialogVisible = true"
+        >
+          <Icon icon="ep:upload" class="mr-5px" /> {{ t('action.import') }}
+        </el-button>
+        <el-button
+          type="warning"
+          v-hasPermi="['system:user:export']"
+          @click="exportList('用户数据.xls')"
+        >
+          <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
+        </el-button>
+      </div>
+      <!-- 列表 -->
+      <Table
+        :columns="allSchemas.tableColumns"
+        :selection="false"
+        :data="tableObject.tableList"
+        :loading="tableObject.loading"
+        :pagination="{
+          total: tableObject.total
+        }"
+        v-model:pageSize="tableObject.pageSize"
+        v-model:currentPage="tableObject.currentPage"
+        @register="register"
+      >
+        <template #status="{ row }">
+          <el-switch
+            v-model="row.status"
+            :active-value="0"
+            :inactive-value="1"
+            @change="handleStatusChange(row)"
+          />
+        </template>
+        <template #loginDate="{ row }">
+          <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
+        </template>
+        <template #action="{ row }">
+          <el-button
+            link
+            type="primary"
+            v-hasPermi="['system:user:update']"
+            @click="handleUpdate(row)"
+          >
+            <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
+          </el-button>
+          <el-button
+            link
+            type="primary"
+            v-hasPermi="['system:user:update']"
+            @click="handleDetail(row)"
+          >
+            <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
+          </el-button>
+          <el-button
+            link
+            type="primary"
+            v-hasPermi="['system:user:update-password']"
+            @click="handleResetPwd(row)"
+          >
+            <Icon icon="ep:key" class="mr-1px" /> 重置密码
+          </el-button>
+          <el-button
+            link
+            type="primary"
+            v-hasPermi="['system:permission:assign-user-role']"
+            @click="handleRole(row)"
+          >
+            <Icon icon="ep:key" class="mr-1px" /> 分配角色
+          </el-button>
+          <el-button
+            link
+            type="primary"
+            v-hasPermi="['system:user:delete']"
+            @click="delList(row.id, false)"
+          >
+            <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
+          </el-button>
+        </template>
+      </Table>
+    </el-card>
+  </div>
+  <XModal v-model="dialogVisible" :title="dialogTitle">
+    <!-- 对话框(添加 / 修改) -->
+    <Form
+      v-if="['create', 'update'].includes(actionType)"
+      :rules="rules"
+      :schema="allSchemas.formSchema"
+      ref="formRef"
+    >
+      <template #deptId>
+        <el-tree-select
+          node-key="id"
+          v-model="deptId"
+          :props="defaultProps"
+          :data="deptOptions"
+          check-strictly
+        />
+      </template>
+      <template #postIds>
+        <el-select v-model="postIds" multiple :placeholder="t('common.selectText')">
+          <el-option
+            v-for="item in postOptions"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          />
+        </el-select>
+      </template>
+    </Form>
+    <!-- 对话框(详情) -->
+    <Descriptions
+      v-if="actionType === 'detail'"
+      :schema="allSchemas.detailSchema"
+      :data="detailRef"
+    >
+      <template #deptId="{ row }">
+        <span>{{ row.dept?.name }}</span>
+      </template>
+      <template #postIds="{ row }">
+        <el-tag v-for="(post, index) in row.postIds" :key="index" index="">
+          <template v-for="postObj in postOptions">
+            {{ post === postObj.id ? postObj.name : '' }}
+          </template>
+        </el-tag>
+      </template>
+    </Descriptions>
+    <!-- 操作按钮 -->
+    <template #footer>
+      <!-- 按钮：保存 -->
+      <XButton
+        v-if="['create', 'update'].includes(actionType)"
+        type="primary"
+        :title="t('action.save')"
+        :loading="loading"
+        @click="submitForm()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :loading="loading" :title="t('dialog.close')" @click="dialogVisible = false" />
+    </template>
+  </XModal>
+  <!-- 分配用户角色 -->
+  <XModal v-model="roleDialogVisible" title="分配角色">
+    <el-form :model="userRole" label-width="80px">
+      <el-form-item label="用户名称">
+        <el-input v-model="userRole.username" :disabled="true" />
+      </el-form-item>
+      <el-form-item label="用户昵称">
+        <el-input v-model="userRole.nickname" :disabled="true" />
+      </el-form-item>
+      <el-form-item label="角色">
+        <el-transfer
+          v-model="userRole.roleIds"
+          :titles="['角色列表', '已选择']"
+          :props="{
+            key: 'id',
+            label: 'name'
+          }"
+          :data="roleOptions"
+        />
+      </el-form-item>
+    </el-form>
+    <!-- 操作按钮 -->
+    <template #footer>
+      <el-button type="primary" :loading="loading" @click="submitRole">
+        {{ t('action.save') }}
+      </el-button>
+      <el-button @click="roleDialogVisible = false">{{ t('dialog.close') }}</el-button>
+    </template>
+  </XModal>
+  <!-- 导入 -->
+  <XModal v-model="importDialogVisible" :title="importDialogTitle">
+    <el-form class="drawer-multiColumn-form" label-width="150px">
+      <el-form-item label="模板下载 :">
+        <el-button type="primary" @click="handleImportTemp">
+          <Icon icon="ep:download" />
+          点击下载
+        </el-button>
+      </el-form-item>
+      <el-form-item label="文件上传 :">
+        <el-upload
+          ref="uploadRef"
+          :action="updateUrl + '?updateSupport=' + updateSupport"
+          :headers="uploadHeaders"
+          :drag="true"
+          :limit="1"
+          :multiple="true"
+          :show-file-list="true"
+          :disabled="uploadDisabled"
+          :before-upload="beforeExcelUpload"
+          :on-exceed="handleExceed"
+          :on-success="handleFileSuccess"
+          :on-error="excelUploadError"
+          :auto-upload="false"
+          accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        >
+          <Icon icon="ep:upload-filled" />
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <template #tip>
+            <div class="el-upload__tip">请上传 .xls , .xlsx 标准格式文件</div>
+          </template>
+        </el-upload>
+      </el-form-item>
+      <el-form-item label="是否更新已经存在的用户数据:">
+        <el-checkbox v-model="updateSupport" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button type="primary" @click="submitFileForm">
+        <Icon icon="ep:upload-filled" />
+        {{ t('action.save') }}
+      </el-button>
+      <el-button @click="importDialogVisible = false">{{ t('dialog.close') }}</el-button>
+    </template>
+  </XModal>
+</template>
 <script setup lang="ts">
 import { onMounted, reactive, ref, unref, watch } from 'vue'
 import dayjs from 'dayjs'
@@ -285,267 +545,6 @@ onMounted(async () => {
   await getTree()
 })
 </script>
-
-<template>
-  <div class="flex">
-    <el-card class="w-1/5 user" :gutter="12" shadow="always">
-      <template #header>
-        <div class="card-header">
-          <span>部门列表</span>
-          <el-button link class="button" type="primary" @click="handleDeptEdit">
-            修改部门
-          </el-button>
-        </div>
-      </template>
-      <el-input v-model="filterText" placeholder="搜索部门" />
-      <el-tree
-        ref="treeRef"
-        node-key="id"
-        default-expand-all
-        :data="deptOptions"
-        :props="defaultProps"
-        :highlight-current="true"
-        :filter-node-method="filterNode"
-        :expand-on-click-node="false"
-        @node-click="handleDeptNodeClick"
-      />
-    </el-card>
-    <!-- 搜索工作区 -->
-    <el-card class="w-4/5 user" style="margin-left: 10px" :gutter="12" shadow="hover">
-      <template #header>
-        <div class="card-header">
-          <span>{{ tableTitle }}</span>
-        </div>
-      </template>
-      <Search
-        :schema="allSchemas.searchSchema"
-        @search="setSearchParams"
-        @reset="setSearchParams"
-        ref="searchForm"
-      />
-      <!-- 操作工具栏 -->
-      <div class="mb-10px">
-        <el-button type="primary" v-hasPermi="['system:user:create']" @click="handleAdd">
-          <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-        </el-button>
-        <el-button
-          type="info"
-          v-hasPermi="['system:user:import']"
-          @click="importDialogVisible = true"
-        >
-          <Icon icon="ep:upload" class="mr-5px" /> {{ t('action.import') }}
-        </el-button>
-        <el-button
-          type="warning"
-          v-hasPermi="['system:user:export']"
-          @click="exportList('用户数据.xls')"
-        >
-          <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
-        </el-button>
-      </div>
-      <!-- 列表 -->
-      <Table
-        :columns="allSchemas.tableColumns"
-        :selection="false"
-        :data="tableObject.tableList"
-        :loading="tableObject.loading"
-        :pagination="{
-          total: tableObject.total
-        }"
-        v-model:pageSize="tableObject.pageSize"
-        v-model:currentPage="tableObject.currentPage"
-        @register="register"
-      >
-        <template #status="{ row }">
-          <el-switch
-            v-model="row.status"
-            :active-value="0"
-            :inactive-value="1"
-            @change="handleStatusChange(row)"
-          />
-        </template>
-        <template #loginDate="{ row }">
-          <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-        </template>
-        <template #action="{ row }">
-          <el-button
-            link
-            type="primary"
-            v-hasPermi="['system:user:update']"
-            @click="handleUpdate(row)"
-          >
-            <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-          </el-button>
-          <el-button
-            link
-            type="primary"
-            v-hasPermi="['system:user:update']"
-            @click="handleDetail(row)"
-          >
-            <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-          </el-button>
-          <el-button
-            link
-            type="primary"
-            v-hasPermi="['system:user:update-password']"
-            @click="handleResetPwd(row)"
-          >
-            <Icon icon="ep:key" class="mr-1px" /> 重置密码
-          </el-button>
-          <el-button
-            link
-            type="primary"
-            v-hasPermi="['system:permission:assign-user-role']"
-            @click="handleRole(row)"
-          >
-            <Icon icon="ep:key" class="mr-1px" /> 分配角色
-          </el-button>
-          <el-button
-            link
-            type="primary"
-            v-hasPermi="['system:user:delete']"
-            @click="delList(row.id, false)"
-          >
-            <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-          </el-button>
-        </template>
-      </Table>
-    </el-card>
-  </div>
-  <XModal v-model="dialogVisible" :title="dialogTitle">
-    <!-- 对话框(添加 / 修改) -->
-    <Form
-      v-if="['create', 'update'].includes(actionType)"
-      :rules="rules"
-      :schema="allSchemas.formSchema"
-      ref="formRef"
-    >
-      <template #deptId>
-        <el-tree-select
-          node-key="id"
-          v-model="deptId"
-          :props="defaultProps"
-          :data="deptOptions"
-          check-strictly
-        />
-      </template>
-      <template #postIds>
-        <el-select v-model="postIds" multiple :placeholder="t('common.selectText')">
-          <el-option
-            v-for="item in postOptions"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          />
-        </el-select>
-      </template>
-    </Form>
-    <!-- 对话框(详情) -->
-    <Descriptions
-      v-if="actionType === 'detail'"
-      :schema="allSchemas.detailSchema"
-      :data="detailRef"
-    >
-      <template #deptId="{ row }">
-        <span>{{ row.dept?.name }}</span>
-      </template>
-      <template #postIds="{ row }">
-        <el-tag v-for="(post, index) in row.postIds" :key="index" index="">
-          <template v-for="postObj in postOptions">
-            {{ post === postObj.id ? postObj.name : '' }}
-          </template>
-        </el-tag>
-      </template>
-    </Descriptions>
-    <!-- 操作按钮 -->
-    <template #footer>
-      <!-- 按钮：保存 -->
-      <XButton
-        v-if="['create', 'update'].includes(actionType)"
-        type="primary"
-        :title="t('action.save')"
-        :loading="loading"
-        @click="submitForm()"
-      />
-      <!-- 按钮：关闭 -->
-      <XButton :loading="loading" :title="t('dialog.close')" @click="dialogVisible = false" />
-    </template>
-  </XModal>
-  <!-- 分配用户角色 -->
-  <XModal v-model="roleDialogVisible" title="分配角色">
-    <el-form :model="userRole" label-width="80px">
-      <el-form-item label="用户名称">
-        <el-input v-model="userRole.username" :disabled="true" />
-      </el-form-item>
-      <el-form-item label="用户昵称">
-        <el-input v-model="userRole.nickname" :disabled="true" />
-      </el-form-item>
-      <el-form-item label="角色">
-        <el-transfer
-          v-model="userRole.roleIds"
-          :titles="['角色列表', '已选择']"
-          :props="{
-            key: 'id',
-            label: 'name'
-          }"
-          :data="roleOptions"
-        />
-      </el-form-item>
-    </el-form>
-    <!-- 操作按钮 -->
-    <template #footer>
-      <el-button type="primary" :loading="loading" @click="submitRole">
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="roleDialogVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </XModal>
-  <!-- 导入 -->
-  <XModal v-model="importDialogVisible" :title="importDialogTitle">
-    <el-form class="drawer-multiColumn-form" label-width="150px">
-      <el-form-item label="模板下载 :">
-        <el-button type="primary" @click="handleImportTemp">
-          <Icon icon="ep:download" />
-          点击下载
-        </el-button>
-      </el-form-item>
-      <el-form-item label="文件上传 :">
-        <el-upload
-          ref="uploadRef"
-          :action="updateUrl + '?updateSupport=' + updateSupport"
-          :headers="uploadHeaders"
-          :drag="true"
-          :limit="1"
-          :multiple="true"
-          :show-file-list="true"
-          :disabled="uploadDisabled"
-          :before-upload="beforeExcelUpload"
-          :on-exceed="handleExceed"
-          :on-success="handleFileSuccess"
-          :on-error="excelUploadError"
-          :auto-upload="false"
-          accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        >
-          <Icon icon="ep:upload-filled" />
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <template #tip>
-            <div class="el-upload__tip">请上传 .xls , .xlsx 标准格式文件</div>
-          </template>
-        </el-upload>
-      </el-form-item>
-      <el-form-item label="是否更新已经存在的用户数据:">
-        <el-checkbox v-model="updateSupport" />
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <el-button type="primary" @click="submitFileForm">
-        <Icon icon="ep:upload-filled" />
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="importDialogVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </XModal>
-</template>
 
 <style scoped>
 .user {

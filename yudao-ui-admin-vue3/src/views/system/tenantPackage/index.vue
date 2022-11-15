@@ -1,3 +1,93 @@
+<template>
+  <!-- 搜索工作区 -->
+  <ContentWrap>
+    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
+  </ContentWrap>
+  <ContentWrap>
+    <!-- 操作工具栏 -->
+    <div class="mb-10px">
+      <el-button type="primary" @click="handleCreate">
+        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
+      </el-button>
+    </div>
+    <!-- 列表 -->
+    <Table
+      :columns="allSchemas.tableColumns"
+      :selection="false"
+      :data="tableObject.tableList"
+      :loading="tableObject.loading"
+      :pagination="{
+        total: tableObject.total
+      }"
+      v-model:pageSize="tableObject.pageSize"
+      v-model:currentPage="tableObject.currentPage"
+      @register="register"
+    >
+      <template #status="{ row }">
+        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+      </template>
+      <template #createTime="{ row }">
+        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
+      </template>
+      <template #action="{ row }">
+        <el-button link type="primary" @click="handleUpdate(row)">
+          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
+        </el-button>
+        <el-button link type="primary" @click="delList(row.id, false)">
+          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
+        </el-button>
+      </template>
+    </Table>
+  </ContentWrap>
+
+  <XModal v-model="dialogVisible" :title="dialogTitle" maxHeight="500px" width="50%">
+    <!-- 对话框(添加 / 修改) -->
+    <Form
+      v-if="['create', 'update'].includes(actionType)"
+      :schema="allSchemas.formSchema"
+      :rules="rules"
+      ref="formRef"
+    >
+      <template #menuIds>
+        <el-card class="box-card">
+          <template #header>
+            <div class="card-header">
+              全选/全不选:
+              <el-switch
+                v-model="treeNodeAll"
+                inline-prompt
+                active-text="是"
+                inactive-text="否"
+                @change="handleCheckedTreeNodeAll()"
+              />
+            </div>
+          </template>
+          <el-tree
+            ref="treeRef"
+            node-key="id"
+            show-checkbox
+            :props="defaultProps"
+            :data="menuOptions"
+            empty-text="加载中，请稍后"
+          />
+        </el-card>
+      </template>
+    </Form>
+    <!-- 操作按钮 -->
+    <template #footer>
+      <!-- 按钮：保存 -->
+      <XButton
+        v-if="['create', 'update'].includes(actionType)"
+        type="primary"
+        :title="t('action.save')"
+        :loading="loading"
+        @click="submitForm()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :loading="loading" :title="t('dialog.close')" @click="dialogVisible = false" />
+    </template>
+  </XModal>
+</template>
 <script setup lang="ts">
 import { onMounted, ref, unref } from 'vue'
 import dayjs from 'dayjs'
@@ -107,94 +197,3 @@ onMounted(async () => {
 })
 // getList()
 </script>
-
-<template>
-  <!-- 搜索工作区 -->
-  <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <el-button type="primary" @click="handleCreate">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
-    </div>
-    <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
-        <el-button link type="primary" @click="handleUpdate(row)">
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button link type="primary" @click="delList(row.id, false)">
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
-      </template>
-    </Table>
-  </ContentWrap>
-
-  <XModal v-model="dialogVisible" :title="dialogTitle" maxHeight="500px" width="50%">
-    <!-- 对话框(添加 / 修改) -->
-    <Form
-      v-if="['create', 'update'].includes(actionType)"
-      :schema="allSchemas.formSchema"
-      :rules="rules"
-      ref="formRef"
-    >
-      <template #menuIds>
-        <el-card class="box-card">
-          <template #header>
-            <div class="card-header">
-              全选/全不选:
-              <el-switch
-                v-model="treeNodeAll"
-                inline-prompt
-                active-text="是"
-                inactive-text="否"
-                @change="handleCheckedTreeNodeAll()"
-              />
-            </div>
-          </template>
-          <el-tree
-            ref="treeRef"
-            node-key="id"
-            show-checkbox
-            :props="defaultProps"
-            :data="menuOptions"
-            empty-text="加载中，请稍后"
-          />
-        </el-card>
-      </template>
-    </Form>
-    <!-- 操作按钮 -->
-    <template #footer>
-      <!-- 按钮：保存 -->
-      <XButton
-        v-if="['create', 'update'].includes(actionType)"
-        type="primary"
-        :title="t('action.save')"
-        :loading="loading"
-        @click="submitForm()"
-      />
-      <!-- 按钮：关闭 -->
-      <XButton :loading="loading" :title="t('dialog.close')" @click="dialogVisible = false" />
-    </template>
-  </XModal>
-</template>
