@@ -167,7 +167,7 @@ getList()
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
   </XModal>
-  <XModal v-model="uploadDialogVisible" :title="uploadDialogTitle" :destroy-on-close="true">
+  <XModal v-model="uploadDialogVisible" :title="uploadDialogTitle">
     <el-upload
       ref="uploadRef"
       :action="updateUrl + '?updateSupport=' + updateSupport"

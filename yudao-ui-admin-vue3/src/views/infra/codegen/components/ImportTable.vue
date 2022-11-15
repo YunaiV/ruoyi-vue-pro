@@ -79,7 +79,7 @@ defineExpose({
 </script>
 <template>
   <!-- 导入表 -->
-  <XModal title="导入表" v-model="visible" maxHeight="500px" width="50%">
+  <XModal title="导入表" v-model="visible">
     <el-form :model="queryParams" ref="queryRef" :inline="true">
       <el-form-item label="数据源" prop="dataSourceConfigId">
         <el-select v-model="queryParams.dataSourceConfigId" placeholder="请选择数据源" clearable>
