@@ -90,7 +90,7 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, delList, getSearchData } = useVxeGrid<PostApi.PostVO>({
+const { gridOptions, reloadList, delList, getSearchData } = useVxeGrid<PostApi.PostVO>({
   allSchemas: allSchemas,
   getListApi: PostApi.getPostPageApi,
   delListApi: PostApi.deletePostApi
@@ -163,7 +163,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        getList(xGrid)
+        reloadList(xGrid)
       }
     }
   })

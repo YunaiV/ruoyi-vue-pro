@@ -113,7 +113,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
   })
 
   // 刷新列表
-  const getList = async (ref) => {
+  const reloadList = async (ref) => {
     await nextTick()
     ref.value?.commitProxy('query')
   }
@@ -147,7 +147,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
 
   return {
     gridOptions,
-    getList,
+    reloadList,
     getSearchData,
     delList
   }

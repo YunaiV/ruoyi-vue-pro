@@ -42,7 +42,7 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions } = useVxeGrid<LoginLogVO>({
+const { gridOptions, getSearchData } = useVxeGrid<LoginLogVO>({
   allSchemas: allSchemas,
   getListApi: getLoginLogPageApi
 })
@@ -61,10 +61,7 @@ const handleDetail = async (row: LoginLogVO) => {
 // 导出操作
 const handleExport = async () => {
   message.exportConfirm().then(async () => {
-    const queryParams = Object.assign(
-      {},
-      JSON.parse(JSON.stringify(xGrid.value?.getRefMaps().refForm.value.data)) // TODO @星语：这个有没办法，封装个 util 获取哈？
-    )
+    const queryParams = await getSearchData(xGrid)
     const res = await exportLoginLogApi(queryParams)
     download.excel(res, '登录列表.xls')
   })
