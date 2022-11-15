@@ -148,7 +148,7 @@ getList()
     </Table>
   </ContentWrap>
 
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
+  <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
     <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
       <template #url="{ row }">
@@ -169,8 +169,8 @@ getList()
     <template #footer>
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
-  <Dialog v-model="uploadDialogVisible" :title="uploadDialogTitle" :destroy-on-close="true">
+  </XModal>
+  <XModal v-model="uploadDialogVisible" :title="uploadDialogTitle" :destroy-on-close="true">
     <el-upload
       ref="uploadRef"
       :action="updateUrl + '?updateSupport=' + updateSupport"
@@ -200,5 +200,5 @@ getList()
       </el-button>
       <el-button @click="uploadDialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
+  </XModal>
 </template>

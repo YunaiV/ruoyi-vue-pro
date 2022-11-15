@@ -233,7 +233,7 @@ onBeforeMount(() => {
       </el-col>
     </el-row>
   </el-scrollbar>
-  <Dialog v-model="dialogVisible" :title="keyTemplate + ' 模板'" width="60%" maxHeight="800px">
+  <XModal v-model="dialogVisible" :title="keyTemplate + ' 模板'" width="60%" maxHeight="800px">
     <el-row>
       <el-col :span="14" style="margin-top: 10px">
         <el-card shadow="always">
@@ -280,7 +280,7 @@ onBeforeMount(() => {
         </el-card>
       </el-col>
     </el-row>
-  </Dialog>
+  </XModal>
 </template>
 <style scoped>
 .redis {

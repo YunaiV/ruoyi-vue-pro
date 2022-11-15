@@ -15,14 +15,14 @@
       </template>
     </vxe-grid>
   </ContentWrap>
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
+  <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
     <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
     <!-- 操作按钮 -->
     <template #footer>
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
+  </XModal>
 </template>
 
 <script setup lang="ts">

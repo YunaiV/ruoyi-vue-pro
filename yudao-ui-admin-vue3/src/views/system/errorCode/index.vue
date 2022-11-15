@@ -38,7 +38,7 @@
     </vxe-grid>
   </ContentWrap>
   <!-- 弹窗 -->
-  <Dialog id="errorCodeModel" v-model="dialogVisible" :title="dialogTitle">
+  <XModal id="errorCodeModel" v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
     <Form
       v-if="['create', 'update'].includes(actionType)"
@@ -64,7 +64,7 @@
       <!-- 按钮：关闭 -->
       <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
-  </Dialog>
+  </XModal>
 </template>
 
 <script setup lang="ts">

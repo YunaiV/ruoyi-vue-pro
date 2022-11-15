@@ -38,7 +38,7 @@
     </vxe-grid>
   </ContentWrap>
   <!-- 弹窗 -->
-  <Dialog id="noticeModel" v-model="dialogVisible" :title="dialogTitle">
+  <XModal id="noticeModel" v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
     <Form
       ref="formRef"
@@ -64,7 +64,7 @@
       <!-- 按钮：关闭 -->
       <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
-  </Dialog>
+  </XModal>
 </template>
 <script setup lang="ts">
 // 全局相关的 import

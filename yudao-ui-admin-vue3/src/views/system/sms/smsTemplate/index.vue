@@ -197,7 +197,7 @@ getList()
     </Table>
   </ContentWrap>
 
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
+  <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
     <Form
       v-if="['create', 'update'].includes(actionType)"
@@ -233,8 +233,8 @@ getList()
       </el-button>
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
-  <Dialog v-model="sendVisible" title="测试">
+  </XModal>
+  <XModal v-model="sendVisible" title="测试">
     <el-form :model="sendSmsForm" :rules="sendSmsRules" label-width="140px">
       <el-form-item label="模板内容" prop="content">
         <el-input
@@ -266,5 +266,5 @@ getList()
       </el-button>
       <el-button @click="sendVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
+  </XModal>
 </template>

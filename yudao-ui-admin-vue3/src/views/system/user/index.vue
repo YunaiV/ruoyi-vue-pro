@@ -413,7 +413,7 @@ onMounted(async () => {
       </Table>
     </el-card>
   </div>
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
+  <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
     <Form
       v-if="['create', 'update'].includes(actionType)"
@@ -476,9 +476,9 @@ onMounted(async () => {
       </el-button>
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
+  </XModal>
   <!-- 分配用户角色 -->
-  <Dialog v-model="roleDialogVisible" title="分配角色" maxHeight="450px">
+  <XModal v-model="roleDialogVisible" title="分配角色" maxHeight="450px">
     <el-form :model="userRole" label-width="80px">
       <el-form-item label="用户名称">
         <el-input v-model="userRole.username" :disabled="true" />
@@ -505,9 +505,9 @@ onMounted(async () => {
       </el-button>
       <el-button @click="roleDialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
+  </XModal>
   <!-- 导入 -->
-  <Dialog
+  <XModal
     v-model="importDialogVisible"
     :title="importDialogTitle"
     :destroy-on-close="true"
@@ -555,7 +555,7 @@ onMounted(async () => {
       </el-button>
       <el-button @click="importDialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
+  </XModal>
 </template>
 
 <style scoped>

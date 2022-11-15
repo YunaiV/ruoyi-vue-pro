@@ -114,7 +114,7 @@ defineExpose({
 })
 </script>
 <template>
-  <Dialog title="预览" v-model="preview.open" top="5vh" maxHeight="800px" width="90%">
+  <XModal title="预览" v-model="preview.open" top="5vh" maxHeight="800px" width="90%">
     <div class="flex">
       <el-card class="w-1/4" :gutter="12" shadow="hover">
         <el-tree
@@ -144,5 +144,5 @@ defineExpose({
         </el-tabs>
       </el-card>
     </div>
-  </Dialog>
+  </XModal>
 </template>

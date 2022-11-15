@@ -103,7 +103,7 @@ getList()
     </Table>
   </ContentWrap>
 
-  <Dialog v-model="dialogVisible" :title="t('action.detail')">
+  <XModal v-model="dialogVisible" :title="t('action.detail')">
     <!-- 对话框(详情) -->
     <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
       <template #status="{ row }">
@@ -117,5 +117,5 @@ getList()
     <template #footer>
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
+  </XModal>
 </template>

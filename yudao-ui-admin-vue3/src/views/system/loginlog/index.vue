@@ -17,14 +17,14 @@
     </vxe-grid>
   </ContentWrap>
   <!-- 弹窗 -->
-  <Dialog id="postModel" v-model="dialogVisible" :title="dialogTitle">
+  <XModal id="postModel" v-model="dialogVisible" :title="dialogTitle">
     <!-- 表单：详情 -->
     <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
     <template #footer>
       <!-- 按钮：关闭 -->
       <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
-  </Dialog>
+  </XModal>
 </template>
 <script setup lang="ts">
 // 全局相关的 import

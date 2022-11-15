@@ -97,7 +97,7 @@
     </vxe-table>
   </ContentWrap>
   <!-- 添加或修改菜单对话框 -->
-  <Dialog v-model="dialogVisible" id="menuModel" :title="dialogTitle">
+  <XModal v-model="dialogVisible" id="menuModel" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
     <el-form
       ref="formRef"
@@ -240,7 +240,7 @@
       <!-- 按钮：关闭 -->
       <XButton :loading="actionLoading" @click="dialogVisible = false" :title="t('dialog.close')" />
     </template>
-  </Dialog>
+  </XModal>
 </template>
 <script setup lang="ts">
 // 全局相关的 import

@@ -113,7 +113,7 @@
         </Table>
       </div>
     </el-card>
-    <Dialog id="dictModel" v-model="dialogVisible" :title="dialogTitle">
+    <XModal id="dictModel" v-model="dialogVisible" :title="dialogTitle">
       <Form
         v-if="['typeCreate', 'typeUpdate'].includes(actionType)"
         :schema="DictTypeSchemas.allSchemas.formSchema"
@@ -144,7 +144,7 @@
         />
         <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
       </template>
-    </Dialog>
+    </XModal>
   </div>
 </template>
 <script setup lang="ts">
