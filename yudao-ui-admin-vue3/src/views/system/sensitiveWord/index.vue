@@ -154,6 +154,7 @@ const setDialogTile = (type: string) => {
 
 // 新增操作
 const handleCreate = () => {
+  tags.value = null
   setDialogTile('create')
 }
 
@@ -162,6 +163,7 @@ const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
   const res = await SensitiveWordApi.getSensitiveWordApi(rowId)
+  tags.value = res.tags
   unref(formRef)?.setValues(res)
 }
 
@@ -175,6 +177,7 @@ const submitForm = async () => {
       // 提交请求
       try {
         const data = unref(formRef)?.formModel as SensitiveWordVO
+        data.tags = tags.value
         if (actionType.value === 'create') {
           await SensitiveWordApi.createSensitiveWordApi(data)
           ElMessage.success(t('common.createSuccess'))

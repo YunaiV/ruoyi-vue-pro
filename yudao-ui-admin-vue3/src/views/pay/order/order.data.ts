@@ -82,7 +82,8 @@ const crudSchemas = reactive<CrudSchema[]>([
   {
     label: '回调商户状态',
     field: 'notifyStatus',
-    dictType: DICT_TYPE.PAY_ORDER_NOTIFY_STATUS
+    dictType: DICT_TYPE.PAY_ORDER_NOTIFY_STATUS,
+    dictData: 'number'
   },
   {
     label: '支付金额',
@@ -109,6 +110,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '支付状态',
     field: 'status',
     dictType: DICT_TYPE.PAY_ORDER_STATUS,
+    dictData: 'number',
     search: {
       show: true
     }
@@ -137,6 +139,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '退款状态',
     field: 'refundStatus',
     dictType: DICT_TYPE.PAY_ORDER_REFUND_STATUS,
+    dictData: 'number',
     search: {
       show: true
     }

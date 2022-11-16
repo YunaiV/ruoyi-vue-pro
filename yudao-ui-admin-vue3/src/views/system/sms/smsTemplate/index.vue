@@ -156,18 +156,18 @@ const handleCreate = () => {
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
+  setDialogTile('update')
   // 设置数据
   const res = await SmsTemplateApi.getSmsTemplateApi(rowId)
   unref(formRef)?.setValues(res)
-  setDialogTile('update')
 }
 
 // 详情操作
 const handleDetail = async (rowId: number) => {
+  setDialogTile('detail')
   // 设置数据
   const res = await SmsTemplateApi.getSmsTemplateApi(rowId)
   detailData.value = res
-  setDialogTile('detail')
 }
 
 // 删除操作

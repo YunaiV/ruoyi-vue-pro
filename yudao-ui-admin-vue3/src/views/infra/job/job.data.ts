@@ -37,6 +37,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: t('common.status'),
     field: 'status',
     dictType: DICT_TYPE.INFRA_JOB_STATUS,
+    dictData: 'number',
     form: {
       show: false
     },

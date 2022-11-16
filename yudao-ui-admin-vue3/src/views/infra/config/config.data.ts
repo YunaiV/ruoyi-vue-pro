@@ -52,6 +52,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '系统内置',
     field: 'type',
     dictType: DICT_TYPE.INFRA_CONFIG_TYPE,
+    dictData: 'number',
     search: {
       show: true
     }

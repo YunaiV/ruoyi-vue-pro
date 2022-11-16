@@ -26,7 +26,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '角色类型',
       field: 'type',
-      dictType: DICT_TYPE.SYSTEM_ROLE_TYPE
+      dictType: DICT_TYPE.SYSTEM_ROLE_TYPE,
+      dictData: 'number'
     },
     {
       title: '角色标识',
@@ -41,6 +42,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: t('common.status'),
       field: 'status',
       dictType: DICT_TYPE.COMMON_STATUS,
+      dictData: 'number',
       isSearch: true
     },
     {

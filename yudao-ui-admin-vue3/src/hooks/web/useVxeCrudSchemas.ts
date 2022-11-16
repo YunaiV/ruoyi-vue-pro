@@ -1,5 +1,5 @@
 import { DescriptionsSchema } from '@/types/descriptions'
-import { getIntDictOptions } from '@/utils/dict'
+import { getBoolDictOptions, getDictOptions, getIntDictOptions } from '@/utils/dict'
 import { reactive } from 'vue'
 import {
   FormItemRenderOptions,
@@ -38,6 +38,7 @@ type VxeCrudColumns = Omit<VxeTableColumn, 'children'> & {
   print?: CrudPrintParams // vxe 打印的字段
   children?: VxeCrudColumns[] // 子级
   dictType?: string // 字典类型
+  dictData?: 'string' | 'number' | 'boolean' // 字典数据类型 string | number | boolean
 }
 
 type CrudSearchParams = {
@@ -124,7 +125,7 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
       if (schemaItem.dictType) {
         const allOptions = { label: '全部', value: '' }
         options.push(allOptions)
-        getIntDictOptions(schemaItem.dictType).forEach((dict) => {
+        getDictOptions(schemaItem.dictType).forEach((dict) => {
           options.push(dict)
         })
         itemRender.options = options
@@ -229,9 +230,19 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
       const options: ComponentOptions[] = []
       let comonentProps = {}
       if (schemaItem.dictType) {
-        getIntDictOptions(schemaItem.dictType).forEach((dict) => {
-          options.push(dict)
-        })
+        if (schemaItem.dictData && schemaItem.dictData === 'number') {
+          getIntDictOptions(schemaItem.dictType).forEach((dict) => {
+            options.push(dict)
+          })
+        } else if (schemaItem.dictData && schemaItem.dictData === 'boolean') {
+          getBoolDictOptions(schemaItem.dictType).forEach((dict) => {
+            options.push(dict)
+          })
+        } else {
+          getDictOptions(schemaItem.dictType).forEach((dict) => {
+            options.push(dict)
+          })
+        }
         comonentProps = {
           options: options
         }

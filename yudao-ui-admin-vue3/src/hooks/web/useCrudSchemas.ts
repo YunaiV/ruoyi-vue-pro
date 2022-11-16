@@ -1,6 +1,6 @@
 import { reactive } from 'vue'
 import { eachTree, treeMap, filter } from '@/utils/tree'
-import { getIntDictOptions } from '@/utils/dict'
+import { getBoolDictOptions, getDictOptions, getIntDictOptions } from '@/utils/dict'
 import { FormSchema } from '@/types/form'
 import { TableColumn } from '@/types/table'
 import { DescriptionsSchema } from '@/types/descriptions'
@@ -12,7 +12,8 @@ export type CrudSchema = Omit<TableColumn, 'children'> & {
   form?: CrudFormParams
   detail?: CrudDescriptionsParams
   children?: CrudSchema[]
-  dictType?: string
+  dictType?: string // 字典类型
+  dictData?: 'string' | 'number' | 'boolean' // 字典数据类型 string | number | boolean
 }
 
 type CrudSearchParams = {
@@ -86,7 +87,7 @@ const filterSearchSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
       if (schemaItem.dictType) {
         const allOptions: ComponentOptions = { label: '全部', value: '' }
         options.push(allOptions)
-        getIntDictOptions(schemaItem.dictType).forEach((dict) => {
+        getDictOptions(schemaItem.dictType).forEach((dict) => {
           options.push(dict)
         })
         comonentProps = {
@@ -144,9 +145,19 @@ const filterFormSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
       const options: ComponentOptions[] = []
       let comonentProps = {}
       if (schemaItem.dictType) {
-        getIntDictOptions(schemaItem.dictType).forEach((dict) => {
-          options.push(dict)
-        })
+        if (schemaItem.dictData && schemaItem.dictData === 'number') {
+          getIntDictOptions(schemaItem.dictType).forEach((dict) => {
+            options.push(dict)
+          })
+        } else if (schemaItem.dictData && schemaItem.dictData === 'boolean') {
+          getBoolDictOptions(schemaItem.dictType).forEach((dict) => {
+            options.push(dict)
+          })
+        } else {
+          getDictOptions(schemaItem.dictType).forEach((dict) => {
+            options.push(dict)
+          })
+        }
         comonentProps = {
           options: options
         }

@@ -106,6 +106,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '租户状态',
     field: 'status',
     dictType: DICT_TYPE.COMMON_STATUS,
+    dictData: 'number',
     search: {
       show: true
     }

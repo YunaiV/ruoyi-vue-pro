@@ -21,6 +21,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '操作类型',
       field: 'type',
       dictType: DICT_TYPE.SYSTEM_OPERATE_TYPE,
+      dictData: 'number',
       isSearch: true
     },
     {

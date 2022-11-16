@@ -25,12 +25,14 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '公告类型',
       field: 'type',
-      dictType: DICT_TYPE.SYSTEM_NOTICE_TYPE
+      dictType: DICT_TYPE.SYSTEM_NOTICE_TYPE,
+      dictData: 'number'
     },
     {
       title: t('common.status'),
       field: 'status',
       dictType: DICT_TYPE.COMMON_STATUS,
+      dictData: 'number',
       isSearch: true
     },
     {

@@ -48,6 +48,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '存储器',
     field: 'storage',
     dictType: DICT_TYPE.INFRA_FILE_STORAGE,
+    dictData: 'number',
     search: {
       show: true
     }
@@ -55,7 +56,8 @@ const crudSchemas = reactive<CrudSchema[]>([
   {
     label: '主配置',
     field: 'primary',
-    dictType: DICT_TYPE.INFRA_BOOLEAN_STRING
+    dictType: DICT_TYPE.INFRA_BOOLEAN_STRING,
+    dictData: 'number'
   },
   {
     label: t('form.remark'),
