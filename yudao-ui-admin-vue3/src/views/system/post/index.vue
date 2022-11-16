@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar" :class="isDark">
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -86,6 +86,8 @@ import { FormExpose } from '@/components/Form'
 import * as PostApi from '@/api/system/post'
 import { rules, allSchemas } from './post.data'
 
+import { useDark } from '@vueuse/core'
+const isDark = useDark()
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量

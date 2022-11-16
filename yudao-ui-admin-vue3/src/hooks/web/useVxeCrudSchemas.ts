@@ -16,9 +16,11 @@ import { ComponentOptions } from '@/types/components'
 
 export type VxeCrudSchema = {
   primaryKey?: string // 主键ID
+  primaryTitle?: string // 主键标题 默认为序号
   primaryType?: VxeColumnPropTypes.Type // 不填写为数据库编号 还支持 "seq" | "radio" | "checkbox" | "expand" | "html" | null
   action?: boolean // 是否开启操作栏插槽
-  actionWidth?: string // 操作栏插槽宽度，一般1个 text 类型按钮 60-80
+  actionTitle?: string // 操作栏标题 默认为操作
+  actionWidth?: string // 操作栏插槽宽度，一般2个字带图标 text 类型按钮 50-70
   columns: VxeCrudColumns[]
 }
 type VxeCrudColumns = Omit<VxeTableColumn, 'children'> & {
@@ -169,7 +171,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
   // 主键ID
   if (crudSchema.primaryKey) {
     const tableSchemaItem = {
-      title: t('common.index'),
+      title: crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index'),
       field: crudSchema.primaryKey,
       type: crudSchema.primaryType ? crudSchema.primaryType : null,
       width: '50px'
@@ -202,7 +204,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
   // 操作栏插槽
   if (crudSchema.action && crudSchema.action == true) {
     const tableSchemaItem = {
-      title: t('table.action'),
+      title: crudSchema.actionTitle ? crudSchema.actionTitle : t('table.action'),
       field: 'actionbtns',
       width: crudSchema.actionWidth ? crudSchema.actionWidth : '200px',
       slots: {
