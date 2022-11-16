@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.aftersale;
 
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleAuditReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleConfirmReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleDeliveryReqVO;
 
@@ -38,5 +39,14 @@ public interface TradeAfterSaleService {
      * @param deliveryReqVO 退货 Request 信息
      */
     void deliveryAfterSale(Long userId, AppTradeAfterSaleDeliveryReqVO deliveryReqVO);
+
+    /**
+     * 确认收货
+     *
+     * @param userId 管理员用户编号
+     * @param userIp 操作 IP
+     * @param confirmReqVO 收货 Request 信息
+     */
+    void confirmAfterSale(Long userId, String userIp, TradeAfterSaleConfirmReqVO confirmReqVO);
 
 }

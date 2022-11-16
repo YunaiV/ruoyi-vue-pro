@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.controller.admin.aftersale;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleAuditReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleConfirmReqVO;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +35,14 @@ public class TradeAfterSaleController {
     @PreAuthorize("@ss.hasPermission('trade:after-sale:audit')")
     public CommonResult<Boolean> auditAfterSale(@RequestBody TradeAfterSaleAuditReqVO auditReqVO) {
         afterSaleService.auditAfterSale(getLoginUserId(), getClientIP(), auditReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/confirm")
+    @ApiOperation("确认收货")
+    @PreAuthorize("@ss.hasPermission('trade:after-sale:audit')")
+    public CommonResult<Boolean> confirmAfterSale(@RequestBody TradeAfterSaleConfirmReqVO confirmReqVO) {
+        afterSaleService.confirmAfterSale(getLoginUserId(), getClientIP(), confirmReqVO);
         return success(true);
     }
 

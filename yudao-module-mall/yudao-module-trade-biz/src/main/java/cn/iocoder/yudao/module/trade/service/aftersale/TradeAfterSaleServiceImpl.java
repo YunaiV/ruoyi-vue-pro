@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.trade.service.aftersale;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleAuditReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleConfirmReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
@@ -129,12 +131,12 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         if (afterSale == null) {
             throw exception(AFTER_SALE_NOT_FOUND);
         }
-        if (afterSale.getStatus().equals(TradeAfterSaleStatusEnum.APPLY.getStatus())) {
+        if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.APPLY.getStatus())) {
             throw exception(AFTER_SALE_AUDIT_FAIL_STATUS_NOT_APPLY);
         }
 
         // 进行审批
-        if (auditReqVO.getAudit()) {
+        if (auditReqVO.getPass()) {
             auditAfterSalePass(userId, userIp, auditReqVO, afterSale);
         } else {
             auditAfterSaleReject(userId, auditReqVO, afterSale);
@@ -207,8 +209,8 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         if (afterSale == null) {
             throw exception(AFTER_SALE_NOT_FOUND);
         }
-        if (afterSale.getStatus().equals(TradeAfterSaleStatusEnum.SELLER_PASS.getStatus())) {
-            throw exception(AFTER_SALE_DELIVERY_FAIL_STATUS_NOT_BUYER_RETURN);
+        if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.SELLER_PASS.getStatus())) {
+            throw exception(AFTER_SALE_DELIVERY_FAIL_STATUS_NOT_SELLER_PASS);
         }
 
         // 更新售后单的物流信息
@@ -216,6 +218,58 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
                 .setStatus(TradeAfterSaleStatusEnum.BUYER_RETURN.getStatus())
                 .setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo())
                 .setDeliveryTime(deliveryReqVO.getDeliveryTime()));
+
+        // TODO 记录售后日志
+
+        // TODO 发送售后消息
+    }
+
+    @Override
+    public void confirmAfterSale(Long userId, String userIp,
+                                 TradeAfterSaleConfirmReqVO confirmReqVO) {
+        // 校验售后单存在，并状态未审批
+        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(confirmReqVO.getId());
+        if (afterSale == null) {
+            throw exception(AFTER_SALE_NOT_FOUND);
+        }
+        if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.BUYER_RETURN.getStatus())) {
+            throw exception(AFTER_SALE_CONFIRM_FAIL_STATUS_NOT_BUYER_RETURN);
+        }
+
+        // 进行审批
+        if (confirmReqVO.getPass()) {
+            confirmAfterSalePass(userId, userIp, confirmReqVO, afterSale);
+        } else {
+            confirmAfterSaleReject(userId, confirmReqVO, afterSale);
+        }
+    }
+
+    private void confirmAfterSalePass(Long userId, String userIp,
+                                      TradeAfterSaleConfirmReqVO confirmReqVO, TradeAfterSaleDO afterSale) {
+        // 更新售后单的状态
+        Integer newStatus = TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus();
+        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.BUYER_RETURN.getStatus(), new TradeAfterSaleDO()
+                .setStatus(newStatus).setReceiptTime(LocalDateTime.now()).setReceiptMemo(confirmReqVO.getReceiptMemo()));
+
+        // 如果直接退款，则发起售后退款
+        if (afterSale.getType().equals(TradeAfterSaleTypeEnum.REFUND.getType())) {
+            createPayRefund(userIp, afterSale);
+        }
+
+        // TODO 记录售后日志
+
+        // TODO 发送售后消息
+    }
+
+    private void confirmAfterSaleReject(Long userId, TradeAfterSaleConfirmReqVO confirmReqVO, TradeAfterSaleDO afterSale) {
+        // 更新售后单的状态
+        Integer newStatus = TradeAfterSaleStatusEnum.SELLER_TERMINATION.getStatus();
+        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.BUYER_RETURN.getStatus(), new TradeAfterSaleDO()
+                .setStatus(newStatus).setReceiptTime(LocalDateTime.now()).setReceiptMemo(confirmReqVO.getReceiptMemo()));
+
+        // 更新交易订单项的售后状态为【未申请】
+        tradeOrderService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
 
         // TODO 记录售后日志
 
