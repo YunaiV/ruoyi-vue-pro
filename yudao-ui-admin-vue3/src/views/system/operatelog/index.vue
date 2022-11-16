@@ -25,7 +25,7 @@
     </vxe-grid>
   </ContentWrap>
   <!-- 弹窗 -->
-  <XModal id="postModel" v-model="dialogVisible" :title="dialogTitle">
+  <XModal id="postModel" v-model="dialogVisible" :title="t('action.detail')">
     <!-- 对话框(详情) -->
     <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
       <template #resultCode="{ row }">
@@ -62,7 +62,6 @@ const { gridOptions, exportList } = useVxeGrid<OperateLogApi.OperateLogVO>({
 
 // 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
-const dialogTitle = ref('edit') // 弹出层标题
 const actionLoading = ref(false) // 按钮 Loading
 const detailRef = ref() // 详情 Ref
 // 详情
