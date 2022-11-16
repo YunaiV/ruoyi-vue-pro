@@ -12,6 +12,12 @@
           @click="handleCreate()"
         />
       </template>
+      <template #accessTokenValiditySeconds_default="{ row }">
+        {{ row.accessTokenValiditySeconds + '秒' }}
+      </template>
+      <template #refreshTokenValiditySeconds_default="{ row }">
+        {{ row.refreshTokenValiditySeconds + '秒' }}
+      </template>
       <template #authorizedGrantTypes_default="{ row }">
         <el-tag
           :disable-transitions="true"
@@ -61,7 +67,54 @@
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
       :data="detailRef"
-    />
+    >
+      <template #accessTokenValiditySeconds="{ row }">
+        {{ row.accessTokenValiditySeconds + '秒' }}
+      </template>
+      <template #refreshTokenValiditySeconds="{ row }">
+        {{ row.refreshTokenValiditySeconds + '秒' }}
+      </template>
+      <template #authorizedGrantTypes="{ row }">
+        <el-tag
+          :disable-transitions="true"
+          :key="index"
+          v-for="(authorizedGrantType, index) in row.authorizedGrantTypes"
+          :index="index"
+        >
+          {{ authorizedGrantType }}
+        </el-tag>
+      </template>
+      <template #scopes="{ row }">
+        <el-tag
+          :disable-transitions="true"
+          :key="index"
+          v-for="(scopes, index) in row.scopes"
+          :index="index"
+        >
+          {{ scopes }}
+        </el-tag>
+      </template>
+      <template #autoApproveScopes="{ row }">
+        <el-tag
+          :disable-transitions="true"
+          :key="index"
+          v-for="(autoApproveScopes, index) in row.autoApproveScopes"
+          :index="index"
+        >
+          {{ autoApproveScopes }}
+        </el-tag>
+      </template>
+      <template #redirectUris="{ row }">
+        <el-tag
+          :disable-transitions="true"
+          :key="index"
+          v-for="(redirectUris, index) in row.redirectUris"
+          :index="index"
+        >
+          {{ redirectUris }}
+        </el-tag>
+      </template>
+    </Descriptions>
     <template #footer>
       <!-- 按钮：保存 -->
       <XButton
@@ -121,17 +174,17 @@ const handleCreate = () => {
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
+  setDialogTile('update')
   // 设置数据
   const res = await ClientApi.getOAuth2ClientApi(rowId)
   unref(formRef)?.setValues(res)
-  setDialogTile('update')
 }
 
 // 详情操作
 const handleDetail = async (rowId: number) => {
+  setDialogTile('detail')
   const res = await ClientApi.getOAuth2ClientApi(rowId)
   detailRef.value = res
-  setDialogTile('detail')
 }
 
 // 删除操作

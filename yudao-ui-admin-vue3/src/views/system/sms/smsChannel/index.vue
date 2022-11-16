@@ -113,17 +113,17 @@ const handleCreate = () => {
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
+  setDialogTile('update')
   // 设置数据
   const res = await SmsChannelApi.getSmsChannelApi(rowId)
   unref(formRef)?.setValues(res)
-  setDialogTile('update')
 }
 
 // 详情操作
 const handleDetail = async (rowId: number) => {
+  setDialogTile('detail')
   const res = await SmsChannelApi.getSmsChannelApi(rowId)
   detailData.value = res
-  setDialogTile('detail')
 }
 
 // 删除操作

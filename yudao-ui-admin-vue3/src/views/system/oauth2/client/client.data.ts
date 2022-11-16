@@ -49,21 +49,31 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '访问令牌的有效期',
-      field: 'accessTokenValiditySeconds', // TODO 星语：展示时，要有 xxx 秒
+      field: 'accessTokenValiditySeconds',
       form: {
         component: 'InputNumber'
+      },
+      table: {
+        slots: {
+          default: 'accessTokenValiditySeconds_default'
+        }
       }
     },
     {
       title: '刷新令牌的有效期',
-      field: 'refreshTokenValiditySeconds', // TODO 星语：展示时，要有 xxx 秒
+      field: 'refreshTokenValiditySeconds',
       form: {
         component: 'InputNumber'
+      },
+      table: {
+        slots: {
+          default: 'refreshTokenValiditySeconds_default'
+        }
       }
     },
     {
       title: '授权类型',
-      field: 'authorizedGrantTypes', // TODO 星语：详情展示时，应该类似 table 也是多个 tag
+      field: 'authorizedGrantTypes',
       table: {
         width: 300,
         slots: {
@@ -74,17 +84,17 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '授权范围',
       field: 'scopes', // TODO @星语：带输入的 SELECT
-      isTable: false // TODO 星语：详情展示时，应该类似 table 也是多个 tag
+      isTable: false
     },
     {
       title: '自动授权范围',
       field: 'autoApproveScopes', // TODO @星语：带输入的 SELECT
-      isTable: false // TODO 星语：详情展示时，应该类似 table 也是多个 tag
+      isTable: false
     },
     {
       title: '可重定向的 URI 地址',
       field: 'redirectUris', // TODO @星语：带输入的 SELECT
-      isTable: false // TODO 星语：详情展示时，应该类似 table 也是多个 tag
+      isTable: false
     },
     {
       title: '权限',

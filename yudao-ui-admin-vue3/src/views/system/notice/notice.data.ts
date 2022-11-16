@@ -34,7 +34,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       isSearch: true
     },
     {
-      title: '公告内容', // TODO 星语：详情时，公告展示有办法是 html 么？
+      title: '公告内容',
       field: 'content',
       table: {
         type: 'html'
