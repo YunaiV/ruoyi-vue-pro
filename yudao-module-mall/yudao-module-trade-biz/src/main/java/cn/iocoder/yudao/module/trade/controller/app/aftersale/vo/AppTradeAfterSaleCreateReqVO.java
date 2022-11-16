@@ -12,7 +12,7 @@ import java.util.List;
 
 @ApiModel("用户 App - 交易售后创建 Request VO")
 @Data
-public class AppAfterSaleCreateReqVO {
+public class AppTradeAfterSaleCreateReqVO {
 
     @ApiModelProperty(name = "订单项编号", required = true, example = "1024")
     @NotNull(message = "订单项编号不能为空")

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
-import cn.iocoder.yudao.module.pay.api.order.PayOrderInfoCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
@@ -42,8 +42,7 @@ import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_CREATE_SKU_NOT_SALE;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_CREATE_SPU_NOT_FOUND;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
  * 交易订单 Service 实现类
@@ -75,6 +74,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Resource
     private TradeOrderProperties tradeOrderProperties;
 
+    // =================== Order ===================
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
@@ -97,16 +98,6 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         afterCreateTradeOrder(userId, createReqVO, tradeOrderDO, tradeOrderItems, spus);
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
         return tradeOrderDO.getId();
-    }
-
-    @Override
-    public TradeOrderItemDO getOrderItem(Long userId, Long itemId) {
-        TradeOrderItemDO orderItem = tradeOrderItemMapper.selectById(itemId);
-        if (orderItem != null
-                && ObjectUtil.notEqual(orderItem.getUserId(), userId)) {
-            return null;
-        }
-        return orderItem;
     }
 
     @Override
@@ -240,12 +231,32 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     private void createPayOrder(TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItemDOs,
                                 List<ProductSpuRespDTO> spus) {
         // 创建支付单，用于后续的支付
-        PayOrderInfoCreateReqDTO payOrderCreateReqDTO = TradeOrderConvert.INSTANCE.convert(
+        PayOrderCreateReqDTO payOrderCreateReqDTO = TradeOrderConvert.INSTANCE.convert(
                 tradeOrderDO, tradeOrderItemDOs, spus, tradeOrderProperties);
         Long payOrderId = payOrderApi.createPayOrder(payOrderCreateReqDTO);
 
         // 更新到交易单上
         tradeOrderMapper.updateById(new TradeOrderDO().setId(tradeOrderDO.getId()).setPayOrderId(payOrderId));
+    }
+
+    // =================== Order ===================
+
+    @Override
+    public TradeOrderItemDO getOrderItem(Long userId, Long itemId) {
+        TradeOrderItemDO orderItem = tradeOrderItemMapper.selectById(itemId);
+        if (orderItem != null
+                && ObjectUtil.notEqual(orderItem.getUserId(), userId)) {
+            return null;
+        }
+        return orderItem;
+    }
+
+    @Override
+    public void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus) {
+        int updateCount = tradeOrderItemMapper.updateAfterSaleStatus(id, oldAfterSaleStatus, newAfterSaleStatus);
+        if (updateCount <= 0) {
+            throw exception(ORDER_ITEM_UPDATE_AFTER_SALE_STATUS_FAIL);
+        }
     }
 
 }

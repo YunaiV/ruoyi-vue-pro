@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.api.order;
+package cn.iocoder.yudao.module.pay.api.order.dto;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * @author LeeYan9
  */
 @Data
-public class PayOrderInfoCreateReqDTO implements Serializable {
+public class PayOrderCreateReqDTO implements Serializable {
 
     /**
      * 应用编号

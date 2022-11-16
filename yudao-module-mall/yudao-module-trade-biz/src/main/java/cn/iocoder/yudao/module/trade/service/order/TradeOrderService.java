@@ -12,6 +12,8 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
  */
 public interface TradeOrderService {
 
+    // =================== Order ===================
+
     /**
      * 创建交易订单
      *
@@ -23,6 +25,17 @@ public interface TradeOrderService {
     Long createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO);
 
     /**
+     * 获得指定用户，指定的交易订单
+     *
+     * @param userId 用户编号
+     * @param orderId 交易订单编号
+     * @return 交易订单
+     */
+    TradeOrderDO getOrder(Long userId, Long orderId);
+
+    // =================== Order Item ===================
+
+    /**
      * 获得指定用户，指定的交易订单项
      *
      * @param userId 用户编号
@@ -32,12 +45,11 @@ public interface TradeOrderService {
     TradeOrderItemDO getOrderItem(Long userId, Long itemId);
 
     /**
-     * 获得指定用户，指定的交易订单
+     * 更新交易订单项的售后状态
      *
-     * @param userId 用户编号
-     * @param orderId 交易订单编号
-     * @return 交易订单
+     * @param id 交易订单项编号
+     * @param oldAfterSaleStatus 当前售后状态；如果不符，更新后会抛出异常
+     * @param newAfterSaleStatus 目标售后状态
      */
-    TradeOrderDO getOrder(Long userId, Long orderId);
-
+    void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus);
 }

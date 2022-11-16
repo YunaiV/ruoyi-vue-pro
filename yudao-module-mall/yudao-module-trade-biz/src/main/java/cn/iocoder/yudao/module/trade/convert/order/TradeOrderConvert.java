@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.trade.convert.order;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
-import cn.iocoder.yudao.module.pay.api.order.PayOrderInfoCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
@@ -71,9 +71,9 @@ public interface TradeOrderConvert {
     ProductSkuUpdateStockReqDTO.Item convert(TradeOrderItemDO bean);
     List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
 
-    default PayOrderInfoCreateReqDTO convert(TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItemDOs,
-                                             List<ProductSpuRespDTO> spus, TradeOrderProperties tradeOrderProperties) {
-        PayOrderInfoCreateReqDTO createReqDTO = new PayOrderInfoCreateReqDTO()
+    default PayOrderCreateReqDTO convert(TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItemDOs,
+                                         List<ProductSpuRespDTO> spus, TradeOrderProperties tradeOrderProperties) {
+        PayOrderCreateReqDTO createReqDTO = new PayOrderCreateReqDTO()
                 .setAppId(tradeOrderProperties.getAppId()).setUserIp(tradeOrderDO.getUserIp());
         // 商户相关字段
         createReqDTO.setMerchantOrderId(String.valueOf(tradeOrderDO.getId()));

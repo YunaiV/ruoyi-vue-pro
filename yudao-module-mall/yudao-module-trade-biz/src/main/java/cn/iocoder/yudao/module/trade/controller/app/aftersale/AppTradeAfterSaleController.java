@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.trade.controller.app.aftersale;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleCreateReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,14 +22,14 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @RequestMapping("/trade/after-sale")
 @Validated
 @Slf4j
-public class AppAfterSaleController {
+public class AppTradeAfterSaleController {
 
     @Resource
     private TradeAfterSaleService afterSaleService;
 
     @PostMapping(value = "/create")
     @ApiOperation(value = "申请售后")
-    private CommonResult<Long> createAfterSale(@RequestBody AppAfterSaleCreateReqVO createReqVO) {
+    private CommonResult<Long> createAfterSale(@RequestBody AppTradeAfterSaleCreateReqVO createReqVO) {
         return success(afterSaleService.createAfterSale(getLoginUserId(), createReqVO));
     }
 

@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.pay.api.order;
 
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
+
 import javax.validation.Valid;
 
 /**
@@ -16,6 +18,6 @@ public interface PayOrderApi {
      * @param reqDTO 创建请求
      * @return 支付单编号
      */
-    Long createPayOrder(@Valid PayOrderInfoCreateReqDTO reqDTO);
+    Long createPayOrder(@Valid PayOrderCreateReqDTO reqDTO);
 
 }

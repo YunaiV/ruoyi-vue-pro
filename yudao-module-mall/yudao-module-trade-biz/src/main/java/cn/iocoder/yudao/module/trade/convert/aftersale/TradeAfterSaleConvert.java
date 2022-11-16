@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.trade.convert.aftersale;
 
-import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleCreateReqVO;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
+import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -20,6 +22,14 @@ public interface TradeAfterSaleConvert {
             @Mapping(target = "creator", ignore = true),
             @Mapping(target = "updater", ignore = true),
     })
-    TradeAfterSaleDO convert(AppAfterSaleCreateReqVO createReqVO, TradeOrderItemDO tradeOrderItem);
+    TradeAfterSaleDO convert(AppTradeAfterSaleCreateReqVO createReqVO, TradeOrderItemDO tradeOrderItem);
+
+    @Mappings({
+            @Mapping(source = "afterSale.orderId", target = "merchantOrderId"),
+            @Mapping(source = "afterSale.applyReason", target = "reason"),
+            @Mapping(source = "afterSale.refundPrice", target = "amount")
+    })
+    PayRefundCreateReqDTO convert(String userIp, TradeAfterSaleDO afterSale,
+                                  TradeOrderProperties orderProperties);
 
 }
