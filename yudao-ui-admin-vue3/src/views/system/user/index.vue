@@ -351,16 +351,17 @@ const setDialogTile = async (type: string) => {
 
 // 新增操作
 const handleCreate = async () => {
+  actionType.value = 'create'
   // 重置表单
   deptId.value = null
   postIds.value = []
   dialogVisible.value = true
   dialogTitle.value = t('action.create')
-  actionType.value = 'create'
 }
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
+  setDialogTile('update')
   unref(formRef)?.delSchema('username')
   unref(formRef)?.delSchema('password')
   // 设置数据
@@ -368,7 +369,6 @@ const handleUpdate = async (rowId: number) => {
   deptId.value = res.deptId
   postIds.value = res.postIds
   unref(formRef)?.setValues(res)
-  setDialogTile('update')
 }
 const detailData = ref()
 

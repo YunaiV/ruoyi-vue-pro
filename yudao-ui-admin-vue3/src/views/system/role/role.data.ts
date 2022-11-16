@@ -35,10 +35,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '显示顺序',
-      field: 'sort',
-      form: {
-        component: 'InputNumber'
-      }
+      field: 'sort'
     },
     {
       title: t('common.status'),
