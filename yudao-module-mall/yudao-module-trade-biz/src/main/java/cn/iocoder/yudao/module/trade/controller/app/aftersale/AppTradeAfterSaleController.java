@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.controller.app.aftersale;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,8 +30,15 @@ public class AppTradeAfterSaleController {
 
     @PostMapping(value = "/create")
     @ApiOperation(value = "申请售后")
-    private CommonResult<Long> createAfterSale(@RequestBody AppTradeAfterSaleCreateReqVO createReqVO) {
+    public CommonResult<Long> createAfterSale(@RequestBody AppTradeAfterSaleCreateReqVO createReqVO) {
         return success(afterSaleService.createAfterSale(getLoginUserId(), createReqVO));
+    }
+
+    @PostMapping(value = "/delivery")
+    @ApiOperation(value = "退回货物")
+    public CommonResult<Boolean> deliveryAfterSale(@RequestBody AppTradeAfterSaleDeliveryReqVO deliveryReqVO) {
+        afterSaleService.deliveryAfterSale(getLoginUserId(), deliveryReqVO);
+        return success(true);
     }
 
 }

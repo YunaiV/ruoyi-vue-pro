@@ -134,26 +134,26 @@ public class TradeAfterSaleDO extends BaseDO {
 
     // ========== 退货相关 ==========
     /**
-     * 退货物流公司编号 TODO
+     * 退货物流公司编号
      *
-     * 关联 ExpressDO 的 id 编号
+     * 关联 LogisticsDO 的 id 编号
      */
-    private Long returnExpressId; // express_name
+    private Long logisticsId;
     /**
-     * 退货物流单号 TODO
+     * 退货物流单号
      */
-    private String returnExpressNo; // express_no
+    private String logisticsNo;
     /**
-     * 退货时间 TODO
+     * 退货时间
      */
-    private LocalDateTime deliveryTime; // ship_time
+    private LocalDateTime deliveryTime;
     /**
-     * 收获备注 TODO
+     * 收货时间
      */
-    private String receiveMemo; // receive_message
+    private LocalDateTime receiptTime;
     /**
-     * 收货时间 TODO
+     * 收货备注
      */
-    private LocalDateTime receiveDate; // receive_time
+    private String receiptMemo;
 
 }

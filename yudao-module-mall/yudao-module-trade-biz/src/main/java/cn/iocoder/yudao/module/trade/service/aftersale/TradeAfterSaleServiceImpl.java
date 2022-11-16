@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleAuditReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -147,7 +148,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         // 情况二：退货退款：需要等用户退货后，才能发起退款
         Integer newStatus = afterSale.getType().equals(TradeAfterSaleTypeEnum.REFUND.getType()) ?
                 TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus() : TradeAfterSaleStatusEnum.SELLER_PASS.getStatus();
-        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.APPLY.getStatus(),  new TradeAfterSaleDO()
+        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.APPLY.getStatus(), new TradeAfterSaleDO()
                 .setStatus(newStatus).setAuditUserId(userId)
                 .setAuditReason(auditReqVO.getAuditReason()).setAuditTime(LocalDateTime.now()));
 
@@ -165,7 +166,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
                                       TradeAfterSaleAuditReqVO auditReqVO, TradeAfterSaleDO afterSale) {
         // 更新售后单的状态
         Integer newStatus = TradeAfterSaleStatusEnum.SELLER_REFUSE.getStatus();
-                updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.APPLY.getStatus(),  new TradeAfterSaleDO()
+                updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.APPLY.getStatus(), new TradeAfterSaleDO()
                 .setStatus(newStatus).setAuditUserId(userId)
                 .setAuditReason(auditReqVO.getAuditReason()).setAuditTime(LocalDateTime.now()));
 
@@ -197,6 +198,28 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         if (updateCount == 0) {
             throw exception(AFTER_SALE_UPDATE_STATUS_FAIL);
         }
+    }
+
+    @Override
+    public void deliveryAfterSale(Long userId, AppTradeAfterSaleDeliveryReqVO deliveryReqVO) {
+        // 校验售后单存在，并状态未退货
+        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(deliveryReqVO.getId());
+        if (afterSale == null) {
+            throw exception(AFTER_SALE_NOT_FOUND);
+        }
+        if (afterSale.getStatus().equals(TradeAfterSaleStatusEnum.SELLER_PASS.getStatus())) {
+            throw exception(AFTER_SALE_DELIVERY_FAIL_STATUS_NOT_BUYER_RETURN);
+        }
+
+        // 更新售后单的物流信息
+        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.SELLER_PASS.getStatus(), new TradeAfterSaleDO()
+                .setStatus(TradeAfterSaleStatusEnum.BUYER_RETURN.getStatus())
+                .setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo())
+                .setDeliveryTime(deliveryReqVO.getDeliveryTime()));
+
+        // TODO 记录售后日志
+
+        // TODO 发送售后消息
     }
 
 }
