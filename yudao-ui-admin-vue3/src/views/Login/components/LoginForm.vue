@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { useIcon } from '@/hooks/web/useIcon'
 import LoginFormTitle from './LoginFormTitle.vue'
 import {

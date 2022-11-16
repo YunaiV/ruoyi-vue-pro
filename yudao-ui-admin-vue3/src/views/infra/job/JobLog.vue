@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
 import * as JobLogApi from '@/api/infra/jobLog'

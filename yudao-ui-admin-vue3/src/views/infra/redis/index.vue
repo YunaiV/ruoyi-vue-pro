@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
 import * as RedisApi from '@/api/infra/redis'
 import { DICT_TYPE } from '@/utils/dict'

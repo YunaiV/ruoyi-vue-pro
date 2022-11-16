@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { computed, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { LoginStateEnum, useLoginState } from './useLogin'
