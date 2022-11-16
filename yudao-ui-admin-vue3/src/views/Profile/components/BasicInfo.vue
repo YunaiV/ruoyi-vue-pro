@@ -1,30 +1,28 @@
+<template>
+  <Form ref="formRef" :rules="rules" :schema="schema" :labelWidth="80">
+    <template #sex>
+      <el-radio-group v-model="sexVlue">
+        <el-radio :label="1">{{ t('profile.user.man') }}</el-radio>
+        <el-radio :label="2">{{ t('profile.user.woman') }}</el-radio>
+      </el-radio-group>
+    </template>
+  </Form>
+  <el-button type="primary" @click="submit()">{{ t('common.save') }}</el-button>
+  <el-button type="danger" @click="init()">{{ t('common.reset') }}</el-button>
+</template>
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import type { FormRules, FormInstance } from 'element-plus'
-import { ElForm, ElFormItem, ElInput, ElRadioGroup, ElRadio, ElMessage } from 'element-plus'
+import { reactive, onMounted, unref, ref } from 'vue'
+import type { FormRules } from 'element-plus'
+import { ElMessage, ElRadioGroup, ElRadio } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
-import { getUserProfileApi, updateUserProfileApi } from '@/api/system/user/profile'
+import {
+  getUserProfileApi,
+  updateUserProfileApi,
+  UserProfileUpdateReqVO
+} from '@/api/system/user/profile'
+import { FormSchema } from '@/types/form'
+import { FormExpose } from '@/components/Form'
 const { t } = useI18n()
-const formRef = ref<FormInstance>()
-interface BasicUserInfoVO {
-  id: number
-  nickname: string
-  email: string
-  mobile: string
-  sex: number
-}
-interface userInfoType {
-  basicUserInfo: BasicUserInfoVO
-}
-const user = reactive<userInfoType>({
-  basicUserInfo: {
-    id: 0,
-    nickname: '',
-    mobile: '',
-    email: '',
-    sex: 0
-  }
-})
 // 表单校验
 const rules = reactive<FormRules>({
   nickname: [{ required: true, message: t('profile.rules.nickname'), trigger: 'blur' }],
@@ -45,47 +43,49 @@ const rules = reactive<FormRules>({
     }
   ]
 })
-const submit = (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  formEl.validate(async (valid) => {
+const schema = reactive<FormSchema[]>([
+  {
+    field: 'nickname',
+    label: t('profile.user.nickname'),
+    component: 'Input'
+  },
+  {
+    field: 'mobile',
+    label: t('profile.user.mobile'),
+    component: 'Input'
+  },
+  {
+    field: 'email',
+    label: t('profile.user.email'),
+    component: 'Input'
+  },
+  {
+    field: 'sex',
+    label: t('profile.user.sex'),
+    component: 'InputNumber'
+  }
+])
+const sexVlue = ref<number>()
+const formRef = ref<FormExpose>() // 表单 Ref
+const submit = () => {
+  const elForm = unref(formRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
     if (valid) {
-      await updateUserProfileApi({ params: user.basicUserInfo })
+      const data = unref(formRef)?.formModel as UserProfileUpdateReqVO
+      data.sex = sexVlue.value as unknown as number
+      await updateUserProfileApi(data)
       ElMessage.success(t('common.updateSuccess'))
+      await init()
     }
   })
 }
-const reset = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  await getUserInfo()
-}
-const getUserInfo = async () => {
-  const users = await getUserProfileApi()
-  user.basicUserInfo = users
+const init = async () => {
+  const res = await getUserProfileApi()
+  sexVlue.value = res.sex
+  unref(formRef)?.setValues(res)
 }
 onMounted(async () => {
-  await getUserInfo()
+  await init()
 })
 </script>
-<template>
-  <el-form ref="form" :model="user.basicUserInfo" :rules="rules" label-width="80px">
-    <el-form-item :label="t('profile.user.nickname')" prop="nickname">
-      <el-input v-model="user.basicUserInfo.nickname" />
-    </el-form-item>
-    <el-form-item :label="t('profile.user.mobile')" prop="mobile">
-      <el-input v-model="user.basicUserInfo.mobile" maxlength="11" />
-    </el-form-item>
-    <el-form-item :label="t('profile.user.email')" prop="email">
-      <el-input v-model="user.basicUserInfo.email" maxlength="50" />
-    </el-form-item>
-    <el-form-item :label="t('profile.user.sex')" prop="sex">
-      <el-radio-group v-model="user.basicUserInfo.sex">
-        <el-radio :label="1">{{ t('profile.user.man') }}</el-radio>
-        <el-radio :label="2">{{ t('profile.user.woman') }}</el-radio>
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary" @click="submit(formRef)">{{ t('common.save') }}</el-button>
-      <el-button type="danger" @click="reset(formRef)">{{ t('common.reset') }}</el-button>
-    </el-form-item>
-  </el-form>
-</template>
