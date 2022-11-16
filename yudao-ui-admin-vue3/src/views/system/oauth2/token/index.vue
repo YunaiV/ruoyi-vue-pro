@@ -39,7 +39,7 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, reloadList } = useVxeGrid<TokenApi.OAuth2TokenVO>({
+const { gridOptions, getList } = useVxeGrid<TokenApi.OAuth2TokenVO>({
   allSchemas: allSchemas,
   getListApi: TokenApi.getAccessTokenPageApi
 })
@@ -65,7 +65,7 @@ const handleForceLogout = (rowId: number) => {
     })
     .finally(async () => {
       // 刷新列表
-      await reloadList(xGrid)
+      await getList(xGrid)
     })
 }
 </script>

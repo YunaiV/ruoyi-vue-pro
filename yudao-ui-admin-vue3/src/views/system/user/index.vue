@@ -242,7 +242,7 @@
   </XModal>
 </template>
 <script setup lang="ts">
-import { onMounted, reactive, ref, unref, watch } from 'vue'
+import { nextTick, onMounted, reactive, ref, unref, watch } from 'vue'
 import {
   ElTag,
   ElInput,
@@ -287,18 +287,20 @@ const defaultProps = {
   label: 'name',
   value: 'id'
 }
-
+const queryParams = reactive({
+  deptId: null
+})
 // ========== 列表相关 ==========
 const tableTitle = ref('用户列表')
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, reloadList, deleteData, exportList, getSearchData } =
-  useVxeGrid<UserApi.UserVO>({
-    allSchemas: allSchemas,
-    getListApi: UserApi.getUserPageApi,
-    deleteApi: UserApi.deleteUserApi,
-    exportListApi: UserApi.exportUserApi
-  })
+const { gridOptions, getList, deleteData, exportList } = useVxeGrid<UserApi.UserVO>({
+  allSchemas: allSchemas,
+  queryParams: queryParams,
+  getListApi: UserApi.getUserPageApi,
+  deleteApi: UserApi.deleteUserApi,
+  exportListApi: UserApi.exportUserApi
+})
 // ========== 创建部门树结构 ==========
 const filterText = ref('')
 const deptOptions = ref<any[]>([]) // 树形结构
@@ -312,13 +314,8 @@ const filterNode = (value: string, data: Tree) => {
   return data.name.includes(value)
 }
 const handleDeptNodeClick = async (row: { [key: string]: any }) => {
-  tableTitle.value = row.name
-  console.log(getSearchData(xGrid))
-  // gridOptions.formConfig?.data.push({
-  //   deptId: row.id
-  // })
-  // TODO 查询
-  await reloadList(xGrid)
+  queryParams.deptId = row.id
+  await getList(xGrid)
 }
 const { push } = useRouter()
 const handleDeptEdit = () => {
@@ -351,17 +348,16 @@ const setDialogTile = async (type: string) => {
 
 // 新增操作
 const handleCreate = async () => {
-  actionType.value = 'create'
+  setDialogTile('create')
   // 重置表单
   deptId.value = null
   postIds.value = []
-  dialogVisible.value = true
-  dialogTitle.value = t('action.create')
 }
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
+  await nextTick()
   unref(formRef)?.delSchema('username')
   unref(formRef)?.delSchema('password')
   // 设置数据
@@ -400,8 +396,9 @@ const submitForm = async () => {
     }
     dialogVisible.value = false
   } finally {
+    // unref(formRef)?.setSchema(allSchemas.formSchema)
     // 刷新列表
-    await reloadList(xGrid)
+    await getList(xGrid)
     loading.value = false
   }
 }
@@ -416,7 +413,7 @@ const handleStatusChange = async (row: UserApi.UserVO) => {
       await UserApi.updateUserStatusApi(row.id, row.status)
       message.success(text + '成功')
       // 刷新列表
-      await reloadList(xGrid)
+      await getList(xGrid)
     })
     .catch(() => {
       row.status =
@@ -516,7 +513,7 @@ const handleFileSuccess = async (response: any): Promise<void> => {
     text += '< ' + username + ': ' + data.failureUsernames[username] + ' >'
   }
   message.alert(text)
-  await reloadList(xGrid)
+  await getList(xGrid)
 }
 // 文件数超出提示
 const handleExceed = (): void => {

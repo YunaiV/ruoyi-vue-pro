@@ -57,10 +57,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '部门',
       field: 'deptId',
-      isTable: false,
-      search: {
-        visible: false
-      }
+      isTable: false
     },
     {
       title: '岗位',

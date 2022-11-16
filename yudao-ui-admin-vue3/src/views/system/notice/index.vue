@@ -82,7 +82,7 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, reloadList, deleteData } = useVxeGrid<NoticeApi.NoticeVO>({
+const { gridOptions, getList, deleteData } = useVxeGrid<NoticeApi.NoticeVO>({
   allSchemas: allSchemas,
   getListApi: NoticeApi.getNoticePageApi,
   deleteApi: NoticeApi.deleteNoticeApi
@@ -148,7 +148,7 @@ const submitForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
-        await reloadList(xGrid)
+        await getList(xGrid)
       }
     }
   })

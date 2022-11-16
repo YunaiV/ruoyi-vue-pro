@@ -14,7 +14,8 @@ interface UseVxeGridConfig<T = any> {
   getListApi: (option: any) => Promise<T>
   deleteApi?: (option: any) => Promise<T>
   exportListApi?: (option: any) => Promise<T>
-  exportName?: string
+  exportName?: string // 导出文件夹名称
+  queryParams?: any // 其他查询参数
 }
 
 const appStore = useAppStore()
@@ -64,7 +65,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
     pagerConfig: {
       border: false, // 带边框
       background: true, // 带背景颜色
-      perfect: true, // 配套的样式
+      perfect: false, // 配套的样式
       pageSize: 10, // 每页大小
       pagerCount: 7, // 显示页码按钮的数量
       autoHidden: true, // 当只有一页时自动隐藏
@@ -72,11 +73,11 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       layouts: [
         'PrevJump',
         'PrevPage',
-        'Jump',
-        'PageCount',
+        'JumpNumber',
         'NextPage',
         'NextJump',
         'Sizes',
+        'FullJump',
         'Total'
       ]
     },
@@ -86,7 +87,10 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       props: { result: 'list', total: 'total' },
       ajax: {
         query: ({ page, form }) => {
-          const queryParams = Object.assign({}, JSON.parse(JSON.stringify(form)))
+          let queryParams: any = Object.assign({}, JSON.parse(JSON.stringify(form)))
+          if (config?.queryParams) {
+            queryParams = Object.assign(queryParams, config.queryParams)
+          }
           queryParams.pageSize = page.pageSize
           queryParams.pageNo = page.currentPage
           gridOptions.loading = false
@@ -121,7 +125,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
    * @param ref
    * @returns
    */
-  const reloadList = async (ref) => {
+  const getList = async (ref) => {
     if (!ref) {
       console.error('未传入gridRef')
       return
@@ -214,7 +218,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
 
   return {
     gridOptions,
-    reloadList,
+    getList,
     getSearchData,
     deleteData,
     exportList,

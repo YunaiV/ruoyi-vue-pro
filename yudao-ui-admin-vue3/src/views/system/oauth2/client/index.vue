@@ -147,7 +147,7 @@ const message = useMessage() // 消息弹窗
 
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, reloadList, deleteData } = useVxeGrid<ClientApi.OAuth2ClientVO>({
+const { gridOptions, getList, deleteData } = useVxeGrid<ClientApi.OAuth2ClientVO>({
   allSchemas: allSchemas,
   getListApi: ClientApi.getOAuth2ClientPageApi,
   deleteApi: ClientApi.deleteOAuth2ClientApi
@@ -213,7 +213,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        await reloadList(xGrid)
+        await getList(xGrid)
       }
     }
   })

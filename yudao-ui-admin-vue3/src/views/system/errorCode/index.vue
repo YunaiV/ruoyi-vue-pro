@@ -83,7 +83,7 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // grid Ref
-const { gridOptions, reloadList, deleteData } = useVxeGrid<ErrorCodeApi.ErrorCodeVO>({
+const { gridOptions, getList, deleteData } = useVxeGrid<ErrorCodeApi.ErrorCodeVO>({
   allSchemas: allSchemas,
   getListApi: ErrorCodeApi.getErrorCodePageApi,
   deleteApi: ErrorCodeApi.deleteErrorCodeApi
@@ -150,7 +150,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        await reloadList(xGrid)
+        await getList(xGrid)
       }
     }
   })

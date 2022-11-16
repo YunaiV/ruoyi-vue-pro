@@ -174,7 +174,7 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, reloadList, deleteData } = useVxeGrid<RoleApi.RoleVO>({
+const { gridOptions, getList, deleteData } = useVxeGrid<RoleApi.RoleVO>({
   allSchemas: allSchemas,
   getListApi: RoleApi.getRolePageApi,
   deleteApi: RoleApi.deleteRoleApi
@@ -242,7 +242,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        await reloadList(xGrid)
+        await getList(xGrid)
       }
     }
   })
