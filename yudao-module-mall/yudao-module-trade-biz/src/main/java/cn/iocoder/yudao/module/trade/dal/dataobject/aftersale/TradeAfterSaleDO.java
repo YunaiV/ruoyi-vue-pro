@@ -125,12 +125,17 @@ public class TradeAfterSaleDO extends BaseDO {
      */
     private Integer refundPrice;
     /**
-     * 支付退款编号 TODO
+     * 支付退款编号
      *
      * 对接 pay-module-biz 支付服务的退款订单编号，即 PayRefundDO 的 id 编号
      */
     private Long payRefundId;
-    // TODO 芋艿：看看是否有必要冗余，order_number、order_amount、flow_trade_no、out_refund_no、pay_type、return_money_sts、refund_time
+    /**
+     * 退款时间
+     *
+     * 退款成功后，才记录该时间
+     */
+    private LocalDateTime refundTime;
 
     // ========== 退货相关 ==========
     /**

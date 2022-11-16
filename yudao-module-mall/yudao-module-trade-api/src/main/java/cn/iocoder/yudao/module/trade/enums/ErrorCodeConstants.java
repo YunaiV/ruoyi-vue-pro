@@ -34,6 +34,9 @@ public interface ErrorCodeConstants {
     ErrorCode AFTER_SALE_UPDATE_STATUS_FAIL = new ErrorCode(1011000107, "操作售后单失败，请刷新后重试");
     ErrorCode AFTER_SALE_DELIVERY_FAIL_STATUS_NOT_SELLER_PASS = new ErrorCode(1011000108, "退货失败，售后单状态不处于【待买家退货】");
     ErrorCode AFTER_SALE_CONFIRM_FAIL_STATUS_NOT_BUYER_RETURN = new ErrorCode(1011000109, "确认收货失败，售后单状态不处于【待确认收货】");
+    ErrorCode AFTER_SALE_REFUND_FAIL_PAY_REFUND_NOT_FOUND = new ErrorCode(1011000110, "退款失败，支付退款单不存在");
+    ErrorCode AFTER_SALE_REFUND_FAIL_PAY_REFUND_STATUS_NOT_SUCCESS = new ErrorCode(1011000111, "退款失败，支付退款单状态不是【成功】");
+    ErrorCode AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND = new ErrorCode(1011000112, "退款失败，售后单状态不是【待退款】");
 
     // ==========  Cart 模块 1-011-001-000 ==========
     ErrorCode CARD_ITEM_NOT_FOUND = new ErrorCode(1011002000, "购物车项不存在");

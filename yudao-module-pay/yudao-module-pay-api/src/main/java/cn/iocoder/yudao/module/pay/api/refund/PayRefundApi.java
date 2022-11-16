@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.pay.api.refund;
 
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 
 import javax.validation.Valid;
 
@@ -18,5 +19,13 @@ public interface PayRefundApi {
      * @return 退款单编号
      */
     Long createPayRefund(@Valid PayRefundCreateReqDTO reqDTO);
+
+    /**
+     * 获得退款单
+     *
+     * @param id 退款单编号
+     * @return 退款单
+     */
+    PayRefundRespDTO getPayRefund(Long id);
 
 }

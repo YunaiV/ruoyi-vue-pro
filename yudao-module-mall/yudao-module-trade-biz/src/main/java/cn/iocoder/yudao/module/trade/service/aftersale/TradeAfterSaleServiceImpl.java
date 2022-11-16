@@ -4,6 +4,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
+import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleAuditReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleConfirmReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
@@ -274,6 +276,44 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         // TODO 记录售后日志
 
         // TODO 发送售后消息
+    }
+
+    @Override
+    public void refundAfterSale(Long payRefundId) {
+        // 校验退款单
+        PayRefundRespDTO payRefund = validatePayRefundSuccess(payRefundId);
+
+        // 校验售后单的状态，并状态待退款
+        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectByPayRefundId(payRefundId);
+        if (afterSale == null) {
+            throw exception(AFTER_SALE_NOT_FOUND);
+        }
+        if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus())) {
+            throw exception(AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND);
+        }
+
+        // 更新售后单的状态为【已完成】
+        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus(), new TradeAfterSaleDO()
+                .setStatus(TradeAfterSaleStatusEnum.COMPLETE.getStatus()).setRefundTime(payRefund.getSuccessTime()));
+
+        // 更新交易订单项的售后状态为【已完成】
+        tradeOrderService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus());
+
+        // TODO 记录售后日志
+
+        // TODO 发送售后消息
+    }
+
+    private PayRefundRespDTO validatePayRefundSuccess(Long payRefundId) {
+        PayRefundRespDTO payRefund = payRefundApi.getPayRefund(payRefundId);
+        if (payRefund == null) {
+            throw exception(AFTER_SALE_REFUND_FAIL_PAY_REFUND_NOT_FOUND);
+        }
+        if (PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
+            throw exception(AFTER_SALE_REFUND_FAIL_PAY_REFUND_STATUS_NOT_SUCCESS);
+        }
+        return payRefund;
     }
 
 }

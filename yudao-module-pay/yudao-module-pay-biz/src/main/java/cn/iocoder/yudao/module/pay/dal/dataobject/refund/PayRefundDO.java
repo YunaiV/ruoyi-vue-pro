@@ -194,6 +194,4 @@ public class PayRefundDO extends BaseDO {
     private LocalDateTime notifyTime;
 
 
-
-
 }

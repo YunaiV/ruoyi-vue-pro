@@ -49,4 +49,11 @@ public interface TradeAfterSaleService {
      */
     void confirmAfterSale(Long userId, String userIp, TradeAfterSaleConfirmReqVO confirmReqVO);
 
+    /**
+     * 确认退款，由【pay】支付服务回调
+     *
+     * @param payRefundId 支付退款编号
+     */
+    void refundAfterSale(Long payRefundId);
+
 }

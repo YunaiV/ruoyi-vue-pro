@@ -13,4 +13,8 @@ public interface TradeAfterSaleMapper extends BaseMapperX<TradeAfterSaleDO> {
                 .eq(TradeAfterSaleDO::getId, id).eq(TradeAfterSaleDO::getStatus, status));
     }
 
+    default TradeAfterSaleDO selectByPayRefundId(Long payRefundId) {
+        return selectOne(TradeAfterSaleDO::getPayRefundId, payRefundId);
+    }
+
 }

@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.pay.enums.refund;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Objects;
+
 @Getter
 @AllArgsConstructor
 public enum PayRefundStatusEnum {
@@ -14,4 +16,9 @@ public enum PayRefundStatusEnum {
 
     private final Integer status;
     private final String name;
+
+    public static boolean isSuccess(Integer status) {
+        return Objects.equals(status, SUCCESS.getStatus());
+    }
+
 }
