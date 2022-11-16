@@ -2,8 +2,8 @@
   <ContentWrap>
     <!-- 列表 -->
     <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
-      <!-- 操作：新增 -->
       <template #toolbar_buttons>
+        <!-- 操作：新增 -->
         <XButton
           type="primary"
           preIcon="ep:zoom-in"
@@ -11,6 +11,7 @@
           v-hasPermi="['system:post:create']"
           @click="handleCreate()"
         />
+        <!-- 操作：导出 -->
         <XButton
           type="warning"
           preIcon="ep:download"
