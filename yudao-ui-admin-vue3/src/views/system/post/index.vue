@@ -32,7 +32,7 @@
         <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
-          v-hasPermi="['system:post:update']"
+          v-hasPermi="['system:post:query']"
           @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->
