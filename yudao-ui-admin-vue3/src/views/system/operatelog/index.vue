@@ -2,8 +2,8 @@
   <ContentWrap>
     <!-- 列表 -->
     <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
-      <!-- 操作：新增 -->
       <template #toolbar_buttons>
+        <!-- 操作：新增 -->
         <XButton
           type="warning"
           preIcon="ep:download"
@@ -74,6 +74,7 @@ const handleDetail = (row: OperateLogApi.OperateLogVO) => {
 
 // 导出操作
 const handleExport = async () => {
+  // TODO 星语：缺少 await 噢
   exportList(xGrid, '岗位列表.xls')
 }
 </script>

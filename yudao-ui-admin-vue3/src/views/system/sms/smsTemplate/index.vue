@@ -30,7 +30,7 @@
         <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
-          v-hasPermi="['system:sms-template:update']"
+          v-hasPermi="['system:sms-template:query']"
           @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->

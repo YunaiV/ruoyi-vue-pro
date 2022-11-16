@@ -25,11 +25,13 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '请求方法名',
-      field: 'requestMethod'
+      field: 'requestMethod',
+      isTable: false
     },
     {
       title: '请求地址',
-      field: 'requestUrl'
+      field: 'requestUrl',
+      isTable: false
     },
     {
       title: '操作人员',
@@ -57,7 +59,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
         slots: {
           default: 'resultCode'
         }
-      }
+      },
+      isSearch: true // TODO 星语：这里可能有点特殊，不确定好不好处理哈。管理后台返回的是错误码，最终前台展示的是 成功 or 失败，然后筛选页是这样的
     },
     {
       title: '操作日期',

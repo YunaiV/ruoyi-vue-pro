@@ -2,8 +2,8 @@
   <ContentWrap>
     <!-- 列表 -->
     <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
-      <!-- 操作：新增 -->
       <template #toolbar_buttons>
+        <!-- 操作：新增 -->
         <XButton
           type="primary"
           preIcon="ep:zoom-in"
@@ -34,7 +34,7 @@
         <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
-          v-hasPermi="['system:oauth2-client:update']"
+          v-hasPermi="['system:oauth2-client:query']"
           @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->

@@ -24,7 +24,7 @@
         <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
-          v-hasPermi="['system:notice:update']"
+          v-hasPermi="['system:notice:query']"
           @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->
@@ -148,7 +148,7 @@ const submitForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
-        // 刷新列表
+        // 刷新列表 TODO 星语：这里要有个 await
         reloadList(xGrid)
       }
     }

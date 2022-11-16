@@ -24,7 +24,7 @@
         <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
-          v-hasPermi="['system:error-code:update']"
+          v-hasPermi="['system:error-code:query']"
           @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->

@@ -22,7 +22,7 @@
         <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
-          v-hasPermi="['system:role:update']"
+          v-hasPermi="['system:role:query']"
           @click="handleDetail(row.id)"
         />
         <XTextButton
