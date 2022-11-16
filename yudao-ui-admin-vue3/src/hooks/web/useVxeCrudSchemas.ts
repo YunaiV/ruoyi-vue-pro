@@ -174,7 +174,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
       title: crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index'),
       field: crudSchema.primaryKey,
       type: crudSchema.primaryType ? crudSchema.primaryType : null,
-      width: '50px'
+      width: '80px'
     }
     tableSchema.push(tableSchemaItem)
   }
