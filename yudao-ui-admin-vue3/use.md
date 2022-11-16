@@ -15,7 +15,7 @@
 - 一个页面(以post为例)由4部分组成
   
 ```bash
-/src/api/system/post/ [index.ts | types.ts] 
+/src/api/system/post/index.ts
 /src/views/system/post/ [index.vue | post.data.ts] 
 ```
 

@@ -117,15 +117,17 @@ defineExpose({
   <XModal title="预览" v-model="preview.open">
     <div class="flex">
       <el-card class="w-1/4" :gutter="12" shadow="hover">
-        <el-tree
-          ref="treeRef"
-          node-key="id"
-          :data="preview.fileTree"
-          :expand-on-click-node="false"
-          default-expand-all
-          highlight-current
-          @node-click="handleNodeClick"
-        />
+        <el-scrollbar height="calc(100vh - 88px - 40px - 50px)">
+          <el-tree
+            ref="treeRef"
+            node-key="id"
+            :data="preview.fileTree"
+            :expand-on-click-node="false"
+            default-expand-all
+            highlight-current
+            @node-click="handleNodeClick"
+          />
+        </el-scrollbar>
       </el-card>
       <el-card class="w-3/4" style="margin-left: 10px" :gutter="12" shadow="hover">
         <el-tabs v-model="preview.activeName">
