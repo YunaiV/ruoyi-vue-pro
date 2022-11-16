@@ -189,13 +189,14 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
       tableSchemaItem.showOverflow = 'tooltip'
       if (schemaItem?.formatter) {
         tableSchemaItem.formatter = schemaItem.formatter
-        tableSchemaItem.width = 160
+        tableSchemaItem.width = tableSchemaItem.width ? tableSchemaItem.width : 160
       }
       if (schemaItem?.dictType) {
         tableSchemaItem.cellRender = {
           name: 'XDict',
           content: schemaItem.dictType
         }
+        tableSchemaItem.width = tableSchemaItem.width ? tableSchemaItem.width : 160
       }
 
       tableSchema.push(tableSchemaItem)

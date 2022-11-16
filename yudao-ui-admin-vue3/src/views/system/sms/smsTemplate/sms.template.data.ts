@@ -21,38 +21,45 @@ const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
   primaryType: 'seq',
   action: true,
+  actionWidth: '280',
   columns: [
     {
-      label: '模板编码',
+      title: '模板编码',
       field: 'code',
       isSearch: true
     },
     {
-      label: '模板名称',
+      title: '模板名称',
       field: 'name',
       isSearch: true
     },
     {
-      label: '模板内容',
+      title: '模板内容',
       field: 'content'
     },
     {
-      label: '短信 API 的模板编号',
+      title: '短信 API 的模板编号',
       field: 'apiTemplateId',
       isSearch: true
     },
     {
-      label: '短信类型',
+      title: '短信类型',
       field: 'type',
-      dictType: DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE
+      dictType: DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE,
+      table: {
+        width: 80
+      }
     },
     {
-      label: t('common.status'),
+      title: t('common.status'),
       field: 'status',
-      dictType: DICT_TYPE.COMMON_STATUS
+      dictType: DICT_TYPE.COMMON_STATUS,
+      table: {
+        width: 80
+      }
     },
     {
-      label: t('form.remark'),
+      title: t('form.remark'),
       field: 'remark',
       isTable: false
     },
