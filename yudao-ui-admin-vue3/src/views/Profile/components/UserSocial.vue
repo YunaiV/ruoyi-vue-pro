@@ -46,13 +46,11 @@ const initSocial = async () => {
       }
     }
   }
-  console.info(socialUsers.value)
 }
 const bind = (row) => {
   const redirectUri = location.origin + '/user/profile?type=' + row.type
   // 进行跳转
   socialAuthRedirect(row.type, encodeURIComponent(redirectUri)).then((res) => {
-    console.log(res.url)
     window.location.href = res.data
   })
 }
