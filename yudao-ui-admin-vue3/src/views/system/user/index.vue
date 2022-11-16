@@ -158,12 +158,12 @@
   </XModal>
   <!-- 分配用户角色 -->
   <XModal v-model="roleDialogVisible" title="分配角色">
-    <el-form :model="userRole" label-width="80px">
+    <el-form :model="userRole" label-width="140px" :inline="true">
       <el-form-item label="用户名称">
-        <el-input v-model="userRole.username" :disabled="true" />
+        <el-tag>{{ userRole.username }}</el-tag>
       </el-form-item>
       <el-form-item label="用户昵称">
-        <el-input v-model="userRole.nickname" :disabled="true" />
+        <el-tag>{{ userRole.nickname }}</el-tag>
       </el-form-item>
       <el-form-item label="角色">
         <el-transfer
@@ -180,13 +180,7 @@
     <!-- 操作按钮 -->
     <template #footer>
       <!-- 按钮：保存 -->
-      <XButton
-        v-if="['create', 'update'].includes(actionType)"
-        type="primary"
-        :title="t('action.save')"
-        :loading="loading"
-        @click="submitRole()"
-      />
+      <XButton type="primary" :title="t('action.save')" :loading="loading" @click="submitRole()" />
       <!-- 按钮：关闭 -->
       <XButton :title="t('dialog.close')" @click="roleDialogVisible = false" />
     </template>

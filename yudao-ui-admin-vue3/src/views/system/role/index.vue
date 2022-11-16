@@ -74,12 +74,12 @@
     </template>
   </XModal>
   <XModal v-model="dialogScopeVisible" :title="dialogScopeTitle">
-    <el-form :model="dataScopeForm">
+    <el-form :model="dataScopeForm" label-width="140px" :inline="true">
       <el-form-item label="角色名称">
-        <el-input v-model="dataScopeForm.name" :disabled="true" />
+        <el-tag>{{ dataScopeForm.name }}</el-tag>
       </el-form-item>
       <el-form-item label="角色标识">
-        <el-input v-model="dataScopeForm.code" :disabled="true" />
+        <el-tag>{{ dataScopeForm.code }}</el-tag>
       </el-form-item>
       <!-- 分配角色的数据权限对话框 -->
       <el-form-item label="权限范围" v-if="actionScopeType === 'data'">
@@ -146,12 +146,12 @@ import { onMounted, reactive, ref, unref } from 'vue'
 import {
   ElForm,
   ElFormItem,
-  ElInput,
   ElSelect,
   ElOption,
   ElTree,
   ElCard,
-  ElSwitch
+  ElSwitch,
+  ElTag
 } from 'element-plus'
 import { DICT_TYPE, getDictOptions } from '@/utils/dict'
 import { useI18n } from '@/hooks/web/useI18n'
