@@ -74,7 +74,6 @@ const handleDetail = (row: OperateLogApi.OperateLogVO) => {
 
 // 导出操作
 const handleExport = async () => {
-  // TODO 星语：缺少 await 噢
-  exportList(xGrid, '岗位列表.xls')
+  await exportList(xGrid, '岗位列表.xls')
 }
 </script>

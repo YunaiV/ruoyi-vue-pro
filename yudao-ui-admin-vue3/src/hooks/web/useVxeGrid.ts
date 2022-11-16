@@ -12,7 +12,7 @@ const message = useMessage() // 消息弹窗
 interface UseVxeGridConfig<T = any> {
   allSchemas: VxeAllSchemas
   getListApi: (option: any) => Promise<T>
-  delListApi?: (option: any) => Promise<T>
+  deleteApi?: (option: any) => Promise<T>
   exportListApi?: (option: any) => Promise<T>
   exportName?: string
 }
@@ -150,12 +150,12 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
    * @param ids rowid
    * @returns
    */
-  const delList = async (ref, ids: string | number | string[] | number[]) => {
+  const deleteData = async (ref, ids: string | number) => {
     if (!ref) {
       console.error('未传入gridRef')
       return
     }
-    if (!config?.delListApi) {
+    if (!config?.deleteApi) {
       console.error('未传入delListApi')
       return
     }
@@ -164,7 +164,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       message
         .delConfirm()
         .then(() => {
-          config?.delListApi && config?.delListApi(ids)
+          config?.deleteApi && config?.deleteApi(ids)
           message.success(t('common.delSuccess'))
         })
         .finally(async () => {
@@ -216,7 +216,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
     gridOptions,
     reloadList,
     getSearchData,
-    delList,
+    deleteData,
     exportList,
     zoom
   }

@@ -82,10 +82,10 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, reloadList, delList } = useVxeGrid<NoticeApi.NoticeVO>({
+const { gridOptions, reloadList, deleteData } = useVxeGrid<NoticeApi.NoticeVO>({
   allSchemas: allSchemas,
   getListApi: NoticeApi.getNoticePageApi,
-  delListApi: NoticeApi.deleteNoticeApi
+  deleteApi: NoticeApi.deleteNoticeApi
 })
 // 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
@@ -109,23 +109,23 @@ const handleCreate = () => {
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
-  setDialogTile('update')
   // 设置数据
   const res = await NoticeApi.getNoticeApi(rowId)
   unref(formRef)?.setValues(res)
+  setDialogTile('update')
 }
 
 // 详情操作
 const handleDetail = async (rowId: number) => {
-  setDialogTile('detail')
   // 设置数据
   const res = await NoticeApi.getNoticeApi(rowId)
   detailRef.value = res
+  setDialogTile('detail')
 }
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  delList(xGrid, rowId)
+  await deleteData(xGrid, rowId)
 }
 
 // 提交新增/修改的表单
@@ -148,8 +148,7 @@ const submitForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
-        // 刷新列表 TODO 星语：这里要有个 await
-        reloadList(xGrid)
+        await reloadList(xGrid)
       }
     }
   })

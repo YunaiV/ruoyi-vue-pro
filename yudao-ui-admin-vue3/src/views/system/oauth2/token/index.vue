@@ -63,9 +63,9 @@ const handleForceLogout = (rowId: number) => {
       await TokenApi.deleteAccessTokenApi(rowId)
       message.success(t('common.success'))
     })
-    .finally(() => {
+    .finally(async () => {
       // 刷新列表
-      reloadList(xGrid)
+      await reloadList(xGrid)
     })
 }
 </script>

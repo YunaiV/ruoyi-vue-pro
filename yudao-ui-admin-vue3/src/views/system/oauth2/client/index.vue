@@ -94,10 +94,10 @@ const message = useMessage() // 消息弹窗
 
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, reloadList, delList } = useVxeGrid<ClientApi.OAuth2ClientVO>({
+const { gridOptions, reloadList, deleteData } = useVxeGrid<ClientApi.OAuth2ClientVO>({
   allSchemas: allSchemas,
   getListApi: ClientApi.getOAuth2ClientPageApi,
-  delListApi: ClientApi.deleteOAuth2ClientApi
+  deleteApi: ClientApi.deleteOAuth2ClientApi
 })
 // 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
@@ -121,22 +121,22 @@ const handleCreate = () => {
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
-  setDialogTile('update')
   // 设置数据
   const res = await ClientApi.getOAuth2ClientApi(rowId)
   unref(formRef)?.setValues(res)
+  setDialogTile('update')
 }
 
 // 详情操作
 const handleDetail = async (rowId: number) => {
-  setDialogTile('detail')
   const res = await ClientApi.getOAuth2ClientApi(rowId)
   detailRef.value = res
+  setDialogTile('detail')
 }
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  delList(xGrid, rowId)
+  await deleteData(xGrid, rowId)
 }
 
 // 提交新增/修改的表单
@@ -160,7 +160,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        reloadList(xGrid)
+        await reloadList(xGrid)
       }
     }
   })

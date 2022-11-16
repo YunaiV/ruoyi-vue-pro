@@ -85,10 +85,10 @@ const message = useMessage() // 消息弹窗
 
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, reloadList, delList } = useVxeGrid<SmsChannelApi.SmsChannelVO>({
+const { gridOptions, reloadList, deleteData } = useVxeGrid<SmsChannelApi.SmsChannelVO>({
   allSchemas: allSchemas,
   getListApi: SmsChannelApi.getSmsChannelPageApi,
-  delListApi: SmsChannelApi.deleteSmsChannelApi
+  deleteApi: SmsChannelApi.deleteSmsChannelApi
 })
 
 // 弹窗相关的变量
@@ -113,22 +113,22 @@ const handleCreate = () => {
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
-  setDialogTile('update')
   // 设置数据
   const res = await SmsChannelApi.getSmsChannelApi(rowId)
   unref(formRef)?.setValues(res)
+  setDialogTile('update')
 }
 
 // 详情操作
 const handleDetail = async (rowId: number) => {
-  setDialogTile('detail')
   const res = await SmsChannelApi.getSmsChannelApi(rowId)
   detailData.value = res
+  setDialogTile('detail')
 }
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  await delList(xGrid, rowId)
+  await deleteData(xGrid, rowId)
 }
 
 // 提交按钮
@@ -152,7 +152,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        reloadList(xGrid)
+        await reloadList(xGrid)
       }
     }
   })

@@ -46,7 +46,7 @@
     </vxe-grid>
   </ContentWrap>
   <!-- 弹窗 -->
-  <XModal id="postModel" v-model="dialogVisible" :title="dialogTitle">
+  <XModal id="postModel" :loading="modelLoading" v-model="modelVisible" :title="modelTitle">
     <!-- 表单：添加/修改 -->
     <Form
       ref="formRef"
@@ -70,7 +70,7 @@
         @click="submitForm()"
       />
       <!-- 按钮：关闭 -->
-      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
+      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="modelVisible = false" />
     </template>
   </XModal>
 </template>
@@ -90,15 +90,16 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, reloadList, delList, exportList } = useVxeGrid<PostApi.PostVO>({
+const { gridOptions, reloadList, deleteData, exportList } = useVxeGrid<PostApi.PostVO>({
   allSchemas: allSchemas,
   getListApi: PostApi.getPostPageApi,
-  delListApi: PostApi.deletePostApi,
+  deleteApi: PostApi.deletePostApi,
   exportListApi: PostApi.exportPostApi
 })
 // 弹窗相关的变量
-const dialogVisible = ref(false) // 是否显示弹出层
-const dialogTitle = ref('edit') // 弹出层标题
+const modelVisible = ref(false) // 是否显示弹出层
+const modelTitle = ref('edit') // 弹出层标题
+const modelLoading = ref(false) // 弹出层loading
 const actionType = ref('') // 操作按钮的类型
 const actionLoading = ref(false) // 按钮 Loading
 const formRef = ref<FormExpose>() // 表单 Ref
@@ -106,27 +107,29 @@ const detailData = ref() // 详情 Ref
 
 // 设置标题
 const setDialogTile = (type: string) => {
-  dialogTitle.value = t('action.' + type)
+  modelLoading.value = true
+  modelTitle.value = t('action.' + type)
   actionType.value = type
-  dialogVisible.value = true
+  modelVisible.value = true
 }
 
 // 新增操作
 const handleCreate = () => {
   setDialogTile('create')
+  modelLoading.value = false
 }
 
 // 导出操作
 const handleExport = async () => {
   await exportList(xGrid, '岗位列表.xls')
 }
-
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
   const res = await PostApi.getPostApi(rowId)
   unref(formRef)?.setValues(res)
+  modelLoading.value = false
 }
 
 // 详情操作
@@ -134,11 +137,12 @@ const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
   const res = await PostApi.getPostApi(rowId)
   detailData.value = res
+  modelLoading.value = false
 }
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  await delList(xGrid, rowId)
+  await deleteData(xGrid, rowId)
 }
 
 // 提交新增/修改的表单
@@ -158,11 +162,11 @@ const submitForm = async () => {
           await PostApi.updatePostApi(data)
           message.success(t('common.updateSuccess'))
         }
-        dialogVisible.value = false
+        modelVisible.value = false
       } finally {
         actionLoading.value = false
         // 刷新列表
-        reloadList(xGrid)
+        await reloadList(xGrid)
       }
     }
   })

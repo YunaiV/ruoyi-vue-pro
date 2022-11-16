@@ -59,6 +59,6 @@ const handleDetail = async (row: LoginLogVO) => {
 
 // 导出操作
 const handleExport = async () => {
-  exportList(xGrid, '登录列表.xls')
+  await exportList(xGrid, '登录列表.xls')
 }
 </script>

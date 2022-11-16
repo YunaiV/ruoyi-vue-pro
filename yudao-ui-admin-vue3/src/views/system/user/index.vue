@@ -72,7 +72,7 @@
             preIcon="ep:view"
             :title="t('action.detail')"
             v-hasPermi="['system:user:update']"
-            @click="handleDetail(row)"
+            @click="handleDetail(row.id)"
           />
           <XTextButton
             preIcon="ep:key"
@@ -292,12 +292,13 @@ const defaultProps = {
 const tableTitle = ref('用户列表')
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, reloadList, delList, exportList, getSearchData } = useVxeGrid<UserApi.UserVO>({
-  allSchemas: allSchemas,
-  getListApi: UserApi.getUserPageApi,
-  delListApi: UserApi.deleteUserApi,
-  exportListApi: UserApi.exportUserApi
-})
+const { gridOptions, reloadList, deleteData, exportList, getSearchData } =
+  useVxeGrid<UserApi.UserVO>({
+    allSchemas: allSchemas,
+    getListApi: UserApi.getUserPageApi,
+    deleteApi: UserApi.deleteUserApi,
+    exportListApi: UserApi.exportUserApi
+  })
 // ========== 创建部门树结构 ==========
 const filterText = ref('')
 const deptOptions = ref<any[]>([]) // 树形结构
@@ -360,7 +361,6 @@ const handleCreate = async () => {
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
-  await setDialogTile('update')
   unref(formRef)?.delSchema('username')
   unref(formRef)?.delSchema('password')
   // 设置数据
@@ -368,18 +368,20 @@ const handleUpdate = async (rowId: number) => {
   deptId.value = res.deptId
   postIds.value = res.postIds
   unref(formRef)?.setValues(res)
+  setDialogTile('update')
 }
 const detailData = ref()
 
 // 详情操作
-const handleDetail = async (row: UserApi.UserVO) => {
+const handleDetail = async (rowId: number) => {
   // 设置数据
-  detailData.value = row
+  const res = await UserApi.getUserApi(rowId)
+  detailData.value = res
   await setDialogTile('detail')
 }
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  await delList(xGrid, rowId)
+  await deleteData(xGrid, rowId)
 }
 // 提交按钮
 const submitForm = async () => {
@@ -398,9 +400,9 @@ const submitForm = async () => {
     }
     dialogVisible.value = false
   } finally {
-    loading.value = false
     // 刷新列表
-    reloadList(xGrid)
+    await reloadList(xGrid)
+    loading.value = false
   }
 }
 // 改变用户状态操作
@@ -414,7 +416,7 @@ const handleStatusChange = async (row: UserApi.UserVO) => {
       await UserApi.updateUserStatusApi(row.id, row.status)
       message.success(text + '成功')
       // 刷新列表
-      reloadList(xGrid)
+      await reloadList(xGrid)
     })
     .catch(() => {
       row.status =
@@ -493,7 +495,7 @@ const submitFileForm = () => {
   uploadRef.value!.submit()
 }
 // 文件上传成功
-const handleFileSuccess = (response: any): void => {
+const handleFileSuccess = async (response: any): Promise<void> => {
   if (response.code !== 0) {
     message.error(response.msg)
     return
@@ -514,7 +516,7 @@ const handleFileSuccess = (response: any): void => {
     text += '< ' + username + ': ' + data.failureUsernames[username] + ' >'
   }
   message.alert(text)
-  reloadList(xGrid)
+  await reloadList(xGrid)
 }
 // 文件数超出提示
 const handleExceed = (): void => {

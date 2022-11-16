@@ -10,7 +10,7 @@ import type { UserGroupVO } from '@/api/bpm/userGroup/types'
 import { rules, allSchemas } from './group.data'
 import * as UserGroupApi from '@/api/bpm/userGroup'
 import { getListSimpleUsersApi } from '@/api/system/user'
-import { UserVO } from '@/api/system/user/types'
+import { UserVO } from '@/api/system/user'
 
 const { t } = useI18n() // 国际化
 

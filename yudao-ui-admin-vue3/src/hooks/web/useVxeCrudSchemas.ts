@@ -15,12 +15,10 @@ import { FormSchema } from '@/types/form'
 import { ComponentOptions } from '@/types/components'
 
 export type VxeCrudSchema = {
-  // 主键ID
-  primaryKey?: string
-  primaryType?: VxeColumnPropTypes.Type
-  // 是否开启操作栏插槽
-  action?: boolean
-  actionWidth?: string
+  primaryKey?: string // 主键ID
+  primaryType?: VxeColumnPropTypes.Type // 不填写为数据库编号 还支持 "seq" | "radio" | "checkbox" | "expand" | "html" | null
+  action?: boolean // 是否开启操作栏插槽
+  actionWidth?: string // 操作栏插槽宽度，一般1个 text 类型按钮 60-80
   columns: VxeCrudColumns[]
 }
 type VxeCrudColumns = Omit<VxeTableColumn, 'children'> & {
@@ -173,7 +171,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
     const tableSchemaItem = {
       title: t('common.index'),
       field: crudSchema.primaryKey,
-      type: crudSchema.primaryType ? crudSchema.primaryType : 'seq',
+      type: crudSchema.primaryType ? crudSchema.primaryType : null,
       width: '50px'
     }
     tableSchema.push(tableSchemaItem)
