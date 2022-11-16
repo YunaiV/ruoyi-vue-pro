@@ -26,7 +26,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '浏览器',
-      field: 'userAgent'
+      field: 'userAgent' // TODO 星语：调宽一点，UA 稍微多展示一点，虽然最终都会缩略
     },
     {
       title: '登陆结果',
@@ -34,7 +34,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       dictType: DICT_TYPE.SYSTEM_LOGIN_RESULT
     },
     {
-      title: '登录日期',
+      title: '登录日期', // TODO 星语：有点窄，看看咋调宽一点，避免日期展示不全
       field: 'createTime',
       formatter: 'formatDate',
       isSearch: true,
