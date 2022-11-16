@@ -73,7 +73,7 @@
     </template>
   </XModal>
   <XModal id="sendTest" v-model="sendVisible" title="测试">
-    <el-form :model="sendSmsForm" :rules="sendSmsRules" label-width="140px">
+    <el-form :model="sendSmsForm" :rules="sendSmsRules" label-width="200px" label-position="top">
       <el-form-item label="模板内容" prop="content">
         <el-input
           v-model="sendSmsForm.content"
@@ -118,6 +118,7 @@ import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
 import { FormExpose } from '@/components/Form'
+import { ElForm, ElFormItem, ElInput } from 'element-plus'
 // 业务相关的 import
 import * as SmsTemplateApi from '@/api/system/sms/smsTemplate'
 import { rules, allSchemas } from './sms.template.data'
