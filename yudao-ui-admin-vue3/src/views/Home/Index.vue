@@ -6,12 +6,11 @@ import { CountTo } from '@/components/CountTo'
 import { formatTime } from '@/utils'
 import { Echart } from '@/components/Echart'
 import { EChartsOption } from 'echarts'
-import { radarOption } from './echarts-data'
 import { Highlight } from '@/components/Highlight'
 import type { WorkplaceTotal, Project, Notice, Shortcut } from './types'
 import { set } from 'lodash-es'
 import { useCache } from '@/hooks/web/useCache'
-import { pieOptions, barOptions, lineOptions } from './echarts-data'
+import { pieOptions, barOptions } from './echarts-data'
 
 const { t } = useI18n()
 const { wsCache } = useCache()
@@ -156,44 +155,6 @@ const getShortcut = async () => {
   shortcut = Object.assign(shortcut, data)
 }
 
-// 获取指数
-let radarOptionData = reactive<EChartsOption>(radarOption) as EChartsOption
-
-const getRadar = async () => {
-  const data = [
-    { name: 'workplace.quote', max: 65, personal: 42, team: 50 },
-    { name: 'workplace.contribution', max: 160, personal: 30, team: 140 },
-    { name: 'workplace.hot', max: 300, personal: 20, team: 28 },
-    { name: 'workplace.yield', max: 130, personal: 35, team: 35 },
-    { name: 'workplace.follow', max: 100, personal: 80, team: 90 }
-  ]
-  set(
-    radarOptionData,
-    'radar.indicator',
-    data.map((v) => {
-      return {
-        name: t(v.name),
-        max: v.max
-      }
-    })
-  )
-  set(radarOptionData, 'series', [
-    {
-      name: '指数',
-      type: 'radar',
-      data: [
-        {
-          value: data.map((v) => v.personal),
-          name: t('workplace.personal')
-        },
-        {
-          value: data.map((v) => v.team),
-          name: t('workplace.team')
-        }
-      ]
-    }
-  ])
-}
 // 用户来源
 const getUserAccessSource = async () => {
   const data = [
@@ -242,60 +203,14 @@ const getWeeklyUserActivity = async () => {
   ])
 }
 
-const lineOptionsData = reactive<EChartsOption>(lineOptions) as EChartsOption
-
-// 每月销售总额
-const getMonthlySales = async () => {
-  const data = [
-    { estimate: 100, actual: 120, name: 'analysis.january' },
-    { estimate: 120, actual: 82, name: 'analysis.february' },
-    { estimate: 161, actual: 91, name: 'analysis.march' },
-    { estimate: 134, actual: 154, name: 'analysis.april' },
-    { estimate: 105, actual: 162, name: 'analysis.may' },
-    { estimate: 160, actual: 140, name: 'analysis.june' },
-    { estimate: 165, actual: 145, name: 'analysis.july' },
-    { estimate: 114, actual: 250, name: 'analysis.august' },
-    { estimate: 163, actual: 134, name: 'analysis.september' },
-    { estimate: 185, actual: 56, name: 'analysis.october' },
-    { estimate: 118, actual: 99, name: 'analysis.november' },
-    { estimate: 123, actual: 123, name: 'analysis.december' }
-  ]
-  set(
-    lineOptionsData,
-    'xAxis.data',
-    data.map((v) => t(v.name))
-  )
-  set(lineOptionsData, 'series', [
-    {
-      name: t('analysis.estimate'),
-      smooth: true,
-      type: 'line',
-      data: data.map((v) => v.estimate),
-      animationDuration: 2800,
-      animationEasing: 'cubicInOut'
-    },
-    {
-      name: t('analysis.actual'),
-      smooth: true,
-      type: 'line',
-      itemStyle: {},
-      data: data.map((v) => v.actual),
-      animationDuration: 2800,
-      animationEasing: 'quadraticOut'
-    }
-  ])
-}
-
 const getAllApi = async () => {
   await Promise.all([
     getCount(),
     getProject(),
     getNotice(),
     getShortcut(),
-    getRadar(),
     getUserAccessSource(),
-    getWeeklyUserActivity(),
-    getMonthlySales()
+    getWeeklyUserActivity()
   ])
   loading.value = false
 }
@@ -359,11 +274,11 @@ getAllApi()
     </el-card>
   </div>
 
-  <el-row class="mt-10px" :gutter="20" justify="space-between">
-    <el-col :xl="16" :lg="16" :md="24" :sm="24" :xs="24" class="mb-20px">
+  <el-row class="mt-5px" :gutter="20" justify="space-between">
+    <el-col :xl="16" :lg="16" :md="24" :sm="24" :xs="24" class="mb-10px">
       <el-card shadow="never">
         <template #header>
-          <div class="flex justify-between">
+          <div class="flex justify-between h-3">
             <span>{{ t('workplace.project') }}</span>
             <el-link type="primary" :underline="false">{{ t('workplace.more') }}</el-link>
           </div>
@@ -375,7 +290,7 @@ getAllApi()
               :key="`card-${index}`"
               :xl="8"
               :lg="8"
-              :md="12"
+              :md="8"
               :sm="24"
               :xs="24"
             >
@@ -395,27 +310,20 @@ getAllApi()
         </el-skeleton>
       </el-card>
 
-      <el-card shadow="never" class="mt-10px">
+      <el-card shadow="never" class="mt-5px">
         <el-skeleton :loading="loading" animated>
           <el-row :gutter="20" justify="space-between">
             <el-col :xl="10" :lg="10" :md="24" :sm="24" :xs="24">
-              <el-card shadow="hover" class="mb-20px">
+              <el-card shadow="hover" class="mb-10px">
                 <el-skeleton :loading="loading" animated>
-                  <Echart :options="pieOptionsData" :height="300" />
+                  <Echart :options="pieOptionsData" :height="280" />
                 </el-skeleton>
               </el-card>
             </el-col>
             <el-col :xl="14" :lg="14" :md="24" :sm="24" :xs="24">
-              <el-card shadow="hover" class="mb-20px">
+              <el-card shadow="hover" class="mb-10px">
                 <el-skeleton :loading="loading" animated>
-                  <Echart :options="barOptionsData" :height="300" />
-                </el-skeleton>
-              </el-card>
-            </el-col>
-            <el-col :span="24">
-              <el-card shadow="hover" class="mb-20px">
-                <el-skeleton :loading="loading" animated :rows="4">
-                  <Echart :options="lineOptionsData" :height="350" />
+                  <Echart :options="barOptionsData" :height="280" />
                 </el-skeleton>
               </el-card>
             </el-col>
@@ -423,14 +331,16 @@ getAllApi()
         </el-skeleton>
       </el-card>
     </el-col>
-    <el-col :xl="8" :lg="8" :md="24" :sm="24" :xs="24" class="mb-20px">
+    <el-col :xl="8" :lg="8" :md="24" :sm="24" :xs="24" class="mb-10px">
       <el-card shadow="never">
         <template #header>
-          <span>{{ t('workplace.shortcutOperation') }}</span>
+          <div class="flex justify-between h-3">
+            <span>{{ t('workplace.shortcutOperation') }}</span>
+          </div>
         </template>
         <el-skeleton :loading="loading" animated>
           <el-row>
-            <el-col v-for="item in shortcut" :key="`team-${item.name}`" :span="8" class="mb-20px">
+            <el-col v-for="item in shortcut" :key="`team-${item.name}`" :span="8" class="mb-10px">
               <div class="flex items-center">
                 <Icon :icon="item.icon" class="mr-10px" />
                 <el-link type="default" :underline="false" :href="item.url">
@@ -443,7 +353,7 @@ getAllApi()
       </el-card>
       <el-card shadow="never" class="mt-10px">
         <template #header>
-          <div class="flex justify-between">
+          <div class="flex justify-between h-3">
             <span>{{ t('workplace.notice') }}</span>
             <el-link type="primary" :underline="false">{{ t('workplace.more') }}</el-link>
           </div>
@@ -465,14 +375,6 @@ getAllApi()
             </div>
             <el-divider />
           </div>
-        </el-skeleton>
-      </el-card>
-      <el-card shadow="never" class="mt-10px">
-        <template #header>
-          <span>{{ t('workplace.index') }}</span>
-        </template>
-        <el-skeleton :loading="loading" animated>
-          <Echart :options="radarOptionData" :height="400" />
         </el-skeleton>
       </el-card>
     </el-col>
