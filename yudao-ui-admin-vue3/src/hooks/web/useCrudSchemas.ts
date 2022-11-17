@@ -142,9 +142,17 @@ const filterFormSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
     // 判断是否显示
     if (schemaItem?.form?.show !== false) {
       let component = schemaItem?.form?.component || 'Input'
-      const options: ComponentOptions[] = []
+      let defaultValue: any = ''
+      if (schemaItem.form?.value) {
+        defaultValue = schemaItem.form?.value
+      } else {
+        if (component === 'InputNumber') {
+          defaultValue = 0
+        }
+      }
       let comonentProps = {}
       if (schemaItem.dictType) {
+        const options: ComponentOptions[] = []
         if (schemaItem.dictData && schemaItem.dictData === 'number') {
           getIntDictOptions(schemaItem.dictType).forEach((dict) => {
             options.push(dict)
@@ -167,6 +175,7 @@ const filterFormSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
         // 默认为 input
         component: component,
         componentProps: comonentProps,
+        value: defaultValue,
         ...schemaItem.form,
         field: schemaItem.field,
         label: schemaItem.form?.label || schemaItem.label

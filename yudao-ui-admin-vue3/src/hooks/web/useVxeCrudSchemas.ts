@@ -228,8 +228,12 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
       // 默认为 input
       let component = schemaItem?.form?.component || 'Input'
       let defaultValue: any = ''
-      if (component === 'InputNumber') {
-        defaultValue = 0
+      if (schemaItem.form?.value) {
+        defaultValue = schemaItem.form?.value
+      } else {
+        if (component === 'InputNumber') {
+          defaultValue = 0
+        }
       }
       let comonentProps = {}
       if (schemaItem.dictType) {
@@ -253,12 +257,12 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
         if (!(schemaItem.form && schemaItem.form.component)) component = 'Select'
       }
       const formSchemaItem = {
-        ...schemaItem.form,
-        field: schemaItem.field,
-        label: schemaItem.form?.label || schemaItem.title,
         component: component,
         componentProps: comonentProps,
-        value: defaultValue
+        value: defaultValue,
+        ...schemaItem.form,
+        field: schemaItem.field,
+        label: schemaItem.form?.label || schemaItem.title
       }
 
       formSchema.push(formSchemaItem)
