@@ -13,7 +13,7 @@ import { createHtmlPlugin } from 'vite-plugin-html'
 import viteCompression from 'vite-plugin-compression'
 import VueMarcos from 'unplugin-vue-macros/vite'
 
-// 当前执行node命令时文件夹的地址（工作目录）
+// 当前执行node命令时文件夹的地址(工作目录)
 const root = process.cwd()
 
 // 路径查找
@@ -144,6 +144,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         'vue-router',
         'vue-types',
         'vue-i18n',
+        'vxe-table',
+        'xe-utils',
         'element-plus/es',
         'element-plus/es/locale/lang/zh-cn',
         'element-plus/es/locale/lang/en',

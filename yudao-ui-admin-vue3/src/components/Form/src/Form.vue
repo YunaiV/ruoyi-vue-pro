@@ -226,11 +226,7 @@ export default defineComponent({
                   vModel={formModel.value[item.field]}
                   {...(autoSetPlaceholder && setTextPlaceholder(item))}
                   {...setComponentProps(item)}
-                  style={
-                    item?.component === 'Input'
-                      ? { width: '189.5px', ...item.componentProps?.style }
-                      : { ...item.componentProps?.style }
-                  }
+                  style={item.componentProps?.style}
                   {...(notRenderOptions.includes(item?.component as string) &&
                   item?.componentProps?.options
                     ? { options: item?.componentProps?.options || [] }
@@ -258,8 +254,8 @@ export default defineComponent({
           return renderRadioOptions(item)
         case 'Checkbox':
         case 'CheckboxButton':
-          const { renderChcekboxOptions } = useRenderCheckbox()
-          return renderChcekboxOptions(item)
+          const { renderCheckboxOptions } = useRenderCheckbox()
+          return renderCheckboxOptions(item)
         default:
           break
       }

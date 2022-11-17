@@ -1,3 +1,89 @@
+<template>
+  <el-form
+    :model="loginData.loginForm"
+    :rules="rules"
+    label-position="top"
+    class="login-form"
+    label-width="120px"
+    size="large"
+    v-show="getShow"
+    ref="formSmsLogin"
+  >
+    <el-row style="margin-left: -10px; margin-right: -10px">
+      <!-- 租户名 -->
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item>
+          <LoginFormTitle style="width: 100%" />
+        </el-form-item>
+      </el-col>
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item prop="tenantName">
+          <el-input
+            type="text"
+            v-model="loginData.loginForm.tenantName"
+            :placeholder="t('login.tenantNamePlaceholder')"
+            :prefix-icon="iconHouse"
+          />
+        </el-form-item>
+      </el-col>
+      <!-- 手机号 -->
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item prop="mobileNumber">
+          <el-input
+            v-model="loginData.loginForm.mobileNumber"
+            :placeholder="t('login.mobileNumberPlaceholder')"
+            :prefix-icon="iconCellphone"
+          />
+        </el-form-item>
+      </el-col>
+      <!-- 验证码 -->
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item prop="code">
+          <el-row justify="space-between" style="width: 100%" :gutter="5">
+            <el-col :span="24">
+              <el-input
+                v-model="loginData.loginForm.code"
+                :placeholder="t('login.codePlaceholder')"
+                :prefix-icon="iconCircleCheck"
+              >
+                <!-- <el-button class="w-[100%]"> -->
+                <template #append>
+                  <span
+                    v-if="mobileCodeTimer <= 0"
+                    @click="getSmsCode"
+                    class="getMobileCode"
+                    style="cursor: pointer"
+                  >
+                    {{ t('login.getSmsCode') }}
+                  </span>
+                  <span v-if="mobileCodeTimer > 0" class="getMobileCode" style="cursor: pointer">
+                    {{ mobileCodeTimer }}秒后可重新获取
+                  </span>
+                </template>
+              </el-input>
+              <!-- </el-button> -->
+            </el-col>
+          </el-row>
+        </el-form-item>
+      </el-col>
+      <!-- 登录按钮 / 返回按钮 -->
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item>
+          <el-button :loading="loginLoading" type="primary" class="w-[100%]" @click="signIn">
+            {{ t('login.login') }}
+          </el-button>
+        </el-form-item>
+      </el-col>
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item>
+          <el-button :loading="loginLoading" class="w-[100%]" @click="handleBackLogin">
+            {{ t('login.backLogin') }}
+          </el-button>
+        </el-form-item>
+      </el-col>
+    </el-row>
+  </el-form>
+</template>
 <script setup lang="ts">
 import { useIcon } from '@/hooks/web/useIcon'
 import { reactive, ref, unref, watch, computed } from 'vue'
@@ -111,92 +197,7 @@ const signIn = async () => {
     })
 }
 </script>
-<template>
-  <el-form
-    :model="loginData.loginForm"
-    :rules="rules"
-    label-position="top"
-    class="login-form"
-    label-width="120px"
-    size="large"
-    v-show="getShow"
-    ref="formSmsLogin"
-  >
-    <el-row style="margin-left: -10px; margin-right: -10px">
-      <!-- 租户名 -->
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item>
-          <LoginFormTitle style="width: 100%" />
-        </el-form-item>
-      </el-col>
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item prop="tenantName">
-          <el-input
-            type="text"
-            v-model="loginData.loginForm.tenantName"
-            :placeholder="t('login.tenantNamePlaceholder')"
-            :prefix-icon="iconHouse"
-          />
-        </el-form-item>
-      </el-col>
-      <!-- 手机号 -->
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item prop="mobileNumber">
-          <el-input
-            v-model="loginData.loginForm.mobileNumber"
-            :placeholder="t('login.mobileNumberPlaceholder')"
-            :prefix-icon="iconCellphone"
-          />
-        </el-form-item>
-      </el-col>
-      <!-- 验证码 -->
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item prop="code">
-          <el-row justify="space-between" style="width: 100%" :gutter="5">
-            <el-col :span="24">
-              <el-input
-                v-model="loginData.loginForm.code"
-                :placeholder="t('login.codePlaceholder')"
-                :prefix-icon="iconCircleCheck"
-              >
-                <!-- <el-button class="w-[100%]"> -->
-                <template #append>
-                  <span
-                    v-if="mobileCodeTimer <= 0"
-                    @click="getSmsCode"
-                    class="getMobileCode"
-                    style="cursor: pointer"
-                  >
-                    {{ t('login.getSmsCode') }}
-                  </span>
-                  <span v-if="mobileCodeTimer > 0" class="getMobileCode" style="cursor: pointer">
-                    {{ mobileCodeTimer }}秒后可重新获取
-                  </span>
-                </template>
-              </el-input>
-              <!-- </el-button> -->
-            </el-col>
-          </el-row>
-        </el-form-item>
-      </el-col>
-      <!-- 登录按钮 / 返回按钮 -->
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item>
-          <el-button :loading="loginLoading" type="primary" class="w-[100%]" @click="signIn">
-            {{ t('login.login') }}
-          </el-button>
-        </el-form-item>
-      </el-col>
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item>
-          <el-button :loading="loginLoading" class="w-[100%]" @click="handleBackLogin">
-            {{ t('login.backLogin') }}
-          </el-button>
-        </el-form-item>
-      </el-col>
-    </el-row>
-  </el-form>
-</template>
+
 <style lang="less" scoped>
 :deep(.anticon) {
   &:hover {

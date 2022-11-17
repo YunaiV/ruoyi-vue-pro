@@ -181,7 +181,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
   }
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.isTable !== false) {
+    if (schemaItem?.isTable !== false && schemaItem?.table?.show !== false) {
       const tableSchemaItem = {
         ...schemaItem.table,
         field: schemaItem.field,
@@ -227,9 +227,17 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
     if (schemaItem?.isForm !== false || schemaItem?.form?.show == true) {
       // 默认为 input
       let component = schemaItem?.form?.component || 'Input'
-      const options: ComponentOptions[] = []
+      let defaultValue: any = ''
+      if (schemaItem.form?.value) {
+        defaultValue = schemaItem.form?.value
+      } else {
+        if (component === 'InputNumber') {
+          defaultValue = 0
+        }
+      }
       let comonentProps = {}
       if (schemaItem.dictType) {
+        const options: ComponentOptions[] = []
         if (schemaItem.dictData && schemaItem.dictData === 'number') {
           getIntDictOptions(schemaItem.dictType).forEach((dict) => {
             options.push(dict)
@@ -249,11 +257,12 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
         if (!(schemaItem.form && schemaItem.form.component)) component = 'Select'
       }
       const formSchemaItem = {
+        component: component,
+        componentProps: comonentProps,
+        value: defaultValue,
         ...schemaItem.form,
         field: schemaItem.field,
-        label: schemaItem.form?.label || schemaItem.title,
-        component: component,
-        componentProps: comonentProps
+        label: schemaItem.form?.label || schemaItem.title
       }
 
       formSchema.push(formSchemaItem)
@@ -269,7 +278,7 @@ const filterDescriptionsSchema = (crudSchema: VxeCrudSchema): DescriptionsSchema
 
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.isDetail !== false) {
+    if (schemaItem?.isDetail !== false || schemaItem.detail?.show !== false) {
       const descriptionsSchemaItem = {
         ...schemaItem.detail,
         field: schemaItem.field,

@@ -1,3 +1,141 @@
+<template>
+  <el-form
+    :model="loginData.loginForm"
+    :rules="LoginRules"
+    label-position="top"
+    class="login-form"
+    label-width="120px"
+    size="large"
+    v-show="getShow"
+    ref="formLogin"
+  >
+    <el-row style="maring-left: -10px; maring-right: -10px">
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item>
+          <LoginFormTitle style="width: 100%" />
+        </el-form-item>
+      </el-col>
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item prop="tenantName">
+          <el-input
+            type="text"
+            v-model="loginData.loginForm.tenantName"
+            :placeholder="t('login.tenantNamePlaceholder')"
+            :prefix-icon="iconHouse"
+          />
+        </el-form-item>
+      </el-col>
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item prop="username">
+          <el-input
+            v-model="loginData.loginForm.username"
+            :placeholder="t('login.usernamePlaceholder')"
+            :prefix-icon="iconAvatar"
+          />
+        </el-form-item>
+      </el-col>
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item prop="password">
+          <el-input
+            v-model="loginData.loginForm.password"
+            type="password"
+            :placeholder="t('login.passwordPlaceholder')"
+            show-password
+            @keyup.enter="getCode()"
+            :prefix-icon="iconLock"
+          />
+        </el-form-item>
+      </el-col>
+      <el-col
+        :span="24"
+        style="padding-left: 10px; padding-right: 10px; margin-top: -20px; margin-bottom: -20px"
+      >
+        <el-form-item>
+          <el-row justify="space-between" style="width: 100%">
+            <el-col :span="6">
+              <el-checkbox v-model="loginData.loginForm.rememberMe">
+                {{ t('login.remember') }}
+              </el-checkbox>
+            </el-col>
+            <el-col :span="12" :offset="6">
+              <el-link type="primary" style="float: right">{{ t('login.forgetPassword') }}</el-link>
+            </el-col>
+          </el-row>
+        </el-form-item>
+      </el-col>
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item>
+          <el-button :loading="loginLoading" type="primary" class="w-[100%]" @click="getCode()">
+            {{ t('login.login') }}
+          </el-button>
+        </el-form-item>
+      </el-col>
+      <Verify
+        ref="verify"
+        mode="pop"
+        :captchaType="captchaType"
+        :imgSize="{ width: '400px', height: '200px' }"
+        @success="handleLogin"
+      />
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item>
+          <el-row justify="space-between" style="width: 100%" :gutter="5">
+            <el-col :span="8">
+              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.MOBILE)">
+                {{ t('login.btnMobile') }}
+              </el-button>
+            </el-col>
+            <el-col :span="8">
+              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.QR_CODE)">
+                {{ t('login.btnQRCode') }}
+              </el-button>
+            </el-col>
+            <el-col :span="8">
+              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.REGISTER)">
+                {{ t('login.btnRegister') }}
+              </el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
+      </el-col>
+      <el-divider content-position="center">{{ t('login.otherLogin') }}</el-divider>
+      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
+        <el-form-item>
+          <div class="flex justify-between w-[100%]">
+            <Icon
+              icon="ant-design:github-filled"
+              :size="iconSize"
+              class="cursor-pointer anticon"
+              :color="iconColor"
+              @click="doSocialLogin('github')"
+            />
+            <Icon
+              icon="ant-design:wechat-filled"
+              :size="iconSize"
+              class="cursor-pointer anticon"
+              :color="iconColor"
+              @click="doSocialLogin('wechat')"
+            />
+            <Icon
+              icon="ant-design:alipay-circle-filled"
+              :size="iconSize"
+              :color="iconColor"
+              class="cursor-pointer anticon"
+              @click="doSocialLogin('alipay')"
+            />
+            <Icon
+              icon="ant-design:dingtalk-circle-filled"
+              :size="iconSize"
+              :color="iconColor"
+              class="cursor-pointer anticon"
+              @click="doSocialLogin('dingtalk')"
+            />
+          </div>
+        </el-form-item>
+      </el-col>
+    </el-row>
+  </el-form>
+</template>
 <script setup lang="ts">
 import { useIcon } from '@/hooks/web/useIcon'
 import LoginFormTitle from './LoginFormTitle.vue'
@@ -153,144 +291,7 @@ onMounted(() => {
   getCookie()
 })
 </script>
-<template>
-  <el-form
-    :model="loginData.loginForm"
-    :rules="LoginRules"
-    label-position="top"
-    class="login-form"
-    label-width="120px"
-    size="large"
-    v-show="getShow"
-    ref="formLogin"
-  >
-    <el-row style="maring-left: -10px; maring-right: -10px">
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item>
-          <LoginFormTitle style="width: 100%" />
-        </el-form-item>
-      </el-col>
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item prop="tenantName">
-          <el-input
-            type="text"
-            v-model="loginData.loginForm.tenantName"
-            :placeholder="t('login.tenantNamePlaceholder')"
-            :prefix-icon="iconHouse"
-          />
-        </el-form-item>
-      </el-col>
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item prop="username">
-          <el-input
-            v-model="loginData.loginForm.username"
-            :placeholder="t('login.usernamePlaceholder')"
-            :prefix-icon="iconAvatar"
-          />
-        </el-form-item>
-      </el-col>
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item prop="password">
-          <el-input
-            v-model="loginData.loginForm.password"
-            type="password"
-            :placeholder="t('login.passwordPlaceholder')"
-            show-password
-            @keyup.enter="getCode()"
-            :prefix-icon="iconLock"
-          />
-        </el-form-item>
-      </el-col>
-      <el-col
-        :span="24"
-        style="padding-left: 10px; padding-right: 10px; margin-top: -20px; margin-bottom: -20px"
-      >
-        <el-form-item>
-          <el-row justify="space-between" style="width: 100%">
-            <el-col :span="6">
-              <el-checkbox v-model="loginData.loginForm.rememberMe">
-                {{ t('login.remember') }}
-              </el-checkbox>
-            </el-col>
-            <el-col :span="12" :offset="6">
-              <el-link type="primary" style="float: right">{{ t('login.forgetPassword') }}</el-link>
-            </el-col>
-          </el-row>
-        </el-form-item>
-      </el-col>
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item>
-          <el-button :loading="loginLoading" type="primary" class="w-[100%]" @click="getCode()">
-            {{ t('login.login') }}
-          </el-button>
-        </el-form-item>
-      </el-col>
-      <Verify
-        ref="verify"
-        mode="pop"
-        :captchaType="captchaType"
-        :imgSize="{ width: '400px', height: '200px' }"
-        @success="handleLogin"
-      />
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item>
-          <el-row justify="space-between" style="width: 100%" :gutter="5">
-            <el-col :span="8">
-              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.MOBILE)">
-                {{ t('login.btnMobile') }}
-              </el-button>
-            </el-col>
-            <el-col :span="8">
-              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.QR_CODE)">
-                {{ t('login.btnQRCode') }}
-              </el-button>
-            </el-col>
-            <el-col :span="8">
-              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.REGISTER)">
-                {{ t('login.btnRegister') }}
-              </el-button>
-            </el-col>
-          </el-row>
-        </el-form-item>
-      </el-col>
-      <el-divider content-position="center">{{ t('login.otherLogin') }}</el-divider>
-      <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item>
-          <div class="flex justify-between w-[100%]">
-            <Icon
-              icon="ant-design:github-filled"
-              :size="iconSize"
-              class="cursor-pointer anticon"
-              :color="iconColor"
-              @click="doSocialLogin('github')"
-            />
-            <Icon
-              icon="ant-design:wechat-filled"
-              :size="iconSize"
-              class="cursor-pointer anticon"
-              :color="iconColor"
-              @click="doSocialLogin('wechat')"
-            />
-            <Icon
-              icon="ant-design:alipay-circle-filled"
-              :size="iconSize"
-              :color="iconColor"
-              class="cursor-pointer anticon"
-              @click="doSocialLogin('alipay')"
-            />
-            <Icon
-              icon="ant-design:dingtalk-circle-filled"
-              :size="iconSize"
-              :color="iconColor"
-              class="cursor-pointer anticon"
-              @click="doSocialLogin('dingtalk')"
-            />
-          </div>
-        </el-form-item>
-      </el-col>
-    </el-row>
-  </el-form>
-</template>
+
 <style lang="less" scoped>
 :deep(.anticon) {
   &:hover {

@@ -64,7 +64,7 @@
  * */
 import { resetSize } from './../utils/util'
 import { aesEncrypt } from './../utils/ase'
-import { reqGet, reqCheck } from './../api/index'
+import { getCodeApi, reqCheckApi } from '@/api/login'
 import { onMounted, reactive, ref, nextTick, toRefs, getCurrentInstance } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 export default {
@@ -172,7 +172,7 @@ export default {
               : JSON.stringify(checkPosArr),
             token: backToken.value
           }
-          reqCheck(data).then((res) => {
+          reqCheckApi(data).then((res) => {
             if (res.repCode == '0000') {
               barAreaColor.value = '#4cae4c'
               barAreaBorderColor.value = '#5cb85c'
@@ -230,7 +230,7 @@ export default {
       let data = {
         captchaType: captchaType.value
       }
-      reqGet(data).then((res) => {
+      getCodeApi(data).then((res) => {
         if (res.repCode == '0000') {
           pointBackImgBase.value = res.repData.originalImageBase64
           backToken.value = res.repData.token

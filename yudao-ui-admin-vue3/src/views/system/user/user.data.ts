@@ -74,6 +74,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '最后登录时间',
       field: 'loginDate',
+      formatter: 'formatDate',
       isForm: false
     },
     {

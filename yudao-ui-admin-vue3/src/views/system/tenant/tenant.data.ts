@@ -82,8 +82,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '账号额度',
     field: 'accountCount',
     form: {
-      component: 'InputNumber',
-      value: 0
+      component: 'InputNumber'
     }
   },
   {

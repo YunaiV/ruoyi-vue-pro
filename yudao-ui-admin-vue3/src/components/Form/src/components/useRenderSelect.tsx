@@ -36,9 +36,9 @@ export const useRenderSelect = (slots: Slots) => {
 
     return (
       <ElOption
+        {...other}
         label={labelAlias ? option[labelAlias] : label}
         value={valueAlias ? option[valueAlias] : value}
-        {...other}
       >
         {{
           default: () =>

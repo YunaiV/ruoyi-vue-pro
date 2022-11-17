@@ -332,7 +332,7 @@
 </script>
 
 <style lang="scss" scoped>
-  ::v-deep .order-table{
+  :deep(.order-table){
     margin-top: 20px;
     border-bottom: none;
     &::before{

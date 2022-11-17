@@ -2,7 +2,7 @@
   <div :class="mode == 'pop' ? 'mask' : ''" v-show="showBox">
     <div
       :class="mode == 'pop' ? 'verifybox' : ''"
-      :style="{ 'max-width': parseInt(imgSize.width) + 30 + 'px' }"
+      :style="{ 'max-width': parseInt(imgSize.width) + 20 + 'px' }"
     >
       <div class="verifybox-top" v-if="mode == 'pop'">
         {{ t('captcha.verification') }}
@@ -10,7 +10,7 @@
           <i class="iconfont icon-close"></i>
         </span>
       </div>
-      <div class="verifybox-bottom" :style="{ padding: mode == 'pop' ? '15px' : '0' }">
+      <div class="verifybox-bottom" :style="{ padding: mode == 'pop' ? '10px' : '0' }">
         <!-- 验证码容器 -->
         <component
           v-if="componentType"
@@ -153,12 +153,13 @@ export default {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   left: 50%;
   top: 50%;
+  border-radius: 5px;
   transform: translate(-50%, -50%);
 }
 .verifybox-top {
   padding: 0 15px;
-  height: 50px;
-  line-height: 50px;
+  height: 40px;
+  line-height: 40px;
   text-align: left;
   font-size: 16px;
   color: #45494c;
@@ -166,7 +167,7 @@ export default {
   box-sizing: border-box;
 }
 .verifybox-bottom {
-  padding: 15px;
+  padding: 10px;
   box-sizing: border-box;
 }
 .verifybox-close {
@@ -262,6 +263,7 @@ export default {
   color: #ffffff;
   border: none;
   margin-top: 10px;
+  border-radius: 8px;
 }
 
 /*滑动验证码*/
@@ -273,6 +275,7 @@ export default {
   -moz-box-sizing: content-box;
   box-sizing: content-box;
   border: 1px solid #ddd;
+  border-radius: 8px;
 }
 
 .verify-bar-area .verify-move-block {
@@ -285,6 +288,7 @@ export default {
   -moz-box-sizing: content-box;
   box-sizing: content-box;
   box-shadow: 0 0 2px #888888;
+  border-radius: 8px;
 }
 
 .verify-bar-area .verify-move-block:hover {
@@ -302,6 +306,7 @@ export default {
   -moz-box-sizing: content-box;
   box-sizing: content-box;
   border: 1px solid #ddd;
+  border-radius: 8px;
 }
 
 .verify-img-panel {

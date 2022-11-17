@@ -119,7 +119,14 @@
         :schema="DictTypeSchemas.allSchemas.formSchema"
         :rules="DictTypeSchemas.dictTypeRules"
         ref="typeFormRef"
-      />
+      >
+        <template #type>
+          <template v-if="dictTypeValue">
+            <el-tag>{{ dictTypeValue }}</el-tag>
+          </template>
+          <template v-else><el-input v-model="dictTypeValue" /> </template>
+        </template>
+      </Form>
       <Form
         v-if="['dataCreate', 'dataUpdate'].includes(actionType)"
         :schema="DictDataSchemas.allSchemas.formSchema"
@@ -152,6 +159,7 @@ import { ref, unref, onMounted } from 'vue'
 import { DICT_TYPE } from '@/utils/dict'
 import { useI18n } from '@/hooks/web/useI18n'
 import { FormExpose } from '@/components/Form'
+import { ElInput, ElTag } from 'element-plus'
 import * as DictTypeSchemas from './dict.type'
 import * as DictDataSchemas from './dict.data'
 import { useTable } from '@/hooks/web/useTable'
@@ -174,15 +182,17 @@ const {
   setSearchParams: setTypeSearchParams,
   delList: delTypeList
 } = typeMethods
-
+const dictTypeValue = ref('')
 // 字典分类修改操作
 const handleTypeCreate = () => {
+  dictTypeValue.value = ''
   setDialogTile('typeCreate')
 }
 const handleTypeUpdate = async (row: DictTypeVO) => {
   setDialogTile('typeUpdate')
   // 设置数据
   const res = await DictTypeApi.getDictTypeApi(row.id)
+  dictTypeValue.value = res.type
   unref(typeFormRef)?.setValues(res)
 }
 
@@ -229,6 +239,7 @@ const actionLoading = ref(false) // 遮罩层
 const typeFormRef = ref<FormExpose>() // 分类表单 Ref
 const dataFormRef = ref<FormExpose>() // 数据表单 Ref
 const actionType = ref('') // 操作按钮的类型
+
 // 设置标题
 const setDialogTile = (type: string) => {
   dialogTitle.value = t('action.' + type)
@@ -246,6 +257,7 @@ const submitTypeForm = async () => {
       try {
         const data = unref(typeFormRef)?.formModel as DictTypeVO
         if (actionType.value === 'typeCreate') {
+          data.type = dictTypeValue.value
           await DictTypeApi.createDictTypeApi(data)
           ElMessage.success(t('common.createSuccess'))
         } else if (actionType.value === 'typeUpdate') {

@@ -244,7 +244,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  ::v-deep .el-descriptions{
+  :deep(.el-descriptions){
     &:not(:nth-child(1)) {
       margin-top: 20px;
     }

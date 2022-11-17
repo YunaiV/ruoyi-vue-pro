@@ -168,12 +168,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     public CommonResult<?> noHandlerFoundExceptionHandler(HttpServletRequest req, NoHandlerFoundException ex) {
-        // 情况一：部分功能未开启
-        if (req.getRequestURI().contains("/bpm/")) {
-            return CommonResult.error(NOT_IMPLEMENTED.getCode(), "[工作流模块 yudao-module-bpm - 已禁用][参考 https://doc.iocoder.cn/bpm/ 开启]");
-        }
-
-        // 情况二：正常情况下的 404
         log.warn("[noHandlerFoundExceptionHandler]", ex);
         return CommonResult.error(NOT_FOUND.getCode(), String.format("请求地址不存在:%s", ex.getRequestURL()));
     }

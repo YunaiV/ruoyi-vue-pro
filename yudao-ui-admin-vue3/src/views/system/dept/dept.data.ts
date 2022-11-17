@@ -49,8 +49,7 @@ export const modelSchema = reactive<FormSchema[]>([
   {
     label: '显示排序',
     field: 'sort',
-    component: 'InputNumber',
-    value: 0
+    component: 'Input'
   },
   {
     label: '状态',

@@ -13,8 +13,8 @@ export const useRenderRadio = () => {
     return item?.componentProps?.options?.map((option) => {
       const { ...other } = option
       return (
-        <Com label={option[labelAlias || 'value']} {...other}>
-          {option[valueAlias || 'label']}
+        <Com {...other} label={option[valueAlias || 'value']}>
+          {option[labelAlias || 'label']}
         </Com>
       )
     })
