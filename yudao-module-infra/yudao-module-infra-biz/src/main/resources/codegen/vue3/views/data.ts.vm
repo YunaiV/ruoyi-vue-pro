@@ -21,71 +21,76 @@ const crudSchemas = reactive<VxeCrudSchema>({
   action: true,
   actionWidth: '200', // 3个按钮默认200，如有删减对应增减即可
   columns: [
-#foreach($column in $columns)
-  #if ($column.listOperation || $column.listOperationResult || $column.createOperation || $column.updateOperation)
-  #set ($dictType = $column.dictType)
-  #if(!$column.primaryKey)
-  {
-    title: '${column.columnComment}',
-    field: '${column.javaField}',
-    #if ("" != $dictType)## 有数据字典
-    dictType: DICT_TYPE.$dictType.toUpperCase(),
-    #end
-    #if (!$column.createOperation && !$column.updateOperation)
-    isForm: false
-    #elseif(!("" != $column.dictType))
-    #if ($column.htmlType == "datetime")## 时间框
-    form: {
-      show: true,
-      component: 'DatePicker',
-      componentProps: {
-        type: 'datetime',
-        valueFormat: 'YYYY-MM-DD HH:mm:ss'
-      }
-    }
-    #elseif($column.htmlType == "editor")## 文本编辑器
-    form: {
-      show: true,
-      component: 'Editor',
-      colProps: {
-        span: 24
+  #foreach($column in $columns)
+    #if ($column.listOperation || $column.listOperationResult || $column.createOperation || $column.updateOperation)
+    #set ($dictType = $column.dictType)
+    #if(!$column.primaryKey)
+    {
+      title: '${column.columnComment}',
+      field: '${column.javaField}',
+      #if ("" != $dictType)## 有数据字典
+      dictType: DICT_TYPE.$dictType.toUpperCase(),
+      #if (${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
+      dictData: 'number',
+      #else
+      dictData: 'string',
+      #end
+      #end
+      #if (!$column.createOperation && !$column.updateOperation)
+      isForm: false,
+      #elseif(!("" != $column.dictType))
+      #if ($column.htmlType == "datetime")## 时间框
+      form: {
+        show: true,
+        component: 'DatePicker',
+        componentProps: {
+          type: 'datetime',
+          valueFormat: 'YYYY-MM-DD HH:mm:ss'
+        }
       },
-      componentProps: {
-        valueHtml: ''
-      }
-    }
-    #elseif($column.htmlType == "textarea")## 文本框
-    form: {
-      show: true,
-      component: 'Input',
-      componentProps: {
-        type: 'textarea',
-        rows: 4
+      #elseif($column.htmlType == "editor")## 文本编辑器
+      form: {
+        show: true,
+        component: 'Editor',
+        colProps: {
+          span: 24
+        },
+        componentProps: {
+          valueHtml: ''
+        }
       },
-      colProps: {
-        span: 24
-      }
-    }
+      #elseif($column.htmlType == "textarea")## 文本框
+      form: {
+        show: true,
+        component: 'Input',
+        componentProps: {
+          type: 'textarea',
+          rows: 4
+        },
+        colProps: {
+          span: 24
+        }
+      },
+      #end
+      #end
+      #if ($column.listOperationResult)
+      #if($column.htmlType == "input")
+      isSearch: true,
+      #elseif("" != $dictType)
+      isSearch: true,
+      #elseif($column.htmlType == "datetime")
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
+      },
+      #end
+      #end
+      #end
+    },
     #end
-    #end
-    #if ($column.listOperationResult)
-    #if($column.htmlType == "input")
-    isSearch: true
-    #elseif("" != $dictType)
-    isSearch: true
-    #elseif($column.htmlType == "datetime")
-    search: {
-      show: true,
-      itemRender: {
-        name: 'XDataTimePicker'
-      }
-    }
-    #end
-    #end
-    #end
-  },
   #end
-#end
   ]
 })
 export const { allSchemas } = useVxeCrudSchemas(crudSchemas)
