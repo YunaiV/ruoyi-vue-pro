@@ -62,7 +62,8 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'sex',
     label: t('profile.user.sex'),
-    component: 'InputNumber'
+    component: 'InputNumber',
+    value: 0
   }
 ])
 const sexVlue = ref<number>()

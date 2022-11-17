@@ -41,7 +41,6 @@ const crudSchemas = reactive<VxeCrudSchema>({
       #elseif(!("" != $column.dictType))
       #if ($column.htmlType == "datetime")## 时间框
       form: {
-        show: true,
         component: 'DatePicker',
         componentProps: {
           type: 'datetime',
@@ -50,7 +49,6 @@ const crudSchemas = reactive<VxeCrudSchema>({
       },
       #elseif($column.htmlType == "editor")## 文本编辑器
       form: {
-        show: true,
         component: 'Editor',
         colProps: {
           span: 24
@@ -61,7 +59,6 @@ const crudSchemas = reactive<VxeCrudSchema>({
       },
       #elseif($column.htmlType == "textarea")## 文本框
       form: {
-        show: true,
         component: 'Input',
         componentProps: {
           type: 'textarea',
@@ -70,6 +67,11 @@ const crudSchemas = reactive<VxeCrudSchema>({
         colProps: {
           span: 24
         }
+      },
+      #elseif(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")## 数字类型
+      form: {
+        component: 'InputNumber',
+        value: 0
       },
       #end
       #end

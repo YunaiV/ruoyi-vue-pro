@@ -52,7 +52,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '访问令牌的有效期',
       field: 'accessTokenValiditySeconds',
       form: {
-        component: 'InputNumber'
+        component: 'InputNumber',
+        value: 0
       },
       table: {
         slots: {
@@ -64,7 +65,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '刷新令牌的有效期',
       field: 'refreshTokenValiditySeconds',
       form: {
-        component: 'InputNumber'
+        component: 'InputNumber',
+        value: 0
       },
       table: {
         slots: {
