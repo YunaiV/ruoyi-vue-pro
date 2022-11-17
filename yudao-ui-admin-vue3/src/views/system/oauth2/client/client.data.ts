@@ -1,9 +1,11 @@
 import { reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
-import { DICT_TYPE } from '@/utils/dict'
+import { DICT_TYPE, getStrDictOptions } from '@/utils/dict'
 import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
+
+const authorizedGrantOptions = getStrDictOptions(DICT_TYPE.SYSTEM_OAUTH2_GRANT_TYPE)
 
 // 表单校验
 export const rules = reactive({
@@ -76,36 +78,105 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '授权类型',
       field: 'authorizedGrantTypes',
       table: {
-        width: 300,
+        width: 400,
         slots: {
           default: 'authorizedGrantTypes_default'
+        }
+      },
+      form: {
+        component: 'Select',
+        componentProps: {
+          options: authorizedGrantOptions,
+          props: {
+            multiple: true,
+            filterable: true
+          }
         }
       }
     },
     {
       title: '授权范围',
-      field: 'scopes', // TODO @星语：带输入的 SELECT
-      isTable: false
+      field: 'scopes',
+      isTable: false,
+      form: {
+        component: 'Select',
+        componentProps: {
+          options: [],
+          props: {
+            multiple: true,
+            filterable: true,
+            allowCreate: true,
+            defaultFirstOption: true
+          }
+        }
+      }
     },
     {
       title: '自动授权范围',
-      field: 'autoApproveScopes', // TODO @星语：带输入的 SELECT
-      isTable: false
+      field: 'autoApproveScopes',
+      isTable: false,
+      form: {
+        component: 'Select',
+        componentProps: {
+          options: [],
+          props: {
+            multiple: true,
+            filterable: true,
+            allowCreate: true,
+            defaultFirstOption: true
+          }
+        }
+      }
     },
     {
       title: '可重定向的 URI 地址',
-      field: 'redirectUris', // TODO @星语：带输入的 SELECT
-      isTable: false
+      field: 'redirectUris',
+      isTable: false,
+      form: {
+        component: 'Select',
+        componentProps: {
+          options: [],
+          props: {
+            multiple: true,
+            filterable: true,
+            allowCreate: true,
+            defaultFirstOption: true
+          }
+        }
+      }
     },
     {
       title: '权限',
       field: 'authorities',
-      isTable: false
+      isTable: false,
+      form: {
+        component: 'Select',
+        componentProps: {
+          options: [],
+          props: {
+            multiple: true,
+            filterable: true,
+            allowCreate: true,
+            defaultFirstOption: true
+          }
+        }
+      }
     },
     {
       title: '资源',
       field: 'resourceIds',
-      isTable: false
+      isTable: false,
+      form: {
+        component: 'Select',
+        componentProps: {
+          options: [],
+          props: {
+            multiple: true,
+            filterable: true,
+            defaultFirstOption: true
+          }
+        }
+      }
     },
     {
       title: '附加信息',
