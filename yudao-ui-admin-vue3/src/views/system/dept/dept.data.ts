@@ -1,6 +1,9 @@
-import { required } from '@/utils/formRules'
 import { reactive } from 'vue'
-import { FormSchema } from '@/types/form'
+import { useI18n } from '@/hooks/web/useI18n'
+import { required } from '@/utils/formRules'
+import { DICT_TYPE } from '@/utils/dict'
+import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
+const { t } = useI18n() // 国际化
 
 // 表单校验
 export const rules = reactive({
@@ -17,55 +20,49 @@ export const rules = reactive({
   ]
 })
 
-export const modelSchema = reactive<FormSchema[]>([
-  {
-    label: '上级部门',
-    field: 'parentId',
-    component: 'Input'
-  },
-  {
-    label: '部门名称',
-    field: 'name',
-    component: 'Input',
-    formItemProps: {
-      rules: [required]
+// CrudSchema
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: null,
+  action: true,
+  columns: [
+    {
+      title: '上级部门',
+      field: 'parentId',
+      isTable: false
+    },
+    {
+      title: '部门名称',
+      field: 'name',
+      isSearch: true,
+      table: {
+        treeNode: true,
+        align: 'left'
+      }
+    },
+    {
+      title: '负责人',
+      field: 'leaderUserId'
+    },
+    {
+      title: '联系电话',
+      field: 'phone'
+    },
+    {
+      title: '邮箱',
+      field: 'email'
+    },
+    {
+      title: '显示排序',
+      field: 'sort'
+    },
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      dictData: 'number',
+      isSearch: true
     }
-  },
-  {
-    label: '负责人',
-    field: 'leaderUserId',
-    component: 'Input'
-  },
-  {
-    label: '联系电话',
-    field: 'phone',
-    component: 'Input'
-  },
-  {
-    label: '邮箱',
-    field: 'email',
-    component: 'Input'
-  },
-  {
-    label: '显示排序',
-    field: 'sort',
-    component: 'Input'
-  },
-  {
-    label: '状态',
-    field: 'status',
-    component: 'RadioButton',
-    componentProps: {
-      options: [
-        {
-          label: '开启',
-          value: 0
-        },
-        {
-          label: '关闭',
-          value: 1
-        }
-      ]
-    }
-  }
-])
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

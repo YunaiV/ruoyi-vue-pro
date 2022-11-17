@@ -1,5 +1,5 @@
 import { computed, nextTick, reactive } from 'vue'
-import { SizeType, VxeGridProps } from 'vxe-table'
+import { SizeType, VxeGridProps, VxeTablePropTypes } from 'vxe-table'
 import { useAppStore } from '@/store/modules/app'
 import { VxeAllSchemas } from './useVxeCrudSchemas'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -11,6 +11,7 @@ const message = useMessage() // 消息弹窗
 
 interface UseVxeGridConfig<T = any> {
   allSchemas: VxeAllSchemas
+  treeConfig?: VxeTablePropTypes.TreeConfig
   getListApi: (option: any) => Promise<T>
   deleteApi?: (option: any) => Promise<T>
   exportListApi?: (option: any) => Promise<T>
@@ -41,6 +42,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
   /**
    * grid options 初始化
    */
+  console.info(config?.allSchemas.tableSchema)
   const gridOptions = reactive<VxeGridProps>({
     loading: true,
     size: currentSize as any,
@@ -62,25 +64,6 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       items: config?.allSchemas.searchSchema
     },
     columns: config?.allSchemas.tableSchema,
-    pagerConfig: {
-      border: false, // 带边框
-      background: true, // 带背景颜色
-      perfect: false, // 配套的样式
-      pageSize: 10, // 每页大小
-      pagerCount: 7, // 显示页码按钮的数量
-      autoHidden: true, // 当只有一页时自动隐藏
-      pageSizes: [5, 10, 20, 30, 50, 100], // 每页大小选项列表
-      layouts: [
-        'PrevJump',
-        'PrevPage',
-        'JumpNumber',
-        'NextPage',
-        'NextJump',
-        'Sizes',
-        'FullJump',
-        'Total'
-      ]
-    },
     proxyConfig: {
       seq: true, // 启用动态序号代理（分页之后索引自动计算为当前页的起始序号）
       form: true, // 启用表单代理，当点击表单提交按钮时会自动触发 reload 行为
@@ -91,8 +74,10 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
           if (config?.queryParams) {
             queryParams = Object.assign(queryParams, config.queryParams)
           }
-          queryParams.pageSize = page.pageSize
-          queryParams.pageNo = page.currentPage
+          if (!config?.treeConfig) {
+            queryParams.pageSize = page.pageSize
+            queryParams.pageNo = page.currentPage
+          }
           gridOptions.loading = false
           return new Promise(async (resolve) => {
             resolve(await config?.getListApi(queryParams))
@@ -119,6 +104,30 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       columns: config?.allSchemas.printSchema
     }
   })
+
+  if (config?.treeConfig) {
+    gridOptions.treeConfig = config.treeConfig
+  } else {
+    gridOptions.pagerConfig = {
+      border: false, // 带边框
+      background: true, // 带背景颜色
+      perfect: false, // 配套的样式
+      pageSize: 10, // 每页大小
+      pagerCount: 7, // 显示页码按钮的数量
+      autoHidden: false, // 当只有一页时自动隐藏
+      pageSizes: [5, 10, 20, 30, 50, 100], // 每页大小选项列表
+      layouts: [
+        'PrevJump',
+        'PrevPage',
+        'JumpNumber',
+        'NextPage',
+        'NextJump',
+        'Sizes',
+        'FullJump',
+        'Total'
+      ]
+    }
+  }
 
   /**
    * 刷新列表

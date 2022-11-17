@@ -17,10 +17,10 @@ import { ComponentOptions } from '@/types/components'
 export type VxeCrudSchema = {
   primaryKey?: string // 主键ID
   primaryTitle?: string // 主键标题 默认为序号
-  primaryType?: VxeColumnPropTypes.Type // 不填写为数据库编号 还支持 "seq" | "radio" | "checkbox" | "expand" | "html" | null
+  primaryType?: VxeColumnPropTypes.Type // 不填写为数据库编号 null为不显示 还支持 "seq" | "radio" | "checkbox" | "expand" | "html" | null
   action?: boolean // 是否开启操作栏插槽
   actionTitle?: string // 操作栏标题 默认为操作
-  actionWidth?: string // 操作栏插槽宽度，一般2个字带图标 text 类型按钮 50-70
+  actionWidth?: string // 操作栏插槽宽度,一般2个字带图标 text 类型按钮 50-70
   columns: VxeCrudColumns[]
 }
 type VxeCrudColumns = Omit<VxeTableColumn, 'children'> & {
@@ -170,7 +170,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
   const { t } = useI18n()
   const tableSchema: VxeGridPropTypes.Columns = []
   // 主键ID
-  if (crudSchema.primaryKey) {
+  if (crudSchema.primaryKey && crudSchema.primaryType) {
     const tableSchemaItem = {
       title: crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index'),
       field: crudSchema.primaryKey,
@@ -179,6 +179,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
     }
     tableSchema.push(tableSchemaItem)
   }
+
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
     if (schemaItem?.isTable !== false && schemaItem?.table?.show !== false) {
