@@ -1,229 +1,288 @@
 <template>
-  <div class="flex">
-    <el-card class="w-1/3 dept" :gutter="12" shadow="always">
-      <template #header>
-        <div class="card-header">
-          <span>部门列表</span>
-          <XButton
-            type="primary"
-            preIcon="ep:zoom-in"
-            title="新增根节点"
-            v-hasPermi="['system:dept:create']"
-            @click="handleCreate"
+  <ContentWrap>
+    <!-- 搜索工作栏 -->
+    <el-form :model="queryParams" ref="queryForm" :inline="true">
+      <el-form-item label="部门名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入部门名称" />
+      </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择部门状态">
+          <el-option
+            v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
-        </div>
-      </template>
-      <div class="custom-tree-container">
-        <!-- <p>部门列表</p> -->
-        <!-- 操作工具栏 -->
-        <el-input v-model="filterText" placeholder="搜索部门" />
-        <el-tree
-          ref="treeRef"
-          node-key="id"
-          :data="deptOptions"
-          :props="defaultProps"
-          :highlight-current="true"
-          default-expand-all
-          :filter-node-method="filterNode"
-          :expand-on-click-node="false"
-        >
-          <template #default="{ node, data }">
-            <span class="custom-tree-node">
-              <span>{{ node.label }}</span>
-              <span>
-                <XTextButton
-                  preIcon="ep:zoom-in"
-                  :title="t('action.add')"
-                  v-hasPermi="['system:dept:create']"
-                  @click="handleCreate(data)"
-                />
-                <XTextButton
-                  preIcon="ep:edit"
-                  :title="t('action.edit')"
-                  v-hasPermi="['system:dept:update']"
-                  @click="handleUpdate(data)"
-                />
-                <XTextButton
-                  preIcon="ep:delete"
-                  :title="t('action.del')"
-                  v-hasPermi="['system:dept:delete']"
-                  @click="handleDelete(data)"
-                />
-              </span>
-            </span>
-          </template>
-        </el-tree>
-      </div>
-    </el-card>
-    <el-card class="w-2/3 dept" style="margin-left: 10px" :gutter="12" shadow="hover">
-      <template #header>
-        <div class="card-header">
-          <span>{{ formTitle }}</span>
-        </div>
-      </template>
-      <div v-if="!showForm">
-        <span><p>请从左侧选择部门</p></span>
-      </div>
-      <div v-if="showForm">
-        <!-- 操作工具栏 -->
-        <Form ref="formRef" :schema="modelSchema" :rules="rules">
-          <template #parentId>
-            <el-tree-select
-              node-key="id"
-              v-model="deptParentId"
-              :props="defaultProps"
-              :data="deptOptions"
-              check-strictly
-            />
-          </template>
-          <template #leaderUserId>
-            <el-select v-model="leaderUserId">
-              <el-option
-                v-for="item in userOption"
-                :key="parseInt(item.id)"
-                :label="item.nickname"
-                :value="parseInt(item.id)"
-              />
-            </el-select>
-          </template>
-        </Form>
-        <!-- 按钮：保存 -->
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <!-- 操作：搜索 -->
         <XButton
           type="primary"
-          :title="t('action.save')"
-          v-hasPermi="['system:dept:update']"
-          :loading="loading"
-          @click="submitForm()"
+          preIcon="ep:search"
+          :title="t('common.query')"
+          @click="handleQuery()"
         />
-        <!-- 按钮：关闭 -->
-        <XButton :loading="loading" :title="t('dialog.close')" @click="showForm = false" />
-      </div>
-    </el-card>
-  </div>
+        <!-- 操作：重置 -->
+        <XButton preIcon="ep:refresh-right" :title="t('common.reset')" @click="resetQuery()" />
+      </el-form-item>
+    </el-form>
+    <vxe-toolbar>
+      <template #buttons>
+        <!-- 操作：新增 -->
+        <XButton
+          type="primary"
+          preIcon="ep:zoom-in"
+          :title="t('action.add')"
+          v-hasPermi="['system:dept:create']"
+          @click="handleCreate()"
+        />
+        <XButton title="展开所有" @click="xTable?.setAllTreeExpand(true)" />
+        <XButton title="关闭所有" @click="xTable?.clearTreeExpand()" />
+      </template>
+    </vxe-toolbar>
+    <!-- 列表 -->
+    <vxe-table
+      show-overflow
+      keep-source
+      ref="xTable"
+      :loading="tableLoading"
+      :row-config="{ keyField: 'id' }"
+      :column-config="{ resizable: true }"
+      :tree-config="{ transform: true, rowField: 'id', parentField: 'parentId' }"
+      :print-config="{}"
+      :export-config="{}"
+      :data="tableData"
+      class="xtable"
+    >
+      <vxe-column title="部门名称" field="name" width="200" tree-node />
+      <vxe-column title="负责人" field="leaderUserId" :formatter="userNicknameFormat" />
+      <vxe-column title="排序" field="sort" />
+      <vxe-column title="状态" field="status">
+        <template #default="{ row }">
+          <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+        </template>
+      </vxe-column>
+      <vxe-column title="创建时间" field="createTime" formatter="formatDate" />
+      <vxe-column title="操作" width="200">
+        <template #default="{ row }">
+          <!-- 操作：修改 -->
+          <XTextButton
+            preIcon="ep:edit"
+            :title="t('action.edit')"
+            v-hasPermi="['system:dept:update']"
+            @click="handleUpdate(row.id)"
+          />
+          <!-- 操作：删除 -->
+          <XTextButton
+            preIcon="ep:delete"
+            :title="t('action.del')"
+            v-hasPermi="['system:dept:delete']"
+            @click="handleDelete(row.id)"
+          />
+        </template>
+      </vxe-column>
+    </vxe-table>
+  </ContentWrap>
+  <!-- 添加或修改菜单对话框 -->
+  <XModal id="deptModel" v-model="dialogVisible" :title="dialogTitle">
+    <!-- 对话框(添加 / 修改) -->
+    <!-- 操作工具栏 -->
+    <Form ref="formRef" :schema="modelSchema" :rules="rules">
+      <template #parentId>
+        <el-tree-select
+          node-key="id"
+          v-model="deptParentId"
+          :props="defaultProps"
+          :data="deptOptions"
+          :default-expanded-keys="[100]"
+          check-strictly
+        />
+      </template>
+      <template #leaderUserId>
+        <el-select v-model="leaderUserId">
+          <el-option
+            v-for="item in userOption"
+            :key="parseInt(item.id)"
+            :label="item.nickname"
+            :value="parseInt(item.id)"
+          />
+        </el-select>
+      </template>
+    </Form>
+    <template #footer>
+      <!-- 按钮：保存 -->
+      <XButton
+        v-if="['create', 'update'].includes(actionType)"
+        type="primary"
+        :loading="actionLoading"
+        @click="submitForm()"
+        :title="t('action.save')"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :loading="actionLoading" @click="dialogVisible = false" :title="t('dialog.close')" />
+    </template>
+  </XModal>
 </template>
 <script setup lang="ts">
+import { nextTick, onMounted, reactive, ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElInput, ElCard, ElTree, ElTreeSelect, ElSelect, ElOption } from 'element-plus'
-import { handleTree } from '@/utils/tree'
-import { onMounted, ref, unref, watch } from 'vue'
-import * as DeptApi from '@/api/system/dept'
-import { Form, FormExpose } from '@/components/Form'
-import { modelSchema, rules } from './dept.data'
-import { DeptVO } from '@/api/system/dept/types'
 import { useMessage } from '@/hooks/web/useMessage'
+import { ElForm, ElFormItem, ElInput, ElSelect, ElTreeSelect, ElOption } from 'element-plus'
+import { VxeColumn, VxeTable, VxeTableInstance, VxeToolbar } from 'vxe-table'
+import { modelSchema } from './dept.data'
+import * as DeptApi from '@/api/system/dept'
 import { getListSimpleUsersApi } from '@/api/system/user'
-const message = useMessage()
+import { required } from '@/utils/formRules.js'
+import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { handleTree } from '@/utils/tree'
+import { FormExpose } from '@/components/Form'
 
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
+// 列表相关的变量
+const xTable = ref<VxeTableInstance>()
+const tableLoading = ref(false)
+const tableData = ref()
+// 弹窗相关的变量
+const dialogVisible = ref(false) // 是否显示弹出层
+const dialogTitle = ref('edit') // 弹出层标题
+const actionType = ref('') // 操作按钮的类型
+const actionLoading = ref(false) // 遮罩层
+const deptParentId = ref(0) // 上级ID
+const leaderUserId = ref()
+const formRef = ref<FormExpose>() // 表单 Ref
+const deptOptions = ref() // 树形结构
+const userOption = ref()
+// 新增和修改的表单校验
+const rules = reactive({
+  name: [required],
+  sort: [required],
+  path: [required],
+  status: [required]
+})
+
+// 下拉框[上级]的配置项目
 const defaultProps = {
+  checkStrictly: true,
   children: 'children',
   label: 'name',
   value: 'id'
 }
-const { t } = useI18n() // 国际化
-const loading = ref(false) // 遮罩层
-const dialogVisible = ref(false) // 是否显示弹出层
-const showForm = ref(false) // 显示form表单
-const formTitle = ref('部门信息') // 显示form标题
-const deptParentId = ref(0) // 上级ID
-// 创建form表单
-const formRef = ref<FormExpose>()
-
-// ========== 创建部门树结构 ==========
-const filterText = ref('')
-const deptOptions = ref() // 树形结构
-const treeRef = ref<InstanceType<typeof ElTree>>()
+// 获取下拉框[上级]的数据
 const getTree = async () => {
   const res = await DeptApi.listSimpleDeptApi()
   deptOptions.value = handleTree(res)
+  console.info(deptOptions.value)
 }
-const filterNode = (value: string, data: Tree) => {
-  if (!value) return true
-  return data.name.includes(value)
-}
-watch(filterText, (val) => {
-  treeRef.value!.filter(val)
-})
-// 用户列表
-const userOption = ref()
-const leaderUserId = ref()
 const getUserList = async () => {
   const res = await getListSimpleUsersApi()
   userOption.value = res
 }
-// 新增
-const handleCreate = (data: { id: number }) => {
-  // 重置表单
-  deptParentId.value = data.id
-  formTitle.value = '新增部门'
-  showForm.value = true
+// ========== 查询 ==========
+const queryParams = reactive<DeptApi.DeptPageReqVO>({
+  name: undefined,
+  status: undefined
+})
+// 执行查询
+const getList = async () => {
+  tableLoading.value = true
+  const res = await DeptApi.getDeptPageApi(queryParams)
+  tableData.value = res
+  tableLoading.value = false
 }
-// 编辑
-const handleUpdate = async (data: { id: number }) => {
-  const res = await DeptApi.getDeptApi(data.id)
-  formTitle.value = '修改- ' + res?.name
-  deptParentId.value = res.parentId
+
+// 查询操作
+const handleQuery = async () => {
+  await getList()
+}
+
+// 重置操作
+const resetQuery = async () => {
+  queryParams.name = undefined
+  queryParams.status = undefined
+  await getList()
+}
+
+// ========== 新增/修改 ==========
+
+// 设置标题
+const setDialogTile = (type: string) => {
+  dialogTitle.value = t('action.' + type)
+  actionType.value = type
+  dialogVisible.value = true
+}
+
+// 新增操作
+const handleCreate = async () => {
+  deptParentId.value = 0
+  leaderUserId.value = null
+  setDialogTile('create')
+}
+
+// 修改操作
+const handleUpdate = async (rowId: number) => {
+  setDialogTile('update')
+  // 设置数据
+  const res = await DeptApi.getDeptApi(rowId)
+  console.info(res)
+  deptParentId.value = res.deptParentId
   leaderUserId.value = res.leaderUserId
+  await nextTick()
   unref(formRef)?.setValues(res)
-  showForm.value = true
 }
-// 删除
-const handleDelete = async (data: { id: number }) => {
-  message
-    .confirm(t('common.delDataMessage'), t('common.confirmTitle'))
-    .then(async () => {
-      await DeptApi.deleteDeptApi(data.id)
-      message.success(t('common.delSuccess'))
-    })
-    .catch(() => {})
-  await getTree()
-}
-// 提交按钮
+
+// 提交新增/修改的表单
 const submitForm = async () => {
   const elForm = unref(formRef)?.getElFormRef()
   if (!elForm) return
   elForm.validate(async (valid) => {
     if (valid) {
-      loading.value = true
+      actionLoading.value = true
       // 提交请求
       try {
-        const data = unref(formRef)?.formModel as DeptVO
+        const data = unref(formRef)?.formModel as DeptApi.DeptVO
         data.parentId = deptParentId.value
         data.leaderUserId = leaderUserId.value
-        if (formTitle.value.startsWith('新增')) {
+        if (dialogTitle.value.startsWith('新增')) {
           await DeptApi.createDeptApi(data)
-        } else if (formTitle.value.startsWith('修改')) {
+        } else if (dialogTitle.value.startsWith('修改')) {
           await DeptApi.updateDeptApi(data)
         }
         // 操作成功，重新加载列表
         dialogVisible.value = false
       } finally {
-        loading.value = false
+        actionLoading.value = false
       }
     }
   })
 }
+
+// 删除操作
+const handleDelete = async (rowId: number) => {
+  message.delConfirm().then(async () => {
+    await DeptApi.deleteDeptApi(rowId)
+    message.success(t('common.delSuccess'))
+    await getList()
+  })
+}
+
+const userNicknameFormat = (row) => {
+  if (!row && !row.row && !row.row.leaderUserId) {
+    return '未设置'
+  }
+  for (const user of userOption.value) {
+    if (row.row.leaderUserId === user.id) {
+      return user.nickname
+    }
+  }
+  return '未知【' + row.row.leaderUserId + '】'
+}
+
+// ========== 初始化 ==========
 onMounted(async () => {
   await getTree()
   await getUserList()
+  await getList()
 })
 </script>
-
-<style scoped>
-.dept {
-  height: 600px;
-  max-height: 1800px;
-}
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  padding-right: 8px;
-}
-</style>
