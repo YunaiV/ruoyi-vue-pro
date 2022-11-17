@@ -4,13 +4,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 交易订单 - 退款状态
+ * 交易订单 - 售后状态
  *
  * @author Sin
  */
 @RequiredArgsConstructor
 @Getter
-public enum TradeOrderRefundStatusEnum {
+public enum TradeOrderAfterSaleStatusEnum {
 
     NONE(0, "未退款"),
     PART(1, "部分退款"),

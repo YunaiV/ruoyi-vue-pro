@@ -86,6 +86,8 @@ public class TradeAfterSaleDO extends BaseDO {
     private Long auditUserId;
     /**
      * 审批备注
+     *
+     * 注意，只有审批不通过才会填写
      */
     private String auditReason;
 
@@ -132,8 +134,6 @@ public class TradeAfterSaleDO extends BaseDO {
     private Long payRefundId;
     /**
      * 退款时间
-     *
-     * 退款成功后，才记录该时间
      */
     private LocalDateTime refundTime;
 
@@ -155,10 +155,12 @@ public class TradeAfterSaleDO extends BaseDO {
     /**
      * 收货时间
      */
-    private LocalDateTime receiptTime;
+    private LocalDateTime receiveTime;
     /**
      * 收货备注
+     *
+     * 注意，只有拒绝收货才会填写
      */
-    private String receiptMemo;
+    private String receiveReason;
 
 }

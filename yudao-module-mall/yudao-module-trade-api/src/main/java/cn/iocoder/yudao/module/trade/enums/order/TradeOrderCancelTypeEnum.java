@@ -13,9 +13,9 @@ import lombok.RequiredArgsConstructor;
 public enum TradeOrderCancelTypeEnum {
 
     PAY_TIMEOUT(10, "超时未支付"),
-    REFUND_CLOSE(20, "退款关闭"),
+    AFTER_SALE_CLOSE(20, "退款关闭"),
     MEMBER_CANCEL(30, "买家取消"),
-    PAY_ON_DELIVERY(40, "已通过货到付款交易"),;
+    PAY_ON_DELIVERY(40, "已通过货到付款交易"),; // TODO 芋艿：这个类型，是不是可以去掉
 
     /**
      * 关闭类型

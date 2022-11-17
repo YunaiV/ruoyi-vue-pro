@@ -21,7 +21,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderConfig;
@@ -182,7 +182,7 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderDO.getReceiverAreaId(), 3306L);
         assertEquals(tradeOrderDO.getReceiverPostCode(), 85757);
         assertEquals(tradeOrderDO.getReceiverDetailAddress(), "土豆村");
-        assertEquals(tradeOrderDO.getRefundStatus(), TradeOrderRefundStatusEnum.NONE.getStatus());
+        assertEquals(tradeOrderDO.getAfterSaleStatus(), TradeOrderAfterSaleStatusEnum.NONE.getStatus());
         assertEquals(tradeOrderDO.getRefundPrice(), 0);
         assertEquals(tradeOrderDO.getCouponPrice(), 30);
         assertEquals(tradeOrderDO.getPointPrice(), 10);

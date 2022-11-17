@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO.OrderItem;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -219,11 +219,11 @@ public class TradeOrderDO extends BaseDO {
 
     // ========== 退款基本信息 ==========
     /**
-     * 退款状态
+     * 收货状态
      *
-     * 枚举 {@link TradeOrderRefundStatusEnum}
+     * 枚举 {@link TradeOrderAfterSaleStatusEnum}
      */
-    private Integer refundStatus;
+    private Integer afterSaleStatus;
     /**
      * 退款金额，单位：分
      *

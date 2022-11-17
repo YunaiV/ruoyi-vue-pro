@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -24,17 +25,16 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreate
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
+import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -180,12 +180,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         tradeOrderDO.setNo(IdUtil.getSnowflakeNextId() + ""); // TODO @LeeYan9: 思考下, 怎么生成好点哈; 这个是会展示给用户的;
         tradeOrderDO.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
         tradeOrderDO.setType(TradeOrderTypeEnum.NORMAL.getType());
-        tradeOrderDO.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
+        tradeOrderDO.setAfterSaleStatus(TradeOrderAfterSaleStatusEnum.NONE.getStatus());
         tradeOrderDO.setProductCount(getSumValue(order.getItems(),  PriceCalculateRespDTO.OrderItem::getCount, Integer::sum));
         tradeOrderDO.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
         tradeOrderDO.setAdjustPrice(0).setPayed(false); // 支付信息
         tradeOrderDO.setDeliveryStatus(false); // 物流信息
-        tradeOrderDO.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0); // 退款信息
+        tradeOrderDO.setAfterSaleStatus(TradeOrderAfterSaleStatusEnum.NONE.getStatus()).setRefundPrice(0); // 退款信息
         tradeOrderMapper.insert(tradeOrderDO);
         return tradeOrderDO;
     }
@@ -252,11 +252,52 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     @Override
-    public void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus) {
+    public void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus, Integer refundPrice) {
+        // 如果退款成功，则 refundPrice 非空
+        if (Objects.equals(newAfterSaleStatus, TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus())
+            && refundPrice == null) {
+            throw new IllegalArgumentException(StrUtil.format("id({}) 退款成功，退款金额不能为空", id));
+        }
+
+        // 更新订单项
         int updateCount = tradeOrderItemMapper.updateAfterSaleStatus(id, oldAfterSaleStatus, newAfterSaleStatus);
         if (updateCount <= 0) {
             throw exception(ORDER_ITEM_UPDATE_AFTER_SALE_STATUS_FAIL);
         }
+
+        // 如果有退款金额，则需要更新订单
+        if (refundPrice == null) {
+            return;
+        }
+        // 计算总的退款金额
+        TradeOrderDO order = tradeOrderMapper.selectById(tradeOrderItemMapper.selectById(id).getOrderId());
+        Integer orderRefundPrice = order.getRefundPrice() + refundPrice;
+        if (isAllOrderItemAfterSaleSuccess(order.getId())) { // 如果都售后成功，则需要取消订单
+            tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
+                    .setAfterSaleStatus(TradeOrderAfterSaleStatusEnum.ALL.getStatus()).setRefundPrice(orderRefundPrice)
+                    .setCancelType(TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE.getType()).setCancelTime(LocalDateTime.now()));
+
+            // TODO 芋艿：记录订单日志
+
+            // TODO 芋艿：站内信？
+        } else { // 如果部分售后，则更新退款金额
+            tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
+                    .setAfterSaleStatus(TradeOrderAfterSaleStatusEnum.PART.getStatus()).setRefundPrice(orderRefundPrice));
+        }
+
+        // TODO 芋艿：未来如果有分佣，需要更新相关分佣订单为已失效
+    }
+
+    /**
+     * 判断指定订单的所有订单项，是不是都售后成功
+     *
+     * @param id 订单编号
+     * @return 是否都售后成功
+     */
+    private boolean isAllOrderItemAfterSaleSuccess(Long id) {
+        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(id);
+        return orderItems.stream().allMatch(orderItem -> Objects.equals(orderItem.getAfterSaleStatus(),
+                TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus()));
     }
 
 }

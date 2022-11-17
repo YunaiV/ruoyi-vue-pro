@@ -50,6 +50,8 @@ public interface TradeOrderService {
      * @param id 交易订单项编号
      * @param oldAfterSaleStatus 当前售后状态；如果不符，更新后会抛出异常
      * @param newAfterSaleStatus 目标售后状态
+     * @param refundPrice 退款金额；当订单项退款成功时，必须传递该值
      */
-    void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus);
+    void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus,
+                                        Integer newAfterSaleStatus, Integer refundPrice);
 }

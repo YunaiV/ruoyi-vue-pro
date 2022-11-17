@@ -4,10 +4,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
-import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
-import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
-import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleAuditReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleConfirmReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDisagreeReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRefuseReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
@@ -28,7 +26,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -66,6 +63,13 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         return afterSale.getId();
     }
 
+    /**
+     * 校验交易订单项是否可以申请售后
+     *
+     * @param userId 用户编号
+     * @param createReqVO 售后创建信息
+     * @return 交易订单项
+     */
     private TradeOrderItemDO validateOrderItemApplicable(Long userId, AppTradeAfterSaleCreateReqVO createReqVO) {
         // 校验订单项存在
         TradeOrderItemDO orderItem = tradeOrderService.getOrderItem(userId, createReqVO.getOrderItemId());
@@ -116,7 +120,8 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
 
         // 更新交易订单项的售后状态
         tradeOrderService.updateOrderItemAfterSaleStatus(tradeOrderItem.getId(),
-                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus());
+                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(),
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), null);
 
         // TODO 记录售后日志
 
@@ -125,62 +130,179 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
     }
 
     @Override
-    @Transactional
-    public void auditAfterSale(Long userId, String userIp,
-                               TradeAfterSaleAuditReqVO auditReqVO) {
+    @Transactional(rollbackFor = Exception.class)
+    public void agreeAfterSale(Long userId, Long id) {
         // 校验售后单存在，并状态未审批
-        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(auditReqVO.getId());
+        TradeAfterSaleDO afterSale = validateAfterSaleAuditable(id);
+
+        // 更新售后单的状态
+        // 情况一：退款：标记为 WAIT_REFUND 状态。后续等退款发起成功后，在标记为 COMPLETE 状态
+        // 情况二：退货退款：需要等用户退货后，才能发起退款
+        Integer newStatus = afterSale.getType().equals(TradeAfterSaleTypeEnum.REFUND.getType()) ?
+                TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus() : TradeAfterSaleStatusEnum.SELLER_AGREE.getStatus();
+        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.APPLY.getStatus(), new TradeAfterSaleDO()
+                .setStatus(newStatus).setAuditUserId(userId).setAuditTime(LocalDateTime.now()));
+
+        // TODO 记录售后日志
+
+        // TODO 发送售后消息
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void disagreeAfterSale(Long userId, TradeAfterSaleDisagreeReqVO auditReqVO) {
+        // 校验售后单存在，并状态未审批
+        TradeAfterSaleDO afterSale = validateAfterSaleAuditable(auditReqVO.getId());
+
+        // 更新售后单的状态
+        Integer newStatus = TradeAfterSaleStatusEnum.SELLER_DISAGREE.getStatus();
+        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.APPLY.getStatus(), new TradeAfterSaleDO()
+                .setStatus(newStatus).setAuditUserId(userId).setAuditTime(LocalDateTime.now())
+                .setAuditReason(auditReqVO.getAuditReason()));
+
+        // TODO 记录售后日志
+
+        // TODO 发送售后消息
+
+        // 更新交易订单项的售后状态为【未申请】
+        tradeOrderService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
+                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), null);
+    }
+
+    /**
+     * 校验售后单是否可审批（同意售后、拒绝售后）
+     *
+     * @param id 售后编号
+     * @return 售后单
+     */
+    private TradeAfterSaleDO validateAfterSaleAuditable(Long id) {
+        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(id);
         if (afterSale == null) {
             throw exception(AFTER_SALE_NOT_FOUND);
         }
         if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.APPLY.getStatus())) {
             throw exception(AFTER_SALE_AUDIT_FAIL_STATUS_NOT_APPLY);
         }
+        return afterSale;
+    }
 
-        // 进行审批
-        if (auditReqVO.getPass()) {
-            auditAfterSalePass(userId, userIp, auditReqVO, afterSale);
-        } else {
-            auditAfterSaleReject(userId, auditReqVO, afterSale);
+    private void updateAfterSaleStatus(Long id, Integer status, TradeAfterSaleDO updateObj) {
+        int updateCount = tradeAfterSaleMapper.updateByIdAndStatus(id, status, updateObj);
+        if (updateCount == 0) {
+            throw exception(AFTER_SALE_UPDATE_STATUS_FAIL);
         }
     }
 
-    private void auditAfterSalePass(Long userId, String userIp,
-                                    TradeAfterSaleAuditReqVO auditReqVO, TradeAfterSaleDO afterSale) {
-        // 更新售后单的状态
-        // 情况一：退款：标记为 WAIT_REFUND 状态。后续等退款发起成功后，在标记为 COMPLETE 状态
-        // 情况二：退货退款：需要等用户退货后，才能发起退款
-        Integer newStatus = afterSale.getType().equals(TradeAfterSaleTypeEnum.REFUND.getType()) ?
-                TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus() : TradeAfterSaleStatusEnum.SELLER_PASS.getStatus();
-        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.APPLY.getStatus(), new TradeAfterSaleDO()
-                .setStatus(newStatus).setAuditUserId(userId)
-                .setAuditReason(auditReqVO.getAuditReason()).setAuditTime(LocalDateTime.now()));
-
-        // 如果直接退款，则发起售后退款
-        if (afterSale.getType().equals(TradeAfterSaleTypeEnum.REFUND.getType())) {
-            createPayRefund(userIp, afterSale);
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deliveryAfterSale(Long userId, AppTradeAfterSaleDeliveryReqVO deliveryReqVO) {
+        // 校验售后单存在，并状态未退货
+        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(deliveryReqVO.getId());
+        if (afterSale == null) {
+            throw exception(AFTER_SALE_NOT_FOUND);
         }
+        if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.SELLER_AGREE.getStatus())) {
+            throw exception(AFTER_SALE_DELIVERY_FAIL_STATUS_NOT_SELLER_AGREE);
+        }
+
+        // 更新售后单的物流信息
+        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.SELLER_AGREE.getStatus(), new TradeAfterSaleDO()
+                .setStatus(TradeAfterSaleStatusEnum.BUYER_DELIVERY.getStatus())
+                .setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo())
+                .setDeliveryTime(deliveryReqVO.getDeliveryTime()));
 
         // TODO 记录售后日志
 
         // TODO 发送售后消息
     }
 
-    private void auditAfterSaleReject(Long userId,
-                                      TradeAfterSaleAuditReqVO auditReqVO, TradeAfterSaleDO afterSale) {
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void receiveAfterSale(Long userId, Long id) {
+        // 校验售后单存在，并状态为已退货
+        TradeAfterSaleDO afterSale = validateAfterSaleReceivable(id);
+
         // 更新售后单的状态
-        Integer newStatus = TradeAfterSaleStatusEnum.SELLER_REFUSE.getStatus();
-                updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.APPLY.getStatus(), new TradeAfterSaleDO()
-                .setStatus(newStatus).setAuditUserId(userId)
-                .setAuditReason(auditReqVO.getAuditReason()).setAuditTime(LocalDateTime.now()));
+        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.BUYER_DELIVERY.getStatus(), new TradeAfterSaleDO()
+                .setStatus(TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus()).setReceiveTime(LocalDateTime.now()));
+
+        // TODO 记录售后日志
+
+        // TODO 发送售后消息
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void refuseAfterSale(Long userId, TradeAfterSaleRefuseReqVO confirmReqVO) {
+        // 校验售后单存在，并状态为已退货
+        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(confirmReqVO.getId());
+        if (afterSale == null) {
+            throw exception(AFTER_SALE_NOT_FOUND);
+        }
+        if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.BUYER_DELIVERY.getStatus())) {
+            throw exception(AFTER_SALE_CONFIRM_FAIL_STATUS_NOT_BUYER_DELIVERY);
+        }
+
+        // 更新售后单的状态
+        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.BUYER_DELIVERY.getStatus(), new TradeAfterSaleDO()
+                .setStatus(TradeAfterSaleStatusEnum.SELLER_REFUSE.getStatus()).setReceiveTime(LocalDateTime.now())
+                .setReceiveReason(confirmReqVO.getRefuseMemo()));
+
+        // TODO 记录售后日志
+
+        // TODO 发送售后消息
 
         // 更新交易订单项的售后状态为【未申请】
         tradeOrderService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
+                TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(), null);
+    }
+
+    /**
+     * 校验售后单是否可收货，即处于买家已发货
+     *
+     * @param id 售后编号
+     * @return 售后单
+     */
+    private TradeAfterSaleDO validateAfterSaleReceivable(Long id) {
+        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(id);
+        if (afterSale == null) {
+            throw exception(AFTER_SALE_NOT_FOUND);
+        }
+        if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.BUYER_DELIVERY.getStatus())) {
+            throw exception(AFTER_SALE_CONFIRM_FAIL_STATUS_NOT_BUYER_DELIVERY);
+        }
+        return afterSale;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void refundAfterSale(Long userId, String userIp, Long id) {
+        // 校验售后单的状态，并状态待退款
+        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectByPayRefundId(id);
+        if (afterSale == null) {
+            throw exception(AFTER_SALE_NOT_FOUND);
+        }
+        if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus())) {
+            throw exception(AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND);
+        }
+
+        // 发起退款单。注意，需要在事务提交后，再进行发起，避免重复发起
+        createPayRefund(userIp, afterSale);
+
+        // 更新售后单的状态为【已完成】
+        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus(), new TradeAfterSaleDO()
+                .setStatus(TradeAfterSaleStatusEnum.COMPLETE.getStatus()).setRefundTime(LocalDateTime.now()));
 
         // TODO 记录售后日志
 
         // TODO 发送售后消息
+
+        // 更新交易订单项的售后状态为【已完成】
+        tradeOrderService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
+                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(),
+                TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus(), afterSale.getRefundPrice());
     }
 
     private void createPayRefund(String userIp, TradeAfterSaleDO afterSale) {
@@ -195,125 +317,6 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
                 tradeAfterSaleMapper.updateById(new TradeAfterSaleDO().setId(afterSale.getId()).setPayRefundId(payRefundId));
             }
         });
-    }
-
-    private void updateAfterSaleStatus(Long id, Integer status, TradeAfterSaleDO updateObj) {
-        int updateCount = tradeAfterSaleMapper.updateByIdAndStatus(id, status, updateObj);
-        if (updateCount == 0) {
-            throw exception(AFTER_SALE_UPDATE_STATUS_FAIL);
-        }
-    }
-
-    @Override
-    public void deliveryAfterSale(Long userId, AppTradeAfterSaleDeliveryReqVO deliveryReqVO) {
-        // 校验售后单存在，并状态未退货
-        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(deliveryReqVO.getId());
-        if (afterSale == null) {
-            throw exception(AFTER_SALE_NOT_FOUND);
-        }
-        if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.SELLER_PASS.getStatus())) {
-            throw exception(AFTER_SALE_DELIVERY_FAIL_STATUS_NOT_SELLER_PASS);
-        }
-
-        // 更新售后单的物流信息
-        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.SELLER_PASS.getStatus(), new TradeAfterSaleDO()
-                .setStatus(TradeAfterSaleStatusEnum.BUYER_RETURN.getStatus())
-                .setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo())
-                .setDeliveryTime(deliveryReqVO.getDeliveryTime()));
-
-        // TODO 记录售后日志
-
-        // TODO 发送售后消息
-    }
-
-    @Override
-    public void confirmAfterSale(Long userId, String userIp,
-                                 TradeAfterSaleConfirmReqVO confirmReqVO) {
-        // 校验售后单存在，并状态未审批
-        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(confirmReqVO.getId());
-        if (afterSale == null) {
-            throw exception(AFTER_SALE_NOT_FOUND);
-        }
-        if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.BUYER_RETURN.getStatus())) {
-            throw exception(AFTER_SALE_CONFIRM_FAIL_STATUS_NOT_BUYER_RETURN);
-        }
-
-        // 进行审批
-        if (confirmReqVO.getPass()) {
-            confirmAfterSalePass(userId, userIp, confirmReqVO, afterSale);
-        } else {
-            confirmAfterSaleReject(userId, confirmReqVO, afterSale);
-        }
-    }
-
-    private void confirmAfterSalePass(Long userId, String userIp,
-                                      TradeAfterSaleConfirmReqVO confirmReqVO, TradeAfterSaleDO afterSale) {
-        // 更新售后单的状态
-        Integer newStatus = TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus();
-        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.BUYER_RETURN.getStatus(), new TradeAfterSaleDO()
-                .setStatus(newStatus).setReceiptTime(LocalDateTime.now()).setReceiptMemo(confirmReqVO.getReceiptMemo()));
-
-        // 如果直接退款，则发起售后退款
-        if (afterSale.getType().equals(TradeAfterSaleTypeEnum.REFUND.getType())) {
-            createPayRefund(userIp, afterSale);
-        }
-
-        // TODO 记录售后日志
-
-        // TODO 发送售后消息
-    }
-
-    private void confirmAfterSaleReject(Long userId, TradeAfterSaleConfirmReqVO confirmReqVO, TradeAfterSaleDO afterSale) {
-        // 更新售后单的状态
-        Integer newStatus = TradeAfterSaleStatusEnum.SELLER_TERMINATION.getStatus();
-        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.BUYER_RETURN.getStatus(), new TradeAfterSaleDO()
-                .setStatus(newStatus).setReceiptTime(LocalDateTime.now()).setReceiptMemo(confirmReqVO.getReceiptMemo()));
-
-        // 更新交易订单项的售后状态为【未申请】
-        tradeOrderService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
-
-        // TODO 记录售后日志
-
-        // TODO 发送售后消息
-    }
-
-    @Override
-    public void refundAfterSale(Long payRefundId) {
-        // 校验退款单
-        PayRefundRespDTO payRefund = validatePayRefundSuccess(payRefundId);
-
-        // 校验售后单的状态，并状态待退款
-        TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectByPayRefundId(payRefundId);
-        if (afterSale == null) {
-            throw exception(AFTER_SALE_NOT_FOUND);
-        }
-        if (ObjectUtil.notEqual(afterSale.getStatus(), TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus())) {
-            throw exception(AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND);
-        }
-
-        // 更新售后单的状态为【已完成】
-        updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus(), new TradeAfterSaleDO()
-                .setStatus(TradeAfterSaleStatusEnum.COMPLETE.getStatus()).setRefundTime(payRefund.getSuccessTime()));
-
-        // 更新交易订单项的售后状态为【已完成】
-        tradeOrderService.updateOrderItemAfterSaleStatus(afterSale.getOrderItemId(),
-                TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus());
-
-        // TODO 记录售后日志
-
-        // TODO 发送售后消息
-    }
-
-    private PayRefundRespDTO validatePayRefundSuccess(Long payRefundId) {
-        PayRefundRespDTO payRefund = payRefundApi.getPayRefund(payRefundId);
-        if (payRefund == null) {
-            throw exception(AFTER_SALE_REFUND_FAIL_PAY_REFUND_NOT_FOUND);
-        }
-        if (PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
-            throw exception(AFTER_SALE_REFUND_FAIL_PAY_REFUND_STATUS_NOT_SUCCESS);
-        }
-        return payRefund;
     }
 
 }
