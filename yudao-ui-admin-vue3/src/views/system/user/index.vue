@@ -237,23 +237,6 @@
 </template>
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref, unref, watch } from 'vue'
-import {
-  ElTag,
-  ElInput,
-  ElCard,
-  ElTree,
-  ElTreeSelect,
-  ElSelect,
-  ElOption,
-  ElTransfer,
-  ElForm,
-  ElFormItem,
-  ElUpload,
-  ElSwitch,
-  ElCheckbox,
-  UploadInstance,
-  UploadRawFile
-} from 'element-plus'
 import { handleTree } from '@/utils/tree'
 import { useI18n } from '@/hooks/web/useI18n'
 import { FormExpose } from '@/components/Form'
@@ -272,6 +255,7 @@ import { getAccessToken, getTenantId } from '@/utils/auth'
 import { useMessage } from '@/hooks/web/useMessage'
 import { VxeGridInstance } from 'vxe-table'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { ElTree, UploadInstance, UploadRawFile } from 'element-plus'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗

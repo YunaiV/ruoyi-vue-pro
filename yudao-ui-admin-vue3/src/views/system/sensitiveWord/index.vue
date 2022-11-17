@@ -114,7 +114,7 @@
 <script setup lang="ts">
 import { onMounted, ref, unref } from 'vue'
 import dayjs from 'dayjs'
-import { ElMessage, ElTag, ElSelect, ElOption } from 'element-plus'
+import { useMessage } from '@/hooks/web/useMessage'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -122,7 +122,9 @@ import { FormExpose } from '@/components/Form'
 import type { SensitiveWordVO } from '@/api/system/sensitiveWord/types'
 import { rules, allSchemas } from './sensitiveWord.data'
 import * as SensitiveWordApi from '@/api/system/sensitiveWord'
+
 const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
 
 // ========== 列表相关 ==========
 const { register, tableObject, methods } = useTable<SensitiveWordVO>({
@@ -180,10 +182,10 @@ const submitForm = async () => {
         data.tags = tags.value
         if (actionType.value === 'create') {
           await SensitiveWordApi.createSensitiveWordApi(data)
-          ElMessage.success(t('common.createSuccess'))
+          message.success(t('common.createSuccess'))
         } else {
           await SensitiveWordApi.updateSensitiveWordApi(data)
-          ElMessage.success(t('common.updateSuccess'))
+          message.success(t('common.updateSuccess'))
         }
         // 操作成功，重新加载列表
         dialogVisible.value = false

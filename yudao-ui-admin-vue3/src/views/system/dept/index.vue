@@ -103,11 +103,10 @@
 </template>
 <script setup lang="ts">
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElInput, ElCard, ElTree, ElTreeSelect, ElSelect, ElOption } from 'element-plus'
 import { handleTree } from '@/utils/tree'
 import { onMounted, ref, unref, watch } from 'vue'
 import * as DeptApi from '@/api/system/dept'
-import { Form, FormExpose } from '@/components/Form'
+import { FormExpose } from '@/components/Form'
 import { modelSchema, rules } from './dept.data'
 import { DeptVO } from '@/api/system/dept/types'
 import { useMessage } from '@/hooks/web/useMessage'

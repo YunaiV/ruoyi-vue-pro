@@ -6,6 +6,8 @@ import WindiCSS from 'vite-plugin-windicss'
 import VueJsx from '@vitejs/plugin-vue-jsx'
 import EslintPlugin from 'vite-plugin-eslint'
 import VueI18n from '@intlify/vite-plugin-vue-i18n'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { createStyleImportPlugin, ElementPlusResolve, VxeTableResolve } from 'vite-plugin-style-import'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import PurgeIcons from 'vite-plugin-purge-icons'
@@ -70,6 +72,20 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
             return `vxe-table/es/${name}/style.css`
           }
         }]
+      }),
+       Components({
+        // 要搜索组件的目录的相对路径
+        dirs: ['src/components'],
+        // 组件的有效文件扩展名
+        extensions: ['vue', 'md'],
+         // 搜索子目录
+        deep: true,
+        include: [/\.vue$/, /\.vue\?vue/],
+        // 生成自定义 `auto-components.d.ts` 全局声明
+        dts: 'src/auto-components.d.ts',
+        // 自定义组件的解析器
+        resolvers: [ElementPlusResolver()],
+        exclude: [/[\\/]node_modules[\\/]/]
       }),
       EslintPlugin({
         cache: false,
