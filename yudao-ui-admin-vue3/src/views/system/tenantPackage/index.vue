@@ -94,16 +94,13 @@ import { handleTree } from '@/utils/tree'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
 import { FormExpose } from '@/components/Form'
 import { TenantPackageVO } from '@/api/system/tenantPackage/types'
+import { ElMessage, ElCard, ElSwitch, ElTree } from 'element-plus'
 import { rules, allSchemas } from './tenantPackage.data'
 import * as TenantPackageApi from '@/api/system/tenantPackage'
 import { listSimpleMenusApi } from '@/api/system/menu'
-
-import { ElTree } from 'element-plus'
 const { t } = useI18n() // 国际化
-const message = useMessage() // 消息弹窗
 
 const defaultProps = {
   children: 'children',
@@ -177,10 +174,10 @@ const submitForm = async () => {
         data.menuIds = treeRef.value!.getCheckedKeys(false) as string[]
         if (actionType.value === 'create') {
           await TenantPackageApi.createTenantPackageTypeApi(data)
-          message.success(t('common.createSuccess'))
+          ElMessage.success(t('common.createSuccess'))
         } else {
           await TenantPackageApi.updateTenantPackageTypeApi(data)
-          message.success(t('common.updateSuccess'))
+          ElMessage.success(t('common.updateSuccess'))
         }
         // 操作成功，重新加载列表
         dialogVisible.value = false

@@ -124,19 +124,17 @@
 <script setup lang="ts">
 import { ref, unref, onMounted } from 'vue'
 import dayjs from 'dayjs'
+import { ElMessage, ElTag, ElSelect, ElOption } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
 import { FormExpose } from '@/components/Form'
 import type { TenantVO } from '@/api/system/tenant/types'
 import { rules, allSchemas } from './tenant.data'
 import * as TenantApi from '@/api/system/tenant'
 import { getTenantPackageList } from '@/api/system/tenantPackage'
 import { TenantPackageVO } from '@/api/system/tenantPackage/types'
-
 const { t } = useI18n() // 国际化
-const message = useMessage() // 消息弹窗
 
 // ========== 列表相关 ==========
 const { register, tableObject, methods } = useTable<TenantVO>({
@@ -207,11 +205,11 @@ const submitForm = async () => {
         if (actionType.value === 'create') {
           data.expireTime = dayjs(data.expireTime).valueOf().toString()
           await TenantApi.createTenantApi(data)
-          message.success(t('common.createSuccess'))
+          ElMessage.success(t('common.createSuccess'))
         } else {
           data.expireTime = dayjs(data.expireTime).valueOf().toString()
           await TenantApi.updateTenantApi(data)
-          message.success(t('common.updateSuccess'))
+          ElMessage.success(t('common.updateSuccess'))
         }
         // 操作成功，重新加载列表
         dialogVisible.value = false

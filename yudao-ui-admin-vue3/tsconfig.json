@@ -34,6 +34,6 @@
     ],
     "typeRoots": ["./node_modules/@types/", "./types"]
   },
-  "include": ["src/**/*", "types/**/*.d.ts", "src/auto-components.d.ts"],
+  "include": ["src/**/*", "types/**/*.d.ts"],
   "exclude": ["dist", "node_modules"]
 }

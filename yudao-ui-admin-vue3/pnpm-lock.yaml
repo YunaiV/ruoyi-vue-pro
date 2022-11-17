@@ -59,7 +59,6 @@ specifiers:
   stylelint-config-standard: ^29.0.0
   stylelint-order: ^5.0.0
   typescript: 4.8.4
-  unplugin-vue-components: ^0.22.9
   unplugin-vue-macros: ^0.16.3
   url: ^0.11.0
   vite: 3.2.4
@@ -151,7 +150,6 @@ devDependencies:
   stylelint-config-standard: 29.0.0_stylelint@14.15.0
   stylelint-order: 5.0.0_stylelint@14.15.0
   typescript: 4.8.4
-  unplugin-vue-components: 0.22.9_rollup@3.3.0+vue@3.2.45
   unplugin-vue-macros: 0.16.3_drqowttw7xgwfzqyhu6wuedde4
   vite: 3.2.4_mp5lu76ee5qtwstsyca37sdhqi
   vite-plugin-compression: 0.5.1_vite@3.2.4
@@ -963,21 +961,6 @@ packages:
     dependencies:
       estree-walker: 2.0.2
       picomatch: 2.3.1
-    dev: true
-
-  /@rollup/pluginutils/5.0.2_rollup@3.3.0:
-    resolution: {integrity: sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-    dependencies:
-      '@types/estree': 1.0.0
-      estree-walker: 2.0.2
-      picomatch: 2.3.1
-      rollup: 3.3.0
     dev: true
 
   /@sxzz/popperjs-es/2.11.7:
@@ -6844,32 +6827,6 @@ packages:
       rollup: 3.3.0
       unplugin: 0.10.2
       vite: 3.2.4_mp5lu76ee5qtwstsyca37sdhqi
-    dev: true
-
-  /unplugin-vue-components/0.22.9_rollup@3.3.0+vue@3.2.45:
-    resolution: {integrity: sha512-qBvooq3EgpjtYicxeccRUGUBBQCCw9rJ0kHPZPOSJd8TBZViSv86vuKLTRDHPyjWtclwOIkVStZJfPdJFhYUMw==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@babel/parser': ^7.15.8
-      vue: 2 || 3
-    peerDependenciesMeta:
-      '@babel/parser':
-        optional: true
-    dependencies:
-      '@antfu/utils': 0.6.0
-      '@rollup/pluginutils': 5.0.2_rollup@3.3.0
-      chokidar: 3.5.3
-      debug: 4.3.4
-      fast-glob: 3.2.12
-      local-pkg: 0.4.2
-      magic-string: 0.26.7
-      minimatch: 5.1.0
-      resolve: 1.22.1
-      unplugin: 0.10.2
-      vue: 3.2.45
-    transitivePeerDependencies:
-      - rollup
-      - supports-color
     dev: true
 
   /unplugin-vue-define-options/0.12.7:

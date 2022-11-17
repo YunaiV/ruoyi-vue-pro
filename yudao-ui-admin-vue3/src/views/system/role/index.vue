@@ -143,16 +143,25 @@
 </template>
 <script setup lang="ts">
 import { onMounted, reactive, ref, unref } from 'vue'
-import { ElTree } from 'element-plus'
+import {
+  ElForm,
+  ElFormItem,
+  ElSelect,
+  ElOption,
+  ElTree,
+  ElCard,
+  ElSwitch,
+  ElTag
+} from 'element-plus'
+import { DICT_TYPE, getDictOptions } from '@/utils/dict'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { FormExpose } from '@/components/Form'
-import { VxeGridInstance } from 'vxe-table'
+import { rules, allSchemas } from './role.data'
 import { handleTree } from '@/utils/tree'
 import { SystemDataScopeEnum } from '@/utils/constants'
-import { DICT_TYPE, getDictOptions } from '@/utils/dict'
-import { rules, allSchemas } from './role.data'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { VxeGridInstance } from 'vxe-table'
 import * as RoleApi from '@/api/system/role'
 import { listSimpleMenusApi } from '@/api/system/menu'
 import { listSimpleDeptApi } from '@/api/system/dept'
@@ -161,7 +170,6 @@ import type {
   PermissionAssignRoleDataScopeReqVO,
   PermissionAssignRoleMenuReqVO
 } from '@/api/system/permission/types'
-
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
