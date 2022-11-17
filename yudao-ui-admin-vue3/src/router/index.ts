@@ -14,7 +14,7 @@ import { isRelogin } from '@/config/axios/service'
 import { getInfoApi } from '@/api/login'
 import { useCache } from '@/hooks/web/useCache'
 
-const { wsCache } = useCache()
+const { wsCache } = useCache('sessionStorage')
 
 const { start, done } = useNProgress()
 
