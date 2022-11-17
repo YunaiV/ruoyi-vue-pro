@@ -19,6 +19,7 @@ const props = defineProps({
   title: propTypes.string.def(''),
   message: propTypes.string.def(''),
   collapse: propTypes.bool.def(true),
+  columns: propTypes.number.def(1),
   schema: {
     type: Array as PropType<DescriptionsSchema[]>,
     default: () => []
@@ -94,7 +95,7 @@ const toggleClick = () => {
     <ElCollapseTransition>
       <div v-show="show" :class="[`${prefixCls}-content`, 'p-10px']">
         <ElDescriptions
-          :column="1"
+          :column="props.columns"
           border
           :direction="mobile ? 'vertical' : 'horizontal'"
           v-bind="getBindValue"

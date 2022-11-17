@@ -51,7 +51,11 @@
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
       :data="detailRef"
-    />
+    >
+      <template #content="{ row }">
+        <Editor :model-value="row.content" read-only="true" />
+      </template>
+    </Descriptions>
     <template #footer>
       <!-- 按钮：保存 -->
       <XButton
@@ -77,6 +81,7 @@ import { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as NoticeApi from '@/api/system/notice'
 import { rules, allSchemas } from './notice.data'
+import { Editor } from '@/components/Editor'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗

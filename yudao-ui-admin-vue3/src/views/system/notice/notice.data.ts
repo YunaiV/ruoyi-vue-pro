@@ -39,7 +39,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '公告内容',
       field: 'content',
       table: {
-        type: 'html' // TODO 芋艿：详情展示，会是 html 的原始内容。要不改成直接使用富文本展示，设置个 readonly？
+        type: 'html'
       },
       form: {
         component: 'Editor',
