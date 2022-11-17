@@ -118,9 +118,17 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
     if (schemaItem?.isSearch || schemaItem.search?.show) {
       let itemRenderName = schemaItem?.search?.itemRender?.name || '$input'
       const options: any[] = []
-      let itemRender: FormItemRenderOptions = {
-        name: itemRenderName,
-        props: { placeholder: t('common.inputText') }
+      let itemRender: FormItemRenderOptions
+      if (schemaItem.search?.itemRender) {
+        itemRender = schemaItem.search.itemRender
+      } else {
+        itemRender = {
+          name: itemRenderName,
+          props:
+            itemRenderName == '$input'
+              ? { placeholder: t('common.inputText') }
+              : { placeholder: t('common.selectText') }
+        }
       }
       if (schemaItem.dictType) {
         const allOptions = { label: '全部', value: '' }

@@ -1,6 +1,9 @@
 import { reactive } from 'vue'
+import { useI18n } from '@/hooks/web/useI18n'
 import { DICT_TYPE } from '@/utils/dict'
 import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
+
+const { t } = useI18n() // 国际化
 
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
@@ -60,8 +63,23 @@ const crudSchemas = reactive<VxeCrudSchema>({
         slots: {
           default: 'resultCode'
         }
-      },
-      isSearch: true // TODO 星语：这里可能有点特殊，不确定好不好处理哈。管理后台返回的是错误码，最终前台展示的是 成功 or 失败，然后筛选页是这样的
+      }
+    },
+    {
+      title: '操作结果',
+      field: 'success',
+      isTable: false,
+      search: {
+        show: true,
+        itemRender: {
+          name: '$select',
+          props: { placeholder: t('common.selectText') },
+          options: [
+            { label: '成功', value: 'true' },
+            { label: '失败', value: 'false' }
+          ]
+        }
+      }
     },
     {
       title: '操作日期',
