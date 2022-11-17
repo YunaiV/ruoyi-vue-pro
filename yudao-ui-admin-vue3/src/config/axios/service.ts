@@ -129,7 +129,6 @@ service.interceptors.response.use(
         isRefreshToken = true
         // 1. 如果获取不到刷新令牌，则只能执行登出操作
         if (!getRefreshToken()) {
-          console.info(getRefreshToken())
           return handleAuthorized()
         }
         // 2. 进行刷新访问令牌
@@ -207,7 +206,6 @@ service.interceptors.response.use(
 )
 
 const refreshToken = async () => {
-  axios.defaults.headers.common['tenant-id'] = getTenantId()
   return await axios.post(base_url + '/system/auth/refresh-token?refreshToken=' + getRefreshToken())
 }
 const handleAuthorized = () => {
