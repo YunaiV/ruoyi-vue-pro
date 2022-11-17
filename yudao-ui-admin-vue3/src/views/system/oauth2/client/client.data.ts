@@ -173,6 +173,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
           props: {
             multiple: true,
             filterable: true,
+            allowCreate: true,
             defaultFirstOption: true
           }
         }
