@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, PropType, reactive, ref, watch } from 'vue'
 import { required } from '@/utils/formRules'
-import { Form } from '@/components/Form'
 import { handleTree } from '@/utils/tree'
 import { ElTreeSelect } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'

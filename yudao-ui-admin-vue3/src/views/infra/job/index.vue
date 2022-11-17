@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Crontab } from '@/components/Crontab'
 import { ref, unref } from 'vue'
 import * as JobApi from '@/api/infra/job'
 import { JobVO } from '@/api/infra/job/types'

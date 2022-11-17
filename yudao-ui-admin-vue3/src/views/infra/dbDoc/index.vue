@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IFrame } from '@/components/IFrame'
 import * as DbDocApi from '@/api/infra/dbDoc'
 import { onMounted, ref } from 'vue'
 import download from '@/utils/download'

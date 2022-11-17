@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { useI18n } from '@/hooks/web/useI18n'
 import { ref, reactive } from 'vue'
-import { CountTo } from '@/components/CountTo'
 import { formatTime } from '@/utils'
-import { Echart } from '@/components/Echart'
 import { EChartsOption } from 'echarts'
 import { radarOption } from './echarts-data'
-import { Highlight } from '@/components/Highlight'
 import type { WorkplaceTotal, Project, Notice, Shortcut } from './types'
 import { set } from 'lodash-es'
 import { useCache } from '@/hooks/web/useCache'

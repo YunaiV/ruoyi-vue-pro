@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { LoginForm, MobileForm, RegisterForm, QrCodeForm } from './components'
-import { ThemeSwitch } from '@/components/ThemeSwitch'
-import { LocaleDropdown } from '@/components/LocaleDropdown'
 import { useI18n } from '@/hooks/web/useI18n'
 import { underlineToHump } from '@/utils'
 import { useAppStore } from '@/store/modules/app'
