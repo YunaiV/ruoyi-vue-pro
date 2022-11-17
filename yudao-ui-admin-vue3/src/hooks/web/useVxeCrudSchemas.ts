@@ -227,9 +227,13 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
     if (schemaItem?.isForm !== false || schemaItem?.form?.show == true) {
       // 默认为 input
       let component = schemaItem?.form?.component || 'Input'
-      const options: ComponentOptions[] = []
+      let defaultValue: any = ''
+      if (component === 'InputNumber') {
+        defaultValue = 0
+      }
       let comonentProps = {}
       if (schemaItem.dictType) {
+        const options: ComponentOptions[] = []
         if (schemaItem.dictData && schemaItem.dictData === 'number') {
           getIntDictOptions(schemaItem.dictType).forEach((dict) => {
             options.push(dict)
@@ -253,7 +257,8 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
         field: schemaItem.field,
         label: schemaItem.form?.label || schemaItem.title,
         component: component,
-        componentProps: comonentProps
+        componentProps: comonentProps,
+        value: defaultValue
       }
 
       formSchema.push(formSchemaItem)
