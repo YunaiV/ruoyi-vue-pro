@@ -181,7 +181,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
   }
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.isTable !== false) {
+    if (schemaItem?.isTable !== false && schemaItem?.table?.show !== false) {
       const tableSchemaItem = {
         ...schemaItem.table,
         field: schemaItem.field,
@@ -278,7 +278,7 @@ const filterDescriptionsSchema = (crudSchema: VxeCrudSchema): DescriptionsSchema
 
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.isDetail !== false) {
+    if (schemaItem?.isDetail !== false || schemaItem.detail?.show !== false) {
       const descriptionsSchemaItem = {
         ...schemaItem.detail,
         field: schemaItem.field,
