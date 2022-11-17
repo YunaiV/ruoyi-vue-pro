@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, unref, onMounted } from 'vue'
 import dayjs from 'dayjs'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElSelect, ElOption } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'

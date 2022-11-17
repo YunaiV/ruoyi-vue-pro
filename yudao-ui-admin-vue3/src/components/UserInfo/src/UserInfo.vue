@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ElMessageBox } from 'element-plus'
+import { ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useCache } from '@/hooks/web/useCache'
 import { useRouter } from 'vue-router'

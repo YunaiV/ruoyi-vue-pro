@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, unref, computed, watch } from 'vue'
+import { ElInput } from 'element-plus'
 import { propTypes } from '@/utils/propTypes'
 import { useConfigGlobal } from '@/hooks/web/useConfigGlobal'
 import { zxcvbn } from '@zxcvbn-ts/core'

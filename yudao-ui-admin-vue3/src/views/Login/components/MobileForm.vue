@@ -2,7 +2,7 @@
 import { useIcon } from '@/hooks/web/useIcon'
 import { reactive, ref, unref, watch, computed } from 'vue'
 import LoginFormTitle from './LoginFormTitle.vue'
-import { ElMessage } from 'element-plus'
+import { ElForm, ElFormItem, ElInput, ElRow, ElCol, ElMessage } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
 import { getTenantIdByNameApi, sendSmsCodeApi, smsLoginApi } from '@/api/login'

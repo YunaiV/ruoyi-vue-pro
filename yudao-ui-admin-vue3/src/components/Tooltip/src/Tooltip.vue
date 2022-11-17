@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { propTypes } from '@/utils/propTypes'
+import { ElTooltip } from 'element-plus'
 defineProps({
   titel: propTypes.string.def(''),
   message: propTypes.string.def(''),

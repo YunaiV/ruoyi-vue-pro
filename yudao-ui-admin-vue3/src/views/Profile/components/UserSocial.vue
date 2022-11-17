@@ -23,6 +23,7 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { ElTable, ElTableColumn } from 'element-plus'
 import { SystemUserSocialTypeEnum } from '@/utils/constants'
 import { getUserProfileApi, ProfileVO } from '@/api/system/user/profile'
 import { socialAuthRedirect, socialUnbind } from '@/api/system/user/socialUser'

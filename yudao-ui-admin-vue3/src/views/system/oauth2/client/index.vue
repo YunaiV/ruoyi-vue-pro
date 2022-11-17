@@ -132,6 +132,7 @@
 <script setup lang="ts">
 // 全局相关的 import
 import { ref, unref } from 'vue'
+import { ElTag } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'

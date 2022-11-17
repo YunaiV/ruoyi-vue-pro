@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, unref } from 'vue'
 import dayjs from 'dayjs'
-import { ElMessage, UploadInstance, UploadRawFile } from 'element-plus'
+import { ElMessage, ElUpload, UploadInstance, UploadRawFile, ElImage } from 'element-plus'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
 import type { FileVO } from '@/api/infra/fileList/types'

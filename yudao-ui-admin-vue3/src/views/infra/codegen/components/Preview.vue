@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, unref } from 'vue'
 import { handleTree2 } from '@/utils/tree'
-import { ElMessage } from 'element-plus'
+import { ElCard, ElTree, ElTabs, ElTabPane, ElMessage } from 'element-plus'
 import { previewCodegenApi } from '@/api/infra/codegen'
 import { CodegenTableVO, CodegenPreviewVO } from '@/api/infra/codegen/types'
 import { useI18n } from '@/hooks/web/useI18n'

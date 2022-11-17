@@ -2,6 +2,7 @@
 import { Form } from '@/components/Form'
 import { PropType, computed, unref, ref } from 'vue'
 import { propTypes } from '@/utils/propTypes'
+import { ElButton } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useForm } from '@/hooks/web/useForm'
 import { findIndex } from '@/utils'

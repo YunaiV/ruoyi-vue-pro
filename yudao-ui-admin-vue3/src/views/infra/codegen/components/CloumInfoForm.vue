@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, PropType, ref } from 'vue'
+import { ElInput, ElSelect, ElOption } from 'element-plus'
 import { CodegenColumnVO } from '@/api/infra/codegen/types'
 import { listSimpleDictTypeApi } from '@/api/system/dict/dict.type'
 import { DictTypeVO } from '@/api/system/dict/types'
