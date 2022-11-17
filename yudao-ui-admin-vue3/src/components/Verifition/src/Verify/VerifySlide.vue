@@ -137,7 +137,7 @@ export default {
       default() {
         return {
           width: '310px',
-          height: '40px'
+          height: '30px'
         }
       }
     }
