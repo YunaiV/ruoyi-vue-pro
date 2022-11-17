@@ -4,17 +4,7 @@ import * as RedisApi from '@/api/infra/redis'
 import { DICT_TYPE } from '@/utils/dict'
 import * as echarts from 'echarts'
 import { RedisKeyInfo, RedisMonitorInfoVO } from '@/api/infra/redis/types'
-import {
-  ElRow,
-  ElCard,
-  ElCol,
-  ElTable,
-  ElTableColumn,
-  ElScrollbar,
-  ElDescriptions,
-  ElDescriptionsItem,
-  ElMessage
-} from 'element-plus'
+import { ElMessage } from 'element-plus'
 const cache = ref<RedisMonitorInfoVO>()
 const keyListLoad = ref(true)
 const keyList = ref<RedisKeyInfo[]>([])

@@ -2,11 +2,11 @@
 import { ref, unref, onMounted } from 'vue'
 import { ContentDetailWrap } from '@/components/ContentDetailWrap'
 import { BasicInfoForm, CloumInfoForm, GenInfoForm } from './components'
-import { ElTabs, ElTabPane, ElMessage } from 'element-plus'
 import { getCodegenTableApi, updateCodegenTableApi } from '@/api/infra/codegen'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
 import { CodegenTableVO, CodegenColumnVO, CodegenUpdateReqVO } from '@/api/infra/codegen/types'
+import { ElMessage } from 'element-plus'
 const { t } = useI18n()
 const { push } = useRouter()
 const { query } = useRoute()

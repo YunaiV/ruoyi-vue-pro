@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ElImageViewer } from 'element-plus'
 import { computed, ref, PropType } from 'vue'
 import { propTypes } from '@/utils/propTypes'
 

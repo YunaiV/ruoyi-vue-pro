@@ -91,7 +91,7 @@
 import { ref, reactive, watch } from 'vue'
 import 'vue-cropper/dist/index.css'
 import { VueCropper } from 'vue-cropper'
-import { ElRow, ElCol, ElUpload, ElMessage, ElDialog } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { propTypes } from '@/utils/propTypes'
 import { uploadAvatarApi } from '@/api/system/user/profile'
 const cropper = ref()

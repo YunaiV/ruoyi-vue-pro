@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, unref } from 'vue'
-import { ElRow, ElCol, ElCard, ElDivider } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useLoginState, LoginStateEnum } from './useLogin'
 import LoginFormTitle from './LoginFormTitle.vue'

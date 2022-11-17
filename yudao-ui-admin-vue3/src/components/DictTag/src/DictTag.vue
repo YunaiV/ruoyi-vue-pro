@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUpdated, PropType, ref } from 'vue'
 import { getDictOptions, DictDataType } from '@/utils/dict'
-import { ElTag } from 'element-plus'
 const props = defineProps({
   type: {
     type: String as PropType<string>,

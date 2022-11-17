@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, unref } from 'vue'
 import dayjs from 'dayjs'
-import { ElTableColumn, ElTag, ElSwitch } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'

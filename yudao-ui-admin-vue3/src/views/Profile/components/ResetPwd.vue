@@ -17,8 +17,7 @@
 </template>
 <script setup lang="ts">
 import { InputPassword } from '@/components/InputPassword'
-import { ElForm, ElFormItem, ElMessage } from 'element-plus'
-import type { FormRules, FormInstance } from 'element-plus'
+import { ElMessage, FormRules, FormInstance } from 'element-plus'
 import { updateUserPwdApi } from '@/api/system/user/profile'
 import { ref, reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'

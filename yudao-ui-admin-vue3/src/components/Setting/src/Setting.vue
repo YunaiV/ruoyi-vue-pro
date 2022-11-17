@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ElDrawer, ElDivider, ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { ref, unref, computed, watch } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { ThemeSwitch } from '@/components/ThemeSwitch'

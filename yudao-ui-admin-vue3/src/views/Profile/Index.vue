@@ -33,7 +33,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElCard, ElTabs, ElTabPane } from 'element-plus'
 import { BasicInfo, ProfileUser, ResetPwd, UserSocial } from './components/'
 const { t } = useI18n()
 

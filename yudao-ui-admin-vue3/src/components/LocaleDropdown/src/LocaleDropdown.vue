@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, unref } from 'vue'
-import { ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import { useLocaleStore } from '@/store/modules/locale'
 import { useLocale } from '@/hooks/web/useLocale'
 import { propTypes } from '@/utils/propTypes'

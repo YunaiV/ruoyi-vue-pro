@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ElCard } from 'element-plus'
 import { propTypes } from '@/utils/propTypes'
 import { useDesign } from '@/hooks/web/useDesign'
 import { ref, onMounted, defineEmits } from 'vue'
