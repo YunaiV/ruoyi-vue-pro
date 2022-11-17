@@ -3,6 +3,7 @@ import { computed, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useLoginState, LoginStateEnum } from './useLogin'
 import LoginFormTitle from './LoginFormTitle.vue'
+import { Qrcode } from '@/components/Qrcode'
 import logoImg from '@/assets/imgs/logo.png'
 
 const { t } = useI18n()

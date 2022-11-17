@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, unref, onMounted } from 'vue'
+import { ContentDetailWrap } from '@/components/ContentDetailWrap'
 import { BasicInfoForm, CloumInfoForm, GenInfoForm } from './components'
 import { getCodegenTableApi, updateCodegenTableApi } from '@/api/infra/codegen'
 import { useRouter, useRoute } from 'vue-router'

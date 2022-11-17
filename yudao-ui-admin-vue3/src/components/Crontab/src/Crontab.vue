@@ -7,7 +7,23 @@
  * @LastEditTime:
 -->
 <script setup lang="ts">
-import { ElMessage } from 'element-plus'
+import {
+  ElInput,
+  ElInputNumber,
+  ElDropdown,
+  ElDropdownMenu,
+  ElDropdownItem,
+  ElDialog,
+  ElTabs,
+  ElTabPane,
+  ElSelect,
+  ElOption,
+  ElForm,
+  ElFormItem,
+  ElRadioGroup,
+  ElRadioButton,
+  ElMessage
+} from 'element-plus'
 import { ref, computed, onMounted, reactive, watch, PropType } from 'vue'
 interface shortcutsType {
   text: string

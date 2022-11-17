@@ -2,9 +2,12 @@
 import { ref, reactive } from 'vue'
 import { set } from 'lodash-es'
 import { EChartsOption } from 'echarts'
+import { Echart } from '@/components/Echart'
 import { useI18n } from '@/hooks/web/useI18n'
+import { CountTo } from '@/components/CountTo'
 import type { AnalysisTotalTypes } from './types'
 import { useDesign } from '@/hooks/web/useDesign'
+import { ElRow, ElCol, ElCard, ElSkeleton } from 'element-plus'
 import { pieOptions, barOptions, lineOptions } from './echarts-data'
 
 const { t } = useI18n()

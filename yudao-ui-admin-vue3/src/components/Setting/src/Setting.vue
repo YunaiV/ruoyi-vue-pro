@@ -2,6 +2,7 @@
 import { ElMessage } from 'element-plus'
 import { ref, unref, computed, watch } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
+import { ThemeSwitch } from '@/components/ThemeSwitch'
 import { colorIsDark, lighten, hexToRGB } from '@/utils/color'
 import { useCssVar } from '@vueuse/core'
 import { useAppStore } from '@/store/modules/app'

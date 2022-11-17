@@ -2,6 +2,7 @@
 import { PropType, reactive, watch } from 'vue'
 import { required } from '@/utils/formRules'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
+import { Form } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { FormSchema } from '@/types/form'
 

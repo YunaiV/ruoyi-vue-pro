@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { IFrame } from '@/components/IFrame'
 import { getAccessToken } from '@/utils/auth'
 import { ref } from 'vue'
 const BASE_URL = import.meta.env.VITE_BASE_URL

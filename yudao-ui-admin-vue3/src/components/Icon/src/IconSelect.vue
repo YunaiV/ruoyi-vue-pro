@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { cloneDeep } from 'lodash-es'
 import { ref, computed, CSSProperties, toRef, watch } from 'vue'
+import {
+  ElInput,
+  ElPopover,
+  ElDivider,
+  ElScrollbar,
+  ElTabs,
+  ElTabPane,
+  ElPagination
+} from 'element-plus'
 import { IconJson } from '@/components/Icon/src/data'
 
 type ParameterCSSProperties = (item?: string) => CSSProperties | undefined
