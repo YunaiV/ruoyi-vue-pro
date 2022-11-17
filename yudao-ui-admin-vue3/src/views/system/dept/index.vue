@@ -129,7 +129,7 @@ import { nextTick, onMounted, reactive, ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { ElForm, ElFormItem, ElInput, ElSelect, ElTreeSelect, ElOption } from 'element-plus'
-import { VxeColumn, VxeTable, VxeTableInstance, VxeToolbar } from 'vxe-table'
+import { VxeTableInstance } from 'vxe-table'
 import { modelSchema } from './dept.data'
 import * as DeptApi from '@/api/system/dept'
 import { getListSimpleUsersApi } from '@/api/system/user'
@@ -171,9 +171,11 @@ const defaultProps = {
 }
 // 获取下拉框[上级]的数据
 const getTree = async () => {
+  deptOptions.value = []
   const res = await DeptApi.listSimpleDeptApi()
-  deptOptions.value = handleTree(res)
-  console.info(deptOptions.value)
+  let dept: Tree = { id: 0, name: '顶级部门', children: [] }
+  dept.children = handleTree(res)
+  deptOptions.value.push(dept)
 }
 const getUserList = async () => {
   const res = await getListSimpleUsersApi()
@@ -225,8 +227,7 @@ const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
   const res = await DeptApi.getDeptApi(rowId)
-  console.info(res)
-  deptParentId.value = res.deptParentId
+  deptParentId.value = res.parentId
   leaderUserId.value = res.leaderUserId
   await nextTick()
   unref(formRef)?.setValues(res)
