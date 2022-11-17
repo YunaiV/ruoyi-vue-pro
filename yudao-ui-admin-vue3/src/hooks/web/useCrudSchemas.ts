@@ -7,14 +7,10 @@ import { DescriptionsSchema } from '@/types/descriptions'
 import { ComponentOptions } from '@/types/components'
 
 export type CrudSchema = Omit<TableColumn, 'children'> & {
-  isSearch?: boolean // 是否在查询显示
-  search?: CrudSearchParams // 查询的详细配置
-  isTable?: boolean // 是否在列表显示
-  table?: CrudTableParams // 列表的详细配置
-  isForm?: boolean // 是否在表单显示
-  form?: CrudFormParams // 表单的详细配置
-  isDetail?: boolean // 是否在详情显示
-  detail?: CrudDescriptionsParams // 详情的详细配置
+  search?: CrudSearchParams
+  table?: CrudTableParams
+  form?: CrudFormParams
+  detail?: CrudDescriptionsParams
   children?: CrudSchema[]
   dictType?: string // 字典类型
   dictData?: 'string' | 'number' | 'boolean' // 字典数据类型 string | number | boolean
@@ -84,7 +80,7 @@ const filterSearchSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
 
   eachTree(crudSchema, (schemaItem: CrudSchema) => {
     // 判断是否显示
-    if (schemaItem?.isSearch || schemaItem.search?.show) {
+    if (schemaItem?.search?.show) {
       let component = schemaItem?.search?.component || 'Input'
       const options: ComponentOptions[] = []
       let comonentProps = {}
@@ -97,7 +93,7 @@ const filterSearchSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
         comonentProps = {
           options: options
         }
-        if (!schemaItem.search?.component) component = 'Select'
+        if (!schemaItem.search.component) component = 'Select'
       }
       const searchSchemaItem = {
         // 默认为 input
@@ -120,7 +116,7 @@ const filterSearchSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
 const filterTableSchema = (crudSchema: CrudSchema[]): TableColumn[] => {
   const tableColumns = treeMap<CrudSchema>(crudSchema, {
     conversion: (schema: CrudSchema) => {
-      if (schema?.isTable !== false || schema?.table?.show !== false) {
+      if (schema?.table?.show !== false) {
         return {
           ...schema.table,
           ...schema
@@ -144,7 +140,7 @@ const filterFormSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
 
   eachTree(crudSchema, (schemaItem: CrudSchema) => {
     // 判断是否显示
-    if (schemaItem?.isForm !== false || schemaItem?.form?.show == true) {
+    if (schemaItem?.form?.show !== false) {
       let component = schemaItem?.form?.component || 'Input'
       let defaultValue: any = ''
       if (schemaItem.form?.value) {
@@ -201,7 +197,7 @@ const filterDescriptionsSchema = (crudSchema: CrudSchema[]): DescriptionsSchema[
 
   eachTree(crudSchema, (schemaItem: CrudSchema) => {
     // 判断是否显示
-    if (schemaItem?.isDetail !== false || schemaItem.detail?.show !== false) {
+    if (schemaItem?.detail?.show !== false) {
       const descriptionsSchemaItem = {
         ...schemaItem.detail,
         field: schemaItem.field,

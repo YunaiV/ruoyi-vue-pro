@@ -17,28 +17,40 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: t('common.index'),
     field: 'id',
     type: 'index',
-    isForm: false,
-    isDetail: false
+    form: {
+      show: false
+    },
+    detail: {
+      show: false
+    }
   },
   {
     label: '表名称',
     field: 'tableName',
-    isSearch: true
+    search: {
+      show: true
+    }
   },
   {
     label: '表描述',
     field: 'tableComment',
-    isSearch: true
+    search: {
+      show: true
+    }
   },
   {
     label: '实体',
     field: 'className',
-    isSearch: true
+    search: {
+      show: true
+    }
   },
   {
     label: t('common.createTime'),
     field: 'createTime',
-    isForm: false,
+    form: {
+      show: false
+    },
     search: {
       show: true,
       component: 'DatePicker',
@@ -52,14 +64,20 @@ const crudSchemas = reactive<CrudSchema[]>([
   {
     label: t('common.updateTime'),
     field: 'updateTime',
-    isForm: false
+    form: {
+      show: false
+    }
   },
   {
     label: t('table.action'),
     field: 'action',
-    width: '350px',
-    isForm: false,
-    isDetail: false
+    width: '500px',
+    form: {
+      show: false
+    },
+    detail: {
+      show: false
+    }
   }
 ])
 export const { allSchemas } = useCrudSchemas(crudSchemas)
