@@ -33,7 +33,7 @@
       :data="dbTableList"
       v-loading="dbLoading"
       :checkbox-config="{ highlight: true, range: true }"
-      height="260px"
+      height="350px"
       class="xtable-scrollbar"
     >
       <vxe-column type="checkbox" width="60" />
