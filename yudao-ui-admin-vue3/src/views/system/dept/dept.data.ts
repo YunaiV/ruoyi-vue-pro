@@ -42,7 +42,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '负责人',
-      field: 'leaderUserId'
+      field: 'leaderUserId',
+      table: {
+        slots: {
+          default: 'leaderUserId_default'
+        }
+      }
     },
     {
       title: '联系电话',

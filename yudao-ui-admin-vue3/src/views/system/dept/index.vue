@@ -14,6 +14,9 @@
         <XButton title="展开所有" @click="xGrid?.setAllTreeExpand(true)" />
         <XButton title="关闭所有" @click="xGrid?.clearTreeExpand()" />
       </template>
+      <template #leaderUserId_default="{ row }">
+        <span>{{ userNicknameFormat(row) }}</span>
+      </template>
       <template #actionbtns_default="{ row }">
         <!-- 操作：修改 -->
         <XTextButton
@@ -200,21 +203,21 @@ const handleDelete = async (rowId: number) => {
   await deleteData(xGrid, rowId)
 }
 
-//const userNicknameFormat = (row) => {
-//  if (!row && !row.row && !row.row.leaderUserId) {
-//    return '未设置'
-//  }
-//  for (const user of userOption.value) {
-//    if (row.row.leaderUserId === user.id) {
-//      return user.nickname
-//    }
-//  }
-//  return '未知【' + row.row.leaderUserId + '】'
-//}
-//
+const userNicknameFormat = (row) => {
+  if (!row || !row.leaderUserId || row.leaderUserId == null) {
+    return '未设置'
+  }
+  for (const user of userOption.value) {
+    if (row.leaderUserId === user.id) {
+      return user.nickname
+    }
+  }
+  return '未知【' + row.leaderUserId + '】'
+}
+
 // ========== 初始化 ==========
 onMounted(async () => {
-  await getTree()
   await getUserList()
+  await getTree()
 })
 </script>

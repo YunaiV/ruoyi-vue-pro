@@ -42,7 +42,6 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
   /**
    * grid options 初始化
    */
-  console.info(config?.allSchemas.tableSchema)
   const gridOptions = reactive<VxeGridProps>({
     loading: true,
     size: currentSize as any,
