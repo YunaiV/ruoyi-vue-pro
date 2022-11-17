@@ -1,21 +1,3 @@
-<script setup lang="ts">
-import { LoginForm, MobileForm, RegisterForm, QrCodeForm } from './components'
-import { ThemeSwitch } from '@/components/ThemeSwitch'
-import { LocaleDropdown } from '@/components/LocaleDropdown'
-import { useI18n } from '@/hooks/web/useI18n'
-import { underlineToHump } from '@/utils'
-import { useAppStore } from '@/store/modules/app'
-import { useDesign } from '@/hooks/web/useDesign'
-
-const { t } = useI18n()
-
-const { getPrefixCls } = useDesign()
-
-const prefixCls = getPrefixCls('login')
-
-const appStore = useAppStore()
-</script>
-
 <template>
   <div
     :class="prefixCls"
@@ -76,6 +58,23 @@ const appStore = useAppStore()
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { LoginForm, MobileForm, RegisterForm, QrCodeForm } from './components'
+import { ThemeSwitch } from '@/components/ThemeSwitch'
+import { LocaleDropdown } from '@/components/LocaleDropdown'
+import { useI18n } from '@/hooks/web/useI18n'
+import { underlineToHump } from '@/utils'
+import { useAppStore } from '@/store/modules/app'
+import { useDesign } from '@/hooks/web/useDesign'
+
+const { t } = useI18n()
+
+const { getPrefixCls } = useDesign()
+
+const prefixCls = getPrefixCls('login')
+
+const appStore = useAppStore()
+</script>
 
 <style lang="less" scoped>
 @prefix-cls: ~'@{namespace}-login';
