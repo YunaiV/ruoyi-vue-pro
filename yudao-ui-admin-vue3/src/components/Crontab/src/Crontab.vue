@@ -1,3 +1,11 @@
+<!--
+ * @Descripttion: cron规则生成器
+ * @version: 1.0
+ * @Author: sakuya
+ * @Date: 2021年12月29日15:23:54
+ * @LastEditors:
+ * @LastEditTime:
+-->
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
 import { ref, computed, onMounted, reactive, watch, PropType } from 'vue'
@@ -496,12 +504,7 @@ const submit = () => {
 <template>
   <el-input v-model="defaultValue" v-bind="$attrs">
     <template #append>
-      <el-dropdown
-        split-button
-        type="text"
-        @command="handleShortcuts"
-        style="width: 35px; margin-left: 5px; margin-right: 2px"
-      >
+      <el-dropdown split-button trigger="click" @command="handleShortcuts">
         生成器
         <template #dropdown>
           <el-dropdown-menu>
