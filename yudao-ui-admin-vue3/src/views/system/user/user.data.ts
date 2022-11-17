@@ -68,7 +68,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: t('common.status'),
       field: 'status',
       dictType: DICT_TYPE.COMMON_STATUS,
-      dictData: 'number',
+      dictClass: 'number',
       isSearch: true
     },
     {

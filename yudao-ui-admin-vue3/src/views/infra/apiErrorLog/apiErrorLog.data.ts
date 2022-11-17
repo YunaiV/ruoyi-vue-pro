@@ -69,7 +69,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '处理状态',
     field: 'processStatus',
     dictType: DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS,
-    dictData: 'number',
+    dictClass: 'number',
     search: {
       show: true
     }

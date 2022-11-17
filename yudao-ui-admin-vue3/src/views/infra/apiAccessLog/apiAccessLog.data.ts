@@ -26,7 +26,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '用户类型',
     field: 'userType',
     dictType: DICT_TYPE.USER_TYPE,
-    dictData: 'number',
+    dictClass: 'number',
     search: {
       show: true
     }

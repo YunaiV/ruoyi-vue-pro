@@ -26,7 +26,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '用户类型',
       field: 'userType',
       dictType: DICT_TYPE.USER_TYPE,
-      dictData: 'number',
+      dictClass: 'number',
       isSearch: true
     },
     {

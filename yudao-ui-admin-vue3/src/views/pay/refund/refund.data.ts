@@ -67,7 +67,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '退款类型',
     field: 'type',
     dictType: DICT_TYPE.PAY_REFUND_ORDER_TYPE,
-    dictData: 'number',
+    dictClass: 'number',
     search: {
       show: true
     }
@@ -76,7 +76,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: t('common.status'),
     field: 'status',
     dictType: DICT_TYPE.PAY_REFUND_ORDER_STATUS,
-    dictData: 'number',
+    dictClass: 'number',
     search: {
       show: true
     }

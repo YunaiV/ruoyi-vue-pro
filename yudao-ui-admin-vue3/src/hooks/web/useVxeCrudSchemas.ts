@@ -38,7 +38,7 @@ type VxeCrudColumns = Omit<VxeTableColumn, 'children'> & {
   print?: CrudPrintParams // vxe 打印的字段
   children?: VxeCrudColumns[] // 子级
   dictType?: string // 字典类型
-  dictData?: 'string' | 'number' | 'boolean' // 字典数据类型 string | number | boolean
+  dictClass?: 'string' | 'number' | 'boolean' // 字典数据类型 string | number | boolean
 }
 
 type CrudSearchParams = {
@@ -239,11 +239,11 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
       let comonentProps = {}
       if (schemaItem.dictType) {
         const options: ComponentOptions[] = []
-        if (schemaItem.dictData && schemaItem.dictData === 'number') {
+        if (schemaItem.dictClass && schemaItem.dictClass === 'number') {
           getIntDictOptions(schemaItem.dictType).forEach((dict) => {
             options.push(dict)
           })
-        } else if (schemaItem.dictData && schemaItem.dictData === 'boolean') {
+        } else if (schemaItem.dictClass && schemaItem.dictClass === 'boolean') {
           getBoolDictOptions(schemaItem.dictType).forEach((dict) => {
             options.push(dict)
           })

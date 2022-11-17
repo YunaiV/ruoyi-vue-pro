@@ -17,7 +17,7 @@ export type CrudSchema = Omit<TableColumn, 'children'> & {
   detail?: CrudDescriptionsParams // 详情的详细配置
   children?: CrudSchema[]
   dictType?: string // 字典类型
-  dictData?: 'string' | 'number' | 'boolean' // 字典数据类型 string | number | boolean
+  dictClass?: 'string' | 'number' | 'boolean' // 字典数据类型 string | number | boolean
 }
 
 type CrudSearchParams = {
@@ -157,11 +157,11 @@ const filterFormSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
       let comonentProps = {}
       if (schemaItem.dictType) {
         const options: ComponentOptions[] = []
-        if (schemaItem.dictData && schemaItem.dictData === 'number') {
+        if (schemaItem.dictClass && schemaItem.dictClass === 'number') {
           getIntDictOptions(schemaItem.dictType).forEach((dict) => {
             options.push(dict)
           })
-        } else if (schemaItem.dictData && schemaItem.dictData === 'boolean') {
+        } else if (schemaItem.dictClass && schemaItem.dictClass === 'boolean') {
           getBoolDictOptions(schemaItem.dictType).forEach((dict) => {
             options.push(dict)
           })

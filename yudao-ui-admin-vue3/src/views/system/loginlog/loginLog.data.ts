@@ -13,7 +13,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '日志类型',
       field: 'logType',
       dictType: DICT_TYPE.SYSTEM_LOGIN_TYPE,
-      dictData: 'number'
+      dictClass: 'number'
     },
     {
       title: '用户名称',
@@ -36,7 +36,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '登陆结果',
       field: 'result',
       dictType: DICT_TYPE.SYSTEM_LOGIN_RESULT,
-      dictData: 'number'
+      dictClass: 'number'
     },
     {
       title: '登录日期',

@@ -22,7 +22,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '错误码类型',
       field: 'type',
       dictType: DICT_TYPE.SYSTEM_ERROR_CODE_TYPE,
-      dictData: 'number',
+      dictClass: 'number',
       isSearch: true
     },
     {

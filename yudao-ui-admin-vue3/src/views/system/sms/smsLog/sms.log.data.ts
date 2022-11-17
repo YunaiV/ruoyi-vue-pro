@@ -23,21 +23,21 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '短信渠道',
       field: 'channelId',
       dictType: DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE,
-      dictData: 'number',
+      dictClass: 'number',
       isSearch: true
     },
     {
       title: '发送状态',
       field: 'sendStatus',
       dictType: DICT_TYPE.SYSTEM_SMS_SEND_STATUS,
-      dictData: 'number',
+      dictClass: 'number',
       isSearch: true
     },
     {
       title: '接收状态',
       field: 'receiveStatus',
       dictType: DICT_TYPE.SYSTEM_SMS_RECEIVE_STATUS,
-      dictData: 'number',
+      dictClass: 'number',
       isSearch: true
     },
     {
@@ -49,7 +49,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '短信类型',
       field: 'templateType',
       dictType: DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE,
-      dictData: 'number',
+      dictClass: 'number',
       isSearch: true
     },
     {
