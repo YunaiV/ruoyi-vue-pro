@@ -11,6 +11,7 @@ const message = useMessage() // 消息弹窗
 
 interface UseVxeGridConfig<T = any> {
   allSchemas: VxeAllSchemas
+  topActionSlots?: boolean // 是否开启表格内顶部操作栏插槽
   treeConfig?: VxeTablePropTypes.TreeConfig
   getListApi: (option: any) => Promise<T>
   deleteApi?: (option: any) => Promise<T>
@@ -51,7 +52,10 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       isHover: true // 当鼠标移到行时，是否要高亮当前行
     },
     toolbarConfig: {
-      slots: { buttons: 'toolbar_buttons' }
+      slots:
+        !config?.topActionSlots && config?.topActionSlots != false
+          ? { buttons: 'toolbar_buttons' }
+          : {}
     },
     printConfig: {
       columns: config?.allSchemas.printSchema

@@ -41,6 +41,7 @@ const message = useMessage() // 消息弹窗
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
 const { gridOptions, getList } = useVxeGrid<TokenApi.OAuth2TokenVO>({
   allSchemas: allSchemas,
+  topActionSlots: false,
   getListApi: TokenApi.getAccessTokenPageApi
 })
 
