@@ -190,11 +190,11 @@ ps：核心功能已经实现，正在对接微信小程序中...
 |---------------------------------------------------------------------------------------------|-----------------------|-------------|----------------------------------------------------------------|
 | [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架             | 2.6.13      | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
 | [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器             | 5.7 / 8.0+  |                                                                |
-| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件     | 1.2.14      | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件     | 1.2.15      | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包       | 3.5.2       | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
 | [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源               | 3.5.2       | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/)                                                                  | key-value 数据库        | 5.0 / 6.0   |                                                                |
-| [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端            | 3.17.7      | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
+| [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端            | 3.18.0      | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
 | [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架               | 5.3.23      | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
 | [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架         | 5.6.8       | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
 | [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件             | 6.2.3       | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
