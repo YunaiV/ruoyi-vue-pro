@@ -227,7 +227,6 @@ export default defineComponent({
                   {...(autoSetPlaceholder && setTextPlaceholder(item))}
                   {...setComponentProps(item)}
                   style={item.componentProps?.style}
-                  {...item.componentProps?.props}
                   {...(notRenderOptions.includes(item?.component as string) &&
                   item?.componentProps?.options
                     ? { options: item?.componentProps?.options || [] }

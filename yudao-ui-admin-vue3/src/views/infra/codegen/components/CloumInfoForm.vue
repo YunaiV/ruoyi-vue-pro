@@ -25,7 +25,7 @@ defineExpose({
 </script>
 <template>
   <vxe-table ref="dragTable" :data="info" stripe :column-config="{ resizable: true }">
-    <vxe-column title="字段列名" field="columnName" width="10%" />
+    <vxe-column title="字段列名" field="columnName" fixed="left" width="80" />
     <vxe-column title="字段描述" field="columnComment">
       <template #default="{ row }">
         <el-input v-model="row.columnComment" />

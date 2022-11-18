@@ -87,10 +87,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
         component: 'Select',
         componentProps: {
           options: authorizedGrantOptions,
-          props: {
-            multiple: true,
-            filterable: true
-          }
+          multiple: true,
+          filterable: true
         }
       }
     },
@@ -102,12 +100,10 @@ const crudSchemas = reactive<VxeCrudSchema>({
         component: 'Select',
         componentProps: {
           options: [],
-          props: {
-            multiple: true,
-            filterable: true,
-            allowCreate: true,
-            defaultFirstOption: true
-          }
+          multiple: true,
+          filterable: true,
+          allowCreate: true,
+          defaultFirstOption: true
         }
       }
     },
@@ -119,12 +115,10 @@ const crudSchemas = reactive<VxeCrudSchema>({
         component: 'Select',
         componentProps: {
           options: [],
-          props: {
-            multiple: true,
-            filterable: true,
-            allowCreate: true,
-            defaultFirstOption: true
-          }
+          multiple: true,
+          filterable: true,
+          allowCreate: true,
+          defaultFirstOption: true
         }
       }
     },
@@ -136,12 +130,10 @@ const crudSchemas = reactive<VxeCrudSchema>({
         component: 'Select',
         componentProps: {
           options: [],
-          props: {
-            multiple: true,
-            filterable: true,
-            allowCreate: true,
-            defaultFirstOption: true
-          }
+          multiple: true,
+          filterable: true,
+          allowCreate: true,
+          defaultFirstOption: true
         }
       }
     },
@@ -153,12 +145,10 @@ const crudSchemas = reactive<VxeCrudSchema>({
         component: 'Select',
         componentProps: {
           options: [],
-          props: {
-            multiple: true,
-            filterable: true,
-            allowCreate: true,
-            defaultFirstOption: true
-          }
+          multiple: true,
+          filterable: true,
+          allowCreate: true,
+          defaultFirstOption: true
         }
       }
     },
@@ -170,12 +160,10 @@ const crudSchemas = reactive<VxeCrudSchema>({
         component: 'Select',
         componentProps: {
           options: [],
-          props: {
-            multiple: true,
-            filterable: true,
-            allowCreate: true,
-            defaultFirstOption: true
-          }
+          multiple: true,
+          filterable: true,
+          allowCreate: true,
+          defaultFirstOption: true
         }
       }
     },

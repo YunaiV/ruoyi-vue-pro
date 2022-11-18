@@ -2,7 +2,7 @@
 <p align="center">
     <img src="https://img.shields.io/badge/-Vue3.2-34495e?logo=vue.j" />
     <img src="https://img.shields.io/badge/-Vite3-646cff?logo=vite&logoColor=white" />
-    <img src="https://img.shields.io/badge/-TypeScript4.8-blue?logo=typescript&logoColor=white" />
+    <img src="https://img.shields.io/badge/-TypeScript4.9-blue?logo=typescript&logoColor=white" />
     <img src="https://img.shields.io/badge/-Pinia2-yellow?logo=picpay&logoColor=white" />
     <img src="https://img.shields.io/badge/-ESLint-4b32c3?logo=eslint&logoColor=white" />
     <img src="https://img.shields.io/badge/-pnpm7-F69220?logo=pnpm&logoColor=white" />
@@ -82,7 +82,7 @@ pnpm install
 - 运行项目
 
 ```bash
-pnpm run dev
+pnpm dev
 ```
 
 - 打包
@@ -103,7 +103,13 @@ pnpm add 包名
 pnpm remove 包名
 ```
 
-- 其他命令请看 package.json
+- 设置镜像源
+
+```bash
+pnpm config set registry https://registry.npm.taobao.org/
+```
+
+- 其他命令请看 package.json scripts
 
 ## 浏览器支持
 
