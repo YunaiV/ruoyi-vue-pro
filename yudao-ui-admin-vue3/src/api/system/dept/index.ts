@@ -1,6 +1,6 @@
 import request from '@/config/axios'
 export type DeptVO = {
-  id: number
+  id?: number
   name: string
   parentId: number
   status: number

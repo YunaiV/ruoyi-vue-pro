@@ -54,9 +54,9 @@
         <el-select v-model="leaderUserId">
           <el-option
             v-for="item in userOption"
-            :key="parseInt(item.id)"
+            :key="item.id"
             :label="item.nickname"
-            :value="parseInt(item.id)"
+            :value="item.id"
           />
         </el-select>
       </template>
@@ -83,7 +83,7 @@ import { VxeGridInstance } from 'vxe-table'
 import { ElSelect, ElTreeSelect, ElOption } from 'element-plus'
 import { allSchemas } from './dept.data'
 import * as DeptApi from '@/api/system/dept'
-import { getListSimpleUsersApi } from '@/api/system/user'
+import { getListSimpleUsersApi, UserVO } from '@/api/system/user'
 import { required } from '@/utils/formRules.js'
 import { handleTree } from '@/utils/tree'
 import { FormExpose } from '@/components/Form'
@@ -99,12 +99,7 @@ const treeConfig = {
   parentField: 'parentId',
   expandAll: true
 }
-const { gridOptions, getList, deleteData } = useVxeGrid<DeptApi.DeptVO>({
-  allSchemas: allSchemas,
-  treeConfig: treeConfig,
-  getListApi: DeptApi.getDeptPageApi,
-  deleteApi: DeptApi.deleteDeptApi
-})
+
 // 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
@@ -114,7 +109,7 @@ const deptParentId = ref(0) // 上级ID
 const leaderUserId = ref()
 const formRef = ref<FormExpose>() // 表单 Ref
 const deptOptions = ref() // 树形结构
-const userOption = ref()
+const userOption = ref<UserVO[]>([])
 // 新增和修改的表单校验
 const rules = reactive({
   name: [required],
@@ -130,6 +125,10 @@ const defaultProps = {
   label: 'name',
   value: 'id'
 }
+const getUserList = async () => {
+  const res = await getListSimpleUsersApi()
+  userOption.value = res
+}
 // 获取下拉框[上级]的数据
 const getTree = async () => {
   deptOptions.value = []
@@ -138,11 +137,12 @@ const getTree = async () => {
   dept.children = handleTree(res)
   deptOptions.value.push(dept)
 }
-const getUserList = async () => {
-  const res = await getListSimpleUsersApi()
-  userOption.value = res
-}
-
+const { gridOptions, getList, deleteData } = useVxeGrid<DeptApi.DeptVO>({
+  allSchemas: allSchemas,
+  treeConfig: treeConfig,
+  getListApi: DeptApi.getDeptPageApi,
+  deleteApi: DeptApi.deleteDeptApi
+})
 // ========== 新增/修改 ==========
 
 // 设置标题
@@ -182,10 +182,11 @@ const submitForm = async () => {
         const data = unref(formRef)?.formModel as DeptApi.DeptVO
         data.parentId = deptParentId.value
         data.leaderUserId = leaderUserId.value
-        if (dialogTitle.value.startsWith('新增')) {
+        console.info(data)
+        if (actionType.value === 'create') {
           await DeptApi.createDeptApi(data)
           message.success(t('common.createSuccess'))
-        } else if (dialogTitle.value.startsWith('修改')) {
+        } else if (actionType.value === 'update') {
           await DeptApi.updateDeptApi(data)
           message.success(t('common.updateSuccess'))
         }
