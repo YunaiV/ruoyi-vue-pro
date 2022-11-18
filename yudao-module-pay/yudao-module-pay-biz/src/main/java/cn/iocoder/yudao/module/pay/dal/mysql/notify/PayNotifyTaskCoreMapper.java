@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -24,7 +24,7 @@ public interface PayNotifyTaskCoreMapper extends BaseMapperX<PayNotifyTaskDO> {
         return selectList(new QueryWrapper<PayNotifyTaskDO>()
                 .in("status", PayNotifyStatusEnum.WAITING.getStatus(), PayNotifyStatusEnum.REQUEST_SUCCESS.getStatus(),
                         PayNotifyStatusEnum.REQUEST_FAILURE.getStatus())
-                .le("next_notify_time", new Date()));
+                .le("next_notify_time", LocalDateTime.now()));
     }
 
 }

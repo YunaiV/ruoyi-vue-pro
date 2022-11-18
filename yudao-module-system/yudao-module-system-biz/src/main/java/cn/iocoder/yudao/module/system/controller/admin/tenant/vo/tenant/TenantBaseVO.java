@@ -5,7 +5,7 @@ import io.swagger.annotations.*;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
 * 租户 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -39,7 +39,7 @@ public class TenantBaseVO {
 
     @ApiModelProperty(value = "过期时间", required = true)
     @NotNull(message = "过期时间不能为空")
-    private Date expireTime;
+    private LocalDateTime expireTime;
 
     @ApiModelProperty(value = "账号数量", required = true, example = "1024")
     @NotNull(message = "账号数量不能为空")

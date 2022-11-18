@@ -175,7 +175,7 @@ export default {
 @import "~@/assets/styles/login.scss";
 .oauth-login {
   display: flex;
-  align-items: cen;
+  align-items: center;
   cursor:pointer;
 }
 .oauth-login-item {

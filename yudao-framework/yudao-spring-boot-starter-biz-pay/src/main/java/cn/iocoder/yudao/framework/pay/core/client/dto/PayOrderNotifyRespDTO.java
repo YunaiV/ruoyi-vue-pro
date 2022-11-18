@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 支付通知 Response DTO
@@ -33,7 +33,7 @@ public class PayOrderNotifyRespDTO {
     /**
      * 支付成功时间
      */
-    private Date successTime;
+    private LocalDateTime successTime;
 
     /**
      * 通知的原始数据

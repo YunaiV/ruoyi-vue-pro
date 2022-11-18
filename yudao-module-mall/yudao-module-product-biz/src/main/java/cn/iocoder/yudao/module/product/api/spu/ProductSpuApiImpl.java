@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.product.api.spu;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.product.api.spu.dto.SpuInfoRespDTO;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
@@ -27,7 +27,7 @@ public class ProductSpuApiImpl implements ProductSpuApi {
     private ProductSpuMapper productSpuMapper;
 
     @Override
-    public List<SpuInfoRespDTO> getSpuList(Collection<Long> spuIds) {
+    public List<ProductSpuRespDTO> getSpuList(Collection<Long> spuIds) {
         // TODO TODO LeeYan9: AllEmpty?
         if (CollectionUtils.isAnyEmpty(spuIds)) {
             return Collections.emptyList();

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.product.api.sku;
 
-import cn.iocoder.yudao.module.product.api.sku.dto.SkuDecrementStockBatchReqDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 
 import java.util.Collection;
@@ -31,11 +31,10 @@ public interface ProductSkuApi {
     List<ProductSkuRespDTO> getSkuList(Collection<Long> ids);
 
     /**
-     * 批量扣减 SKU 库存
+     * 更新 SKU 库存
      *
-     * @param batchReqDTO sku库存信息列表
+     * @param updateStockReqDTO 更新请求
      */
-    // TODO @LeeYan9: decrementSkuStockBatch? 啊哈, 动名词;
-    void decrementStockBatch(SkuDecrementStockBatchReqDTO batchReqDTO);
+    void updateSkuStock(ProductSkuUpdateStockReqDTO updateStockReqDTO);
 
 }

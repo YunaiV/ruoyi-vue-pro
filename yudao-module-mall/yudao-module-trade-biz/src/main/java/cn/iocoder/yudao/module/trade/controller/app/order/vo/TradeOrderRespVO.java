@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 
 import lombok.*;
 import io.swagger.annotations.*;
+
+import java.time.LocalDateTime;
 import java.util.*;
 
 @ApiModel("订单交易 Response VO")
@@ -19,7 +21,7 @@ public class TradeOrderRespVO {
     @ApiModelProperty(value = "备注")
     private String remark;
     @ApiModelProperty(value = "订单结束时间")
-    private Date endTime;
+    private LocalDateTime endTime;
     @ApiModelProperty(value = "订单金额(总金额)，单位：分", required = true)
     private Integer buyPrice;
     @ApiModelProperty(value = "优惠总金额，单位：分", required = true)
@@ -33,7 +35,7 @@ public class TradeOrderRespVO {
     @ApiModelProperty(value = "退款金额，单位：分", required = true)
     private Integer refundPrice;
     @ApiModelProperty(value = "付款时间")
-    private Date payTime;
+    private LocalDateTime payTime;
     @ApiModelProperty(value = "支付订单编号")
     private Integer payTransactionId;
     @ApiModelProperty(value = "支付渠道")
@@ -41,9 +43,9 @@ public class TradeOrderRespVO {
     @ApiModelProperty(value = "配送类型", required = true)
     private Integer deliveryType;
     @ApiModelProperty(value = "发货时间")
-    private Date deliveryTime;
+    private LocalDateTime deliveryTime;
     @ApiModelProperty(value = "收货时间")
-    private Date receiveTime;
+    private LocalDateTime receiveTime;
     @ApiModelProperty(value = "收件人名称", required = true)
     private String receiverName;
     @ApiModelProperty(value = "手机号", required = true)
@@ -57,7 +59,7 @@ public class TradeOrderRespVO {
     @ApiModelProperty(value = "优惠劵编号")
     private Integer couponCardId;
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 订单项数组

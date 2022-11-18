@@ -8,4 +8,6 @@ export interface DescriptionsSchema {
   labelAlign?: 'left' | 'center' | 'right'
   className?: string
   labelClassName?: string
+  dateFormat?: string
+  dictType?: string
 }

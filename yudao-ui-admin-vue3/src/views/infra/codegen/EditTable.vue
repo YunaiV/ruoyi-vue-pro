@@ -38,14 +38,14 @@ const submitForm = async () => {
   if (basicForm && genForm) {
     const basicInfoData = (await basicInfo?.getFormData()) as CodegenTableVO
     const genInfoData = (await genInfo?.getFormData()) as CodegenTableVO
-    const genTable: CodegenUpdateReqVO = {
-      table: Object.assign({}, basicInfoData, genInfoData),
-      columns: cloumCurrentRow.value
-    }
     if (parentMenuId.value) {
       genInfoData.parentMenuId = parentMenuId.value
     } else {
       genInfoData.parentMenuId = 0
+    }
+    const genTable: CodegenUpdateReqVO = {
+      table: Object.assign({}, basicInfoData, genInfoData),
+      columns: cloumCurrentRow.value
     }
     await updateCodegenTableApi(genTable)
     ElMessage.success(t('common.updateSuccess'))

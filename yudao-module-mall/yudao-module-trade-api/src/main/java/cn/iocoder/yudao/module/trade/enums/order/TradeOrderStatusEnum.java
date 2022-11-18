@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.trade.enums.order;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,11 +14,14 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum TradeOrderStatusEnum {
 
-    WAITING_PAYMENT(0, "待付款"),
-    WAIT_SHIPMENT(1, "待发货"),
-    ALREADY_SHIPMENT(2, "待收货"),
-    COMPLETED(3, "已完成"),
-    CANCEL(4, "已关闭");
+    UNPAID(0, "未付款"),
+    PAID(10, "已付款"), // 例如说，拼团订单，支付后，需要拼团成功后，才会处于待发货
+    UNDELIVERED(20, "待发货"),
+    DELIVERED(30, "已发货"),
+    COMPLETED(40, "已完成"),
+    CANCELED(50, "已取消");
+
+    // TODO 芋艿： TAKE("待核验")：虚拟订单需要核验商品
 
     /**
      * 状态值
@@ -26,5 +31,36 @@ public enum TradeOrderStatusEnum {
      * 状态名
      */
     private final String name;
+
+    /**
+     * 判断指定状态，是否正处于【已取消】状态
+     *
+     * @param status 指定状态
+     * @return 是否
+     */
+    public static boolean isCanceled(Integer status) {
+        return ObjectUtil.equals(status, CANCELED.getStatus());
+    }
+
+    /**
+     * 判断指定状态，是否有过【已付款】状态
+     *
+     * @param status 指定状态
+     * @return 是否
+     */
+    public static boolean havePaid(Integer status) {
+        return ObjectUtils.equalsAny(status, PAID.getStatus(), UNDELIVERED.getStatus(),
+                DELIVERED.getStatus(), COMPLETED.getStatus());
+    }
+
+    /**
+     * 判断指定状态，是否有过【已发货】状态
+     *
+     * @param status 指定状态
+     * @return 是否
+     */
+    public static boolean haveDelivered(Integer status) {
+        return ObjectUtils.equalsAny(status, DELIVERED.getStatus(), COMPLETED.getStatus());
+    }
 
 }

@@ -150,7 +150,7 @@ defineExpose({
         :props="menuProps"
         :data="menuOptions"
         check-strictly
-        @node-click="handleNodeClick"
+        @change="handleNodeClick"
       />
     </template>
   </Form>

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
+import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
@@ -39,6 +40,9 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
 
     // TODO @芋艿：登录相关的单测，待补全
 
+    @Resource
+    private MemberAuthServiceImpl authService;
+
     @MockBean
     private MemberUserService userService;
     @MockBean
@@ -50,11 +54,12 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
     @MockBean
     private SocialUserApi socialUserApi;
     @MockBean
+    private WxMaService wxMaService;
+    @MockBean
     private PasswordEncoder passwordEncoder;
+
     @Resource
     private MemberUserMapper memberUserMapper;
-    @Resource
-    private MemberAuthServiceImpl authService;
 
     @Test
     public void testUpdatePassword_success(){

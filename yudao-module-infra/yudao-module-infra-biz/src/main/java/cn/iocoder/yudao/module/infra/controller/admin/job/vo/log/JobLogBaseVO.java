@@ -5,7 +5,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -34,11 +34,11 @@ public class JobLogBaseVO {
     @ApiModelProperty(value = "开始执行时间", required = true)
     @NotNull(message = "开始执行时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date beginTime;
+    private LocalDateTime beginTime;
 
     @ApiModelProperty(value = "结束执行时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date endTime;
+    private LocalDateTime endTime;
 
     @ApiModelProperty(value = "执行时长", example = "123")
     private Integer duration;

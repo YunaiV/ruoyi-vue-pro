@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Set;
@@ -41,6 +42,19 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .inIfPresent(ProductSpuDO::getId, alarmStockSpuIds) // 库存告警
                 .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
                 .orderByDesc(ProductSpuDO::getSort));
+    }
+
+    /**
+     * 更新商品 SPU 库存
+     *
+     * @param id 商品 SPU 编号
+     * @param incrCount 增加的库存数量
+     */
+    default void updateStock(Long id, Integer incrCount) {
+        LambdaUpdateWrapper<ProductSpuDO> updateWrapper = new LambdaUpdateWrapper<ProductSpuDO>()
+                .setSql(" total_stock = total_stock +" + incrCount) // 负数，所以使用 + 号
+                .eq(ProductSpuDO::getId, id);
+        update(null, updateWrapper);
     }
 
 }

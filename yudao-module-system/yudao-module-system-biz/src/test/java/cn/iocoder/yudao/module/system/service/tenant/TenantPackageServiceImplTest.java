@@ -15,9 +15,9 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -142,7 +142,7 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
            o.setName("芋道源码");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setRemark("源码解析");
-           o.setCreateTime(buildTime(2022, 10, 10));
+           o.setCreateTime(buildLocalDateTime(2022, 10, 10));
        });
        tenantPackageMapper.insert(dbTenantPackage);
        // 测试 name 不匹配
@@ -152,13 +152,13 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
        // 测试 remark 不匹配
        tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setRemark("解析")));
        // 测试 createTime 不匹配
-       tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setCreateTime(buildTime(2022, 11, 11))));
+       tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setCreateTime(buildLocalDateTime(2022, 11, 11))));
        // 准备参数
        TenantPackagePageReqVO reqVO = new TenantPackagePageReqVO();
        reqVO.setName("芋道");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
        reqVO.setRemark("源码");
-       reqVO.setCreateTime((new Date[]{buildTime(2022, 10, 9),buildTime(2022, 10, 11)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2022, 10, 9),buildLocalDateTime(2022, 10, 11)}));
 
        // 调用
        PageResult<TenantPackageDO> pageResult = tenantPackageService.getTenantPackagePage(reqVO);

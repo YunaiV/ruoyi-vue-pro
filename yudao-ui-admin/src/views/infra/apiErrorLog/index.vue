@@ -48,7 +48,7 @@
       <el-table-column label="日志编号" align="center" prop="id" />
       <el-table-column label="用户编号" align="center" prop="userId" />
       <el-table-column label="用户类型" align="center" prop="userType">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType"/>
         </template>
       </el-table-column>>
@@ -56,18 +56,18 @@
       <el-table-column label="请求方法名" align="center" prop="requestMethod" />
       <el-table-column label="请求地址" align="center" prop="requestUrl" width="250" />
       <el-table-column label="异常发生时间" align="center" prop="exceptionTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.exceptionTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="异常名" align="center" prop="exceptionName" width="250" />
       <el-table-column label="处理状态" align="center" prop="processStatus">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS" :value="scope.row.processStatus" />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row,scope.index)"
                      v-hasPermi="['infra:api-access-log:query']">详细</el-button>
           <el-button type="text" size="mini" icon="el-icon-check"

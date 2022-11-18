@@ -15,7 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -65,12 +65,12 @@ public class CouponTemplateBaseVO {
     @ApiModelProperty(value = "固定日期 - 生效开始时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-    private Date validStartTime;
+    private LocalDateTime validStartTime;
 
     @ApiModelProperty(value = "固定日期 - 生效结束时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-    private Date validEndTime;
+    private LocalDateTime validEndTime;
 
     @ApiModelProperty(value = "领取日期 - 开始天数")
     @Min(value = 0L, message = "开始天数必须大于 0")

@@ -10,7 +10,7 @@ import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { useDictStoreWithOut } from '@/store/modules/dict'
 import { useUserStoreWithOut } from '@/store/modules/user'
 import { listSimpleDictDataApi } from '@/api/system/dict/dict.data'
-import { isRelogin } from '@/config/axios'
+import { isRelogin } from '@/config/axios/service'
 import { getInfoApi } from '@/api/login'
 
 const { start, done } = useNProgress()

@@ -18,13 +18,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -59,7 +59,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         // 调用
         smsChannelService.initSmsClients();
         // 校验 maxUpdateTime 属性
-        Date maxUpdateTime = (Date) BeanUtil.getFieldValue(smsChannelService, "maxUpdateTime");
+        LocalDateTime maxUpdateTime = (LocalDateTime) BeanUtil.getFieldValue(smsChannelService, "maxUpdateTime");
         assertEquals(max(smsChannelDO01.getUpdateTime(), smsChannelDO02.getUpdateTime()), maxUpdateTime);
         // 校验调用
         verify(smsClientFactory, times(1)).createOrUpdateSmsClient(
@@ -159,7 +159,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
        SmsChannelDO dbSmsChannel = randomPojo(SmsChannelDO.class, o -> { // 等会查询到
            o.setSignature("芋道源码");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-           o.setCreateTime(buildTime(2020, 12, 12));
+           o.setCreateTime(buildLocalDateTime(2020, 12, 12));
        });
        smsChannelMapper.insert(dbSmsChannel);
        // 测试 signature 不匹配
@@ -167,12 +167,12 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
        // 测试 status 不匹配
        smsChannelMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsChannel, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
        // 测试 createTime 不匹配
-       smsChannelMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsChannel, o -> o.setCreateTime(buildTime(2020, 11, 11))));
+       smsChannelMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsChannel, o -> o.setCreateTime(buildLocalDateTime(2020, 11, 11))));
        // 准备参数
        SmsChannelPageReqVO reqVO = new SmsChannelPageReqVO();
        reqVO.setSignature("芋道");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setCreateTime((new Date[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2020, 12, 1),buildLocalDateTime(2020, 12, 24)}));
 
        // 调用
        PageResult<SmsChannelDO> pageResult = smsChannelService.getSmsChannelPage(reqVO);

@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -51,14 +52,12 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private ProductCategoryService categoryService;
 
     @Resource
+    @Lazy // 循环依赖，避免报错
     private ProductSkuService productSkuService;
-
     @Resource
     private ProductPropertyService productPropertyService;
-
     @Resource
     private ProductPropertyValueService productPropertyValueService;
-
     @Resource
     private ProductBrandService brandService;
 
@@ -106,7 +105,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         updateObj.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
         productSpuMapper.updateById(updateObj);
         // 批量更新 SKU
-        productSkuService.updateProductSkus(updateObj.getId(), updateReqVO.getSkus());
+        productSkuService.updateSkus(updateObj.getId(), updateReqVO.getSkus());
     }
 
     @Override
@@ -208,6 +207,12 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         pageResult.setList(collect);
         pageResult.setTotal(productSpuDOPageResult.getTotal());
         return pageResult;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSpuStock(Map<Long, Integer> stockIncrCounts) {
+        stockIncrCounts.forEach((id, incCount) -> productSpuMapper.updateStock(id, incCount));
     }
 
 }

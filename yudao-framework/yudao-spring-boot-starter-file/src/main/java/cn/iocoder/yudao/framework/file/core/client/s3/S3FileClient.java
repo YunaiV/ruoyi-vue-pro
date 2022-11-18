@@ -75,7 +75,8 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
         // 阿里云必须有 region，否则会报错
         if (config.getEndpoint().contains(ENDPOINT_ALIYUN)) {
             return StrUtil.subBefore(config.getEndpoint(), '.', false)
-                    .replaceAll("-internal", ""); // 去除内网 Endpoint 的后缀
+                    .replaceAll("-internal", "")// 去除内网 Endpoint 的后缀
+                    .replaceAll("https://", "");
         }
         return null;
     }

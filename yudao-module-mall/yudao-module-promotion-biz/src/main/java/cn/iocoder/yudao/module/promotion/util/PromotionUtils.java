@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.promotion.util;
 
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 活动工具类
@@ -19,11 +19,11 @@ public class PromotionUtils {
      * @param endTime 结束时间
      * @return 活动状态
      */
-    public static Integer calculateActivityStatus(Date startTime, Date endTime) {
-        if (DateUtils.beforeNow(endTime)) {
+    public static Integer calculateActivityStatus(LocalDateTime startTime, LocalDateTime endTime) {
+        if (LocalDateTimeUtils.beforeNow(endTime)) {
             return PromotionActivityStatusEnum.END.getStatus();
         }
-        if (DateUtils.afterNow(startTime)) {
+        if (LocalDateTimeUtils.afterNow(startTime)) {
             return PromotionActivityStatusEnum.WAIT.getStatus();
         }
         return PromotionActivityStatusEnum.RUN.getStatus();

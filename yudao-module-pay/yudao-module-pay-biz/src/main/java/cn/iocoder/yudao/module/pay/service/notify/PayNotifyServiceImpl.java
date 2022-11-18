@@ -29,8 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -83,7 +82,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     public void createPayNotifyTask(PayNotifyTaskCreateReqDTO reqDTO) {
         PayNotifyTaskDO task = new PayNotifyTaskDO();
         task.setType(reqDTO.getType()).setDataId(reqDTO.getDataId());
-        task.setStatus(PayNotifyStatusEnum.WAITING.getStatus()).setNextNotifyTime(new Date())
+        task.setStatus(PayNotifyStatusEnum.WAITING.getStatus()).setNextNotifyTime(LocalDateTime.now())
                 .setNotifyTimes(0).setMaxNotifyTimes(PayNotifyTaskDO.NOTIFY_FREQUENCY.length + 1);
         // 补充 merchantId + appId + notifyUrl 字段
         if (Objects.equals(task.getType(), PayNotifyTypeEnum.ORDER.getType())) {
@@ -232,7 +231,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         // 设置通用的更新 PayNotifyTaskDO 的字段
         PayNotifyTaskDO updateTask = new PayNotifyTaskDO()
                 .setId(task.getId())
-                .setLastExecuteTime(new Date())
+                .setLastExecuteTime(LocalDateTime.now())
                 .setNotifyTimes(task.getNotifyTimes() + 1);
 
         // 情况一：调用成功
@@ -247,7 +246,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             return updateTask.getStatus();
         }
         // 2.2 未超过最大回调次数
-        updateTask.setNextNotifyTime(DateUtils.addDate(Calendar.SECOND, PayNotifyTaskDO.NOTIFY_FREQUENCY[updateTask.getNotifyTimes()]));
+        updateTask.setNextNotifyTime(LocalDateTime.now().plusSeconds(PayNotifyTaskDO.NOTIFY_FREQUENCY[updateTask.getNotifyTimes()]));
         updateTask.setStatus(invokeException != null ? PayNotifyStatusEnum.REQUEST_FAILURE.getStatus()
                 : PayNotifyStatusEnum.REQUEST_SUCCESS.getStatus());
         return updateTask.getStatus();

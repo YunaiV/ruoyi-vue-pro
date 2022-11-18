@@ -11,7 +11,6 @@ import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
 import com.aliyuncs.AcsRequest;
 import com.aliyuncs.IAcsClient;
@@ -27,6 +26,7 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 
@@ -125,7 +125,7 @@ public class AliyunSmsClientTest extends BaseMockitoUnitTest {
         assertEquals("DELIVERED", statuses.get(0).getErrorCode());
         assertEquals("用户接收成功", statuses.get(0).getErrorMsg());
         assertEquals("13900000001", statuses.get(0).getMobile());
-        assertEquals(DateUtils.buildTime(2017, 2, 2, 22, 23, 24), statuses.get(0).getReceiveTime());
+        assertEquals(LocalDateTime.of(2017, 2, 2, 22, 23, 24), statuses.get(0).getReceiveTime());
         assertEquals("12345", statuses.get(0).getSerialNo());
         assertEquals(67890L, statuses.get(0).getLogId());
     }
@@ -181,7 +181,7 @@ public class AliyunSmsClientTest extends BaseMockitoUnitTest {
         when(client.getAcsResponse(any(AcsRequest.class))).thenThrow(ex);
 
         // 调用，并断言异常
-        SmsCommonResult<?> result = smsClient.invoke(request,null);
+        SmsCommonResult<?> result = smsClient.invoke(request, null);
         // 断言
         assertEquals(ex.getErrCode(), result.getApiCode());
         assertEquals(ex.getErrMsg(), result.getApiMsg());

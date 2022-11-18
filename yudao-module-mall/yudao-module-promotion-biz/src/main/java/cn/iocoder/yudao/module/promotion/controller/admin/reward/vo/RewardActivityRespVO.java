@@ -1,8 +1,12 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.reward.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 满减送活动 Response VO")
 @Data
@@ -17,6 +21,6 @@ public class RewardActivityRespVO extends RewardActivityBaseVO {
     private Integer status;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

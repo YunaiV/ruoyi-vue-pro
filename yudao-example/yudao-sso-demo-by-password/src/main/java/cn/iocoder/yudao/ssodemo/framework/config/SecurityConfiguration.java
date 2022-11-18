@@ -11,7 +11,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.annotation.Resource;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Resource

@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @ApiModel("管理后台 - 流程实例的分页 Item Response VO")
@@ -30,10 +30,10 @@ public class BpmProcessInstancePageItemRespVO {
     private Integer result;
 
     @ApiModelProperty(value = "提交时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ApiModelProperty(value = "结束时间", required = true)
-    private Date endTime;
+    private LocalDateTime endTime;
 
     /**
      * 当前任务

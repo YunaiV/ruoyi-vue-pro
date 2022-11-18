@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
             return validationException((ValidationException) ex);
         }
         if (ex instanceof NoHandlerFoundException) {
-            return noHandlerFoundExceptionHandler((NoHandlerFoundException) ex);
+            return noHandlerFoundExceptionHandler(request, (NoHandlerFoundException) ex);
         }
         if (ex instanceof HttpRequestMethodNotSupportedException) {
             return httpRequestMethodNotSupportedExceptionHandler((HttpRequestMethodNotSupportedException) ex);
@@ -167,7 +167,13 @@ public class GlobalExceptionHandler {
      * 2. spring.mvc.static-path-pattern 为 /statics/**
      */
     @ExceptionHandler(NoHandlerFoundException.class)
-    public CommonResult<?> noHandlerFoundExceptionHandler(NoHandlerFoundException ex) {
+    public CommonResult<?> noHandlerFoundExceptionHandler(HttpServletRequest req, NoHandlerFoundException ex) {
+        // 情况一：部分功能未开启
+        if (req.getRequestURI().contains("/bpm/")) {
+            return CommonResult.error(NOT_IMPLEMENTED.getCode(), "[工作流模块 yudao-module-bpm - 已禁用][参考 https://doc.iocoder.cn/bpm/ 开启]");
+        }
+
+        // 情况二：正常情况下的 404
         log.warn("[noHandlerFoundExceptionHandler]", ex);
         return CommonResult.error(NOT_FOUND.getCode(), String.format("请求地址不存在:%s", ex.getRequestURL()));
     }
@@ -267,7 +273,7 @@ public class GlobalExceptionHandler {
         errorLog.setRequestMethod(request.getMethod());
         errorLog.setUserAgent(ServletUtils.getUserAgent(request));
         errorLog.setUserIp(ServletUtil.getClientIP(request));
-        errorLog.setExceptionTime(new Date());
+        errorLog.setExceptionTime(LocalDateTime.now());
     }
 
 }

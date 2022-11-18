@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.framework.mybatis.core.type;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.extra.spring.SpringUtil;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.jasypt.encryption.StringEncryptor;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -12,18 +13,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * 字段字段的 TypeHandler 实现类，基于 {@link StringEncryptor} 实现
+ * 字段字段的 TypeHandler 实现类，基于 {@link cn.hutool.crypto.symmetric.AES} 实现
  * 可通过 jasypt.encryptor.password 配置项，设置密钥
  *
  * @author 芋道源码
  */
 public class EncryptTypeHandler extends BaseTypeHandler<String> {
 
-    private static StringEncryptor encryptor;
+    private static final String ENCRYPTOR_PROPERTY_NAME = "mybatis-plus.encryptor.password";
+
+    private static AES aes;
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType) throws SQLException {
-        ps.setString(i, getEncryptor().encrypt(parameter));
+        ps.setString(i, encrypt(parameter));
     }
 
     @Override
@@ -48,23 +51,25 @@ public class EncryptTypeHandler extends BaseTypeHandler<String> {
         if (value == null) {
             return null;
         }
-        return getEncryptor().decrypt(value);
+        return getEncryptor().decryptStr(value);
     }
 
     public static String encrypt(String rawValue) {
         if (rawValue == null) {
             return null;
         }
-        return getEncryptor().encrypt(rawValue);
+        return getEncryptor().encryptBase64(rawValue);
     }
 
-    private static StringEncryptor getEncryptor() {
-        if (encryptor != null) {
-            return encryptor;
+    private static AES getEncryptor() {
+        if (aes != null) {
+            return aes;
         }
-        encryptor = SpringUtil.getBean(StringEncryptor.class);
-        Assert.notNull(encryptor, "StringEncryptor 不能为空");
-        return encryptor;
+        // 构建 AES
+        String password = SpringUtil.getProperty(ENCRYPTOR_PROPERTY_NAME);
+        Assert.notEmpty(password, "配置项({}) 不能为空", ENCRYPTOR_PROPERTY_NAME);
+        aes = SecureUtil.aes(password.getBytes());
+        return aes;
     }
 
 }

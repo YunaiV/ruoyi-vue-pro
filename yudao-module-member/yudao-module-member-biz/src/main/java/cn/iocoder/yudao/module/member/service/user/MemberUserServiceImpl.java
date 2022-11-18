@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
@@ -85,7 +86,7 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Override
     public void updateUserLogin(Long id, String loginIp) {
         memberUserMapper.updateById(new MemberUserDO().setId(id)
-                .setLoginIp(loginIp).setLoginDate(new Date()));
+                .setLoginIp(loginIp).setLoginDate(LocalDateTime.now()));
     }
 
     @Override

@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.system.util.oauth2;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -46,7 +49,7 @@ public class OAuth2Utils {
      * @param additionalInformation 附加信息
      * @return 简化授权模式下的重定向 URI
      */
-    public static String buildImplicitRedirectUri(String redirectUri, String accessToken, String state, Date expireTime,
+    public static String buildImplicitRedirectUri(String redirectUri, String accessToken, String state, LocalDateTime expireTime,
                                                   Collection<String> scopes, Map<String, Object> additionalInformation) {
         Map<String, Object> vars = new LinkedHashMap<String, Object>();
         Map<String, String> keys = new HashMap<String, String>();
@@ -85,8 +88,8 @@ public class OAuth2Utils {
         return HttpUtils.append(redirectUri, query, null, !responseType.contains("code"));
     }
 
-    public static long getExpiresIn(Date expireTime) {
-        return (expireTime.getTime() - System.currentTimeMillis()) / 1000;
+    public static long getExpiresIn(LocalDateTime expireTime) {
+        return LocalDateTimeUtil.between(LocalDateTime.now(), expireTime, ChronoUnit.SECONDS);
     }
 
     public static String buildScopeStr(Collection<String> scopes) {

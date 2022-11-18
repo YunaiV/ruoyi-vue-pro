@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -27,13 +27,13 @@ public class SmsLogExportReqVO {
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "开始发送时间")
-    private Date[] sendTime;
+    private LocalDateTime[] sendTime;
 
     @ApiModelProperty(value = "接收状态", example = "0")
     private Integer receiveStatus;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "开始接收时间")
-    private Date[] receiveTime;
+    private LocalDateTime[] receiveTime;
 
 }

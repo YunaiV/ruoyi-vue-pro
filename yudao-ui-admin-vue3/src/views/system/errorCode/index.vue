@@ -1,30 +1,92 @@
+<template>
+  <ContentWrap>
+    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+      <template #toolbar_buttons>
+        <XButton
+          type="primary"
+          preIcon="ep:zoom-in"
+          :title="t('action.add')"
+          v-hasPermi="['system:error-code:create']"
+          @click="handleCreate()"
+        />
+      </template>
+      <template #actionbtns_default="{ row }">
+        <XTextButton
+          preIcon="ep:edit"
+          :title="t('action.edit')"
+          v-hasPermi="['system:error-code:update']"
+          @click="handleUpdate(row.id)"
+        />
+        <XTextButton
+          preIcon="ep:view"
+          :title="t('action.detail')"
+          v-hasPermi="['system:error-code:update']"
+          @click="handleDetail(row)"
+        />
+        <XTextButton
+          preIcon="ep:delete"
+          :title="t('action.del')"
+          v-hasPermi="['system:error-code:delete']"
+          @click="handleDelete(row.id)"
+        />
+      </template>
+    </vxe-grid>
+  </ContentWrap>
+  <XModal id="errorCodeModel" v-model="dialogVisible" :title="dialogTitle">
+    <template #default>
+      <!-- 对话框(添加 / 修改) -->
+      <Form
+        v-if="['create', 'update'].includes(actionType)"
+        :schema="allSchemas.formSchema"
+        :rules="rules"
+        ref="formRef"
+      />
+      <!-- 对话框(详情) -->
+      <Descriptions
+        v-if="actionType === 'detail'"
+        :schema="allSchemas.detailSchema"
+        :data="detailRef"
+      />
+    </template>
+    <!-- 操作按钮 -->
+    <template #footer>
+      <XButton
+        v-if="['create', 'update'].includes(actionType)"
+        type="primary"
+        :title="t('action.save')"
+        :loading="actionLoading"
+        @click="submitForm"
+      />
+      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
+    </template>
+  </XModal>
+</template>
+
 <script setup lang="ts">
 import { ref, unref } from 'vue'
-import dayjs from 'dayjs'
-import { ElMessage } from 'element-plus'
-import { DICT_TYPE } from '@/utils/dict'
-import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
-import { FormExpose } from '@/components/Form'
 import type { ErrorCodeVO } from '@/api/system/errorCode/types'
 import { rules, allSchemas } from './errorCode.data'
 import * as ErrorCodeApi from '@/api/system/errorCode'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useMessage } from '@/hooks/web/useMessage'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { VxeGridInstance } from 'vxe-table'
+import { FormExpose } from '@/components/Form'
+
 const { t } = useI18n() // 国际化
-
-// ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<ErrorCodeVO>({
-  getListApi: ErrorCodeApi.getErrorCodePageApi,
-  delListApi: ErrorCodeApi.deleteErrorCodeApi
-})
-const { getList, setSearchParams, delList } = methods
-
-// ========== CRUD 相关 ==========
-const loading = ref(false) // 遮罩层
-const actionType = ref('') // 操作按钮的类型
+const message = useMessage() // 消息弹窗
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
+const actionType = ref('') // 操作按钮的类型
+const actionLoading = ref(false) // 按钮Loading
+const xGrid = ref<VxeGridInstance>() // grid Ref
 const formRef = ref<FormExpose>() // 表单 Ref
+const detailRef = ref() // 详情 Ref
 
+const { gridOptions } = useVxeGrid<ErrorCodeVO>({
+  allSchemas: allSchemas,
+  getListApi: ErrorCodeApi.getErrorCodePageApi
+})
 // 设置标题
 const setDialogTile = (type: string) => {
   dialogTitle.value = t('action.' + type)
@@ -39,12 +101,32 @@ const handleCreate = () => {
   unref(formRef)?.getElFormRef()?.resetFields()
 }
 
+// 详情操作
+const handleDetail = async (row: ErrorCodeVO) => {
+  // 设置数据
+  detailRef.value = row
+  setDialogTile('detail')
+}
+
 // 修改操作
-const handleUpdate = async (row: ErrorCodeVO) => {
+const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
-  const res = await ErrorCodeApi.getErrorCodeApi(row.id)
+  const res = await ErrorCodeApi.getErrorCodeApi(rowId)
   unref(formRef)?.setValues(res)
+}
+
+// 删除操作
+const handleDelete = async (rowId: number) => {
+  message
+    .delConfirm()
+    .then(async () => {
+      await ErrorCodeApi.deleteErrorCodeApi(rowId)
+      message.success(t('common.delSuccess'))
+    })
+    .finally(() => {
+      xGrid.value?.commitProxy('query')
+    })
 }
 
 // 提交按钮
@@ -53,133 +135,23 @@ const submitForm = async () => {
   if (!elForm) return
   elForm.validate(async (valid) => {
     if (valid) {
-      loading.value = true
+      actionLoading.value = true
       // 提交请求
       try {
         const data = unref(formRef)?.formModel as ErrorCodeVO
         if (actionType.value === 'create') {
           await ErrorCodeApi.createErrorCodeApi(data)
-          ElMessage.success(t('common.createSuccess'))
+          message.success(t('common.createSuccess'))
         } else {
           await ErrorCodeApi.updateErrorCodeApi(data)
-          ElMessage.success(t('common.updateSuccess'))
+          message.success(t('common.updateSuccess'))
         }
-        // 操作成功，重新加载列表
         dialogVisible.value = false
-        await getList()
       } finally {
-        loading.value = false
+        actionLoading.value = false
+        xGrid.value?.commitProxy('query')
       }
     }
   })
 }
-
-// ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
-
-// 详情操作
-const handleDetail = async (row: ErrorCodeVO) => {
-  // 设置数据
-  detailRef.value = row
-  setDialogTile('detail')
-}
-
-// ========== 初始化 ==========
-getList()
 </script>
-
-<template>
-  <!-- 搜索工作区 -->
-  <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <el-button v-hasPermi="['system:error-code:create']" type="primary" @click="handleCreate">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
-    </div>
-    <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #type="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_ERROR_CODE_TYPE" :value="row.type" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:error-code:update']"
-          @click="handleUpdate(row)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:error-code:update']"
-          @click="handleDetail(row)"
-        >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['system:error-code:delete']"
-          @click="delList(row.id, false)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
-      </template>
-    </Table>
-  </ContentWrap>
-
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
-    <!-- 对话框(添加 / 修改) -->
-    <Form
-      v-if="['create', 'update'].includes(actionType)"
-      :schema="allSchemas.formSchema"
-      :rules="rules"
-      ref="formRef"
-    />
-    <!-- 对话框(详情) -->
-    <Descriptions
-      v-if="actionType === 'detail'"
-      :schema="allSchemas.detailSchema"
-      :data="detailRef"
-    >
-      <template #type="{ row }">
-        <DictTag :type="DICT_TYPE.SYSTEM_ERROR_CODE_TYPE" :value="row.type" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-    </Descriptions>
-    <!-- 操作按钮 -->
-    <template #footer>
-      <el-button
-        v-if="['create', 'update'].includes(actionType)"
-        type="primary"
-        :loading="loading"
-        @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </Dialog>
-</template>

@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("用户 APP - 登录 Response VO")
 @Data
@@ -26,6 +26,6 @@ public class AppAuthLoginRespVO {
     private String refreshToken;
 
     @ApiModelProperty(value = "过期时间", required = true)
-    private Date expiresTime;
+    private LocalDateTime expiresTime;
 
 }

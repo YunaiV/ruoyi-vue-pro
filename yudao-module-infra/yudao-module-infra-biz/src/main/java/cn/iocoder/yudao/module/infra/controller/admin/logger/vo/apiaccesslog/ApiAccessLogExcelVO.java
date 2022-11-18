@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * API 访问日志 Excel VO
@@ -48,10 +48,10 @@ public class ApiAccessLogExcelVO {
     private String userAgent;
 
     @ExcelProperty("开始请求时间")
-    private Date beginTime;
+    private LocalDateTime beginTime;
 
     @ExcelProperty("结束请求时间")
-    private Date endTime;
+    private LocalDateTime endTime;
 
     @ExcelProperty("执行时长")
     private Integer duration;

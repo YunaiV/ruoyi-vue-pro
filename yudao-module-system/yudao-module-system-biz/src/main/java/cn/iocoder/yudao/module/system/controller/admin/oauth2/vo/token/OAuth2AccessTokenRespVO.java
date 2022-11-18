@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 访问令牌 Response VO")
 @Data
@@ -33,9 +33,9 @@ public class OAuth2AccessTokenRespVO {
     private String clientId;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ApiModelProperty(value = "过期时间", required = true)
-    private Date expiresTime;
+    private LocalDateTime expiresTime;
 
 }

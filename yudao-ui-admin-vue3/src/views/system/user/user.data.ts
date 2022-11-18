@@ -36,11 +36,18 @@ const crudSchemas = reactive<CrudSchema[]>([
   {
     label: '用户账号',
     field: 'username',
-    form: {
-      show: false
-    },
     search: {
       show: true
+    }
+  },
+  {
+    label: '用户密码',
+    field: 'password',
+    form: {
+      component: 'InputPassword'
+    },
+    detail: {
+      show: false
     }
   },
   {
@@ -57,11 +64,6 @@ const crudSchemas = reactive<CrudSchema[]>([
     search: {
       show: true
     }
-  },
-  {
-    label: '用户性别',
-    field: 'sex',
-    dictType: DICT_TYPE.SYSTEM_USER_SEX
   },
   {
     label: '部门',

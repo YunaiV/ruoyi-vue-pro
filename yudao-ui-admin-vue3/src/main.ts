@@ -16,6 +16,9 @@ import { setupGlobCom } from '@/components'
 // 引入element-plus
 import { setupElementPlus } from '@/plugins/elementPlus'
 
+// 引入vxe-table
+import { setupVxeTable } from '@/plugins/vxeTable'
+
 // 引入全局样式
 import '@/styles/index.less'
 
@@ -43,6 +46,8 @@ const setupAll = async () => {
   setupGlobCom(app)
 
   setupElementPlus(app)
+
+  setupVxeTable(app)
 
   setupRouter(app)
 

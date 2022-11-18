@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.member.controller.app.address.vo;
 
 import lombok.*;
-import java.util.*;
+import java.time.LocalDateTime;
 import io.swagger.annotations.*;
 
 @ApiModel("用户 APP - 用户收件地址 Response VO")
@@ -14,6 +14,6 @@ public class AppAddressRespVO extends AppAddressBaseVO {
     private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

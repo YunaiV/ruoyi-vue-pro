@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -62,15 +62,15 @@ public class PayOrderPageReqVO extends PageParam {
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "订单失效时间")
-    private Date[] expireTime;
+    private LocalDateTime[] expireTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "订单支付成功时间")
-    private Date[] successTime;
+    private LocalDateTime[] successTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "订单支付通知时间")
-    private Date[] notifyTime;
+    private LocalDateTime[] notifyTime;
 
     @ApiModelProperty(value = "支付成功的订单拓展单编号")
     private Long successExtensionId;
@@ -92,6 +92,6 @@ public class PayOrderPageReqVO extends PageParam {
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "创建时间")
-    private Date[] createTime;
+    private LocalDateTime[] createTime;
 
 }

@@ -68,19 +68,19 @@ export default {
 		},
 		// 周期两个值变化时
 		cycleChange() {
-			if (this.radioValue == '2') {
+			if (this.radioValue === '2') {
 				this.$emit('update', 'second', this.cycleTotal);
 			}
 		},
 		// 平均两个值变化时
 		averageChange() {
-			if (this.radioValue == '3') {
+			if (this.radioValue === '3') {
 				this.$emit('update', 'second', this.averageTotal);
 			}
 		},
 		// checkbox值变化时
 		checkboxChange() {
-			if (this.radioValue == '4') {
+			if (this.radioValue === '4') {
 				this.$emit('update', 'second', this.checkboxString);
 			}
 		}
@@ -110,7 +110,7 @@ export default {
 		// 计算勾选的checkbox值合集
 		checkboxString: function () {
 			let str = this.checkboxList.join();
-			return str == '' ? '*' : str;
+			return str === '' ? '*' : str;
 		}
 	}
 }

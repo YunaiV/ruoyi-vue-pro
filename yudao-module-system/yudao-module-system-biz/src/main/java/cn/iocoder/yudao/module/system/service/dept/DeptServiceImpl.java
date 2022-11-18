@@ -24,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -64,7 +65,7 @@ public class DeptServiceImpl implements DeptService {
     /**
      * 缓存部门的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private DeptMapper deptMapper;
@@ -112,7 +113,7 @@ public class DeptServiceImpl implements DeptService {
      * @param maxUpdateTime 当前部门的最大更新时间
      * @return 部门列表
      */
-    protected List<DeptDO> loadDeptIfUpdate(Date maxUpdateTime) {
+    protected List<DeptDO> loadDeptIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadMenuIfUpdate][首次加载全量部门]");

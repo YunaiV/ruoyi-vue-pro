@@ -1,6 +1,4 @@
-import { useAxios } from '@/hooks/web/useAxios'
-
-const request = useAxios()
+import request from '@/config/axios'
 
 // 查询用户个人信息
 export const getUserProfileApi = () => {
@@ -16,7 +14,7 @@ export const updateUserProfileApi = (params) => {
 export const updateUserPwdApi = (oldPassword: string, newPassword: string) => {
   return request.put({
     url: '/system/user/profile/update-password',
-    params: {
+    data: {
       oldPassword: oldPassword,
       newPassword: newPassword
     }

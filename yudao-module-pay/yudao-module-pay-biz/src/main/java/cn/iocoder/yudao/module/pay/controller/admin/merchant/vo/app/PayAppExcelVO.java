@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 支付应用信息 Excel VO
@@ -35,6 +35,6 @@ public class PayAppExcelVO {
     private Long merchantId;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

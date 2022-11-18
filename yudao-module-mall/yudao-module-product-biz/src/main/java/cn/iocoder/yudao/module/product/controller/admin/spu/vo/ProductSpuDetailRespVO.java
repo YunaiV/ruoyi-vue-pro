@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @ApiModel(value = "管理后台 - 商品 SPU 详细 Response VO", description = "包括关联的 SKU 等信息")
@@ -21,7 +21,7 @@ public class ProductSpuDetailRespVO extends ProductSpuBaseVO {
     private Long id;
 
     @ApiModelProperty(value = "创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * SKU 数组

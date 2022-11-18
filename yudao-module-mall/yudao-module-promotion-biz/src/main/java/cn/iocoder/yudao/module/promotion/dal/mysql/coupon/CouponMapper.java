@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 优惠劵 Mapper
@@ -27,10 +28,25 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
                 .orderByDesc(CouponDO::getId));
     }
 
+    default List<CouponDO> selectListByUserIdAndStatus(Long userId, Integer status) {
+        return selectList(new LambdaQueryWrapperX<CouponDO>()
+                .eq(CouponDO::getUserId, userId).eq(CouponDO::getStatus, status));
+    }
+
+    default CouponDO selectByIdAndUserId(Long id, Long userId) {
+        return selectOne(new LambdaQueryWrapperX<CouponDO>()
+                .eq(CouponDO::getId, id).eq(CouponDO::getUserId, userId));
+    }
+
     default int delete(Long id, Collection<Integer> whereStatuses) {
         return update(null, new LambdaUpdateWrapper<CouponDO>()
                 .eq(CouponDO::getId, id).in(CouponDO::getStatus, whereStatuses)
                 .set(CouponDO::getDeleted, 1));
+    }
+
+    default int updateByIdAndStatus(Long id, Integer status, CouponDO updateObj) {
+        return update(updateObj, new LambdaUpdateWrapper<CouponDO>()
+                .eq(CouponDO::getId, id).eq(CouponDO::getStatus, status));
     }
 
 }

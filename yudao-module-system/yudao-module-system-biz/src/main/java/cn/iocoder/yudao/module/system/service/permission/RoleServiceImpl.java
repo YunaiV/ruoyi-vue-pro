@@ -32,6 +32,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,7 @@ public class RoleServiceImpl implements RoleService {
      * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     @Getter
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private PermissionService permissionService;
@@ -111,7 +112,7 @@ public class RoleServiceImpl implements RoleService {
      * @param maxUpdateTime 当前角色的最大更新时间
      * @return 角色列表
      */
-    private List<RoleDO> loadRoleIfUpdate(Date maxUpdateTime) {
+    private List<RoleDO> loadRoleIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadRoleIfUpdate][首次加载全量角色]");

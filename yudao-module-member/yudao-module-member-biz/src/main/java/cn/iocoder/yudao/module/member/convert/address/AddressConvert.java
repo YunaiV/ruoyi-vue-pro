@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.module.member.convert.address;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
+import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressRespVO;
+import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.address.AddressDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import cn.iocoder.yudao.module.member.controller.app.address.vo.*;
-import cn.iocoder.yudao.module.member.dal.dataobject.address.AddressDO;
+
+import java.util.List;
 
 /**
  * 用户收件地址 Convert
@@ -28,5 +30,7 @@ public interface AddressConvert {
     List<AppAddressRespVO> convertList(List<AddressDO> list);
 
     PageResult<AppAddressRespVO> convertPage(PageResult<AddressDO> page);
+
+    AddressRespDTO convert02(AddressDO bean);
 
 }

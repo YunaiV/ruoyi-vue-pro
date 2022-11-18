@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -38,7 +38,7 @@ public class OAuth2CodeServiceImpl implements OAuth2CodeService {
         OAuth2CodeDO codeDO = new OAuth2CodeDO().setCode(generateCode())
                 .setUserId(userId).setUserType(userType)
                 .setClientId(clientId).setScopes(scopes)
-                .setExpiresTime(DateUtils.addDate(Calendar.SECOND, TIMEOUT))
+                .setExpiresTime(LocalDateTime.now().plusSeconds(TIMEOUT))
                 .setRedirectUri(redirectUri).setState(state);
         oauth2CodeMapper.insert(codeDO);
         return codeDO;

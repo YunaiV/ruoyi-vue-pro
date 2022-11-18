@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group;
 
 import lombok.*;
-import java.util.*;
+
+import java.time.LocalDateTime;
+
 import io.swagger.annotations.*;
 
 @ApiModel("管理后台 - 用户组 Response VO")
@@ -14,6 +16,6 @@ public class BpmUserGroupRespVO extends BpmUserGroupBaseVO {
     private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

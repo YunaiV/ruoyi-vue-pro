@@ -7,7 +7,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 支付单创建 Request DTO
@@ -59,6 +59,6 @@ public class PayOrderCreateReqDTO implements Serializable {
      * 支付过期时间
      */
     @NotNull(message = "支付过期时间不能为空")
-    private Date expireTime;
+    private LocalDateTime expireTime;
 
 }

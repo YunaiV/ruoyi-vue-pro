@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class YudaoDataPermissionAutoConfiguration {
 
     @Bean
@@ -27,9 +27,8 @@ public class YudaoDataPermissionAutoConfiguration {
 
     @Bean
     public DataPermissionDatabaseInterceptor dataPermissionDatabaseInterceptor(MybatisPlusInterceptor interceptor,
-                                                                               List<DataPermissionRule> rules) {
+                                                                               DataPermissionRuleFactory ruleFactory) {
         // 创建 DataPermissionDatabaseInterceptor 拦截器
-        DataPermissionRuleFactory ruleFactory = dataPermissionRuleFactory(rules);
         DataPermissionDatabaseInterceptor inner = new DataPermissionDatabaseInterceptor(ruleFactory);
         // 添加到 interceptor 中
         // 需要加在首个，主要是为了在分页插件前面。这个是 MyBatis Plus 的规定

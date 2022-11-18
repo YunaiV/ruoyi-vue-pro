@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.product.convert.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.api.spu.dto.SpuInfoRespDTO;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
@@ -35,7 +35,7 @@ public interface ProductSpuConvert {
 
     AppSpuPageRespVO convertAppResp(ProductSpuDO list);
 
-    List<SpuInfoRespDTO> convertList2(List<ProductSpuDO> list);
+    List<ProductSpuRespDTO> convertList2(List<ProductSpuDO> list);
 
     List<ProductSpuSimpleRespVO> convertList02(List<ProductSpuDO> list);
 

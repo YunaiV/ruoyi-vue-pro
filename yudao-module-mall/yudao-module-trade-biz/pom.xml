@@ -29,16 +29,19 @@
             <artifactId>yudao-module-product-api</artifactId>
             <version>${revision}</version>
         </dependency>
-
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-pay-api</artifactId>
             <version>${revision}</version>
         </dependency>
-
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-promotion-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-member-api</artifactId>
             <version>${revision}</version>
         </dependency>
 

@@ -4,7 +4,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -96,7 +96,7 @@ public class OperateLogCreateReqDTO {
      * 开始时间
      */
     @NotNull(message = "开始时间不能为空")
-    private Date startTime;
+    private LocalDateTime startTime;
 
     /**
      * 执行时长，单位：毫秒

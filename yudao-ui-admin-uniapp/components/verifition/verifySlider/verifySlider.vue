@@ -230,8 +230,9 @@
 							"token": this.backToken
 						}
 						myRequest({
-							url: `/captcha/check`,
-							data,
+							// url: `/captcha/check`,
+              url: '/admin-api/system/captcha/check', // 使用项目自定义的 /admin-api/ 前缀
+              data,
 							method: "POST",
 						}).then((result) => {
 							let res = result.data
@@ -317,7 +318,8 @@
 					ts: Date.now(), // 现在的时间戳
 				}
 				myRequest({
-					url: '/captcha/get', //仅为示例，并非真实接口地址。
+					// url: '/captcha/get', //仅为示例，并非真实接口地址。
+					url: '/admin-api/system/captcha/get', // 使用项目自定义的 /admin-api/ 前缀
 					data,
 					method: "POST",
 				}).then((result) => {

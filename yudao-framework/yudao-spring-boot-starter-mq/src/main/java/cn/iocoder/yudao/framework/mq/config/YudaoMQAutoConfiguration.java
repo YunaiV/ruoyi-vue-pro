@@ -25,6 +25,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.stream.DefaultStreamMessageListenerContainerX;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Properties;
@@ -34,7 +35,7 @@ import java.util.Properties;
  *
  * @author 芋道源码
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @AutoConfigureAfter(YudaoRedisAutoConfiguration.class)
 @Slf4j
 public class YudaoMQAutoConfiguration {
@@ -54,6 +55,7 @@ public class YudaoMQAutoConfiguration {
      * 创建 Redis Pub/Sub 广播消费的容器
      */
     @Bean
+    @Async // 异步化，可降低 2 秒左右的启动时间
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisMQTemplate redisMQTemplate, List<AbstractChannelMessageListener<?>> listeners) {
         // 创建 RedisMessageListenerContainer 对象
@@ -76,6 +78,7 @@ public class YudaoMQAutoConfiguration {
      * Redis Stream 的 xreadgroup 命令：https://www.geek-book.com/src/docs/redis/redis/redis.io/commands/xreadgroup.html
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
+    @Async // 异步化，可降低 5 秒左右的启动时间
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer(
             RedisMQTemplate redisMQTemplate, List<AbstractStreamMessageListener<?>> listeners) {
         RedisTemplate<String, ?> redisTemplate = redisMQTemplate.getRedisTemplate();
@@ -95,6 +98,8 @@ public class YudaoMQAutoConfiguration {
         // 第二步，注册监听器，消费对应的 Stream 主题
         String consumerName = buildConsumerName();
         listeners.parallelStream().forEach(listener -> {
+            log.info("[redisStreamMessageListenerContainer][开始注册 StreamKey({}) 对应的监听器({})]",
+                    listener.getStreamKey(), listener.getClass().getName());
             // 创建 listener 对应的消费者分组
             try {
                 redisTemplate.opsForStream().createGroup(listener.getStreamKey(), listener.getGroup());
@@ -111,6 +116,8 @@ public class YudaoMQAutoConfiguration {
                     .autoAcknowledge(false) // 不自动 ack
                     .cancelOnError(throwable -> false); // 默认配置，发生异常就取消消费，显然不符合预期；因此，我们设置为 false
             container.register(builder.build(), listener);
+            log.info("[redisStreamMessageListenerContainer][完成注册 StreamKey({}) 对应的监听器({})]",
+                    listener.getStreamKey(), listener.getClass().getName());
         });
         return container;
     }

@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 定时任务 Response VO")
 @Data
@@ -26,6 +26,6 @@ public class JobRespVO extends JobBaseVO {
     private String handlerName;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

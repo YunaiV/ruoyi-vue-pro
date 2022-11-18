@@ -5,7 +5,9 @@ import java.util.*;
 #foreach ($column in $columns)
 #if (${column.javaType} == "BigDecimal")
 import java.math.BigDecimal;
-#break
+#end
+#if (${column.javaType} == "LocalDateTime")
+import java.time.LocalDateTime;
 #end
 #end
 import com.baomidou.mybatisplus.annotation.*;

@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -16,7 +17,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@TableName(value = "trade_order_item")
+@TableName(value = "trade_order_item", autoResultMap = true)
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
@@ -56,7 +57,7 @@ public class TradeOrderItemDO extends BaseDO {
     /**
      * 规格值数组，JSON 格式
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = PropertyTypeHandler.class)
     private List<Property> properties;
     /**
      * 商品名称
@@ -70,13 +71,13 @@ public class TradeOrderItemDO extends BaseDO {
      * 购买数量
      */
     private Integer count;
-    /**
-     * 是否评论 TODO
-     *
-     * false - 未评论
-     * true - 已评论
-     */
-    private Boolean commented;
+//    /**
+//     * 是否评论 TODO
+//     *
+//     * false - 未评论
+//     * true - 已评论
+//     */
+//    private Boolean commented;
 
     // ========== 价格 + 支付基本信息 ==========
 
@@ -131,26 +132,17 @@ public class TradeOrderItemDO extends BaseDO {
 
     // ========== 营销基本信息 ==========
 
+    // TODO 芋艿：在捉摸一下
+
     // ========== 退款基本信息 ==========
     /**
-     * 退款状态 TODO
+     * 退款状态
      *
-     * 枚举 {@link TradeOrderItemRefundStatusEnum}
+     * 枚举 {@link TradeOrderItemAfterSaleStatusEnum}
+     *
+     * @see cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO
      */
-    private Integer refundStatus; // TODO 芋艿：可以考虑去查
-    // 如上字段，举个例子：
-    // 假设购买三个，即 stock = 3 。
-    // originPrice = 15
-    // 使用限时折扣（单品优惠）8 折，buyPrice = 12
-    // 开始算总的价格
-    // buyTotal = buyPrice * stock = 12 * 3 = 36
-    // discountTotal ，假设有满减送（分组优惠）满 20 减 10 ，并且使用优惠劵满 1.01 减 1 ，则 discountTotal = 10 + 1 = 11
-    // presentTotal = buyTotal - discountTotal = 24 - 11 = 13
-    // 最终 presentPrice = presentTotal / stock = 13 / 3 = 4.33
-    /**
-     * 退款总金额，单位：分 TODO
-     */
-    private Integer refundTotal;
+    private Integer afterSaleStatus;
 
     /**
      * 商品属性
@@ -170,6 +162,21 @@ public class TradeOrderItemDO extends BaseDO {
          * 关联 ProductPropertyValueDO 的 id 编号
          */
         private Long valueId;
+
+    }
+
+    // TODO @芋艿：可以找一些新的思路
+    public static class PropertyTypeHandler extends AbstractJsonTypeHandler<List<Property>> {
+
+        @Override
+        protected List<Property> parse(String json) {
+            return JsonUtils.parseArray(json, Property.class);
+        }
+
+        @Override
+        protected String toJson(List<Property> obj) {
+            return JsonUtils.toJsonString(obj);
+        }
 
     }
 

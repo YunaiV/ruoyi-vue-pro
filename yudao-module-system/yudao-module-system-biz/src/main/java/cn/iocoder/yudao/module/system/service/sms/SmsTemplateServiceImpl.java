@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -76,7 +77,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     /**
      * 缓存短信模板的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Override
     @PostConstruct
@@ -100,7 +101,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
      * @param maxUpdateTime 当前短信模板的最大更新时间
      * @return 短信模板列表
      */
-    private List<SmsTemplateDO> loadSmsTemplateIfUpdate(Date maxUpdateTime) {
+    private List<SmsTemplateDO> loadSmsTemplateIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadSmsTemplateIfUpdate][首次加载全量短信模板]");

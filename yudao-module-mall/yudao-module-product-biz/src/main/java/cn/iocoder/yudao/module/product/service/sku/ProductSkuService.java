@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 
@@ -64,7 +65,16 @@ public interface ProductSkuService {
      * @param spuId SPU 编码
      * @param skus SKU 的集合
      */
-    void updateProductSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus);
+    void updateSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus);
+
+    /**
+     * 更新 SKU 库存（增量）
+     *
+     * 如果更新的库存不足，会抛出异常
+     *
+     * @param updateStockReqDTO 更行请求
+     */
+    void updateSkuStock(ProductSkuUpdateStockReqDTO updateStockReqDTO);
 
     /**
      * 获得商品 sku 集合
@@ -95,5 +105,6 @@ public interface ProductSkuService {
      * @return SKU 数组
      */
     List<ProductSkuDO> getSkusByAlarmStock();
+
 
 }

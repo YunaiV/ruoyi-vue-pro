@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 优惠劵模板 Response VO")
 @Data
@@ -30,6 +30,6 @@ public class CouponTemplateRespVO extends CouponTemplateBaseVO {
     private Integer useCount;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

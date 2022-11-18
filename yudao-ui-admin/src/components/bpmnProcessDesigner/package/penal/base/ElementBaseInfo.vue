@@ -76,7 +76,7 @@ export default {
       if (!value) {
         return;
       }
-      if (!value.match(/[a-zA-Z_][\-_.0-9_a-zA-Z$]*/)) {
+      if (!value.match(/[a-zA-Z_][\-_.0-9a-zA-Z$]*/)) {
         console.log('key 不满足 XML NCName 规则，所以不进行赋值');
         return;
       }

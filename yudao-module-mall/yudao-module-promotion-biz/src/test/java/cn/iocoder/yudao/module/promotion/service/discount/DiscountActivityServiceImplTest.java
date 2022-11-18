@@ -17,11 +17,12 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -196,7 +197,7 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
        DiscountActivityPageReqVO reqVO = new DiscountActivityPageReqVO();
        reqVO.setName("芋艿");
        reqVO.setStatus(PromotionActivityStatusEnum.WAIT.getStatus());
-       reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 1), buildTime(2021, 1, 31)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 1), buildTime(2021, 1, 31)}));
 
        // 调用
        PageResult<DiscountActivityDO> pageResult = discountActivityService.getDiscountActivityPage(reqVO);
