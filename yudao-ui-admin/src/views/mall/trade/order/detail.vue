@@ -199,6 +199,16 @@ export default {
                 name: 'Otic 巴拉啦小魔仙联名麦克风儿童早教家用一体卡拉OK宝宝话筒唱歌 魔仙粉',
                 count: 6,
                 imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+              },
+              {
+                name: 'Otic 巴拉啦小魔仙联名麦克风儿童早教家用一体卡拉OK宝宝话筒唱歌 魔仙粉',
+                count: 6,
+                imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+              },
+              {
+                name: 'Otic 巴拉啦小魔仙联名麦克风儿童早教家用一体卡拉OK宝宝话筒唱歌 魔仙粉',
+                count: 6,
+                imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
               }
             ]
           },
