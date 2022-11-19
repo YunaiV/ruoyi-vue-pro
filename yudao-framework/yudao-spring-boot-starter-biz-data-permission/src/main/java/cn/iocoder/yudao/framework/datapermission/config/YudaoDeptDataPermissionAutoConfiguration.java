@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(LoginUser.class)
 @ConditionalOnBean(value = {PermissionApi.class, DeptDataPermissionRuleCustomizer.class})
 public class YudaoDeptDataPermissionAutoConfiguration {

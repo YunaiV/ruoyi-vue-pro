@@ -4,14 +4,14 @@ import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO.OrderItem;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 交易订单 DO
@@ -71,7 +71,6 @@ public class TradeOrderDO extends BaseDO {
      * 枚举 {@link TradeOrderStatusEnum}
      */
     private Integer status;
-    // TODO 芋艿：要不要存储 prod_name 购买的商品名门？
     /**
      * 购买的商品数量
      */
@@ -79,11 +78,11 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 订单完成时间
      */
-    private Date finishTime;
+    private LocalDateTime finishTime;
     /**
      * 订单取消时间
      */
-    private Date cancelTime;
+    private LocalDateTime cancelTime;
     /**
      * 取消类型
      *
@@ -106,7 +105,7 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 付款时间
      */
-    private Date payTime;
+    private LocalDateTime payTime;
 
     // ========== 价格 + 支付基本信息 ==========
     // 价格文档 - 淘宝：https://open.taobao.com/docV3.htm?docId=108471&docType=1
@@ -191,11 +190,11 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 发货时间
      */
-    private Date deliveryTime;
+    private LocalDateTime deliveryTime;
     /**
      * 收货时间
      */
-    private Date receiveTime;
+    private LocalDateTime receiveTime;
     /**
      * 收件人名称
      */
@@ -219,11 +218,11 @@ public class TradeOrderDO extends BaseDO {
 
     // ========== 退款基本信息 ==========
     /**
-     * 退款状态
+     * 收货状态
      *
-     * 枚举 {@link TradeOrderRefundStatusEnum}
+     * 枚举 {@link TradeOrderAfterSaleStatusEnum}
      */
-    private Integer refundStatus;
+    private Integer afterSaleStatus;
     /**
      * 退款金额，单位：分
      *

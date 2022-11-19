@@ -38,8 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -204,7 +204,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         // 目前的算法
         // 时间序列，年月日时分秒 14 位
         // 纯随机，6 位 TODO 芋艿：此处估计是会有问题的，后续在调整
-        return DateUtil.format(new Date(), "yyyyMMddHHmmss") + // 时间序列
+        return DateUtil.format(LocalDateTime.now(), "yyyyMMddHHmmss") + // 时间序列
                 RandomUtil.randomInt(100000, 999999) // 随机。为什么是这个范围，因为偷懒
                 ;
     }
@@ -259,7 +259,7 @@ public class PayOrderServiceImpl implements PayOrderService {
                 PayOrderDO.builder().status(PayOrderStatusEnum.SUCCESS.getStatus()).channelId(channelId).channelCode(channel.getCode())
                         .successTime(notifyRespDTO.getSuccessTime()).successExtensionId(orderExtension.getId())
                         .channelOrderNo(notifyRespDTO.getChannelOrderNo()).channelUserId(notifyRespDTO.getChannelUserId())
-                        .notifyTime(new Date()).build());
+                        .notifyTime(LocalDateTime.now()).build());
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.PAY_ORDER_STATUS_IS_NOT_WAITING);
         }

@@ -14,7 +14,7 @@ import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -33,13 +33,13 @@ public class RewardActivityBaseVO {
     @ApiModelProperty(value = "开始时间", required = true)
     @NotNull(message = "开始时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date startTime;
+    private LocalDateTime startTime;
 
     @ApiModelProperty(value = "结束时间", required = true)
     @NotNull(message = "结束时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @Future(message = "结束时间必须大于当前时间")
-    private Date endTime;
+    private LocalDateTime endTime;
 
     @ApiModelProperty(value = "备注", example = "biubiubiu")
     private String remark;

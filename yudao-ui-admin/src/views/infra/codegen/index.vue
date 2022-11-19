@@ -38,17 +38,17 @@
       <el-table-column label="表描述" align="center" prop="tableComment" :show-overflow-tooltip="true" width="120"/>
       <el-table-column label="实体" align="center" prop="className" width="200"/>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="更新时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="300px" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button type="text" size="small" icon="el-icon-view" @click="handlePreview(scope.row)" v-hasPermi="['infra:codegen:preview']">预览</el-button>
           <el-button type="text" size="small" icon="el-icon-edit" @click="handleEditTable(scope.row)" v-hasPermi="['infra:codegen:update']">编辑</el-button>
           <el-button type="text" size="small" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['infra:codegen:delete']">删除</el-button>
@@ -209,7 +209,7 @@ export default {
     highlightedCode(item) {
       // const vmName = key.substring(key.lastIndexOf("/") + 1, key.indexOf(".vm"));
       // var language = vmName.substring(vmName.indexOf(".") + 1, vmName.length);
-      var language = item.filePath.substring(item.filePath.lastIndexOf(".") + 1);
+      const language = item.filePath.substring(item.filePath.lastIndexOf('.') + 1)
       const result = hljs.highlight(language, item.code || "", true);
       return result.value || '&nbsp;';
     },

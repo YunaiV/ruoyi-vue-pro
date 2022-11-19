@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from '@/router'
 import '@/styles/index.scss'
-import '@/icons'
+import '@/assets/icons'
 import axios from 'axios'
 import Tinymce from '@/components/tinymce/index.vue'
 

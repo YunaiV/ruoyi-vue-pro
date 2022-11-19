@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 退款订单分页查询 Response VO")
 @Data
@@ -27,6 +27,6 @@ public class PayRefundPageItemRespVO extends PayRefundBaseVO {
     private String channelCodeName;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

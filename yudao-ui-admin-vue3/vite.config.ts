@@ -6,7 +6,7 @@ import WindiCSS from 'vite-plugin-windicss'
 import VueJsx from '@vitejs/plugin-vue-jsx'
 import EslintPlugin from 'vite-plugin-eslint'
 import VueI18n from '@intlify/vite-plugin-vue-i18n'
-import { createStyleImportPlugin, ElementPlusResolve } from 'vite-plugin-style-import'
+import { createStyleImportPlugin, ElementPlusResolve, VxeTableResolve } from 'vite-plugin-style-import'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import PurgeIcons from 'vite-plugin-purge-icons'
 import { createHtmlPlugin } from 'vite-plugin-html'
@@ -56,12 +56,18 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       VueJsx(),
       WindiCSS(),
       createStyleImportPlugin({
-        resolves: [ElementPlusResolve()],
+        resolves: [ElementPlusResolve(),VxeTableResolve()],
         libs: [{
           libraryName: 'element-plus',
           esModule: true,
           resolveStyle: (name) => {
             return `element-plus/es/components/${name.substring(3)}/style/css`
+          }
+        },{
+          libraryName: 'vxe-table',
+          esModule: true,
+          resolveStyle: (name) => {
+            return `vxe-table/es/${name}/style.css`
           }
         }]
       }),

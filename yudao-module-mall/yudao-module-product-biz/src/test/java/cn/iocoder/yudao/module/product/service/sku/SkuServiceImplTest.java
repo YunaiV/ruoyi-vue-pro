@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.product.service.sku;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 * @author 芋道源码
 */
 @Import(ProductSkuServiceImpl.class)
+@Disabled // TODO 芋艿：临时去掉
 public class SkuServiceImplTest extends BaseDbUnitTest {
 
     @Resource

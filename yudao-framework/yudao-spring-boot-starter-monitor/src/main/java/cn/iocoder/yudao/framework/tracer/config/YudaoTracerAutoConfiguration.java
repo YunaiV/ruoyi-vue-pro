@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author mashu
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({BizTraceAspect.class})
 @EnableConfigurationProperties(TracerProperties.class)
 @ConditionalOnProperty(prefix = "yudao.tracer", value = "enable", matchIfMissing = true)

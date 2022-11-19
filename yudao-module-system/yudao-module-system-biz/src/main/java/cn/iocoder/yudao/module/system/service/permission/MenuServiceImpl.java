@@ -28,6 +28,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,7 +67,7 @@ public class MenuServiceImpl implements MenuService {
     /**
      * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private MenuMapper menuMapper;
@@ -118,7 +119,7 @@ public class MenuServiceImpl implements MenuService {
      * @param maxUpdateTime 当前菜单的最大更新时间
      * @return 菜单列表
      */
-    private List<MenuDO> loadMenuIfUpdate(Date maxUpdateTime) {
+    private List<MenuDO> loadMenuIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadMenuIfUpdate][首次加载全量菜单]");

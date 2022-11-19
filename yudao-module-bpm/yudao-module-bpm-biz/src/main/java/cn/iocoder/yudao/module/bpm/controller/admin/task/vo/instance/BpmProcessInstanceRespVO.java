@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -28,10 +28,10 @@ public class BpmProcessInstanceRespVO {
     private Integer result;
 
     @ApiModelProperty(value = "提交时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ApiModelProperty(value = "结束时间", required = true)
-    private Date endTime;
+    private LocalDateTime endTime;
 
     @ApiModelProperty(value = "提交的表单值", required = true)
     private Map<String, Object> formVariables;

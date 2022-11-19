@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @ApiModel(value = "管理后台 - 支付应用信息分页查询 Response VO", description = "相比于支付信息，还会多出应用渠道的开关信息")
@@ -19,7 +19,7 @@ public class PayAppPageItemRespVO extends PayAppBaseVO {
     private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 所属商户

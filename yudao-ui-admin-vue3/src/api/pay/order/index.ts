@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { OrderVO } from './types'
-
-const request = useAxios()
 
 // 查询列表支付订单
 export const getOrderPageApi = async (params) => {

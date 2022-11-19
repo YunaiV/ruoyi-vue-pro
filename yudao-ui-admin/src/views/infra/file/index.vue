@@ -32,7 +32,7 @@
       <el-table-column label="文件大小" align="center" prop="size" min-width="120px" :formatter="sizeFormat"/>
       <el-table-column label="文件类型" :show-overflow-tooltip="true" align="center" prop="type" width="180px"/>
       <el-table-column label="文件内容" align="center" prop="content" min-width="150px">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <image-preview v-if="scope.row.type&&scope.row.type.indexOf('image/') === 0" :src="scope.row.url"
                          :width="'100px'"></image-preview>
           <i v-else>无法预览，点击
@@ -43,12 +43,12 @@
         </template>
       </el-table-column>
       <el-table-column label="上传时间" align="center" prop="createTime" min-width="170px">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="100px">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['infra:file:delete']">删除
           </el-button>

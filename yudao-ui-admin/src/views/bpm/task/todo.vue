@@ -24,18 +24,18 @@
       <el-table-column label="所属流程" align="center" prop="processInstance.name" />
       <el-table-column label="流程发起人" align="center" prop="processInstance.startUserNickname" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="version" width="80">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-tag type="success" v-if="scope.row.suspensionState === 1">激活</el-tag>
           <el-tag type="warning" v-if="scope.row.suspensionState === 2">挂起</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)"
                      v-hasPermi="['bpm:task:update']">审批</el-button>
         </template>
@@ -50,7 +50,6 @@
 
 <script>
 import {getTodoTaskPage} from '@/api/bpm/task'
-import {listSimpleUsers} from "@/api/system/user";
 
 export default {
   name: "Todo",

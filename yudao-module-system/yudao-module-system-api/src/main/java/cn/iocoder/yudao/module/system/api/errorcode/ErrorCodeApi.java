@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeAutoGenerateReq
 import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeRespDTO;
 
 import javax.validation.Valid;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -30,6 +30,6 @@ public interface ErrorCodeApi {
      * @param minUpdateTime 最小更新时间
      * @return 错误码数组
      */
-    List<ErrorCodeRespDTO> getErrorCodeList(String applicationName, Date minUpdateTime);
+    List<ErrorCodeRespDTO> getErrorCodeList(String applicationName, LocalDateTime minUpdateTime);
 
 }

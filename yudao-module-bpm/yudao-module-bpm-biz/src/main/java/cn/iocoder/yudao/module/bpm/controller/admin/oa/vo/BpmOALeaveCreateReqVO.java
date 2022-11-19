@@ -15,7 +15,7 @@ public class BpmOALeaveCreateReqVO extends BpmOALeaveBaseVO {
 
     @AssertTrue(message = "结束时间，需要在开始时间之后")
     public boolean isEndTimeValid() {
-        return !getEndTime().before(getStartTime());
+        return !getEndTime().isBefore(getStartTime());
     }
 
 }

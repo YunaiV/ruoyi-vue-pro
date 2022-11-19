@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -118,7 +119,7 @@ public class CouponTemplateServiceImplTest extends BaseDbUnitTest {
            o.setName("芋艿");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setDiscountType(PromotionDiscountTypeEnum.PERCENT.getType());
-           o.setCreateTime(buildTime(2022, 2, 2));
+           o.setCreateTime(buildLocalDateTime(2022, 2, 2));
        });
        couponTemplateMapper.insert(dbCouponTemplate);
        // 测试 name 不匹配
@@ -128,7 +129,7 @@ public class CouponTemplateServiceImplTest extends BaseDbUnitTest {
        // 测试 type 不匹配
        couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setDiscountType(PromotionDiscountTypeEnum.PRICE.getType())));
        // 测试 createTime 不匹配
-       couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setCreateTime(buildTime(2022, 1, 1))));
+       couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setCreateTime(buildLocalDateTime(2022, 1, 1))));
        // 准备参数
        CouponTemplatePageReqVO reqVO = new CouponTemplatePageReqVO();
        reqVO.setName("芋艿");

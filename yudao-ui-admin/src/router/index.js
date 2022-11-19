@@ -216,6 +216,12 @@ export const constantRoutes = [
         hidden: true,
         meta: { title: '订单详情' },
         component: (resolve) => require(['@/views/mall/trade/order/detail'], resolve)
+      },
+      {
+        path: '/mall/trade/orderrefund',
+        name: '退款维权',
+        meta: { title: '退款维权' },
+        component: (resolve) => require(['@/views/mall/trade/orderrefund'], resolve)
       }
     ]
   }

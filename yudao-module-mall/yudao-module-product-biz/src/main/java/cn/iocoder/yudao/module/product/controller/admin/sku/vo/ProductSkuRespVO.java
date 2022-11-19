@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @ApiModel("管理后台 - 商品 SKU Response VO")
@@ -19,7 +19,7 @@ public class ProductSkuRespVO extends ProductSkuBaseVO {
     private Long id;
 
     @ApiModelProperty(value = "创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 规格值数组

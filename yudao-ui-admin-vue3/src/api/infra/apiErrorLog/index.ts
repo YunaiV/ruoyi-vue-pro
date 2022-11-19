@@ -1,6 +1,4 @@
-import { useAxios } from '@/hooks/web/useAxios'
-
-const request = useAxios()
+import request from '@/config/axios'
 
 // 查询列表API 访问日志
 export const getApiErrorLogPageApi = (params) => {

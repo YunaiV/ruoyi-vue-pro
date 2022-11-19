@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.bpm.convert.definition;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
@@ -67,7 +69,7 @@ public interface BpmProcessDefinitionConvert {
         BpmProcessDefinitionPageItemRespVO respVO = convert(bean);
         respVO.setSuspensionState(bean.isSuspended() ? SuspensionState.SUSPENDED.getStateCode() : SuspensionState.ACTIVE.getStateCode());
         if (deployment != null) {
-            respVO.setDeploymentTime(deployment.getDeploymentTime());
+            respVO.setDeploymentTime(LocalDateTimeUtil.of(deployment.getDeploymentTime()));
         }
         if (form != null) {
             respVO.setFormName(form.getName());

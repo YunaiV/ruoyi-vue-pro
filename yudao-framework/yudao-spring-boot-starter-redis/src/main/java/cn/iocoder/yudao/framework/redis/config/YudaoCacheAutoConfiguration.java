@@ -13,7 +13,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 /**
  * Cache 配置类，基于 Redis 实现
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties({CacheProperties.class})
 @EnableCaching
 public class YudaoCacheAutoConfiguration {

@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWord
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -43,6 +43,6 @@ public interface SensitiveWordMapper extends BaseMapperX<SensitiveWordDO> {
     }
 
     @Select("SELECT COUNT(*) FROM system_sensitive_word WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
+    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

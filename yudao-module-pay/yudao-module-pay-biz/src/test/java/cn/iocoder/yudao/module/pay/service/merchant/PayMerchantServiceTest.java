@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -116,7 +116,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
            o.setShortName("灿灿子");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setRemark("灿哥的杂货铺");
-           o.setCreateTime(buildTime(2021,11,3));
+           o.setCreateTime(buildLocalDateTime(2021,11,3));
        });
        merchantMapper.insert(dbMerchant);
        // 测试 no 不匹配
@@ -130,7 +130,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
        // 测试 remark 不匹配
        merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setRemark("斌哥的杂货铺")));
        // 测试 createTime 不匹配
-       merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setCreateTime(buildTime(2022,12,4))));
+       merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setCreateTime(buildLocalDateTime(2022,12,4))));
        // 准备参数
        PayMerchantPageReqVO reqVO = new PayMerchantPageReqVO();
        reqVO.setNo("M1008611");
@@ -138,7 +138,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
        reqVO.setShortName("灿灿子");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
        reqVO.setRemark("灿哥的杂货铺");
-       reqVO.setCreateTime((new Date[]{buildTime(2021,11,2),buildTime(2021,11,4)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021,11,2),buildLocalDateTime(2021,11,4)}));
 
        // 调用
        PageResult<PayMerchantDO> pageResult = merchantService.getMerchantPage(reqVO);
@@ -157,7 +157,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
            o.setShortName("灿灿子");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setRemark("灿哥的杂货铺");
-           o.setCreateTime(buildTime(2021,11,3));
+           o.setCreateTime(buildLocalDateTime(2021,11,3));
        });
         merchantMapper.insert(dbMerchant);
         // 测试 no 不匹配
@@ -171,7 +171,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
         // 测试 remark 不匹配
         merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setRemark("斌哥的杂货铺")));
         // 测试 createTime 不匹配
-        merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setCreateTime(buildTime(2022,12,4))));
+        merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setCreateTime(buildLocalDateTime(2022,12,4))));
        // 准备参数
        PayMerchantExportReqVO reqVO = new PayMerchantExportReqVO();
        reqVO.setNo("M1008611");
@@ -179,7 +179,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
        reqVO.setShortName("灿灿子");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
        reqVO.setRemark("灿哥的杂货铺");
-       reqVO.setCreateTime((new Date[]{buildTime(2021,11,2),buildTime(2021,11,4)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021,11,2),buildLocalDateTime(2021,11,4)}));
 
        // 调用
        List<PayMerchantDO> list = merchantService.getMerchantList(reqVO);

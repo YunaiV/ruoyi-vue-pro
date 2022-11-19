@@ -13,14 +13,7 @@ import {
 } from 'element-plus'
 import { reactive, ref, unref, onMounted, computed, watch } from 'vue'
 import * as LoginApi from '@/api/login'
-import {
-  setToken,
-  setTenantId,
-  getUsername,
-  getRememberMe,
-  getPassword,
-  getTenantName
-} from '@/utils/auth'
+import { setToken, setTenantId } from '@/utils/auth'
 import { usePermissionStore } from '@/store/modules/permission'
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -29,6 +22,8 @@ import { Icon } from '@/components/Icon'
 import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { Verify } from '@/components/Verifition'
+import Cookies from 'js-cookie'
+import { decrypt, encrypt } from '@/utils/jsencrypt'
 
 const { currentRoute, push } = useRouter()
 const permissionStore = usePermissionStore()
@@ -72,7 +67,7 @@ const captchaType = ref('blockPuzzle')
 // 获取验证码
 const getCode = async () => {
   // 情况一，未开启：则直接登录
-  if (!loginData.captchaEnable) {
+  if (loginData.captchaEnable === 'false') {
     await handleLogin({})
     return
   }
@@ -88,15 +83,15 @@ const getTenantId = async () => {
 }
 // 记住我
 const getCookie = () => {
-  const username = getUsername()
-  const password = getPassword()
-  const rememberMe = getRememberMe()
-  const tenantName = getTenantName()
+  const username = Cookies.get('username')
+  const password = Cookies.get('password') ? decrypt(Cookies.get('password')) : undefined
+  const rememberMe = Cookies.get('rememberMe')
+  const tenantName = Cookies.get('tenantName')
   loginData.loginForm = {
     ...loginData.loginForm,
     username: username ? username : loginData.loginForm.username,
     password: password ? password : loginData.loginForm.password,
-    rememberMe: rememberMe ? getRememberMe() : false,
+    rememberMe: rememberMe ? true : false,
     tenantName: tenantName ? tenantName : loginData.loginForm.tenantName
   }
 }
@@ -114,12 +109,23 @@ const handleLogin = async (params) => {
     if (!res) {
       return
     }
+    if (loginData.loginForm.rememberMe) {
+      Cookies.set('username', loginData.loginForm.username, { expires: 30 })
+      Cookies.set('password', encrypt(loginData.loginForm.password), { expires: 30 })
+      Cookies.set('rememberMe', loginData.loginForm.rememberMe, { expires: 30 })
+      Cookies.set('tenantName', loginData.loginForm.tenantName, { expires: 30 })
+    } else {
+      Cookies.remove('username')
+      Cookies.remove('password')
+      Cookies.remove('rememberMe')
+      Cookies.remove('tenantName')
+    }
     setToken(res)
     if (!redirect.value) {
       redirect.value = '/'
     }
     push({ path: redirect.value || permissionStore.addRouters[0].path })
-  } finally {
+  } catch {
     loginLoading.value = false
   }
 }
@@ -132,7 +138,7 @@ const doSocialLogin = async (type: string) => {
     location.origin + '/social-login?type=' + type + '&redirect=' + (redirect.value || '/')
   // 进行跳转
   const res = await LoginApi.socialAuthRedirectApi(type, encodeURIComponent(redirectUri))
-  window.open = res
+  window.location.href = res
 }
 watch(
   () => currentRoute.value,

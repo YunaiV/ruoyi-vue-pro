@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.api.errorcode.dto;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 错误码的 Response DTO
@@ -23,6 +23,6 @@ public class ErrorCodeRespDTO {
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
 }

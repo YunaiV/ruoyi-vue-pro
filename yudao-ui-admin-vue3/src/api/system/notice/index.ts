@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { NoticeVO } from './types'
-
-const request = useAxios()
 
 // 查询公告列表
 export const getNoticePageApi = (params) => {

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.convert.oauth2;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -34,7 +35,7 @@ public interface OAuth2OpenConvert {
 
     default OAuth2OpenCheckTokenRespVO convert2(OAuth2AccessTokenDO bean) {
         OAuth2OpenCheckTokenRespVO respVO = convert3(bean);
-        respVO.setExp(bean.getExpiresTime().getTime() / 1000L);
+        respVO.setExp(LocalDateTimeUtil.toEpochMilli(bean.getExpiresTime()) / 1000L);
         respVO.setUserType(UserTypeEnum.ADMIN.getValue());
         return respVO;
     }

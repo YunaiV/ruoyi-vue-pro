@@ -29,7 +29,7 @@ import static springfox.documentation.builders.RequestHandlerSelectors.basePacka
  *
  * @author 芋道源码
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableSwagger2
 @EnableKnife4j
 @ConditionalOnClass({Docket.class, ApiInfoBuilder.class})

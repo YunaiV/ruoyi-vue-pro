@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 文件配置 Response VO")
 @Data
@@ -31,6 +31,6 @@ public class FileConfigRespVO extends FileConfigBaseVO {
     private FileClientConfig config;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

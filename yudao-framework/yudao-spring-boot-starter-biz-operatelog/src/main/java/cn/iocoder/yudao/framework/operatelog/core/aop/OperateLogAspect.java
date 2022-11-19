@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.operatelog.core.aop;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
@@ -32,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -94,7 +96,7 @@ public class OperateLogAspect {
         }
 
         // 记录开始时间
-        Date startTime = new Date();
+        LocalDateTime startTime = LocalDateTime.now();
         try {
             // 执行原有方法
             Object result = joinPoint.proceed();
@@ -128,7 +130,7 @@ public class OperateLogAspect {
     private void log(ProceedingJoinPoint joinPoint,
                      cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
                      ApiOperation apiOperation,
-                     Date startTime, Object result, Throwable exception) {
+                     LocalDateTime startTime, Object result, Throwable exception) {
         try {
             // 判断不记录的情况
             if (!isLogEnable(joinPoint, operateLog)) {
@@ -145,7 +147,7 @@ public class OperateLogAspect {
     private void log0(ProceedingJoinPoint joinPoint,
                       cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
                       ApiOperation apiOperation,
-                      Date startTime, Object result, Throwable exception) {
+                      LocalDateTime startTime, Object result, Throwable exception) {
         OperateLog operateLogObj = new OperateLog();
         // 补全通用字段
         operateLogObj.setTraceId(TracerUtils.getTraceId());
@@ -226,7 +228,7 @@ public class OperateLogAspect {
     private static void fillMethodFields(OperateLog operateLogObj,
                                          ProceedingJoinPoint joinPoint,
                                          cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
-                                         Date startTime, Object result, Throwable exception) {
+                                         LocalDateTime startTime, Object result, Throwable exception) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         operateLogObj.setJavaMethod(methodSignature.toString());
         if (operateLog == null || operateLog.logArgs()) {
@@ -235,7 +237,7 @@ public class OperateLogAspect {
         if (operateLog == null || operateLog.logResultData()) {
             operateLogObj.setResultData(obtainResultData(result));
         }
-        operateLogObj.setDuration((int) (System.currentTimeMillis() - startTime.getTime()));
+        operateLogObj.setDuration((int) (LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis()));
         // （正常）处理 resultCode 和 resultMsg 字段
         if (result instanceof CommonResult) {
             CommonResult<?> commonResult = (CommonResult<?>) result;

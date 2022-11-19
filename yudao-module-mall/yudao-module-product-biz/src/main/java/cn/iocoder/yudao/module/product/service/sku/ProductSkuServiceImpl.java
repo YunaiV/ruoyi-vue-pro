@@ -119,9 +119,9 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public void createSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList) {
+    public void createSkus(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList) {
         // 批量插入 SKU
-        List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertSkuDOList(skuCreateReqList);
+        List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertList06(skuCreateReqList, spuName);
         skuDOList.forEach(v -> v.setSpuId(spuId));
         productSkuMapper.insertBatch(skuDOList);
     }
@@ -148,7 +148,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     @Transactional
-    public void updateSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
+    public void updateSkus(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // 查询 SPU 下已经存在的 SKU 的集合
         List<ProductSkuDO> existsSkus = productSkuMapper.selectListBySpuId(spuId);
         // 构建规格与 SKU 的映射关系;
@@ -168,7 +168,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         List<ProductSkuDO> updateSkus = new ArrayList<>();
         List<Long> deleteSkus = new ArrayList<>();
 
-        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertSkuDOList(skus);
+        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertList06(skus, spuName);
         allUpdateSkus.forEach(p -> {
             String propertiesKey = p.getProperties() == null? "null": p.getProperties().stream().map(m -> String.valueOf(m.getValueId())).collect(Collectors.joining());
             // 1、找得到的，进行更新

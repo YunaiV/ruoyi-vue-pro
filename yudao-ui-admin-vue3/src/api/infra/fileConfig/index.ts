@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { FileConfigVO } from './types'
-
-const request = useAxios()
 
 // 查询文件配置列表
 export const getFileConfigPageApi = (params) => {

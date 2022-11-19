@@ -7,9 +7,9 @@ import javax.validation.constraints.*;
 ## 处理 Date 字段的引入
 #foreach ($column in $columns)
 #if (${column.updateOperation} && (!${column.createOperation} || !${column.listOperationResult})
-    && ${column.javaType} == "Date")## 时间类型
+    && ${column.javaType} == "LocalDateTime")## 时间类型
 import org.springframework.format.annotation.DateTimeFormat;
-
+import java.time.LocalDateTime;
 import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 #break
 #end

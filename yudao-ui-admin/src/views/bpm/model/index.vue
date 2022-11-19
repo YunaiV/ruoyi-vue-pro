@@ -40,19 +40,19 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="流程标识" align="center" prop="key" />
       <el-table-column label="流程名称" align="center" prop="name" width="200">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button type="text" @click="handleBpmnDetail(scope.row)">
             <span>{{ scope.row.name }}</span>
           </el-button>
         </template>
       </el-table-column>
       <el-table-column label="流程分类" align="center" prop="category" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.BPM_MODEL_CATEGORY" :value="scope.row.category" />
         </template>
       </el-table-column>
       <el-table-column label="表单信息" align="center" prop="formType" width="200">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button v-if="scope.row.formId" type="text" @click="handleFormDetail(scope.row)">
             <span>{{ scope.row.formName }}</span>
           </el-button>
@@ -63,31 +63,31 @@
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="最新部署的流程定义" align="center">
         <el-table-column label="流程版本" align="center" prop="processDefinition.version" width="80">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-tag size="medium" v-if="scope.row.processDefinition">v{{ scope.row.processDefinition.version }}</el-tag>
             <el-tag size="medium" type="warning" v-else>未部署</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="激活状态" align="center" prop="processDefinition.version" width="80">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-switch v-if="scope.row.processDefinition" v-model="scope.row.processDefinition.suspensionState"
                        :active-value="1" :inactive-value="2" @change="handleChangeState(scope.row)" />
           </template>
         </el-table-column>
         <el-table-column label="部署时间" align="center" prop="deploymentTime" width="180">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <span v-if="scope.row.processDefinition">{{ parseTime(scope.row.processDefinition.deploymentTime) }}</span>
           </template>
         </el-table-column>
       </el-table-column>
       <el-table-column label="操作" align="center" width="450" fixed="right">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['bpm:model:update']">修改流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-setting" @click="handleDesign(scope.row)"
@@ -489,7 +489,10 @@ export default {
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess(statusState + "成功");
-      }).catch(() => {});
+      }).catch(() => {
+        // 取消后，进行恢复按钮
+        row.processDefinition.suspensionState = (state === 1 ? 2 : 1);
+      });
     },
     /** 导入按钮操作 */
     handleImport() {

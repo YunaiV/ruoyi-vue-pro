@@ -5,7 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.UserRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -60,7 +60,7 @@ public class CouponServiceImpl implements CouponService {
             throw exception(COUPON_STATUS_NOT_UNUSED);
         }
         // 校验有效期；为避免定时器没跑，实际优惠劵已经过期
-        if (DateUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime())) {
+        if (LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime())) {
             throw exception(COUPON_VALID_TIME_NOT_NOW);
         }
     }
@@ -87,7 +87,7 @@ public class CouponServiceImpl implements CouponService {
         // 更新状态
         int updateCount = couponMapper.updateByIdAndStatus(id, CouponStatusEnum.UNUSED.getStatus(),
                 new CouponDO().setStatus(CouponStatusEnum.USED.getStatus())
-                        .setUseOrderId(orderId).setUseTime(new Date()));
+                        .setUseOrderId(orderId).setUseTime(LocalDateTime.now()));
         if (updateCount == 0) {
             throw exception(COUPON_STATUS_NOT_UNUSED);
         }

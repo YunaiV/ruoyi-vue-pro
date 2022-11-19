@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.refund;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
@@ -22,10 +21,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -78,11 +76,11 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setChannelErrorCode("");
             o.setChannelErrorMsg("");
             o.setChannelExtras("");
-            o.setExpireTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 30));
-            o.setSuccessTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 15));
-            o.setNotifyTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 20));
-            o.setCreateTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 10));
-            o.setUpdateTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 35));
+            o.setExpireTime(LocalDateTime.of(2021, 1, 1, 10, 10, 30));
+            o.setSuccessTime(LocalDateTime.of(2021, 1, 1, 10, 10, 15));
+            o.setNotifyTime(LocalDateTime.of(2021, 1, 1, 10, 10, 20));
+            o.setCreateTime(LocalDateTime.of(2021, 1, 1, 10, 10, 10));
+            o.setUpdateTime(LocalDateTime.of(2021, 1, 1, 10, 10, 35));
         });
         refundMapper.insert(dbRefund);
         // 测试 merchantId 不匹配
@@ -102,7 +100,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setType(PayRefundTypeEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o ->
-                o.setCreateTime(DateUtils.buildTime(2022, 1, 1, 10, 10, 10))));
+                o.setCreateTime(LocalDateTime.of(2022, 1, 1, 10, 10, 10))));
         // 准备参数
         PayRefundPageReqVO reqVO = new PayRefundPageReqVO();
         reqVO.setMerchantId(1L);
@@ -112,7 +110,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
         reqVO.setType(PayRefundTypeEnum.SOME.getStatus());
-        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 1, 10, 10, 10),buildTime(2021, 1, 1, 10, 10, 12)}));
+        reqVO.setCreateTime((new LocalDateTime[]{LocalDateTime.of(2021, 1, 1, 10, 10, 10), LocalDateTime.of(2021, 1, 1, 10, 10, 12)}));
 
         // 调用
         PageResult<PayRefundDO> pageResult = refundService.getRefundPage(reqVO);
@@ -147,11 +145,11 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setChannelErrorCode("");
             o.setChannelErrorMsg("");
             o.setChannelExtras("");
-            o.setExpireTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 30));
-            o.setSuccessTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 15));
-            o.setNotifyTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 20));
-            o.setCreateTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 10));
-            o.setUpdateTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 35));
+            o.setExpireTime(LocalDateTime.of(2021, 1, 1, 10, 10, 30));
+            o.setSuccessTime(LocalDateTime.of(2021, 1, 1, 10, 10, 15));
+            o.setNotifyTime(LocalDateTime.of(2021, 1, 1, 10, 10, 20));
+            o.setCreateTime(LocalDateTime.of(2021, 1, 1, 10, 10, 10));
+            o.setUpdateTime(LocalDateTime.of(2021, 1, 1, 10, 10, 35));
         });
         refundMapper.insert(dbRefund);
         // 测试 merchantId 不匹配
@@ -171,7 +169,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setType(PayRefundTypeEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o ->
-                o.setCreateTime(DateUtils.buildTime(2022, 1, 1, 10, 10, 10))));
+                o.setCreateTime(LocalDateTime.of(2022, 1, 1, 10, 10, 10))));
 
         // 准备参数
         PayRefundExportReqVO reqVO = new PayRefundExportReqVO();
@@ -182,7 +180,7 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         reqVO.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
         reqVO.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
         reqVO.setType(PayRefundTypeEnum.SOME.getStatus());
-        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 1, 10, 10, 10),buildTime(2021, 1, 1, 10, 10, 12)}));
+        reqVO.setCreateTime((new LocalDateTime[]{LocalDateTime.of(2021, 1, 1, 10, 10, 10), LocalDateTime.of(2021, 1, 1, 10, 10, 12)}));
 
         // 调用
         List<PayRefundDO> list = refundService.getRefundList(reqVO);

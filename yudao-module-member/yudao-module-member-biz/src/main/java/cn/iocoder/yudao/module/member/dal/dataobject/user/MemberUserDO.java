@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 会员用户 DO
@@ -67,7 +67,7 @@ public class MemberUserDO extends TenantBaseDO {
     /**
      * 最后登录时间
      */
-    private Date loginDate;
+    private LocalDateTime loginDate;
 
     // TODO 芋艿：name 真实名字；
     // TODO 芋艿：email 邮箱；

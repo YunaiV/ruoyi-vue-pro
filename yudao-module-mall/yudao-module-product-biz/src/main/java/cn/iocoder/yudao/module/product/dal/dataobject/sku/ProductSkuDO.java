@@ -36,15 +36,17 @@ public class ProductSkuDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 商品 SKU 名字
-     */
-    private String name;
-    /**
      * SPU 编号
      * <p>
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
+    /**
+     * SPU 名字
+     *
+     * 冗余 {@link ProductSkuDO#getSpuName()}
+     */
+    private String spuName;
     /**
      * 规格值数组，JSON 格式
      */

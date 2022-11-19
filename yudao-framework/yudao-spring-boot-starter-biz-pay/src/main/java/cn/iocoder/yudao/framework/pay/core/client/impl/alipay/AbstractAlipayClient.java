@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.http.HttpUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.*;
@@ -61,7 +60,7 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
         return  PayOrderNotifyRespDTO.builder().orderExtensionNo(params.get("out_trade_no"))
                 .channelOrderNo(params.get("trade_no")).channelUserId(params.get("seller_id"))
                 .tradeStatus(params.get("trade_status"))
-                .successTime(DateUtil.parse(params.get("notify_time"), "yyyy-MM-dd HH:mm:ss"))
+                .successTime(LocalDateTimeUtil.parse(params.get("notify_time"), "yyyy-MM-dd HH:mm:ss"))
                 .data(data.getBody()).build();
     }
 
@@ -72,7 +71,7 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
                 .tradeNo(params.get("out_trade_no"))
                 .reqNo(params.get("out_biz_no"))
                 .status(PayNotifyRefundStatusEnum.SUCCESS)
-                .refundSuccessTime(DateUtil.parse(params.get("gmt_refund"), "yyyy-MM-dd HH:mm:ss"))
+                .refundSuccessTime(LocalDateTimeUtil.parse(params.get("gmt_refund"), "yyyy-MM-dd HH:mm:ss"))
                 .build();
         return notifyDTO;
     }

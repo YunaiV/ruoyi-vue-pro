@@ -56,7 +56,7 @@ export default {
   },
   // 添加tab页签
   openPage(title, url, params) {
-    var obj = { path: url, meta: { title: title } }
+    const obj = { path: url, meta: { title: title } }
     store.dispatch('tagsView/addView', obj);
     return router.push({ path: url, query: params });
   },

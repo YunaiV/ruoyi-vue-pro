@@ -14,7 +14,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -100,13 +100,13 @@ public class CouponTemplateDO extends BaseDO {
      *
      * 当 {@link #validityType} 为 {@link CouponTemplateValidityTypeEnum#DATE}
      */
-    private Date validStartTime;
+    private LocalDateTime validStartTime;
     /**
      * 固定日期 - 生效结束时间
      *
      * 当 {@link #validityType} 为 {@link CouponTemplateValidityTypeEnum#DATE}
      */
-    private Date validEndTime;
+    private LocalDateTime validEndTime;
     /**
      * 领取日期 - 开始天数
      *

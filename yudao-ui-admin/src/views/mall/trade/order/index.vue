@@ -63,70 +63,71 @@
     </el-row>
 
     <!-- tab切换-->
-    <el-radio-group v-model="activeTabName">
-      <el-radio-button v-for="tabPane in tabPanes" :label="tabPane.label">{{tabPane.text}}</el-radio-button>
-    </el-radio-group>
-
-    <!-- table -->
-    <el-table :data="tableData" :show-header="false" class="order-table">
-      <el-table-column label="订单信息">
-        <template slot-scope="{ row }">
-          <el-row>
-            <el-col :span="5">
-              订单号：{{row.orderNo}}
-              <el-popover title="支付流水号：" :content="row.payNo" ref="popover" placement="right" width="200" trigger="click"/>
-              <el-button type="text" v-popover:popover>更多</el-button>
-            </el-col>
-            <el-col :span="5">下单时间：{{row.time}}</el-col>
-            <el-col :span="4">订单来源：{{row.orderSource}}</el-col>
-            <el-col :span="4">支付方式：{{row.payWay}}</el-col>
-            <el-col :span="6" align="right" type="flex">
-              <el-button type="text">关闭订单</el-button>
-              <el-button type="text">修改地址</el-button>
-              <el-button type="text">调整价格</el-button>
-              <el-dropdown style="margin-left: 10px">
-                <el-button type="text">
-                  更多操作<i class="el-icon-arrow-down el-icon--right"></i>
-                </el-button>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item><el-button type="text">打印发货单</el-button></el-dropdown-item>
-                  <el-dropdown-item><el-button type="text" @click="goToDetail(row)">详情</el-button></el-dropdown-item>
-                  <el-dropdown-item><el-button type="text">备注</el-button></el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-col>
-          </el-row>
-          <!-- 订单下的商品 -->
-          <el-table :data="row.goods" border>
-            <el-table-column label="商品" prop="goods" header-align="center" width="360">
-              <template slot-scope="{ row, $index }">
-                <div class="goods-info">
-                  <img :src="row.picture"/>
-                  <span class="ellipsis-2" :title="row.name">{{row.name}}</span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column label="单价(元)/数量" prop="fee" align="center" width="115">
-              <template slot-scope="{ row }">
-                <div>{{row.price}}</div>
-                <div>{{row.count}}</div>
-              </template>
-            </el-table-column>
-            <el-table-column label="维权" prop="safeguard" align="center" width="115"/>
-            <el-table-column label="实付金额(元)" prop="amount" align="center" width="115"/>
-            <el-table-column label="买家/收货人" prop="buyer" header-align="center" width="360">
-              <template slot-scope="{ row }">
-                <div>{{row.buyer}}</div>
-                <div>{{row.receiver}}{{row.tel}}</div>
-                <div class="ellipsis-2" :title="row.address">{{row.address}}</div>
-              </template>
-            </el-table-column>
-            <el-table-column label="配送方式" prop="sendWay" align="center" width="115"/>
-            <el-table-column label="交易状态" prop="status" align="center"/>
-          </el-table>
-        </template>
-      </el-table-column>
-    </el-table>
+    <el-tabs v-model="activeTabName" type="card">
+      <el-tab-pane v-for="tabPane in tabPanes" :label="tabPane.text" :name="tabPane.name">
+        <!-- table -->
+        <el-table :data="tableData" :show-header="false" class="order-table">
+          <el-table-column>
+            <template slot-scope="{ row }">
+              <el-row type="flex" align="middle">
+                <el-col :span="5">
+                  订单号：{{row.orderNo}}
+                  <el-popover title="支付流水号：" :content="row.orderNo" placement="right" width="200" trigger="click">
+                    <el-button slot="reference" type="text">更多</el-button>
+                  </el-popover>
+                </el-col>
+                <el-col :span="5">下单时间：{{row.time}}</el-col>
+                <el-col :span="4">订单来源：{{row.orderSource}}</el-col>
+                <el-col :span="4">支付方式：{{row.payWay}}</el-col>
+                <el-col :span="6" align="right">
+                  <el-button type="text">关闭订单</el-button>
+                  <el-button type="text">修改地址</el-button>
+                  <el-button type="text">调整价格</el-button>
+                  <el-dropdown style="margin-left: 10px">
+                    <el-button type="text">
+                      更多操作<i class="el-icon-arrow-down el-icon--right"></i>
+                    </el-button>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item><el-button type="text">打印发货单</el-button></el-dropdown-item>
+                      <el-dropdown-item><el-button type="text" @click="goToDetail(row)">详情</el-button></el-dropdown-item>
+                      <el-dropdown-item><el-button type="text">备注</el-button></el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </el-col>
+              </el-row>
+              <!-- 订单下的商品 -->
+              <el-table :data="row.goods" border :show-header="true">
+                <el-table-column label="商品" prop="goods" header-align="center" width="auto" min-width="300">
+                  <template slot-scope="{ row, $index }">
+                    <div class="goods-info">
+                      <img :src="row.picture"/>
+                      <span class="ellipsis-2" :title="row.name">{{row.name}}</span>
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="单价(元)/数量" prop="fee" align="center" width="115">
+                  <template slot-scope="{ row }">
+                    <div>{{row.price}}</div>
+                    <div>{{row.count}}</div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="维权" prop="safeguard" align="center" width="100"/>
+                <el-table-column label="实付金额(元)" prop="amount" align="center" width="100"/>
+                <el-table-column label="买家/收货人" prop="buyer" header-align="center" width="auto" min-width="300">
+                  <template slot-scope="{ row }">
+                    <div>{{row.buyer}}</div>
+                    <div>{{row.receiver}}{{row.tel}}</div>
+                    <div class="ellipsis-2" :title="row.address">{{row.address}}</div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="配送方式" prop="sendWay" align="center" width="100"/>
+                <el-table-column label="交易状态" prop="status" align="center" width="100"/>
+              </el-table>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+    </el-tabs>
   </div>
 </template>
 
@@ -234,14 +235,14 @@
         },
         activeTabName: 'all',
         tabPanes: [
-          { text: '全部', label: 'all' },
-          { text: '待支付', label: 'toBePay' },
-          { text: '待发货', label: 'toBeSend' },
-          { text: '已发货', label: 'send' },
-          { text: '已收货', label: 'received' },
-          { text: '已完成', label: 'finished' },
-          { text: '已关闭', label: 'closed' },
-          { text: '退款中', label: 'refund' }
+          { text: '全部', name: 'all' },
+          { text: '待支付', name: 'toBePay' },
+          { text: '待发货', name: 'toBeSend' },
+          { text: '已发货', name: 'send' },
+          { text: '已收货', name: 'received' },
+          { text: '已完成', name: 'finished' },
+          { text: '已关闭', name: 'closed' },
+          { text: '退款中', name: 'refund' }
         ],
         tableData: [
           {
@@ -333,7 +334,6 @@
 
 <style lang="scss" scoped>
   ::v-deep .order-table{
-    margin-top: 20px;
     border-bottom: none;
     &::before{
       height: 0;

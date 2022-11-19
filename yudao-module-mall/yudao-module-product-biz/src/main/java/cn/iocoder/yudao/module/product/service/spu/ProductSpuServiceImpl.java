@@ -79,7 +79,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         spu.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
         productSpuMapper.insert(spu);
         // 插入 SKU
-        productSkuService.createSkus(spu.getId(), skuCreateReqList);
+        productSkuService.createSkus(spu.getId(), spu.getName(), skuCreateReqList);
         // 返回
         return spu.getId();
     }
@@ -105,7 +105,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         updateObj.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
         productSpuMapper.updateById(updateObj);
         // 批量更新 SKU
-        productSkuService.updateSkus(updateObj.getId(), updateReqVO.getSkus());
+        productSkuService.updateSkus(updateObj.getId(), updateObj.getName(), updateReqVO.getSkus());
     }
 
     @Override

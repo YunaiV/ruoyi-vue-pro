@@ -1,18 +1,18 @@
 <template>
   <div class="upload-file">
     <el-upload
-      multiple
-      :action="uploadFileUrl"
-      :before-upload="handleBeforeUpload"
-      :file-list="fileList"
-      :limit="limit"
-      :on-error="handleUploadError"
-      :on-exceed="handleExceed"
-      :on-success="handleUploadSuccess"
-      :show-file-list="false"
-      :headers="headers"
-      class="upload-file-uploader"
-      ref="upload"
+        multiple
+        :action="uploadFileUrl"
+        :before-upload="handleBeforeUpload"
+        :file-list="fileList"
+        :limit="limit"
+        :on-error="handleUploadError"
+        :on-exceed="handleExceed"
+        :on-success="handleUploadSuccess"
+        :show-file-list="false"
+        :headers="headers"
+        class="upload-file-uploader"
+        ref="fileUpload"
     >
       <!-- 上传按钮 -->
       <el-button size="mini" type="primary">选取文件</el-button>
@@ -72,6 +72,7 @@ export default {
     return {
       number: 0,
       uploadList: [],
+      baseUrl: process.env.VUE_APP_BASE_API,
       uploadFileUrl: process.env.VUE_APP_BASE_API + "/admin-api/infra/file/upload", // 请求地址
       headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
       fileList: [],
@@ -118,7 +119,8 @@ export default {
         }
         const isTypeOk = this.fileType.some((type) => {
           if (file.type.indexOf(type) > -1) return true;
-          return !!(fileExtension && fileExtension.indexOf(type) > -1);
+          if (fileExtension && fileExtension.indexOf(type) > -1) return true;
+          return false;
         });
         if (!isTypeOk) {
           this.$modal.msgError(`文件格式不正确, 请上传${this.fileType.join("/")}格式文件!`);
@@ -147,21 +149,33 @@ export default {
       this.$modal.closeLoading()
     },
     // 上传成功回调
-    handleUploadSuccess(res) {
-      // edit by 芋道源码
-      this.uploadList.push({ name: res.data, url: res.data });
-      if (this.uploadList.length === this.number) {
-        this.fileList = this.fileList.concat(this.uploadList);
-        this.uploadList = [];
-        this.number = 0;
-        this.$emit("input", this.listToString(this.fileList));
+    handleUploadSuccess(res, file) {
+      if (res.code === 200) {
+        // edit by 芋道源码
+        this.uploadList.push({ name: res.data, url: res.data });
+        this.uploadedSuccessfully();
+      } else {
+        this.number--;
         this.$modal.closeLoading();
+        this.$modal.msgError(res.msg);
+        this.$refs.fileUpload.handleRemove(file);
+        this.uploadedSuccessfully();
       }
     },
     // 删除文件
     handleDelete(index) {
       this.fileList.splice(index, 1);
       this.$emit("input", this.listToString(this.fileList));
+    },
+    // 上传结束处理
+    uploadedSuccessfully() {
+      if (this.number > 0 && this.uploadList.length === this.number) {
+        this.fileList = this.fileList.concat(this.uploadList);
+        this.uploadList = [];
+        this.number = 0;
+        this.$emit("input", this.listToString(this.fileList));
+        this.$modal.closeLoading();
+      }
     },
     // 获取文件名称
     getFileName(name) {
@@ -178,7 +192,7 @@ export default {
       for (let i in list) {
         strs += list[i].url + separator;
       }
-      return strs !== '' ? strs.substr(0, strs.length - 1) : '';
+      return strs != '' ? strs.substr(0, strs.length - 1) : '';
     }
   }
 };

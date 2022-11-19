@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class YudaoDictAutoConfiguration {
 
     @Bean

@@ -5,7 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -66,7 +66,7 @@ public class OperateLogBaseVO {
 
     @ApiModelProperty(value = "开始时间", required = true)
     @NotNull(message = "开始时间不能为空")
-    private Date startTime;
+    private LocalDateTime startTime;
 
     @ApiModelProperty(value = "执行时长，单位：毫秒", required = true)
     @NotNull(message = "执行时长不能为空")

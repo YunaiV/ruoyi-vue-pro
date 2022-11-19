@@ -38,7 +38,7 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="访问编号" align="center" prop="id" />
       <el-table-column label="日志类型" align="center" prop="logType" width="120">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.SYSTEM_LOGIN_TYPE" :value="scope.row.logType" />
         </template>
       </el-table-column>
@@ -46,12 +46,12 @@
       <el-table-column label="登录地址" align="center" prop="userIp" width="130" :show-overflow-tooltip="true" />
       <el-table-column label="userAgent" align="center" prop="userAgent" width="400" :show-overflow-tooltip="true" />
       <el-table-column label="结果" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.SYSTEM_LOGIN_RESULT" :value="scope.row.result" />
         </template>
       </el-table-column>
       <el-table-column label="登录日期" align="center" prop="loginTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
@@ -79,8 +79,6 @@ export default {
       total: 0,
       // 表格数据
       list: [],
-      // 状态数据字典
-      statusOptions: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
