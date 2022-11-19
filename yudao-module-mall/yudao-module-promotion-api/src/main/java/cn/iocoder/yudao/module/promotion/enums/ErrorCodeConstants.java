@@ -45,4 +45,7 @@ public interface ErrorCodeConstants {
     // ========== Price 相关 1003007000 ============
     ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1003007000, "支付价格计算异常，原因：价格小于等于 0");
 
+    // ========== 秒杀活动 1003008000 ==========
+    ErrorCode SECKILL_ACTIVITY_NOT_EXISTS = new ErrorCode(1003008000, "秒杀活动不存在");
+
 }
