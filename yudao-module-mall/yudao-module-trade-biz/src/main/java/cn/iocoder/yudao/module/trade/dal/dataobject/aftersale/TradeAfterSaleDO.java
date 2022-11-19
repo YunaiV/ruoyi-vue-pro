@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@TableName(value = "trade_after_sale")
+@TableName(value = "trade_after_sale", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
@@ -57,9 +57,10 @@ public class TradeAfterSaleDO extends BaseDO {
     /**
      * 申请原因
      *
-     * 使用数据字典枚举，对应 trade_refund_apply_reason 类型
+     * type = 退款，对应 trade_after_sale_refund_reason 类型
+     * type = 退货退款，对应 trade_after_sale_refund_and_return_reason 类型
      */
-    private Integer applyReason;
+    private String applyReason;
     /**
      * 补充描述
      */
@@ -71,25 +72,6 @@ public class TradeAfterSaleDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> applyPicUrls;
-
-    // ========== 商家相关 ==========
-
-    /**
-     * 审批时间
-     */
-    private LocalDateTime auditTime;
-    /**
-     * 审批人
-     *
-     * 关联 AdminUserDO 的 id 编号
-     */
-    private Long auditUserId;
-    /**
-     * 审批备注
-     *
-     * 注意，只有审批不通过才会填写
-     */
-    private String auditReason;
 
     // ========== 交易订单相关 ==========
     /**
@@ -107,19 +89,59 @@ public class TradeAfterSaleDO extends BaseDO {
     /**
      * 商品 SPU 编号
      *
-     * 关联 ProductSpuDO 的编号
+     * 关联 ProductSpuDO 的 id 字段
+     * 冗余 {@link TradeOrderItemDO#getSpuId()}
      */
     private Long spuId;
+    /**
+     * 商品 SPU 名称
+     *
+     * 关联 ProductSkuDO 的 name 字段
+     * 冗余 {@link TradeOrderItemDO#getSpuName()}
+     */
+    private String spuName;
     /**
      * 商品 SKU 编号
      *
      * 关联 ProductSkuDO 的编号
      */
-    private Integer skuId;
+    private Long skuId;
+    /**
+     * 规格值数组，JSON 格式
+     *
+     * 冗余 {@link TradeOrderItemDO#getProperties()}
+     */
+    @TableField(typeHandler = TradeOrderItemDO.PropertyTypeHandler.class)
+    private List<TradeOrderItemDO.Property> properties;
+    /**
+     * 商品图片
+     *
+     * 冗余 {@link TradeOrderItemDO#getPicUrl()}
+     */
+    private String picUrl;
     /**
      * 退货商品数量
      */
     private Integer count;
+
+    // ========== 审批相关 ==========
+
+    /**
+     * 审批时间
+     */
+    private LocalDateTime auditTime;
+    /**
+     * 审批人
+     *
+     * 关联 AdminUserDO 的 id 编号
+     */
+    private Long auditUserId;
+    /**
+     * 审批备注
+     *
+     * 注意，只有审批不通过才会填写
+     */
+    private String auditReason;
 
     // ========== 退款相关 ==========
     /**

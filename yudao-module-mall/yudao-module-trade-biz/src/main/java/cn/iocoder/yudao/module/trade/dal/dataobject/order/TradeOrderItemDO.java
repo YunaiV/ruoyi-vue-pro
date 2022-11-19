@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -41,13 +42,19 @@ public class TradeOrderItemDO extends BaseDO {
      */
     private Long orderId;
 
-    // ========== 商品基本信息 ==========
+    // ========== 商品基本信息; 冗余较多字段，减少关联查询 ==========
     /**
      * 商品 SPU 编号
      *
      * 关联 ProductSkuDO 的 spuId 编号
      */
     private Long spuId;
+    /**
+     * 商品 SPU 名称
+     *
+     * 冗余 ProductSkuDO 的 spuName 编号
+     */
+    private String spuName;
     /**
      * 商品 SKU 编号
      *
@@ -56,15 +63,11 @@ public class TradeOrderItemDO extends BaseDO {
     private Long skuId;
     /**
      * 规格值数组，JSON 格式
+     *
+     * 冗余 ProductSkuDO 的 properties 字段
      */
     @TableField(typeHandler = PropertyTypeHandler.class)
     private List<Property> properties;
-    /**
-     * 商品名称
-     *
-     * 冗余 ProductSpuDO 的 name 字段
-     */
-    private String name;
     /**
      * 商品图片
      */
@@ -142,7 +145,7 @@ public class TradeOrderItemDO extends BaseDO {
      *
      * 枚举 {@link TradeOrderItemAfterSaleStatusEnum}
      *
-     * @see cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO
+     * @see TradeAfterSaleDO
      */
     private Integer afterSaleStatus;
 

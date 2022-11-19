@@ -84,7 +84,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         // TODO 芋艿：超过一定时间，不允许售后
 
         // 申请的退款金额，不能超过商品的价格
-        if (createReqVO.getApplyPrice() > orderItem.getOrderDividePrice()) {
+        if (createReqVO.getRefundPrice() > orderItem.getOrderDividePrice()) {
             throw exception(AFTER_SALE_CREATE_FAIL_REFUND_PRICE_ERROR);
         }
 

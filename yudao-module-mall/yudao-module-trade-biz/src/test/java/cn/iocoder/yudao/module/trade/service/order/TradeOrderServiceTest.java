@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
  * @since 2022-09-07
  */
 @Import({TradeOrderServiceImpl.class, TradeOrderConfig.class})
-class TradeOrderServiceTest extends BaseDbUnitTest {
+public class TradeOrderServiceTest extends BaseDbUnitTest {
 
     @Resource
     private TradeOrderServiceImpl tradeOrderService;
@@ -196,7 +196,7 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderItemDO01.getProperties().size(), 1);
         assertEquals(tradeOrderItemDO01.getProperties().get(0).getPropertyId(), 111L);
         assertEquals(tradeOrderItemDO01.getProperties().get(0).getValueId(), 222L);
-        assertEquals(tradeOrderItemDO01.getName(), sku01.getName());
+        assertEquals(tradeOrderItemDO01.getSpuName(), sku01.getSpuName());
         assertEquals(tradeOrderItemDO01.getPicUrl(), sku01.getPicUrl());
         assertEquals(tradeOrderItemDO01.getCount(), 3);
         assertEquals(tradeOrderItemDO01.getOriginalPrice(), 150);
@@ -216,7 +216,7 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderItemDO02.getProperties().size(), 1);
         assertEquals(tradeOrderItemDO02.getProperties().get(0).getPropertyId(), 333L);
         assertEquals(tradeOrderItemDO02.getProperties().get(0).getValueId(), 444L);
-        assertEquals(tradeOrderItemDO02.getName(), sku02.getName());
+        assertEquals(tradeOrderItemDO02.getSpuName(), sku02.getSpuName());
         assertEquals(tradeOrderItemDO02.getPicUrl(), sku02.getPicUrl());
         assertEquals(tradeOrderItemDO02.getCount(), 4);
         assertEquals(tradeOrderItemDO02.getOriginalPrice(), 80);
