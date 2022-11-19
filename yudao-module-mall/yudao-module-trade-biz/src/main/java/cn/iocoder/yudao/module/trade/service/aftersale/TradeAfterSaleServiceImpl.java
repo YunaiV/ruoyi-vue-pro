@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.trade.service.aftersale;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDisagreeReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRefuseReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleDeliveryReqVO;
@@ -51,6 +53,11 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
+
+    @Override
+    public PageResult<TradeAfterSaleDO> getAfterSalePage(TradeAfterSalePageReqVO pageReqVO) {
+        return tradeAfterSaleMapper.selectPage(pageReqVO);
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

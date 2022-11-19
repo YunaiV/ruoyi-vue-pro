@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.trade.enums.order;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 /**
  * 交易订单 - 状态
@@ -12,7 +15,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Getter
-public enum TradeOrderStatusEnum {
+public enum TradeOrderStatusEnum implements IntArrayValuable {
 
     UNPAID(0, "未付款"),
     PAID(10, "已付款"), // 例如说，拼团订单，支付后，需要拼团成功后，才会处于待发货
@@ -23,6 +26,8 @@ public enum TradeOrderStatusEnum {
 
     // TODO 芋艿： TAKE("待核验")：虚拟订单需要核验商品
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderStatusEnum::getStatus).toArray();
+
     /**
      * 状态值
      */
@@ -31,6 +36,11 @@ public enum TradeOrderStatusEnum {
      * 状态名
      */
     private final String name;
+
+    @Override
+    public int[] array() {
+        return ARRAYS;
+    }
 
     /**
      * 判断指定状态，是否正处于【已取消】状态

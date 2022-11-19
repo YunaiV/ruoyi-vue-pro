@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.trade.convert.aftersale;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -31,5 +33,7 @@ public interface TradeAfterSaleConvert {
     })
     PayRefundCreateReqDTO convert(String userIp, TradeAfterSaleDO afterSale,
                                   TradeOrderProperties orderProperties);
+
+    PageResult<TradeAfterSaleRespVO> convertPage(PageResult<TradeAfterSaleDO> page);
 
 }

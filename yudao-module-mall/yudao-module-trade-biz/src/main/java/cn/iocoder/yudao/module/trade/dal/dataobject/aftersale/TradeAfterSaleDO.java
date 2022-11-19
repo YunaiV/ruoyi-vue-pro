@@ -81,6 +81,12 @@ public class TradeAfterSaleDO extends BaseDO {
      */
     private Long orderId;
     /**
+     * 订单流水号
+     *
+     * 冗余 {@link TradeOrderDO#getNo()}
+     */
+    private String orderNo;
+    /**
      * 交易订单项编号
      *
      * 关联 {@link TradeOrderItemDO#getId()}

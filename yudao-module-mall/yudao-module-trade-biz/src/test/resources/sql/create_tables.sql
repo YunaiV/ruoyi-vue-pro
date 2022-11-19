@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS "trade_after_sale" (
     "apply_description" varchar,
     "apply_pic_urls" varchar,
     "order_id" bigint NOT NULL,
+    "order_no" varchar NOT NULL,
     "order_item_id" bigint NOT NULL,
     "spu_id" bigint NOT NULL,
     "spu_name" varchar NOT NULL,

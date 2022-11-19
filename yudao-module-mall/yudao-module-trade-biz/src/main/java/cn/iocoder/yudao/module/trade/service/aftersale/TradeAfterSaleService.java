@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.trade.service.aftersale;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDisagreeReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRefuseReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 
 /**
  * 交易售后 Service 接口
@@ -11,6 +14,14 @@ import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSa
  * @author 芋道源码
  */
 public interface TradeAfterSaleService {
+
+    /**
+     * 获得交易售后分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 交易售后分页
+     */
+    PageResult<TradeAfterSaleDO> getAfterSalePage(TradeAfterSalePageReqVO pageReqVO);
 
     /**
      * 【会员】创建交易售后

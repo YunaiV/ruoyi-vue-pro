@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.trade.service.aftersale;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -18,7 +20,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static java.util.Arrays.asList;
@@ -84,4 +89,44 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
         assertNull(afterSale.getReceiveReason());
     }
 
+    @Test
+    public void testGetAfterSalePage() {
+        // mock 数据
+        TradeAfterSaleDO dbAfterSale = randomPojo(TradeAfterSaleDO.class, o -> { // 等会查询到
+            o.setNo("202211190847450020500077");
+            o.setStatus(TradeAfterSaleStatusEnum.APPLY.getStatus());
+            o.setType(TradeAfterSaleTypeEnum.RETURN_AND_REFUND.getType());
+            o.setOrderNo("202211190847450020500011");
+            o.setSpuName("芋艿");
+            o.setCreateTime(buildTime(2022, 1, 15));
+        });
+        tradeAfterSaleMapper.insert(dbAfterSale);
+        // 测试 no 不匹配
+        tradeAfterSaleMapper.insert(cloneIgnoreId(dbAfterSale, o -> o.setNo("202211190847450020500066")));
+        // 测试 status 不匹配
+        tradeAfterSaleMapper.insert(cloneIgnoreId(dbAfterSale, o -> o.setStatus(TradeAfterSaleStatusEnum.SELLER_REFUSE.getStatus())));
+        // 测试 type 不匹配
+        tradeAfterSaleMapper.insert(cloneIgnoreId(dbAfterSale, o -> o.setType(TradeAfterSaleTypeEnum.REFUND.getType())));
+        // 测试 orderNo 不匹配
+        tradeAfterSaleMapper.insert(cloneIgnoreId(dbAfterSale, o -> o.setOrderNo("202211190847450020500022")));
+        // 测试 spuName 不匹配
+        tradeAfterSaleMapper.insert(cloneIgnoreId(dbAfterSale, o -> o.setSpuName("土豆")));
+        // 测试 createTime 不匹配
+        tradeAfterSaleMapper.insert(cloneIgnoreId(dbAfterSale, o -> o.setCreateTime(buildTime(2022, 1, 20))));
+        // 准备参数
+        TradeAfterSalePageReqVO reqVO = new TradeAfterSalePageReqVO();
+        reqVO.setNo("20221119084745002050007");
+        reqVO.setStatus(TradeAfterSaleStatusEnum.APPLY.getStatus());
+        reqVO.setType(TradeAfterSaleTypeEnum.RETURN_AND_REFUND.getType());
+        reqVO.setOrderNo("20221119084745002050001");
+        reqVO.setSpuName("芋");
+        reqVO.setCreateTime(new LocalDateTime[]{buildTime(2022, 1, 1), buildTime(2022, 1, 16)});
+
+        // 调用
+        PageResult<TradeAfterSaleDO> pageResult = tradeAfterSaleService.getAfterSalePage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbAfterSale, pageResult.getList().get(0));
+    }
 }

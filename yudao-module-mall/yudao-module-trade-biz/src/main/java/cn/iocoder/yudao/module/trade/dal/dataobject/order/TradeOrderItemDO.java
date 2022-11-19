@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -153,7 +154,7 @@ public class TradeOrderItemDO extends BaseDO {
      * 商品属性
      */
     @Data
-    public static class Property {
+    public static class Property implements Serializable {
 
         /**
          * 属性编号

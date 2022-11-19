@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.trade.enums.order;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 /**
  * 交易订单项 - 售后状态
@@ -11,11 +14,13 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Getter
-public enum TradeOrderItemAfterSaleStatusEnum {
+public enum TradeOrderItemAfterSaleStatusEnum implements IntArrayValuable {
 
     NONE(0, "未申请"),
     APPLY(1, "已申请"),
     SUCCESS(2, "申请成功");
+
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderItemAfterSaleStatusEnum::getStatus).toArray();
 
     /**
      * 状态值
@@ -28,6 +33,11 @@ public enum TradeOrderItemAfterSaleStatusEnum {
 
     // TODO 芋艿：EXPIRED 已失效不允许申请售后
     // TODO 芋艿：PART_AFTER_SALE 部分售后
+
+    @Override
+    public int[] array() {
+        return ARRAYS;
+    }
 
     /**
      * 判断指定状态，是否正处于【未申请】状态

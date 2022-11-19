@@ -1,7 +1,12 @@
 package cn.iocoder.yudao.module.trade.controller.admin.aftersale;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDisagreeReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRespVO;
+import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -12,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
@@ -26,6 +32,14 @@ public class TradeAfterSaleController {
 
     @Resource
     private TradeAfterSaleService afterSaleService;
+
+    @GetMapping("/page")
+    @ApiOperation("获得交易售后分页")
+    @PreAuthorize("@ss.hasPermission('trade:after-sale:query')")
+    public CommonResult<PageResult<TradeAfterSaleRespVO>> getAfterSalePage(@Valid TradeAfterSalePageReqVO pageVO) {
+        PageResult<TradeAfterSaleDO> pageResult = afterSaleService.getAfterSalePage(pageVO);
+        return success(TradeAfterSaleConvert.INSTANCE.convertPage(pageResult));
+    }
 
     @PutMapping("/agree")
     @ApiOperation("同意售后")

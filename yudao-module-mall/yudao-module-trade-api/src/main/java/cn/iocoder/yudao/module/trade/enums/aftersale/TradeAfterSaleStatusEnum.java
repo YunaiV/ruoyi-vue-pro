@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.trade.enums.aftersale;
 
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 /**
  * 售后状态的枚举
@@ -12,7 +15,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum TradeAfterSaleStatusEnum {
+public enum TradeAfterSaleStatusEnum implements IntArrayValuable {
 
     APPLY(10,"申请中"),
     SELLER_AGREE(20, "卖家通过"), // 卖家通过售后
@@ -25,6 +28,8 @@ public enum TradeAfterSaleStatusEnum {
     SELLER_REFUSE(63,"卖家拒绝收货"), // 卖家拒绝收货，终止售后
     ;
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeAfterSaleStatusEnum::getStatus).toArray();
+
     /**
      * 状态
      */
@@ -33,5 +38,10 @@ public enum TradeAfterSaleStatusEnum {
      * 状态名
      */
     private final String name;
+
+    @Override
+    public int[] array() {
+        return ARRAYS;
+    }
 
 }

@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 import static cn.hutool.core.text.CharSequenceUtil.*;
+import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.hutool.core.util.RandomUtil.randomInt;
 
 /**
  * 代码生成器的 Builder，负责：
@@ -128,6 +130,7 @@ public class CodegenBuilder {
             // 初始化 Column 列的默认字段
             processColumnOperation(column); // 处理 CRUD 相关的字段的默认值
             processColumnUI(column); // 处理 UI 相关的字段的默认值
+            processColumnExample(column); // 处理字段的 swagger example 示例
         }
         return columns;
     }
@@ -166,6 +169,44 @@ public class CodegenBuilder {
         // 兜底，设置默认为 input 类型
         if (column.getHtmlType() == null) {
             column.setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
+        }
+    }
+
+    /**
+     * 处理字段的 swagger example 示例
+     *
+     * @param column 字段
+     */
+    private void processColumnExample(CodegenColumnDO column) {
+        // id、price、count 等可能是整数的后缀
+        if (StrUtil.endWithAnyIgnoreCase(column.getJavaField(), "id", "price", "count")) {
+            column.setExample(String.valueOf(randomInt(1, Short.MAX_VALUE)));
+            return;
+        }
+        // name
+        if (StrUtil.endWithIgnoreCase(column.getJavaField(), "name")) {
+            column.setExample(randomEle(new String[]{"张三", "李四", "王五", "赵六", "芋艿"}));
+            return;
+        }
+        // status
+        if (StrUtil.endWithAnyIgnoreCase(column.getJavaField(), "status", "type")) {
+            column.setExample(randomEle(new String[]{"1", "2"}));
+            return;
+        }
+        // url
+        if (StrUtil.endWithIgnoreCase(column.getColumnName(), "url")) {
+            column.setExample("https://www.iocoder.cn");
+            return;
+        }
+        // reason
+        if (StrUtil.endWithIgnoreCase(column.getColumnName(), "reason")) {
+            column.setExample(randomEle(new String[]{"不喜欢", "不对", "不好", "不香"}));
+            return;
+        }
+        // description、memo、remark
+        if (StrUtil.endWithAnyIgnoreCase(column.getColumnName(), "description", "memo", "remark")) {
+            column.setExample(randomEle(new String[]{"你猜", "随便", "你说的对"}));
+            return;
         }
     }
 
