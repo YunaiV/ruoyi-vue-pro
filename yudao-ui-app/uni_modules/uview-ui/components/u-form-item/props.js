@@ -15,6 +15,11 @@ export default {
             type: [String, Boolean],
             default: uni.$u.props.formItem.borderBottom
         },
+        // label的位置，left-左边，top-上边
+        labelPosition: {
+            type: String,
+            default: uni.$u.props.formItem.labelPosition
+        },
         // label的宽度，单位px
         labelWidth: {
             type: [String, Number],

@@ -19,11 +19,17 @@
 			class="u-notice__content"
 			ref="u-notice__content"
 		>
-			<text
+			<view
 				ref="u-notice__content__text"
 				class="u-notice__content__text"
-				:style="[textStyle]"
-			>{{text}}</text>
+				:style="[animationStyle]"
+			>
+				<text
+					v-for="(item, index) in innerText"
+					:key="index"
+					:style="[textStyle]"
+				>{{item}}</text>
+			</view>
 		</view>
 		<view
 			class="u-notice__right-icon"
@@ -118,11 +124,28 @@
 			textStyle() {
 				let style = {}
 				style.color = this.color
-				style.animationDuration = this.animationDuration
-				style.animationPlayState = this.animationPlayState
 				style.fontSize = uni.$u.addUnit(this.fontSize)
 				return style
 			},
+			animationStyle() {
+				let style = {}
+				style.animationDuration = this.animationDuration
+				style.animationPlayState = this.animationPlayState
+				return style
+			},
+			// 内部对用户传入的数据进一步分割，放到多个text标签循环，否则如果用户传入的字符串很长（100个字符以上）
+			// 放在一个text标签中进行滚动，在低端安卓机上，动画可能会出现抖动现象，需要分割到多个text中可解决此问题
+			innerText() {
+				let result = [],
+					// 每组text标签的字符长度
+					len = 20
+				const textArr = this.text.split('')
+				for (let i = 0; i < textArr.length; i += len) {
+					// 对拆分的后的text进行slice分割，得到的为数组再进行join拼接为字符串
+					result.push(textArr.slice(i, i + len).join(''))
+				}
+				return result
+			}
 		},
 		mounted() {
 			// #ifdef APP-PLUS
@@ -289,6 +312,7 @@
 				white-space: nowrap;
 				animation: u-loop-animation 10s linear infinite both;
 				/* #endif */
+				@include flex(row);
 			}
 		}
 
