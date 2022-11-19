@@ -10,43 +10,22 @@
       </view>
       <view class="info-item">
         <view class="label">昵称：</view>
-        <view v-if="!nameEditOn" class="info">
-          <view class="value">{{ userInfo.nickname }}</view>
-          <u-icon
-            class="btn"
-            name="edit-pen"
-            @click="
-              tempName = userInfo.nickname
-              nameEditOn = true
-            "
-          ></u-icon>
-        </view>
-        <view v-else class="name-edit">
-          <u--input maxlength="10" border="bottom" v-model="tempName"></u--input>
-          <view class="edit-btn-group">
-            <u-tag class="edit-btn" text="保存" plain size="mini" type="primary" @click="handleSaveBtnClick"></u-tag>
-            <u-tag
-              class="edit-btn"
-              text="取消"
-              plain
-              size="mini"
-              type="info"
-              @click="
-                tempName = ''
-                nameEditOn = false
-              "
-            ></u-tag>
-          </view>
+        <view class="info">
+          <u--input maxlength="10" :border="borderStyle" v-model="userInfo.nickname" @focus="borderStyle = 'bottom'" inputAlign="right" @blur="borderStyle = 'none'" @change="handleNameChange"></u--input>
         </view>
       </view>
       <view class="info-item">
         <view class="label">手机：</view>
         <view class="info">
           <view class="value">{{ userInfo.mobile }}</view>
-          <u-icon class="btn" name="edit-pen"></u-icon>
         </view>
       </view>
     </view>
+
+    <view v-if="nameUpdateVisible" class="btn-group">
+      <u-button type="primary" text="保存" customStyle="margin-top: 50px" @click="handleSaveBtnClick"></u-button>
+    </view>
+
   </view>
 </template>
 
@@ -62,8 +41,13 @@ export default {
         mobile: ''
       },
       avatarFiles: [],
-      nameEditOn: false,
-      tempName: ''
+      tempName: '',
+      borderStyle: 'none'
+    }
+  },
+  computed: {
+    nameUpdateVisible: function () {
+      return this.userInfo.nickname !== this.tempName
     }
   },
   onLoad() {
@@ -73,6 +57,7 @@ export default {
     loadUserInfoData() {
       getUserInfo().then(res => {
         this.userInfo = res.data
+        this.tempName = this.userInfo.nickname
       })
     },
     handleAvatarClick() {
@@ -86,11 +71,22 @@ export default {
         }
       })
     },
+    handleNameChange(val) {
+      let str = uni.$u.trim(val, 'all')
+      this.$nextTick(() => {
+        this.userInfo.nickname = str
+      })
+    },
     handleSaveBtnClick() {
-      updateNickname({ nickname: this.tempName }).then(res => {
-        this.nameEditOn = false;
-        this.userInfo.nickname = this.tempName
+      updateNickname({ nickname: this.userInfo.nickname }).then(res => {
+        this.tempName  = this.userInfo.nickname
         this.$store.commit('SET_USER_INFO', this.userInfo)
+        uni.$u.toast('已保存')
+        setTimeout(() => {
+          uni.switchTab({
+            url: '/pages/user/user'
+          })
+        }, 300)
       })
     }
   }
@@ -107,7 +103,7 @@ export default {
       font-size: 30rpx;
     }
     .info {
-      @include flex-right;
+      @include flex-left;
       .value {
         font-size: 30rpx;
       }
@@ -125,5 +121,9 @@ export default {
       }
     }
   }
+}
+
+.btn-group {
+  padding: 0 30rpx;
 }
 </style>

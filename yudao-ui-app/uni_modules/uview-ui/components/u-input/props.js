@@ -177,6 +177,11 @@ export default {
 		formatter: {
 			type: [Function, null],
 			default: uni.$u.props.input.formatter
+		},
+		// 是否忽略组件内对文本合成系统事件的处理
+		ignoreCompositionEvent: {
+			type: Boolean,
+			default: true
 		}
 	}
 }

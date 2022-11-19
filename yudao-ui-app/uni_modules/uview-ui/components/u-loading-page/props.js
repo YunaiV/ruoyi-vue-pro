@@ -35,6 +35,11 @@ export default {
             type: [String, Number],
             default: uni.$u.props.loadingPage.fontSize
         },
+		// 图标大小
+		iconSize: {
+		    type: [String, Number],
+		    default: uni.$u.props.loadingPage.fontSize
+		},
         // 加载中图标的颜色，只能rgb或者十六进制颜色值
         loadingColor: {
             type: String,

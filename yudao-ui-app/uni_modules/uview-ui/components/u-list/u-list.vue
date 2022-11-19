@@ -29,9 +29,7 @@
 		@scrolltolower="scrolltolower"
 		@scrolltoupper="scrolltoupper"
 	>
-		<view :style="{
-			paddingTop: `${offset}px`
-		}">
+		<view>
 			<slot />
 		</view>
 	</scroll-view>

@@ -66,7 +66,6 @@
  * @property {String}			confirmText			确认按钮的文字（默认 '确定' ）
  * @property {String}			cancelColor			取消按钮的颜色（默认 '#909193' ）
  * @property {String}			confirmColor		确认按钮的颜色（默认 '#3c9cff' ）
- * @property {Array}			singleIndex			选择器只有一列时，默认选中项的索引，从0开始（默认 0 ）
  * @property {String | Number}	visibleItemCount	每列中可见选项的数量（默认 5 ）
  * @property {String}			keyName				选项对象中，需要展示的属性键名（默认 'text' ）
  * @property {Boolean}			closeOnClickOverlay	是否允许点击遮罩关闭选择器（默认 false ）
@@ -161,7 +160,7 @@ export default {
 			this.setIndexs(value)
 
 			this.$emit('change', {
-				// #ifndef MP-WEIXIN
+				// #ifndef MP-WEIXIN || MP-LARK
 				// 微信小程序不能传递this，会因为循环引用而报错
 				picker: this,
 				// #endif

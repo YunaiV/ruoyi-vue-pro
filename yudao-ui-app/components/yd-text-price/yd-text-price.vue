@@ -11,7 +11,7 @@
  * 此组件简单的显示特定样式的(人名币)价格数字
  */
 export default {
-  name: 'custom-text-price',
+  name: 'yd-text-price',
   components: {},
   props: {
     price: {

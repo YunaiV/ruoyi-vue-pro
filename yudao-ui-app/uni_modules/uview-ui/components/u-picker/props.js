@@ -50,11 +50,6 @@ export default {
             type: String,
             default: uni.$u.props.picker.confirmColor
         },
-        // 选择器只有一列时，默认选中项的索引，从0开始
-        singleIndex: {
-            type: [String, Number],
-            default: uni.$u.props.picker.singleIndex
-        },
         // 每列中可见选项的数量
         visibleItemCount: {
             type: [String, Number],
