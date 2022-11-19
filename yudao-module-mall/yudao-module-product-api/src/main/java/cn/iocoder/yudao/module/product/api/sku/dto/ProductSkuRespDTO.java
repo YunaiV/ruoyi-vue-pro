@@ -19,7 +19,7 @@ public class ProductSkuRespDTO {
      */
     private Long id;
     /**
-     * 商品 SKU 名字
+     * SPU 名字
      */
     private String name;
     /**

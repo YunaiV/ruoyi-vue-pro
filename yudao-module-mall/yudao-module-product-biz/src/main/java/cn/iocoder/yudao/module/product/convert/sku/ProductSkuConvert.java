@@ -32,7 +32,13 @@ public interface ProductSkuConvert {
 
     List<ProductSkuRespVO> convertList(List<ProductSkuDO> list);
 
-    List<ProductSkuDO> convertSkuDOList(List<ProductSkuCreateOrUpdateReqVO> list);
+    List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list);
+
+    default List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list, String spuName) {
+        List<ProductSkuDO> result = convertList06(list);
+        result.forEach(item -> item.setSpuName(spuName));
+        return result;
+    }
 
     ProductSkuRespDTO convert02(ProductSkuDO bean);
 

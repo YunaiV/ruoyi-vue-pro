@@ -80,15 +80,6 @@
                   <ImageUpload v-model="scope.row.picUrl" :limit="1" :isShowTip="false" style="width: 100px; height: 50px"/>
                 </template>
               </el-table-column>
-              <template v-if="this.specSwitch">
-                <el-table-column label="sku名称" :render-header="addRedStar" key="91">
-                  <template slot-scope="scope">
-                    <el-form-item :prop="'rates.'+ scope.$index + '.name'" :rules="[{required: true, trigger: 'change'}]">
-                      <el-input v-model="scope.row.name"/>
-                    </el-form-item>
-                  </template>
-                </el-table-column>
-              </template>
               <el-table-column label="市场价(元)" :render-header="addRedStar" key="92">
                 <template slot-scope="scope">
                   <el-form-item :prop="'rates.'+ scope.$index + '.marketPrice'" :rules="[{required: true, trigger: 'change'}]">

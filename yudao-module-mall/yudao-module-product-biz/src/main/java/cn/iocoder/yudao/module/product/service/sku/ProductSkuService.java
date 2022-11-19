@@ -55,17 +55,19 @@ public interface ProductSkuService {
      * 批量创建 SKU
      *
      * @param spuId 商品 SPU 编号
+     * @para spuName 商品 SPU 名称
      * @param list SKU 对象集合
      */
-    void createSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> list);
+    void createSkus(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> list);
 
     /**
      * 根据 SPU 编号，批量更新它的 SKU 信息
      *
      * @param spuId SPU 编码
+     * @para spuName 商品 SPU 名称
      * @param skus SKU 的集合
      */
-    void updateSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus);
+    void updateSkus(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skus);
 
     /**
      * 更新 SKU 库存（增量）
