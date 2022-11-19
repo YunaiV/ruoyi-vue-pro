@@ -16,6 +16,7 @@ public interface TradeAfterSaleMapper extends BaseMapperX<TradeAfterSaleDO> {
                 .likeIfPresent(TradeAfterSaleDO::getNo, reqVO.getNo())
                 .eqIfPresent(TradeAfterSaleDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(TradeAfterSaleDO::getType, reqVO.getType())
+                .eqIfPresent(TradeAfterSaleDO::getWay, reqVO.getWay())
                 .likeIfPresent(TradeAfterSaleDO::getOrderNo, reqVO.getOrderNo())
                 .likeIfPresent(TradeAfterSaleDO::getSpuName, reqVO.getSpuName())
                 .betweenIfPresent(TradeAfterSaleDO::getCreateTime, reqVO.getCreateTime())

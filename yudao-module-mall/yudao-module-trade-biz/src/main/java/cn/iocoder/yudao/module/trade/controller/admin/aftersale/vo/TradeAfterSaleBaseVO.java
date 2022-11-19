@@ -22,13 +22,17 @@ public class TradeAfterSaleBaseVO {
     @NotNull(message = "售后流水号不能为空")
     private String no;
 
-    @ApiModelProperty(value = "售后状态", required = true, example = "2", notes = "参见 TradeAfterSaleStatusEnum 枚举")
+    @ApiModelProperty(value = "售后状态", required = true, example = "10", notes = "参见 TradeAfterSaleStatusEnum 枚举")
     @NotNull(message = "售后状态不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "售后类型", required = true, example = "2", notes = "参见 TradeAfterSaleTypeEnum 枚举")
+    @ApiModelProperty(value = "售后类型", required = true, example = "20", notes = "参见 TradeAfterSaleTypeEnum 枚举")
     @NotNull(message = "售后类型不能为空")
     private Integer type;
+
+    @ApiModelProperty(value = "售后方式", required = true, example = "10", notes = "参见 TradeAfterSaleWayEnum 枚举")
+    @NotNull(message = "售后方式不能为空")
+    private Integer way;
 
     @ApiModelProperty(value = "用户编号", required = true, example = "30337")
     @NotNull(message = "用户编号不能为空")

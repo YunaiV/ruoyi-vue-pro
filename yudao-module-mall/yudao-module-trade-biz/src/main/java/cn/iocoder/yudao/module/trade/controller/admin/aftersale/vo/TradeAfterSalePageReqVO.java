@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -24,13 +25,17 @@ public class TradeAfterSalePageReqVO extends PageParam {
     @ApiModelProperty(value = "售后流水号", example = "202211190847450020500077", notes = "模糊匹配")
     private String no;
 
-    @ApiModelProperty(value = "售后状态", example = "2", notes = "参见 TradeAfterSaleStatusEnum 枚举")
+    @ApiModelProperty(value = "售后状态", example = "10", notes = "参见 TradeAfterSaleStatusEnum 枚举")
     @InEnum(value = TradeAfterSaleStatusEnum.class, message = "售后状态必须是 {value}")
     private Integer status;
 
-    @ApiModelProperty(value = "售后类型", example = "2", notes = "参见 TradeAfterSaleTypeEnum 枚举")
+    @ApiModelProperty(value = "售后类型", example = "20", notes = "参见 TradeAfterSaleTypeEnum 枚举")
     @InEnum(value = TradeAfterSaleTypeEnum.class, message = "售后类型必须是 {value}")
     private Integer type;
+
+    @ApiModelProperty(value = "售后方式", example = "10", notes = "参见 TradeAfterSaleWayEnum 枚举")
+    @InEnum(value = TradeAfterSaleWayEnum.class, message = "售后方式必须是 {value}")
+    private Integer way;
 
     @ApiModelProperty(value = "订单编号", example = "18078", notes = "模糊匹配")
     private String orderNo;

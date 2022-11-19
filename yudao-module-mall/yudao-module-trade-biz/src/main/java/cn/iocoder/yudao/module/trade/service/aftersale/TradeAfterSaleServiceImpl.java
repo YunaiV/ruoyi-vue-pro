@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.aftersale.TradeAfterSaleMapper;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
@@ -88,7 +89,6 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         if (!TradeOrderItemAfterSaleStatusEnum.isNone(orderItem.getAfterSaleStatus())) {
             throw exception(AFTER_SALE_CREATE_FAIL_ORDER_ITEM_APPLIED);
         }
-        // TODO 芋艿：超过一定时间，不允许售后
 
         // 申请的退款金额，不能超过商品的价格
         if (createReqVO.getRefundPrice() > orderItem.getOrderDividePrice()) {
@@ -100,6 +100,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
+        // TODO 芋艿：超过一定时间，不允许售后
         // 已取消，无法发起售后
         if (TradeOrderStatusEnum.isCanceled(order.getStatus())) {
             throw exception(AFTER_SALE_CREATE_FAIL_ORDER_STATUS_CANCELED);
@@ -109,7 +110,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
             throw exception(AFTER_SALE_CREATE_FAIL_ORDER_STATUS_NO_PAID);
         }
         // 如果是【退货退款】的情况，需要额外校验是否发货
-        if (createReqVO.getType().equals(TradeAfterSaleTypeEnum.RETURN_AND_REFUND.getType())
+        if (createReqVO.getWay().equals(TradeAfterSaleWayEnum.RETURN_AND_REFUND.getWay())
             && !TradeOrderStatusEnum.haveDelivered(order.getStatus())) {
             throw exception(AFTER_SALE_CREATE_FAIL_ORDER_STATUS_NO_DELIVERED);
         }
@@ -117,16 +118,21 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
     }
 
     private TradeAfterSaleDO createAfterSale(AppTradeAfterSaleCreateReqVO createReqVO,
-                                             TradeOrderItemDO tradeOrderItem) {
+                                             TradeOrderItemDO orderItem) {
         // 创建售后单
-        TradeAfterSaleDO afterSale = TradeAfterSaleConvert.INSTANCE.convert(createReqVO, tradeOrderItem);
+        TradeAfterSaleDO afterSale = TradeAfterSaleConvert.INSTANCE.convert(createReqVO, orderItem);
         afterSale.setNo(RandomUtil.randomString(10)); // TODO 芋艿：优化 no 生成逻辑
         afterSale.setStatus(TradeAfterSaleStatusEnum.APPLY.getStatus());
+        // 标记是售中还是售后
+        TradeOrderDO order = tradeOrderService.getOrder(orderItem.getUserId(), orderItem.getOrderId());
+        afterSale.setOrderNo(order.getNo()); // 记录 orderNo 订单流水，方便后续检索
+        afterSale.setType(TradeOrderStatusEnum.isCompleted(order.getStatus())
+            ? TradeAfterSaleTypeEnum.AFTER_SALE.getType() : TradeAfterSaleTypeEnum.IN_SALE.getType());
         // TODO 退还积分
         tradeAfterSaleMapper.insert(afterSale);
 
         // 更新交易订单项的售后状态
-        tradeOrderService.updateOrderItemAfterSaleStatus(tradeOrderItem.getId(),
+        tradeOrderService.updateOrderItemAfterSaleStatus(orderItem.getId(),
                 TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(),
                 TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), null);
 
@@ -145,7 +151,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         // 更新售后单的状态
         // 情况一：退款：标记为 WAIT_REFUND 状态。后续等退款发起成功后，在标记为 COMPLETE 状态
         // 情况二：退货退款：需要等用户退货后，才能发起退款
-        Integer newStatus = afterSale.getType().equals(TradeAfterSaleTypeEnum.REFUND.getType()) ?
+        Integer newStatus = afterSale.getType().equals(TradeAfterSaleWayEnum.REFUND.getWay()) ?
                 TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus() : TradeAfterSaleStatusEnum.SELLER_AGREE.getStatus();
         updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.APPLY.getStatus(), new TradeAfterSaleDO()
                 .setStatus(newStatus).setAuditUserId(userId).setAuditTime(LocalDateTime.now()));

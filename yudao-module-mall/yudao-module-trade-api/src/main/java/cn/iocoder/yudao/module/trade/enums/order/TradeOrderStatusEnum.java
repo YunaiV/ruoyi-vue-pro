@@ -53,6 +53,16 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
     }
 
     /**
+     * 判断指定状态，是否正处于【已完成】状态
+     *
+     * @param status 指定状态
+     * @return 是否
+     */
+    public static boolean isCompleted(Integer status) {
+        return ObjectUtil.equals(status, COMPLETED.getStatus());
+    }
+
+    /**
      * 判断指定状态，是否有过【已付款】状态
      *
      * @param status 指定状态

@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS "trade_after_sale" (
     "no" varchar NOT NULL,
     "status" int NOT NULL,
     "type" int NOT NULL,
+    "way" int NOT NULL,
     "user_id" bigint NOT NULL,
     "apply_reason" varchar NOT NULL,
     "apply_description" varchar,

@@ -60,6 +60,11 @@ export const DICT_TYPE = {
   // ========== MALL - PRODUCT 模块 ==========
   PRODUCT_SPU_STATUS: 'product_spu_status', // 商品 SPU 状态
 
+  // ========== MALL - ORDER 模块 ==========
+  TRADE_AFTER_SALE_STATUS: 'trade_after_sale_status', // 售后 - 状态
+  TRADE_AFTER_SALE_WAY: 'trade_after_sale_way', // 售后 - 方式
+  TRADE_AFTER_SALE_TYPE: 'trade_after_sale_type', // 售后 - 类型
+
   // ========== MALL - PROMOTION 模块 ==========
   PROMOTION_DISCOUNT_TYPE: 'promotion_discount_type', // 优惠类型
   PROMOTION_PRODUCT_SCOPE: 'promotion_product_scope', // 营销的商品范围

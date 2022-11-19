@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -42,6 +43,12 @@ public class TradeAfterSaleDO extends BaseDO {
      * 枚举 {@link TradeAfterSaleStatusEnum}
      */
     private Integer status;
+    /**
+     * 售后方式
+     *
+     * 枚举 {@link TradeAfterSaleWayEnum}
+     */
+    private Integer way;
     /**
      * 售后类型
      *

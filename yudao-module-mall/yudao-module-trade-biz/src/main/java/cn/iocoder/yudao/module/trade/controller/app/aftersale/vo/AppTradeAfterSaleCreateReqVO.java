@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.trade.controller.app.aftersale.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,10 +18,10 @@ public class AppTradeAfterSaleCreateReqVO {
     @NotNull(message = "订单项编号不能为空")
     private Long orderItemId;
 
-    @ApiModelProperty(name = "售后类型", required = true, example = "1", notes = "对应 TradeAfterSaleTypeEnum 枚举")
-    @NotNull(message = "售后类型不能为空")
-    @InEnum(value = TradeAfterSaleTypeEnum.class, message = "售后类型必须是 {value}")
-    private Integer type;
+    @ApiModelProperty(name = "售后方式", required = true, example = "1", notes = "对应 TradeAfterSaleWayEnum 枚举")
+    @NotNull(message = "售后方式不能为空")
+    @InEnum(value = TradeAfterSaleWayEnum.class, message = "售后方式必须是 {value}")
+    private Integer way;
 
     @ApiModelProperty(name = "退款金额", required = true, example = "100", notes = "单位：分")
     @NotNull(message = "退款金额不能为空")
