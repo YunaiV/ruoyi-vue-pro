@@ -71,7 +71,6 @@ public class TradeOrderDO extends BaseDO {
      * 枚举 {@link TradeOrderStatusEnum}
      */
     private Integer status;
-    // TODO 芋艿：要不要存储 prod_name 购买的商品名门？
     /**
      * 购买的商品数量
      */

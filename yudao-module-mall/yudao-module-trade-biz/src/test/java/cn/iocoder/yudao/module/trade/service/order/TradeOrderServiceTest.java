@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
@@ -18,17 +17,16 @@ import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderConfig;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
@@ -208,7 +206,6 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderItemDO01.getOrderPartPrice(), 7);
         assertEquals(tradeOrderItemDO01.getOrderDividePrice(), 35);
         assertEquals(tradeOrderItemDO01.getAfterSaleStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
-        assertEquals(tradeOrderItemDO01.getRefundTotal(), 0);
         // 断言 TradeOrderItemDO 订单（第 2 个）
         TradeOrderItemDO tradeOrderItemDO02 = tradeOrderItemDOs.get(1);
         assertNotNull(tradeOrderItemDO02.getId());
@@ -229,20 +226,14 @@ class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderItemDO02.getOrderPartPrice(), 15);
         assertEquals(tradeOrderItemDO02.getOrderDividePrice(), 25);
         assertEquals(tradeOrderItemDO02.getAfterSaleStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
-        assertEquals(tradeOrderItemDO02.getRefundTotal(), 0);
         // 校验调用
-        verify(productSkuApi).updateSkuStock(argThat(new ArgumentMatcher<ProductSkuUpdateStockReqDTO>() {
-
-            @Override
-            public boolean matches(ProductSkuUpdateStockReqDTO updateStockReqDTO) {
-                assertEquals(updateStockReqDTO.getItems().size(), 2);
-                assertEquals(updateStockReqDTO.getItems().get(0).getId(), 1L);
-                assertEquals(updateStockReqDTO.getItems().get(0).getIncrCount(), 3);
-                assertEquals(updateStockReqDTO.getItems().get(1).getId(), 2L);
-                assertEquals(updateStockReqDTO.getItems().get(1).getIncrCount(), 4);
-                return true;
-            }
-
+        verify(productSkuApi).updateSkuStock(argThat(updateStockReqDTO -> {
+            assertEquals(updateStockReqDTO.getItems().size(), 2);
+            assertEquals(updateStockReqDTO.getItems().get(0).getId(), 1L);
+            assertEquals(updateStockReqDTO.getItems().get(0).getIncrCount(), 3);
+            assertEquals(updateStockReqDTO.getItems().get(1).getId(), 2L);
+            assertEquals(updateStockReqDTO.getItems().get(1).getIncrCount(), 4);
+            return true;
         }));
         verify(couponApi).useCoupon(argThat(reqDTO -> {
             assertEquals(reqDTO.getId(), reqVO.getCouponId());

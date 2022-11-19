@@ -38,6 +38,7 @@ public class ProductSkuDO extends BaseDO {
     /**
      * 商品 SKU 名字
      */
+    @Deprecated // TODO 芋艿：参考有赞，不需要 sku 的标题
     private String name;
     /**
      * SPU 编号

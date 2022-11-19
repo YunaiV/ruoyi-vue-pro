@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@TableName(value = "trade_refund")
+@TableName(value = "trade_after_sale")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)

@@ -61,6 +61,8 @@ public class TradeOrderItemDO extends BaseDO {
     private List<Property> properties;
     /**
      * 商品名称
+     *
+     * 冗余 ProductSpuDO 的 name 字段
      */
     private String name;
     /**
@@ -136,7 +138,7 @@ public class TradeOrderItemDO extends BaseDO {
 
     // ========== 退款基本信息 ==========
     /**
-     * 退款状态
+     * 售后状态
      *
      * 枚举 {@link TradeOrderItemAfterSaleStatusEnum}
      *
