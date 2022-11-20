@@ -1,13 +1,16 @@
 package cn.iocoder.yudao.module.trade.service.aftersale;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleLogDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.dal.mysql.aftersale.TradeAfterSaleLogMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.aftersale.TradeAfterSaleMapper;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleTypeEnum;
@@ -45,6 +48,8 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
 
     @Resource
     private TradeAfterSaleMapper tradeAfterSaleMapper;
+    @Resource
+    private TradeAfterSaleLogMapper tradeAfterSaleLogMapper;
 
     @MockBean
     private TradeOrderService tradeOrderService;
@@ -76,7 +81,7 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
 
         // 调用
         Long afterSaleId = tradeAfterSaleService.createAfterSale(userId, createReqVO);
-        // 断言
+        // 断言（TradeAfterSaleDO）
         TradeAfterSaleDO afterSale = tradeAfterSaleMapper.selectById(afterSaleId);
         assertNotNull(afterSale.getNo());
         assertEquals(afterSale.getStatus(), TradeAfterSaleStatusEnum.APPLY.getStatus());
@@ -91,6 +96,15 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
         assertNull(afterSale.getLogisticsNo());
         assertNull(afterSale.getDeliveryTime());
         assertNull(afterSale.getReceiveReason());
+        // 断言（TradeAfterSaleLogDO）
+        TradeAfterSaleLogDO afterSaleLog = tradeAfterSaleLogMapper.selectList().get(0);
+        assertEquals(afterSaleLog.getUserId(), userId);
+        assertEquals(afterSaleLog.getUserType(), UserTypeEnum.MEMBER.getValue());
+        assertEquals(afterSaleLog.getAfterSaleId(), afterSaleId);
+        assertPojoEquals(afterSale, orderItem, "id", "creator", "createTime", "updater", "updateTime");
+        assertNull(afterSaleLog.getBeforeStatus());
+        assertEquals(afterSaleLog.getAfterStatus(), TradeAfterSaleStatusEnum.APPLY.getStatus());
+        assertEquals(afterSaleLog.getContent(), TradeAfterSaleStatusEnum.APPLY.getContent());
     }
 
     @Test

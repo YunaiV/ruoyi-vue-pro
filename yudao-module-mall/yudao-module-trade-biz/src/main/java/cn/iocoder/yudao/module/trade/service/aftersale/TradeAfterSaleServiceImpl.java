@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.aftersale;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
@@ -12,8 +13,10 @@ import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSa
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleLogDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.dal.mysql.aftersale.TradeAfterSaleLogMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.aftersale.TradeAfterSaleMapper;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleTypeEnum;
@@ -48,6 +51,8 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
 
     @Resource
     private TradeAfterSaleMapper tradeAfterSaleMapper;
+    @Resource
+    private TradeAfterSaleLogMapper tradeAfterSaleLogMapper;
 
     @Resource
     private PayRefundApi payRefundApi;
@@ -136,7 +141,9 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
                 TradeOrderItemAfterSaleStatusEnum.NONE.getStatus(),
                 TradeOrderItemAfterSaleStatusEnum.APPLY.getStatus(), null);
 
-        // TODO 记录售后日志
+        // 记录售后日志
+        createAfterSaleLog(orderItem.getUserId(), UserTypeEnum.MEMBER.getValue(),
+                afterSale, null, afterSale.getStatus());
 
         // TODO 发送售后消息
         return afterSale;
@@ -156,7 +163,9 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.APPLY.getStatus(), new TradeAfterSaleDO()
                 .setStatus(newStatus).setAuditUserId(userId).setAuditTime(LocalDateTime.now()));
 
-        // TODO 记录售后日志
+        // 记录售后日志
+        createAfterSaleLog(userId, UserTypeEnum.ADMIN.getValue(),
+                afterSale, afterSale.getStatus(), newStatus);
 
         // TODO 发送售后消息
     }
@@ -173,7 +182,9 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
                 .setStatus(newStatus).setAuditUserId(userId).setAuditTime(LocalDateTime.now())
                 .setAuditReason(auditReqVO.getAuditReason()));
 
-        // TODO 记录售后日志
+        // 记录售后日志
+        createAfterSaleLog(userId, UserTypeEnum.ADMIN.getValue(),
+                afterSale, afterSale.getStatus(), newStatus);
 
         // TODO 发送售后消息
 
@@ -225,7 +236,9 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
                 .setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo())
                 .setDeliveryTime(deliveryReqVO.getDeliveryTime()));
 
-        // TODO 记录售后日志
+        // 记录售后日志
+        createAfterSaleLog(userId, UserTypeEnum.MEMBER.getValue(),
+                afterSale, afterSale.getStatus(), TradeAfterSaleStatusEnum.BUYER_DELIVERY.getStatus());
 
         // TODO 发送售后消息
     }
@@ -240,7 +253,9 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.BUYER_DELIVERY.getStatus(), new TradeAfterSaleDO()
                 .setStatus(TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus()).setReceiveTime(LocalDateTime.now()));
 
-        // TODO 记录售后日志
+        // 记录售后日志
+        createAfterSaleLog(userId, UserTypeEnum.ADMIN.getValue(),
+                afterSale, afterSale.getStatus(), TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus());
 
         // TODO 发送售后消息
     }
@@ -262,7 +277,9 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
                 .setStatus(TradeAfterSaleStatusEnum.SELLER_REFUSE.getStatus()).setReceiveTime(LocalDateTime.now())
                 .setReceiveReason(confirmReqVO.getRefuseMemo()));
 
-        // TODO 记录售后日志
+        // 记录售后日志
+        createAfterSaleLog(userId, UserTypeEnum.ADMIN.getValue(),
+                afterSale, afterSale.getStatus(), TradeAfterSaleStatusEnum.SELLER_REFUSE.getStatus());
 
         // TODO 发送售后消息
 
@@ -308,7 +325,9 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         updateAfterSaleStatus(afterSale.getId(), TradeAfterSaleStatusEnum.WAIT_REFUND.getStatus(), new TradeAfterSaleDO()
                 .setStatus(TradeAfterSaleStatusEnum.COMPLETE.getStatus()).setRefundTime(LocalDateTime.now()));
 
-        // TODO 记录售后日志
+        // 记录售后日志
+        createAfterSaleLog(userId, UserTypeEnum.ADMIN.getValue(),
+                afterSale, afterSale.getStatus(), TradeAfterSaleStatusEnum.COMPLETE.getStatus());
 
         // TODO 发送售后消息
 
@@ -330,6 +349,15 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
                 tradeAfterSaleMapper.updateById(new TradeAfterSaleDO().setId(afterSale.getId()).setPayRefundId(payRefundId));
             }
         });
+    }
+
+    private void createAfterSaleLog(Long userId, Integer userType, TradeAfterSaleDO afterSale,
+                                    Integer beforeStatus, Integer afterStatus) {
+        TradeAfterSaleLogDO afterSaleLog = new TradeAfterSaleLogDO().setUserId(userId).setUserType(userType)
+                .setAfterSaleId(afterSale.getId()).setOrderId(afterSale.getOrderId())
+                .setOrderItemId(afterSale.getOrderItemId()).setBeforeStatus(beforeStatus).setAfterStatus(afterStatus)
+                .setContent(TradeAfterSaleStatusEnum.valueOf(afterStatus).getContent());
+        tradeAfterSaleLogMapper.insert(afterSaleLog);
     }
 
 }
