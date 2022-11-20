@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDisagreeReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRefuseReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRespPageItemVO;
 import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
@@ -79,6 +80,15 @@ public class TradeAfterSaleController {
     @PreAuthorize("@ss.hasPermission('trade:after-sale:receive')")
     public CommonResult<Boolean> receiveAfterSale(@RequestParam("id") Long id) {
         afterSaleService.receiveAfterSale(getLoginUserId(), id);
+        return success(true);
+    }
+
+    @PutMapping("/receive")
+    @ApiOperation("确认收货")
+    @ApiImplicitParam(name = "id", value = "售后编号", required = true, example = "1")
+    @PreAuthorize("@ss.hasPermission('trade:after-sale:receive')")
+    public CommonResult<Boolean> refuseAfterSale(TradeAfterSaleRefuseReqVO refuseReqVO) {
+        afterSaleService.refuseAfterSale(getLoginUserId(), refuseReqVO);
         return success(true);
     }
 

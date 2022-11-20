@@ -70,9 +70,9 @@ public interface TradeAfterSaleService {
      * 【管理员】拒绝收货
      *
      * @param userId 管理员用户编号
-     * @param confirmReqVO 收货 Request 信息
+     * @param refuseReqVO 拒绝收货 Request 信息
      */
-    void refuseAfterSale(Long userId, TradeAfterSaleRefuseReqVO confirmReqVO);
+    void refuseAfterSale(Long userId, TradeAfterSaleRefuseReqVO refuseReqVO);
 
     /**
      * 【管理员】确认退款
@@ -82,5 +82,13 @@ public interface TradeAfterSaleService {
      * @param id 售后编号
      */
     void refundAfterSale(Long userId, String userIp, Long id);
+
+    /**
+     * 【会员】取消售后
+     *
+     * @param userId 会员用户编号
+     * @param id 交易售后编号
+     */
+    void cancelAfterSale(Long userId, Long id);
 
 }

@@ -5,13 +5,11 @@ import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSa
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -38,6 +36,14 @@ public class AppTradeAfterSaleController {
     @ApiOperation(value = "退回货物")
     public CommonResult<Boolean> deliveryAfterSale(@RequestBody AppTradeAfterSaleDeliveryReqVO deliveryReqVO) {
         afterSaleService.deliveryAfterSale(getLoginUserId(), deliveryReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping(value = "/cancel")
+    @ApiOperation(value = "取消售后")
+    @ApiImplicitParam(name = "id", value = "售后编号", required = true, example = "1")
+    public CommonResult<Boolean> cancelAfterSale(@RequestParam("id") Long id) {
+        afterSaleService.cancelAfterSale(getLoginUserId(), id);
         return success(true);
     }
 
