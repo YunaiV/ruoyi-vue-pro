@@ -47,5 +47,5 @@ public interface ErrorCodeConstants {
 
     // ========== 秒杀活动 1003008000 ==========
     ErrorCode SECKILL_ACTIVITY_NOT_EXISTS = new ErrorCode(1003008000, "秒杀活动不存在");
-
+    ErrorCode SECKILL_TIME_NOT_EXISTS = new ErrorCode(1003008001, "秒杀时段不存在");
 }
