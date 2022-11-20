@@ -30,6 +30,7 @@ public interface TradeOrderConvert {
     TradeOrderConvert INSTANCE = Mappers.getMapper(TradeOrderConvert.class);
 
     @Mappings({
+            @Mapping(target = "id", ignore = true),
             @Mapping(source = "createReqVO.couponId", target = "couponId"),
             @Mapping(target = "remark", ignore = true),
             @Mapping(source = "createReqVO.remark", target = "userRemark"),
