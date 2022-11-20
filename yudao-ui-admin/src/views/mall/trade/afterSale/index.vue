@@ -46,20 +46,28 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
+    <!-- Tab 选项：真正的内容在 Lab -->
+    <el-tabs v-model="activeTab" type="card" @tab-click="tabClick" style="margin-top: -40px;">
+      <el-tab-pane v-for="tab in statusTabs" :key="tab.value" :label="tab.label" :name="tab.value" />
+    </el-tabs>
+
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="退款编号" align="center" prop="no" />
-      <el-table-column label="订单编号" align="center" prop="orderNo" />
-      <el-table-column label="订单编号" align="center" prop="orderNo" />
-      <el-table-column label="商品信息" align="center" prop="status" width="auto" min-width="300">
+      <el-table-column label="订单编号" align="center" prop="orderNo" /> <!-- TODO 芋艿：未来要加个订单链接 -->
+      <el-table-column label="商品信息" align="center" prop="spuName" width="auto" min-width="300">
         <!-- TODO @小红：样式不太对，辛苦改改 -->
 <!--        <div slot-scope="{ row }" class="goods-info">-->
 <!--          <img :src="row.picUrl"/>-->
 <!--          <span class="ellipsis-2" :title="row.name">{{row.name}}</span>-->
 <!--        </div>-->
       </el-table-column>
-      <el-table-column label="订单金额" align="center" prop="refundPrice" />
-      <el-table-column label="买家" align="center" prop="userId" />
+      <el-table-column label="订单金额" align="center" prop="refundPrice">
+        <template v-slot="scope">
+          <span>￥{{ (scope.row.refundPrice / 100.0).toFixed(2) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="买家" align="center" prop="user.nickname" /> <!-- TODO 芋艿：未来要加个会员链接 -->
       <el-table-column label="申请时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -77,8 +85,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
-<!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"-->
-<!--                     v-hasPermi="['trade:after-sale:update']">修改</el-button>-->
+          <el-button size="mini" type="text" icon="el-icon-thumb"
+                     >处理退款</el-button>
+<!--      @click="handleUpdate(scope.row)"    v-hasPermi="['trade:after-sale:update']"-->
         </template>
       </el-table-column>
     </el-table>
@@ -91,6 +100,7 @@
 <script>
 import { getAfterSalePage } from "@/api/mall/trade/afterSale";
 import { datePickerOptions } from "@/utils/constants";
+import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 
 export default {
   name: "AfterSale",
@@ -124,12 +134,25 @@ export default {
         way: null,
         type: null,
       },
+      // Tab 筛选
+      activeTab: 'all',
+      statusTabs: [{
+        label: '全部',
+        value: 'all'
+      }],
       // 静态变量
       datePickerOptions: datePickerOptions
     };
   },
   created() {
     this.getList();
+    // 设置 statuses 过滤
+    for (const dict of getDictDatas(DICT_TYPE.TRADE_AFTER_SALE_STATUS)) {
+      this.statusTabs.push({
+        label: dict.label,
+        value: dict.value
+      })
+    }
   },
   methods: {
     /** 查询列表 */
@@ -145,13 +168,23 @@ export default {
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNo = 1;
+      this.activeTab = this.queryParams.status ? this.queryParams.status : 'all'; // 处理 tab
       this.getList();
     },
     /** 重置按钮操作 */
     resetQuery() {
       this.resetForm("queryForm");
+      this.activeTab = 'all'; // 处理 tab
       this.handleQuery();
     },
+    /** tab 切换 */
+    tabClick(tab) {
+      this.queryParams.status = tab.name === 'all' ? undefined : tab.name;
+      this.getList();
+    },
+    goToDetail (row) {
+      this.$router.push({ path: '/mall/trade/order/detail', query: { orderNo: row.orderNo }})
+    }
   }
 };
 </script>

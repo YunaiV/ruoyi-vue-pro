@@ -9,7 +9,7 @@ import lombok.Data;
  * @author 芋道源码
  */
 @Data
-public class UserRespDTO {
+public class MemberUserRespDTO {
 
     /**
      * 用户ID

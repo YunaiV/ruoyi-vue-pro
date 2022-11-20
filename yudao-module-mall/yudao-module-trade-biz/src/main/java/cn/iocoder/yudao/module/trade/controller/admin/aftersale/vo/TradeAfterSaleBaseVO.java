@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo;
 
-import cn.iocoder.yudao.module.trade.controller.admin.base.property.ProductPropertyRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyRespVO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;

@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.trade.controller.admin.aftersale;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDisagreeReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRespPageItemVO;
 import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
@@ -18,8 +21,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -33,12 +38,22 @@ public class TradeAfterSaleController {
     @Resource
     private TradeAfterSaleService afterSaleService;
 
+    @Resource
+    private MemberUserApi memberUserApi;
+
     @GetMapping("/page")
     @ApiOperation("获得交易售后分页")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:query')")
-    public CommonResult<PageResult<TradeAfterSaleRespVO>> getAfterSalePage(@Valid TradeAfterSalePageReqVO pageVO) {
+    public CommonResult<PageResult<TradeAfterSaleRespPageItemVO>> getAfterSalePage(@Valid TradeAfterSalePageReqVO pageVO) {
         PageResult<TradeAfterSaleDO> pageResult = afterSaleService.getAfterSalePage(pageVO);
-        return success(TradeAfterSaleConvert.INSTANCE.convertPage(pageResult));
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty());
+        }
+
+        // 拼接数据
+        Map<Long, MemberUserRespDTO> memberUsers = memberUserApi.getUserMap(
+                convertSet(pageResult.getList(), TradeAfterSaleDO::getUserId));
+        return success(TradeAfterSaleConvert.INSTANCE.convertPage(pageResult, memberUsers));
     }
 
     @PutMapping("/agree")
