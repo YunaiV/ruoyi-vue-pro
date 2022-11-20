@@ -4,6 +4,8 @@ import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
 
+import javax.validation.constraints.NotNull;
+
 @ApiModel("管理后台 - 秒杀活动 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -21,5 +23,8 @@ public class SeckillActivityRespVO extends SeckillActivityBaseVO {
 
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;
+
+    @ApiModelProperty(value = "秒杀时段id", required = true)
+    private String timeId;
 
 }

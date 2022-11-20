@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckillactivity;
 
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.annotations.*;
@@ -14,11 +16,13 @@ import java.io.IOException;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
 
 import cn.iocoder.yudao.module.promotion.controller.admin.seckillactivity.vo.*;
@@ -65,6 +69,9 @@ public class SeckillActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
     public CommonResult<SeckillActivityRespVO> getSeckillActivity(@RequestParam("id") Long id) {
         SeckillActivityDO seckillActivity = seckillActivityService.getSeckillActivity(id);
+        if (seckillActivity == null) {
+            return success(null);
+        }
         return success(SeckillActivityConvert.INSTANCE.convert(seckillActivity));
     }
 

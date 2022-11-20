@@ -20,6 +20,6 @@ public class SeckillActivityCreateReqVO extends SeckillActivityBaseVO {
 
     @ApiModelProperty(value = "秒杀时段id", required = true)
     @NotNull(message = "秒杀时段id不能为空")
-    private Long timeId;
+    private String timeId;
 
 }

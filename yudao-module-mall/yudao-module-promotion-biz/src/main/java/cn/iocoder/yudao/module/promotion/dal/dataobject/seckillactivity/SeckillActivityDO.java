@@ -55,7 +55,7 @@ public class SeckillActivityDO extends BaseDO {
     /**
      * 秒杀时段id
      */
-    private Long timeId;
+    private String timeId;
     /**
      * 付款订单数
      */

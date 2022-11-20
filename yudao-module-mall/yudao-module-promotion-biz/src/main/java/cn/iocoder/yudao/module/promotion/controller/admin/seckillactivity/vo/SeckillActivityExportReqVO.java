@@ -19,7 +19,7 @@ public class SeckillActivityExportReqVO {
     private Integer status;
 
     @ApiModelProperty(value = "秒杀时段id")
-    private Long timeId;
+    private String timeId;
 
     @ApiModelProperty(value = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
