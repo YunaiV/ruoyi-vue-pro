@@ -60,7 +60,7 @@ public class TradeCartController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除购物车商品")
-    @ApiImplicitParam(name = "skuId", value = "商品 SKU 编号的数组", required = true, example = "1024,2048", dataTypeClass = List.class)
+    @ApiImplicitParam(name = "skuIds", value = "商品 SKU 编号的数组", required = true, example = "1024,2048", dataTypeClass = List.class)
     @PreAuthenticated
     public CommonResult<Boolean> deleteCartItem(@RequestParam("skuIds") List<Long> skuIds) {
         cartService.deleteCartItems(getLoginUserId(), skuIds);
