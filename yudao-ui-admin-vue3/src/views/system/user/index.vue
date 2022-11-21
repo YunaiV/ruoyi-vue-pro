@@ -254,24 +254,26 @@ import {
   UploadInstance,
   UploadRawFile
 } from 'element-plus'
-import { handleTree } from '@/utils/tree'
-import { useI18n } from '@/hooks/web/useI18n'
-import { FormExpose } from '@/components/Form'
-import type { PostVO } from '@/api/system/post'
-import type { PermissionAssignUserRoleReqVO } from '@/api/system/permission/types'
-import { listSimpleDeptApi } from '@/api/system/dept'
-import { listSimplePostsApi } from '@/api/system/post'
-import { listSimpleRolesApi } from '@/api/system/role'
-import { aassignUserRoleApi, listUserRolesApi } from '@/api/system/permission'
-import { rules, allSchemas } from './user.data'
-import * as UserApi from '@/api/system/user'
-import download from '@/utils/download'
 import { useRouter } from 'vue-router'
+import { VxeGridInstance } from 'vxe-table'
+import { handleTree } from '@/utils/tree'
+import download from '@/utils/download'
 import { CommonStatusEnum } from '@/utils/constants'
 import { getAccessToken, getTenantId } from '@/utils/auth'
+import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { VxeGridInstance } from 'vxe-table'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { FormExpose } from '@/components/Form'
+import { rules, allSchemas } from './user.data'
+import * as UserApi from '@/api/system/user'
+import { listSimpleDeptApi } from '@/api/system/dept'
+import { listSimplePostsApi, PostVO } from '@/api/system/post'
+import { listSimpleRolesApi } from '@/api/system/role'
+import {
+  aassignUserRoleApi,
+  listUserRolesApi,
+  PermissionAssignUserRoleReqVO
+} from '@/api/system/permission'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
