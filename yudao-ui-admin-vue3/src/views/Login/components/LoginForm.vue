@@ -147,7 +147,8 @@ import {
   ElCol,
   ElLink,
   ElRow,
-  ElDivider
+  ElDivider,
+  ElLoading
 } from 'element-plus'
 import { reactive, ref, unref, onMounted, computed, watch } from 'vue'
 import * as LoginApi from '@/api/login'
@@ -247,6 +248,11 @@ const handleLogin = async (params) => {
     if (!res) {
       return
     }
+    ElLoading.service({
+      lock: true,
+      text: '正在加载系统中...',
+      background: 'rgba(0, 0, 0, 0.7)'
+    })
     if (loginData.loginForm.rememberMe) {
       Cookies.set('username', loginData.loginForm.username, { expires: 30 })
       Cookies.set('password', encrypt(loginData.loginForm.password), { expires: 30 })
@@ -265,6 +271,11 @@ const handleLogin = async (params) => {
     push({ path: redirect.value || permissionStore.addRouters[0].path })
   } catch {
     loginLoading.value = false
+  } finally {
+    setTimeout(() => {
+      const loadingInstance = ElLoading.service()
+      loadingInstance.close()
+    }, 400)
   }
 }
 
