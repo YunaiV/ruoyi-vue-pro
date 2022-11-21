@@ -53,7 +53,6 @@
       :print-config="{}"
       :export-config="{}"
       :data="tableData"
-      class="xtable"
     >
       <vxe-column title="菜单名称" field="name" width="200" tree-node>
         <template #default="{ row }">
