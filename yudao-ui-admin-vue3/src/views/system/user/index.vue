@@ -346,6 +346,25 @@ const handleCreate = async () => {
   // 重置表单
   deptId.value = null
   postIds.value = []
+  await nextTick()
+  if (allSchemas.formSchema[0].field !== 'username') {
+    unref(formRef)?.addSchema(
+      {
+        field: 'username',
+        label: '用户账号',
+        component: 'Input'
+      },
+      0
+    )
+    unref(formRef)?.addSchema(
+      {
+        field: 'password',
+        label: '用户密码',
+        component: 'InputPassword'
+      },
+      1
+    )
+  }
 }
 
 // 修改操作
