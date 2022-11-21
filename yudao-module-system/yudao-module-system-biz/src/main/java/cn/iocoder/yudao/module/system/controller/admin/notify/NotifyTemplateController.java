@@ -19,12 +19,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
+// TODO 芋艿：VO 类上的 swagger 注解完善下，例如说 swagger，枚举等等
 @Api(tags = "管理后台 - 站内信模版")
 @RestController
 @RequestMapping("/system/notify-template")
@@ -67,15 +67,6 @@ public class NotifyTemplateController {
         return success(NotifyTemplateConvert.INSTANCE.convert(notifyTemplate));
     }
 
-    @GetMapping("/list")
-    @ApiOperation("获得站内信模版列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    @PreAuthorize("@ss.hasPermission('system:notify-template:query')")
-    public CommonResult<List<NotifyTemplateRespVO>> getNotifyTemplateList(@RequestParam("ids") Collection<Long> ids) {
-        List<NotifyTemplateDO> list = notifyTemplateService.getNotifyTemplateList(ids);
-        return success(NotifyTemplateConvert.INSTANCE.convertList(list));
-    }
-
     @GetMapping("/page")
     @ApiOperation("获得站内信模版分页")
     @PreAuthorize("@ss.hasPermission('system:notify-template:query')")
@@ -95,5 +86,9 @@ public class NotifyTemplateController {
         List<NotifyTemplateExcelVO> datas = NotifyTemplateConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "站内信模版.xls", "数据", NotifyTemplateExcelVO.class, datas);
     }
+
+    // TODO @芋艿：参考 SmsTemplateController 的 sendNotify 写一个发送站内信的接口
+
+    // TODO @芋艿：参考 SmsSendServiceImpl，新建一个 NotifySendServiceImpl，用于提供出来给发送消息。注意，不要考虑异步发送，直接 insert 就可以了。也不用考虑发送后的回调
 
 }

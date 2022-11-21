@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.module.system.controller.admin.notify.vo.message;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -18,12 +22,13 @@ public class NotifyMessagePageReqVO extends PageParam {
     private String title;
 
     @ApiModelProperty(value = "是否已读 0-未读  1-已读")
-    private Integer readStatus;
+    private Boolean readStatus;
 
     @ApiModelProperty(value = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private Date[] createTime;
 
+    // TODO 芋艿：去掉 userId 和 userType，不要在 VO 里
 
     @ApiModelProperty(value = "用户编号", hidden = true)
     private Long userId;

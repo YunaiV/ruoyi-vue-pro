@@ -71,32 +71,6 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
         }).collect(Collectors.toList());
     }
 
-    @Override
-    public Long createNotifyMessage(NotifyMessageCreateReqVO createReqVO) {
-        // 插入
-        NotifyMessageDO notifyMessage = NotifyMessageConvert.INSTANCE.convert(createReqVO);
-        notifyMessageMapper.insert(notifyMessage);
-        // 返回
-        return notifyMessage.getId();
-    }
-
-    @Override
-    public void updateNotifyMessage(NotifyMessageUpdateReqVO updateReqVO) {
-        // 校验存在
-        this.validateNotifyMessageExists(updateReqVO.getId());
-        // 更新
-        NotifyMessageDO updateObj = NotifyMessageConvert.INSTANCE.convert(updateReqVO);
-        notifyMessageMapper.updateById(updateObj);
-    }
-
-    @Override
-    public void deleteNotifyMessage(Long id) {
-        // 校验存在
-        this.validateNotifyMessageExists(id);
-        // 删除
-        notifyMessageMapper.deleteById(id);
-    }
-
     private void validateNotifyMessageExists(Long id) {
         if (notifyMessageMapper.selectById(id) == null) {
             throw exception(NOTIFY_MESSAGE_NOT_EXISTS);
@@ -185,6 +159,7 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
         }
     }
 
+    // TODO 芋艿：批量更新，不要单条遍历哈。
     private void batchUpdateReadStatus(Collection<Long> ids) {
         if (CollUtil.isNotEmpty(ids)) {
             for (Long id : ids) {

@@ -38,7 +38,7 @@ public class UserNotifyMessageController {
     @Resource
     private NotifyMessageService notifyMessageService;
 
-
+    // TODO 芋艿：和 NotifyMessageController 的 page 合并
     @GetMapping("/page")
     @ApiOperation("获得站内信分页")
     public CommonResult<PageResult<NotifyMessageRespVO>> getNotifyMessagePage(@Valid NotifyMessagePageReqVO pageVO) {
@@ -48,6 +48,7 @@ public class UserNotifyMessageController {
         return success(NotifyMessageConvert.INSTANCE.convertPage(pageResult));
     }
 
+    // TODO @芋艿：url 改成 get-recent-list；方法名也改下。默认传入 size = 10；
     @GetMapping("/latest/list")
     @ApiOperation("获得最新10站内信列表")
     public CommonResult<List<NotifyMessageRespVO>> getNotifyLatestMessageList() {
@@ -56,6 +57,7 @@ public class UserNotifyMessageController {
         reqVO.setUserType(UserTypeEnum.ADMIN.getValue());
         reqVO.setPageNo(1);
         reqVO.setPageSize(10);
+        // TODO 芋艿：不要用分页写；
         PageResult<NotifyMessageDO> pageResult = notifyMessageService.getNotifyMessagePage(reqVO);
         if (CollUtil.isNotEmpty(pageResult.getList())) {
             return success(NotifyMessageConvert.INSTANCE.convertList(pageResult.getList()));
@@ -63,12 +65,14 @@ public class UserNotifyMessageController {
         return success(Collections.emptyList());
     }
 
+    // TODO @芋艿：get-unread-count
     @GetMapping("/unread/count")
     @ApiOperation("获得未读站内信数量")
     public CommonResult<Long> getUnreadNotifyMessageCount() {
         return success(notifyMessageService.getUnreadNotifyMessageCount(getLoginUserId(), UserTypeEnum.ADMIN.getValue()));
     }
 
+    // TODO @芋艿：把 get 站内信，和更新站内信已经读分开。其中更新单条和多条，使用一个接口就好列
     @GetMapping("/read")
     @ApiOperation("获得站内信")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
@@ -79,6 +83,7 @@ public class UserNotifyMessageController {
         return success(NotifyMessageConvert.INSTANCE.convert(notifyMessage));
     }
 
+    // TODO @芋艿：PutMapping；update-list-read
     @GetMapping("/read/list")
     @ApiOperation("批量标记已读")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
@@ -87,6 +92,7 @@ public class UserNotifyMessageController {
         return success(Boolean.TRUE);
     }
 
+    // TODO @芋艿：PutMapping：update-all-read
     @GetMapping("/read/all")
     @ApiOperation("所有未读消息标记已读")
     public CommonResult<Boolean> batchUpdateAllNotifyMessageReadStatus() {

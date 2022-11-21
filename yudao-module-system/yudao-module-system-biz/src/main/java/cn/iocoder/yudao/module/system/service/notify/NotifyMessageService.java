@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.system.service.notify;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessagePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,28 +13,6 @@ import java.util.List;
  * @author xrcoder
  */
 public interface NotifyMessageService {
-
-    /**
-     * 创建站内信
-     *
-     * @param createReqVO 创建信息
-     * @return 编号
-     */
-    Long createNotifyMessage(@Valid NotifyMessageCreateReqVO createReqVO);
-
-    /**
-     * 更新站内信
-     *
-     * @param updateReqVO 更新信息
-     */
-    void updateNotifyMessage(@Valid NotifyMessageUpdateReqVO updateReqVO);
-
-    /**
-     * 删除站内信
-     *
-     * @param id 编号
-     */
-    void deleteNotifyMessage(Long id);
 
     /**
      * 获得站内信

@@ -1,21 +1,23 @@
 package cn.iocoder.yudao.module.system.service.notify;
 
-import java.util.*;
-import javax.validation.*;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 站内信模版 Service 接口
  *
  * @author xrcoder
  */
+// TODO 芋艿：缺少单测，可以参考 SmsTemplateServiceTest 写下
 public interface NotifyTemplateService {
 
     /**

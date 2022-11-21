@@ -114,7 +114,6 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
         initLocalCache();
     }
 
-
     /**
      * 获得站内信模板，从缓存中
      *
