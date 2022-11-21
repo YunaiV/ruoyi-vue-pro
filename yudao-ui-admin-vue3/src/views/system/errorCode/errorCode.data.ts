@@ -45,8 +45,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'createTime',
       formatter: 'formatDate',
       isForm: false,
-      isSearch: true,
       search: {
+        show: true,
         itemRender: {
           name: 'XDataTimePicker'
         }
