@@ -31,38 +31,32 @@ public class NotifyTemplateDO extends BaseDO {
      */
     @TableId
     private Long id;
-
     /**
      * 模版编码
      */
     private String code;
-
     /**
      * 模版标题
      */
     private String title;
-
     /**
      * 模版内容
      */
     private String content;
-
     /**
      * 参数数组
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> params;
-
     /**
-     * 状态：1-启用 0-禁用
-     * <p>
+     * 状态
+     *
      * 枚举 {@link CommonStatusEnum}
      */
     private String status;
-
     /**
      * 备注
      */
-    private String remarks;
+    private String remark;
 
 }

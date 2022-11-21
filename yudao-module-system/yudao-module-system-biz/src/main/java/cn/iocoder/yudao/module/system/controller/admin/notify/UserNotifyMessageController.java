@@ -28,11 +28,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-/**
- * 管理后台 - 站内信-消息中心
- *
- * @author xrcoder
- */
+// TODO 芋艿：合并到 合并到 NotifyTemplateController 中
 @Api(tags = "管理后台 - 站内信-消息中心")
 @RestController
 @RequestMapping("/system/user/notify-message")

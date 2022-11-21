@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.notify;
 
-import lombok.*;
-import java.util.*;
-import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
+
+import java.util.Date;
 
 /**
  * 站内信 DO
@@ -27,14 +31,20 @@ public class NotifyMessageDO extends BaseDO {
     private Long id;
     /**
      * 站内信模版编号
+     *
+     * 关联 {@link NotifyTemplateDO#getId()}
      */
     private Long templateId;
     /**
      * 用户编号
+     *
+     * 关联 MemberUserDO 的 id 字段、或者 AdminUserDO 的 id 字段
      */
     private Long userId;
     /**
      * 用户类型
+     *
+     * 枚举 {@link UserTypeEnum}
      */
     private Integer userType;
     /**
@@ -46,11 +56,9 @@ public class NotifyMessageDO extends BaseDO {
      */
     private String content;
     /**
-     * 是否已读 0-未读  1-已读
-     *
-     * 枚举 {@link cn.iocoder.yudao.module.system.enums.notify.NotifyReadStatusEnum}
+     * 是否已读
      */
-    private Integer readStatus;
+    private Boolean readStatus;
     /**
      * 阅读时间
      */
