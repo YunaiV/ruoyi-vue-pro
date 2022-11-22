@@ -1,5 +1,19 @@
 import request from '@/config/axios'
 
+export type JobLogVO = {
+  id: number
+  jobId: number
+  handlerName: string
+  handlerParam: string
+  cronExpression: string
+  executeIndex: string
+  beginTime: string
+  endTime: string
+  duration: string
+  status: number
+  createTime: string
+}
+
 // 任务日志列表
 export const getJobLogPageApi = (params) => {
   return request.get({ url: '/infra/job-log/page', params })
