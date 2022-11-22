@@ -1,157 +1,3 @@
-<script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
-import * as RedisApi from '@/api/infra/redis'
-import { DICT_TYPE } from '@/utils/dict'
-import * as echarts from 'echarts'
-import { RedisKeyInfo, RedisMonitorInfoVO } from '@/api/infra/redis/types'
-import {
-  ElRow,
-  ElCard,
-  ElCol,
-  ElTable,
-  ElTableColumn,
-  ElScrollbar,
-  ElDescriptions,
-  ElDescriptionsItem,
-  ElMessage
-} from 'element-plus'
-const cache = ref<RedisMonitorInfoVO>()
-const keyListLoad = ref(true)
-const keyList = ref<RedisKeyInfo[]>([])
-// 基本信息
-const readRedisInfo = async () => {
-  const data = await RedisApi.getCacheApi()
-  cache.value = data
-  loadEchartOptions(data.commandStats)
-  const redisKeysInfo = await RedisApi.getKeyDefineListApi()
-  keyList.value = redisKeysInfo
-  keyListLoad.value = false //加载完成
-}
-// 图表
-const commandStatsRef = ref<HTMLElement>()
-
-const usedmemory = ref<HTMLDivElement>()
-
-const loadEchartOptions = (stats) => {
-  const commandStats = [] as any[]
-  const nameList = [] as string[]
-  stats.forEach((row) => {
-    commandStats.push({
-      name: row.command,
-      value: row.calls
-    })
-    nameList.push(row.command)
-  })
-
-  const commandStatsInstance = echarts.init(commandStatsRef.value!, 'macarons')
-
-  commandStatsInstance.setOption({
-    title: {
-      text: '命令统计',
-      left: 'center'
-    },
-    tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b} : {c} ({d}%)'
-    },
-    legend: {
-      type: 'scroll',
-      orient: 'vertical',
-      right: 30,
-      top: 10,
-      bottom: 20,
-      data: nameList,
-      textStyle: {
-        color: '#a1a1a1'
-      }
-    },
-    series: [
-      {
-        name: '命令',
-        type: 'pie',
-        radius: [20, 120],
-        center: ['40%', '60%'],
-        data: commandStats,
-        roseType: 'radius',
-        label: {
-          show: true
-        },
-        emphasis: {
-          label: {
-            show: true
-          },
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.5)'
-          }
-        }
-      }
-    ]
-  })
-
-  const usedMemoryInstance = echarts.init(usedmemory.value!, 'macarons')
-  usedMemoryInstance.setOption({
-    title: {
-      text: '内存使用情况',
-      left: 'center'
-    },
-    tooltip: {
-      formatter: '{b} <br/>{a} : ' + cache.value!.info.used_memory_human
-    },
-    series: [
-      {
-        name: '峰值',
-        type: 'gauge',
-        min: 0,
-        max: 100,
-        progress: {
-          show: true
-        },
-        detail: {
-          formatter: cache.value!.info.used_memory_human
-        },
-        data: [
-          {
-            value: parseFloat(cache.value!.info.used_memory_human),
-            name: '内存消耗'
-          }
-        ]
-      }
-    ]
-  })
-}
-const dialogVisible = ref(false)
-const keyTemplate = ref('')
-const cacheKeys = ref()
-const cacheForm = ref<{
-  key: string
-  value: string
-}>({
-  key: '',
-  value: ''
-})
-const openKeyTemplate = async (row: RedisKeyInfo) => {
-  keyTemplate.value = row.keyTemplate
-  cacheKeys.value = await RedisApi.getKeyListApi(row.keyTemplate)
-  dialogVisible.value = true
-}
-const handleDeleteKey = async (row) => {
-  RedisApi.deleteKeyApi(row)
-  ElMessage.success('删除成功')
-}
-const handleDeleteKeys = async (row) => {
-  RedisApi.deleteKeysApi(row)
-  ElMessage.success('删除成功')
-}
-const handleKeyValue = async (row) => {
-  const res = await RedisApi.getKeyValueApi(row)
-  cacheForm.value = res
-}
-onBeforeMount(() => {
-  readRedisInfo()
-})
-</script>
 <template>
   <el-scrollbar height="calc(100vh - 88px - 40px - 50px)">
     <el-row>
@@ -282,6 +128,163 @@ onBeforeMount(() => {
     </el-row>
   </XModal>
 </template>
+<script setup lang="ts">
+import { onBeforeMount, ref } from 'vue'
+import {
+  ElRow,
+  ElCard,
+  ElCol,
+  ElTable,
+  ElTableColumn,
+  ElScrollbar,
+  ElDescriptions,
+  ElDescriptionsItem
+} from 'element-plus'
+import * as echarts from 'echarts'
+import { DICT_TYPE } from '@/utils/dict'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useMessage } from '@/hooks/web/useMessage'
+import * as RedisApi from '@/api/infra/redis'
+import { RedisKeyInfo, RedisMonitorInfoVO } from '@/api/infra/redis/types'
+
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
+const cache = ref<RedisMonitorInfoVO>()
+const keyListLoad = ref(true)
+const keyList = ref<RedisKeyInfo[]>([])
+// 基本信息
+const readRedisInfo = async () => {
+  const data = await RedisApi.getCacheApi()
+  cache.value = data
+  loadEchartOptions(data.commandStats)
+  const redisKeysInfo = await RedisApi.getKeyDefineListApi()
+  keyList.value = redisKeysInfo
+  keyListLoad.value = false //加载完成
+}
+// 图表
+const commandStatsRef = ref<HTMLElement>()
+const usedmemory = ref<HTMLDivElement>()
+
+const loadEchartOptions = (stats) => {
+  const commandStats = [] as any[]
+  const nameList = [] as string[]
+  stats.forEach((row) => {
+    commandStats.push({
+      name: row.command,
+      value: row.calls
+    })
+    nameList.push(row.command)
+  })
+
+  const commandStatsInstance = echarts.init(commandStatsRef.value!, 'macarons')
+
+  commandStatsInstance.setOption({
+    title: {
+      text: '命令统计',
+      left: 'center'
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: '{a} <br/>{b} : {c} ({d}%)'
+    },
+    legend: {
+      type: 'scroll',
+      orient: 'vertical',
+      right: 30,
+      top: 10,
+      bottom: 20,
+      data: nameList,
+      textStyle: {
+        color: '#a1a1a1'
+      }
+    },
+    series: [
+      {
+        name: '命令',
+        type: 'pie',
+        radius: [20, 120],
+        center: ['40%', '60%'],
+        data: commandStats,
+        roseType: 'radius',
+        label: {
+          show: true
+        },
+        emphasis: {
+          label: {
+            show: true
+          },
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        }
+      }
+    ]
+  })
+
+  const usedMemoryInstance = echarts.init(usedmemory.value!, 'macarons')
+  usedMemoryInstance.setOption({
+    title: {
+      text: '内存使用情况',
+      left: 'center'
+    },
+    tooltip: {
+      formatter: '{b} <br/>{a} : ' + cache.value!.info.used_memory_human
+    },
+    series: [
+      {
+        name: '峰值',
+        type: 'gauge',
+        min: 0,
+        max: 100,
+        progress: {
+          show: true
+        },
+        detail: {
+          formatter: cache.value!.info.used_memory_human
+        },
+        data: [
+          {
+            value: parseFloat(cache.value!.info.used_memory_human),
+            name: '内存消耗'
+          }
+        ]
+      }
+    ]
+  })
+}
+const dialogVisible = ref(false)
+const keyTemplate = ref('')
+const cacheKeys = ref()
+const cacheForm = ref<{
+  key: string
+  value: string
+}>({
+  key: '',
+  value: ''
+})
+const openKeyTemplate = async (row: RedisKeyInfo) => {
+  keyTemplate.value = row.keyTemplate
+  cacheKeys.value = await RedisApi.getKeyListApi(row.keyTemplate)
+  dialogVisible.value = true
+}
+const handleDeleteKey = async (row) => {
+  RedisApi.deleteKeyApi(row)
+  message.success(t('common.delSuccess'))
+}
+const handleDeleteKeys = async (row) => {
+  RedisApi.deleteKeysApi(row)
+  message.success(t('common.delSuccess'))
+}
+const handleKeyValue = async (row) => {
+  const res = await RedisApi.getKeyValueApi(row)
+  cacheForm.value = res
+}
+onBeforeMount(() => {
+  readRedisInfo()
+})
+</script>
 <style scoped>
 .redis {
   height: 600px;
