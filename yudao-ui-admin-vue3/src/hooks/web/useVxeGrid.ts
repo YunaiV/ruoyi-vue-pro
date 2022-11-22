@@ -12,10 +12,11 @@ const message = useMessage() // 消息弹窗
 interface UseVxeGridConfig<T = any> {
   allSchemas: VxeAllSchemas
   topActionSlots?: boolean // 是否开启表格内顶部操作栏插槽
-  treeConfig?: VxeTablePropTypes.TreeConfig
-  getListApi: (option: any) => Promise<T>
-  deleteApi?: (option: any) => Promise<T>
-  exportListApi?: (option: any) => Promise<T>
+  treeConfig?: VxeTablePropTypes.TreeConfig // 树形表单配置
+  isList?: boolean // 是否不带分页的list
+  getListApi: (option: any) => Promise<T> // 获取列表接口
+  deleteApi?: (option: any) => Promise<T> // 删除接口
+  exportListApi?: (option: any) => Promise<T> // 导出接口
   exportName?: string // 导出文件夹名称
   queryParams?: any // 其他查询参数
 }
@@ -110,6 +111,24 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
 
   if (config?.treeConfig) {
     gridOptions.treeConfig = config.treeConfig
+  } else if (config?.isList) {
+    gridOptions.proxyConfig = {
+      seq: true, // 启用动态序号代理（分页之后索引自动计算为当前页的起始序号）
+      form: true, // 启用表单代理，当点击表单提交按钮时会自动触发 reload 行为
+      props: { result: 'data' },
+      ajax: {
+        query: ({ form }) => {
+          let queryParams: any = Object.assign({}, JSON.parse(JSON.stringify(form)))
+          if (config?.queryParams) {
+            queryParams = Object.assign(queryParams, config.queryParams)
+          }
+          gridOptions.loading = false
+          return new Promise(async (resolve) => {
+            resolve(await config?.getListApi(queryParams))
+          })
+        }
+      }
+    }
   } else {
     gridOptions.pagerConfig = {
       border: false, // 带边框

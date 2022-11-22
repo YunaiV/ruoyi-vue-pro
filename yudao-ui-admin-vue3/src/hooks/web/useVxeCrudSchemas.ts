@@ -156,20 +156,22 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
       searchSchema.push(searchSchemaItem)
     }
   })
-  // 添加搜索按钮
-  const buttons: VxeFormItemProps = {
-    span: 24,
-    align: 'center',
-    collapseNode: searchSchema.length > 3,
-    itemRender: {
-      name: '$buttons',
-      children: [
-        { props: { type: 'submit', content: t('common.query'), status: 'primary' } },
-        { props: { type: 'reset', content: t('common.reset') } }
-      ]
+  if (searchSchema.length > 0) {
+    // 添加搜索按钮
+    const buttons: VxeFormItemProps = {
+      span: 24,
+      align: 'center',
+      collapseNode: searchSchema.length > 3,
+      itemRender: {
+        name: '$buttons',
+        children: [
+          { props: { type: 'submit', content: t('common.query'), status: 'primary' } },
+          { props: { type: 'reset', content: t('common.reset') } }
+        ]
+      }
     }
+    searchSchema.push(buttons)
   }
-  searchSchema.push(buttons)
   return searchSchema
 }
 
