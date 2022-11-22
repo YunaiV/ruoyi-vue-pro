@@ -24,13 +24,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { ElTable, ElTableColumn } from 'element-plus'
+import { useMessage } from '@/hooks/web/useMessage'
 import { SystemUserSocialTypeEnum } from '@/utils/constants'
 import { getUserProfileApi, ProfileVO } from '@/api/system/user/profile'
 import { socialAuthRedirect, socialUnbind } from '@/api/system/user/socialUser'
-import { ElMessage } from 'element-plus'
 
+const message = useMessage()
 const socialUsers = ref<any[]>([])
 const userInfo = ref<ProfileVO>()
+
 const initSocial = async () => {
   const res = await getUserProfileApi()
   userInfo.value = res
@@ -59,7 +61,7 @@ const unbind = async (row) => {
   if (res) {
     row.openid = undefined
   }
-  ElMessage.success('解绑成功')
+  message.success('解绑成功')
 }
 
 onMounted(async () => {

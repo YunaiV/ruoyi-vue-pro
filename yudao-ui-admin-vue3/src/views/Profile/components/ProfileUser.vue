@@ -40,11 +40,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { getUserProfileApi, ProfileVO } from '@/api/system/user/profile'
 import { onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
 import UserAvatar from './UserAvatar.vue'
 import { useI18n } from '@/hooks/web/useI18n'
+import { getUserProfileApi, ProfileVO } from '@/api/system/user/profile'
+
 const { t } = useI18n()
 const userInfo = ref<ProfileVO>()
 const getUserInfo = async () => {

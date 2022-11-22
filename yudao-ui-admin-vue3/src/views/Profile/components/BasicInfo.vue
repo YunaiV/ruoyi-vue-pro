@@ -15,13 +15,14 @@ import { reactive, onMounted, unref, ref } from 'vue'
 import type { FormRules } from 'element-plus'
 import { ElMessage, ElRadioGroup, ElRadio } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
+import { FormSchema } from '@/types/form'
+import { FormExpose } from '@/components/Form'
 import {
   getUserProfileApi,
   updateUserProfileApi,
   UserProfileUpdateReqVO
 } from '@/api/system/user/profile'
-import { FormSchema } from '@/types/form'
-import { FormExpose } from '@/components/Form'
+
 const { t } = useI18n()
 // 表单校验
 const rules = reactive<FormRules>({

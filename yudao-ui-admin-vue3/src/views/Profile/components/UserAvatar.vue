@@ -94,6 +94,7 @@ import { VueCropper } from 'vue-cropper'
 import { ElRow, ElCol, ElUpload, ElMessage, ElDialog } from 'element-plus'
 import { propTypes } from '@/utils/propTypes'
 import { uploadAvatarApi } from '@/api/system/user/profile'
+
 const cropper = ref()
 const dialogVisible = ref(false)
 const cropperVisible = ref(false)
