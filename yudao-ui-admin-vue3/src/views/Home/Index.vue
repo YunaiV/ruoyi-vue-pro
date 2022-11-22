@@ -123,7 +123,7 @@
             <el-col v-for="item in shortcut" :key="`team-${item.name}`" :span="8" class="mb-10px">
               <div class="flex items-center">
                 <Icon :icon="item.icon" class="mr-10px" />
-                <el-link type="default" :underline="false" :href="item.url">
+                <el-link type="default" :underline="false" @click="setWatermark(item.name)">
                   {{ item.name }}
                 </el-link>
               </div>
@@ -168,6 +168,7 @@ import { ElRow, ElCol, ElSkeleton, ElCard, ElDivider, ElLink } from 'element-plu
 import { formatTime } from '@/utils'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useCache } from '@/hooks/web/useCache'
+import { useWatermark } from '@/hooks/web/useWatermark'
 import { Echart } from '@/components/Echart'
 import { CountTo } from '@/components/CountTo'
 import { Highlight } from '@/components/Highlight'
@@ -176,6 +177,7 @@ import { pieOptions, barOptions } from './echarts-data'
 
 const { t } = useI18n()
 const { wsCache } = useCache()
+const { setWatermark } = useWatermark()
 const loading = ref(true)
 const avatar = wsCache.get('user').user.avatar
 const username = wsCache.get('user').user.nickname
