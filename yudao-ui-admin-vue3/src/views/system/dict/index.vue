@@ -6,54 +6,36 @@
           <span>字典分类</span>
         </div>
       </template>
-      <Search
-        :schema="DictTypeSchemas.allSchemas.searchSchema"
-        @search="setTypeSearchParams"
-        @reset="setTypeSearchParams"
-      />
-      <!-- 操作工具栏 -->
-      <div class="mb-10px">
-        <XButton
-          type="primary"
-          preIcon="ep:zoom-in"
-          :title="t('action.add')"
-          v-hasPermi="['system:dict:create']"
-          @click="handleTypeCreate()"
-        />
-      </div>
-      <!-- 列表 -->
-      <Table
-        @row-click="onClickType"
-        :columns="DictTypeSchemas.allSchemas.tableColumns"
-        :selection="false"
-        :data="typeTableObject.tableList"
-        :loading="typeTableObject.loading"
-        :pagination="{
-          total: typeTableObject.total
-        }"
-        :highlight-current-row="true"
-        v-model:pageSize="typeTableObject.pageSize"
-        v-model:currentPage="typeTableObject.currentPage"
-        @register="typeRegister"
+      <vxe-grid
+        ref="xTypeGrid"
+        v-bind="typeGridOptions"
+        @cell-click="cellClickEvent"
+        class="xtable-scrollbar"
       >
-        <template #status="{ row }">
-          <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+        <template #toolbar_buttons>
+          <XButton
+            type="primary"
+            preIcon="ep:zoom-in"
+            :title="t('action.add')"
+            v-hasPermi="['system:dict:create']"
+            @click="handleTypeCreate()"
+          />
         </template>
-        <template #action="{ row }">
+        <template #actionbtns_default="{ row }">
           <XTextButton
             preIcon="ep:edit"
             :title="t('action.edit')"
             v-hasPermi="['system:dict:update']"
-            @click="handleTypeUpdate(row)"
+            @click="handleTypeUpdate(row.id)"
           />
           <XTextButton
             preIcon="ep:delete"
             :title="t('action.del')"
             v-hasPermi="['system:dict:delete']"
-            @click="delTypeList(row.id, false)"
+            @click="handleTypeDelete(row.id)"
           />
         </template>
-      </Table>
+      </vxe-grid>
     </el-card>
     <el-card class="w-1/2 dict" style="margin-left: 10px" :gutter="12" shadow="hover">
       <template #header>
@@ -66,51 +48,32 @@
         <span>请从左侧选择</span>
       </div>
       <div v-if="tableTypeSelect">
-        <Search
-          :schema="DictDataSchemas.allSchemas.searchSchema"
-          @search="setDataSearchParams"
-          @reset="setDataSearchParams"
-        />
-        <!-- 操作工具栏 -->
-        <div class="mb-10px">
-          <XButton
-            type="primary"
-            preIcon="ep:zoom-in"
-            :title="t('action.add')"
-            v-hasPermi="['system:dict:create']"
-            @click="handleDataCreate()"
-          />
-        </div>
-        <Table
-          :columns="DictDataSchemas.allSchemas.tableColumns"
-          :selection="false"
-          :data="dataTableObject.tableList"
-          :loading="dataTableObject.loading"
-          :pagination="{
-            total: dataTableObject.total
-          }"
-          v-model:pageSize="dataTableObject.pageSize"
-          v-model:currentPage="dataTableObject.currentPage"
-          @register="dataRegister"
-        >
-          <template #status="{ row }">
-            <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+        <!-- 列表 -->
+        <vxe-grid ref="xDataGrid" v-bind="dataGridOptions" class="xtable-scrollbar">
+          <template #toolbar_buttons>
+            <XButton
+              type="primary"
+              preIcon="ep:zoom-in"
+              :title="t('action.add')"
+              v-hasPermi="['system:dict:create']"
+              @click="handleDataCreate()"
+            />
           </template>
-          <template #action="{ row }">
+          <template #actionbtns_default="{ row }">
             <XTextButton
               v-hasPermi="['system:dict:update']"
               preIcon="ep:edit"
               :title="t('action.edit')"
-              @click="handleDataUpdate(row)"
+              @click="handleDataUpdate(row.id)"
             />
             <XTextButton
               v-hasPermi="['system:dict:delete']"
               preIcon="ep:delete"
               :title="t('action.del')"
-              @click="delDataList(row.id, false)"
+              @click="handleDataDelete(row.id)"
             />
           </template>
-        </Table>
+        </vxe-grid>
       </div>
     </el-card>
     <XModal id="dictModel" v-model="dialogVisible" :title="dialogTitle">
@@ -155,82 +118,81 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, unref, onMounted } from 'vue'
-import { DICT_TYPE } from '@/utils/dict'
+import { ref, unref, reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
+import { useMessage } from '@/hooks/web/useMessage'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { VxeGridInstance, VxeTableEvents } from 'vxe-table'
 import { FormExpose } from '@/components/Form'
-import { ElInput, ElTag } from 'element-plus'
+import { ElInput, ElTag, ElCard } from 'element-plus'
 import * as DictTypeSchemas from './dict.type'
 import * as DictDataSchemas from './dict.data'
-import { useTable } from '@/hooks/web/useTable'
-import { ElCard, ElMessage } from 'element-plus'
 import * as DictTypeApi from '@/api/system/dict/dict.type'
 import * as DictDataApi from '@/api/system/dict/dict.data'
 import { DictDataVO, DictTypeVO } from '@/api/system/dict/types'
+
 const { t } = useI18n() // 国际化
-// ========== 字典分类列表相关 ==========
+const message = useMessage() // 消息弹窗
+
+const xTypeGrid = ref<VxeGridInstance>() // 列表 Grid Ref
 const {
-  register: typeRegister,
-  tableObject: typeTableObject,
-  methods: typeMethods
-} = useTable<DictTypeVO>({
+  gridOptions: typeGridOptions,
+  getList: typeGetList,
+  deleteData: typeDeleteData
+} = useVxeGrid<DictTypeVO>({
+  allSchemas: DictTypeSchemas.allSchemas,
   getListApi: DictTypeApi.getDictTypePageApi,
-  delListApi: DictTypeApi.deleteDictTypeApi
+  deleteApi: DictTypeApi.deleteDictTypeApi
+})
+
+const xDataGrid = ref<VxeGridInstance>() // 列表 Grid Ref
+const queryParams = reactive({
+  dictType: null
 })
 const {
-  getList: getTypeList,
-  setSearchParams: setTypeSearchParams,
-  delList: delTypeList
-} = typeMethods
+  gridOptions: dataGridOptions,
+  getList: dataGetList,
+  deleteData: dataDeleteData
+} = useVxeGrid<DictDataVO>({
+  allSchemas: DictDataSchemas.allSchemas,
+  queryParams: queryParams,
+  getListApi: DictDataApi.getDictDataPageApi,
+  deleteApi: DictDataApi.deleteDictDataApi
+})
+// ========== 字典分类列表相关 ==========
 const dictTypeValue = ref('')
 // 字典分类修改操作
 const handleTypeCreate = () => {
   dictTypeValue.value = ''
   setDialogTile('typeCreate')
 }
-const handleTypeUpdate = async (row: DictTypeVO) => {
+const handleTypeUpdate = async (rowId: number) => {
   setDialogTile('typeUpdate')
   // 设置数据
-  const res = await DictTypeApi.getDictTypeApi(row.id)
+  const res = await DictTypeApi.getDictTypeApi(rowId)
   dictTypeValue.value = res.type
   unref(typeFormRef)?.setValues(res)
 }
-
-// ========== 字典数据列表相关 ==========
-const tableTypeSelect = ref(false)
-const {
-  register: dataRegister,
-  tableObject: dataTableObject,
-  methods: dataMethods
-} = useTable<DictDataVO>({
-  getListApi: DictDataApi.getDictDataPageApi,
-  delListApi: DictDataApi.deleteDictDataApi
-})
-const {
-  getList: getDataList,
-  setSearchParams: setDataSearchParams,
-  delList: delDataList
-} = dataMethods
 
 // 字典数据修改操作
 const handleDataCreate = () => {
   setDialogTile('dataCreate')
 }
-const handleDataUpdate = async (row: DictDataVO) => {
+const handleDataUpdate = async (rowId: number) => {
   setDialogTile('dataUpdate')
   // 设置数据
-  const res = await DictDataApi.getDictDataApi(row.id)
+  const res = await DictDataApi.getDictDataApi(rowId)
   unref(dataFormRef)?.setValues(res)
 }
 // 字典分类点击行事件
 const parentType = ref('')
-const onClickType = async (data: { [key: string]: any }) => {
+const tableTypeSelect = ref(false)
+const cellClickEvent: VxeTableEvents.CellClick = async ({ row }) => {
+  console.info(row['type'])
   tableTypeSelect.value = true
-  dataTableObject.params = {
-    dictType: data.type
-  }
-  getDataList()
-  parentType.value = data.type
+  queryParams.dictType = row['type']
+  await dataGetList(xDataGrid)
+  parentType.value = row['type']
 }
 // 弹出框
 const dialogVisible = ref(false) // 是否显示弹出层
@@ -246,6 +208,16 @@ const setDialogTile = (type: string) => {
   actionType.value = type
   dialogVisible.value = true
 }
+
+// 删除操作
+const handleTypeDelete = async (rowId: number) => {
+  await typeDeleteData(xTypeGrid, rowId)
+}
+
+const handleDataDelete = async (rowId: number) => {
+  await dataDeleteData(xDataGrid, rowId)
+}
+
 // 提交按钮
 const submitTypeForm = async () => {
   const elForm = unref(typeFormRef)?.getElFormRef()
@@ -259,16 +231,15 @@ const submitTypeForm = async () => {
         if (actionType.value === 'typeCreate') {
           data.type = dictTypeValue.value
           await DictTypeApi.createDictTypeApi(data)
-          ElMessage.success(t('common.createSuccess'))
+          message.success(t('common.createSuccess'))
         } else if (actionType.value === 'typeUpdate') {
           await DictTypeApi.updateDictTypeApi(data)
-          ElMessage.success(t('common.updateSuccess'))
+          message.success(t('common.updateSuccess'))
         }
-        // 操作成功，重新加载列表
-        await getTypeList()
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
+        typeGetList(xTypeGrid)
       }
     }
   })
@@ -285,23 +256,17 @@ const submitDataForm = async () => {
         if (actionType.value === 'dataCreate') {
           data.dictType = parentType.value
           await DictDataApi.createDictDataApi(data)
-          ElMessage.success(t('common.createSuccess'))
+          message.success(t('common.createSuccess'))
         } else if (actionType.value === 'dataUpdate') {
           await DictDataApi.updateDictDataApi(data)
-          ElMessage.success(t('common.updateSuccess'))
+          message.success(t('common.updateSuccess'))
         }
-        await getDataList()
-        // 操作成功，重新加载列表
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
+        dataGetList(xDataGrid)
       }
     }
   })
 }
-// 初始化查询
-onMounted(async () => {
-  await getTypeList()
-  typeTableObject.tableList[0] && onClickType(typeTableObject.tableList[0])
-})
 </script>
