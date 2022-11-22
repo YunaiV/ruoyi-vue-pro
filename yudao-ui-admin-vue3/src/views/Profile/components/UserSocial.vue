@@ -3,19 +3,19 @@
     <el-table-column type="seq" title="序号" width="60" fixed="left" />
     <el-table-column label="社交平台" align="left" width="120">
       <template #default="{ row }">
-        <img style="height: 20px; vertical-align: middle" :src="row.img" alt="" />
-        {{ row.title }}
+        <img class="h-5 align-middle" :src="row.img" alt="" />
+        <p class="mr-5">{{ row.title }}</p>
       </template>
     </el-table-column>
     <el-table-column label="操作" align="center">
       <template #default="{ row }">
         <template v-if="row.openid">
           已绑定
-          <XTextButton type="primary" @click="unbind(row)" title="(解绑)" />
+          <XTextButton type="primary" class="mr-5" @click="unbind(row)" title="(解绑)" />
         </template>
         <template v-else>
           未绑定
-          <XTextButton type="primary" @click="bind(row)" title="(绑定)" />
+          <XTextButton type="primary" class="mr-5" @click="bind(row)" title="(绑定)" />
         </template>
       </template>
     </el-table-column>
