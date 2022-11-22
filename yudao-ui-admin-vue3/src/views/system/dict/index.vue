@@ -188,7 +188,6 @@ const handleDataUpdate = async (rowId: number) => {
 const parentType = ref('')
 const tableTypeSelect = ref(false)
 const cellClickEvent: VxeTableEvents.CellClick = async ({ row }) => {
-  console.info(row['type'])
   tableTypeSelect.value = true
   queryParams.dictType = row['type']
   await dataGetList(xDataGrid)

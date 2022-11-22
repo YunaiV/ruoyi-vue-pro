@@ -182,7 +182,6 @@ const submitForm = async () => {
         const data = unref(formRef)?.formModel as DeptApi.DeptVO
         data.parentId = deptParentId.value
         data.leaderUserId = leaderUserId.value
-        console.info(data)
         if (actionType.value === 'create') {
           await DeptApi.createDeptApi(data)
           message.success(t('common.createSuccess'))
