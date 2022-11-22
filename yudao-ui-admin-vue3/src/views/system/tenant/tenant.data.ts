@@ -69,11 +69,9 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'expireTime',
       formatter: 'formatDate',
       form: {
-        show: true,
         component: 'DatePicker',
         componentProps: {
-          type: 'datetime',
-          valueFormat: 'x'
+          type: 'datetime'
         }
       }
     },

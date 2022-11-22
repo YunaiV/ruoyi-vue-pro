@@ -99,7 +99,6 @@
 </template>
 <script setup lang="ts">
 import { ref, unref, onMounted } from 'vue'
-import dayjs from 'dayjs'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
@@ -163,7 +162,6 @@ const handleUpdate = async (rowId: number) => {
   // 设置数据
   const res = await TenantApi.getTenantApi(rowId)
   tenantPackageId.value = res.packageId
-  res.expireTime = dayjs(res.expireTime).format('YYYY-MM-DD HH:mm:ss')
   unref(formRef)?.setValues(res)
 }
 
@@ -198,11 +196,9 @@ const submitForm = async () => {
         const data = unref(formRef)?.formModel as TenantApi.TenantVO
         data.packageId = tenantPackageId.value
         if (actionType.value === 'create') {
-          data.expireTime = dayjs(data.expireTime).valueOf().toString()
           await TenantApi.createTenantApi(data)
           message.success(t('common.createSuccess'))
         } else {
-          data.expireTime = dayjs(data.expireTime).valueOf().toString()
           await TenantApi.updateTenantApi(data)
           message.success(t('common.updateSuccess'))
         }
