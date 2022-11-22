@@ -137,7 +137,7 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { useIcon } from '@/hooks/web/useIcon'
+import { reactive, ref, unref, onMounted, computed, watch } from 'vue'
 import LoginFormTitle from './LoginFormTitle.vue'
 import {
   ElForm,
@@ -150,20 +150,24 @@ import {
   ElDivider,
   ElLoading
 } from 'element-plus'
-import { reactive, ref, unref, onMounted, computed, watch } from 'vue'
-import * as LoginApi from '@/api/login'
-import { setToken, setTenantId } from '@/utils/auth'
-import { usePermissionStore } from '@/store/modules/permission'
-import { useRouter } from 'vue-router'
-import { useI18n } from '@/hooks/web/useI18n'
-import { required } from '@/utils/formRules'
-import { Icon } from '@/components/Icon'
-import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'
-import type { RouteLocationNormalizedLoaded } from 'vue-router'
-import { Verify } from '@/components/Verifition'
 import Cookies from 'js-cookie'
+import { useRouter } from 'vue-router'
+import type { RouteLocationNormalizedLoaded } from 'vue-router'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useIcon } from '@/hooks/web/useIcon'
+import { required } from '@/utils/formRules'
+import { setToken, setTenantId } from '@/utils/auth'
 import { decrypt, encrypt } from '@/utils/jsencrypt'
+import { Icon } from '@/components/Icon'
+import { Verify } from '@/components/Verifition'
+import { usePermissionStore } from '@/store/modules/permission'
+import * as LoginApi from '@/api/login'
+import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'
 
+const { t } = useI18n()
+const iconHouse = useIcon({ icon: 'ep:house' })
+const iconAvatar = useIcon({ icon: 'ep:avatar' })
+const iconLock = useIcon({ icon: 'ep:lock' })
 const { currentRoute, push } = useRouter()
 const permissionStore = usePermissionStore()
 const formLogin = ref()
@@ -173,16 +177,12 @@ const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN)
 const iconSize = 30
 const iconColor = '#999'
 const redirect = ref<string>('')
-const { t } = useI18n()
-const iconHouse = useIcon({ icon: 'ep:house' })
-const iconAvatar = useIcon({ icon: 'ep:avatar' })
-const iconLock = useIcon({ icon: 'ep:lock' })
+const loginLoading = ref(false)
 const LoginRules = {
   tenantName: [required],
   username: [required],
   password: [required]
 }
-const loginLoading = ref(false)
 const loginData = reactive({
   isShowPassword: false,
   captchaEnable: import.meta.env.VITE_APP_CAPTCHA_ENABLE,
@@ -202,7 +202,6 @@ const loginData = reactive({
 // blockPuzzle 滑块 clickWord 点击文字
 const verify = ref()
 const captchaType = ref('blockPuzzle')
-
 // 获取验证码
 const getCode = async () => {
   // 情况一，未开启：则直接登录
@@ -210,7 +209,6 @@ const getCode = async () => {
     await handleLogin({})
     return
   }
-
   // 情况二，已开启：则展示验证码；只有完成验证码的情况，才进行登录
   // 弹出验证码
   verify.value.show()

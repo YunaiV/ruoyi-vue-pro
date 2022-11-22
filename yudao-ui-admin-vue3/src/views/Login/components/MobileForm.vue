@@ -85,31 +85,34 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { useIcon } from '@/hooks/web/useIcon'
 import { reactive, ref, unref, watch, computed } from 'vue'
-import LoginFormTitle from './LoginFormTitle.vue'
-import { ElForm, ElFormItem, ElInput, ElRow, ElCol, ElMessage } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
-import { required } from '@/utils/formRules'
-import { getTenantIdByNameApi, sendSmsCodeApi, smsLoginApi } from '@/api/login'
-import { useCache } from '@/hooks/web/useCache'
-import { usePermissionStore } from '@/store/modules/permission'
+import { ElForm, ElFormItem, ElInput, ElRow, ElCol } from 'element-plus'
 import { useRouter } from 'vue-router'
-import { setToken } from '@/utils/auth'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useIcon } from '@/hooks/web/useIcon'
+import { useCache } from '@/hooks/web/useCache'
+import { useMessage } from '@/hooks/web/useMessage'
+import { setToken } from '@/utils/auth'
+import { required } from '@/utils/formRules'
+import { usePermissionStore } from '@/store/modules/permission'
+import { getTenantIdByNameApi, sendSmsCodeApi, smsLoginApi } from '@/api/login'
+import LoginFormTitle from './LoginFormTitle.vue'
 import { useLoginState, LoginStateEnum, useFormValid } from './useLogin'
+
+const { t } = useI18n()
+const { wsCache } = useCache()
+const message = useMessage()
+const permissionStore = usePermissionStore()
+const { currentRoute, push } = useRouter()
 const formSmsLogin = ref()
-const { validForm } = useFormValid(formSmsLogin)
-const { handleBackLogin, getLoginState } = useLoginState()
-const getShow = computed(() => unref(getLoginState) === LoginStateEnum.MOBILE)
+const loginLoading = ref(false)
 const iconHouse = useIcon({ icon: 'ep:house' })
 const iconCellphone = useIcon({ icon: 'ep:cellphone' })
 const iconCircleCheck = useIcon({ icon: 'ep:circle-check' })
-const { wsCache } = useCache()
-const permissionStore = usePermissionStore()
-const { currentRoute, push } = useRouter()
-const loginLoading = ref(false)
-const { t } = useI18n()
+const { validForm } = useFormValid(formSmsLogin)
+const { handleBackLogin, getLoginState } = useLoginState()
+const getShow = computed(() => unref(getLoginState) === LoginStateEnum.MOBILE)
 
 const rules = {
   tenantName: [required],
@@ -146,11 +149,7 @@ const getSmsCode = async () => {
   await getTenantId()
   smsVO.smsCode.mobile = loginData.loginForm.mobileNumber
   await sendSmsCodeApi(smsVO.smsCode).then(async () => {
-    // 提示验证码发送成功
-    ElMessage({
-      type: 'success',
-      message: t('login.SmsSendMsg')
-    })
+    message.success(t('login.SmsSendMsg'))
     // 设置倒计时
     mobileCodeTimer.value = 60
     let msgTimer = setInterval(() => {

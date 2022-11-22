@@ -35,22 +35,21 @@
 </template>
 
 <script setup lang="ts">
-import { Form } from '@/components/Form'
 import { computed, reactive, ref, unref } from 'vue'
+import { ElInput, FormRules } from 'element-plus'
+import { Form } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useForm } from '@/hooks/web/useForm'
-import { ElInput, FormRules } from 'element-plus'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useLoginState, LoginStateEnum } from './useLogin'
 import LoginFormTitle from './LoginFormTitle.vue'
 import { FormSchema } from '@/types/form'
 
+const { t } = useI18n()
+const { required } = useValidator()
 const { register, elFormRef } = useForm()
 const { handleBackLogin, getLoginState } = useLoginState()
 const getShow = computed(() => unref(getLoginState) === LoginStateEnum.REGISTER)
-const { t } = useI18n()
-
-const { required } = useValidator()
 
 const schema = reactive<FormSchema[]>([
   {

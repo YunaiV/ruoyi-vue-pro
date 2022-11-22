@@ -59,21 +59,18 @@
   </div>
 </template>
 <script setup lang="ts">
-import { LoginForm, MobileForm, RegisterForm, QrCodeForm } from './components'
+import { underlineToHump } from '@/utils'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useDesign } from '@/hooks/web/useDesign'
+import { useAppStore } from '@/store/modules/app'
 import { ThemeSwitch } from '@/components/ThemeSwitch'
 import { LocaleDropdown } from '@/components/LocaleDropdown'
-import { useI18n } from '@/hooks/web/useI18n'
-import { underlineToHump } from '@/utils'
-import { useAppStore } from '@/store/modules/app'
-import { useDesign } from '@/hooks/web/useDesign'
+import { LoginForm, MobileForm, RegisterForm, QrCodeForm } from './components'
 
 const { t } = useI18n()
-
-const { getPrefixCls } = useDesign()
-
-const prefixCls = getPrefixCls('login')
-
 const appStore = useAppStore()
+const { getPrefixCls } = useDesign()
+const prefixCls = getPrefixCls('login')
 </script>
 
 <style lang="less" scoped>
