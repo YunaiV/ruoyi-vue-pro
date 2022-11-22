@@ -11,6 +11,7 @@ VXETable.renderer.add('XImg', {
         style="width: 80px; height: 50px"
         src={row[column.field]}
         key={row[column.field]}
+        preview-src-list={[row[column.field]]}
         fit="contain"
         lazy
       ></ElImage>

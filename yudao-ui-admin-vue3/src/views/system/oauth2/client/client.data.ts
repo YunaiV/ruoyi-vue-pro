@@ -39,8 +39,9 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '应用图标',
       field: 'logo',
       table: {
-        type: 'html',
-        formatter: 'formatImg'
+        cellRender: {
+          name: 'XImg'
+        }
       }
     },
     {
