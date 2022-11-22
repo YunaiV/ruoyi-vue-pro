@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.core.client.impl;
+package cn.iocoder.yudao.framework.pay.core.client.impl;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.impl.PayClientFactoryImpl;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayQrPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayWapPayClient;
@@ -14,6 +13,7 @@ import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPubPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileInputStream;
@@ -24,7 +24,8 @@ import java.io.FileNotFoundException;
  *
  * @author 芋道源码
  */
-public class PayClientFactoryImplTest {
+@Disabled
+public class PayClientFactoryImplIntegrationTest {
 
     private final PayClientFactoryImpl payClientFactory = new PayClientFactoryImpl();
 
@@ -91,7 +92,7 @@ public class PayClientFactoryImplTest {
         PayClient client = payClientFactory.getPayClient(channelId);
         // 发起支付
         PayOrderUnifiedReqDTO reqDTO = buildPayOrderUnifiedReqDTO();
-        reqDTO.setNotifyUrl("http://niubi.natapp1.cc/api/pay/order/notify/alipay-qr/1"); // TODO @tina: 这里改成你的 natapp 回调地址
+        reqDTO.setNotifyUrl("http://yunai.natapp1.cc/admin-api/pay/notify/callback/18"); // TODO @tina: 这里改成你的 natapp 回调地址
         CommonResult<AlipayTradePrecreateResponse> result = (CommonResult<AlipayTradePrecreateResponse>) client.unifiedOrder(reqDTO);
         System.out.println(JsonUtils.toJsonString(result));
         System.out.println(result.getData().getQrCode());
