@@ -211,7 +211,7 @@ public class PayOrderServiceImpl implements PayOrderService {
 
     @Override
     @Transactional
-    public void notifyPayOrder(Long channelId,  PayNotifyDataDTO notifyData) throws Exception {
+    public void notifyPayOrder(Long channelId, PayNotifyDataDTO notifyData) throws Exception {
         // TODO 芋艿，记录回调日志
         log.info("[notifyPayOrder][channelId({}) 回调数据({})]", channelId, notifyData.getBody());
 

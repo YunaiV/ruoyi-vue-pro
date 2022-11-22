@@ -83,7 +83,7 @@ public class TradeAfterSaleController {
         return success(true);
     }
 
-    @PutMapping("/receive")
+    @PutMapping("/refuse")
     @ApiOperation("确认收货")
     @ApiImplicitParam(name = "id", value = "售后编号", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:receive')")
