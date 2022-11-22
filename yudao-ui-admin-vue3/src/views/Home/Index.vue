@@ -161,17 +161,17 @@
   </el-row>
 </template>
 <script setup lang="ts">
-import { ElRow, ElCol, ElSkeleton, ElCard, ElDivider, ElLink } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
 import { ref, reactive } from 'vue'
-import { CountTo } from '@/components/CountTo'
-import { formatTime } from '@/utils'
-import { Echart } from '@/components/Echart'
+import { set } from 'lodash-es'
 import { EChartsOption } from 'echarts'
+import { ElRow, ElCol, ElSkeleton, ElCard, ElDivider, ElLink } from 'element-plus'
+import { formatTime } from '@/utils'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useCache } from '@/hooks/web/useCache'
+import { Echart } from '@/components/Echart'
+import { CountTo } from '@/components/CountTo'
 import { Highlight } from '@/components/Highlight'
 import type { WorkplaceTotal, Project, Notice, Shortcut } from './types'
-import { set } from 'lodash-es'
-import { useCache } from '@/hooks/web/useCache'
 import { pieOptions, barOptions } from './echarts-data'
 
 const { t } = useI18n()

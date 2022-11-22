@@ -1,6 +1,6 @@
 import { EChartsOption } from 'echarts'
-import { EChartsOption as EChartsWordOption } from 'echarts-wordcloud'
 import { useI18n } from '@/hooks/web/useI18n'
+import { EChartsOption as EChartsWordOption } from 'echarts-wordcloud'
 
 const { t } = useI18n()
 
