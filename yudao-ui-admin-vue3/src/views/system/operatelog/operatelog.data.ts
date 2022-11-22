@@ -69,6 +69,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '操作结果',
       field: 'success',
       isTable: false,
+      isDetail: false,
       search: {
         show: true,
         itemRender: {

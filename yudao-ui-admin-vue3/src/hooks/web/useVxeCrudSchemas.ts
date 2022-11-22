@@ -1,6 +1,5 @@
-import { DescriptionsSchema } from '@/types/descriptions'
-import { getBoolDictOptions, getDictOptions, getIntDictOptions } from '@/utils/dict'
 import { reactive } from 'vue'
+
 import {
   FormItemRenderOptions,
   VxeColumnPropTypes,
@@ -9,10 +8,12 @@ import {
   VxeTableDefines
 } from 'vxe-table'
 import { eachTree } from 'xe-utils'
+import { getBoolDictOptions, getDictOptions, getIntDictOptions } from '@/utils/dict'
 import { useI18n } from '@/hooks/web/useI18n'
-import { VxeTableColumn } from '@/types/table'
 import { FormSchema } from '@/types/form'
+import { VxeTableColumn } from '@/types/table'
 import { ComponentOptions } from '@/types/components'
+import { DescriptionsSchema } from '@/types/descriptions'
 
 export type VxeCrudSchema = {
   primaryKey?: string // 主键ID
@@ -146,11 +147,11 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
       }
       const searchSchemaItem = {
         // 默认为 input
-        folding: searchSchema.length > 2,
+        folding: searchSchema.length > 3,
         itemRender: schemaItem.itemRender ? schemaItem.itemRender : itemRender,
         field: schemaItem.field,
         title: schemaItem.search?.title || schemaItem.title,
-        span: 8
+        span: 6
       }
 
       searchSchema.push(searchSchemaItem)
