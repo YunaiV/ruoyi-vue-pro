@@ -11,6 +11,7 @@ export type ConfigVO = {
   remark: string
   createTime: string
 }
+
 export interface ConfigPageReqVO extends PageParam {
   name?: string
   type?: number
