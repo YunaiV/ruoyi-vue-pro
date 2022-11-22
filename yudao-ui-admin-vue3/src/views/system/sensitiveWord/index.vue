@@ -1,40 +1,24 @@
 <template>
-  <!-- 搜索工作区 -->
   <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <XButton
-        type="primary"
-        preIcon="ep:zoom-in"
-        :title="t('action.add')"
-        v-hasPermi="['system:sensitive-word:create']"
-        @click="handleCreate()"
-      />
-      <XButton
-        type="warning"
-        preIcon="ep:download"
-        :title="t('action.export')"
-        v-hasPermi="['system:sensitive-word:export']"
-        @click="exportList('敏感词数据.xls')"
-      />
-    </div>
     <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #tags="{ row }">
+    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+      <template #toolbar_buttons>
+        <XButton
+          type="primary"
+          preIcon="ep:zoom-in"
+          :title="t('action.add')"
+          v-hasPermi="['system:sensitive-word:create']"
+          @click="handleCreate()"
+        />
+        <XButton
+          type="warning"
+          preIcon="ep:download"
+          :title="t('action.export')"
+          v-hasPermi="['system:sensitive-word:export']"
+          @click="handleExport()"
+        />
+      </template>
+      <template #tags_default="{ row }">
         <el-tag
           :disable-transitions="true"
           :key="index"
@@ -44,13 +28,7 @@
           {{ tag }}
         </el-tag>
       </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
+      <template #actionbtns_default="{ row }">
         <!-- 操作：修改 -->
         <XTextButton
           preIcon="ep:edit"
@@ -63,17 +41,17 @@
           preIcon="ep:view"
           :title="t('action.detail')"
           v-hasPermi="['system:sensitive-word:update']"
-          @click="handleDetail(row)"
+          @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->
         <XTextButton
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:sensitive-word:delete']"
-          @click="delList(row.id, false)"
+          @click="handleDelete(row.id)"
         />
       </template>
-    </Table>
+    </vxe-grid>
   </ContentWrap>
 
   <XModal v-model="dialogVisible" :title="dialogTitle">
@@ -94,7 +72,7 @@
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
-      :data="detailRef"
+      :data="detailData"
     />
     <!-- 操作按钮 -->
     <template #footer>
@@ -113,24 +91,33 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref, unref } from 'vue'
-import dayjs from 'dayjs'
-import { ElMessage, ElTag, ElSelect, ElOption } from 'element-plus'
-import { DICT_TYPE } from '@/utils/dict'
-import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
+import { useMessage } from '@/hooks/web/useMessage'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { VxeGridInstance } from 'vxe-table'
 import { FormExpose } from '@/components/Form'
-import type { SensitiveWordVO } from '@/api/system/sensitiveWord/types'
-import { rules, allSchemas } from './sensitiveWord.data'
+import { ElTag, ElSelect, ElOption } from 'element-plus'
 import * as SensitiveWordApi from '@/api/system/sensitiveWord'
-const { t } = useI18n() // 国际化
+import { rules, allSchemas } from './sensitiveWord.data'
 
-// ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<SensitiveWordVO>({
-  getListApi: SensitiveWordApi.getSensitiveWordPageApi,
-  delListApi: SensitiveWordApi.deleteSensitiveWordApi,
-  exportListApi: SensitiveWordApi.exportSensitiveWordApi
-})
-const { getList, setSearchParams, delList, exportList } = methods
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
+// 列表相关的变量
+const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
+const { gridOptions, getList, deleteData, exportList } =
+  useVxeGrid<SensitiveWordApi.SensitiveWordVO>({
+    allSchemas: allSchemas,
+    getListApi: SensitiveWordApi.getSensitiveWordPageApi,
+    deleteApi: SensitiveWordApi.deleteSensitiveWordApi,
+    exportListApi: SensitiveWordApi.exportSensitiveWordApi
+  })
+const actionLoading = ref(false) // 遮罩层
+const actionType = ref('') // 操作按钮的类型
+const dialogVisible = ref(false) // 是否显示弹出层
+const dialogTitle = ref('edit') // 弹出层标题
+const formRef = ref<FormExpose>() // 表单 Ref
+const detailData = ref() // 详情 Ref
+const tags = ref()
 
 // 获取标签
 const tagsOptions = ref()
@@ -138,13 +125,7 @@ const getTags = async () => {
   const res = await SensitiveWordApi.getSensitiveWordTagsApi()
   tagsOptions.value = res
 }
-// ========== CRUD 相关 ==========
-const actionLoading = ref(false) // 遮罩层
-const actionType = ref('') // 操作按钮的类型
-const dialogVisible = ref(false) // 是否显示弹出层
-const dialogTitle = ref('edit') // 弹出层标题
-const formRef = ref<FormExpose>() // 表单 Ref
-const tags = ref()
+
 // 设置标题
 const setDialogTile = (type: string) => {
   dialogTitle.value = t('action.' + type)
@@ -158,6 +139,11 @@ const handleCreate = () => {
   setDialogTile('create')
 }
 
+// 导出操作
+const handleExport = async () => {
+  await exportList(xGrid, '敏感词数据.xls')
+}
+
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -165,6 +151,18 @@ const handleUpdate = async (rowId: number) => {
   const res = await SensitiveWordApi.getSensitiveWordApi(rowId)
   tags.value = res.tags
   unref(formRef)?.setValues(res)
+}
+
+// 详情操作
+const handleDetail = async (rowId: number) => {
+  setDialogTile('detail')
+  const res = await SensitiveWordApi.getSensitiveWordApi(rowId)
+  detailData.value = res
+}
+
+// 删除操作
+const handleDelete = async (rowId: number) => {
+  await deleteData(xGrid, rowId)
 }
 
 // 提交按钮
@@ -176,38 +174,27 @@ const submitForm = async () => {
       actionLoading.value = true
       // 提交请求
       try {
-        const data = unref(formRef)?.formModel as SensitiveWordVO
+        const data = unref(formRef)?.formModel as SensitiveWordApi.SensitiveWordVO
         data.tags = tags.value
         if (actionType.value === 'create') {
           await SensitiveWordApi.createSensitiveWordApi(data)
-          ElMessage.success(t('common.createSuccess'))
+          message.success(t('common.createSuccess'))
         } else {
           await SensitiveWordApi.updateSensitiveWordApi(data)
-          ElMessage.success(t('common.updateSuccess'))
+          message.success(t('common.updateSuccess'))
         }
-        // 操作成功，重新加载列表
         dialogVisible.value = false
-        await getList()
       } finally {
         actionLoading.value = false
+        // 刷新列表
+        await getList(xGrid)
       }
     }
   })
 }
 
-// ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
-
-// 详情操作
-const handleDetail = async (row: SensitiveWordVO) => {
-  // 设置数据
-  detailRef.value = row
-  setDialogTile('detail')
-}
-
 // ========== 初始化 ==========
 onMounted(async () => {
   await getTags()
-  await getList()
 })
 </script>

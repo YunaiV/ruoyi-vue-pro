@@ -1,8 +1,27 @@
 import request from '@/config/axios'
-import type { SensitiveWordVO } from './types'
+
+export type SensitiveWordVO = {
+  id: number
+  name: string
+  status: number
+  description: string
+  tags: string
+  type: number
+  createTime: string
+}
+
+export interface SensitiveWordPageReqVO extends PageParam {
+  name?: string
+  status?: number
+}
+
+export interface SensitiveWordExportReqVO {
+  name?: string
+  status?: number
+}
 
 // 查询敏感词列表
-export const getSensitiveWordPageApi = (params) => {
+export const getSensitiveWordPageApi = (params: SensitiveWordPageReqVO) => {
   return request.get({ url: '/system/sensitive-word/page', params })
 }
 
@@ -27,7 +46,7 @@ export const deleteSensitiveWordApi = (id: number) => {
 }
 
 // 导出敏感词
-export const exportSensitiveWordApi = (params) => {
+export const exportSensitiveWordApi = (params: SensitiveWordExportReqVO) => {
   return request.download({ url: '/system/sensitive-word/export-excel', params })
 }
 
