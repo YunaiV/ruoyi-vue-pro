@@ -1,3 +1,4 @@
 import './dataTimePicker'
 import './dict'
-import './default'
+import './link'
+import './img'
