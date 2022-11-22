@@ -1,6 +1,6 @@
 import request from '@/config/axios'
 
-export type SensitiveWordVO = {
+export interface SensitiveWordVO {
   id: number
   name: string
   status: number

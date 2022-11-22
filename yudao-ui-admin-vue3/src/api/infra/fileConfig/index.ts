@@ -1,5 +1,28 @@
 import request from '@/config/axios'
-import type { FileConfigVO } from './types'
+
+export interface ConfigType {
+  basePath: string
+  host: string
+  port: string
+  username: string
+  password: string
+  mode: string
+  endpoint: string
+  bucket: string
+  accessKey: string
+  accessSecret: string
+  domain: string
+}
+export interface FileConfigVO {
+  id: number
+  name: string
+  storage: string
+  master: boolean
+  visible: boolean
+  config: ConfigType
+  remark: string
+  createTime: string
+}
 
 // 查询文件配置列表
 export const getFileConfigPageApi = (params) => {

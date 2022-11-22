@@ -1,5 +1,6 @@
 import request from '@/config/axios'
-export type SmsLogVO = {
+
+export interface SmsLogVO {
   id: number
   idchannelId: number
   templateId: number

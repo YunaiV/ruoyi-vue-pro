@@ -1,4 +1,5 @@
 import request from '@/config/axios'
+
 export interface OAuth2ClientVO {
   id: number
   clientId: string

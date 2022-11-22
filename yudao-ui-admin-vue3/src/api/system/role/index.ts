@@ -1,6 +1,6 @@
 import request from '@/config/axios'
 
-export type RoleVO = {
+export interface RoleVO {
   id: number
   name: string
   code: string

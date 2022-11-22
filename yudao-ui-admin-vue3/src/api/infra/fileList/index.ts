@@ -1,6 +1,6 @@
 import request from '@/config/axios'
 
-export type FileVO = {
+export interface FileVO {
   id: number
   path: string
   url: string

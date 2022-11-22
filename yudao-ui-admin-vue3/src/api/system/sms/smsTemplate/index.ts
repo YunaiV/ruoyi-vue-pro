@@ -1,5 +1,6 @@
 import request from '@/config/axios'
-export type SmsTemplateVO = {
+
+export interface SmsTemplateVO {
   id: number
   type: number
   status: number

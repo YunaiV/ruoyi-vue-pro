@@ -1,5 +1,6 @@
 import request from '@/config/axios'
-export type SmsChannelVO = {
+
+export interface SmsChannelVO {
   id: number
   status: number
   signature: string

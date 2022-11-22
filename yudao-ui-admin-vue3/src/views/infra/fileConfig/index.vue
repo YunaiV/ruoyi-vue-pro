@@ -86,14 +86,13 @@ import { VxeGridInstance } from 'vxe-table'
 import { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as FileConfigApi from '@/api/infra/fileConfig'
-import type { FileConfigVO } from '@/api/infra/fileConfig/types'
 import { rules, allSchemas } from './fileConfig.data'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData } = useVxeGrid<FileConfigVO>({
+const { gridOptions, getList, deleteData } = useVxeGrid<FileConfigApi.FileConfigVO>({
   allSchemas: allSchemas,
   getListApi: FileConfigApi.getFileConfigPageApi,
   deleteApi: FileConfigApi.deleteFileConfigApi
@@ -135,7 +134,7 @@ const handleDetail = async (rowId: number) => {
 }
 
 // 主配置操作
-const handleMaster = (row: FileConfigVO) => {
+const handleMaster = (row: FileConfigApi.FileConfigVO) => {
   message
     .confirm('是否确认修改配置【 ' + row.name + ' 】为主配置?', t('common.reminder'))
     .then(async () => {
@@ -158,7 +157,7 @@ const submitForm = async () => {
       actionLoading.value = true
       // 提交请求
       try {
-        const data = unref(formRef)?.formModel as FileConfigVO
+        const data = unref(formRef)?.formModel as FileConfigApi.FileConfigVO
         if (actionType.value === 'create') {
           await FileConfigApi.createFileConfigApi(data)
           message.success(t('common.createSuccess'))

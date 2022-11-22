@@ -1,5 +1,6 @@
 import request from '@/config/axios'
-export type DeptVO = {
+
+export interface DeptVO {
   id?: number
   name: string
   parentId: number

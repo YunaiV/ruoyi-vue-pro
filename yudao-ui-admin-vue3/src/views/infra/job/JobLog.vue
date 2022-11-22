@@ -55,7 +55,6 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
 import * as JobLogApi from '@/api/infra/jobLog'
-import { JobLogVO } from '@/api/infra/jobLog/types'
 import { allSchemas } from './jobLog.data'
 
 const { t } = useI18n() // 国际化
@@ -74,7 +73,7 @@ const dialogTitle = ref('') // 弹出层标题
 const detailRef = ref() // 详情 Ref
 
 // 详情操作
-const handleDetail = async (row: JobLogVO) => {
+const handleDetail = async (row: JobLogApi.JobLogVO) => {
   // 设置数据
   const res = JobLogApi.getJobLogApi(row.id)
   detailRef.value = res

@@ -1,4 +1,5 @@
 import request from '@/config/axios'
+
 export interface ErrorCodeVO {
   id: number
   type: number

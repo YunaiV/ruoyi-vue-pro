@@ -1,6 +1,6 @@
 import request from '@/config/axios'
 
-export type DataSourceConfigVO = {
+export interface DataSourceConfigVO {
   id: number
   name: string
   url: string

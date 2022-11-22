@@ -1,6 +1,6 @@
 import request from '@/config/axios'
 
-export type ConfigVO = {
+export interface ConfigVO {
   id: number
   group: string
   name: string

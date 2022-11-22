@@ -1,6 +1,6 @@
 import request from '@/config/axios'
 
-export type JobVO = {
+export interface JobVO {
   id: number
   name: string
   status: number

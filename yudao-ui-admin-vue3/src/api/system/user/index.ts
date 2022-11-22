@@ -1,5 +1,6 @@
 import request from '@/config/axios'
-export type UserVO = {
+
+export interface UserVO {
   id: number
   username: string
   nickname: string
