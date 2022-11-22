@@ -27,7 +27,6 @@
         <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.5.2</dynamic-datasource.version>
         <redisson.version>3.18.0</redisson.version>
-        <!-- Config 配置中心相关 -->
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.2</lock4j.version>
         <resilience4j.version>1.7.1</resilience4j.version>

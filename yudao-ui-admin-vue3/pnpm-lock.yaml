@@ -28,7 +28,7 @@ specifiers:
   dayjs: ^1.11.6
   echarts: ^5.4.0
   echarts-wordcloud: ^2.0.0
-  element-plus: 2.2.22
+  element-plus: 2.2.21
   eslint: ^8.27.0
   eslint-config-prettier: ^8.5.0
   eslint-define-config: ^1.12.0
@@ -92,7 +92,7 @@ dependencies:
   dayjs: registry.npmmirror.com/dayjs/1.11.6
   echarts: registry.npmmirror.com/echarts/5.4.0
   echarts-wordcloud: registry.npmmirror.com/echarts-wordcloud/2.0.0_echarts@5.4.0
-  element-plus: registry.npmmirror.com/element-plus/2.2.22_vue@3.2.45
+  element-plus: registry.npmmirror.com/element-plus/2.2.21_vue@3.2.45
   intro.js: registry.npmmirror.com/intro.js/6.0.0
   js-cookie: registry.npmmirror.com/js-cookie/3.0.1
   jsencrypt: registry.npmmirror.com/jsencrypt/3.3.1
@@ -3645,11 +3645,11 @@ packages:
     version: 1.4.284
     dev: true
 
-  registry.npmmirror.com/element-plus/2.2.22_vue@3.2.45:
-    resolution: {integrity: sha512-gg2g2WOMNpWf0wGesymUvTV0VZDF/4khQKroSNeCV/vWJ/cqssPYdtqfGxTiFRt/f+JpyFkV7O1mo0yzMCzrBg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/element-plus/-/element-plus-2.2.22.tgz}
-    id: registry.npmmirror.com/element-plus/2.2.22
+  registry.npmmirror.com/element-plus/2.2.21_vue@3.2.45:
+    resolution: {integrity: sha512-wZUePoXZ1zuCkzENK/8mn+mekuLJ9OoGYiudjUujzCf+T8HfOQl+TKQStwOkGBNk93fK8e9YdFIty4jH4AX6dg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/element-plus/-/element-plus-2.2.21.tgz}
+    id: registry.npmmirror.com/element-plus/2.2.21
     name: element-plus
-    version: 2.2.22
+    version: 2.2.21
     peerDependencies:
       vue: ^3.2.0
     dependencies:

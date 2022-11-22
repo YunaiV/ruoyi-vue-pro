@@ -1,79 +1,55 @@
 <template>
-  <!-- 搜索工作区 -->
   <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <XButton
-        type="primary"
-        preIcon="ep:zoom-in"
-        :title="t('action.add')"
-        v-hasPermi="['system:tenant:create']"
-        @click="handleCreate()"
-      />
-      <XButton
-        type="warning"
-        preIcon="ep:download"
-        :title="t('action.export')"
-        v-hasPermi="['system:tenant:export']"
-        @click="exportList('租户数据.xls')"
-      />
-    </div>
     <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
+    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+      <template #toolbar_buttons>
+        <!-- 操作：新增 -->
+        <XButton
+          type="primary"
+          preIcon="ep:zoom-in"
+          :title="t('action.add')"
+          v-hasPermi="['system:tenant:create']"
+          @click="handleCreate()"
+        />
+        <XButton
+          type="warning"
+          preIcon="ep:download"
+          :title="t('action.export')"
+          v-hasPermi="['system:tenant:export']"
+          @click="handleExport()"
+        />
+      </template>
       <template #accountCount="{ row }">
         <el-tag> {{ row.accountCount }} </el-tag>
-      </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
       </template>
       <template #packageId="{ row }">
         <el-tag v-if="row.packageId === 0" type="danger">系统租户</el-tag>
         <el-tag v-else type="success"> {{ getPackageName(row.packageId) }} </el-tag>
       </template>
-      <template #expireTime="{ row }">
-        <span>{{ dayjs(row.expireTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
+      <template #actionbtns_default="{ row }">
         <!-- 操作：修改 -->
         <XTextButton
           preIcon="ep:edit"
           :title="t('action.edit')"
           v-hasPermi="['system:tenant:update']"
-          @click="handleUpdate(row)"
+          @click="handleUpdate(row.id)"
         />
         <!-- 操作：详情 -->
         <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
           v-hasPermi="['system:tenant:update']"
-          @click="handleDetail(row)"
+          @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->
         <XTextButton
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:tenant:delete']"
-          @click="delList(row.id, false)"
+          @click="handleDelete(row.id)"
         />
       </template>
-    </Table>
+    </vxe-grid>
   </ContentWrap>
 
   <XModal v-model="dialogVisible" :title="dialogTitle">
@@ -124,27 +100,33 @@
 <script setup lang="ts">
 import { ref, unref, onMounted } from 'vue'
 import dayjs from 'dayjs'
-import { ElMessage, ElTag, ElSelect, ElOption } from 'element-plus'
-import { DICT_TYPE } from '@/utils/dict'
-import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
+import { useMessage } from '@/hooks/web/useMessage'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { VxeGridInstance } from 'vxe-table'
+import { ElTag, ElSelect, ElOption } from 'element-plus'
 import { FormExpose } from '@/components/Form'
-import type { TenantVO } from '@/api/system/tenant/types'
-import { rules, allSchemas } from './tenant.data'
 import * as TenantApi from '@/api/system/tenant'
-import { getTenantPackageList } from '@/api/system/tenantPackage'
-import { TenantPackageVO } from '@/api/system/tenantPackage/types'
-const { t } = useI18n() // 国际化
+import { rules, allSchemas } from './tenant.data'
+import { getTenantPackageList, TenantPackageVO } from '@/api/system/tenantPackage'
 
-// ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<TenantVO>({
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
+// 列表相关的变量
+const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
+const { gridOptions, getList, deleteData, exportList } = useVxeGrid<TenantApi.TenantVO>({
+  allSchemas: allSchemas,
   getListApi: TenantApi.getTenantPageApi,
-  delListApi: TenantApi.deleteTenantApi,
+  deleteApi: TenantApi.deleteTenantApi,
   exportListApi: TenantApi.exportTenantApi
 })
-const { getList, setSearchParams, delList, exportList } = methods
 
-// ========== 套餐 ==========
+const actionLoading = ref(false) // 遮罩层
+const actionType = ref('') // 操作按钮的类型
+const dialogVisible = ref(false) // 是否显示弹出层
+const dialogTitle = ref('edit') // 弹出层标题
+const formRef = ref<FormExpose>() // 表单 Ref
+const detailRef = ref() // 详情 Ref
 const tenantPackageId = ref() // 套餐
 const tenantPackageOptions = ref<TenantPackageVO[]>([]) //套餐列表
 
@@ -160,12 +142,6 @@ const getPackageName = (packageId: number) => {
   }
   return '未知套餐'
 }
-// ========== CRUD 相关 ==========
-const actionLoading = ref(false) // 遮罩层
-const actionType = ref('') // 操作按钮的类型
-const dialogVisible = ref(false) // 是否显示弹出层
-const dialogTitle = ref('edit') // 弹出层标题
-const formRef = ref<FormExpose>() // 表单 Ref
 
 // 设置标题
 const setDialogTile = (type: string) => {
@@ -182,13 +158,32 @@ const handleCreate = () => {
 }
 
 // 修改操作
-const handleUpdate = async (row: any) => {
+const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
-  const res = await TenantApi.getTenantApi(row.id)
+  const res = await TenantApi.getTenantApi(rowId)
   tenantPackageId.value = res.packageId
   res.expireTime = dayjs(res.expireTime).format('YYYY-MM-DD HH:mm:ss')
   unref(formRef)?.setValues(res)
+}
+
+// 详情操作
+const handleDetail = async (rowId: number) => {
+  // 设置数据
+  const res = await TenantApi.getTenantApi(rowId)
+  tenantPackageId.value = res.packageId
+  detailRef.value = res
+  setDialogTile('detail')
+}
+
+// 删除操作
+const handleDelete = async (rowId: number) => {
+  await deleteData(xGrid, rowId)
+}
+
+// 导出操作
+const handleExport = async () => {
+  await exportList(xGrid, '租户列表.xls')
 }
 
 // 提交按钮
@@ -200,40 +195,30 @@ const submitForm = async () => {
       actionLoading.value = true
       // 提交请求
       try {
-        const data = unref(formRef)?.formModel as TenantVO
+        const data = unref(formRef)?.formModel as TenantApi.TenantVO
         data.packageId = tenantPackageId.value
         if (actionType.value === 'create') {
           data.expireTime = dayjs(data.expireTime).valueOf().toString()
           await TenantApi.createTenantApi(data)
-          ElMessage.success(t('common.createSuccess'))
+          message.success(t('common.createSuccess'))
         } else {
           data.expireTime = dayjs(data.expireTime).valueOf().toString()
           await TenantApi.updateTenantApi(data)
-          ElMessage.success(t('common.updateSuccess'))
+          message.success(t('common.updateSuccess'))
         }
         // 操作成功，重新加载列表
         dialogVisible.value = false
-        await getList()
       } finally {
         actionLoading.value = false
+        // 刷新列表
+        await getList(xGrid)
       }
     }
   })
 }
 
-// ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
-
-// 详情操作
-const handleDetail = async (row: any) => {
-  // 设置数据
-  detailRef.value = row
-  setDialogTile('detail')
-}
-
 // ========== 初始化 ==========
 onMounted(async () => {
-  await getList()
   await getTenantPackageOptions()
 })
 </script>
