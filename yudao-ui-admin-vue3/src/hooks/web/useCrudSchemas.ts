@@ -120,7 +120,7 @@ const filterSearchSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
 const filterTableSchema = (crudSchema: CrudSchema[]): TableColumn[] => {
   const tableColumns = treeMap<CrudSchema>(crudSchema, {
     conversion: (schema: CrudSchema) => {
-      if (schema?.isTable !== false || schema?.table?.show !== false) {
+      if (schema?.isTable !== false && schema?.table?.show !== false) {
         return {
           ...schema.table,
           ...schema
@@ -144,7 +144,7 @@ const filterFormSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
 
   eachTree(crudSchema, (schemaItem: CrudSchema) => {
     // 判断是否显示
-    if (schemaItem?.isForm !== false || schemaItem?.form?.show == true) {
+    if (schemaItem?.isForm !== false && schemaItem?.form?.show !== false) {
       let component = schemaItem?.form?.component || 'Input'
       let defaultValue: any = ''
       if (schemaItem.form?.value) {
@@ -201,7 +201,7 @@ const filterDescriptionsSchema = (crudSchema: CrudSchema[]): DescriptionsSchema[
 
   eachTree(crudSchema, (schemaItem: CrudSchema) => {
     // 判断是否显示
-    if (schemaItem?.isDetail !== false || schemaItem.detail?.show !== false) {
+    if (schemaItem?.isDetail !== false && schemaItem.detail?.show !== false) {
       const descriptionsSchemaItem = {
         ...schemaItem.detail,
         field: schemaItem.field,

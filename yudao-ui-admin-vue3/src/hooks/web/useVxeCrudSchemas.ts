@@ -233,7 +233,7 @@ const filterFormSchema = (crudSchema: VxeCrudSchema): FormSchema[] => {
 
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.isForm !== false || schemaItem?.form?.show == true) {
+    if (schemaItem?.isForm !== false && schemaItem?.form?.show !== false) {
       // 默认为 input
       let component = schemaItem?.form?.component || 'Input'
       let defaultValue: any = ''
@@ -287,7 +287,7 @@ const filterDescriptionsSchema = (crudSchema: VxeCrudSchema): DescriptionsSchema
 
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
-    if (schemaItem?.isDetail !== false || schemaItem.detail?.show !== false) {
+    if (schemaItem?.isDetail !== false && schemaItem.detail?.show !== false) {
       const descriptionsSchemaItem = {
         ...schemaItem.detail,
         field: schemaItem.field,
