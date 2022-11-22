@@ -15,7 +15,7 @@ export type FileConfigVO = {
   id: number
   name: string
   storage: string
-  primary: number
+  master: boolean
   visible: boolean
   config: ConfigType
   remark: string

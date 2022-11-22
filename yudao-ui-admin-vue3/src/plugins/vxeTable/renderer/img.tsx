@@ -1,4 +1,5 @@
 import { VXETable } from 'vxe-table'
+import { ElImage } from 'element-plus'
 
 // 图片渲染
 VXETable.renderer.add('XImg', {
@@ -6,13 +7,13 @@ VXETable.renderer.add('XImg', {
   renderDefault(_renderOpts, params) {
     const { row, column } = params
     return (
-      <el-image
+      <ElImage
         style="width: 80px; height: 50px"
         src={row[column.field]}
         key={row[column.field]}
         fit="contain"
         lazy
-      ></el-image>
+      ></ElImage>
     )
   }
 })
