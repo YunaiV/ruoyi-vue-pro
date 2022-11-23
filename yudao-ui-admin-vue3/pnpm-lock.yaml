@@ -46,7 +46,7 @@ specifiers:
   postcss: ^8.4.19
   postcss-html: ^1.5.0
   postcss-scss: ^4.0.5
-  prettier: ^2.7.1
+  prettier: ^2.8.0
   qrcode: ^1.5.1
   qs: ^6.11.0
   rimraf: ^3.0.2
@@ -75,7 +75,7 @@ specifiers:
   vue-i18n: 9.2.2
   vue-router: ^4.1.6
   vue-tsc: ^1.0.9
-  vue-types: ^5.0.0
+  vue-types: ^5.0.1
   vxe-table: ^4.3.5
   web-storage-cache: ^1.1.1
   windicss: ^3.5.6
@@ -108,7 +108,7 @@ dependencies:
   vue-cropper: registry.npmmirror.com/vue-cropper/1.0.5
   vue-i18n: registry.npmmirror.com/vue-i18n/9.2.2_vue@3.2.45
   vue-router: registry.npmmirror.com/vue-router/4.1.6_vue@3.2.45
-  vue-types: registry.npmmirror.com/vue-types/5.0.0_vue@3.2.45
+  vue-types: registry.npmmirror.com/vue-types/5.0.1_vue@3.2.45
   vxe-table: registry.npmmirror.com/vxe-table/4.3.5_vue@3.2.45+xe-utils@3.5.7
   web-storage-cache: registry.npmmirror.com/web-storage-cache/1.1.1
   xe-utils: registry.npmmirror.com/xe-utils/3.5.7
@@ -133,14 +133,14 @@ devDependencies:
   eslint: registry.npmmirror.com/eslint/8.28.0
   eslint-config-prettier: registry.npmmirror.com/eslint-config-prettier/8.5.0_eslint@8.28.0
   eslint-define-config: registry.npmmirror.com/eslint-define-config/1.12.0
-  eslint-plugin-prettier: registry.npmmirror.com/eslint-plugin-prettier/4.2.1_pgxuib4rd7wiymfktharf5ydt4
+  eslint-plugin-prettier: registry.npmmirror.com/eslint-plugin-prettier/4.2.1_cwlo2dingkvfydnaculr42urve
   eslint-plugin-vue: registry.npmmirror.com/eslint-plugin-vue/9.7.0_eslint@8.28.0
   lint-staged: registry.npmmirror.com/lint-staged/13.0.3
   plop: registry.npmmirror.com/plop/3.1.1
   postcss: registry.npmmirror.com/postcss/8.4.19
   postcss-html: registry.npmmirror.com/postcss-html/1.5.0
   postcss-scss: registry.npmmirror.com/postcss-scss/4.0.5_postcss@8.4.19
-  prettier: registry.npmmirror.com/prettier/2.7.1
+  prettier: registry.npmmirror.com/prettier/2.8.0
   rimraf: registry.npmmirror.com/rimraf/3.0.2
   rollup: registry.npmmirror.com/rollup/3.4.0
   sass: registry.npmmirror.com/sass/1.56.1
@@ -3871,7 +3871,7 @@ packages:
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0, npm: '>=6.14.13', pnpm: '>= 7.0.0'}
     dev: true
 
-  registry.npmmirror.com/eslint-plugin-prettier/4.2.1_pgxuib4rd7wiymfktharf5ydt4:
+  registry.npmmirror.com/eslint-plugin-prettier/4.2.1_cwlo2dingkvfydnaculr42urve:
     resolution: {integrity: sha512-f/0rXLXUt0oFYs8ra4w49wYZBG5GKZpAYsJSm6rnYL5uVDjd+zowwMwVZHnAjf4edNrKpCDYfXDgmRE/Ak7QyQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/eslint-plugin-prettier/-/eslint-plugin-prettier-4.2.1.tgz}
     id: registry.npmmirror.com/eslint-plugin-prettier/4.2.1
     name: eslint-plugin-prettier
@@ -3887,7 +3887,7 @@ packages:
     dependencies:
       eslint: registry.npmmirror.com/eslint/8.28.0
       eslint-config-prettier: registry.npmmirror.com/eslint-config-prettier/8.5.0_eslint@8.28.0
-      prettier: registry.npmmirror.com/prettier/2.7.1
+      prettier: registry.npmmirror.com/prettier/2.8.0
       prettier-linter-helpers: registry.npmmirror.com/prettier-linter-helpers/1.0.0
     dev: true
 
@@ -6915,10 +6915,10 @@ packages:
       fast-diff: registry.npmmirror.com/fast-diff/1.2.0
     dev: true
 
-  registry.npmmirror.com/prettier/2.7.1:
-    resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/prettier/-/prettier-2.7.1.tgz}
+  registry.npmmirror.com/prettier/2.8.0:
+    resolution: {integrity: sha512-9Lmg8hTFZKG0Asr/kW9Bp8tJjRVluO8EJQVfY2T7FMw9T5jy4I/Uvx0Rca/XWf50QQ1/SS48+6IJWnrb+2yemA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/prettier/-/prettier-2.8.0.tgz}
     name: prettier
-    version: 2.7.1
+    version: 2.8.0
     engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
@@ -8717,11 +8717,11 @@ packages:
       typescript: registry.npmmirror.com/typescript/4.9.3
     dev: true
 
-  registry.npmmirror.com/vue-types/5.0.0_vue@3.2.45:
-    resolution: {integrity: sha512-giq56UtZRugrJXAO71croWBrYlhBrtvRZPqBqcng3yq4D4NwmwZdTeJu/x76aoUAAghJ24CvALoVt1sc23IaFw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vue-types/-/vue-types-5.0.0.tgz}
-    id: registry.npmmirror.com/vue-types/5.0.0
+  registry.npmmirror.com/vue-types/5.0.1_vue@3.2.45:
+    resolution: {integrity: sha512-pHahh/Ht+mxAhSGXfFe0WQidZukYUoCevPoQtePpONrmNP+OjX3/ps/XjYLgw/Zbv4rks242eiVJcjE3EELsyw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vue-types/-/vue-types-5.0.1.tgz}
+    id: registry.npmmirror.com/vue-types/5.0.1
     name: vue-types
-    version: 5.0.0
+    version: 5.0.1
     engines: {node: '>=14.0.0'}
     peerDependencies:
       vue: ^2.0.0 || ^3.0.0

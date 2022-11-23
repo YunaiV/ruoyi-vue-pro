@@ -51,7 +51,7 @@
     "vue-cropper": "^1.0.3",
     "vue-i18n": "9.2.2",
     "vue-router": "^4.1.6",
-    "vue-types": "^5.0.0",
+    "vue-types": "^5.0.1",
     "vxe-table": "^4.3.5",
     "web-storage-cache": "^1.1.1",
     "xe-utils": "^3.5.7"
@@ -85,7 +85,7 @@
     "postcss": "^8.4.19",
     "postcss-html": "^1.5.0",
     "postcss-scss": "^4.0.5",
-    "prettier": "^2.7.1",
+    "prettier": "^2.8.0",
     "rimraf": "^3.0.2",
     "rollup": "^3.4.0",
     "stylelint": "^14.15.0",
