@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/badge/-pnpm7-F69220?logo=pnpm&logoColor=white" />
     <img src="https://img.shields.io/badge/-Axios-008fc7?logo=axios.js&logoColor=white" />
     <img src="https://img.shields.io/badge/-Prettier-ef9421?logo=Prettier&logoColor=white" alt="Prettier">
-    <img src="https://img.shields.io/badge/-Less-1D365D?logo=less&logoColor=white" alt="Less">
+    <img src="https://img.shields.io/badge/-Sass-1D365D?logo=Sass&logoColor=white" alt="Sass">
     <img src="https://img.shields.io/badge/-Wind%20CSS-06B6D4?logo=Tailwind%20CSS&logoColor=white" alt="Taiwind">
 </p>
 

@@ -105,14 +105,14 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     ],
     css: {
       preprocessorOptions: {
-        less: {
-          additionalData: '@import "./src/styles/variables.module.less";',
+        scss: {
+          additionalData: '@import "./src/styles/variables.scss";',
           javascriptEnabled: true
         }
       }
     },
     resolve: {
-      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.less', '.css'],
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.scss', '.css'],
       alias: [
         {
           find: 'vue-i18n',

@@ -92,23 +92,14 @@ const dialogStyle = computed(() => {
   </ElDialog>
 </template>
 
-<style lang="less">
-.@{elNamespace}-dialog__header {
+<style lang="scss">
+.#{$elNamespace}-dialog__header {
   margin-right: 0 !important;
-  padding-bottom: 6px;
-  padding-top: 10px;
   border-bottom: 1px solid var(--tags-view-border-color);
 }
 
-.@{elNamespace}-dialog__headerbtn {
-  top: -4px !important;
-}
-
-.@{elNamespace}-dialog__footer {
-  border-top: 0px solid var(--tags-view-border-color);
-}
-.dialog-footer button:first-child {
-  margin-right: 10px;
+.#{$elNamespace}-dialog__footer {
+  border-top: 1px solid var(--tags-view-border-color);
 }
 
 .is-hover {
@@ -118,11 +109,11 @@ const dialogStyle = computed(() => {
 }
 
 .dark {
-  .@{elNamespace}-dialog__header {
+  .#{$elNamespace}-dialog__header {
     border-bottom: 1px solid var(--el-border-color);
   }
 
-  .@{elNamespace}-dialog__footer {
+  .#{$elNamespace}-dialog__footer {
     border-top: 1px solid var(--el-border-color);
   }
 }

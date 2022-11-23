@@ -73,10 +73,10 @@ const { getPrefixCls } = useDesign()
 const prefixCls = getPrefixCls('login')
 </script>
 
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-login';
+<style lang="scss" scoped>
+$prefix-cls: #{$namespace}-panel;
 
-.@{prefix-cls} {
+.#{$prefix-cls} {
   &__left {
     &::before {
       position: absolute;

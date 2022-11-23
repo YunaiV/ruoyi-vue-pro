@@ -129,10 +129,10 @@ const toggleClick = () => {
   </div>
 </template>
 
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-descriptions';
+<style lang="scss" scoped>
+$prefix-cls: #{$namespace}-descriptions;
 
-.@{prefix-cls}-header {
+.#{$prefix-cls}-header {
   &__title {
     &::after {
       position: absolute;
@@ -146,8 +146,8 @@ const toggleClick = () => {
   }
 }
 
-.@{prefix-cls}-content {
-  :deep(.@{elNamespace}-descriptions__cell) {
+.#{$prefix-cls}-content {
+  :deep(.#{$elNamespace}-descriptions__cell) {
     width: 0;
   }
 }

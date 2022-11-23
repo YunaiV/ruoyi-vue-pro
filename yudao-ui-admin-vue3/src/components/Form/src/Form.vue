@@ -294,8 +294,8 @@ export default defineComponent({
 })
 </script>
 
-<style lang="less" scoped>
-.@{elNamespace}-form.@{namespace}-form .@{elNamespace}-row {
+<style lang="scss" scoped>
+.#{$elNamespace}-form.#{$namespace}-form .#{$elNamespace}-row {
   margin-right: 0 !important;
   margin-left: 0 !important;
 }

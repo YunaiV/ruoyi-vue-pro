@@ -270,10 +270,10 @@ const getAllApi = async () => {
 getAllApi()
 </script>
 
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-panel';
+<style lang="scss" scoped>
+$prefix-cls: #{$namespace}-panel;
 
-.@{prefix-cls} {
+.#{$prefix-cls} {
   &__item {
     &--peoples {
       color: #40c9c6;
@@ -292,22 +292,22 @@ getAllApi()
     }
 
     &:hover {
-      :deep(.@{namespace}-icon) {
+      :deep(.#{$namespace}-icon) {
         color: #fff !important;
       }
-      .@{prefix-cls}__item--icon {
+      .#{$prefix-cls}__item--icon {
         transition: all 0.38s ease-out;
       }
-      .@{prefix-cls}__item--peoples {
+      .#{$prefix-cls}__item--peoples {
         background: #40c9c6;
       }
-      .@{prefix-cls}__item--message {
+      .#{$prefix-cls}__item--message {
         background: #36a3f7;
       }
-      .@{prefix-cls}__item--money {
+      .#{$prefix-cls}__item--money {
         background: #f4516c;
       }
-      .@{prefix-cls}__item--shopping {
+      .#{$prefix-cls}__item--shopping {
         background: #34bfa3;
       }
     }

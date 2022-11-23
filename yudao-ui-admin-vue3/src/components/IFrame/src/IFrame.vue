@@ -29,4 +29,3 @@ onMounted(() => {
     ></iframe>
   </div>
 </template>
-<script lang="less" scoped></script>

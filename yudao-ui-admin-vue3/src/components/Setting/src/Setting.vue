@@ -288,10 +288,10 @@ const clear = () => {
   </ElDrawer>
 </template>
 
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-setting';
+<style lang="scss" scoped>
+$prefix-cls: #{$namespace}-setting;
 
-.@{prefix-cls} {
+.#{$prefix-cls} {
   border-radius: 6px 0 0 6px;
 }
 </style>

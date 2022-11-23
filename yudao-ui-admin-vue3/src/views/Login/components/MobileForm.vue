@@ -197,7 +197,7 @@ const signIn = async () => {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 :deep(.anticon) {
   &:hover {
     color: var(--el-color-primary) !important;
