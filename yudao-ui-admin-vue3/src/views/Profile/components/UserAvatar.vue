@@ -87,8 +87,8 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, watch, Ref, UnwrapNestedRefs } from 'vue'
-import 'vue-cropper/dist/index.css'
 import VueCropper from 'vue-cropper/lib/vue-cropper.vue'
+import 'vue-cropper/dist/index.css'
 import { ElRow, ElCol, ElUpload, ElMessage, ElDialog } from 'element-plus'
 import { propTypes } from '@/utils/propTypes'
 import { uploadAvatarApi } from '@/api/system/user/profile'

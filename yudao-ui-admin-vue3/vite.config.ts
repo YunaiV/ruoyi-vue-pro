@@ -87,11 +87,11 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       PurgeIcons(),
       viteCompression({
         verbose: true, // 是否在控制台输出压缩结果
-        disable: true, // 是否禁用
+        disable: false, // 是否禁用
         threshold: 10240, // 体积大于 threshold 才会被压缩,单位 b
         algorithm: 'gzip', // 压缩算法,可选 [ 'gzip' , 'brotliCompress' ,'deflate' , 'deflateRaw']
         ext: '.gz', // 生成的压缩包后缀
-        deleteOriginFile: false //压缩后是否删除源文件
+        deleteOriginFile: true //压缩后是否删除源文件
       }),
       createHtmlPlugin({
         inject: {

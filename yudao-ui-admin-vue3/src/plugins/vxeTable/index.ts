@@ -4,7 +4,7 @@ import XEUtils from 'xe-utils'
 import './renderer'
 import { i18n } from '@/plugins/vueI18n'
 import zhCN from 'vxe-table/es/locale/lang/zh-CN'
-import enUS from 'vxe-table/lib/locale/lang/en-US'
+import enUS from 'vxe-table/es/locale/lang/en-US'
 import {
   // 全局对象
   VXETable,
