@@ -1,0 +1,50 @@
+// 修改样式变量
+//@import 'vxe-table/styles/variable.scss';
+
+/*font*/
+$vxe-font-color: #e5e7eb;
+$vxe-font-size: 14px !default;
+$vxe-font-size-medium: 14px !default;
+$vxe-font-size-small: 13px !default;
+$vxe-font-size-mini: 12px !default;
+
+/*icon*/
+$vxe-icon-font-family: Verdana, Arial, Tahoma !default;
+$vxe-icon-background-color: #fff !default;
+
+$vxe-toolbar-background-color: #262626;
+$vxe-toolbar-button-border: #dcdfe6 !default;
+
+$vxe-table-font-color: #e5e7eb;
+$vxe-table-header-background-color: #262626;
+$vxe-table-body-background-color: #141414;
+$vxe-table-row-striped-background-color: #1d1d1d;
+$vxe-table-row-hover-background-color: #262626;
+$vxe-table-row-hover-striped-background-color: #1e1e1e;
+$vxe-table-footer-background-color: #141414;
+$vxe-table-row-current-background-color: #a7a3a3;
+$vxe-table-column-current-background-color: #a7a3a3;
+$vxe-table-column-hover-background-color: #a7a3a3;
+$vxe-table-row-hover-current-background-color: #a7a3a3;
+$vxe-table-menu-background-color: #262626;
+$vxe-table-border-width: 0px !default;
+$vxe-table-border-color: #dfe5f0 !default;
+
+$vxe-form-background-color: #141414;
+
+$vxe-pager-background-color: #262626;
+
+$vxe-input-background-color: #141414;
+$vxe-select-panel-background-color: #141414;
+$vxe-select-option-hover-background-color: #262626;
+
+/*button*/
+$vxe-button-default-background-color: #262626;
+$vxe-button-dropdown-panel-background-color: #141414;
+
+/*modal*/
+$vxe-modal-header-background-color: #141414;
+$vxe-modal-body-background-color: #141414;
+$vxe-modal-border-color: #3b3b3b;
+
+@import 'vxe-table/styles/index';
