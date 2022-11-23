@@ -1,10 +1,10 @@
 import { App, unref } from 'vue'
-import 'xe-utils'
 import XEUtils from 'xe-utils'
+import './index.scss'
 import './renderer'
 import { i18n } from '@/plugins/vueI18n'
-import zhCN from 'vxe-table/es/locale/lang/zh-CN'
-import enUS from 'vxe-table/es/locale/lang/en-US'
+import zhCN from 'vxe-table/lib/locale/lang/zh-CN'
+import enUS from 'vxe-table/lib/locale/lang/en-US'
 import {
   // 全局对象
   VXETable,
