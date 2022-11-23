@@ -1,4 +1,5 @@
 <h1>🌈 yudao-ui-admin-vue3</h1>
+
 <p align="center">
     <img src="https://img.shields.io/badge/-Vue3.2-34495e?logo=vue.j" />
     <img src="https://img.shields.io/badge/-Vite3-646cff?logo=vite&logoColor=white" />
@@ -11,6 +12,7 @@
     <img src="https://img.shields.io/badge/-Less-1D365D?logo=less&logoColor=white" alt="Less">
     <img src="https://img.shields.io/badge/-Wind%20CSS-06B6D4?logo=Tailwind%20CSS&logoColor=white" alt="Taiwind">
 </p>
+
 ## 介绍
 
 - 基于 vue3.2+ ，TypeScript ，Element Plus 2.2.0+ ，Vite3 ，Pinia ，Windicss 等开发的后台管理系统
@@ -29,7 +31,7 @@
 | --- | --- |--------|
 | [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.45 |
 | [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.2.3 |
-| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.21 |
+| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.22 |
 | [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.9.3 |
 | [pinia](https://pinia.vuejs.org/) | Vue 存储库 替代 vuex5 | 2.0.25 |
 | [vueuse](https://vueuse.org//) | 常用工具集 | 9.6.0 |

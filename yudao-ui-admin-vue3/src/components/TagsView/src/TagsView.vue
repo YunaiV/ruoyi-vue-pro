@@ -137,7 +137,7 @@ const moveToCurrentTag = async () => {
 const tagLinksRefs = useTemplateRefsList<RouterLinkProps>()
 
 const moveToTarget = (currentTag: RouteLocationNormalizedLoaded) => {
-  const wrap$ = unref(scrollbarRef)?.wrap$
+  const wrap$ = unref(scrollbarRef)?.wrapRef
   let firstTag: Nullable<RouterLinkProps> = null
   let lastTag: Nullable<RouterLinkProps> = null
 
@@ -233,7 +233,7 @@ const scroll = ({ scrollLeft }) => {
 
 // 移动到某个位置
 const move = (to: number) => {
-  const wrap$ = unref(scrollbarRef)?.wrap$
+  const wrap$ = unref(scrollbarRef)?.wrapRef
   const { start } = useScrollTo({
     el: wrap$!,
     position: 'scrollLeft',
