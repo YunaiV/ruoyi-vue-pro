@@ -8,18 +8,20 @@ GET {{shop-api-base-url}}/trade-order/confirm-create-order-info-from-cart
 Content-Type: application/x-www-form-urlencoded
 Authorization: Bearer {{user-access-token}}
 
-### /trade-order/confirm-create-order-info-from-cart 基于商品，创建订单
-POST {{shop-api-base-url}}/trade-order/create
+### /trade-order/create 基于商品，创建订单
+POST {{appApi}}/trade/order/create
 Content-Type: application/json
-Authorization: Bearer {{user-access-token}}
+Authorization: Bearer {{appToken}}
+tenant-id: {{appTenentId}}
 
 {
-  "userAddressId": 19,
+  "addressId": 21,
   "remark": "我是备注",
-  "orderItems": [
+  "fromCart": false,
+  "items": [
     {
-      "skuId": 3,
-      "quantity": 1
+      "skuId": 29,
+      "count": 1
     }
   ]
 }

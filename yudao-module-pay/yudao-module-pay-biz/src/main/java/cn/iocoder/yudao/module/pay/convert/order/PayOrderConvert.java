@@ -1,16 +1,17 @@
 package cn.iocoder.yudao.module.pay.convert.order;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderDetailsRespVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExcelVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageItemRespVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderRespVO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
-import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitReqDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
@@ -88,6 +89,7 @@ public interface PayOrderConvert {
 
     PayOrderDO convert(PayOrderCreateReqDTO bean);
 
+    @Mapping(target = "id", ignore = true)
     PayOrderExtensionDO convert(PayOrderSubmitReqDTO bean);
 
     PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqDTO bean);

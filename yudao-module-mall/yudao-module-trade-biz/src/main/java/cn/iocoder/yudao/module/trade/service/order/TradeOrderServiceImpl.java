@@ -167,7 +167,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      * @return 收件地址
      */
     private AddressRespDTO validateAddress(Long userId, Long addressId) {
-        AddressRespDTO address = addressApi.getAddress(userId, addressId);
+        AddressRespDTO address = addressApi.getAddress(addressId, userId);
         if (Objects.isNull(address)) {
             throw exception(ErrorCodeConstants.ORDER_CREATE_ADDRESS_NOT_FOUND);
         }

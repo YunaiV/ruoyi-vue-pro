@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pay.controller.admin.notify;
 
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
@@ -61,6 +62,7 @@ public class PayNotifyController {
     @PostMapping(value = "/callback/{channelId}")
     @ApiOperation(value = "支付渠道的统一回调接口", notes = "包括支付回调，退款回调")
     @PermitAll
+    @OperateLog(enable = false) // 回调地址，无需记录操作日志
     public String notifyCallback(@PathVariable("channelId") Long channelId,
                                  @RequestParam Map<String, String> params,
                                  @RequestBody String body) throws Exception {
