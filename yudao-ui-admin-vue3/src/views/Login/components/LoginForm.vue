@@ -104,29 +104,29 @@
           <div class="flex justify-between w-[100%]">
             <Icon
               icon="ant-design:github-filled"
-              :size="iconSize"
+              :size="30"
               class="cursor-pointer anticon"
-              :color="iconColor"
+              color="#999"
               @click="doSocialLogin('github')"
             />
             <Icon
               icon="ant-design:wechat-filled"
-              :size="iconSize"
+              :size="30"
               class="cursor-pointer anticon"
-              :color="iconColor"
+              color="#999"
               @click="doSocialLogin('wechat')"
             />
             <Icon
               icon="ant-design:alipay-circle-filled"
-              :size="iconSize"
-              :color="iconColor"
+              :size="30"
+              color="#999"
               class="cursor-pointer anticon"
               @click="doSocialLogin('alipay')"
             />
             <Icon
               icon="ant-design:dingtalk-circle-filled"
-              :size="iconSize"
-              :color="iconColor"
+              :size="30"
+              color="#999"
               class="cursor-pointer anticon"
               @click="doSocialLogin('dingtalk')"
             />
@@ -165,19 +165,21 @@ import * as LoginApi from '@/api/login'
 import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'
 
 const { t } = useI18n()
-const iconHouse = useIcon({ icon: 'ep:house' })
-const iconAvatar = useIcon({ icon: 'ep:avatar' })
-const iconLock = useIcon({ icon: 'ep:lock' })
-const { currentRoute, push } = useRouter()
-const permissionStore = usePermissionStore()
 const formLogin = ref()
 const { validForm } = useFormValid(formLogin)
 const { setLoginState, getLoginState } = useLoginState()
-const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN)
-const iconSize = 30
-const iconColor = '#999'
+const { currentRoute, push } = useRouter()
+const permissionStore = usePermissionStore()
 const redirect = ref<string>('')
 const loginLoading = ref(false)
+const iconHouse = useIcon({ icon: 'ep:house' })
+const iconAvatar = useIcon({ icon: 'ep:avatar' })
+const iconLock = useIcon({ icon: 'ep:lock' })
+const verify = ref()
+const captchaType = ref('blockPuzzle') // blockPuzzle 滑块 clickWord 点击文字
+
+const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN)
+
 const LoginRules = {
   tenantName: [required],
   username: [required],
@@ -192,26 +194,26 @@ const loginData = reactive({
     signIn: false
   },
   loginForm: {
-    tenantName: '芋道源码',
-    username: 'admin',
-    password: 'admin123',
+    tenantName: Cookies.get('tenantName') ? Cookies.get('tenantName') : '芋道源码',
+    username: Cookies.get('username') ? Cookies.get('username') : 'admin',
+    password: Cookies.get('password')
+      ? (decrypt(Cookies.get('password')) as unknown as string)
+      : 'admin123',
     captchaVerification: '',
     rememberMe: false
   }
 })
-// blockPuzzle 滑块 clickWord 点击文字
-const verify = ref()
-const captchaType = ref('blockPuzzle')
+
 // 获取验证码
 const getCode = async () => {
   // 情况一，未开启：则直接登录
   if (loginData.captchaEnable === 'false') {
     await handleLogin({})
-    return
+  } else {
+    // 情况二，已开启：则展示验证码；只有完成验证码的情况，才进行登录
+    // 弹出验证码
+    verify.value.show()
   }
-  // 情况二，已开启：则展示验证码；只有完成验证码的情况，才进行登录
-  // 弹出验证码
-  verify.value.show()
 }
 //获取租户ID
 const getTenantId = async () => {
@@ -221,7 +223,9 @@ const getTenantId = async () => {
 // 记住我
 const getCookie = () => {
   const username = Cookies.get('username')
-  const password = Cookies.get('password') ? decrypt(Cookies.get('password')) : undefined
+  const password = Cookies.get('password')
+    ? (decrypt(Cookies.get('password')) as unknown as string)
+    : undefined
   const rememberMe = Cookies.get('rememberMe')
   const tenantName = Cookies.get('tenantName')
   loginData.loginForm = {
@@ -253,7 +257,9 @@ const handleLogin = async (params) => {
     })
     if (loginData.loginForm.rememberMe) {
       Cookies.set('username', loginData.loginForm.username, { expires: 30 })
-      Cookies.set('password', encrypt(loginData.loginForm.password), { expires: 30 })
+      Cookies.set('password', encrypt(loginData.loginForm.password as unknown as string), {
+        expires: 30
+      })
       Cookies.set('rememberMe', loginData.loginForm.rememberMe, { expires: 30 })
       Cookies.set('tenantName', loginData.loginForm.tenantName, { expires: 30 })
     } else {
