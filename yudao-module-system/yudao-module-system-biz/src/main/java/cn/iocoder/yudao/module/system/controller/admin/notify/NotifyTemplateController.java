@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.*;
 import cn.iocoder.yudao.module.system.convert.notify.NotifyTemplateConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
+import cn.iocoder.yudao.module.system.service.notify.NotifySendService;
 import cn.iocoder.yudao.module.system.service.notify.NotifyTemplateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -24,7 +25,6 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-// TODO 芋艿：VO 类上的 swagger 注解完善下，例如说 swagger，枚举等等
 @Api(tags = "管理后台 - 站内信模版")
 @RestController
 @RequestMapping("/system/notify-template")
@@ -33,6 +33,10 @@ public class NotifyTemplateController {
 
     @Resource
     private NotifyTemplateService notifyTemplateService;
+
+    @Resource
+    private NotifySendService notifySendService;
+
 
     @PostMapping("/create")
     @ApiOperation("创建站内信模版")
@@ -87,8 +91,10 @@ public class NotifyTemplateController {
         ExcelUtils.write(response, "站内信模版.xls", "数据", NotifyTemplateExcelVO.class, datas);
     }
 
-    // TODO @芋艿：参考 SmsTemplateController 的 sendNotify 写一个发送站内信的接口
-
-    // TODO @芋艿：参考 SmsSendServiceImpl，新建一个 NotifySendServiceImpl，用于提供出来给发送消息。注意，不要考虑异步发送，直接 insert 就可以了。也不用考虑发送后的回调
-
+    @PostMapping("/send-notify")
+    @ApiOperation("发送站内信")
+    public CommonResult<Long> sendNotify(@Valid @RequestBody NotifyTemplateSendReqVO sendReqVO) {
+        return success(notifySendService.sendSingleNotifyToAdmin(sendReqVO.getUserId(),
+                sendReqVO.getTemplateId(), sendReqVO.getTemplateParams()));
+    }
 }

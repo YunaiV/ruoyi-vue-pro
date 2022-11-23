@@ -5,14 +5,11 @@ import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageCreateReqVO;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessagePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.notify.NotifyMessageConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.notify.NotifyMessageMapper;
-import cn.iocoder.yudao.module.system.enums.notify.NotifyReadStatusEnum;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -88,6 +85,11 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
     }
 
     @Override
+    public List<NotifyMessageDO> getNotifyMessageList(NotifyMessagePageReqVO pageReqVO, Integer size) {
+        return notifyMessageMapper.selectList(pageReqVO, size);
+    }
+
+    @Override
     public PageResult<NotifyMessageDO> getNotifyMessagePage(NotifyMessagePageReqVO pageReqVO) {
         return notifyMessageMapper.selectPage(pageReqVO);
     }
@@ -111,7 +113,7 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
      * @param status 状态
      */
     @Override
-    public void updateNotifyMessageReadStatus(Long id, Integer status) {
+    public void updateNotifyMessageReadStatus(Long id, Boolean status) {
         // 校验消息是否存在
         this.validateNotifyMessageExists(id);
         // 更新状态
@@ -155,20 +157,12 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
         List<NotifyMessageDO> list = notifyMessageMapper.selectUnreadListByUserIdAndUserType(userId, userType);
         if (CollUtil.isNotEmpty(list)) {
             batchUpdateReadStatus(CollectionUtils.convertList(list, NotifyMessageDO::getId));
-
         }
     }
 
-    // TODO 芋艿：批量更新，不要单条遍历哈。
     private void batchUpdateReadStatus(Collection<Long> ids) {
-        if (CollUtil.isNotEmpty(ids)) {
-            for (Long id : ids) {
-                NotifyMessageDO updateObj = new NotifyMessageDO();
-                updateObj.setId(id);
-                updateObj.setReadStatus(NotifyReadStatusEnum.READ.getStatus());
-                notifyMessageMapper.updateById(updateObj);
-            }
-        }
-
+        NotifyMessageDO updateObj = new NotifyMessageDO();
+        updateObj.setReadStatus(false);
+        notifyMessageMapper.update(updateObj, new LambdaQueryWrapperX<NotifyMessageDO>().in(NotifyMessageDO::getId, ids));
     }
 }

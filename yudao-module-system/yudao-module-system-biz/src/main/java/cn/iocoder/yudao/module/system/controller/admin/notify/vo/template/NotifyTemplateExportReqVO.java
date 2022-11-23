@@ -19,7 +19,7 @@ public class NotifyTemplateExportReqVO {
     private String title;
 
     @ApiModelProperty(value = "状态：1-启用 0-禁用")
-    private String status;
+    private Integer status;
 
     @ApiModelProperty(value = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

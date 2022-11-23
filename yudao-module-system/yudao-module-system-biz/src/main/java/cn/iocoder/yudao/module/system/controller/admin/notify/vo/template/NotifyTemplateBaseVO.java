@@ -29,7 +29,7 @@ public class NotifyTemplateBaseVO {
     @ApiModelProperty(value = "状态：1-启用 0-禁用", required = true)
     @NotNull(message = "状态：1-启用 0-禁用不能为空")
     @InEnum(value = CommonStatusEnum.class, message = "状态必须是 {value}")
-    private String status;
+    private Integer status;
 
     @ApiModelProperty(value = "备注")
     private String remarks;

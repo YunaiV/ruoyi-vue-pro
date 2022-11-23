@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.notify.vo.template;
 
+import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
@@ -30,8 +31,8 @@ public class NotifyTemplateExcelVO {
     private String content;
 
     @ExcelProperty(value = "状态：1-启用 0-禁用", converter = DictConvert.class)
-    @DictFormat("common_status") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
-    private String status;
+    @DictFormat(DictTypeConstants.COMMON_STATUS)
+    private Integer status;
 
     @ExcelProperty("备注")
     private String remarks;

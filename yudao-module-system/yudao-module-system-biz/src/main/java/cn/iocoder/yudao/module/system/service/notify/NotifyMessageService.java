@@ -31,6 +31,14 @@ public interface NotifyMessageService {
     List<NotifyMessageDO> getNotifyMessageList(Collection<Long> ids);
 
     /**
+     * 获得站内信集合
+     *
+     * @param pageReqVO 分页查询
+     * @return 站内信分页
+     */
+    List<NotifyMessageDO> getNotifyMessageList(NotifyMessagePageReqVO pageReqVO, Integer size);
+
+    /**
      * 获得站内信分页
      *
      * @param pageReqVO 分页查询
@@ -53,7 +61,7 @@ public interface NotifyMessageService {
      * @param id 站内信编号
      * @param status 状态
      */
-    void updateNotifyMessageReadStatus(Long id, Integer status);
+    void updateNotifyMessageReadStatus(Long id, Boolean status);
 
     /**
      * 批量修改站内信阅读状态
