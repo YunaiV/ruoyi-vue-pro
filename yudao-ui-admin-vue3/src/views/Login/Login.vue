@@ -1,7 +1,7 @@
 <template>
   <div
     :class="prefixCls"
-    class="h-[100%] relative overflow-hidden <xl:bg-v-dark <sm:px-10px <xl:px-10px <md:px-10px"
+    class="h-[100%] relative <xl:bg-v-dark <sm:px-10px <xl:px-10px <md:px-10px"
   >
     <div class="relative h-full flex mx-auto">
       <div
@@ -74,7 +74,7 @@ const prefixCls = getPrefixCls('login')
 </script>
 
 <style lang="scss" scoped>
-$prefix-cls: #{$namespace}-panel;
+$prefix-cls: #{$namespace}-login;
 
 .#{$prefix-cls} {
   &__left {
