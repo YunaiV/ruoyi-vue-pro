@@ -28,7 +28,7 @@
     <!--商品展示栏-->
     <yd-product-box :product-list="productList" :title="'每日上新'" show-type="normal"></yd-product-box>
     <yd-product-box :product-list="productList" :title="'热卖商品'" show-type="half"></yd-product-box>
-    <yd-product-more :product-list="productList" more-status="moreStatus"></yd-product-more>
+    <yd-product-more :product-list="productList" :more-status="moreStatus"></yd-product-more>
 
     <u-gap height="5px"></u-gap>
   </view>
