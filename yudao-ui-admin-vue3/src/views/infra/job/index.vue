@@ -113,8 +113,7 @@
     </template>
   </XModal>
 </template>
-
-<script setup lang="ts">
+<script setup lang="ts" name="Job">
 import { ref, unref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'

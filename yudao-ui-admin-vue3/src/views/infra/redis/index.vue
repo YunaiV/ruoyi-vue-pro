@@ -128,7 +128,7 @@
     </el-row>
   </XModal>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="Redis">
 import { onBeforeMount, ref } from 'vue'
 import {
   ElRow,

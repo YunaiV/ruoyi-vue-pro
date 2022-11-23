@@ -235,7 +235,7 @@
     </template>
   </XModal>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="User">
 import { nextTick, onMounted, reactive, ref, unref, watch } from 'vue'
 import {
   ElTag,
@@ -267,8 +267,8 @@ import { FormExpose } from '@/components/Form'
 import { rules, allSchemas } from './user.data'
 import * as UserApi from '@/api/system/user'
 import { listSimpleDeptApi } from '@/api/system/dept'
-import { listSimplePostsApi, PostVO } from '@/api/system/post'
 import { listSimpleRolesApi } from '@/api/system/role'
+import { listSimplePostsApi, PostVO } from '@/api/system/post'
 import {
   aassignUserRoleApi,
   listUserRolesApi,

@@ -3,7 +3,7 @@
     <IFrame :src="src" />
   </ContentWrap>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="Jmreport">
 import { ref } from 'vue'
 import { IFrame } from '@/components/IFrame'
 import { getAccessToken } from '@/utils/auth'

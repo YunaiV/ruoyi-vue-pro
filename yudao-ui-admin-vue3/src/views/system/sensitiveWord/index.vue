@@ -89,7 +89,7 @@
     </template>
   </XModal>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="SensitiveWord">
 import { onMounted, ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'

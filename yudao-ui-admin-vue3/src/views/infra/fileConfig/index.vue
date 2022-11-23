@@ -46,7 +46,6 @@
       </template>
     </vxe-grid>
   </ContentWrap>
-
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
     <Form
@@ -76,7 +75,7 @@
     </template>
   </XModal>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="FileConfig">
 // 全局相关的 import
 import { ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'

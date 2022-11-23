@@ -27,7 +27,7 @@
     </template>
   </XModal>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="Loginlog">
 // 全局相关的 import
 import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'

@@ -30,7 +30,7 @@
     </el-card>
   </div>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="Profile">
 import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { ElCard, ElTabs, ElTabPane } from 'element-plus'

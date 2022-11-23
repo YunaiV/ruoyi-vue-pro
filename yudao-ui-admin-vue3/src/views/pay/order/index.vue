@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" name="Order">
 import { ref, unref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'

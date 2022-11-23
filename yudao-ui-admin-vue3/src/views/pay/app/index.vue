@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" name="App">
 import { ref, unref } from 'vue'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'

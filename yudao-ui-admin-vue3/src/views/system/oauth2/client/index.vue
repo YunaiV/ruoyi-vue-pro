@@ -129,7 +129,7 @@
     </template>
   </XModal>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="Client">
 // 全局相关的 import
 import { ref, unref } from 'vue'
 import { ElTag } from 'element-plus'

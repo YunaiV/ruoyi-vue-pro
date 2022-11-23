@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" name="ProcessInstance">
 import { ref } from 'vue'
 import dayjs from 'dayjs'
 import { DICT_TYPE } from '@/utils/dict'

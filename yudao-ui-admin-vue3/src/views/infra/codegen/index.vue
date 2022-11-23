@@ -48,7 +48,7 @@
   <ImportTable ref="importRef" @ok="handleQuery()" />
   <Preview ref="previewRef" />
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="Codegen">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { VxeGridInstance } from 'vxe-table'

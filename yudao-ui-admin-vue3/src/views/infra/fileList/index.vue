@@ -26,7 +26,6 @@
       </template>
     </vxe-grid>
   </ContentWrap>
-
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
     <Descriptions :schema="allSchemas.detailSchema" :data="detailData">
@@ -78,7 +77,7 @@
     </template>
   </XModal>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="FileList">
 import { ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'

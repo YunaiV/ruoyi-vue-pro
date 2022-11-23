@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" name="Group">
 import { ref, unref, onMounted } from 'vue'
 import dayjs from 'dayjs'
 import { ElMessage, ElSelect, ElOption } from 'element-plus'

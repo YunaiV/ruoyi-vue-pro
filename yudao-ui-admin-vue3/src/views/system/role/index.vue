@@ -141,7 +141,7 @@
     </template>
   </XModal>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="Role">
 import { onMounted, reactive, ref, unref } from 'vue'
 import {
   ElForm,

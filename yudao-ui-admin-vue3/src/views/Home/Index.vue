@@ -160,7 +160,7 @@
     </el-col>
   </el-row>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="Home">
 import { ref, reactive } from 'vue'
 import { set } from 'lodash-es'
 import { EChartsOption } from 'echarts'

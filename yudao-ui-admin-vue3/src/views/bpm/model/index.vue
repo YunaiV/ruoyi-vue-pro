@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" name="Model">
 import { ref, unref } from 'vue'
 import dayjs from 'dayjs'
 import { ElTableColumn, ElTag, ElSwitch } from 'element-plus'

@@ -24,7 +24,7 @@
     <IFrame v-if="!loding" v-loading="loding" :src="src" />
   </ContentWrap>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="DbDoc">
 import { onMounted, ref } from 'vue'
 import download from '@/utils/download'
 import { useI18n } from '@/hooks/web/useI18n'

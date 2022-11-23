@@ -117,7 +117,7 @@
     </XModal>
   </div>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="Dict">
 import { ref, unref, reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
