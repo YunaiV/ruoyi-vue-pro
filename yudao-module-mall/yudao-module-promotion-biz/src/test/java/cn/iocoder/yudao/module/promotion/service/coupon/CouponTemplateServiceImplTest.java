@@ -15,11 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -119,7 +118,7 @@ public class CouponTemplateServiceImplTest extends BaseDbUnitTest {
            o.setName("芋艿");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setDiscountType(PromotionDiscountTypeEnum.PERCENT.getType());
-           o.setCreateTime(buildLocalDateTime(2022, 2, 2));
+           o.setCreateTime(buildTime(2022, 2, 2));
        });
        couponTemplateMapper.insert(dbCouponTemplate);
        // 测试 name 不匹配
@@ -129,13 +128,13 @@ public class CouponTemplateServiceImplTest extends BaseDbUnitTest {
        // 测试 type 不匹配
        couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setDiscountType(PromotionDiscountTypeEnum.PRICE.getType())));
        // 测试 createTime 不匹配
-       couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setCreateTime(buildLocalDateTime(2022, 1, 1))));
+       couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setCreateTime(buildTime(2022, 1, 1))));
        // 准备参数
        CouponTemplatePageReqVO reqVO = new CouponTemplatePageReqVO();
        reqVO.setName("芋艿");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
        reqVO.setDiscountType(PromotionDiscountTypeEnum.PERCENT.getType());
-       reqVO.setCreateTime((new Date[]{buildTime(2022, 2, 1), buildTime(2022, 2, 3)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1), buildTime(2022, 2, 3)}));
 
        // 调用
        PageResult<CouponTemplateDO> pageResult = couponTemplateService.getCouponTemplatePage(reqVO);

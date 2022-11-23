@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +46,7 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
 
             logDO.setUserIp("192.168.199.16");
             logDO.setUsername("wangkai");
-            logDO.setCreateTime(buildLocalDateTime(2021, 3, 6));
+            logDO.setCreateTime(buildTime(2021, 3, 6));
             logDO.setResult(SUCCESS.getResult());
         });
         loginLogMapper.insert(loginLogDO);
@@ -59,7 +59,7 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
         // 不同username
         loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setUsername("yunai")));
         // 构造一个早期时间 2021-02-06 00:00:00
-        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setCreateTime(buildLocalDateTime(2021, 2, 6))));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setCreateTime(buildTime(2021, 2, 6))));
 
 
         // 构造调用参数
@@ -67,8 +67,8 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUsername("wangkai");
         reqVO.setUserIp("192.168.199");
         reqVO.setStatus(true);
-        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021, 3, 5),
-                buildLocalDateTime(2021, 3, 7)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 3, 5),
+                buildTime(2021, 3, 7)}));
 
         // 调用service方法
         PageResult<LoginLogDO> pageResult = loginLogService.getLoginLogPage(reqVO);
@@ -91,7 +91,7 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
 
             logDO.setUserIp("192.168.111.16");
             logDO.setUsername("wangxiaokai");
-            logDO.setCreateTime(buildLocalDateTime(2021, 3, 6));
+            logDO.setCreateTime(buildTime(2021, 3, 6));
             logDO.setResult(SUCCESS.getResult());
         });
         loginLogMapper.insert(loginLogDO);
@@ -104,15 +104,15 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
         // 不同username
         loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setUsername("yunai")));
         // 构造一个早期时间 2021-02-06 00:00:00
-        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setCreateTime(buildLocalDateTime(2021, 2, 6))));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setCreateTime(buildTime(2021, 2, 6))));
 
         // 构造调用参数
         LoginLogExportReqVO reqVO = new LoginLogExportReqVO();
         reqVO.setUsername("wangxiaokai");
         reqVO.setUserIp("192.168.111");
         reqVO.setStatus(true);
-        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021, 3, 5),
-                buildLocalDateTime(2021, 3, 7)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 3, 5),
+                buildTime(2021, 3, 7)}));
 
         // 调用service方法
         List<LoginLogDO> loginLogList = loginLogService.getLoginLogList(reqVO);

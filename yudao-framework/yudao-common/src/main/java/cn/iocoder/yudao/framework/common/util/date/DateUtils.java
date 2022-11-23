@@ -83,11 +83,6 @@ public class DateUtils {
         return buildTime(year, mouth, day, 0, 0, 0);
     }
 
-    @Deprecated
-    public static LocalDateTime buildLocalDateTime(int year, int mouth, int day) {
-        return LocalDateTime.of(year, mouth, day, 0, 0, 0);
-    }
-
     /**
      * 创建指定时间
      *
@@ -130,11 +125,6 @@ public class DateUtils {
             return a;
         }
         return a.isAfter(b) ? a : b;
-    }
-
-    @Deprecated
-    public static boolean afterNow(LocalDateTime localDateTime) {
-        return localDateTime.isAfter(LocalDateTime.now());
     }
 
     /**
