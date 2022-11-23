@@ -1,5 +1,4 @@
 import { reactive } from 'vue'
-
 import {
   FormItemRenderOptions,
   VxeColumnPropTypes,
@@ -8,8 +7,8 @@ import {
   VxeTableDefines
 } from 'vxe-table'
 import { eachTree } from 'xe-utils'
-import { getBoolDictOptions, getDictOptions, getIntDictOptions } from '@/utils/dict'
 import { useI18n } from '@/hooks/web/useI18n'
+import { getBoolDictOptions, getDictOptions, getIntDictOptions } from '@/utils/dict'
 import { FormSchema } from '@/types/form'
 import { VxeTableColumn } from '@/types/table'
 import { ComponentOptions } from '@/types/components'
@@ -162,7 +161,7 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
     const buttons: VxeFormItemProps = {
       span: 24,
       align: 'center',
-      collapseNode: searchSchema.length > 3,
+      collapseNode: searchSchema.length > 4,
       itemRender: {
         name: '$buttons',
         children: [
