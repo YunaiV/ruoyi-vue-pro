@@ -23,7 +23,7 @@ specifiers:
   '@zxcvbn-ts/core': ^2.1.0
   animate.css: ^4.1.1
   autoprefixer: ^10.4.13
-  axios: ^0.27.2
+  axios: ^1.2.0
   crypto-js: ^4.1.1
   dayjs: ^1.11.6
   echarts: ^5.4.0
@@ -87,7 +87,7 @@ dependencies:
   '@wangeditor/editor-for-vue': registry.npmmirror.com/@wangeditor/editor-for-vue/5.1.12_3apfu3xbp6awzuex7ed3sbrv6y
   '@zxcvbn-ts/core': registry.npmmirror.com/@zxcvbn-ts/core/2.1.0
   animate.css: registry.npmmirror.com/animate.css/4.1.1
-  axios: registry.npmmirror.com/axios/0.27.2
+  axios: registry.npmmirror.com/axios/1.2.0
   crypto-js: registry.npmmirror.com/crypto-js/4.1.1
   dayjs: registry.npmmirror.com/dayjs/1.11.6
   echarts: registry.npmmirror.com/echarts/5.4.0
@@ -2496,13 +2496,14 @@ packages:
       - debug
     dev: true
 
-  registry.npmmirror.com/axios/0.27.2:
-    resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/axios/-/axios-0.27.2.tgz}
+  registry.npmmirror.com/axios/1.2.0:
+    resolution: {integrity: sha512-zT7wZyNYu3N5Bu0wuZ6QccIf93Qk1eV8LOewxgjOZFd2DenOs98cJ7+Y6703d0wkaXGY6/nZd4EweJaHz9uzQw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/axios/-/axios-1.2.0.tgz}
     name: axios
-    version: 0.27.2
+    version: 1.2.0
     dependencies:
       follow-redirects: registry.npmmirror.com/follow-redirects/1.15.2
       form-data: registry.npmmirror.com/form-data/4.0.0
+      proxy-from-env: registry.npmmirror.com/proxy-from-env/1.1.0
     transitivePeerDependencies:
       - debug
     dev: false
@@ -7225,6 +7226,12 @@ packages:
     name: prismjs
     version: 1.29.0
     engines: {node: '>=6'}
+    dev: false
+
+  registry.npmmirror.com/proxy-from-env/1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/proxy-from-env/-/proxy-from-env-1.1.0.tgz}
+    name: proxy-from-env
+    version: 1.1.0
     dev: false
 
   registry.npmmirror.com/prr/1.0.1:
