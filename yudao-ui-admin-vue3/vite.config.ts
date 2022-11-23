@@ -7,11 +7,11 @@ import VueJsx from '@vitejs/plugin-vue-jsx'
 import EslintPlugin from 'vite-plugin-eslint'
 import VueI18n from '@intlify/vite-plugin-vue-i18n'
 import { createStyleImportPlugin, ElementPlusResolve, VxeTableResolve } from 'vite-plugin-style-import'
+import progress from 'vite-plugin-progress'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import PurgeIcons from 'vite-plugin-purge-icons'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import viteCompression from 'vite-plugin-compression'
-
 // 当前执行node命令时文件夹的地址(工作目录)
 const root = process.cwd()
 
@@ -54,6 +54,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       Vue(),
       VueJsx(),
       WindiCSS(),
+      progress(),
+      PurgeIcons(),
       createStyleImportPlugin({
         resolves: [ElementPlusResolve(),VxeTableResolve()],
         libs: [{
@@ -84,7 +86,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         symbolId: 'icon-[dir]-[name]',
         svgoOptions: true
       }),
-      PurgeIcons(),
       viteCompression({
         verbose: true, // 是否在控制台输出压缩结果
         disable: false, // 是否禁用
@@ -102,7 +103,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         }
       })
     ],
-
     css: {
       preprocessorOptions: {
         less: {
@@ -144,6 +144,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         'vue-i18n',
         'vxe-table',
         'xe-utils',
+        'lodash-es',
         'element-plus/es',
         'element-plus/es/locale/lang/zh-cn',
         'element-plus/es/locale/lang/en',
