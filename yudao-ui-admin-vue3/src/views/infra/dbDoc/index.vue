@@ -44,14 +44,16 @@ const init = async () => {
 }
 /** 处理导出  */
 const handleExport = async (type: string) => {
-  const res = await DbDocApi.exportHtmlApi()
   if (type === 'HTML') {
+    const res = await DbDocApi.exportHtmlApi()
     download.html(res, '数据库文档.html')
   }
   if (type === 'Word') {
+    const res = await DbDocApi.exportWordApi()
     download.word(res, '数据库文档.doc')
   }
   if (type === 'Markdown') {
+    const res = await DbDocApi.exportMarkdownApi()
     download.markdown(res, '数据库文档.md')
   }
 }
