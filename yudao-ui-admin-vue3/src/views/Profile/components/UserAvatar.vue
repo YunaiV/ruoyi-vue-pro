@@ -24,7 +24,7 @@
           :fixedNumber="options.fixedNumber"
           :fixedBox="options.fixedBox"
           :centerBox="options.centerBox"
-          @realTime="realTime"
+          @real-time="realTime"
         />
       </el-col>
       <el-col :xs="24" :md="12" :style="{ height: '350px' }">

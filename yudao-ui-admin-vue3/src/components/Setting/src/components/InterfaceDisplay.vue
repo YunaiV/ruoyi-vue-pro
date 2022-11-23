@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { ElSwitch, ElInput, ElMessage } from 'element-plus'
+import { ElSwitch, ElInput } from 'element-plus'
 import { setCssVar } from '@/utils'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useDesign } from '@/hooks/web/useDesign'
@@ -108,14 +108,6 @@ const greyModeChange = (show: boolean) => {
   appStore.setGreyMode(show)
 }
 
-// 动态路由
-const dynamicRouter = ref(appStore.getDynamicRouter)
-
-const dynamicRouterChange = (show: boolean) => {
-  ElMessage.info(t('setting.reExperienced'))
-  appStore.setDynamicRouter(show)
-}
-
 // 固定菜单
 const fixedMenu = ref(appStore.getFixedMenu)
 
@@ -205,11 +197,6 @@ watch(
     <div class="flex justify-between items-center">
       <span class="text-14px">{{ t('setting.greyMode') }}</span>
       <ElSwitch v-model="greyMode" @change="greyModeChange" />
-    </div>
-
-    <div class="flex justify-between items-center">
-      <span class="text-14px">{{ t('setting.dynamicRouter') }}</span>
-      <ElSwitch v-model="dynamicRouter" @change="dynamicRouterChange" />
     </div>
 
     <div class="flex justify-between items-center">

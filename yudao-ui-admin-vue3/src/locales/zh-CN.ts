@@ -93,7 +93,6 @@ export default {
     footer: '页脚',
     uniqueOpened: '菜单手风琴',
     tagsViewIcon: '标签页图标',
-    dynamicRouter: '动态路由',
     reExperienced: '请重新退出登录体验',
     fixedMenu: '固定菜单'
   },

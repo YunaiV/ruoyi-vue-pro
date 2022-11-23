@@ -153,23 +153,20 @@ import {
   ElSwitch,
   ElTag
 } from 'element-plus'
-import { DICT_TYPE, getDictOptions } from '@/utils/dict'
+import { VxeGridInstance } from 'vxe-table'
+import { FormExpose } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { FormExpose } from '@/components/Form'
-import { rules, allSchemas } from './role.data'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { handleTree } from '@/utils/tree'
 import { SystemDataScopeEnum } from '@/utils/constants'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { DICT_TYPE, getDictOptions } from '@/utils/dict'
+import { rules, allSchemas } from './role.data'
 import * as RoleApi from '@/api/system/role'
 import { listSimpleMenusApi } from '@/api/system/menu'
 import { listSimpleDeptApi } from '@/api/system/dept'
 import * as PermissionApi from '@/api/system/permission'
-import type {
-  PermissionAssignRoleDataScopeReqVO,
-  PermissionAssignRoleMenuReqVO
-} from '@/api/system/permission/types'
+
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
@@ -305,14 +302,14 @@ const handleScope = async (type: string, row: RoleApi.RoleVO) => {
 const submitScope = async () => {
   const keys = treeRef.value!.getCheckedKeys(false) as unknown as Array<number>
   if ('data' === actionScopeType.value) {
-    const data = ref<PermissionAssignRoleDataScopeReqVO>({
+    const data = ref<PermissionApi.PermissionAssignRoleDataScopeReqVO>({
       roleId: dataScopeForm.id,
       dataScope: dataScopeForm.dataScope,
       dataScopeDeptIds: dataScopeForm.dataScope !== SystemDataScopeEnum.DEPT_CUSTOM ? [] : keys
     })
     await PermissionApi.assignRoleDataScopeApi(data.value)
   } else if ('menu' === actionScopeType.value) {
-    const data = ref<PermissionAssignRoleMenuReqVO>({
+    const data = ref<PermissionApi.PermissionAssignRoleMenuReqVO>({
       roleId: dataScopeForm.id,
       menuIds: keys
     })

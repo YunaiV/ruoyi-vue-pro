@@ -2,24 +2,24 @@
   <ContentWrap title="数据库文档">
     <!-- 操作工具栏 -->
     <div class="mb-10px">
-       <XButton
-          type="primary"
-          preIcon="ep:download"
-          :title="t('action.export') + ' HTML'"
-          @click="handleExport('HTML')"
-        />
-         <XButton
-          type="primary"
-          preIcon="ep:download"
-          :title="t('action.export') + ' Word'"
-          @click="handleExport('Word')"
-        />
-         <XButton
-          type="primary"
-          preIcon="ep:download"
-          :title="t('action.export') + ' Markdown'"
-          @click="handleExport('Markdown')"
-        />
+      <XButton
+        type="primary"
+        preIcon="ep:download"
+        :title="t('action.export') + ' HTML'"
+        @click="handleExport('HTML')"
+      />
+      <XButton
+        type="primary"
+        preIcon="ep:download"
+        :title="t('action.export') + ' Word'"
+        @click="handleExport('Word')"
+      />
+      <XButton
+        type="primary"
+        preIcon="ep:download"
+        :title="t('action.export') + ' Markdown'"
+        @click="handleExport('Markdown')"
+      />
     </div>
     <IFrame v-if="!loding" v-loading="loding" :src="src" />
   </ContentWrap>
@@ -45,13 +45,17 @@ const init = async () => {
 /** 处理导出  */
 const handleExport = async (type: string) => {
   const res = await DbDocApi.exportHtmlApi()
-  if (type === 'HTML') { download.html(res, '数据库文档.html') }
-  if (type === 'Word') { download.word(res, '数据库文档.doc') }
-  if(type === 'Markdown') {download.markdown(res, '数据库文档.md')}
-  
+  if (type === 'HTML') {
+    download.html(res, '数据库文档.html')
+  }
+  if (type === 'Word') {
+    download.word(res, '数据库文档.doc')
+  }
+  if (type === 'Markdown') {
+    download.markdown(res, '数据库文档.md')
+  }
 }
 onMounted(async () => {
   await init()
 })
 </script>
-

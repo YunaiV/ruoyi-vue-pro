@@ -93,7 +93,6 @@ export default {
     footer: 'Footer',
     uniqueOpened: 'Unique opened',
     tagsViewIcon: 'Tags view icon',
-    dynamicRouter: 'Dynamic router',
     reExperienced: 'Please exit the login experience again',
     fixedMenu: 'Fixed menu'
   },
