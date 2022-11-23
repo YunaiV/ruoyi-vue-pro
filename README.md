@@ -38,7 +38,7 @@
 * 集成阿里云、腾讯云、云片等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务
 * 集成报表设计器，支持数据报表、图形报表、打印设计等
 
-| 项目名                | 说明                     | 传说门                                                                                                                                 |
+| 项目名                | 说明                     | 传送门                                                                                                                                 |
 |--------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | `ruoyi-vue-pro`    | Spring Boot 多模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro)     |
 | `yudao-cloud`  | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)         |
