@@ -224,8 +224,8 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [Vue](https://staging-cn.vuejs.org/)                                 | Vue 框架         | 3.2.45 |
 | [Vite](https://cn.vitejs.dev//)                                      | 开发与构建工具     | 3.2.3  |
 | [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus    | 2.2.21 |
-| [TypeScript](https://www.typescriptlang.org/docs/)                   | TypeScript      | 4.8.4  |
-| [pinia](https://pinia.vuejs.org/)                                    | vuex5           | 2.0.24 |
+| [TypeScript](https://www.typescriptlang.org/docs/)                   | TypeScript      | 4.9.3  |
+| [pinia](https://pinia.vuejs.org/)                                    | vuex5           | 2.0.25 |
 | [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化             | 9.2.2  |
 | [windicss](https://cn.windicss.org/)                                 | 下一代工具优先的 CSS 框架 | 3.5.6  |
 | [iconify](https://icon-sets.iconify.design/)                         | 在线图标库           | 3.0.0  |
