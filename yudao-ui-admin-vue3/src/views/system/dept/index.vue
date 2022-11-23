@@ -75,19 +75,19 @@
     </template>
   </XModal>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="Dept">
 import { nextTick, onMounted, reactive, ref, unref } from 'vue'
+import { ElSelect, ElTreeSelect, ElOption } from 'element-plus'
+import { VxeGridInstance } from 'vxe-table'
+import { handleTree } from '@/utils/tree'
+import { required } from '@/utils/formRules.js'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { VxeGridInstance } from 'vxe-table'
-import { ElSelect, ElTreeSelect, ElOption } from 'element-plus'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { FormExpose } from '@/components/Form'
 import { allSchemas } from './dept.data'
 import * as DeptApi from '@/api/system/dept'
 import { getListSimpleUsersApi, UserVO } from '@/api/system/user'
-import { required } from '@/utils/formRules.js'
-import { handleTree } from '@/utils/tree'
-import { FormExpose } from '@/components/Form'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗

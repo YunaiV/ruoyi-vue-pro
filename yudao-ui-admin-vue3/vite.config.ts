@@ -2,16 +2,18 @@ import { resolve } from 'path'
 import { loadEnv } from 'vite'
 import type { UserConfig, ConfigEnv } from 'vite'
 import Vue from '@vitejs/plugin-vue'
-import WindiCSS from 'vite-plugin-windicss'
 import VueJsx from '@vitejs/plugin-vue-jsx'
-import EslintPlugin from 'vite-plugin-eslint'
 import VueI18n from '@intlify/vite-plugin-vue-i18n'
-import { createStyleImportPlugin, ElementPlusResolve, VxeTableResolve } from 'vite-plugin-style-import'
+import WindiCSS from 'vite-plugin-windicss'
 import progress from 'vite-plugin-progress'
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import EslintPlugin from 'vite-plugin-eslint'
 import PurgeIcons from 'vite-plugin-purge-icons'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import viteCompression from 'vite-plugin-compression'
+import vueSetupExtend from 'vite-plugin-vue-setup-extend'
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import { createStyleImportPlugin, ElementPlusResolve, VxeTableResolve } from 'vite-plugin-style-import'
+
 // 当前执行node命令时文件夹的地址(工作目录)
 const root = process.cwd()
 
@@ -56,6 +58,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       WindiCSS(),
       progress(),
       PurgeIcons(),
+      vueSetupExtend(),
       createStyleImportPlugin({
         resolves: [ElementPlusResolve(),VxeTableResolve()],
         libs: [{
