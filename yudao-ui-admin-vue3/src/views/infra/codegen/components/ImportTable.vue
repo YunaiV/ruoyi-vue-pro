@@ -48,16 +48,16 @@
     </template>
   </XModal>
 </template>
-
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { getSchemaTableListApi, createCodegenListApi } from '@/api/infra/codegen'
-import { ElForm, ElFormItem, ElInput, ElSelect, ElOption } from 'element-plus'
-import { getDataSourceConfigListApi, DataSourceConfigVO } from '@/api/infra/dataSourceConfig'
-import type { DatabaseTableVO } from '@/api/infra/codegen/types'
 import { VxeTableInstance } from 'vxe-table'
+import { ElForm, ElFormItem, ElInput, ElSelect, ElOption } from 'element-plus'
+import type { DatabaseTableVO } from '@/api/infra/codegen/types'
+import { getSchemaTableListApi, createCodegenListApi } from '@/api/infra/codegen'
+import { getDataSourceConfigListApi, DataSourceConfigVO } from '@/api/infra/dataSourceConfig'
+
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 const emit = defineEmits(['ok'])

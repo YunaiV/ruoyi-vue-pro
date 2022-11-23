@@ -1,28 +1,3 @@
-<script setup lang="ts">
-import { onMounted, PropType, ref } from 'vue'
-import { ElInput, ElSelect, ElOption } from 'element-plus'
-import { CodegenColumnVO } from '@/api/infra/codegen/types'
-import { listSimpleDictTypeApi } from '@/api/system/dict/dict.type'
-import { DictTypeVO } from '@/api/system/dict/types'
-const props = defineProps({
-  info: {
-    type: Array as unknown as PropType<CodegenColumnVO[]>,
-    default: () => null
-  }
-})
-/** 查询字典下拉列表 */
-const dictOptions = ref<DictTypeVO[]>()
-const getDictOptions = async () => {
-  const res = await listSimpleDictTypeApi()
-  dictOptions.value = res
-}
-onMounted(async () => {
-  await getDictOptions()
-})
-defineExpose({
-  info: props.info
-})
-</script>
 <template>
   <vxe-table ref="dragTable" :data="info" stripe :column-config="{ resizable: true }">
     <vxe-column title="字段列名" field="columnName" fixed="left" width="80" />
@@ -123,3 +98,29 @@ defineExpose({
     </vxe-column>
   </vxe-table>
 </template>
+<script setup lang="ts">
+import { onMounted, PropType, ref } from 'vue'
+import { ElInput, ElSelect, ElOption } from 'element-plus'
+import { DictTypeVO } from '@/api/system/dict/types'
+import { CodegenColumnVO } from '@/api/infra/codegen/types'
+import { listSimpleDictTypeApi } from '@/api/system/dict/dict.type'
+
+const props = defineProps({
+  info: {
+    type: Array as unknown as PropType<CodegenColumnVO[]>,
+    default: () => null
+  }
+})
+/** 查询字典下拉列表 */
+const dictOptions = ref<DictTypeVO[]>()
+const getDictOptions = async () => {
+  const res = await listSimpleDictTypeApi()
+  dictOptions.value = res
+}
+onMounted(async () => {
+  await getDictOptions()
+})
+defineExpose({
+  info: props.info
+})
+</script>

@@ -1,10 +1,12 @@
+<template>
+  <Form :rules="rules" @register="register" />
+</template>
 <script setup lang="ts">
 import { onMounted, PropType, reactive, ref, watch } from 'vue'
-import { required } from '@/utils/formRules'
 import { Form } from '@/components/Form'
-import { handleTree } from '@/utils/tree'
-import { ElTreeSelect } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
+import { required } from '@/utils/formRules'
+import { handleTree } from '@/utils/tree'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { listSimpleMenusApi } from '@/api/system/menu'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
@@ -32,7 +34,6 @@ const rules = reactive({
 })
 const templateTypeOptions = getIntDictOptions(DICT_TYPE.INFRA_CODEGEN_TEMPLATE_TYPE)
 const sceneOptions = getIntDictOptions(DICT_TYPE.INFRA_CODEGEN_SCENE)
-const treeRef = ref<InstanceType<typeof ElTreeSelect>>()
 const menuOptions = ref<any>([]) // 树形结构
 const getTree = async () => {
   const res = await listSimpleMenusApi()
@@ -100,8 +101,12 @@ const schema = reactive<FormSchema[]>([
   {
     label: '上级菜单',
     field: 'parentMenuId',
+    component: 'TreeSelect',
     componentProps: {
-      optionsSlot: true
+      data: menuOptions,
+      props: menuProps,
+      checkStrictly: true,
+      nodeKey: 'id'
     },
     labelMessage: '分配到指定菜单下，例如 系统管理',
     colProps: {
@@ -112,12 +117,6 @@ const schema = reactive<FormSchema[]>([
 const { register, methods, elFormRef } = useForm({
   schema
 })
-const parentMenuId = ref<number>()
-//子组件像父组件传值
-const emit = defineEmits(['menu'])
-const handleNodeClick = () => {
-  emit('menu', parentMenuId.value)
-}
 
 // ========== 初始化 ==========
 onMounted(async () => {
@@ -140,18 +139,3 @@ defineExpose({
   getFormData: methods.getFormData
 })
 </script>
-<template>
-  <Form :rules="rules" @register="register">
-    <template #parentMenuId>
-      <el-tree-select
-        v-model="parentMenuId"
-        ref="treeRef"
-        node-key="id"
-        :props="menuProps"
-        :data="menuOptions"
-        check-strictly
-        @change="handleNodeClick"
-      />
-    </template>
-  </Form>
-</template>
