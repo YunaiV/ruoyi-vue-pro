@@ -94,7 +94,6 @@
     "stylelint-config-standard": "^29.0.0",
     "stylelint-order": "^5.0.0",
     "typescript": "4.9.3",
-    "unplugin-vue-macros": "^0.16.4",
     "vite": "3.2.4",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-eslint": "^1.8.1",
