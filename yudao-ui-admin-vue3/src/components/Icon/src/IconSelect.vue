@@ -168,7 +168,7 @@ watch(
 
           <ElPagination
             small
-            :total="copyIconList[currentActiveType].length"
+            :total="copyIconList[currentActiveType].length as unknown as number"
             :page-size="pageSize"
             :current-page="currentPage"
             background
