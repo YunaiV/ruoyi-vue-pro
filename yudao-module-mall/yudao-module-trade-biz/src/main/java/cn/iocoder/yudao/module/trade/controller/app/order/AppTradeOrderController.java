@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderGetCreateInfoRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.TradeOrderPageReqVO;
@@ -33,7 +34,7 @@ public class AppTradeOrderController {
     @GetMapping("/get-create-info")
     @ApiOperation("基于商品，确认创建订单")
     @PreAuthenticated
-    public CommonResult<AppTradeOrderGetCreateInfoRespVO> getTradeOrderCreateInfo(AppTradeOrderCreateReqVO createReqVO) {
+    public CommonResult<AppTradeOrderGetCreateInfoRespVO> getOrderCreateInfo(AppTradeOrderCreateReqVO createReqVO) {
 //        return success(tradeOrderService.getOrderConfirmCreateInfo(UserSecurityContextHolder.getUserId(), skuId, quantity, couponCardId));
         return null;
     }
@@ -41,14 +42,20 @@ public class AppTradeOrderController {
     @PostMapping("/create")
     @ApiOperation("创建订单")
     @PreAuthenticated
-    public CommonResult<Long> createTradeOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO,
-                                               HttpServletRequest servletRequest) {
+    public CommonResult<Long> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO,
+                                          HttpServletRequest servletRequest) {
         // 获取登录用户、用户 IP 地址
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         String clientIp = ServletUtil.getClientIP(servletRequest);
         // 创建交易订单，预支付记录
         Long orderId = tradeOrderService.createOrder(loginUserId, clientIp, createReqVO);
         return CommonResult.success(orderId);
+    }
+
+    @PostMapping("/update-paid")
+    @ApiOperation(value = "更新订单为已支付", notes = "由 pay-module 支付服务，进行回调，可见 PayNotifyJob")
+    public CommonResult<Boolean> updateOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
+        return null;
     }
 
     @GetMapping("/get")
