@@ -60,7 +60,7 @@
         <minio.version>8.2.2</minio.version>
         <aliyun-java-sdk-core.version>4.6.2</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
-        <tencentcloud-sdk-java.version>3.1.561</tencentcloud-sdk-java.version>
+        <tencentcloud-sdk-java.version>3.1.634</tencentcloud-sdk-java.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
         <jimureport.version>1.5.3</jimureport.version>
@@ -496,6 +496,7 @@
                 <artifactId>commons-net</artifactId> <!-- 解决 ftp 连接 -->
                 <version>${commons-net.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.jcraft</groupId>
                 <artifactId>jsch</artifactId> <!-- 解决 sftp 连接 -->
@@ -564,6 +565,12 @@
                 <groupId>org.jeecgframework.jimureport</groupId>
                 <artifactId>jimureport-spring-boot-starter</artifactId>
                 <version>${jimureport.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.alibaba</groupId>
+                        <artifactId>druid</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>xerces</groupId>
