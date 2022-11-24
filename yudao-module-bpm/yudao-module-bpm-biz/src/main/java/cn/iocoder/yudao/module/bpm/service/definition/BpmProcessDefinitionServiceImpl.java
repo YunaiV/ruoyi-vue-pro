@@ -199,8 +199,8 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         // 校验 BPMN XML 信息
         BpmnModel newModel = buildBpmnModel(createReqDTO.getBpmnBytes());
         BpmnModel oldModel = getBpmnModel(oldProcessDefinition.getId());
-        // TODO  貌似 flowable 不修改这个也不同。需要看看。 sourceSystemId 不同
-        if (FlowableUtils.equals(oldModel, newModel)) {
+        // 对比字节变化
+        if (!FlowableUtils.equals(oldModel, newModel)) {
             return false;
         }
         // 最终发现都一致，则返回 true

@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore(LockAutoConfiguration.class)
 public class YudaoLock4jConfiguration {
 

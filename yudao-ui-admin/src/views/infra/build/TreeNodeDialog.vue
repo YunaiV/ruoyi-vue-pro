@@ -71,7 +71,7 @@
   </div>
 </template>
 <script>
-import { isNumberStr } from '@/utils/index'
+import { isNumberStr } from '@/utils'
 import { getTreeNodeId, saveTreeNodeId } from '@/utils/db'
 
 const id = getTreeNodeId()

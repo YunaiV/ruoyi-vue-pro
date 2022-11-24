@@ -4,6 +4,12 @@ export type TableColumn = {
   children?: TableColumn[]
 } & Recordable
 
+export type VxeTableColumn = {
+  field: string
+  title?: string
+  children?: TableColumn[]
+} & Recordable
+
 export type TableSlotDefault = {
   row: Recordable
   column: TableColumn

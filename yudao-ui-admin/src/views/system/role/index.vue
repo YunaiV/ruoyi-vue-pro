@@ -50,7 +50,7 @@
       <el-table-column label="显示顺序" prop="sort" width="100" />
       <el-table-column label="状态" align="center" width="100">
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.status" :active-value="0" :inactive-value="1" @change="handleStatusChange(scope.row)"></el-switch>
+          <el-switch v-model="scope.row.status" :active-value="0" :inactive-value="1" @change="handleStatusChange(scope.row)"/>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -167,7 +167,6 @@
 import {
   addRole,
   changeRoleStatus,
-  dataScope,
   delRole,
   exportRole,
   getRole,

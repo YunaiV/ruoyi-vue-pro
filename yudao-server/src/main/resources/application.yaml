@@ -17,6 +17,8 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER # 解决 SpringFox 与 SpringBoot 2.6.x 不兼容的问题，参见 SpringFoxHandlerProviderBeanPostProcessor 类
+#    throw-exception-if-no-handler-found: true # 404 错误时抛出异常，方便统一处理
+#    static-path-pattern: /static/** # 静态资源路径; 注意：如果不配置，则 throw-exception-if-no-handler-found 不生效！！！ TODO 芋艿：不能配置，会导致 swagger 不生效
 
   # Jackson 配置项
   jackson:
@@ -56,6 +58,8 @@ mybatis-plus:
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
   type-aliases-package: ${yudao.info.base-package}.module.*.dal.dataobject
+  encryptor:
+    password: XDV71a+xqStEA3WH # 加解密的秘钥，可使用 https://www.imaegoo.com/2020/aes-key-generator/ 网站生成
 
 --- #################### 验证码相关配置 ####################
 
@@ -68,9 +72,9 @@ aj:
     timing-clear: 180 # local定时清除过期缓存(单位秒),设置为0代表不执行
     type: blockPuzzle # 验证码类型 default两种都实例化。 blockPuzzle 滑块拼图 clickWord 文字点选
     water-mark: 芋道源码 # 右下角水印文字(我的水印)，可使用 https://tool.chinaz.com/tools/unicode.aspx 中文转 Unicode，Linux 可能需要转 unicode
-    interference-options: 2 # 滑动干扰项(0/1/2)
+    interference-options: 0 # 滑动干扰项(0/1/2)
     req-frequency-limit-enable: false # 接口请求次数一分钟限制是否开启 true|false
-    req-get-lock-limit: 5 # 验证失败5次，get接口锁定
+    req-get-lock-limit: 5 # 验证失败 5 次，get接口锁定
     req-get-lock-seconds: 10 # 验证失败后，锁定时间间隔
     req-get-minute-limit: 30 # get 接口一分钟内请求数限制
     req-check-minute-limit: 60 # check 接口一分钟内请求数限制
@@ -94,7 +98,7 @@ yudao:
     version: ${yudao.info.version}
     base-package: ${yudao.info.base-package}
   captcha:
-    enable: true # 验证码的开关，默认为 true；注意，优先读取数据库 infra_config 的 yudao.captcha.enable，所以请从数据库修改，可能需要重启项目
+    enable: true # 验证码的开关，默认为 true
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
@@ -109,8 +113,8 @@ yudao:
     enable: true
     ignore-urls:
       - /admin-api/system/tenant/get-id-by-name # 基于名字获取租户，不许带租户编号
-      - /captcha/get # 获取图片验证码，和租户无关
-      - /captcha/check # 校验图片验证码，和租户无关
+      - /admin-api/system/captcha/get # 获取图片验证码，和租户无关
+      - /admin-api/system/captcha/check # 校验图片验证码，和租户无关
       - /admin-api/infra/file/*/get/** # 获取图片，和租户无关
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
       - /app-api/pay/order/notify/* # 支付回调通知，不携带租户编号
@@ -160,6 +164,10 @@ yudao:
     send-maximum-quantity-per-day: 10
     begin-code: 9999 # 这里配置 9999 的原因是，测试方便。
     end-code: 9999 # 这里配置 9999 的原因是，测试方便。
+  trade:
+    order:
+      app-id: 1 # 商户编号
+      expire-time: 2h # 支付的过期时间
 
 debug: false
 

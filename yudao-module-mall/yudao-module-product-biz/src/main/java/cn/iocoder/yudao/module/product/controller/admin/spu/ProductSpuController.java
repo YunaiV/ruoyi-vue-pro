@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.product.controller.admin.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
@@ -56,6 +53,15 @@ public class ProductSpuController {
         return success(true);
     }
 
+    // TODO 芋艿：修改接口
+    @GetMapping("/get/detail")
+    @ApiOperation("获得商品 SPU")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @PreAuthorize("@ss.hasPermission('product:spu:query')")
+    public CommonResult<ProductSpuDetailRespVO> getSpuDetail(@RequestParam("id") Long id) {
+        return success(spuService.getSpuDetail(id));
+    }
+
     @GetMapping("/get")
     @ApiOperation("获得商品 SPU")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
@@ -64,7 +70,6 @@ public class ProductSpuController {
         return success(spuService.getSpu(id));
     }
 
-    // TODO @luowenfeng：新增 get-detail，返回 SpuDetailRespVO
 
     @GetMapping("/list")
     @ApiOperation("获得商品 SPU 列表")
@@ -73,6 +78,14 @@ public class ProductSpuController {
     public CommonResult<List<ProductSpuRespVO>> getSpuList(@RequestParam("ids") Collection<Long> ids) {
         List<ProductSpuDO> list = spuService.getSpuList(ids);
         return success(ProductSpuConvert.INSTANCE.convertList(list));
+    }
+
+    @GetMapping("/get-simple-list")
+    @ApiOperation("获得商品 SPU 精简列表")
+    @PreAuthorize("@ss.hasPermission('product:spu:query')")
+    public CommonResult<List<ProductSpuSimpleRespVO>> getSpuSimpleList() {
+        List<ProductSpuDO> list = spuService.getSpuList();
+        return success(ProductSpuConvert.INSTANCE.convertList02(list));
     }
 
     @GetMapping("/page")

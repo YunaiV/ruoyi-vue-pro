@@ -15,13 +15,13 @@
     <name>${project.artifactId}</name>
 
     <description>
-        商城大模块，由 product 商品、market 营销、trade 交易 coupon等组成
+        商城大模块，由 product 商品、promotion 营销、trade 交易 coupon等组成
     </description>
     <modules>
-        <module>yudao-module-coupon-api</module>
-        <module>yudao-module-coupon-biz</module>
-        <module>yudao-module-market-api</module>
-        <module>yudao-module-market-biz</module>
+<!--        <module>yudao-module-coupon-api</module>-->
+<!--        <module>yudao-module-coupon-biz</module>-->
+        <module>yudao-module-promotion-api</module>
+        <module>yudao-module-promotion-biz</module>
         <module>yudao-module-product-api</module>
         <module>yudao-module-product-biz</module>
         <module>yudao-module-trade-api</module>

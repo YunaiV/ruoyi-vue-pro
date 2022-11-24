@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import { OAuth2ClientVo } from './client.types'
-
-const request = useAxios()
 
 // 查询 OAuth2列表
 export const getOAuth2ClientPageApi = (params) => {

@@ -288,24 +288,24 @@ export default {
 
     &.half {
       .prod-item {
-        width: 346rpx;
+        width: 345rpx;
         margin: 10rpx;
         .prod-image {
-          width: 346rpx;
-          height: 346rpx;
+          width: 345rpx;
+          height: 345rpx;
         }
       }
     }
 
     .prod-item {
-      width: 224rpx;
+      width: 223rpx;
       margin: 10rpx;
       background: #ffffff;
       border-radius: 10rpx;
       box-shadow: 0rpx 6rpx 8rpx rgba(58,134,185,0.2);
       .prod-image {
-        width: 224rpx;
-        height: 224rpx;
+        width: 223rpx;
+        height: 223rpx;
         border-radius: 10rpx 10rpx 0 0;
       }
       .item-info {

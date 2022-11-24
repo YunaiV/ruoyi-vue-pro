@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * 定时任务 Configuration
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableScheduling // 开启 Spring 自带的定时任务
 public class YudaoQuartzAutoConfiguration {
 

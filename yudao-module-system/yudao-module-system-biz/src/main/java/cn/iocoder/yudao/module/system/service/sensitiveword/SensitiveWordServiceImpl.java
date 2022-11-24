@@ -23,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -58,7 +59,7 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
      * 缓存敏感词的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     @Getter
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private SensitiveWordMapper sensitiveWordMapper;
@@ -133,7 +134,7 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
      * @param maxUpdateTime 当前敏感词的最大更新时间
      * @return 敏感词列表
      */
-    private List<SensitiveWordDO> loadSensitiveWordIfUpdate(Date maxUpdateTime) {
+    private List<SensitiveWordDO> loadSensitiveWordIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         // 如果更新时间为空，说明 DB 一定有新数据
         if (maxUpdateTime == null) {

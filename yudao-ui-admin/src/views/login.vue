@@ -1,4 +1,4 @@
-<template>
+<template xmlns="">
   <div class="container">
     <div class="logo"></div>
     <!-- 登录区域 -->
@@ -150,7 +150,7 @@ export default {
           {required: true, trigger: "blur", message: "手机号不能为空"},
           {
             validator: function (rule, value, callback) {
-              if (/^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-79])|(?:5[0-35-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[189]))\d{8}$/.test(value) === false) {
+              if (/^(?:(?:\+|00)86)?1(?:3[\d]|4[5-79]|5[0-35-9]|6[5-7]|7[0-8]|8[\d]|9[189])\d{8}$/.test(value) === false) {
                 callback(new Error("手机号格式错误"));
               } else {
                 callback();
@@ -187,6 +187,14 @@ export default {
   created() {
     // 租户开关
     this.tenantEnable = getTenantEnable();
+    if (this.tenantEnable) {
+      getTenantIdByName(this.loginForm.tenantName).then(res => { // 设置租户
+        const tenantId = res.data;
+        if (tenantId && tenantId >= 0) {
+          setTenantId(tenantId)
+        }
+      });
+    }
     // 验证码开关
     this.captchaEnable = getCaptchaEnable();
     // 重定向地址
@@ -250,7 +258,8 @@ export default {
       // 设置登录中
       this.loading = true;
       // 计算 redirectUri
-      const redirectUri = location.origin + '/social-login?type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/"); // 重定向不能丢
+      const redirectUri = location.origin + '/social-login?'
+        + encodeURIComponent('type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/")); // 重定向不能丢
       // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
       // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
       // 进行跳转
@@ -285,7 +294,7 @@ export default {
 
 .oauth-login {
   display: flex;
-  align-items: cen;
+  align-items: center;
   cursor:pointer;
 }
 .oauth-login-item {

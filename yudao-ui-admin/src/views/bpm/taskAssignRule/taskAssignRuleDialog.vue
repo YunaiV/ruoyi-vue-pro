@@ -6,19 +6,19 @@
         <el-table-column label="任务名" align="center" prop="taskDefinitionName" width="120" fixed />
         <el-table-column label="任务标识" align="center" prop="taskDefinitionKey" width="120" show-tooltip-when-overflow />
         <el-table-column label="规则类型" align="center" prop="type" width="120">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <dict-tag :type="DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE" :value="scope.row.type" />
           </template>
         </el-table-column>
         <el-table-column label="规则范围" align="center" prop="options" width="440px">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-tag size="medium" v-if="scope.row.options" :key="option" v-for="option in scope.row.options">
               {{ getAssignRuleOptionName(scope.row.type, option) }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column v-if="modelId" label="操作" align="center" width="80" fixed="right">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdateTaskAssignRule(scope.row)"
                        v-hasPermi="['bpm:task-assign-rule:update']">修改</el-button>
           </template>

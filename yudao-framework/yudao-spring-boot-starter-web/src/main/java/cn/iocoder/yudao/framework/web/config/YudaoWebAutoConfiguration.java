@@ -26,7 +26,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import javax.annotation.Resource;
 import javax.servlet.Filter;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties({WebProperties.class, XssProperties.class})
 public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
 

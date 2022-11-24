@@ -10,6 +10,7 @@ import {
   ElRate,
   ElSelect,
   ElSelectV2,
+  ElTreeSelect,
   ElSlider,
   ElSwitch,
   ElTimePicker,
@@ -41,6 +42,7 @@ const componentMap: Recordable<Component, ComponentName> = {
   Divider: ElDivider,
   TimeSelect: ElTimeSelect,
   SelectV2: ElSelectV2,
+  TreeSelect: ElTreeSelect,
   RadioButton: ElRadioGroup,
   InputPassword: InputPassword,
   Editor: Editor

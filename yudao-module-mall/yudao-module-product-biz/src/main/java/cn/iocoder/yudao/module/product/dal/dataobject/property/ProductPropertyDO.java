@@ -37,6 +37,10 @@ public class ProductPropertyDO extends BaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+    /**
+     * 备注
+     */
+    private String remark;
 
     // TODO 芋艿：rule；规格属性 (发布商品时，和 SKU 关联)；规格参数(搜索商品时，与 Category 关联搜索)
 

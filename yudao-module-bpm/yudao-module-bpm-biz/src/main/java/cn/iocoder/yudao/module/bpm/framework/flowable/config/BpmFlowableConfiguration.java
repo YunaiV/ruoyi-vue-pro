@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author jason
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class BpmFlowableConfiguration {
 
     /**

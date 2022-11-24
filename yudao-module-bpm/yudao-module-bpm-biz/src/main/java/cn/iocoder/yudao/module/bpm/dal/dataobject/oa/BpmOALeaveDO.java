@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.bpm.dal.dataobject.oa;
 
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import lombok.*;
-import java.util.*;
+import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -46,11 +46,11 @@ public class BpmOALeaveDO extends BaseDO {
     /**
      * 开始时间
      */
-    private Date startTime;
+    private LocalDateTime startTime;
     /**
      * 结束时间
      */
-    private Date endTime;
+    private LocalDateTime endTime;
     /**
      * 请假天数
      */

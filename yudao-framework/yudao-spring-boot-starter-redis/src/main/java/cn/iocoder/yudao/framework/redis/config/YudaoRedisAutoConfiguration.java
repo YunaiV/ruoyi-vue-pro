@@ -9,7 +9,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 /**
  * Redis 配置类
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class YudaoRedisAutoConfiguration {
 
     /**

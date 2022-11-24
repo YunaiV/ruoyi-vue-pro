@@ -99,6 +99,17 @@ export const constantRoutes = [
       }
     ]
   }, {
+    path: '/property',
+    component: Layout,
+    hidden: true,
+    children: [{
+        path: 'value/:propertyId(\\d+)',
+        component: (resolve) => require(['@/views/mall/product/property/value'], resolve),
+        name: 'PropertyValue',
+        meta: {title: '规格数据', icon: '', activeMenu: '/product/property'}
+      }
+    ]
+  }, {
     path: '/job',
     component: Layout,
     hidden: true,
@@ -118,6 +129,23 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/infra/codegen/editTable'], resolve),
         name: 'GenEdit',
         meta: {title: '修改生成配置', activeMenu: '/infra/codegen'}
+      }
+    ]
+  }, {
+    path: '/spu',
+    component: Layout,
+    hidden: true,
+    children: [{
+        path: 'edit/:spuId(\\d+)',
+        component: (resolve) => require(['@/views/mall/product/spu/save'], resolve),
+        name: 'SpuEdit',
+        meta: {title: '修改商品', activeMenu: '/product/spu'}
+      },
+      {
+        path: 'add',
+        component: (resolve) => require(['@/views/mall/product/spu/save'], resolve),
+        name: 'SpuAdd',
+        meta: {title: '添加商品', activeMenu: '/product/spu'}
       }
     ]
   }, {
@@ -166,6 +194,28 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/bpm/processInstance/detail'], resolve),
         name: '流程详情',
         meta: {title: '流程详情', activeMenu: '/bpm/task/my'}
+      }
+    ]
+  },
+  {
+    path: '/order',
+    component: Layout,
+    name: '订单管理',
+    meta: { title: '订单管理' },
+    alwaysShow: true,
+    children: [
+      {
+        path: '/mall/trade/order',
+        name: '商品订单',
+        meta: { title: '商品订单' },
+        component: (resolve) => require(['@/views/mall/trade/order'], resolve)
+      },
+      {
+        path: '/mall/trade/order/detail',
+        name: '订单详情',
+        hidden: true,
+        meta: { title: '订单详情' },
+        component: (resolve) => require(['@/views/mall/trade/order/detail'], resolve)
       }
     ]
   }

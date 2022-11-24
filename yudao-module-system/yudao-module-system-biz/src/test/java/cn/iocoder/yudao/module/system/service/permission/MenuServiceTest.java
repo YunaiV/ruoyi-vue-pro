@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringAopUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuUpdateReqVO;
@@ -13,13 +14,13 @@ import cn.iocoder.yudao.module.system.dal.mysql.permission.MenuMapper;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.MenuProducer;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import com.google.common.collect.Multimap;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
@@ -74,7 +75,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
         assertPojoEquals(menuDO1, permissionMenuCache.get(menuDO1.getPermission()));
         assertPojoEquals(menuDO2, permissionMenuCache.get(menuDO2.getPermission()));
 
-        Date maxUpdateTime = (Date) BeanUtil.getFieldValue(target, "maxUpdateTime");
+        LocalDateTime maxUpdateTime = (LocalDateTime) BeanUtil.getFieldValue(target, "maxUpdateTime");
         assertEquals(ObjectUtils.max(menuDO1.getUpdateTime(), menuDO2.getUpdateTime()), maxUpdateTime);
     }
 

@@ -23,15 +23,12 @@ import javax.servlet.http.HttpServletRequest;
 @Api(tags = "用户 App - 交易订单")
 @RestController
 @RequestMapping("/trade/order")
-@RequiredArgsConstructor
+@RequiredArgsConstructor // TODO @LeeYan9: 先统一使用 @Resource 注入哈; 项目只有三层, 依赖注入会存在, 所以使用 @Resource; 也因此, 最好全局保持一致
 @Validated
 @Slf4j
 public class AppTradeOrderController {
 
-    // TODO 在思考下；
-
     private final TradeOrderService tradeOrderService;
-
 
     @GetMapping("/get-create-info")
     @ApiOperation("基于商品，确认创建订单")
@@ -46,21 +43,17 @@ public class AppTradeOrderController {
     @PreAuthenticated
     public CommonResult<Long> createTradeOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO,
                                                HttpServletRequest servletRequest) {
-//        return success(tradeOrderService.createTradeOrder(UserSecurityContextHolder.getUserId(),
-//                HttpUtil.getIp(servletRequest), createReqVO));
-        // 获取登录用户
+        // 获取登录用户、用户 IP 地址
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
-        // 获取用户ip地址
         String clientIp = ServletUtil.getClientIP(servletRequest);
         // 创建交易订单，预支付记录
-        Long result = tradeOrderService.createTradeOrder(loginUserId, clientIp, createReqVO);
-
-        return CommonResult.success(result);
+        Long orderId = tradeOrderService.createTradeOrder(loginUserId, clientIp, createReqVO);
+        return CommonResult.success(orderId);
     }
 
     @GetMapping("/get")
     @ApiOperation("获得交易订单")
-    @ApiImplicitParam(name = "tradeOrderId", value = "交易订单编号", required = true)
+    @ApiImplicitParam(name = "tradeOrderId", value = "交易订单编号", required = true, dataTypeClass = Long.class)
     public CommonResult<TradeOrderRespVO> getTradeOrder(@RequestParam("tradeOrderId") Integer tradeOrderId) {
 //        return success(tradeOrderService.getTradeOrder(tradeOrderId));
         return null;

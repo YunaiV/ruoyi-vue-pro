@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 部门信息 Response VO")
 @Data
@@ -19,6 +19,6 @@ public class DeptRespVO extends DeptBaseVO {
     private Integer status;
 
     @ApiModelProperty(value = "创建时间", required = true, example = "时间戳格式")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 字典数据信息 Response VO")
 @Data
@@ -20,6 +20,6 @@ public class DictDataRespVO extends DictDataBaseVO {
     private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true, example = "时间戳格式")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

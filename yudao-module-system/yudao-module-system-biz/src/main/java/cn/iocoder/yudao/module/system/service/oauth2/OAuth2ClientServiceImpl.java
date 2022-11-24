@@ -23,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -59,7 +60,7 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
      * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     @Getter
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private OAuth2ClientMapper oauth2ClientMapper;
@@ -97,7 +98,7 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
      * @param maxUpdateTime 当前客户端的最大更新时间
      * @return 客户端列表
      */
-    private List<OAuth2ClientDO> loadOAuth2ClientIfUpdate(Date maxUpdateTime) {
+    private List<OAuth2ClientDO> loadOAuth2ClientIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadOAuth2ClientIfUpdate][首次加载全量客户端]");

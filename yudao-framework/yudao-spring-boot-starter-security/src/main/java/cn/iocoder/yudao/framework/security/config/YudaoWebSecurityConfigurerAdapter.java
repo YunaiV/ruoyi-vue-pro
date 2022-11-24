@@ -32,7 +32,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 

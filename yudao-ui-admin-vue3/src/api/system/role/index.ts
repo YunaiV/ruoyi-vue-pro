@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { RoleVO } from './types'
-
-const request = useAxios()
 
 // 查询角色列表
 export const getRolePageApi = async (params) => {

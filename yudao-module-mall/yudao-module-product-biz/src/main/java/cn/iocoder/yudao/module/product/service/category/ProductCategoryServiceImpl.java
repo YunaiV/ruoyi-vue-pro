@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.service.category;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
@@ -93,33 +92,19 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public void validateCategoryLevel(Long id) {
-        Integer level = getProductCategoryLevel(id, 1);
-        if (level < 3){
+        // TODO @芋艿：在看看，杂能优化下
+        Long parentId = id;
+        int i = 2;
+        for (; i >= 0; --i) {
+            ProductCategoryDO category = productCategoryMapper.selectById(parentId);
+            parentId = category.getParentId();
+            if(Objects.equals(parentId, ProductCategoryDO.PARENT_ID_NULL)){
+                break;
+            }
+        }
+        if (!Objects.equals(parentId, ProductCategoryDO.PARENT_ID_NULL) || i != 0) {
             throw exception(CATEGORY_LEVEL_ERROR);
         }
-    }
-
-    // TODO @Luowenfeng：建议使用 for 循环，避免递归
-    /**
-     * 获得商品分类的级别
-     *
-     * @param id 商品分类的编号
-     * @return 级别
-     */
-    private Integer getProductCategoryLevel(Long id, int level){
-        ProductCategoryDO category = productCategoryMapper.selectById(id);
-        if (category == null) {
-            throw exception(CATEGORY_NOT_EXISTS);
-        }
-        // TODO Luowenfeng：去掉是否开启，它不影响级别哈
-        if (ObjectUtil.notEqual(category.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
-            throw exception(CATEGORY_DISABLED);
-        }
-        // TODO Luowenfeng：不使用 0 直接比较哈，使用枚举
-        if (category.getParentId() == 0) {
-            return level;
-        }
-        return getProductCategoryLevel(category.getParentId(), ++level);
     }
 
     @Override

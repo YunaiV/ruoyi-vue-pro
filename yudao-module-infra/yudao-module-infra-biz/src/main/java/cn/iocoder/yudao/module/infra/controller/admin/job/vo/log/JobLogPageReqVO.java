@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -26,11 +26,11 @@ public class JobLogPageReqVO extends PageParam {
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "开始执行时间")
-    private Date beginTime;
+    private LocalDateTime beginTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "结束执行时间")
-    private Date endTime;
+    private LocalDateTime endTime;
 
     @ApiModelProperty(value = "任务状态", notes = "参见 JobLogStatusEnum 枚举")
     private Integer status;

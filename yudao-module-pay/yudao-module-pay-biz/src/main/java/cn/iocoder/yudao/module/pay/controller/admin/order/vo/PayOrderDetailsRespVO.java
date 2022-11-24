@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 支付订单详细信息 Response VO")
 @Data
@@ -27,7 +27,7 @@ public class PayOrderDetailsRespVO extends PayOrderBaseVO {
     private String channelCodeName;
 
     @ApiModelProperty(value = "创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 支付订单扩展

@@ -40,6 +40,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -86,7 +87,7 @@ public class PermissionServiceImpl implements PermissionService {
      * 缓存 RoleMenu 的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     @Getter
-    private volatile Date roleMenuMaxUpdateTime;
+    private volatile LocalDateTime roleMenuMaxUpdateTime;
 
     /**
      * 用户编号与角色编号的缓存映射
@@ -102,7 +103,7 @@ public class PermissionServiceImpl implements PermissionService {
      * 缓存 UserRole 的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     @Getter
-    private volatile Date userRoleMaxUpdateTime;
+    private volatile LocalDateTime userRoleMaxUpdateTime;
 
     @Resource
     private RoleMenuMapper roleMenuMapper;
@@ -192,7 +193,7 @@ public class PermissionServiceImpl implements PermissionService {
      * @param maxUpdateTime 当前角色与菜单的关联的最大更新时间
      * @return 角色与菜单的关联列表
      */
-    protected List<RoleMenuDO> loadRoleMenuIfUpdate(Date maxUpdateTime) {
+    protected List<RoleMenuDO> loadRoleMenuIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadRoleMenuIfUpdate][首次加载全量角色与菜单的关联]");
@@ -213,7 +214,7 @@ public class PermissionServiceImpl implements PermissionService {
      * @param maxUpdateTime 当前角色与菜单的关联的最大更新时间
      * @return 角色与菜单的关联列表
      */
-    protected List<UserRoleDO> loadUserRoleIfUpdate(Date maxUpdateTime) {
+    protected List<UserRoleDO> loadUserRoleIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadUserRoleIfUpdate][首次加载全量用户与角色的关联]");

@@ -46,7 +46,7 @@
       <el-table-column label="租户编号" align="center" prop="id" />
       <el-table-column label="租户名" align="center" prop="name" />
       <el-table-column label="租户套餐" align="center" prop="packageId">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-tag v-if="scope.row.packageId === 0" type="danger">系统租户</el-tag>
           <el-tag v-else> {{getPackageName(scope.row.packageId)}} </el-tag>
         </template>
@@ -54,28 +54,28 @@
       <el-table-column label="联系人" align="center" prop="contactName" />
       <el-table-column label="联系手机" align="center" prop="contactMobile" />
       <el-table-column label="账号额度" align="center" prop="accountCount">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-tag> {{scope.row.accountCount}} </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="过期时间" align="center" prop="expireTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.expireTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="绑定域名" align="center" prop="domain" width="180" />
       <el-table-column label="租户状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:tenant:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"

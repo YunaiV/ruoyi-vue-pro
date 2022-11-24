@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel;
 
 import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
+
+import java.time.LocalDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 
@@ -44,6 +44,6 @@ public class PayChannelExcelVO {
     /// private String config;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

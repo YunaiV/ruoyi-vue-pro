@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import { ${simpleClassName}VO, ${simpleClassName}PageReqVO, ${simpleClassName}ExcelReqVO } from './types'
-
-const request = useAxios()
 
 #set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
 // 查询${table.classComment}列表

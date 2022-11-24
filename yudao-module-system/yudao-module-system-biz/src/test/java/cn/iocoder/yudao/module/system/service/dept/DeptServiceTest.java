@@ -17,7 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -69,7 +69,7 @@ public class DeptServiceTest extends BaseDbUnitTest {
         assertPojoEquals(deptDO1, parentDeptCache.get(deptDO1.getParentId()));
         assertPojoEquals(deptDO2, parentDeptCache.get(deptDO2.getParentId()));
         // 断言 maxUpdateTime 缓存
-        Date maxUpdateTime = (Date) getFieldValue(deptService, "maxUpdateTime");
+        LocalDateTime maxUpdateTime = (LocalDateTime) getFieldValue(deptService, "maxUpdateTime");
         assertEquals(ObjectUtils.max(deptDO1.getUpdateTime(), deptDO2.getUpdateTime()), maxUpdateTime);
     }
 

@@ -59,13 +59,6 @@
             <artifactId>dynamic-datasource-spring-boot-starter</artifactId> <!-- 多数据源 -->
         </dependency>
 
-        <!-- 工具类相关 -->
-        <dependency>
-            <groupId>com.github.ulisesbocchio</groupId>
-            <artifactId>jasypt-spring-boot-starter</artifactId> <!-- 加解密 -->
-            <optional>true</optional>
-        </dependency>
-
     </dependencies>
 
 </project>

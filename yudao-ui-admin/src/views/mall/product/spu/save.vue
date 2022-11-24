@@ -1,58 +1,58 @@
 <template>
   <div class="container">
-    <el-tabs v-model="activeName" class="tabs"  :before-leave="confirmLeave">
+    <!-- TODO 样式优化：表单宽度、表单项对齐、hr 粗细； -->
+    <el-tabs v-model="activeName" class="tabs">
       <!-- 基础设置 -->
+      <!-- TODO @luowenfeng：基础设置，分成基础信息、配送信息 -->
+      <!-- TODO @luowenfeng：base=》basic 会更好哈 -->
       <el-tab-pane label="基础设置" name="base">
         <el-form ref="base" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
           <el-form-item label="商品名称" prop="name">
-            <el-input v-model="baseForm.name" placeholder="请输入商品名称"/>
+            <el-input v-model="baseForm.name" placeholder="请输入商品名称" />
           </el-form-item>
-          <el-form-item label="商品卖点">
-            <el-input type="textarea" v-model="baseForm.sellPoint" placeholder="请输入商品卖点"/>
+          <el-form-item label="促销语">
+            <el-input type="textarea" v-model="baseForm.sellPoint" placeholder="请输入促销语"/>
           </el-form-item>
-          <!-- TODO @Luowenfeng：商品主图，80 x 80 即可 -->
           <el-form-item label="商品主图" prop="picUrls">
-            <ImageUpload v-model="baseForm.picUrls" :value="baseForm.picUrls" :limit="10"/>
+            <ImageUpload v-model="baseForm.picUrls" :value="baseForm.picUrls" :limit="10" class="mall-image"/>
           </el-form-item>
-          <!-- TODO @Luowenfeng：商品视频 -->
+          <el-form-item label="商品视频" prop="videoUrl">
+            <VideoUpload v-model="baseForm.videoUrl" :value="baseForm.videoUrl"/>
+          </el-form-item>
           <el-form-item label="商品品牌" prop="brandId">
             <el-select v-model="baseForm.brandId" placeholder="请选择商品品牌">
-              <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id" />
+              <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id"/>
             </el-select>
           </el-form-item>
           <el-form-item label="商品分类" prop="categoryIds">
             <el-cascader v-model="baseForm.categoryIds" placeholder="商品分类" style="width: 100%"
-                         :options="categoryList" :props="propName" clearable />
+                         :options="categoryList" :props="propName" clearable/>
           </el-form-item>
           <el-form-item label="是否上架" prop="status">
             <el-radio-group v-model="baseForm.status">
-              <el-radio :label="0">立即上架</el-radio>
-              <el-radio :label="1">放入仓库</el-radio>
+              <el-radio :label="1">立即上架</el-radio>
+              <el-radio :label="0">放入仓库</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-form>
       </el-tab-pane>
 
       <!-- 价格库存 -->
+      <!-- TODO @luowenfeng：rates=》priceStack 会更好哈 -->
       <el-tab-pane label="价格库存" name="rates" class="rates">
         <el-form ref="rates" :model="ratesForm" :rules="rules">
           <el-form-item label="启用多规格">
-            <!-- TODO @Luowenfeng：改成开关的按钮；关闭，单规格；开启，多规格 -->
-            <el-radio-group v-model="ratesForm.spec" @change="changeRadio">
-              <el-radio :label="1">单规格</el-radio>
-              <el-radio :label="2">多规格</el-radio>
-            </el-radio-group>
+            <el-switch v-model="specSwitch" @change="changeSpecSwitch"/>
           </el-form-item>
-
           <!-- 动态添加规格属性 -->
           <div v-show="ratesForm.spec === 2">
             <div v-for="(specs, index) in dynamicSpec" :key="index" class="dynamic-spec">
               <!-- 删除按钮 -->
-              <el-button type="danger" icon="el-icon-delete" circle class="spec-delete" @click="removeSpec(index)" />
+              <el-button type="danger" icon="el-icon-delete" circle class="spec-delete" @click="removeSpec(index)"/>
               <div class="spec-header">
                 规格项：
                 <el-select v-model="specs.specId" filterable placeholder="请选择" @change="changeSpec">
-                  <el-option v-for="item in propertyPageList" :key="item.id" :label="item.name" :value="item.id" />
+                  <el-option v-for="item in propertyPageList" :key="item.id" :label="item.name" :value="item.id"/>
                 </el-select>
               </div>
               <div class="spec-values">
@@ -67,25 +67,24 @@
           <!-- 规格明细 -->
           <el-form-item label="规格明细">
             <el-table :data="ratesForm.rates" border style="width: 100%" ref="ratesTable">
-              <template v-if="ratesForm.spec == 2">
+              <template v-if="this.specSwitch">
                 <el-table-column :key="index" v-for="(item, index) in dynamicSpec.filter(v => v.specName !== undefined)"
                                  :label="item.specName">
                   <template slot-scope="scope">
-                    <el-input v-if="scope.row.spec" v-model="scope.row.spec[index]" disabled />
+                    <el-input v-if="scope.row.spec" v-model="scope.row.spec[index]" disabled/>
                   </template>
                 </el-table-column>
               </template>
               <el-table-column label="规格图片" width="120px" :render-header="addRedStar" key="90">
                 <template slot-scope="scope">
-                    <ImageUpload v-model="scope.row.picUrl" :limit="1" :isShowTip="false"
-                               style="width: 100px; height: 50px"/>
+                  <ImageUpload v-model="scope.row.picUrl" :limit="1" :isShowTip="false" style="width: 100px; height: 50px"/>
                 </template>
               </el-table-column>
-              <template v-if="ratesForm.spec === 2">
-               <el-table-column label="sku名称" :render-header="addRedStar" key="91">
+              <template v-if="this.specSwitch">
+                <el-table-column label="sku名称" :render-header="addRedStar" key="91">
                   <template slot-scope="scope">
                     <el-form-item :prop="'rates.'+ scope.$index + '.name'" :rules="[{required: true, trigger: 'change'}]">
-                      <el-input v-model="scope.row.name" />
+                      <el-input v-model="scope.row.name"/>
                     </el-form-item>
                   </template>
                 </el-table-column>
@@ -94,24 +93,25 @@
                 <template slot-scope="scope">
                   <el-form-item :prop="'rates.'+ scope.$index + '.marketPrice'" :rules="[{required: true, trigger: 'change'}]">
                     <el-input v-model="scope.row.marketPrice"
-                      oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
+                              oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
                   </el-form-item>
                 </template>
               </el-table-column>
               <el-table-column label="销售价(元)" :render-header="addRedStar" key="93">
                 <template slot-scope="scope">
-                 <el-form-item :prop="'rates.'+ scope.$index + '.price'" :rules="[{required: true, trigger: 'change'}]">
-                  <el-input v-model="scope.row.price" oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''"></el-input>
+                  <el-form-item :prop="'rates.'+ scope.$index + '.price'"
+                                :rules="[{required: true, trigger: 'change'}]">
+                    <el-input v-model="scope.row.price"
+                              oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''" />
                   </el-form-item>
                 </template>
               </el-table-column>
               <el-table-column label="成本价" :render-header="addRedStar" key="94">
                 <template slot-scope="scope">
-                <el-form-item :prop="'rates.'+ scope.$index + '.costPrice'" :rules="[{required: true, trigger: 'change'}]">
-                  <el-input
-                    v-model="scope.row.costPrice"
-                    oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''"
-                  ></el-input>
+                  <el-form-item :prop="'rates.'+ scope.$index + '.costPrice'"
+                                :rules="[{required: true, trigger: 'change'}]">
+                    <el-input v-model="scope.row.costPrice"
+                              oninput="value= value.match(/\d+(\.\d{0,2})?/) ? value.match(/\d+(\.\d{0,2})?/)[0] : ''" />
                   </el-form-item>
                 </template>
               </el-table-column>
@@ -129,53 +129,59 @@
               </el-table-column>
               <el-table-column label="体积" key="97">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.volume" ></el-input>
+                  <el-input v-model="scope.row.volume" />
                 </template>
               </el-table-column>
               <el-table-column label="重量" key="98">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.weight" ></el-input>
+                  <el-input v-model="scope.row.weight" />
                 </template>
               </el-table-column>
               <el-table-column label="条码" key="99">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.barCode"></el-input>
+                  <el-input v-model="scope.row.barCode" />
                 </template>
               </el-table-column>
-               <template v-if="ratesForm.spec === 2">
+              <template v-if="this.specSwitch">
                 <el-table-column fixed="right" label="操作" width="50" key="100">
                   <template slot-scope="scope">
-                    <el-button @click="scope.row.status = 1" type="text" size="small" v-show="scope.row.status == undefined || scope.row.status == 0 ">禁用</el-button>
-                    <el-button @click="scope.row.status = 0" type="text" size="small" v-show="scope.row.status == 1">启用</el-button>
+                    <el-button @click="scope.row.status = 1" type="text" size="small"
+                               v-show="scope.row.status === undefined || scope.row.status === 0 ">禁用
+                    </el-button>
+                    <el-button @click="scope.row.status = 0" type="text" size="small" v-show="scope.row.status === 1">
+                      启用
+                    </el-button>
                   </template>
                 </el-table-column>
               </template>
             </el-table>
           </el-form-item>
           <el-form-item label="虚拟销量" prop="virtualSalesCount">
-            <!-- TODO @Luowenfeng：使用 input 类型即可 -->
-            <el-input v-model="baseForm.virtualSalesCount" placeholder="请输入虚拟销量" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
+            <el-input v-model="baseForm.virtualSalesCount" placeholder="请输入虚拟销量"
+                      oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
           </el-form-item>
         </el-form>
       </el-tab-pane>
 
       <!-- 商品详情 -->
+      <!-- TODO @luowenfeng：third=》detail 会更好哈 -->
       <el-tab-pane label="商品详情" name="third">
-      <el-form ref="third" :model="baseForm" :rules="rules">
-        <el-form-item prop="description">
-          <editor v-model="baseForm.description" :min-height="380"/>
-        </el-form-item>
-      </el-form>
+        <el-form ref="third" :model="baseForm" :rules="rules">
+          <el-form-item prop="description">
+            <editor v-model="baseForm.description" :min-height="380"/>
+          </el-form-item>
+        </el-form>
       </el-tab-pane>
 
       <!-- 销售设置 -->
+      <!-- TODO @luowenfeng：fourth=》senior 会更好哈 -->
       <el-tab-pane label="高级设置" name="fourth">
         <el-form ref="fourth" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
           <el-form-item label="排序字段">
             <el-input v-model="baseForm.sort" placeholder="请输入排序字段" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
           </el-form-item>
-           <el-form-item label="是否展示库存" prop="showStock">
-             <el-radio-group v-model="baseForm.showStock">
+          <el-form-item label="是否展示库存" prop="showStock">
+            <el-radio-group v-model="baseForm.showStock">
               <el-radio :label="true">是</el-radio>
               <el-radio :label="false">否</el-radio>
             </el-radio-group>
@@ -196,26 +202,22 @@
 
 import {getBrandList} from "@/api/mall/product/brand";
 import {getProductCategoryList} from "@/api/mall/product/category";
-import {createSpu, updateSpu, getSpu} from "@/api/mall/product/spu";
-import {getPropertyPage,} from "@/api/mall/product/property";
+import {createSpu, getSpuDetail, updateSpu} from "@/api/mall/product/spu";
+import {getPropertyListAndValue,} from "@/api/mall/product/property";
 import Editor from "@/components/Editor";
 import ImageUpload from "@/components/ImageUpload";
+import VideoUpload from "@/components/VideoUpload";
 
 export default {
   components: {
     Editor,
-    ImageUpload
-  },
-  props:{//props列表
-    type:{
-      type:String,
-      default:"add" //定义参数默认值
-    },
-    obj: Object
+    ImageUpload,
+    VideoUpload
   },
   data() {
     return {
-      activeName: "base", // TODO @Luowenfeng：切换时，不需要校验通过
+      specSwitch: false,
+      activeName: "base",
       propName: {
         checkStrictly: true,
         label: "name",
@@ -230,11 +232,13 @@ export default {
         sort: null,
         description: null,
         picUrls: null,
+        videoUrl: null,
         status: 0,
         virtualSalesCount: 0,
         showStock: true,
-        brandId: null
+        brandId: null,
       },
+
       categoryList: [],
       // 价格库存
       ratesForm: {
@@ -258,12 +262,12 @@ export default {
 
       // 表单校验
       rules: {
-        name:[{required: true, message: "商品名称不能为空", trigger: "blur"},],
+        name: [{required: true, message: "商品名称不能为空", trigger: "blur"},],
         description: [{required: true, message: "描述不能为空", trigger: "blur"},],
         categoryIds: [{required: true, message: "分类id不能为空", trigger: "blur"},],
         status: [{required: true, message: "商品状态不能为空", trigger: "blur"}],
+        brandId: [{required: true, message: "商品品牌不能为空", trigger: "blur"}],
         picUrls: [{required: true, message: "商品轮播图地址不能为空", trigger: "blur"}],
-        virtualSalesCount: [{required: true, message: "虚拟销量不能为空", trigger: "blur"}],
       },
     };
   },
@@ -271,38 +275,31 @@ export default {
     this.getListBrand();
     this.getListCategory();
     this.getPropertyPageList();
-    if(this.type == 'upd'){
-      this.updateType(this.obj.id)
+    const spuId = this.$route.params && this.$route.params.spuId;
+    if (spuId != null) {
+      this.updateType(spuId)
     }
   },
   methods: {
-    removeSpec(index){
-        this.dynamicSpec.splice(index, 1);
-        this.changeRadio()
-    },
-    async confirmLeave(active, old){
-      await this.$refs[old].validate((valid) => {
-        console.log(valid)
-        if (!valid) {
-          return reject();
-        }
-      });
+    removeSpec(index) {
+      this.dynamicSpec.splice(index, 1);
+      this.changeSpecSwitch()
     },
     // 必选标识
-    addRedStar(h, { column }) {
+    addRedStar(h, {column}) {
       return [
-        h('span', { style: 'color: #F56C6C' }, '*'),
+        h('span', {style: 'color: #F56C6C'}, '*'),
         h('span', ' ' + column.label)
       ];
     },
-    changeRadio() {
+    changeSpecSwitch() {
+      this.specSwitch ? this.ratesForm.spec = 2 : this.ratesForm.spec = 1;
       this.$refs.ratesTable.doLayout();
-      if (this.ratesForm.spec == 1) {
+      if (this.ratesForm.spec === 1) {
         this.ratesForm.rates = [{}]
       } else {
         this.ratesForm.rates = []
         if (this.dynamicSpec.length > 0) {
-          console.log( this.dynamicSpec)
           this.buildRatesFormRates()
         }
       }
@@ -316,6 +313,7 @@ export default {
           last.forEach(par1 => {
             current.forEach(par2 => {
               let v
+              // 当两个对象合并时，需使用[1,2]方式生成数组，而当数组和对象合并时，需使用concat
               if (par1 instanceof Array) {
                 v = par1.concat(par2)
               } else {
@@ -327,7 +325,12 @@ export default {
           return array;
         })
         .forEach(v => {
-          rates.push({spec: v, status: 0, name: Array.of(v).join()})
+          let spec = v;
+          // 当v为单个规格项时，会变成字符串。造成表格只截取第一个字符串，而不是数组的第一个元素
+          if (typeof v == 'string') {
+            spec = Array.of(v)
+          }
+          rates.push({spec: spec, status: 0, name: Array.of(v).join()})
         });
       this.ratesForm.rates = rates
     },
@@ -338,146 +341,161 @@ export default {
         this.categoryList = this.handleTree(response.data, "id", "parentId");
       });
     },
-     /** 查询品牌列表 */
+    /** 查询品牌列表 */
     getListBrand() {
       // 执行查询
       getBrandList().then((response) => {
         this.brandList = response.data;
       });
     },
+    // 取消按钮
     cancel() {
-      this.$emit("closeDialog");
+      var currentView = this.$store.state.tagsView.visitedViews[0]
+      for (currentView of this.$store.state.tagsView.visitedViews) {
+        if (currentView.path === this.$route.path) {
+          break
+        }
+      }
+      this.$store.dispatch('tagsView/delView', currentView)
+        .then(() => {
+          this.$router.push("/product/spu")
+        })
     },
     submit() {
-       this.$refs[this.activeName].validate((valid) => {
+      this.$refs[this.activeName].validate((valid) => {
         if (!valid) {
           return;
         }
-      let rates = this.ratesForm.rates;
+        let rates = JSON.parse(JSON.stringify(this.ratesForm.rates));
 
-      // 价格元转分
-      rates.forEach(r=>{
-        r.marketPrice = r.marketPrice*100;
-        r.price = r.price*100;
-        r.costPrice = r.costPrice*100;
-      })
-
-      // 动态规格调整字段
-      if (this.ratesForm.spec == 2) {
+        // 价格元转分
         rates.forEach(r => {
-          let properties = []
+          r.marketPrice = r.marketPrice * 100;
+          r.price = r.price * 100;
+          r.costPrice = r.costPrice * 100;
+        })
+
+        // 动态规格调整字段
+        if (this.specSwitch) {
+          rates.forEach(r => {
+            let properties = []
             Array.of(r.spec).forEach(s => {
               let obj;
-               if (s instanceof Array) {
-                  obj = s;
-               }else{
-                  obj = Array.of(s);
-               }
+              if (s instanceof Array) {
+                obj = s;
+              } else {
+                obj = Array.of(s);
+              }
               obj.forEach((v, i) => {
-                let specValue = this.dynamicSpec[i].specValue.find(o => o.name == v);
+                let specValue = this.dynamicSpec[i].specValue.find(o => o.name === v);
                 let propertie = {};
                 propertie.propertyId = this.dynamicSpec[i].specId;
                 propertie.valueId = specValue.id;
                 properties.push(propertie);
               })
             })
-          r.properties = properties;
-        })
-      }else{
-        rates[0].name = this.baseForm.name;
-        rates[0].status = this.baseForm.status;
-      }
-      let form = this.baseForm
+            r.properties = properties;
+          })
+        } else {
+          rates[0].name = this.baseForm.name;
+          rates[0].status = this.baseForm.status;
+        }
+        let form = this.baseForm
+        if (form.picUrls instanceof Array) {
+          form.picUrls = form.picUrls.flatMap(m => m.split(','))
+        } else if (form.picUrls.split(',') instanceof Array) {
+          form.picUrls = form.picUrls.split(',').flatMap(m => m.split(','))
+        } else {
+          form.picUrls = Array.of(form.picUrls)
+        }
+        form.skus = rates;
+        form.specType = this.ratesForm.spec;
 
-      if(form.picUrls instanceof Array){
-        form.picUrls = form.picUrls.flatMap(m=>m.split(','))
-      }else if(form.picUrls.split(',') instanceof Array){
-        form.picUrls = form.picUrls.split(',').flatMap(m=>m.split(','))
-      }else{
-        form.picUrls = Array.of(form.picUrls)
-      }
-      console.log(rates)
-      form.skus = rates;
-      form.specType = this.ratesForm.spec;
-      form.categoryId = form.categoryIds[this.baseForm.categoryIds.length - 1];
+        let category = form.categoryIds instanceof Array ? form.categoryIds: Array.of(form.categoryIds)
+        console.log(category)
+        form.categoryId = category[category.length - 1];
 
-
-      if(form.id == null){
-        createSpu(form).then((response) => {
-          this.$modal.msgSuccess("新增成功");
-        })
-      }else{
-        updateSpu(form).then((response) => {
-          this.$modal.msgSuccess("修改成功");
-        })
-      }
+        if (form.id == null) {
+          createSpu(form).then(() => {
+            this.$modal.msgSuccess("新增成功");
+          }).then(()=>{
+            this.cancel();
+          })
+        } else {
+          updateSpu(form).then(() => {
+            this.$modal.msgSuccess("修改成功");
+          }).then(()=>{
+            this.cancel();
+          })
+        }
       });
-      this.$emit("closeDialog");
+
     },
     /** 查询规格 */
     getPropertyPageList() {
       // 执行查询
-      getPropertyPage().then((response) => {
-        this.propertyPageList = response.data.list;
+      getPropertyListAndValue().then((response) => {
+        this.propertyPageList = response.data;
       });
     },
+    // 添加规格项目
     changeSpec(val) {
-      let obj = this.propertyPageList.find(o => o.id == val);
-      let dynamicSpec = this.dynamicSpec;
-      let spec = dynamicSpec.find(o => o.specId == val)
+      let obj = this.propertyPageList.find(o => o.id === val);
+      let spec = this.dynamicSpec.find(o => o.specId === val)
       spec.specId = obj.id;
       spec.specName = obj.name;
-      spec.specValue = obj.propertyValueList;
-      this.dynamicSpec = dynamicSpec;
+      spec.specValue = obj.values;
       this.buildRatesFormRates();
     },
-    updateType(id){
-        getSpu(id).then((response) =>{
-            let data = response.data;
-            this.baseForm.id=data.id;
-            this.baseForm.name=data.name;
-            this.baseForm.sellPoint=data.sellPoint;
-            this.baseForm.categoryIds=data.categoryIds;
-            this.baseForm.sort=data.sort;
-            this.baseForm.description=data.description;
-            this.baseForm.picUrls=data.picUrls;
-            this.baseForm.status=data.status;
-            this.baseForm.virtualSalesCount=data.virtualSalesCount;
-            this.baseForm.showStock=data.showStock;
-            this.baseForm.brandId=data.brandId;
-            this.ratesForm.spec=data.specType;
-            data.skus.forEach(r=>{
-              r.marketPrice = this.divide(r.marketPrice, 100)
-              r.price = this.divide(r.price, 100)
-              r.costPrice = this.divide(r.costPrice, 100)
-            })
-            if(this.ratesForm.spec == 2){
-              data.productPropertyViews.forEach(p=>{
-                let obj = {};
-                obj.specId = p.propertyId;
-                obj.specName = p.name;
-                obj.specValue = p.propertyValues;
-                this.dynamicSpec.push(obj);
-              })
-              data.skus.forEach(s=>{
-                s.spec = [];
-                s.properties.forEach(sp=>{
-                  let spec = data.productPropertyViews.find(o=>o.propertyId == sp.propertyId).propertyValues.find(v=>v.id == sp.valueId).name;
-                   s.spec.push(spec)
-                })
-              })
-            }
-            this.ratesForm.rates=data.skus
+    updateType(id) {
+      getSpuDetail(id).then((response) => {
+        let data = response.data;
+        this.baseForm.id = data.id;
+        this.baseForm.name = data.name;
+        this.baseForm.sellPoint = data.sellPoint;
+        this.baseForm.categoryIds = data.categoryId;
+        this.baseForm.videoUrl = data.videoUrl;
+        this.baseForm.sort = data.sort;
+        this.baseForm.description = data.description;
+        this.baseForm.picUrls = data.picUrls;
+        this.baseForm.status = data.status;
+        this.baseForm.virtualSalesCount = data.virtualSalesCount;
+        this.baseForm.showStock = data.showStock;
+        this.baseForm.brandId = data.brandId;
+        this.ratesForm.spec = data.specType;
+        data.skus.forEach(r => {
+          r.marketPrice = this.divide(r.marketPrice, 100)
+          r.price = this.divide(r.price, 100)
+          r.costPrice = this.divide(r.costPrice, 100)
         })
-    }
+        if (this.ratesForm.spec === 2) {
+          this.specSwitch = true;
+          data.productPropertyViews.forEach(p => {
+            let obj = {};
+            obj.specId = p.propertyId;
+            obj.specName = p.name;
+            obj.specValue = p.propertyValues;
+            this.dynamicSpec.push(obj);
+          })
+          data.skus.forEach(s => {
+            s.spec = [];
+            s.properties.forEach(sp => {
+              let spec = data.productPropertyViews.find(o => o.propertyId === sp.propertyId).propertyValues.find(v => v.id === sp.valueId).name;
+              s.spec.push(spec)
+            })
+          })
+        }
+        this.ratesForm.rates = data.skus
+      })
+    },
+
   },
 };
 </script>
 
 <style lang="scss">
-.spec-dialog {
-  width: 400px;
-  height: 300px;
+.container{
+  padding: 20px;
 }
 
 .dynamic-spec {
@@ -522,11 +540,9 @@ export default {
 }
 
 .tabs {
-  height: 500px;
   border-bottom: 2px solid #f2f2f2;
 
   .el-tab-pane {
-    height: 445px;
     overflow-y: auto;
   }
 }
@@ -559,4 +575,18 @@ export default {
     margin-left: 15px;
   }
 }
+
+.mall-image {
+  .el-upload--picture-card {
+    width: 80px;
+    height: 80px;
+    line-height: 90px;
+  }
+
+  .el-upload-list__item {
+    width: 80px;
+    height: 80px;
+  }
+}
+
 </style>

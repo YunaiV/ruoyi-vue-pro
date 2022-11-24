@@ -30,7 +30,7 @@ spring:
             multi-statement-allow: true
     dynamic: # 多数据源配置
       druid: # Druid 【连接池】相关的全局配置
-        initial-size: 5 # 初始连接数
+        initial-size: 1 # 初始连接数
         min-idle: 10 # 最小连接池数量
         max-active: 20 # 最大连接池数量
         max-wait: 600000 # 配置获取连接等待超时的时间，单位：毫秒
@@ -56,7 +56,7 @@ spring:
         #          password: JSm:g(*%lU4ZAkz06cd52KqT3)i1?H7W
         slave: # 模拟从库，可根据自己需要修改
           name: ruoyi-vue-pro
-          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?allowMultiQueries=true&useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?allowMultiQueries=true&useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
           #          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT # MySQL Connector/J 5.X 连接的示例
           #          url: jdbc:postgresql://127.0.0.1:5432/${spring.datasource.dynamic.datasource.slave.name} # PostgreSQL 连接的示例
           #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
@@ -72,10 +72,6 @@ spring:
     port: 6379 # 端口
     database: 0 # 数据库索引
 #    password: 123456 # 密码，建议生产环境开启
-
-jasypt:
-  encryptor:
-    password: yuanma # 加解密的秘钥
 
 --- #################### 定时任务相关配置 ####################
 
@@ -107,20 +103,6 @@ spring:
             class: org.quartz.simpl.SimpleThreadPool # 线程池类型
     jdbc: # 使用 JDBC 的 JobStore 的时候，JDBC 的配置
       initialize-schema: NEVER # 是否自动使用 SQL 初始化 Quartz 表结构。这里设置成 never ，我们手动创建表结构。
-
---- #################### 配置中心相关配置 ####################
-
-# Apollo 配置中心
-apollo:
-  bootstrap:
-    enabled: true # 设置 Apollo 在启动阶段生效
-    eagerLoad:
-      enabled: true # 设置 Apollo 在日志初始化前生效，可以实现日志的动态级别配置
-  jdbc: # 自定义的 JDBC 配置项，用于数据库的地址
-    dao: cn.iocoder.yudao.module.infra.dal.mysql.config.ConfigDAOImpl
-    url: ${spring.datasource.dynamic.datasource.master.url}
-    username: ${spring.datasource.dynamic.datasource.master.username}
-    password: ${spring.datasource.dynamic.datasource.master.password}
 
 --- #################### 服务保障相关配置 ####################
 
@@ -173,6 +155,9 @@ logging:
     cn.iocoder.yudao.module.system.dal.mysql: debug
     cn.iocoder.yudao.module.tool.dal.mysql: debug
     cn.iocoder.yudao.module.member.dal.mysql: debug
+    cn.iocoder.yudao.module.trade.dal.mysql: debug
+    cn.iocoder.yudao.module.promotion.dal.mysql: debug
+debug: false
 
 --- #################### 微信公众号、小程序相关配置 ####################
 wx:

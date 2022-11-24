@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -223,7 +223,7 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setSuccessTime(refundNotify.getRefundSuccessTime())
                 .setChannelRefundNo(refundNotify.getChannelOrderNo())
                 .setTradeNo(refundNotify.getTradeNo())
-                .setNotifyTime(new Date())
+                .setNotifyTime(LocalDateTime.now())
                 .setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
         refundMapper.updateById(updateRefundDO);
 

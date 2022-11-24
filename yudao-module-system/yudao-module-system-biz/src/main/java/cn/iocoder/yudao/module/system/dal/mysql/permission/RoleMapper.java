@@ -11,8 +11,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.lang.Nullable;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -48,6 +48,6 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
     }
 
     @Select("SELECT COUNT(*) FROM system_role WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
+    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

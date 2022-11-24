@@ -105,7 +105,7 @@
         </el-form-item>
       </el-col>
 
-      <el-col :span="24" v-if="info.genType == '1'">
+      <el-col :span="24" v-if="info.genType === '1'">
         <el-form-item prop="genPath">
           <span slot="label">
             自定义路径
@@ -128,7 +128,7 @@
       </el-col>
     </el-row>
 
-    <el-row v-show="info.tplCategory == 'tree'">
+    <el-row v-show="info.tplCategory === 'tree'">
       <h4 class="form-header">其他信息</h4>
       <el-col :span="12">
         <el-form-item>
@@ -185,7 +185,7 @@
         </el-form-item>
       </el-col>
     </el-row>
-    <el-row v-show="info.tplCategory == 'sub'">
+    <el-row v-show="info.tplCategory === 'sub'">
       <h4 class="form-header">关联信息</h4>
       <el-col :span="12">
         <el-form-item>
@@ -314,7 +314,7 @@ export default {
     },
     /** 设置关联外键 */
     setSubTableColumns(value) {
-      for (var item in this.tables) {
+      for (let item in this.tables) {
         const name = this.tables[item].tableName;
         if (value === name) {
           this.subColumns = this.tables[item].columns;

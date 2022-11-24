@@ -11,10 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -74,7 +73,7 @@ class OAuth2CodeServiceImplTest extends BaseDbUnitTest {
         String code = "test_code";
         // mock 数据
         OAuth2CodeDO codeDO = randomPojo(OAuth2CodeDO.class).setCode(code)
-                .setExpiresTime(addTime(Duration.ofDays(-1)));
+                .setExpiresTime(LocalDateTime.now().minusDays(1));
         oauth2CodeMapper.insert(codeDO);
 
         // 调用，并断言
@@ -88,7 +87,7 @@ class OAuth2CodeServiceImplTest extends BaseDbUnitTest {
         String code = "test_code";
         // mock 数据
         OAuth2CodeDO codeDO = randomPojo(OAuth2CodeDO.class).setCode(code)
-                .setExpiresTime(addTime(Duration.ofDays(1)));
+                .setExpiresTime(LocalDateTime.now().plusDays(1));
         oauth2CodeMapper.insert(codeDO);
 
         // 调用

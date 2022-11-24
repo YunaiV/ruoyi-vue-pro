@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form } from '@/components/Form'
-import { PropType, computed, unref, ref, defineEmits } from 'vue'
+import { PropType, computed, unref, ref } from 'vue'
 import { propTypes } from '@/utils/propTypes'
 import { ElButton } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
