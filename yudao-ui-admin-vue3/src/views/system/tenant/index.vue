@@ -19,10 +19,10 @@
           @click="handleExport()"
         />
       </template>
-      <template #accountCount="{ row }">
+      <template #accountCount_default="{ row }">
         <el-tag> {{ row.accountCount }} </el-tag>
       </template>
-      <template #packageId="{ row }">
+      <template #packageId_default="{ row }">
         <el-tag v-if="row.packageId === 0" type="danger">系统租户</el-tag>
         <el-tag v-else type="success"> {{ getPackageName(row.packageId) }} </el-tag>
       </template>
@@ -58,18 +58,7 @@
       :schema="allSchemas.formSchema"
       :rules="rules"
       ref="formRef"
-    >
-      <template #packageId>
-        <el-select v-model="tenantPackageId">
-          <el-option
-            v-for="item in tenantPackageOptions"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          />
-        </el-select>
-      </template>
-    </Form>
+    />
     <!-- 对话框(详情) -->
     <Descriptions
       v-if="actionType === 'detail'"
@@ -97,16 +86,15 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Tenant">
-import { ref, unref, onMounted } from 'vue'
+import { ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
-import { ElTag, ElSelect, ElOption } from 'element-plus'
+import { ElTag } from 'element-plus'
 import { FormExpose } from '@/components/Form'
 import * as TenantApi from '@/api/system/tenant'
-import { rules, allSchemas } from './tenant.data'
-import { getTenantPackageList, TenantPackageVO } from '@/api/system/tenantPackage'
+import { rules, allSchemas, tenantPackageOption } from './tenant.data'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
@@ -125,17 +113,10 @@ const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormExpose>() // 表单 Ref
 const detailRef = ref() // 详情 Ref
-const tenantPackageId = ref() // 套餐
-const tenantPackageOptions = ref<TenantPackageVO[]>([]) //套餐列表
-
-const getTenantPackageOptions = async () => {
-  const res = await getTenantPackageList()
-  tenantPackageOptions.value.push(...res)
-}
 const getPackageName = (packageId: number) => {
-  for (let item of tenantPackageOptions.value) {
-    if (item.id === packageId) {
-      return item.name
+  for (let item of tenantPackageOption) {
+    if (item.value === packageId) {
+      return item.label
     }
   }
   return '未知套餐'
@@ -151,7 +132,6 @@ const setDialogTile = (type: string) => {
 // 新增操作
 const handleCreate = () => {
   // 重置表单
-  tenantPackageId.value = ''
   setDialogTile('create')
 }
 
@@ -160,7 +140,6 @@ const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
   const res = await TenantApi.getTenantApi(rowId)
-  tenantPackageId.value = res.packageId
   unref(formRef)?.setValues(res)
 }
 
@@ -168,7 +147,6 @@ const handleUpdate = async (rowId: number) => {
 const handleDetail = async (rowId: number) => {
   // 设置数据
   const res = await TenantApi.getTenantApi(rowId)
-  tenantPackageId.value = res.packageId
   detailRef.value = res
   setDialogTile('detail')
 }
@@ -193,7 +171,6 @@ const submitForm = async () => {
       // 提交请求
       try {
         const data = unref(formRef)?.formModel as TenantApi.TenantVO
-        data.packageId = tenantPackageId.value
         if (actionType.value === 'create') {
           await TenantApi.createTenantApi(data)
           message.success(t('common.createSuccess'))
@@ -211,9 +188,4 @@ const submitForm = async () => {
     }
   })
 }
-
-// ========== 初始化 ==========
-onMounted(async () => {
-  await getTenantPackageOptions()
-})
 </script>

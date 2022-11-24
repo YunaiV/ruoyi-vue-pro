@@ -3,7 +3,23 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
 import { DICT_TYPE } from '@/utils/dict'
 import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
+import { getTenantPackageList, TenantPackageVO } from '@/api/system/tenantPackage'
+import { ComponentOptions } from '@/types/components'
 const { t } = useI18n() // 国际化
+export const tenantPackageOption: ComponentOptions[] = []
+const getTenantPackageOptions = async () => {
+  const res = await getTenantPackageList()
+  res.forEach((tenantPackage: TenantPackageVO) => {
+    tenantPackageOption.push({
+      key: tenantPackage.id,
+      value: tenantPackage.id,
+      label: tenantPackage.name
+    })
+  })
+
+  return tenantPackageOption
+}
+getTenantPackageOptions()
 
 // 表单校验
 export const rules = reactive({
@@ -30,7 +46,18 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '租户套餐',
-      field: 'packageId'
+      field: 'packageId',
+      table: {
+        slots: {
+          default: 'packageId_default'
+        }
+      },
+      form: {
+        component: 'Select',
+        componentProps: {
+          options: tenantPackageOption
+        }
+      }
     },
     {
       title: '联系人',
@@ -60,6 +87,11 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '账号额度',
       field: 'accountCount',
+      table: {
+        slots: {
+          default: 'accountCount_default'
+        }
+      },
       form: {
         component: 'InputNumber'
       }
