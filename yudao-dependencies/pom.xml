@@ -522,11 +522,6 @@
 
             <!-- SMS SDK begin -->
             <dependency>
-                <groupId>com.yunpian.sdk</groupId>
-                <artifactId>yunpian-java-sdk</artifactId>
-                <version>${yunpian-java-sdk.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.aliyun</groupId>
                 <artifactId>aliyun-java-sdk-core</artifactId>
                 <version>${aliyun-java-sdk-core.version}</version>
