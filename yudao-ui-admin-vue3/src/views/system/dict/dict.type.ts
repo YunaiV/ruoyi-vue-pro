@@ -13,7 +13,7 @@ export const dictTypeRules = reactive({
 // 新增 + 修改
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
-  primaryType: 'seq',
+  primaryType: null,
   action: true,
   actionWidth: '140px',
   columns: [

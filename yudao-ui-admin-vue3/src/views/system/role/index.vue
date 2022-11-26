@@ -13,30 +13,35 @@
         />
       </template>
       <template #actionbtns_default="{ row }">
+        <!-- 操作：编辑 -->
         <XTextButton
           preIcon="ep:edit"
           :title="t('action.edit')"
           v-hasPermi="['system:role:update']"
           @click="handleUpdate(row.id)"
         />
+        <!-- 操作：详情 -->
         <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
           v-hasPermi="['system:role:query']"
           @click="handleDetail(row.id)"
         />
+        <!-- 操作：菜单权限 -->
         <XTextButton
           preIcon="ep:basketball"
           title="菜单权限"
           v-hasPermi="['system:permission:assign-role-menu']"
           @click="handleScope('menu', row)"
         />
+        <!-- 操作：数据权限 -->
         <XTextButton
           preIcon="ep:coin"
           title="数据权限"
           v-hasPermi="['system:permission:assign-role-data-scope']"
           @click="handleScope('data', row)"
         />
+        <!-- 操作：删除 -->
         <XTextButton
           preIcon="ep:delete"
           :title="t('action.del')"
@@ -73,6 +78,7 @@
       <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
   </XModal>
+
   <XModal v-model="dialogScopeVisible" :title="dialogScopeTitle">
     <el-form :model="dataScopeForm" label-width="140px" :inline="true">
       <el-form-item label="角色名称">

@@ -14,7 +14,7 @@ export const dictDataRules = reactive({
 // crudSchemas
 export const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
-  primaryType: 'seq',
+  primaryType: null,
   action: true,
   actionWidth: '140px',
   columns: [

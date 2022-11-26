@@ -1,5 +1,7 @@
 <template>
   <div class="flex">
+    <!-- ====== 字典分类 ====== -->
+    <!-- TODO 星语：筛选框很小 -->
     <el-card class="w-1/2 dict" :gutter="12" shadow="always">
       <template #header>
         <div class="card-header">
@@ -12,6 +14,7 @@
         @cell-click="cellClickEvent"
         class="xtable-scrollbar"
       >
+        <!-- 操作：新增类型 -->
         <template #toolbar_buttons>
           <XButton
             type="primary"
@@ -22,12 +25,14 @@
           />
         </template>
         <template #actionbtns_default="{ row }">
+          <!-- 操作：编辑类型 -->
           <XTextButton
             preIcon="ep:edit"
             :title="t('action.edit')"
             v-hasPermi="['system:dict:update']"
             @click="handleTypeUpdate(row.id)"
           />
+          <!-- 操作：删除类型 -->
           <XTextButton
             preIcon="ep:delete"
             :title="t('action.del')"
@@ -36,7 +41,9 @@
           />
         </template>
       </vxe-grid>
+      <!-- @星语：分页和列表重叠在一起了 -->
     </el-card>
+    <!-- ====== 字典数据 ====== -->
     <el-card class="w-1/2 dict" style="margin-left: 10px" :gutter="12" shadow="hover">
       <template #header>
         <div class="card-header">
@@ -50,6 +57,7 @@
       <div v-if="tableTypeSelect">
         <!-- 列表 -->
         <vxe-grid ref="xDataGrid" v-bind="dataGridOptions" class="xtable-scrollbar">
+          <!-- 操作：新增数据 -->
           <template #toolbar_buttons>
             <XButton
               type="primary"
@@ -60,12 +68,14 @@
             />
           </template>
           <template #actionbtns_default="{ row }">
+            <!-- 操作：修改数据 -->
             <XTextButton
               v-hasPermi="['system:dict:update']"
               preIcon="ep:edit"
               :title="t('action.edit')"
               @click="handleDataUpdate(row.id)"
             />
+            <!-- 操作：删除数据 -->
             <XTextButton
               v-hasPermi="['system:dict:delete']"
               preIcon="ep:delete"
