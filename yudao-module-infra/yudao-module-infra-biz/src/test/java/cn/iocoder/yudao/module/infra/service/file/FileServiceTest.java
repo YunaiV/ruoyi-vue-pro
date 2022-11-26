@@ -79,7 +79,7 @@ public class FileServiceTest extends BaseDbUnitTest {
         FileClient client = mock(FileClient.class);
         when(fileConfigService.getMasterFileClient()).thenReturn(client);
         String url = randomString();
-        when(client.upload(same(content), same(path))).thenReturn(url);
+        when(client.upload(same(content), same(path), same("image/jpeg"))).thenReturn(url);
         when(client.getId()).thenReturn(10L);
         String name = "单测文件名";
         // 调用
