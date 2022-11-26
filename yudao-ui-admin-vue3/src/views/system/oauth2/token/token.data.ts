@@ -6,7 +6,7 @@ const { t } = useI18n() // 国际化
 // CrudSchema
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
-  primaryType: 'seq',
+  primaryType: null,
   action: true,
   columns: [
     {

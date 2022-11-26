@@ -23,7 +23,7 @@ export const rules = reactive({
 // CrudSchema
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'clientId',
-  primaryType: 'seq',
+  primaryType: null,
   action: true,
   columns: [
     {
