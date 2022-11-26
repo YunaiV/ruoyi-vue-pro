@@ -84,6 +84,8 @@ import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
 import { ElUpload, ElImage, UploadInstance, UploadRawFile } from 'element-plus'
+// 业务相关的 import
+// TODO 星语：貌似这个界面打开 404
 import { allSchemas } from './fileList.data'
 import * as FileApi from '@/api/infra/fileList'
 import { getAccessToken, getTenantId } from '@/utils/auth'

@@ -6,6 +6,7 @@ import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
   primaryType: 'seq',
+  primaryTitle: '日志编号',
   action: true,
   actionWidth: '80px',
   columns: [

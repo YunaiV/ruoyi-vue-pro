@@ -3,6 +3,7 @@
     <!-- 列表 -->
     <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
       <template #toolbar_buttons>
+        <!-- 操作：导入 -->
         <XButton
           type="primary"
           preIcon="ep:zoom-in"
@@ -12,30 +13,35 @@
         />
       </template>
       <template #actionbtns_default="{ row }">
+        <!-- 操作：预览 -->
         <XTextButton
           preIcon="ep:view"
           :title="t('action.preview')"
           v-hasPermi="['infra:codegen:query']"
           @click="handlePreview(row.id)"
         />
+        <!-- 操作：编辑 -->
         <XTextButton
           preIcon="ep:edit"
           :title="t('action.edit')"
           v-hasPermi="['infra:codegen:update']"
           @click="handleUpdate(row.id)"
         />
+        <!-- 操作：删除 -->
         <XTextButton
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['infra:codegen:delete']"
           @click="handleDelete(row.id)"
         />
+        <!-- 操作：同步 -->
         <XTextButton
           preIcon="ep:refresh"
           :title="t('action.sync')"
           v-hasPermi="['infra:codegen:update']"
           @click="handleSynchDb(row.id)"
         />
+        <!-- 操作：生成 -->
         <XTextButton
           preIcon="ep:download"
           :title="t('action.generate')"
@@ -45,7 +51,9 @@
       </template>
     </vxe-grid>
   </ContentWrap>
+  <!-- 弹窗：导入表 -->
   <ImportTable ref="importRef" @ok="handleQuery()" />
+  <!-- 弹窗：预览代码 -->
   <Preview ref="previewRef" />
 </template>
 <script setup lang="ts" name="Codegen">
@@ -78,12 +86,15 @@ const openImportTable = () => {
   importRef.value.show()
 }
 // 预览操作
+// TODO 星语：点击后报错
 const previewRef = ref()
 const handlePreview = (row: CodegenTableVO) => {
   previewRef.value.show(row)
 }
 // 编辑操作
 const handleUpdate = (rowId: number) => {
+  // TODO 星语：修改某个的时候，tab 要展示名字。例如说："修改[" + tableName + "]生成配置"
+  // TODO 星语：【暗黑模式】编辑界面，周边有白色的边框，不太好看
   push('/codegen/edit?id=' + rowId)
 }
 // 同步操作

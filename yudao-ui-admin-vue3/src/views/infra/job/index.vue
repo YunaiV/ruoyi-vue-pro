@@ -58,18 +58,21 @@
           v-hasPermi="['infra:job:delete']"
           @click="handleDelete(row.id)"
         />
+        <!-- 操作：执行 -->
         <XTextButton
           preIcon="ep:view"
           title="执行一次"
           v-hasPermi="['infra:job:trigger']"
           @click="handleRun(row)"
         />
+        <!-- 操作：日志 -->
         <XTextButton
           preIcon="ep:view"
           title="调度日志"
           v-hasPermi="['infra:job:query']"
           @click="handleJobLog(row.id)"
         />
+        <!-- TODO @星语：执行一次、任务详情、调度日志，可以收成【更多】 -->
       </template>
     </vxe-grid>
   </ContentWrap>
@@ -97,6 +100,7 @@
       <template #monitorTimeout="{ row }">
         <span>{{ row.monitorTimeout > 0 ? row.monitorTimeout + ' 毫秒' : '未开启' }}</span>
       </template>
+      <!-- TODO @星语：有个【后续执行时间】字段：2022-11-26 23:03:16; 2022-11-26 23:03:17; 2022-11-26 23:03:18; 2022-11-26 23:03:19; 2022-11-26 23:03:20 -->
     </Descriptions>
     <!-- 操作按钮 -->
     <template #footer>

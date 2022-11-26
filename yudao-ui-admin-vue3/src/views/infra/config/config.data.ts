@@ -16,7 +16,7 @@ export const rules = reactive({
 // CrudSchema
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
-  primaryType: 'seq',
+  primaryType: null,
   action: true,
   columns: [
     {
@@ -91,4 +91,5 @@ const crudSchemas = reactive<VxeCrudSchema>({
     }
   ]
 })
+// TODO 星语：“创建时间”的筛选，超过 table 的边框
 export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

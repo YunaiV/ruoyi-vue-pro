@@ -13,30 +13,35 @@
         />
       </template>
       <template #actionbtns_default="{ row }">
+        <!-- 操作：编辑 -->
         <XTextButton
           preIcon="ep:edit"
           :title="t('action.edit')"
           v-hasPermi="['infra:file-config:update']"
           @click="handleUpdate(row.id)"
         />
+        <!-- 操作：详情 -->
         <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
           v-hasPermi="['infra:file-config:query']"
           @click="handleDetail(row.id)"
         />
+        <!-- 操作：主配置 -->
         <XTextButton
           preIcon="ep:flag"
           title="主配置"
           v-hasPermi="['infra:file-config:update']"
           @click="handleMaster(row)"
         />
+        <!-- 操作：测试 -->
         <XTextButton
           preIcon="ep:share"
           :title="t('action.test')"
           v-hasPermi="['infra:file-config:update']"
           @click="handleUpdate(row.id)"
         />
+        <!-- 操作：删除 -->
         <XTextButton
           preIcon="ep:delete"
           :title="t('action.del')"
