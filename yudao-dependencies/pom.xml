@@ -61,7 +61,6 @@
         <aliyun-java-sdk-core.version>4.6.2</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
         <tencentcloud-sdk-java.version>3.1.634</tencentcloud-sdk-java.version>
-        <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
         <jimureport.version>1.5.3</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
@@ -522,11 +521,6 @@
             </dependency>
 
             <!-- SMS SDK begin -->
-            <dependency>
-                <groupId>com.yunpian.sdk</groupId>
-                <artifactId>yunpian-java-sdk</artifactId>
-                <version>${yunpian-java-sdk.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.aliyun</groupId>
                 <artifactId>aliyun-java-sdk-core</artifactId>
