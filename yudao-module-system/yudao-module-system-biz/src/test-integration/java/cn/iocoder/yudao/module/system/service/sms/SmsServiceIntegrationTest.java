@@ -31,22 +31,6 @@ public class SmsServiceIntegrationTest extends BaseDbAndRedisIntegrationTest {
     private AdminUserService userService;
 
     @Test
-    public void testSendSingleSms_yunpianSuccess() {
-        // 参数准备
-        String mobile = "15601691399";
-        Long userId = 1L;
-        Integer userType = UserTypeEnum.ADMIN.getValue();
-        String templateCode = "test_01";
-        Map<String, Object> templateParams = MapUtil.<String, Object>builder()
-                .put("operation", "登录").put("code", "1234").build();
-        // 调用
-        smsService.sendSingleSms(mobile, userId, userType, templateCode, templateParams);
-
-        // 等待 MQ 消费
-        ThreadUtil.sleep(1, TimeUnit.HOURS);
-    }
-
-    @Test
     public void testSendSingleSms_aliyunSuccess() {
         // 参数准备
         String mobile = "15601691399";
