@@ -15,6 +15,7 @@ export const rules = reactive({
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
   primaryType: 'seq',
+  primaryTitle: '敏感词编号', // TODO 星语：如果长度超过 4 个字符，会导致表格列宽度不够，需要优化
   action: true,
   columns: [
     {
@@ -24,7 +25,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '标签',
-      field: 'tags',
+      field: 'tags', // TODO 星语：如果是数组的话，是不是使用 el tag 展示呀？
       table: {
         slots: {
           default: 'tags_default'
