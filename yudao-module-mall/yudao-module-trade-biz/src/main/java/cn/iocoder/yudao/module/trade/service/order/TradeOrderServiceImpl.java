@@ -3,13 +3,17 @@ package cn.iocoder.yudao.module.trade.service.order;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
@@ -30,6 +34,7 @@ import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +47,7 @@ import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_ORDER_NOT_FOUND;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -51,6 +57,7 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
  * @since 2022-08-26
  */
 @Service
+@Slf4j
 public class TradeOrderServiceImpl implements TradeOrderService {
 
     @Resource
@@ -110,6 +117,84 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return order;
     }
 
+    @Override
+    public void updateOrderPaid(Long id, Long payOrderId) {
+        // 校验并获得交易订单
+        KeyValue<TradeOrderDO, PayOrderRespDTO> orderResult = validateOrderPaid(id, payOrderId);
+        TradeOrderDO order = orderResult.getKey();
+        PayOrderRespDTO payOrder = orderResult.getValue();
+
+        // 更新 TradeOrderDO 状态为已支付，等待发货
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus()).setPayed(true)
+                        .setPayTime(LocalDateTime.now()).setPayChannelCode(payOrder.getChannelCode()));
+        if (updateCount == 0) {
+            throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+        }
+
+        // TODO 芋艿：发送订单变化的消息
+
+        // TODO 芋艿：发送站内信
+
+        // TODO 芋艿：OrderLog
+    }
+
+    /**
+     * 校验交易订单满足被支付的条件
+     *
+     * 1. 交易订单未支付
+     * 2. 支付单已支付
+     *
+     * @param id 交易订单编号
+     * @param payOrderId 支付订单编号
+     * @return 交易订单
+     */
+    private KeyValue<TradeOrderDO, PayOrderRespDTO> validateOrderPaid(Long id, Long payOrderId) {
+        // 校验订单是否存在
+        TradeOrderDO order = tradeOrderMapper.selectById(id);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 校验订单未支付
+        if (TradeOrderStatusEnum.isUnpaid(order.getStatus())) { // 状态
+            log.error("[validateOrderPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
+                    id, JsonUtils.toJsonString(order));
+            throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+        }
+        // 校验支付订单匹配
+        if (ObjectUtil.notEqual(order.getPayOrderId(), payOrderId)) { // 支付单号
+            log.error("[validateOrderPaid][order({}) 支付单不匹配({})，请进行处理！order 数据是：{}]",
+                    id, payOrderId, JsonUtils.toJsonString(order));
+            throw exception(ORDER_UPDATE_PAID_PAY_ORDER_ID_ERROR);
+        }
+
+        // 校验支付单是否存在
+        PayOrderRespDTO payOrder = payOrderApi.getOrder(payOrderId);
+        if (payOrder == null) {
+            log.error("[validateOrderPaid][order({}) payOrder({}) 不存在，请进行处理！]", id, payOrderId);
+            throw exception(PAY_ORDER_NOT_FOUND);
+        }
+        // 校验支付单已支付
+        if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
+            log.error("[validateOrderPaid][order({}) payOrder({}) 未支付，请进行处理！payOrder 数据是：{}]",
+                     id, payOrderId, JsonUtils.toJsonString(payOrder));
+            throw exception(ORDER_UPDATE_PAID_PAY_ORDER_STATUS_NOT_SUCCESS);
+        }
+        // 校验支付金额一致
+        if (ObjectUtil.notEqual(payOrder.getAmount(), order.getPayPrice())) {
+            log.error("[validateOrderPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
+                     id, payOrderId, JsonUtils.toJsonString(order), JsonUtils.toJsonString(payOrder));
+            throw exception(ORDER_UPDATE_PAID_PAY_PRICE_NOT_MATCH);
+        }
+        // 校验支付订单匹配（二次）
+        if (ObjectUtil.notEqual(payOrder.getMerchantOrderId(), id.toString())) {
+            log.error("[validateOrderPaid][order({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
+                    id, payOrderId, JsonUtils.toJsonString(payOrder));
+            throw exception(ORDER_UPDATE_PAID_PAY_ORDER_ID_ERROR);
+        }
+        return new KeyValue<>(order, payOrder);
+    }
+
     /**
      * 校验商品 SKU 是否可出售
      *
@@ -120,7 +205,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuList(convertSet(items, Item::getSkuId));
         // SKU 不存在
         if (items.size() != skus.size()) {
-            throw exception(ErrorCodeConstants.ORDER_CREATE_SKU_NOT_FOUND);
+            throw exception(ORDER_CREATE_SKU_NOT_FOUND);
         }
         // 校验是否禁用 or 库存不足
         Map<Long, ProductSkuRespDTO> skuMap = convertMap(skus, ProductSkuRespDTO::getId);
@@ -233,13 +318,15 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 创建支付单，用于后续的支付
         PayOrderCreateReqDTO payOrderCreateReqDTO = TradeOrderConvert.INSTANCE.convert(
                 tradeOrderDO, tradeOrderItemDOs, spus, tradeOrderProperties);
-        Long payOrderId = payOrderApi.createPayOrder(payOrderCreateReqDTO);
+        Long payOrderId = payOrderApi.createOrder(payOrderCreateReqDTO);
 
         // 更新到交易单上
         tradeOrderMapper.updateById(new TradeOrderDO().setId(tradeOrderDO.getId()).setPayOrderId(payOrderId));
     }
 
-    // =================== Order ===================
+
+
+    // =================== Order Item ===================
 
     @Override
     public TradeOrderItemDO getOrderItem(Long userId, Long itemId) {

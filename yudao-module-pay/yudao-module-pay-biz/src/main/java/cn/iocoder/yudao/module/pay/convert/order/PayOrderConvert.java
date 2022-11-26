@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.pay.convert.order;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderDetailsRespVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExcelVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageItemRespVO;
@@ -41,13 +42,14 @@ public interface PayOrderConvert {
     List<PayOrderExcelVO> convertList02(List<PayOrderDO> list);
 
     /**
-     * 订单DO转自定义分页对象
+     * 订单 DO 转自定义分页对象
      *
      * @param bean 订单DO
      * @return 分页对象
      */
     PayOrderPageItemRespVO pageConvertItemPage(PayOrderDO bean);
 
+    // TODO 芋艿：优化下 convert 逻辑
     default PayOrderExcelVO excelConvert(PayOrderDO bean) {
         if (bean == null) {
             return null;
@@ -93,5 +95,7 @@ public interface PayOrderConvert {
     PayOrderExtensionDO convert(PayOrderSubmitReqDTO bean);
 
     PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqDTO bean);
+
+    PayOrderRespDTO convert2(PayOrderDO bean);
 
 }

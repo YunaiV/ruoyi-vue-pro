@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.pay.api.order;
 
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
+import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +21,14 @@ public class PayOrderApiImpl implements PayOrderApi {
     private PayOrderService payOrderService;
 
     @Override
-    public Long createPayOrder(PayOrderCreateReqDTO reqDTO) {
+    public Long createOrder(PayOrderCreateReqDTO reqDTO) {
         return payOrderService.createPayOrder(reqDTO);
+    }
+
+    @Override
+    public PayOrderRespDTO getOrder(Long id) {
+        PayOrderDO order = payOrderService.getOrder(id);
+        return PayOrderConvert.INSTANCE.convert2(order);
     }
 
 }

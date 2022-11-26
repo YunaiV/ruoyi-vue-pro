@@ -42,6 +42,19 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
         return ARRAYS;
     }
 
+    // ========== 问：为什么写了很多 isXXX 和 haveXXX 的判断逻辑呢？ ==========
+    // ========== 答：方便找到某一类判断，哪些业务正在使用 ==========
+
+    /**
+     * 判断指定状态，是否正处于【未付款】状态
+     *
+     * @param status 指定状态
+     * @return 是否
+     */
+    public static boolean isUnpaid(Integer status) {
+        return ObjectUtil.equal(PAID.getStatus(), status);
+    }
+
     /**
      * 判断指定状态，是否正处于【已取消】状态
      *

@@ -95,6 +95,13 @@ public class TradeOrderDO extends BaseDO {
     private String remark;
 
     // ========== 价格 + 支付基本信息 ==========
+
+    /**
+     * 支付订单编号
+     *
+     * 对接 pay-module-biz 支付服务的支付订单编号，即 PayOrderDO 的 id 编号
+     */
+    private Long payOrderId;
     /**
      * 是否已支付
      *
@@ -106,6 +113,12 @@ public class TradeOrderDO extends BaseDO {
      * 付款时间
      */
     private LocalDateTime payTime;
+    /**
+     * 支付成功的支付渠道
+     *
+     * 对应 PayChannelEnum 枚举
+     */
+    private String payChannelCode;
 
     // ========== 价格 + 支付基本信息 ==========
     // 价格文档 - 淘宝：https://open.taobao.com/docV3.htm?docId=108471&docType=1
@@ -156,18 +169,6 @@ public class TradeOrderDO extends BaseDO {
      * + {@link #adjustPrice}
      */
     private Integer payPrice;
-    /**
-     * 支付订单编号
-     *
-     * 对接 pay-module-biz 支付服务的支付订单编号，即 PayOrderDO 的 id 编号
-     */
-    private Long payOrderId;
-    /**
-     * 支付成功的支付渠道
-     *
-     * 对应 PayChannelEnum 枚举
-     */
-    private Integer payChannel;
 
     // ========== 收件 + 物流基本信息 ==========
     /**
@@ -206,7 +207,7 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 收件人地区编号
      */
-    private Long receiverAreaId;
+    private Integer receiverAreaId;
     /**
      * 收件人邮编
      */

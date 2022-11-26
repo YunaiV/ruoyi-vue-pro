@@ -33,6 +33,14 @@ public interface TradeOrderService {
      */
     TradeOrderDO getOrder(Long userId, Long orderId);
 
+    /**
+     * 更新交易订单已支付
+     *
+     * @param id 交易订单编号
+     * @param payOrderId 支付订单编号
+     */
+    void updateOrderPaid(Long id, Long payOrderId);
+
     // =================== Order Item ===================
 
     /**
@@ -54,4 +62,5 @@ public interface TradeOrderService {
      */
     void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus,
                                         Integer newAfterSaleStatus, Integer refundPrice);
+
 }

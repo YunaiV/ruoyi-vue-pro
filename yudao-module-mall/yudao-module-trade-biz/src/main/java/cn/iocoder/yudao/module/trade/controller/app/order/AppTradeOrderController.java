@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+
 @Api(tags = "用户 App - 交易订单")
 @RestController
 @RequestMapping("/trade/order")
@@ -49,13 +51,15 @@ public class AppTradeOrderController {
         String clientIp = ServletUtil.getClientIP(servletRequest);
         // 创建交易订单，预支付记录
         Long orderId = tradeOrderService.createOrder(loginUserId, clientIp, createReqVO);
-        return CommonResult.success(orderId);
+        return success(orderId);
     }
 
     @PostMapping("/update-paid")
     @ApiOperation(value = "更新订单为已支付", notes = "由 pay-module 支付服务，进行回调，可见 PayNotifyJob")
     public CommonResult<Boolean> updateOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
-        return null;
+        tradeOrderService.updateOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+                notifyReqDTO.getPayOrderId());
+        return success(true);
     }
 
     @GetMapping("/get")

@@ -6,6 +6,8 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -109,7 +111,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // mock 方法（用户收件地址的校验）
         AddressRespDTO addressRespDTO = new AddressRespDTO().setId(10L).setUserId(userId).setName("芋艿")
                 .setMobile("15601691300").setAreaId(3306L).setPostCode("85757").setDetailAddress("土豆村");
-        when(addressApi.getAddress(eq(userId), eq(10L))).thenReturn(addressRespDTO);
+        when(addressApi.getAddress(eq(10L), eq(userId))).thenReturn(addressRespDTO);
         // mock 方法（价格计算）
         PriceCalculateRespDTO.OrderItem priceOrderItem01 = new PriceCalculateRespDTO.OrderItem()
                 .setSpuId(11L).setSkuId(1L).setCount(3).setOriginalPrice(150).setOriginalUnitPrice(50)
@@ -131,7 +133,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
             return true;
         }))).thenReturn(new PriceCalculateRespDTO().setOrder(priceOrder));
         // mock 方法（创建支付单）
-        when(payOrderApi.createPayOrder(argThat(createReqDTO -> {
+        when(payOrderApi.createOrder(argThat(createReqDTO -> {
             assertEquals(createReqDTO.getAppId(), 888L);
             assertEquals(createReqDTO.getUserIp(), userIp);
             assertNotNull(createReqDTO.getMerchantOrderId()); // 由于 tradeOrderId 后生成，只能校验非空
@@ -169,7 +171,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderDO.getAdjustPrice(), 0);
         assertEquals(tradeOrderDO.getPayPrice(), 80);
         assertEquals(tradeOrderDO.getPayOrderId(), 1000L);
-        assertNull(tradeOrderDO.getPayChannel());
+        assertNull(tradeOrderDO.getPayChannelCode());
         assertNull(tradeOrderDO.getDeliveryTemplateId());
         assertNull(tradeOrderDO.getExpressNo());
         assertFalse(tradeOrderDO.getDeliveryStatus());
@@ -177,7 +179,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertNull(tradeOrderDO.getReceiveTime());
         assertEquals(tradeOrderDO.getReceiverName(), "芋艿");
         assertEquals(tradeOrderDO.getReceiverMobile(), "15601691300");
-        assertEquals(tradeOrderDO.getReceiverAreaId(), 3306L);
+        assertEquals(tradeOrderDO.getReceiverAreaId(), 3306);
         assertEquals(tradeOrderDO.getReceiverPostCode(), 85757);
         assertEquals(tradeOrderDO.getReceiverDetailAddress(), "土豆村");
         assertEquals(tradeOrderDO.getAfterSaleStatus(), TradeOrderAfterSaleStatusEnum.NONE.getStatus());
@@ -241,11 +243,30 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
             assertEquals(reqDTO.getOrderId(), tradeOrderId);
             return true;
         }));
-//        //mock 支付订单信息
-//        when(payOrderApi.createPayOrder(any())).thenReturn(1L);
-
-//        //价格
-//        assertEquals(calculateRespDTO.getOrder().getItems().get(0).getPresentPrice(), tradeOrderItemDO.getPresentPrice());
     }
 
+    @Test
+    public void updateOrderPaid() {
+        // mock 数据（TradeOrder）
+        TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> {
+            o.setId(1L).setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
+            o.setPayOrderId(10L).setPayPrice(100).setPayTime(null);
+        });
+        tradeOrderMapper.insert(order);
+        // 准备参数
+        Long id = 1L;
+        Long payOrderId = 10L;
+        // mock 方法（支付单）
+        when(payOrderApi.getOrder(eq(10L))).thenReturn(randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus()).setChannelCode("wx_pub")
+                        .setMerchantOrderId("1")).setAmount(100));
+        // 调用
+        tradeOrderService.updateOrderPaid(id, payOrderId);
+        // 断言
+        TradeOrderDO dbOrder = tradeOrderMapper.selectById(id);
+        assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.PAID.getStatus());
+        assertTrue(dbOrder.getPayed());
+        assertNotNull(dbOrder.getPayTime());
+        assertEquals(dbOrder.getPayChannelCode(), "wx_pub");
+    }
 }
