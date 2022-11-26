@@ -204,7 +204,7 @@ const handleDelete = async (rowId: number) => {
 }
 
 const userNicknameFormat = (row) => {
-  if (!row || !row.leaderUserId || row.leaderUserId == null) {
+  if (!row || !row.leaderUserId) {
     return '未设置'
   }
   for (const user of userOption.value) {

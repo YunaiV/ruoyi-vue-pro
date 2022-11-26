@@ -14,7 +14,7 @@ export const rules = reactive({
   mobile: [
     {
       pattern:
-        /^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-79])|(?:5[0-35-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[189]))\d{8}$/,
+        /^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-79])|(?:5[0-35-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[189]))\d{8}$/, // TODO @星语：前端只校验长度，格式交给后端；因为号码格式不断在变的
       trigger: 'blur',
       message: '请输入正确的手机号码'
     }
@@ -24,6 +24,7 @@ export const rules = reactive({
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
   primaryType: 'seq',
+  primaryTitle: '用户编号',
   action: true,
   actionWidth: '400px',
   columns: [
@@ -56,12 +57,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '部门',
-      field: 'deptId',
+      field: 'deptId', // TODO 星语：详情的部门没展示
       isTable: false
     },
     {
       title: '岗位',
-      field: 'postIds',
+      field: 'postIds', // TODO 星语：岗位为空的时候，要不要不展示
       isTable: false
     },
     {
@@ -74,7 +75,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '最后登录时间',
       field: 'loginDate',
-      formatter: 'formatDate',
+      formatter: 'formatDate', // TODO 星语：未登录的时候，不要展示 Invalid Date
       isForm: false
     },
     {

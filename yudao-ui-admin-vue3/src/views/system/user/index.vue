@@ -28,8 +28,8 @@
       </template>
       <!-- 列表 -->
       <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
-        <!-- 操作：新增 -->
         <template #toolbar_buttons>
+          <!-- 操作：新增 -->
           <XButton
             type="primary"
             preIcon="ep:zoom-in"
@@ -37,6 +37,7 @@
             v-hasPermi="['system:user:create']"
             @click="handleCreate()"
           />
+          <!-- 操作：导入用户 -->
           <XButton
             type="warning"
             preIcon="ep:upload"
@@ -44,6 +45,7 @@
             v-hasPermi="['system:user:import']"
             @click="importDialogVisible = true"
           />
+          <!-- 操作：导出用户 -->
           <XButton
             type="warning"
             preIcon="ep:download"
@@ -52,6 +54,7 @@
             @click="exportList('用户数据.xls')"
           />
         </template>
+        <!-- TODO @星语：貌似没生效？ -->
         <template #status="{ row }">
           <el-switch
             v-model="row.status"
@@ -61,6 +64,7 @@
           />
         </template>
         <template #actionbtns_default="{ row }">
+          <!-- 操作：编辑 -->
           <XTextButton
             preIcon="ep:edit"
             :title="t('action.edit')"
@@ -74,12 +78,15 @@
             v-hasPermi="['system:user:update']"
             @click="handleDetail(row.id)"
           />
+          <!-- TODO 芋艿：可以重置角色、密码收起来么，形成【更多】 -->
+          <!-- 操作：重置密码 -->
           <XTextButton
             preIcon="ep:key"
             title="重置密码"
             v-hasPermi="['system:user:update-password']"
             @click="handleResetPwd(row)"
           />
+          <!-- 操作：分配角色 -->
           <XTextButton
             preIcon="ep:key"
             title="分配角色"
@@ -349,6 +356,7 @@ const handleCreate = async () => {
   deptId.value = null
   postIds.value = []
   await nextTick()
+  // TODO 星语：要不要这个放到新增里？这样和 handleUpdate 统一一点
   if (allSchemas.formSchema[0].field !== 'username') {
     unref(formRef)?.addSchema(
       {
@@ -371,7 +379,7 @@ const handleCreate = async () => {
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
-  setDialogTile('update')
+  setDialogTile('update') // TODO @星语：有警告
   await nextTick()
   unref(formRef)?.delSchema('username')
   unref(formRef)?.delSchema('password')
@@ -475,6 +483,7 @@ const submitRole = async () => {
   roleDialogVisible.value = false
 }
 // ========== 导入相关 ==========
+// TODO @星语：这个要不要把导入用户，封装成一个小组件？可选哈
 const importDialogVisible = ref(false)
 const uploadDisabled = ref(false)
 const importDialogTitle = ref('用户导入')

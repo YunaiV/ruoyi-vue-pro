@@ -19,6 +19,7 @@ export const rules = reactive({
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
   primaryType: 'seq',
+  primaryTitle: '套餐编号',
   action: true,
   columns: [
     {
@@ -35,7 +36,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '菜单权限',
-      field: 'menuIds',
+      field: 'menuIds', // TODO 星语：菜单权限，表单可以搞大点哇？
       isTable: false
     },
     {
