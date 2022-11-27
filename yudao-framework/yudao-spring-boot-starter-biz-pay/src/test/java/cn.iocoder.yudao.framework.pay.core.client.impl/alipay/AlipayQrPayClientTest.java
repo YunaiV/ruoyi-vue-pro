@@ -73,7 +73,7 @@ public class AlipayQrPayClientTest extends BaseMockitoUnitTest {
         Long shopOrderId = System.currentTimeMillis();
         PayOrderUnifiedReqDTO reqDTO=new PayOrderUnifiedReqDTO();
         reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
-        reqDTO.setAmount(1L);
+        reqDTO.setAmount(1);
         reqDTO.setBody("内容：" + shopOrderId);
         reqDTO.setSubject("标题："+shopOrderId);
         String notify="http://niubi.natapp1.cc/api/pay/order/notify";

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO.OrderItem;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderDeliveryStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -178,20 +179,24 @@ public class TradeOrderDO extends BaseDO {
      */
     private Long deliveryTemplateId;
     /**
-     * 物流公司单号
+     * 发货物流公司编号
      */
-    private String expressNo;
+    private Long logisticsId;
+    /**
+     * 发货物流单号
+     */
+    private String logisticsNo;
     /**
      * 发货状态
      *
-     * true - 已发货
-     * false - 未发货
+     * 枚举 {@link TradeOrderDeliveryStatusEnum}
      */
-    private Boolean deliveryStatus;
+    private Integer deliveryStatus;
     /**
      * 发货时间
      */
     private LocalDateTime deliveryTime;
+
     /**
      * 收货时间
      */

@@ -16,15 +16,13 @@ import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.price.PriceApi;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAfterSaleStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderConfig;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +36,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -173,8 +173,8 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderDO.getPayOrderId(), 1000L);
         assertNull(tradeOrderDO.getPayChannelCode());
         assertNull(tradeOrderDO.getDeliveryTemplateId());
-        assertNull(tradeOrderDO.getExpressNo());
-        assertFalse(tradeOrderDO.getDeliveryStatus());
+        assertNull(tradeOrderDO.getLogisticsId());
+        assertEquals(tradeOrderDO.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
         assertNull(tradeOrderDO.getDeliveryTime());
         assertNull(tradeOrderDO.getReceiveTime());
         assertEquals(tradeOrderDO.getReceiverName(), "芋艿");
@@ -246,11 +246,11 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void updateOrderPaid() {
+    public void testUpdateOrderPaid() {
         // mock 数据（TradeOrder）
         TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> {
             o.setId(1L).setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
-            o.setPayOrderId(10L).setPayPrice(100).setPayTime(null);
+            o.setPayOrderId(10L).setPayed(false).setPayPrice(100).setPayTime(null);
         });
         tradeOrderMapper.insert(order);
         // 准备参数
@@ -260,13 +260,39 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         when(payOrderApi.getOrder(eq(10L))).thenReturn(randomPojo(PayOrderRespDTO.class,
                 o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus()).setChannelCode("wx_pub")
                         .setMerchantOrderId("1")).setAmount(100));
+
         // 调用
         tradeOrderService.updateOrderPaid(id, payOrderId);
         // 断言
         TradeOrderDO dbOrder = tradeOrderMapper.selectById(id);
-        assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.PAID.getStatus());
+        assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.UNDELIVERED.getStatus());
         assertTrue(dbOrder.getPayed());
         assertNotNull(dbOrder.getPayTime());
         assertEquals(dbOrder.getPayChannelCode(), "wx_pub");
     }
+
+    @Test
+    public void testDeliveryOrder() {
+        // mock 数据（TradeOrder）
+        TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> {
+            o.setId(1L).setStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus());
+            o.setLogisticsId(null).setLogisticsNo(null).setDeliveryTime(null)
+                    .setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
+        });
+        tradeOrderMapper.insert(order);
+        // 准备参数
+        TradeOrderDeliveryReqVO deliveryReqVO = new TradeOrderDeliveryReqVO().setId(1L)
+                .setLogisticsId(10L).setLogisticsNo("100");
+        // mock 方法（支付单）
+
+        // 调用
+        tradeOrderService.deliveryOrder(randomLongId(), deliveryReqVO);
+        // 断言
+        TradeOrderDO dbOrder = tradeOrderMapper.selectById(1L);
+        assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.DELIVERED.getStatus());
+        assertEquals(dbOrder.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.DELIVERED.getStatus());
+        assertPojoEquals(dbOrder, deliveryReqVO);
+        assertNotNull(dbOrder.getDeliveryTime());
+    }
+
 }

@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.PriceApi;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO.Item;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
@@ -107,94 +108,6 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return tradeOrderDO.getId();
     }
 
-    @Override
-    public TradeOrderDO getOrder(Long userId, Long orderId) {
-        TradeOrderDO order = tradeOrderMapper.selectById(orderId);
-        if (order != null
-                && ObjectUtil.notEqual(order.getUserId(), userId)) {
-            return null;
-        }
-        return order;
-    }
-
-    @Override
-    public void updateOrderPaid(Long id, Long payOrderId) {
-        // 校验并获得交易订单
-        KeyValue<TradeOrderDO, PayOrderRespDTO> orderResult = validateOrderPaid(id, payOrderId);
-        TradeOrderDO order = orderResult.getKey();
-        PayOrderRespDTO payOrder = orderResult.getValue();
-
-        // 更新 TradeOrderDO 状态为已支付，等待发货
-        int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
-                new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus()).setPayed(true)
-                        .setPayTime(LocalDateTime.now()).setPayChannelCode(payOrder.getChannelCode()));
-        if (updateCount == 0) {
-            throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
-        }
-
-        // TODO 芋艿：发送订单变化的消息
-
-        // TODO 芋艿：发送站内信
-
-        // TODO 芋艿：OrderLog
-    }
-
-    /**
-     * 校验交易订单满足被支付的条件
-     *
-     * 1. 交易订单未支付
-     * 2. 支付单已支付
-     *
-     * @param id 交易订单编号
-     * @param payOrderId 支付订单编号
-     * @return 交易订单
-     */
-    private KeyValue<TradeOrderDO, PayOrderRespDTO> validateOrderPaid(Long id, Long payOrderId) {
-        // 校验订单是否存在
-        TradeOrderDO order = tradeOrderMapper.selectById(id);
-        if (order == null) {
-            throw exception(ORDER_NOT_FOUND);
-        }
-        // 校验订单未支付
-        if (TradeOrderStatusEnum.isUnpaid(order.getStatus())) { // 状态
-            log.error("[validateOrderPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
-                    id, JsonUtils.toJsonString(order));
-            throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
-        }
-        // 校验支付订单匹配
-        if (ObjectUtil.notEqual(order.getPayOrderId(), payOrderId)) { // 支付单号
-            log.error("[validateOrderPaid][order({}) 支付单不匹配({})，请进行处理！order 数据是：{}]",
-                    id, payOrderId, JsonUtils.toJsonString(order));
-            throw exception(ORDER_UPDATE_PAID_PAY_ORDER_ID_ERROR);
-        }
-
-        // 校验支付单是否存在
-        PayOrderRespDTO payOrder = payOrderApi.getOrder(payOrderId);
-        if (payOrder == null) {
-            log.error("[validateOrderPaid][order({}) payOrder({}) 不存在，请进行处理！]", id, payOrderId);
-            throw exception(PAY_ORDER_NOT_FOUND);
-        }
-        // 校验支付单已支付
-        if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
-            log.error("[validateOrderPaid][order({}) payOrder({}) 未支付，请进行处理！payOrder 数据是：{}]",
-                     id, payOrderId, JsonUtils.toJsonString(payOrder));
-            throw exception(ORDER_UPDATE_PAID_PAY_ORDER_STATUS_NOT_SUCCESS);
-        }
-        // 校验支付金额一致
-        if (ObjectUtil.notEqual(payOrder.getAmount(), order.getPayPrice())) {
-            log.error("[validateOrderPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
-                     id, payOrderId, JsonUtils.toJsonString(order), JsonUtils.toJsonString(payOrder));
-            throw exception(ORDER_UPDATE_PAID_PAY_PRICE_NOT_MATCH);
-        }
-        // 校验支付订单匹配（二次）
-        if (ObjectUtil.notEqual(payOrder.getMerchantOrderId(), id.toString())) {
-            log.error("[validateOrderPaid][order({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
-                    id, payOrderId, JsonUtils.toJsonString(payOrder));
-            throw exception(ORDER_UPDATE_PAID_PAY_ORDER_ID_ERROR);
-        }
-        return new KeyValue<>(order, payOrder);
-    }
-
     /**
      * 校验商品 SKU 是否可出售
      *
@@ -269,7 +182,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         tradeOrderDO.setProductCount(getSumValue(order.getItems(),  PriceCalculateRespDTO.OrderItem::getCount, Integer::sum));
         tradeOrderDO.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
         tradeOrderDO.setAdjustPrice(0).setPayed(false); // 支付信息
-        tradeOrderDO.setDeliveryStatus(false); // 物流信息
+        tradeOrderDO.setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus()); // 物流信息
         tradeOrderDO.setAfterSaleStatus(TradeOrderAfterSaleStatusEnum.NONE.getStatus()).setRefundPrice(0); // 退款信息
         tradeOrderMapper.insert(tradeOrderDO);
         return tradeOrderDO;
@@ -324,7 +237,142 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         tradeOrderMapper.updateById(new TradeOrderDO().setId(tradeOrderDO.getId()).setPayOrderId(payOrderId));
     }
 
+    @Override
+    public void updateOrderPaid(Long id, Long payOrderId) {
+        // 校验并获得交易订单（可支付）
+        KeyValue<TradeOrderDO, PayOrderRespDTO> orderResult = validateOrderPayable(id, payOrderId);
+        TradeOrderDO order = orderResult.getKey();
+        PayOrderRespDTO payOrder = orderResult.getValue();
 
+        // 更新 TradeOrderDO 状态为已支付，等待发货
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus()).setPayed(true)
+                        .setPayTime(LocalDateTime.now()).setPayChannelCode(payOrder.getChannelCode()));
+        if (updateCount == 0) {
+            throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+        }
+
+        // TODO 芋艿：发送订单变化的消息
+
+        // TODO 芋艿：发送站内信
+
+        // TODO 芋艿：OrderLog
+    }
+
+    /**
+     * 校验交易订单满足被支付的条件
+     *
+     * 1. 交易订单未支付
+     * 2. 支付单已支付
+     *
+     * @param id 交易订单编号
+     * @param payOrderId 支付订单编号
+     * @return 交易订单
+     */
+    private KeyValue<TradeOrderDO, PayOrderRespDTO> validateOrderPayable(Long id, Long payOrderId) {
+        // 校验订单是否存在
+        TradeOrderDO order = tradeOrderMapper.selectById(id);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 校验订单未支付
+        if (!TradeOrderStatusEnum.isUnpaid(order.getStatus()) || order.getPayed()) {
+            log.error("[validateOrderPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
+                    id, JsonUtils.toJsonString(order));
+            throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+        }
+        // 校验支付订单匹配
+        if (ObjectUtil.notEqual(order.getPayOrderId(), payOrderId)) { // 支付单号
+            log.error("[validateOrderPaid][order({}) 支付单不匹配({})，请进行处理！order 数据是：{}]",
+                    id, payOrderId, JsonUtils.toJsonString(order));
+            throw exception(ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
+        }
+
+        // 校验支付单是否存在
+        PayOrderRespDTO payOrder = payOrderApi.getOrder(payOrderId);
+        if (payOrder == null) {
+            log.error("[validateOrderPaid][order({}) payOrder({}) 不存在，请进行处理！]", id, payOrderId);
+            throw exception(PAY_ORDER_NOT_FOUND);
+        }
+        // 校验支付单已支付
+        if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
+            log.error("[validateOrderPaid][order({}) payOrder({}) 未支付，请进行处理！payOrder 数据是：{}]",
+                    id, payOrderId, JsonUtils.toJsonString(payOrder));
+            throw exception(ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
+        }
+        // 校验支付金额一致
+        if (ObjectUtil.notEqual(payOrder.getAmount(), order.getPayPrice())) {
+            log.error("[validateOrderPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
+                    id, payOrderId, JsonUtils.toJsonString(order), JsonUtils.toJsonString(payOrder));
+            throw exception(ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);
+        }
+        // 校验支付订单匹配（二次）
+        if (ObjectUtil.notEqual(payOrder.getMerchantOrderId(), id.toString())) {
+            log.error("[validateOrderPaid][order({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
+                    id, payOrderId, JsonUtils.toJsonString(payOrder));
+            throw exception(ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
+        }
+        return new KeyValue<>(order, payOrder);
+    }
+
+    @Override
+    public void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO) {
+        // 校验并获得交易订单（可发货）
+        TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
+
+        // TODO 芋艿：logisticsId 校验存在
+
+        // 更新 TradeOrderDO 状态为已发货，等待收货
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(),
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.DELIVERED.getStatus())
+                        .setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo())
+                        .setDeliveryStatus(TradeOrderDeliveryStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now()));
+        if (updateCount == 0) {
+            throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
+        }
+
+        // TODO 芋艿：发送订单变化的消息
+
+        // TODO 芋艿：发送站内信
+
+        // TODO 芋艿：OrderLog
+
+        // TODO 设计：like：是否要单独一个 delivery 发货单表？？？
+        // TODO 设计：niu：要不要支持一个订单下，多个 order item 单独发货，类似有赞
+        // TODO 设计：lili：是不是发货后，才支持售后？
+    }
+
+    /**
+     * 校验交易订单满足被发货的条件
+     *
+     * 1. 交易订单未发货
+     *
+     * @param id 交易订单编号
+     * @return 交易订单
+     */
+    private TradeOrderDO validateOrderDeliverable(Long id) {
+        // 校验订单是否存在
+        TradeOrderDO order = tradeOrderMapper.selectById(id);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 校验订单是否是待发货状态
+        if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())
+            || ObjectUtil.notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus())) {
+            throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
+        }
+        return order;
+    }
+
+    @Override
+    public TradeOrderDO getOrder(Long userId, Long orderId) {
+        TradeOrderDO order = tradeOrderMapper.selectById(orderId);
+        if (order != null
+                && ObjectUtil.notEqual(order.getUserId(), userId)) {
+            return null;
+        }
+        return order;
+    }
 
     // =================== Order Item ===================
 

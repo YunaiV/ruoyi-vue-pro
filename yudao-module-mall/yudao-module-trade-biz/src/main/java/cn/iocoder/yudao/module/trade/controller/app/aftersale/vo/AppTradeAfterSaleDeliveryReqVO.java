@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -24,7 +25,7 @@ public class AppTradeAfterSaleDeliveryReqVO {
     private String logisticsNo;
 
     @ApiModelProperty(name = "退货时间", required = true)
-    @NotNull(message = "退货时间不能为空")
+    @NotEmpty(message = "退货时间不能为空")
     private LocalDateTime deliveryTime;
 
 }

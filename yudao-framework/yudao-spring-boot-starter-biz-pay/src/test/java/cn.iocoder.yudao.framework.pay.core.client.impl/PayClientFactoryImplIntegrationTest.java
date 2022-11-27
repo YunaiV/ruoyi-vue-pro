@@ -122,7 +122,7 @@ public class PayClientFactoryImplIntegrationTest {
 
     private static PayOrderUnifiedReqDTO buildPayOrderUnifiedReqDTO() {
         PayOrderUnifiedReqDTO reqDTO = new PayOrderUnifiedReqDTO();
-        reqDTO.setAmount(123L);
+        reqDTO.setAmount(123);
         reqDTO.setSubject("IPhone 13");
         reqDTO.setBody("biubiubiu");
         reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));

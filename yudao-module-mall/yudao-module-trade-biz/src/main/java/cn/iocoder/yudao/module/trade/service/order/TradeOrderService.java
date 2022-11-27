@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -15,7 +16,7 @@ public interface TradeOrderService {
     // =================== Order ===================
 
     /**
-     * 创建交易订单
+     * 【会员】创建交易订单
      *
      * @param userId 登录用户
      * @param userIp 用户 IP 地址
@@ -25,6 +26,22 @@ public interface TradeOrderService {
     Long createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO);
 
     /**
+     * 更新交易订单已支付
+     *
+     * @param id 交易订单编号
+     * @param payOrderId 支付订单编号
+     */
+    void updateOrderPaid(Long id, Long payOrderId);
+
+    /**
+     * 【管理员】发货交易订单
+     *
+     * @param userId 管理员编号
+     * @param deliveryReqVO 发货请求
+     */
+    void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO);
+
+    /**
      * 获得指定用户，指定的交易订单
      *
      * @param userId 用户编号
@@ -32,14 +49,6 @@ public interface TradeOrderService {
      * @return 交易订单
      */
     TradeOrderDO getOrder(Long userId, Long orderId);
-
-    /**
-     * 更新交易订单已支付
-     *
-     * @param id 交易订单编号
-     * @param payOrderId 支付订单编号
-     */
-    void updateOrderPaid(Long id, Long payOrderId);
 
     // =================== Order Item ===================
 
