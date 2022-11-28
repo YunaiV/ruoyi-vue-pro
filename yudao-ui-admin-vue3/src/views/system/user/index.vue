@@ -142,11 +142,14 @@
         <span>{{ row.dept?.name }}</span>
       </template>
       <template #postIds="{ row }">
-        <el-tag v-for="(post, index) in row.postIds" :key="index" index="">
-          <template v-for="postObj in postOptions">
-            {{ post === postObj.id ? postObj.name : '' }}
-          </template>
-        </el-tag>
+        <template v-if="row.postIds !== ''">
+          <el-tag v-for="(post, index) in row.postIds" :key="index" index="">
+            <template v-for="postObj in postOptions">
+              {{ post === postObj.id ? postObj.name : '' }}
+            </template>
+          </el-tag>
+        </template>
+        <template v-else> </template>
       </template>
     </Descriptions>
     <!-- 操作按钮 -->
@@ -379,7 +382,7 @@ const handleCreate = async () => {
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
-  setDialogTile('update') // TODO @星语：有警告
+  setDialogTile('update')
   await nextTick()
   unref(formRef)?.delSchema('username')
   unref(formRef)?.delSchema('password')

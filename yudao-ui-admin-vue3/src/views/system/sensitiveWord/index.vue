@@ -75,7 +75,18 @@
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
       :data="detailData"
-    />
+    >
+      <template #tags="{ row }">
+        <el-tag
+          :disable-transitions="true"
+          :key="index"
+          v-for="(tag, index) in row.tags"
+          :index="index"
+        >
+          {{ tag }}
+        </el-tag>
+      </template>
+    </Descriptions>
     <!-- 操作按钮 -->
     <template #footer>
       <!-- 按钮：保存 -->

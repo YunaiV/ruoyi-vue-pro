@@ -1,7 +1,6 @@
 <template>
   <div class="flex">
     <!-- ====== 字典分类 ====== -->
-    <!-- TODO 星语：筛选框很小 -->
     <el-card class="w-1/2 dict" :gutter="12" shadow="always">
       <template #header>
         <div class="card-header">
@@ -94,7 +93,7 @@
         ref="typeFormRef"
       >
         <template #type>
-          <template v-if="dictTypeValue">
+          <template v-if="actionType == 'typeUpdate'">
             <el-tag>{{ dictTypeValue }}</el-tag>
           </template>
           <template v-else><el-input v-model="dictTypeValue" /> </template>
@@ -232,7 +231,7 @@ const submitTypeForm = async () => {
   const elForm = unref(typeFormRef)?.getElFormRef()
   if (!elForm) return
   elForm.validate(async (valid) => {
-    if (valid) {
+    if (valid && dictTypeValue.value != '') {
       actionLoading.value = true
       // 提交请求
       try {

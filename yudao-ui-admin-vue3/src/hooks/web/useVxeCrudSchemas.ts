@@ -22,6 +22,7 @@ export type VxeCrudSchema = {
   actionTitle?: string // 操作栏标题 默认为操作
   actionWidth?: string // 操作栏插槽宽度,一般2个字带图标 text 类型按钮 50-70
   columns: VxeCrudColumns[]
+  searchSpan?: number
 }
 type VxeCrudColumns = Omit<VxeTableColumn, 'children'> & {
   field: string // 字段名
@@ -112,6 +113,8 @@ export const useVxeCrudSchemas = (
 // 过滤 Search 结构
 const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
   const { t } = useI18n()
+  const span = crudSchema.searchSpan ? crudSchema.searchSpan : 6
+  const spanLength = 24 / span
   const searchSchema: VxeFormItemProps[] = []
   eachTree(crudSchema.columns, (schemaItem: VxeCrudColumns) => {
     // 判断是否显示
@@ -144,13 +147,14 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
           props: { placeholder: t('common.selectText') }
         }
       }
+
       const searchSchemaItem = {
         // 默认为 input
-        folding: searchSchema.length > 3,
+        folding: searchSchema.length > spanLength,
         itemRender: schemaItem.itemRender ? schemaItem.itemRender : itemRender,
         field: schemaItem.field,
         title: schemaItem.search?.title || schemaItem.title,
-        span: 6
+        span: span
       }
 
       searchSchema.push(searchSchemaItem)
@@ -161,7 +165,7 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
     const buttons: VxeFormItemProps = {
       span: 24,
       align: 'center',
-      collapseNode: searchSchema.length > 4,
+      collapseNode: searchSchema.length > spanLength + 1,
       itemRender: {
         name: '$buttons',
         children: [
@@ -181,11 +185,13 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
   const tableSchema: VxeGridPropTypes.Columns = []
   // 主键ID
   if (crudSchema.primaryKey && crudSchema.primaryType) {
+    const primaryWidth =
+      (crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index')).length * 20 + 'px'
     const tableSchemaItem = {
       title: crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index'),
       field: crudSchema.primaryKey,
       type: crudSchema.primaryType ? crudSchema.primaryType : null,
-      width: '80px'
+      width: primaryWidth
     }
     tableSchema.push(tableSchemaItem)
   }

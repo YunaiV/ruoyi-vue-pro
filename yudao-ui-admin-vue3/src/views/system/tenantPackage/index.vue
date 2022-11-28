@@ -25,7 +25,7 @@
       ref="formRef"
     >
       <template #menuIds>
-        <el-card class="box-card">
+        <el-card class="w-120">
           <template #header>
             <div class="card-header">
               全选/全不选:

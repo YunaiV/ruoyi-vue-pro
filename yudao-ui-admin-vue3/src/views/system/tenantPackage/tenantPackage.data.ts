@@ -36,7 +36,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '菜单权限',
-      field: 'menuIds', // TODO 星语：菜单权限，表单可以搞大点哇？
+      field: 'menuIds',
       isTable: false
     },
     {

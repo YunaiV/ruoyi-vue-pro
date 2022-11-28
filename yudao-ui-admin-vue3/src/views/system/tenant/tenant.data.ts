@@ -122,7 +122,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: t('table.createTime'),
       field: 'createTime',
-      formatter: 'formatDate', // TODO 星语：要不给 formatter = formatDate 的时候，设置一个它的默认宽度，避免缩进
+      formatter: 'formatDate',
       isForm: false
     }
   ]

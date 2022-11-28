@@ -18,7 +18,7 @@
           preIcon="ep:view"
           :title="t('action.preview')"
           v-hasPermi="['infra:codegen:query']"
-          @click="handlePreview(row.id)"
+          @click="handlePreview(row)"
         />
         <!-- 操作：编辑 -->
         <XTextButton
@@ -39,14 +39,14 @@
           preIcon="ep:refresh"
           :title="t('action.sync')"
           v-hasPermi="['infra:codegen:update']"
-          @click="handleSynchDb(row.id)"
+          @click="handleSynchDb(row)"
         />
         <!-- 操作：生成 -->
         <XTextButton
           preIcon="ep:download"
           :title="t('action.generate')"
           v-hasPermi="['infra:codegen:download']"
-          @click="handleGenTable(row.id)"
+          @click="handleGenTable(row)"
         />
       </template>
     </vxe-grid>
@@ -86,7 +86,6 @@ const openImportTable = () => {
   importRef.value.show()
 }
 // 预览操作
-// TODO 星语：点击后报错
 const previewRef = ref()
 const handlePreview = (row: CodegenTableVO) => {
   previewRef.value.show(row)

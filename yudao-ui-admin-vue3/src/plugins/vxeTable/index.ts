@@ -150,7 +150,11 @@ VXETable.setup({
 VXETable.formats.mixin({
   // 格式日期，默认 yyyy-MM-dd HH:mm:ss
   formatDate({ cellValue }, format) {
-    return XEUtils.toDateString(cellValue, format || 'yyyy-MM-dd HH:mm:ss')
+    if (cellValue != null) {
+      return XEUtils.toDateString(cellValue, format || 'yyyy-MM-dd HH:mm:ss')
+    } else {
+      return ''
+    }
   },
   // 四舍五入金额，每隔3位逗号分隔，默认2位数
   formatAmount({ cellValue }, digits = 2) {

@@ -7,8 +7,7 @@ const { t } = useI18n() // 国际化
 
 // 表单校验
 export const dictTypeRules = reactive({
-  name: [required],
-  type: [required]
+  name: [required]
 })
 // 新增 + 修改
 const crudSchemas = reactive<VxeCrudSchema>({
@@ -16,6 +15,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
   primaryType: null,
   action: true,
   actionWidth: '140px',
+  searchSpan: 12,
   columns: [
     {
       title: '字典名称',
