@@ -359,7 +359,6 @@ const handleCreate = async () => {
   deptId.value = null
   postIds.value = []
   await nextTick()
-  // TODO 星语：要不要这个放到新增里？这样和 handleUpdate 统一一点
   if (allSchemas.formSchema[0].field !== 'username') {
     unref(formRef)?.addSchema(
       {

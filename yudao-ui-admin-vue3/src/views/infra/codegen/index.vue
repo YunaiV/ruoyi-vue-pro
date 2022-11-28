@@ -71,7 +71,7 @@ import { ImportTable, Preview } from './components'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
-const { push } = useRouter()
+const { push } = useRouter() // 路由跳转
 // 列表相关的变量
 const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
 const { gridOptions, getList, deleteData } = useVxeGrid<CodegenTableVO>({
@@ -92,8 +92,6 @@ const handlePreview = (row: CodegenTableVO) => {
 }
 // 编辑操作
 const handleUpdate = (rowId: number) => {
-  // TODO 星语：修改某个的时候，tab 要展示名字。例如说："修改[" + tableName + "]生成配置"
-  // TODO 星语：【暗黑模式】编辑界面，周边有白色的边框，不太好看
   push('/codegen/edit?id=' + rowId)
 }
 // 同步操作

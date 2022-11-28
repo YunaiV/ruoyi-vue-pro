@@ -185,10 +185,10 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
   const tableSchema: VxeGridPropTypes.Columns = []
   // 主键ID
   if (crudSchema.primaryKey && crudSchema.primaryType) {
-    const primaryWidth =
-      (crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index')).length * 20 + 'px'
+    const primaryTitle = crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index')
+    const primaryWidth = primaryTitle.length * 30 + 'px'
     const tableSchemaItem = {
-      title: crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index'),
+      title: primaryTitle,
       field: crudSchema.primaryKey,
       type: crudSchema.primaryType ? crudSchema.primaryType : null,
       width: primaryWidth

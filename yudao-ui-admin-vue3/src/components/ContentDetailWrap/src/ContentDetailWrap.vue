@@ -24,12 +24,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div :class="[`${prefixCls}-container`, 'relative bg-[#fff]']" ref="contentDetailWrap">
+  <div :class="[`${prefixCls}-container`]" ref="contentDetailWrap">
     <Sticky :offset="offset">
       <div
         :class="[
           `${prefixCls}-header`,
-          'flex border-bottom-1 h-50px items-center text-center bg-white pr-10px'
+          'flex border-bottom-1 h-50px items-center text-center pr-10px'
         ]"
       >
         <div :class="[`${prefixCls}-header__back`, 'flex pl-10px pr-10px ']">
@@ -50,9 +50,7 @@ onMounted(() => {
     </Sticky>
     <div style="padding: var(--app-content-padding)">
       <ElCard :class="[`${prefixCls}-body`, 'mb-20px']" shadow="never">
-        <div>
-          <slot></slot>
-        </div>
+        <div> <slot></slot> </div>
       </ElCard>
     </div>
   </div>
