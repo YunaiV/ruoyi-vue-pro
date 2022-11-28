@@ -100,7 +100,9 @@
       <template #monitorTimeout="{ row }">
         <span>{{ row.monitorTimeout > 0 ? row.monitorTimeout + ' 毫秒' : '未开启' }}</span>
       </template>
-      <!-- TODO @星语：有个【后续执行时间】字段：2022-11-26 23:03:16; 2022-11-26 23:03:17; 2022-11-26 23:03:18; 2022-11-26 23:03:19; 2022-11-26 23:03:20 -->
+      <template #nextTimes>
+        <span>{{ Array.from(nextTimes, (x) => parseTime(x)).join('; ') }}</span>
+      </template>
     </Descriptions>
     <!-- 操作按钮 -->
     <template #footer>
@@ -151,6 +153,7 @@ const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormExpose>() // 表单 Ref
 const detailRef = ref() // 详情 Ref
 const cronExpression = ref('')
+const nextTimes = ref([])
 const shortcuts = ref([
   {
     text: '每天8点和12点 (自定义追加)',
@@ -169,10 +172,12 @@ const handleCreate = () => {
   cronExpression.value = ''
   setDialogTile('create')
 }
+
 // 导出操作
 const handleExport = async () => {
   await exportList(xGrid, '定时任务.xls')
 }
+
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -187,8 +192,57 @@ const handleDetail = async (rowId: number) => {
   // 设置数据
   const res = await JobApi.getJobApi(rowId)
   detailRef.value = res
+  // 后续执行时长
+  const jobNextTime = await JobApi.getJobNextTimesApi(rowId)
+  nextTimes.value = jobNextTime
   setDialogTile('detail')
 }
+
+const parseTime = (time) => {
+  if (!time) {
+    return null
+  }
+  const format = '{y}-{m}-{d} {h}:{i}:{s}'
+  let date
+  if (typeof time === 'object') {
+    date = time
+  } else {
+    if (typeof time === 'string' && /^[0-9]+$/.test(time)) {
+      time = parseInt(time)
+    } else if (typeof time === 'string') {
+      time = time
+        .replace(new RegExp(/-/gm), '/')
+        .replace('T', ' ')
+        .replace(new RegExp(/\.[\d]{3}/gm), '')
+    }
+    if (typeof time === 'number' && time.toString().length === 10) {
+      time = time * 1000
+    }
+    date = new Date(time)
+  }
+  const formatObj = {
+    y: date.getFullYear(),
+    m: date.getMonth() + 1,
+    d: date.getDate(),
+    h: date.getHours(),
+    i: date.getMinutes(),
+    s: date.getSeconds(),
+    a: date.getDay()
+  }
+  const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+    let value = formatObj[key]
+    // Note: getDay() returns 0 on Sunday
+    if (key === 'a') {
+      return ['日', '一', '二', '三', '四', '五', '六'][value]
+    }
+    if (result.length > 0 && value < 10) {
+      value = '0' + value
+    }
+    return value || 0
+  })
+  return time_str
+}
+
 // 删除操作
 const handleDelete = async (rowId: number) => {
   await deleteData(xGrid, rowId)

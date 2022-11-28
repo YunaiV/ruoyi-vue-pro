@@ -40,14 +40,14 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '存储器',
       field: 'storage',
-      dictType: DICT_TYPE.INFRA_FILE_STORAGE, // TODO @星语：不同存储器，不同表单
+      dictType: DICT_TYPE.INFRA_FILE_STORAGE,
       dictClass: 'number',
       isSearch: true
     },
     {
       title: '主配置',
       field: 'master',
-      dictType: DICT_TYPE.INFRA_BOOLEAN_STRING, // TODO @星语：新增时，不选择主配置
+      dictType: DICT_TYPE.INFRA_BOOLEAN_STRING,
       dictClass: 'boolean'
     },
     {

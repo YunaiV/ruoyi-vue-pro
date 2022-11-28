@@ -16,7 +16,7 @@ export interface ConfigType {
 export interface FileConfigVO {
   id: number
   name: string
-  storage: string
+  storage: number
   master: boolean
   visible: boolean
   config: ConfigType

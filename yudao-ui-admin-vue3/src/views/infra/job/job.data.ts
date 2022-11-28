@@ -49,6 +49,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'cronExpression'
     },
     {
+      title: '后续执行时间',
+      field: 'nextTimes',
+      isTable: false,
+      isForm: false
+    },
+    {
       title: '重试次数',
       field: 'retryCount',
       isTable: false
