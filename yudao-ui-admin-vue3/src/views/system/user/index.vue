@@ -54,8 +54,7 @@
             @click="exportList('用户数据.xls')"
           />
         </template>
-        <!-- TODO @星语：貌似没生效？ -->
-        <template #status="{ row }">
+        <template #status_default="{ row }">
           <el-switch
             v-model="row.status"
             :active-value="0"

@@ -12,8 +12,8 @@ VXETable.renderer.add('XDataTimePicker', {
     return (
       <ElDatePicker
         v-model={data[field]}
+        style="width: 100%"
         type={content ? (content as any) : 'datetimerange'}
-        style="maxWidth: 300px"
         value-format="YYYY-MM-DD HH:mm:ss"
         range-separator="-"
         start-placeholder={t('common.startTimeText')}

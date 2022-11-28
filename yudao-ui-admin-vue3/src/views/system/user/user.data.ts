@@ -70,7 +70,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'status',
       dictType: DICT_TYPE.COMMON_STATUS,
       dictClass: 'number',
-      isSearch: true
+      isSearch: true,
+      table: {
+        slots: {
+          default: 'status_default'
+        }
+      }
     },
     {
       title: '最后登录时间',
