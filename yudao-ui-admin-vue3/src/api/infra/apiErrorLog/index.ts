@@ -1,5 +1,23 @@
 import request from '@/config/axios'
 
+export interface ApiErrorLogVO {
+  id: number
+  userId: string
+  userIp: string
+  userAgent: string
+  userType: string
+  applicationName: string
+  requestMethod: string
+  requestParams: string
+  requestUrl: string
+  exceptionTime: string
+  exceptionName: string
+  exceptionStackTrace: string
+  processUserId: string
+  processStatus: number
+  resultCode: number
+}
+
 // 查询列表API 访问日志
 export const getApiErrorLogPageApi = (params) => {
   return request.get({ url: '/infra/api-error-log/page', params })

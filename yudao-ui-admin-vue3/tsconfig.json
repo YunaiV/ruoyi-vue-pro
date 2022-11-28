@@ -29,8 +29,7 @@
       "element-plus/global",
       "@types/intro.js",
       "@types/qrcode",
-      "vite-plugin-svg-icons/client",
-      "unplugin-vue-macros/macros-global"
+      "vite-plugin-svg-icons/client"
     ],
     "typeRoots": ["./node_modules/@types/", "./types"]
   },

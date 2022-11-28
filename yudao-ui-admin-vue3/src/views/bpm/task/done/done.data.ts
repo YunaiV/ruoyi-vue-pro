@@ -29,7 +29,8 @@ const crudSchemas = reactive<CrudSchema[]>([
   {
     label: '结果',
     field: 'result',
-    dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT
+    dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
+    dictClass: 'number'
   },
   {
     label: '审批意见',

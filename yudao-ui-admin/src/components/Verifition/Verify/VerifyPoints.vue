@@ -60,7 +60,7 @@
  * */
 import { resetSize } from './../utils/util'
 import { aesEncrypt } from '@/utils/ase'
-import { reqGet, reqCheck } from './../api/index'
+import { reqGet, reqCheck } from '@/api/login'
 
 export default {
   name: 'VerifyPoints',

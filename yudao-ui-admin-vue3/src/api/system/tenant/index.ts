@@ -1,8 +1,36 @@
 import request from '@/config/axios'
-import type { TenantVO } from './types'
+
+export interface TenantVO {
+  id: number
+  name: string
+  packageId: number
+  contactName: string
+  contactMobile: string
+  username: string
+  password: string
+  accountCount: number
+  expireTime: string
+  domain: string
+  status: number
+  createTime: string
+}
+
+export interface TenantPageReqVO extends PageParam {
+  name?: string
+  contactName?: string
+  contactMobile?: string
+  status?: number
+}
+
+export interface TenantExportReqVO {
+  name?: string
+  contactName?: string
+  contactMobile?: string
+  status?: number
+}
 
 // 查询租户列表
-export const getTenantPageApi = (params) => {
+export const getTenantPageApi = (params: TenantPageReqVO) => {
   return request.get({ url: '/system/tenant/page', params })
 }
 
@@ -27,6 +55,6 @@ export const deleteTenantApi = (id: number) => {
 }
 
 // 导出租户
-export const exportTenantApi = (params) => {
+export const exportTenantApi = (params: TenantExportReqVO) => {
   return request.download({ url: '/system/tenant/export-excel', params })
 }

@@ -1,116 +1,3 @@
-<script setup lang="ts">
-import { useIcon } from '@/hooks/web/useIcon'
-import { reactive, ref, unref, watch, computed } from 'vue'
-import LoginFormTitle from './LoginFormTitle.vue'
-import { ElForm, ElFormItem, ElInput, ElRow, ElCol, ElMessage } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
-import { required } from '@/utils/formRules'
-import { getTenantIdByNameApi, sendSmsCodeApi, smsLoginApi } from '@/api/login'
-import { useCache } from '@/hooks/web/useCache'
-import { usePermissionStore } from '@/store/modules/permission'
-import { useRouter } from 'vue-router'
-import { setToken } from '@/utils/auth'
-import type { RouteLocationNormalizedLoaded } from 'vue-router'
-import { useLoginState, LoginStateEnum, useFormValid } from './useLogin'
-const formSmsLogin = ref()
-const { validForm } = useFormValid(formSmsLogin)
-const { handleBackLogin, getLoginState } = useLoginState()
-const getShow = computed(() => unref(getLoginState) === LoginStateEnum.MOBILE)
-const iconHouse = useIcon({ icon: 'ep:house' })
-const iconCellphone = useIcon({ icon: 'ep:cellphone' })
-const iconCircleCheck = useIcon({ icon: 'ep:circle-check' })
-const { wsCache } = useCache()
-const permissionStore = usePermissionStore()
-const { currentRoute, push } = useRouter()
-const loginLoading = ref(false)
-const { t } = useI18n()
-
-const rules = {
-  tenantName: [required],
-  mobileNumber: [required],
-  code: [required]
-}
-const loginData = reactive({
-  codeImg: '',
-  tenantEnable: true,
-  token: '',
-  loading: {
-    signIn: false
-  },
-  loginForm: {
-    uuid: '',
-    tenantName: '芋道源码',
-    mobileNumber: '',
-    code: ''
-  }
-})
-const smsVO = reactive({
-  smsCode: {
-    mobile: '',
-    scene: 21
-  },
-  loginSms: {
-    mobile: '',
-    code: ''
-  }
-})
-const mobileCodeTimer = ref(0)
-const redirect = ref<string>('')
-const getSmsCode = async () => {
-  await getTenantId()
-  smsVO.smsCode.mobile = loginData.loginForm.mobileNumber
-  await sendSmsCodeApi(smsVO.smsCode).then(async () => {
-    // 提示验证码发送成功
-    ElMessage({
-      type: 'success',
-      message: t('login.SmsSendMsg')
-    })
-    // 设置倒计时
-    mobileCodeTimer.value = 60
-    let msgTimer = setInterval(() => {
-      mobileCodeTimer.value = mobileCodeTimer.value - 1
-      if (mobileCodeTimer.value <= 0) {
-        clearInterval(msgTimer)
-      }
-    }, 1000)
-  })
-}
-watch(
-  () => currentRoute.value,
-  (route: RouteLocationNormalizedLoaded) => {
-    redirect.value = route?.query?.redirect as string
-  },
-  {
-    immediate: true
-  }
-)
-// 获取租户 ID
-const getTenantId = async () => {
-  const res = await getTenantIdByNameApi(loginData.loginForm.tenantName)
-  wsCache.set('tenantId', res)
-}
-// 登录
-const signIn = async () => {
-  await getTenantId()
-  const data = await validForm()
-  if (!data) return
-  loginLoading.value = true
-  smsVO.loginSms.mobile = loginData.loginForm.mobileNumber
-  smsVO.loginSms.code = loginData.loginForm.code
-  await smsLoginApi(smsVO.loginSms)
-    .then(async (res) => {
-      setToken(res?.token)
-      if (!redirect.value) {
-        redirect.value = '/'
-      }
-      push({ path: redirect.value || permissionStore.addRouters[0].path })
-    })
-    .catch(() => {})
-    .finally(() => {
-      loginLoading.value = false
-    })
-}
-</script>
 <template>
   <el-form
     :model="loginData.loginForm"
@@ -197,7 +84,120 @@ const signIn = async () => {
     </el-row>
   </el-form>
 </template>
-<style lang="less" scoped>
+<script setup lang="ts">
+import { reactive, ref, unref, watch, computed } from 'vue'
+import { ElForm, ElFormItem, ElInput, ElRow, ElCol } from 'element-plus'
+import { useRouter } from 'vue-router'
+import type { RouteLocationNormalizedLoaded } from 'vue-router'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useIcon } from '@/hooks/web/useIcon'
+import { useCache } from '@/hooks/web/useCache'
+import { useMessage } from '@/hooks/web/useMessage'
+import { setToken } from '@/utils/auth'
+import { required } from '@/utils/formRules'
+import { usePermissionStore } from '@/store/modules/permission'
+import { getTenantIdByNameApi, sendSmsCodeApi, smsLoginApi } from '@/api/login'
+import LoginFormTitle from './LoginFormTitle.vue'
+import { useLoginState, LoginStateEnum, useFormValid } from './useLogin'
+
+const { t } = useI18n()
+const { wsCache } = useCache()
+const message = useMessage()
+const permissionStore = usePermissionStore()
+const { currentRoute, push } = useRouter()
+const formSmsLogin = ref()
+const loginLoading = ref(false)
+const iconHouse = useIcon({ icon: 'ep:house' })
+const iconCellphone = useIcon({ icon: 'ep:cellphone' })
+const iconCircleCheck = useIcon({ icon: 'ep:circle-check' })
+const { validForm } = useFormValid(formSmsLogin)
+const { handleBackLogin, getLoginState } = useLoginState()
+const getShow = computed(() => unref(getLoginState) === LoginStateEnum.MOBILE)
+
+const rules = {
+  tenantName: [required],
+  mobileNumber: [required],
+  code: [required]
+}
+const loginData = reactive({
+  codeImg: '',
+  tenantEnable: true,
+  token: '',
+  loading: {
+    signIn: false
+  },
+  loginForm: {
+    uuid: '',
+    tenantName: '芋道源码',
+    mobileNumber: '',
+    code: ''
+  }
+})
+const smsVO = reactive({
+  smsCode: {
+    mobile: '',
+    scene: 21
+  },
+  loginSms: {
+    mobile: '',
+    code: ''
+  }
+})
+const mobileCodeTimer = ref(0)
+const redirect = ref<string>('')
+const getSmsCode = async () => {
+  await getTenantId()
+  smsVO.smsCode.mobile = loginData.loginForm.mobileNumber
+  await sendSmsCodeApi(smsVO.smsCode).then(async () => {
+    message.success(t('login.SmsSendMsg'))
+    // 设置倒计时
+    mobileCodeTimer.value = 60
+    let msgTimer = setInterval(() => {
+      mobileCodeTimer.value = mobileCodeTimer.value - 1
+      if (mobileCodeTimer.value <= 0) {
+        clearInterval(msgTimer)
+      }
+    }, 1000)
+  })
+}
+watch(
+  () => currentRoute.value,
+  (route: RouteLocationNormalizedLoaded) => {
+    redirect.value = route?.query?.redirect as string
+  },
+  {
+    immediate: true
+  }
+)
+// 获取租户 ID
+const getTenantId = async () => {
+  const res = await getTenantIdByNameApi(loginData.loginForm.tenantName)
+  wsCache.set('tenantId', res)
+}
+// 登录
+const signIn = async () => {
+  await getTenantId()
+  const data = await validForm()
+  if (!data) return
+  loginLoading.value = true
+  smsVO.loginSms.mobile = loginData.loginForm.mobileNumber
+  smsVO.loginSms.code = loginData.loginForm.code
+  await smsLoginApi(smsVO.loginSms)
+    .then(async (res) => {
+      setToken(res?.token)
+      if (!redirect.value) {
+        redirect.value = '/'
+      }
+      push({ path: redirect.value || permissionStore.addRouters[0].path })
+    })
+    .catch(() => {})
+    .finally(() => {
+      loginLoading.value = false
+    })
+}
+</script>
+
+<style lang="scss" scoped>
 :deep(.anticon) {
   &:hover {
     color: var(--el-color-primary) !important;

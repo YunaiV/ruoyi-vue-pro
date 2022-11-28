@@ -1,106 +1,39 @@
-<script lang="ts" setup>
-import { onMounted, ref } from 'vue'
-import dayjs from 'dayjs'
-import * as JobLogApi from '@/api/infra/jobLog'
-import { JobLogVO } from '@/api/infra/jobLog/types'
-import { DICT_TYPE } from '@/utils/dict'
-import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useRoute } from 'vue-router'
-import { allSchemas } from './jobLog.data'
-const { t } = useI18n() // 国际化
-const { query } = useRoute()
-// ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<JobLogVO>({
-  getListApi: JobLogApi.getJobLogPageApi,
-  exportListApi: JobLogApi.exportJobLogApi
-})
-const { getList, setSearchParams, exportList } = methods
-const getTableList = async () => {
-  const id = (query.id as unknown as number) && (query.jobId as unknown as number)
-  tableObject.params = {
-    jobId: id
-  }
-  await getList()
-}
-
-// ========== CRUD 相关 ==========
-const dialogVisible = ref(false) // 是否显示弹出层
-const dialogTitle = ref('') // 弹出层标题
-
-// ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
-
-// 详情操作
-const handleDetail = async (row: JobLogVO) => {
-  // 设置数据
-  const res = JobLogApi.getJobLogApi(row.id)
-  detailRef.value = res
-  dialogTitle.value = t('action.detail')
-  dialogVisible.value = true
-}
-
-// ========== 初始化 ==========
-onMounted(() => {
-  getTableList()
-})
-</script>
 <template>
-  <!-- 搜索工作区 -->
   <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <el-button
-        type="warning"
-        v-hasPermi="['infra:job:export']"
-        :loading="tableObject.exportLoading"
-        @click="exportList('定时任务日志.xls')"
-      >
-        <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
-      </el-button>
-    </div>
     <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #beginTime="{ row }">
+    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+      <template #toolbar_buttons>
+        <XButton
+          type="warning"
+          preIcon="ep:download"
+          :title="t('action.export')"
+          v-hasPermi="['infra:job:export']"
+          @click="handleExport()"
+        />
+      </template>
+      <template #beginTime_default="{ row }">
         <span>{{
           dayjs(row.beginTime).format('YYYY-MM-DD HH:mm:ss') +
           ' ~ ' +
           dayjs(row.endTime).format('YYYY-MM-DD HH:mm:ss')
         }}</span>
       </template>
-      <template #duration="{ row }">
+      <template #duration_default="{ row }">
         <span>{{ row.duration + ' 毫秒' }}</span>
       </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.INFRA_JOB_LOG_STATUS" :value="row.status" />
+      <template #actionbtns_default="{ row }">
+        <XTextButton
+          preIcon="ep:view"
+          :title="t('action.detail')"
+          v-hasPermi="['infra:job:query']"
+          @click="handleDetail(row)"
+        />
       </template>
-      <template #action="{ row }">
-        <el-button link type="primary" v-hasPermi="['infra:job:query']" @click="handleDetail(row)">
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-      </template>
-    </Table>
+    </vxe-grid>
   </ContentWrap>
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
+  <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
     <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.INFRA_JOB_LOG_STATUS" :value="row.status" />
-      </template>
       <template #retryInterval="{ row }">
         <span>{{ row.retryInterval + '毫秒' }} </span>
       </template>
@@ -112,5 +45,42 @@ onMounted(() => {
     <template #footer>
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
+  </XModal>
 </template>
+<script setup lang="ts" name="JobLog">
+import { ref } from 'vue'
+import dayjs from 'dayjs'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { VxeGridInstance } from 'vxe-table'
+import * as JobLogApi from '@/api/infra/jobLog'
+import { allSchemas } from './jobLog.data'
+
+const { t } = useI18n() // 国际化
+// 列表相关的变量
+const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
+const { gridOptions, exportList } = useVxeGrid<JobLogApi.JobLogVO>({
+  allSchemas: allSchemas,
+  getListApi: JobLogApi.getJobLogPageApi,
+  exportListApi: JobLogApi.exportJobLogApi
+})
+// ========== CRUD 相关 ==========
+const dialogVisible = ref(false) // 是否显示弹出层
+const dialogTitle = ref('') // 弹出层标题
+
+// ========== 详情相关 ==========
+const detailRef = ref() // 详情 Ref
+
+// 详情操作
+const handleDetail = async (row: JobLogApi.JobLogVO) => {
+  // 设置数据
+  const res = JobLogApi.getJobLogApi(row.id)
+  detailRef.value = res
+  dialogTitle.value = t('action.detail')
+  dialogVisible.value = true
+}
+// 导出操作
+const handleExport = async () => {
+  await exportList(xGrid, '定时任务详情.xls')
+}
+</script>

@@ -20,7 +20,7 @@ import { setupElementPlus } from '@/plugins/elementPlus'
 import { setupVxeTable } from '@/plugins/vxeTable'
 
 // 引入全局样式
-import '@/styles/index.less'
+import '@/styles/index.scss'
 
 // 引入动画
 import '@/plugins/animate.css'

@@ -1,5 +1,16 @@
 import request from '@/config/axios'
-import type { JobVO } from './types'
+
+export interface JobVO {
+  id: number
+  name: string
+  status: number
+  handlerName: string
+  handlerParam: string
+  cronExpression: string
+  retryCount: number
+  retryInterval: number
+  monitorTimeout: number
+}
 
 // 任务列表
 export const getJobPageApi = (params) => {

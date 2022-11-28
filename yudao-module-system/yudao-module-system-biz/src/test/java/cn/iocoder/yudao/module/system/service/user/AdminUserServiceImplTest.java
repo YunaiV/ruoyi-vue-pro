@@ -40,7 +40,7 @@ import java.util.function.Consumer;
 import static cn.hutool.core.util.RandomUtil.randomBytes;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -295,7 +295,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         reqVO.setUsername("tu");
         reqVO.setMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2020, 12, 1),buildLocalDateTime(2020, 12, 24)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)}));
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
         List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));
@@ -318,7 +318,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         reqVO.setUsername("tu");
         reqVO.setMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2020, 12, 1),buildLocalDateTime(2020, 12, 24)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)}));
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
         List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));
@@ -340,7 +340,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
             o.setUsername("tudou");
             o.setMobile("15601691300");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setCreateTime(buildLocalDateTime(2020, 12, 12));
+            o.setCreateTime(buildTime(2020, 12, 12));
             o.setDeptId(2L);
         });
         userMapper.insert(dbUser);
@@ -351,7 +351,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         // 测试 status 不匹配
         userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 测试 createTime 不匹配
-        userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setCreateTime(buildLocalDateTime(2020, 11, 11))));
+        userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setCreateTime(buildTime(2020, 11, 11))));
         // 测试 dept 不匹配
         userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setDeptId(0L)));
         return dbUser;

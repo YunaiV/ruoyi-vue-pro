@@ -2,18 +2,19 @@ import { resolve } from 'path'
 import { loadEnv } from 'vite'
 import type { UserConfig, ConfigEnv } from 'vite'
 import Vue from '@vitejs/plugin-vue'
-import WindiCSS from 'vite-plugin-windicss'
 import VueJsx from '@vitejs/plugin-vue-jsx'
-import EslintPlugin from 'vite-plugin-eslint'
 import VueI18n from '@intlify/vite-plugin-vue-i18n'
-import { createStyleImportPlugin, ElementPlusResolve, VxeTableResolve } from 'vite-plugin-style-import'
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import WindiCSS from 'vite-plugin-windicss'
+import progress from 'vite-plugin-progress'
+import EslintPlugin from 'vite-plugin-eslint'
 import PurgeIcons from 'vite-plugin-purge-icons'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import viteCompression from 'vite-plugin-compression'
-import VueMarcos from 'unplugin-vue-macros/vite'
+import vueSetupExtend from 'vite-plugin-vue-setup-extend'
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import { createStyleImportPlugin, ElementPlusResolve, VxeTableResolve } from 'vite-plugin-style-import'
 
-// 当前执行node命令时文件夹的地址（工作目录）
+// 当前执行node命令时文件夹的地址(工作目录)
 const root = process.cwd()
 
 // 路径查找
@@ -55,6 +56,9 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       Vue(),
       VueJsx(),
       WindiCSS(),
+      progress(),
+      PurgeIcons(),
+      vueSetupExtend(),
       createStyleImportPlugin({
         resolves: [ElementPlusResolve(),VxeTableResolve()],
         libs: [{
@@ -85,15 +89,13 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         symbolId: 'icon-[dir]-[name]',
         svgoOptions: true
       }),
-      PurgeIcons(),
-      VueMarcos(),
       viteCompression({
         verbose: true, // 是否在控制台输出压缩结果
-        disable: true, // 是否禁用
+        disable: false, // 是否禁用
         threshold: 10240, // 体积大于 threshold 才会被压缩,单位 b
         algorithm: 'gzip', // 压缩算法,可选 [ 'gzip' , 'brotliCompress' ,'deflate' , 'deflateRaw']
         ext: '.gz', // 生成的压缩包后缀
-        deleteOriginFile: false //压缩后是否删除源文件
+        deleteOriginFile: true //压缩后是否删除源文件
       }),
       createHtmlPlugin({
         inject: {
@@ -104,17 +106,16 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         }
       })
     ],
-
     css: {
       preprocessorOptions: {
-        less: {
-          additionalData: '@import "./src/styles/variables.module.less";',
+        scss: {
+          additionalData: '@import "./src/styles/variables.scss";',
           javascriptEnabled: true
         }
       }
     },
     resolve: {
-      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.less', '.css'],
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.scss', '.css'],
       alias: [
         {
           find: 'vue-i18n',
@@ -144,6 +145,9 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         'vue-router',
         'vue-types',
         'vue-i18n',
+        'vxe-table',
+        'xe-utils',
+        'lodash-es',
         'element-plus/es',
         'element-plus/es/locale/lang/zh-cn',
         'element-plus/es/locale/lang/en',

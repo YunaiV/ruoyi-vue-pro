@@ -1,2 +1,5 @@
 import './dataTimePicker'
 import './dict'
+import './html'
+import './link'
+import './img'

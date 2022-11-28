@@ -78,7 +78,7 @@
  * */
 import { aesEncrypt } from './../utils/ase'
 import { resetSize } from './../utils/util'
-import { reqGet, reqCheck } from './../api/index'
+import { getCodeApi, reqCheckApi } from '@/api/login'
 import { useI18n } from '@/hooks/web/useI18n'
 import {
   computed,
@@ -137,7 +137,7 @@ export default {
       default() {
         return {
           width: '310px',
-          height: '40px'
+          height: '30px'
         }
       }
     }
@@ -302,7 +302,7 @@ export default {
             : JSON.stringify({ x: moveLeftDistance, y: 5.0 }),
           token: backToken.value
         }
-        reqCheck(data).then((res) => {
+        reqCheckApi(data).then((res) => {
           if (res.repCode == '0000') {
             moveBlockBackgroundColor.value = '#5cb85c'
             leftBarBorderColor.value = '#5cb85c'
@@ -379,7 +379,7 @@ export default {
       let data = {
         captchaType: captchaType.value
       }
-      reqGet(data).then((res) => {
+      getCodeApi(data).then((res) => {
         if (res.repCode == '0000') {
           backImgBase.value = res.repData.originalImageBase64
           blockBackImgBase.value = res.repData.jigsawImageBase64

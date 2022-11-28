@@ -91,8 +91,6 @@ public class CodegenEngine {
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
             .put(vue3TemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
-            .put(vue3TemplatePath("api/types.ts"),
-                    vue3FilePath("api/${table.moduleName}/${classNameVar}/types.ts"))
             // SQL
             .put("codegen/sql/sql.vm", "sql/sql.sql")
             .put("codegen/sql/h2.vm", "sql/h2.sql")

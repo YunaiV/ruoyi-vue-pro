@@ -36,4 +36,15 @@ declare global {
     code: string
     data: T extends any ? T : T & any
   }
+
+  declare interface PageParam {
+    pageSize?: number
+    pageNo?: number
+  }
+
+  declare interface Tree {
+    id: number
+    name: string
+    children?: Tree[] | any[]
+  }
 }

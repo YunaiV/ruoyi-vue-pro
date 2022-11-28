@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.pay.service.notify;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.http.HttpUtil;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyLogDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyTaskDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
@@ -164,7 +165,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             // 校验，当前任务是否已经被通知过
             // 虽然已经通过分布式加锁，但是可能同时满足通知的条件，然后都去获得锁。此时，第一个执行完后，第二个还是能拿到锁，然后会再执行一次。
             PayNotifyTaskDO dbTask = payNotifyTaskCoreMapper.selectById(task.getId());
-            if (DateUtils.afterNow(dbTask.getNextNotifyTime())) {
+            if (LocalDateTimeUtils.afterNow(dbTask.getNextNotifyTime())) {
                 log.info("[executeNotify][dbTask({}) 任务被忽略，原因是未到达下次通知时间，可能是因为并发执行了]", JsonUtils.toJsonString(dbTask));
                 return;
             }

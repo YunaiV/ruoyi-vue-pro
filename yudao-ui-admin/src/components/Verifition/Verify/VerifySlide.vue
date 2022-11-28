@@ -64,7 +64,7 @@
  * */
 import { aesEncrypt } from '@/utils/ase'
 import { resetSize } from './../utils/util'
-import { reqGet, reqCheck } from './../api/index'
+import { reqGet, reqCheck } from '@/api/login'
 
 //  "captchaType":"blockPuzzle",
 export default {

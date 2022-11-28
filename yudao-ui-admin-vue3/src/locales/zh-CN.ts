@@ -17,6 +17,7 @@ export default {
     cancel: '取消',
     close: '关闭',
     reload: '重新加载',
+    success: '成功',
     closeTab: '关闭标签页',
     closeTheLeftTab: '关闭左侧标签页',
     closeTheRightTab: '关闭右侧标签页',
@@ -92,7 +93,6 @@ export default {
     footer: '页脚',
     uniqueOpened: '菜单手风琴',
     tagsViewIcon: '标签页图标',
-    dynamicRouter: '动态路由',
     reExperienced: '请重新退出登录体验',
     fixedMenu: '固定菜单'
   },

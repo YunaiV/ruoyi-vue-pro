@@ -1,54 +1,70 @@
-<script setup lang="ts">
-import { ElTable, ElTableColumn } from 'element-plus'
-import { onMounted, reactive } from 'vue'
-interface sociaType {
-  title: string
-  type: string
-  source: string
-  img: string
-}
-interface socialUserType {
-  socialUser: {
-    socia: sociaType[]
-  }
-}
-const state = reactive<socialUserType>({
-  socialUser: {
-    socia: []
-  }
-})
-const initSocial = () => {
-  console.info(1)
-}
-const bind = () => {
-  console.info(1)
-}
-const unbind = () => {
-  console.info(1)
-}
-onMounted(async () => {
-  await initSocial()
-})
-</script>
 <template>
-  <el-table :data="state.socialUser.socia" :show-header="false">
-    <el-table-column label="社交平台" align="left" width="120" prop="socia">
-      <template #socia="{ row }">
-        <img style="height: 20px; vertical-align: middle" :src="row.img" alt="" />
-        {{ row.title }}
+  <el-table :data="socialUsers" :show-header="false">
+    <el-table-column type="seq" title="序号" width="60" fixed="left" />
+    <el-table-column label="社交平台" align="left" width="120">
+      <template #default="{ row }">
+        <img class="h-5 align-middle" :src="row.img" alt="" />
+        <p class="mr-5">{{ row.title }}</p>
       </template>
     </el-table-column>
-    <el-table-column label="操作" align="left" prop="action">
-      <template #action="{ row }">
-        <div v-if="row.openid">
+    <el-table-column label="操作" align="center">
+      <template #default="{ row }">
+        <template v-if="row.openid">
           已绑定
-          <el-button link type="primary" @click="unbind()">(解绑)</el-button>
-        </div>
-        <div v-else>
+          <XTextButton type="primary" class="mr-5" @click="unbind(row)" title="(解绑)" />
+        </template>
+        <template v-else>
           未绑定
-          <el-button link type="primary" @click="bind()">(绑定)</el-button>
-        </div>
+          <XTextButton type="primary" class="mr-5" @click="bind(row)" title="(绑定)" />
+        </template>
       </template>
     </el-table-column>
   </el-table>
 </template>
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { ElTable, ElTableColumn } from 'element-plus'
+import { useMessage } from '@/hooks/web/useMessage'
+import { SystemUserSocialTypeEnum } from '@/utils/constants'
+import { getUserProfileApi, ProfileVO } from '@/api/system/user/profile'
+import { socialAuthRedirect, socialUnbind } from '@/api/system/user/socialUser'
+
+const message = useMessage()
+const socialUsers = ref<any[]>([])
+const userInfo = ref<ProfileVO>()
+
+const initSocial = async () => {
+  const res = await getUserProfileApi()
+  userInfo.value = res
+  for (const i in SystemUserSocialTypeEnum) {
+    const socialUser = { ...SystemUserSocialTypeEnum[i] }
+    socialUsers.value.push(socialUser)
+    if (userInfo.value?.socialUsers) {
+      for (const j in userInfo.value.socialUsers) {
+        if (socialUser.type === userInfo.value.socialUsers[j].type) {
+          socialUser.openid = userInfo.value.socialUsers[j].openid
+          break
+        }
+      }
+    }
+  }
+}
+const bind = (row) => {
+  const redirectUri = location.origin + '/user/profile?type=' + row.type
+  // 进行跳转
+  socialAuthRedirect(row.type, encodeURIComponent(redirectUri)).then((res) => {
+    window.location.href = res.data
+  })
+}
+const unbind = async (row) => {
+  const res = await socialUnbind(row.type, row.openid)
+  if (res) {
+    row.openid = undefined
+  }
+  message.success('解绑成功')
+}
+
+onMounted(async () => {
+  await initSocial()
+})
+</script>

@@ -1,9 +1,25 @@
 import { reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
 import { DICT_TYPE } from '@/utils/dict'
+import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
+import { getTenantPackageList, TenantPackageVO } from '@/api/system/tenantPackage'
+import { ComponentOptions } from '@/types/components'
 const { t } = useI18n() // 国际化
+export const tenantPackageOption: ComponentOptions[] = []
+const getTenantPackageOptions = async () => {
+  const res = await getTenantPackageList()
+  res.forEach((tenantPackage: TenantPackageVO) => {
+    tenantPackageOption.push({
+      key: tenantPackage.id,
+      value: tenantPackage.id,
+      label: tenantPackage.name
+    })
+  })
+
+  return tenantPackageOption
+}
+getTenantPackageOptions()
 
 // 表单校验
 export const rules = reactive({
@@ -18,115 +34,97 @@ export const rules = reactive({
 })
 
 // CrudSchema.
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryTitle: '租户编号',
+  primaryType: 'seq',
+  action: true,
+  columns: [
+    {
+      title: '租户名称',
+      field: 'name',
+      isSearch: true
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '租户名称',
-    field: 'name',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '租户套餐',
-    field: 'packageId'
-  },
-  {
-    label: '联系人',
-    field: 'contactName',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '联系手机',
-    field: 'contactMobile',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '用户名称',
-    field: 'username',
-    table: {
-      show: false
-    },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '用户密码',
-    field: 'password',
-    table: {
-      show: false
-    },
-    detail: {
-      show: false
-    },
-    form: {
-      component: 'InputPassword'
-    }
-  },
-  {
-    label: '账号额度',
-    field: 'accountCount',
-    form: {
-      component: 'InputNumber',
-      value: 0
-    }
-  },
-  {
-    label: '过期时间',
-    field: 'expireTime',
-    form: {
-      show: true,
-      component: 'DatePicker',
-      componentProps: {
-        type: 'datetime',
-        valueFormat: 'x'
+    {
+      title: '租户套餐',
+      field: 'packageId',
+      table: {
+        slots: {
+          default: 'packageId_default'
+        }
+      },
+      form: {
+        component: 'Select',
+        componentProps: {
+          options: tenantPackageOption
+        }
       }
-    }
-  },
-  {
-    label: '绑定域名',
-    field: 'domain'
-  },
-  {
-    label: '租户状态',
-    field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: t('table.createTime'),
-    field: 'createTime',
-    form: {
-      show: false
-    }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '240px',
-    form: {
-      show: false
     },
-    detail: {
-      show: false
+    {
+      title: '联系人',
+      field: 'contactName',
+      isSearch: true
+    },
+    {
+      title: '联系手机',
+      field: 'contactMobile',
+      isSearch: true
+    },
+    {
+      title: '用户名称',
+      field: 'username',
+      isTable: false,
+      isDetail: false
+    },
+    {
+      title: '用户密码',
+      field: 'password',
+      isTable: false,
+      isDetail: false,
+      form: {
+        component: 'InputPassword'
+      }
+    },
+    {
+      title: '账号额度',
+      field: 'accountCount',
+      table: {
+        slots: {
+          default: 'accountCount_default'
+        }
+      },
+      form: {
+        component: 'InputNumber'
+      }
+    },
+    {
+      title: '过期时间',
+      field: 'expireTime',
+      formatter: 'formatDate',
+      form: {
+        component: 'DatePicker',
+        componentProps: {
+          type: 'datetime'
+        }
+      }
+    },
+    {
+      title: '绑定域名',
+      field: 'domain'
+    },
+    {
+      title: '租户状态',
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: t('table.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate',
+      isForm: false
     }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

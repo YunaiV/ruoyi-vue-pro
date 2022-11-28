@@ -26,17 +26,21 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '公告类型',
       field: 'type',
       dictType: DICT_TYPE.SYSTEM_NOTICE_TYPE,
-      isSearch: true
+      dictClass: 'number'
     },
     {
       title: t('common.status'),
       field: 'status',
       dictType: DICT_TYPE.COMMON_STATUS,
+      dictClass: 'number',
       isSearch: true
     },
     {
       title: '公告内容',
       field: 'content',
+      table: {
+        type: 'html'
+      },
       form: {
         component: 'Editor',
         colProps: {
@@ -45,7 +49,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
         componentProps: {
           valueHtml: ''
         }
-      }
+      },
+      isTable: false
     },
     {
       title: t('common.createTime'),

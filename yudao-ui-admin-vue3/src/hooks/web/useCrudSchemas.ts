@@ -1,18 +1,23 @@
 import { reactive } from 'vue'
 import { eachTree, treeMap, filter } from '@/utils/tree'
-import { getIntDictOptions } from '@/utils/dict'
+import { getBoolDictOptions, getDictOptions, getIntDictOptions } from '@/utils/dict'
 import { FormSchema } from '@/types/form'
 import { TableColumn } from '@/types/table'
 import { DescriptionsSchema } from '@/types/descriptions'
 import { ComponentOptions } from '@/types/components'
 
 export type CrudSchema = Omit<TableColumn, 'children'> & {
-  search?: CrudSearchParams
-  table?: CrudTableParams
-  form?: CrudFormParams
-  detail?: CrudDescriptionsParams
+  isSearch?: boolean // 是否在查询显示
+  search?: CrudSearchParams // 查询的详细配置
+  isTable?: boolean // 是否在列表显示
+  table?: CrudTableParams // 列表的详细配置
+  isForm?: boolean // 是否在表单显示
+  form?: CrudFormParams // 表单的详细配置
+  isDetail?: boolean // 是否在详情显示
+  detail?: CrudDescriptionsParams // 详情的详细配置
   children?: CrudSchema[]
-  dictType?: string
+  dictType?: string // 字典类型
+  dictClass?: 'string' | 'number' | 'boolean' // 字典数据类型 string | number | boolean
 }
 
 type CrudSearchParams = {
@@ -79,20 +84,20 @@ const filterSearchSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
 
   eachTree(crudSchema, (schemaItem: CrudSchema) => {
     // 判断是否显示
-    if (schemaItem?.search?.show) {
+    if (schemaItem?.isSearch || schemaItem.search?.show) {
       let component = schemaItem?.search?.component || 'Input'
       const options: ComponentOptions[] = []
       let comonentProps = {}
       if (schemaItem.dictType) {
         const allOptions: ComponentOptions = { label: '全部', value: '' }
         options.push(allOptions)
-        getIntDictOptions(schemaItem.dictType).forEach((dict) => {
+        getDictOptions(schemaItem.dictType).forEach((dict) => {
           options.push(dict)
         })
         comonentProps = {
           options: options
         }
-        if (!schemaItem.search.component) component = 'Select'
+        if (!schemaItem.search?.component) component = 'Select'
       }
       const searchSchemaItem = {
         // 默认为 input
@@ -115,7 +120,7 @@ const filterSearchSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
 const filterTableSchema = (crudSchema: CrudSchema[]): TableColumn[] => {
   const tableColumns = treeMap<CrudSchema>(crudSchema, {
     conversion: (schema: CrudSchema) => {
-      if (schema?.table?.show !== false) {
+      if (schema?.isTable !== false && schema?.table?.show !== false) {
         return {
           ...schema.table,
           ...schema
@@ -139,14 +144,32 @@ const filterFormSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
 
   eachTree(crudSchema, (schemaItem: CrudSchema) => {
     // 判断是否显示
-    if (schemaItem?.form?.show !== false) {
+    if (schemaItem?.isForm !== false && schemaItem?.form?.show !== false) {
       let component = schemaItem?.form?.component || 'Input'
-      const options: ComponentOptions[] = []
+      let defaultValue: any = ''
+      if (schemaItem.form?.value) {
+        defaultValue = schemaItem.form?.value
+      } else {
+        if (component === 'InputNumber') {
+          defaultValue = 0
+        }
+      }
       let comonentProps = {}
       if (schemaItem.dictType) {
-        getIntDictOptions(schemaItem.dictType).forEach((dict) => {
-          options.push(dict)
-        })
+        const options: ComponentOptions[] = []
+        if (schemaItem.dictClass && schemaItem.dictClass === 'number') {
+          getIntDictOptions(schemaItem.dictType).forEach((dict) => {
+            options.push(dict)
+          })
+        } else if (schemaItem.dictClass && schemaItem.dictClass === 'boolean') {
+          getBoolDictOptions(schemaItem.dictType).forEach((dict) => {
+            options.push(dict)
+          })
+        } else {
+          getDictOptions(schemaItem.dictType).forEach((dict) => {
+            options.push(dict)
+          })
+        }
         comonentProps = {
           options: options
         }
@@ -156,6 +179,7 @@ const filterFormSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
         // 默认为 input
         component: component,
         componentProps: comonentProps,
+        value: defaultValue,
         ...schemaItem.form,
         field: schemaItem.field,
         label: schemaItem.form?.label || schemaItem.label
@@ -177,11 +201,19 @@ const filterDescriptionsSchema = (crudSchema: CrudSchema[]): DescriptionsSchema[
 
   eachTree(crudSchema, (schemaItem: CrudSchema) => {
     // 判断是否显示
-    if (schemaItem?.detail?.show !== false) {
+    if (schemaItem?.isDetail !== false && schemaItem.detail?.show !== false) {
       const descriptionsSchemaItem = {
         ...schemaItem.detail,
         field: schemaItem.field,
         label: schemaItem.detail?.label || schemaItem.label
+      }
+      if (schemaItem.dictType) {
+        descriptionsSchemaItem.dictType = schemaItem.dictType
+      }
+      if (schemaItem.detail?.dateFormat || schemaItem.formatter == 'formatDate') {
+        descriptionsSchemaItem.dateFormat = schemaItem.dateFormat
+          ? schemaItem?.detail?.dateFormat
+          : 'YYYY-MM-DD HH:mm:ss'
       }
 
       // 删除不必要的字段

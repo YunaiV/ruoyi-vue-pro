@@ -59,10 +59,10 @@ const layout = computed(() => appStore.getLayout)
   </div>
 </template>
 
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-layout-radio-picker';
+<style lang="scss" scoped>
+$prefix-cls: #{$namespace}-layout-radio-picker;
 
-.@{prefix-cls} {
+.#{$prefix-cls} {
   &__classic {
     border: 2px solid #e5e7eb;
     border-radius: 4px;

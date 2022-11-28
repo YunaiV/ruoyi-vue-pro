@@ -1,43 +1,46 @@
 <h1>🌈 yudao-ui-admin-vue3</h1>
+
 <p align="center">
     <img src="https://img.shields.io/badge/-Vue3.2-34495e?logo=vue.j" />
     <img src="https://img.shields.io/badge/-Vite3-646cff?logo=vite&logoColor=white" />
-    <img src="https://img.shields.io/badge/-TypeScript4.8-blue?logo=typescript&logoColor=white" />
+    <img src="https://img.shields.io/badge/-TypeScript4.9-blue?logo=typescript&logoColor=white" />
     <img src="https://img.shields.io/badge/-Pinia2-yellow?logo=picpay&logoColor=white" />
     <img src="https://img.shields.io/badge/-ESLint-4b32c3?logo=eslint&logoColor=white" />
     <img src="https://img.shields.io/badge/-pnpm7-F69220?logo=pnpm&logoColor=white" />
     <img src="https://img.shields.io/badge/-Axios-008fc7?logo=axios.js&logoColor=white" />
     <img src="https://img.shields.io/badge/-Prettier-ef9421?logo=Prettier&logoColor=white" alt="Prettier">
-    <img src="https://img.shields.io/badge/-Less-1D365D?logo=less&logoColor=white" alt="Less">
+    <img src="https://img.shields.io/badge/-Sass-1D365D?logo=Sass&logoColor=white" alt="Sass">
     <img src="https://img.shields.io/badge/-Wind%20CSS-06B6D4?logo=Tailwind%20CSS&logoColor=white" alt="Taiwind">
 </p>
+
 ## 介绍
 
-- 基于 vue3.2+ ，TypeScript ，Element Plus 2.2.0+ ，Vite3 ，Pinia ，Windicss 等开发的后台管理系统
+- 基于 vue3.2+ ，TypeScript ，Element Plus 2.2.0+ ，Vite3 ，Pinia ，Vxe-table , Windicss 等开发的后台管理系统
 
 ## 注意事项
 
 - 项目路径请不要使用中文命名！！！会造成解析乱码！！！请使用全英文路径！！！
-- node >=14.19.0(建议使用 16 版本) ,pnpm >=7
+- node >=14.19.0(后续升级版本，对应 node 最低版本也会升级，建议直接使用 16 版本) ,pnpm >=7
 - 开发建议使用 [谷歌浏览器-开发者版](https://www.google.cn/intl/zh-CN/chrome/dev/) 不支持 IE\QQ 等浏览器
 
 ### 点击查看[使用说明](./use.md)
 
 ### 前端依赖
 
-| 框架 | 说明 | 版本     |
-| --- | --- |--------|
-| [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.44 |
-| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.2.3  |
-| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.20 |
-| [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.8.4  |
-| [pinia](https://pinia.vuejs.org/) | Vue 存储库 替代 vuex5 | 2.0.23 |
-| [vueuse](https://vueuse.org//) | 常用工具集 | 9.4.0  |
-| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化 | 9.2.2  |
-| [vue-router](https://router.vuejs.org/) | vue 路由 | 4.1.6  |
-| [windicss](https://cn.windicss.org/) | 下一代工具优先的 CSS 框架 | 3.5.6  |
-| [iconify](https://icon-sets.iconify.design/) | 在线图标库 | 3.0.0  |
-| [wangeditor](https://www.wangeditor.com/) | 富文本编辑器 | 5.1.22 |
+| 框架 | 说明 | 版本 |
+| --- | --- | --- |
+| [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.45 |
+| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.2.3 |
+| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.23 |
+| [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.9.3 |
+| [pinia](https://pinia.vuejs.org/) | Vue 存储库 替代 vuex5 | 2.0.26 |
+| [vueuse](https://vueuse.org/) | 常用工具集 | 9.6.0 |
+| [vxe-table](https://vxetable.cn/) | vue 最强表单 | 4.3.6 |
+| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化 | 9.2.2 |
+| [vue-router](https://router.vuejs.org/) | vue 路由 | 4.1.6 |
+| [windicss](https://cn.windicss.org/) | 下一代工具优先的 CSS 框架 | 3.5.6 |
+| [iconify](https://icon-sets.iconify.design/) | 在线图标库 | 3.0.0 |
+| [wangeditor](https://www.wangeditor.com/) | 富文本编辑器 | 5.1.23 |
 
 ### 推荐 VScode 开发，插件如下
 
@@ -82,7 +85,7 @@ pnpm install
 - 运行项目
 
 ```bash
-pnpm run dev
+pnpm dev
 ```
 
 - 打包
@@ -103,7 +106,13 @@ pnpm add 包名
 pnpm remove 包名
 ```
 
-- 其他命令请看 package.json
+- 设置镜像源
+
+```bash
+pnpm config set registry https://registry.npm.taobao.org/
+```
+
+- 其他命令请看 package.json scripts
 
 ## 浏览器支持
 

@@ -1,8 +1,24 @@
 import request from '@/config/axios'
-import type { RoleVO } from './types'
+
+export interface RoleVO {
+  id: number
+  name: string
+  code: string
+  sort: number
+  status: number
+  type: number
+  createTime: string
+}
+
+export interface RolePageReqVO extends PageParam {
+  name?: string
+  code?: string
+  status?: number
+  createTime?: string[]
+}
 
 // 查询角色列表
-export const getRolePageApi = async (params) => {
+export const getRolePageApi = async (params: RolePageReqVO) => {
   return await request.get({ url: '/system/role/page', params })
 }
 

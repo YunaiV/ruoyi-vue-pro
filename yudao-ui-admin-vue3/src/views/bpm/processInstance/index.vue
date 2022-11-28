@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" name="ProcessInstance">
 import { ref } from 'vue'
 import dayjs from 'dayjs'
 import { DICT_TYPE } from '@/utils/dict'
@@ -103,19 +103,12 @@ getList()
     </Table>
   </ContentWrap>
 
-  <Dialog v-model="dialogVisible" :title="t('action.detail')">
+  <XModal v-model="dialogVisible" :title="t('action.detail')">
     <!-- 对话框(详情) -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-    </Descriptions>
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
     <!-- 操作按钮 -->
     <template #footer>
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
+  </XModal>
 </template>

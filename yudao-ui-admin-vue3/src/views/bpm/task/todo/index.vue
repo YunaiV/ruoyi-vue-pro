@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" name="Todo">
 import dayjs from 'dayjs'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'

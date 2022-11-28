@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { propTypes } from '@/utils/propTypes'
 import { computed, useAttrs, useSlots } from 'vue'
-
+import { ElScrollbar } from 'element-plus'
 const slots = useSlots()
 
 const props = defineProps({
@@ -29,9 +29,11 @@ const getBindValue = computed(() => {
     <template v-if="slots.header" #header>
       <slot name="header"></slot>
     </template>
-    <template v-if="slots.default" #default>
-      <slot name="default"></slot>
-    </template>
+    <ElScrollbar>
+      <template v-if="slots.default" #default>
+        <slot name="default"></slot>
+      </template>
+    </ElScrollbar>
     <template v-if="slots.corner" #corner>
       <slot name="corner"></slot>
     </template>

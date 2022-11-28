@@ -1,29 +1,25 @@
 <script setup lang="ts">
 import { ElDrawer, ElDivider, ElMessage } from 'element-plus'
 import { ref, unref, computed, watch } from 'vue'
+import { useCssVar, useClipboard } from '@vueuse/core'
 import { useI18n } from '@/hooks/web/useI18n'
-import { ThemeSwitch } from '@/components/ThemeSwitch'
-import { colorIsDark, lighten, hexToRGB } from '@/utils/color'
-import { useCssVar } from '@vueuse/core'
-import { useAppStore } from '@/store/modules/app'
+import { useCache } from '@/hooks/web/useCache'
+import { useDesign } from '@/hooks/web/useDesign'
+
 import { trim, setCssVar } from '@/utils'
+import { colorIsDark, lighten, hexToRGB } from '@/utils/color'
+import { useAppStore } from '@/store/modules/app'
+import { ThemeSwitch } from '@/components/ThemeSwitch'
 import ColorRadioPicker from './components/ColorRadioPicker.vue'
 import InterfaceDisplay from './components/InterfaceDisplay.vue'
 import LayoutRadioPicker from './components/LayoutRadioPicker.vue'
-import { useCache } from '@/hooks/web/useCache'
-import { useClipboard } from '@vueuse/core'
-import { useDesign } from '@/hooks/web/useDesign'
-
-const { getPrefixCls } = useDesign()
-
-const prefixCls = getPrefixCls('setting')
-
-const appStore = useAppStore()
 
 const { t } = useI18n()
+const appStore = useAppStore()
 
+const { getPrefixCls } = useDesign()
+const prefixCls = getPrefixCls('setting')
 const layout = computed(() => appStore.getLayout)
-
 const drawer = ref(false)
 
 // 主题色相关
@@ -292,10 +288,10 @@ const clear = () => {
   </ElDrawer>
 </template>
 
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-setting';
+<style lang="scss" scoped>
+$prefix-cls: #{$namespace}-setting;
 
-.@{prefix-cls} {
+.#{$prefix-cls} {
   border-radius: 6px 0 0 6px;
 }
 </style>

@@ -1,5 +1,13 @@
 import request from '@/config/axios'
-import type { DataSourceConfigVO } from './types'
+
+export interface DataSourceConfigVO {
+  id: number
+  name: string
+  url: string
+  username: string
+  password: string
+  createTime: string
+}
 
 // 查询数据源配置列表
 export const getDataSourceConfigListApi = () => {

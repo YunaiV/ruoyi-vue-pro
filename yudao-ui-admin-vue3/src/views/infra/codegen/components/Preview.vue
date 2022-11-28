@@ -1,12 +1,47 @@
+<template>
+  <XModal title="预览" v-model="preview.open">
+    <div class="flex">
+      <el-card class="w-1/4" :gutter="12" shadow="hover">
+        <el-scrollbar height="calc(100vh - 88px - 40px - 50px)">
+          <el-tree
+            ref="treeRef"
+            node-key="id"
+            :data="preview.fileTree"
+            :expand-on-click-node="false"
+            default-expanded-keys="[0]"
+            highlight-current
+            @node-click="handleNodeClick"
+          />
+        </el-scrollbar>
+      </el-card>
+      <el-card class="w-3/4" style="margin-left: 10px" :gutter="12" shadow="hover">
+        <el-tabs v-model="preview.activeName">
+          <el-tab-pane
+            v-for="item in previewCodegen"
+            :label="item.filePath.substring(item.filePath.lastIndexOf('/') + 1)"
+            :name="item.filePath"
+            :key="item.filePath"
+          >
+            <XTextButton style="float: right" :title="t('common.copy')" @click="copy(item.code)" />
+            <pre>{{ item.code }}</pre>
+          </el-tab-pane>
+        </el-tabs>
+      </el-card>
+    </div>
+  </XModal>
+</template>
 <script setup lang="ts">
 import { reactive, ref, unref } from 'vue'
+import { useClipboard } from '@vueuse/core'
+import { ElCard, ElTree, ElTabs, ElTabPane } from 'element-plus'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useMessage } from '@/hooks/web/useMessage'
 import { handleTree2 } from '@/utils/tree'
-import { ElCard, ElTree, ElTabs, ElTabPane, ElMessage } from 'element-plus'
 import { previewCodegenApi } from '@/api/infra/codegen'
 import { CodegenTableVO, CodegenPreviewVO } from '@/api/infra/codegen/types'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useClipboard } from '@vueuse/core'
-const { t } = useI18n()
+
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
 // ======== 显示页面 ========
 const preview = reactive({
   open: false,
@@ -101,11 +136,11 @@ const handleFiles = (datas: CodegenPreviewVO[]) => {
 const copy = async (text: string) => {
   const { copy, copied, isSupported } = useClipboard({ source: text })
   if (!isSupported) {
-    ElMessage.error(t('common.copyError'))
+    message.error(t('common.copyError'))
   } else {
     await copy()
     if (unref(copied)) {
-      ElMessage.success(t('common.copySuccess'))
+      message.success(t('common.copySuccess'))
     }
   }
 }
@@ -113,36 +148,3 @@ defineExpose({
   show
 })
 </script>
-<template>
-  <Dialog title="预览" v-model="preview.open" top="5vh" maxHeight="800px" width="90%">
-    <div class="flex">
-      <el-card class="w-1/4" :gutter="12" shadow="hover">
-        <el-tree
-          ref="treeRef"
-          node-key="id"
-          :data="preview.fileTree"
-          :expand-on-click-node="false"
-          default-expand-all
-          highlight-current
-          @node-click="handleNodeClick"
-        />
-      </el-card>
-      <el-card class="w-3/4" style="margin-left: 10px" :gutter="12" shadow="hover">
-        <el-tabs v-model="preview.activeName">
-          <el-tab-pane
-            v-for="item in previewCodegen"
-            :label="item.filePath.substring(item.filePath.lastIndexOf('/') + 1)"
-            :name="item.filePath"
-            :key="item.filePath"
-          >
-            <el-button link style="float: right" @click="copy(item.code)">
-              {{ t('common.copy') }}
-            </el-button>
-            <pre>{{ item.code }}</pre>
-            <!-- <pre><code class="language-html" v-html="highlightedCode(item)"></code></pre> -->
-          </el-tab-pane>
-        </el-tabs>
-      </el-card>
-    </div>
-  </Dialog>
-</template>

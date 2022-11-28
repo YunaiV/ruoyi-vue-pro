@@ -38,7 +38,7 @@ onUpdated(() => {
       dictData?.colorType === '' ||
       dictData?.colorType === undefined
     "
-    :key="dictData?.value"
+    :key="dictData?.value.toString()"
     :class="dictData?.cssClass"
   >
     {{ dictData?.label }}

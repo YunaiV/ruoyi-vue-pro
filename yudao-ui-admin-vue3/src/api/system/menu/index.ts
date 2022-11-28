@@ -1,5 +1,25 @@
 import request from '@/config/axios'
-import type { MenuVO } from './types'
+
+export interface MenuVO {
+  id: number
+  name: string
+  permission: string
+  type: number
+  sort: number
+  parentId: number
+  path: string
+  icon: string
+  component: string
+  status: number
+  visible: boolean
+  keepAlive: boolean
+  createTime: string
+}
+
+export interface MenuPageReqVO {
+  name?: string
+  status?: number
+}
 
 // 查询菜单（精简）列表
 export const listSimpleMenusApi = () => {
@@ -7,7 +27,7 @@ export const listSimpleMenusApi = () => {
 }
 
 // 查询菜单列表
-export const getMenuListApi = (params) => {
+export const getMenuListApi = (params: MenuPageReqVO) => {
   return request.get({ url: '/system/menu/list', params })
 }
 

@@ -12,6 +12,9 @@ import { useUserStoreWithOut } from '@/store/modules/user'
 import { listSimpleDictDataApi } from '@/api/system/dict/dict.data'
 import { isRelogin } from '@/config/axios/service'
 import { getInfoApi } from '@/api/login'
+import { useCache } from '@/hooks/web/useCache'
+
+const { wsCache } = useCache('sessionStorage')
 
 const { start, done } = useNProgress()
 
@@ -47,7 +50,8 @@ router.beforeEach(async (to, from, next) => {
       const dictStore = useDictStoreWithOut()
       const userStore = useUserStoreWithOut()
       const permissionStore = usePermissionStoreWithOut()
-      if (!dictStore.getHasDictData) {
+      const dictMap = wsCache.get('dictCache')
+      if (!dictMap) {
         const res = await listSimpleDictDataApi()
         dictStore.setDictMap(res)
       }

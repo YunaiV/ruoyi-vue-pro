@@ -14,7 +14,7 @@ import { ColProps } from '@/types/components'
 export const setTextPlaceholder = (schema: FormSchema): PlaceholderMoel => {
   const { t } = useI18n()
   const textMap = ['Input', 'Autocomplete', 'InputNumber', 'InputPassword']
-  const selectMap = ['Select', 'TimePicker', 'DatePicker', 'TimeSelect', 'TimeSelect']
+  const selectMap = ['Select', 'SelectV2', 'TimePicker', 'DatePicker', 'TimeSelect', 'TimeSelect']
   if (textMap.includes(schema?.component as string)) {
     return {
       placeholder: t('common.inputText')

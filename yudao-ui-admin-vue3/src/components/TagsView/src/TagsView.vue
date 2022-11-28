@@ -137,7 +137,7 @@ const moveToCurrentTag = async () => {
 const tagLinksRefs = useTemplateRefsList<RouterLinkProps>()
 
 const moveToTarget = (currentTag: RouteLocationNormalizedLoaded) => {
-  const wrap$ = unref(scrollbarRef)?.wrap$
+  const wrap$ = unref(scrollbarRef)?.wrapRef
   let firstTag: Nullable<RouterLinkProps> = null
   let lastTag: Nullable<RouterLinkProps> = null
 
@@ -233,7 +233,7 @@ const scroll = ({ scrollLeft }) => {
 
 // 移动到某个位置
 const move = (to: number) => {
-  const wrap$ = unref(scrollbarRef)?.wrap$
+  const wrap$ = unref(scrollbarRef)?.wrapRef
   const { start } = useScrollTo({
     el: wrap$!,
     position: 'scrollLeft',
@@ -463,11 +463,11 @@ watch(
   </div>
 </template>
 
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-tags-view';
+<style lang="scss" scoped>
+$prefix-cls: #{$namespace}-tags-view;
 
-.@{prefix-cls} {
-  :deep(.@{elNamespace}-scrollbar__view) {
+.#{$prefix-cls} {
+  :deep(.#{$elNamespace}-scrollbar__view) {
     height: 100%;
   }
 
@@ -485,7 +485,7 @@ watch(
       top: 1px;
       left: 0;
       width: 100%;
-      height: calc(~'100% - 1px');
+      height: calc(100% - 1px);
       border-right: 1px solid var(--tags-view-border-color);
       border-left: 1px solid var(--tags-view-border-color);
       content: '';
@@ -495,7 +495,7 @@ watch(
   &__item {
     position: relative;
     top: 2px;
-    height: calc(~'100% - 4px');
+    height: calc(100% - 4px);
     padding-right: 25px;
     margin-left: 4px;
     font-size: 12px;
@@ -509,8 +509,8 @@ watch(
       display: none;
       transform: translate(0, -50%);
     }
-    &:not(.@{prefix-cls}__item--affix):hover {
-      .@{prefix-cls}__item--close {
+    &:not(.#{$prefix-cls}__item--affix):hover {
+      .#{$prefix-cls}__item--close {
         display: block;
       }
     }
@@ -526,7 +526,7 @@ watch(
     color: var(--el-color-white);
     background-color: var(--el-color-primary);
     border: 1px solid var(--el-color-primary);
-    .@{prefix-cls}__item--close {
+    .#{$prefix-cls}__item--close {
       :deep(span) {
         color: var(--el-color-white) !important;
       }
@@ -535,7 +535,7 @@ watch(
 }
 
 .dark {
-  .@{prefix-cls} {
+  .#{$prefix-cls} {
     &__tool {
       &:hover {
         :deep(span) {
@@ -552,7 +552,7 @@ watch(
     &__item {
       position: relative;
       top: 2px;
-      height: calc(~'100% - 4px');
+      height: calc(100% - 4px);
       padding-right: 25px;
       font-size: 12px;
       cursor: pointer;
@@ -568,7 +568,7 @@ watch(
     &__item.is-active {
       color: var(--el-color-white);
       background-color: var(--el-color-primary);
-      .@{prefix-cls}__item--close {
+      .#{$prefix-cls}__item--close {
         :deep(span) {
           color: var(--el-color-white) !important;
         }

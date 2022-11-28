@@ -17,6 +17,7 @@ export default {
     cancel: 'Cancel',
     close: 'Close',
     reload: 'Reload current',
+    success: 'Success',
     closeTab: 'Close current',
     closeTheLeftTab: 'Close left',
     closeTheRightTab: 'Close right',
@@ -92,7 +93,6 @@ export default {
     footer: 'Footer',
     uniqueOpened: 'Unique opened',
     tagsViewIcon: 'Tags view icon',
-    dynamicRouter: 'Dynamic router',
     reExperienced: 'Please exit the login experience again',
     fixedMenu: 'Fixed menu'
   },
