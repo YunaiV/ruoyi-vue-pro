@@ -1,30 +1,24 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckilltime;
 
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
-import cn.iocoder.yudao.module.promotion.controller.admin.seckilltime.vo.*;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckilltime.SeckillTimeDO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckilltime.vo.SeckillTimeCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckilltime.vo.SeckillTimeRespVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckilltime.vo.SeckillTimeUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.seckilltime.SeckillTimeConvert;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckilltime.SeckillTimeDO;
 import cn.iocoder.yudao.module.promotion.service.seckilltime.SeckillTimeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Api(tags = "管理后台 - 秒杀时段")
 @RestController
@@ -83,17 +77,5 @@ public class SeckillTimeController {
 //        PageResult<SeckillTimeDO> pageResult = seckillTimeService.getSeckillTimePage(pageVO);
 //        return success(SeckillTimeConvert.INSTANCE.convertPage(pageResult));
 //    }
-
-    @GetMapping("/export-excel")
-    @ApiOperation("导出秒杀时段 Excel")
-    @PreAuthorize("@ss.hasPermission('promotion:seckill-time:export')")
-    @OperateLog(type = EXPORT)
-    public void exportSeckillTimeExcel(@Valid SeckillTimeExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<SeckillTimeDO> list = seckillTimeService.getSeckillTimeList(exportReqVO);
-        // 导出 Excel
-        List<SeckillTimeExcelVO> datas = SeckillTimeConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "秒杀时段.xls", "数据", SeckillTimeExcelVO.class, datas);
-    }
 
 }

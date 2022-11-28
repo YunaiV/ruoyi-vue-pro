@@ -1,13 +1,17 @@
 package cn.iocoder.yudao.module.promotion.service.seckilltime;
 
+import cn.hutool.core.collection.CollUtil;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
+
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalTime;
 import java.util.*;
+
 import cn.iocoder.yudao.module.promotion.controller.admin.seckilltime.vo.*;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckilltime.SeckillTimeDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import cn.iocoder.yudao.module.promotion.convert.seckilltime.SeckillTimeConvert;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckilltime.SeckillTimeMapper;
@@ -24,11 +28,14 @@ import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 @Validated
 public class SeckillTimeServiceImpl implements SeckillTimeService {
 
+
     @Resource
     private SeckillTimeMapper seckillTimeMapper;
 
     @Override
     public Long createSeckillTime(SeckillTimeCreateReqVO createReqVO) {
+        // 校验时间段是否冲突
+        validateSeckillTimeConflict(null,createReqVO.getStartTime(), createReqVO.getEndTime());
         // 插入
         SeckillTimeDO seckillTime = SeckillTimeConvert.INSTANCE.convert(createReqVO);
         seckillTimeMapper.insert(seckillTime);
@@ -40,6 +47,8 @@ public class SeckillTimeServiceImpl implements SeckillTimeService {
     public void updateSeckillTime(SeckillTimeUpdateReqVO updateReqVO) {
         // 校验存在
         this.validateSeckillTimeExists(updateReqVO.getId());
+        // 校验时间段是否冲突
+        validateSeckillTimeConflict(updateReqVO.getId(), updateReqVO.getStartTime(), updateReqVO.getEndTime());
         // 更新
         SeckillTimeDO updateObj = SeckillTimeConvert.INSTANCE.convert(updateReqVO);
         seckillTimeMapper.updateById(updateObj);
@@ -59,6 +68,31 @@ public class SeckillTimeServiceImpl implements SeckillTimeService {
         }
     }
 
+    /**
+     * 校验时间是否存在冲突
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     */
+    private void validateSeckillTimeConflict(Long id, LocalTime startTime, LocalTime endTime) {
+        //查询开始时间，结束时间，是否在别人的时间段内
+        List<SeckillTimeDO> startTimeList = seckillTimeMapper.selectListWithTime(startTime);
+        List<SeckillTimeDO> endTimeList = seckillTimeMapper.selectListWithTime(endTime);
+        //查询自己时间段内是否有时间段
+        List<SeckillTimeDO> startEndTimeList = seckillTimeMapper.selectListWithTime(startTime, endTime);
+        if (id != null) {
+            //移除自己
+            startTimeList.removeIf(seckillTime -> Objects.equals(seckillTime.getId(), id));
+            endTimeList.removeIf(seckillTime -> Objects.equals(seckillTime.getId(), id));
+            startEndTimeList.removeIf(seckillTime -> Objects.equals(seckillTime.getId(), id));
+        }
+        if (CollUtil.isNotEmpty(startTimeList) || CollUtil.isNotEmpty(endTimeList)
+                || CollUtil.isNotEmpty(startEndTimeList)) {
+            throw exception(SECKILL_TIME_CONFLICTS);
+        }
+    }
+
+
     @Override
     public SeckillTimeDO getSeckillTime(Long id) {
         return seckillTimeMapper.selectById(id);
@@ -69,14 +103,14 @@ public class SeckillTimeServiceImpl implements SeckillTimeService {
         return seckillTimeMapper.selectList();
     }
 
-//    @Override
-//    public PageResult<SeckillTimeDO> getSeckillTimePage(SeckillTimePageReqVO pageReqVO) {
-//        return seckillTimeMapper.selectPage(pageReqVO);
-//    }
+    @Override
+    public void sekillActivityCountAdd(List<Long> ids) {
+        seckillTimeMapper.sekillActivityCountAdd(ids);
+    }
 
     @Override
-    public List<SeckillTimeDO> getSeckillTimeList(SeckillTimeExportReqVO exportReqVO) {
-        return seckillTimeMapper.selectList(exportReqVO);
+    public void sekillActivityCountReduce(List<Long> ids) {
+        seckillTimeMapper.sekillActivityCountReduce(ids);
     }
 
 }

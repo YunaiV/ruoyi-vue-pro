@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.promotion.service.seckilltime;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckilltime.vo.*;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckilltime.vo.SeckillTimeCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckilltime.vo.SeckillTimeUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckilltime.SeckillTimeDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 秒杀时段 Service 接口
@@ -50,20 +51,18 @@ public interface SeckillTimeService {
      */
     List<SeckillTimeDO> getSeckillTimeList();
 
-//    /**
-//     * 获得秒杀时段分页
-//     *
-//     * @param pageReqVO 分页查询
-//     * @return 秒杀时段分页
-//     */
-//    PageResult<SeckillTimeDO> getSeckillTimePage(SeckillTimePageReqVO pageReqVO);
+    /**
+     * 秒杀时段列表的秒杀活动数量加 1
+     *
+     * @param ids 秒杀时段id列表
+     */
+    void sekillActivityCountAdd(List<Long> ids);
+
 
     /**
-     * 获得秒杀时段列表, 用于 Excel 导出
+     * 秒杀时段列表的秒杀活动数量减 1
      *
-     * @param exportReqVO 查询条件
-     * @return 秒杀时段列表
+     * @param ids 秒杀时段id列表
      */
-    List<SeckillTimeDO> getSeckillTimeList(SeckillTimeExportReqVO exportReqVO);
-
+    void sekillActivityCountReduce(List<Long> ids);
 }

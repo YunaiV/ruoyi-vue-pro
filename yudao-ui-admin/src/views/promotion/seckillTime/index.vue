@@ -47,7 +47,7 @@
           <span>{{ scope.row.endTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="商品数量" align="center" prop="productCount" />
+      <el-table-column label="秒杀活动数量" align="center" prop="seckillActivityCount" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>

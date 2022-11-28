@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.seckilltime;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalTime;
-import java.util.*;
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 秒杀时段 DO
@@ -40,8 +41,8 @@ public class SeckillTimeDO extends BaseDO {
      */
     private LocalTime endTime;
     /**
-     * 商品数量
+     * 秒杀活动数量
      */
-    private Integer productCount;
+    private Integer seckillActivityCount;
 
 }

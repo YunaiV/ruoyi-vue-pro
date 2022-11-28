@@ -29,5 +29,4 @@ public interface SeckillTimeConvert {
 
     PageResult<SeckillTimeRespVO> convertPage(PageResult<SeckillTimeDO> page);
 
-    List<SeckillTimeExcelVO> convertList02(List<SeckillTimeDO> list);
 }
