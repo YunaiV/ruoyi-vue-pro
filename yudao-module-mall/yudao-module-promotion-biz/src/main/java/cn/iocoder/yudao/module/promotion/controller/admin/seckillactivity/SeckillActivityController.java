@@ -1,34 +1,25 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckillactivity;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckillactivity.vo.*;
+import cn.iocoder.yudao.module.promotion.convert.seckillactivity.SeckillActivityConvert;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckillactivity.SeckillActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckillactivity.SeckillProductDO;
+import cn.iocoder.yudao.module.promotion.service.seckillactivity.SeckillActivityService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
-import cn.iocoder.yudao.module.promotion.controller.admin.seckillactivity.vo.*;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckillactivity.SeckillActivityDO;
-import cn.iocoder.yudao.module.promotion.convert.seckillactivity.SeckillActivityConvert;
-import cn.iocoder.yudao.module.promotion.service.seckillactivity.SeckillActivityService;
 
 @Api(tags = "管理后台 - 秒杀活动")
 @RestController
@@ -54,6 +45,15 @@ public class SeckillActivityController {
         return success(true);
     }
 
+    @PutMapping("/close")
+    @ApiOperation("关闭秒杀活动")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:close')")
+    public CommonResult<Boolean> closeSeckillActivity(@RequestParam("id") Long id) {
+        seckillActivityService.closeSeckillActivity(id);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @ApiOperation("删除秒杀活动")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
@@ -67,12 +67,13 @@ public class SeckillActivityController {
     @ApiOperation("获得秒杀活动")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
-    public CommonResult<SeckillActivityRespVO> getSeckillActivity(@RequestParam("id") Long id) {
+    public CommonResult<SeckillActivityDetailRespVO> getSeckillActivity(@RequestParam("id") Long id) {
         SeckillActivityDO seckillActivity = seckillActivityService.getSeckillActivity(id);
         if (seckillActivity == null) {
             return success(null);
         }
-        return success(SeckillActivityConvert.INSTANCE.convert(seckillActivity));
+        List<SeckillProductDO> seckillProducts =  seckillActivityService.getSeckillProductListByActivityId(id);
+        return success(SeckillActivityConvert.INSTANCE.convert(seckillActivity,seckillProducts));
     }
 
     @GetMapping("/list")
@@ -90,18 +91,6 @@ public class SeckillActivityController {
     public CommonResult<PageResult<SeckillActivityRespVO>> getSeckillActivityPage(@Valid SeckillActivityPageReqVO pageVO) {
         PageResult<SeckillActivityDO> pageResult = seckillActivityService.getSeckillActivityPage(pageVO);
         return success(SeckillActivityConvert.INSTANCE.convertPage(pageResult));
-    }
-
-    @GetMapping("/export-excel")
-    @ApiOperation("导出秒杀活动 Excel")
-    @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:export')")
-    @OperateLog(type = EXPORT)
-    public void exportSeckillActivityExcel(@Valid SeckillActivityExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<SeckillActivityDO> list = seckillActivityService.getSeckillActivityList(exportReqVO);
-        // 导出 Excel
-        List<SeckillActivityExcelVO> datas = SeckillActivityConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "秒杀活动.xls", "数据", SeckillActivityExcelVO.class, datas);
     }
 
 }

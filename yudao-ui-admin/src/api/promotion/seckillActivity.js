@@ -18,6 +18,14 @@ export function updateSeckillActivity(data) {
   })
 }
 
+// 关闭限时折扣活动
+export function closeSeckillActivity(id) {
+  return request({
+    url: '/promotion/seckill-activity/close?id=' + id,
+    method: 'put'
+  })
+}
+
 // 删除秒杀活动
 export function deleteSeckillActivity(id) {
   return request({
@@ -40,15 +48,5 @@ export function getSeckillActivityPage(query) {
     url: '/promotion/seckill-activity/page',
     method: 'get',
     params: query
-  })
-}
-
-// 导出秒杀活动 Excel
-export function exportSeckillActivityExcel(query) {
-  return request({
-    url: '/promotion/seckill-activity/export-excel',
-    method: 'get',
-    params: query,
-    responseType: 'blob'
   })
 }

@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.seckillactivity;
 
-import lombok.*;
-import java.util.*;
-import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * 秒杀活动 DO
@@ -33,7 +37,7 @@ public class SeckillActivityDO extends BaseDO {
     /**
      * 活动状态
      *
-     * 枚举 {@link TODO promotion_activity_status 对应的类}
+     * 枚举 {@link PromotionActivityStatusEnum 对应的类}
      */
     private Integer status;
     /**
@@ -43,11 +47,11 @@ public class SeckillActivityDO extends BaseDO {
     /**
      * 活动开始时间
      */
-    private Date startTime;
+    private LocalDateTime startTime;
     /**
      * 活动结束时间
      */
-    private Date endTime;
+    private LocalDateTime endTime;
     /**
      * 排序
      */

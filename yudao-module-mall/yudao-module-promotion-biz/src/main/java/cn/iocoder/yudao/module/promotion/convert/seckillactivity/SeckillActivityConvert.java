@@ -1,13 +1,16 @@
 package cn.iocoder.yudao.module.promotion.convert.seckillactivity;
 
-import java.util.*;
-
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckillactivity.vo.*;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckillactivity.SeckillActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckillactivity.SeckillProductDO;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 /**
  * 秒杀活动 Convert
@@ -19,7 +22,14 @@ public interface SeckillActivityConvert {
 
     SeckillActivityConvert INSTANCE = Mappers.getMapper(SeckillActivityConvert.class);
 
+    SeckillProductDO convert(SeckillActivityBaseVO.Product product);
+
+
     SeckillActivityDO convert(SeckillActivityCreateReqVO bean);
+
+    default String map(Long[] value){
+        return value.toString();
+    }
 
     SeckillActivityDO convert(SeckillActivityUpdateReqVO bean);
 
@@ -29,6 +39,39 @@ public interface SeckillActivityConvert {
 
     PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
 
-    List<SeckillActivityExcelVO> convertList02(List<SeckillActivityDO> list);
+    @Mappings({@Mapping(target = "products",source = "seckillProducts")})
+    SeckillActivityDetailRespVO convert(SeckillActivityDO seckillActivity,List<SeckillProductDO> seckillProducts);
 
+
+    /**
+     * 比较两个秒杀商品对象是否相等
+     *
+     * @param productDO 数据库中的商品
+     * @param productVO 前端传入的商品
+     * @return 是否匹配
+     */
+    default boolean isEquals(SeckillProductDO productDO, SeckillActivityBaseVO.Product productVO) {
+        return ObjectUtil.equals(productDO.getSpuId(), productVO.getSpuId())
+                && ObjectUtil.equals(productDO.getSkuId(), productVO.getSkuId())
+                && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice())
+                && ObjectUtil.equals(productDO.getStock(), productVO.getStock())
+                && ObjectUtil.equals(productDO.getLimitBuyCount(), productVO.getLimitBuyCount());
+
+    }
+
+    /**
+     * 比较两个秒杀商品对象是否相等
+     *
+     * @param productDO 商品1
+     * @param productVO 商品2
+     * @return 是否匹配
+     */
+    default boolean isEquals(SeckillProductDO productDO, SeckillProductDO productVO) {
+        return ObjectUtil.equals(productDO.getSpuId(), productVO.getSpuId())
+                && ObjectUtil.equals(productDO.getSkuId(), productVO.getSkuId())
+                && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice())
+                && ObjectUtil.equals(productDO.getStock(), productVO.getStock())
+                && ObjectUtil.equals(productDO.getLimitBuyCount(), productVO.getLimitBuyCount());
+
+    }
 }

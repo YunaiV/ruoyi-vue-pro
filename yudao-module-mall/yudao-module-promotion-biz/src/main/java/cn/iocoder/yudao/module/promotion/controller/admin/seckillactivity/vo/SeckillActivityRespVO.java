@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckillactivity.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 秒杀活动 Response VO")
 @Data
@@ -22,9 +24,18 @@ public class SeckillActivityRespVO extends SeckillActivityBaseVO {
     private Integer userCount;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ApiModelProperty(value = "秒杀时段id", required = true)
     private String timeId;
+
+    @ApiModelProperty(value = "排序", required = true)
+    private Integer sort;
+
+    @ApiModelProperty(value = "备注", example = "限时秒杀活动")
+    private String remark;
+
+    @ApiModelProperty(value = "活动状态", example = "进行中")
+    private Integer status;
 
 }

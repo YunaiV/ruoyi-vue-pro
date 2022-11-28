@@ -5,6 +5,7 @@ import javax.validation.*;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckillactivity.vo.*;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckillactivity.SeckillProductDO;
 
 /**
  * 秒杀活动 Service 接口
@@ -27,6 +28,12 @@ public interface SeckillActivityService {
      * @param updateReqVO 更新信息
      */
     void updateSeckillActivity(@Valid SeckillActivityUpdateReqVO updateReqVO);
+
+    /**
+     * 关闭秒杀活动
+     * @param id 编号
+     */
+    void closeSeckillActivity(Long id);
 
     /**
      * 删除秒杀活动
@@ -60,11 +67,9 @@ public interface SeckillActivityService {
     PageResult<SeckillActivityDO> getSeckillActivityPage(SeckillActivityPageReqVO pageReqVO);
 
     /**
-     * 获得秒杀活动列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 秒杀活动列表
+     * 通过活动编号获取活动商品
+     * @param id 活动编号
+     * @return 活动商品列表
      */
-    List<SeckillActivityDO> getSeckillActivityList(SeckillActivityExportReqVO exportReqVO);
-
+    List<SeckillProductDO> getSeckillProductListByActivityId(Long id);
 }
