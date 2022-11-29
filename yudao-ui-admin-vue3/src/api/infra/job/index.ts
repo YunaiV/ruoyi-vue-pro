@@ -10,10 +10,23 @@ export interface JobVO {
   retryCount: number
   retryInterval: number
   monitorTimeout: number
+  createTime: Date
+}
+
+export interface JobPageReqVO extends PageParam {
+  name?: string
+  status?: number
+  handlerName?: string
+}
+
+export interface JobExportReqVO {
+  name?: string
+  status?: number
+  handlerName?: string
 }
 
 // 任务列表
-export const getJobPageApi = (params) => {
+export const getJobPageApi = (params: JobPageReqVO) => {
   return request.get({ url: '/infra/job/page', params })
 }
 
@@ -38,7 +51,7 @@ export const deleteJobApi = (id: number) => {
 }
 
 // 导出定时任务调度
-export const exportJobApi = (params) => {
+export const exportJobApi = (params: JobExportReqVO) => {
   return request.download({ url: '/infra/job/export-excel', params })
 }
 

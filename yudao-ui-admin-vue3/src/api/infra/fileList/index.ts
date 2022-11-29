@@ -2,16 +2,19 @@ import request from '@/config/axios'
 
 export interface FileVO {
   id: number
+  configId: number
   path: string
+  name: string
   url: string
   size: string
   type: string
-  createTime: string
+  createTime: Date
 }
 
 export interface FilePageReqVO extends PageParam {
-  name?: string
-  createTime?: string[]
+  path?: string
+  type?: string
+  createTime?: Date[]
 }
 
 // 查询文件列表

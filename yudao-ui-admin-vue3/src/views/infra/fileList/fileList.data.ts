@@ -11,10 +11,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
   columns: [
     {
       title: '文件名',
+      field: 'name'
+    },
+    {
+      title: '文件路径',
       field: 'path',
-      search: {
-        show: true
-      }
+      isSearch: true
     },
     {
       title: 'URL',
@@ -26,8 +28,14 @@ const crudSchemas = reactive<VxeCrudSchema>({
       }
     },
     {
+      title: '文件大小',
+      field: 'size',
+      formatter: 'formatSize'
+    },
+    {
       title: '文件类型',
-      field: 'type'
+      field: 'type',
+      isSearch: true
     },
     {
       title: t('common.createTime'),

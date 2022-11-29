@@ -23,16 +23,15 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '任务名称',
       field: 'name',
-      search: {
-        show: true
-      }
+      isSearch: true
     },
     {
       title: t('common.status'),
       field: 'status',
       dictType: DICT_TYPE.INFRA_JOB_STATUS,
       dictClass: 'number',
-      isForm: false
+      isForm: false,
+      isSearch: true
     },
     {
       title: '处理器的名字',
