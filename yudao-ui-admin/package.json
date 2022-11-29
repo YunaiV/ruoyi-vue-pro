@@ -1,7 +1,7 @@
 {
   "name": "yudao-ui-admin",
   "version": "1.6.4-snapshot",
-  "description": "芋道管理系统",
+  "description": "岳阳医院信息管理系统",
   "author": "芋道",
   "license": "MIT",
   "scripts": {

@@ -29,7 +29,7 @@ public class ProjectReactor {
     private static final String GROUP_ID = "cn.iocoder.boot";
     private static final String ARTIFACT_ID = "yudao";
     private static final String PACKAGE_NAME = "cn.iocoder.yudao";
-    private static final String TITLE = "芋道管理系统";
+    private static final String TITLE = "岳阳医院信息管理系统";
 
     /**
      * 白名单文件，不进行重写，避免出问题
