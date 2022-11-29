@@ -45,4 +45,16 @@ public interface ErrorCodeConstants {
     // ========== Price 相关 1003007000 ============
     ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1003007000, "支付价格计算异常，原因：价格小于等于 0");
 
+    // ========== 秒杀活动 1003008000 ==========
+    ErrorCode SECKILL_ACTIVITY_NOT_EXISTS = new ErrorCode(1003008000, "秒杀活动不存在");
+    ErrorCode SECKILL_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1003008002, "存在商品参加了其它秒杀活动");
+    ErrorCode SECKILL_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1003008003, "秒杀活动已关闭，不能修改");
+    ErrorCode SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1003008004, "秒杀活动未关闭或未结束，不能删除");
+    ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1003008005, "秒杀活动已关闭，不能重复关闭");
+    ErrorCode SECKILL_ACTIVITY_CLOSE_FAIL_STATUS_END = new ErrorCode(1003008006, "秒杀活动已结束，不能关闭");
+
+    // ========== 秒杀时段 1003009000 ==========
+    ErrorCode SECKILL_TIME_NOT_EXISTS = new ErrorCode(1003009000, "秒杀时段不存在");
+    ErrorCode SECKILL_TIME_CONFLICTS = new ErrorCode(1003009001, "秒杀时段冲突");
+
 }
