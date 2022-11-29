@@ -7,7 +7,7 @@ export interface ErrorCodeVO {
   code: number
   message: string
   memo: string
-  createTime: string
+  createTime: Date
 }
 
 export interface ErrorCodePageReqVO extends PageParam {
@@ -15,7 +15,7 @@ export interface ErrorCodePageReqVO extends PageParam {
   applicationName?: string
   code?: number
   message?: string
-  createTime?: string[]
+  createTime?: Date[]
 }
 
 // 查询错误码列表

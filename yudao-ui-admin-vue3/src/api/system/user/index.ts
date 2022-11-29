@@ -13,8 +13,8 @@ export interface UserVO {
   loginIp: string
   status: number
   remark: string
-  loginDate: string
-  createTime: string
+  loginDate: Date
+  createTime: Date
 }
 
 export interface UserPageReqVO extends PageParam {
@@ -22,14 +22,14 @@ export interface UserPageReqVO extends PageParam {
   username?: string
   mobile?: string
   status?: number
-  createTime?: string[]
+  createTime?: Date[]
 }
 
 export interface UserExportReqVO {
   code?: string
   name?: string
   status?: number
-  createTime?: string[]
+  createTime?: Date[]
 }
 
 // 查询用户管理列表

@@ -104,7 +104,7 @@
         :loading="actionLoading"
         @click="sendSmsTest()"
       />
-      <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
+      <XButton :title="t('dialog.close')" @click="sendVisible = false" />
     </template>
   </XModal>
 </template>
@@ -204,7 +204,7 @@ const submitForm = async () => {
 const sendSmsForm = ref({
   content: '',
   params: {},
-  mobile: '141',
+  mobile: '',
   templateCode: '',
   templateParams: {}
 })
@@ -230,14 +230,16 @@ const handleSendSms = (row: any) => {
   sendVisible.value = true
 }
 
-const sendSmsTest = () => {
-  const data = {
+const sendSmsTest = async () => {
+  const data: SmsTemplateApi.SendSmsReqVO = {
     mobile: sendSmsForm.value.mobile,
     templateCode: sendSmsForm.value.templateCode,
-    templateParams: sendSmsForm.value.templateParams
+    templateParams: sendSmsForm.value.templateParams as unknown as Map<string, Object>
   }
-  SmsTemplateApi.sendSmsApi(data)
-  message.info('发送成功')
+  const res = await SmsTemplateApi.sendSmsApi(data)
+  if (res) {
+    message.success('发送成功')
+  }
   sendVisible.value = false
 }
 </script>

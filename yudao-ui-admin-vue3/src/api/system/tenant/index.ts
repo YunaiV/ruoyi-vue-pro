@@ -3,16 +3,16 @@ import request from '@/config/axios'
 export interface TenantVO {
   id: number
   name: string
-  packageId: number
   contactName: string
   contactMobile: string
+  status: number
+  domain: string
+  packageId: number
   username: string
   password: string
+  expireTime: Date
   accountCount: number
-  expireTime: string
-  domain: string
-  status: number
-  createTime: string
+  createTime: Date
 }
 
 export interface TenantPageReqVO extends PageParam {
@@ -20,6 +20,7 @@ export interface TenantPageReqVO extends PageParam {
   contactName?: string
   contactMobile?: string
   status?: number
+  createTime?: Date[]
 }
 
 export interface TenantExportReqVO {
@@ -27,6 +28,7 @@ export interface TenantExportReqVO {
   contactName?: string
   contactMobile?: string
   status?: number
+  createTime?: Date[]
 }
 
 // 查询租户列表

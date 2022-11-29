@@ -5,19 +5,22 @@ export interface SensitiveWordVO {
   name: string
   status: number
   description: string
-  tags: string
-  type: number
-  createTime: string
+  tags: string[]
+  createTime: Date
 }
 
 export interface SensitiveWordPageReqVO extends PageParam {
   name?: string
+  tag?: string
   status?: number
+  createTime?: Date[]
 }
 
 export interface SensitiveWordExportReqVO {
   name?: string
+  tag?: string
   status?: number
+  createTime?: Date[]
 }
 
 // 查询敏感词列表

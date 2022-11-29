@@ -6,17 +6,17 @@ export interface TenantPackageVO {
   status: number
   remark: string
   creator: string
-  createTime: string
   updater: string
   updateTime: string
-  menuIds: string[]
+  menuIds: number[]
+  createTime: Date
 }
 
 export interface TenantPackagePageReqVO extends PageParam {
   name?: string
-  contactName?: string
-  contactMobile?: string
   status?: number
+  remark?: string
+  createTime?: Date[]
 }
 
 // 查询租户套餐列表

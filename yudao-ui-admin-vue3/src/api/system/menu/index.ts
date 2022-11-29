@@ -13,7 +13,7 @@ export interface MenuVO {
   status: number
   visible: boolean
   keepAlive: boolean
-  createTime: string
+  createTime: Date
 }
 
 export interface MenuPageReqVO {

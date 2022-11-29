@@ -7,14 +7,14 @@ export interface OAuth2TokenVO {
   userId: number
   userType: number
   clientId: string
-  createTime: string
-  expiresTime: string
+  createTime: Date
+  expiresTime: Date
 }
 
 export interface OAuth2TokenPageReqVO extends PageParam {
-  code?: string
-  name?: string
-  status?: number
+  userId?: number
+  userType?: number
+  clientId?: string
 }
 
 // 查询 token列表

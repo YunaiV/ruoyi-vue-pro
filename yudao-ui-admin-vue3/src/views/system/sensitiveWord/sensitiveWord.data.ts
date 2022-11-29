@@ -25,6 +25,14 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '标签',
+      field: 'tag',
+      isTable: false,
+      isForm: false,
+      isDetail: false,
+      isSearch: true
+    },
+    {
+      title: '标签',
       field: 'tags',
       table: {
         slots: {
@@ -57,7 +65,13 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: t('common.createTime'),
       field: 'createTime',
       formatter: 'formatDate',
-      isForm: false
+      isForm: false,
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
+      }
     }
   ]
 })
