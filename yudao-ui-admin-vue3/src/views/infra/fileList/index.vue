@@ -42,7 +42,7 @@
     </Descriptions>
     <!-- 操作按钮 -->
     <template #footer>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
+      <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
   </XModal>
   <XModal v-model="uploadDialogVisible" :title="uploadDialogTitle">
@@ -69,11 +69,15 @@
       </template>
     </el-upload>
     <template #footer>
-      <el-button type="primary" @click="submitFileForm">
-        <Icon icon="ep:upload-filled" />
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="uploadDialogVisible = false">{{ t('dialog.close') }}</el-button>
+      <!-- 按钮：保存 -->
+      <XButton
+        type="primary"
+        prefix="ep:upload-filled"
+        :title="t('action.save')"
+        @click="submitFileForm()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :title="t('dialog.close')" @click="uploadDialogVisible = false" />
     </template>
   </XModal>
 </template>

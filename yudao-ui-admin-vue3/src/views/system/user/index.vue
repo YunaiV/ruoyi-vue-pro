@@ -210,10 +210,7 @@
   <XModal v-model="importDialogVisible" :title="importDialogTitle">
     <el-form class="drawer-multiColumn-form" label-width="150px">
       <el-form-item label="模板下载 :">
-        <el-button type="primary" @click="handleImportTemp">
-          <Icon icon="ep:download" />
-          点击下载
-        </el-button>
+        <XButton type="primary" prefix="ep:download" title="点击下载" @click="handleImportTemp()" />
       </el-form-item>
       <el-form-item label="文件上传 :">
         <el-upload

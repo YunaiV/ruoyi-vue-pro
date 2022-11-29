@@ -44,7 +44,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
   /**
    * grid options 初始化
    */
-  const gridOptions = reactive<VxeGridProps>({
+  const gridOptions = reactive<VxeGridProps<any>>({
     loading: true,
     size: currentSize as any,
     height: 730, // 1080高度
