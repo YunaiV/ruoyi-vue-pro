@@ -1,36 +1,12 @@
 <template>
   <div class="app-container">
 
-    <!-- 搜索工作栏 -->
-    <!-- <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="100px">
-      <el-form-item label="秒杀时段名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入秒杀时段名称" clearable @keyup.enter.native="handleQuery" />
-      </el-form-item>
-
-      <el-form-item label="开始时间点" prop="startTime">
-        <el-time-picker v-model="queryParams.startTime" placeholder="选择开始时间" value-format="HH:mm:ss" />
-      </el-form-item>
-
-      <el-form-item label="结束时间点" prop="endTime">
-        <el-time-picker v-model="queryParams.endTime" placeholder="选择结束时间" value-format="HH:mm:ss" />
-      </el-form-item>
-
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form> -->
-
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-          v-hasPermi="['promotion:seckill-time:create']">新增</el-button>
+          v-hasPermi="['promotion:seckill-time:create']">新增秒杀时段</el-button>
       </el-col>
-      <!-- <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
-          :loading="exportLoading" v-hasPermi="['promotion:seckill-time:export']">导出</el-button>
-      </el-col> -->
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -55,6 +31,8 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <el-button size="mini" type="text" icon="el-icon-view" @click="handleOpenSeckillActivity(scope.row)">
+            查看秒杀活动</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
             v-hasPermi="['promotion:seckill-time:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -62,9 +40,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <!-- 分页组件 -->
-    <!-- <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
-      @pagination="getList" /> -->
 
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="600px" v-dialogDrag append-to-body>
@@ -87,7 +62,8 @@
 </template>
 
 <script>
-import { createSeckillTime, updateSeckillTime, deleteSeckillTime, getSeckillTime, getSeckillTimePage, exportSeckillTimeExcel, getSeckillTimeList } from "@/api/promotion/seckillTime";
+import { createSeckillTime, updateSeckillTime, deleteSeckillTime, getSeckillTime, getSeckillTimePage, exportSeckillTimeExcel, getSeckillTimeList } from "@/api/mall/promotion/seckillTime";
+import router from "@/router";
 import { deepClone } from "@/utils";
 
 export default {
@@ -110,14 +86,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 查询参数
-      // queryParams: {
-      //   pageNo: 1,
-      //   pageSize: 10,
-      //   name: null,
-      //   startTime: null,
-      //   endTime: null,
-      // },
       // 表单参数
       form: {},
       // 表单校验
@@ -136,9 +104,7 @@ export default {
       this.loading = true;
       // 执行查询
       getSeckillTimeList().then(response => {
-        console.log(response, "返回的数据")
         this.list = response.data;
-        // this.total = response.data.total;
         this.loading = false;
       });
     },
@@ -160,7 +126,6 @@ export default {
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      // this.queryParams.pageNo = 1;
       this.getList();
     },
     /** 重置按钮操作 */
@@ -168,10 +133,13 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
+    /**查看当前秒杀时段的秒杀活动 */
+    handleOpenSeckillActivity(row) {
+      router.push({ name: 'SeckillActivity', params: { timeId: row.id } })
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
-      console.log(this.form, "点击新增时的form");
       this.open = true;
       this.title = "添加秒杀时段";
     },
@@ -224,20 +192,6 @@ export default {
         this.$modal.msgSuccess("删除成功");
       }).catch(() => { });
     },
-    /** 导出按钮操作 */
-    // handleExport() {
-    //   // 处理查询参数
-    //   let params = { ...this.queryParams };
-    //   params.pageNo = undefined;
-    //   params.pageSize = undefined;
-    //   this.$modal.confirm('是否确认导出所有秒杀时段数据项?').then(() => {
-    //     this.exportLoading = true;
-    //     return exportSeckillTimeExcel(params);
-    //   }).then(response => {
-    //     this.$download.excel(response, '秒杀时段.xls');
-    //     this.exportLoading = false;
-    //   }).catch(() => { });
-    // }
   }
 };
 </script>

@@ -18,8 +18,6 @@
                 <el-select v-model="queryParams.timeId" placeholder="请选择参与场次" clearable size="small">
                     <el-option v-for="item in seckillTimeList" :key="item.id" :label="item.name" :value="item.id" />
                 </el-select>
-                <!-- <el-option v-for="seckill in seckillTimeList" :key="seckill.id" :lable="seckill.name" :value="seckill.id" /> -->
-                <!-- <el-input v-model="queryParams.timeId" placeholder="请输入秒杀时段id" clearable @keyup.enter.native="handleQuery" /> -->
             </el-form-item>
             <el-form-item label="创建时间" prop="createTime">
                 <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss"
@@ -39,8 +37,8 @@
                     v-hasPermi="['promotion:seckill-activity:create']">新增秒杀活动</el-button>
             </el-col>
             <el-col :span="1.5">
-                <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
-                    :loading="exportLoading" v-hasPermi="['promotion:seckill-activity:export']">导出</el-button>
+                <el-button type="primary" plain icon="el-icon-menu" size="mini" @click="openSeckillTime"
+                    v-hasPermi="['promotion:seckill-activity:create']">管理参与场次</el-button>
             </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -70,11 +68,6 @@
 
             <el-table-column label="付款订单数" align="center" prop="orderCount" />
             <el-table-column label="付款人数" align="center" prop="userCount" />
-            <el-table-column label="订单实付金额" align="center">
-                <template slot-scope="scope">
-                    ￥{{ (scope.row.totalPrice / 100.0).toFixed(2) }}
-                </template>
-            </el-table-column>
             <el-table-column label="创建时间" align="center" prop="createTime" width="180">
                 <template slot-scope="scope">
                     <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -84,6 +77,8 @@
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                         v-hasPermi="['promotion:seckill-activity:update']">修改</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-close" @click="handleClose(scope.row)"
+                        v-hasPermi="['promotion:seckill-activity:delete']">关闭</el-button>
                     <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
                         v-hasPermi="['promotion:seckill-activity:delete']">删除</el-button>
                 </template>
@@ -99,40 +94,20 @@
                 <el-form-item label="活动名称" prop="name">
                     <el-input v-model="form.name" placeholder="请输入秒杀活动名称" />
                 </el-form-item>
-                <!-- <el-form-item label="活动状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.PROMOTION_ACTIVITY_STATUS)"
-                      :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
-          </el-radio-group>
-        </el-form-item> -->
-
                 <el-form-item label="活动时间" prop="startAndEndTime">
                     <el-date-picker clearable v-model="form.startAndEndTime" type="datetimerange"
                         value-format="timestamp" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
                         style="width: 1080px" />
                 </el-form-item>
-                <!-- 
-        <el-form-item label="活动结束时间" prop="endTime">
-          <el-date-picker clearable v-model="form.endTime" type="date" value-format="timestamp" placeholder="选择活动结束时间" />
-        </el-form-item> -->
-
                 <el-form-item label="排序" prop="sort">
                     <el-input-number v-model="form.sort" controls-position="right" :min="0" :max="10000">
                     </el-input-number>
                 </el-form-item>
-
-                <!-- <el-form-item label="秒杀时段id" prop="timeId">
-          <el-input v-model="form.timeId" placeholder="请输入秒杀时段id" />
-        </el-form-item>
-        <el-form-item label="订单实付金额(分)" prop="totalPrice">
-          <el-input v-model="form.totalPrice" placeholder="请输入订单实付金额(分)" />
-        </el-form-item> -->
-
                 <el-form-item label="备注" prop="remark">
                     <el-input type="textarea" v-model="form.remark" placeholder="请输入备注" />
                 </el-form-item>
                 <el-form-item label="场次选择">
-                    <el-select v-model="form.timeIds" placeholder="请选择参与场次" clearable size="small" multiple filterable
+                    <el-select v-model="form.timeId" placeholder="请选择参与场次" clearable size="small" multiple filterable
                         style="width: 880px">
                         <el-option v-for="item in seckillTimeList" :key="item.id" :label="item.name" :value="item.id">
                             <span style="float: left">{{ item.name + ': { ' }} {{ item.startTime }} -- {{ item.endTime +
@@ -142,7 +117,6 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-
                 <el-form-item label="商品选择">
                     <el-select v-model="form.skuIds" placeholder="请选择活动商品" clearable size="small" multiple filterable
                         style="width: 880px" @change="changeFormSku">
@@ -154,13 +128,11 @@
                             }}</span>
                         </el-option>
                     </el-select>
-
                     <el-row>
                         <el-button type="primary" size="mini" @click="batchEditProduct('limitBuyCount')">限购</el-button>
                         <el-button type="primary" size="mini" @click="batchEditProduct('seckillPrice')">秒杀价</el-button>
                         <el-button type="primary" size="mini" @click="batchEditProduct('seckillStock')">秒杀库存</el-button>
                     </el-row>
-
                     <el-table v-loading="loading" ref="productsTable" :data="form.products">
                         <el-table-column type="selection" width="55">
                         </el-table-column>
@@ -177,28 +149,23 @@
                         <el-table-column label="库存" align="center" prop="productStock" />
                         <el-table-column label="限购(0为不限购)" align="center" width="150">
                             <template slot-scope="scope">
-                                <el-input-number v-model="scope.row.limitBuyCount" size="mini" controls-position="right"
-                                    :min="0" :max="10000">
+                                <el-input-number v-model="scope.row.limitBuyCount" size="mini" :min="0" :max="10000">
                                 </el-input-number>
                             </template>
                         </el-table-column>
-
                         <el-table-column label="秒杀价(元)" align="center" width="150">
                             <template slot-scope="scope">
-                                <el-input-number v-model="scope.row.seckillPrice" size="mini" controls-position="right"
-                                    :precision="2" :min="0" :max="10000">
+                                <el-input-number v-model="scope.row.seckillPrice" size="mini" :precision="2" :min="0"
+                                    :max="10000">
                                 </el-input-number>
                             </template>
                         </el-table-column>
-
-                        <el-table-column label="秒杀库存" align="center" width="150">
+                        <el-table-column label="秒杀库存" align="center" width="150" prop="seckillStock">
                             <template slot-scope="scope">
-                                <el-input-number v-model="scope.row.seckillStock" size="mini" controls-position="right"
-                                    :min="0" :max="10000">
+                                <el-input-number v-model="scope.row.seckillStock" size="mini" :min="0" :max="10000">
                                 </el-input-number>
                             </template>
                         </el-table-column>
-
                         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                             <template slot-scope="scope">
                                 <el-button size="mini" type="text" icon="el-icon-delete"
@@ -208,8 +175,6 @@
                         </el-table-column>
                     </el-table>
                 </el-form-item>
-
-
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -221,10 +186,9 @@
 
 <script>
 import { getSkuOptionList } from "@/api/mall/product/sku";
-import { createSeckillActivity, updateSeckillActivity, deleteSeckillActivity, getSeckillActivity, getSeckillActivityPage, exportSeckillActivityExcel } from "@/api/promotion/seckillActivity";
-import { getSeckillTimeList } from "@/api/promotion/seckillTime";
-import router from '@/router';
-import { PromotionDiscountTypeEnum } from "@/utils/constants";
+import { createSeckillActivity, updateSeckillActivity, closeSeckillActivity,deleteSeckillActivity, getSeckillActivity, getSeckillActivityPage, exportSeckillActivityExcel } from "@/api/mall/promotion/seckillActivity";
+import { getSeckillTimeList } from "@/api/mall/promotion/seckillTime";
+import { deepClone } from "@/utils";
 
 export default {
     name: "SeckillActivity",
@@ -234,8 +198,6 @@ export default {
         return {
             // 遮罩层
             loading: true,
-            // 导出遮罩层
-            exportLoading: false,
             // 显示搜索条件
             showSearch: true,
             // 总条数
@@ -261,7 +223,7 @@ export default {
             form: {
                 skuIds: [], // 选中的 SKU
                 products: [], // 商品信息
-                timeIds: [], //选中的秒杀场次id
+                timeId: [], //选中的秒杀场次id
             },
             // 商品 SKU 列表
             productSkus: [],
@@ -270,9 +232,8 @@ export default {
                 name: [{ required: true, message: "秒杀活动名称不能为空", trigger: "blur" }],
                 status: [{ required: true, message: "活动状态不能为空", trigger: "blur" }],
                 startAndEndTime: [{ required: true, message: "活动时间不能为空", trigger: "blur" }],
-                endTime: [{ required: true, message: "活动结束时间不能为空", trigger: "blur" }],
                 sort: [{ required: true, message: "排序不能为空", trigger: "blur" }],
-                timeIds: [{ required: true, message: "秒杀场次不能为空", trigger: "blur" }],
+                timeId: [{ required: true, message: "秒杀场次不能为空", trigger: "blur" }],
                 totalPrice: [{ required: true, message: "订单实付金额，单位：分不能为空", trigger: "blur" }],
             }
         };
@@ -280,17 +241,26 @@ export default {
     created() {
         this.getList();
     },
+    watch:{
+        $route: 'getList'
+    },
     methods: {
         /** 查询列表 */
         getList() {
+            const timeId = this.$route.params && this.$route.params.timeId;
+            if (timeId) {
+                this.queryParams.timeId = timeId
+            }
             this.loading = true;
             // 执行查询
             getSeckillActivityPage(this.queryParams).then(response => {
                 this.list = response.data.list;
-                console.log(response, "查询返回的秒杀活动列表");
                 this.total = response.data.total;
                 this.loading = false;
             });
+            if (timeId) {
+                this.$route.params.timeId = undefined
+            }
             // 获得 SKU 商品列表
             getSkuOptionList().then(response => {
                 this.productSkus = response.data;
@@ -298,7 +268,6 @@ export default {
             // 获取参与场次列表
             getSeckillTimeList().then(response => {
                 this.seckillTimeList = response.data;
-                console.log(this.seckillTimeList, "最终获取的参与场次列表");
             });
         },
         /** 取消按钮 */
@@ -316,7 +285,7 @@ export default {
                 startTime: undefined,
                 endTime: undefined,
                 sort: undefined,
-                timeId: undefined,
+                timeId: [],
                 totalPrice: undefined,
                 skuIds: [],
                 products: [],
@@ -333,6 +302,10 @@ export default {
             this.resetForm("queryForm");
             this.handleQuery();
         },
+        /**打开秒杀场次管理页面 */
+        openSeckillTime() {
+            this.$tab.openPage("秒杀场次管理", "/promotion/seckill-time");
+        },
         /** 新增按钮操作 */
         handleAdd() {
             this.reset();
@@ -341,14 +314,34 @@ export default {
         },
         /** 修改按钮操作 */
         handleUpdate(row) {
-            console.log(row, "当前行数据");
             this.reset();
             const id = row.id;
             getSeckillActivity(id).then(response => {
+                var timeIdList = response.data.timeId.split(',')
                 this.form = response.data;
+                // 修改数据
+                this.form.startAndEndTime = [response.data.startTime, response.data.endTime];
+                this.form.timeId = timeIdList.map(item => parseInt(item))
+                this.form.skuIds = response.data.products.map(item => item.skuId);
+                this.form.products.forEach(product => {
+                    // 获得对应的 SKU 信息
+                    const sku = this.productSkus.find(item => item.id === product.skuId);
+                    if (!sku) {
+                        return;
+                    }
+                    // 设置商品信息
+                    product.name = sku.name;
+                    product.spuName = sku.spuName;
+                    product.price = sku.price;
+                    product.productStock = sku.stock;
+                    this.$set(product,'seckillStock',product.stock);
+                    product.seckillPrice = product.seckillPrice !== undefined ? product.seckillPrice / 100 : undefined;
+
+                });
+                // 打开弹窗
                 this.open = true;
-                this.title = "修改秒杀活动";
-            });
+                this.title = "修改限时折扣活动";
+            })
         },
         /** 提交按钮 */
         submitForm() {
@@ -360,6 +353,11 @@ export default {
                 const data = deepClone(this.form);
                 data.startTime = this.form.startAndEndTime[0];
                 data.endTime = this.form.startAndEndTime[1];
+                data.timeId = data.timeId.toString();
+                data.products.forEach(product => {
+                    product.stock = product.seckillStock;
+                    product.seckillPrice = product.seckillPrice !== undefined ? product.seckillPrice * 100 : undefined;
+                });
                 // 修改的提交
                 if (this.form.id != null) {
                     updateSeckillActivity(data).then(response => {
@@ -377,6 +375,16 @@ export default {
                 });
             });
         },
+        /** 关闭按钮操作 */
+        handleClose(row) {
+            const id = row.id;
+            this.$modal.confirm('是否确认关闭秒杀活动编号为"' + id + '"的数据项?').then(function () {
+                return closeSeckillActivity(id);
+            }).then(() => {
+                this.getList();
+                this.$modal.msgSuccess("关闭成功");
+            }).catch(() => { });
+        },
         /** 删除按钮操作 */
         handleDelete(row) {
             const id = row.id;
@@ -385,20 +393,6 @@ export default {
             }).then(() => {
                 this.getList();
                 this.$modal.msgSuccess("删除成功");
-            }).catch(() => { });
-        },
-        /** 导出按钮操作 */
-        handleExport() {
-            // 处理查询参数
-            let params = { ...this.queryParams };
-            params.pageNo = undefined;
-            params.pageSize = undefined;
-            this.$modal.confirm('是否确认导出所有秒杀活动数据项?').then(() => {
-                this.exportLoading = true;
-                return exportSeckillActivityExcel(params);
-            }).then(response => {
-                this.$download.excel(response, '秒杀活动.xls');
-                this.exportLoading = false;
             }).catch(() => { });
         },
         /** 批量修改商品秒杀价，秒杀库存，每人限购数量 */
@@ -459,7 +453,6 @@ export default {
                     return;
                 }
                 // 判断已存在，直接跳过
-                console.log(this.form, "当前form")
                 const product = this.form.products.find(item => item.skuId === skuId);
                 if (product) {
                     return;
