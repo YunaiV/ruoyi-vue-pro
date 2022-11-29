@@ -25,7 +25,7 @@ public class FtpFileClientTest {
         // 上传文件
         String path = IdUtil.fastSimpleUUID() + ".jpg";
         byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
-        String fullPath = client.upload(content, path);
+        String fullPath = client.upload(content, path, "image/jpeg");
         System.out.println("访问地址：" + fullPath);
         if (false) {
             byte[] bytes = client.getContent(path);
