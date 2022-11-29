@@ -196,16 +196,12 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
     }
     await nextTick()
     return new Promise(async () => {
-      message
-        .delConfirm()
-        .then(() => {
-          config?.deleteApi && config?.deleteApi(ids)
-          message.success(t('common.delSuccess'))
-        })
-        .finally(async () => {
-          // 刷新列表
-          ref.value.commitProxy('query')
-        })
+      message.delConfirm().then(async () => {
+        await (config?.deleteApi && config?.deleteApi(ids))
+        message.success(t('common.delSuccess'))
+        // 刷新列表
+        ref.value.commitProxy('query')
+      })
     })
   }
   /**
