@@ -295,4 +295,26 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertNotNull(dbOrder.getDeliveryTime());
     }
 
+    @Test
+    public void testReceiveOrder() {
+        // mock 数据（TradeOrder）
+        TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> {
+            o.setId(1L).setUserId(10L).setStatus(TradeOrderStatusEnum.DELIVERED.getStatus());
+            o.setDeliveryStatus(TradeOrderDeliveryStatusEnum.DELIVERED.getStatus()).setReceiveTime(null);
+        });
+        tradeOrderMapper.insert(order);
+        // 准备参数
+        Long id = 1L;
+        Long userId = 10L;
+        // mock 方法（支付单）
+
+        // 调用
+        tradeOrderService.receiveOrder(userId, id);
+        // 断言
+        TradeOrderDO dbOrder = tradeOrderMapper.selectById(1L);
+        assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus());
+        assertEquals(dbOrder.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.RECEIVED.getStatus());
+        assertNotNull(dbOrder.getReceiveTime());
+    }
+
 }

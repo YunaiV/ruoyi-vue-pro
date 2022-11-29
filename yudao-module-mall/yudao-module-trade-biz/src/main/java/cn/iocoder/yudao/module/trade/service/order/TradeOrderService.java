@@ -42,13 +42,21 @@ public interface TradeOrderService {
     void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO);
 
     /**
+     * 【会员】收货交易订单
+     *
+     * @param userId 用户编号
+     * @param id 订单编号
+     */
+    void receiveOrder(Long userId, Long id);
+
+    /**
      * 获得指定用户，指定的交易订单
      *
      * @param userId 用户编号
-     * @param orderId 交易订单编号
+     * @param id 交易订单编号
      * @return 交易订单
      */
-    TradeOrderDO getOrder(Long userId, Long orderId);
+    TradeOrderDO getOrder(Long userId, Long id);
 
     // =================== Order Item ===================
 

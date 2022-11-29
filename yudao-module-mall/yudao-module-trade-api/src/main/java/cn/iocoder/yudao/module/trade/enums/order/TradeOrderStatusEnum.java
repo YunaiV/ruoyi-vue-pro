@@ -75,6 +75,15 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
         return ObjectUtil.equal(UNDELIVERED.getStatus(), status);
     }
 
+    /**
+     * 判断指定状态，是否正处于【已发货】状态
+     *
+     * @param status 指定状态
+     * @return 是否
+     */
+    public static boolean isDelivered(Integer status) {
+        return ObjectUtil.equals(status, DELIVERED.getStatus());
+    }
 
     /**
      * 判断指定状态，是否正处于【已取消】状态

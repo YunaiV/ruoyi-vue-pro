@@ -13,4 +13,9 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .eq(TradeOrderDO::getId, id).eq(TradeOrderDO::getStatus, status));
     }
 
+    default TradeOrderDO selectByIdAndUserId(Long id, Long userId) {
+        return selectOne(TradeOrderDO::getId, id,
+                TradeOrderDO::getUserId, userId);
+    }
+
 }

@@ -315,6 +315,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return new KeyValue<>(order, payOrder);
     }
 
+    // TODO 芋艿：如果无需发货，需要怎么存储？
     @Override
     public void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO) {
         // 校验并获得交易订单（可发货）
@@ -365,8 +366,52 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     @Override
-    public TradeOrderDO getOrder(Long userId, Long orderId) {
-        TradeOrderDO order = tradeOrderMapper.selectById(orderId);
+    @Transactional(rollbackFor = Exception.class)
+    public void receiveOrder(Long userId, Long id) {
+        // 校验并获得交易订单（可收货）
+        TradeOrderDO order = validateOrderReceivable(userId, id);
+
+        // 更新 TradeOrderDO 状态为已完成
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(),
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.COMPLETED.getStatus())
+                        .setDeliveryStatus(TradeOrderDeliveryStatusEnum.RECEIVED.getStatus()).setReceiveTime(LocalDateTime.now()));
+        if (updateCount == 0) {
+            throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
+        }
+
+        // TODO 芋艿：OrderLog
+
+        // TODO 芋艿：lili 发送订单变化的消息
+
+        // TODO 芋艿：lili 发送商品被购买完成的数据
+    }
+
+    /**
+     * 校验交易订单满足可售货的条件
+     *
+     * 1. 交易订单待收货
+     *
+     * @param userId 用户编号
+     * @param id 交易订单编号
+     * @return 交易订单
+     */
+    private TradeOrderDO validateOrderReceivable(Long userId, Long id) {
+        // 校验订单是否存在
+        TradeOrderDO order = tradeOrderMapper.selectByIdAndUserId(id, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 校验订单是否是待收货状态
+        if (!TradeOrderStatusEnum.isDelivered(order.getStatus())
+                || ObjectUtil.notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.DELIVERED.getStatus())) {
+            throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
+        }
+        return order;
+    }
+
+    @Override
+    public TradeOrderDO getOrder(Long userId, Long id) {
+        TradeOrderDO order = tradeOrderMapper.selectById(id);
         if (order != null
                 && ObjectUtil.notEqual(order.getUserId(), userId)) {
             return null;

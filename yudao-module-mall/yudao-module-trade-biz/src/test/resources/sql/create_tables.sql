@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS "trade_order" (
      "delivery_template_id" bigint,
      "logistics_id" bigint,
      "logistics_no" varchar,
-     "delivery_status" bit NOT NULL,
+     "delivery_status" smallint NOT NULL,
      "delivery_time" datetime,
      "receive_time" datetime,
      "receiver_name" varchar NOT NULL,
