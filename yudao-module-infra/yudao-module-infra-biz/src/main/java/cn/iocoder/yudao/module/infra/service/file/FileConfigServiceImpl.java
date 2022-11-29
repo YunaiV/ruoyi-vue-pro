@@ -230,7 +230,7 @@ public class FileConfigServiceImpl implements FileConfigService {
         this.validateFileConfigExists(id);
         // 上传文件
         byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
-        return fileClientFactory.getFileClient(id).upload(content, IdUtil.fastSimpleUUID() + ".jpg");
+        return fileClientFactory.getFileClient(id).upload(content, IdUtil.fastSimpleUUID() + ".jpg", "image/jpeg");
     }
 
     @Override
