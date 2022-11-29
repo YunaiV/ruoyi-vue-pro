@@ -25,7 +25,7 @@
     "p": "plop"
   },
   "dependencies": {
-    "@iconify/iconify": "^3.0.0",
+    "@iconify/iconify": "^3.0.1",
     "@vueuse/core": "^9.6.0",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.10",
@@ -59,7 +59,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
     "@commitlint/config-conventional": "^17.3.0",
-    "@iconify/json": "^2.1.144",
+    "@iconify/json": "^2.1.145",
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
     "@purge-icons/generated": "^0.9.0",
     "@types/intro.js": "^5.1.0",
@@ -68,8 +68,8 @@
     "@types/nprogress": "^0.2.0",
     "@types/qrcode": "^1.5.0",
     "@types/qs": "^6.9.7",
-    "@typescript-eslint/eslint-plugin": "^5.44.0",
-    "@typescript-eslint/parser": "^5.44.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "@vitejs/plugin-vue": "^3.2.0",
     "@vitejs/plugin-vue-jsx": "^2.1.1",
     "autoprefixer": "^10.4.13",
