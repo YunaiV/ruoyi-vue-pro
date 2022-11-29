@@ -77,28 +77,40 @@
             v-hasPermi="['system:user:update']"
             @click="handleDetail(row.id)"
           />
-          <!-- TODO 芋艿：可以重置角色、密码收起来么，形成【更多】 -->
-          <!-- 操作：重置密码 -->
-          <XTextButton
-            preIcon="ep:key"
-            title="重置密码"
-            v-hasPermi="['system:user:update-password']"
-            @click="handleResetPwd(row)"
-          />
-          <!-- 操作：分配角色 -->
-          <XTextButton
-            preIcon="ep:key"
-            title="分配角色"
-            v-hasPermi="['system:permission:assign-user-role']"
-            @click="handleRole(row)"
-          />
-          <!-- 操作：删除 -->
-          <XTextButton
-            preIcon="ep:delete"
-            :title="t('action.del')"
-            v-hasPermi="['system:user:delete']"
-            @click="handleDelete(row.id)"
-          />
+          <el-dropdown class="p-0.5" v-hasPermi="['infra:job:trigger', 'infra:job:query']">
+            <XTextButton title="更多" postIcon="ep:arrow-down" />
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item>
+                  <!-- 操作：重置密码 -->
+                  <XTextButton
+                    preIcon="ep:key"
+                    title="重置密码"
+                    v-hasPermi="['system:user:update-password']"
+                    @click="handleResetPwd(row)"
+                  />
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <!-- 操作：分配角色 -->
+                  <XTextButton
+                    preIcon="ep:key"
+                    title="分配角色"
+                    v-hasPermi="['system:permission:assign-user-role']"
+                    @click="handleRole(row)"
+                  />
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <!-- 操作：删除 -->
+                  <XTextButton
+                    preIcon="ep:delete"
+                    :title="t('action.del')"
+                    v-hasPermi="['system:user:delete']"
+                    @click="handleDelete(row.id)"
+                  />
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </template>
       </vxe-grid>
     </el-card>
@@ -260,6 +272,9 @@ import {
   ElUpload,
   ElSwitch,
   ElCheckbox,
+  ElDropdown,
+  ElDropdownMenu,
+  ElDropdownItem,
   UploadInstance,
   UploadRawFile
 } from 'element-plus'

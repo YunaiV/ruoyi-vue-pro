@@ -18,7 +18,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
   primaryType: 'seq',
   primaryTitle: '任务编号',
   action: true,
-  actionWidth: '500px',
+  actionWidth: '280px',
   columns: [
     {
       title: '任务名称',

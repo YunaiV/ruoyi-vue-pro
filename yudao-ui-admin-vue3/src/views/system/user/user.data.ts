@@ -26,7 +26,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
   primaryType: 'seq',
   primaryTitle: '用户编号',
   action: true,
-  actionWidth: '400px',
+  actionWidth: '200px',
   columns: [
     {
       title: '用户账号',

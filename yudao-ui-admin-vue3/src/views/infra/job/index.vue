@@ -35,21 +35,11 @@
           v-hasPermi="['infra:job:update']"
           @click="handleUpdate(row.id)"
         />
-        <el-button
-          link
-          type="primary"
+        <XTextButton
+          preIcon="ep:edit"
+          :title="row.status === InfraJobStatusEnum.STOP ? '开启' : '暂停'"
           v-hasPermi="['infra:job:update']"
           @click="handleChangeStatus(row)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" />
-          {{ row.status === InfraJobStatusEnum.STOP ? '开启' : '暂停' }}
-        </el-button>
-        <!-- 操作：详情 -->
-        <XTextButton
-          preIcon="ep:view"
-          :title="t('action.detail')"
-          v-hasPermi="['infra:job:query']"
-          @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->
         <XTextButton
@@ -58,21 +48,40 @@
           v-hasPermi="['infra:job:delete']"
           @click="handleDelete(row.id)"
         />
-        <!-- 操作：执行 -->
-        <XTextButton
-          preIcon="ep:view"
-          title="执行一次"
-          v-hasPermi="['infra:job:trigger']"
-          @click="handleRun(row)"
-        />
-        <!-- 操作：日志 -->
-        <XTextButton
-          preIcon="ep:view"
-          title="调度日志"
-          v-hasPermi="['infra:job:query']"
-          @click="handleJobLog(row.id)"
-        />
-        <!-- TODO @星语：执行一次、任务详情、调度日志，可以收成【更多】 -->
+        <el-dropdown class="p-0.5" v-hasPermi="['infra:job:trigger', 'infra:job:query']">
+          <XTextButton title="更多" postIcon="ep:arrow-down" />
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>
+                <!-- 操作：执行 -->
+                <XTextButton
+                  preIcon="ep:view"
+                  title="执行一次"
+                  v-hasPermi="['infra:job:trigger']"
+                  @click="handleRun(row)"
+                />
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <!-- 操作：详情 -->
+                <XTextButton
+                  preIcon="ep:view"
+                  :title="t('action.detail')"
+                  v-hasPermi="['infra:job:query']"
+                  @click="handleDetail(row.id)"
+                />
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <!-- 操作：日志 -->
+                <XTextButton
+                  preIcon="ep:view"
+                  title="调度日志"
+                  v-hasPermi="['infra:job:query']"
+                  @click="handleJobLog(row.id)"
+                />
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </template>
     </vxe-grid>
   </ContentWrap>
@@ -122,6 +131,7 @@
 <script setup lang="ts" name="Job">
 import { ref, unref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
