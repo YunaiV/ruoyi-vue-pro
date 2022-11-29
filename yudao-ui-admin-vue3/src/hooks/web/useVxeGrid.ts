@@ -87,6 +87,15 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
             resolve(await config?.getListApi(queryParams))
           })
         },
+        delete: ({ body }) => {
+          return new Promise(async (resolve) => {
+            if (config?.deleteApi) {
+              resolve(await config?.deleteApi(JSON.stringify(body)))
+            } else {
+              Promise.reject('未设置deleteApi')
+            }
+          })
+        },
         queryAll: ({ form }) => {
           const queryParams = Object.assign({}, JSON.parse(JSON.stringify(form)))
           return new Promise(async (resolve) => {
