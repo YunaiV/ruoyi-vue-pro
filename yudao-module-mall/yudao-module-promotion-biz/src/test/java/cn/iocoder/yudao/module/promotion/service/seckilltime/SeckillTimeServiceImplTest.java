@@ -1,34 +1,27 @@
 package cn.iocoder.yudao.module.promotion.service.seckilltime;
 
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.service.seckill.seckilltime.SeckillTimeServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.annotation.Resource;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 
-import cn.iocoder.yudao.module.promotion.controller.admin.seckilltime.vo.*;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckilltime.SeckillTimeDO;
-import cn.iocoder.yudao.module.promotion.dal.mysql.seckilltime.SeckillTimeMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckilltime.SeckillTimeDO;
+import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckilltime.SeckillTimeMapper;
 
-import javax.annotation.Resource;
 import org.springframework.context.annotation.Import;
 
-import java.time.LocalTime;
-import java.util.*;
-
-import static cn.hutool.core.util.RandomUtil.*;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
 * {@link SeckillTimeServiceImpl} 的单元测试类

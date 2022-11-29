@@ -2,11 +2,12 @@ package cn.iocoder.yudao.module.promotion.service.seckillactivity;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckillactivity.vo.SeckillActivityCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckillactivity.vo.SeckillActivityPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckillactivity.vo.SeckillActivityUpdateReqVO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckillactivity.SeckillActivityDO;
-import cn.iocoder.yudao.module.promotion.dal.mysql.seckillactivity.SeckillActivityMapper;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo.SeckillActivityCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo.SeckillActivityPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo.SeckillActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillActivityMapper;
+import cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity.SeckillActivityServiceImpl;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
