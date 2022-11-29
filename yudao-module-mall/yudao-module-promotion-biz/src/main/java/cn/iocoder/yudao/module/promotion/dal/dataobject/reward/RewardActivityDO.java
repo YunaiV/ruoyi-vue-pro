@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * 满减送活动 DO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName(value = "promotion_reward_activity", autoResultMap = true)
 @KeySequence("promotion_reward_activity_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

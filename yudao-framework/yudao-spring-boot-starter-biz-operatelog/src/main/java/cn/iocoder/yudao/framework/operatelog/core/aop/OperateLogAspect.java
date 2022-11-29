@@ -49,7 +49,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
  * <p>
  * 但是，如果声明 @OperateLog 注解时，将 enable 属性设置为 false 时，强制不记录。
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Aspect
 @Slf4j

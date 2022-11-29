@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 /**
  * 定时任务的执行日志
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName("infra_job_log")
 @KeySequence("infra_job_log_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

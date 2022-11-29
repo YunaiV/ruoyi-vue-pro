@@ -35,7 +35,7 @@ public class AuthPermissionInfoRespVO {
         @ApiModelProperty(value = "用户编号", required = true, example = "1024")
         private Long id;
 
-        @ApiModelProperty(value = "用户昵称", required = true, example = "芋道源码")
+        @ApiModelProperty(value = "用户昵称", required = true, example = "岳阳医院")
         private String nickname;
 
         @ApiModelProperty(value = "用户头像", required = true, example = "http://www.iocoder.cn/xx.jpg")

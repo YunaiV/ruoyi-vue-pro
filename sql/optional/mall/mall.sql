@@ -101,7 +101,7 @@ CREATE TABLE `member_address`  (
 -- Records of member_address
 -- ----------------------------
 BEGIN;
-INSERT INTO `member_address` (`id`, `user_id`, `name`, `mobile`, `area_id`, `post_code`, `detail_address`, `defaulted`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (21, 1, 'yunai', '15601691300', 610632, '200000', '芋道源码 233 号 666 室', b'1', '1', '2022-08-01 22:46:35', '1', '2022-08-01 22:46:35', b'0', 1);
+INSERT INTO `member_address` (`id`, `user_id`, `name`, `mobile`, `area_id`, `post_code`, `detail_address`, `defaulted`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (21, 1, 'yunai', '15601691300', 610632, '200000', '岳阳医院 233 号 666 室', b'1', '1', '2022-08-01 22:46:35', '1', '2022-08-01 22:46:35', b'0', 1);
 COMMIT;
 
 -- ----------------------------

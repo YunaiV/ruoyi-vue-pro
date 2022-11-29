@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * 商品spu Mapper
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {

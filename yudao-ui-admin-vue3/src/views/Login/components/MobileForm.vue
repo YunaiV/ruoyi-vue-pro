@@ -39,7 +39,7 @@ const loginData = reactive({
   },
   loginForm: {
     uuid: '',
-    tenantName: '芋道源码',
+    tenantName: '岳阳医院',
     mobileNumber: '',
     code: ''
   }

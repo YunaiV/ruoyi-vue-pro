@@ -9,7 +9,7 @@ import java.util.Collection;
 /**
  * 岗位 API 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 public class PostApiImpl implements PostApi {

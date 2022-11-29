@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * 短信模板 Response DTO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class SmsTemplateRespDTO {

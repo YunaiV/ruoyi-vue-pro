@@ -7,7 +7,7 @@ import lombok.Data;
  *
  * why 放在 price 包下？主要获取的时候，需要涉及到较多的价格计算逻辑，放在 price 可以更好的复用逻辑
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class CouponMeetRespDTO {

@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.*;
 /**
  * 支付客户端，用于对接各支付渠道的 SDK，实现发起支付、退款等功能
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface PayClient {
 

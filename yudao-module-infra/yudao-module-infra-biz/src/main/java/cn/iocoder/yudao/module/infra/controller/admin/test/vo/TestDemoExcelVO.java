@@ -9,7 +9,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 /**
  * 字典类型 Excel VO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class TestDemoExcelVO {

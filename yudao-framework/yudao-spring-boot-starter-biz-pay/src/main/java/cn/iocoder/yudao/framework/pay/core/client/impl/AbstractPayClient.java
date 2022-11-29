@@ -16,7 +16,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 /**
  * 支付客户端的抽象类，提供模板方法，减少子类的冗余代码
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Slf4j
 public abstract class AbstractPayClient<Config extends PayClientConfig> implements PayClient {

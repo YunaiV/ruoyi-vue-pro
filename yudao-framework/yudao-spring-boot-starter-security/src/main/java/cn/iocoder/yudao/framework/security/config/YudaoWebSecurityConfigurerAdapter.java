@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * 自定义的 Spring Security 配置适配器实现
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Configuration(proxyBeanMethods = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)

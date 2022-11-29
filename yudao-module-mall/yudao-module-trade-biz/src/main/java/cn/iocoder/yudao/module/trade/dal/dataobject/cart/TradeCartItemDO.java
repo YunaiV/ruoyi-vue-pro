@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 /**
  * 购物车的商品信息 DO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName("trade_cart_item")
 @Data

@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Sftp 文件客户端的配置类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class SftpFileClientConfig implements FileClientConfig {

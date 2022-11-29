@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 /**
  * 短信验证码 API 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 @Validated

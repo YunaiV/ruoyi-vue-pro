@@ -7,7 +7,7 @@ import lombok.Getter;
 /**
  * OAuth2 授权类型（模式）的枚举
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @AllArgsConstructor
 @Getter

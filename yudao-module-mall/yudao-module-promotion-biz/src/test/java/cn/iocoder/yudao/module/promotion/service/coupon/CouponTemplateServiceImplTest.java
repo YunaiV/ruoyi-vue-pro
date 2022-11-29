@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
 * {@link CouponTemplateServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author 岳阳医院
 */
 @Import(CouponTemplateServiceImpl.class)
 public class CouponTemplateServiceImplTest extends BaseDbUnitTest {

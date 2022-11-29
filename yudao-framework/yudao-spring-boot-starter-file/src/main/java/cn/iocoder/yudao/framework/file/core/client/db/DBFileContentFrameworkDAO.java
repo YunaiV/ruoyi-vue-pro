@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.file.core.client.db;
 /**
  * 文件内容 Framework DAO 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface DBFileContentFrameworkDAO {
 

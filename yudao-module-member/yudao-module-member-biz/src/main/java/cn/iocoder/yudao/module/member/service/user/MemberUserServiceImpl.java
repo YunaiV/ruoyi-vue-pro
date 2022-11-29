@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.USER_NOT_E
 /**
  * 会员 User Service 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 @Valid

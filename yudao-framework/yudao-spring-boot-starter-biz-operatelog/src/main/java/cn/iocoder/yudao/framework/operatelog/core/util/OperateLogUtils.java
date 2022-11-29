@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.operatelog.core.aop.OperateLogAspect;
  * 操作日志工具类
  * 目前主要的作用，是提供给业务代码，记录操作明细和拓展字段
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class OperateLogUtils {
 

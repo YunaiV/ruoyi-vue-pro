@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationListener;
 /**
  * {@link BpmProcessInstanceResultEvent} 的监听器
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public abstract class BpmProcessInstanceResultEventListener
         implements ApplicationListener<BpmProcessInstanceResultEvent> {

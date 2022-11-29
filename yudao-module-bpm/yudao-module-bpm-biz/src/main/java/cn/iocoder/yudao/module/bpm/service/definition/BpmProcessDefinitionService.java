@@ -21,7 +21,7 @@ import java.util.Set;
  *
  * @author yunlong.li
  * @author ZJQ
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface BpmProcessDefinitionService {
 

@@ -10,7 +10,7 @@ import javax.validation.Valid;
  *
  * 提供用户的登录、登出的能力
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface AdminAuthService {
 

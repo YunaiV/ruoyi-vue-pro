@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Param;
 /**
  * 优惠劵模板 Mapper
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {

@@ -11,7 +11,7 @@ import org.mapstruct.factory.Mappers;
 /**
  * 满减送活动 Convert
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface RewardActivityConvert {

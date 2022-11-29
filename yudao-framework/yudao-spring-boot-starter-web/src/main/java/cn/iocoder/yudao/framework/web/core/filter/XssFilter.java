@@ -16,7 +16,7 @@ import java.io.IOException;
  *
  * 对 Xss 不了解的胖友，可以看看 http://www.iocoder.cn/Fight/The-new-girl-asked-me-why-AJAX-requests-are-not-secure-I-did-not-answer/
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @AllArgsConstructor
 public class XssFilter extends OncePerRequestFilter {

@@ -21,7 +21,7 @@ public class SmsChannelPageReqVO extends PageParam {
     @ApiModelProperty(value = "任务状态", example = "1")
     private Integer status;
 
-    @ApiModelProperty(value = "短信签名", example = "芋道源码", notes = "模糊匹配")
+    @ApiModelProperty(value = "短信签名", example = "岳阳医院", notes = "模糊匹配")
     private String signature;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

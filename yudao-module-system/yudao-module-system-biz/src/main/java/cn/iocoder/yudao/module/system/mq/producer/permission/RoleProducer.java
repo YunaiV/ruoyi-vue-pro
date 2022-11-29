@@ -9,7 +9,7 @@ import javax.annotation.Resource;
 /**
  * Role 角色相关消息的 Producer
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Component
 public class RoleProducer {

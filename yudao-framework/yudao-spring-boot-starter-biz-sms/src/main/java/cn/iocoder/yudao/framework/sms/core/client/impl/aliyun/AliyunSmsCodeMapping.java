@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
  *
  * 参见 https://help.aliyun.com/document_detail/101346.htm 文档
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class AliyunSmsCodeMapping implements SmsCodeMapping {
 

@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * 登录用户信息
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class LoginUser {

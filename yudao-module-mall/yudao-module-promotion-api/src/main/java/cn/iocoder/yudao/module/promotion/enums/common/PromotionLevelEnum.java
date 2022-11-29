@@ -11,7 +11,7 @@ import java.util.Arrays;
  *
  * 参考有赞：<a href="https://img01.yzcdn.cn/upload_files/2021/11/02/FhDjUrNDq-G0wjNdYDtgUX09fdGj.png">营销级别</a>
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Getter
 @AllArgsConstructor

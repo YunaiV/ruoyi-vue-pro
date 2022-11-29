@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link DeptDataPermissionRule} 的单元测试
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 class DeptDataPermissionRuleTest extends BaseMockitoUnitTest {
 

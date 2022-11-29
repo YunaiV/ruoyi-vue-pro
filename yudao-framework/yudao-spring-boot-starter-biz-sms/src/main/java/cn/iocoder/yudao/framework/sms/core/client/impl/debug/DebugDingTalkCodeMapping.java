@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * 钉钉的 SmsCodeMapping 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class DebugDingTalkCodeMapping implements SmsCodeMapping {
 

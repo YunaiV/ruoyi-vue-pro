@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
  * @see PayCommonResult
  * @see PayFrameworkErrorCodeConstants
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Slf4j
 public abstract class AbstractPayCodeMapping {

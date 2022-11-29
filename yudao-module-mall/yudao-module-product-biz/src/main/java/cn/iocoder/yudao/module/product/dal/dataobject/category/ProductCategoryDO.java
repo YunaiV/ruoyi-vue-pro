@@ -13,7 +13,7 @@ import lombok.*;
  * 1）一级分类：{@link #parentId} 等于 0
  * 2）二级 + 三级分类：{@link #parentId} 不等于 0
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName("product_category")
 @Data

@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
 * {@link AddressServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author 岳阳医院
 */
 @Import(AddressServiceImpl.class)
 public class AddressServiceImplTest extends BaseDbUnitTest {

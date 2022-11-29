@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 错误码 Api 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface ErrorCodeApi {
 

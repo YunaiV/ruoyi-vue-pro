@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 /**
  * 取消绑定社交用户 Request DTO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 @NoArgsConstructor

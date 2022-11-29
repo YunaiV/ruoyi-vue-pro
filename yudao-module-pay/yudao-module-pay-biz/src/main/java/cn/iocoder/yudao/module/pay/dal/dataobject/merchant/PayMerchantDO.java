@@ -9,7 +9,7 @@ import lombok.*;
  * 支付商户信息 DO
  * 目前暂时没有特别的用途，主要为未来多商户提供基础。
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName("pay_merchant")
 @KeySequence("pay_merchant_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

@@ -12,7 +12,7 @@ import java.util.Set;
  * 2. 设置审批人为发起人的 Leader
  * 3. 甚至审批人为发起人的 Leader 的 Leader
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface BpmTaskAssignScript {
 

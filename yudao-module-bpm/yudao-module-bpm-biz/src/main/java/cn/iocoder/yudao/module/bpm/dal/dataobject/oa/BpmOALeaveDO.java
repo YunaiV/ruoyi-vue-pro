@@ -12,7 +12,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
  * {@link #day} 请假天数，目前先简单做。一般是分成请假上午和下午，可以是 1 整天，可以是 0.5 半天
  *
  * @author jason
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName("bpm_oa_leave")
 @Data

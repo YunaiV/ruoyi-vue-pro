@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * 限时折扣 Service 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface DiscountActivityService {
 

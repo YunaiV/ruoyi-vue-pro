@@ -11,7 +11,7 @@ import static cn.iocoder.yudao.framework.redis.core.RedisKeyDefine.KeyTypeEnum.S
 /**
  * 幂等 Redis DAO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @AllArgsConstructor
 public class IdempotentRedisDAO {

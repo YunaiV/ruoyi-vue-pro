@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.TEST_DEMO_N
 /**
  * 字典类型 Service 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 @Validated

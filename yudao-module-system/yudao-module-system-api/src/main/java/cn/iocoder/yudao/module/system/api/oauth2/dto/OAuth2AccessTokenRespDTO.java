@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 /**
  * OAuth2.0 访问令牌的信息 Response DTO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 @Accessors(chain = true)

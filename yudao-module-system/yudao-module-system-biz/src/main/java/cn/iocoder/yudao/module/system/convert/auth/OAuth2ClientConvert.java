@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * OAuth2 客户端 Convert
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface OAuth2ClientConvert {

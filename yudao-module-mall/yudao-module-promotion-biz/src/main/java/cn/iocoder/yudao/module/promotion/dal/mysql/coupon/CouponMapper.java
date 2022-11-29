@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 优惠劵 Mapper
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface CouponMapper extends BaseMapperX<CouponDO> {

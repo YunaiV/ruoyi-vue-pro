@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 错误码 Api 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 public class ErrorCodeApiImpl implements ErrorCodeApi {

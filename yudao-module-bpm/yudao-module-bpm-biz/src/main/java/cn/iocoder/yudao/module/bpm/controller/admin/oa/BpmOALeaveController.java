@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
  * OA 请假申请 Controller，用于演示自己存储数据，接入工作流的例子
  *
  * @author jason
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Api(tags = "管理后台 - OA 请假申请")
 @RestController

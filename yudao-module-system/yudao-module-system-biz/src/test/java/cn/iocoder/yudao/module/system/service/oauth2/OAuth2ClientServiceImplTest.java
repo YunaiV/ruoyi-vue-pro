@@ -30,7 +30,7 @@ import static org.mockito.Mockito.verify;
 /**
 * {@link OAuth2ClientServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author 岳阳医院
 */
 @Import(OAuth2ClientServiceImpl.class)
 public class OAuth2ClientServiceImplTest extends BaseDbUnitTest {

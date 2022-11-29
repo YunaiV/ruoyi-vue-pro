@@ -12,7 +12,7 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 /**
  * 租户 Excel VO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class TenantExcelVO {

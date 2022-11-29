@@ -11,7 +11,7 @@ import javax.annotation.Resource;
 /**
  * 针对 {@link OAuth2ClientRefreshMessage} 的消费者
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Component
 @Slf4j

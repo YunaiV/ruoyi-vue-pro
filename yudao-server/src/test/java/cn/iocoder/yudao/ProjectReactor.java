@@ -21,7 +21,7 @@ import static java.io.File.separator;
  * <p>
  * 通过修改 groupIdNew、artifactIdNew、projectBaseDirNew 三个变量
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Slf4j
 public class ProjectReactor {

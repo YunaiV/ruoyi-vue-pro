@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Bpm 用户组
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName(value = "bpm_user_group", autoResultMap = true)
 @Data

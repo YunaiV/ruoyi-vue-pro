@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 /**
  * 文件 Service 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface FileService {
 

@@ -10,7 +10,7 @@ import java.time.Duration;
 /**
  * Redis Key 定义类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class RedisKeyDefine {

@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 代码生成模板类型
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @AllArgsConstructor
 @Getter

@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
  * 支付宝【扫码支付】的 PayClient 实现类
  * 文档：https://opendocs.alipay.com/apis/02890k
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Slf4j
 public class AlipayQrPayClient extends AbstractAlipayClient {

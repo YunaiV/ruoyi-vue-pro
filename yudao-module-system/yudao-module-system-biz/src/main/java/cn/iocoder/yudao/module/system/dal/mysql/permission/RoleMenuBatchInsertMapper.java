@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 /**
  * 实体 {@link RoleMenuDO} 的批量插入 Mapper
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Repository
 public class RoleMenuBatchInsertMapper extends ServiceImpl<RoleMenuMapper, RoleMenuDO> {

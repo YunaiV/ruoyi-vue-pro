@@ -9,7 +9,7 @@ import javax.validation.Valid;
  *
  * 提供用户的账号密码登录、token 的校验等认证相关的功能
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface MemberAuthService {
 

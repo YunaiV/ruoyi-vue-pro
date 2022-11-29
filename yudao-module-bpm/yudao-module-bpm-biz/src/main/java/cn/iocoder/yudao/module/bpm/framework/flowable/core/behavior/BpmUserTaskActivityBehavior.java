@@ -23,7 +23,7 @@ import java.util.Set;
  * 第一步，基于分配规则，计算出分配任务的【单个】候选人。如果找不到，则直接报业务异常，不继续执行后续的流程；
  * 第二步，随机选择一个候选人，则选择作为 assignee 负责人。
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Slf4j
 public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {

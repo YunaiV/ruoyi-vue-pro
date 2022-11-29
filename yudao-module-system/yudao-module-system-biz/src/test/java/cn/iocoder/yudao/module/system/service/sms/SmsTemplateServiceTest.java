@@ -202,7 +202,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
            o.setType(SmsTemplateTypeEnum.PROMOTION.getType());
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setCode("tudou");
-           o.setContent("芋道源码");
+           o.setContent("岳阳医院");
            o.setApiTemplateId("yunai");
            o.setChannelId(1L);
            o.setCreateTime(buildLocalDateTime(2021, 11, 11));
@@ -247,7 +247,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
             o.setType(SmsTemplateTypeEnum.PROMOTION.getType());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
             o.setCode("tudou");
-            o.setContent("芋道源码");
+            o.setContent("岳阳医院");
             o.setApiTemplateId("yunai");
             o.setChannelId(1L);
             o.setCreateTime(buildLocalDateTime(2021, 11, 11));

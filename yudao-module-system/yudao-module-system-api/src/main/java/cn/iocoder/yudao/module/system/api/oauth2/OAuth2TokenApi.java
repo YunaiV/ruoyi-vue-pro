@@ -9,7 +9,7 @@ import javax.validation.Valid;
 /**
  * OAuth2.0 Token API 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface OAuth2TokenApi {
 

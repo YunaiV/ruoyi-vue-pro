@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * 后台用户 Service 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface AdminUserService {
 

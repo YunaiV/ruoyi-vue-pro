@@ -29,7 +29,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 /**
  * API 访问日志 Filter
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Slf4j
 public class ApiAccessLogFilter extends ApiRequestFilter {

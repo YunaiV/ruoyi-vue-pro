@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 规格名称 Mapper
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface ProductPropertyMapper extends BaseMapperX<ProductPropertyDO> {

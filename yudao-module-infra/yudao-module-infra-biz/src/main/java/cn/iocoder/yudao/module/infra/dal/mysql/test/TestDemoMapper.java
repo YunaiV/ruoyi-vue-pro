@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 字典类型 Mapper
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface TestDemoMapper extends BaseMapperX<TestDemoDO> {

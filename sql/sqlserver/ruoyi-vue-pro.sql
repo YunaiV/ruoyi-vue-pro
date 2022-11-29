@@ -4036,7 +4036,7 @@ GO
 SET IDENTITY_INSERT [dbo].[pay_merchant] ON
 GO
 
-INSERT INTO [dbo].[pay_merchant] ([id], [no], [name], [short_name], [status], [remark], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1', N'M233666999', N'芋道源码', N'芋艿', N'0', N'我是备注', N'', N'2021-10-23 08:31:14.0000000', N'', N'2022-02-27 04:15:20.0000000', N'1', N'0')
+INSERT INTO [dbo].[pay_merchant] ([id], [no], [name], [short_name], [status], [remark], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1', N'M233666999', N'岳阳医院', N'芋艿', N'0', N'我是备注', N'', N'2021-10-23 08:31:14.0000000', N'', N'2022-02-27 04:15:20.0000000', N'1', N'0')
 GO
 
 SET IDENTITY_INSERT [dbo].[pay_merchant] OFF
@@ -5216,7 +5216,7 @@ GO
 SET IDENTITY_INSERT [dbo].[system_dept] ON
 GO
 
-INSERT INTO [dbo].[system_dept] ([id], [name], [parent_id], [sort], [leader_user_id], [phone], [email], [status], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'100', N'芋道源码', N'0', N'0', N'1', N'15888888888', N'ry@qq.com', N'0', N'admin', N'2021-01-05 17:03:47.0000000', N'103', N'2022-01-14 01:04:05.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_dept] ([id], [name], [parent_id], [sort], [leader_user_id], [phone], [email], [status], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'100', N'岳阳医院', N'0', N'0', N'1', N'15888888888', N'ry@qq.com', N'0', N'admin', N'2021-01-05 17:03:47.0000000', N'103', N'2022-01-14 01:04:05.0000000', N'1', N'0')
 GO
 
 INSERT INTO [dbo].[system_dept] ([id], [name], [parent_id], [sort], [leader_user_id], [phone], [email], [status], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'101', N'深圳总公司', N'100', N'1', N'104', N'15888888888', N'ry@qq.com', N'0', N'admin', N'2021-01-05 17:03:47.0000000', N'1', N'2022-02-22 19:47:48.0000000', N'1', N'0')
@@ -7810,7 +7810,7 @@ GO
 SET IDENTITY_INSERT [dbo].[system_oauth2_client] ON
 GO
 
-INSERT INTO [dbo].[system_oauth2_client] ([id], [client_id], [secret], [name], [logo], [description], [status], [access_token_validity_seconds], [refresh_token_validity_seconds], [redirect_uris], [auto_approve_scopes], [authorized_grant_types], [scopes], [authorities], [resource_ids], [additional_information], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1', N'default', N'admin123', N'芋道源码', N'http://test.yudao.iocoder.cn/a5e2e244368878a366b516805a4aabf1.png', N'我是描述', N'0', N'180', N'8640', N'["https://www.iocoder.cn","https://doc.iocoder.cn"]', N'', N'["password","authorization_code","implicit","refresh_token"]', N'["user.read", "user.write"]', N'["system:user:query"]', N'[]', N'{}', N'1', N'2022-05-11 21:47:12.0000000', N'1', N'2022-05-13 10:50:16.9620000', N'0')
+INSERT INTO [dbo].[system_oauth2_client] ([id], [client_id], [secret], [name], [logo], [description], [status], [access_token_validity_seconds], [refresh_token_validity_seconds], [redirect_uris], [auto_approve_scopes], [authorized_grant_types], [scopes], [authorities], [resource_ids], [additional_information], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1', N'default', N'admin123', N'岳阳医院', N'http://test.yudao.iocoder.cn/a5e2e244368878a366b516805a4aabf1.png', N'我是描述', N'0', N'180', N'8640', N'["https://www.iocoder.cn","https://doc.iocoder.cn"]', N'', N'["password","authorization_code","implicit","refresh_token"]', N'["user.read", "user.write"]', N'["system:user:query"]', N'[]', N'{}', N'1', N'2022-05-11 21:47:12.0000000', N'1', N'2022-05-13 10:50:16.9620000', N'0')
 GO
 
 SET IDENTITY_INSERT [dbo].[system_oauth2_client] OFF
@@ -10696,7 +10696,7 @@ GO
 SET IDENTITY_INSERT [dbo].[system_tenant] ON
 GO
 
-INSERT INTO [dbo].[system_tenant] ([id], [name], [contact_user_id], [contact_name], [contact_mobile], [status], [domain], [package_id], [expire_time], [account_count], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1', N'芋道源码', NULL, N'芋艿', N'17321315478', N'0', N'https://www.iocoder.cn', N'0', N'2099-02-19 17:14:16.0000000', N'9999', N'1', N'2021-01-05 17:03:47.0000000', N'1', N'2022-02-23 12:15:11.0000000', N'0')
+INSERT INTO [dbo].[system_tenant] ([id], [name], [contact_user_id], [contact_name], [contact_mobile], [status], [domain], [package_id], [expire_time], [account_count], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1', N'岳阳医院', NULL, N'芋艿', N'17321315478', N'0', N'https://www.iocoder.cn', N'0', N'2099-02-19 17:14:16.0000000', N'9999', N'1', N'2021-01-05 17:03:47.0000000', N'1', N'2022-02-23 12:15:11.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_tenant] ([id], [name], [contact_user_id], [contact_name], [contact_mobile], [status], [domain], [package_id], [expire_time], [account_count], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'121', N'小租户', N'110', N'小王2', N'15601691300', N'0', N'http://www.iocoder.cn', N'111', N'2024-03-11 00:00:00.0000000', N'20', N'1', N'2022-02-22 00:56:14.0000000', N'1', N'2022-03-19 18:37:20.0000000', N'0')
@@ -11291,7 +11291,7 @@ GO
 SET IDENTITY_INSERT [dbo].[system_users] ON
 GO
 
-INSERT INTO [dbo].[system_users] ([id], [username], [password], [nickname], [remark], [dept_id], [post_ids], [email], [mobile], [sex], [avatar], [status], [login_ip], [login_date], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1', N'admin', N'$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', N'芋道源码', N'管理员', N'103', N'[1]', N'aoteman@126.com', N'15612345678', N'1', N'http://test.yudao.iocoder.cn/48934f2f-92d4-4250-b917-d10d2b262c6a', N'0', N'127.0.0.1', N'2022-05-26 00:51:15.3820000', N'admin', N'2021-01-05 17:03:47.0000000', NULL, N'2022-05-26 00:51:15.3870000', N'1', N'0')
+INSERT INTO [dbo].[system_users] ([id], [username], [password], [nickname], [remark], [dept_id], [post_ids], [email], [mobile], [sex], [avatar], [status], [login_ip], [login_date], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1', N'admin', N'$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', N'岳阳医院', N'管理员', N'103', N'[1]', N'aoteman@126.com', N'15612345678', N'1', N'http://test.yudao.iocoder.cn/48934f2f-92d4-4250-b917-d10d2b262c6a', N'0', N'127.0.0.1', N'2022-05-26 00:51:15.3820000', N'admin', N'2021-01-05 17:03:47.0000000', NULL, N'2022-05-26 00:51:15.3870000', N'1', N'0')
 GO
 
 INSERT INTO [dbo].[system_users] ([id], [username], [password], [nickname], [remark], [dept_id], [post_ids], [email], [mobile], [sex], [avatar], [status], [login_ip], [login_date], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'100', N'yudao', N'$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', N'芋道', N'不要吓我', N'104', N'[1]', N'yudao@iocoder.cn', N'15601691300', N'1', N'', N'1', N'127.0.0.1', N'2022-05-03 16:49:24.6860000', N'', N'2021-01-07 09:07:17.0000000', NULL, N'2022-05-03 16:49:24.6860000', N'1', N'0')

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 /**
  * OAuth2 客户端 Mapper
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface OAuth2ClientMapper extends BaseMapperX<OAuth2ClientDO> {

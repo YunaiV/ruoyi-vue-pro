@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Metrics 配置类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({MeterRegistryCustomizer.class})

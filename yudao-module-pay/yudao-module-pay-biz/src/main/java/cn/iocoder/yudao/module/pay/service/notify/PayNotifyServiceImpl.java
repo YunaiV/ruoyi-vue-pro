@@ -40,7 +40,7 @@ import static cn.iocoder.yudao.module.pay.framework.job.config.PayJobConfigurati
 /**
  * 支付通知 Core Service 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 @Valid

@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link PriceServiceImpl} 的单元测试
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class PriceServiceTest extends BaseMockitoUnitTest {
 

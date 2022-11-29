@@ -15,7 +15,7 @@ import java.util.Map;
  * 支付订单拓展 DO
  *
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName(value = "pay_order_extension",autoResultMap = true)
 @KeySequence("pay_order_extension_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

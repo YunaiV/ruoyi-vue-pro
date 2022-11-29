@@ -12,7 +12,7 @@ import lombok.*;
  *
  * 专门用于存储 {@link cn.iocoder.yudao.framework.file.core.client.db.DBFileClient} 的文件内容
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName("infra_file_content")
 @KeySequence("infra_file_content_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

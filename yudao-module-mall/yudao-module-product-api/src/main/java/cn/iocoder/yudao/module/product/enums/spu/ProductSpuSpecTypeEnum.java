@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * 商品 SPU 规格类型
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Getter
 @AllArgsConstructor

@@ -14,7 +14,7 @@ import lombok.ToString;
  *
  * 考虑到不同的平台，返回的 code 和 msg 是不同的，所以统一额外返回 {@link #apiCode} 和 {@link #apiMsg} 字段
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

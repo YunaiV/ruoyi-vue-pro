@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 文件客户端的抽象类，提供模板方法，减少子类的冗余代码
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Slf4j
 public abstract class AbstractFileClient<Config extends FileClientConfig> implements FileClient {

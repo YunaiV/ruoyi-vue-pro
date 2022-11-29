@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.quartz.core.handler;
 /**
  * 任务处理器
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface JobHandler {
 

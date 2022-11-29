@@ -9,7 +9,7 @@ Authorization: Bearer {{appToken}}
   "mobile": "15601691300",
   "areaId": "610632",
   "postCode": "200000",
-  "detailAddress": "芋道源码 233 号 666 室",
+  "detailAddress": "岳阳医院 233 号 666 室",
   "defaulted": true
 }
 
@@ -25,7 +25,7 @@ Authorization: Bearer {{appToken}}
   "mobile": "15601691300",
   "areaId": "610632",
   "postCode": "200000",
-  "detailAddress": "芋道源码 233 号 666 室",
+  "detailAddress": "岳阳医院 233 号 666 室",
   "defaulted": false
 }
 

@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 会员 User Mapper
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {

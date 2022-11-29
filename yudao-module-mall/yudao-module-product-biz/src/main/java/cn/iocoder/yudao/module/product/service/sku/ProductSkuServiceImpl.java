@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 /**
  * 商品 SKU Service 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 @Validated

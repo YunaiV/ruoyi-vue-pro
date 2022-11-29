@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 短信的接收状态枚举
  *
- * @author 芋道源码
+ * @author 岳阳医院
  * @date 2021/2/1 13:39
  */
 @Getter

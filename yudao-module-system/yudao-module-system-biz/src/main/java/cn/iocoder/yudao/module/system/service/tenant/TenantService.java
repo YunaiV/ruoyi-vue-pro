@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * 租户 Service 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface TenantService {
 

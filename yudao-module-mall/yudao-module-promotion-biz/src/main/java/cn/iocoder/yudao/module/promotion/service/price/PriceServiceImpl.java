@@ -47,7 +47,7 @@ import static java.util.Collections.singletonList;
  * 2. 满减送：循环、折扣
  * 3. 优惠劵：待定
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 @Validated

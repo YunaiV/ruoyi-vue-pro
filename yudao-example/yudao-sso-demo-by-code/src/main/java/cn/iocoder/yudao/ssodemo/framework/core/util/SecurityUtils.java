@@ -15,7 +15,7 @@ import java.util.Collections;
 /**
  * 安全服务工具类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class SecurityUtils {
 

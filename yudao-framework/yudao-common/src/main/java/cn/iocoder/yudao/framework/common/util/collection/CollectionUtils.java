@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * Collection 工具类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class CollectionUtils {
 

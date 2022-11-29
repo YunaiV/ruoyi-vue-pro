@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * 字典数据 Response DTO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class DictDataRespDTO {

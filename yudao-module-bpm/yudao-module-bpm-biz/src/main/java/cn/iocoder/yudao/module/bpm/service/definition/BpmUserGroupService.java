@@ -12,7 +12,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 /**
  * 用户组 Service 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface BpmUserGroupService {
 

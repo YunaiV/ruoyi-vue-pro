@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
 * {@link ProductSkuServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author 岳阳医院
 */
 @Import(ProductSkuServiceImpl.class)
 @Disabled // TODO 芋艿：临时去掉

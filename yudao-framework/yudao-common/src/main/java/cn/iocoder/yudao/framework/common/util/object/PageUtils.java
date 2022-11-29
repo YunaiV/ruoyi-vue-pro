@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 /**
  * {@link cn.iocoder.yudao.framework.common.pojo.PageParam} 工具类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class PageUtils {
 

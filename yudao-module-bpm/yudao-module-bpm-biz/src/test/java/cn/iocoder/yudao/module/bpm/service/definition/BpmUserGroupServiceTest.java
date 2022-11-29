@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.USER_GROUP_NO
 /**
 * {@link BpmUserGroupServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author 岳阳医院
 */
 @Import(BpmUserGroupServiceImpl.class)
 public class BpmUserGroupServiceTest extends BaseDbUnitTest {
@@ -104,7 +104,7 @@ public class BpmUserGroupServiceTest extends BaseDbUnitTest {
     public void testGetUserGroupPage() {
        // mock 数据
        BpmUserGroupDO dbUserGroup = RandomUtils.randomPojo(BpmUserGroupDO.class, o -> { // 等会查询到
-           o.setName("芋道源码");
+           o.setName("岳阳医院");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setCreateTime(DateUtils.buildLocalDateTime(2021, 11, 11));
        });

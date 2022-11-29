@@ -53,7 +53,7 @@ const loginData = reactive({
     signIn: false
   },
   loginForm: {
-    tenantName: '芋道源码',
+    tenantName: '岳阳医院',
     username: 'admin',
     password: 'admin123',
     captchaVerification: '',

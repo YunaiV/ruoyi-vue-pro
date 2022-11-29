@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * 错误码配置类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(prefix = "yudao.error-code", value = "enable", matchIfMissing = true) // 允许使用 yudao.error-code.enable=false 禁用访问日志

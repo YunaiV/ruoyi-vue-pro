@@ -61,7 +61,7 @@ public class AppPayOrderController {
 
     // ========== 支付渠道的回调 ==========
     // TODO @芋艿：是不是放到 notify 模块更合适
-    //TODO 芋道源码 换成了统一的地址了 /notify/{channelId}，测试通过可以删除
+    //TODO 岳阳医院 换成了统一的地址了 /notify/{channelId}，测试通过可以删除
     @PostMapping("/notify/wx-pub/{channelId}")
     @ApiOperation("通知微信公众号支付的结果")
     public String notifyWxPayOrder(@PathVariable("channelId") Long channelId,

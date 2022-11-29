@@ -16,7 +16,7 @@ import java.util.function.Function;
  * 对应 issue：https://github.com/spring-projects/spring-data-redis/issues/2147 和 https://github.com/redisson/redisson/issues/4006
  * 目前看下来 Spring Data Redis 不肯加 null 判断，Redisson 暂时也没改返回 null 到空 List 的打算，所以暂时只能自己改，哽咽！
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class DefaultStreamMessageListenerContainerX<K, V extends Record<K, ?>> extends DefaultStreamMessageListenerContainer<K, V> {
 

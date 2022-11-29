@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Quartz Cron 表达式的工具类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class CronUtils {
 

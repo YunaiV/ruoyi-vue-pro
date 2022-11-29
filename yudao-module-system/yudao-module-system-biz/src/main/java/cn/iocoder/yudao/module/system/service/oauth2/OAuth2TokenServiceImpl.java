@@ -28,7 +28,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * OAuth2.0 Token Service 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 public class OAuth2TokenServiceImpl implements OAuth2TokenService {

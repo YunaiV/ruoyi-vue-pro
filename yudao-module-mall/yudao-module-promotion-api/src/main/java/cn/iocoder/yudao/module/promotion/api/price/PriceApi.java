@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 /**
  * 价格 API 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface PriceApi {
 

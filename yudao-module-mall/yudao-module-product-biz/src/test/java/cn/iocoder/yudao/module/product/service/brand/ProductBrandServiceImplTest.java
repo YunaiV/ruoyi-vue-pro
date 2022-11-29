@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
 * {@link ProductBrandServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author 岳阳医院
 */
 @Import(ProductBrandServiceImpl.class)
 public class ProductBrandServiceImplTest extends BaseDbUnitTest {
@@ -118,7 +118,7 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
         /*20221129
        // mock 数据
        ProductBrandDO dbBrand = randomPojo(ProductBrandDO.class, o -> { // 等会查询到
-           o.setName("芋道源码");
+           o.setName("岳阳医院");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setCreateTime(buildLocalDateTime(2022, 2, 1));
        });

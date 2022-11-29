@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
  * 商户支付、退款等的通知
  * 在支付系统收到支付渠道的支付、退款的结果后，需要不断的通知到业务系统，直到成功。
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName("pay_notify_task")
 @KeySequence("pay_notify_task_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

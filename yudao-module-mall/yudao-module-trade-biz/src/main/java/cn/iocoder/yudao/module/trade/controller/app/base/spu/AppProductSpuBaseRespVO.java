@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 商品 SPU 基础 Response VO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class AppProductSpuBaseRespVO {

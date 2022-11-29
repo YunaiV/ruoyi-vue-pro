@@ -7,7 +7,7 @@ import org.apache.skywalking.apm.toolkit.trace.TraceContext;
  *
  * 考虑到每个 starter 都需要用到该工具类，所以放到 common 模块下的 util 包下
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class TracerUtils {
 

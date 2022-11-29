@@ -13,7 +13,7 @@ import java.util.Set;
  *
  * 提供用户-角色、角色-菜单、角色-部门的关联权限处理
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface PermissionService {
 

@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * 社交平台的类型枚举
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Getter
 @AllArgsConstructor

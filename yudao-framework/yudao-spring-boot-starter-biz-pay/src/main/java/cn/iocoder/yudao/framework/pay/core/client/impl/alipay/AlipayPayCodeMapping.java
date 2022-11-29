@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * 支付宝的 PayCodeMapping 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class AlipayPayCodeMapping extends AbstractPayCodeMapping {
 

@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * 流程实例 Convert
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface BpmProcessInstanceConvert {

@@ -8,7 +8,7 @@ import static cn.iocoder.yudao.framework.redis.core.RedisKeyDefine.KeyTypeEnum.H
 /**
  * Lock4j Redis Key 枚举类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface Lock4jRedisKeyConstants {
 

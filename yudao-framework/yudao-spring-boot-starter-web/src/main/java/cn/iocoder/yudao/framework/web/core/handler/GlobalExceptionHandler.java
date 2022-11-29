@@ -39,7 +39,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 /**
  * 全局异常处理器，将 Exception 翻译成 CommonResult + 对应的异常编号
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @RestControllerAdvice
 @AllArgsConstructor

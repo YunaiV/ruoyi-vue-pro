@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 性别的枚举值
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Getter
 @AllArgsConstructor

@@ -39,7 +39,7 @@ import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_E
 /**
  * 商品 SPU Service 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 @Validated

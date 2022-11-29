@@ -16,7 +16,7 @@ import org.flowable.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFacto
  * 自定义的 ActivityBehaviorFactory 实现类，目的如下：
  * 1. 自定义 {@link #createUserTaskActivityBehavior(UserTask)}：实现自定义的流程任务的 assignee 负责人的分配
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

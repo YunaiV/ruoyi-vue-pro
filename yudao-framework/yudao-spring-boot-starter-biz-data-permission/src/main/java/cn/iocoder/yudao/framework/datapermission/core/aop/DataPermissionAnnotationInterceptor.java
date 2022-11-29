@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 1. 在执行方法前，将 @DataPermission 注解入栈
  * 2. 在执行方法后，将 @DataPermission 注解出栈
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @DataPermission // 该注解，用于 {@link DATA_PERMISSION_NULL} 的空对象
 public class DataPermissionAnnotationInterceptor implements MethodInterceptor {

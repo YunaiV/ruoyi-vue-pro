@@ -41,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 整体的代码实现上，参考 {@link com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor} 实现。
  * 所以每次 MyBatis Plus 升级时，需要 Review 下其具体的实现是否有变更！
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @RequiredArgsConstructor
 public class DataPermissionDatabaseInterceptor extends JsqlParserSupport implements InnerInterceptor {
@@ -532,7 +532,7 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
     /**
      * SQL 解析上下文，方便透传 {@link DataPermissionRule} 规则
      *
-     * @author 芋道源码
+     * @author 岳阳医院
      */
     static final class ContextHolder {
 
@@ -574,7 +574,7 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
      * 目前主要用于，记录 {@link DataPermissionRule} 是否对指定 {@link MappedStatement} 无效
      * 如果无效，则可以避免 SQL 的解析，加快速度
      *
-     * @author 芋道源码
+     * @author 岳阳医院
      */
     static final class MappedStatementCache {
 

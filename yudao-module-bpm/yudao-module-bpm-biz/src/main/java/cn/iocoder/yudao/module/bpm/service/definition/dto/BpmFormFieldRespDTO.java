@@ -7,7 +7,7 @@ import lombok.Data;
  * Bpm 表单的 Field 表单项 Response DTO
  * 字段的定义，可见 https://github.com/JakHuang/form-generator/issues/46 文档
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class BpmFormFieldRespDTO {

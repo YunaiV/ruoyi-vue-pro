@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 /**
  * 数据源配置 Convert
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface DataSourceConfigConvert {

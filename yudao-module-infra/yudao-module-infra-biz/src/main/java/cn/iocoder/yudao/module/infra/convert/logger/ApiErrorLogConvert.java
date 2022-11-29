@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * API 错误日志 Convert
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface ApiErrorLogConvert {

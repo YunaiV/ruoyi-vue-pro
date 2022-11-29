@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * 错误码 Excel VO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class ErrorCodeExcelVO {

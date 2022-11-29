@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * 文件配置 Mapper
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface FileConfigMapper extends BaseMapperX<FileConfigDO> {

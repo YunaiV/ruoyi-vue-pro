@@ -9,7 +9,7 @@ import org.mapstruct.factory.Mappers;
 /**
  * 优惠劵 Convert
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface CouponConvert {

@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * {@link BpmFormServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Import(BpmFormServiceImpl.class)
 public class BpmFormServiceTest extends BaseDbUnitTest {
@@ -118,7 +118,7 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
     public void testGetFormPage() {
         // mock 数据
         BpmFormDO dbForm = randomPojo(BpmFormDO.class, o -> { // 等会查询到
-            o.setName("芋道源码");
+            o.setName("岳阳医院");
         });
         formMapper.insert(dbForm);
         // 测试 name 不匹配

@@ -7,7 +7,7 @@ import lombok.Getter;
 /**
  * 支付订单的通知状态枚举
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Getter
 @AllArgsConstructor

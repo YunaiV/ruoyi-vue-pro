@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * 限时折扣活动 Convert
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface DiscountActivityConvert {

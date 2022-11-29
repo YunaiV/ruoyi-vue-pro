@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.file.core.client.AbstractFileClient;
 /**
  * 基于 DB 存储的文件客户端的配置类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class DBFileClient extends AbstractFileClient<DBFileClientConfig> {
 

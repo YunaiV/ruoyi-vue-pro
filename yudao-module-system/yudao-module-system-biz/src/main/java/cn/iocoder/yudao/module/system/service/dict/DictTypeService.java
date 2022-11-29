@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 字典类型 Service 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface DictTypeService {
 

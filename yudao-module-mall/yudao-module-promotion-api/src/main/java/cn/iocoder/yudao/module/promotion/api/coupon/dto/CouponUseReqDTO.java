@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 /**
  * 优惠劵使用 Request DTO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class CouponUseReqDTO {

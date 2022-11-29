@@ -87,7 +87,7 @@ function renderFormItem(h, elementList) {
     const config = scheme.__config__
     const layout = layouts[config.layout]
 
-    // edit by 芋道源码，解决 el-upload 上传的问题
+    // edit by 岳阳医院，解决 el-upload 上传的问题
     // 参考 https://github.com/JakHuang/form-generator/blob/master/src/components/parser/example/Index.vue 实现
     const vModel = scheme.__vModel__
     const val = data[vModel]
@@ -216,7 +216,7 @@ export default {
       this.$refs[this.formConf.formRef].validate(valid => {
         if (!valid) return false
         // 触发 submit 事件
-        // update by 芋道源码
+        // update by 岳阳医院
         // this.$emit('submit', this[this.formConf.formModel])
         this.$emit('submit', {
           conf: this.formConfCopy,

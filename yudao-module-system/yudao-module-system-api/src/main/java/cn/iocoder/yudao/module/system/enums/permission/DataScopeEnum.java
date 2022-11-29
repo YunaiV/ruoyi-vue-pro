@@ -8,7 +8,7 @@ import lombok.Getter;
  *
  * 用于实现数据级别的权限
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Getter
 @AllArgsConstructor

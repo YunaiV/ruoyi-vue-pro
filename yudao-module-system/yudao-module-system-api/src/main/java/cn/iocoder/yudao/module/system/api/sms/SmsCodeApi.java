@@ -10,7 +10,7 @@ import javax.validation.Valid;
 /**
  * 短信验证码 API 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface SmsCodeApi {
 

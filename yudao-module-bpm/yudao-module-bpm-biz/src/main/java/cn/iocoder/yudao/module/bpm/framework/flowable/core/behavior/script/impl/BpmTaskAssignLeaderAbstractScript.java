@@ -22,7 +22,7 @@ import static java.util.Collections.emptySet;
  * 分配给发起人的 Leader 审批的 Script 实现类
  * 目前 Leader 的定义是，
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public abstract class BpmTaskAssignLeaderAbstractScript implements BpmTaskAssignScript {
 

@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 基于部门的数据权限 AutoConfiguration
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(LoginUser.class)

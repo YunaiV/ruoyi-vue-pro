@@ -18,7 +18,7 @@ import java.util.Map;
  * Bpm 流程实例的拓展表
  * 主要解决 Activiti ProcessInstance 和 HistoricProcessInstance 不支持拓展字段，所以新建拓展表
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName(value = "bpm_process_instance_ext", autoResultMap = true)
 @Data

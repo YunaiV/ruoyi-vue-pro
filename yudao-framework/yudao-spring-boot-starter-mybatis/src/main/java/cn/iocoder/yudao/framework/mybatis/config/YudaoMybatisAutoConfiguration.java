@@ -21,7 +21,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 /**
  * MyBaits 配置类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Configuration(proxyBeanMethods = false)
 @MapperScan(value = "${yudao.info.base-package}", annotationClass = Mapper.class,

@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 /**
  * OAuth2.0 Token API 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 public class OAuth2TokenApiImpl implements OAuth2TokenApi {

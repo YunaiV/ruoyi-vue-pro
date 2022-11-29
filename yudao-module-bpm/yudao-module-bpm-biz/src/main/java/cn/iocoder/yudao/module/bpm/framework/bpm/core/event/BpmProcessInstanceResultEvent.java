@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
  * 流程实例的结果发生变化的 Event
  * 定位：由于额外增加了 {@link BpmProcessInstanceExtDO#getResult()} 结果，所以增加该事件
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @SuppressWarnings("ALL")
 @Data

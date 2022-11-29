@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  *
  * 短信框架，使用 2-002-000-000 段
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface PayFrameworkErrorCodeConstants {
 

@@ -17,7 +17,7 @@ import java.time.Duration;
  * 注意，大多数情况下，并不用使用 TenantRedisKeyDefine 实现。主要的使用场景，还是 Redis Key 可能存在冲突的情况。
  * 例如说，租户 1 和 2 都有一个手机号作为 Key，则他们会存在冲突的问题
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class TenantRedisKeyDefine extends RedisKeyDefine {
 

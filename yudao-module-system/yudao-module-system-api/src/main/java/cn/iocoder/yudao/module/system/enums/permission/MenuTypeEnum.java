@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 菜单类型枚举类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Getter
 @AllArgsConstructor

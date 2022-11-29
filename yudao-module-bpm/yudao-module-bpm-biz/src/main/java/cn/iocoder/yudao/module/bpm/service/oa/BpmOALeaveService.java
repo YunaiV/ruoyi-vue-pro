@@ -12,7 +12,7 @@ import javax.validation.Valid;
  * 请假申请 Service 接口
  *
  * @author jason
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface BpmOALeaveService {
 

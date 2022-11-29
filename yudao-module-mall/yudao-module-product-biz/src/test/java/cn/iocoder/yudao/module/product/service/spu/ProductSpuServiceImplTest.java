@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * {@link ProductSpuServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Import(ProductSpuServiceImpl.class)
 @Disabled // TODO 芋艿：临时去掉

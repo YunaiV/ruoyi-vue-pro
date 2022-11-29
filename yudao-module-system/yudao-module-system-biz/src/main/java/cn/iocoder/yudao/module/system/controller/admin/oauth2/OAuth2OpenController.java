@@ -53,7 +53,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
  * 考虑到【本系统】暂时不想做的过于复杂，默认只有获取到 access token 之后，可以访问【本系统】管理后台的 /system-api/* 所有接口，除非手动添加 scope 控制。
  * scope 的使用示例，可见 {@link OAuth2UserController} 类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Api(tags = "管理后台 - OAuth2.0 授权")
 @RestController

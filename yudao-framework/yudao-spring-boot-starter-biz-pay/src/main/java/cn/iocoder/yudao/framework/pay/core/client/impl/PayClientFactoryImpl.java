@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * 支付客户端的工厂实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Slf4j
 public class PayClientFactoryImpl implements PayClientFactory {

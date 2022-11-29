@@ -90,7 +90,7 @@ export default {
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
             if (typeof item === "string") {
-              // edit by 芋道源码
+              // edit by 岳阳医院
               item = { name: item, url: item };
             }
             return item;
@@ -121,7 +121,7 @@ export default {
     },
     // 上传成功回调
     handleUploadSuccess(res) {
-      // edit by 芋道源码
+      // edit by 岳阳医院
       this.uploadList.push({ name: res.data, url: res.data });
       if (this.uploadList.length === this.number) {
         this.fileList = this.fileList.concat(this.uploadList);

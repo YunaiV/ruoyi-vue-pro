@@ -1,5 +1,5 @@
 ### 获取租户编号 /admin-api/system/get-id-by-name
-GET {{baseUrl}}/system/tenant/get-id-by-name?name=芋道源码
+GET {{baseUrl}}/system/tenant/get-id-by-name?name=岳阳医院
 
 ### 创建租户 /admin-api/system/tenant/create
 POST {{baseUrl}}/system/tenant/create

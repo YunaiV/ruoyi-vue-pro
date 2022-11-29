@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 /**
  * 交易订单 DO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName("trade_order")
 @KeySequence("trade_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

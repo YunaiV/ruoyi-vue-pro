@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Banner 的自动配置类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Configuration(proxyBeanMethods = false)
 public class YudaoBannerAutoConfiguration {

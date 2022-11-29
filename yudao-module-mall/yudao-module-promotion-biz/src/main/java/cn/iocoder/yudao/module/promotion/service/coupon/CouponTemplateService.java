@@ -11,7 +11,7 @@ import javax.validation.Valid;
 /**
  * 优惠劵模板 Service 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface CouponTemplateService {
 

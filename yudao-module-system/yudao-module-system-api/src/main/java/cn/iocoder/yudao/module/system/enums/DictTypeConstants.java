@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.enums;
 /**
  * System 字典类型的枚举类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface DictTypeConstants {
 

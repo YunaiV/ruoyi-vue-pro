@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 /**
  * Object 工具类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class ObjectUtils {
 

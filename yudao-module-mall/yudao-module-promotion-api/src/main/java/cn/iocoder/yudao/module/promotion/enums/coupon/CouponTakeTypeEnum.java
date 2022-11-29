@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * 优惠劵领取方式
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @AllArgsConstructor
 @Getter

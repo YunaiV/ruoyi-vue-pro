@@ -6,7 +6,7 @@ import java.util.Set;
  * 租户菜单处理
  * 目的：尽量减少租户逻辑耦合到系统中
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface TenantMenuHandler {
 

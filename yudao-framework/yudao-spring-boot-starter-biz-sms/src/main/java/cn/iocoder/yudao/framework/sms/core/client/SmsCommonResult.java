@@ -16,7 +16,7 @@ import lombok.ToString;
  *
  * 另外，一些短信平台（例如说阿里云、腾讯云）会返回一个请求编号，用于排查请求失败的问题，我们设置到 {@link #apiRequestId} 字段
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

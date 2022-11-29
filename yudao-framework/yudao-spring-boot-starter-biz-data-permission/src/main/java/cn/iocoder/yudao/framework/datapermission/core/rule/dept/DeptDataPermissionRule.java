@@ -45,7 +45,7 @@ import java.util.Set;
  *  3）想要保证原 dept_id 和 user_id 都可以看的到，此时使用 dept_id 和 user_id 一起过滤；
  *      最终过滤条件是 WHERE dept_id = ? OR user_id IN (?, ?, ? ...)
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @AllArgsConstructor
 @Slf4j

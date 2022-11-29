@@ -21,7 +21,7 @@ import java.util.List;
  * 1. 商品 1：原价 108 元，优惠 29 元，子订单实付 79 元，分摊主订单优惠 1.99 元；
  * 2. 商品 2：原价 269 元，优惠 150 元，子订单实付 119 元，分摊主订单优惠 3.01 元；
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 public class PriceCalculateRespDTO {

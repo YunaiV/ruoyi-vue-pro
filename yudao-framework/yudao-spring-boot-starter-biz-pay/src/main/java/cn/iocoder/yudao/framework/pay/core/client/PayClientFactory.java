@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.pay.core.client;
 /**
  * 支付客户端的工厂接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface PayClientFactory {
 

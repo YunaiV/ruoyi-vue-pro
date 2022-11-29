@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * 邮箱发送消息
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

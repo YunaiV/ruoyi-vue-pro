@@ -135,7 +135,7 @@ export default {
         mobile: "",
         mobileCode: "",
         rememberMe: false,
-        tenantName: "芋道源码",
+        tenantName: "岳阳医院",
       },
       scene: 21,
 

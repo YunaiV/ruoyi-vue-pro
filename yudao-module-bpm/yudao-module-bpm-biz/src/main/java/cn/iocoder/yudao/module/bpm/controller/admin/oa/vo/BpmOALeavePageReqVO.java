@@ -20,7 +20,7 @@ public class BpmOALeavePageReqVO extends PageParam {
     @ApiModelProperty(value = "请假类型", example = "1", notes = "参见 bpm_oa_type")
     private Integer type;
 
-    @ApiModelProperty(value = "原因", example = "阅读芋道源码", notes = "模糊匹配")
+    @ApiModelProperty(value = "原因", example = "阅读岳阳医院", notes = "模糊匹配")
     private String reason;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 限时折扣商城 Mapper
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface DiscountProductMapper extends BaseMapperX<DiscountProductDO> {

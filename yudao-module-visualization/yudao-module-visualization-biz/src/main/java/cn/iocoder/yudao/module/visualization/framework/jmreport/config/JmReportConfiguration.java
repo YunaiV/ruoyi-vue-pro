@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 积木报表的配置类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Configuration(proxyBeanMethods = false)
 @ComponentScan(basePackages = "org.jeecg.modules.jmreport") // 扫描积木报表的包

@@ -7,7 +7,7 @@ import lombok.Getter;
  * BPM 任务规则的脚本枚举
  * 目前暂时通过 TODO 芋艿：硬编码，未来可以考虑 Groovy 动态脚本的方式
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Getter
 @AllArgsConstructor

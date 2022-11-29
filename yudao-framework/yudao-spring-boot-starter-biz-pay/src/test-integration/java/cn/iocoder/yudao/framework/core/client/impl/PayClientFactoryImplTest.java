@@ -22,7 +22,7 @@ import java.io.FileNotFoundException;
 /**
  * {@link PayClientFactoryImpl} 的集成测试
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class PayClientFactoryImplTest {
 

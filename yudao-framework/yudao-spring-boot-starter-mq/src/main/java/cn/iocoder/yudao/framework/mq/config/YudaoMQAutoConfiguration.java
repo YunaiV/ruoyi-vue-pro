@@ -33,7 +33,7 @@ import java.util.Properties;
 /**
  * 消息队列配置类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureAfter(YudaoRedisAutoConfiguration.class)

@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * 交易订单项 DO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName(value = "trade_order_item", autoResultMap = true)
 @Data

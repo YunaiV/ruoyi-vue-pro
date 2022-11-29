@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * Bpm 流程任务的拓展表
  * 主要解决 Flowable Task 和 HistoricTaskInstance 不支持拓展字段，所以新建拓展表
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName(value = "bpm_task_ext", autoResultMap = true)
 @Data

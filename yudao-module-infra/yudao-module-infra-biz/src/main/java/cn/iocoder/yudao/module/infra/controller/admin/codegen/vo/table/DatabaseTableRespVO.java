@@ -11,7 +11,7 @@ public class DatabaseTableRespVO {
     @ApiModelProperty(value = "表名称", required = true, example = "yuanma")
     private String name;
 
-    @ApiModelProperty(value = "表描述", required = true, example = "芋道源码")
+    @ApiModelProperty(value = "表描述", required = true, example = "岳阳医院")
     private String comment;
 
 }

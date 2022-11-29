@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 /**
  * OAuth2 授予 Service 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 public class OAuth2GrantServiceImpl implements OAuth2GrantService {

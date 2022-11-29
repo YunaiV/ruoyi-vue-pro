@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 限时折扣商品 DO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @TableName(value = "promotion_discount_product", autoResultMap = true)
 @KeySequence("promotion_discount_product_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants.OAUTH2_
 /**
  * {@link OAuth2AccessTokenDO} 的 RedisDAO
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Repository
 public class OAuth2AccessTokenRedisDAO {

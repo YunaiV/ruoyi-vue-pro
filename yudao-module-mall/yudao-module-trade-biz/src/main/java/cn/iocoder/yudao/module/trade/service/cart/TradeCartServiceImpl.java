@@ -34,7 +34,7 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.CARD_ITEM_N
 /**
  * 购物车 Service 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 @Validated

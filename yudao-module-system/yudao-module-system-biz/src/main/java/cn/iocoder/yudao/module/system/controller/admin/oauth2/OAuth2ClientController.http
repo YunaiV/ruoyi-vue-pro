@@ -7,7 +7,7 @@ tenant-id: {{adminTenentId}}
 {
   "id": "1",
   "secret": "admin123",
-  "name": "芋道源码",
+  "name": "岳阳医院",
   "logo": "https://www.iocoder.cn/images/favicon.ico",
   "description": "我是描述",
   "status": 0,

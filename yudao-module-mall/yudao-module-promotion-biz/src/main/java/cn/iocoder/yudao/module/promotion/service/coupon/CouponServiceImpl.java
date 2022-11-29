@@ -28,7 +28,7 @@ import static java.util.Arrays.asList;
 /**
  * 优惠劵 Service 实现类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 @Validated

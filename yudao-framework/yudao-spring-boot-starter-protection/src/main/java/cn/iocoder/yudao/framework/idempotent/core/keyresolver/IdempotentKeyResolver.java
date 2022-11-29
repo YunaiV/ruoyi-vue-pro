@@ -6,7 +6,7 @@ import org.aspectj.lang.JoinPoint;
 /**
  * 幂等 Key 解析器接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface IdempotentKeyResolver {
 

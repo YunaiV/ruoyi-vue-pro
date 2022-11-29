@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * {@link TestDemoServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Import(TestDemoServiceImpl.class)
 public class TestDemoServiceImplTest extends BaseDbUnitTest {
@@ -107,7 +107,7 @@ public class TestDemoServiceImplTest extends BaseDbUnitTest {
     public void testGetTestDemoPage() {
         // mock 数据
         TestDemoDO dbTestDemo = randomPojo(TestDemoDO.class, o -> { // 等会查询到
-            o.setName("芋道源码");
+            o.setName("岳阳医院");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
             o.setType(1);
             o.setCategory(2);
@@ -148,7 +148,7 @@ public class TestDemoServiceImplTest extends BaseDbUnitTest {
     public void testGetTestDemoList() {
         // mock 数据
         TestDemoDO dbTestDemo = randomPojo(TestDemoDO.class, o -> { // 等会查询到
-            o.setName("芋道源码");
+            o.setName("岳阳医院");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
             o.setType(1);
             o.setCategory(2);

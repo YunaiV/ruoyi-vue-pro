@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 定时任务 Mapper
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface JobMapper extends BaseMapperX<JobDO> {

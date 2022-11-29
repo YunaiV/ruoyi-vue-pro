@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * 1、Redis 场景：因为是基于 Key 实现多租户的能力，所以忽略没有意义，不像 DB 是一个 column 实现的
  * 2、MQ 场景：有点难以抉择，目前可以通过 Consumer 手动在消费的方法上，添加 @TenantIgnore 进行忽略
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

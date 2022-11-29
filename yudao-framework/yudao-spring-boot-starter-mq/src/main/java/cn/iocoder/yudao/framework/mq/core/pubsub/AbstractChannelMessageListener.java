@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @param <T> 消息类型。一定要填写噢，不然会报错
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public abstract class AbstractChannelMessageListener<T extends AbstractChannelMessage> implements MessageListener {
 

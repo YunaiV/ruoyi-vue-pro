@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * BPM 活动 Convert
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface BpmActivityConvert {

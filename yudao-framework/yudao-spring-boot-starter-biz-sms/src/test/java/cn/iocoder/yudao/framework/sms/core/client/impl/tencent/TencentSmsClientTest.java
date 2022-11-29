@@ -45,7 +45,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
     private final SmsChannelProperties properties = new SmsChannelProperties()
             .setApiKey(randomString() + " " + randomString()) // 随机一个 apiKey，避免构建报错
             .setApiSecret(randomString()) // 随机一个 apiSecret，避免构建报错
-            .setSignature("芋道源码");
+            .setSignature("岳阳医院");
 
     @InjectMocks
     private TencentSmsClient smsClient = new TencentSmsClient(properties);
@@ -70,7 +70,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
         SmsChannelProperties p = new SmsChannelProperties()
                 .setApiKey(randomString() + " " + randomString()) // 随机一个 apiKey，避免构建报错
                 .setApiSecret(randomString()) // 随机一个 apiSecret，避免构建报错
-                .setSignature("芋道源码");
+                .setSignature("岳阳医院");
         // 调用
         smsClient.refresh(p);
         // 断言

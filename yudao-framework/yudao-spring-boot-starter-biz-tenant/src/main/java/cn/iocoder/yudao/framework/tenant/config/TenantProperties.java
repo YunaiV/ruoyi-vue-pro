@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * 多租户配置
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @ConfigurationProperties(prefix = "yudao.tenant")
 @Data

@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.file.core.client.s3.S3FileClientConfig.
  *
  * S3 协议的客户端，采用亚马逊提供的 software.amazon.awssdk.s3 库
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
 

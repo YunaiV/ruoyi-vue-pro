@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 /**
 * {@link TenantPackageServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author 岳阳医院
 */
 @Import(TenantPackageServiceImpl.class)
 public class TenantPackageServiceImplTest extends BaseDbUnitTest {
@@ -139,7 +139,7 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
     public void testGetTenantPackagePage() {
        // mock 数据
        TenantPackageDO dbTenantPackage = randomPojo(TenantPackageDO.class, o -> { // 等会查询到
-           o.setName("芋道源码");
+           o.setName("岳阳医院");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setRemark("源码解析");
            o.setCreateTime(buildLocalDateTime(2022, 10, 10));

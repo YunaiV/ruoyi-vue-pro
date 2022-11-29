@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 品牌 Convert
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Mapper
 public interface ProductBrandConvert {

@@ -10,7 +10,7 @@ import static cn.iocoder.yudao.framework.redis.core.RedisKeyDefine.KeyTypeEnum.S
 /**
  * System Redis Key 枚举类
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 public interface RedisKeyConstants {
 

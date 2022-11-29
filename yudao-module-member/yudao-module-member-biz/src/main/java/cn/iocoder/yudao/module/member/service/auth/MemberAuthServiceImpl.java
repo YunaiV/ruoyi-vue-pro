@@ -42,7 +42,7 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 /**
  * 会员的认证 Service 接口
  *
- * @author 芋道源码
+ * @author 岳阳医院
  */
 @Service
 @Slf4j
