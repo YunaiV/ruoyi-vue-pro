@@ -7,8 +7,8 @@ import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRuleFac
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRuleFactoryImpl;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 public class YudaoDataPermissionAutoConfiguration {
 
     @Bean
