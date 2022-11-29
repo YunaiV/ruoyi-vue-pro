@@ -212,10 +212,10 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 ### [管理后台 Vue2 前端](./yudao-ui-admin)
 
-| 框架                                                                           | 说明            | 版本    |
-|------------------------------------------------------------------------------|---------------|-------|
-| [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.7.0 |
-| [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -     |
+| 框架                                                                           | 说明            | 版本     |
+|------------------------------------------------------------------------------|---------------|--------|
+| [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.7.14 |
+| [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -      |
 
 ### [管理后台 Vue3 前端](./yudao-ui-admin-vue3)
 
