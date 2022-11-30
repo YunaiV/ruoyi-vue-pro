@@ -30,6 +30,7 @@ public class CaptchaController extends com.anji.captcha.controller.CaptchaContro
     @ApiOperation("获得验证码")
     @PermitAll
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    @Override
     public ResponseModel get(@RequestBody CaptchaVO data, HttpServletRequest request) {
         return super.get(data, request);
     }
@@ -38,6 +39,7 @@ public class CaptchaController extends com.anji.captcha.controller.CaptchaContro
     @ApiOperation("校验验证码")
     @PermitAll
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    @Override
     public ResponseModel check(@RequestBody CaptchaVO data, HttpServletRequest request) {
         return super.check(data, request);
     }

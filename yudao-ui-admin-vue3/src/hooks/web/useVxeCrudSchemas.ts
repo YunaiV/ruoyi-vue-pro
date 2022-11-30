@@ -17,7 +17,7 @@ import { DescriptionsSchema } from '@/types/descriptions'
 export type VxeCrudSchema = {
   primaryKey?: string // 主键ID
   primaryTitle?: string // 主键标题 默认为序号
-  primaryType?: VxeColumnPropTypes.Type // 不填写为数据库编号 null为不显示 还支持 "seq" | "radio" | "checkbox" | "expand" | "html" | null
+  primaryType?: VxeColumnPropTypes.Type | 'id' // 还支持 "id" | "seq" | "radio" | "checkbox" | "expand" | "html" | null
   action?: boolean // 是否开启表格内右侧操作栏插槽
   actionTitle?: string // 操作栏标题 默认为操作
   actionWidth?: string // 操作栏插槽宽度,一般2个字带图标 text 类型按钮 50-70
@@ -121,18 +121,8 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
     if (schemaItem?.isSearch || schemaItem.search?.show) {
       let itemRenderName = schemaItem?.search?.itemRender?.name || '$input'
       const options: any[] = []
-      let itemRender: FormItemRenderOptions
-      if (schemaItem.search?.itemRender) {
-        itemRender = schemaItem.search.itemRender
-      } else {
-        itemRender = {
-          name: itemRenderName,
-          props:
-            itemRenderName == '$input'
-              ? { placeholder: t('common.inputText') }
-              : { placeholder: t('common.selectText') }
-        }
-      }
+      let itemRender: FormItemRenderOptions = {}
+
       if (schemaItem.dictType) {
         const allOptions = { label: '全部', value: '' }
         options.push(allOptions)
@@ -146,8 +136,19 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
           options: options,
           props: { placeholder: t('common.selectText') }
         }
+      } else {
+        if (schemaItem.search?.itemRender) {
+          itemRender = schemaItem.search.itemRender
+        } else {
+          itemRender = {
+            name: itemRenderName,
+            props:
+              itemRenderName == '$input'
+                ? { placeholder: t('common.inputText') }
+                : { placeholder: t('common.selectText') }
+          }
+        }
       }
-
       const searchSchemaItem = {
         // 默认为 input
         folding: searchSchema.length > spanLength - 1,
@@ -156,7 +157,6 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
         title: schemaItem.search?.title || schemaItem.title,
         span: span
       }
-
       searchSchema.push(searchSchemaItem)
     }
   })
@@ -187,11 +187,17 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
   if (crudSchema.primaryKey && crudSchema.primaryType) {
     const primaryTitle = crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index')
     const primaryWidth = primaryTitle.length * 30 + 'px'
-    const tableSchemaItem = {
+
+    let tableSchemaItem: { [x: string]: any } = {
       title: primaryTitle,
       field: crudSchema.primaryKey,
-      type: crudSchema.primaryType ? crudSchema.primaryType : null,
       width: primaryWidth
+    }
+    if (crudSchema.primaryType != 'id') {
+      tableSchemaItem = {
+        ...tableSchemaItem,
+        type: crudSchema.primaryType
+      }
     }
     tableSchema.push(tableSchemaItem)
   }

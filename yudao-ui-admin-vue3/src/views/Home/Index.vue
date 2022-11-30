@@ -60,7 +60,7 @@
         <template #header>
           <div class="flex justify-between h-3">
             <span>{{ t('workplace.project') }}</span>
-            <el-link type="primary" :underline="false">{{ t('workplace.more') }}</el-link>
+            <el-link type="primary" :underline="false">{{ t('action.more') }}</el-link>
           </div>
         </template>
         <el-skeleton :loading="loading" animated>
@@ -135,7 +135,7 @@
         <template #header>
           <div class="flex justify-between h-3">
             <span>{{ t('workplace.notice') }}</span>
-            <el-link type="primary" :underline="false">{{ t('workplace.more') }}</el-link>
+            <el-link type="primary" :underline="false">{{ t('action.more') }}</el-link>
           </div>
         </template>
         <el-skeleton :loading="loading" animated>

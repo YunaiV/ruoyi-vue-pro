@@ -43,6 +43,7 @@ public class YudaoAuthRequestFactory extends AuthRequestFactory {
      * @param source {@link AuthSource}
      * @return {@link AuthRequest}
      */
+    @Override
     public AuthRequest get(String source) {
         // 先尝试获取自定义扩展的
         AuthRequest authRequest = getExtendRequest(source);

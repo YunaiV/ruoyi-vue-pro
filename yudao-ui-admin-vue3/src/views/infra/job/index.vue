@@ -49,7 +49,7 @@
           @click="handleDelete(row.id)"
         />
         <el-dropdown class="p-0.5" v-hasPermi="['infra:job:trigger', 'infra:job:query']">
-          <XTextButton title="更多" postIcon="ep:arrow-down" />
+          <XTextButton :title="t('action.more')" postIcon="ep:arrow-down" />
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item>
