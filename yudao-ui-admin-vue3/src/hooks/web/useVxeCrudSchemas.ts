@@ -121,18 +121,8 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
     if (schemaItem?.isSearch || schemaItem.search?.show) {
       let itemRenderName = schemaItem?.search?.itemRender?.name || '$input'
       const options: any[] = []
-      let itemRender: FormItemRenderOptions
-      if (schemaItem.search?.itemRender) {
-        itemRender = schemaItem.search.itemRender
-      } else {
-        itemRender = {
-          name: itemRenderName,
-          props:
-            itemRenderName == '$input'
-              ? { placeholder: t('common.inputText') }
-              : { placeholder: t('common.selectText') }
-        }
-      }
+      let itemRender: FormItemRenderOptions = {}
+
       if (schemaItem.dictType) {
         const allOptions = { label: '全部', value: '' }
         options.push(allOptions)
@@ -146,8 +136,19 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
           options: options,
           props: { placeholder: t('common.selectText') }
         }
+      } else {
+        if (schemaItem.search?.itemRender) {
+          itemRender = schemaItem.search.itemRender
+        } else {
+          itemRender = {
+            name: itemRenderName,
+            props:
+              itemRenderName == '$input'
+                ? { placeholder: t('common.inputText') }
+                : { placeholder: t('common.selectText') }
+          }
+        }
       }
-
       const searchSchemaItem = {
         // 默认为 input
         folding: searchSchema.length > spanLength - 1,
@@ -156,7 +157,6 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
         title: schemaItem.search?.title || schemaItem.title,
         span: span
       }
-
       searchSchema.push(searchSchemaItem)
     }
   })
