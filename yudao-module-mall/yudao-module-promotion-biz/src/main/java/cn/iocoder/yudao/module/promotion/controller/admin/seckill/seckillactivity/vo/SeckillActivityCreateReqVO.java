@@ -12,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+// TODO halfninety：检查下所有的 VO，需要保证 example 都写了哈。
 @ApiModel("管理后台 - 秒杀活动创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -25,6 +26,7 @@ public class SeckillActivityCreateReqVO extends SeckillActivityBaseVO {
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
+    // TODO halfninety：直接使用数组接口。timeIds，
     @ApiModelProperty(value = "秒杀时段id", required = true)
     @NotBlank(message = "参与场次不能为空")
     private String timeId;

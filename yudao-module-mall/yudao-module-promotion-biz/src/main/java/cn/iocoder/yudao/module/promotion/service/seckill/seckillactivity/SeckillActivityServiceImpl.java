@@ -31,7 +31,7 @@ import static java.util.Arrays.asList;
 /**
  * 秒杀活动 Service 实现类
  *
- * @author 芋道源码
+ * @author 芋道源码 // TODO @halfninety：作者改成你自己哈
  */
 @Service
 @Validated
@@ -39,7 +39,6 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Resource
     private SeckillActivityMapper seckillActivityMapper;
-
     @Resource
     private SeckillProductMapper seckillProductMapper;
 
@@ -48,32 +47,40 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Override
     public Long createSeckillActivity(SeckillActivityCreateReqVO createReqVO) {
+        // TODO @halfninety：多余的变量，需要删除
         List<Integer> statuses = asList(PromotionActivityStatusEnum.WAIT.getStatus(), PromotionActivityStatusEnum.RUN.getStatus());
         // 校验商品是否冲突
         validateSeckillActivityProductConflicts(null, createReqVO.getProducts());
-        // 更新秒杀时段的秒杀活动数量
-        seckillTimeService.sekillActivityCountAdd(StrUtils.splitToLong(createReqVO.getTimeId(),","));
+
+        // TODO halfninety：要校验下，秒杀时间段存在
         // 插入秒杀活动
         SeckillActivityDO seckillActivity = SeckillActivityConvert.INSTANCE.convert(createReqVO)
                 .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getStartTime(), createReqVO.getEndTime()));
         seckillActivityMapper.insert(seckillActivity);
         // 插入商品
+        // TODO @halfninety：是不是写成一个 convertList，通过 default 来处理下；这样可读性更好哈
         List<SeckillProductDO> productDOS = CollectionUtils.convertList(createReqVO.getProducts(),
                 product -> SeckillActivityConvert.INSTANCE.convert(product).setActivityId(seckillActivity.getId()));
         seckillProductMapper.insertBatch(productDOS);
+
+        // TODO halfninety：最后在更新秒杀时间段的商品数量哈。【我已经改了】一般先做核心的逻辑，在做附件的逻辑。
+        // 更新秒杀时段的秒杀活动数量
+        seckillTimeService.sekillActivityCountAdd(StrUtils.splitToLong(createReqVO.getTimeId(),","));
         return seckillActivity.getId();
     }
 
     @Override
     public void updateSeckillActivity(SeckillActivityUpdateReqVO updateReqVO) {
         // 校验存在
-        SeckillActivityDO seckillActivity = this.validateSeckillActivityExists(updateReqVO.getId());
+        SeckillActivityDO seckillActivity = validateSeckillActivityExists(updateReqVO.getId());
         if (PromotionActivityStatusEnum.CLOSE.getStatus().equals(seckillActivity.getStatus())) {
             throw exception(SECKILL_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED);
         }
         // 校验商品是否冲突
         validateSeckillActivityProductConflicts(updateReqVO.getId(), updateReqVO.getProducts());
+
         // 更新秒杀时段的秒杀活动数量
+        // TODO @halfninety：可以直接传递 seckillActivity 进去，不用重复查询；
         updateSeckillTimeActivityCount(updateReqVO.getId(), updateReqVO.getTimeId());
         // 更新活动
         SeckillActivityDO updateObj = SeckillActivityConvert.INSTANCE.convert(updateReqVO)
@@ -83,6 +90,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         updateSeckillProduct(updateReqVO);
     }
 
+    // TODO @halfninety：注释写全哈；
     /**
      * 更新秒杀时段的秒杀活动数量
      *
@@ -91,16 +99,19 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
      */
     private void updateSeckillTimeActivityCount(Long id, String timeId) {
         List<Long> updateTimeIds = StrUtils.splitToLong(timeId, ",");
-        // 查出自己的timeIds
+        // 查出自己的 timeIds
         SeckillActivityDO seckillActivityDO = seckillActivityMapper.selectById(id);
         List<Long> existsTimeIds = StrUtils.splitToLong(seckillActivityDO.getTimeId(), ",");
-        //需要减少的时间段
+        // 需要减少的时间段
+        // TODO @halfninety：可以使用 CollUtil.filterNew()
         List<Long> reduceIds = existsTimeIds.stream()
                 .filter(existsTimeId -> !updateTimeIds.contains(existsTimeId))
                 .collect(Collectors.toList());
-        //需要添加的时间段
+        // 需要添加的时间段
+        // TODO @halfninety：IDEA 一般会有告警提示，下面可以 lambada 表达式优化下；通过 command + 回车
         updateTimeIds.removeIf(updateTimeId -> existsTimeIds.contains(updateTimeId));
-        //更新减少时间段和增加时间段
+        // 更新减少时间段和增加时间段
+        // TODO @halfninety：判断非空才操作
         seckillTimeService.sekillActivityCountAdd(updateTimeIds);
         seckillTimeService.sekillActivityCountReduce(reduceIds);
     }
@@ -111,17 +122,20 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     private void updateSeckillProduct(SeckillActivityUpdateReqVO updateReqVO) {
         List<SeckillProductDO> seckillProductDOS = seckillProductMapper.selectListByActivityId(updateReqVO.getId());
         List<SeckillActivityBaseVO.Product> products = updateReqVO.getProducts();
-        //对后台查出的数据和前台查出的数据进行遍历，
-        //1.对前台数据进行遍历：如果不存在于后台的sku中需要新增
-        //2.对后台数据进行遍历：如果不存在于前台的sku中需要删除
-        //计算需要删除的数据
+        // TODO halfninety：下面这段，其实可以放到注释哈
+        // 对后台查出的数据和前台查出的数据进行遍历，
+        // 1. 对前台数据进行遍历：如果不存在于后台的 sku 中需要新增
+        // 2. 对后台数据进行遍历：如果不存在于前台的 sku 中需要删除
+
+        // 计算需要删除的数据
         List<Long> deleteIds = CollectionUtils.convertList(seckillProductDOS, SeckillProductDO::getId,
                 seckillProductDO -> products.stream()
                         .noneMatch(product -> SeckillActivityConvert.INSTANCE.isEquals(seckillProductDO, product)));
         if (CollUtil.isNotEmpty(deleteIds)) {
             seckillProductMapper.deleteBatchIds(deleteIds);
         }
-        //计算需要新增的数据
+
+        // 计算需要新增的数据
         List<SeckillProductDO> newSeckillProductDOs = CollectionUtils.convertList(products,
                 product -> SeckillActivityConvert.INSTANCE.convert(product).setActivityId(updateReqVO.getId()));
         newSeckillProductDOs.removeIf(product -> seckillProductDOS.stream()
@@ -148,17 +162,16 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         }
         List<SeckillActivityDO> seckillActivityDOS = seckillActivityMapper
                 .selectBatchIds(CollectionUtils.convertSet(seckillProductDOS, SeckillProductDO::getActivityId));
-        if (id != null) {// 排除自己这个活动
+        if (id != null) { // 排除自己这个活动
             seckillActivityDOS.removeIf(item -> id.equals(item.getId()));
         }
-        // 排除不满足status的活动
+        // 排除不满足 status 的活动
         List<Integer> statuses = asList(PromotionActivityStatusEnum.WAIT.getStatus(), PromotionActivityStatusEnum.RUN.getStatus());
         seckillActivityDOS.removeIf(item -> !statuses.contains(item.getStatus()));
-        //如果非空，则说明冲突
+        // 如果非空，则说明冲突
         if (CollUtil.isNotEmpty(seckillActivityDOS)) {
             throw exception(SECKILL_ACTIVITY_SPU_CONFLICTS);
         }
-
     }
 
     @Override

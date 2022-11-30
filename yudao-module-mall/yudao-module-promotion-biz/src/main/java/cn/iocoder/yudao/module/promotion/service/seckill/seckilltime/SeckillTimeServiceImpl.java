@@ -3,32 +3,29 @@ package cn.iocoder.yudao.module.promotion.service.seckill.seckilltime;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.convert.seckill.seckilltime.SeckillTimeConvert;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckilltime.SeckillTimeDO;
+import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckilltime.SeckillTimeMapper;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalTime;
-import java.util.*;
-
-import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckilltime.SeckillTimeDO;
-
-import cn.iocoder.yudao.module.promotion.convert.seckill.seckilltime.SeckillTimeConvert;
-import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckilltime.SeckillTimeMapper;
+import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.SECKILL_TIME_CONFLICTS;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.SECKILL_TIME_NOT_EXISTS;
 
 /**
  * 秒杀时段 Service 实现类
  *
- * @author 芋道源码
+ * @author 芋道源码     // TODO @halfninety：作者改成你自己哈
  */
 @Service
 @Validated
 public class SeckillTimeServiceImpl implements SeckillTimeService {
-
 
     @Resource
     private SeckillTimeMapper seckillTimeMapper;
@@ -93,7 +90,6 @@ public class SeckillTimeServiceImpl implements SeckillTimeService {
         }
     }
 
-
     @Override
     public SeckillTimeDO getSeckillTime(Long id) {
         return seckillTimeMapper.selectById(id);
@@ -104,6 +100,7 @@ public class SeckillTimeServiceImpl implements SeckillTimeService {
         return seckillTimeMapper.selectList();
     }
 
+    // TODO @halfninety：updateActivityCount + 和 -，可以执使用一个方法实现哈。多传递一个参数
     @Override
     public void sekillActivityCountAdd(List<Long> ids) {
         seckillTimeMapper.sekillActivityCountAdd(ids);

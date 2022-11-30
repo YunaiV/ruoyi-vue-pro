@@ -8,5 +8,6 @@
         代码生成器暂时只生成 Mapper XML 文件本身，更多推荐 MybatisX 快速开发插件来生成查询。
         文档可见：https://www.iocoder.cn/MyBatis/x-plugins/
      -->
+    <!-- TODO halfninety：不用的话，可以删除掉哈。 -->
 
 </mapper>

@@ -57,8 +57,9 @@ public class SeckillActivityDO extends BaseDO {
      */
     private Integer sort;
     /**
-     * 秒杀时段id
+     * 秒杀时段 id
      */
+    // TODO @halfninety 可以使用 List 存储；看下别的模块怎么做的哈
     private String timeId;
     /**
      * 付款订单数
@@ -68,6 +69,7 @@ public class SeckillActivityDO extends BaseDO {
      * 付款人数
      */
     private Integer userCount;
+    // TODO @halfninety 使用 Long 哈。单位是分
     /**
      * 订单实付金额，单位：分
      */
