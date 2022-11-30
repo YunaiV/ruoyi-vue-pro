@@ -17,7 +17,7 @@ import { DescriptionsSchema } from '@/types/descriptions'
 export type VxeCrudSchema = {
   primaryKey?: string // 主键ID
   primaryTitle?: string // 主键标题 默认为序号
-  primaryType?: VxeColumnPropTypes.Type // 不填写为数据库编号 null为不显示 还支持 "seq" | "radio" | "checkbox" | "expand" | "html" | null
+  primaryType?: VxeColumnPropTypes.Type | 'id' // 还支持 "id" | "seq" | "radio" | "checkbox" | "expand" | "html" | null
   action?: boolean // 是否开启表格内右侧操作栏插槽
   actionTitle?: string // 操作栏标题 默认为操作
   actionWidth?: string // 操作栏插槽宽度,一般2个字带图标 text 类型按钮 50-70
@@ -187,11 +187,17 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
   if (crudSchema.primaryKey && crudSchema.primaryType) {
     const primaryTitle = crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index')
     const primaryWidth = primaryTitle.length * 30 + 'px'
-    const tableSchemaItem = {
+
+    let tableSchemaItem: { [x: string]: any } = {
       title: primaryTitle,
       field: crudSchema.primaryKey,
-      type: crudSchema.primaryType ? crudSchema.primaryType : null,
       width: primaryWidth
+    }
+    if (crudSchema.primaryType != 'id') {
+      tableSchemaItem = {
+        ...tableSchemaItem,
+        type: crudSchema.primaryType
+      }
     }
     tableSchema.push(tableSchemaItem)
   }
