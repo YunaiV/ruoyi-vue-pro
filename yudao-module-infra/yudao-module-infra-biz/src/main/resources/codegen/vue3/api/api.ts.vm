@@ -3,7 +3,7 @@ import request from '@/config/axios'
 export interface ${simpleClassName}VO {
 #foreach ($column in $columns)
 #if ($column.createOperation || $column.updateOperation)
-#if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
+#if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "double")
   ${column.javaField}: number
 #elseif(${column.javaType.toLowerCase()} == "date")
   ${column.javaField}: Date
@@ -17,7 +17,7 @@ export interface ${simpleClassName}VO {
 export interface ${simpleClassName}PageReqVO extends PageParam {
 #foreach ($column in $columns)
 #if (${column.listOperation})##查询操作
-#if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
+#if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "double")
   ${column.javaField}?: number
 #elseif(${column.javaType.toLowerCase()} == "date")
   ${column.javaField}?: Date[]
@@ -31,7 +31,7 @@ export interface ${simpleClassName}PageReqVO extends PageParam {
 export interface ${simpleClassName}ExcelReqVO {
 #foreach ($column in $columns)
 #if (${column.listOperation})##查询操作
-#if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
+#if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "double")
   ${column.javaField}?: number
 #elseif(${column.javaType.toLowerCase()} == "date")
   ${column.javaField}?: string[]
