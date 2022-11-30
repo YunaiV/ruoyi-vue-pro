@@ -6,7 +6,7 @@ export interface ${simpleClassName}VO {
 #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
   ${column.javaField}: number
 #elseif(${column.javaType.toLowerCase()} == "date")
-  ${column.javaField}: string
+  ${column.javaField}: Date
 #else
   ${column.javaField}: ${column.javaType.toLowerCase()}
 #end
@@ -20,7 +20,7 @@ export interface ${simpleClassName}PageReqVO extends PageParam {
 #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
   ${column.javaField}?: number
 #elseif(${column.javaType.toLowerCase()} == "date")
-  ${column.javaField}?: string[]
+  ${column.javaField}?: Date[]
 #else
   ${column.javaField}?: ${column.javaType.toLowerCase()}
 #end
