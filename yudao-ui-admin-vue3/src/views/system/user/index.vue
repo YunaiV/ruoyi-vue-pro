@@ -77,7 +77,14 @@
             v-hasPermi="['system:user:update']"
             @click="handleDetail(row.id)"
           />
-          <el-dropdown class="p-0.5" v-hasPermi="['infra:job:trigger', 'infra:job:query']">
+          <el-dropdown
+            class="p-0.5"
+            v-hasPermi="[
+              'system:user:update-password',
+              'system:permission:assign-user-role',
+              'system:user:delete'
+            ]"
+          >
             <XTextButton :title="t('action.more')" postIcon="ep:arrow-down" />
             <template #dropdown>
               <el-dropdown-menu>
