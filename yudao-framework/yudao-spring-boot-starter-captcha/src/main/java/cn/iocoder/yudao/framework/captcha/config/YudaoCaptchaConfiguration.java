@@ -4,11 +4,11 @@ import cn.hutool.core.util.ClassUtil;
 import cn.iocoder.yudao.framework.captcha.core.enums.CaptchaRedisKeyConstants;
 import cn.iocoder.yudao.framework.captcha.core.service.RedisCaptchaServiceImpl;
 import com.anji.captcha.service.CaptchaCacheService;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 public class YudaoCaptchaConfiguration {
 
     static {

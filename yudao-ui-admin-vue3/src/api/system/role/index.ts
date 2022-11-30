@@ -7,14 +7,19 @@ export interface RoleVO {
   sort: number
   status: number
   type: number
-  createTime: string
+  createTime: Date
 }
 
 export interface RolePageReqVO extends PageParam {
   name?: string
   code?: string
   status?: number
-  createTime?: string[]
+  createTime?: Date[]
+}
+
+export interface UpdateStatusReqVO {
+  id: number
+  status: number
 }
 
 // 查询角色列表
@@ -43,7 +48,7 @@ export const updateRoleApi = async (data: RoleVO) => {
 }
 
 // 修改角色状态
-export const updateRoleStatusApi = async (data: RoleVO) => {
+export const updateRoleStatusApi = async (data: UpdateStatusReqVO) => {
   return await request.put({ url: '/system/role/update-status', data })
 }
 

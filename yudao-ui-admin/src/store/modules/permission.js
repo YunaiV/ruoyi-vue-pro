@@ -62,7 +62,7 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
     route.name = toCamelCase(route.path, true)
     // 处理三级及以上菜单路由缓存问题，将path名字赋值给name
     if (route.path.indexOf("/") !== -1) {
-      var pathArr = route.path.split("/")
+      const pathArr = route.path.split("/");
       route.name = toCamelCase(pathArr[pathArr.length - 1], true)
     }
     route.hidden = !route.visible
@@ -91,7 +91,7 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
 }
 
 function filterChildren(childrenMap, lastRouter = false) {
-  var children = []
+  let children = [];
   childrenMap.forEach((el, index) => {
     if (el.children && el.children.length) {
       if (!el.component && !lastRouter) {

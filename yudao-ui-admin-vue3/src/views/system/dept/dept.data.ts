@@ -55,7 +55,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '邮箱',
-      field: 'email'
+      field: 'email',
+      isTable: false
     },
     {
       title: '显示排序',
@@ -67,6 +68,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
       dictType: DICT_TYPE.COMMON_STATUS,
       dictClass: 'number',
       isSearch: true
+    },
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate',
+      isForm: false
     }
   ]
 })

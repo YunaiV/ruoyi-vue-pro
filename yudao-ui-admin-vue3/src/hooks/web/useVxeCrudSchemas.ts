@@ -150,7 +150,7 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
 
       const searchSchemaItem = {
         // 默认为 input
-        folding: searchSchema.length > spanLength,
+        folding: searchSchema.length > spanLength - 1,
         itemRender: schemaItem.itemRender ? schemaItem.itemRender : itemRender,
         field: schemaItem.field,
         title: schemaItem.search?.title || schemaItem.title,
@@ -165,7 +165,7 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
     const buttons: VxeFormItemProps = {
       span: 24,
       align: 'center',
-      collapseNode: searchSchema.length > spanLength + 1,
+      collapseNode: searchSchema.length > spanLength,
       itemRender: {
         name: '$buttons',
         children: [
@@ -185,10 +185,10 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
   const tableSchema: VxeGridPropTypes.Columns = []
   // 主键ID
   if (crudSchema.primaryKey && crudSchema.primaryType) {
-    const primaryWidth =
-      (crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index')).length * 20 + 'px'
+    const primaryTitle = crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index')
+    const primaryWidth = primaryTitle.length * 30 + 'px'
     const tableSchemaItem = {
-      title: crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index'),
+      title: primaryTitle,
       field: crudSchema.primaryKey,
       type: crudSchema.primaryType ? crudSchema.primaryType : null,
       width: primaryWidth

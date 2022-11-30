@@ -2,19 +2,21 @@ import request from '@/config/axios'
 
 export interface SmsChannelVO {
   id: number
+  code: string
   status: number
   signature: string
   remark: string
   apiKey: string
   apiSecret: string
   callbackUrl: string
-  createTime: string
+  createTime: Date
 }
 
 export interface SmsChannelPageReqVO extends PageParam {
   signature?: string
   code?: string
   status?: number
+  createTime?: Date[]
 }
 
 // 查询短信渠道列表

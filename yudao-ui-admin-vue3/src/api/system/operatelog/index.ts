@@ -9,14 +9,14 @@ export type OperateLogVO = {
   name: string
   type: number
   content: string
-  exts: object
+  exts: Map<String, Object>
   requestMethod: string
   requestUrl: string
   userIp: string
   userAgent: string
   javaMethod: string
   javaMethodArgs: string
-  startTime: string
+  startTime: Date
   duration: number
   resultCode: number
   resultMsg: string
@@ -28,7 +28,7 @@ export interface OperateLogPageReqVO extends PageParam {
   userNickname?: string
   type?: number
   success?: boolean
-  startTime?: string[]
+  startTime?: Date[]
 }
 
 // 查询操作日志列表

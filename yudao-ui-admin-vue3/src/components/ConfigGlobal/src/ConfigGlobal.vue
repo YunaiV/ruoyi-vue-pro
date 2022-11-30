@@ -14,7 +14,7 @@ const { variables } = useDesign()
 const appStore = useAppStore()
 
 const props = defineProps({
-  size: propTypes.oneOf<ElementPlusSize[]>(['default', 'small', 'large']).def('default')
+  size: propTypes.oneOf<ElementPlusSize>(['default', 'small', 'large']).def('default')
 })
 
 provide('configGlobal', props)

@@ -26,7 +26,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
   primaryType: 'seq',
   primaryTitle: '用户编号',
   action: true,
-  actionWidth: '400px',
+  actionWidth: '200px',
   columns: [
     {
       title: '用户账号',
@@ -70,7 +70,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'status',
       dictType: DICT_TYPE.COMMON_STATUS,
       dictClass: 'number',
-      isSearch: true
+      isSearch: true,
+      table: {
+        slots: {
+          default: 'status_default'
+        }
+      }
     },
     {
       title: '最后登录时间',

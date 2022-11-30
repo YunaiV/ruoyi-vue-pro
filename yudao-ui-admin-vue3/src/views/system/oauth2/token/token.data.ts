@@ -23,6 +23,11 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'refreshToken'
     },
     {
+      title: '客户端编号',
+      field: 'clientId',
+      isSearch: true
+    },
+    {
       title: '用户类型',
       field: 'userType',
       dictType: DICT_TYPE.USER_TYPE,

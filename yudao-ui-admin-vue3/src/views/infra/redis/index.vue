@@ -44,18 +44,18 @@
           </el-descriptions>
         </el-card>
       </el-col>
-      <el-col :span="12" style="margin-top: 10px">
+      <el-col :span="12" class="mt-3">
         <el-card :gutter="12" shadow="hover">
-          <div ref="commandStatsRef" style="height: 350px"></div>
+          <div ref="commandStatsRef" class="h-88"></div>
         </el-card>
       </el-col>
-      <el-col :span="12" style="margin-top: 10px">
-        <el-card style="margin-left: 10px" :gutter="12" shadow="hover">
-          <div ref="usedmemory" style="height: 350px"></div>
+      <el-col :span="12" class="mt-3">
+        <el-card class="ml-3" :gutter="12" shadow="hover">
+          <div ref="usedmemory" class="h-88"></div>
         </el-card>
       </el-col>
     </el-row>
-    <el-row style="margin-top: 10px">
+    <el-row class="mt-3">
       <el-col :span="24" class="card-box" shadow="hover">
         <el-card>
           <el-table
@@ -81,7 +81,7 @@
   </el-scrollbar>
   <XModal v-model="dialogVisible" :title="keyTemplate + ' 模板'">
     <el-row>
-      <el-col :span="14" style="margin-top: 10px">
+      <el-col :span="14" class="mt-3">
         <el-card shadow="always">
           <template #header>
             <div class="card-header">
@@ -96,27 +96,23 @@
             </el-table-column>
             <el-table-column label="操作" align="right" width="60">
               <template #default="{ row }">
-                <el-button link type="primary" @click="handleDeleteKey(row)">
-                  <Icon icon="ep:delete" />
-                </el-button>
+                <XTextButton preIcon="ep:delete" @click="handleDeleteKey(row)" />
               </template>
             </el-table-column>
           </el-table>
         </el-card>
       </el-col>
-      <el-col :span="10" style="margin-top: 10px">
+      <el-col :span="10" class="mt-3">
         <el-card shadow="always">
           <template #header>
             <div class="card-header">
               <span>缓存内容</span>
-              <el-button
-                link
-                type="primary"
+              <XTextButton
+                preIcon="ep:refresh"
+                title="清理全部"
                 @click="handleDeleteKeys(keyTemplate)"
-                style="float: right; padding: 3px 0"
-              >
-                <Icon icon="ep:refresh" />清理全部
-              </el-button>
+                class="float-right p-1"
+              />
             </div>
           </template>
           <el-descriptions :column="1">

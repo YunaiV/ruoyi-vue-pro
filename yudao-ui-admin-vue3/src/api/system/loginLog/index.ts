@@ -4,19 +4,20 @@ export interface LoginLogVO {
   id: number
   logType: number
   traceId: number
+  userId: number
   userType: number
   username: string
   status: number
   userIp: string
   userAgent: string
-  createTime: string
+  createTime: Date
 }
 
 export interface LoginLogReqVO extends PageParam {
   userIp?: string
   username?: string
   status?: boolean
-  createTime?: string[]
+  createTime?: Date[]
 }
 
 // 查询登录日志列表

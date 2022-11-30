@@ -7,7 +7,7 @@ export interface PostVO {
   sort: number
   status: number
   remark: string
-  createTime?: string
+  createTime?: Date
 }
 
 export interface PostPageReqVO extends PageParam {

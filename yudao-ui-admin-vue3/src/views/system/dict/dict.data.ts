@@ -42,23 +42,23 @@ export const crudSchemas = reactive<VxeCrudSchema>({
         componentProps: {
           options: [
             {
-              title: 'default',
+              label: 'default',
               value: ''
             },
             {
-              title: 'success',
+              label: 'success',
               value: 'success'
             },
             {
-              title: 'info',
+              label: 'info',
               value: 'info'
             },
             {
-              title: 'warning',
+              label: 'warning',
               value: 'warning'
             },
             {
-              title: 'danger',
+              label: 'danger',
               value: 'danger'
             }
           ]

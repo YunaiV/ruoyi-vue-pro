@@ -21,6 +21,11 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'templateContent'
     },
     {
+      title: '模板编号',
+      field: 'templateId',
+      isSearch: true
+    },
+    {
       title: '短信渠道',
       field: 'channelId',
       dictType: DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE,
@@ -35,16 +40,15 @@ const crudSchemas = reactive<VxeCrudSchema>({
       isSearch: true
     },
     {
-      title: '接收状态',
-      field: 'receiveStatus',
-      dictType: DICT_TYPE.SYSTEM_SMS_RECEIVE_STATUS,
-      dictClass: 'number',
-      isSearch: true
-    },
-    {
-      title: '模板编号',
-      field: 'templateId',
-      isSearch: true
+      title: '发送时间',
+      field: 'sendTime',
+      formatter: 'formatDate',
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
+      }
     },
     {
       title: '短信类型',
@@ -54,12 +58,15 @@ const crudSchemas = reactive<VxeCrudSchema>({
       isSearch: true
     },
     {
-      title: '接收时间',
-      field: 'receiveTime'
+      title: '接收状态',
+      field: 'receiveStatus',
+      dictType: DICT_TYPE.SYSTEM_SMS_RECEIVE_STATUS,
+      dictClass: 'number',
+      isSearch: true
     },
     {
-      title: t('common.createTime'),
-      field: 'createTime',
+      title: '接收时间',
+      field: 'receiveTime',
       formatter: 'formatDate',
       search: {
         show: true,
@@ -67,6 +74,11 @@ const crudSchemas = reactive<VxeCrudSchema>({
           name: 'XDataTimePicker'
         }
       }
+    },
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate'
     }
   ]
 })

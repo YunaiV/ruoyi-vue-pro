@@ -35,21 +35,11 @@
           v-hasPermi="['infra:job:update']"
           @click="handleUpdate(row.id)"
         />
-        <el-button
-          link
-          type="primary"
+        <XTextButton
+          preIcon="ep:edit"
+          :title="row.status === InfraJobStatusEnum.STOP ? '开启' : '暂停'"
           v-hasPermi="['infra:job:update']"
           @click="handleChangeStatus(row)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" />
-          {{ row.status === InfraJobStatusEnum.STOP ? '开启' : '暂停' }}
-        </el-button>
-        <!-- 操作：详情 -->
-        <XTextButton
-          preIcon="ep:view"
-          :title="t('action.detail')"
-          v-hasPermi="['infra:job:query']"
-          @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->
         <XTextButton
@@ -58,21 +48,40 @@
           v-hasPermi="['infra:job:delete']"
           @click="handleDelete(row.id)"
         />
-        <!-- 操作：执行 -->
-        <XTextButton
-          preIcon="ep:view"
-          title="执行一次"
-          v-hasPermi="['infra:job:trigger']"
-          @click="handleRun(row)"
-        />
-        <!-- 操作：日志 -->
-        <XTextButton
-          preIcon="ep:view"
-          title="调度日志"
-          v-hasPermi="['infra:job:query']"
-          @click="handleJobLog(row.id)"
-        />
-        <!-- TODO @星语：执行一次、任务详情、调度日志，可以收成【更多】 -->
+        <el-dropdown class="p-0.5" v-hasPermi="['infra:job:trigger', 'infra:job:query']">
+          <XTextButton title="更多" postIcon="ep:arrow-down" />
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>
+                <!-- 操作：执行 -->
+                <XTextButton
+                  preIcon="ep:view"
+                  title="执行一次"
+                  v-hasPermi="['infra:job:trigger']"
+                  @click="handleRun(row)"
+                />
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <!-- 操作：详情 -->
+                <XTextButton
+                  preIcon="ep:view"
+                  :title="t('action.detail')"
+                  v-hasPermi="['infra:job:query']"
+                  @click="handleDetail(row.id)"
+                />
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <!-- 操作：日志 -->
+                <XTextButton
+                  preIcon="ep:view"
+                  title="调度日志"
+                  v-hasPermi="['infra:job:query']"
+                  @click="handleJobLog(row.id)"
+                />
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </template>
     </vxe-grid>
   </ContentWrap>
@@ -100,7 +109,9 @@
       <template #monitorTimeout="{ row }">
         <span>{{ row.monitorTimeout > 0 ? row.monitorTimeout + ' 毫秒' : '未开启' }}</span>
       </template>
-      <!-- TODO @星语：有个【后续执行时间】字段：2022-11-26 23:03:16; 2022-11-26 23:03:17; 2022-11-26 23:03:18; 2022-11-26 23:03:19; 2022-11-26 23:03:20 -->
+      <template #nextTimes>
+        <span>{{ Array.from(nextTimes, (x) => parseTime(x)).join('; ') }}</span>
+      </template>
     </Descriptions>
     <!-- 操作按钮 -->
     <template #footer>
@@ -120,6 +131,7 @@
 <script setup lang="ts" name="Job">
 import { ref, unref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
@@ -151,6 +163,7 @@ const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormExpose>() // 表单 Ref
 const detailRef = ref() // 详情 Ref
 const cronExpression = ref('')
+const nextTimes = ref([])
 const shortcuts = ref([
   {
     text: '每天8点和12点 (自定义追加)',
@@ -169,10 +182,12 @@ const handleCreate = () => {
   cronExpression.value = ''
   setDialogTile('create')
 }
+
 // 导出操作
 const handleExport = async () => {
   await exportList(xGrid, '定时任务.xls')
 }
+
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -187,8 +202,57 @@ const handleDetail = async (rowId: number) => {
   // 设置数据
   const res = await JobApi.getJobApi(rowId)
   detailRef.value = res
+  // 后续执行时长
+  const jobNextTime = await JobApi.getJobNextTimesApi(rowId)
+  nextTimes.value = jobNextTime
   setDialogTile('detail')
 }
+
+const parseTime = (time) => {
+  if (!time) {
+    return null
+  }
+  const format = '{y}-{m}-{d} {h}:{i}:{s}'
+  let date
+  if (typeof time === 'object') {
+    date = time
+  } else {
+    if (typeof time === 'string' && /^[0-9]+$/.test(time)) {
+      time = parseInt(time)
+    } else if (typeof time === 'string') {
+      time = time
+        .replace(new RegExp(/-/gm), '/')
+        .replace('T', ' ')
+        .replace(new RegExp(/\.[\d]{3}/gm), '')
+    }
+    if (typeof time === 'number' && time.toString().length === 10) {
+      time = time * 1000
+    }
+    date = new Date(time)
+  }
+  const formatObj = {
+    y: date.getFullYear(),
+    m: date.getMonth() + 1,
+    d: date.getDate(),
+    h: date.getHours(),
+    i: date.getMinutes(),
+    s: date.getSeconds(),
+    a: date.getDay()
+  }
+  const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+    let value = formatObj[key]
+    // Note: getDay() returns 0 on Sunday
+    if (key === 'a') {
+      return ['日', '一', '二', '三', '四', '五', '六'][value]
+    }
+    if (result.length > 0 && value < 10) {
+      value = '0' + value
+    }
+    return value || 0
+  })
+  return time_str
+}
+
 // 删除操作
 const handleDelete = async (rowId: number) => {
   await deleteData(xGrid, rowId)

@@ -43,6 +43,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: t('form.remark'),
       field: 'remark',
       isTable: false,
+      isSearch: true,
       form: {
         component: 'Input',
         componentProps: {
@@ -58,7 +59,13 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '创建时间',
       field: 'createTime',
       formatter: 'formatDate',
-      isForm: false
+      isForm: false,
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
+      }
     }
   ]
 })

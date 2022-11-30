@@ -10,9 +10,8 @@ import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessageListener;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisServerCommands;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
@@ -35,9 +34,8 @@ import java.util.Properties;
  *
  * @author 芋道源码
  */
-@Configuration(proxyBeanMethods = false)
-@AutoConfigureAfter(YudaoRedisAutoConfiguration.class)
 @Slf4j
+@AutoConfiguration(after = YudaoRedisAutoConfiguration.class)
 public class YudaoMQAutoConfiguration {
 
     @Bean

@@ -175,6 +175,14 @@ VXETable.formats.mixin({
   // 格式化图片，将图片链接转换为html标签
   formatImg({ cellValue }) {
     return '<img height="40" src="' + cellValue + '"> '
+  },
+  // 格式化文件大小
+  formatSize({ cellValue }, digits = 0) {
+    const unitArr = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    const srcSize = parseFloat(cellValue)
+    const index = Math.floor(Math.log(srcSize) / Math.log(1024))
+    const size = srcSize / Math.pow(1024, index)
+    return XEUtils.toFixed(XEUtils.floor(size, 2), 2) + ' ' + unitArr[digits]
   }
 })
 export const setupVxeTable = (app: App<Element>) => {

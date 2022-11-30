@@ -44,7 +44,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
   /**
    * grid options 初始化
    */
-  const gridOptions = reactive<VxeGridProps>({
+  const gridOptions = reactive<VxeGridProps<any>>({
     loading: true,
     size: currentSize as any,
     height: 730, // 1080高度
@@ -85,6 +85,15 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
           gridOptions.loading = false
           return new Promise(async (resolve) => {
             resolve(await config?.getListApi(queryParams))
+          })
+        },
+        delete: ({ body }) => {
+          return new Promise(async (resolve) => {
+            if (config?.deleteApi) {
+              resolve(await config?.deleteApi(JSON.stringify(body)))
+            } else {
+              Promise.reject('未设置deleteApi')
+            }
           })
         },
         queryAll: ({ form }) => {
@@ -196,16 +205,12 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
     }
     await nextTick()
     return new Promise(async () => {
-      message
-        .delConfirm()
-        .then(() => {
-          config?.deleteApi && config?.deleteApi(ids)
-          message.success(t('common.delSuccess'))
-        })
-        .finally(async () => {
-          // 刷新列表
-          ref.value.commitProxy('query')
-        })
+      message.delConfirm().then(async () => {
+        await (config?.deleteApi && config?.deleteApi(ids))
+        message.success(t('common.delSuccess'))
+        // 刷新列表
+        ref.value.commitProxy('query')
+      })
     })
   }
   /**

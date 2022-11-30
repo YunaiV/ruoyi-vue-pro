@@ -8,9 +8,7 @@ export interface NoticeVO {
   status: number
   remark: string
   creator: string
-  createTime: string
-  updater: string
-  updateTime: string
+  createTime: Date
 }
 
 export interface NoticePageReqVO extends PageParam {

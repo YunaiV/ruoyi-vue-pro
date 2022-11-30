@@ -43,6 +43,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
       isForm: false,
       table: {
         width: 150
+      },
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
       }
     },
     {

@@ -7,8 +7,8 @@
       </el-radio-group>
     </template>
   </Form>
-  <el-button type="primary" @click="submit()">{{ t('common.save') }}</el-button>
-  <el-button type="danger" @click="init()">{{ t('common.reset') }}</el-button>
+  <XButton :title="t('common.save')" @click="submit()" />
+  <XButton type="danger" :title="t('common.reset')" @click="init()" />
 </template>
 <script setup lang="ts">
 import { reactive, onMounted, unref, ref } from 'vue'

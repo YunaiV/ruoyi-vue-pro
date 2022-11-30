@@ -48,6 +48,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'type',
       dictType: DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE,
       dictClass: 'number',
+      isSearch: true,
       table: {
         width: 80
       }
@@ -57,6 +58,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'status',
       dictType: DICT_TYPE.COMMON_STATUS,
       dictClass: 'number',
+      isSearch: true,
       table: {
         width: 80
       }

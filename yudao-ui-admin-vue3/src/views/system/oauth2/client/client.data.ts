@@ -12,7 +12,6 @@ export const rules = reactive({
   clientId: [required],
   secret: [required],
   name: [required],
-  logo: [required],
   status: [required],
   accessTokenValiditySeconds: [required],
   refreshTokenValiditySeconds: [required],

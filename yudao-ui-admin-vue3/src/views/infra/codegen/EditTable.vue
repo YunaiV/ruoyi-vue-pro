@@ -1,5 +1,5 @@
 <template>
-  <ContentDetailWrap title="代码生成" @back="push('/infra/codegen')">
+  <ContentDetailWrap :title="title" @back="push('/infra/codegen')">
     <el-tabs v-model="activeName">
       <el-tab-pane label="基本信息" name="basicInfo">
         <BasicInfoForm ref="basicInfoRef" :basicInfo="tableCurrentRow" />
@@ -31,22 +31,25 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 const { push } = useRouter()
 const { query } = useRoute()
+const loading = ref(false)
+const title = ref('代码生成')
+const activeName = ref('cloum')
+const cloumInfoRef = ref(null)
 const tableCurrentRow = ref<CodegenTableVO>()
 const cloumCurrentRow = ref<CodegenColumnVO[]>([])
+const basicInfoRef = ref<ComponentRef<typeof BasicInfoForm>>()
+const genInfoRef = ref<ComponentRef<typeof GenInfoForm>>()
+
 const getList = async () => {
   const id = query.id as unknown as number
   if (id) {
     // 获取表详细信息
     const res = await getCodegenTableApi(id)
     tableCurrentRow.value = res.table
+    title.value = '修改[ ' + res.table.tableName + ' ]生成配置'
     cloumCurrentRow.value = res.columns
   }
 }
-const loading = ref(false)
-const activeName = ref('cloum')
-const basicInfoRef = ref<ComponentRef<typeof BasicInfoForm>>()
-const genInfoRef = ref<ComponentRef<typeof GenInfoForm>>()
-const cloumInfoRef = ref(null)
 const submitForm = async () => {
   const basicInfo = unref(basicInfoRef)
   const genInfo = unref(genInfoRef)

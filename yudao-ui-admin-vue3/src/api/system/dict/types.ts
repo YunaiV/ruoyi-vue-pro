@@ -4,21 +4,21 @@ export type DictTypeVO = {
   type: string
   status: number
   remark: string
-  createTime: string
+  createTime: Date
 }
 
 export type DictTypePageReqVO = {
   name: string
   type: string
   status: number
-  createTime: []
+  createTime: Date[]
 }
 
 export type DictTypeExportReqVO = {
   name: string
   type: string
   status: number
-  createTime: []
+  createTime: Date[]
 }
 
 export type DictDataVO = {
@@ -31,7 +31,7 @@ export type DictDataVO = {
   colorType: string
   cssClass: string
   remark: string
-  createTime: string
+  createTime: Date
 }
 export type DictDataPageReqVO = {
   label: string

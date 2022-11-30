@@ -1,31 +1,37 @@
 import request from '@/config/axios'
 
-export interface ConfigType {
+export interface FileClientConfig {
   basePath: string
-  host: string
-  port: string
-  username: string
-  password: string
-  mode: string
-  endpoint: string
-  bucket: string
-  accessKey: string
-  accessSecret: string
+  host?: string
+  port?: number
+  username?: string
+  password?: string
+  mode?: string
+  endpoint?: string
+  bucket?: string
+  accessKey?: string
+  accessSecret?: string
   domain: string
 }
 export interface FileConfigVO {
   id: number
   name: string
-  storage: string
+  storage: number
   master: boolean
   visible: boolean
-  config: ConfigType
+  config: FileClientConfig
   remark: string
-  createTime: string
+  createTime: Date
+}
+
+export interface FileConfigPageReqVO extends PageParam {
+  name?: string
+  storage?: number
+  createTime?: Date[]
 }
 
 // 查询文件配置列表
-export const getFileConfigPageApi = (params) => {
+export const getFileConfigPageApi = (params: FileConfigPageReqVO) => {
   return request.get({ url: '/infra/file-config/page', params })
 }
 

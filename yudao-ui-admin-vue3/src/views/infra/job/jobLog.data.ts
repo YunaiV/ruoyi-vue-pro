@@ -41,7 +41,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       search: {
         show: true,
         itemRender: {
-          name: 'XDataTimePicker'
+          name: 'XDataPicker'
         }
       }
     },
@@ -53,7 +53,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       search: {
         show: true,
         itemRender: {
-          name: 'XDataTimePicker'
+          name: 'XDataPicker'
         }
       }
     },

@@ -8,12 +8,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @Slf4j
 public class YudaoJacksonAutoConfiguration {
 

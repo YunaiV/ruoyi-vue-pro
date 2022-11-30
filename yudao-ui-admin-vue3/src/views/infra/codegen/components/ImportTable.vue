@@ -28,7 +28,6 @@
         <XButton preIcon="ep:refresh-right" :title="t('common.reset')" @click="resetQuery()" />
       </el-form-item>
     </el-form>
-    <!-- TODO 星语：【暗黑模式】选中后，样式有点不太好看 -->
     <vxe-table
       ref="xTable"
       :data="dbTableList"

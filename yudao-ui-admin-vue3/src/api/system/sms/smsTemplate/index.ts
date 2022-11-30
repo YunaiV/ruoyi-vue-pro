@@ -11,17 +11,38 @@ export interface SmsTemplateVO {
   apiTemplateId: string
   channelId: number
   channelCode: string
-  createTime: string
+  params: string[]
+  createTime: Date
 }
 
-export type SmsSendVO = {
+export interface SendSmsReqVO {
   mobile: string
   templateCode: string
-  templateParams: string
+  templateParams: Map<String, Object>
+}
+
+export interface SmsTemplatePageReqVO {
+  type?: number
+  status?: number
+  code?: string
+  content?: string
+  apiTemplateId?: string
+  channelId?: number
+  createTime?: Date[]
+}
+
+export interface SmsTemplateExportReqVO {
+  type?: number
+  status?: number
+  code?: string
+  content?: string
+  apiTemplateId?: string
+  channelId?: number
+  createTime?: Date[]
 }
 
 // 查询短信模板列表
-export const getSmsTemplatePageApi = (params) => {
+export const getSmsTemplatePageApi = (params: SmsTemplatePageReqVO) => {
   return request.get({ url: '/system/sms-template/page', params })
 }
 
@@ -46,12 +67,12 @@ export const deleteSmsTemplateApi = (id: number) => {
 }
 
 // 发送短信
-export const sendSmsApi = (data) => {
+export const sendSmsApi = (data: SendSmsReqVO) => {
   return request.post({ url: '/system/sms-template/send-sms', data })
 }
 
 // 导出短信模板
-export const exportPostApi = (params) => {
+export const exportPostApi = (params: SmsTemplateExportReqVO) => {
   return request.download({
     url: '/system/sms-template/export-excel',
     params

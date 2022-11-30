@@ -4,10 +4,10 @@ import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -32,7 +32,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 

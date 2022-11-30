@@ -2,26 +2,28 @@ import request from '@/config/axios'
 
 export interface ConfigVO {
   id: number
-  group: string
+  category: string
   name: string
   key: string
   value: string
-  type: string
+  type: number
   visible: boolean
   remark: string
-  createTime: string
+  createTime: Date
 }
 
 export interface ConfigPageReqVO extends PageParam {
   name?: string
+  key?: string
   type?: number
-  createTime?: string[]
+  createTime?: Date[]
 }
 
 export interface ConfigExportReqVO {
   name?: string
+  key?: string
   type?: number
-  createTime?: string[]
+  createTime?: Date[]
 }
 
 // 查询参数列表

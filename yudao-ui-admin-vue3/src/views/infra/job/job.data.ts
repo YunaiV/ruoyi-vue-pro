@@ -18,21 +18,20 @@ const crudSchemas = reactive<VxeCrudSchema>({
   primaryType: 'seq',
   primaryTitle: '任务编号',
   action: true,
-  actionWidth: '500px',
+  actionWidth: '280px',
   columns: [
     {
       title: '任务名称',
       field: 'name',
-      search: {
-        show: true
-      }
+      isSearch: true
     },
     {
       title: t('common.status'),
       field: 'status',
       dictType: DICT_TYPE.INFRA_JOB_STATUS,
       dictClass: 'number',
-      isForm: false
+      isForm: false,
+      isSearch: true
     },
     {
       title: '处理器的名字',
@@ -47,6 +46,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: 'CRON 表达式',
       field: 'cronExpression'
+    },
+    {
+      title: '后续执行时间',
+      field: 'nextTimes',
+      isTable: false,
+      isForm: false
     },
     {
       title: '重试次数',

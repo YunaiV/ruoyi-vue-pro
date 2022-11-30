@@ -2,30 +2,48 @@ import request from '@/config/axios'
 
 export interface SmsLogVO {
   id: number
-  idchannelId: number
+  channelId: number
+  channelCode: string
   templateId: number
+  templateCode: string
+  templateType: number
+  templateContent: string
+  templateParams: Map<string, object>
   mobile: string
   userId: number
   userType: number
   sendStatus: number
+  sendTime: Date
+  sendCode: number
+  sendMsg: string
+  apiSendCode: string
+  apiSendMsg: string
+  apiRequestId: string
+  apiSerialNo: string
   receiveStatus: number
-  templateType: number
-  templateContent: string
-  templateParams: Map<string, object>
-  apiTemplateId: string
-  sendTime: string
-  createTime: string
+  receiveTime: Date
+  apiReceiveCode: string
+  apiReceiveMsg: string
+  createTime: Date
 }
 
 export interface SmsLogPageReqVO extends PageParam {
-  signature?: string
-  code?: string
-  status?: number
+  channelId?: number
+  templateId?: number
+  mobile?: string
+  sendStatus?: number
+  sendTime?: Date[]
+  receiveStatus?: number
+  receiveTime?: Date[]
 }
 export interface SmsLogExportReqVO {
-  code?: string
-  name?: string
-  status?: number
+  channelId?: number
+  templateId?: number
+  mobile?: string
+  sendStatus?: number
+  sendTime?: Date[]
+  receiveStatus?: number
+  receiveTime?: Date[]
 }
 
 // 查询短信日志列表

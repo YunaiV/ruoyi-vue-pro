@@ -24,30 +24,27 @@
         <span>{{ row.visible ? '是' : '否' }} </span>
       </template>
       <template #actionbtns_default="{ row }">
-        <el-button
-          link
-          type="primary"
+        <!-- 操作：修改 -->
+        <XTextButton
+          preIcon="ep:edit"
+          :title="t('action.edit')"
           v-hasPermi="['infra:config:update']"
           @click="handleUpdate(row.id)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['infra:config:update']"
+        />
+        <!-- 操作：详情 -->
+        <XTextButton
+          preIcon="ep:view"
+          :title="t('action.detail')"
+          v-hasPermi="['infra:config:query']"
           @click="handleDetail(row.id)"
-        >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
+        />
+        <!-- 操作：删除 -->
+        <XTextButton
+          preIcon="ep:delete"
+          :title="t('action.del')"
           v-hasPermi="['infra:config:delete']"
           @click="handleDelete(row.id)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
+        />
       </template>
     </vxe-grid>
   </ContentWrap>
