@@ -1,5 +1,5 @@
 {
-  "name": "ruoyi-vue-pro-vue3",
+  "name": "yudao-ui-admin-vue3",
   "version": "1.6.5.1863",
   "description": "基于vue3、vite3、element-plus、typesScript",
   "author": "xingyu",
@@ -116,7 +116,7 @@
     "url": "git+https://gitee.com/zhijiantianya/ruoyi-vue-pro"
   },
   "bugs": {
-    "url": "https://gitee.com/zhijiantianya/ruoyi-vue-pro/issues/I57XOQ"
+    "url": "https://gitee.com/zhijiantianya/ruoyi-vue-pro/issues"
   },
   "homepage": "https://gitee.com/zhijiantianya/ruoyi-vue-pro"
 }
