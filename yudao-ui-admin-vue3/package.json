@@ -1,6 +1,6 @@
 {
   "name": "yudao-ui-admin-vue3",
-  "version": "1.6.5.1863",
+  "version": "1.6.5.1864",
   "description": "基于vue3、vite3、element-plus、typesScript",
   "author": "xingyu",
   "private": false,
@@ -21,8 +21,7 @@
     "lint:format": "prettier --write --loglevel warn \"src/**/*.{js,ts,json,tsx,css,less,scss,vue,html,md}\"",
     "lint:style": "stylelint --fix \"**/*.{vue,less,postcss,css,scss}\" --cache --cache-location node_modules/.cache/stylelint/",
     "lint:lint-staged": "lint-staged -c ",
-    "lint:pretty": "pretty-quick --staged",
-    "p": "plop"
+    "lint:pretty": "pretty-quick --staged"
   },
   "dependencies": {
     "@iconify/iconify": "^3.0.1",
@@ -78,7 +77,6 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.8.0",
     "lint-staged": "^13.0.4",
-    "plop": "^3.1.1",
     "postcss": "^8.4.19",
     "postcss-html": "^1.5.0",
     "postcss-scss": "^4.0.6",
