@@ -150,11 +150,11 @@ import {
   ElDivider,
   ElLoading
 } from 'element-plus'
-import Cookies from 'js-cookie'
 import { useRouter } from 'vue-router'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useIcon } from '@/hooks/web/useIcon'
+import { useCache } from '@/hooks/web/useCache'
 import { required } from '@/utils/formRules'
 import { setToken, setTenantId } from '@/utils/auth'
 import { decrypt, encrypt } from '@/utils/jsencrypt'
@@ -166,6 +166,7 @@ import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'
 
 const { t } = useI18n()
 const formLogin = ref()
+const { wsCache } = useCache()
 const { validForm } = useFormValid(formLogin)
 const { setLoginState, getLoginState } = useLoginState()
 const { currentRoute, push } = useRouter()
@@ -194,10 +195,10 @@ const loginData = reactive({
     signIn: false
   },
   loginForm: {
-    tenantName: Cookies.get('tenantName') ? Cookies.get('tenantName') : '芋道源码',
-    username: Cookies.get('username') ? Cookies.get('username') : 'admin',
-    password: Cookies.get('password')
-      ? (decrypt(Cookies.get('password')) as unknown as string)
+    tenantName: wsCache.get('tenantName') ? wsCache.get('tenantName') : '芋道源码',
+    username: wsCache.get('username') ? wsCache.get('username') : 'admin',
+    password: wsCache.get('password')
+      ? (decrypt(wsCache.get('password')) as unknown as string)
       : 'admin123',
     captchaVerification: '',
     rememberMe: false
@@ -222,12 +223,12 @@ const getTenantId = async () => {
 }
 // 记住我
 const getCookie = () => {
-  const username = Cookies.get('username')
-  const password = Cookies.get('password')
-    ? (decrypt(Cookies.get('password')) as unknown as string)
+  const username = wsCache.get('username')
+  const password = wsCache.get('password')
+    ? (decrypt(wsCache.get('password')) as unknown as string)
     : undefined
-  const rememberMe = Cookies.get('rememberMe')
-  const tenantName = Cookies.get('tenantName')
+  const rememberMe = wsCache.get('rememberMe')
+  const tenantName = wsCache.get('tenantName')
   loginData.loginForm = {
     ...loginData.loginForm,
     username: username ? username : loginData.loginForm.username,
@@ -256,17 +257,17 @@ const handleLogin = async (params) => {
       background: 'rgba(0, 0, 0, 0.7)'
     })
     if (loginData.loginForm.rememberMe) {
-      Cookies.set('username', loginData.loginForm.username, { expires: 30 })
-      Cookies.set('password', encrypt(loginData.loginForm.password as unknown as string), {
-        expires: 30
+      wsCache.set('username', loginData.loginForm.username, { exp: 30 * 24 * 60 * 60 })
+      wsCache.set('password', encrypt(loginData.loginForm.password as unknown as string), {
+        exp: 30
       })
-      Cookies.set('rememberMe', loginData.loginForm.rememberMe, { expires: 30 })
-      Cookies.set('tenantName', loginData.loginForm.tenantName, { expires: 30 })
+      wsCache.set('rememberMe', loginData.loginForm.rememberMe, { exp: 30 * 24 * 60 * 60 })
+      wsCache.set('tenantName', loginData.loginForm.tenantName, { exp: 30 * 24 * 60 * 60 })
     } else {
-      Cookies.remove('username')
-      Cookies.remove('password')
-      Cookies.remove('rememberMe')
-      Cookies.remove('tenantName')
+      wsCache.delete('username')
+      wsCache.delete('password')
+      wsCache.delete('rememberMe')
+      wsCache.delete('tenantName')
     }
     setToken(res)
     if (!redirect.value) {
