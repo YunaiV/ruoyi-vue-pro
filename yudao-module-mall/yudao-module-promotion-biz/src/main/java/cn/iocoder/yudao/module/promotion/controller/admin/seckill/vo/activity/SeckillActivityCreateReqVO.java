@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -28,8 +28,8 @@ public class SeckillActivityCreateReqVO extends SeckillActivityBaseVO {
 
     // TODO halfninety：直接使用数组接口。timeIds，
     @ApiModelProperty(value = "秒杀时段id", required = true)
-    @NotBlank(message = "参与场次不能为空")
-    private String timeId;
+    @NotEmpty(message = "参与场次不能为空")
+    private List<Long> timeIds;
 
     /**
      * 商品列表

@@ -1,14 +1,11 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time;
 
 import lombok.*;
 
 import java.time.LocalTime;
-import java.util.*;
+
 import io.swagger.annotations.*;
 import javax.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
 * 秒杀时段 Base VO，提供给添加、修改、详细的子 VO 使用

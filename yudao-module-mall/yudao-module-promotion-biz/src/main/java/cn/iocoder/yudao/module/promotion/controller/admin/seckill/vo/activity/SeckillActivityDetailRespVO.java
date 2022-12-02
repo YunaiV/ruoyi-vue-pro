@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;

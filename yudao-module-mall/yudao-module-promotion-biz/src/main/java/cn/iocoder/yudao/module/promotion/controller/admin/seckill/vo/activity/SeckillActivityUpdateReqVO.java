@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -29,8 +29,8 @@ public class SeckillActivityUpdateReqVO extends SeckillActivityBaseVO {
     private Integer sort;
 
     @ApiModelProperty(value = "秒杀时段id", required = true)
-    @NotNull(message = "秒杀时段id不能为空")
-    private String timeId;
+    @NotEmpty(message = "秒杀时段id不能为空")
+    private List<Long> timeIds;
 
     /**
      * 商品列表

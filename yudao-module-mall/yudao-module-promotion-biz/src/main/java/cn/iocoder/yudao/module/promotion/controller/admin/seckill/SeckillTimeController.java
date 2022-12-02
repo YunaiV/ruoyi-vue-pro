@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time.SeckillTimeCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time.SeckillTimeRespVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time.SeckillTimeUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckilltime.SeckillTimeConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckilltime.SeckillTimeDO;
 import cn.iocoder.yudao.module.promotion.service.seckill.seckilltime.SeckillTimeService;
@@ -20,7 +20,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-// TODO @halfninety：controller 可以都放在 seckill 包下；vo 下分成 actvity 和 time
 @Api(tags = "管理后台 - 秒杀时段")
 @RestController
 @RequestMapping("/promotion/seckill-time")
@@ -65,20 +64,9 @@ public class SeckillTimeController {
 
     @GetMapping("/list")
     @ApiOperation("获得所有秒杀时段列表")
-//    @PreAuthorize("@ss.hasPermission('promotion:seckill-time:query')")
-    // TODO @halfninety：权限为啥注释掉呀？
+    @PreAuthorize("@ss.hasPermission('promotion:seckill-time:query')")
     public CommonResult<List<SeckillTimeRespVO>> getSeckillTimeList() {
         List<SeckillTimeDO> list = seckillTimeService.getSeckillTimeList();
         return success(SeckillTimeConvert.INSTANCE.convertList(list));
     }
-
-    // TODO @halfninety：不用的，可以删除掉
-//    @GetMapping("/page")
-//    @ApiOperation("获得秒杀时段分页")
-//    @PreAuthorize("@ss.hasPermission('promotion:seckill-time:query')")
-//    public CommonResult<PageResult<SeckillTimeRespVO>> getSeckillTimePage(@Valid SeckillTimePageReqVO pageVO) {
-//        PageResult<SeckillTimeDO> pageResult = seckillTimeService.getSeckillTimePage(pageVO);
-//        return success(SeckillTimeConvert.INSTANCE.convertPage(pageResult));
-//    }
-
 }

@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity;
 import java.util.*;
 import javax.validation.*;
 
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo.SeckillActivityCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo.SeckillActivityPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo.SeckillActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.
 /**
  * 秒杀活动 Service 接口
  *
- * @author 芋道源码
+ * @author halfninety
  */
 public interface SeckillActivityService {
 
@@ -34,6 +34,7 @@ public interface SeckillActivityService {
 
     /**
      * 关闭秒杀活动
+     *
      * @param id 编号
      */
     void closeSeckillActivity(Long id);
@@ -71,6 +72,7 @@ public interface SeckillActivityService {
 
     /**
      * 通过活动编号获取活动商品
+     *
      * @param id 活动编号
      * @return 活动商品列表
      */

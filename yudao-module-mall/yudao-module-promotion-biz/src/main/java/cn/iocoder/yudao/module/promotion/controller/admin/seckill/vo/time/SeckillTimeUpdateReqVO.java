@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

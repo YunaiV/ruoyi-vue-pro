@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time;
 
 import lombok.*;
 import java.util.*;

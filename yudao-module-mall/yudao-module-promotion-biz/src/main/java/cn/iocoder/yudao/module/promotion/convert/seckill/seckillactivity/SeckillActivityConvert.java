@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo.*;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.*;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
 import org.mapstruct.Mapper;
@@ -27,7 +28,7 @@ public interface SeckillActivityConvert {
 
     SeckillActivityDO convert(SeckillActivityCreateReqVO bean);
 
-    default String map(Long[] value){
+    default String map(Long[] value) {
         return value.toString();
     }
 
@@ -39,7 +40,7 @@ public interface SeckillActivityConvert {
 
     PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
 
-    @Mappings({@Mapping(target = "products",source = "seckillProducts")})
+    @Mappings({@Mapping(target = "products", source = "seckillProducts")})
     SeckillActivityDetailRespVO convert(SeckillActivityDO seckillActivity, List<SeckillProductDO> seckillProducts);
 
 
@@ -56,7 +57,6 @@ public interface SeckillActivityConvert {
                 && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice())
                 && ObjectUtil.equals(productDO.getStock(), productVO.getStock())
                 && ObjectUtil.equals(productDO.getLimitBuyCount(), productVO.getLimitBuyCount());
-
     }
 
     /**
@@ -73,5 +73,10 @@ public interface SeckillActivityConvert {
                 && ObjectUtil.equals(productDO.getStock(), productVO.getStock())
                 && ObjectUtil.equals(productDO.getLimitBuyCount(), productVO.getLimitBuyCount());
 
+    }
+
+    default List<SeckillProductDO> convertList(List<SeckillActivityBaseVO.Product> products, Long seckillActivityId, List<Long> timeIds) {
+        return CollectionUtils.convertList(products, product -> convert(product)
+                .setActivityId(seckillActivityId).setTimeIds(timeIds));
     }
 }

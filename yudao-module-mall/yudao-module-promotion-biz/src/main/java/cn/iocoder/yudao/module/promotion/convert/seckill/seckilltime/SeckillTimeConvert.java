@@ -4,9 +4,9 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time.SeckillTimeCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time.SeckillTimeRespVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time.SeckillTimeUpdateReqVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckilltime.SeckillTimeDO;

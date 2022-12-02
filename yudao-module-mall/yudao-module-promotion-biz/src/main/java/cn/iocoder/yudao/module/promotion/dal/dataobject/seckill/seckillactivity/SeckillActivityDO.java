@@ -9,11 +9,12 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 秒杀活动 DO
  *
- * @author 芋道源码
+ * @author halfninety
  */
 @TableName("promotion_seckill_activity")
 @KeySequence("promotion_seckill_activity_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -59,8 +60,7 @@ public class SeckillActivityDO extends BaseDO {
     /**
      * 秒杀时段 id
      */
-    // TODO @halfninety 可以使用 List 存储；看下别的模块怎么做的哈
-    private String timeId;
+    private List<Long> timeIds;
     /**
      * 付款订单数
      */
@@ -69,10 +69,9 @@ public class SeckillActivityDO extends BaseDO {
      * 付款人数
      */
     private Integer userCount;
-    // TODO @halfninety 使用 Long 哈。单位是分
     /**
      * 订单实付金额，单位：分
      */
-    private BigDecimal totalPrice;
+    private Long totalPrice;
 
 }

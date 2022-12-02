@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
@@ -26,15 +26,5 @@ public class SeckillTimePageReqVO extends PageParam {
     @ApiModelProperty(value = "结束时间点")
     @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime endTime;
-
-
-
-
-
-
-
-//    @ApiModelProperty(value = "创建时间")
-//    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-//    private Date[] createTime;
 
 }

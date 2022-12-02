@@ -5,16 +5,21 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
 
 /**
  * 秒杀参与商品
+ *
+ * @author halfninety
  * @TableName promotion_seckill_product
  */
-@TableName(value ="promotion_seckill_product")
+@TableName(value = "promotion_seckill_product")
 @Data
 public class SeckillProductDO extends BaseDO {
     /**
@@ -31,7 +36,7 @@ public class SeckillProductDO extends BaseDO {
     /**
      * 秒杀时段id
      */
-    private Long timeId;
+    private List<Long> timeIds;
 
     /**
      * 商品id
