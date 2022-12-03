@@ -24,11 +24,11 @@ public class SeckillActivityUpdateReqVO extends SeckillActivityBaseVO {
     @ApiModelProperty(value = "备注", example = "限时秒杀活动")
     private String remark;
 
-    @ApiModelProperty(value = "排序", required = true)
+    @ApiModelProperty(value = "排序", required = true, example = "1")
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
-    @ApiModelProperty(value = "秒杀时段id", required = true)
+    @ApiModelProperty(value = "秒杀时段id", required = true, example = "1,3")
     @NotEmpty(message = "秒杀时段id不能为空")
     private List<Long> timeIds;
 

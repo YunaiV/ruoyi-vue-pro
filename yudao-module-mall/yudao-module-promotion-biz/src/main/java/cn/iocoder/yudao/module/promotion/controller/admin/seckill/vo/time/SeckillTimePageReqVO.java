@@ -16,14 +16,14 @@ import java.time.LocalTime;
 @ToString(callSuper = true)
 public class SeckillTimePageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "秒杀时段名称")
+    @ApiModelProperty(value = "秒杀时段名称", example = "上午场")
     private String name;
 
-    @ApiModelProperty(value = "开始时间点")
+    @ApiModelProperty(value = "开始时间点", example = "16:30:40")
     @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime startTime;
 
-    @ApiModelProperty(value = "结束时间点")
+    @ApiModelProperty(value = "结束时间点", example = "16:30:40")
     @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime endTime;
 

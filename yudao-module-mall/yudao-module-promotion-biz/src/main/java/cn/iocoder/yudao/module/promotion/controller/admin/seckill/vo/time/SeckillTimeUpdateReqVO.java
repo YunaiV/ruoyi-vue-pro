@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class SeckillTimeUpdateReqVO extends SeckillTimeBaseVO {
 
-    @ApiModelProperty(value = "编号", required = true)
+    @ApiModelProperty(value = "编号", required = true, example = "1")
     @NotNull(message = "编号不能为空")
     private Long id;
 

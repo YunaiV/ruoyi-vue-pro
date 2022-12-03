@@ -26,7 +26,7 @@ public class SeckillActivityPageReqVO extends PageParam {
     @ApiModelProperty(value = "活动状态", example = "进行中")
     private Integer status;
 
-    @ApiModelProperty(value = "秒杀时段id")
+    @ApiModelProperty(value = "秒杀时段id", example = "1")
     private Long timeId;
 
     @ApiModelProperty(value = "创建时间")

@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SeckillActivityDetailRespVO extends SeckillActivityRespVO{
+public class SeckillActivityDetailRespVO extends SeckillActivityRespVO {
 
     /**
      * 商品列表
