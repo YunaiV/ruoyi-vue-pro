@@ -64,7 +64,7 @@ public interface SeckillTimeService {
      *
      * @param ids 秒杀时段id列表
      */
-    void sekillActivityCountAdd(Collection<Long> ids);
+    void sekillActivityCountIncr(Collection<Long> ids);
 
 
     /**
@@ -72,5 +72,5 @@ public interface SeckillTimeService {
      *
      * @param ids 秒杀时段id列表
      */
-    void sekillActivityCountReduce(Collection<Long> ids);
+    void sekillActivityCountDecr(Collection<Long> ids);
 }

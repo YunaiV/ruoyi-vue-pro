@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -26,7 +25,6 @@ public class SeckillActivityCreateReqVO extends SeckillActivityBaseVO {
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
-    // TODO halfninety：直接使用数组接口。timeIds，
     @ApiModelProperty(value = "秒杀时段id", required = true)
     @NotEmpty(message = "参与场次不能为空")
     private List<Long> timeIds;

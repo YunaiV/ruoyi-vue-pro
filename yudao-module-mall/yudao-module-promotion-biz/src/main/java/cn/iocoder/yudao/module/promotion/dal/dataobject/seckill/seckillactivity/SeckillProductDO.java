@@ -1,17 +1,13 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.util.List;
 
 /**
  * 秒杀参与商品
@@ -19,8 +15,11 @@ import lombok.Data;
  * @author halfninety
  * @TableName promotion_seckill_product
  */
-@TableName(value = "promotion_seckill_product")
+@TableName(value = "promotion_seckill_product", autoResultMap = true)
+@KeySequence("promotion_seckill_product_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class SeckillProductDO extends BaseDO {
     /**
      * 秒杀参与商品编号
@@ -36,6 +35,7 @@ public class SeckillProductDO extends BaseDO {
     /**
      * 秒杀时段id
      */
+    @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> timeIds;
 
     /**

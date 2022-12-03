@@ -75,8 +75,9 @@ public interface SeckillActivityConvert {
 
     }
 
-    default List<SeckillProductDO> convertList(List<SeckillActivityBaseVO.Product> products, Long seckillActivityId, List<Long> timeIds) {
+    default List<SeckillProductDO> convertList(List<SeckillActivityBaseVO.Product> products, SeckillActivityDO seckillActivity) {
         return CollectionUtils.convertList(products, product -> convert(product)
-                .setActivityId(seckillActivityId).setTimeIds(timeIds));
+                .setActivityId(seckillActivity.getId()).setTimeIds(seckillActivity.getTimeIds()));
     }
+
 }

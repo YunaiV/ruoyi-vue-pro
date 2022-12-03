@@ -104,22 +104,21 @@ public class SeckillTimeServiceImpl implements SeckillTimeService {
     @Override
     public void validateSeckillTimeExists(Collection<Long> timeIds) {
         if (CollUtil.isEmpty(timeIds)) {
-            return;
+            throw exception(SECKILL_TIME_NOT_EXISTS);
         }
         if (seckillTimeMapper.selectBatchIds(timeIds).size() != timeIds.size()) {
             throw exception(SECKILL_TIME_NOT_EXISTS);
         }
     }
 
-    // TODO @halfninety：updateActivityCount + 和 -，可以执使用一个方法实现哈。多传递一个参数
     @Override
-    public void sekillActivityCountAdd(Collection<Long> ids) {
-        seckillTimeMapper.sekillActivityCountAdd(ids);
+    public void sekillActivityCountIncr(Collection<Long> ids) {
+        seckillTimeMapper.updateActivityCount(ids, "+", 1);
     }
 
     @Override
-    public void sekillActivityCountReduce(Collection<Long> ids) {
-        seckillTimeMapper.sekillActivityCountReduce(ids);
+    public void sekillActivityCountDecr(Collection<Long> ids) {
+        seckillTimeMapper.updateActivityCount(ids, "-", 1);
     }
 
 }
