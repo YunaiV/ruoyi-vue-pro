@@ -32,7 +32,7 @@
 
 <script>
 /**
- * 商品列表
+ * 商品列表(加载更多)
  */
 export default {
   name: 'yd-product-more',

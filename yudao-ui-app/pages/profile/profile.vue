@@ -4,14 +4,14 @@
       <view class="info-item">
         <view class="label">头像：</view>
         <view class="info" @click="handleAvatarClick">
-          <u-avatar size="60" :src="userInfo.avatar"></u-avatar>
+          <u-avatar size="50" shape="square" :src="userInfo.avatar"></u-avatar>
           <u-icon class="btn" name="arrow-right"></u-icon>
         </view>
       </view>
       <view class="info-item">
         <view class="label">昵称：</view>
         <view class="info">
-          <u--input maxlength="10" :border="borderStyle" v-model="userInfo.nickname" @focus="borderStyle = 'bottom'" inputAlign="right" @blur="borderStyle = 'none'" @change="handleNameChange"></u--input>
+          <u--input maxlength="10" border="none" v-model="userInfo.nickname" inputAlign="right" @change="handleNameChange"></u--input>
         </view>
       </view>
       <view class="info-item">
@@ -41,8 +41,7 @@ export default {
         mobile: ''
       },
       avatarFiles: [],
-      tempName: '',
-      borderStyle: 'none'
+      tempName: ''
     }
   },
   computed: {
