@@ -33,11 +33,11 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       open: env.VITE_OPEN,
       // 本地跨域代理
       proxy: {
-        ['/dev-api']: {
+        ['/admin-api']: {
           target: env.VITE_BASE_URL,
           ws: false,
           changeOrigin: true,
-          rewrite: (path) => path.replace(new RegExp(`^/dev-api`), ''),
+          rewrite: (path) => path.replace(new RegExp(`^/admin-api`), ''),
         },
       },
     },

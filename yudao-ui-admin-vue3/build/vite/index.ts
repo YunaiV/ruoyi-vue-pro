@@ -67,7 +67,7 @@ export function createVitePlugins(VITE_APP_TITLE: string) {
       threshold: 10240, // 体积大于 threshold 才会被压缩,单位 b
       algorithm: 'gzip', // 压缩算法,可选 [ 'gzip' , 'brotliCompress' ,'deflate' , 'deflateRaw']
       ext: '.gz', // 生成的压缩包后缀
-      deleteOriginFile: true //压缩后是否删除源文件
+      deleteOriginFile: false //压缩后是否删除源文件
     }),
     ViteEjsPlugin({
       title: VITE_APP_TITLE
