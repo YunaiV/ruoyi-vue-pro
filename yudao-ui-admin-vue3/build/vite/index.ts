@@ -6,7 +6,7 @@ import WindiCSS from 'vite-plugin-windicss'
 import progress from 'vite-plugin-progress'
 import EslintPlugin from 'vite-plugin-eslint'
 import PurgeIcons from 'vite-plugin-purge-icons'
-import { createHtmlPlugin } from 'vite-plugin-html'
+import { ViteEjsPlugin } from 'vite-plugin-ejs'
 import viteCompression from 'vite-plugin-compression'
 import vueSetupExtend from 'vite-plugin-vue-setup-extend'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
@@ -69,13 +69,8 @@ export function createVitePlugins(VITE_APP_TITLE: string) {
       ext: '.gz', // 生成的压缩包后缀
       deleteOriginFile: true //压缩后是否删除源文件
     }),
-    createHtmlPlugin({
-      inject: {
-        data: {
-          title: VITE_APP_TITLE,
-          injectScript: `<script src="./inject.js"></script>`
-        }
-      }
+    ViteEjsPlugin({
+      title: VITE_APP_TITLE
     })
   ]
 }
