@@ -78,7 +78,7 @@
 import { nextTick, onMounted, reactive, ref, unref } from 'vue'
 import { ElSelect, ElTreeSelect, ElOption } from 'element-plus'
 import { VxeGridInstance } from 'vxe-table'
-import { handleTree } from '@/utils/tree'
+import { handleTree, defaultProps } from '@/utils/tree'
 import { required } from '@/utils/formRules.js'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
@@ -115,13 +115,6 @@ const rules = reactive({
   status: [required]
 })
 
-// 下拉框[上级]的配置项目
-const defaultProps = {
-  checkStrictly: true,
-  children: 'children',
-  label: 'name',
-  value: 'id'
-}
 const getUserList = async () => {
   const res = await getListSimpleUsersApi()
   userOption.value = res

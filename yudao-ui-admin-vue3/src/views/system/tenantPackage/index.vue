@@ -66,7 +66,7 @@
 </template>
 <script setup lang="ts" name="TenantPackage">
 import { onMounted, ref, unref } from 'vue'
-import { handleTree } from '@/utils/tree'
+import { handleTree, defaultProps } from '@/utils/tree'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
@@ -92,12 +92,6 @@ const loading = ref(false) // 遮罩层
 const actionType = ref('') // 操作按钮的类型
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
-
-const defaultProps = {
-  children: 'children',
-  label: 'name',
-  value: 'id'
-}
 
 // 全选/全不选
 const handleCheckedTreeNodeAll = () => {

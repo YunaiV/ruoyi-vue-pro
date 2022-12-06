@@ -6,7 +6,7 @@ import { onMounted, PropType, reactive, ref, watch } from 'vue'
 import { Form } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { required } from '@/utils/formRules'
-import { handleTree } from '@/utils/tree'
+import { handleTree, defaultProps } from '@/utils/tree'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { listSimpleMenusApi } from '@/api/system/menu'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
@@ -17,12 +17,6 @@ const props = defineProps({
     default: () => null
   }
 })
-const menuProps = {
-  checkStrictly: true,
-  children: 'children',
-  label: 'name',
-  value: 'id'
-}
 const rules = reactive({
   templateType: [required],
   scene: [required],
@@ -104,7 +98,7 @@ const schema = reactive<FormSchema[]>([
     component: 'TreeSelect',
     componentProps: {
       data: menuOptions,
-      props: menuProps,
+      props: defaultProps,
       checkStrictly: true,
       nodeKey: 'id'
     },

@@ -164,7 +164,7 @@ import { FormExpose } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { handleTree } from '@/utils/tree'
+import { handleTree, defaultProps } from '@/utils/tree'
 import { SystemDataScopeEnum } from '@/utils/constants'
 import { DICT_TYPE, getDictOptions } from '@/utils/dict'
 import { rules, allSchemas } from './role.data'
@@ -259,11 +259,6 @@ const dataScopeForm = reactive({
   dataScope: 0,
   checkList: []
 })
-const defaultProps = {
-  children: 'children',
-  label: 'name',
-  value: 'id'
-}
 const treeOptions = ref<any[]>([]) // 菜单树形结构
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const dialogScopeVisible = ref(false)

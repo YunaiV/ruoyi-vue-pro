@@ -284,7 +284,7 @@ import {
 } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { VxeGridInstance } from 'vxe-table'
-import { handleTree } from '@/utils/tree'
+import { handleTree, defaultProps } from '@/utils/tree'
 import download from '@/utils/download'
 import { CommonStatusEnum } from '@/utils/constants'
 import { getAccessToken, getTenantId } from '@/utils/auth'
@@ -306,11 +306,6 @@ import {
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
-const defaultProps = {
-  children: 'children',
-  label: 'name',
-  value: 'id'
-}
 const queryParams = reactive({
   deptId: null
 })
@@ -327,7 +322,7 @@ const { gridOptions, getList, deleteData, exportList } = useVxeGrid<UserApi.User
 })
 // ========== 创建部门树结构 ==========
 const filterText = ref('')
-const deptOptions = ref<any[]>([]) // 树形结构
+const deptOptions = ref<Tree[]>([]) // 树形结构
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const getTree = async () => {
   const res = await listSimpleDeptApi()

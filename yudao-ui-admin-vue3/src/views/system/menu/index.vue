@@ -103,7 +103,7 @@
         <el-tree-select
           node-key="id"
           v-model="menuForm.parentId"
-          :props="menuProps"
+          :props="defaultProps"
           :data="menuOptions"
           :default-expanded-keys="[0]"
           check-strictly
@@ -237,8 +237,7 @@ import * as MenuApi from '@/api/system/menu'
 import { required } from '@/utils/formRules.js'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
-import { handleTree } from '@/utils/tree'
-import { deepCopy } from 'windicss/utils'
+import { handleTree, defaultProps } from '@/utils/tree'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
@@ -253,7 +252,7 @@ const actionType = ref('') // 操作按钮的类型
 const actionLoading = ref(false) // 遮罩层
 // 新增和修改的表单值
 const formRef = ref<FormInstance>()
-const menuFormNull = {
+const menuForm = ref<MenuApi.MenuVO>({
   id: 0,
   name: '',
   permission: '',
@@ -266,9 +265,8 @@ const menuFormNull = {
   status: CommonStatusEnum.ENABLE,
   visible: true,
   keepAlive: true,
-  createTime: ''
-}
-const menuForm = ref<MenuApi.MenuVO>(menuFormNull)
+  createTime: new Date()
+})
 // 新增和修改的表单校验
 const rules = reactive({
   name: [required],
@@ -278,13 +276,6 @@ const rules = reactive({
 })
 
 // ========== 下拉框[上级菜单] ==========
-// 下拉框[上级菜单]的配置项目
-const menuProps = {
-  checkStrictly: true,
-  children: 'children',
-  label: 'name',
-  value: 'id'
-}
 const menuOptions = ref<any[]>([]) // 树形结构
 // 获取下拉框[上级菜单]的数据
 const getTree = async () => {
@@ -335,7 +326,21 @@ const handleCreate = () => {
   setDialogTile('create')
   // 重置表单
   formRef.value?.resetFields()
-  menuForm.value = deepCopy(menuFormNull)
+  menuForm.value = {
+    id: 0,
+    name: '',
+    permission: '',
+    type: SystemMenuTypeEnum.DIR,
+    sort: 1,
+    parentId: 0,
+    path: '',
+    icon: '',
+    component: '',
+    status: CommonStatusEnum.ENABLE,
+    visible: true,
+    keepAlive: true,
+    createTime: new Date()
+  }
 }
 
 // 修改操作
