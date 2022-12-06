@@ -174,7 +174,6 @@ import { CountTo } from '@/components/CountTo'
 import { Highlight } from '@/components/Highlight'
 import type { WorkplaceTotal, Project, Notice, Shortcut } from './types'
 import { pieOptions, barOptions } from './echarts-data'
-import { Icon } from 'vxe-table'
 
 const { t } = useI18n()
 const { wsCache } = useCache()

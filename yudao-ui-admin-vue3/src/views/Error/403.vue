@@ -1,5 +1,5 @@
 <template>
-  <Error type="403" @error-click="errorClick" />
+  <Error type="403" @error-click="errorClick()" />
 </template>
 <script setup lang="ts">
 import { Error } from '@/components/Error'
