@@ -53,7 +53,6 @@ public class YudaoMQAutoConfiguration {
      * 创建 Redis Pub/Sub 广播消费的容器
      */
     @Bean
-    @Async // 异步化，可降低 2 秒左右的启动时间
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisMQTemplate redisMQTemplate, List<AbstractChannelMessageListener<?>> listeners) {
         // 创建 RedisMessageListenerContainer 对象
