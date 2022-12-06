@@ -8,7 +8,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
   primaryType: 'seq',
   primaryTitle: '日志编号',
   action: true,
-  actionWidth: '80px',
+  actionWidth: '100px',
   columns: [
     {
       title: '日志类型',
@@ -28,10 +28,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '浏览器',
-      field: 'userAgent',
-      table: {
-        width: 100
-      }
+      field: 'userAgent'
     },
     {
       title: '登陆结果',
@@ -44,7 +41,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'createTime',
       formatter: 'formatDate',
       table: {
-        width: 100
+        width: 150
       },
       search: {
         show: true,
