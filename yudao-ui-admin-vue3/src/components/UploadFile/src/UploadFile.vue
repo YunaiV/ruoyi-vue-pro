@@ -5,8 +5,8 @@
       :multiple="props.limit > 1"
       name="file"
       v-model="valueRef"
-      :file-list="fileList"
-      :show-file-list="false"
+      v-model:file-list="fileList"
+      :show-file-list="true"
       :action="updateUrl"
       :headers="uploadHeaders"
       :limit="props.limit"
@@ -15,9 +15,18 @@
       :on-success="handleFileSuccess"
       :on-error="excelUploadError"
       :on-remove="handleRemove"
+      :on-preview="handlePreview"
       class="upload-file-uploader"
     >
-      <Icon icon="ep:upload-filled" />
+      <el-button type="primary"><Icon icon="ep:upload-filled" />选取文件</el-button>
+      <template v-if="isShowTip" #tip>
+        <div style="font-size: 8px">
+          大小不超过 <b style="color: #f56c6c">{{ fileSize }}MB</b>
+        </div>
+        <div style="font-size: 8px">
+          格式为 <b style="color: #f56c6c">{{ fileType.join('/') }}</b> 的文件
+        </div>
+      </template>
     </el-upload>
   </div>
 </template>
@@ -38,7 +47,7 @@ const props = defineProps({
   fileType: propTypes.array.def(['doc', 'xls', 'ppt', 'txt', 'pdf']), // 文件类型, 例如['png', 'jpg', 'jpeg']
   fileSize: propTypes.number.def(5), // 大小限制(MB)
   limit: propTypes.number.def(5), // 数量限制
-  isShowTip: propTypes.bool.def(false) // 是否显示提示
+  isShowTip: propTypes.bool.def(true) // 是否显示提示
 })
 // ========== 上传相关 ==========
 const valueRef = ref(props.modelValue)
@@ -135,6 +144,9 @@ const handleRemove = (file) => {
     emit('update:modelValue', listToString(fileList.value))
   }
 }
+const handlePreview: UploadProps['onPreview'] = (uploadFile) => {
+  console.log(uploadFile)
+}
 // 对象转成指定字符串分隔
 const listToString = (list: UploadUserFile[], separator?: string) => {
   let strs = ''
@@ -149,19 +161,22 @@ const listToString = (list: UploadUserFile[], separator?: string) => {
 .upload-file-uploader {
   margin-bottom: 5px;
 }
-.upload-file-list .el-upload-list__item {
+:deep(.upload-file-list .el-upload-list__item) {
   border: 1px solid #e4e7ed;
   line-height: 2;
   margin-bottom: 10px;
   position: relative;
 }
-.upload-file-list .ele-upload-list__item-content {
+:deep(.el-upload-list__item-file-name) {
+  max-width: 250px;
+}
+:deep(.upload-file-list .ele-upload-list__item-content) {
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: inherit;
 }
-.ele-upload-list__item-content-action .el-link {
+:deep(.ele-upload-list__item-content-action .el-link) {
   margin-right: 10px;
 }
 </style>

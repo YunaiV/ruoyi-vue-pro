@@ -6,7 +6,7 @@
       name="file"
       v-model="valueRef"
       list-type="picture-card"
-      :file-list="fileList"
+      v-model:file-list="fileList"
       :show-file-list="true"
       :action="updateUrl"
       :headers="uploadHeaders"
