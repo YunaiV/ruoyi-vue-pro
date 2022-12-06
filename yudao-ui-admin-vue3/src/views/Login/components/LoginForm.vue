@@ -149,12 +149,10 @@ import { useMessage } from '@/hooks/web/useMessage'
 import { required } from '@/utils/formRules'
 import * as authUtil from '@/utils/auth'
 import { decrypt } from '@/utils/jsencrypt'
-import { Icon } from '@/components/Icon'
 import { Verify } from '@/components/Verifition'
 import { usePermissionStore } from '@/store/modules/permission'
 import * as LoginApi from '@/api/login'
 import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'
-import { XButton } from '@/components/XButton'
 
 const { t } = useI18n()
 const message = useMessage()
