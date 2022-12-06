@@ -155,22 +155,7 @@ import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useIcon } from '@/hooks/web/useIcon'
 import { required } from '@/utils/formRules'
-import {
-  setToken,
-  setTenantId,
-  setUsername,
-  setPassword,
-  setRememberMe,
-  setTenantName,
-  removeUsername,
-  removePassword,
-  removeRememberMe,
-  removeTenantName,
-  getUsername,
-  getPassword,
-  getRememberMe,
-  getTenantName
-} from '@/utils/auth'
+import * as authUtil from '@/utils/auth'
 import { decrypt } from '@/utils/jsencrypt'
 import { Icon } from '@/components/Icon'
 import { Verify } from '@/components/Verifition'
@@ -230,14 +215,16 @@ const getCode = async () => {
 //获取租户ID
 const getTenantId = async () => {
   const res = await LoginApi.getTenantIdByNameApi(loginData.loginForm.tenantName)
-  setTenantId(res)
+  authUtil.setTenantId(res)
 }
 // 记住我
 const getCookie = () => {
-  const username = getUsername()
-  const password = getPassword() ? decrypt(getPassword() as unknown as string) : undefined
-  const rememberMe = getRememberMe()
-  const tenantName = getTenantName()
+  const username = authUtil.getUsername()
+  const password = authUtil.getPassword()
+    ? decrypt(authUtil.getPassword() as unknown as string)
+    : undefined
+  const rememberMe = authUtil.getRememberMe()
+  const tenantName = authUtil.getTenantName()
   loginData.loginForm = {
     ...loginData.loginForm,
     username: username ? username : loginData.loginForm.username,
@@ -266,17 +253,17 @@ const handleLogin = async (params) => {
       background: 'rgba(0, 0, 0, 0.7)'
     })
     if (loginData.loginForm.rememberMe) {
-      setUsername(loginData.loginForm.username)
-      setPassword(loginData.loginForm.password)
-      setRememberMe(loginData.loginForm.rememberMe)
-      setTenantName(loginData.loginForm.tenantName)
+      authUtil.setUsername(loginData.loginForm.username)
+      authUtil.setPassword(loginData.loginForm.password)
+      authUtil.setRememberMe(loginData.loginForm.rememberMe)
+      authUtil.setTenantName(loginData.loginForm.tenantName)
     } else {
-      removeUsername()
-      removePassword()
-      removeRememberMe()
-      removeTenantName()
+      authUtil.removeUsername()
+      authUtil.removePassword()
+      authUtil.removeRememberMe()
+      authUtil.removeTenantName()
     }
-    setToken(res)
+    authUtil.setToken(res)
     if (!redirect.value) {
       redirect.value = '/'
     }
