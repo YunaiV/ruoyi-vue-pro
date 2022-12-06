@@ -223,7 +223,7 @@ export const useAppStore = defineStore('app', {
         return
       }
       this.layout = layout
-      wsCache.set(CACHE_KEY.THEME, this.layout)
+      wsCache.set(CACHE_KEY.LAYOUT, this.layout)
     },
     setTitle(title: string) {
       this.title = title
