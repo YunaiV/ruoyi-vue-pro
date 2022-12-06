@@ -28,6 +28,9 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '${column.columnComment}',
       field: '${column.javaField}',
+      #if (!$column.listOperationResult)
+      isTable: false,
+      #end
       #if ("" != $dictType)## 有数据字典
       dictType: DICT_TYPE.$dictType.toUpperCase(),
       #if (${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
@@ -76,7 +79,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       },
       #end
       #end
-      #if ($column.listOperationResult)
+      #if ($column.listOperation)
       #if($column.htmlType == "input")
       isSearch: true,
       #elseif("" != $dictType)
