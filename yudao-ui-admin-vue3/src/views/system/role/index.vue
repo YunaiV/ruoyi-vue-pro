@@ -105,7 +105,7 @@
           actionScopeType === 'menu' || dataScopeForm.dataScope === SystemDataScopeEnum.DEPT_CUSTOM
         "
       >
-        <el-card class="box-card">
+        <el-card shadow="never">
           <template #header>
             父子联动(选中父节点，自动选择子节点):
             <el-switch v-model="checkStrictly" inline-prompt active-text="是" inactive-text="否" />
