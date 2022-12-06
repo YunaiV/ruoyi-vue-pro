@@ -17,7 +17,7 @@
         </el-form-item>
       </el-col>
       <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item prop="tenantName">
+        <el-form-item prop="tenantName" v-if="loginData.tenantEnable === 'true'">
           <el-input
             type="text"
             v-model="loginData.loginForm.tenantName"
@@ -69,16 +69,23 @@
       <!-- 登录按钮 / 返回按钮 -->
       <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
         <el-form-item>
-          <el-button :loading="loginLoading" type="primary" class="w-[100%]" @click="signIn">
-            {{ t('login.login') }}
-          </el-button>
+          <XButton
+            :loading="loginLoading"
+            type="primary"
+            class="w-[100%]"
+            :title="t('login.login')"
+            @click="signIn()"
+          />
         </el-form-item>
       </el-col>
       <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
         <el-form-item>
-          <el-button :loading="loginLoading" class="w-[100%]" @click="handleBackLogin">
-            {{ t('login.backLogin') }}
-          </el-button>
+          <XButton
+            :loading="loginLoading"
+            class="w-[100%]"
+            :title="t('login.backLogin')"
+            @click="handleBackLogin()"
+          />
         </el-form-item>
       </el-col>
     </el-row>
@@ -92,8 +99,8 @@ import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useIcon } from '@/hooks/web/useIcon'
 import { useMessage } from '@/hooks/web/useMessage'
-import { setTenantId, setToken } from '@/utils/auth'
 import { required } from '@/utils/formRules'
+import { setTenantId, setToken } from '@/utils/auth'
 import { usePermissionStore } from '@/store/modules/permission'
 import { getTenantIdByNameApi, sendSmsCodeApi, smsLoginApi } from '@/api/login'
 import LoginFormTitle from './LoginFormTitle.vue'
@@ -119,7 +126,7 @@ const rules = {
 }
 const loginData = reactive({
   codeImg: '',
-  tenantEnable: true,
+  tenantEnable: import.meta.env.VITE_APP_TENANT_ENABLE,
   token: '',
   loading: {
     signIn: false
@@ -169,8 +176,10 @@ watch(
 )
 // 获取租户 ID
 const getTenantId = async () => {
-  const res = await getTenantIdByNameApi(loginData.loginForm.tenantName)
-  setTenantId(res)
+  if (loginData.tenantEnable === 'true') {
+    const res = await getTenantIdByNameApi(loginData.loginForm.tenantName)
+    setTenantId(res)
+  }
 }
 // 登录
 const signIn = async () => {

@@ -21,14 +21,19 @@
 
     <template #register>
       <div class="w-[100%]">
-        <el-button type="primary" class="w-[100%]" :loading="loading" @click="loginRegister">
-          {{ t('login.register') }}
-        </el-button>
+        <XButton
+          :loading="loading"
+          type="primary"
+          class="w-[100%]"
+          :title="t('login.register')"
+          @click="loginRegister()"
+        />
       </div>
       <div class="w-[100%] mt-15px">
         <el-button class="w-[100%]" @click="handleBackLogin">
           {{ t('login.hasUser') }}
         </el-button>
+        <XButton class="w-[100%]" :title="t('login.hasUser')" @click="handleBackLogin()" />
       </div>
     </template>
   </Form>
@@ -40,8 +45,8 @@ import { Form } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
-import { useLoginState, LoginStateEnum } from './useLogin'
 import LoginFormTitle from './LoginFormTitle.vue'
+import { useLoginState, LoginStateEnum } from './useLogin'
 import { FormSchema } from '@/types/form'
 
 const { t } = useI18n()
