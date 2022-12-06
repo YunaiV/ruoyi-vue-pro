@@ -29,7 +29,6 @@ const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormExpose>() // 表单 Ref
 
 // ========== 用户选择  ==========
-const userIds = ref<number[]>([])
 const userOptions = ref<UserVO[]>([])
 const getUserOptions = async () => {
   const res = await getListSimpleUsersApi()
@@ -46,7 +45,6 @@ const setDialogTile = (type: string) => {
 // 新增操作
 const handleCreate = () => {
   setDialogTile('create')
-  userIds.value = []
 }
 
 // 修改操作
@@ -54,7 +52,6 @@ const handleUpdate = async (row: UserGroupVO) => {
   setDialogTile('update')
   // 设置数据
   const res = await UserGroupApi.getUserGroupApi(row.id)
-  userIds.value = res.memberUserIds
   unref(formRef)?.setValues(res)
 }
 
@@ -68,7 +65,6 @@ const submitForm = async () => {
       // 提交请求
       try {
         const data = unref(formRef)?.formModel as UserGroupVO
-        data.memberUserIds = userIds.value
         if (actionType.value === 'create') {
           await UserGroupApi.createUserGroupApi(data)
           ElMessage.success(t('common.createSuccess'))
@@ -183,8 +179,8 @@ onMounted(async () => {
       :rules="rules"
       ref="formRef"
     >
-      <template #memberUserIds>
-        <el-select v-model="userIds" multiple>
+      <template #memberUserIds="form">
+        <el-select v-model="form['memberUserIds']" multiple>
           <el-option
             v-for="item in userOptions"
             :key="item.id"

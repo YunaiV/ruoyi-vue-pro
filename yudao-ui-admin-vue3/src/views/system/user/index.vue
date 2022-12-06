@@ -130,17 +130,17 @@
       :schema="allSchemas.formSchema"
       ref="formRef"
     >
-      <template #deptId>
+      <template #deptId="form">
         <el-tree-select
           node-key="id"
-          v-model="deptId"
+          v-model="form['deptId']"
           :props="defaultProps"
           :data="deptOptions"
           check-strictly
         />
       </template>
-      <template #postIds>
-        <el-select v-model="postIds" multiple :placeholder="t('common.selectText')">
+      <template #postIds="form">
+        <el-select v-model="form['postIds']" multiple :placeholder="t('common.selectText')">
           <el-option
             v-for="item in postOptions"
             :key="item.id"
@@ -354,8 +354,6 @@ const actionType = ref('') // 操作按钮的类型
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormExpose>() // 表单 Ref
-const deptId = ref() // 部门ID
-const postIds = ref<string[]>([]) // 岗位ID
 const postOptions = ref<PostVO[]>([]) //岗位列表
 
 // 获取岗位列表
@@ -374,8 +372,6 @@ const setDialogTile = async (type: string) => {
 const handleCreate = async () => {
   setDialogTile('create')
   // 重置表单
-  deptId.value = null
-  postIds.value = []
   await nextTick()
   if (allSchemas.formSchema[0].field !== 'username') {
     unref(formRef)?.addSchema(
@@ -405,8 +401,6 @@ const handleUpdate = async (rowId: number) => {
   unref(formRef)?.delSchema('password')
   // 设置数据
   const res = await UserApi.getUserApi(rowId)
-  deptId.value = res.deptId
-  postIds.value = res.postIds
   unref(formRef)?.setValues(res)
 }
 const detailData = ref()
@@ -428,8 +422,6 @@ const submitForm = async () => {
   // 提交请求
   try {
     const data = unref(formRef)?.formModel as UserApi.UserVO
-    data.deptId = deptId.value
-    data.postIds = postIds.value
     if (actionType.value === 'create') {
       await UserApi.createUserApi(data)
       message.success(t('common.createSuccess'))

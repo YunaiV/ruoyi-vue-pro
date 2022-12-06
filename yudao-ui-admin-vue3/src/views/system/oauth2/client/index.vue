@@ -62,8 +62,8 @@
       :schema="allSchemas.formSchema"
       :rules="rules"
     >
-      <template #logo>
-        <UploadImg :imgs="uploadLogo" :limit="1" />
+      <template #logo="form">
+        <UploadImg :imgs="form['logo']" :limit="1" />
       </template>
     </Form>
     <!-- 表单：详情 -->
@@ -164,7 +164,6 @@ const actionType = ref('') // 操作按钮的类型
 const actionLoading = ref(false) // 按钮 Loading
 const formRef = ref<FormExpose>() // 表单 Ref
 const detailRef = ref() // 详情 Ref
-const uploadLogo = ref('')
 // 设置标题
 const setDialogTile = (type: string) => {
   dialogTitle.value = t('action.' + type)
@@ -174,7 +173,6 @@ const setDialogTile = (type: string) => {
 
 // 新增操作
 const handleCreate = () => {
-  uploadLogo.value = ''
   setDialogTile('create')
 }
 
@@ -183,7 +181,6 @@ const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
   const res = await ClientApi.getOAuth2ClientApi(rowId)
-  uploadLogo.value = res.logo
   unref(formRef)?.setValues(res)
 }
 
@@ -209,7 +206,6 @@ const submitForm = async () => {
       // 提交请求
       try {
         const data = unref(formRef)?.formModel as ClientApi.OAuth2ClientVO
-        data.logo = uploadLogo.value
         if (actionType.value === 'create') {
           await ClientApi.createOAuth2ClientApi(data)
           message.success(t('common.createSuccess'))

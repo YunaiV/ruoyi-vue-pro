@@ -1,7 +1,7 @@
 <template>
   <Form ref="formRef" :rules="rules" :schema="schema" :labelWidth="80">
-    <template #sex>
-      <el-radio-group v-model="sexVlue">
+    <template #sex="form">
+      <el-radio-group v-model="form['sex']">
         <el-radio :label="1">{{ t('profile.user.man') }}</el-radio>
         <el-radio :label="2">{{ t('profile.user.woman') }}</el-radio>
       </el-radio-group>
@@ -67,7 +67,6 @@ const schema = reactive<FormSchema[]>([
     value: 0
   }
 ])
-const sexVlue = ref<number>()
 const formRef = ref<FormExpose>() // 表单 Ref
 const submit = () => {
   const elForm = unref(formRef)?.getElFormRef()
@@ -75,7 +74,6 @@ const submit = () => {
   elForm.validate(async (valid) => {
     if (valid) {
       const data = unref(formRef)?.formModel as UserProfileUpdateReqVO
-      data.sex = sexVlue.value as unknown as number
       await updateUserProfileApi(data)
       ElMessage.success(t('common.updateSuccess'))
       await init()
@@ -84,7 +82,6 @@ const submit = () => {
 }
 const init = async () => {
   const res = await getUserProfileApi()
-  sexVlue.value = res.sex
   unref(formRef)?.setValues(res)
 }
 onMounted(async () => {

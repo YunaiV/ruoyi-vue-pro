@@ -38,20 +38,19 @@
   <!-- 添加或修改菜单对话框 -->
   <XModal id="deptModel" v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
-    <!-- 操作工具栏 -->
     <Form ref="formRef" :schema="allSchemas.formSchema" :rules="rules">
-      <template #parentId>
+      <template #parentId="form">
         <el-tree-select
           node-key="id"
-          v-model="deptParentId"
+          v-model="form['parentId']"
           :props="defaultProps"
           :data="deptOptions"
           :default-expanded-keys="[100]"
           check-strictly
         />
       </template>
-      <template #leaderUserId>
-        <el-select v-model="leaderUserId">
+      <template #leaderUserId="form">
+        <el-select v-model="form['leaderUserId']">
           <el-option
             v-for="item in userOption"
             :key="item.id"
@@ -105,8 +104,6 @@ const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const actionType = ref('') // 操作按钮的类型
 const actionLoading = ref(false) // 遮罩层
-const deptParentId = ref(0) // 上级ID
-const leaderUserId = ref()
 const formRef = ref<FormExpose>() // 表单 Ref
 const deptOptions = ref() // 树形结构
 const userOption = ref<UserVO[]>([])
@@ -154,8 +151,6 @@ const setDialogTile = (type: string) => {
 
 // 新增操作
 const handleCreate = async () => {
-  deptParentId.value = 0
-  leaderUserId.value = null
   setDialogTile('create')
 }
 
@@ -164,8 +159,6 @@ const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
   const res = await DeptApi.getDeptApi(rowId)
-  deptParentId.value = res.parentId
-  leaderUserId.value = res.leaderUserId
   await nextTick()
   unref(formRef)?.setValues(res)
 }
@@ -180,8 +173,6 @@ const submitForm = async () => {
       // 提交请求
       try {
         const data = unref(formRef)?.formModel as DeptApi.DeptVO
-        data.parentId = deptParentId.value
-        data.leaderUserId = leaderUserId.value
         if (actionType.value === 'create') {
           await DeptApi.createDeptApi(data)
           message.success(t('common.createSuccess'))
