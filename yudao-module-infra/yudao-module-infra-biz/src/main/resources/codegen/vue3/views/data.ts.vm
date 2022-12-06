@@ -77,6 +77,17 @@ const crudSchemas = reactive<VxeCrudSchema>({
         component: 'InputNumber',
         value: 0
       },
+      #elseif($column.htmlType == "imageUpload")## 图片上传
+      form: {
+        component: 'UploadImg',
+        componentProps: {
+          limit: 1
+        }
+      },
+      #elseif($column.htmlType == "fileUpload")## 图片上传
+      form: {
+        component: 'UploadFile'
+      },
       #end
       #end
       #if ($column.listOperation)

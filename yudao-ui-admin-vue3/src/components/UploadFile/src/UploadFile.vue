@@ -1,13 +1,12 @@
 <template>
-  <div class="component-upload-image">
+  <div class="upload-file">
     <el-upload
       ref="uploadRef"
       :multiple="props.limit > 1"
       name="file"
       v-model="valueRef"
-      list-type="picture-card"
       :file-list="fileList"
-      :show-file-list="true"
+      :show-file-list="false"
       :action="updateUrl"
       :headers="uploadHeaders"
       :limit="props.limit"
@@ -16,16 +15,11 @@
       :on-success="handleFileSuccess"
       :on-error="excelUploadError"
       :on-remove="handleRemove"
-      :on-preview="handlePictureCardPreview"
-      :class="{ hide: fileList.length >= props.limit }"
+      class="upload-file-uploader"
     >
       <Icon icon="ep:upload-filled" />
     </el-upload>
   </div>
-  <!-- 文件列表 -->
-  <Dialog v-model="dialogVisible" title="预览" width="800" append-to-body>
-    <img :src="dialogImageUrl" style="display: block; max-width: 100%; margin: 0 auto" />
-  </Dialog>
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
@@ -39,11 +33,11 @@ const emit = defineEmits(['update:modelValue'])
 
 const props = defineProps({
   modelValue: propTypes.oneOfType([String, Object, Array]),
-  title: propTypes.string.def('图片上传'),
+  title: propTypes.string.def('文件上传'),
   updateUrl: propTypes.string.def(import.meta.env.VITE_UPLOAD_URL),
-  fileType: propTypes.array.def(['jpg', 'png', 'gif', 'jpeg']), // 文件类型, 例如['png', 'jpg', 'jpeg']
+  fileType: propTypes.array.def(['doc', 'xls', 'ppt', 'txt', 'pdf']), // 文件类型, 例如['png', 'jpg', 'jpeg']
   fileSize: propTypes.number.def(5), // 大小限制(MB)
-  limit: propTypes.number.def(1), // 数量限制
+  limit: propTypes.number.def(5), // 数量限制
   isShowTip: propTypes.bool.def(false) // 是否显示提示
 })
 // ========== 上传相关 ==========
@@ -52,8 +46,6 @@ const uploadRef = ref<UploadInstance>()
 const uploadList = ref<UploadUserFile[]>([])
 const fileList = ref<UploadUserFile[]>([])
 const uploadNumber = ref<number>(0)
-const dialogImageUrl = ref()
-const dialogVisible = ref(false)
 const uploadHeaders = ref({
   Authorization: 'Bearer ' + getAccessToken(),
   'tenant-id': getTenantId()
@@ -152,24 +144,24 @@ const listToString = (list: UploadUserFile[], separator?: string) => {
   }
   return strs != '' ? strs.substr(0, strs.length - 1) : ''
 }
-// 预览
-const handlePictureCardPreview: UploadProps['onPreview'] = (file) => {
-  dialogImageUrl.value = file.url
-  dialogVisible.value = true
-}
 </script>
 <style scoped lang="scss">
-// .el-upload--picture-card 控制加号部分
-:deep(.hide .el-upload--picture-card) {
-  display: none;
+.upload-file-uploader {
+  margin-bottom: 5px;
 }
-// 去掉动画效果
-:deep(.el-list-enter-active, .el-list-leave-active) {
-  transition: all 0s;
+.upload-file-list .el-upload-list__item {
+  border: 1px solid #e4e7ed;
+  line-height: 2;
+  margin-bottom: 10px;
+  position: relative;
 }
-
-:deep(.el-list-enter, .el-list-leave-active) {
-  opacity: 0;
-  transform: translateY(0);
+.upload-file-list .ele-upload-list__item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: inherit;
+}
+.ele-upload-list__item-content-action .el-link {
+  margin-right: 10px;
 }
 </style>

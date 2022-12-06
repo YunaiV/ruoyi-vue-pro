@@ -61,16 +61,12 @@
       v-if="['create', 'update'].includes(actionType)"
       :schema="allSchemas.formSchema"
       :rules="rules"
-    >
-      <template #logo="form">
-        <UploadImg :imgs="form['logo']" :limit="1" />
-      </template>
-    </Form>
+    />
     <!-- 表单：详情 -->
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
-      :data="detailRef"
+      :data="detailData"
     >
       <template #accessTokenValiditySeconds="{ row }">
         {{ row.accessTokenValiditySeconds + '秒' }}
@@ -142,7 +138,6 @@ import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { VxeGridInstance } from 'vxe-table'
 import { FormExpose } from '@/components/Form'
-import { UploadImg } from '@/components/UploadFile'
 // 业务相关的 import
 import * as ClientApi from '@/api/system/oauth2/client'
 import { rules, allSchemas } from './client.data'
@@ -163,7 +158,7 @@ const dialogTitle = ref('edit') // 弹出层标题
 const actionType = ref('') // 操作按钮的类型
 const actionLoading = ref(false) // 按钮 Loading
 const formRef = ref<FormExpose>() // 表单 Ref
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 // 设置标题
 const setDialogTile = (type: string) => {
   dialogTitle.value = t('action.' + type)
@@ -188,7 +183,7 @@ const handleUpdate = async (rowId: number) => {
 const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
   const res = await ClientApi.getOAuth2ClientApi(rowId)
-  detailRef.value = res
+  detailData.value = res
 }
 
 // 删除操作
