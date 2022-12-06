@@ -30,9 +30,6 @@
         />
       </div>
       <div class="w-[100%] mt-15px">
-        <el-button class="w-[100%]" @click="handleBackLogin">
-          {{ t('login.hasUser') }}
-        </el-button>
         <XButton class="w-[100%]" :title="t('login.hasUser')" @click="handleBackLogin()" />
       </div>
     </template>
