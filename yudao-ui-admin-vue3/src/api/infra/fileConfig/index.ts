@@ -42,7 +42,7 @@ export const getFileConfigApi = (id: number) => {
 
 // 更新文件配置为主配置
 export const updateFileConfigMasterApi = (id: number) => {
-  return request.get({ url: '/infra/file-config/update-master?id=' + id })
+  return request.put({ url: '/infra/file-config/update-master?id=' + id })
 }
 
 // 新增文件配置
