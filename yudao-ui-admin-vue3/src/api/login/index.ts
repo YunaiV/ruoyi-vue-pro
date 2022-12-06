@@ -57,7 +57,7 @@ export const smsLoginApi = (data: SmsLoginVO) => {
 }
 
 // 社交授权的跳转
-export const socialAuthRedirectApi = (type: string, redirectUri: string) => {
+export const socialAuthRedirectApi = (type: number, redirectUri: string) => {
   return request.get({
     url: '/system/auth/social-auth-redirect?type=' + type + '&redirectUri=' + redirectUri
   })
