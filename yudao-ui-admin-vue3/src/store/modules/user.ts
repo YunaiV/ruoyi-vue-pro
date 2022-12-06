@@ -1,7 +1,7 @@
 import { store } from '../index'
 import { defineStore } from 'pinia'
 import { getAccessToken, removeToken } from '@/utils/auth'
-import { useCache } from '@/hooks/web/useCache'
+import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 
 const { wsCache } = useCache()
 
@@ -46,7 +46,7 @@ export const useUserStore = defineStore('admin-user', {
       this.permissions = userInfo.permissions
       this.roles = userInfo.roles
       this.user = userInfo.user
-      wsCache.set('user', userInfo)
+      wsCache.set(CACHE_KEY.USER, userInfo)
     },
     loginOut() {
       removeToken()

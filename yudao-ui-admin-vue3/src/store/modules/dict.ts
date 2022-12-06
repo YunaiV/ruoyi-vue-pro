@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { store } from '../index'
 import { DictDataVO } from '@/api/system/dict/types'
-import { useCache } from '@/hooks/web/useCache'
+import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 const { wsCache } = useCache('sessionStorage')
 
 export interface DictValueType {
@@ -24,7 +24,7 @@ export const useDictStore = defineStore('dict', {
   }),
   getters: {
     getDictMap(): Recordable {
-      const dictMap = wsCache.get('dictCache')
+      const dictMap = wsCache.get(CACHE_KEY.DICT_CACHE)
       return dictMap ? dictMap : this.dictMap
     },
     getHasDictData(): boolean {
@@ -54,7 +54,7 @@ export const useDictStore = defineStore('dict', {
         })
       })
       this.dictMap = dictDataMap
-      wsCache.set('dictCache', dictDataMap, { exp: 60 }) // 60 秒 过期
+      wsCache.set(CACHE_KEY.DICT_CACHE, dictDataMap, { exp: 60 }) // 60 秒 过期
     }
   }
 })

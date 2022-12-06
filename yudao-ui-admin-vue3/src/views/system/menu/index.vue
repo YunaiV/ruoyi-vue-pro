@@ -215,6 +215,7 @@
 // 全局相关的 import
 import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
+import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { useMessage } from '@/hooks/web/useMessage'
 import {
   ElForm,
@@ -241,6 +242,7 @@ import { handleTree, defaultProps } from '@/utils/tree'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
+const { wsCache } = useCache()
 // 列表相关的变量
 const xTable = ref<VxeTableInstance>()
 const tableLoading = ref(false)
@@ -380,6 +382,7 @@ const submitForm = async () => {
   } finally {
     dialogVisible.value = false
     actionLoading.value = false
+    wsCache.delete(CACHE_KEY.ROLE_ROUTERS)
     // 操作成功，重新加载列表
     await getList()
   }

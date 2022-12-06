@@ -91,9 +91,8 @@ import { useRouter } from 'vue-router'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useIcon } from '@/hooks/web/useIcon'
-import { useCache } from '@/hooks/web/useCache'
 import { useMessage } from '@/hooks/web/useMessage'
-import { setToken } from '@/utils/auth'
+import { setTenantId, setToken } from '@/utils/auth'
 import { required } from '@/utils/formRules'
 import { usePermissionStore } from '@/store/modules/permission'
 import { getTenantIdByNameApi, sendSmsCodeApi, smsLoginApi } from '@/api/login'
@@ -101,7 +100,6 @@ import LoginFormTitle from './LoginFormTitle.vue'
 import { useLoginState, LoginStateEnum, useFormValid } from './useLogin'
 
 const { t } = useI18n()
-const { wsCache } = useCache()
 const message = useMessage()
 const permissionStore = usePermissionStore()
 const { currentRoute, push } = useRouter()
@@ -172,7 +170,7 @@ watch(
 // 获取租户 ID
 const getTenantId = async () => {
   const res = await getTenantIdByNameApi(loginData.loginForm.tenantName)
-  wsCache.set('tenantId', res)
+  setTenantId(res)
 }
 // 登录
 const signIn = async () => {

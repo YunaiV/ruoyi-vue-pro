@@ -45,7 +45,7 @@ export const getUsername = () => {
 }
 
 export const setUsername = (username: string) => {
-  wsCache.set(UsernameKey, username)
+  wsCache.set(UsernameKey, username, { exp: 30 * 24 * 60 * 60 })
 }
 
 export const removeUsername = () => {
@@ -58,7 +58,7 @@ export const getPassword = () => {
 }
 
 export const setPassword = (password: string) => {
-  wsCache.set(PasswordKey, encrypt(password))
+  wsCache.set(PasswordKey, encrypt(password), { exp: 30 * 24 * 60 * 60 })
 }
 
 export const removePassword = () => {
@@ -66,11 +66,11 @@ export const removePassword = () => {
 }
 
 export const getRememberMe = () => {
-  return wsCache.get(RememberMeKey) === 'true'
+  return wsCache.get(RememberMeKey) === true
 }
 
-export const setRememberMe = (rememberMe: string) => {
-  wsCache.set(RememberMeKey, rememberMe)
+export const setRememberMe = (rememberMe: boolean) => {
+  wsCache.set(RememberMeKey, rememberMe, { exp: 30 * 24 * 60 * 60 })
 }
 
 export const removeRememberMe = () => {
@@ -87,7 +87,7 @@ export const getTenantName = () => {
 }
 
 export const setTenantName = (username: string) => {
-  wsCache.set(TenantNameKey, username)
+  wsCache.set(TenantNameKey, username, { exp: 30 * 24 * 60 * 60 })
 }
 
 export const removeTenantName = () => {

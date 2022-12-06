@@ -1,5 +1,5 @@
 import type { App } from 'vue'
-import { useCache } from '@/hooks/web/useCache'
+import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { useI18n } from '@/hooks/web/useI18n'
 const { t } = useI18n() // 国际化
 
@@ -8,7 +8,7 @@ export function hasRole(app: App<Element>) {
     const { wsCache } = useCache()
     const { value } = binding
     const super_admin = 'admin'
-    const roles = wsCache.get('user').roles
+    const roles = wsCache.get(CACHE_KEY.USER).roles
 
     if (value && value instanceof Array && value.length > 0) {
       const roleFlag = value
