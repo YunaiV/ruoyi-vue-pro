@@ -20,7 +20,7 @@
   <!-- 弹窗 -->
   <XModal id="postModel" v-model="dialogVisible" :title="dialogTitle">
     <!-- 表单：详情 -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailData" />
     <template #footer>
       <!-- 按钮：关闭 -->
       <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
@@ -47,13 +47,13 @@ const { gridOptions, exportList } = useVxeGrid<LoginLogVO>({
 })
 
 // 详情操作
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref(t('action.detail')) // 弹出层标题
 // 详情
 const handleDetail = async (row: LoginLogVO) => {
   // 设置数据
-  detailRef.value = row
+  detailData.value = row
   dialogVisible.value = true
 }
 

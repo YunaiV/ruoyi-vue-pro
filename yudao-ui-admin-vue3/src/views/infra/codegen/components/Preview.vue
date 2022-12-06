@@ -8,7 +8,6 @@
             node-key="id"
             :data="preview.fileTree"
             :expand-on-click-node="false"
-            default-expanded-keys="[0]"
             highlight-current
             @node-click="handleNodeClick"
           />

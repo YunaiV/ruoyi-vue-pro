@@ -50,7 +50,7 @@
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
-      :data="detailRef"
+      :data="detailData"
     >
       <template #content="{ row }">
         <Editor :model-value="row.content" read-only="true" />
@@ -98,7 +98,7 @@ const dialogTitle = ref('edit') // 弹出层标题
 const actionType = ref('') // 操作按钮的类型
 const actionLoading = ref(false) // 按钮 Loading
 const formRef = ref<FormExpose>() // 表单 Ref
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 
 // 设置标题
 const setDialogTile = (type: string) => {
@@ -125,7 +125,7 @@ const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
   // 设置数据
   const res = await NoticeApi.getNoticeApi(rowId)
-  detailRef.value = res
+  detailData.value = res
 }
 
 // 删除操作

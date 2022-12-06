@@ -63,7 +63,7 @@
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
-      :data="detailRef"
+      :data="detailData"
     >
       <template #packageId="{ row }">
         <el-tag v-if="row.packageId === 0" type="danger">系统租户</el-tag>
@@ -112,7 +112,7 @@ const actionType = ref('') // 操作按钮的类型
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormExpose>() // 表单 Ref
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 const getPackageName = (packageId: number) => {
   for (let item of tenantPackageOption) {
     if (item.value === packageId) {
@@ -147,7 +147,7 @@ const handleUpdate = async (rowId: number) => {
 const handleDetail = async (rowId: number) => {
   // 设置数据
   const res = await TenantApi.getTenantApi(rowId)
-  detailRef.value = res
+  detailData.value = res
   setDialogTile('detail')
 }
 

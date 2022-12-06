@@ -17,7 +17,7 @@
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailData" />
     <!-- 操作按钮 -->
     <template #footer>
       <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
@@ -45,13 +45,13 @@ const { gridOptions, getList } = useVxeGrid<TokenApi.OAuth2TokenVO>({
 })
 
 // ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref(t('action.detail')) // 弹出层标题
 // 详情
 const handleDetail = async (row: TokenApi.OAuth2TokenVO) => {
   // 设置数据
-  detailRef.value = row
+  detailData.value = row
   dialogVisible.value = true
 }
 

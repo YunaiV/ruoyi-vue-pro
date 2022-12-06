@@ -73,12 +73,12 @@ const submitForm = async () => {
 }
 
 // ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 
 // 详情操作
 const handleDetail = async (row: FormVO) => {
   // 设置数据
-  detailRef.value = row
+  detailData.value = row
   setDialogTile('detail')
 }
 
@@ -148,7 +148,7 @@ getList()
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
-      :data="detailRef"
+      :data="detailData"
     />
     <!-- 操作按钮 -->
     <template #footer>

@@ -27,7 +27,7 @@
   <!-- 弹窗 -->
   <XModal id="postModel" v-model="dialogVisible" :title="t('action.detail')">
     <!-- 对话框(详情) -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailData">
       <template #resultCode="{ row }">
         <span>{{ row.resultCode === 0 ? '成功' : '失败' }}</span>
       </template>
@@ -63,11 +63,11 @@ const { gridOptions, exportList } = useVxeGrid<OperateLogApi.OperateLogVO>({
 // 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
 const actionLoading = ref(false) // 按钮 Loading
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 // 详情
 const handleDetail = (row: OperateLogApi.OperateLogVO) => {
   // 设置数据
-  detailRef.value = row
+  detailData.value = row
   dialogVisible.value = true
 }
 
