@@ -42,7 +42,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       #if (!$column.createOperation && !$column.updateOperation)
       isForm: false,
       #elseif(!("" != $column.dictType))
-      #if ($column.htmlType == "datetime")## 时间框
+      #if (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdatetime")
       formatter: 'formatDate',
       form: {
         component: 'DatePicker',
