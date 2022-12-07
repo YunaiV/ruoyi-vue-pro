@@ -208,7 +208,8 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
       const tableSchemaItem = {
         ...schemaItem.table,
         field: schemaItem.field,
-        title: schemaItem.table?.title || schemaItem.title
+        title: schemaItem.table?.title || schemaItem.title,
+        minWidth: '80px'
       }
       tableSchemaItem.showOverflow = 'tooltip'
       if (schemaItem?.formatter) {
