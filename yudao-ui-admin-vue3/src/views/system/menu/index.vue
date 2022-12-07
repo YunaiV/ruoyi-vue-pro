@@ -98,7 +98,13 @@
   <!-- 添加或修改菜单对话框 -->
   <XModal id="menuModel" v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
-    <el-form ref="formRef" :model="menuForm" :rules="rules" label-width="auto" label-position="top">
+    <el-form
+      ref="formRef"
+      :model="menuForm"
+      :rules="rules"
+      label-width="120px"
+      label-position="left"
+    >
       <el-form-item label="上级菜单">
         <el-tree-select
           node-key="id"
@@ -109,9 +115,11 @@
           check-strictly
         />
       </el-form-item>
-      <el-form-item label="菜单名称" prop="name" span="12">
-        <el-input v-model="menuForm.name" placeholder="请输入菜单名称" clearable />
-      </el-form-item>
+      <el-col :span="8">
+        <el-form-item label="菜单名称" prop="name">
+          <el-input v-model="menuForm.name" placeholder="请输入菜单名称" clearable />
+        </el-form-item>
+      </el-col>
       <el-form-item label="菜单类型" prop="type">
         <el-radio-group v-model="menuForm.type">
           <el-radio-button
@@ -127,74 +135,88 @@
         <el-form-item label="菜单图标">
           <IconSelect v-model="menuForm.icon" clearable />
         </el-form-item>
-        <el-form-item label="路由地址" prop="path">
-          <template #label>
-            <Tooltip
-              titel="路由地址"
-              message="访问的路由地址，如：`user`。如需外网地址时，则以 `http(s)://` 开头"
-            />
-          </template>
-          <el-input v-model="menuForm.path" placeholder="请输入路由地址" clearable />
-        </el-form-item>
+        <el-col :span="8">
+          <el-form-item label="路由地址" prop="path">
+            <template #label>
+              <Tooltip
+                titel="路由地址"
+                message="访问的路由地址，如：`user`。如需外网地址时，则以 `http(s)://` 开头"
+              />
+            </template>
+            <el-input v-model="menuForm.path" placeholder="请输入路由地址" clearable />
+          </el-form-item>
+        </el-col>
       </template>
       <template v-if="menuForm.type === 2">
-        <el-form-item label="路由地址" prop="component">
-          <el-input v-model="menuForm.component" placeholder="请输入组件地址" clearable />
-        </el-form-item>
+        <el-col :span="8">
+          <el-form-item label="路由地址" prop="component">
+            <el-input v-model="menuForm.component" placeholder="请输入组件地址" clearable />
+          </el-form-item>
+        </el-col>
       </template>
       <template v-if="menuForm.type !== 1">
-        <el-form-item label="权限标识" prop="permission">
-          <template #label>
-            <Tooltip
-              titel="权限标识"
-              message="Controller 方法上的权限字符，如：@PreAuthorize(`@ss.hasPermission('system:user:list')`)"
-            />
-          </template>
-          <el-input v-model="menuForm.permission" placeholder="请输入权限标识" clearable />
-        </el-form-item>
+        <el-col :span="8">
+          <el-form-item label="权限标识" prop="permission">
+            <template #label>
+              <Tooltip
+                titel="权限标识"
+                message="Controller 方法上的权限字符，如：@PreAuthorize(`@ss.hasPermission('system:user:list')`)"
+              />
+            </template>
+            <el-input v-model="menuForm.permission" placeholder="请输入权限标识" clearable />
+          </el-form-item>
+        </el-col>
       </template>
-      <el-form-item label="显示排序" prop="sort">
-        <el-input-number v-model="menuForm.sort" controls-position="right" :min="0" clearable />
-      </el-form-item>
-      <el-form-item label="菜单状态" prop="status">
-        <el-radio-group v-model="menuForm.status">
-          <el-radio
-            border
-            v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
-            :key="dict.value"
-            :label="dict.value"
-          >
-            {{ dict.label }}
-          </el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <template v-if="menuForm.type !== 3">
-        <el-form-item label="显示状态" prop="status">
-          <template #label>
-            <Tooltip
-              titel="显示状态"
-              message="选择隐藏时，路由将不会出现在侧边栏，但仍然可以访问"
-            />
-          </template>
-          <el-radio-group v-model="menuForm.visible">
-            <el-radio border key="true" :label="true">显示</el-radio>
-            <el-radio border key="false" :label="false">隐藏</el-radio>
+      <el-col :span="8">
+        <el-form-item label="显示排序" prop="sort">
+          <el-input-number v-model="menuForm.sort" controls-position="right" :min="0" clearable />
+        </el-form-item>
+      </el-col>
+      <el-col :span="8">
+        <el-form-item label="菜单状态" prop="status">
+          <el-radio-group v-model="menuForm.status">
+            <el-radio
+              border
+              v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
+              :key="dict.value"
+              :label="dict.value"
+            >
+              {{ dict.label }}
+            </el-radio>
           </el-radio-group>
         </el-form-item>
+      </el-col>
+      <template v-if="menuForm.type !== 3">
+        <el-col :span="8">
+          <el-form-item label="显示状态" prop="status">
+            <template #label>
+              <Tooltip
+                titel="显示状态"
+                message="选择隐藏时，路由将不会出现在侧边栏，但仍然可以访问"
+              />
+            </template>
+            <el-radio-group v-model="menuForm.visible">
+              <el-radio border key="true" :label="true">显示</el-radio>
+              <el-radio border key="false" :label="false">隐藏</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
       </template>
       <template v-if="menuForm.type === 2">
-        <el-form-item label="缓存状态" prop="keepAlive">
-          <template #label>
-            <Tooltip
-              titel="缓存状态"
-              message="选择缓存时，则会被 `keep-alive` 缓存，需要匹配组件的 `name` 和路由地址保持一致"
-            />
-          </template>
-          <el-radio-group v-model="menuForm.keepAlive">
-            <el-radio border key="true" :label="true">缓存</el-radio>
-            <el-radio border key="false" :label="false">不缓存</el-radio>
-          </el-radio-group>
-        </el-form-item>
+        <el-col :span="8">
+          <el-form-item label="缓存状态" prop="keepAlive">
+            <template #label>
+              <Tooltip
+                titel="缓存状态"
+                message="选择缓存时，则会被 `keep-alive` 缓存，需要匹配组件的 `name` 和路由地址保持一致"
+              />
+            </template>
+            <el-radio-group v-model="menuForm.keepAlive">
+              <el-radio border key="true" :label="true">缓存</el-radio>
+              <el-radio border key="false" :label="false">不缓存</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
       </template>
     </el-form>
     <template #footer>
@@ -218,6 +240,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { useMessage } from '@/hooks/web/useMessage'
 import {
+  ElCol,
   ElForm,
   ElFormItem,
   ElInput,
