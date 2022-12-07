@@ -7,9 +7,11 @@
       v-model="valueRef"
       v-model:file-list="fileList"
       :show-file-list="true"
+      :auto-upload="autoUpload"
       :action="updateUrl"
       :headers="uploadHeaders"
       :limit="props.limit"
+      :drag="drag"
       :before-upload="beforeUpload"
       :on-exceed="handleExceed"
       :on-success="handleFileSuccess"
@@ -47,6 +49,8 @@ const props = defineProps({
   fileType: propTypes.array.def(['doc', 'xls', 'ppt', 'txt', 'pdf']), // 文件类型, 例如['png', 'jpg', 'jpeg']
   fileSize: propTypes.number.def(5), // 大小限制(MB)
   limit: propTypes.number.def(5), // 数量限制
+  autoUpload: propTypes.bool.def(true), // 自动上传
+  drag: propTypes.bool.def(false), // 拖拽上传
   isShowTip: propTypes.bool.def(true) // 是否显示提示
 })
 // ========== 上传相关 ==========
