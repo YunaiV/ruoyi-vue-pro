@@ -48,7 +48,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
         component: 'DatePicker',
         componentProps: {
           type: 'datetime',
-          valueFormat: 'YYYY-MM-DD HH:mm:ss'
+          valueFormat: 'x'
         }
       },
       #elseif($column.htmlType == "editor")## 文本编辑器
