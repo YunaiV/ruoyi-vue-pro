@@ -27,7 +27,7 @@ specifiers:
   axios: ^1.2.1
   consola: ^2.15.3
   crypto-js: ^4.1.1
-  dayjs: ^1.11.6
+  dayjs: ^1.11.7
   echarts: ^5.4.0
   echarts-wordcloud: ^2.1.0
   element-plus: 2.2.26
@@ -91,7 +91,7 @@ dependencies:
   animate.css: 4.1.1
   axios: registry.npmmirror.com/axios/1.2.1
   crypto-js: 4.1.1
-  dayjs: 1.11.6
+  dayjs: registry.npmmirror.com/dayjs/1.11.7
   echarts: 5.4.0
   echarts-wordcloud: 2.1.0_echarts@5.4.0
   element-plus: 2.2.26_vue@3.2.45
@@ -2178,10 +2178,6 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /dayjs/1.11.6:
-    resolution: {integrity: sha512-zZbY5giJAinCG+7AGaw0wIhNZ6J8AhWuSXKvuc1KAyMiRsvGQWqh4L+MomvhdAYjN+lqvVCMq1I41e3YHvXkyQ==}
-    dev: false
-
   /de-indent/1.0.2:
     resolution: {integrity: sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==}
     dev: true
@@ -2402,7 +2398,7 @@ packages:
       '@types/lodash-es': 4.17.6
       '@vueuse/core': 9.6.0_vue@3.2.45
       async-validator: 4.2.5
-      dayjs: 1.11.6
+      dayjs: registry.npmmirror.com/dayjs/1.11.7
       escape-html: 1.0.3
       lodash: 4.17.21
       lodash-es: 4.17.21
@@ -6172,6 +6168,12 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       delayed-stream: registry.npmmirror.com/delayed-stream/1.0.0
+    dev: false
+
+  registry.npmmirror.com/dayjs/1.11.7:
+    resolution: {integrity: sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/dayjs/-/dayjs-1.11.7.tgz}
+    name: dayjs
+    version: 1.11.7
     dev: false
 
   registry.npmmirror.com/debug/2.6.9:

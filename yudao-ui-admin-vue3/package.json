@@ -1,6 +1,6 @@
 {
   "name": "yudao-ui-admin-vue3",
-  "version": "1.6.5.1872",
+  "version": "1.6.5.1873",
   "description": "基于vue3、vite3、element-plus、typesScript",
   "author": "xingyu",
   "private": false,
@@ -32,7 +32,7 @@
     "animate.css": "^4.1.1",
     "axios": "^1.2.1",
     "crypto-js": "^4.1.1",
-    "dayjs": "^1.11.6",
+    "dayjs": "^1.11.7",
     "echarts": "^5.4.0",
     "echarts-wordcloud": "^2.1.0",
     "element-plus": "2.2.26",
