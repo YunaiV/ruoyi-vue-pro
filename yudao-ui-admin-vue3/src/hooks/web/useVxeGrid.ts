@@ -113,7 +113,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       // 默认选中类型
       type: 'csv',
       // 自定义数据量列表
-      modes: ['current', 'all'],
+      modes: config?.exportListApi ? ['current', 'all'] : ['current'],
       columns: config?.allSchemas.printSchema
     }
   })
