@@ -6,10 +6,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+// TODO 芋艿：字段优化
 @ApiModel("交易订单分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class TradeOrderPageReqVO extends PageParam {
+public class AppTradeOrderPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "订单状态", example = "1", notes = "参见 TradeOrderStatusEnum 枚举")
     private Integer orderStatus;

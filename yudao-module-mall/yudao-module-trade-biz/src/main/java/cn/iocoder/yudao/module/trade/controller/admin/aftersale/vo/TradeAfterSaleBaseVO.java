@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo;
 
-import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -73,7 +73,7 @@ public class TradeAfterSaleBaseVO {
     private Long skuId;
 
     @ApiModelProperty(value = "规格值数组")
-    private List<ProductPropertyRespVO> properties;
+    private List<ProductPropertyValueDetailRespVO> properties;
 
     @ApiModelProperty(value = "商品图片", example = "https://www.iocoder.cn/2.png")
     private String picUrl;

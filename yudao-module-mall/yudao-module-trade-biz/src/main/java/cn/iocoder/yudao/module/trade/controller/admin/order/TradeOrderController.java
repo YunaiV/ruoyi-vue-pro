@@ -1,18 +1,18 @@
 package cn.iocoder.yudao.module.trade.controller.admin.order;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -28,6 +28,14 @@ public class TradeOrderController {
 
     @Resource
     private TradeOrderService tradeOrderService;
+
+    @GetMapping("/page")
+    @ApiOperation("获得交易订单分页")
+    @PreAuthorize("@ss.hasPermission('trade:order:query')")
+    public CommonResult<PageResult<TradeOrderPageItemRespVO>> getOrderPage(TradeOrderPageReqVO reqVO) {
+        PageResult<TradeOrderDO> pageResult = tradeOrderService.getOrderPage(reqVO);
+        return success(null);
+    }
 
     @PostMapping("/delivery")
     @ApiOperation("发货订单")

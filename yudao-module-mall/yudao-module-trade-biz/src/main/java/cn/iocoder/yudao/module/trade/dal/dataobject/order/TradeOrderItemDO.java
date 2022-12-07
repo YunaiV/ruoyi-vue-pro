@@ -140,7 +140,7 @@ public class TradeOrderItemDO extends BaseDO {
 
     // TODO 芋艿：在捉摸一下
 
-    // ========== 退款基本信息 ==========
+    // ========== 售后基本信息 ==========
     /**
      * 售后状态
      *

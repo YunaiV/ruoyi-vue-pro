@@ -6,9 +6,10 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+// TODO 芋艿：字段优化
 @ApiModel("交易订单项 Response VO")
 @Data
-public class TradeOrderItemRespVO {
+public class AppTradeOrderItemRespVO {
 
     @ApiModelProperty(value = "id自增长", required = true)
     private Integer id;

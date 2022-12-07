@@ -6,9 +6,10 @@ import io.swagger.annotations.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+// TODO 芋艿：字段优化
 @ApiModel("订单交易 Response VO")
 @Data
-public class TradeOrderRespVO {
+public class AppTradeOrderRespVO {
 
     @ApiModelProperty(value = "订单编号", required = true)
     private Integer id;
@@ -66,7 +67,7 @@ public class TradeOrderRespVO {
      *
      * // TODO 芋艿，后续考虑怎么优化下，目前是内嵌了别的 dto
      */
-    private List<TradeOrderItemRespVO> orderItems;
+    private List<AppTradeOrderItemRespVO> orderItems;
 
 
 }

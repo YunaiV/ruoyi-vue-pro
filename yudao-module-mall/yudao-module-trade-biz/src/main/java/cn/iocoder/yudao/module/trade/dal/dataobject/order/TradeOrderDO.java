@@ -47,7 +47,7 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer type; // TODO order_promotion_type
     /**
-     * 订单来源终端
+     * 订单来源
      *
      * 枚举 {@link TerminalEnum}
      */
@@ -97,6 +97,10 @@ public class TradeOrderDO extends BaseDO {
 
     // ========== 价格 + 支付基本信息 ==========
 
+    // 价格文档 - 淘宝：https://open.taobao.com/docV3.htm?docId=108471&docType=1
+    // 价格文档 - 京东到家：https://openo2o.jddj.com/api/getApiDetail/182/4d1494c5e7ac4679bfdaaed950c5bc7f.htm
+    // 价格文档 - 有赞：https://doc.youzanyun.com/detail/API/0/906
+
     /**
      * 支付订单编号
      *
@@ -115,16 +119,11 @@ public class TradeOrderDO extends BaseDO {
      */
     private LocalDateTime payTime;
     /**
-     * 支付成功的支付渠道
+     * 支付渠道
      *
      * 对应 PayChannelEnum 枚举
      */
     private String payChannelCode;
-
-    // ========== 价格 + 支付基本信息 ==========
-    // 价格文档 - 淘宝：https://open.taobao.com/docV3.htm?docId=108471&docType=1
-    // 价格文档 - 京东到家：https://openo2o.jddj.com/api/getApiDetail/182/4d1494c5e7ac4679bfdaaed950c5bc7f.htm
-    // 价格文档 - 有赞：https://doc.youzanyun.com/detail/API/0/906
 
     /**
      * 商品原价（总），单位：分
@@ -222,7 +221,7 @@ public class TradeOrderDO extends BaseDO {
      */
     private String receiverDetailAddress;
 
-    // ========== 退款基本信息 ==========
+    // ========== 售后基本信息 ==========
     /**
      * 收货状态
      *

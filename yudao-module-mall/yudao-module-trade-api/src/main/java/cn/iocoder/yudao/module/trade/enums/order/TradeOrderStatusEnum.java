@@ -17,12 +17,11 @@ import java.util.Arrays;
 @Getter
 public enum TradeOrderStatusEnum implements IntArrayValuable {
 
-    UNPAID(0, "未付款"),
-    PAID(10, "已付款"), // 例如说，拼团订单，支付后，需要拼团成功后，才会处于待发货
-    UNDELIVERED(20, "待发货"),
-    DELIVERED(30, "已发货"),
-    COMPLETED(40, "已完成"),
-    CANCELED(50, "已取消");
+    UNPAID(0, "待支付"),
+    UNDELIVERED(10, "待发货"),
+    DELIVERED(20, "已发货"),
+    COMPLETED(30, "已完成"),
+    CANCELED(40, "已取消");
 
     // TODO 芋艿： TAKE("待核验")：虚拟订单需要核验商品
 
@@ -53,16 +52,6 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
      */
     public static boolean isUnpaid(Integer status) {
         return ObjectUtil.equal(UNPAID.getStatus(), status);
-    }
-
-    /**
-     * 判断指定状态，是否正处于【已支付】状态
-     *
-     * @param status 指定状态
-     * @return 是否
-     */
-    public static boolean isPaid(Integer status) {
-        return ObjectUtil.equal(PAID.getStatus(), status);
     }
 
     /**
@@ -112,7 +101,7 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
      * @return 是否
      */
     public static boolean havePaid(Integer status) {
-        return ObjectUtils.equalsAny(status, PAID.getStatus(), UNDELIVERED.getStatus(),
+        return ObjectUtils.equalsAny(status, UNDELIVERED.getStatus(),
                 DELIVERED.getStatus(), COMPLETED.getStatus());
     }
 

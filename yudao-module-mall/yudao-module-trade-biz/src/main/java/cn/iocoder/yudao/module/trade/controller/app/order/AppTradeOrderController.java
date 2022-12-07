@@ -8,8 +8,8 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderGetCreateInfoRespVO;
-import cn.iocoder.yudao.module.trade.controller.app.order.vo.TradeOrderPageReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.order.vo.TradeOrderRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderRespVO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -65,14 +65,14 @@ public class AppTradeOrderController {
     @GetMapping("/get")
     @ApiOperation("获得交易订单")
     @ApiImplicitParam(name = "tradeOrderId", value = "交易订单编号", required = true, dataTypeClass = Long.class)
-    public CommonResult<TradeOrderRespVO> getTradeOrder(@RequestParam("tradeOrderId") Integer tradeOrderId) {
+    public CommonResult<AppTradeOrderRespVO> getTradeOrder(@RequestParam("tradeOrderId") Integer tradeOrderId) {
 //        return success(tradeOrderService.getTradeOrder(tradeOrderId));
         return null;
     }
 
     @GetMapping("/page")
     @ApiOperation("获得订单交易分页")
-    public CommonResult<PageResult<TradeOrderRespVO>> pageTradeOrder(TradeOrderPageReqVO pageVO) {
+    public CommonResult<PageResult<AppTradeOrderRespVO>> pageTradeOrder(AppTradeOrderPageReqVO pageVO) {
 //        return success(tradeOrderService.pageTradeOrder(UserSecurityContextHolder.getUserId(), pageVO));
         return null;
     }
