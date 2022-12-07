@@ -77,7 +77,14 @@
             v-hasPermi="['system:user:update']"
             @click="handleDetail(row.id)"
           />
-          <el-dropdown class="p-0.5" v-hasPermi="['infra:job:trigger', 'infra:job:query']">
+          <el-dropdown
+            class="p-0.5"
+            v-hasPermi="[
+              'system:user:update-password',
+              'system:permission:assign-user-role',
+              'system:user:delete'
+            ]"
+          >
             <XTextButton :title="t('action.more')" postIcon="ep:arrow-down" />
             <template #dropdown>
               <el-dropdown-menu>
@@ -123,17 +130,17 @@
       :schema="allSchemas.formSchema"
       ref="formRef"
     >
-      <template #deptId>
+      <template #deptId="form">
         <el-tree-select
           node-key="id"
-          v-model="deptId"
+          v-model="form['deptId']"
           :props="defaultProps"
           :data="deptOptions"
           check-strictly
         />
       </template>
-      <template #postIds>
-        <el-select v-model="postIds" multiple :placeholder="t('common.selectText')">
+      <template #postIds="form">
+        <el-select v-model="form['postIds']" multiple :placeholder="t('common.selectText')">
           <el-option
             v-for="item in postOptions"
             :key="item.id"
@@ -277,7 +284,7 @@ import {
 } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { VxeGridInstance } from 'vxe-table'
-import { handleTree } from '@/utils/tree'
+import { handleTree, defaultProps } from '@/utils/tree'
 import download from '@/utils/download'
 import { CommonStatusEnum } from '@/utils/constants'
 import { getAccessToken, getTenantId } from '@/utils/auth'
@@ -299,11 +306,6 @@ import {
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
-const defaultProps = {
-  children: 'children',
-  label: 'name',
-  value: 'id'
-}
 const queryParams = reactive({
   deptId: null
 })
@@ -320,7 +322,7 @@ const { gridOptions, getList, deleteData, exportList } = useVxeGrid<UserApi.User
 })
 // ========== 创建部门树结构 ==========
 const filterText = ref('')
-const deptOptions = ref<any[]>([]) // 树形结构
+const deptOptions = ref<Tree[]>([]) // 树形结构
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const getTree = async () => {
   const res = await listSimpleDeptApi()
@@ -347,8 +349,6 @@ const actionType = ref('') // 操作按钮的类型
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormExpose>() // 表单 Ref
-const deptId = ref() // 部门ID
-const postIds = ref<string[]>([]) // 岗位ID
 const postOptions = ref<PostVO[]>([]) //岗位列表
 
 // 获取岗位列表
@@ -367,8 +367,6 @@ const setDialogTile = async (type: string) => {
 const handleCreate = async () => {
   setDialogTile('create')
   // 重置表单
-  deptId.value = null
-  postIds.value = []
   await nextTick()
   if (allSchemas.formSchema[0].field !== 'username') {
     unref(formRef)?.addSchema(
@@ -398,8 +396,6 @@ const handleUpdate = async (rowId: number) => {
   unref(formRef)?.delSchema('password')
   // 设置数据
   const res = await UserApi.getUserApi(rowId)
-  deptId.value = res.deptId
-  postIds.value = res.postIds
   unref(formRef)?.setValues(res)
 }
 const detailData = ref()
@@ -421,8 +417,6 @@ const submitForm = async () => {
   // 提交请求
   try {
     const data = unref(formRef)?.formModel as UserApi.UserVO
-    data.deptId = deptId.value
-    data.postIds = postIds.value
     if (actionType.value === 'create') {
       await UserApi.createUserApi(data)
       message.success(t('common.createSuccess'))

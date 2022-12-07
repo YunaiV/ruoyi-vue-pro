@@ -167,20 +167,21 @@ import { EChartsOption } from 'echarts'
 import { ElRow, ElCol, ElSkeleton, ElCard, ElDivider, ElLink } from 'element-plus'
 import { formatTime } from '@/utils'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useCache } from '@/hooks/web/useCache'
+import { useUserStore } from '@/store/modules/user'
 import { useWatermark } from '@/hooks/web/useWatermark'
 import { Echart } from '@/components/Echart'
 import { CountTo } from '@/components/CountTo'
 import { Highlight } from '@/components/Highlight'
+import avatarImg from '@/assets/imgs/avatar.gif'
 import type { WorkplaceTotal, Project, Notice, Shortcut } from './types'
 import { pieOptions, barOptions } from './echarts-data'
 
 const { t } = useI18n()
-const { wsCache } = useCache()
+const userStore = useUserStore()
 const { setWatermark } = useWatermark()
 const loading = ref(true)
-const avatar = wsCache.get('user').user.avatar
-const username = wsCache.get('user').user.nickname
+const avatar = userStore.getUser.avatar ? userStore.getUser.avatar : avatarImg
+const username = userStore.getUser.nickname
 const pieOptionsData = reactive<EChartsOption>(pieOptions) as EChartsOption
 // 获取统计数
 let totalSate = reactive<WorkplaceTotal>({

@@ -28,6 +28,9 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '${column.columnComment}',
       field: '${column.javaField}',
+      #if (!$column.listOperationResult)
+      isTable: false,
+      #end
       #if ("" != $dictType)## 有数据字典
       dictType: DICT_TYPE.$dictType.toUpperCase(),
       #if (${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
@@ -39,7 +42,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
       #if (!$column.createOperation && !$column.updateOperation)
       isForm: false,
       #elseif(!("" != $column.dictType))
-      #if ($column.htmlType == "datetime")## 时间框
+      #if (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdatetime")
+      formatter: 'formatDate',
       form: {
         component: 'DatePicker',
         componentProps: {
@@ -73,9 +77,20 @@ const crudSchemas = reactive<VxeCrudSchema>({
         component: 'InputNumber',
         value: 0
       },
+      #elseif($column.htmlType == "imageUpload")## 图片上传
+      form: {
+        component: 'UploadImg',
+        componentProps: {
+          limit: 1
+        }
+      },
+      #elseif($column.htmlType == "fileUpload")## 图片上传
+      form: {
+        component: 'UploadFile'
+      },
       #end
       #end
-      #if ($column.listOperationResult)
+      #if ($column.listOperation)
       #if($column.htmlType == "input")
       isSearch: true,
       #elseif("" != $dictType)

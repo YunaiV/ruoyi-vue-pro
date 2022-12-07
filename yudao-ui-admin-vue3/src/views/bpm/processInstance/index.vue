@@ -38,12 +38,12 @@ const handleCancel = (row: ProcessInstanceVO) => {
 }
 
 // ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 
 // 详情操作
 const handleDetail = async (row: ProcessInstanceVO) => {
   // 设置数据
-  detailRef.value = row
+  detailData.value = row
   dialogVisible.value = true
 }
 
@@ -105,7 +105,7 @@ getList()
 
   <XModal v-model="dialogVisible" :title="t('action.detail')">
     <!-- 对话框(详情) -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailData" />
     <!-- 操作按钮 -->
     <template #footer>
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>

@@ -223,7 +223,6 @@ export default {
       this.checkPosArr.splice(0, this.checkPosArr.length)
       this.num = 1
       this.getPictrue()
-      this.text = '验证失败'
       this.showRefresh = true
     },
 

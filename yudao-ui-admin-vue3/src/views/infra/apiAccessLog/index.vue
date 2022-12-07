@@ -21,7 +21,7 @@
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailData">
       <template #duration="{ row }">
         <span>{{ row.duration + 'ms' }}</span>
       </template>
@@ -52,14 +52,14 @@ const { gridOptions } = useVxeGrid<ApiAccessLogApi.ApiAccessLogVO>({
   getListApi: ApiAccessLogApi.getApiAccessLogPageApi
 })
 // ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('') // 弹出层标题
 
 // 详情操作
 const handleDetail = (row: ApiAccessLogApi.ApiAccessLogVO) => {
   // 设置数据
-  detailRef.value = row
+  detailData.value = row
   dialogTitle.value = t('action.detail')
   dialogVisible.value = true
 }

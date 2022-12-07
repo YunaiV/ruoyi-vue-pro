@@ -28,15 +28,15 @@
         <dynamic-datasource.version>3.5.2</dynamic-datasource.version>
         <redisson.version>3.18.0</redisson.version>
         <!-- 服务保障相关 -->
-        <lock4j.version>2.2.2</lock4j.version>
+        <lock4j.version>2.2.3</lock4j.version>
         <resilience4j.version>1.7.1</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>8.12.0</skywalking.version>
         <spring-boot-admin.version>2.7.7</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
-        <podam.version>7.2.9.RELEASE</podam.version>
-        <jedis-mock.version>1.0.4</jedis-mock.version>
+        <podam.version>7.2.11.RELEASE</podam.version>
+        <jedis-mock.version>1.0.5</jedis-mock.version>
         <mockito-inline.version>4.8.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.7.2</flowable.version>
@@ -50,19 +50,19 @@
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>31.1-jre</guava.version>
         <guice.version>5.1.0</guice.version>
-        <transmittable-thread-local.version>2.14.0</transmittable-thread-local.version>
+        <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.5.0</tika-core.version>
         <aj-captcha.version>1.3.0</aj-captcha.version>
-        <netty-all.version>4.1.82.Final</netty-all.version>
+        <netty-all.version>4.1.85.Final</netty-all.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.0.0</okio.version>
         <okhttp3.version>4.10.0</okhttp3.version>
         <minio.version>8.4.6</minio.version>
-        <aliyun-java-sdk-core.version>4.6.2</aliyun-java-sdk-core.version>
+        <aliyun-java-sdk-core.version>4.6.3</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
-        <tencentcloud-sdk-java.version>3.1.635</tencentcloud-sdk-java.version>
+        <tencentcloud-sdk-java.version>3.1.637</tencentcloud-sdk-java.version>
         <justauth.version>1.4.0</justauth.version>
         <jimureport.version>1.5.4</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>

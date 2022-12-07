@@ -28,7 +28,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '角色类型',
       field: 'type',
       dictType: DICT_TYPE.SYSTEM_ROLE_TYPE,
-      dictClass: 'number'
+      dictClass: 'number',
+      isForm: false
     },
     {
       title: '角色标识',
@@ -38,6 +39,21 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: '显示顺序',
       field: 'sort'
+    },
+    {
+      title: t('form.remark'),
+      field: 'remark',
+      isTable: false,
+      form: {
+        component: 'Input',
+        componentProps: {
+          type: 'textarea',
+          rows: 4
+        },
+        colProps: {
+          span: 24
+        }
+      }
     },
     {
       title: t('common.status'),

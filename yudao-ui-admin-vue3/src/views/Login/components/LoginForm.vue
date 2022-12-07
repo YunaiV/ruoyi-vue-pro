@@ -16,7 +16,7 @@
         </el-form-item>
       </el-col>
       <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
-        <el-form-item prop="tenantName">
+        <el-form-item prop="tenantName" v-if="loginData.tenantEnable === 'true'">
           <el-input
             type="text"
             v-model="loginData.loginForm.tenantName"
@@ -65,9 +65,13 @@
       </el-col>
       <el-col :span="24" style="padding-left: 10px; padding-right: 10px">
         <el-form-item>
-          <el-button :loading="loginLoading" type="primary" class="w-[100%]" @click="getCode()">
-            {{ t('login.login') }}
-          </el-button>
+          <XButton
+            :loading="loginLoading"
+            type="primary"
+            class="w-[100%]"
+            :title="t('login.login')"
+            @click="getCode()"
+          />
         </el-form-item>
       </el-col>
       <Verify
@@ -81,19 +85,25 @@
         <el-form-item>
           <el-row justify="space-between" style="width: 100%" :gutter="5">
             <el-col :span="8">
-              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.MOBILE)">
-                {{ t('login.btnMobile') }}
-              </el-button>
+              <XButton
+                class="w-[100%]"
+                :title="t('login.btnMobile')"
+                @click="setLoginState(LoginStateEnum.MOBILE)"
+              />
             </el-col>
             <el-col :span="8">
-              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.QR_CODE)">
-                {{ t('login.btnQRCode') }}
-              </el-button>
+              <XButton
+                class="w-[100%]"
+                :title="t('login.btnQRCode')"
+                @click="setLoginState(LoginStateEnum.QR_CODE)"
+              />
             </el-col>
             <el-col :span="8">
-              <el-button class="w-[100%]" @click="setLoginState(LoginStateEnum.REGISTER)">
-                {{ t('login.btnRegister') }}
-              </el-button>
+              <XButton
+                class="w-[100%]"
+                :title="t('login.btnRegister')"
+                @click="setLoginState(LoginStateEnum.REGISTER)"
+              />
             </el-col>
           </el-row>
         </el-form-item>
@@ -103,32 +113,13 @@
         <el-form-item>
           <div class="flex justify-between w-[100%]">
             <Icon
-              icon="ant-design:github-filled"
+              v-for="(item, key) in socialList"
+              :key="key"
+              :icon="item.icon"
               :size="30"
               class="cursor-pointer anticon"
               color="#999"
-              @click="doSocialLogin('github')"
-            />
-            <Icon
-              icon="ant-design:wechat-filled"
-              :size="30"
-              class="cursor-pointer anticon"
-              color="#999"
-              @click="doSocialLogin('wechat')"
-            />
-            <Icon
-              icon="ant-design:alipay-circle-filled"
-              :size="30"
-              color="#999"
-              class="cursor-pointer anticon"
-              @click="doSocialLogin('alipay')"
-            />
-            <Icon
-              icon="ant-design:dingtalk-circle-filled"
-              :size="30"
-              color="#999"
-              class="cursor-pointer anticon"
-              @click="doSocialLogin('dingtalk')"
+              @click="doSocialLogin(item.type)"
             />
           </div>
         </el-form-item>
@@ -150,21 +141,24 @@ import {
   ElDivider,
   ElLoading
 } from 'element-plus'
-import Cookies from 'js-cookie'
 import { useRouter } from 'vue-router'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useIcon } from '@/hooks/web/useIcon'
+import { useMessage } from '@/hooks/web/useMessage'
 import { required } from '@/utils/formRules'
-import { setToken, setTenantId } from '@/utils/auth'
-import { decrypt, encrypt } from '@/utils/jsencrypt'
-import { Icon } from '@/components/Icon'
+import * as authUtil from '@/utils/auth'
+import { decrypt } from '@/utils/jsencrypt'
 import { Verify } from '@/components/Verifition'
 import { usePermissionStore } from '@/store/modules/permission'
 import * as LoginApi from '@/api/login'
 import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'
 
 const { t } = useI18n()
+const message = useMessage()
+const iconHouse = useIcon({ icon: 'ep:house' })
+const iconAvatar = useIcon({ icon: 'ep:avatar' })
+const iconLock = useIcon({ icon: 'ep:lock' })
 const formLogin = ref()
 const { validForm } = useFormValid(formLogin)
 const { setLoginState, getLoginState } = useLoginState()
@@ -172,9 +166,6 @@ const { currentRoute, push } = useRouter()
 const permissionStore = usePermissionStore()
 const redirect = ref<string>('')
 const loginLoading = ref(false)
-const iconHouse = useIcon({ icon: 'ep:house' })
-const iconAvatar = useIcon({ icon: 'ep:avatar' })
-const iconLock = useIcon({ icon: 'ep:lock' })
 const verify = ref()
 const captchaType = ref('blockPuzzle') // blockPuzzle 滑块 clickWord 点击文字
 
@@ -194,15 +185,32 @@ const loginData = reactive({
     signIn: false
   },
   loginForm: {
-    tenantName: Cookies.get('tenantName') ? Cookies.get('tenantName') : '芋道源码',
-    username: Cookies.get('username') ? Cookies.get('username') : 'admin',
-    password: Cookies.get('password')
-      ? (decrypt(Cookies.get('password')) as unknown as string)
-      : 'admin123',
+    tenantName: '芋道源码',
+    username: 'admin',
+    password: 'admin123',
     captchaVerification: '',
     rememberMe: false
   }
 })
+
+const socialList = [
+  {
+    icon: 'ant-design:github-filled',
+    type: 0
+  },
+  {
+    icon: 'ant-design:wechat-filled',
+    type: 30
+  },
+  {
+    icon: 'ant-design:alipay-circle-filled',
+    type: 0
+  },
+  {
+    icon: 'ant-design:dingtalk-circle-filled',
+    type: 20
+  }
+]
 
 // 获取验证码
 const getCode = async () => {
@@ -217,17 +225,19 @@ const getCode = async () => {
 }
 //获取租户ID
 const getTenantId = async () => {
-  const res = await LoginApi.getTenantIdByNameApi(loginData.loginForm.tenantName)
-  setTenantId(res)
+  if (loginData.tenantEnable === 'true') {
+    const res = await LoginApi.getTenantIdByNameApi(loginData.loginForm.tenantName)
+    authUtil.setTenantId(res)
+  }
 }
 // 记住我
 const getCookie = () => {
-  const username = Cookies.get('username')
-  const password = Cookies.get('password')
-    ? (decrypt(Cookies.get('password')) as unknown as string)
+  const username = authUtil.getUsername()
+  const password = authUtil.getPassword()
+    ? decrypt(authUtil.getPassword() as unknown as string)
     : undefined
-  const rememberMe = Cookies.get('rememberMe')
-  const tenantName = Cookies.get('tenantName')
+  const rememberMe = authUtil.getRememberMe()
+  const tenantName = authUtil.getTenantName()
   loginData.loginForm = {
     ...loginData.loginForm,
     username: username ? username : loginData.loginForm.username,
@@ -256,19 +266,17 @@ const handleLogin = async (params) => {
       background: 'rgba(0, 0, 0, 0.7)'
     })
     if (loginData.loginForm.rememberMe) {
-      Cookies.set('username', loginData.loginForm.username, { expires: 30 })
-      Cookies.set('password', encrypt(loginData.loginForm.password as unknown as string), {
-        expires: 30
-      })
-      Cookies.set('rememberMe', loginData.loginForm.rememberMe, { expires: 30 })
-      Cookies.set('tenantName', loginData.loginForm.tenantName, { expires: 30 })
+      authUtil.setUsername(loginData.loginForm.username)
+      authUtil.setPassword(loginData.loginForm.password)
+      authUtil.setRememberMe(loginData.loginForm.rememberMe)
+      authUtil.setTenantName(loginData.loginForm.tenantName)
     } else {
-      Cookies.remove('username')
-      Cookies.remove('password')
-      Cookies.remove('rememberMe')
-      Cookies.remove('tenantName')
+      authUtil.removeUsername()
+      authUtil.removePassword()
+      authUtil.removeRememberMe()
+      authUtil.removeTenantName()
     }
-    setToken(res)
+    authUtil.setToken(res)
     if (!redirect.value) {
       redirect.value = '/'
     }
@@ -284,14 +292,24 @@ const handleLogin = async (params) => {
 }
 
 // 社交登录
-const doSocialLogin = async (type: string) => {
-  loginLoading.value = true
-  // 计算 redirectUri
-  const redirectUri =
-    location.origin + '/social-login?type=' + type + '&redirect=' + (redirect.value || '/')
-  // 进行跳转
-  const res = await LoginApi.socialAuthRedirectApi(type, encodeURIComponent(redirectUri))
-  window.location.href = res
+const doSocialLogin = async (type: number) => {
+  if (type === 0) {
+    message.error('此方式未配置')
+  } else {
+    loginLoading.value = true
+    if (loginData.tenantEnable === 'true') {
+      await message.prompt('请输入租户名称', t('common.reminder')).then(async ({ value }) => {
+        const res = await LoginApi.getTenantIdByNameApi(value)
+        authUtil.setTenantId(res)
+      })
+    }
+    // 计算 redirectUri
+    const redirectUri =
+      location.origin + '/social-login?type=' + type + '&redirect=' + (redirect.value || '/')
+    // 进行跳转
+    const res = await LoginApi.socialAuthRedirectApi(type, encodeURIComponent(redirectUri))
+    window.location.href = res
+  }
 }
 watch(
   () => currentRoute.value,

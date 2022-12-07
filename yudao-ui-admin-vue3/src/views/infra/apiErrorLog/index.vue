@@ -44,7 +44,7 @@
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef" />
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailData" />
     <!-- 操作按钮 -->
     <template #footer>
       <XButton :title="t('dialog.close')" @click="dialogVisible = false" />
@@ -71,14 +71,14 @@ const { gridOptions, getList, exportList } = useVxeGrid<ApiErrorLogApi.ApiErrorL
   exportListApi: ApiErrorLogApi.exportApiErrorLogApi
 })
 // ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('') // 弹出层标题
 
 // 详情操作
 const handleDetail = (row: ApiErrorLogApi.ApiErrorLogVO) => {
   // 设置数据
-  detailRef.value = row
+  detailData.value = row
   dialogTitle.value = t('action.detail')
   dialogVisible.value = true
 }

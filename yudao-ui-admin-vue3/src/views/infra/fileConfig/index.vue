@@ -35,12 +35,7 @@
           @click="handleMaster(row)"
         />
         <!-- 操作：测试 -->
-        <XTextButton
-          preIcon="ep:share"
-          :title="t('action.test')"
-          v-hasPermi="['infra:file-config:update']"
-          @click="handleUpdate(row.id)"
-        />
+        <XTextButton preIcon="ep:share" :title="t('action.test')" @click="handleTest(row.id)" />
         <!-- 操作：删除 -->
         <XTextButton
           preIcon="ep:delete"
@@ -164,7 +159,7 @@
 </template>
 <script setup lang="ts" name="FileConfig">
 // 全局相关的 import
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 import {
   ElForm,
   ElFormItem,
@@ -202,7 +197,7 @@ const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormInstance>() // 表单 Ref
 const detailData = ref() // 详情 Ref
-let form = reactive<FileConfigApi.FileConfigVO>({
+let form = ref<FileConfigApi.FileConfigVO>({
   id: 0,
   name: '',
   storage: 0,
@@ -211,7 +206,7 @@ let form = reactive<FileConfigApi.FileConfigVO>({
   config: {
     basePath: '',
     host: '',
-    port: '',
+    port: 0,
     username: '',
     password: '',
     mode: '',
@@ -222,7 +217,7 @@ let form = reactive<FileConfigApi.FileConfigVO>({
     domain: ''
   },
   remark: '',
-  createTime: ''
+  createTime: new Date()
 })
 // 设置标题
 const setDialogTile = (type: string) => {
@@ -241,7 +236,7 @@ const handleCreate = (formEl: FormInstance | undefined) => {
 const handleUpdate = async (rowId: number) => {
   // 设置数据
   const res = await FileConfigApi.getFileConfigApi(rowId)
-  form = res
+  form.value = res
   setDialogTile('update')
 }
 
@@ -263,6 +258,11 @@ const handleMaster = (row: FileConfigApi.FileConfigVO) => {
     })
 }
 
+const handleTest = async (rowId: number) => {
+  const res = await FileConfigApi.testFileConfigApi(rowId)
+  message.alert('测试通过，上传文件成功！访问地址：' + res)
+}
+
 // 删除操作
 const handleDelete = async (rowId: number) => {
   await deleteData(xGrid, rowId)
@@ -277,10 +277,10 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       // 提交请求
       try {
         if (actionType.value === 'create') {
-          await FileConfigApi.createFileConfigApi(form)
+          await FileConfigApi.createFileConfigApi(form.value)
           message.success(t('common.createSuccess'))
         } else {
-          await FileConfigApi.updateFileConfigApi(form)
+          await FileConfigApi.updateFileConfigApi(form.value)
           message.success(t('common.updateSuccess'))
         }
         dialogVisible.value = false

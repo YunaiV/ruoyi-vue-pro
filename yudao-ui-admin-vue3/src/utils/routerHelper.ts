@@ -18,7 +18,7 @@ export const getParentLayout = () => {
 }
 
 // 按照路由中meta下的rank等级升序来排序路由
-export function ascending(arr: any[]) {
+export const ascending = (arr: any[]) => {
   arr.forEach((v) => {
     if (v?.meta?.rank === null) v.meta.rank = undefined
     if (v?.meta?.rank === 0) {
@@ -109,7 +109,7 @@ export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecord
         data.children = generateRoute(route.children)
       }
     }
-    res.push(data)
+    res.push(data as AppRouteRecordRaw)
   }
   return res
 }
@@ -203,7 +203,7 @@ const addToChildren = (
     }
   }
 }
-function toCamelCase(str: string, upperCaseFirst: boolean) {
+const toCamelCase = (str: string, upperCaseFirst: boolean) => {
   str = (str || '').toLowerCase().replace(/-(.)/g, function (group1: string) {
     return group1.toUpperCase()
   })

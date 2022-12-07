@@ -41,6 +41,12 @@ const crudSchemas = reactive<VxeCrudSchema>({
         cellRender: {
           name: 'XImg'
         }
+      },
+      form: {
+        component: 'UploadImg',
+        componentProps: {
+          limit: 1
+        }
       }
     },
     {

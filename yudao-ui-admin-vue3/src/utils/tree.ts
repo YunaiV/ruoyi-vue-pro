@@ -8,6 +8,11 @@ const DEFAULT_CONFIG: TreeHelperConfig = {
   children: 'children',
   pid: 'pid'
 }
+export const defaultProps = {
+  children: 'children',
+  label: 'name',
+  value: 'id'
+}
 
 const getConfig = (config: Partial<TreeHelperConfig>) => Object.assign({}, DEFAULT_CONFIG, config)
 
@@ -214,6 +219,10 @@ export const eachTree = (treeDatas: any[], callBack: Fn, parentNode = {}) => {
  * @param {*} children 孩子节点字段 默认 'children'
  */
 export const handleTree = (data: any[], id?: string, parentId?: string, children?: string) => {
+  if (!Array.isArray(data)) {
+    console.warn('data must be an array')
+    return []
+  }
   const config = {
     id: id || 'id',
     parentId: parentId || 'parentId',

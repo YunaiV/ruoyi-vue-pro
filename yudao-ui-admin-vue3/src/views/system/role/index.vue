@@ -64,7 +64,7 @@
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
-      :data="detailRef"
+      :data="detailData"
     />
     <!-- 操作按钮 -->
     <template #footer>
@@ -92,9 +92,9 @@
         <el-select v-model="dataScopeForm.dataScope">
           <el-option
             v-for="item in dataScopeDictDatas"
-            :key="parseInt(item.value)"
+            :key="item.value"
             :label="item.label"
-            :value="parseInt(item.value)"
+            :value="item.value"
           />
         </el-select>
       </el-form-item>
@@ -105,7 +105,7 @@
           actionScopeType === 'menu' || dataScopeForm.dataScope === SystemDataScopeEnum.DEPT_CUSTOM
         "
       >
-        <el-card class="box-card">
+        <el-card shadow="never">
           <template #header>
             父子联动(选中父节点，自动选择子节点):
             <el-switch v-model="checkStrictly" inline-prompt active-text="是" inactive-text="否" />
@@ -164,9 +164,9 @@ import { FormExpose } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { handleTree } from '@/utils/tree'
+import { handleTree, defaultProps } from '@/utils/tree'
 import { SystemDataScopeEnum } from '@/utils/constants'
-import { DICT_TYPE, getDictOptions } from '@/utils/dict'
+import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { rules, allSchemas } from './role.data'
 import * as RoleApi from '@/api/system/role'
 import { listSimpleMenusApi } from '@/api/system/menu'
@@ -189,7 +189,7 @@ const actionType = ref('') // 操作按钮的类型
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormExpose>() // 表单 Ref
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 
 // 设置标题
 const setDialogTile = (type: string) => {
@@ -216,7 +216,7 @@ const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
   // 设置数据
   const res = await RoleApi.getRoleApi(rowId)
-  detailRef.value = res
+  detailData.value = res
 }
 
 // 删除操作
@@ -259,11 +259,6 @@ const dataScopeForm = reactive({
   dataScope: 0,
   checkList: []
 })
-const defaultProps = {
-  children: 'children',
-  label: 'name',
-  value: 'id'
-}
 const treeOptions = ref<any[]>([]) // 菜单树形结构
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const dialogScopeVisible = ref(false)
@@ -306,18 +301,20 @@ const handleScope = async (type: string, row: RoleApi.RoleVO) => {
 }
 // 保存权限
 const submitScope = async () => {
-  const keys = treeRef.value!.getCheckedKeys(false) as unknown as Array<number>
   if ('data' === actionScopeType.value) {
     const data = ref<PermissionApi.PermissionAssignRoleDataScopeReqVO>({
       roleId: dataScopeForm.id,
       dataScope: dataScopeForm.dataScope,
-      dataScopeDeptIds: dataScopeForm.dataScope !== SystemDataScopeEnum.DEPT_CUSTOM ? [] : keys
+      dataScopeDeptIds:
+        dataScopeForm.dataScope !== SystemDataScopeEnum.DEPT_CUSTOM
+          ? []
+          : (treeRef.value!.getCheckedKeys(false) as unknown as Array<number>)
     })
     await PermissionApi.assignRoleDataScopeApi(data.value)
   } else if ('menu' === actionScopeType.value) {
     const data = ref<PermissionApi.PermissionAssignRoleMenuReqVO>({
       roleId: dataScopeForm.id,
-      menuIds: keys
+      menuIds: treeRef.value!.getCheckedKeys(false) as unknown as Array<number>
     })
     await PermissionApi.assignRoleMenuApi(data.value)
   }
@@ -325,7 +322,7 @@ const submitScope = async () => {
   dialogScopeVisible.value = false
 }
 const init = () => {
-  dataScopeDictDatas.value = getDictOptions(DICT_TYPE.SYSTEM_DATA_SCOPE)
+  dataScopeDictDatas.value = getIntDictOptions(DICT_TYPE.SYSTEM_DATA_SCOPE)
 }
 // ========== 初始化 ==========
 onMounted(() => {

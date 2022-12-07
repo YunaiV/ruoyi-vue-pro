@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useCache } from '@/hooks/web/useCache'
+import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { useRouter } from 'vue-router'
 import { useDesign } from '@/hooks/web/useDesign'
 import avatarImg from '@/assets/imgs/avatar.gif'
@@ -22,7 +22,7 @@ const { getPrefixCls } = useDesign()
 
 const prefixCls = getPrefixCls('user-info')
 
-const user = wsCache.get('user')
+const user = wsCache.get(CACHE_KEY.USER)
 
 const avatar = user.user.avatar ? user.user.avatar : avatarImg
 

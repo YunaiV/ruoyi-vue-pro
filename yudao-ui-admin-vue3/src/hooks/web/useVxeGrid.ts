@@ -11,10 +11,12 @@ const message = useMessage() // 消息弹窗
 
 interface UseVxeGridConfig<T = any> {
   allSchemas: VxeAllSchemas
+  height?: number // 高度 默认730
   topActionSlots?: boolean // 是否开启表格内顶部操作栏插槽
   treeConfig?: VxeTablePropTypes.TreeConfig // 树形表单配置
   isList?: boolean // 是否不带分页的list
   getListApi: (option: any) => Promise<T> // 获取列表接口
+  getAllListApi?: (option: any) => Promise<T> // 获取全部数据接口 用于VXE导出
   deleteApi?: (option: any) => Promise<T> // 删除接口
   exportListApi?: (option: any) => Promise<T> // 导出接口
   exportName?: string // 导出文件夹名称
@@ -47,7 +49,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
   const gridOptions = reactive<VxeGridProps<any>>({
     loading: true,
     size: currentSize as any,
-    height: 730, // 1080高度
+    height: config?.height ? config.height : 730,
     rowConfig: {
       isCurrent: true, // 当鼠标点击行时，是否要高亮当前行
       isHover: true // 当鼠标移到行时，是否要高亮当前行
@@ -99,8 +101,8 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
         queryAll: ({ form }) => {
           const queryParams = Object.assign({}, JSON.parse(JSON.stringify(form)))
           return new Promise(async (resolve) => {
-            if (config?.exportListApi) {
-              resolve(await config?.exportListApi(queryParams))
+            if (config?.getAllListApi) {
+              resolve(await config?.getAllListApi(queryParams))
             } else {
               resolve(await config?.getListApi(queryParams))
             }
@@ -113,7 +115,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       // 默认选中类型
       type: 'csv',
       // 自定义数据量列表
-      modes: ['current', 'all'],
+      modes: config?.getAllListApi ? ['current', 'all'] : ['current'],
       columns: config?.allSchemas.printSchema
     }
   })

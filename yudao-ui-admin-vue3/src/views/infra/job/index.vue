@@ -93,15 +93,15 @@
       :rules="rules"
       ref="formRef"
     >
-      <template #cronExpression>
-        <Crontab v-model="cronExpression" :shortcuts="shortcuts" />
+      <template #cronExpression="form">
+        <Crontab v-model="form['cronExpression']" :shortcuts="shortcuts" />
       </template>
     </Form>
     <!-- 对话框(详情) -->
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
-      :data="detailRef"
+      :data="detailData"
     >
       <template #retryInterval="{ row }">
         <span>{{ row.retryInterval + '毫秒' }} </span>
@@ -161,8 +161,7 @@ const actionType = ref('') // 操作按钮的类型
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormExpose>() // 表单 Ref
-const detailRef = ref() // 详情 Ref
-const cronExpression = ref('')
+const detailData = ref() // 详情 Ref
 const nextTimes = ref([])
 const shortcuts = ref([
   {
@@ -179,7 +178,6 @@ const setDialogTile = (type: string) => {
 
 // 新增操作
 const handleCreate = () => {
-  cronExpression.value = ''
   setDialogTile('create')
 }
 
@@ -193,7 +191,6 @@ const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
   const res = await JobApi.getJobApi(rowId)
-  cronExpression.value = res.cronExpression
   unref(formRef)?.setValues(res)
 }
 
@@ -201,7 +198,7 @@ const handleUpdate = async (rowId: number) => {
 const handleDetail = async (rowId: number) => {
   // 设置数据
   const res = await JobApi.getJobApi(rowId)
-  detailRef.value = res
+  detailData.value = res
   // 后续执行时长
   const jobNextTime = await JobApi.getJobNextTimesApi(rowId)
   nextTimes.value = jobNextTime
@@ -305,7 +302,6 @@ const submitForm = async () => {
       // 提交请求
       try {
         const data = unref(formRef)?.formModel as JobApi.JobVO
-        data.cronExpression = cronExpression.value
         if (actionType.value === 'create') {
           await JobApi.createJobApi(data)
           message.success(t('common.createSuccess'))

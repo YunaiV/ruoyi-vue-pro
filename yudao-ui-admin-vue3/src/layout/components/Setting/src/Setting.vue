@@ -3,13 +3,13 @@ import { ElDrawer, ElDivider, ElMessage } from 'element-plus'
 import { ref, unref, computed, watch } from 'vue'
 import { useCssVar, useClipboard } from '@vueuse/core'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useCache } from '@/hooks/web/useCache'
+import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { useDesign } from '@/hooks/web/useDesign'
 
 import { trim, setCssVar } from '@/utils'
 import { colorIsDark, lighten, hexToRGB } from '@/utils/color'
 import { useAppStore } from '@/store/modules/app'
-import { ThemeSwitch } from '@/components/ThemeSwitch'
+import { ThemeSwitch } from '@/layout/components/ThemeSwitch'
 import ColorRadioPicker from './components/ColorRadioPicker.vue'
 import InterfaceDisplay from './components/InterfaceDisplay.vue'
 import LayoutRadioPicker from './components/LayoutRadioPicker.vue'
@@ -188,9 +188,9 @@ const copyConfig = async () => {
 // 清空缓存
 const clear = () => {
   const { wsCache } = useCache()
-  wsCache.delete('layout')
-  wsCache.delete('theme')
-  wsCache.delete('isDark')
+  wsCache.delete(CACHE_KEY.LAYOUT)
+  wsCache.delete(CACHE_KEY.THEME)
+  wsCache.delete(CACHE_KEY.IS_DARK)
   window.location.reload()
 }
 </script>

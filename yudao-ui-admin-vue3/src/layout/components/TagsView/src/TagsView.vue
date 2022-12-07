@@ -7,7 +7,7 @@ import { useTagsViewStore } from '@/store/modules/tagsView'
 import { useAppStore } from '@/store/modules/app'
 import { useI18n } from '@/hooks/web/useI18n'
 import { filterAffixTags } from './helper'
-import { ContextMenu, ContextMenuExpose } from '@/components/ContextMenu'
+import { ContextMenu, ContextMenuExpose } from '@/layout/components/ContextMenu'
 import { useDesign } from '@/hooks/web/useDesign'
 import { useTemplateRefsList } from '@vueuse/core'
 import { ElScrollbar } from 'element-plus'
@@ -114,8 +114,8 @@ const toLastView = () => {
       addTags()
       return
     }
-    // You can set another route
-    push(permissionStore.getAddRouters[0].path)
+    // TODO: You can set another route
+    push('/')
   }
 }
 
@@ -128,7 +128,6 @@ const moveToCurrentTag = async () => {
       if (v.fullPath !== unref(currentRoute).fullPath) {
         tagsViewStore.updateVisitedView(unref(currentRoute))
       }
-
       break
     }
   }

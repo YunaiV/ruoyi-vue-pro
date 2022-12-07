@@ -4,7 +4,7 @@ import { isDark } from '@/utils/is'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
 import { ConfigGlobal } from '@/components/ConfigGlobal'
-import { useCache } from '@/hooks/web/useCache'
+import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 
 const { getPrefixCls } = useDesign()
 const prefixCls = getPrefixCls('app')
@@ -15,15 +15,10 @@ const { wsCache } = useCache()
 
 // 根据浏览器当前主题设置系统主题色
 const setDefaultTheme = () => {
-  if (wsCache.get('isDark')) {
-    if (wsCache.get('isDark') || wsCache.get('isDark') === 'true') {
-      appStore.setIsDark(true)
-    } else {
-      appStore.setIsDark(false)
-    }
-    return
+  let isDarkTheme = wsCache.get(CACHE_KEY.IS_DARK)
+  if (isDarkTheme === null) {
+    isDarkTheme = isDark()
   }
-  const isDarkTheme = isDark()
   appStore.setIsDark(isDarkTheme)
 }
 setDefaultTheme()

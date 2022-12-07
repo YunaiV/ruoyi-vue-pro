@@ -191,6 +191,7 @@ export default {
   transition: all 0.5s;
 }
 .verify-tips {
+  text-indent: 10px;
   position: absolute;
   left: 0px;
   bottom: 0px;

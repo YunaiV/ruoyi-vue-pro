@@ -1,35 +1,39 @@
 <template>
-  <div class="component-upload-image">
+  <div class="upload-file">
     <el-upload
       ref="uploadRef"
       :multiple="props.limit > 1"
       name="file"
       v-model="valueRef"
-      list-type="picture-card"
       v-model:file-list="fileList"
       :show-file-list="true"
+      :auto-upload="autoUpload"
       :action="updateUrl"
       :headers="uploadHeaders"
       :limit="props.limit"
+      :drag="drag"
       :before-upload="beforeUpload"
       :on-exceed="handleExceed"
       :on-success="handleFileSuccess"
       :on-error="excelUploadError"
       :on-remove="handleRemove"
-      :on-preview="handlePictureCardPreview"
-      :class="{ hide: fileList.length >= props.limit }"
+      :on-preview="handlePreview"
+      class="upload-file-uploader"
     >
-      <Icon icon="ep:upload-filled" />
+      <el-button type="primary"><Icon icon="ep:upload-filled" />选取文件</el-button>
+      <template v-if="isShowTip" #tip>
+        <div style="font-size: 8px">
+          大小不超过 <b style="color: #f56c6c">{{ fileSize }}MB</b>
+        </div>
+        <div style="font-size: 8px">
+          格式为 <b style="color: #f56c6c">{{ fileType.join('/') }}</b> 的文件
+        </div>
+      </template>
     </el-upload>
   </div>
-  <!-- 文件列表 -->
-  <Dialog v-model="dialogVisible" title="预览" width="800" append-to-body>
-    <img :src="dialogImageUrl" style="display: block; max-width: 100%; margin: 0 auto" />
-  </Dialog>
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Dialog } from '@/components/Dialog'
 import { useMessage } from '@/hooks/web/useMessage'
 import { propTypes } from '@/utils/propTypes'
 import { getAccessToken, getTenantId } from '@/utils/auth'
@@ -40,12 +44,14 @@ const emit = defineEmits(['update:modelValue'])
 
 const props = defineProps({
   modelValue: propTypes.oneOfType([String, Object, Array]),
-  title: propTypes.string.def('图片上传'),
+  title: propTypes.string.def('文件上传'),
   updateUrl: propTypes.string.def(import.meta.env.VITE_UPLOAD_URL),
-  fileType: propTypes.array.def(['jpg', 'png', 'gif', 'jpeg']), // 文件类型, 例如['png', 'jpg', 'jpeg']
+  fileType: propTypes.array.def(['doc', 'xls', 'ppt', 'txt', 'pdf']), // 文件类型, 例如['png', 'jpg', 'jpeg']
   fileSize: propTypes.number.def(5), // 大小限制(MB)
-  limit: propTypes.number.def(1), // 数量限制
-  isShowTip: propTypes.bool.def(false) // 是否显示提示
+  limit: propTypes.number.def(5), // 数量限制
+  autoUpload: propTypes.bool.def(true), // 自动上传
+  drag: propTypes.bool.def(false), // 拖拽上传
+  isShowTip: propTypes.bool.def(true) // 是否显示提示
 })
 // ========== 上传相关 ==========
 const valueRef = ref(props.modelValue)
@@ -53,8 +59,6 @@ const uploadRef = ref<UploadInstance>()
 const uploadList = ref<UploadUserFile[]>([])
 const fileList = ref<UploadUserFile[]>([])
 const uploadNumber = ref<number>(0)
-const dialogImageUrl = ref()
-const dialogVisible = ref(false)
 const uploadHeaders = ref({
   Authorization: 'Bearer ' + getAccessToken(),
   'tenant-id': getTenantId()
@@ -144,6 +148,9 @@ const handleRemove = (file) => {
     emit('update:modelValue', listToString(fileList.value))
   }
 }
+const handlePreview: UploadProps['onPreview'] = (uploadFile) => {
+  console.log(uploadFile)
+}
 // 对象转成指定字符串分隔
 const listToString = (list: UploadUserFile[], separator?: string) => {
   let strs = ''
@@ -153,24 +160,27 @@ const listToString = (list: UploadUserFile[], separator?: string) => {
   }
   return strs != '' ? strs.substr(0, strs.length - 1) : ''
 }
-// 预览
-const handlePictureCardPreview: UploadProps['onPreview'] = (file) => {
-  dialogImageUrl.value = file.url
-  dialogVisible.value = true
-}
 </script>
 <style scoped lang="scss">
-// .el-upload--picture-card 控制加号部分
-:deep(.hide .el-upload--picture-card) {
-  display: none;
+.upload-file-uploader {
+  margin-bottom: 5px;
 }
-// 去掉动画效果
-:deep(.el-list-enter-active, .el-list-leave-active) {
-  transition: all 0s;
+:deep(.upload-file-list .el-upload-list__item) {
+  border: 1px solid #e4e7ed;
+  line-height: 2;
+  margin-bottom: 10px;
+  position: relative;
 }
-
-:deep(.el-list-enter, .el-list-leave-active) {
-  opacity: 0;
-  transform: translateY(0);
+:deep(.el-upload-list__item-file-name) {
+  max-width: 250px;
+}
+:deep(.upload-file-list .ele-upload-list__item-content) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: inherit;
+}
+:deep(.ele-upload-list__item-content-action .el-link) {
+  margin-right: 10px;
 }
 </style>

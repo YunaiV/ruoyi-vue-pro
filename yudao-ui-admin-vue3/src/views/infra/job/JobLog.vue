@@ -33,7 +33,7 @@
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailData">
       <template #retryInterval="{ row }">
         <span>{{ row.retryInterval + '毫秒' }} </span>
       </template>
@@ -69,13 +69,13 @@ const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('') // 弹出层标题
 
 // ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 
 // 详情操作
 const handleDetail = async (row: JobLogApi.JobLogVO) => {
   // 设置数据
   const res = JobLogApi.getJobLogApi(row.id)
-  detailRef.value = res
+  detailData.value = res
   dialogTitle.value = t('action.detail')
   dialogVisible.value = true
 }

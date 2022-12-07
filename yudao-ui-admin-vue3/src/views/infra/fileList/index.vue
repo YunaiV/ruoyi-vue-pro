@@ -72,7 +72,7 @@
       <!-- 按钮：保存 -->
       <XButton
         type="primary"
-        prefix="ep:upload-filled"
+        preIcon="ep:upload-filled"
         :title="t('action.save')"
         @click="submitFileForm()"
       />

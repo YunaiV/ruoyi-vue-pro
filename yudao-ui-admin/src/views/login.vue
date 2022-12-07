@@ -53,10 +53,10 @@
                 <el-form-item prop="mobileCode">
                   <el-input v-model="loginForm.mobileCode" type="text" auto-complete="off" placeholder="短信验证码"
                             @keyup.enter.native="handleLogin">
-                    <template slot="icon">
+                    <template v-slot="icon">
                       <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
                     </template>
-                    <template slot="append">
+                    <template v-slot="append">
                       <span v-if="mobileCodeTimer <= 0" class="getMobileCode" @click="getSmsCode" style="cursor: pointer;">获取验证码</span>
                       <span v-if="mobileCodeTimer > 0" class="getMobileCode">{{ mobileCodeTimer }}秒后可重新获取</span>
                     </template>
@@ -115,6 +115,7 @@ import {
 } from "@/utils/auth";
 
 import Verify from '@/components/Verifition/Verify';
+import {resetUserPwd} from "@/api/system/user";
 
 export default {
   name: "Login",
@@ -254,19 +255,40 @@ export default {
         }
       });
     },
-    doSocialLogin(socialTypeEnum) {
+    async doSocialLogin(socialTypeEnum) {
       // 设置登录中
       this.loading = true;
-      // 计算 redirectUri
-      const redirectUri = location.origin + '/social-login?'
-        + encodeURIComponent('type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/")); // 重定向不能丢
-      // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
-      // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
-      // 进行跳转
-      socialAuthRedirect(socialTypeEnum.type, encodeURIComponent(redirectUri)).then((res) => {
-        // console.log(res.url);
-        window.location.href = res.data;
-      });
+      let tenant = false;
+      if (this.tenantEnable) {
+        await this.$prompt('请输入租户名称', "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消"
+        }).then(({value}) => {
+          getTenantIdByName(value).then(res => {
+            const tenantId = res.data;
+            tenant = true
+            if (tenantId && tenantId >= 0) {
+              setTenantId(tenantId)
+            }
+          });
+        }).catch(() => {
+          return false
+        });
+      } else {
+        tenant = true
+      }
+     if(tenant){
+       // 计算 redirectUri
+       const redirectUri = location.origin + '/social-login?'
+         + encodeURIComponent('type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/")); // 重定向不能丢
+       // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
+       // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
+       // 进行跳转
+       socialAuthRedirect(socialTypeEnum.type, encodeURIComponent(redirectUri)).then((res) => {
+         // console.log(res.url);
+         window.location.href = res.data;
+       });
+     }
     },
     /** ========== 以下为升级短信登录 ========== */
     getSmsCode() {

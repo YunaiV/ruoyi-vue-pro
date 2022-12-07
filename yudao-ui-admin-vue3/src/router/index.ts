@@ -1,18 +1,18 @@
 import type { App } from 'vue'
-import { getAccessToken } from '@/utils/auth'
 import type { RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import remainingRouter from './modules/remaining'
+import { isRelogin } from '@/config/axios/service'
+import { getAccessToken } from '@/utils/auth'
 import { useTitle } from '@/hooks/web/useTitle'
 import { useNProgress } from '@/hooks/web/useNProgress'
+import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { usePageLoading } from '@/hooks/web/usePageLoading'
-import { createRouter, createWebHashHistory } from 'vue-router'
-import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { useDictStoreWithOut } from '@/store/modules/dict'
 import { useUserStoreWithOut } from '@/store/modules/user'
-import { listSimpleDictDataApi } from '@/api/system/dict/dict.data'
-import { isRelogin } from '@/config/axios/service'
+import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { getInfoApi } from '@/api/login'
-import { useCache } from '@/hooks/web/useCache'
+import { listSimpleDictDataApi } from '@/api/system/dict/dict.data'
 
 const { wsCache } = useCache('sessionStorage')
 
@@ -50,12 +50,12 @@ router.beforeEach(async (to, from, next) => {
       const dictStore = useDictStoreWithOut()
       const userStore = useUserStoreWithOut()
       const permissionStore = usePermissionStoreWithOut()
-      const dictMap = wsCache.get('dictCache')
+      const dictMap = wsCache.get(CACHE_KEY.DICT_CACHE)
       if (!dictMap) {
         const res = await listSimpleDictDataApi()
         dictStore.setDictMap(res)
       }
-      if (userStore.getRoles.length === 0) {
+      if (!userStore.getIsSetUser) {
         isRelogin.show = true
         const res = await getInfoApi()
         await userStore.setUserInfoAction(res)

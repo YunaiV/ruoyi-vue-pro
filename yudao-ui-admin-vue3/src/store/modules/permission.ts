@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash-es'
 import remainingRouter from '@/router/modules/remaining'
 import { generateRoute, flatMultiLevelRoutes } from '@/utils/routerHelper'
 import { getAsyncRoutesApi } from '@/api/login'
-import { useCache } from '@/hooks/web/useCache'
+import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 
 const { wsCache } = useCache()
 
@@ -35,11 +35,11 @@ export const usePermissionStore = defineStore('permission', {
     async generateRoutes(): Promise<unknown> {
       return new Promise<void>(async (resolve) => {
         let res: AppCustomRouteRecordRaw[]
-        if (wsCache.get('roleRouters')) {
-          res = wsCache.get('roleRouters') as AppCustomRouteRecordRaw[]
+        if (wsCache.get(CACHE_KEY.ROLE_ROUTERS)) {
+          res = wsCache.get(CACHE_KEY.ROLE_ROUTERS) as AppCustomRouteRecordRaw[]
         } else {
           res = await getAsyncRoutesApi()
-          wsCache.set('roleRouters', res)
+          wsCache.set(CACHE_KEY.ROLE_ROUTERS, res)
         }
         const routerMap: AppRouteRecordRaw[] = generateRoute(res as AppCustomRouteRecordRaw[])
         // 动态路由，404一定要放到最后面
