@@ -8,7 +8,7 @@
     </u-sticky>
 
     <!--轮播图-->
-    <mkt-banner :banner-list="bannerList"></mkt-banner>
+    <yd-banner :banner-list="bannerList"></yd-banner>
 
     <u-gap height="20px"></u-gap>
 

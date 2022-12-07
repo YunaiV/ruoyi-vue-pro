@@ -11,7 +11,7 @@
  * 广告滚动图
  */
 export default {
-  name: 'mkt-banner',
+  name: 'yd-banner',
   components: {},
   props: {
     keyName: {

@@ -1,9 +1,15 @@
 <template>
   <view class="container">
     <view class="user-header">
-      <view class="user-info" @click="loginOrJump('/pages/profile/profile')">
-        <u-avatar size="80" :src="userInfo.avatar"></u-avatar>
-        <text class="nick-name">{{ hasLogin ? userInfo.nickname || '游客' : '登录/注册' }}</text>
+      <view class="user-info" @click="pageRouter('/pages/profile/profile')">
+        <u-avatar size="60" shape="square" :src="userInfo.avatar"></u-avatar>
+        <view class="info-text">
+          <view class="user-nickname">{{ hasLogin ? userInfo.nickname || ' ' : '匿名用户' }}</view>
+          <view class="user-mobile">{{ hasLogin ? userInfo.mobile || ' ' : '登录/注册' }}</view>
+        </view>
+      </view>
+      <view class="user-setting">
+        <u-icon v-if="hasLogin" name="setting" color="#939393" size="22" @click="pageRouter('/pages/setting/setting')"></u-icon>
       </view>
     </view>
 
@@ -12,7 +18,7 @@
     <view>
       <view class="order-header">
         <text class="order-title">我的订单</text>
-        <view class="see-all">
+        <view class="see-all" @click="pageRouter(orderPage, -1)">
           <text>查看全部</text>
           <u-icon name="arrow-right"></u-icon>
         </view>
@@ -20,7 +26,7 @@
 
       <view class="order-status-box">
         <u-grid :border="false" :col="orderStatusList.length">
-          <u-grid-item v-for="(item, index) in orderStatusList" :key="index">
+          <u-grid-item v-for="(item, index) in orderStatusList" :key="index" @click="pageRouter(orderPage, item.state)">
             <u-icon :name="item.icon" :size="32"></u-icon>
             <text class="grid-title">{{ item.title }}</text>
           </u-grid-item>
@@ -45,12 +51,9 @@
       <u-cell class="fun-item" :border="false" icon="gift" title="分销中心" isLink></u-cell>
       <u-cell class="fun-item" :border="false" icon="tags" title="领券中心" isLink></u-cell>
       <u-cell class="fun-item" :border="false" icon="coupon" title="我的优惠券" isLink></u-cell>
-      <u-cell class="fun-item" :border="false" icon="map" title="收货地址" @click="loginOrJump('/pages/address/list')" isLink></u-cell>
+      <u-cell class="fun-item" :border="false" icon="map" title="收货地址" @click="pageRouter('/pages/address/list')" isLink></u-cell>
     </u-cell-group>
 
-    <view v-if="hasLogin" class="logout-btn">
-      <u-button type="error" color="#ea322b" text="退出登录" @click="logout"></u-button>
-    </view>
   </view>
 </template>
 
@@ -58,11 +61,12 @@
 export default {
   data() {
     return {
+      orderPage: '/pages/order/order',
       orderStatusList: [
-        { icon: 'rmb-circle', title: '待支付' },
-        { icon: 'car', title: '代发货' },
-        { icon: 'order', title: '待收货' },
-        { icon: 'integral', title: '已完成' }
+        { icon: 'red-packet', title: '待付款', state: '0' },
+        { icon: 'car', title: '待发货', state:'20' },
+        { icon: 'order', title: '待收货', state: '30' },
+        { icon: 'integral', title: '已完成', state: '40' }
       ],
       statList: [
         { value: '0', title: '我的收藏' },
@@ -77,9 +81,13 @@ export default {
     }
   },
   methods: {
-    loginOrJump(pageUrl) {
+    pageRouter(pageUrl, param) {
       if (!this.hasLogin) {
         uni.$u.route('/pages/login/social')
+      } else if (pageUrl === this.orderPage) {
+        uni.$u.route(this.orderPage, {
+          status: param
+        });
       } else {
         uni.$u.route(pageUrl)
       }
@@ -110,16 +118,37 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .user-header {
-  @include flex-center(column);
-  height: 280rpx;
+  background-color: #fff;
+  @include flex-space-between;
+  padding: 30rpx;
+  height: 200rpx;
+
   .user-info {
-    @include flex-center(column);
-    .nick-name {
-      margin-top: 20rpx;
-      font-size: 32rpx;
-      font-weight: 700;
+    @include flex-left;
+    align-items: center;
+
+    .info-text {
+      margin-left: 20rpx;
+
+      .user-nickname {
+        font-size: 30rpx;
+        font-weight: 700;
+        line-height: 50rpx;
+      }
+
+      .user-mobile {
+        font-size: 24rpx;
+        font-weight: 700;
+        color: #939393;
+        line-height: 50rpx;
+      }
     }
+  }
+
+  .user-setting {
+    margin-right: 5rpx;
   }
 }
 
@@ -168,8 +197,4 @@ export default {
   }
 }
 
-.logout-btn {
-  margin: 60rpx auto 0;
-  width: 400rpx;
-}
 </style>
