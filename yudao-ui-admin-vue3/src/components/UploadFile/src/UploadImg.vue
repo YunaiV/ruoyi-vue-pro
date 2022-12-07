@@ -29,6 +29,7 @@
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { Dialog } from '@/components/Dialog'
 import { useMessage } from '@/hooks/web/useMessage'
 import { propTypes } from '@/utils/propTypes'
 import { getAccessToken, getTenantId } from '@/utils/auth'
