@@ -231,6 +231,7 @@ const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns 
     const tableSchemaItem = {
       title: crudSchema.actionTitle ? crudSchema.actionTitle : t('table.action'),
       field: 'actionbtns',
+      fixed: 'right' as unknown as VxeColumnPropTypes.Fixed,
       width: crudSchema.actionWidth ? crudSchema.actionWidth : '200px',
       slots: {
         default: 'actionbtns_default'
