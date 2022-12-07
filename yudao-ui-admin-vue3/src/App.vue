@@ -15,15 +15,10 @@ const { wsCache } = useCache()
 
 // 根据浏览器当前主题设置系统主题色
 const setDefaultTheme = () => {
-  if (wsCache.get(CACHE_KEY.IS_DARK)) {
-    if (wsCache.get(CACHE_KEY.IS_DARK) || wsCache.get(CACHE_KEY.IS_DARK) === 'true') {
-      appStore.setIsDark(true)
-    } else {
-      appStore.setIsDark(false)
-    }
-    return
+  let isDarkTheme = wsCache.get(CACHE_KEY.IS_DARK)
+  if (isDarkTheme === null) {
+    isDarkTheme = isDark()
   }
-  const isDarkTheme = isDark()
   appStore.setIsDark(isDarkTheme)
 }
 setDefaultTheme()
