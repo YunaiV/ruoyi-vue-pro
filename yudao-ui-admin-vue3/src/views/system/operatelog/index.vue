@@ -73,6 +73,6 @@ const handleDetail = (row: OperateLogApi.OperateLogVO) => {
 
 // 导出操作
 const handleExport = async () => {
-  await exportList(xGrid, '岗位列表.xls')
+  await exportList(xGrid, '操作日志.xls')
 }
 </script>
