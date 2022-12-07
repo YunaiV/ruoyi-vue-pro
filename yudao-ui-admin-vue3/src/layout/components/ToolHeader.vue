@@ -1,11 +1,11 @@
 <script lang="tsx">
 import { defineComponent, computed } from 'vue'
-import { Collapse } from '@/components/Collapse'
-import { LocaleDropdown } from '@/components/LocaleDropdown'
-import { SizeDropdown } from '@/components/SizeDropdown'
-import { UserInfo } from '@/components/UserInfo'
-import { Screenfull } from '@/components/Screenfull'
-import { Breadcrumb } from '@/components/Breadcrumb'
+import { Collapse } from '@/layout/components/Collapse'
+import { LocaleDropdown } from '@/layout/components/LocaleDropdown'
+import { SizeDropdown } from '@/layout/components/SizeDropdown'
+import { UserInfo } from '@/layout/components/UserInfo'
+import { Screenfull } from '@/layout/components/Screenfull'
+import { Breadcrumb } from '@/layout/components/Breadcrumb'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
 
