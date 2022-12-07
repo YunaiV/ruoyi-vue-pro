@@ -102,8 +102,8 @@
       ref="formRef"
       :model="menuForm"
       :rules="rules"
-      label-width="120px"
-      label-position="left"
+      label-width="100px"
+      label-position="right"
     >
       <el-form-item label="上级菜单">
         <el-tree-select
@@ -115,7 +115,7 @@
           check-strictly
         />
       </el-form-item>
-      <el-col :span="8">
+      <el-col :span="16">
         <el-form-item label="菜单名称" prop="name">
           <el-input v-model="menuForm.name" placeholder="请输入菜单名称" clearable />
         </el-form-item>
@@ -135,7 +135,7 @@
         <el-form-item label="菜单图标">
           <IconSelect v-model="menuForm.icon" clearable />
         </el-form-item>
-        <el-col :span="8">
+        <el-col :span="16">
           <el-form-item label="路由地址" prop="path">
             <template #label>
               <Tooltip
@@ -148,14 +148,14 @@
         </el-col>
       </template>
       <template v-if="menuForm.type === 2">
-        <el-col :span="8">
+        <el-col :span="16">
           <el-form-item label="路由地址" prop="component">
             <el-input v-model="menuForm.component" placeholder="请输入组件地址" clearable />
           </el-form-item>
         </el-col>
       </template>
       <template v-if="menuForm.type !== 1">
-        <el-col :span="8">
+        <el-col :span="16">
           <el-form-item label="权限标识" prop="permission">
             <template #label>
               <Tooltip
@@ -167,12 +167,12 @@
           </el-form-item>
         </el-col>
       </template>
-      <el-col :span="8">
+      <el-col :span="16">
         <el-form-item label="显示排序" prop="sort">
           <el-input-number v-model="menuForm.sort" controls-position="right" :min="0" clearable />
         </el-form-item>
       </el-col>
-      <el-col :span="8">
+      <el-col :span="16">
         <el-form-item label="菜单状态" prop="status">
           <el-radio-group v-model="menuForm.status">
             <el-radio
@@ -187,7 +187,7 @@
         </el-form-item>
       </el-col>
       <template v-if="menuForm.type !== 3">
-        <el-col :span="8">
+        <el-col :span="16">
           <el-form-item label="显示状态" prop="status">
             <template #label>
               <Tooltip
@@ -203,7 +203,7 @@
         </el-col>
       </template>
       <template v-if="menuForm.type === 2">
-        <el-col :span="8">
+        <el-col :span="16">
           <el-form-item label="缓存状态" prop="keepAlive">
             <template #label>
               <Tooltip
