@@ -114,8 +114,8 @@ const toLastView = () => {
       addTags()
       return
     }
-    // You can set another route
-    push(permissionStore.getAddRouters[0].path)
+    // TODO: You can set another route
+    push('/')
   }
 }
 
@@ -128,7 +128,6 @@ const moveToCurrentTag = async () => {
       if (v.fullPath !== unref(currentRoute).fullPath) {
         tagsViewStore.updateVisitedView(unref(currentRoute))
       }
-
       break
     }
   }
