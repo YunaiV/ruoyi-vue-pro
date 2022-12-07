@@ -55,7 +55,7 @@ router.beforeEach(async (to, from, next) => {
         const res = await listSimpleDictDataApi()
         dictStore.setDictMap(res)
       }
-      if (userStore.getRoles.length === 0) {
+      if (!userStore.getIsSetUser) {
         isRelogin.show = true
         const res = await getInfoApi()
         await userStore.setUserInfoAction(res)

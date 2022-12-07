@@ -13,6 +13,7 @@ interface UserVO {
 interface UserInfoVO {
   permissions: string[]
   roles: string[]
+  isSetUser: boolean
   user: UserVO
 }
 
@@ -20,6 +21,7 @@ export const useUserStore = defineStore('admin-user', {
   state: (): UserInfoVO => ({
     permissions: [],
     roles: [],
+    isSetUser: false,
     user: {
       id: 0,
       avatar: '',
@@ -32,6 +34,9 @@ export const useUserStore = defineStore('admin-user', {
     },
     getRoles(): string[] {
       return this.roles
+    },
+    getIsSetUser(): boolean {
+      return this.isSetUser
     },
     getUser(): UserVO {
       return this.user
@@ -46,6 +51,7 @@ export const useUserStore = defineStore('admin-user', {
       this.permissions = userInfo.permissions
       this.roles = userInfo.roles
       this.user = userInfo.user
+      this.isSetUser = true
       wsCache.set(CACHE_KEY.USER, userInfo)
     },
     loginOut() {
@@ -56,6 +62,7 @@ export const useUserStore = defineStore('admin-user', {
     resetState() {
       this.permissions = []
       this.roles = []
+      this.isSetUser = false
       this.user = {
         id: 0,
         avatar: '',
