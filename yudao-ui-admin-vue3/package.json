@@ -1,12 +1,12 @@
 {
   "name": "yudao-ui-admin-vue3",
-  "version": "1.6.5.1873",
+  "version": "1.6.5.1874",
   "description": "基于vue3、vite3、element-plus、typesScript",
   "author": "xingyu",
   "private": false,
   "scripts": {
     "i": "pnpm install",
-    "dev": "vite --mode base --open",
+    "dev": "vite --mode base",
     "ts:check": "vue-tsc --noEmit",
     "build:pro": "vite build --mode pro",
     "build:dev": "vite build --mode dev",
@@ -57,7 +57,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
     "@commitlint/config-conventional": "^17.3.0",
-    "@iconify/json": "^2.1.148",
+    "@iconify/json": "^2.1.149",
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
     "@purge-icons/generated": "^0.9.0",
     "@types/intro.js": "^5.1.0",
