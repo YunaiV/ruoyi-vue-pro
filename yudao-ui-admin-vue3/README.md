@@ -32,7 +32,7 @@
 | [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.45 |
 | [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.2.3 |
 | [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.23 |
-| [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.9.3 |
+| [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.9.4 |
 | [pinia](https://pinia.vuejs.org/) | Vue 存储库 替代 vuex5 | 2.0.26 |
 | [vueuse](https://vueuse.org/) | 常用工具集 | 9.6.0 |
 | [vxe-table](https://vxetable.cn/) | vue 最强表单 | 4.3.6 |
