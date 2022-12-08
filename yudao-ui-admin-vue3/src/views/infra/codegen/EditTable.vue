@@ -1,20 +1,27 @@
 <template>
-  <ContentDetailWrap :title="title" @back="push('/infra/codegen')">
-    <el-tabs v-model="activeName">
-      <el-tab-pane label="基本信息" name="basicInfo">
-        <BasicInfoForm ref="basicInfoRef" :basicInfo="tableCurrentRow" />
-      </el-tab-pane>
-      <el-tab-pane label="字段信息" name="cloum">
-        <CloumInfoForm ref="cloumInfoRef" :info="cloumCurrentRow" />
-      </el-tab-pane>
-      <el-tab-pane label="生成信息" name="genInfo">
-        <GenInfoForm ref="genInfoRef" :genInfo="tableCurrentRow" />
-      </el-tab-pane>
-    </el-tabs>
-    <template #right>
-      <XButton type="primary" :title="t('action.save')" :loading="loading" @click="submitForm()" />
-    </template>
-  </ContentDetailWrap>
+  <ContentWrap>
+    <ContentDetailWrap :title="title" @back="push('/infra/codegen')">
+      <el-tabs v-model="activeName">
+        <el-tab-pane label="基本信息" name="basicInfo">
+          <BasicInfoForm ref="basicInfoRef" :basicInfo="tableCurrentRow" />
+        </el-tab-pane>
+        <el-tab-pane label="字段信息" name="cloum">
+          <CloumInfoForm ref="cloumInfoRef" :info="cloumCurrentRow" />
+        </el-tab-pane>
+        <el-tab-pane label="生成信息" name="genInfo">
+          <GenInfoForm ref="genInfoRef" :genInfo="tableCurrentRow" />
+        </el-tab-pane>
+      </el-tabs>
+      <template #right>
+        <XButton
+          type="primary"
+          :title="t('action.save')"
+          :loading="loading"
+          @click="submitForm()"
+        />
+      </template>
+    </ContentDetailWrap>
+  </ContentWrap>
 </template>
 <script setup lang="ts">
 import { ref, unref, onMounted } from 'vue'
