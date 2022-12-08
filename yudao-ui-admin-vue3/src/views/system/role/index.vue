@@ -314,7 +314,10 @@ const submitScope = async () => {
   } else if ('menu' === actionScopeType.value) {
     const data = ref<PermissionApi.PermissionAssignRoleMenuReqVO>({
       roleId: dataScopeForm.id,
-      menuIds: treeRef.value!.getCheckedKeys(false) as unknown as Array<number>
+      menuIds: [
+        ...(treeRef.value!.getCheckedKeys(false) as unknown as Array<number>),
+        ...(treeRef.value!.getHalfCheckedKeys() as unknown as Array<number>)
+      ]
     })
     await PermissionApi.assignRoleMenuApi(data.value)
   }
