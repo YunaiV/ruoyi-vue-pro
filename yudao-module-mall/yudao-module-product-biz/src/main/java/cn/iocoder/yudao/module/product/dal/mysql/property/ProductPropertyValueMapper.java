@@ -9,11 +9,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
-/**
- * 规格值 Mapper
- *
- * @author 芋道源码
- */
 @Mapper
 public interface ProductPropertyValueMapper extends BaseMapperX<ProductPropertyValueDO> {
 

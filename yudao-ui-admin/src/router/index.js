@@ -106,7 +106,7 @@ export const constantRoutes = [
         path: 'value/:propertyId(\\d+)',
         component: (resolve) => require(['@/views/mall/product/property/value'], resolve),
         name: 'PropertyValue',
-        meta: {title: '规格数据', icon: '', activeMenu: '/product/property'}
+        meta: {title: '商品属性值', icon: '', activeMenu: '/product/property'}
       }
     ]
   }, {

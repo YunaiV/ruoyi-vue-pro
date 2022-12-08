@@ -35,22 +35,22 @@ public class ProductSpuDetailRespVO extends ProductSpuBaseVO {
     public static class Sku extends ProductSkuBaseVO {
 
         /**
-         * 规格的数组
+         * 属性数组
          */
         private List<ProductSpuDetailRespVO.Property> properties;
 
     }
 
-    @ApiModel(value = "管理后台 - 商品规格的详细 Response VO")
+    @ApiModel(value = "管理后台 - 商品属性的详细 Response VO")
     @Data
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     public static class Property extends ProductSkuBaseVO.Property {
 
-        @ApiModelProperty(value = "规格的名字", required = true, example = "颜色")
+        @ApiModelProperty(value = "属性项的名字", required = true, example = "颜色")
         private String propertyName;
 
-        @ApiModelProperty(value = "规格值的名字", required = true, example = "蓝色")
+        @ApiModelProperty(value = "属性值的名称", required = true, example = "蓝色")
         private String valueName;
 
     }
@@ -59,7 +59,7 @@ public class ProductSpuDetailRespVO extends ProductSpuBaseVO {
     private Long categoryId;
 
     // TODO @芋艿：在瞅瞅~
-    @ApiModelProperty(value = "规格属性修改和详情展示组合", example = "[{\"propertyId\":2,\"name\":\"内存\",\"propertyValues\":[{\"v1\":11,\"v2\":\"64G\"},{\"v1\":10,\"v2\":\"32G\"}]},{\"propertyId\":3,\"name\":\"尺寸\",\"propertyValues\":[{\"v1\":16,\"v2\":\"6.1\"},{\"v1\":15,\"v2\":\"5.7\"}]}]")
+    @ApiModelProperty(value = "属性修改和详情展示组合", example = "[{\"propertyId\":2,\"name\":\"内存\",\"propertyValues\":[{\"v1\":11,\"v2\":\"64G\"},{\"v1\":10,\"v2\":\"32G\"}]},{\"propertyId\":3,\"name\":\"尺寸\",\"propertyValues\":[{\"v1\":16,\"v2\":\"6.1\"},{\"v1\":15,\"v2\":\"5.7\"}]}]")
     private List<ProductPropertyViewRespVO> productPropertyViews;
 
 }

@@ -18,7 +18,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - 规格名称")
+@Api(tags = "管理后台 - 商品属性项")
 @RestController
 @RequestMapping("/product/property")
 @Validated
@@ -28,14 +28,14 @@ public class ProductPropertyController {
     private ProductPropertyService productPropertyService;
 
     @PostMapping("/create")
-    @ApiOperation("创建规格名称")
+    @ApiOperation("创建属性项")
     @PreAuthorize("@ss.hasPermission('product:property:create')")
     public CommonResult<Long> createProperty(@Valid @RequestBody ProductPropertyCreateReqVO createReqVO) {
         return success(productPropertyService.createProperty(createReqVO));
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新规格名称")
+    @ApiOperation("更新属性项")
     @PreAuthorize("@ss.hasPermission('product:property:update')")
     public CommonResult<Boolean> updateProperty(@Valid @RequestBody ProductPropertyUpdateReqVO updateReqVO) {
         productPropertyService.updateProperty(updateReqVO);
@@ -43,7 +43,7 @@ public class ProductPropertyController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除规格名称")
+    @ApiOperation("删除属性项")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:property:delete')")
     public CommonResult<Boolean> deleteProperty(@RequestParam("id") Long id) {
@@ -52,7 +52,7 @@ public class ProductPropertyController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得规格名称")
+    @ApiOperation("获得属性项")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<ProductPropertyRespVO> getProperty(@RequestParam("id") Long id) {
@@ -60,21 +60,21 @@ public class ProductPropertyController {
     }
 
     @GetMapping("/list")
-    @ApiOperation("获得规格名称列表")
+    @ApiOperation("获得属性项列表")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<List<ProductPropertyRespVO>> getPropertyList(@Valid ProductPropertyListReqVO listReqVO) {
         return success(productPropertyService.getPropertyList(listReqVO));
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得规格名称分页")
+    @ApiOperation("获得属性项分页")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<PageResult<ProductPropertyRespVO>> getPropertyPage(@Valid ProductPropertyPageReqVO pageVO) {
         return success(productPropertyService.getPropertyPage(pageVO));
     }
 
     @GetMapping("/listAndValue")
-    @ApiOperation("获得规格名称列表")
+    @ApiOperation("获得属性项列表")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<List<ProductPropertyAndValueRespVO>> getPropertyAndValueList(@Valid ProductPropertyListReqVO listReqVO) {
         return success(productPropertyService.getPropertyAndValueList(listReqVO));

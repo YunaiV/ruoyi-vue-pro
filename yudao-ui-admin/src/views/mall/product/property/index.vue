@@ -3,8 +3,8 @@
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="规格名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入规格名称" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择开启状态" clearable size="small">
@@ -33,8 +33,8 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="规格id" align="center" prop="id" />
-      <el-table-column label="规格名称" align="center" :show-overflow-tooltip="true">
+      <el-table-column label="编号" align="center" prop="id" />
+      <el-table-column label="名称" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <router-link :to="'/property/value/' + scope.row.id" class="link-type">
             <span>{{ scope.row.name }}</span>
@@ -68,13 +68,13 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="规格id" prop="id" v-if="form.id != null">
+        <el-form-item label="编号" prop="id" v-if="form.id != null">
           <el-input v-model="form.id" disabled />
         </el-form-item>
-        <el-form-item label="规格名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入规格名称" />
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入名称" />
         </el-form-item>
-        <el-form-item label="开启状态" prop="status">
+        <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
             <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                       :key="dict.value" :label="parseInt(dict.value)">{{ dict.label }}
@@ -110,7 +110,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 规格名称列表
+      // 属性项列表
       list: [],
       // 弹出层标题
       title: "",
@@ -134,7 +134,7 @@ export default {
       // 表单校验
       rules: {
         name: [
-          { required: true, message: "规格不能为空", trigger: "blur" }
+          { required: true, message: "名称不能为空", trigger: "blur" }
         ],
         status: [
           { required: true, message: "状态不能为空", trigger: "blur" }
@@ -185,7 +185,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加规格";
+      this.title = "添加属性项";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -194,7 +194,7 @@ export default {
       getProperty(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改规格";
+        this.title = "修改属性项";
       });
     },
     /** 提交按钮 */
@@ -223,7 +223,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$modal.confirm('是否确认删除规格名称为"' + row.name + '"的数据项?').then(function() {
+      this.$modal.confirm('是否确认删除名称为"' + row.name + '"的数据项?').then(function() {
           return deleteProperty(id);
         }).then(() => {
           this.getList();
@@ -237,11 +237,11 @@ export default {
       params.pageNo = undefined;
       params.pageSize = undefined;
       // 执行导出
-      this.$modal.confirm('是否确认导出所有规格名称数据项?').then(() => {
+      this.$modal.confirm('是否确认导出所有名称数据项?').then(() => {
           this.exportLoading = true;
           return exportPropertyExcel(params);
         }).then(response => {
-          this.$download.excel(response, '规格名称.xls');
+          this.$download.excel(response, '名称.xls');
           this.exportLoading = false;
         }).catch(() => {});
     },

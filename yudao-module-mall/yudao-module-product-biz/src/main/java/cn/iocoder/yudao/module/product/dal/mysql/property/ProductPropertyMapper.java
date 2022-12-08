@@ -7,13 +7,6 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.Pro
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
-
-/**
- * 规格名称 Mapper
- *
- * @author 芋道源码
- */
 @Mapper
 public interface ProductPropertyMapper extends BaseMapperX<ProductPropertyDO> {
 

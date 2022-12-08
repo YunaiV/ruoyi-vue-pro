@@ -9,16 +9,14 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.Produc
 import java.util.List;
 
 /**
- * <p>
- * 规格值 Service 接口
- * </p>
+ * 商品属性值 Service 接口
  *
  * @author LuoWenFeng
  */
 public interface ProductPropertyValueService {
 
     /**
-     * 创建规格值
+     * 创建属性值
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -26,40 +24,40 @@ public interface ProductPropertyValueService {
     Long createPropertyValue(ProductPropertyValueCreateReqVO createReqVO);
 
     /**
-     * 更新规格值
+     * 更新属性值
      *
      * @param updateReqVO 更新信息
      */
     void updatePropertyValue(ProductPropertyValueUpdateReqVO updateReqVO);
 
     /**
-     * 删除规格值
+     * 删除属性值
      *
      * @param id 编号
      */
     void deletePropertyValue(Long id);
 
     /**
-     * 获得规格值
+     * 获得属性值
      *
      * @param id 编号
-     * @return 规格名称
+     * @return 属性值
      */
     ProductPropertyValueRespVO getPropertyValue(Long id);
 
     /**
-     * 获得规格值
+     * 获得属性值
      *
      * @param id 编号
-     * @return 规格名称
+     * @return 属性值
      */
     List<ProductPropertyValueRespVO> getPropertyValueListByPropertyId(List<Long> id);
 
     /**
-     * 获取规格值 分页
+     * 获取属性值的分页
      *
      * @param pageReqVO 查询条件
-     * @return
+     * @return 属性值的分页
      */
     PageResult<ProductPropertyValueRespVO> getPropertyValueListPage(ProductPropertyValuePageReqVO pageReqVO);
 }

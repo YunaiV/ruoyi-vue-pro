@@ -1,13 +1,13 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="规格名称" prop="propertyId">
+      <el-form-item label="属性项" prop="propertyId">
         <el-select v-model="queryParams.propertyId">
           <el-option v-for="item in propertyOptions" :key="item.id" :label="item.id +'-'+ item.name" :value="item.id"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="规格值" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入规格值" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="状态" clearable size="small">
@@ -35,8 +35,8 @@
     </el-row>
 
     <el-table v-loading="loading" :data="dataList">
-      <el-table-column label="规格值id" align="center" prop="id"/>
-      <el-table-column label="规格值" align="center" prop="name"/>
+      <el-table-column label="编号" align="center" prop="id"/>
+      <el-table-column label="名称" align="center" prop="name"/>
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
@@ -66,11 +66,11 @@
     <!-- 添加或修改参数配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="90px">
-        <el-form-item label="规格值编码">
+        <el-form-item label="属性项">
           <el-input v-model="form.propertyId" :disabled="true"/>
         </el-form-item>
-        <el-form-item label="规格值" prop="name">
-          <el-input v-model="form.name" placeholder="请输入数据标签"/>
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入名称"/>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
@@ -137,7 +137,7 @@ export default {
       // 表单校验
       rules: {
         name: [
-          {required: true, message: "规格值不能为空", trigger: "blur"}
+          {required: true, message: "名称不能为空", trigger: "blur"}
         ],
         status: [
           {required: true, message: "状态不能为空", trigger: "blur"}
@@ -206,7 +206,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加规格值";
+      this.title = "添加属性值";
       this.form.propertyId = this.queryParams.propertyId;
     },
     /** 修改按钮操作 */
@@ -216,7 +216,7 @@ export default {
       getPropertyValue(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改规格值";
+        this.title = "修改属性值";
       });
     },
     /** 提交按钮 */

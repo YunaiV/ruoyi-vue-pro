@@ -265,7 +265,7 @@ public class PriceServiceImpl implements PriceService {
 
     private void calculatePriceByRewardActivity(PriceCalculateRespDTO priceCalculate, List<PriceCalculateRespDTO.OrderItem> orderItems,
                                                 RewardActivityDO rewardActivity) {
-        // 获得最大匹配的满减送活动的规格
+        // 获得最大匹配的满减送活动的规则
         RewardActivityDO.Rule rule = getLastMatchRewardActivityRule(rewardActivity, orderItems);
         if (rule == null) {
             // 获取不到的情况下，记录不满足的优惠明细
@@ -288,11 +288,11 @@ public class PriceServiceImpl implements PriceService {
     }
 
     /**
-     * 获得最大匹配的满减送活动的规格
+     * 获得最大匹配的满减送活动的规则
      *
      * @param rewardActivity 满减送活动
      * @param orderItems 商品项
-     * @return 匹配的活动规格
+     * @return 匹配的活动规则
      */
     private RewardActivityDO.Rule getLastMatchRewardActivityRule(RewardActivityDO rewardActivity,
                                                                  List<PriceCalculateRespDTO.OrderItem> orderItems) {

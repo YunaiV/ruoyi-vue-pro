@@ -9,7 +9,7 @@ import lombok.*;
 
 
 /**
- * 规格值 DO
+ * 商品属性值 DO
  *
  * @author 芋道源码
  */
@@ -29,13 +29,13 @@ public class ProductPropertyValueDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 规格键编号
+     * 属性项的编号
      *
      * 关联 {@link ProductPropertyDO#getId()}
      */
     private Long propertyId;
     /**
-     * 规格值名字
+     * 名称
      */
     private String name;
     /**

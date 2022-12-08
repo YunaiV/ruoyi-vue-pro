@@ -55,7 +55,7 @@ public class ProductSkuBaseVO {
     @ApiModelProperty(value = "商品体积", example = "1024", notes = "单位：m^3 平米")
     private Double volume;
 
-    @ApiModel("规格值")
+    @ApiModel("商品属性")
     @Data
     public static class Property {
 

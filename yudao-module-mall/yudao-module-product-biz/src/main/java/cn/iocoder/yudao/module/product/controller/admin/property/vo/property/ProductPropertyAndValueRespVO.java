@@ -10,20 +10,20 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@ApiModel("管理后台 - 规格 + 规格值 Response VO")
+@ApiModel("管理后台 - 商品属性项 + 属性值 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductPropertyAndValueRespVO extends ProductPropertyBaseVO {
 
-    @ApiModelProperty(value = "规格的编号", required = true, example = "1024")
+    @ApiModelProperty(value = "属性项的编号", required = true, example = "1024")
     private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true)
     private LocalDateTime createTime;
 
     /**
-     * 规格值的集合
+     * 属性值的集合
      */
     private List<ProductPropertyValueRespVO> values;
 

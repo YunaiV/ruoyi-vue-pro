@@ -43,10 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -423,7 +420,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     @Override
     public PageResult<TradeOrderDO> getOrderPage(TradeOrderPageReqVO reqVO) {
-        return null;
+        return tradeOrderMapper.selectPage(reqVO);
     }
 
     // =================== Order Item ===================
@@ -473,6 +470,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         }
 
         // TODO 芋艿：未来如果有分佣，需要更新相关分佣订单为已失效
+    }
+
+    @Override
+    public List<TradeOrderItemDO> getOrderItems(Collection<Long> ids) {
+        return tradeOrderItemMapper.selectBatchIds(ids);
     }
 
     /**

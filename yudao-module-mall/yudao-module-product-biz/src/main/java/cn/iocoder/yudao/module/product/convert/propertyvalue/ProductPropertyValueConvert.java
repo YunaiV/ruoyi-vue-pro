@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.module.product.convert.propertyvalue;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueUpdateReqVO;
@@ -11,8 +8,10 @@ import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyVa
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 /**
- * 规格值 Convert
+ * 属性值 Convert
  *
  * @author 芋道源码
  */

@@ -72,7 +72,7 @@ public class TradeAfterSaleBaseVO {
     @NotNull(message = "商品 SKU 编号不能为空")
     private Long skuId;
 
-    @ApiModelProperty(value = "规格值数组")
+    @ApiModelProperty(value = "商品属性数组")
     private List<ProductPropertyValueDetailRespVO> properties;
 
     @ApiModelProperty(value = "商品图片", example = "https://www.iocoder.cn/2.png")

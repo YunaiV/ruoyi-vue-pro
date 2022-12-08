@@ -14,13 +14,12 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_VALUE_EXISTS;
 
 /**
- * 规格值 Service 实现类
+ * 商品属性值 Service 实现类
  *
  * @author LuoWenFeng
  */

@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.trade.controller.admin.order;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
+import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,8 +18,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Api(tags = "管理后台 - 交易订单")
@@ -33,7 +39,19 @@ public class TradeOrderController {
     @ApiOperation("获得交易订单分页")
     @PreAuthorize("@ss.hasPermission('trade:order:query')")
     public CommonResult<PageResult<TradeOrderPageItemRespVO>> getOrderPage(TradeOrderPageReqVO reqVO) {
+        // 查询订单
         PageResult<TradeOrderDO> pageResult = tradeOrderService.getOrderPage(reqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty());
+        }
+
+        // 查询订单项
+        List<TradeOrderItemDO> orderItems = tradeOrderService.getOrderItems(
+                convertSet(pageResult.getList(), TradeOrderDO::getId));
+        // 查询属性
+        Set<Long> propertyValueIds = TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems);
+
+
         return success(null);
     }
 

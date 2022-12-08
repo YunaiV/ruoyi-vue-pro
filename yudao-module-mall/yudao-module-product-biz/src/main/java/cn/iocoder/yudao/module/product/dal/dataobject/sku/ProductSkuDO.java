@@ -48,7 +48,7 @@ public class ProductSkuDO extends BaseDO {
      */
     private String spuName;
     /**
-     * 规格值数组，JSON 格式
+     * 属性数组，JSON 格式
      */
     @TableField(typeHandler = PropertyTypeHandler.class)
     private List<Property> properties;

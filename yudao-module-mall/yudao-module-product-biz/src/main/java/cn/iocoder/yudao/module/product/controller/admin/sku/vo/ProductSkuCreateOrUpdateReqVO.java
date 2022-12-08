@@ -18,7 +18,7 @@ public class ProductSkuCreateOrUpdateReqVO extends ProductSkuBaseVO {
     private Long id;
 
     /**
-     * 规格值数组
+     * 属性数组
      */
     private List<Property> properties;
 

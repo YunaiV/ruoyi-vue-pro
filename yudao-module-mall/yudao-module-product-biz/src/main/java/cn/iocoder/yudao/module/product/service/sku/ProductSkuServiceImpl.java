@@ -84,15 +84,17 @@ public class ProductSkuServiceImpl implements ProductSkuService {
             return;
         }
 
-        // 1、校验规格属性存在
-        Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null).flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
-                .map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toSet()); // 将每个 Property 转换成对应的 propertyId，最后形成集合
+        // 1、校验属性项存在
+        Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null)
+                .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
+                .map(ProductSkuBaseVO.Property::getPropertyId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
+                .collect(Collectors.toSet());
         List<ProductPropertyRespVO> propertyList = productPropertyService.getPropertyList(propertyIds);
         if (propertyList.size() != propertyIds.size()) {
             throw exception(PROPERTY_NOT_EXISTS);
         }
 
-        // 2. 校验，一个 SKU 下，没有重复的规格。校验方式是，遍历每个 SKU ，看看是否有重复的规格 propertyId
+        // 2. 校验，一个 SKU 下，没有重复的属性。校验方式是，遍历每个 SKU ，看看是否有重复的属性 propertyId
         Map<Long, ProductPropertyValueRespVO> propertyValueMap = CollectionUtils.convertMap(productPropertyValueService.getPropertyValueListByPropertyId(new ArrayList<>(propertyIds)), ProductPropertyValueRespVO::getId);
         skus.forEach(sku -> {
             Set<Long> skuPropertyIds = convertSet(sku.getProperties(), propertyItem -> propertyValueMap.get(propertyItem.getValueId()).getPropertyId());
@@ -101,7 +103,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
             }
         });
 
-        // 3. 再校验，每个 Sku 的规格值的数量，是一致的。
+        // 3. 再校验，每个 Sku 的属性值的数量，是一致的。
         int attrValueIdsSize = skus.get(0).getProperties().size();
         for (int i = 1; i < skus.size(); i++) {
             if (attrValueIdsSize != skus.get(i).getProperties().size()) {
@@ -151,7 +153,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     public void updateSkus(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // 查询 SPU 下已经存在的 SKU 的集合
         List<ProductSkuDO> existsSkus = productSkuMapper.selectListBySpuId(spuId);
-        // 构建规格与 SKU 的映射关系;
+        // 构建属性与 SKU 的映射关系;
         // TODO @luowenfeng: 可以下 existsSkuMap2; 会简洁一点; 另外, 可以考虑抽一个小方法, 用于 Properties 生成一个串; 这样 177 也可以复用了
         Map<String, Long> existsSkuMap = existsSkus.stream()
                 .map(v -> {

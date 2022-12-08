@@ -8,13 +8,13 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-@ApiModel("管理后台 - 规格值 Response VO")
+@ApiModel("管理后台 - 商品属性值 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductPropertyValueRespVO extends ProductPropertyValueBaseVO {
 
-    @ApiModelProperty(value = "主键", required = true, example = "10")
+    @ApiModelProperty(value = "编号", required = true, example = "10")
     private Long id;
 
     @ApiModelProperty(value = "创建时间")

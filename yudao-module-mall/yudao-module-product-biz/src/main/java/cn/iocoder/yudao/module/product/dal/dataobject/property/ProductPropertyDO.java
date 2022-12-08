@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 规格名称 DO
+ * 商品属性项 DO
  *
  * @author 芋道源码
  */
@@ -28,7 +28,7 @@ public class ProductPropertyDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 规格名称
+     * 名称
      */
     private String name;
     /**

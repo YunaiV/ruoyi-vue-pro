@@ -133,7 +133,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         if (null != spu) {
             List<ProductSpuDetailRespVO.Sku> skuReqs = ProductSkuConvert.INSTANCE.convertList03(productSkuService.getSkusBySpuId(id));
             respVO.setSkus(skuReqs);
-            // 组合 sku 规格属性
+            // 组合 sku 属性
             if (spu.getSpecType().equals(ProductSpuSpecTypeEnum.DISABLE.getType())) {
                 List<ProductSkuRespVO.Property> properties = new ArrayList<>();
                 for (ProductSpuDetailRespVO.Sku productSkuRespVO : skuReqs) {

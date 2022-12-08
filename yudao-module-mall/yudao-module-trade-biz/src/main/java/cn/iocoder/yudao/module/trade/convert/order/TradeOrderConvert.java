@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.convert.order;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
@@ -18,8 +19,11 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
@@ -86,6 +90,16 @@ public interface TradeOrderConvert {
         // 订单相关字段
         createReqDTO.setAmount(tradeOrderDO.getPayPrice()).setExpireTime(addTime(tradeOrderProperties.getExpireTime()));
         return createReqDTO;
+    }
+
+    default Set<Long> convertPropertyValueIds(List<TradeOrderItemDO> orderItems) {
+        if (CollUtil.isEmpty(orderItems)) {
+            return new HashSet<>();
+        }
+        return orderItems.stream().filter(item -> item.getProperties() != null)
+                .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
+                .map(TradeOrderItemDO.Property::getValueId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
+                .collect(Collectors.toSet());
     }
 
 }

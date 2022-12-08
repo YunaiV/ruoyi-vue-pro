@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.product.service.property;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.*;
 import cn.iocoder.yudao.module.product.convert.property.ProductPropertyConvert;
@@ -19,14 +18,13 @@ import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_NOT_EXISTS;
 
 /**
- * 规格名称 Service 实现类
+ * 商品属性项 Service 实现类
  *
  * @author 芋道源码
  */
@@ -58,7 +56,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     @Transactional(rollbackFor = Exception.class)
     public void updateProperty(ProductPropertyUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validatePropertyExists(updateReqVO.getId());
+        validatePropertyExists(updateReqVO.getId());
         ProductPropertyDO productPropertyDO = productPropertyMapper.selectByName(updateReqVO.getName());
         if (productPropertyDO != null && !productPropertyDO.getId().equals(updateReqVO.getId())) {
             throw exception(PROPERTY_EXISTS);
@@ -71,10 +69,10 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     @Override
     public void deleteProperty(Long id) {
         // 校验存在
-        this.validatePropertyExists(id);
+        validatePropertyExists(id);
         // 删除
         productPropertyMapper.deleteById(id);
-        //同步删除属性值
+        // 同步删除属性值
         productPropertyValueMapper.deletePropertyValueByPropertyId(id);
     }
 
@@ -93,7 +91,6 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
 
     @Override
     public PageResult<ProductPropertyRespVO> getPropertyPage(ProductPropertyPageReqVO pageReqVO) {
-        //获取属性列表
         PageResult<ProductPropertyDO> pageResult = productPropertyMapper.selectPage(pageReqVO);
         return ProductPropertyConvert.INSTANCE.convertPage(pageResult);
     }
@@ -104,11 +101,13 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         return ProductPropertyConvert.INSTANCE.convert(property);
     }
 
+    // TODO @芋艿：丢到 Controller
     @Override
     public List<ProductPropertyRespVO> getPropertyList(Collection<Long> ids) {
         return ProductPropertyConvert.INSTANCE.convertList(productPropertyMapper.selectBatchIds(ids));
     }
 
+    // TODO @芋艿：丢到 Controller
     @Override
     public List<ProductPropertyAndValueRespVO> getPropertyAndValueList(ProductPropertyListReqVO listReqVO) {
         List<ProductPropertyRespVO> propertyList = getPropertyList(listReqVO);

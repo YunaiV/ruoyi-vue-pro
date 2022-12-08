@@ -22,13 +22,13 @@ public interface ErrorCodeConstants {
     ErrorCode BRAND_DISABLED = new ErrorCode(1008002001, "品牌不存在");
     ErrorCode BRAND_NAME_EXISTS = new ErrorCode(1008002002, "品牌名称已存在");
 
-    // ========== 商品规格名称 1008003000 ==========
-    ErrorCode PROPERTY_NOT_EXISTS = new ErrorCode(1008003000, "规格名称不存在");
-    ErrorCode PROPERTY_EXISTS = new ErrorCode(1008003001, "规格名称已存在");
+    // ========== 商品属性项 1008003000 ==========
+    ErrorCode PROPERTY_NOT_EXISTS = new ErrorCode(1008003000, "属性项不存在");
+    ErrorCode PROPERTY_EXISTS = new ErrorCode(1008003001, "属性项的名称已存在");
 
-    // ========== 规格值 1008004000 ==========
-    ErrorCode PROPERTY_VALUE_NOT_EXISTS = new ErrorCode(1008004000, "规格值不存在");
-    ErrorCode PROPERTY_VALUE_EXISTS = new ErrorCode(1008004001, "规格值已存在");
+    // ========== 商品属性值 1008004000 ==========
+    ErrorCode PROPERTY_VALUE_NOT_EXISTS = new ErrorCode(1008004000, "属性值不存在");
+    ErrorCode PROPERTY_VALUE_EXISTS = new ErrorCode(1008004001, "属性值的名称已存在");
 
     // ========== 商品 SPU 1008005000 ==========
     ErrorCode SPU_NOT_EXISTS = new ErrorCode(1008005000, "商品 SPU 不存在");
@@ -36,7 +36,7 @@ public interface ErrorCodeConstants {
     // ========== 商品 SKU 1008006000 ==========
     ErrorCode SKU_NOT_EXISTS = new ErrorCode(1008006000, "商品 SKU 不存在");
     ErrorCode SKU_PROPERTIES_DUPLICATED = new ErrorCode(1008006001, "商品 SKU 的属性组合存在重复");
-    ErrorCode SPU_ATTR_NUMBERS_MUST_BE_EQUALS = new ErrorCode(1008006002, "一个 SPU 下的每个 SKU，其规格数必须一致");
+    ErrorCode SPU_ATTR_NUMBERS_MUST_BE_EQUALS = new ErrorCode(1008006002, "一个 SPU 下的每个 SKU，其属性项必须一致");
     ErrorCode SPU_SKU_NOT_DUPLICATE = new ErrorCode(1008006003, "一个 SPU 下的每个 SKU，必须不重复");
     ErrorCode SKU_STOCK_NOT_ENOUGH = new ErrorCode(1008006004, "商品 SKU 库存不足");
 

@@ -20,7 +20,7 @@ public class TradeOrderPageItemRespVO {
     public static class Item extends TradeOrderItemBaseVO {
 
         /**
-         * 规格值数组
+         * 属性数组
          */
         private List<ProductPropertyValueDetailRespVO> properties;
 

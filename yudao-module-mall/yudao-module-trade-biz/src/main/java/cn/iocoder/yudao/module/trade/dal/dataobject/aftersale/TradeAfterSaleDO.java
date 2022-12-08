@@ -120,7 +120,7 @@ public class TradeAfterSaleDO extends BaseDO {
      */
     private Long skuId;
     /**
-     * 规格值数组，JSON 格式
+     * 属性数组，JSON 格式
      *
      * 冗余 {@link TradeOrderItemDO#getProperties()}
      */
