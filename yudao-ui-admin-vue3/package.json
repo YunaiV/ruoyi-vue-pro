@@ -108,7 +108,7 @@
     "windicss": "^3.5.6"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": "^14.19.0 || >=16.0.0"
   },
   "license": "MIT",
   "repository": {

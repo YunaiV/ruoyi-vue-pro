@@ -155,7 +155,6 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
         itemRender: schemaItem.itemRender ? schemaItem.itemRender : itemRender,
         field: schemaItem.field,
         title: schemaItem.search?.title || schemaItem.title,
-        slots: schemaItem.search?.slots,
         span: span
       }
       searchSchema.push(searchSchemaItem)
