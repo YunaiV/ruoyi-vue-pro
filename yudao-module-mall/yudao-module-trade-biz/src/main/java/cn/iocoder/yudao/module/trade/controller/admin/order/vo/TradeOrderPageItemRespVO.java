@@ -8,7 +8,7 @@ import java.util.List;
 
 @ApiModel("管理后台 - 交易订单的分页项 Response VO")
 @Data
-public class TradeOrderPageItemRespVO {
+public class TradeOrderPageItemRespVO extends TradeOrderBaseVO {
 
     /**
      * 订单项列表

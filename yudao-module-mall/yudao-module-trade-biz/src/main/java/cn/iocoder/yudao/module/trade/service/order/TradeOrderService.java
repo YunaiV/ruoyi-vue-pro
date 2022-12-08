@@ -9,9 +9,6 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 
 /**
  * 交易订单 Service 接口
@@ -97,22 +94,19 @@ public interface TradeOrderService {
                                         Integer newAfterSaleStatus, Integer refundPrice);
 
     /**
-     * 查询交易订单项
+     * 根据交易订单项编号数组，查询交易订单项
      *
      * @param ids 交易订单项编号数组
      * @return 交易订单项数组
      */
-    List<TradeOrderItemDO> getOrderItems(Collection<Long> ids);
+    List<TradeOrderItemDO> getOrderItemList(Collection<Long> ids);
 
     /**
-     * 查询交易订单项 Map
+     * 根据交易订单编号数组，查询交易订单项
      *
-     * @param ids 交易订单项编号数组
-     * @return 交易订单项 Map
+     * @param orderIds 交易订单编号数组
+     * @return 交易订单项数组
      */
-    default Map<Long, List<TradeOrderItemDO>> getOrderItemMap(Collection<Long> ids) {
-        List<TradeOrderItemDO> orderItems = getOrderItems(ids);
-        return convertMultiMap(orderItems, TradeOrderItemDO::getOrderId);
-    }
+    List<TradeOrderItemDO> getOrderItemListByOrderId(Collection<Long> orderIds);
 
 }

@@ -142,7 +142,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                 Map<Long, List<ProductSkuBaseVO.Property>> propertyMaps = properties.stream().collect(Collectors.groupingBy(ProductSkuBaseVO.Property::getPropertyId));
 
                 List<ProductPropertyValueRespVO> propertyValueList = productPropertyValueService.getPropertyValueListByPropertyId(new ArrayList<>(propertyMaps.keySet()));
-                List<ProductPropertyRespVO> propertyList = productPropertyService.getPropertyList(new ArrayList<>(propertyMaps.keySet()));
+                List<ProductPropertyRespVO> propertyList = productPropertyService.getPropertyVOList(new ArrayList<>(propertyMaps.keySet()));
                 // 装载组装过后的属性
                 List<ProductPropertyViewRespVO> productPropertyViews = new ArrayList<>();
                 propertyList.forEach(p -> {

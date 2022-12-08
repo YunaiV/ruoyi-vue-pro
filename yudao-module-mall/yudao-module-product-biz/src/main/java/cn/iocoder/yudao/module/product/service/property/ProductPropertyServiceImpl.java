@@ -83,7 +83,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     }
 
     @Override
-    public List<ProductPropertyRespVO> getPropertyList(ProductPropertyListReqVO listReqVO) {
+    public List<ProductPropertyRespVO> getPropertyVOList(ProductPropertyListReqVO listReqVO) {
         return ProductPropertyConvert.INSTANCE.convertList(productPropertyMapper.selectList(new LambdaQueryWrapperX<ProductPropertyDO>()
                 .likeIfPresent(ProductPropertyDO::getName, listReqVO.getName())
                 .eqIfPresent(ProductPropertyDO::getStatus, listReqVO.getStatus())));
@@ -101,16 +101,21 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         return ProductPropertyConvert.INSTANCE.convert(property);
     }
 
+    @Override
+    public List<ProductPropertyDO> getPropertyList(Collection<Long> ids) {
+        return productPropertyMapper.selectBatchIds(ids);
+    }
+
     // TODO @芋艿：丢到 Controller
     @Override
-    public List<ProductPropertyRespVO> getPropertyList(Collection<Long> ids) {
+    public List<ProductPropertyRespVO> getPropertyVOList(Collection<Long> ids) {
         return ProductPropertyConvert.INSTANCE.convertList(productPropertyMapper.selectBatchIds(ids));
     }
 
     // TODO @芋艿：丢到 Controller
     @Override
     public List<ProductPropertyAndValueRespVO> getPropertyAndValueList(ProductPropertyListReqVO listReqVO) {
-        List<ProductPropertyRespVO> propertyList = getPropertyList(listReqVO);
+        List<ProductPropertyRespVO> propertyList = getPropertyVOList(listReqVO);
 
         // 查询属性值
         List<ProductPropertyValueDO> valueDOList = productPropertyValueMapper.selectListByPropertyId(CollectionUtils.convertList(propertyList, ProductPropertyRespVO::getId));

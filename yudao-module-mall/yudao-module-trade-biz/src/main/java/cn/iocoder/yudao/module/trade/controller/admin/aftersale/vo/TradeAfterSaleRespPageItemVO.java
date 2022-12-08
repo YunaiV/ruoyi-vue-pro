@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo;
 
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @ApiModel("管理后台 - 交易售后分页的每一条记录 Response VO")
 @Data
@@ -20,6 +22,11 @@ public class TradeAfterSaleRespPageItemVO extends TradeAfterSaleBaseVO {
 
     @ApiModelProperty(value = "创建时间", required = true)
     private LocalDateTime createTime;
+
+    /**
+     * 商品属性数组
+     */
+    private List<ProductPropertyValueDetailRespVO> properties;
 
     /**
      * 用户信息

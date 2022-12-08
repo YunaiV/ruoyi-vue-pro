@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
+import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDisagreeReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRefuseReqVO;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -41,20 +44,26 @@ public class TradeAfterSaleController {
 
     @Resource
     private MemberUserApi memberUserApi;
+    @Resource
+    private ProductPropertyValueApi productPropertyValueApi;
 
     @GetMapping("/page")
     @ApiOperation("获得交易售后分页")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:query')")
     public CommonResult<PageResult<TradeAfterSaleRespPageItemVO>> getAfterSalePage(@Valid TradeAfterSalePageReqVO pageVO) {
+        // 查询售后
         PageResult<TradeAfterSaleDO> pageResult = afterSaleService.getAfterSalePage(pageVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty());
         }
 
-        // 拼接数据
+        // 查询商品属性
+        List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
+                .getPropertyValueDetailList(TradeAfterSaleConvert.INSTANCE.convertPropertyValueIds(pageResult.getList()));
+        // 查询会员
         Map<Long, MemberUserRespDTO> memberUsers = memberUserApi.getUserMap(
                 convertSet(pageResult.getList(), TradeAfterSaleDO::getUserId));
-        return success(TradeAfterSaleConvert.INSTANCE.convertPage(pageResult, memberUsers));
+        return success(TradeAfterSaleConvert.INSTANCE.convertPage(pageResult, memberUsers, propertyValueDetails));
     }
 
     @PutMapping("/agree")

@@ -63,7 +63,7 @@ public class ProductPropertyController {
     @ApiOperation("获得属性项列表")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<List<ProductPropertyRespVO>> getPropertyList(@Valid ProductPropertyListReqVO listReqVO) {
-        return success(productPropertyService.getPropertyList(listReqVO));
+        return success(productPropertyService.getPropertyVOList(listReqVO));
     }
 
     @GetMapping("/page")

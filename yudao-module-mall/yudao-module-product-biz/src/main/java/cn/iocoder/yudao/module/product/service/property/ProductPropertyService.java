@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.product.service.property;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.*;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -41,7 +42,7 @@ public interface ProductPropertyService {
      * @param listReqVO 集合查询
      * @return 属性项集合
      */
-    List<ProductPropertyRespVO> getPropertyList(ProductPropertyListReqVO listReqVO);
+    List<ProductPropertyRespVO> getPropertyVOList(ProductPropertyListReqVO listReqVO);
 
     /**
      * 获取属性名称分页
@@ -65,7 +66,15 @@ public interface ProductPropertyService {
      * @param ids 属性项的编号的集合
      * @return 属性项数组
      */
-    List<ProductPropertyRespVO> getPropertyList(Collection<Long> ids);
+    List<ProductPropertyDO> getPropertyList(Collection<Long> ids);
+
+    /**
+     * 根据属性项的编号的集合，获得对应的属性项数组
+     *
+     * @param ids 属性项的编号的集合
+     * @return 属性项数组
+     */
+    List<ProductPropertyRespVO> getPropertyVOList(Collection<Long> ids);
 
     /**
      * 获得属性项 + 值的列表

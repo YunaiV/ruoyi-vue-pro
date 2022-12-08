@@ -5,7 +5,9 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.Produc
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValuePageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueUpdateReqVO;
+import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -44,6 +46,14 @@ public interface ProductPropertyValueService {
      * @return 属性值
      */
     ProductPropertyValueRespVO getPropertyValue(Long id);
+
+    /**
+     * 根据编号数组，获得属性值列表
+     *
+     * @param ids 编号数组
+     * @return 属性值明细列表
+     */
+    List<ProductPropertyValueDetailRespBO> getPropertyValueDetailList(Collection<Long> ids);
 
     /**
      * 获得属性值

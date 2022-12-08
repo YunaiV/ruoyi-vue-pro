@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.trade.controller.admin.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
+import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -35,6 +36,9 @@ public class TradeOrderController {
     @Resource
     private TradeOrderService tradeOrderService;
 
+    @Resource
+    private ProductPropertyValueApi productPropertyValueApi;
+
     @GetMapping("/page")
     @ApiOperation("获得交易订单分页")
     @PreAuthorize("@ss.hasPermission('trade:order:query')")
@@ -44,15 +48,14 @@ public class TradeOrderController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty());
         }
-
         // 查询订单项
-        List<TradeOrderItemDO> orderItems = tradeOrderService.getOrderItems(
+        List<TradeOrderItemDO> orderItems = tradeOrderService.getOrderItemListByOrderId(
                 convertSet(pageResult.getList(), TradeOrderDO::getId));
-        // 查询属性
-        Set<Long> propertyValueIds = TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems);
-
-
-        return success(null);
+        // 查询商品属性
+        List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
+                .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
+        // 最终组合
+        return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, propertyValueDetails));
     }
 
     @PostMapping("/delivery")

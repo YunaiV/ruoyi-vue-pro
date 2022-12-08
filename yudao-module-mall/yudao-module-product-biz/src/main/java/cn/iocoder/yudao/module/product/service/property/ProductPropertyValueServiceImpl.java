@@ -1,21 +1,28 @@
 package cn.iocoder.yudao.module.product.service.property;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValuePageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.propertyvalue.ProductPropertyValueConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.mysql.property.ProductPropertyValueMapper;
+import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_VALUE_EXISTS;
 
 /**
@@ -29,6 +36,10 @@ public class ProductPropertyValueServiceImpl implements ProductPropertyValueServ
 
     @Resource
     private ProductPropertyValueMapper productPropertyValueMapper;
+
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private ProductPropertyService productPropertyService;
 
     @Override
     public Long createPropertyValue(ProductPropertyValueCreateReqVO createReqVO) {
@@ -60,6 +71,23 @@ public class ProductPropertyValueServiceImpl implements ProductPropertyValueServ
         ProductPropertyValueDO productPropertyValueDO = productPropertyValueMapper.selectOne(new LambdaQueryWrapper<ProductPropertyValueDO>()
                 .eq(ProductPropertyValueDO::getId, id));
         return ProductPropertyValueConvert.INSTANCE.convert(productPropertyValueDO);
+    }
+
+    @Override
+    public List<ProductPropertyValueDetailRespBO> getPropertyValueDetailList(Collection<Long> ids) {
+        // 获得属性值列表
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        List<ProductPropertyValueDO> values = productPropertyValueMapper.selectBatchIds(ids);
+        if (CollUtil.isEmpty(values)) {
+            return Collections.emptyList();
+        }
+        // 获得属性项列表
+        List<ProductPropertyDO> keys = productPropertyService.getPropertyList(
+                convertSet(values, ProductPropertyValueDO::getPropertyId));
+        // 组装明细
+        return ProductPropertyValueConvert.INSTANCE.convertList(values, keys);
     }
 
     @Override

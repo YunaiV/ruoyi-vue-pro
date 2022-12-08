@@ -1,0 +1,4 @@
+### 获得交易售后分页 => 成功
+GET {{baseUrl}}/trade/after-sale/page?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}

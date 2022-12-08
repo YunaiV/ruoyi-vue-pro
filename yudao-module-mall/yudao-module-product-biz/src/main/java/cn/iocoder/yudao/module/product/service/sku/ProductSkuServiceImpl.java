@@ -89,7 +89,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
                 .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
                 .map(ProductSkuBaseVO.Property::getPropertyId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
                 .collect(Collectors.toSet());
-        List<ProductPropertyRespVO> propertyList = productPropertyService.getPropertyList(propertyIds);
+        List<ProductPropertyRespVO> propertyList = productPropertyService.getPropertyVOList(propertyIds);
         if (propertyList.size() != propertyIds.size()) {
             throw exception(PROPERTY_NOT_EXISTS);
         }
