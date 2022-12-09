@@ -36,6 +36,7 @@
         <module>yudao-spring-boot-starter-biz-tenant</module>
         <module>yudao-spring-boot-starter-biz-data-permission</module>
         <module>yudao-spring-boot-starter-biz-error-code</module>
+        <module>yudao-spring-boot-starter-biz-ip</module>
 
         <module>yudao-spring-boot-starter-flowable</module>
         <module>yudao-spring-boot-starter-captcha</module>

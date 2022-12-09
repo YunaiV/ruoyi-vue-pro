@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.convert.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
@@ -131,6 +132,8 @@ public interface TradeOrderConvert {
                     });
                 }
             }
+            // 处理收货地址
+            orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
             return orderVO;
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());
