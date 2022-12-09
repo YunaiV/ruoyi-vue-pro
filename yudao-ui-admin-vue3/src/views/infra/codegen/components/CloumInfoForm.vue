@@ -4,6 +4,7 @@
     :data="info"
     max-height="600"
     stripe
+    class="xtable-scrollbar"
     :column-config="{ resizable: true }"
   >
     <vxe-column title="字段列名" field="columnName" fixed="left" width="80" />

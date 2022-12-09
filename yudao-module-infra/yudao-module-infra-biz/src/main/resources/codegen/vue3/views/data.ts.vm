@@ -43,12 +43,11 @@ const crudSchemas = reactive<VxeCrudSchema>({
       isForm: false,
       #elseif(!("" != $column.dictType))
       #if (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdatetime")
-      formatter: 'formatDate',
       form: {
         component: 'DatePicker',
         componentProps: {
           type: 'datetime',
-          valueFormat: 'YYYY-MM-DD HH:mm:ss'
+          valueFormat: 'x'
         }
       },
       #elseif($column.htmlType == "editor")## 文本编辑器
@@ -96,6 +95,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       #elseif("" != $dictType)
       isSearch: true,
       #elseif($column.htmlType == "datetime")
+      formatter: 'formatDate',
       search: {
         show: true,
         itemRender: {
@@ -104,8 +104,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
       },
       #end
       #end
-      #end
     },
+      #end
     #end
   #end
   ]

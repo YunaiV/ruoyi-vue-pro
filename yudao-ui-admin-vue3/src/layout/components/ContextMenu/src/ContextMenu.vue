@@ -4,7 +4,7 @@ import { PropType, ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useDesign } from '@/hooks/web/useDesign'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
-import { contextMenuSchema } from '../../../types/contextMenu'
+import { contextMenuSchema } from '@/types/contextMenu'
 
 const { getPrefixCls } = useDesign()
 

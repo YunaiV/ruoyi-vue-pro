@@ -104,7 +104,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
       form: {
         component: 'DatePicker',
         componentProps: {
-          type: 'datetime'
+          type: 'datetime',
+          valueFormat: 'x'
         }
       }
     },

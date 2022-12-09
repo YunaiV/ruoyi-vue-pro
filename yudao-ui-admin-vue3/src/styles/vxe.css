@@ -24,3 +24,7 @@
 .xtable-scrollbar ::-webkit-scrollbar-corner {
   background-color: #ffffff;
 }
+/*移除 vxe-grid 右侧外框*/
+.vxe-button.size--medium.type--button.is--circle {
+  border: 0;
+}

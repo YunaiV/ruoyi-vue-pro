@@ -38,11 +38,12 @@
 * 集成阿里云、腾讯云等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务
 * 集成报表设计器，支持数据报表、图形报表、打印设计等
 
-| 项目名                | 说明                     | 传送门                                                                                                                                 |
-|--------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| `ruoyi-vue-pro`    | Spring Boot 多模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro)     |
-| `yudao-cloud`  | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)         |
+| 项目名                | 说明                     | 传送门                                                                                                                               |
+|--------------------|------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `ruoyi-vue-pro`    | Spring Boot 多模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro)   |
+| `yudao-cloud`  | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)       |
 | `Spring-Boot-Labs` | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/zhijiantianya/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/SpringBoot-Labs) |
+ | `ruoyi-vue-pro-mini` | 精简版 移除工作流 支付等模块| **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini)**  |
 
 ## 😎 开源协议
 
@@ -224,7 +225,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [Vue](https://staging-cn.vuejs.org/)                                 |   Vue 框架    | 3.2.45 |
 | [Vite](https://cn.vitejs.dev//)                                      | 开发与构建工具  | 3.2.3  |
 | [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus | 2.2.25 |
-| [TypeScript](https://www.typescriptlang.org/docs/)                   |  TypeScript  | 4.9.3  |
+| [TypeScript](https://www.typescriptlang.org/docs/)                   |  TypeScript  | 4.9.4  |
 | [pinia](https://pinia.vuejs.org/)                                    |    vuex5     | 2.0.27 |
 | [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) |    国际化     | 9.2.2  |
 | [vxe-table](https://vxetable.cn/)                                    |  vue最强表单  | 4.5.6  |

@@ -495,16 +495,17 @@ $prefix-cls: #{$namespace}-tags-view;
     position: relative;
     top: 2px;
     height: calc(100% - 4px);
-    padding-right: 25px;
+    padding-right: 16px;
     margin-left: 4px;
     font-size: 12px;
+    border-radius: 3px 3px 3px 3px;
     cursor: pointer;
     border: 1px solid #d9d9d9;
 
     &--close {
       position: absolute;
       top: 50%;
-      right: 5px;
+      right: 3px;
       display: none;
       transform: translate(0, -50%);
     }
@@ -552,8 +553,9 @@ $prefix-cls: #{$namespace}-tags-view;
       position: relative;
       top: 2px;
       height: calc(100% - 4px);
-      padding-right: 25px;
+      padding-right: 16px;
       font-size: 12px;
+      border-radius: 3px 3px 3px 3px;
       cursor: pointer;
       border: 1px solid var(--el-border-color);
     }
