@@ -15,7 +15,7 @@ import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 #end
 #end
 
-@ApiModel("${sceneEnum.name} - ${table.classComment}创建 Request VO")
+@Schema(title = "${sceneEnum.name} - ${table.classComment}创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

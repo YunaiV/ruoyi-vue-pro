@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.product.controller.app.spu.vo;
 
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  *
  * @author LuoWenFeng
  */
-@ApiModel("App - 商品spu Response VO")
+@Schema(title = "App - 商品spu Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AppSpuRespVO extends ProductSpuRespVO {

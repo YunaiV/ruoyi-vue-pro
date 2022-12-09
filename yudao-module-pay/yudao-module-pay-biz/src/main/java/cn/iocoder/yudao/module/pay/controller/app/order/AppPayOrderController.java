@@ -12,8 +12,8 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitRespDTO;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 
-@Api(tags = "用户 APP - 支付订单")
+@Tag(name = "用户 APP - 支付订单")
 @RestController
 @RequestMapping("/pay/order")
 @Validated
@@ -42,7 +42,7 @@ public class AppPayOrderController {
     private PayClientFactory payClientFactory;
 
     @PostMapping("/submit")
-    @ApiOperation("提交支付订单")
+    @Operation(summary = "提交支付订单")
 //    @PreAuthenticated // TODO 暂时不加登陆验证，前端暂时没做好
     public CommonResult<AppPayOrderSubmitRespVO> submitPayOrder(@RequestBody AppPayOrderSubmitReqVO reqVO) {
         // 获得订单
@@ -63,7 +63,7 @@ public class AppPayOrderController {
     // TODO @芋艿：是不是放到 notify 模块更合适
     //TODO 芋道源码 换成了统一的地址了 /notify/{channelId}，测试通过可以删除
     @PostMapping("/notify/wx-pub/{channelId}")
-    @ApiOperation("通知微信公众号支付的结果")
+    @Operation(summary = "通知微信公众号支付的结果")
     public String notifyWxPayOrder(@PathVariable("channelId") Long channelId,
                                    @RequestBody String xmlData) throws Exception {
         orderService.notifyPayOrder(channelId,  PayNotifyDataDTO.builder().body(xmlData).build());
@@ -77,7 +77,7 @@ public class AppPayOrderController {
      * @return 返回跳转页面
      */
     @GetMapping(value = "/return/{channelId}")
-    @ApiOperation("渠道统一的支付成功返回地址")
+    @Operation(summary = "渠道统一的支付成功返回地址")
     public String returnAliPayOrder(@PathVariable("channelId") Long channelId, @RequestParam Map<String, String> params){
         //TODO 可以根据渠道和 app_id 返回不同的页面
         log.info("app_id  is {}", params.get("app_id"));
@@ -93,7 +93,7 @@ public class AppPayOrderController {
      * @return 成功返回 "success"
      */
     @PostMapping(value = "/notify/{channelId}")
-    @ApiOperation("渠道统一的支付成功,或退款成功 通知url")
+    @Operation(summary = "渠道统一的支付成功,或退款成功 通知url")
     public String notifyChannelPay(@PathVariable("channelId") Long channelId,
                                    @RequestParam Map<String, String> params,
                                    @RequestBody String originData) throws Exception {

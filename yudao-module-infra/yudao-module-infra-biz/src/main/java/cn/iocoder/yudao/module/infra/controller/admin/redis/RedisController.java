@@ -9,9 +9,9 @@ import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisKeyDefineRes
 import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisKeyValueRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisMonitorRespVO;
 import cn.iocoder.yudao.module.infra.convert.redis.RedisConvert;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.redis.connection.RedisServerCommands;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisCallback;
@@ -25,7 +25,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - Redis 监控")
+@Tag(name = "管理后台 - Redis 监控")
 @RestController
 @RequestMapping("/infra/redis")
 public class RedisController {
@@ -34,7 +34,7 @@ public class RedisController {
     private StringRedisTemplate stringRedisTemplate;
 
     @GetMapping("/get-monitor-info")
-    @ApiOperation("获得 Redis 监控信息")
+    @Operation(summary = "获得 Redis 监控信息")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-monitor-info')")
     public CommonResult<RedisMonitorRespVO> getRedisMonitorInfo() {
         // 获得 Redis 统计信息
@@ -48,7 +48,7 @@ public class RedisController {
     }
 
     @GetMapping("/get-key-define-list")
-    @ApiOperation("获得 Redis Key 模板列表")
+    @Operation(summary = "获得 Redis Key 模板列表")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
     public CommonResult<List<RedisKeyDefineRespVO>> getKeyDefineList() {
         List<RedisKeyDefine> keyDefines = RedisKeyRegistry.list();
@@ -56,8 +56,8 @@ public class RedisController {
     }
 
     @GetMapping("/get-key-list")
-    @ApiOperation("获得 Redis keys 键名列表")
-    @ApiImplicitParam(name = "keyTemplate", value = "Redis Key 定义", example = "true", dataTypeClass = String.class)
+    @Operation(summary = "获得 Redis keys 键名列表")
+    @Parameter(name = "keyTemplate", description = "Redis Key 定义", example = "true")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
     public CommonResult<Set<String>> getKeyDefineList(@RequestParam("keyTemplate") String keyTemplate) {
         return success(getKeyDefineList0(keyTemplate));
@@ -80,8 +80,8 @@ public class RedisController {
     }
 
     @GetMapping("/get-key-value")
-    @ApiOperation("获得 Redis key 内容")
-    @ApiImplicitParam(name = "key", value = "Redis Key", example = "oauth2_access_token:233", dataTypeClass = String.class)
+    @Operation(summary = "获得 Redis key 内容")
+    @Parameter(name = "key", description = "Redis Key", example = "oauth2_access_token:233")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
     public CommonResult<RedisKeyValueRespVO> getKeyValue(@RequestParam("key") String key) {
         String value = stringRedisTemplate.opsForValue().get(key);
@@ -89,8 +89,8 @@ public class RedisController {
     }
 
     @DeleteMapping("/delete-key")
-    @ApiOperation("删除 Redis Key")
-    @ApiImplicitParam(name = "key", value = "Redis Key", example = "oauth2_access_token:233", dataTypeClass = String.class)
+    @Operation(summary = "删除 Redis Key")
+    @Parameter(name = "key", description = "Redis Key", example = "oauth2_access_token:233")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
     public CommonResult<Boolean> deleteKey(@RequestParam("key") String key) {
         stringRedisTemplate.delete(key);
@@ -98,8 +98,8 @@ public class RedisController {
     }
 
     @DeleteMapping("/delete-keys")
-    @ApiOperation("删除 Redis Key 根据模板")
-    @ApiImplicitParam(name = "keyTemplate", value = "Redis Key 定义", example = "true", dataTypeClass = String.class)
+    @Operation(summary = "删除 Redis Key 根据模板")
+    @Parameter(name = "keyTemplate", description = "Redis Key 定义", example = "true")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
     public CommonResult<Boolean> deleteKeys(@RequestParam("keyTemplate") String keyTemplate) {
         Set<String> keys = getKeyDefineList0(keyTemplate);

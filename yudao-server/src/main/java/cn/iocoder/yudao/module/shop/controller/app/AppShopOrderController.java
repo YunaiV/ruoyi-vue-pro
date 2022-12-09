@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.util.PaySeqUtils;
 import cn.iocoder.yudao.module.shop.controller.app.vo.AppShopOrderCreateRespVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 
-@Api(tags = "用户 APP - 商城订单")
+@Tag(name = "用户 APP - 商城订单")
 @RestController
 @RequestMapping("/shop/order")
 @Validated
@@ -34,7 +34,7 @@ public class AppShopOrderController {
     private PayOrderService payOrderService;
 
     @PostMapping("/create")
-    @ApiOperation("创建商城订单")
+    @Operation(summary = "创建商城订单")
 //    @PreAuthenticated // TODO 暂时不加登陆验证，前端暂时没做好
     public CommonResult<AppShopOrderCreateRespVO> create() {
         // 假装创建商城订单
@@ -57,14 +57,14 @@ public class AppShopOrderController {
     }
 
     @PostMapping("/pay-notify")
-    @ApiOperation("支付回调")
+    @Operation(summary = "支付回调")
     public CommonResult<Boolean> payNotify(@RequestBody @Valid PayNotifyOrderReqVO reqVO) {
         log.info("[payNotify][回调成功]");
         return success(true);
     }
 
     @PostMapping("/refund-notify")
-    @ApiOperation("退款回调")
+    @Operation(summary = "退款回调")
     public CommonResult<Boolean> refundNotify(@RequestBody @Valid PayRefundOrderReqVO reqVO) {
         log.info("[refundNotify][回调成功]");
         return success(true);

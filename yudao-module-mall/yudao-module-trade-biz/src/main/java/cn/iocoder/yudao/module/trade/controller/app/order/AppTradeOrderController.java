@@ -10,9 +10,9 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderGetCre
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.TradeOrderRespVO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Api(tags = "用户 App - 交易订单")
+@Tag(name = "用户 App - 交易订单")
 @RestController
 @RequestMapping("/trade/order")
 @RequiredArgsConstructor // TODO @LeeYan9: 先统一使用 @Resource 注入哈; 项目只有三层, 依赖注入会存在, 所以使用 @Resource; 也因此, 最好全局保持一致
@@ -31,7 +31,7 @@ public class AppTradeOrderController {
     private final TradeOrderService tradeOrderService;
 
     @GetMapping("/get-create-info")
-    @ApiOperation("基于商品，确认创建订单")
+    @Operation(summary = "基于商品，确认创建订单")
     @PreAuthenticated
     public CommonResult<AppTradeOrderGetCreateInfoRespVO> getTradeOrderCreateInfo(AppTradeOrderCreateReqVO createReqVO) {
 //        return success(tradeOrderService.getOrderConfirmCreateInfo(UserSecurityContextHolder.getUserId(), skuId, quantity, couponCardId));
@@ -39,7 +39,7 @@ public class AppTradeOrderController {
     }
 
     @PostMapping("/create")
-    @ApiOperation("创建订单")
+    @Operation(summary = "创建订单")
     @PreAuthenticated
     public CommonResult<Long> createTradeOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO,
                                                HttpServletRequest servletRequest) {
@@ -52,15 +52,15 @@ public class AppTradeOrderController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得交易订单")
-    @ApiImplicitParam(name = "tradeOrderId", value = "交易订单编号", required = true, dataTypeClass = Long.class)
+    @Operation(summary = "获得交易订单")
+    @Parameter(name = "tradeOrderId", description = "交易订单编号", required = true)
     public CommonResult<TradeOrderRespVO> getTradeOrder(@RequestParam("tradeOrderId") Integer tradeOrderId) {
 //        return success(tradeOrderService.getTradeOrder(tradeOrderId));
         return null;
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得订单交易分页")
+    @Operation(summary = "获得订单交易分页")
     public CommonResult<PageResult<TradeOrderRespVO>> pageTradeOrder(TradeOrderPageReqVO pageVO) {
 //        return success(tradeOrderService.pageTradeOrder(UserSecurityContextHolder.getUserId(), pageVO));
         return null;

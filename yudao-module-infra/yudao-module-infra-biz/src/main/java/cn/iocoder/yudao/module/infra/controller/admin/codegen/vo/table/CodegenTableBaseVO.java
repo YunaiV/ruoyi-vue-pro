@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table;
-
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -12,46 +11,46 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CodegenTableBaseVO {
 
-    @ApiModelProperty(value = "生成场景", required = true, example = "1", notes = "参见 CodegenSceneEnum 枚举")
+    @Schema(title = "生成场景", required = true, example = "1", description = "参见 CodegenSceneEnum 枚举")
     @NotNull(message = "导入类型不能为空")
     private Integer scene;
 
-    @ApiModelProperty(value = "表名称", required = true, example = "yudao")
+    @Schema(title = "表名称", required = true, example = "yudao")
     @NotNull(message = "表名称不能为空")
     private String tableName;
 
-    @ApiModelProperty(value = "表描述", required = true, example = "芋道")
+    @Schema(title = "表描述", required = true, example = "芋道")
     @NotNull(message = "表描述不能为空")
     private String tableComment;
 
-    @ApiModelProperty(value = "备注", example = "我是备注")
+    @Schema(title = "备注", example = "我是备注")
     private String remark;
 
-    @ApiModelProperty(value = "模块名", required = true, example = "system")
+    @Schema(title = "模块名", required = true, example = "system")
     @NotNull(message = "模块名不能为空")
     private String moduleName;
 
-    @ApiModelProperty(value = "业务名", required = true, example = "codegen")
+    @Schema(title = "业务名", required = true, example = "codegen")
     @NotNull(message = "业务名不能为空")
     private String businessName;
 
-    @ApiModelProperty(value = "类名称", required = true, example = "CodegenTable")
+    @Schema(title = "类名称", required = true, example = "CodegenTable")
     @NotNull(message = "类名称不能为空")
     private String className;
 
-    @ApiModelProperty(value = "类描述", required = true, example = "代码生成器的表定义")
+    @Schema(title = "类描述", required = true, example = "代码生成器的表定义")
     @NotNull(message = "类描述不能为空")
     private String classComment;
 
-    @ApiModelProperty(value = "作者", required = true, example = "芋道源码")
+    @Schema(title = "作者", required = true, example = "芋道源码")
     @NotNull(message = "作者不能为空")
     private String author;
 
-    @ApiModelProperty(value = "模板类型", required = true, example = "1", notes = "参见 CodegenTemplateTypeEnum 枚举")
+    @Schema(title = "模板类型", required = true, example = "1", description = "参见 CodegenTemplateTypeEnum 枚举")
     @NotNull(message = "模板类型不能为空")
     private Integer templateType;
 
-    @ApiModelProperty(value = "父菜单编号", example = "1024")
+    @Schema(title = "父菜单编号", example = "1024")
     private Long parentMenuId;
 
 }
