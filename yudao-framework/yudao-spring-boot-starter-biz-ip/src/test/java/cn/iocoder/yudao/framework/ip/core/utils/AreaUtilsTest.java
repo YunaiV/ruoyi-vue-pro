@@ -28,9 +28,9 @@ public class AreaUtilsTest {
 
     @Test
     public void testFormat() {
-        assertEquals(AreaUtils.format(110105L), "北京 北京市 朝阳区");
-        assertEquals(AreaUtils.format(1L), "中国");
-        assertEquals(AreaUtils.format(2L), "蒙古");
+        assertEquals(AreaUtils.format(110105), "北京 北京市 朝阳区");
+        assertEquals(AreaUtils.format(1), "中国");
+        assertEquals(AreaUtils.format(2), "蒙古");
     }
 
 }

@@ -31,7 +31,6 @@ public interface MemberUserService {
      */
     List<MemberUserDO> getUserListByNickname(String nickname);
 
-
     /**
      * 基于手机号创建用户。
      * 如果用户已经存在，则直接进行返回

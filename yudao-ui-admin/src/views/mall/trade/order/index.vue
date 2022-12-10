@@ -3,32 +3,34 @@
     <!-- 搜索工作栏 -->
     <!-- TODO: inline 看看是不是需要; v-show= 那块逻辑还是要的 -->
     <el-row :gutter="20">
-      <el-form :model="queryParams" label-width="68px" size="small">
+      <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
         <el-col :span="6" :xs="24">
-          <el-form-item label="搜索方式">
-            <el-input style="width: 240px">
-              <el-select v-model="queryParams.searchType" slot="prepend" clearable style="width: 100px">
+          <el-form-item label="搜索方式" prop="searchValue">
+            <el-input v-model="queryParams.searchValue" style="width: 240px">
+              <el-select v-model="queryParams.searchType" slot="prepend" style="width: 100px">
                 <el-option v-for="dict in dicData.searchType" v-bind="dict" :key="dict.value"/>
               </el-select>
             </el-input>
           </el-form-item>
         </el-col>
         <el-col :span="6" :xs="24">
-          <el-form-item label="订单类型">
-            <el-select v-model="queryParams.orderType" clearable style="width: 240px">
-              <el-option v-for="dict in dicData.orderType" v-bind="dict" :key="dict.value"/>
+          <el-form-item label="订单类型" prop="type">
+            <el-select v-model="queryParams.type" clearable style="width: 240px">
+              <el-option v-for="dict in this.getDictDatas(DICT_TYPE.TRADE_ORDER_TYPE)"
+                         :key="dict.value" :label="dict.label" :value="dict.value"/>
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="6" :xs="24">
-          <el-form-item label="订单状态">
-            <el-select v-model="queryParams.orderStatus" clearable style="width: 240px">
-              <el-option v-for="dict in dicData.orderStatus" v-bind="dict" :key="dict.value"/>
+          <el-form-item label="订单状态" prop="status">
+            <el-select v-model="queryParams.status" clearable style="width: 240px">
+              <el-option v-for="dict in this.getDictDatas(DICT_TYPE.TRADE_ORDER_STATUS)"
+                         :key="dict.value" :label="dict.label" :value="dict.value"/>
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="6" :xs="24">
-          <el-form-item label="订单来源">
+          <el-form-item label="订单来源" prop="terminal">
             <el-select v-model="queryParams.terminal" clearable style="width: 240px">
               <el-option v-for="dict in this.getDictDatas(DICT_TYPE.TERMINAL)"
                          :key="dict.value" :label="dict.label" :value="dict.value"/>
@@ -36,7 +38,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="6" :xs="24">
-          <el-form-item label="支付方式">
+          <el-form-item label="支付方式" prop="payChannelCode">
             <el-select v-model="queryParams.payChannelCode" clearable style="width: 240px">
               <el-option v-for="dict in this.getDictDatas(DICT_TYPE.PAY_CHANNEL_CODE_TYPE)"
                          :key="dict.value" :label="dict.label" :value="dict.value"/>
@@ -44,23 +46,30 @@
           </el-form-item>
         </el-col>
         <el-col :span="6" :xs="24">
-          <el-form-item label="下单时间">
-            <el-date-picker v-model="queryParams.date" type="daterange" range-separator="至"
-                            start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="datePickerOptions" style="width: 240px"/>
+          <el-form-item label="下单时间" prop="createTime">
+            <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                            range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"
+                            :picker-options="datePickerOptions" :default-time="['00:00:00', '23:59:59']" />
           </el-form-item>
         </el-col>
         <el-col :span="6" :xs="24" style="line-height: 32px">
-          <el-button type="primary" icon="el-icon-search" size="mini">搜索</el-button>
-          <el-button icon="el-icon-refresh" size="mini">重置</el-button>
+          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+          <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
         </el-col>
       </el-form>
     </el-row>
 
-    <!-- tab切换-->
-    <el-tabs v-model="activeTabName" type="card">
-      <el-tab-pane v-for="tabPane in tabPanes" :label="tabPane.text" :name="tabPane.name">
-        <!-- table -->
-        <el-table :data="list" :show-header="false" class="order-table">
+    <!-- 操作工具栏 -->
+    <el-row :gutter="10" class="mb8">
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+    </el-row>
+
+    <!-- tab切换 -->
+    <!-- TODO @小程：看看能不能往上挪 -40px，和【隐藏搜索】【刷新】对齐 -->
+    <el-tabs v-model="activeTab" type="card" @tab-click="tabClick">
+      <el-tab-pane v-for="tab in statusTabs" :key="tab.value" :label="tab.label" :name="tab.value">
+        <!-- 列表 -->
+        <el-table v-loading="loading" :data="list" :show-header="false" class="order-table">
           <el-table-column>
             <template slot-scope="{ row }">
               <el-row type="flex" align="middle">
@@ -136,33 +145,25 @@
         </el-table>
       </el-tab-pane>
     </el-tabs>
+    <!-- 分页组件 -->
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                @pagination="getList"/>
   </div>
 </template>
 
 <script>
 import { getOrderPage } from "@/api/mall/trade/order";
 import { datePickerOptions } from "@/utils/constants";
+import { DICT_TYPE, getDictDatas } from "@/utils/dict";
 
 const dicData = {
     searchType: [
-      { label: '订单号', value: 'ddh' },
-      { label: '交易流水号', value: 'jylsh' },
-      { label: '订单备注', value: 'ddbz' },
-      { label: '收货人姓名', value: 'shrxm' },
-      { label: '商品名称', value: 'spmc' },
-      { label: '收货人电话', value: 'shrdh' },
-      { label: '会员昵称', value: 'hync' },
-      { label: '商品编号', value: 'spbh' }
-    ],
-    orderStatus: [
-      { label: '全部', value: 'qb' },
-      { label: '待支付', value: 'dzf' },
-      { label: '待发货', value: 'dfh' },
-      { label: '已发货', value: 'yfh' },
-      { label: '已收货', value: 'ysh' },
-      { label: '已完成', value: 'ywc' },
-      { label: '已关闭', value: 'ygb' },
-      { label: '退款中', value: 'tkz' }
+      { label: '订单号', value: 'no' },
+      { label: '会员编号', value: 'userId' },
+      { label: '会员昵称', value: 'userNickname' },
+      { label: '会员手机号', value: 'userMobile' },
+      { label: '收货人姓名', value: 'receiverName' },
+      { label: '收货人手机号码', value: 'receiverMobile' },
     ],
   }
   export default {
@@ -183,20 +184,19 @@ const dicData = {
         queryParams: {
           pageNo: 1,
           pageSize: 10,
-          searchType: 'ddh',
-          orderType: ''
+          searchType: 'no',
+          searchValue: '',
+          type: null,
+          status: null,
+          payChannelCode: null,
+          createTime: [],
         },
-        activeTabName: 'all',
-        tabPanes: [
-          { text: '全部', name: 'all' },
-          { text: '待支付', name: 'toBePay' },
-          { text: '待发货', name: 'toBeSend' },
-          { text: '已发货', name: 'send' },
-          { text: '已收货', name: 'received' },
-          { text: '已完成', name: 'finished' },
-          { text: '已关闭', name: 'closed' },
-          { text: '退款中', name: 'refund' }
-        ],
+        // Tab 筛选
+        activeTab: 'all',
+        statusTabs: [{
+          label: '全部',
+          value: 'all'
+        }],
         // 静态变量
         datePickerOptions: datePickerOptions
       }
@@ -204,23 +204,49 @@ const dicData = {
     created() {
       this.getList();
       // 设置 statuses 过滤
-      // for (const dict of getDictDatas(DICT_TYPE.TRADE_AFTER_SALE_STATUS)) {
-      //   this.statusTabs.push({
-      //     label: dict.label,
-      //     value: dict.value
-      //   })
-      // }
+      for (const dict of getDictDatas(DICT_TYPE.TRADE_ORDER_STATUS)) {
+        this.statusTabs.push({
+          label: dict.label,
+          value: dict.value
+        })
+      }
     },
     methods: {
       /** 查询列表 */
       getList() {
         this.loading = true;
         // 执行查询
-        getOrderPage(this.queryParams).then(response => {
+        getOrderPage({
+          ...this.queryParams,
+          searchType: undefined,
+          searchValue: undefined,
+          no: this.queryParams.searchType === 'no' ? this.queryParams.searchValue : undefined,
+          userId: this.queryParams.searchType === 'userId' ? this.queryParams.searchValue : undefined,
+          userNickname: this.queryParams.searchType === 'userNickname' ? this.queryParams.searchValue : undefined,
+          userMobile: this.queryParams.searchType === 'userMobile' ? this.queryParams.searchValue : undefined,
+          receiverName: this.queryParams.searchType === 'receiverName' ? this.queryParams.searchValue : undefined,
+          receiverMobile: this.queryParams.searchType === 'receiverMobile' ? this.queryParams.searchValue : undefined,
+        }).then(response => {
           this.list = response.data.list;
           this.total = response.data.total;
           this.loading = false;
         });
+      },
+      /** 搜索按钮操作 */
+      handleQuery() {
+        this.queryParams.pageNo = 1;
+        this.activeTab = this.queryParams.status ? this.queryParams.status : 'all'; // 处理 tab
+        this.getList();
+      },
+      /** 重置按钮操作 */
+      resetQuery() {
+        this.resetForm("queryForm");
+        this.handleQuery();
+      },
+      /** tab 切换 */
+      tabClick(tab) {
+        this.queryParams.status = tab.name === 'all' ? undefined : tab.name;
+        this.getList();
       },
       goToDetail (row) {
         this.$router.push({ path: '/mall/trade/order/detail', query: { orderNo: row.orderNo }})

@@ -65,6 +65,8 @@ export const DICT_TYPE = {
   TRADE_AFTER_SALE_STATUS: 'trade_after_sale_status', // 售后 - 状态
   TRADE_AFTER_SALE_WAY: 'trade_after_sale_way', // 售后 - 方式
   TRADE_AFTER_SALE_TYPE: 'trade_after_sale_type', // 售后 - 类型
+  TRADE_ORDER_TYPE: 'trade_order_type', // 订单 - 类型
+  TRADE_ORDER_STATUS: 'trade_order_status', // 订单 - 状态
 
   // ========== MALL - PROMOTION 模块 ==========
   PROMOTION_DISCOUNT_TYPE: 'promotion_discount_type', // 优惠类型

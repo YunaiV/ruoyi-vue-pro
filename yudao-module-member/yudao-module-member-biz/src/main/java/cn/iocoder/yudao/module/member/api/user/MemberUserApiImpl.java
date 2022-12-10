@@ -39,4 +39,9 @@ public class MemberUserApiImpl implements MemberUserApi {
         return UserConvert.INSTANCE.convertList2(userService.getUserListByNickname(nickname));
     }
 
+    @Override
+    public MemberUserRespDTO getUserByMobile(String mobile) {
+        return UserConvert.INSTANCE.convert2(userService.getUserByMobile(mobile));
+    }
+
 }

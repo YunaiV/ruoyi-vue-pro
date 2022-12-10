@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -11,6 +12,8 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -77,6 +80,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     private AddressApi addressApi;
     @Resource
     private CouponApi couponApi;
+    @Resource
+    private MemberUserApi memberUserApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -420,7 +425,24 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     @Override
     public PageResult<TradeOrderDO> getOrderPage(TradeOrderPageReqVO reqVO) {
-        return tradeOrderMapper.selectPage(reqVO);
+        // 获得 userId 相关的查询
+        Set<Long> userIds = new HashSet<>();
+        if (StrUtil.isNotEmpty(reqVO.getUserMobile())) {
+            MemberUserRespDTO user = memberUserApi.getUserByMobile(reqVO.getUserMobile());
+            if (user == null) { // 没查询到用户，说明肯定也没他的订单
+                return new PageResult<>();
+            }
+            userIds.add(user.getId());
+        }
+        if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
+            List<MemberUserRespDTO> users = memberUserApi.getUserListByNickname(reqVO.getUserNickname());
+            if (CollUtil.isEmpty(users)) { // 没查询到用户，说明肯定也没他的订单
+                return new PageResult<>();
+            }
+            userIds.addAll(convertSet(users, MemberUserRespDTO::getId));
+        }
+        // 分页查询
+        return tradeOrderMapper.selectPage(reqVO, userIds);
     }
 
     // =================== Order Item ===================

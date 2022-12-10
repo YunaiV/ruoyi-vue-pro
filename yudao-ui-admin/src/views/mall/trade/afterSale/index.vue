@@ -46,7 +46,7 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <!-- Tab 选项：真正的内容在 Lab -->
+    <!-- Tab 选项：真正的内容在 Table -->
     <el-tabs v-model="activeTab" type="card" @tab-click="tabClick" style="margin-top: -40px;">
       <el-tab-pane v-for="tab in statusTabs" :key="tab.value" :label="tab.label" :name="tab.value" />
     </el-tabs>
@@ -100,7 +100,7 @@
 <script>
 import { getAfterSalePage } from "@/api/mall/trade/afterSale";
 import { datePickerOptions } from "@/utils/constants";
-import {DICT_TYPE, getDictDatas} from "@/utils/dict";
+import { DICT_TYPE, getDictDatas } from "@/utils/dict";
 
 export default {
   name: "AfterSale",

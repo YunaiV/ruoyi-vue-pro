@@ -49,4 +49,12 @@ public interface MemberUserApi {
      */
     List<MemberUserRespDTO> getUserListByNickname(String nickname);
 
+    /**
+     * 基于手机号，精准匹配用户
+     *
+     * @param mobile 手机号
+     * @return 用户信息
+     */
+    MemberUserRespDTO getUserByMobile(String mobile);
+
 }

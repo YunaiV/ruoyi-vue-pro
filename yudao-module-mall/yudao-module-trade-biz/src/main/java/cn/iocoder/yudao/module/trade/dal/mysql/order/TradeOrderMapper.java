@@ -8,6 +8,8 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Set;
+
 @Mapper
 public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
 
@@ -20,9 +22,17 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
         return selectOne(TradeOrderDO::getId, id, TradeOrderDO::getUserId, userId);
     }
 
-    default PageResult<TradeOrderDO> selectPage(TradeOrderPageReqVO reqVO) {
+    default PageResult<TradeOrderDO> selectPage(TradeOrderPageReqVO reqVO, Set<Long> userIds) {
         return selectPage(reqVO, new LambdaQueryWrapperX<TradeOrderDO>()
-                .eqIfPresent(TradeOrderDO::getStatus, reqVO.getStatus()));
+                .likeIfPresent(TradeOrderDO::getNo, reqVO.getNo())
+                .eqIfPresent(TradeOrderDO::getUserId, reqVO.getUserId())
+                .inIfPresent(TradeOrderDO::getUserId, userIds)
+                .likeIfPresent(TradeOrderDO::getReceiverName, reqVO.getReceiverName())
+                .likeIfPresent(TradeOrderDO::getReceiverMobile, reqVO.getReceiverMobile())
+                .eqIfPresent(TradeOrderDO::getType, reqVO.getType())
+                .eqIfPresent(TradeOrderDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(TradeOrderDO::getPayChannelCode, reqVO.getPayChannelCode())
+                .betweenIfPresent(TradeOrderDO::getCreateTime, reqVO.getCreateTime()));
     }
 
 }
