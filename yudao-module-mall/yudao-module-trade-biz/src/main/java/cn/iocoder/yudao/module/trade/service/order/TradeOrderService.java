@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 
@@ -74,12 +75,21 @@ public interface TradeOrderService {
     TradeOrderDO getOrder(Long userId, Long id);
 
     /**
-     * 获得交易订单分页
+     * 【管理员】获得交易订单分页
      *
      * @param reqVO 分页请求
      * @return 交易订单
      */
     PageResult<TradeOrderDO> getOrderPage(TradeOrderPageReqVO reqVO);
+
+    /**
+     * 【会员】获得交易订单分页
+     *
+     * @param userId 用户编号
+     * @param reqVO 分页请求
+     * @return 交易订单
+     */
+    PageResult<TradeOrderDO> getOrderPage(Long userId, AppTradeOrderPageReqVO reqVO);
 
     // =================== Order Item ===================
 

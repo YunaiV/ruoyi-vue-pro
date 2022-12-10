@@ -229,7 +229,7 @@ export default {
       this.getList();
     },
     goToDetail (row) {
-      this.$router.push({ path: '/mall/trade/order/detail', query: { id: row.id }})
+      this.$router.push({ path: '/trade/order/detail', query: { id: row.id }})
     }
   }
 }

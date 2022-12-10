@@ -17,7 +17,10 @@ import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUse
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderDetailRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageItemRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
@@ -173,5 +176,66 @@ public interface TradeOrderConvert {
     }
     TradeOrderDetailRespVO convert2(TradeOrderDO order, List<TradeOrderItemDO> items);
     MemberUserRespVO convert(MemberUserRespDTO bean);
+
+    default PageResult<AppTradeOrderPageItemRespVO> convertPage02(PageResult<TradeOrderDO> pageResult, List<TradeOrderItemDO> orderItems,
+                                                                  List<ProductPropertyValueDetailRespDTO> propertyValueDetails) {
+        Map<Long, List<TradeOrderItemDO>> orderItemMap = convertMultiMap(orderItems, TradeOrderItemDO::getOrderId);
+        Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);
+        // 转化 List
+        List<AppTradeOrderPageItemRespVO> orderVOs = CollectionUtils.convertList(pageResult.getList(), order -> {
+            List<TradeOrderItemDO> xOrderItems = orderItemMap.get(order.getId());
+            AppTradeOrderPageItemRespVO orderVO = convert02(order, xOrderItems);
+            if (CollUtil.isNotEmpty(xOrderItems)) {
+                // 处理商品属性
+                for (int i = 0; i < xOrderItems.size(); i++) {
+                    List<TradeOrderItemDO.Property> properties = xOrderItems.get(i).getProperties();
+                    if (CollUtil.isEmpty(properties)) {
+                        continue;
+                    }
+                    AppTradeOrderPageItemRespVO.Item item = orderVO.getItems().get(i);
+                    item.setProperties(new ArrayList<>(properties.size()));
+                    // 遍历每个 properties，设置到 TradeOrderPageItemRespVO.Item 中
+                    properties.forEach(property -> {
+                        ProductPropertyValueDetailRespDTO propertyValueDetail = propertyValueDetailMap.get(property.getValueId());
+                        if (propertyValueDetail == null) {
+                            return;
+                        }
+                        item.getProperties().add(convert02(propertyValueDetail));
+                    });
+                }
+            }
+            return orderVO;
+        });
+        return new PageResult<>(orderVOs, pageResult.getTotal());
+    }
+    AppTradeOrderPageItemRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> items);
+    AppProductPropertyValueDetailRespVO convert02(ProductPropertyValueDetailRespDTO bean);
+
+    default AppTradeOrderDetailRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
+                                                List<ProductPropertyValueDetailRespDTO> propertyValueDetails) {
+        AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
+        // 处理商品属性
+        Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);
+        for (int i = 0; i < orderItems.size(); i++) {
+            List<TradeOrderItemDO.Property> properties = orderItems.get(i).getProperties();
+            if (CollUtil.isEmpty(properties)) {
+                continue;
+            }
+            AppTradeOrderDetailRespVO.Item item = orderVO.getItems().get(i);
+            item.setProperties(new ArrayList<>(properties.size()));
+            // 遍历每个 properties，设置到 TradeOrderPageItemRespVO.Item 中
+            properties.forEach(property -> {
+                ProductPropertyValueDetailRespDTO propertyValueDetail = propertyValueDetailMap.get(property.getValueId());
+                if (propertyValueDetail == null) {
+                    return;
+                }
+                item.getProperties().add(convert02(propertyValueDetail));
+            });
+        }
+        // 处理收货地址
+        orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
+        return orderVO;
+    }
+    AppTradeOrderDetailRespVO convert3(TradeOrderDO order, List<TradeOrderItemDO> items);
 
 }

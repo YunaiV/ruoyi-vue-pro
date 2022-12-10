@@ -198,20 +198,12 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/order',
+    path: '/trade/order',
     component: Layout,
-    name: '订单管理',
-    meta: { title: '订单管理' },
-    alwaysShow: true,
+    hidden: true,
     children: [
       {
-        path: '/mall/trade/order',
-        name: '商品订单',
-        meta: { title: '商品订单' },
-        component: (resolve) => require(['@/views/mall/trade/order'], resolve)
-      },
-      {
-        path: '/mall/trade/order/detail',
+        path: 'detail',
         name: '订单详情',
         hidden: true,
         meta: { title: '订单详情' },

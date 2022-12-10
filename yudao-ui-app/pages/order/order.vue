@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { getOrderPageData } from '../../api/order'
+import { getOrderPage } from '../../api/order'
 
 export default {
   name: 'order',
@@ -32,23 +32,19 @@ export default {
           status: '0'
         },
         {
-          name: '已付款',
+          name: '待发货',
           status: '10'
         },
         {
-          name: '待发货',
+          name: '待收货',
           status: '20'
         },
         {
-          name: '待收货',
+          name: '已完成',
           status: '30'
         },
         {
-          name: '已完成',
-          status: '40'
-        },
-        {
-          name: '已取消',
+          name: '已取消', // TODO @辰尘：已取消不展示
           status: '50'
         }
       ],
@@ -76,7 +72,7 @@ export default {
       if (status >= 0) {
         params.orderStatus = status
       }
-      getOrderPageData(params)
+      getOrderPage(params)
         .then(res => {
           console.log(res)
         })
