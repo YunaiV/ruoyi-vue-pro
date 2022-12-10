@@ -1,5 +1,10 @@
 <template>
   <div class="app-container order-detail-page">
+    <!-- 订单信息 -->
+    <el-descriptions title="订单信息">
+      <el-descriptions-item label="支付单号">123</el-descriptions-item>
+    </el-descriptions>
+
     <template v-for="(group, index) in detailGroups">
       <el-descriptions v-bind="group.groupProps" :key="`group_${index}`" :title="group.title">
         <!-- 商品信息 -->
@@ -92,6 +97,9 @@
 </template>
 
 <script>
+import {DICT_TYPE, getDictDatas} from "@/utils/dict";
+import { getOrderDetail } from "@/api/mall/trade/order";
+
 export default {
   name: "detail",
   data () {
@@ -100,7 +108,7 @@ export default {
         {
           title: '订单详情',
           children: [
-            { label: '交易流水号', valueKey: 'jylsh'},
+            { label: '支付单号', valueKey: 'jylsh'},
             { label: '配送方式', valueKey: 'psfs'},
             { label: '营销活动', valueKey: 'yxhd'},
             { label: '订单编号', valueKey: 'ddbh'},
@@ -242,8 +250,16 @@ export default {
           }
         ],
         goodsInfo: [] // 商品详情tableData
-      }
+      },
+      order: {
+        items: [],
+      },
     }
+  },
+  created() {
+    getOrderDetail(this.$route.query.id).then(res => {
+      this.order = res.data
+    })
   },
   methods: {
     clipboardSuccess() {

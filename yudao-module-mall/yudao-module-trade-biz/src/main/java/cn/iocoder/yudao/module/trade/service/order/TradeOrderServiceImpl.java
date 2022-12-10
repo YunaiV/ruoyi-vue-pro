@@ -390,6 +390,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // TODO 芋艿：lili 发送商品被购买完成的数据
     }
 
+    @Override
+    public TradeOrderDO getOrder(Long id) {
+        return tradeOrderMapper.selectById(id);
+    }
+
     /**
      * 校验交易订单满足可售货的条件
      *

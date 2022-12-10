@@ -10,6 +10,8 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import java.util.Collection;
 import java.util.List;
 
+import static java.util.Collections.singleton;
+
 /**
  * 交易订单 Service 接口
  *
@@ -53,6 +55,14 @@ public interface TradeOrderService {
      * @param id 订单编号
      */
     void receiveOrder(Long userId, Long id);
+
+    /**
+     * 获得指定编号的交易订单
+     *
+     * @param id 交易订单编号
+     * @return 交易订单
+     */
+    TradeOrderDO getOrder(Long id);
 
     /**
      * 获得指定用户，指定的交易订单
@@ -100,6 +110,16 @@ public interface TradeOrderService {
      * @return 交易订单项数组
      */
     List<TradeOrderItemDO> getOrderItemList(Collection<Long> ids);
+
+    /**
+     * 根据交易订单编号，查询交易订单项
+     *
+     * @param orderId 交易订单编号
+     * @return 交易订单项数组
+     */
+    default List<TradeOrderItemDO> getOrderItemListByOrderId(Long orderId) {
+        return getOrderItemListByOrderId(singleton(orderId));
+    }
 
     /**
      * 根据交易订单编号数组，查询交易订单项

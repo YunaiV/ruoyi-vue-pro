@@ -3,9 +3,12 @@ package cn.iocoder.yudao.module.trade.controller.admin.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
@@ -13,6 +16,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,6 +42,8 @@ public class TradeOrderController {
 
     @Resource
     private ProductPropertyValueApi productPropertyValueApi;
+    @Resource
+    private MemberUserApi memberUserApi;
 
     @GetMapping("/page")
     @ApiOperation("获得交易订单分页")
@@ -56,6 +62,24 @@ public class TradeOrderController {
                 .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
         // 最终组合
         return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, propertyValueDetails));
+    }
+
+    @GetMapping("/get-detail")
+    @ApiOperation("获得交易订单详情")
+    @ApiImplicitParam(name = "id", value = "订单编号", required = true, example = "1")
+    @PreAuthorize("@ss.hasPermission('trade:order:query')")
+    public CommonResult<TradeOrderDetailRespVO> getOrderDetail(@RequestParam("id") Long id) {
+        // 查询订单
+        TradeOrderDO order = tradeOrderService.getOrder(id);
+        // 查询订单项
+        List<TradeOrderItemDO> orderItems = tradeOrderService.getOrderItemListByOrderId(id);
+        // 查询商品属性
+        List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
+                .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
+        // 查询会员
+        MemberUserRespDTO user = memberUserApi.getUser(order.getUserId());
+        // 最终组合
+        return success(TradeOrderConvert.INSTANCE.convert(order, orderItems, propertyValueDetails, user));
     }
 
     @PostMapping("/delivery")

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
@@ -12,7 +13,9 @@ import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
+import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -138,9 +141,37 @@ public interface TradeOrderConvert {
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());
     }
-
     TradeOrderPageItemRespVO convert(TradeOrderDO order, List<TradeOrderItemDO> items);
-
     ProductPropertyValueDetailRespVO convert(ProductPropertyValueDetailRespDTO bean);
+
+    default TradeOrderDetailRespVO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
+                                           List<ProductPropertyValueDetailRespDTO> propertyValueDetails, MemberUserRespDTO user) {
+        TradeOrderDetailRespVO orderVO = convert2(order, orderItems);
+        // 处理商品属性
+        Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);
+        for (int i = 0; i < orderItems.size(); i++) {
+            List<TradeOrderItemDO.Property> properties = orderItems.get(i).getProperties();
+            if (CollUtil.isEmpty(properties)) {
+                continue;
+            }
+            TradeOrderDetailRespVO.Item item = orderVO.getItems().get(i);
+            item.setProperties(new ArrayList<>(properties.size()));
+            // 遍历每个 properties，设置到 TradeOrderPageItemRespVO.Item 中
+            properties.forEach(property -> {
+                ProductPropertyValueDetailRespDTO propertyValueDetail = propertyValueDetailMap.get(property.getValueId());
+                if (propertyValueDetail == null) {
+                    return;
+                }
+                item.getProperties().add(convert(propertyValueDetail));
+            });
+        }
+        // 处理收货地址
+        orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
+        // 处理用户信息
+        orderVO.setUser(convert(user));
+        return orderVO;
+    }
+    TradeOrderDetailRespVO convert2(TradeOrderDO order, List<TradeOrderItemDO> items);
+    MemberUserRespVO convert(MemberUserRespDTO bean);
 
 }

@@ -8,7 +8,7 @@
           <el-form-item label="搜索方式" prop="searchValue">
             <el-input v-model="queryParams.searchValue" style="width: 240px">
               <el-select v-model="queryParams.searchType" slot="prepend" style="width: 100px">
-                <el-option v-for="dict in dicData.searchType" v-bind="dict" :key="dict.value"/>
+                <el-option v-for="dict in searchTypes" :key="dict.value" :label="dict.label" :value="dict.value"/>
               </el-select>
             </el-input>
           </el-form-item>
@@ -156,103 +156,100 @@ import { getOrderPage } from "@/api/mall/trade/order";
 import { datePickerOptions } from "@/utils/constants";
 import { DICT_TYPE, getDictDatas } from "@/utils/dict";
 
-const dicData = {
-    searchType: [
-      { label: '订单号', value: 'no' },
-      { label: '会员编号', value: 'userId' },
-      { label: '会员昵称', value: 'userNickname' },
-      { label: '会员手机号', value: 'userMobile' },
-      { label: '收货人姓名', value: 'receiverName' },
-      { label: '收货人手机号码', value: 'receiverMobile' },
-    ],
-  }
-  export default {
-    name: "index",
-    data () {
-      return {
-        dicData,
-        // 遮罩层
-        loading: true,
-        // 导出遮罩层
-        exportLoading: false,
-        // 显示搜索条件
-        showSearch: true,
-        // 总条数
-        total: 0,
-        // 交易售后列表
-        list: [],
-        queryParams: {
-          pageNo: 1,
-          pageSize: 10,
-          searchType: 'no',
-          searchValue: '',
-          type: null,
-          status: null,
-          payChannelCode: null,
-          createTime: [],
-        },
-        // Tab 筛选
-        activeTab: 'all',
-        statusTabs: [{
-          label: '全部',
-          value: 'all'
-        }],
-        // 静态变量
-        datePickerOptions: datePickerOptions
-      }
+export default {
+  name: "index",
+  data () {
+    return {
+      // 遮罩层
+      loading: true,
+      // 导出遮罩层
+      exportLoading: false,
+      // 显示搜索条件
+      showSearch: true,
+      // 总条数
+      total: 0,
+      // 交易售后列表
+      list: [],
+      queryParams: {
+        pageNo: 1,
+        pageSize: 10,
+        searchType: 'no',
+        searchValue: '',
+        type: null,
+        status: null,
+        payChannelCode: null,
+        createTime: [],
+      },
+      // Tab 筛选
+      activeTab: 'all',
+      statusTabs: [{
+        label: '全部',
+        value: 'all'
+      }],
+      // 静态变量
+      datePickerOptions: datePickerOptions,
+      searchTypes: [
+        { label: '订单号', value: 'no' },
+        { label: '会员编号', value: 'userId' },
+        { label: '会员昵称', value: 'userNickname' },
+        { label: '会员手机号', value: 'userMobile' },
+        { label: '收货人姓名', value: 'receiverName' },
+        { label: '收货人手机号码', value: 'receiverMobile' },
+      ],
+    }
+  },
+  created() {
+    this.getList();
+    // 设置 statuses 过滤
+    for (const dict of getDictDatas(DICT_TYPE.TRADE_ORDER_STATUS)) {
+      this.statusTabs.push({
+        label: dict.label,
+        value: dict.value
+      })
+    }
+  },
+  methods: {
+    /** 查询列表 */
+    getList() {
+      this.loading = true;
+      // 执行查询
+      getOrderPage({
+        ...this.queryParams,
+        searchType: undefined,
+        searchValue: undefined,
+        no: this.queryParams.searchType === 'no' ? this.queryParams.searchValue : undefined,
+        userId: this.queryParams.searchType === 'userId' ? this.queryParams.searchValue : undefined,
+        userNickname: this.queryParams.searchType === 'userNickname' ? this.queryParams.searchValue : undefined,
+        userMobile: this.queryParams.searchType === 'userMobile' ? this.queryParams.searchValue : undefined,
+        receiverName: this.queryParams.searchType === 'receiverName' ? this.queryParams.searchValue : undefined,
+        receiverMobile: this.queryParams.searchType === 'receiverMobile' ? this.queryParams.searchValue : undefined,
+      }).then(response => {
+        this.list = response.data.list;
+        this.total = response.data.total;
+        this.loading = false;
+      });
     },
-    created() {
+    /** 搜索按钮操作 */
+    handleQuery() {
+      this.queryParams.pageNo = 1;
+      this.activeTab = this.queryParams.status ? this.queryParams.status : 'all'; // 处理 tab
       this.getList();
-      // 设置 statuses 过滤
-      for (const dict of getDictDatas(DICT_TYPE.TRADE_ORDER_STATUS)) {
-        this.statusTabs.push({
-          label: dict.label,
-          value: dict.value
-        })
-      }
     },
-    methods: {
-      /** 查询列表 */
-      getList() {
-        this.loading = true;
-        // 执行查询
-        getOrderPage({
-          ...this.queryParams,
-          searchType: undefined,
-          searchValue: undefined,
-          no: this.queryParams.searchType === 'no' ? this.queryParams.searchValue : undefined,
-          userId: this.queryParams.searchType === 'userId' ? this.queryParams.searchValue : undefined,
-          userNickname: this.queryParams.searchType === 'userNickname' ? this.queryParams.searchValue : undefined,
-          userMobile: this.queryParams.searchType === 'userMobile' ? this.queryParams.searchValue : undefined,
-          receiverName: this.queryParams.searchType === 'receiverName' ? this.queryParams.searchValue : undefined,
-          receiverMobile: this.queryParams.searchType === 'receiverMobile' ? this.queryParams.searchValue : undefined,
-        }).then(response => {
-          this.list = response.data.list;
-          this.total = response.data.total;
-          this.loading = false;
-        });
-      },
-      /** 搜索按钮操作 */
-      handleQuery() {
-        this.queryParams.pageNo = 1;
-        this.activeTab = this.queryParams.status ? this.queryParams.status : 'all'; // 处理 tab
-        this.getList();
-      },
-      /** 重置按钮操作 */
-      resetQuery() {
-        this.resetForm("queryForm");
-        this.handleQuery();
-      },
-      /** tab 切换 */
-      tabClick(tab) {
-        this.queryParams.status = tab.name === 'all' ? undefined : tab.name;
-        this.getList();
-      },
-      goToDetail (row) {
-        this.$router.push({ path: '/mall/trade/order/detail', query: { orderNo: row.orderNo }})
-      }
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
+    },
+    /** tab 切换 */
+    tabClick(tab) {
+      this.queryParams.status = tab.name === 'all' ? undefined : tab.name;
+      this.getList();
+    },
+    goToDetail (row) {
+      this.$router.push({ path: '/mall/trade/order/detail', query: { id: row.id }})
     }
   }
+}
 </script>
 
 <style lang="scss" scoped>
