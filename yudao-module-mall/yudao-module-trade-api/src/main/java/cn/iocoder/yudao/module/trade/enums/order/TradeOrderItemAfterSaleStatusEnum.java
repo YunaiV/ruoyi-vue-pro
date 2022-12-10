@@ -16,9 +16,9 @@ import java.util.Arrays;
 @Getter
 public enum TradeOrderItemAfterSaleStatusEnum implements IntArrayValuable {
 
-    NONE(0, "未申请"),
-    APPLY(1, "已申请"),
-    SUCCESS(2, "申请成功");
+    NONE(0, "未售后"),
+    APPLY(1, "售后中"),
+    SUCCESS(2, "已退款");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderItemAfterSaleStatusEnum::getStatus).toArray();
 

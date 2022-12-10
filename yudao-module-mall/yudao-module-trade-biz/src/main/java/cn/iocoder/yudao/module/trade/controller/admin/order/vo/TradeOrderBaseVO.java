@@ -24,6 +24,9 @@ public class TradeOrderBaseVO {
     @ApiModelProperty(value = "创建时间", required = true, notes = "下单时间")
     private Date createTime;
 
+    @ApiModelProperty(value = "订单类型", required = true, example = "1", notes = "参见 TradeOrderTypeEnum 枚举")
+    private Integer type;
+
     @ApiModelProperty(value = "订单来源", required = true, example = "1", notes = "参见 TerminalEnum 枚举")
     private Integer terminal;
 

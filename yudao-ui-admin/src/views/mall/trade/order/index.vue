@@ -89,23 +89,6 @@
                 </el-col>
                 <el-col :span="6" align="right">
                   <el-button type="text" @click="goToDetail(row)">详情</el-button>
-                  <el-dropdown style="margin-left: 10px">
-                    <el-button type="text">
-                      更多操作<i class="el-icon-arrow-down el-icon--right"></i>
-                    </el-button>
-                    <el-dropdown-menu slot="dropdown">
-                      <!-- TODO @芋艿：【暂未开发】关闭订单 -->
-                      <el-dropdown-item><el-button type="text">关闭订单</el-button></el-dropdown-item>
-                      <!-- TODO @芋艿：【暂未开发】修改地址 -->
-                      <el-dropdown-item><el-button type="text">修改地址</el-button></el-dropdown-item>
-                      <!-- TODO @芋艿：【暂未开发】调整价格 -->
-                      <el-dropdown-item><el-button type="text">调整价格</el-button></el-dropdown-item>
-                      <!-- TODO @芋艿：【暂未开发】备注 -->
-                      <el-dropdown-item><el-button type="text">备注</el-button></el-dropdown-item>
-                      <!-- TODO @芋艿：【暂未开发】关闭订单 -->
-                      <el-dropdown-item><el-button type="text">打印发货单</el-button></el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown>
                 </el-col>
               </el-row>
               <!-- 订单下的商品 -->

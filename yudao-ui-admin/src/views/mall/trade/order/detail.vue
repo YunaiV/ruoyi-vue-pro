@@ -2,23 +2,104 @@
   <div class="app-container order-detail-page">
     <!-- 订单信息 -->
     <el-descriptions title="订单信息">
-      <el-descriptions-item label="支付单号">123</el-descriptions-item>
+      <el-descriptions-item label="订单号">{{ order.no }}</el-descriptions-item>
+      <el-descriptions-item label="配送方式">物流配送</el-descriptions-item> <!-- TODO 芋艿：待实现 -->
+      <el-descriptions-item label="营销活动">物流配送</el-descriptions-item> <!-- TODO 芋艿：待实现 -->
+      <el-descriptions-item label="订单类型">
+        <dict-tag :type="DICT_TYPE.TRADE_ORDER_TYPE" :value="order.type" />
+      </el-descriptions-item>
+      <el-descriptions-item label="收货人">{{ order.receiverName }}</el-descriptions-item>
+      <el-descriptions-item label="买家留言">{{ order.userRemark }}</el-descriptions-item>
+      <el-descriptions-item label="订单来源">
+        <dict-tag :type="DICT_TYPE.TERMINAL" :value="order.terminal" />
+      </el-descriptions-item>
+      <el-descriptions-item label="联系电话">{{ order.receiverMobile }}</el-descriptions-item>
+      <el-descriptions-item label="商家备注">{{ order.remark }}</el-descriptions-item>
+      <el-descriptions-item label="支付单号">{{ order.payOrderId }}</el-descriptions-item>
+      <el-descriptions-item label="付款方式">
+        <dict-tag :type="DICT_TYPE.PAY_CHANNEL_CODE_TYPE" :value="order.payChannelCode" />
+      </el-descriptions-item>
+      <el-descriptions-item label="买家">{{ order.user.nickname }}</el-descriptions-item> <!-- TODO 芋艿：待实现：跳转会员 -->
+      <el-descriptions-item label="收货地址">
+        {{ order.receiverAreaName }} &nbsp; {{ order.receiverDetailAddress }} &nbsp;
+        <el-link v-clipboard:copy="order.receiverAreaName + ' ' + order.receiverDetailAddress"
+                 v-clipboard:success="clipboardSuccess" icon="el-icon-document-copy" type="primary"/>
+      </el-descriptions-item>
+    </el-descriptions>
+
+    <!-- 订单状态 -->
+    <el-descriptions title="订单状态" :column="1">
+      <el-descriptions-item label="订单状态">
+        <dict-tag :type="DICT_TYPE.TRADE_ORDER_STATUS" :value="order.status" />
+      </el-descriptions-item>
+      <el-descriptions-item label-class-name="no-colon">
+        <el-button type="primary" size="small">调整价格</el-button>  <!-- TODO 芋艿：待实现 -->
+        <el-button type="primary" size="small">备注</el-button> <!-- TODO 芋艿：待实现 -->
+        <el-button type="primary" size="small">发货</el-button> <!-- TODO 芋艿：待实现 -->
+        <el-button type="primary" size="small">关闭订单</el-button>  <!-- TODO 芋艿：待实现 -->
+        <el-button type="primary" size="small">修改地址</el-button>  <!-- TODO 芋艿：待实现 -->
+        <el-button type="primary" size="small">打印电子面单</el-button>  <!-- TODO 芋艿：待实现 -->
+        <el-button type="primary" size="small">打印发货单</el-button>  <!-- TODO 芋艿：待实现 -->
+        <el-button type="primary" size="small">确认收货</el-button>  <!-- TODO 芋艿：待实现 -->
+      </el-descriptions-item>
+      <el-descriptions-item label="提醒" label-style="color: red">
+        买家付款成功后，货款将直接进入您的商户号（微信、支付宝）<br />
+        请及时关注你发出的包裹状态，确保可以配送至买家手中 <br />
+        如果买家表示没收到货或货物有问题，请及时联系买家处理，友好协商
+      </el-descriptions-item>
+    </el-descriptions>
+
+    <!-- 物流信息 TODO -->
+
+    <!-- 商品信息 -->
+    <el-descriptions title="商品信息" :column="6">
+      <el-descriptions-item labelClassName="no-colon">
+        <el-table :data="order.items" border>
+          <el-table-column prop="spuName" label="商品" width="700">
+            <template slot-scope="{ row }">
+              {{row.spuName}}
+              <el-tag size="medium" v-for="property in row.properties">{{property.propertyName}}：{{property.valueName}}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="originalUnitPrice" label="单价(元)" width="180">
+            <template slot-scope="{ row }">
+              ￥{{ (row.originalUnitPrice / 100.0).toFixed(2) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="count" label="数量" width="180"/>
+          <el-table-column prop="originalPrice" label="小计（元）" width="180">
+            <template slot-scope="{ row }">
+              ￥{{ (row.originalPrice / 100.0).toFixed(2) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="afterSaleStatus" label="退款状态">
+            <template slot-scope="{ row }">
+              <dict-tag :type="DICT_TYPE.TRADE_ORDER_ITEM_AFTER_SALE_STATUS" :value="row.afterSaleStatus" />
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-descriptions-item>
+      <el-descriptions-item v-for="(item,index) in 5" label-class-name="no-colon" /> <!-- 占位 -->
+      <el-descriptions-item label="商品总额">￥{{ (order.originalPrice / 100.0).toFixed(2) }}</el-descriptions-item>
+      <el-descriptions-item label="运费金额">￥{{ (order.deliveryPrice / 100.0).toFixed(2) }}</el-descriptions-item>
+      <el-descriptions-item label="订单调价">￥{{ (order.adjustPrice / 100.0).toFixed(2) }}</el-descriptions-item>
+      <el-descriptions-item label="商品优惠" label-style="color: red">
+        ￥{{ ((order.originalPrice - order.originalPrice) / 100.0).toFixed(2) }}
+      </el-descriptions-item>
+      <el-descriptions-item label="订单优惠" label-style="color: red">
+        ￥{{ (order.discountPrice / 100.0).toFixed(2) }}
+      </el-descriptions-item>
+      <el-descriptions-item label="积分抵扣" label-style="color: red">
+        ￥{{ (order.pointPrice / 100.0).toFixed(2) }}
+      </el-descriptions-item>
+      <el-descriptions-item v-for="(item,index) in 5" label-class-name="no-colon" /> <!-- 占位 -->
+      <el-descriptions-item label="应付金额">
+        ￥{{ (order.payPrice / 100.0).toFixed(2) }}
+      </el-descriptions-item>
     </el-descriptions>
 
     <template v-for="(group, index) in detailGroups">
       <el-descriptions v-bind="group.groupProps" :key="`group_${index}`" :title="group.title">
-        <!-- 商品信息 -->
-        <el-descriptions-item  v-if="group.key === 'goodsInfo'" labelClassName="no-colon">
-          <el-table border>
-            <el-table-column prop="date" label="商品" width="180"/>
-            <el-table-column prop="jg" label="价格"/>
-            <el-table-column prop="spbm" label="商品编码"/>
-            <el-table-column prop="xl" label="数量"/>
-            <el-table-column prop="xj" label="小计（元）"/>
-            <el-table-column prop="tkzt" label="退款状态"/>
-            <el-table-column prop="zt" label="状态"/>
-          </el-table>
-        </el-descriptions-item>
 
         <!-- 订单操作日志 -->
         <el-descriptions-item  v-if="group.key === 'orderLog'" labelClassName="no-colon">
@@ -74,30 +155,12 @@
             </el-tab-pane>
           </el-tabs>
         </el-descriptions-item>
-
-        <!--订单详情、订单状态-->
-        <el-descriptions-item v-else v-for="(child, cIdx) in group.children" v-bind="child.childProps" :key="`child_${cIdx}`" :label="child.label">
-
-          <!-- 操作按钮(订单状态)-->
-          <template v-if="group.key === 'orderStatus' && child.valueKey === 'actions'" slot="label">
-            <el-button type="primary">备注</el-button>
-            <el-button type="primary">打印发货单</el-button>
-          </template>
-
-          <!-- 内容 -->
-          <template v-else>
-            {{detailInfo[child.valueKey]}}
-            <!--复制地址(订单详情) -->
-            <el-link v-if="child.valueKey==='shdz'" v-clipboard:copy="detailInfo[child.valueKey]" v-clipboard:success="clipboardSuccess" icon="el-icon-document-copy" type="primary"/>
-          </template>
-        </el-descriptions-item>
       </el-descriptions>
     </template>
   </div>
 </template>
 
 <script>
-import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import { getOrderDetail } from "@/api/mall/trade/order";
 
 export default {
@@ -106,50 +169,15 @@ export default {
     return {
       detailGroups: [
         {
-          title: '订单详情',
-          children: [
-            { label: '支付单号', valueKey: 'jylsh'},
-            { label: '配送方式', valueKey: 'psfs'},
-            { label: '营销活动', valueKey: 'yxhd'},
-            { label: '订单编号', valueKey: 'ddbh'},
-            { label: '收货人', valueKey: 'shr'},
-            { label: '买家留言', valueKey: 'mjly'},
-            { label: '订单类型', valueKey: 'ddlx'},
-            { label: '联系电话', valueKey: 'lxdh'},
-            { label: '备注', valueKey: 'bz'},
-            { label: '订单来源', valueKey: 'ddly'},
-            { label: '付款方式', valueKey: 'fkfs'},
-            { label: '买家', valueKey: 'mj'},
-            { label: '收货地址', valueKey: 'shdz'}
-          ]
-        },
-        {
-          title: '订单状态',
-          key: 'orderStatus',
-          groupProps: {
-            column: 1
-          },
-          children: [
-            { label: '订单状态', valueKey: 'ddzt', childProps: { contentStyle: { color: 'red' }}},
-            { label: '', valueKey: 'actions', childProps: { labelClassName: 'no-colon'}},
-            { label: '提醒', valueKey: 'tx', childProps: { labelStyle: { color: 'red' }}}
-          ]
-        },
-        {
           title: '物流信息',
           key: 'expressInfo',
           children: [
             { label: '发货时间', valueKey: 'fhsj'},
             { label: '物流公司', valueKey: 'wlgs'},
             { label: '运单号', valueKey: 'ydh'},
-            { label: '商品信息', valueKey: 'goodsList', childProps: { span: 3 }},
             { label: '物流状态', valueKey: 'wlzt', childProps: { span: 3 }},
             { label: '物流详情', valueKey: 'wlxq'}
           ]
-        },
-        {
-          title: '商品信息',
-          key: 'goodsInfo'
         },
         {
           title: '订单操作日志',
@@ -157,21 +185,6 @@ export default {
         }
       ],
       detailInfo: {
-        jylsh: '16674653573152181000',
-        psfs: '物流配送',
-        yxhd: '',
-        ddbh: '20221103164918001',
-        shr: '',
-        mjly: '',
-        ddlx: '',
-        lxdh: '',
-        bz: '',
-        ddly: '',
-        shdz: '陕西省-西安市-莲湖区-九座花园西区(莲湖区二环南路西段202)陕西省-西安市-莲湖区-九座花园西区(莲湖区二环南路西段202)',
-        fkfs: '',
-        mj: '',
-        ddzt: '已完成',
-        tx: '买家付款成功后，货款将直接进入您的商户号（微信、支付宝）请及时关注你发出的包裹状态，确保可以配送至买家手中如果买家表示没收到货或货物有问题，请及时联系买家处理，友好协商',
         expressInfo: [ // 物流信息
           {
             label: '包裹1',
@@ -201,42 +214,7 @@ export default {
                 content: '快件已发车',
                 timestamp: '2018-04-11 12:55:52'
               }
-            ],
-            goodsList: [ // 包裹下的商品列表
-              {
-                name: 'Otic 巴拉啦小魔仙联名麦克风儿童早教家用一体卡拉OK宝宝话筒唱歌 魔仙粉',
-                count: 6,
-                imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
-              },
-              {
-                name: 'Otic 巴拉啦小魔仙联名麦克风儿童早教家用一体卡拉OK宝宝话筒唱歌 魔仙粉',
-                count: 6,
-                imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
-              },
-              {
-                name: 'Otic 巴拉啦小魔仙联名麦克风儿童早教家用一体卡拉OK宝宝话筒唱歌 魔仙粉',
-                count: 6,
-                imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
-              }
             ]
-          },
-          {
-            label: '包裹2',
-            name: 'bg1',
-            fhsj: '',
-            wlgs: '',
-            ydh: '',
-            wlzt: '',
-            goodsInfo: {}
-          },
-          {
-            label: '包裹3',
-            name: 'bg1',
-            fhsj: '',
-            wlgs: '',
-            ydh: '',
-            wlzt: '',
-            goodsInfo: {}
           }
         ],
         orderLog: [ // 订单操作日志
@@ -253,6 +231,7 @@ export default {
       },
       order: {
         items: [],
+        user: {},
       },
     }
   },
