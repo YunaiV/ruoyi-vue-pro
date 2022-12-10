@@ -45,7 +45,7 @@ public class TradeOrderDO extends BaseDO {
      *
      * 枚举 {@link TradeOrderTypeEnum}
      */
-    private Integer type; // TODO order_promotion_type
+    private Integer type;
     /**
      * 订单来源
      *

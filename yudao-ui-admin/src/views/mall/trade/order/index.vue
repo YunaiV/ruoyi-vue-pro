@@ -29,35 +29,29 @@
         </el-col>
         <el-col :span="6" :xs="24">
           <el-form-item label="订单来源">
-            <el-select v-model="queryParams.orderSource" clearable style="width: 240px">
-              <el-option v-for="dict in dicData.orderSource" v-bind="dict" :key="dict.value"/>
+            <el-select v-model="queryParams.terminal" clearable style="width: 240px">
+              <el-option v-for="dict in this.getDictDatas(DICT_TYPE.TERMINAL)"
+                         :key="dict.value" :label="dict.label" :value="dict.value"/>
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="6" :xs="24">
-          <el-form-item label="付款方式">
-            <el-select v-model="queryParams.payWay" clearable style="width: 240px">
-              <el-option v-for="dict in dicData.payWay" v-bind="dict" :key="dict.value"/>
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="6" :xs="24">
-          <el-form-item label="营销类型">
-            <el-select v-model="queryParams.marketingType" clearable style="width: 240px">
-              <el-option v-for="dict in dicData.marketingType" v-bind="dict" :key="dict.value"/>
+          <el-form-item label="支付方式">
+            <el-select v-model="queryParams.payChannelCode" clearable style="width: 240px">
+              <el-option v-for="dict in this.getDictDatas(DICT_TYPE.PAY_CHANNEL_CODE_TYPE)"
+                         :key="dict.value" :label="dict.label" :value="dict.value"/>
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="6" :xs="24">
           <el-form-item label="下单时间">
             <el-date-picker v-model="queryParams.date" type="daterange" range-separator="至"
-                            start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="rangePickerOptions" style="width: 240px"/>
+                            start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="datePickerOptions" style="width: 240px"/>
           </el-form-item>
         </el-col>
         <el-col :span="6" :xs="24" style="line-height: 32px">
           <el-button type="primary" icon="el-icon-search" size="mini">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini">重置</el-button>
-          <el-button icon="el-icon-document" size="mini">导出订单</el-button>
         </el-col>
       </el-form>
     </el-row>
@@ -66,61 +60,75 @@
     <el-tabs v-model="activeTabName" type="card">
       <el-tab-pane v-for="tabPane in tabPanes" :label="tabPane.text" :name="tabPane.name">
         <!-- table -->
-        <el-table :data="tableData" :show-header="false" class="order-table">
+        <el-table :data="list" :show-header="false" class="order-table">
           <el-table-column>
             <template slot-scope="{ row }">
               <el-row type="flex" align="middle">
                 <el-col :span="5">
-                  订单号：{{row.orderNo}}
-                  <el-popover title="支付流水号：" :content="row.orderNo" placement="right" width="200" trigger="click">
+                  订单号：{{row.no}}
+                  <el-popover title="支付单号：" :content="row.payOrderId + ''" placement="right" width="200" trigger="click">
                     <el-button slot="reference" type="text">更多</el-button>
                   </el-popover>
                 </el-col>
-                <el-col :span="5">下单时间：{{row.time}}</el-col>
-                <el-col :span="4">订单来源：{{row.orderSource}}</el-col>
-                <el-col :span="4">支付方式：{{row.payWay}}</el-col>
+                <el-col :span="5">下单时间：{{ parseTime(row.createTime) }}</el-col>
+                <el-col :span="4">订单来源：
+                  <dict-tag :type="DICT_TYPE.TERMINAL" :value="row.terminal" />
+                </el-col>
+                <el-col :span="4">支付方式：
+                  <dict-tag v-if="row.payChannelCode" :type="DICT_TYPE.PAY_CHANNEL_CODE_TYPE" :value="row.payChannelCode" />
+                  <span v-else>未支付</span>
+                </el-col>
                 <el-col :span="6" align="right">
-                  <el-button type="text">关闭订单</el-button>
-                  <el-button type="text">修改地址</el-button>
-                  <el-button type="text">调整价格</el-button>
+                  <el-button type="text" @click="goToDetail(row)">详情</el-button>
                   <el-dropdown style="margin-left: 10px">
                     <el-button type="text">
                       更多操作<i class="el-icon-arrow-down el-icon--right"></i>
                     </el-button>
                     <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item><el-button type="text">打印发货单</el-button></el-dropdown-item>
-                      <el-dropdown-item><el-button type="text" @click="goToDetail(row)">详情</el-button></el-dropdown-item>
+                      <!-- TODO @芋艿：【暂未开发】关闭订单 -->
+                      <el-dropdown-item><el-button type="text">关闭订单</el-button></el-dropdown-item>
+                      <!-- TODO @芋艿：【暂未开发】修改地址 -->
+                      <el-dropdown-item><el-button type="text">修改地址</el-button></el-dropdown-item>
+                      <!-- TODO @芋艿：【暂未开发】调整价格 -->
+                      <el-dropdown-item><el-button type="text">调整价格</el-button></el-dropdown-item>
+                      <!-- TODO @芋艿：【暂未开发】备注 -->
                       <el-dropdown-item><el-button type="text">备注</el-button></el-dropdown-item>
+                      <!-- TODO @芋艿：【暂未开发】关闭订单 -->
+                      <el-dropdown-item><el-button type="text">打印发货单</el-button></el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
                 </el-col>
               </el-row>
               <!-- 订单下的商品 -->
-              <el-table :data="row.goods" border :show-header="true">
+              <el-table :data="row.items" border :show-header="true">
                 <el-table-column label="商品" prop="goods" header-align="center" width="auto" min-width="300">
                   <template slot-scope="{ row, $index }">
                     <div class="goods-info">
-                      <img :src="row.picture"/>
-                      <span class="ellipsis-2" :title="row.name">{{row.name}}</span>
+                      <img :src="row.picUrl"/>
+                      <span class="ellipsis-2" :title="row.spuName">{{row.spuName}}</span>
+                      <!-- TODO @小程：下面是商品属性，想当度一行，放在商品名下面 -->
+                      <el-tag size="medium" v-for="property in row.properties">{{property.propertyName}}：{{property.valueName}}</el-tag>
                     </div>
                   </template>
                 </el-table-column>
                 <el-table-column label="单价(元)/数量" prop="fee" align="center" width="115">
                   <template slot-scope="{ row }">
-                    <div>{{row.price}}</div>
-                    <div>{{row.count}}</div>
+                    <div>￥{{ (row.originalUnitPrice / 100.0).toFixed(2) }}</div>
+                    <div>{{row.count}} 件</div>
                   </template>
                 </el-table-column>
-                <el-table-column label="维权" prop="safeguard" align="center" width="100"/>
+                <!-- TODO @小程：这里应该是一个订单下，多个商品，只展示订单上的总金额，就是 order.payPrice -->
                 <el-table-column label="实付金额(元)" prop="amount" align="center" width="100"/>
+                <!-- TODO @小程：这里应该是一个订单下，多个商品，只展示订单上的收件信息；使用 order.receiverXXX 开头的字段 -->
                 <el-table-column label="买家/收货人" prop="buyer" header-align="center" width="auto" min-width="300">
                   <template slot-scope="{ row }">
+                    <!-- TODO @芋艿：以后增加一个会员详情界面 -->
                     <div>{{row.buyer}}</div>
                     <div>{{row.receiver}}{{row.tel}}</div>
                     <div class="ellipsis-2" :title="row.address">{{row.address}}</div>
                   </template>
                 </el-table-column>
-                <el-table-column label="配送方式" prop="sendWay" align="center" width="100"/>
+                <!-- TODO @小程：这里应该是一个订单下，多个商品，交易状态是统一的；使用 order.status 字段 -->
                 <el-table-column label="交易状态" prop="status" align="center" width="100"/>
               </el-table>
             </template>
@@ -132,7 +140,10 @@
 </template>
 
 <script>
-  const dicData = {
+import { getOrderPage } from "@/api/mall/trade/order";
+import { datePickerOptions } from "@/utils/constants";
+
+const dicData = {
     searchType: [
       { label: '订单号', value: 'ddh' },
       { label: '交易流水号', value: 'jylsh' },
@@ -142,14 +153,6 @@
       { label: '收货人电话', value: 'shrdh' },
       { label: '会员昵称', value: 'hync' },
       { label: '商品编号', value: 'spbh' }
-    ],
-    orderType: [
-      { label: '全部', value: 'qb' },
-      { label: '物流订单', value: 'wldd' },
-      { label: '自提订单', value: 'ztdd' },
-      { label: '外卖订单', value: 'wmdd' },
-      { label: '虚拟订单', value: 'xndd' },
-      { label: '收银订单', value: 'sydd' }
     ],
     orderStatus: [
       { label: '全部', value: 'qb' },
@@ -161,75 +164,25 @@
       { label: '已关闭', value: 'ygb' },
       { label: '退款中', value: 'tkz' }
     ],
-    orderSource: [
-      { label: '全部', value: 'qb' },
-      { label: '微信公众号', value: 'wxgzh' },
-      { label: '微信小程序', value: 'wxxcx' },
-      { label: 'PC', value: 'pc' },
-      { label: 'H5', value: 'h5' },
-      { label: 'APP', value: 'app' },
-      { label: '收银台', value: 'syt' },
-      { label: '代客下单', value: 'dkxd' }
-    ],
-    payWay: [
-      { label: '全部', value: 'qb' },
-      { label: '在线支付', value: 'zxzf' },
-      { label: '余额支付', value: 'yezf' },
-      { label: '线下支付', value: 'xxzf' },
-      { label: '积分兑换', value: 'jfdh' },
-      { label: '支付宝支付', value: 'zfbzf' },
-      { label: '微信支付', value: 'wxzf' }
-    ],
-    marketingType: [
-      { label: '全部', value: 'qb' },
-      { label: '一口价', value: 'ykj' },
-      { label: '专题', value: 'zt' },
-      { label: '团购', value: 'tg' },
-      { label: '拼团', value: 'pt' },
-      { label: '拼团返利', value: 'ptfl' },
-      { label: '盲盒', value: 'mh' },
-      { label: '砍价', value: 'kj' },
-      { label: '礼品卡优惠', value: 'lpkyh' },
-      { label: '秒杀', value: 'ms' },
-      { label: '积分兑换', value: 'jfdh' },
-      { label: '组合套餐', value: 'zhtc' },
-      { label: '预售', value: 'ys' }
-    ]
-  }
-  const rangePickerOptions = {
-    shortcuts: [{
-      text: '最近一周',
-      onClick(picker) {
-        const end = new Date();
-        const start = new Date();
-        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-        picker.$emit('pick', [start, end]);
-      }
-    }, {
-      text: '最近一个月',
-      onClick(picker) {
-        const end = new Date();
-        const start = new Date();
-        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-        picker.$emit('pick', [start, end]);
-      }
-    }, {
-      text: '最近三个月',
-      onClick(picker) {
-        const end = new Date();
-        const start = new Date();
-        start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-        picker.$emit('pick', [start, end]);
-      }
-    }]
   }
   export default {
     name: "index",
     data () {
       return {
         dicData,
-        rangePickerOptions,
+        // 遮罩层
+        loading: true,
+        // 导出遮罩层
+        exportLoading: false,
+        // 显示搜索条件
+        showSearch: true,
+        // 总条数
+        total: 0,
+        // 交易售后列表
+        list: [],
         queryParams: {
+          pageNo: 1,
+          pageSize: 10,
           searchType: 'ddh',
           orderType: ''
         },
@@ -244,87 +197,31 @@
           { text: '已关闭', name: 'closed' },
           { text: '退款中', name: 'refund' }
         ],
-        tableData: [
-          {
-            orderInfo: '',
-            orderNo: '20221026220424001',
-            payNo: '20221026220424001',
-            time: '2022-10-26 22:04:20',
-            orderSource: 'PC',
-            payWay: '微信支付',
-            goods: [
-              {
-                name: '颜衫短袖男polo衫夏季翻领衣服潮牌休闲上衣夏天翻领半袖男士t恤',
-                picture: 'https://b2c-v5-yanshi.oss-cn-hangzhou.aliyuncs.com/upload/1/common/images/20220723/20220723115621165854858145027_SMALL.webp',
-                price: '199',
-                count: '5件',
-                amount: 460,
-                safeguard: '主动退款',
-                buyer: '小明',
-                receiver: '小花',
-                tel: '15823655095',
-                address: '北京市-北京市-东城区 观音桥',
-                sendWay: '物流配送',
-                status: '已完成'
-              },
-              {
-                name: '颜衫短袖男polo衫夏季翻领衣服潮牌休闲上衣夏天翻领半袖男士t恤',
-                picture: 'https://b2c-v5-yanshi.oss-cn-hangzhou.aliyuncs.com/upload/1/common/images/20220723/20220723115621165854858145027_SMALL.webp',
-                price: '199',
-                count: '5件',
-                amount: 460,
-                safeguard: '主动退款',
-                buyer: '小明',
-                receiver: '小花',
-                tel: '15823655095',
-                address: '北京市-北京市-东城区 观音桥',
-                sendWay: '物流配送',
-                status: '已完成'
-              }
-            ]
-          },
-          {
-            orderInfo: '',
-            orderNo: '20221026220424001',
-            payNo: '20221026220424001',
-            time: '2022-10-26 22:04:20',
-            orderSource: 'PC',
-            payWay: '微信支付',
-            goods: [
-              {
-                name: '颜衫短袖男polo衫夏季翻领衣服潮牌休闲上衣夏天翻领半袖男士t恤',
-                picture: 'https://b2c-v5-yanshi.oss-cn-hangzhou.aliyuncs.com/upload/1/common/images/20220723/20220723115621165854858145027_SMALL.webp',
-                price: '199',
-                count: '5件',
-                amount: 460,
-                safeguard: '主动退款',
-                buyer: '小明',
-                receiver: '小花',
-                tel: '15823655095',
-                address: '北京市-北京市-东城区 观音桥',
-                sendWay: '物流配送',
-                status: '已完成'
-              },
-              {
-                name: '颜衫短袖男polo衫夏季翻领衣服潮牌休闲上衣夏天翻领半袖男士t恤',
-                picture: 'https://b2c-v5-yanshi.oss-cn-hangzhou.aliyuncs.com/upload/1/common/images/20220723/20220723115621165854858145027_SMALL.webp',
-                price: '199',
-                count: '5件',
-                amount: 460,
-                safeguard: '主动退款',
-                buyer: '小明',
-                receiver: '小花',
-                tel: '15823655095',
-                address: '北京市-北京市-东城区 观音桥',
-                sendWay: '物流配送',
-                status: '已完成'
-              }
-            ]
-          }
-        ]
+        // 静态变量
+        datePickerOptions: datePickerOptions
       }
     },
+    created() {
+      this.getList();
+      // 设置 statuses 过滤
+      // for (const dict of getDictDatas(DICT_TYPE.TRADE_AFTER_SALE_STATUS)) {
+      //   this.statusTabs.push({
+      //     label: dict.label,
+      //     value: dict.value
+      //   })
+      // }
+    },
     methods: {
+      /** 查询列表 */
+      getList() {
+        this.loading = true;
+        // 执行查询
+        getOrderPage(this.queryParams).then(response => {
+          this.list = response.data.list;
+          this.total = response.data.total;
+          this.loading = false;
+        });
+      },
       goToDetail (row) {
         this.$router.push({ path: '/mall/trade/order/detail', query: { orderNo: row.orderNo }})
       }
