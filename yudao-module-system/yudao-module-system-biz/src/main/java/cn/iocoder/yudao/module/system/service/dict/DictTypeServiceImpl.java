@@ -81,9 +81,7 @@ public class DictTypeServiceImpl implements DictTypeService {
             throw exception(DICT_TYPE_HAS_CHILDREN);
         }
         // 删除字典类型
-        dictType.setDeletedTime(LocalDateTime.now());
-        dictType.setDeleted(true);
-        dictTypeMapper.updateById(dictType);
+        dictTypeMapper.deleteById(id);
     }
 
     @Override
