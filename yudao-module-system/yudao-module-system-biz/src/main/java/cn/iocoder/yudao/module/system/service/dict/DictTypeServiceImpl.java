@@ -13,6 +13,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -80,7 +81,9 @@ public class DictTypeServiceImpl implements DictTypeService {
             throw exception(DICT_TYPE_HAS_CHILDREN);
         }
         // 删除字典类型
-        dictTypeMapper.deleteById(id);
+        dictType.setDeletedTime(LocalDateTime.now());
+        dictType.setDeleted(true);
+        dictTypeMapper.updateById(dictType);
     }
 
     @Override
