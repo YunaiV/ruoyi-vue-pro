@@ -5,7 +5,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyViewRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
@@ -15,6 +14,7 @@ import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 
 /**
@@ -141,7 +142,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                 }
                 Map<Long, List<ProductSkuBaseVO.Property>> propertyMaps = properties.stream().collect(Collectors.groupingBy(ProductSkuBaseVO.Property::getPropertyId));
 
-                List<ProductPropertyValueRespVO> propertyValueList = productPropertyValueService.getPropertyValueListByPropertyId(new ArrayList<>(propertyMaps.keySet()));
+                List<ProductPropertyValueDO> propertyValueList = productPropertyValueService.getPropertyValueListByPropertyId(propertyMaps.keySet());
                 List<ProductPropertyDO> propertyList = productPropertyService.getPropertyList(propertyMaps.keySet());
                 // 装载组装过后的属性
                 List<ProductPropertyViewRespVO> productPropertyViews = new ArrayList<>();
@@ -151,7 +152,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                     productPropertyViewRespVO.setName(p.getName());
                     List<ProductPropertyViewRespVO.Tuple2> propertyValues = new ArrayList<>();
                     // 转换成map是为了能快速获取
-                    Map<Long, ProductPropertyValueRespVO> propertyValueMaps = CollectionUtils.convertMap(propertyValueList, ProductPropertyValueRespVO::getId);
+                    Map<Long, ProductPropertyValueDO> propertyValueMaps = convertMap(propertyValueList, ProductPropertyValueDO::getId);
                     propertyMaps.get(p.getId()).forEach(pv -> {
                         ProductPropertyViewRespVO.Tuple2 tuple2 = new ProductPropertyViewRespVO.Tuple2(pv.getValueId(), propertyValueMaps.get(pv.getValueId()).getName());
                         propertyValues.add(tuple2);

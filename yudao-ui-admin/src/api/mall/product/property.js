@@ -63,17 +63,6 @@ export function getPropertyListAndValue(query) {
   })
 }
 
-
-// 导出属性项 Excel
-export function exportPropertyExcel(query) {
-  return request({
-    url: '/product/property/export-excel',
-    method: 'get',
-    params: query,
-    responseType: 'blob'
-  })
-}
-
 // ------------------------ 属性值 -------------------
 
 // 获得属性值分页
@@ -118,4 +107,7 @@ export function deletePropertyValue(id) {
     url: '/product/property/value/delete?id=' + id,
     method: 'delete'
   })
+}
+
+export class exportPropertyExcel {
 }

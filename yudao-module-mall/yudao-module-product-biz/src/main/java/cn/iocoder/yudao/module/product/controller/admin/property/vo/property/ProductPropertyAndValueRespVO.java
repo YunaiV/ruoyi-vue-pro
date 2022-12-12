@@ -3,16 +3,12 @@ package cn.iocoder.yudao.module.product.controller.admin.property.vo.property;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.util.List;
 
 @ApiModel("管理后台 - 商品属性项 + 属性值 Response VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class ProductPropertyAndValueRespVO extends ProductPropertyBaseVO {
+public class ProductPropertyAndValueRespVO {
 
     @ApiModelProperty(value = "属性项的编号", required = true, example = "1024")
     private Long id;

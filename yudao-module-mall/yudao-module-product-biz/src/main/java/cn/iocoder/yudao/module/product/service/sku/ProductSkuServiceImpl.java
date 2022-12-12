@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
@@ -25,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
@@ -95,7 +95,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         }
 
         // 2. 校验，一个 SKU 下，没有重复的属性。校验方式是，遍历每个 SKU ，看看是否有重复的属性 propertyId
-        Map<Long, ProductPropertyValueRespVO> propertyValueMap = CollectionUtils.convertMap(productPropertyValueService.getPropertyValueListByPropertyId(new ArrayList<>(propertyIds)), ProductPropertyValueRespVO::getId);
+        Map<Long, ProductPropertyValueDO> propertyValueMap = convertMap(productPropertyValueService.getPropertyValueListByPropertyId(propertyIds), ProductPropertyValueDO::getId);
         skus.forEach(sku -> {
             Set<Long> skuPropertyIds = convertSet(sku.getProperties(), propertyItem -> propertyValueMap.get(propertyItem.getValueId()).getPropertyId());
             if (skuPropertyIds.size() != sku.getProperties().size()) {

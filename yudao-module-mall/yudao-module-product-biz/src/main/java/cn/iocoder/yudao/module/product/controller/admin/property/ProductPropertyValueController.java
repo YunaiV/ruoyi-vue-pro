@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.Produc
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValuePageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueUpdateReqVO;
+import cn.iocoder.yudao.module.product.convert.propertyvalue.ProductPropertyValueConvert;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -57,13 +58,13 @@ public class ProductPropertyValueController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<ProductPropertyValueRespVO> getProperty(@RequestParam("id") Long id) {
-        return success(productPropertyValueService.getPropertyValue(id));
+        return success(ProductPropertyValueConvert.INSTANCE.convert(productPropertyValueService.getPropertyValue(id)));
     }
 
     @GetMapping("/page")
     @ApiOperation("获得属性值分页")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<PageResult<ProductPropertyValueRespVO>> getPropertyValuePage(@Valid ProductPropertyValuePageReqVO pageVO) {
-        return success(productPropertyValueService.getPropertyValueListPage(pageVO));
+        return success(ProductPropertyValueConvert.INSTANCE.convertPage(productPropertyValueService.getPropertyValuePage(pageVO)));
     }
 }

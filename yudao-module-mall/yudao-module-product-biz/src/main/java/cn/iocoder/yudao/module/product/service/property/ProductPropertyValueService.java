@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.product.service.property;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValuePageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
@@ -46,7 +45,7 @@ public interface ProductPropertyValueService {
      * @param id 编号
      * @return 属性值
      */
-    ProductPropertyValueRespVO getPropertyValue(Long id);
+    ProductPropertyValueDO getPropertyValue(Long id);
 
     /**
      * 根据属性项编号数组，获得属性值列表
@@ -65,14 +64,6 @@ public interface ProductPropertyValueService {
     List<ProductPropertyValueDetailRespBO> getPropertyValueDetailList(Collection<Long> ids);
 
     /**
-     * 根据属性项编号，获得属性值数组
-     *
-     * @param propertyIds 属性项编号数组
-     * @return 属性值
-     */
-    List<ProductPropertyValueRespVO> getPropertyValueListByPropertyId(List<Long> propertyIds);
-
-    /**
      * 根据属性项编号，活的属性值数量
      *
      * @param propertyId 属性项编号数
@@ -86,7 +77,7 @@ public interface ProductPropertyValueService {
      * @param pageReqVO 查询条件
      * @return 属性值的分页
      */
-    PageResult<ProductPropertyValueRespVO> getPropertyValueListPage(ProductPropertyValuePageReqVO pageReqVO);
+    PageResult<ProductPropertyValueDO> getPropertyValuePage(ProductPropertyValuePageReqVO pageReqVO);
 
     /**
      * 删除指定属性项编号下的属性值们

@@ -6,12 +6,6 @@
       <el-form-item label="名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择开启状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                     :key="dict.value" :label="dict.label" :value="dict.value"/>
-        </el-select>
-      </el-form-item>
       <el-form-item label="创建时间" prop="createTime">
         <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
@@ -41,12 +35,12 @@
           </router-link>
         </template>
       </el-table-column>
+      <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="left" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -63,9 +57,6 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="编号" prop="id" v-if="form.id != null">
-          <el-input v-model="form.id" disabled />
-        </el-form-item>
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入名称" />
         </el-form-item>
@@ -82,7 +73,7 @@
 </template>
 
 <script>
-import { createProperty, updateProperty, deleteProperty, getProperty, getPropertyPage, exportPropertyExcel } from "@/api/mall/product/property";
+import { createProperty, updateProperty, deleteProperty, getProperty, getPropertyPage } from "@/api/mall/product/property";
 
 export default {
   name: "Property",
@@ -92,8 +83,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -114,7 +103,6 @@ export default {
       // 表单参数
       form: {
         name:'',
-        status:'',
         remark:"",
         id: null,
       },
