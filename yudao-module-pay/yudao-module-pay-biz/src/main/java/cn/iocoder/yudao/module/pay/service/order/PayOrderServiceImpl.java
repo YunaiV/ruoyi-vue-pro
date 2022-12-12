@@ -103,7 +103,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (order != null) {
             log.warn("[createPayOrder][appId({}) merchantOrderId({}) 已经存在对应的支付单({})]", order.getAppId(),
                     order.getMerchantOrderId(), JsonUtils.toJsonString(order)); // 理论来说，不会出现这个情况
-            return app.getId();
+            return order.getId();
         }
 
         // 创建支付交易单
