@@ -5,7 +5,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyViewRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
@@ -15,6 +14,7 @@ import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
@@ -142,7 +142,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                 Map<Long, List<ProductSkuBaseVO.Property>> propertyMaps = properties.stream().collect(Collectors.groupingBy(ProductSkuBaseVO.Property::getPropertyId));
 
                 List<ProductPropertyValueRespVO> propertyValueList = productPropertyValueService.getPropertyValueListByPropertyId(new ArrayList<>(propertyMaps.keySet()));
-                List<ProductPropertyRespVO> propertyList = productPropertyService.getPropertyVOList(new ArrayList<>(propertyMaps.keySet()));
+                List<ProductPropertyDO> propertyList = productPropertyService.getPropertyList(propertyMaps.keySet());
                 // 装载组装过后的属性
                 List<ProductPropertyViewRespVO> productPropertyViews = new ArrayList<>();
                 propertyList.forEach(p -> {

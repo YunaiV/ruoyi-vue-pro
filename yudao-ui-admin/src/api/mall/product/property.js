@@ -57,7 +57,7 @@ export function getPropertyList(query) {
 // 获得属性项列表
 export function getPropertyListAndValue(query) {
   return request({
-    url: '/product/property/listAndValue',
+    url: '/product/property/get-value-list',
     method: 'get',
     params: query
   })

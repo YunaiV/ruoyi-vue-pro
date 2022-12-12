@@ -13,7 +13,4 @@ public class ProductPropertyListReqVO {
     @ApiModelProperty(value = "名称", example = "颜色")
     private String name;
 
-    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举")
-    private Integer status;
-
 }

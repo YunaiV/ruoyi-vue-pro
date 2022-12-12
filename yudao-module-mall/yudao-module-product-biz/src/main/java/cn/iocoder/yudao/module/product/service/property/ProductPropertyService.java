@@ -42,7 +42,7 @@ public interface ProductPropertyService {
      * @param listReqVO 集合查询
      * @return 属性项集合
      */
-    List<ProductPropertyRespVO> getPropertyVOList(ProductPropertyListReqVO listReqVO);
+    List<ProductPropertyDO> getPropertyList(ProductPropertyListReqVO listReqVO);
 
     /**
      * 获取属性名称分页
@@ -50,7 +50,7 @@ public interface ProductPropertyService {
      * @param pageReqVO 分页条件
      * @return 属性项分页
      */
-    PageResult<ProductPropertyRespVO> getPropertyPage(ProductPropertyPageReqVO pageReqVO);
+    PageResult<ProductPropertyDO> getPropertyPage(ProductPropertyPageReqVO pageReqVO);
 
     /**
      * 获得指定编号的属性项
@@ -58,7 +58,7 @@ public interface ProductPropertyService {
      * @param id 编号
      * @return 属性项
      */
-    ProductPropertyRespVO getProperty(Long id);
+    ProductPropertyDO getProperty(Long id);
 
     /**
      * 根据属性项的编号的集合，获得对应的属性项数组
@@ -67,21 +67,5 @@ public interface ProductPropertyService {
      * @return 属性项数组
      */
     List<ProductPropertyDO> getPropertyList(Collection<Long> ids);
-
-    /**
-     * 根据属性项的编号的集合，获得对应的属性项数组
-     *
-     * @param ids 属性项的编号的集合
-     * @return 属性项数组
-     */
-    List<ProductPropertyRespVO> getPropertyVOList(Collection<Long> ids);
-
-    /**
-     * 获得属性项 + 值的列表
-     *
-     * @param listReqVO 列表查询
-     * @return 属性项 + 值的列表
-     */
-    List<ProductPropertyAndValueRespVO> getPropertyAndValueList(ProductPropertyListReqVO listReqVO);
 
 }

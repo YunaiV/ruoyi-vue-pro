@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.Produc
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValuePageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueUpdateReqVO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 
 import java.util.Collection;
@@ -48,6 +49,14 @@ public interface ProductPropertyValueService {
     ProductPropertyValueRespVO getPropertyValue(Long id);
 
     /**
+     * 根据属性项编号数组，获得属性值列表
+     *
+     * @param propertyIds 属性项目编号数组
+     * @return 属性值列表
+     */
+    List<ProductPropertyValueDO> getPropertyValueListByPropertyId(Collection<Long> propertyIds);
+
+    /**
      * 根据编号数组，获得属性值列表
      *
      * @param ids 编号数组
@@ -56,12 +65,20 @@ public interface ProductPropertyValueService {
     List<ProductPropertyValueDetailRespBO> getPropertyValueDetailList(Collection<Long> ids);
 
     /**
-     * 获得属性值
+     * 根据属性项编号，获得属性值数组
      *
-     * @param id 编号
+     * @param propertyIds 属性项编号数组
      * @return 属性值
      */
-    List<ProductPropertyValueRespVO> getPropertyValueListByPropertyId(List<Long> id);
+    List<ProductPropertyValueRespVO> getPropertyValueListByPropertyId(List<Long> propertyIds);
+
+    /**
+     * 根据属性项编号，活的属性值数量
+     *
+     * @param propertyId 属性项编号数
+     * @return 属性值数量
+     */
+    Integer getPropertyValueCountByPropertyId(Long propertyId);
 
     /**
      * 获取属性值的分页
@@ -70,4 +87,12 @@ public interface ProductPropertyValueService {
      * @return 属性值的分页
      */
     PageResult<ProductPropertyValueRespVO> getPropertyValueListPage(ProductPropertyValuePageReqVO pageReqVO);
+
+    /**
+     * 删除指定属性项编号下的属性值们
+     *
+     * @param propertyId 属性项的编号
+     */
+    void deletePropertyValueByPropertyId(Long propertyId);
+
 }

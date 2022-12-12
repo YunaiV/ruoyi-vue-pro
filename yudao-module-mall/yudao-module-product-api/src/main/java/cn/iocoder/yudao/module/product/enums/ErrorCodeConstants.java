@@ -25,6 +25,7 @@ public interface ErrorCodeConstants {
     // ========== 商品属性项 1008003000 ==========
     ErrorCode PROPERTY_NOT_EXISTS = new ErrorCode(1008003000, "属性项不存在");
     ErrorCode PROPERTY_EXISTS = new ErrorCode(1008003001, "属性项的名称已存在");
+    ErrorCode PROPERTY_DELETE_FAIL_VALUE_EXISTS = new ErrorCode(1008003002, "属性项下存在属性值，无法删除");
 
     // ========== 商品属性值 1008004000 ==========
     ErrorCode PROPERTY_VALUE_NOT_EXISTS = new ErrorCode(1008004000, "属性值不存在");

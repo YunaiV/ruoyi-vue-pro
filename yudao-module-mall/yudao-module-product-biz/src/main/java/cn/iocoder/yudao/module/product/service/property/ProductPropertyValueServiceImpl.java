@@ -74,6 +74,11 @@ public class ProductPropertyValueServiceImpl implements ProductPropertyValueServ
     }
 
     @Override
+    public List<ProductPropertyValueDO> getPropertyValueListByPropertyId(Collection<Long> propertyIds) {
+        return productPropertyValueMapper.selectListByPropertyId(propertyIds);
+    }
+
+    @Override
     public List<ProductPropertyValueDetailRespBO> getPropertyValueDetailList(Collection<Long> ids) {
         // 获得属性值列表
         if (CollUtil.isEmpty(ids)) {
@@ -91,12 +96,23 @@ public class ProductPropertyValueServiceImpl implements ProductPropertyValueServ
     }
 
     @Override
-    public List<ProductPropertyValueRespVO> getPropertyValueListByPropertyId(List<Long> id) {
-        return ProductPropertyValueConvert.INSTANCE.convertList(productPropertyValueMapper.selectList("property_id", id));
+    public List<ProductPropertyValueRespVO> getPropertyValueListByPropertyId(List<Long> propertyIds) {
+        return ProductPropertyValueConvert.INSTANCE.convertList(productPropertyValueMapper.selectList("property_id", propertyIds));
+    }
+
+    @Override
+    public Integer getPropertyValueCountByPropertyId(Long propertyId) {
+        return productPropertyValueMapper.selectCountByPropertyId(propertyId);
     }
 
     @Override
     public PageResult<ProductPropertyValueRespVO> getPropertyValueListPage(ProductPropertyValuePageReqVO pageReqVO) {
         return ProductPropertyValueConvert.INSTANCE.convertPage(productPropertyValueMapper.selectPage(pageReqVO));
     }
+
+    @Override
+    public void deletePropertyValueByPropertyId(Long propertyId) {
+        productPropertyValueMapper.deleteByPropertyId(propertyId);
+    }
+
 }

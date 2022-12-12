@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 /**
  * 商品属性项 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -19,9 +18,5 @@ public class ProductPropertyBaseVO {
 
     @ApiModelProperty(value = "备注", example = "颜色")
     private String remark;
-
-    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举")
-    @NotNull(message = "状态不能为空")
-    private Integer status;
 
 }

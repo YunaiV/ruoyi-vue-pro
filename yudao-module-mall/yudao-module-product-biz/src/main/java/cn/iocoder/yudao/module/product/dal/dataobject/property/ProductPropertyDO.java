@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.property;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -32,16 +31,8 @@ public class ProductPropertyDO extends BaseDO {
      */
     private String name;
     /**
-     * 状态
-     *
-     * 枚举 {@link CommonStatusEnum}
-     */
-    private Integer status;
-    /**
      * 备注
      */
     private String remark;
-
-    // TODO 芋艿：rule；规格属性 (发布商品时，和 SKU 关联)；规格参数(搜索商品时，与 Category 关联搜索)
 
 }

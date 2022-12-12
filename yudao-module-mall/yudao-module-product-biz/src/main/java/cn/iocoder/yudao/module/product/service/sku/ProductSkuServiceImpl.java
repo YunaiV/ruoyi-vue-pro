@@ -3,11 +3,11 @@ package cn.iocoder.yudao.module.product.service.sku;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
@@ -89,7 +89,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
                 .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
                 .map(ProductSkuBaseVO.Property::getPropertyId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
                 .collect(Collectors.toSet());
-        List<ProductPropertyRespVO> propertyList = productPropertyService.getPropertyVOList(propertyIds);
+        List<ProductPropertyDO> propertyList = productPropertyService.getPropertyList(propertyIds);
         if (propertyList.size() != propertyIds.size()) {
             throw exception(PROPERTY_NOT_EXISTS);
         }

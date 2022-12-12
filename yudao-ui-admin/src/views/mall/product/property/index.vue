@@ -41,11 +41,6 @@
           </router-link>
         </template>
       </el-table-column>
-      <el-table-column label="开启状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
-        </template>
-      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -73,13 +68,6 @@
         </el-form-item>
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入名称" />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                      :key="dict.value" :label="parseInt(dict.value)">{{ dict.label }}
-            </el-radio>
-          </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="备注" />
@@ -121,7 +109,6 @@ export default {
         pageNo: 1,
         pageSize: 10,
         name: null,
-        status: null,
         createTime: []
       },
       // 表单参数
@@ -135,9 +122,6 @@ export default {
       rules: {
         name: [
           { required: true, message: "名称不能为空", trigger: "blur" }
-        ],
-        status: [
-          { required: true, message: "状态不能为空", trigger: "blur" }
         ]
       }
     };
@@ -165,7 +149,6 @@ export default {
     reset() {
       this.form = {
         name:'',
-        status:'',
         remark:"",
         id: null,
       };
@@ -228,21 +211,6 @@ export default {
         }).then(() => {
           this.getList();
           this.$modal.msgSuccess("删除成功");
-        }).catch(() => {});
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      // 处理查询参数
-      let params = {...this.queryParams};
-      params.pageNo = undefined;
-      params.pageSize = undefined;
-      // 执行导出
-      this.$modal.confirm('是否确认导出所有名称数据项?').then(() => {
-          this.exportLoading = true;
-          return exportPropertyExcel(params);
-        }).then(response => {
-          this.$download.excel(response, '名称.xls');
-          this.exportLoading = false;
         }).catch(() => {});
     },
   }
