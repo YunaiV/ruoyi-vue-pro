@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class SeckillTimeUpdateReqVO extends SeckillTimeBaseVO {
 
-    @ApiModelProperty(value = "编号", required = true)
+    @ApiModelProperty(value = "编号", required = true, example = "1")
     @NotNull(message = "编号不能为空")
     private Long id;
 

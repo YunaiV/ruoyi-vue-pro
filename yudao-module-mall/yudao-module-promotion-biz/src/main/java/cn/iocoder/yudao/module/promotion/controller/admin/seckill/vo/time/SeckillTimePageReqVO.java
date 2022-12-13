@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
@@ -16,25 +16,15 @@ import java.time.LocalTime;
 @ToString(callSuper = true)
 public class SeckillTimePageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "秒杀时段名称")
+    @ApiModelProperty(value = "秒杀时段名称", example = "上午场")
     private String name;
 
-    @ApiModelProperty(value = "开始时间点")
+    @ApiModelProperty(value = "开始时间点", example = "16:30:40")
     @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime startTime;
 
-    @ApiModelProperty(value = "结束时间点")
+    @ApiModelProperty(value = "结束时间点", example = "16:30:40")
     @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime endTime;
-
-
-
-
-
-
-
-//    @ApiModelProperty(value = "创建时间")
-//    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-//    private Date[] createTime;
 
 }

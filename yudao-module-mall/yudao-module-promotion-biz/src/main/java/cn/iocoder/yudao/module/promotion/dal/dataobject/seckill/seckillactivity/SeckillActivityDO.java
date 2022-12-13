@@ -1,28 +1,29 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 秒杀活动 DO
  *
- * @author 芋道源码
+ * @author halfninety
  */
-@TableName("promotion_seckill_activity")
+@TableName(value = "promotion_seckill_activity", autoResultMap = true)
 @KeySequence("promotion_seckill_activity_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class SeckillActivityDO extends BaseDO {
 
     /**
@@ -36,7 +37,7 @@ public class SeckillActivityDO extends BaseDO {
     private String name;
     /**
      * 活动状态
-     *
+     * <p>
      * 枚举 {@link PromotionActivityStatusEnum 对应的类}
      */
     private Integer status;
@@ -59,8 +60,8 @@ public class SeckillActivityDO extends BaseDO {
     /**
      * 秒杀时段 id
      */
-    // TODO @halfninety 可以使用 List 存储；看下别的模块怎么做的哈
-    private String timeId;
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> timeIds;
     /**
      * 付款订单数
      */
@@ -69,10 +70,9 @@ public class SeckillActivityDO extends BaseDO {
      * 付款人数
      */
     private Integer userCount;
-    // TODO @halfninety 使用 Long 哈。单位是分
     /**
      * 订单实付金额，单位：分
      */
-    private BigDecimal totalPrice;
+    private Long totalPrice;
 
 }

@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo.*;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.*;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity.SeckillActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
