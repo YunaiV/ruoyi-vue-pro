@@ -167,7 +167,8 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
         return PayOrderNotifyRespDTO
                 .builder()
                 .orderExtensionNo(result.getOutTradeNo())
-                .channelOrderNo(result.getTradeState())
+                .channelOrderNo(result.getTransactionId())
+                .channelUserId(result.getPayer().getOpenid())
                 .successTime(LocalDateTimeUtil.parse(result.getSuccessTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
                 .data(data.getBody())
                 .build();
