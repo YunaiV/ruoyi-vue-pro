@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.promotion.service.seckillactivity;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo.SeckillActivityCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo.SeckillActivityPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo.SeckillActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillActivityMapper;
 import cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity.SeckillActivityServiceImpl;
@@ -107,7 +107,7 @@ public class SeckillActivityServiceImplTest extends BaseDbUnitTest {
        SeckillActivityDO dbSeckillActivity = randomPojo(SeckillActivityDO.class, o -> { // 等会查询到
            o.setName(null);
            o.setStatus(null);
-           o.setTimeId(null);
+           o.setTimeIds(null);
            o.setCreateTime(null);
        });
        seckillActivityMapper.insert(dbSeckillActivity);
@@ -116,7 +116,7 @@ public class SeckillActivityServiceImplTest extends BaseDbUnitTest {
        // 测试 status 不匹配
        seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setStatus(null)));
        // 测试 timeId 不匹配
-       seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setTimeId(null)));
+       seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setTimeIds(null)));
        // 测试 createTime 不匹配
        seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setCreateTime(null)));
        // 准备参数
@@ -141,7 +141,7 @@ public class SeckillActivityServiceImplTest extends BaseDbUnitTest {
        SeckillActivityDO dbSeckillActivity = randomPojo(SeckillActivityDO.class, o -> { // 等会查询到
            o.setName(null);
            o.setStatus(null);
-           o.setTimeId(null);
+           o.setTimeIds(null);
            o.setCreateTime(null);
        });
        seckillActivityMapper.insert(dbSeckillActivity);
@@ -150,7 +150,7 @@ public class SeckillActivityServiceImplTest extends BaseDbUnitTest {
        // 测试 status 不匹配
        seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setStatus(null)));
        // 测试 timeId 不匹配
-       seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setTimeId(null)));
+       seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setTimeIds(null)));
        // 测试 createTime 不匹配
        seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setCreateTime(null)));
        // 准备参数

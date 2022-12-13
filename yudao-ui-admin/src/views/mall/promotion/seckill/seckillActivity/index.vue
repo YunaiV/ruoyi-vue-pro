@@ -51,10 +51,10 @@
                     <dict-tag :type="DICT_TYPE.PROMOTION_ACTIVITY_STATUS" :value="scope.row.status" />
                 </template>
             </el-table-column>
-            <el-table-column label="参与场次" prop="timeId" width="250">
+            <el-table-column label="参与场次" prop="timeIds" width="250">
                 <template slot-scope="scope">
                     <span v-for="item in seckillTimeList" :key="item.id"
-                        v-if="scope.row.timeId.indexOf(item.id) !== -1">
+                        v-if="scope.row.timeIds.includes(item.id)">
                         <el-tag style="margin:4px;" size="small">{{ item.name }}</el-tag>
                     </span>
                 </template>
@@ -107,7 +107,7 @@
                     <el-input type="textarea" v-model="form.remark" placeholder="请输入备注" />
                 </el-form-item>
                 <el-form-item label="场次选择">
-                    <el-select v-model="form.timeId" placeholder="请选择参与场次" clearable size="small" multiple filterable
+                    <el-select v-model="form.timeIds" placeholder="请选择参与场次" clearable size="small" multiple filterable
                         style="width: 880px">
                         <el-option v-for="item in seckillTimeList" :key="item.id" :label="item.name" :value="item.id">
                             <span style="float: left">{{ item.name + ': { ' }} {{ item.startTime }} -- {{ item.endTime +
@@ -186,7 +186,7 @@
 
 <script>
 import { getSkuOptionList } from "@/api/mall/product/sku";
-import { createSeckillActivity, updateSeckillActivity, closeSeckillActivity,deleteSeckillActivity, getSeckillActivity, getSeckillActivityPage, exportSeckillActivityExcel } from "@/api/mall/promotion/seckillActivity";
+import { createSeckillActivity, updateSeckillActivity, closeSeckillActivity, deleteSeckillActivity, getSeckillActivity, getSeckillActivityPage, exportSeckillActivityExcel } from "@/api/mall/promotion/seckillActivity";
 import { getSeckillTimeList } from "@/api/mall/promotion/seckillTime";
 import { deepClone } from "@/utils";
 
@@ -223,7 +223,7 @@ export default {
             form: {
                 skuIds: [], // 选中的 SKU
                 products: [], // 商品信息
-                timeId: [], //选中的秒杀场次id
+                timeIds: [], //选中的秒杀场次id
             },
             // 商品 SKU 列表
             productSkus: [],
@@ -233,7 +233,7 @@ export default {
                 status: [{ required: true, message: "活动状态不能为空", trigger: "blur" }],
                 startAndEndTime: [{ required: true, message: "活动时间不能为空", trigger: "blur" }],
                 sort: [{ required: true, message: "排序不能为空", trigger: "blur" }],
-                timeId: [{ required: true, message: "秒杀场次不能为空", trigger: "blur" }],
+                timeIds: [{ required: true, message: "秒杀场次不能为空", trigger: "blur" }],
                 totalPrice: [{ required: true, message: "订单实付金额，单位：分不能为空", trigger: "blur" }],
             }
         };
@@ -241,12 +241,13 @@ export default {
     created() {
         this.getList();
     },
-    watch:{
+    watch: {
         $route: 'getList'
     },
     methods: {
         /** 查询列表 */
         getList() {
+            // 从秒杀时段跳转过来并鞋带timeId参数进行查询
             const timeId = this.$route.params && this.$route.params.timeId;
             if (timeId) {
                 this.queryParams.timeId = timeId
@@ -254,11 +255,13 @@ export default {
             this.loading = true;
             // 执行查询
             getSeckillActivityPage(this.queryParams).then(response => {
+                console.log(response.data.list, "查询出的值");
                 this.list = response.data.list;
                 this.total = response.data.total;
                 this.loading = false;
             });
             if (timeId) {
+                //查询完成后设置为空
                 this.$route.params.timeId = undefined
             }
             // 获得 SKU 商品列表
@@ -285,7 +288,7 @@ export default {
                 startTime: undefined,
                 endTime: undefined,
                 sort: undefined,
-                timeId: [],
+                timeIds: [],
                 totalPrice: undefined,
                 skuIds: [],
                 products: [],
@@ -317,11 +320,9 @@ export default {
             this.reset();
             const id = row.id;
             getSeckillActivity(id).then(response => {
-                var timeIdList = response.data.timeId.split(',')
                 this.form = response.data;
                 // 修改数据
                 this.form.startAndEndTime = [response.data.startTime, response.data.endTime];
-                this.form.timeId = timeIdList.map(item => parseInt(item))
                 this.form.skuIds = response.data.products.map(item => item.skuId);
                 this.form.products.forEach(product => {
                     // 获得对应的 SKU 信息
@@ -334,7 +335,7 @@ export default {
                     product.spuName = sku.spuName;
                     product.price = sku.price;
                     product.productStock = sku.stock;
-                    this.$set(product,'seckillStock',product.stock);
+                    this.$set(product, 'seckillStock', product.stock);
                     product.seckillPrice = product.seckillPrice !== undefined ? product.seckillPrice / 100 : undefined;
 
                 });
@@ -353,7 +354,6 @@ export default {
                 const data = deepClone(this.form);
                 data.startTime = this.form.startAndEndTime[0];
                 data.endTime = this.form.startAndEndTime[1];
-                data.timeId = data.timeId.toString();
                 data.products.forEach(product => {
                     product.stock = product.seckillStock;
                     product.seckillPrice = product.seckillPrice !== undefined ? product.seckillPrice * 100 : undefined;

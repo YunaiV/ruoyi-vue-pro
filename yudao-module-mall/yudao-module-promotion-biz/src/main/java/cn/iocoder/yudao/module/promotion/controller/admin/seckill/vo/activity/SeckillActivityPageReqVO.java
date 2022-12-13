@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckillactivity.vo;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -26,8 +26,8 @@ public class SeckillActivityPageReqVO extends PageParam {
     @ApiModelProperty(value = "活动状态", example = "进行中")
     private Integer status;
 
-    @ApiModelProperty(value = "秒杀时段id")
-    private String timeId;
+    @ApiModelProperty(value = "秒杀时段id", example = "1")
+    private Long timeId;
 
     @ApiModelProperty(value = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

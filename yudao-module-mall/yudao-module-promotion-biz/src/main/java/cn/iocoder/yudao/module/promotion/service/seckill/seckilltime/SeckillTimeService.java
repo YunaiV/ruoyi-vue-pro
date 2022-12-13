@@ -1,16 +1,17 @@
 package cn.iocoder.yudao.module.promotion.service.seckill.seckilltime;
 
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.seckilltime.vo.SeckillTimeUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time.SeckillTimeCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time.SeckillTimeUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckilltime.SeckillTimeDO;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * 秒杀时段 Service 接口
  *
- * @author 芋道源码
+ * @author halfninety
  */
 public interface SeckillTimeService {
 
@@ -52,11 +53,18 @@ public interface SeckillTimeService {
     List<SeckillTimeDO> getSeckillTimeList();
 
     /**
+     * 校验秒杀时段是否存在
+     *
+     * @param timeIds 秒杀时段id集合
+     */
+    void validateSeckillTimeExists(Collection<Long> timeIds);
+
+    /**
      * 秒杀时段列表的秒杀活动数量加 1
      *
      * @param ids 秒杀时段id列表
      */
-    void sekillActivityCountAdd(List<Long> ids);
+    void sekillActivityCountIncr(Collection<Long> ids);
 
 
     /**
@@ -64,5 +72,5 @@ public interface SeckillTimeService {
      *
      * @param ids 秒杀时段id列表
      */
-    void sekillActivityCountReduce(List<Long> ids);
+    void sekillActivityCountDecr(Collection<Long> ids);
 }

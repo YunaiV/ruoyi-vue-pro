@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.mybatis.core.mapper;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -75,9 +76,13 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
         return selectList(new LambdaQueryWrapper<T>().in(field, values));
     }
 
+    default List<T> selectList(SFunction<T, ?> leField, SFunction<T, ?> geField, Object value) {
+        return selectList(new LambdaQueryWrapper<T>().le(leField, value).ge(geField, value));
+    }
+
     /**
      * 逐条插入，适合少量数据插入，或者对性能要求不高的场景
-     *
+     * <p>
      * 如果大量，请使用 {@link com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#saveBatch(Collection)} 方法
      * 使用示例，可见 RoleMenuBatchInsertMapper、UserRoleBatchInsertMapper 类
      *
