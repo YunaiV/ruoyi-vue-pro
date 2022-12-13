@@ -26,6 +26,8 @@ import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -99,7 +101,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
                 .outTradeNo(reqDTO.getMerchantOrderId())
                 .body(reqDTO.getBody())
                 .totalFee(reqDTO.getAmount().intValue()) // 单位分
-                .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
+                .timeExpire(DateUtil.format(Date.from(reqDTO.getExpireTime().atZone(ZoneId.systemDefault()).toInstant()), "yyyy-MM-dd'T'HH:mm:ssXXX"))
                 .spbillCreateIp(reqDTO.getUserIp())
                 .openid(getOpenid(reqDTO))
                 .notifyUrl(reqDTO.getNotifyUrl())
@@ -114,7 +116,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         request.setOutTradeNo(reqDTO.getMerchantOrderId());
         request.setDescription(reqDTO.getBody());
         request.setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getAmount().intValue())); // 单位分
-        request.setTimeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"));
+        request.setTimeExpire(DateUtil.format(Date.from(reqDTO.getExpireTime().atZone(ZoneId.systemDefault()).toInstant()), "yyyy-MM-dd'T'HH:mm:ssXXX"));
         request.setPayer(new WxPayUnifiedOrderV3Request.Payer().setOpenid(getOpenid(reqDTO)));
         request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
         request.setNotifyUrl(reqDTO.getNotifyUrl());
