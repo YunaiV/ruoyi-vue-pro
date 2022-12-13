@@ -9,47 +9,39 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * {@link IPUtils} 的单元测试
+ *
+ * @author wanglhup
  */
-class IPUtilsTest {
+public class IPUtilsTest {
 
     @Test
-    void getAreaId() {
+    public void testGetAreaId_string() {
         // 120.202.4.0|120.202.4.255|420600
         Integer areaId = IPUtils.getAreaId("120.202.4.50");
         assertEquals(420600, areaId);
     }
 
     @Test
-    void testGetAreaId() {
+    public void testGetAreaId_long() throws Exception {
         // 120.203.123.0|120.203.133.255|360900
-        long ip = 0L;
-        try {
-            ip = Searcher.checkIP("120.203.123.250");
-        } catch (Exception e) {
-            // ignore
-        }
+        long ip = Searcher.checkIP("120.203.123.250");
         Integer areaId = IPUtils.getAreaId(ip);
         assertEquals(360900, areaId);
     }
 
     @Test
-    void getArea() {
+    public void testGetArea_string() {
         // 120.202.4.0|120.202.4.255|420600
         Area area = IPUtils.getArea("120.202.4.50");
         assertEquals("襄阳市", area.getName());
     }
 
     @Test
-    void testGetArea() {
+    public void testGetArea_long() throws Exception {
         // 120.203.123.0|120.203.133.255|360900
-        long ip = 0L;
-        try {
-            ip = Searcher.checkIP("120.203.123.252");
-        } catch (Exception e) {
-            // ignore
-        }
+        long ip = Searcher.checkIP("120.203.123.252");
         Area area = IPUtils.getArea(ip);
         assertEquals("宜春市", area.getName());
-
     }
+
 }

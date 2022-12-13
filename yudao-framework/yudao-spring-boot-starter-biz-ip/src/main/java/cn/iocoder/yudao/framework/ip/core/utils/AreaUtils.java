@@ -6,6 +6,7 @@ import cn.hutool.core.text.csv.CsvUtil;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,19 +18,20 @@ import java.util.Map;
  *
  * @author 芋道源码
  */
+@Slf4j
 public class AreaUtils {
+
+    /**
+     * 初始化 SEARCHER
+     */
+    @SuppressWarnings("InstantiationOfUtilityClass")
+    private final static AreaUtils INSTANCE = new AreaUtils();
+
 
     private static Map<Integer, Area> areas;
 
-    static {
-        // 懒加载，使用时初始化
-        init();
-    }
-
-    /**
-     * 初始化
-     */
-    private static synchronized void init() {
+    private AreaUtils() {
+        long now = System.currentTimeMillis();
         areas = new HashMap<>();
         areas.put(Area.ID_GLOBAL, new Area(Area.ID_GLOBAL, "全球", 0,
                 null, new ArrayList<>()));
@@ -51,6 +53,7 @@ public class AreaUtils {
             area.setParent(parent);
             parent.getChildren().add(area);
         }
+        log.info("启动加载 AreaUtils 成功，耗时 ({}) 毫秒", System.currentTimeMillis() - now);
     }
 
     /**
