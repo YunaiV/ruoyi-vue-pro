@@ -64,8 +64,8 @@
       <el-form-item label="存储器" prop="storage">
         <el-select v-model="form.storage" placeholder="请选择存储器" :disabled="form.id !== 0">
           <el-option
-            v-for="dict in getIntDictOptions(DICT_TYPE.INFRA_FILE_STORAGE)"
-            :key="dict.value"
+            v-for="(dict, index) in getIntDictOptions(DICT_TYPE.INFRA_FILE_STORAGE)"
+            :key="index"
             :label="dict.label"
             :value="dict.value"
           />

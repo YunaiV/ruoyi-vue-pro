@@ -8,8 +8,8 @@
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择菜单状态">
           <el-option
-            v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
-            :key="dict.value"
+            v-for="(dict, index) in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
+            :key="index"
             :label="dict.label"
             :value="dict.value"
           />
@@ -124,7 +124,7 @@
         <el-radio-group v-model="menuForm.type">
           <el-radio-button
             v-for="dict in getIntDictOptions(DICT_TYPE.SYSTEM_MENU_TYPE)"
-            :key="dict.value"
+            :key="dict.label"
             :label="dict.value"
           >
             {{ dict.label }}
@@ -178,7 +178,7 @@
             <el-radio
               border
               v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
-              :key="dict.value"
+              :key="dict.label"
               :label="dict.value"
             >
               {{ dict.label }}
