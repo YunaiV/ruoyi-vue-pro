@@ -52,3 +52,19 @@ CREATE TABLE IF NOT EXISTS `product_spu` (
     `deleted` bit(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
 PRIMARY KEY (`id`)
 ) COMMENT '商品spu';
+
+CREATE TABLE IF NOT EXISTS `product_category` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '分类编号',
+    `parent_id` bigint DEFAULT NULL COMMENT '父分类编号',
+    `name` varchar(128) NOT NULL COMMENT '分类名称',
+    `description` varchar(128) NOT NULL COMMENT '分类描述',
+    `pic_url` varchar DEFAULT NULL COMMENT '分类图片',
+    `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段',
+    `status` bit(1) DEFAULT NULL COMMENT '状态',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `creator` varchar DEFAULT NULL COMMENT '创建人',
+    `updater` varchar DEFAULT NULL COMMENT '更新人',
+    `deleted` bit(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
+    PRIMARY KEY (`id`)
+) COMMENT '商品分类';

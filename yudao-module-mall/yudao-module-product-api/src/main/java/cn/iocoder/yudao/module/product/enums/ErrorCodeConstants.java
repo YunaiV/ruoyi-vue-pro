@@ -15,7 +15,6 @@ public interface ErrorCodeConstants {
     ErrorCode CATEGORY_PARENT_NOT_FIRST_LEVEL = new ErrorCode(1008001002, "父分类不能是二级分类");
     ErrorCode CATEGORY_EXISTS_CHILDREN = new ErrorCode(1008001003, "存在子分类，无法删除");
     ErrorCode CATEGORY_DISABLED = new ErrorCode(1008001004, "商品分类({})已禁用，无法使用");
-    ErrorCode CATEGORY_LEVEL_ERROR = new ErrorCode(1008001005, "商品分类不正确，原因：必须使用第三级的商品分类下");
 
     // ========== 商品品牌相关编号 1008002000 ==========
     ErrorCode BRAND_NOT_EXISTS = new ErrorCode(1008002000, "品牌不存在");
@@ -33,6 +32,7 @@ public interface ErrorCodeConstants {
 
     // ========== 商品 SPU 1008005000 ==========
     ErrorCode SPU_NOT_EXISTS = new ErrorCode(1008005000, "商品 SPU 不存在");
+    ErrorCode SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR = new ErrorCode(1008005001, "商品分类不正确，原因：必须使用第三级的商品分类下");
 
     // ========== 商品 SKU 1008006000 ==========
     ErrorCode SKU_NOT_EXISTS = new ErrorCode(1008006000, "商品 SKU 不存在");

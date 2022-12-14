@@ -104,6 +104,25 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetCategoryLevel() {
+        // mock 数据
+        ProductCategoryDO category1 = randomPojo(ProductCategoryDO.class,
+                o -> o.setParentId(ProductCategoryDO.PARENT_ID_NULL));
+        productCategoryMapper.insert(category1);
+        ProductCategoryDO category2 = randomPojo(ProductCategoryDO.class,
+                o -> o.setParentId(category1.getId()));
+        productCategoryMapper.insert(category2);
+        ProductCategoryDO category3 = randomPojo(ProductCategoryDO.class,
+                o -> o.setParentId(category2.getId()));
+        productCategoryMapper.insert(category3);
+
+        // 调用，并断言
+        assertEquals(productCategoryService.getCategoryLevel(category1.getId()), 1);
+        assertEquals(productCategoryService.getCategoryLevel(category2.getId()), 2);
+        assertEquals(productCategoryService.getCategoryLevel(category3.getId()), 3);
+    }
+
+    @Test
     public void testGetCategoryList() {
         // mock 数据
         ProductCategoryDO dbCategory = randomPojo(ProductCategoryDO.class, o -> { // 等会查询到

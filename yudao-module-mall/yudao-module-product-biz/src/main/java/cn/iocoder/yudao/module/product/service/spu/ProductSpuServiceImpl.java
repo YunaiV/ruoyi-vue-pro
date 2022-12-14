@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR;
 
 /**
  * 商品 SPU Service 实现类
@@ -66,7 +67,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Transactional
     public Long createSpu(ProductSpuCreateReqVO createReqVO) {
         // 校验分类
-        categoryService.validateCategoryLevel(createReqVO.getCategoryId());
+        validateCategory(createReqVO.getCategoryId());
         // 校验品牌
         brandService.validateProductBrand(createReqVO.getBrandId());
         // 校验SKU
@@ -91,7 +92,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验 SPU 是否存在
         validateSpuExists(updateReqVO.getId());
         // 校验分类
-        categoryService.validateCategoryLevel(updateReqVO.getCategoryId());
+        validateCategory(updateReqVO.getCategoryId());
         // 校验品牌
         brandService.validateProductBrand(updateReqVO.getBrandId());
         // 校验SKU
@@ -107,6 +108,19 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         productSpuMapper.updateById(updateObj);
         // 批量更新 SKU
         productSkuService.updateSkus(updateObj.getId(), updateObj.getName(), updateReqVO.getSkus());
+    }
+
+    /**
+     * 校验商品分类是否合法
+     *
+     * @param id 商品分类编号
+     */
+    private void validateCategory(Long id) {
+        categoryService.validateCategory(id);
+        // 校验层级
+        if (categoryService.getCategoryLevel(id) != 3) {
+            throw exception(SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR);
+        }
     }
 
     @Override

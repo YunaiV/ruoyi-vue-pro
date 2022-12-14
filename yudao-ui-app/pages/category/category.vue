@@ -34,7 +34,7 @@
               <u-grid-item v-for="(subItem, subIndex) in item.children" :key="subItem.id">
                 <view class="sub-category-item" @click="handleCategory(item, subIndex)">
                   <u-icon name="photo" :size="80" v-if="subItem.picUrl === null"></u-icon>
-                  <image :src="item.picUrl" v-if="subItem.picUrl != null" mode='widthFix' />
+                  <image :src="subItem.picUrl" v-if="subItem.picUrl != null" mode='widthFix' />
                   <text class="sub-category-title">{{ subItem.name }}</text>
                 </view>
               </u-grid-item>

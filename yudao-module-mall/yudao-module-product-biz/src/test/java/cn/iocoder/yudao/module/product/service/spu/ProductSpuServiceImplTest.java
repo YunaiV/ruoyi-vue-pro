@@ -187,9 +187,9 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         });
 
         Mockito.when(productSkuService.getSkusBySpuId(createReqVO.getId())).thenReturn(productSkuDOS);
-        Mockito.when(productPropertyValueService.getPropertyValueListByPropertyId(new ArrayList<>(collect.keySet()))).thenReturn(productPropertyValueRespVO);
-        Mockito.when(productPropertyService.getPropertyVOList(new ArrayList<>(collect.keySet()))).thenReturn(productPropertyRespVOS);
-
+//        Mockito.when(productPropertyValueService.getPropertyValueListByPropertyId(new ArrayList<>(collect.keySet()))).thenReturn(productPropertyValueRespVO);
+//        Mockito.when(productPropertyService.getPropertyVOList(new ArrayList<>(collect.keySet()))).thenReturn(productPropertyRespVOS);
+//
         // 调用
         ProductSpuDetailRespVO spuDetail = productSpuService.getSpuDetail(createReqVO.getId());
 
