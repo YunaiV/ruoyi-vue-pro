@@ -31,7 +31,10 @@ const crudSchemas = reactive<VxeCrudSchema>({
       table: {
         treeNode: true,
         align: 'left',
-        width: '200px'
+        width: '200px',
+        slots: {
+          default: 'name_default'
+        }
       }
     },
     {

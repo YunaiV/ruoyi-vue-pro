@@ -14,6 +14,10 @@
         <XButton title="展开所有" @click="xGrid?.setAllTreeExpand(true)" />
         <XButton title="关闭所有" @click="xGrid?.clearTreeExpand()" />
       </template>
+      <template #name_default="{ row }">
+        <Icon :icon="row.icon" />
+        <span class="ml-3">{{ row.name }}</span>
+      </template>
       <template #actionbtns_default="{ row }">
         <!-- 操作：修改 -->
         <XTextButton
