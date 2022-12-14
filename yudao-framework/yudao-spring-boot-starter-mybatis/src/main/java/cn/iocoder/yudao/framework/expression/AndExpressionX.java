@@ -18,7 +18,7 @@ public class AndExpressionX extends AndExpression {
 
     @Override
     public String toString() {
-        return "(" + this.getLeftExpression() + " " + this.getStringExpression() + " " + this.getRightExpression() + ")";
+        return "(" + super.toString() + ")";
     }
 
 }

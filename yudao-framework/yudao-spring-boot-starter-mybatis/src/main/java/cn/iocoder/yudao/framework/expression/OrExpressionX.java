@@ -18,7 +18,7 @@ public class OrExpressionX extends OrExpression {
 
     @Override
     public String toString() {
-        return "(" + this.getLeftExpression() + " " + this.getStringExpression() + " " + this.getRightExpression() + ")";
+        return "(" + super.toString() + ")";
     }
 
 }
