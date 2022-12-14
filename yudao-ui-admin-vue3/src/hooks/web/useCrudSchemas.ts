@@ -1,6 +1,9 @@
 import { reactive } from 'vue'
+import { AxiosPromise } from 'axios'
+import { findIndex } from '@/utils'
 import { eachTree, treeMap, filter } from '@/utils/tree'
 import { getBoolDictOptions, getDictOptions, getIntDictOptions } from '@/utils/dict'
+import { useI18n } from '@/hooks/web/useI18n'
 import { FormSchema } from '@/types/form'
 import { TableColumn } from '@/types/table'
 import { DescriptionsSchema } from '@/types/descriptions'
@@ -23,6 +26,8 @@ export type CrudSchema = Omit<TableColumn, 'children'> & {
 type CrudSearchParams = {
   // 是否显示在查询项
   show?: boolean
+  // 接口
+  api?: () => Promise<any>
 } & Omit<FormSchema, 'field'>
 
 type CrudTableParams = {
@@ -33,6 +38,8 @@ type CrudTableParams = {
 type CrudFormParams = {
   // 是否显示表单项
   show?: boolean
+  // 接口
+  api?: () => Promise<any>
 } & Omit<FormSchema, 'field'>
 
 type CrudDescriptionsParams = {
@@ -46,6 +53,8 @@ interface AllSchemas {
   formSchema: FormSchema[]
   detailSchema: DescriptionsSchema[]
 }
+
+const { t } = useI18n()
 
 // 过滤所有结构
 export const useCrudSchemas = (
@@ -61,13 +70,13 @@ export const useCrudSchemas = (
     detailSchema: []
   })
 
-  const searchSchema = filterSearchSchema(crudSchema)
+  const searchSchema = filterSearchSchema(crudSchema, allSchemas)
   allSchemas.searchSchema = searchSchema || []
 
   const tableColumns = filterTableSchema(crudSchema)
   allSchemas.tableColumns = tableColumns || []
 
-  const formSchema = filterFormSchema(crudSchema)
+  const formSchema = filterFormSchema(crudSchema, allSchemas)
   allSchemas.formSchema = formSchema
 
   const detailSchema = filterDescriptionsSchema(crudSchema)
@@ -79,9 +88,11 @@ export const useCrudSchemas = (
 }
 
 // 过滤 Search 结构
-const filterSearchSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
+const filterSearchSchema = (crudSchema: CrudSchema[], allSchemas: AllSchemas): FormSchema[] => {
   const searchSchema: FormSchema[] = []
 
+  // 获取字典列表队列
+  const searchRequestTask: Array<() => Promise<void>> = []
   eachTree(crudSchema, (schemaItem: CrudSchema) => {
     // 判断是否显示
     if (schemaItem?.isSearch || schemaItem.search?.show) {
@@ -107,12 +118,31 @@ const filterSearchSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
         field: schemaItem.field,
         label: schemaItem.search?.label || schemaItem.label
       }
+      if (searchSchemaItem.api) {
+        searchRequestTask.push(async () => {
+          const res = await (searchSchemaItem.api as () => AxiosPromise)()
+          if (res) {
+            const index = findIndex(allSchemas.searchSchema, (v: FormSchema) => {
+              return v.field === searchSchemaItem.field
+            })
+            if (index !== -1) {
+              allSchemas.searchSchema[index]!.componentProps!.options = filterOptions(
+                res,
+                searchSchemaItem.componentProps.optionsAlias?.labelField
+              )
+            }
+          }
+        })
+      }
       // 删除不必要的字段
       delete searchSchemaItem.show
 
       searchSchema.push(searchSchemaItem)
     }
   })
+  for (const task of searchRequestTask) {
+    task()
+  }
   return searchSchema
 }
 
@@ -139,8 +169,11 @@ const filterTableSchema = (crudSchema: CrudSchema[]): TableColumn[] => {
 }
 
 // 过滤 form 结构
-const filterFormSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
+const filterFormSchema = (crudSchema: CrudSchema[], allSchemas: AllSchemas): FormSchema[] => {
   const formSchema: FormSchema[] = []
+
+  // 获取字典列表队列
+  const formRequestTask: Array<() => Promise<void>> = []
 
   eachTree(crudSchema, (schemaItem: CrudSchema) => {
     // 判断是否显示
@@ -185,6 +218,23 @@ const filterFormSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
         label: schemaItem.form?.label || schemaItem.label
       }
 
+      if (formSchemaItem.api) {
+        formRequestTask.push(async () => {
+          const res = await (formSchemaItem.api as () => AxiosPromise)()
+          if (res) {
+            const index = findIndex(allSchemas.formSchema, (v: FormSchema) => {
+              return v.field === formSchemaItem.field
+            })
+            if (index !== -1) {
+              allSchemas.formSchema[index]!.componentProps!.options = filterOptions(
+                res,
+                formSchemaItem.componentProps.optionsAlias?.labelField
+              )
+            }
+          }
+        })
+      }
+
       // 删除不必要的字段
       delete formSchemaItem.show
 
@@ -192,6 +242,9 @@ const filterFormSchema = (crudSchema: CrudSchema[]): FormSchema[] => {
     }
   })
 
+  for (const task of formRequestTask) {
+    task()
+  }
   return formSchema
 }
 
@@ -224,4 +277,16 @@ const filterDescriptionsSchema = (crudSchema: CrudSchema[]): DescriptionsSchema[
   })
 
   return descriptionsSchema
+}
+
+// 给options添加国际化
+const filterOptions = (options: Recordable, labelField?: string) => {
+  return options.map((v: Recordable) => {
+    if (labelField) {
+      v['labelField'] = t(v.labelField)
+    } else {
+      v['label'] = t(v.label)
+    }
+    return v
+  })
 }
