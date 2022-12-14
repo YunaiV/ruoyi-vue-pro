@@ -33,6 +33,7 @@ public interface ErrorCodeConstants {
     // ========== 商品 SPU 1008005000 ==========
     ErrorCode SPU_NOT_EXISTS = new ErrorCode(1008005000, "商品 SPU 不存在");
     ErrorCode SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR = new ErrorCode(1008005001, "商品分类不正确，原因：必须使用第三级的商品分类下");
+    ErrorCode SPU_NOT_ENABLE = new ErrorCode(1008005002, "商品 SPU 不处于上架状态");
 
     // ========== 商品 SKU 1008006000 ==========
     ErrorCode SKU_NOT_EXISTS = new ErrorCode(1008006000, "商品 SKU 不存在");

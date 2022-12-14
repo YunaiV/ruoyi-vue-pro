@@ -72,7 +72,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         brandService.validateProductBrand(createReqVO.getBrandId());
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();
-        productSkuService.validateSkus(skuCreateReqList, createReqVO.getSpecType());
+        productSkuService.validateSkuList(skuCreateReqList, createReqVO.getSpecType());
         // 插入 SPU
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
         spu.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
@@ -81,7 +81,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         spu.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
         productSpuMapper.insert(spu);
         // 插入 SKU
-        productSkuService.createSkus(spu.getId(), spu.getName(), skuCreateReqList);
+        productSkuService.createSkuList(spu.getId(), spu.getName(), skuCreateReqList);
         // 返回
         return spu.getId();
     }
@@ -97,7 +97,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         brandService.validateProductBrand(updateReqVO.getBrandId());
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = updateReqVO.getSkus();
-        productSkuService.validateSkus(skuCreateReqList, updateReqVO.getSpecType());
+        productSkuService.validateSkuList(skuCreateReqList, updateReqVO.getSpecType());
 
         // 更新 SPU
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
@@ -107,7 +107,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         updateObj.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
         productSpuMapper.updateById(updateObj);
         // 批量更新 SKU
-        productSkuService.updateSkus(updateObj.getId(), updateObj.getName(), updateReqVO.getSkus());
+        productSkuService.updateSkuList(updateObj.getId(), updateObj.getName(), updateReqVO.getSkus());
     }
 
     /**
@@ -146,7 +146,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         ProductSpuDO spu = productSpuMapper.selectById(id);
         ProductSpuDetailRespVO respVO = BeanUtil.copyProperties(spu, ProductSpuDetailRespVO.class);
         if (null != spu) {
-            List<ProductSpuDetailRespVO.Sku> skuReqs = ProductSkuConvert.INSTANCE.convertList03(productSkuService.getSkusBySpuId(id));
+            List<ProductSpuDetailRespVO.Sku> skuReqs = ProductSkuConvert.INSTANCE.convertList03(productSkuService.getSkuListBySpuId(id));
             respVO.setSkus(skuReqs);
             // 组合 sku 属性
             if (spu.getSpecType().equals(ProductSpuSpecTypeEnum.DISABLE.getType())) {
@@ -181,8 +181,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public ProductSpuRespVO getSpu(Long id) {
-        return ProductSpuConvert.INSTANCE.convert(productSpuMapper.selectById(id));
+    public ProductSpuDO getSpu(Long id) {
+        return productSpuMapper.selectById(id);
     }
 
     @Override
@@ -200,7 +200,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 库存告警的 SPU 编号的集合
         Set<Long> alarmStockSpuIds = null;
         if (Boolean.TRUE.equals(pageReqVO.getAlarmStock())) {
-            alarmStockSpuIds = CollectionUtils.convertSet(productSkuService.getSkusByAlarmStock(), ProductSkuDO::getSpuId);
+            alarmStockSpuIds = CollectionUtils.convertSet(productSkuService.getSkuListByAlarmStock(), ProductSkuDO::getSpuId);
             if (CollUtil.isEmpty(alarmStockSpuIds)) {
                 return PageResult.empty();
             }

@@ -78,7 +78,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public void validateSkus(List<ProductSkuCreateOrUpdateReqVO> skus, Integer specType) {
+    public void validateSkuList(List<ProductSkuCreateOrUpdateReqVO> skus, Integer specType) {
         // 非多规格，不需要校验
         if (ObjectUtil.notEqual(specType, ProductSpuSpecTypeEnum.DISABLE.getType())) {
             return;
@@ -121,7 +121,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public void createSkus(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList) {
+    public void createSkuList(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList) {
         // 批量插入 SKU
         List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertList06(skuCreateReqList, spuName);
         skuDOList.forEach(v -> v.setSpuId(spuId));
@@ -129,13 +129,18 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public List<ProductSkuDO> getSkusBySpuId(Long spuId) {
-        return productSkuMapper.selectList(ProductSkuDO::getSpuId, spuId);
+    public List<ProductSkuDO> getSkuListBySpuId(Long spuId) {
+        return productSkuMapper.selectListBySpuId(spuId);
     }
 
     @Override
-    public List<ProductSkuDO> getSkusBySpuIds(List<Long> spuIds) {
-        return productSkuMapper.selectList(ProductSkuDO::getSpuId, spuIds);
+    public List<ProductSkuDO> getSkuListBySpuIdAndStatus(Long spuId, Integer status) {
+        return productSkuMapper.selectListBySpuIdAndStatus(spuId, status);
+    }
+
+    @Override
+    public List<ProductSkuDO> getSkuListBySpuId(List<Long> spuIds) {
+        return productSkuMapper.selectListBySpuId(spuIds);
     }
 
     @Override
@@ -144,13 +149,13 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public List<ProductSkuDO> getSkusByAlarmStock() {
+    public List<ProductSkuDO> getSkuListByAlarmStock() {
         return productSkuMapper.selectListByAlarmStock();
     }
 
     @Override
     @Transactional
-    public void updateSkus(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skus) {
+    public void updateSkuList(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // 查询 SPU 下已经存在的 SKU 的集合
         List<ProductSkuDO> existsSkus = productSkuMapper.selectListBySpuId(spuId);
         // 构建属性与 SKU 的映射关系;

@@ -66,7 +66,7 @@ public class ProductSpuController {
     @ApiOperation("获得商品 SPU")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<ProductSpuRespVO> getSpu(@RequestParam("id") Long id) {
+    public CommonResult<ProductSpuDO> getSpu(@RequestParam("id") Long id) {
         return success(spuService.getSpu(id));
     }
 
@@ -75,7 +75,7 @@ public class ProductSpuController {
     @ApiOperation("获得商品 SPU 列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<List<ProductSpuRespVO>> getSpuList(@RequestParam("ids") Collection<Long> ids) {
+    public CommonResult<List<ProductSpuDO>> getSpuList(@RequestParam("ids") Collection<Long> ids) {
         List<ProductSpuDO> list = spuService.getSpuList(ids);
         return success(ProductSpuConvert.INSTANCE.convertList(list));
     }

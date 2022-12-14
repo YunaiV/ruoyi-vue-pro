@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.convert.sku;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
@@ -10,9 +11,8 @@ import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
@@ -70,6 +70,16 @@ public interface ProductSkuConvert {
             spuIdAndStockMap.put(spuId, stock);
         });
         return spuIdAndStockMap;
+    }
+
+    default Collection<Long> convertPropertyValueIds(List<ProductSkuDO> list) {
+        if (CollUtil.isEmpty(list)) {
+            return new HashSet<>();
+        }
+        return list.stream().filter(item -> item.getProperties() != null)
+                .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
+                .map(ProductSkuDO.Property::getValueId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
+                .collect(Collectors.toSet());
     }
 
 }

@@ -186,7 +186,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
         });
 
-        Mockito.when(productSkuService.getSkusBySpuId(createReqVO.getId())).thenReturn(productSkuDOS);
+        Mockito.when(productSkuService.getSkuListBySpuId(createReqVO.getId())).thenReturn(productSkuDOS);
 //        Mockito.when(productPropertyValueService.getPropertyValueListByPropertyId(new ArrayList<>(collect.keySet()))).thenReturn(productPropertyValueRespVO);
 //        Mockito.when(productPropertyService.getPropertyVOList(new ArrayList<>(collect.keySet()))).thenReturn(productPropertyRespVOS);
 //
@@ -202,7 +202,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class);
         productSpuMapper.insert(createReqVO);
 
-        ProductSpuRespVO spu = productSpuService.getSpu(createReqVO.getId());
+        ProductSpuDO spu = productSpuService.getSpu(createReqVO.getId());
         assertPojoEquals(createReqVO, spu);
     }
 
@@ -267,7 +267,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setSpuId(createReqVO.getId());
         }));
 
-        Mockito.when(productSkuService.getSkusByAlarmStock()).thenReturn(productSpuDOS);
+        Mockito.when(productSkuService.getSkuListByAlarmStock()).thenReturn(productSpuDOS);
 
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
