@@ -2,7 +2,7 @@
 
 <p align="center">
     <img src="https://img.shields.io/badge/-Vue3.2-34495e?logo=vue.j" />
-    <img src="https://img.shields.io/badge/-Vite3-646cff?logo=vite&logoColor=white" />
+    <img src="https://img.shields.io/badge/-Vite4-646cff?logo=vite&logoColor=white" />
     <img src="https://img.shields.io/badge/-TypeScript4.9-blue?logo=typescript&logoColor=white" />
     <img src="https://img.shields.io/badge/-Pinia2-yellow?logo=picpay&logoColor=white" />
     <img src="https://img.shields.io/badge/-ESLint-4b32c3?logo=eslint&logoColor=white" />
@@ -15,7 +15,7 @@
 
 ## 介绍
 
-- 基于 vue3.2+ ，TypeScript ，Element Plus 2.2.0+ ，Vite3 ，Pinia ，Vxe-table , Windicss 等开发的后台管理系统
+- 基于 vue3.2+ ，TypeScript ，Element Plus 2.2.0+ ，Vite4 ，Pinia ，Vxe-table , Windicss 等开发的后台管理系统
 
 ## 注意事项
 
@@ -30,12 +30,12 @@
 | 框架 | 说明 | 版本 |
 | --- | --- | --- |
 | [Vue](https://staging-cn.vuejs.org/) | vue 框架 | 3.2.45 |
-| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 3.2.3 |
-| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.23 |
+| [Vite](https://cn.vitejs.dev//) | 开发与构建工具 | 4.0.1 |
+| [Element Plus](https://element-plus.org/zh-CN/) | Element Plus | 2.2.26 |
 | [TypeScript](https://www.typescriptlang.org/docs/) | JavaScript 的超集 | 4.9.4 |
-| [pinia](https://pinia.vuejs.org/) | Vue 存储库 替代 vuex5 | 2.0.26 |
+| [pinia](https://pinia.vuejs.org/) | Vue 存储库 替代 vuex5 | 2.0.28 |
 | [vueuse](https://vueuse.org/) | 常用工具集 | 9.6.0 |
-| [vxe-table](https://vxetable.cn/) | vue 最强表单 | 4.3.6 |
+| [vxe-table](https://vxetable.cn/) | vue 最强表单 | 4.3.7 |
 | [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化 | 9.2.2 |
 | [vue-router](https://router.vuejs.org/) | vue 路由 | 4.1.6 |
 | [windicss](https://cn.windicss.org/) | 下一代工具优先的 CSS 框架 | 3.5.6 |
