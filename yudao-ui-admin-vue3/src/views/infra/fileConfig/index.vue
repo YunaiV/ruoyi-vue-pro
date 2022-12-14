@@ -197,7 +197,7 @@ const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormInstance>() // 表单 Ref
 const detailData = ref() // 详情 Ref
-let form = ref<FileConfigApi.FileConfigVO>({
+const form = ref<FileConfigApi.FileConfigVO>({
   id: 0,
   name: '',
   storage: 0,
@@ -230,6 +230,28 @@ const setDialogTile = (type: string) => {
 const handleCreate = (formEl: FormInstance | undefined) => {
   setDialogTile('create')
   formEl?.resetFields()
+  form.value = {
+    id: 0,
+    name: '',
+    storage: 0,
+    master: false,
+    visible: false,
+    config: {
+      basePath: '',
+      host: '',
+      port: 0,
+      username: '',
+      password: '',
+      mode: '',
+      endpoint: '',
+      bucket: '',
+      accessKey: '',
+      accessSecret: '',
+      domain: ''
+    },
+    remark: '',
+    createTime: new Date()
+  }
 }
 
 // 修改操作
