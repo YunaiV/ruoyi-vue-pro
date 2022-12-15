@@ -305,9 +305,7 @@ export default {
   },
   methods: {
     loadProductData() {
-      let param = {}
-      param.spuId =  this.product.id
-      productSpu(param).then(res => {
+      productSpu(this.product.id).then(res => {
         this.product.images = res.data.picUrls;
         this.product.sku = res.data.skus;
         this.product.desc = res.data.description.replace(/<[^>]*>/g,'');

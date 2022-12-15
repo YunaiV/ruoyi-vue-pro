@@ -1,5 +1,5 @@
 ### 获得订单交易的分页 TODO
-GET {{appApi}}/trade/order/page?pageNo=1&pageSize=10
+GET {{appApi}}/product/spu/page?pageNo=1&pageSize=10
 Authorization: Bearer {{appToken}}
 tenant-id: {{appTenentId}}
 

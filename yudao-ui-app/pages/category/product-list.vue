@@ -15,11 +15,11 @@
                 <image :src="item.picUrls[0]" mode='widthFix' />
               </view>
               <view class="product-button">
-                <view class="product-text">【{{ item.sellPoint }}】{{ item.name }}</view>
+                <view class="product-text">{{ item.name }}</view>
                 <view class="product-price-button">
                   <text class="product-price">￥
-                    <text class="price-size">{{ towNumber(item.price) }}</text></text>
-                  <text class="product-like-ccount">销量 {{ item.likeCount }}</text>
+                    <text class="price-size">{{ towNumber(item.minPrice) }}</text></text>
+                  <text class="product-like-count">销量 {{ item.salesCount }}</text>
                 </view>
               </view>
             </view>
@@ -144,7 +144,7 @@
               }
             }
 
-            .product-like-ccount {
+            .product-like-count {
               font-size: 16rpx;
               margin-left: 10rpx;
             }

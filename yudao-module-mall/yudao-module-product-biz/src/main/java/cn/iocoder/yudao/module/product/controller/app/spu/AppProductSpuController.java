@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.product.controller.app.spu;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuDetailRespVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageItemRespVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
@@ -47,9 +47,10 @@ public class AppProductSpuController {
     private ProductPropertyValueService productPropertyValueService;
 
     @GetMapping("/page")
-    @ApiOperation("获得商品spu分页")
-    public CommonResult<PageResult<AppSpuPageRespVO>> getSpuPage(@Valid AppSpuPageReqVO pageVO) {
-        return success(productSpuService.getSpuPage(pageVO));
+    @ApiOperation("获得商品 SPU 分页")
+    public CommonResult<PageResult<AppSpuPageItemRespVO>> getSpuPage(@Valid AppProductSpuPageReqVO pageVO) {
+        PageResult<ProductSpuDO> pageResult = productSpuService.getSpuPage(pageVO, ProductSpuStatusEnum.ENABLE.getStatus());
+        return success(ProductSpuConvert.INSTANCE.convertPage02(pageResult));
     }
 
     @GetMapping("/get-detail")

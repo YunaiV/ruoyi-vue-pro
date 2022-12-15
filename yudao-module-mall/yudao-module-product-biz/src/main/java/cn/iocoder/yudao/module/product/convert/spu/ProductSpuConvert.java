@@ -5,9 +5,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuDetailRespVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageItemRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
@@ -22,7 +22,7 @@ import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
- * 商品spu Convert
+ * 商品 SPU Convert
  *
  * @author 芋道源码
  */
@@ -39,10 +39,7 @@ public interface ProductSpuConvert {
 
     PageResult<ProductSpuRespVO> convertPage(PageResult<ProductSpuDO> page);
 
-    ProductSpuPageReqVO convert(AppSpuPageReqVO bean);
-
-    // TODO 芋艿：修改下
-    AppSpuPageRespVO convertAppResp(ProductSpuDO list);
+    ProductSpuPageReqVO convert(AppProductSpuPageReqVO bean);
 
     List<ProductSpuRespDTO> convertList2(List<ProductSpuDO> list);
 
@@ -76,5 +73,7 @@ public interface ProductSpuConvert {
     AppSpuDetailRespVO convert02(ProductSpuDO spu);
     List<AppSpuDetailRespVO.Sku> convertList03(List<ProductSkuDO> skus);
     AppProductPropertyValueDetailRespVO convert03(ProductPropertyValueDetailRespBO propertyValue);
+
+    PageResult<AppSpuPageItemRespVO> convertPage02(PageResult<ProductSpuDO> page);
 
 }

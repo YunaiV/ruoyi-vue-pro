@@ -2,8 +2,7 @@ package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 
 import javax.validation.Valid;
@@ -95,9 +94,10 @@ public interface ProductSpuService {
      * 获得商品 SPU 分页
      *
      * @param pageReqVO 分页查询
-     * @return 商品spu分页
+     * @param status 状态
+     * @return 商品 SPU 分页
      */
-    PageResult<AppSpuPageRespVO> getSpuPage(AppSpuPageReqVO pageReqVO);
+    PageResult<ProductSpuDO> getSpuPage(AppProductSpuPageReqVO pageReqVO, Integer status);
 
     /**
      * 更新商品 SPU 库存（增量）

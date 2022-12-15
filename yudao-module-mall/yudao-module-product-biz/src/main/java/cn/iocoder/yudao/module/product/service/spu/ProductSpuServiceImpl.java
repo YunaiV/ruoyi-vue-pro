@@ -9,8 +9,7 @@ import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
@@ -195,6 +194,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         return productSpuMapper.selectList();
     }
 
+    // TODO 芋艿：改成 DO 返回
     @Override
     public PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
         // 库存告警的 SPU 编号的集合
@@ -210,18 +210,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public PageResult<AppSpuPageRespVO> getSpuPage(AppSpuPageReqVO pageReqVO) {
-        // TODO 芋艿：貌似实现不太合理
-        PageResult<ProductSpuDO> productSpuDOPageResult = productSpuMapper.selectPage(ProductSpuConvert.INSTANCE.convert(pageReqVO));
-        PageResult<AppSpuPageRespVO> pageResult = new PageResult<>();
-        // TODO @芋艿 这里用convert如何解决
-        List<AppSpuPageRespVO> collect = productSpuDOPageResult.getList()
-                .stream()
-                .map(ProductSpuConvert.INSTANCE::convertAppResp)
-                .collect(Collectors.toList());
-        pageResult.setList(collect);
-        pageResult.setTotal(productSpuDOPageResult.getTotal());
-        return pageResult;
+    public PageResult<ProductSpuDO> getSpuPage(AppProductSpuPageReqVO pageReqVO, Integer status) {
+        return productSpuMapper.selectPage(pageReqVO, status);
     }
 
     @Override

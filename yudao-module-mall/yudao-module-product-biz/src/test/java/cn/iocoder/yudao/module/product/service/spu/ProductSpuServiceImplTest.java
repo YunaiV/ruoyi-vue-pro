@@ -12,8 +12,8 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.Pro
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageRespVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppSpuPageItemRespVO;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -339,15 +339,15 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         productSpuMapper.insert(createReqVO);
 
         // 调用
-        AppSpuPageReqVO appSpuPageReqVO = new AppSpuPageReqVO();
+        AppProductSpuPageReqVO appSpuPageReqVO = new AppProductSpuPageReqVO();
         appSpuPageReqVO.setCategoryId(2L);
 
-        PageResult<AppSpuPageRespVO> spuPage = productSpuService.getSpuPage(appSpuPageReqVO);
+        PageResult<AppSpuPageItemRespVO> spuPage = productSpuService.getSpuPage(appSpuPageReqVO);
 
         PageResult<ProductSpuDO> result = productSpuMapper.selectPage(
                 ProductSpuConvert.INSTANCE.convert(appSpuPageReqVO));
 
-        List<AppSpuPageRespVO> collect = result.getList()
+        List<AppSpuPageItemRespVO> collect = result.getList()
                 .stream()
                 .map(ProductSpuConvert.INSTANCE::convertAppResp)
                 .collect(Collectors.toList());
