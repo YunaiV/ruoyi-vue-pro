@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.convert.sku;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
@@ -34,15 +35,13 @@ public interface ProductSkuConvert {
 
     List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list);
 
-    default List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list, String spuName) {
+    default List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list, Long spuId, String spuName) {
         List<ProductSkuDO> result = convertList06(list);
-        result.forEach(item -> item.setSpuName(spuName));
+        result.forEach(item -> item.setSpuId(spuId).setSpuName(spuName));
         return result;
     }
 
     ProductSkuRespDTO convert02(ProductSkuDO bean);
-
-    List<ProductSkuRespDTO> convertList02(List<ProductSkuDO> list);
 
     List<ProductSpuDetailRespVO.Sku> convertList03(List<ProductSkuDO> list);
 
@@ -80,6 +79,15 @@ public interface ProductSkuConvert {
                 .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
                 .map(ProductSkuDO.Property::getValueId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
                 .collect(Collectors.toSet());
+    }
+
+    default String buildPropertyKey(ProductSkuDO bean) {
+        if (CollUtil.isEmpty(bean.getProperties())) {
+            return StrUtil.EMPTY;
+        }
+        List<ProductSkuDO.Property> properties = new ArrayList<>(bean.getProperties());
+        properties.sort(Comparator.comparing(ProductSkuDO.Property::getValueId));
+        return properties.stream().map(m -> String.valueOf(m.getValueId())).collect(Collectors.joining());
     }
 
 }

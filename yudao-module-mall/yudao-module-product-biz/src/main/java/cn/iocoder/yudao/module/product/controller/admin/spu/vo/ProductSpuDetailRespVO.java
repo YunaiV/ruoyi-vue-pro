@@ -23,10 +23,29 @@ public class ProductSpuDetailRespVO extends ProductSpuBaseVO {
     @ApiModelProperty(value = "创建时间")
     private LocalDateTime createTime;
 
+    // ========== SKU 相关字段 =========
+
+    @ApiModelProperty(value = "库存", required = true, example = "true")
+    private Integer totalStock;
+
+    @ApiModelProperty(value = " 最小价格，单位使用：分", required = true, example = "1024")
+    private Integer minPrice;
+
+    @ApiModelProperty(value = "最大价格，单位使用：分", required = true, example = "1024")
+    private Integer maxPrice;
+
+    @ApiModelProperty(value = "商品销量", example = "1024")
+    private Integer salesCount;
+
     /**
      * SKU 数组
      */
     private List<Sku> skus;
+
+    // ========== 统计相关字段 =========
+
+    @ApiModelProperty(value = "点击量", example = "1024")
+    private Integer clickCount;
 
     @ApiModel(value = "管理后台 - 商品 SKU 详细 Response VO")
     @Data

@@ -27,20 +27,20 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class ProductSpuController {
 
     @Resource
-    private ProductSpuService spuService;
+    private ProductSpuService productSpuService;
 
     @PostMapping("/create")
     @ApiOperation("创建商品 SPU")
     @PreAuthorize("@ss.hasPermission('product:spu:create')")
     public CommonResult<Long> createProductSpu(@Valid @RequestBody ProductSpuCreateReqVO createReqVO) {
-        return success(spuService.createSpu(createReqVO));
+        return success(productSpuService.createSpu(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新商品 SPU")
     @PreAuthorize("@ss.hasPermission('product:spu:update')")
     public CommonResult<Boolean> updateSpu(@Valid @RequestBody ProductSpuUpdateReqVO updateReqVO) {
-        spuService.updateSpu(updateReqVO);
+        productSpuService.updateSpu(updateReqVO);
         return success(true);
     }
 
@@ -49,7 +49,7 @@ public class ProductSpuController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:spu:delete')")
     public CommonResult<Boolean> deleteSpu(@RequestParam("id") Long id) {
-        spuService.deleteSpu(id);
+        productSpuService.deleteSpu(id);
         return success(true);
     }
 
@@ -59,7 +59,7 @@ public class ProductSpuController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<ProductSpuDetailRespVO> getSpuDetail(@RequestParam("id") Long id) {
-        return success(spuService.getSpuDetail(id));
+        return success(productSpuService.getSpuDetail(id));
     }
 
     @GetMapping("/get")
@@ -67,7 +67,7 @@ public class ProductSpuController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<ProductSpuDO> getSpu(@RequestParam("id") Long id) {
-        return success(spuService.getSpu(id));
+        return success(productSpuService.getSpu(id));
     }
 
 
@@ -76,7 +76,7 @@ public class ProductSpuController {
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<List<ProductSpuDO>> getSpuList(@RequestParam("ids") Collection<Long> ids) {
-        List<ProductSpuDO> list = spuService.getSpuList(ids);
+        List<ProductSpuDO> list = productSpuService.getSpuList(ids);
         return success(ProductSpuConvert.INSTANCE.convertList(list));
     }
 
@@ -84,7 +84,7 @@ public class ProductSpuController {
     @ApiOperation("获得商品 SPU 精简列表")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<List<ProductSpuSimpleRespVO>> getSpuSimpleList() {
-        List<ProductSpuDO> list = spuService.getSpuList();
+        List<ProductSpuDO> list = productSpuService.getSpuList();
         return success(ProductSpuConvert.INSTANCE.convertList02(list));
     }
 
@@ -92,7 +92,7 @@ public class ProductSpuController {
     @ApiOperation("获得商品 SPU 分页")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<PageResult<ProductSpuRespVO>> getSpuPage(@Valid ProductSpuPageReqVO pageVO) {
-        return success(spuService.getSpuPage(pageVO));
+        return success(productSpuService.getSpuPage(pageVO));
     }
 
 }

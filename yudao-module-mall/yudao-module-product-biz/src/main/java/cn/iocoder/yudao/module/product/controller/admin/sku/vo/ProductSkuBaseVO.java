@@ -4,7 +4,9 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -57,6 +59,8 @@ public class ProductSkuBaseVO {
 
     @ApiModel("商品属性")
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Property {
 
         @ApiModelProperty(value = "属性编号", required = true, example = "1")

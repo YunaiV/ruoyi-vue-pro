@@ -1,8 +1,7 @@
 CREATE TABLE IF NOT EXISTS `product_sku` (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
     `spu_id` bigint NOT NULL COMMENT 'spu编号',
-    `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-    `name` varchar DEFAULT NULL COMMENT '商品 SKU 名字',
+    `spu_name` varchar DEFAULT NULL COMMENT '商品 SPU 名字',
     `properties` varchar DEFAULT NULL COMMENT '规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]',
     `price` int NOT NULL DEFAULT '-1' COMMENT '销售价格，单位：分',
     `market_price` int DEFAULT NULL COMMENT '市场价',

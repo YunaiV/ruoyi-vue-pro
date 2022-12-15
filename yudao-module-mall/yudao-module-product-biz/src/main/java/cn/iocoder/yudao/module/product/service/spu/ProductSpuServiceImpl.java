@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR;
 
@@ -63,30 +63,28 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private ProductBrandService brandService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Long createSpu(ProductSpuCreateReqVO createReqVO) {
         // 校验分类
         validateCategory(createReqVO.getCategoryId());
         // 校验品牌
         brandService.validateProductBrand(createReqVO.getBrandId());
         // 校验SKU
-        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();
-        productSkuService.validateSkuList(skuCreateReqList, createReqVO.getSpecType());
+        List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = createReqVO.getSkus();
+        productSkuService.validateSkuList(skuSaveReqList, createReqVO.getSpecType());
+
         // 插入 SPU
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
-        spu.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
-        spu.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-        spu.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-        spu.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
+        initSpuFromSkus(spu, skuSaveReqList);
         productSpuMapper.insert(spu);
         // 插入 SKU
-        productSkuService.createSkuList(spu.getId(), spu.getName(), skuCreateReqList);
+        productSkuService.createSkuList(spu.getId(), spu.getName(), skuSaveReqList);
         // 返回
         return spu.getId();
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateSpu(ProductSpuUpdateReqVO updateReqVO) {
         // 校验 SPU 是否存在
         validateSpuExists(updateReqVO.getId());
@@ -95,18 +93,29 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验品牌
         brandService.validateProductBrand(updateReqVO.getBrandId());
         // 校验SKU
-        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = updateReqVO.getSkus();
-        productSkuService.validateSkuList(skuCreateReqList, updateReqVO.getSpecType());
+        List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = updateReqVO.getSkus();
+        productSkuService.validateSkuList(skuSaveReqList, updateReqVO.getSpecType());
 
         // 更新 SPU
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
-        updateObj.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
-        updateObj.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-        updateObj.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-        updateObj.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
+        initSpuFromSkus(updateObj, skuSaveReqList);
         productSpuMapper.updateById(updateObj);
         // 批量更新 SKU
         productSkuService.updateSkuList(updateObj.getId(), updateObj.getName(), updateReqVO.getSkus());
+    }
+
+    /**
+     * 基于 SKU 的信息，初始化 SPU 的信息
+     * 主要是计数相关的字段，例如说市场价、最大最小价、库存等等
+     *
+     * @param spu 商品 SPU
+     * @param skus 商品 SKU 数组
+     */
+    private void initSpuFromSkus(ProductSpuDO spu, List<ProductSkuCreateOrUpdateReqVO> skus) {
+        spu.setMarketPrice(getMaxValue(skus, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
+        spu.setMaxPrice(getMaxValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
+        spu.setMinPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
+        spu.setTotalStock(getSumValue(skus, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
     }
 
     /**
@@ -123,7 +132,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteSpu(Long id) {
         // 校验存在
         validateSpuExists(id);
