@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import cn.iocoder.yudao.framework.mq.core.interceptor.RedisMessageInterceptor;
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessageListener;
+import cn.iocoder.yudao.framework.mq.scheduler.PendingMessageScheduler;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -24,7 +25,6 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.stream.DefaultStreamMessageListenerContainerX;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
-import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Properties;
@@ -67,6 +67,15 @@ public class YudaoMQAutoConfiguration {
                     listener.getChannel(), listener.getClass().getName());
         });
         return container;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Bean
+    public PendingMessageScheduler pendingMessageScheduler(){
+        return new PendingMessageScheduler();
     }
 
     /**
