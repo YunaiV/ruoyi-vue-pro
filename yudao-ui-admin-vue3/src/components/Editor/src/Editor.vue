@@ -23,6 +23,7 @@ const props = defineProps({
     type: Object as PropType<IEditorConfig>,
     default: () => undefined
   },
+  readonly: propTypes.bool.def(false),
   modelValue: propTypes.string.def('')
 })
 
@@ -61,7 +62,7 @@ const editorConfig = computed((): IEditorConfig => {
   return Object.assign(
     {
       placeholder: '请输入内容...',
-      readOnly: false,
+      readOnly: props.readonly,
       customAlert: (s: string, t: string) => {
         switch (t) {
           case 'success':

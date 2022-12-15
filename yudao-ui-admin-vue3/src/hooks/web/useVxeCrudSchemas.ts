@@ -63,7 +63,7 @@ type CrudDescriptionsParams = {
 } & Omit<DescriptionsSchema, 'field'>
 
 type CrudPrintParams = {
-  // 是否显示表单项
+  // 是否显示打印项
   show?: boolean
 } & Omit<VxeTableDefines.ColumnInfo[], 'field'>
 

@@ -64,8 +64,8 @@
       <el-form-item label="存储器" prop="storage">
         <el-select v-model="form.storage" placeholder="请选择存储器" :disabled="form.id !== 0">
           <el-option
-            v-for="dict in getIntDictOptions(DICT_TYPE.INFRA_FILE_STORAGE)"
-            :key="dict.value"
+            v-for="(dict, index) in getIntDictOptions(DICT_TYPE.INFRA_FILE_STORAGE)"
+            :key="index"
             :label="dict.label"
             :value="dict.value"
           />
@@ -197,7 +197,7 @@ const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormInstance>() // 表单 Ref
 const detailData = ref() // 详情 Ref
-let form = ref<FileConfigApi.FileConfigVO>({
+const form = ref<FileConfigApi.FileConfigVO>({
   id: 0,
   name: '',
   storage: 0,
@@ -230,6 +230,28 @@ const setDialogTile = (type: string) => {
 const handleCreate = (formEl: FormInstance | undefined) => {
   setDialogTile('create')
   formEl?.resetFields()
+  form.value = {
+    id: 0,
+    name: '',
+    storage: 0,
+    master: false,
+    visible: false,
+    config: {
+      basePath: '',
+      host: '',
+      port: 0,
+      username: '',
+      password: '',
+      mode: '',
+      endpoint: '',
+      bucket: '',
+      accessKey: '',
+      accessSecret: '',
+      domain: ''
+    },
+    remark: '',
+    createTime: new Date()
+  }
 }
 
 // 修改操作

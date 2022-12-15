@@ -75,16 +75,15 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Dept">
-import { nextTick, onMounted, reactive, ref, unref } from 'vue'
+import { nextTick, onMounted, ref, unref } from 'vue'
 import { ElSelect, ElTreeSelect, ElOption } from 'element-plus'
 import { VxeGridInstance } from 'vxe-table'
 import { handleTree, defaultProps } from '@/utils/tree'
-import { required } from '@/utils/formRules.js'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import { FormExpose } from '@/components/Form'
-import { allSchemas } from './dept.data'
+import { allSchemas, rules } from './dept.data'
 import * as DeptApi from '@/api/system/dept'
 import { getListSimpleUsersApi, UserVO } from '@/api/system/user'
 
@@ -107,13 +106,6 @@ const actionLoading = ref(false) // 遮罩层
 const formRef = ref<FormExpose>() // 表单 Ref
 const deptOptions = ref() // 树形结构
 const userOption = ref<UserVO[]>([])
-// 新增和修改的表单校验
-const rules = reactive({
-  name: [required],
-  sort: [required],
-  path: [required],
-  status: [required]
-})
 
 const getUserList = async () => {
   const res = await getListSimpleUsersApi()

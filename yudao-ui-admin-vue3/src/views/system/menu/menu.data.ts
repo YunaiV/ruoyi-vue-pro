@@ -1,22 +1,16 @@
 import { reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
-import { required } from '@/utils/formRules'
 import { DICT_TYPE } from '@/utils/dict'
+import { required } from '@/utils/formRules'
 import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 
-// 表单校验
+// 新增和修改的表单校验
 export const rules = reactive({
   name: [required],
   sort: [required],
-  email: [required],
-  phone: [
-    {
-      len: 11,
-      trigger: 'blur',
-      message: '请输入正确的手机号码'
-    }
-  ]
+  path: [required],
+  status: [required]
 })
 
 // CrudSchema
@@ -26,39 +20,42 @@ const crudSchemas = reactive<VxeCrudSchema>({
   action: true,
   columns: [
     {
-      title: '上级部门',
+      title: '上级菜单',
       field: 'parentId',
       isTable: false
     },
     {
-      title: '部门名称',
+      title: '菜单名称',
       field: 'name',
       isSearch: true,
       table: {
         treeNode: true,
-        align: 'left'
-      }
-    },
-    {
-      title: '负责人',
-      field: 'leaderUserId',
-      table: {
+        align: 'left',
+        width: '200px',
         slots: {
-          default: 'leaderUserId_default'
+          default: 'name_default'
         }
       }
     },
     {
-      title: '联系电话',
-      field: 'phone'
+      title: '菜单类型',
+      field: 'type',
+      dictType: DICT_TYPE.SYSTEM_MENU_TYPE
     },
     {
-      title: '邮箱',
-      field: 'email',
-      isTable: false
+      title: '路由地址',
+      field: 'path'
     },
     {
-      title: '显示排序',
+      title: '组件路径',
+      field: 'component'
+    },
+    {
+      title: '权限标识',
+      field: 'permission'
+    },
+    {
+      title: '排序',
       field: 'sort'
     },
     {
@@ -71,8 +68,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: t('common.createTime'),
       field: 'createTime',
-      formatter: 'formatDate',
-      isForm: false
+      formatter: 'formatDate'
     }
   ]
 })
