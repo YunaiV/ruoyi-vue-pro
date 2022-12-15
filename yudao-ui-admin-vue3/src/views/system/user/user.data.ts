@@ -10,7 +10,6 @@ export const rules = reactive({
   username: [required],
   nickname: [required],
   email: [required],
-  postIds: [required],
   status: [required],
   mobile: [
     {

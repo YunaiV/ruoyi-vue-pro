@@ -68,8 +68,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: t('common.createTime'),
       field: 'createTime',
-      formatter: 'formatDate',
-      isForm: false
+      formatter: 'formatDate'
     }
   ]
 })
