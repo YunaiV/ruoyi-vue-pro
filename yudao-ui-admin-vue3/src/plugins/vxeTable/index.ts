@@ -56,7 +56,7 @@ watch(
       import('./theme/light.scss')
     }
   },
-  { immediate: true }
+  { deep: true }
 )
 // 全局默认参数
 VXETable.setup({
