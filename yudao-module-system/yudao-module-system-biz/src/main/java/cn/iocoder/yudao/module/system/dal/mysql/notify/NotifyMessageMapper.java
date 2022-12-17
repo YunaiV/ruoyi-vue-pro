@@ -32,6 +32,7 @@ public interface NotifyMessageMapper extends BaseMapperX<NotifyMessageDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<NotifyMessageDO>()
                 .likeIfPresent(NotifyMessageDO::getTitle, reqVO.getTitle())
                 .betweenIfPresent(NotifyMessageDO::getSendTime, reqVO.getSendTime())
+                .eqIfPresent(NotifyMessageDO::getTemplateCode, reqVO.getTemplateCode())
                 .eq(NotifyMessageDO::getSendUserId, userId)
                 .orderByDesc(NotifyMessageDO::getId));
     }
