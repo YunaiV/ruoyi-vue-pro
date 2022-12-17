@@ -36,6 +36,12 @@ public class NotifyMessageDO extends BaseDO {
      */
     private Long templateId;
     /**
+     * 站内信模版编码
+     *
+     * 关联 {@link NotifyTemplateDO#getCode()}
+     */
+    private String templateCode;
+    /**
      * 用户编号
      *
      * 关联 MemberUserDO 的 id 字段、或者 AdminUserDO 的 id 字段
@@ -55,6 +61,18 @@ public class NotifyMessageDO extends BaseDO {
      * 内容
      */
     private String content;
+    /**
+     * 发送时间
+     */
+    private Date sendTime;
+    /**
+     * 发送用户id
+     */
+    private Long sendUserId;
+    /**
+     * 发送用户名
+     */
+    private String sendUserName;
     /**
      * 是否已读
      */

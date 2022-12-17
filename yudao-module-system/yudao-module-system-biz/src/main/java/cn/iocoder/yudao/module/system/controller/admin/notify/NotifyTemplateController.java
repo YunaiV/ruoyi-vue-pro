@@ -95,6 +95,6 @@ public class NotifyTemplateController {
     @ApiOperation("发送站内信")
     public CommonResult<Long> sendNotify(@Valid @RequestBody NotifyTemplateSendReqVO sendReqVO) {
         return success(notifySendService.sendSingleNotifyToAdmin(sendReqVO.getUserId(),
-                sendReqVO.getTemplateId(), sendReqVO.getTemplateParams()));
+                sendReqVO.getTemplateCode(), sendReqVO.getTemplateParams()));
     }
 }

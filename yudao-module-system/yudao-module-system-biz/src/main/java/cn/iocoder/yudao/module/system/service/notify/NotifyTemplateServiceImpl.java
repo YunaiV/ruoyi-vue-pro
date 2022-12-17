@@ -109,7 +109,7 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
         return notifyTemplateMapper.selectList();
     }
 
-    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
+    @Scheduled(fixedDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
         initLocalCache();
     }

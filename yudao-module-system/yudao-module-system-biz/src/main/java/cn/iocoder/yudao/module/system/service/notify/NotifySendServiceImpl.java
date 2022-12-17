@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.system.service.notify;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.notify.NotifyMessageMapper;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.Date;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.NOTICE_NOT_FOUND;
 
 /**
@@ -32,41 +35,48 @@ public class NotifySendServiceImpl implements NotifySendService {
     @Resource
     private NotifyMessageMapper notifyMessageMapper;
 
-    @Override
-    public Long sendSingleNotifyToAdmin(Long userId, Long templateId, Map<String, Object> templateParams) {
+    @Resource
+    private AdminUserService userService;
 
-        return sendSingleNotify(userId, UserTypeEnum.ADMIN.getValue(), templateId, templateParams);
+    @Override
+    public Long sendSingleNotifyToAdmin(Long userId, String templateCode, Map<String, Object> templateParams) {
+
+        return sendSingleNotify(userId, UserTypeEnum.ADMIN.getValue(), templateCode, templateParams);
     }
 
     @Override
-    public Long sendSingleNotifyToMember(Long userId, Long templateId, Map<String, Object> templateParams) {
-        return sendSingleNotify(userId, UserTypeEnum.MEMBER.getValue(), templateId, templateParams);
+    public Long sendSingleNotifyToMember(Long userId, String templateCode, Map<String, Object> templateParams) {
+        return sendSingleNotify(userId, UserTypeEnum.MEMBER.getValue(), templateCode, templateParams);
     }
 
     @Override
-    public Long sendSingleNotify(Long userId, Integer userType, Long templateId, Map<String, Object> templateParams) {
+    public Long sendSingleNotify(Long userId, Integer userType, String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否合法
-        NotifyTemplateDO template = this.checkNotifyTemplateValid(templateId);
+        NotifyTemplateDO template = this.checkNotifyTemplateValid(templateCode);
         String content = notifyTemplateService.formatNotifyTemplateContent(template.getContent(), templateParams);
+        AdminUserDO sendUser = userService.getUser(getLoginUserId());
 
         // todo 模板状态未开启时的业务
         NotifyMessageDO notifyMessageDO = new NotifyMessageDO();
         notifyMessageDO.setContent(content);
         notifyMessageDO.setTitle(template.getTitle());
         notifyMessageDO.setReadStatus(false);
-        notifyMessageDO.setReadTime(new Date());
-        notifyMessageDO.setTemplateId(templateId);
+        notifyMessageDO.setTemplateId(template.getId());
+        notifyMessageDO.setTemplateCode(templateCode);
         notifyMessageDO.setUserId(userId);
         notifyMessageDO.setUserType(userType);
+        notifyMessageDO.setSendTime(new Date());
+        notifyMessageDO.setSendUserId(sendUser.getId());
+        notifyMessageDO.setSendUserName(sendUser.getUsername());
         notifyMessageMapper.insert(notifyMessageDO);
         return notifyMessageDO.getId();
     }
 
     // 此注解的含义
     @VisibleForTesting
-    public NotifyTemplateDO checkNotifyTemplateValid(Long templateId) {
+    public NotifyTemplateDO checkNotifyTemplateValid(String templateCode) {
         // 获得短信模板。考虑到效率，从缓存中获取
-        NotifyTemplateDO template = notifyTemplateService.getNotifyTemplate(templateId);
+        NotifyTemplateDO template = notifyTemplateService.getNotifyTemplateByCodeFromCache(templateCode);
         // 短信模板不存在
         if (template == null) {
             throw exception(NOTICE_NOT_FOUND);

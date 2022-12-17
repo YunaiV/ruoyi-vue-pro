@@ -15,9 +15,9 @@ public class NotifyTemplateSendReqVO {
     @NotNull(message = "用户id不能为空")
     private Long userId;
 
-    @ApiModelProperty(value = "模板Id", required = true, example = "01")
-    @NotNull(message = "模板Id不能为空")
-    private Long templateId;
+    @ApiModelProperty(value = "模板编码", required = true, example = "01")
+    @NotNull(message = "模板编码不能为空")
+    private String templateCode;
 
     @ApiModelProperty(value = "模板参数")
     private Map<String, Object> templateParams;

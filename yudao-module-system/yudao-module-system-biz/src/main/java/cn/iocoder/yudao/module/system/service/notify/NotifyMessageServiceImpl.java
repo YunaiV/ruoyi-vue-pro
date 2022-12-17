@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.notify;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -16,11 +17,13 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
@@ -86,12 +89,12 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
 
     @Override
     public List<NotifyMessageDO> getNotifyMessageList(NotifyMessagePageReqVO pageReqVO, Integer size) {
-        return notifyMessageMapper.selectList(pageReqVO, size);
+        return notifyMessageMapper.selectList(pageReqVO, size, getLoginUserId(), UserTypeEnum.ADMIN.getValue());
     }
 
     @Override
     public PageResult<NotifyMessageDO> getNotifyMessagePage(NotifyMessagePageReqVO pageReqVO) {
-        return notifyMessageMapper.selectPage(pageReqVO);
+        return notifyMessageMapper.selectPage(pageReqVO, getLoginUserId(), UserTypeEnum.ADMIN.getValue());
     }
 
     /**
@@ -160,9 +163,15 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
         }
     }
 
+
+    /**
+     * 批量修改阅读状态为已读
+     * @param ids
+     */
     private void batchUpdateReadStatus(Collection<Long> ids) {
         NotifyMessageDO updateObj = new NotifyMessageDO();
-        updateObj.setReadStatus(false);
+        updateObj.setReadStatus(true);
+        updateObj.setReadTime(new Date());
         notifyMessageMapper.update(updateObj, new LambdaQueryWrapperX<NotifyMessageDO>().in(NotifyMessageDO::getId, ids));
     }
 }

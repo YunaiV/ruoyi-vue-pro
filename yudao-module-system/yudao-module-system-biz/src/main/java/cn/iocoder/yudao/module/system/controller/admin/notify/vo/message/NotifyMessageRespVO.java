@@ -13,7 +13,4 @@ public class NotifyMessageRespVO extends NotifyMessageBaseVO {
     @ApiModelProperty(value = "ID", required = true)
     private Long id;
 
-    @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
-
 }
