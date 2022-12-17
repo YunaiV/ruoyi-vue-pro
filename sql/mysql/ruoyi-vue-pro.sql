@@ -1330,6 +1330,9 @@ INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `st
 INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1158, 3, 'implicit', 'implicit', 'system_oauth2_grant_type', 0, 'success', '', '简化模式', '1', '2022-05-12 00:23:40', '1', '2022-05-11 16:26:05', b'0');
 INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1159, 4, 'client_credentials', 'client_credentials', 'system_oauth2_grant_type', 0, 'default', '', '客户端模式', '1', '2022-05-12 00:23:51', '1', '2022-05-11 16:26:08', b'0');
 INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1160, 5, 'refresh_token', 'refresh_token', 'system_oauth2_grant_type', 0, 'info', '', '刷新模式', '1', '2022-05-12 00:24:02', '1', '2022-05-11 16:26:11', b'0');
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1162, 0, '已读', 'true', 'system_notify_read_status', 0, 'success', '', NULL, '1', '2022-12-16 17:48:28', '1', '2022-12-17 03:32:09', b'0');
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1163, 1, '未读', 'false', 'system_notify_read_status', 0, 'info', '', NULL, '1', '2022-12-16 17:48:43', '1', '2022-12-17 03:32:11', b'0');
+
 COMMIT;
 
 -- ----------------------------
@@ -1395,6 +1398,8 @@ INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creat
 INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (145, '角色类型', 'system_role_type', 0, '角色类型', '1', '2022-02-16 13:01:46', '1', '2022-02-16 13:01:46', b'0');
 INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (146, '文件存储器', 'infra_file_storage', 0, '文件存储器', '1', '2022-03-15 00:24:38', '1', '2022-03-15 00:24:38', b'0');
 INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (147, 'OAuth 2.0 授权类型', 'system_oauth2_grant_type', 0, 'OAuth 2.0 授权类型（模式）', '1', '2022-05-12 00:20:52', '1', '2022-05-11 16:25:49', b'0');
+INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (149, '站内信读取状态', 'system_notify_read_status', 0, '站内信读取状态', '1', '2022-12-16 17:47:35', '1', '2022-12-17 03:25:08', b'0');
+
 COMMIT;
 
 -- ----------------------------
@@ -1712,6 +1717,21 @@ INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_i
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1267, '客户端删除', 'system:oauth2-client:delete', 3, 4, 1263, '', '', '', 0, b'1', b'1', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:33', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1281, '可视化报表', '', 1, 12, 0, '/visualization', 'chart', NULL, 0, b'1', b'1', '1', '2022-07-10 20:22:15', '1', '2022-07-10 20:33:30', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1282, '积木报表', '', 2, 1, 1281, 'jimu-report', 'example', 'visualization/jmreport/index', 0, b'1', b'1', '1', '2022-07-10 20:26:36', '1', '2022-07-28 21:17:34', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2030, '站内信', '', 1, 14, 1, 'notify', 'build', '', 0, b'1', b'1', '1', '2022-12-16 11:27:45', '1', '2022-12-16 11:44:11', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2031, '站内信模板', '', 2, 1, 2030, 'notify-template', 'build', 'system/notify/notifyTemplate', 0, b'1', b'1', '1', '2022-12-16 11:35:14', '1', '2022-12-16 11:44:43', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2032, '我的站内信', '', 2, 2, 2030, 'my-notify', 'checkbox', 'system/notify/myNotify', 0, b'1', b'1', '1', '2022-12-16 11:35:58', '1', '2022-12-16 11:44:48', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2033, '查询', 'system:notify-template:query', 3, 1, 2031, '', '', '', 0, b'1', b'1', '1', '2022-12-16 11:36:57', '1', '2022-12-16 11:36:57', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2034, '创建', 'system:notify-template:create', 3, 2, 2031, '', '', '', 0, b'1', b'1', '1', '2022-12-16 11:43:16', '1', '2022-12-16 12:06:48', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2035, '更新', 'system:notify-template:update', 3, 3, 2031, '', '', '', 0, b'1', b'1', '1', '2022-12-16 12:06:41', '1', '2022-12-16 12:06:41', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2036, '删除', 'system:notify-template:delete', 3, 4, 2031, '', '', '', 0, b'1', b'1', '1', '2022-12-16 12:07:03', '1', '2022-12-16 12:07:03', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2037, '导出', 'system:notify-template:export', 3, 5, 2031, '', '', '', 0, b'1', b'1', '1', '2022-12-16 12:07:20', '1', '2022-12-16 12:07:20', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2038, '发送', 'system:notify-template:send-notify', 3, 6, 2031, '', '', '', 0, b'1', b'1', '1', '2022-12-16 15:21:16', '1', '2022-12-16 15:21:16', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2039, '日志', '', 2, 3, 2030, 'notify-log', 'post', 'system/notify/notifyLog', 0, b'1', b'1', '1', '2022-12-16 17:29:00', '1', '2022-12-17 16:07:58', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2040, '查询', 'system:notify-log:query', 3, 1, 2039, '', '', '', 0, b'1', b'1', '1', '2022-12-16 17:29:23', '1', '2022-12-16 17:29:23', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2041, '撤销', 'system:notify-log:cancel', 3, 2, 2039, '', '', '', 0, b'1', b'1', '1', '2022-12-16 17:30:13', '1', '2022-12-16 17:30:13', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2042, '查询', 'system:my-notify:query', 3, 1, 2032, '', '', '', 0, b'1', b'1', '1', '2022-12-16 17:31:31', '1', '2022-12-16 17:31:31', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2043, '读取', 'system:my-notify:query', 3, 2, 2032, '', '', '', 0, b'1', b'1', '1', '2022-12-16 17:32:03', '1', '2022-12-16 09:32:20', b'1');
+
 COMMIT;
 
 -- ----------------------------
@@ -2662,3 +2682,64 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- 积木报表菜单
 INSERT INTO `system_menu` VALUES (1281, '可视化报表', '', 1, 12, 0, '/visualization', 'chart', NULL, 0, b'1', b'1', '1', '2022-07-10 20:22:15', '1', '2022-07-10 20:33:30', b'0');
 INSERT INTO `system_menu` VALUES (1282, '积木报表', '', 2, 1, 1281, 'jm-report', '#', 'visualization/jm/index', 0, b'1', b'1', '1', '2022-07-10 20:26:36', '1', '2022-07-10 20:33:26', b'0');
+
+-- ----------------------------
+-- Table structure for system_notify_message
+-- ----------------------------
+DROP TABLE IF EXISTS `system_notify_message`;
+
+CREATE TABLE `system_notify_message` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+    `template_id` int DEFAULT NULL COMMENT '模板id',
+    `template_code` varchar(64)  DEFAULT NULL COMMENT '模板编码',
+    `title` varchar(100)  DEFAULT NULL COMMENT '模板标题',
+    `content` varchar(255)  DEFAULT NULL COMMENT '模板内容',
+    `send_time` datetime DEFAULT NULL COMMENT '发送时间',
+    `send_user_id` int DEFAULT NULL COMMENT '发送用户id',
+    `send_user_name` varchar(30)  DEFAULT NULL COMMENT '发送用户名',
+    `user_id` bigint DEFAULT NULL COMMENT '用户id',
+    `user_type` bit(2) DEFAULT NULL COMMENT '用户类型',
+    `read_status` bit(1) DEFAULT NULL COMMENT '阅读状态 0未读 1已读',
+    `read_time` datetime DEFAULT NULL COMMENT '阅读时间',
+    `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+    `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+    `creator` varchar(64)  DEFAULT NULL COMMENT '创建者',
+    `updater` varchar(64)  DEFAULT NULL COMMENT '更新者',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT = '站内信消息表';
+
+-- ----------------------------
+-- Records of system_notify_message
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for system_notify_template
+-- ----------------------------
+DROP TABLE IF EXISTS `system_notify_template`;
+
+CREATE TABLE `system_notify_template` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `code` varchar(64)  DEFAULT NULL COMMENT '模版编码',
+    `title` varchar(255)  DEFAULT NULL COMMENT '模版标题',
+    `content` varchar(255) DEFAULT NULL COMMENT '模版内容',
+    `params` varchar(255)  DEFAULT NULL COMMENT '参数数组',
+    `status` bit(1) DEFAULT NULL COMMENT '状态',
+    `remark` varchar(60)  DEFAULT NULL COMMENT '备注',
+    `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+    `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+    `creator` varchar(64)  DEFAULT NULL COMMENT '创建者',
+    `updater` varchar(64)  DEFAULT NULL COMMENT '更新者',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` int DEFAULT NULL COMMENT '租户id',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT = '站内信模板表';
+
+-- ----------------------------
+-- Records of system_notify_template
+-- ----------------------------
+BEGIN;
+COMMIT;
