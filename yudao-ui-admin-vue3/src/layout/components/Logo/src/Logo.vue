@@ -55,31 +55,33 @@ watch(
 </script>
 
 <template>
-  <router-link
-    :class="[
-      prefixCls,
-      layout !== 'classic' ? `${prefixCls}__Top` : '',
-      'flex !h-[var(--logo-height)] items-center cursor-pointer justify-center relative',
-      'dark:bg-[var(--el-bg-color)]'
-    ]"
-    to="/"
-  >
-    <img
-      src="@/assets/imgs/logo.png"
-      class="w-[calc(var(--logo-height)-10px)] h-[calc(var(--logo-height)-10px)]"
-    />
-    <div
-      v-if="show"
+  <div>
+    <router-link
       :class="[
-        'ml-10px text-16px font-700',
-        {
-          'text-[var(--logo-title-text-color)]': layout === 'classic',
-          'text-[var(--top-header-text-color)]':
-            layout === 'topLeft' || layout === 'top' || layout === 'cutMenu'
-        }
+        prefixCls,
+        layout !== 'classic' ? `${prefixCls}__Top` : '',
+        'flex !h-[var(--logo-height)] items-center cursor-pointer justify-center relative',
+        'dark:bg-[var(--el-bg-color)]'
       ]"
+      to="/"
     >
-      {{ title }}
-    </div>
-  </router-link>
+      <img
+        src="@/assets/imgs/logo.png"
+        class="w-[calc(var(--logo-height)-10px)] h-[calc(var(--logo-height)-10px)]"
+      />
+      <div
+        v-if="show"
+        :class="[
+          'ml-10px text-16px font-700',
+          {
+            'text-[var(--logo-title-text-color)]': layout === 'classic',
+            'text-[var(--top-header-text-color)]':
+              layout === 'topLeft' || layout === 'top' || layout === 'cutMenu'
+          }
+        ]"
+      >
+        {{ title }}
+      </div>
+    </router-link>
+  </div>
 </template>
