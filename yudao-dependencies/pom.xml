@@ -25,14 +25,14 @@
         <druid.version>1.2.15</druid.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
-        <dynamic-datasource.version>3.5.2</dynamic-datasource.version>
+        <dynamic-datasource.version>3.6.0</dynamic-datasource.version>
         <redisson.version>3.18.0</redisson.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.3</lock4j.version>
         <resilience4j.version>1.7.1</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>8.12.0</skywalking.version>
-        <spring-boot-admin.version>2.7.7</spring-boot-admin.version>
+        <spring-boot-admin.version>2.7.9</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>7.2.11.RELEASE</podam.version>
@@ -64,7 +64,7 @@
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
         <tencentcloud-sdk-java.version>3.1.637</tencentcloud-sdk-java.version>
         <justauth.version>1.4.0</justauth.version>
-        <jimureport.version>1.5.4</jimureport.version>
+        <jimureport.version>1.5.6</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
     </properties>
 
