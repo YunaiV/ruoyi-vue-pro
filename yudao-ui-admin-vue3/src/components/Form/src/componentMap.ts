@@ -21,7 +21,7 @@ import {
 } from 'element-plus'
 import { InputPassword } from '@/components/InputPassword'
 import { Editor } from '@/components/Editor'
-import { UploadImg, UploadFile } from '@/components/UploadFile'
+import { UploadImg, UploadImgs, UploadFile } from '@/components/UploadFile'
 import { ComponentName } from '@/types/components'
 
 const componentMap: Recordable<Component, ComponentName> = {
@@ -48,6 +48,7 @@ const componentMap: Recordable<Component, ComponentName> = {
   InputPassword: InputPassword,
   Editor: Editor,
   UploadImg: UploadImg,
+  UploadImgs: UploadImgs,
   UploadFile: UploadFile
 }
 

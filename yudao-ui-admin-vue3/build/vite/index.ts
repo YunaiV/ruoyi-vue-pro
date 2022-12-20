@@ -1,7 +1,6 @@
 import { resolve } from 'path'
 import Vue from '@vitejs/plugin-vue'
 import VueJsx from '@vitejs/plugin-vue-jsx'
-import VueI18n from '@intlify/vite-plugin-vue-i18n'
 import WindiCSS from 'vite-plugin-windicss'
 import progress from 'vite-plugin-progress'
 import EslintPlugin from 'vite-plugin-eslint'
@@ -9,6 +8,7 @@ import PurgeIcons from 'vite-plugin-purge-icons'
 import { ViteEjsPlugin } from 'vite-plugin-ejs'
 import viteCompression from 'vite-plugin-compression'
 import vueSetupExtend from 'vite-plugin-vue-setup-extend'
+import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import {
   createStyleImportPlugin,
@@ -51,7 +51,7 @@ export function createVitePlugins(VITE_APP_TITLE: string) {
       cache: false,
       include: ['src/**/*.vue', 'src/**/*.ts', 'src/**/*.tsx'] // 检查的文件
     }),
-    VueI18n({
+    VueI18nPlugin({
       runtimeOnly: true,
       compositionOnly: true,
       include: [resolve(__dirname, 'src/locales/**')]

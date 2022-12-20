@@ -30,7 +30,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       // 端口号
       port: env.VITE_PORT,
       host: "0.0.0.0",
-      open: env.VITE_OPEN,
+      open: env.VITE_OPEN === 'true',
       // 本地跨域代理
       proxy: {
         ['/admin-api']: {
