@@ -1,16 +1,15 @@
-<h1>🌈 yudao-ui-admin-vue3</h1>
+# 🌈 yudao-ui-admin-vue3 #
 
-<p align="center">
-    <img src="https://img.shields.io/badge/-Vue3.2-34495e?logo=vue.j" />
-    <img src="https://img.shields.io/badge/-Vite4-646cff?logo=vite&logoColor=white" />
-    <img src="https://img.shields.io/badge/-TypeScript4.9-blue?logo=typescript&logoColor=white" />
-    <img src="https://img.shields.io/badge/-Pinia2-yellow?logo=picpay&logoColor=white" />
-    <img src="https://img.shields.io/badge/-ESLint-4b32c3?logo=eslint&logoColor=white" />
-    <img src="https://img.shields.io/badge/-pnpm7-F69220?logo=pnpm&logoColor=white" />
-    <img src="https://img.shields.io/badge/-Axios-008fc7?logo=axios.js&logoColor=white" />
+<p style="text-align: center">
+    <img src="https://img.shields.io/badge/-Vue3.2-34495e?logo=vue.j" alt="vue" />
+    <img src="https://img.shields.io/badge/-Vite4-646cff?logo=vite&logoColor=white" alt="vite" />
+    <img src="https://img.shields.io/badge/-TypeScript4.9-blue?logo=typescript&logoColor=white" alt="typescript" />
+    <img src="https://img.shields.io/badge/-Pinia2-yellow?logo=picpay&logoColor=white" alt="Pinia2" />
+    <img src="https://img.shields.io/badge/-ESLint-4b32c3?logo=eslint&logoColor=white" alt="eslint" />
+    <img src="https://img.shields.io/badge/-pnpm7-F69220?logo=pnpm&logoColor=white" alt="pnpm" />
     <img src="https://img.shields.io/badge/-Prettier-ef9421?logo=Prettier&logoColor=white" alt="Prettier">
     <img src="https://img.shields.io/badge/-Sass-1D365D?logo=Sass&logoColor=white" alt="Sass">
-    <img src="https://img.shields.io/badge/-Wind%20CSS-06B6D4?logo=Tailwind%20CSS&logoColor=white" alt="Taiwind">
+    <img src="https://img.shields.io/badge/-Wind%20CSS-06B6D4?logo=Tailwind%20CSS&logoColor=white" alt="WindCSS">
 </p>
 
 ## 介绍
