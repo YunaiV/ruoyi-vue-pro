@@ -43,10 +43,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
         }
       },
       form: {
-        component: 'UploadImg',
-        componentProps: {
-          limit: 1
-        }
+        component: 'UploadImg'
       }
     },
     {

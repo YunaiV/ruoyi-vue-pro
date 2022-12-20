@@ -22,6 +22,7 @@ export type ComponentName =
   | 'InputPassword'
   | 'Editor'
   | 'UploadImg'
+  | 'UploadImgs'
   | 'UploadFile'
 
 export type ColProps = {
