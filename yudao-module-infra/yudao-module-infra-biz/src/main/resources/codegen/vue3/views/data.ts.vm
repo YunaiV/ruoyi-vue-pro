@@ -34,9 +34,9 @@ const crudSchemas = reactive<VxeCrudSchema>({
       #if ("" != $dictType)## 有数据字典
       dictType: DICT_TYPE.$dictType.toUpperCase(),
       #if (${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
-      dictData: 'number',
+      dictClass: 'number',
       #else
-      dictData: 'string',
+      dictClass: 'string',
       #end
       #end
       #if (!$column.createOperation && !$column.updateOperation)
