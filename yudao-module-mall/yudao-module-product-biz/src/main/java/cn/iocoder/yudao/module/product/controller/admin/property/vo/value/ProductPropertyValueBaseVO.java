@@ -12,19 +12,19 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProductPropertyValueBaseVO {
 
-    @Schema(title = "规格编号", required = true, example = "1024")
+    @Schema(description = "规格编号", required = true, example = "1024")
     @NotNull(message = "规格编号不能为空")
     private Long propertyId;
 
-    @Schema(title = "规格值名字", required = true, example = "红色")
+    @Schema(description = "规格值名字", required = true, example = "红色")
     @NotEmpty(message = "规格值名字不能为空")
     private String name;
 
-    @Schema(title = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举")
+    @Schema(description = "状态,参见 CommonStatusEnum 枚举", required = true, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
-    @Schema(title = "备注", example = "颜色")
+    @Schema(description = "备注", example = "颜色")
     private String remark;
 
 }

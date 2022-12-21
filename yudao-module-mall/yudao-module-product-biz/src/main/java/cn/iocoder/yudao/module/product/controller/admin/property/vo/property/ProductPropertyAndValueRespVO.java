@@ -9,16 +9,16 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(title = "管理后台 - 规格 + 规格值 Response VO")
+@Schema(description = "管理后台 - 规格 + 规格值 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductPropertyAndValueRespVO extends ProductPropertyBaseVO {
 
-    @Schema(title = "规格的编号", required = true, example = "1024")
+    @Schema(description = "规格的编号", required = true, example = "1024")
     private Long id;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
     /**

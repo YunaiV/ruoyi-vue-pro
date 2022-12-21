@@ -9,15 +9,15 @@ import net.bytebuddy.implementation.bind.annotation.Empty;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@Schema(title = "管理后台 - 流程任务的更新负责人的 Request VO")
+@Schema(description = "管理后台 - 流程任务的更新负责人的 Request VO")
 @Data
 public class BpmTaskUpdateAssigneeReqVO {
 
-    @Schema(title = "任务编号", required = true, example = "1024")
+    @Schema(description = "任务编号", required = true, example = "1024")
     @NotEmpty(message = "任务编号不能为空")
     private String id;
 
-    @Schema(title = "新审批人的用户编号", required = true, example = "2048")
+    @Schema(description = "新审批人的用户编号", required = true, example = "2048")
     @NotNull(message = "新审批人的用户编号不能为空")
     private Long assigneeUserId;
 

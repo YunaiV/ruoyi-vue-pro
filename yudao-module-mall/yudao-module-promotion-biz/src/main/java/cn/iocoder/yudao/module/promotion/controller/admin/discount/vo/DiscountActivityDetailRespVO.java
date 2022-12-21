@@ -6,7 +6,7 @@ import lombok.ToString;
 
 import java.util.List;
 
-@Schema(title = "管理后台 - 限时折扣活动的详细 Response VO")
+@Schema(description = "管理后台 - 限时折扣活动的详细 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

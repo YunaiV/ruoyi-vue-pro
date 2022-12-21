@@ -4,16 +4,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
-@Schema(title = "管理后台 - OAuth2 客户端分页 Request VO")
+@Schema(description = "管理后台 - OAuth2 客户端分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class OAuth2ClientPageReqVO extends PageParam {
 
-    @Schema(title = "应用名", example = "土豆", description = "模糊匹配")
+    @Schema(description = "应用名,模糊匹配", example = "土豆")
     private String name;
 
-    @Schema(title = "状态", example = "1", description = "参见 CommonStatusEnum 枚举")
+    @Schema(description = "状态,参见 CommonStatusEnum 枚举", example = "1")
     private Integer status;
 
 }

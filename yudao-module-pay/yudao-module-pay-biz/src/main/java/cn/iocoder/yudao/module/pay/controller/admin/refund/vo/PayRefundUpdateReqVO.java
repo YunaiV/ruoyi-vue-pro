@@ -3,13 +3,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import javax.validation.constraints.*;
 
-@Schema(title = "管理后台 - 退款订单更新 Request VO")
+@Schema(description = "管理后台 - 退款订单更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class PayRefundUpdateReqVO extends PayRefundBaseVO {
 
-    @Schema(title = "支付退款编号", required = true)
+    @Schema(description = "支付退款编号", required = true)
     @NotNull(message = "支付退款编号不能为空")
     private Long id;
 

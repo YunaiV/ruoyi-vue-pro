@@ -3,13 +3,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import javax.validation.constraints.*;
 
-@Schema(title = "管理后台 - 数据源配置创建 Request VO")
+@Schema(description = "管理后台 - 数据源配置创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class DataSourceConfigCreateReqVO extends DataSourceConfigBaseVO {
 
-    @Schema(title = "密码", required = true, example = "123456")
+    @Schema(description = "密码", required = true, example = "123456")
     @NotNull(message = "密码不能为空")
     private String password;
 

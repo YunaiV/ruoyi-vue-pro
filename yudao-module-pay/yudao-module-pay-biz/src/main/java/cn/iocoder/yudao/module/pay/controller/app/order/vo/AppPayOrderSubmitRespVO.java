@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-@Schema(title = "用户 APP - 支付订单提交 Response VO")
+@Schema(description = "用户 APP - 支付订单提交 Response VO")
 @Data
 @Accessors(chain = true)
 @Builder

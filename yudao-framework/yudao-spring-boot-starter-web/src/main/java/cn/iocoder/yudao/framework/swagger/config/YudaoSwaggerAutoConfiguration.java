@@ -57,10 +57,10 @@ public class YudaoSwaggerAutoConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi publicApi() {
+    public GroupedOpenApi appApi() {
         return GroupedOpenApi.builder()
                 .group("app")
-                .pathsToMatch("/app/**")
+                .pathsToMatch("/app-api/**")
                 .build();
     }
 
@@ -68,7 +68,7 @@ public class YudaoSwaggerAutoConfiguration {
     public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
                 .group("admin")
-                .pathsToMatch("/admin/**")
+                .pathsToMatch("/admin-api/**")
                 .build();
     }
 

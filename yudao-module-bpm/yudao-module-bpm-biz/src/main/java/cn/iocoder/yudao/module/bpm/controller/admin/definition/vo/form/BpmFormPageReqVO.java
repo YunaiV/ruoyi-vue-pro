@@ -6,13 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@Schema(title = "管理后台 - 动态表单分页 Request VO")
+@Schema(description = "管理后台 - 动态表单分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class BpmFormPageReqVO extends PageParam {
 
-    @Schema(title = "表单名称", example = "芋道")
+    @Schema(description = "表单名称", example = "芋道")
     private String name;
 
 }

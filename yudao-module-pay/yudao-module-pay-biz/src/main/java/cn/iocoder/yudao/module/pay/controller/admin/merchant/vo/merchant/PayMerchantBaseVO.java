@@ -11,19 +11,19 @@ import javax.validation.constraints.NotNull;
 @Data
 public class PayMerchantBaseVO {
 
-    @Schema(title = "商户全称", required = true)
+    @Schema(description = "商户全称", required = true)
     @NotNull(message = "商户全称不能为空")
     private String name;
 
-    @Schema(title = "商户简称", required = true)
+    @Schema(description = "商户简称", required = true)
     @NotNull(message = "商户简称不能为空")
     private String shortName;
 
-    @Schema(title = "开启状态", required = true)
+    @Schema(description = "开启状态", required = true)
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
-    @Schema(title = "备注")
+    @Schema(description = "备注")
     private String remark;
 
 }

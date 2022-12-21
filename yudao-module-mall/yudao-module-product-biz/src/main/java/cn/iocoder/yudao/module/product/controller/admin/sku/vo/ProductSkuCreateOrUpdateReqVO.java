@@ -7,13 +7,13 @@ import lombok.ToString;
 
 import java.util.List;
 
-@Schema(title = "管理后台 - 商品 SKU 创建/更新 Request VO")
+@Schema(description = "管理后台 - 商品 SKU 创建/更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSkuCreateOrUpdateReqVO extends ProductSkuBaseVO {
 
-    @Schema(title = "商品 SKU 编号", example = "1")
+    @Schema(description = "商品 SKU 编号", example = "1")
     private Long id;
 
     /**

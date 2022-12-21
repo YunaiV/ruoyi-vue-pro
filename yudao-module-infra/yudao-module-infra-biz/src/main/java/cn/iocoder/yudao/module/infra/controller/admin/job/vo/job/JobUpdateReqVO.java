@@ -7,13 +7,13 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
-@Schema(title = "管理后台 - 定时任务更新 Request VO")
+@Schema(description = "管理后台 - 定时任务更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class JobUpdateReqVO extends JobBaseVO {
 
-    @Schema(title = "任务编号", required = true, example = "1024")
+    @Schema(description = "任务编号", required = true, example = "1024")
     @NotNull(message = "任务编号不能为空")
     private Long id;
 

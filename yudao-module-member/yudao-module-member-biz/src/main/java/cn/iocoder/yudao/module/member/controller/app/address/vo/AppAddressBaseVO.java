@@ -12,27 +12,27 @@ import javax.validation.constraints.NotNull;
 @Data
 public class AppAddressBaseVO {
 
-    @Schema(title = "收件人名称", required = true)
+    @Schema(description = "收件人名称", required = true)
     @NotNull(message = "收件人名称不能为空")
     private String name;
 
-    @Schema(title = "手机号", required = true)
+    @Schema(description = "手机号", required = true)
     @NotNull(message = "手机号不能为空")
     private String mobile;
 
-    @Schema(title = "地区编号", required = true)
+    @Schema(description = "地区编号", required = true)
     @NotNull(message = "地区编号不能为空")
     private Long areaId;
 
-    @Schema(title = "邮编", required = true)
+    @Schema(description = "邮编", required = true)
     @NotEmpty(message = "邮编不能为空")
     private String postCode;
 
-    @Schema(title = "收件详细地址", required = true)
+    @Schema(description = "收件详细地址", required = true)
     @NotNull(message = "收件详细地址不能为空")
     private String detailAddress;
 
-    @Schema(title = "是否默认地址", required = true)
+    @Schema(description = "是否默认地址", required = true)
     @NotNull(message = "是否默认地址不能为空")
     private Boolean defaulted;
 

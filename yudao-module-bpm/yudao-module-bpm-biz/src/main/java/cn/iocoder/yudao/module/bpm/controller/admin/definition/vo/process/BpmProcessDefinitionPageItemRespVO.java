@@ -7,16 +7,16 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - 流程定义的分页的每一项 Response VO")
+@Schema(description = "管理后台 - 流程定义的分页的每一项 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class BpmProcessDefinitionPageItemRespVO extends BpmProcessDefinitionRespVO {
 
-    @Schema(title = "表单名字", example = "请假表单")
+    @Schema(description = "表单名字", example = "请假表单")
     private String formName;
 
-    @Schema(title = "部署时间", required = true)
+    @Schema(description = "部署时间", required = true)
     private LocalDateTime deploymentTime;
 
 }

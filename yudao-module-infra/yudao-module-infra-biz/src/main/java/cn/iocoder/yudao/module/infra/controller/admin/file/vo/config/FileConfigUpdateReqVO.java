@@ -8,17 +8,17 @@ import lombok.ToString;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 
-@Schema(title = "管理后台 - 文件配置更新 Request VO")
+@Schema(description = "管理后台 - 文件配置更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class FileConfigUpdateReqVO extends FileConfigBaseVO {
 
-    @Schema(title = "编号", required = true, example = "1")
+    @Schema(description = "编号", required = true, example = "1")
     @NotNull(message = "编号不能为空")
     private Long id;
 
-    @Schema(title = "存储配置", required = true, description = "配置是动态参数，所以使用 Map 接收")
+    @Schema(description = "存储配置,配置是动态参数，所以使用 Map 接收", required = true)
     @NotNull(message = "存储配置不能为空")
     private Map<String, Object> config;
 

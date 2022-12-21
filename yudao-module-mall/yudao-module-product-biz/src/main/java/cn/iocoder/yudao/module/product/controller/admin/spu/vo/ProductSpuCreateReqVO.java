@@ -9,7 +9,7 @@ import lombok.ToString;
 import javax.validation.Valid;
 import java.util.List;
 
-@Schema(title = "管理后台 - 商品 SPU 创建 Request VO")
+@Schema(description = "管理后台 - 商品 SPU 创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

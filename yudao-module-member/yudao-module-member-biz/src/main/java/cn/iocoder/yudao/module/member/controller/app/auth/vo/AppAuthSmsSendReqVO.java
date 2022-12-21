@@ -9,16 +9,16 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 
-@Schema(title = "用户 APP - 发送手机验证码 Request VO")
+@Schema(description = "用户 APP - 发送手机验证码 Request VO")
 @Data
 @Accessors(chain = true)
 public class AppAuthSmsSendReqVO {
 
-    @Schema(title = "手机号", example = "15601691234")
+    @Schema(description = "手机号", example = "15601691234")
     @Mobile
     private String mobile;
 
-    @Schema(title = "发送场景", example = "1", description = "对应 SmsSceneEnum 枚举")
+    @Schema(description = "发送场景,对应 SmsSceneEnum 枚举", example = "1")
     @NotNull(message = "发送场景不能为空")
     @InEnum(SmsSceneEnum.class)
     private Integer scene;

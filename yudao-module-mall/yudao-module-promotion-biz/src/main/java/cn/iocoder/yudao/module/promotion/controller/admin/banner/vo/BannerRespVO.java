@@ -10,16 +10,16 @@ import java.time.LocalDateTime;
 /**
  * @author xia
  */
-@Schema(title = "管理后台 - Banner Response VO")
+@Schema(description = "管理后台 - Banner Response VO")
 @Data
 @ToString(callSuper = true)
 public class BannerRespVO  extends BannerBaseVO {
 
-    @Schema(title = "banner编号", required = true)
+    @Schema(description = "banner编号", required = true)
     @NotNull(message = "banner编号不能为空")
     private Long id;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
 }

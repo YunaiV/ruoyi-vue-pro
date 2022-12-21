@@ -34,6 +34,10 @@ spring:
     redis:
       time-to-live: 1h # 设置过期时间为 1 小时
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+
 # 工作流 Flowable 配置
 flowable:
   # 1. false: 默认值，Flowable 启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常

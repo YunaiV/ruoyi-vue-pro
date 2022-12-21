@@ -8,7 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
-@Schema(title = "管理后台 - 限时折扣活动创建 Request VO")
+@Schema(description = "管理后台 - 限时折扣活动创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

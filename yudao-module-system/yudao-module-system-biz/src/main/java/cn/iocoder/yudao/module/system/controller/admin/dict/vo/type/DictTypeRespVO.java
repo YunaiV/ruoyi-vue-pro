@@ -8,20 +8,20 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - 字典类型信息 Response VO")
+@Schema(description = "管理后台 - 字典类型信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DictTypeRespVO extends DictTypeBaseVO {
 
-    @Schema(title = "字典类型编号", required = true, example = "1024")
+    @Schema(description = "字典类型编号", required = true, example = "1024")
     private Long id;
 
-    @Schema(title = "字典类型", required = true, example = "sys_common_sex")
+    @Schema(description = "字典类型", required = true, example = "sys_common_sex")
     private String type;
 
-    @Schema(title = "创建时间", required = true, example = "时间戳格式")
+    @Schema(description = "创建时间", required = true, example = "时间戳格式")
     private LocalDateTime createTime;
 
 }

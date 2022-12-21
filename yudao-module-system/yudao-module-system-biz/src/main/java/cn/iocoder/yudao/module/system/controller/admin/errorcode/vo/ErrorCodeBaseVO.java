@@ -12,19 +12,19 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ErrorCodeBaseVO {
 
-    @Schema(title = "应用名", required = true, example = "dashboard")
+    @Schema(description = "应用名", required = true, example = "dashboard")
     @NotNull(message = "应用名不能为空")
     private String applicationName;
 
-    @Schema(title = "错误码编码", required = true, example = "1234")
+    @Schema(description = "错误码编码", required = true, example = "1234")
     @NotNull(message = "错误码编码不能为空")
     private Integer code;
 
-    @Schema(title = "错误码错误提示", required = true, example = "帅气")
+    @Schema(description = "错误码错误提示", required = true, example = "帅气")
     @NotNull(message = "错误码错误提示不能为空")
     private String message;
 
-    @Schema(title = "备注", example = "哈哈哈")
+    @Schema(description = "备注", example = "哈哈哈")
     private String memo;
 
 }

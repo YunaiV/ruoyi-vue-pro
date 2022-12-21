@@ -5,23 +5,23 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - 流程任务的 Running 进行中的分页项 Response VO")
+@Schema(description = "管理后台 - 流程任务的 Running 进行中的分页项 Response VO")
 @Data
 public class BpmTaskTodoPageItemRespVO {
 
-    @Schema(title = "任务编号", required = true, example = "1024")
+    @Schema(description = "任务编号", required = true, example = "1024")
     private String id;
 
-    @Schema(title = "任务名字", required = true, example = "芋道")
+    @Schema(description = "任务名字", required = true, example = "芋道")
     private String name;
 
-    @Schema(title = "接收时间", required = true)
+    @Schema(description = "接收时间", required = true)
     private LocalDateTime claimTime;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
-    @Schema(title = "激活状态", required = true, example = "1", description = "参见 SuspensionState 枚举")
+    @Schema(description = "激活状态-参见 SuspensionState 枚举", required = true, example = "1")
     private Integer suspensionState;
 
     /**
@@ -30,22 +30,22 @@ public class BpmTaskTodoPageItemRespVO {
     private ProcessInstance processInstance;
 
     @Data
-    @Schema(title = "流程实例")
+    @Schema(description = "流程实例")
     public static class ProcessInstance {
 
-        @Schema(title = "流程实例编号", required = true, example = "1024")
+        @Schema(description = "流程实例编号", required = true, example = "1024")
         private String id;
 
-        @Schema(title = "流程实例名称", required = true, example = "芋道")
+        @Schema(description = "流程实例名称", required = true, example = "芋道")
         private String name;
 
-        @Schema(title = "发起人的用户编号", required = true, example = "1024")
+        @Schema(description = "发起人的用户编号", required = true, example = "1024")
         private Long startUserId;
 
-        @Schema(title = "发起人的用户昵称", required = true, example = "芋艿")
+        @Schema(description = "发起人的用户昵称", required = true, example = "芋艿")
         private String startUserNickname;
 
-        @Schema(title = "流程定义的编号", required = true, example = "2048")
+        @Schema(description = "流程定义的编号", required = true, example = "2048")
         private String processDefinitionId;
 
     }

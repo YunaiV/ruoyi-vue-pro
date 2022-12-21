@@ -13,11 +13,11 @@ import java.util.Set;
 @Data
 public class BpmTaskAssignRuleBaseVO {
 
-    @Schema(title = "规则类型", required = true, example = "bpm_task_assign_rule_type")
+    @Schema(description = "规则类型", required = true, example = "bpm_task_assign_rule_type")
     @NotNull(message = "规则类型不能为空")
     private Integer type;
 
-    @Schema(title = "规则值数组", required = true, example = "1,2,3")
+    @Schema(description = "规则值数组", required = true, example = "1,2,3")
     @NotNull(message = "规则值数组不能为空")
     private Set<Long> options;
 

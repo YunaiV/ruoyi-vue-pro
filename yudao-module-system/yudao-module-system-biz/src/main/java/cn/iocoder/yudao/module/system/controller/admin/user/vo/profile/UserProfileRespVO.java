@@ -15,22 +15,22 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "管理后台 - 用户个人中心信息 Response VO")
+@Schema(description = "管理后台 - 用户个人中心信息 Response VO")
 public class UserProfileRespVO extends UserBaseVO {
 
-    @Schema(title = "用户编号", required = true, example = "1")
+    @Schema(description = "用户编号", required = true, example = "1")
     private Long id;
 
-    @Schema(title = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举类")
+    @Schema(description = "状态,参见 CommonStatusEnum 枚举类", required = true, example = "1")
     private Integer status;
 
-    @Schema(title = "最后登录 IP", required = true, example = "192.168.1.1")
+    @Schema(description = "最后登录 IP", required = true, example = "192.168.1.1")
     private String loginIp;
 
-    @Schema(title = "最后登录时间", required = true, example = "时间戳格式")
+    @Schema(description = "最后登录时间", required = true, example = "时间戳格式")
     private LocalDateTime loginDate;
 
-    @Schema(title = "创建时间", required = true, example = "时间戳格式")
+    @Schema(description = "创建时间", required = true, example = "时间戳格式")
     private LocalDateTime createTime;
 
     /**
@@ -52,50 +52,50 @@ public class UserProfileRespVO extends UserBaseVO {
      */
     private List<SocialUser> socialUsers;
 
-    @Schema(title = "角色")
+    @Schema(description = "角色")
     @Data
     public static class Role {
 
-        @Schema(title = "角色编号", required = true, example = "1")
+        @Schema(description = "角色编号", required = true, example = "1")
         private Long id;
 
-        @Schema(title = "角色名称", required = true, example = "普通角色")
+        @Schema(description = "角色名称", required = true, example = "普通角色")
         private String name;
 
     }
 
-    @Schema(title = "部门")
+    @Schema(description = "部门")
     @Data
     public static class Dept {
 
-        @Schema(title = "部门编号", required = true, example = "1")
+        @Schema(description = "部门编号", required = true, example = "1")
         private Long id;
 
-        @Schema(title = "部门名称", required = true, example = "研发部")
+        @Schema(description = "部门名称", required = true, example = "研发部")
         private String name;
 
     }
 
-    @Schema(title = "岗位")
+    @Schema(description = "岗位")
     @Data
     public static class Post {
 
-        @Schema(title = "岗位编号", required = true, example = "1")
+        @Schema(description = "岗位编号", required = true, example = "1")
         private Long id;
 
-        @Schema(title = "岗位名称", required = true, example = "开发")
+        @Schema(description = "岗位名称", required = true, example = "开发")
         private String name;
 
     }
 
-    @Schema(title = "社交用户")
+    @Schema(description = "社交用户")
     @Data
     public static class SocialUser {
 
-        @Schema(title = "社交平台的类型", required = true, example = "10", description = "参见 SocialTypeEnum 枚举类")
+        @Schema(description = "社交平台的类型,参见 SocialTypeEnum 枚举类", required = true, example = "10")
         private Integer type;
 
-        @Schema(title = "社交用户的 openid", required = true, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
+        @Schema(description = "社交用户的 openid", required = true, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
         private String openid;
 
     }

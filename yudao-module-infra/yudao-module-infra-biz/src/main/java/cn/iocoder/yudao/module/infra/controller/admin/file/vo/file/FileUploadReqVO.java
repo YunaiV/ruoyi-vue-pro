@@ -6,15 +6,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 
-@Schema(title = "管理后台 - 上传文件 Request VO")
+@Schema(description = "管理后台 - 上传文件 Request VO")
 @Data
 public class FileUploadReqVO {
 
-    @Schema(title = "文件附件", required = true)
+    @Schema(description = "文件附件", required = true)
     @NotNull(message = "文件附件不能为空")
     private MultipartFile file;
 
-    @Schema(title = "文件附件", example = "yudaoyuanma.png")
+    @Schema(description = "文件附件", example = "yudaoyuanma.png")
     private String path;
 
 }

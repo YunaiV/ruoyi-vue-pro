@@ -13,19 +13,19 @@ import java.util.List;
 @Data
 public class SensitiveWordBaseVO {
 
-    @Schema(title = "敏感词", required = true, example = "敏感词")
+    @Schema(description = "敏感词", required = true, example = "敏感词")
     @NotNull(message = "敏感词不能为空")
     private String name;
 
-    @Schema(title = "标签", required = true, example = "短信,评论")
+    @Schema(description = "标签", required = true, example = "短信,评论")
     @NotNull(message = "标签不能为空")
     private List<String> tags;
 
-    @Schema(title = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举类")
+    @Schema(description = "状态,参见 CommonStatusEnum 枚举类", required = true, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
-    @Schema(title = "描述", example = "污言秽语")
+    @Schema(description = "描述", example = "污言秽语")
     private String description;
 
 }

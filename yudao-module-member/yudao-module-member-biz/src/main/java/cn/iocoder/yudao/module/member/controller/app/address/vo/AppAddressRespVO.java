@@ -3,16 +3,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Schema(title = "用户 APP - 用户收件地址 Response VO")
+@Schema(description = "用户 APP - 用户收件地址 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class AppAddressRespVO extends AppAddressBaseVO {
 
-    @Schema(title = "编号", required = true)
+    @Schema(description = "编号", required = true)
     private Long id;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
 }

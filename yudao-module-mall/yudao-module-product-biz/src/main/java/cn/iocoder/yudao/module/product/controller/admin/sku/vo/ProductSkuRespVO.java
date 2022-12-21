@@ -8,16 +8,16 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(title = "管理后台 - 商品 SKU Response VO")
+@Schema(description = "管理后台 - 商品 SKU Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSkuRespVO extends ProductSkuBaseVO {
 
-    @Schema(title = "主键", required = true, example = "1024")
+    @Schema(description = "主键", required = true, example = "1024")
     private Long id;
 
-    @Schema(title = "创建时间")
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
 
     /**

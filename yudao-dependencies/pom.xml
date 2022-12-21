@@ -19,7 +19,7 @@
         <spring.boot.version>2.7.6</spring.boot.version>
         <!-- Web 相关 -->
         <springdoc.version>1.6.14</springdoc.version>
-        <knife4j.version>3.0.3</knife4j.version>
+        <knife4j.version>4.0.0</knife4j.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
         <druid.version>1.2.15</druid.version>
@@ -158,9 +158,9 @@
             </dependency>
 
             <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-webmvc-core</artifactId>
-                <version>${springdoc.version}</version>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
             </dependency>
 
             <dependency>

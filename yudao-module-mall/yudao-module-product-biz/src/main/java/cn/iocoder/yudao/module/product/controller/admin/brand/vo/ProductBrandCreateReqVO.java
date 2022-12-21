@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.product.controller.admin.brand.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-@Schema(title = "管理后台 - 商品品牌创建 Request VO")
+@Schema(description = "管理后台 - 商品品牌创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

@@ -12,13 +12,13 @@ import java.util.List;
 @Data
 public class AppProductSpuBaseRespVO {
 
-    @Schema(title = "主键", required = true, example = "1024")
+    @Schema(description = "主键", required = true, example = "1024")
     private Long id;
 
-    @Schema(title = "商品 SPU 名字", required = true, example = "芋道")
+    @Schema(description = "商品 SPU 名字", required = true, example = "芋道")
     private String name;
 
-    @Schema(title = "商品主图地址", example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "商品主图地址", example = "https://www.iocoder.cn/xx.png")
     private List<String> picUrls;
 
 }

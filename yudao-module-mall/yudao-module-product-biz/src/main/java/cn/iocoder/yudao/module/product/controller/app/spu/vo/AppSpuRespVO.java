@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  *
  * @author LuoWenFeng
  */
-@Schema(title = "App - 商品spu Response VO")
+@Schema(description = "App - 商品spu Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AppSpuRespVO extends ProductSpuRespVO {

@@ -6,40 +6,40 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@Schema(title = "管理后台 - 商品 SPU 分页 Request VO")
+@Schema(description = "管理后台 - 商品 SPU 分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSpuPageReqVO extends PageParam {
 
-    @Schema(title = "商品名称", example = "yutou")
+    @Schema(description = "商品名称", example = "yutou")
     private String name;
 
-    @Schema(title = "商品编码", example = "yudaoyuanma")
+    @Schema(description = "商品编码", example = "yudaoyuanma")
     private String code;
 
-    @Schema(title = "分类id", example = "1")
+    @Schema(description = "分类id", example = "1")
     private Long categoryId;
 
-    @Schema(title = "商品品牌编号", example = "1")
+    @Schema(description = "商品品牌编号", example = "1")
     private Long brandId;
 
-    @Schema(title = "上下架状态", example = "1", description = "参见 ProductSpuStatusEnum 枚举值")
+    @Schema(description = "上下架状态,参见 ProductSpuStatusEnum 枚举值", example = "1")
     private Integer status;
 
-    @Schema(title = "销量最小值", example = "1")
+    @Schema(description = "销量最小值", example = "1")
     private Integer salesCountMin;
 
-    @Schema(title = "销量最大值", example = "1024")
+    @Schema(description = "销量最大值", example = "1024")
     private Integer salesCountMax;
 
-    @Schema(title = "市场价最小值", example = "1")
+    @Schema(description = "市场价最小值", example = "1")
     private Integer marketPriceMin;
 
-    @Schema(title = "市场价最大值", example = "1024")
+    @Schema(description = "市场价最大值", example = "1024")
     private Integer marketPriceMax;
 
-    @Schema(title = "是否库存告警", example = "true")
+    @Schema(description = "是否库存告警", example = "true")
     private Boolean alarmStock;
 
 }

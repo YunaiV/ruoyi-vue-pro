@@ -6,13 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@Schema(title = "管理后台 - 流程定义分页 Request VO")
+@Schema(description = "管理后台 - 流程定义分页 Request VO")
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class BpmProcessDefinitionPageReqVO extends PageParam {
 
-    @Schema(title = "标识", example = "process1641042089407", description = "精准匹配")
+    @Schema(description = "标识-精准匹配", example = "process1641042089407")
     private String key;
 
 }

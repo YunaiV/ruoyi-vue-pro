@@ -5,13 +5,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@Schema(title = "管理后台 - 优惠劵分页的每一项 Response VO")
+@Schema(description = "管理后台 - 优惠劵分页的每一项 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class CouponPageItemRespVO extends CouponRespVO {
 
-    @Schema(title = "用户昵称", example = "老芋艿")
+    @Schema(description = "用户昵称", example = "老芋艿")
     private String nickname;
 
 }

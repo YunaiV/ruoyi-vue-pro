@@ -5,12 +5,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Schema(title = "交易订单分页 Request VO")
+@Schema(description = "交易订单分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class TradeOrderPageReqVO extends PageParam {
 
-    @Schema(title = "订单状态", example = "1", description = "参见 TradeOrderStatusEnum 枚举")
+    @Schema(description = "订单状态-参见 TradeOrderStatusEnum 枚举", example = "1")
     private Integer orderStatus;
 
 }

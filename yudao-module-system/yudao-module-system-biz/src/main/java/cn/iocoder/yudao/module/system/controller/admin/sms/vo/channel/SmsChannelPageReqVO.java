@@ -11,20 +11,20 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(title = "管理后台 - 短信渠道分页 Request VO")
+@Schema(description = "管理后台 - 短信渠道分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class SmsChannelPageReqVO extends PageParam {
 
-    @Schema(title = "任务状态", example = "1")
+    @Schema(description = "任务状态", example = "1")
     private Integer status;
 
-    @Schema(title = "短信签名", example = "芋道源码", description = "模糊匹配")
+    @Schema(description = "短信签名,模糊匹配", example = "芋道源码")
     private String signature;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @Schema(title = "创建时间")
+    @Schema(description = "创建时间")
     private LocalDateTime[] createTime;
 
 }

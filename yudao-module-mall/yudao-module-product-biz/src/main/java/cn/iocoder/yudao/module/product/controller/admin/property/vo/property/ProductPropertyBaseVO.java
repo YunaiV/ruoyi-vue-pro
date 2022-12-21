@@ -12,14 +12,14 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProductPropertyBaseVO {
 
-    @Schema(title = "规格名称", required = true, example = "颜色")
+    @Schema(description = "规格名称", required = true, example = "颜色")
     @NotBlank(message = "规格名称不能为空")
     private String name;
 
-    @Schema(title = "备注", example = "颜色")
+    @Schema(description = "备注", example = "颜色")
     private String remark;
 
-    @Schema(title = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举")
+    @Schema(description = "状态-参见 CommonStatusEnum 枚举", required = true, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

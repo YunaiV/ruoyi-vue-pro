@@ -15,28 +15,28 @@ import javax.validation.constraints.NotNull;
 @Data
 public class BannerBaseVO {
 
-    @Schema(title = "标题", required = true)
+    @Schema(description = "标题", required = true)
     @NotNull(message = "标题不能为空")
     private String title;
 
-    @Schema(title = "跳转链接", required = true)
+    @Schema(description = "跳转链接", required = true)
     @NotNull(message = "跳转链接不能为空")
     private String url;
 
-    @Schema(title = "图片地址", required = true)
+    @Schema(description = "图片地址", required = true)
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
 
-    @Schema(title = "排序", required = true)
+    @Schema(description = "排序", required = true)
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
-    @Schema(title = "状态", required = true)
+    @Schema(description = "状态", required = true)
     @NotNull(message = "状态不能为空")
     @InEnum(CommonStatusEnum.class)
     private Integer status;
 
-    @Schema(title = "备注")
+    @Schema(description = "备注")
     private String memo;
 
 }

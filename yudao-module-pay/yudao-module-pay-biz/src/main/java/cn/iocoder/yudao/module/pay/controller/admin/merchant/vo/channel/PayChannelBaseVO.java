@@ -10,26 +10,26 @@ import javax.validation.constraints.*;
 @Data
 public class PayChannelBaseVO {
 
-    @Schema(title = "渠道编码", required = true)
+    @Schema(description = "渠道编码", required = true)
     @NotNull(message = "渠道编码不能为空")
     private String code;
 
-    @Schema(title = "开启状态", required = true)
+    @Schema(description = "开启状态", required = true)
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
-    @Schema(title = "备注")
+    @Schema(description = "备注")
     private String remark;
 
-    @Schema(title = "渠道费率，单位：百分比", required = true)
+    @Schema(description = "渠道费率，单位：百分比", required = true)
     @NotNull(message = "渠道费率，单位：百分比不能为空")
     private Double feeRate;
 
-    @Schema(title = "商户编号", required = true)
+    @Schema(description = "商户编号", required = true)
     @NotNull(message = "商户编号不能为空")
     private Long merchantId;
 
-    @Schema(title = "应用编号", required = true)
+    @Schema(description = "应用编号", required = true)
     @NotNull(message = "应用编号不能为空")
     private Long appId;
 

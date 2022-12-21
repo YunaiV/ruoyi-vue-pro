@@ -11,26 +11,26 @@ import javax.validation.constraints.NotNull;
 @Data
 public class JobBaseVO {
 
-    @Schema(title = "任务名称", required = true, example = "测试任务")
+    @Schema(description = "任务名称", required = true, example = "测试任务")
     @NotNull(message = "任务名称不能为空")
     private String name;
 
-    @Schema(title = "处理器的参数", example = "yudao")
+    @Schema(description = "处理器的参数", example = "yudao")
     private String handlerParam;
 
-    @Schema(title = "CRON 表达式", required = true, example = "0/10 * * * * ? *")
+    @Schema(description = "CRON 表达式", required = true, example = "0/10 * * * * ? *")
     @NotNull(message = "CRON 表达式不能为空")
     private String cronExpression;
 
-    @Schema(title = "重试次数", required = true, example = "3")
+    @Schema(description = "重试次数", required = true, example = "3")
     @NotNull(message = "重试次数不能为空")
     private Integer retryCount;
 
-    @Schema(title = "重试间隔", required = true, example = "1000")
+    @Schema(description = "重试间隔", required = true, example = "1000")
     @NotNull(message = "重试间隔不能为空")
     private Integer retryInterval;
 
-    @Schema(title = "监控超时时间", example = "1000")
+    @Schema(description = "监控超时时间", example = "1000")
     private Integer monitorTimeout;
 
 }

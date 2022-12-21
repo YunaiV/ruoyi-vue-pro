@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@Schema(title = "管理后台 - 用户分页时的信息 Response VO", description = "相比用户基本信息来说，会多部门信息")
+@Schema(description = "管理后台 - 用户分页时的信息 Response VO,相比用户基本信息来说，会多部门信息")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,14 +18,14 @@ public class UserPageItemRespVO extends UserRespVO {
      */
     private Dept dept;
 
-    @Schema(title = "部门")
+    @Schema(description = "部门")
     @Data
     public static class Dept {
 
-        @Schema(title = "部门编号", required = true, example = "1")
+        @Schema(description = "部门编号", required = true, example = "1")
         private Long id;
 
-        @Schema(title = "部门名称", required = true, example = "研发部")
+        @Schema(description = "部门名称", required = true, example = "研发部")
         private String name;
 
     }

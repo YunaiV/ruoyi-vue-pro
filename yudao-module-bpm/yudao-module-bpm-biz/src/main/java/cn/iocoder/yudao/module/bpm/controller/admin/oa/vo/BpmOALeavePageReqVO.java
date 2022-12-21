@@ -7,23 +7,23 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(title = "管理后台 - 请假申请分页 Request VO")
+@Schema(description = "管理后台 - 请假申请分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class BpmOALeavePageReqVO extends PageParam {
 
-    @Schema(title = "状态", example = "1", description = "参见 bpm_process_instance_result 枚举")
+    @Schema(description = "状态-参见 bpm_process_instance_result 枚举", example = "1")
     private Integer result;
 
-    @Schema(title = "请假类型", example = "1", description = "参见 bpm_oa_type")
+    @Schema(description = "请假类型-参见 bpm_oa_type", example = "1")
     private Integer type;
 
-    @Schema(title = "原因", example = "阅读芋道源码", description = "模糊匹配")
+    @Schema(description = "原因-模糊匹配", example = "阅读芋道源码")
     private String reason;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @Schema(title = "申请时间")
+    @Schema(description = "申请时间")
     private LocalDateTime[] createTime;
 
 }

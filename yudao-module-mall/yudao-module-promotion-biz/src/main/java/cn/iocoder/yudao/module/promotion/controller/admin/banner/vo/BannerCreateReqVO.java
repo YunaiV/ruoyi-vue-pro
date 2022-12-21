@@ -7,7 +7,7 @@ import lombok.ToString;
 /**
  * @author xia
  */
-@Schema(title = "管理后台 - Banner 创建 Request VO")
+@Schema(description = "管理后台 - Banner 创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

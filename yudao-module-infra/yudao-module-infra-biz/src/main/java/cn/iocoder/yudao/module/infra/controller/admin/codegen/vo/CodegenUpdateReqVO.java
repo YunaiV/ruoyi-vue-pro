@@ -14,7 +14,7 @@ import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Schema(title = "管理后台 - 代码生成表和字段的修改 Request VO")
+@Schema(description = "管理后台 - 代码生成表和字段的修改 Request VO")
 @Data
 public class CodegenUpdateReqVO {
 
@@ -26,14 +26,14 @@ public class CodegenUpdateReqVO {
     @NotNull(message = "字段定义不能为空")
     private List<Column> columns;
 
-    @Schema(title = "更新表定义")
+    @Schema(description = "更新表定义")
     @Data
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     @Valid
     public static class Table extends CodegenTableBaseVO {
 
-        @Schema(title = "编号", required = true, example = "1")
+        @Schema(description = "编号", required = true, example = "1")
         private Long id;
 
         @AssertTrue(message = "上级菜单不能为空")
@@ -45,13 +45,13 @@ public class CodegenUpdateReqVO {
 
     }
 
-    @Schema(title = "更新表定义")
+    @Schema(description = "更新表定义")
     @Data
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     public static class Column extends CodegenColumnBaseVO {
 
-        @Schema(title = "编号", required = true, example = "1")
+        @Schema(description = "编号", required = true, example = "1")
         private Long id;
 
     }

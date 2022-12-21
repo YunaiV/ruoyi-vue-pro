@@ -7,13 +7,13 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
-@Schema(title = "管理后台 - 短信模板更新 Request VO")
+@Schema(description = "管理后台 - 短信模板更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class SmsTemplateUpdateReqVO extends SmsTemplateBaseVO {
 
-    @Schema(title = "编号", required = true, example = "1024")
+    @Schema(description = "编号", required = true, example = "1024")
     @NotNull(message = "编号不能为空")
     private Long id;
 

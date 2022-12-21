@@ -7,25 +7,25 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - 支付订单详细信息 Response VO")
+@Schema(description = "管理后台 - 支付订单详细信息 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class PayOrderDetailsRespVO extends PayOrderBaseVO {
 
-    @Schema(title = "支付订单编号")
+    @Schema(description = "支付订单编号")
     private Long id;
 
-    @Schema(title = "商户名称")
+    @Schema(description = "商户名称")
     private String merchantName;
 
-    @Schema(title = "应用名称")
+    @Schema(description = "应用名称")
     private String appName;
 
-    @Schema(title = "渠道编号名称")
+    @Schema(description = "渠道编号名称")
     private String channelCodeName;
 
-    @Schema(title = "创建时间")
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
 
     /**
@@ -34,13 +34,13 @@ public class PayOrderDetailsRespVO extends PayOrderBaseVO {
     private PayOrderExtension payOrderExtension;
 
     @Data
-    @Schema(title = "支付订单扩展")
+    @Schema(description = "支付订单扩展")
     public static class PayOrderExtension {
 
-        @Schema(title = "支付订单号")
+        @Schema(description = "支付订单号")
         private String no;
 
-        @Schema(title = "支付异步通知的内容")
+        @Schema(description = "支付异步通知的内容")
         private String channelNotifyData;
     }
 

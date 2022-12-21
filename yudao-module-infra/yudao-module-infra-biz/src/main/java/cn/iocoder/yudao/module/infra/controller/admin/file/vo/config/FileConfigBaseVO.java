@@ -11,11 +11,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class FileConfigBaseVO {
 
-    @Schema(title = "配置名", required = true, example = "S3 - 阿里云")
+    @Schema(description = "配置名", required = true, example = "S3 - 阿里云")
     @NotNull(message = "配置名不能为空")
     private String name;
 
-    @Schema(title = "备注", example = "我是备注")
+    @Schema(description = "备注", example = "我是备注")
     private String remark;
 
 }

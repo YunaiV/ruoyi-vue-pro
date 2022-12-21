@@ -12,22 +12,22 @@ import java.util.List;
  * @CreateDate: 2022/7/5 21:29
  * @Version: 1.0.0
  */
-@Schema(title = "管理后台 - 规格名称详情展示 Request VO")
+@Schema(description = "管理后台 - 规格名称详情展示 Request VO")
 @Data
 @ToString(callSuper = true)
 public class ProductPropertyViewRespVO {
 
-    @Schema(title = "规格名称id", example = "1")
+    @Schema(description = "规格名称id", example = "1")
     public Long propertyId;
 
-    @Schema(title = "规格名称", example = "内存")
+    @Schema(description = "规格名称", example = "内存")
     public String name;
 
-    @Schema(title = "规格属性值集合", example = "[{\"v1\":11,\"v2\":\"64G\"},{\"v1\":10,\"v2\":\"32G\"}]")
+    @Schema(description = "规格属性值集合", example = "[{\"v1\":11,\"v2\":\"64G\"},{\"v1\":10,\"v2\":\"32G\"}]")
     public List<Tuple2> propertyValues;
 
     @Data
-    @Schema(title = "规格属性值元组")
+    @Schema(description = "规格属性值元组")
     public static class Tuple2 {
         private final long id;
         private final String name;

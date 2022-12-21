@@ -22,44 +22,44 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class DiscountActivityBaseVO {
 
-    @Schema(title = "活动标题", required = true, example = "一个标题")
+    @Schema(description = "活动标题", required = true, example = "一个标题")
     @NotNull(message = "活动标题不能为空")
     private String name;
 
-    @Schema(title = "开始时间", required = true)
+    @Schema(description = "开始时间", required = true)
     @NotNull(message = "开始时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime startTime;
 
-    @Schema(title = "结束时间", required = true)
+    @Schema(description = "结束时间", required = true)
     @NotNull(message = "结束时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime endTime;
 
-    @Schema(title = "备注", example = "我是备注")
+    @Schema(description = "备注", example = "我是备注")
     private String remark;
 
-    @Schema(title = "商品")
+    @Schema(description = "商品")
     @Data
     public static class Product {
 
-        @Schema(title = "商品 SPU 编号", required = true, example = "1")
+        @Schema(description = "商品 SPU 编号", required = true, example = "1")
         @NotNull(message = "商品 SPU 编号不能为空")
         private Long spuId;
 
-        @Schema(title = "商品 SKU 编号", required = true, example = "1")
+        @Schema(description = "商品 SKU 编号", required = true, example = "1")
         @NotNull(message = "商品 SKU 编号不能为空")
         private Long skuId;
 
-        @Schema(title = "优惠类型", required = true, example = "1", description = "参见 PromotionDiscountTypeEnum 枚举")
+        @Schema(description = "优惠类型,参见 PromotionDiscountTypeEnum 枚举", required = true, example = "1")
         @NotNull(message = "优惠类型不能为空")
         @InEnum(PromotionDiscountTypeEnum.class)
         private Integer discountType;
 
-        @Schema(title = "折扣百分比", example = "80", description = "例如说，80% 为 80")
+        @Schema(description = "折扣百分比,例如说，80% 为 80", example = "80")
         private Integer discountPercent;
 
-        @Schema(title = "优惠金额", example = "10", description = "单位：分")
+        @Schema(description = "优惠金额,单位：分", example = "10")
         @Min(value = 0, message = "优惠金额需要大于等于 0")
         private Integer discountPrice;
 

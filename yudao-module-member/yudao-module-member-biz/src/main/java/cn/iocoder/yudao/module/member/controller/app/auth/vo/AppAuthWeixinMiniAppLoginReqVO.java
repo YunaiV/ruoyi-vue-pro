@@ -8,18 +8,18 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 
-@Schema(title = "用户 APP - 微信小程序手机登录 Request VO")
+@Schema(description = "用户 APP - 微信小程序手机登录 Request VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class AppAuthWeixinMiniAppLoginReqVO {
 
-    @Schema(title = "手机 code", required = true, example = "hello", description = "小程序通过 wx.getPhoneNumber 方法获得")
+    @Schema(description = "手机 code,小程序通过 wx.getPhoneNumber 方法获得", required = true, example = "hello")
     @NotEmpty(message = "手机 code 不能为空")
     private String phoneCode;
 
-    @Schema(title = "登录 code", required = true, example = "word", description = "小程序通过 wx.login 方法获得")
+    @Schema(description = "登录 code,小程序通过 wx.login 方法获得", required = true, example = "word")
     @NotEmpty(message = "登录 code 不能为空")
     private String loginCode;
 

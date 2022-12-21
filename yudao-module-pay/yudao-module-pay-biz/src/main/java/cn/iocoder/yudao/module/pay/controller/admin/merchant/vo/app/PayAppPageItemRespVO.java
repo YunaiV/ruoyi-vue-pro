@@ -8,16 +8,16 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-@Schema(title = "管理后台 - 支付应用信息分页查询 Response VO", description = "相比于支付信息，还会多出应用渠道的开关信息")
+@Schema(description = "管理后台 - 支付应用信息分页查询 Response VO,相比于支付信息，还会多出应用渠道的开关信息")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class PayAppPageItemRespVO extends PayAppBaseVO {
 
-    @Schema(title = "应用编号", required = true)
+    @Schema(description = "应用编号", required = true)
     private Long id;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
     /**
@@ -25,19 +25,19 @@ public class PayAppPageItemRespVO extends PayAppBaseVO {
      */
     private PayMerchant payMerchant;
 
-    @Schema(title = "商户")
+    @Schema(description = "商户")
     @Data
     public static class PayMerchant {
 
-        @Schema(title = "商户编号", required = true, example = "1")
+        @Schema(description = "商户编号", required = true, example = "1")
         private Long id;
 
-        @Schema(title = "商户名称", required = true, example = "研发部")
+        @Schema(description = "商户名称", required = true, example = "研发部")
         private String name;
 
     }
 
-    @Schema(title = "渠道编码集合", required = true, example = "alipay_pc,alipay_wap...")
+    @Schema(description = "渠道编码集合", required = true, example = "alipay_pc,alipay_wap...")
     private Set<String> channelCodes;
 
 

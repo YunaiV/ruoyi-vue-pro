@@ -10,13 +10,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Schema(title = "管理后台 - 商品 SPU 更新 Request VO")
+@Schema(description = "管理后台 - 商品 SPU 更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSpuUpdateReqVO extends ProductSpuBaseVO {
 
-    @Schema(title = "商品编号", required = true, example = "1")
+    @Schema(description = "商品编号", required = true, example = "1")
     @NotNull(message = "商品编号不能为空")
     private Long id;
 

@@ -6,7 +6,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.AssertTrue;
 
-@Schema(title = "管理后台 - 请假申请创建 Request VO")
+@Schema(description = "管理后台 - 请假申请创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

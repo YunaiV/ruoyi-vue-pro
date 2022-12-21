@@ -5,15 +5,15 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
-@Schema(title = "管理后台 - 租户套餐精简 Response VO")
+@Schema(description = "管理后台 - 租户套餐精简 Response VO")
 @Data
 public class TenantPackageSimpleRespVO {
 
-    @Schema(title = "套餐编号", required = true, example = "1024")
+    @Schema(description = "套餐编号", required = true, example = "1024")
     @NotNull(message = "套餐编号不能为空")
     private Long id;
 
-    @Schema(title = "套餐名", required = true, example = "VIP")
+    @Schema(description = "套餐名", required = true, example = "VIP")
     @NotNull(message = "套餐名不能为空")
     private String name;
 

@@ -14,16 +14,16 @@ import javax.validation.constraints.Size;
 @Data
 public class DictTypeBaseVO {
 
-    @Schema(title = "字典名称", required = true, example = "性别")
+    @Schema(description = "字典名称", required = true, example = "性别")
     @NotBlank(message = "字典名称不能为空")
     @Size(max = 100, message = "字典类型名称长度不能超过100个字符")
     private String name;
 
-    @Schema(title = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举类")
+    @Schema(description = "状态,参见 CommonStatusEnum 枚举类", required = true, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
-    @Schema(title = "备注", example = "快乐的备注")
+    @Schema(description = "备注", example = "快乐的备注")
     private String remark;
 
 }

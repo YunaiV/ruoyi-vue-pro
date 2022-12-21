@@ -8,17 +8,17 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - 字典数据信息 Response VO")
+@Schema(description = "管理后台 - 字典数据信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DictDataRespVO extends DictDataBaseVO {
 
-    @Schema(title = "字典数据编号", required = true, example = "1024")
+    @Schema(description = "字典数据编号", required = true, example = "1024")
     private Long id;
 
-    @Schema(title = "创建时间", required = true, example = "时间戳格式")
+    @Schema(description = "创建时间", required = true, example = "时间戳格式")
     private LocalDateTime createTime;
 
 }

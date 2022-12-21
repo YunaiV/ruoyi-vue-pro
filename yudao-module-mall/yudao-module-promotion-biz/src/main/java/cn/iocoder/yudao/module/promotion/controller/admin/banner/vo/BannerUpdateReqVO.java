@@ -10,13 +10,13 @@ import javax.validation.constraints.NotNull;
 /**
  * @author xia
  */
-@Schema(title = "管理后台 - Banner更新 Request VO")
+@Schema(description = "管理后台 - Banner更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class BannerUpdateReqVO extends BannerBaseVO {
 
-    @Schema(title = "banner 编号", required = true)
+    @Schema(description = "banner 编号", required = true)
     @NotNull(message = "banner 编号不能为空")
     private Long id;
 

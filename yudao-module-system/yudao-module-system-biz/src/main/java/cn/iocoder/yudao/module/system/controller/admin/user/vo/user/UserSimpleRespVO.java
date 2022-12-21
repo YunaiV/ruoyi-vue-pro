@@ -5,16 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(title = "用户精简信息 Response VO")
+@Schema(description = "用户精简信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserSimpleRespVO {
 
-    @Schema(title = "用户编号", required = true, example = "1024")
+    @Schema(description = "用户编号", required = true, example = "1024")
     private Long id;
 
-    @Schema(title = "用户昵称", required = true, example = "芋道")
+    @Schema(description = "用户昵称", required = true, example = "芋道")
     private String nickname;
 
 }

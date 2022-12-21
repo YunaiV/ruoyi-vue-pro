@@ -6,15 +6,15 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - 岗位信息 Response VO")
+@Schema(description = "管理后台 - 岗位信息 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PostRespVO extends PostBaseVO {
 
-    @Schema(title = "岗位序号", required = true, example = "1024")
+    @Schema(description = "岗位序号", required = true, example = "1024")
     private Long id;
 
-    @Schema(title = "创建时间", required = true, example = "时间戳格式")
+    @Schema(description = "创建时间", required = true, example = "时间戳格式")
     private LocalDateTime createTime;
 
 }

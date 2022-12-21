@@ -6,19 +6,19 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@Schema(title = "管理后台 - 定时任务分页 Request VO")
+@Schema(description = "管理后台 - 定时任务分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class JobPageReqVO extends PageParam {
 
-    @Schema(title = "任务名称", example = "测试任务", description = "模糊匹配")
+    @Schema(description = "任务名称,模糊匹配", example = "测试任务")
     private String name;
 
-    @Schema(title = "任务状态", example = "1", description = "参见 JobStatusEnum 枚举")
+    @Schema(description = "任务状态,参见 JobStatusEnum 枚举", example = "1")
     private Integer status;
 
-    @Schema(title = "处理器的名字", example = "sysUserSessionTimeoutJob", description = "模糊匹配")
+    @Schema(description = "处理器的名字,模糊匹配", example = "sysUserSessionTimeoutJob")
     private String handlerName;
 
 }

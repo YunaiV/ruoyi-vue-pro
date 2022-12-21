@@ -8,21 +8,21 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Schema(title = "用户 App - 交易订单创建 Request VO")
+@Schema(description = "用户 App - 交易订单创建 Request VO")
 @Data
 public class AppTradeOrderCreateReqVO {
 
-    @Schema(name = "收件地址编号", required = true, example = "1")
+    @Schema(description = "收件地址编号", required = true, example = "1")
     @NotNull(message = "收件地址不能为空")
     private Long addressId;
 
-    @Schema(name = "优惠劵编号", example = "1024")
+    @Schema(description = "优惠劵编号", example = "1024")
     private Long couponId;
 
-    @Schema(name = "备注", example = "这个是我的订单哟")
+    @Schema(description = "备注", example = "这个是我的订单哟")
     private String remark;
 
-    @Schema(name = "是否来自购物车", required = true, example = "true", description = "true - 来自购物车；false - 立即购买")
+    @Schema(description = "是否来自购物车,true - 来自购物车；false - 立即购买", required = true, example = "true")
     @NotNull(message = "是否来自购物车不能为空")
     private Boolean fromCart;
 
@@ -32,15 +32,15 @@ public class AppTradeOrderCreateReqVO {
     @NotEmpty(message = "必须选择购买的商品")
     private List<Item> items;
 
-    @Schema(title = "订单商品项")
+    @Schema(description = "订单商品项")
     @Data
     public static class Item {
 
-        @Schema(name = "商品 SKU 编号", required = true, example = "111")
+        @Schema(description = "商品 SKU 编号", required = true, example = "111")
         @NotNull(message = "商品 SKU 编号不能为空")
         private Long skuId;
 
-        @Schema(name = "商品 SKU 购买数量", required = true, example = "1024")
+        @Schema(description = "商品 SKU 购买数量", required = true, example = "1024")
         @NotNull(message = "商品 SKU 购买数量不能为空")
         @Min(value = 1, message = "商品 SKU 购买数量必须大于 0")
         private Integer count;

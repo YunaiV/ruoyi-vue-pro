@@ -5,18 +5,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Schema(title = "管理后台 - 访问令牌分页 Request VO")
+@Schema(description = "管理后台 - 访问令牌分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class OAuth2AccessTokenPageReqVO extends PageParam {
 
-    @Schema(title = "用户编号", required = true, example = "666")
+    @Schema(description = "用户编号", required = true, example = "666")
     private Long userId;
 
-    @Schema(title = "用户类型", required = true, example = "2", description = "参见 UserTypeEnum 枚举")
+    @Schema(description = "用户类型,参见 UserTypeEnum 枚举", required = true, example = "2")
     private Integer userType;
 
-    @Schema(title = "客户端编号", required = true, example = "2")
+    @Schema(description = "客户端编号", required = true, example = "2")
     private String clientId;
 
 }

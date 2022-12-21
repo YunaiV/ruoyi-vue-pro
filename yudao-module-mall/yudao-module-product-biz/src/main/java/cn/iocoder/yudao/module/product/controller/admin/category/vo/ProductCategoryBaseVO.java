@@ -12,25 +12,25 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProductCategoryBaseVO {
 
-    @Schema(title = "父分类编号", required = true, example = "1")
+    @Schema(description = "父分类编号", required = true, example = "1")
     @NotNull(message = "父分类编号不能为空")
     private Long parentId;
 
-    @Schema(title = "分类名称", required = true, example = "办公文具")
+    @Schema(description = "分类名称", required = true, example = "办公文具")
     @NotBlank(message = "分类名称不能为空")
     private String name;
 
-    @Schema(title = "分类图片", required = true)
+    @Schema(description = "分类图片", required = true)
     @NotBlank(message = "分类图片不能为空")
     private String picUrl;
 
-    @Schema(title = "分类排序", required = true, example = "1")
+    @Schema(description = "分类排序", required = true, example = "1")
     private Integer sort;
 
-    @Schema(title = "分类描述", required = true, example = "描述")
+    @Schema(description = "分类描述", required = true, example = "描述")
     private String description;
 
-    @Schema(title = "开启状态", required = true, example = "0")
+    @Schema(description = "开启状态", required = true, example = "0")
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 

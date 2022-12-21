@@ -14,26 +14,26 @@ import javax.validation.constraints.Size;
 @Data
 public class ConfigBaseVO {
 
-    @Schema(title = "参数分组", required = true, example = "biz")
+    @Schema(description = "参数分组", required = true, example = "biz")
     @NotEmpty(message = "参数分组不能为空")
     @Size(max = 50, message = "参数名称不能超过50个字符")
     private String category;
 
-    @Schema(title = "参数名称", required = true, example = "数据库名")
+    @Schema(description = "参数名称", required = true, example = "数据库名")
     @NotBlank(message = "参数名称不能为空")
     @Size(max = 100, message = "参数名称不能超过100个字符")
     private String name;
 
-    @Schema(title = "参数键值", required = true, example = "1024")
+    @Schema(description = "参数键值", required = true, example = "1024")
     @NotBlank(message = "参数键值不能为空")
     @Size(max = 500, message = "参数键值长度不能超过500个字符")
     private String value;
 
-    @Schema(title = "是否敏感", required = true, example = "true")
+    @Schema(description = "是否敏感", required = true, example = "true")
     @NotNull(message = "是否敏感不能为空")
     private Boolean visible;
 
-    @Schema(title = "备注", example = "备注一下很帅气！")
+    @Schema(description = "备注", example = "备注一下很帅气！")
     private String remark;
 
 }

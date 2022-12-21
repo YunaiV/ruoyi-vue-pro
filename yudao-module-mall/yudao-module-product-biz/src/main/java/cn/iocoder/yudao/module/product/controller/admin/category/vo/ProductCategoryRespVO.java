@@ -4,16 +4,16 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - 商品分类 Response VO")
+@Schema(description = "管理后台 - 商品分类 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductCategoryRespVO extends ProductCategoryBaseVO {
 
-    @Schema(title = "分类编号", required = true, example = "2")
+    @Schema(description = "分类编号", required = true, example = "2")
     private Long id;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
 }

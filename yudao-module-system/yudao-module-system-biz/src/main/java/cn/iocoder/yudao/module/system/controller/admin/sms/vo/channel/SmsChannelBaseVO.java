@@ -12,25 +12,25 @@ import javax.validation.constraints.NotNull;
 @Data
 public class SmsChannelBaseVO {
 
-    @Schema(title = "短信签名", required = true, example = "芋道源码")
+    @Schema(description = "短信签名", required = true, example = "芋道源码")
     @NotNull(message = "短信签名不能为空")
     private String signature;
 
-    @Schema(title = "启用状态", required = true, example = "1")
+    @Schema(description = "启用状态", required = true, example = "1")
     @NotNull(message = "启用状态不能为空")
     private Integer status;
 
-    @Schema(title = "备注", example = "好吃！")
+    @Schema(description = "备注", example = "好吃！")
     private String remark;
 
-    @Schema(title = "短信 API 的账号", required = true, example = "yudao")
+    @Schema(description = "短信 API 的账号", required = true, example = "yudao")
     @NotNull(message = "短信 API 的账号不能为空")
     private String apiKey;
 
-    @Schema(title = "短信 API 的密钥", example = "yuanma")
+    @Schema(description = "短信 API 的密钥", example = "yuanma")
     private String apiSecret;
 
-    @Schema(title = "短信发送回调 URL", example = "http://www.iocoder.cn")
+    @Schema(description = "短信发送回调 URL", example = "http://www.iocoder.cn")
     @URL(message = "回调 URL 格式不正确")
     private String callbackUrl;
 

@@ -5,16 +5,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@Schema(title = "管理后台 - 操作日志 Response VO")
+@Schema(description = "管理后台 - 操作日志 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class OperateLogRespVO extends OperateLogBaseVO {
 
-    @Schema(title = "日志编号", required = true, example = "1024")
+    @Schema(description = "日志编号", required = true, example = "1024")
     private Long id;
 
-    @Schema(title = "用户昵称", required = true, example = "芋艿")
+    @Schema(description = "用户昵称", required = true, example = "芋艿")
     private String userNickname;
 
 }

@@ -5,19 +5,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(title = "管理后台 - 部门精简信息 Response VO")
+@Schema(description = "管理后台 - 部门精简信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeptSimpleRespVO {
 
-    @Schema(title = "部门编号", required = true, example = "1024")
+    @Schema(description = "部门编号", required = true, example = "1024")
     private Long id;
 
-    @Schema(title = "部门名称", required = true, example = "芋道")
+    @Schema(description = "部门名称", required = true, example = "芋道")
     private String name;
 
-    @Schema(title = "父部门 ID", required = true, example = "1024")
+    @Schema(description = "父部门 ID", required = true, example = "1024")
     private Long parentId;
 
 }

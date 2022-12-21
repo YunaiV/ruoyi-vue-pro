@@ -6,15 +6,15 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - 通知公告信息 Response VO")
+@Schema(description = "管理后台 - 通知公告信息 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class NoticeRespVO extends NoticeBaseVO {
 
-    @Schema(title = "通知公告序号", required = true, example = "1024")
+    @Schema(description = "通知公告序号", required = true, example = "1024")
     private Long id;
 
-    @Schema(title = "创建时间", required = true, example = "时间戳格式")
+    @Schema(description = "创建时间", required = true, example = "时间戳格式")
     private LocalDateTime createTime;
 
 }

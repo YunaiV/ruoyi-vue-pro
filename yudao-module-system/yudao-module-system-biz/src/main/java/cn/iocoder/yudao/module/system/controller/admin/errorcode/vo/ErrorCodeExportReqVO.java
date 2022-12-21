@@ -8,24 +8,24 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(title = "管理后台 - 错误码 Excel 导出 Request VO", description = "参数和 InfErrorCodePageReqVO 是一致的")
+@Schema(description = "管理后台 - 错误码 Excel 导出 Request VO,参数和 InfErrorCodePageReqVO 是一致的")
 @Data
 public class ErrorCodeExportReqVO {
 
-    @Schema(title = "错误码类型", example = "1")
+    @Schema(description = "错误码类型", example = "1")
     private Integer type;
 
-    @Schema(title = "应用名", example = "dashboard")
+    @Schema(description = "应用名", example = "dashboard")
     private String applicationName;
 
-    @Schema(title = "错误码编码", example = "1234")
+    @Schema(description = "错误码编码", example = "1234")
     private Integer code;
 
-    @Schema(title = "错误码错误提示", example = "帅气")
+    @Schema(description = "错误码错误提示", example = "帅气")
     private String message;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @Schema(title = "创建时间")
+    @Schema(description = "创建时间")
     private LocalDateTime[] createTime;
 
 }

@@ -5,13 +5,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@Schema(title = "管理后台 - 流程任务的 Response VO")
+@Schema(description = "管理后台 - 流程任务的 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class BpmTaskRespVO extends BpmTaskDonePageItemRespVO {
 
-    @Schema(title = "任务定义的标识", required = true, example = "user-001")
+    @Schema(description = "任务定义的标识", required = true, example = "user-001")
     private String definitionKey;
 
     /**
@@ -19,18 +19,18 @@ public class BpmTaskRespVO extends BpmTaskDonePageItemRespVO {
      */
     private User assigneeUser;
 
-    @Schema(title = "用户信息")
+    @Schema(description = "用户信息")
     @Data
     public static class User {
 
-        @Schema(title = "用户编号", required = true, example = "1")
+        @Schema(description = "用户编号", required = true, example = "1")
         private Long id;
-        @Schema(title = "用户昵称", required = true, example = "芋艿")
+        @Schema(description = "用户昵称", required = true, example = "芋艿")
         private String nickname;
 
-        @Schema(title = "部门编号", required = true, example = "1")
+        @Schema(description = "部门编号", required = true, example = "1")
         private Long deptId;
-        @Schema(title = "部门名称", required = true, example = "研发部")
+        @Schema(description = "部门名称", required = true, example = "研发部")
         private String deptName;
 
     }

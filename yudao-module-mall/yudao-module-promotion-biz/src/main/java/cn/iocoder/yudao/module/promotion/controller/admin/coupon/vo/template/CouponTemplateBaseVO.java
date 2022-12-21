@@ -29,70 +29,70 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DE
 @Data
 public class CouponTemplateBaseVO {
 
-    @Schema(title = "优惠劵名", required = true, example = "春节送送送")
+    @Schema(description = "优惠劵名", required = true, example = "春节送送送")
     @NotNull(message = "优惠劵名不能为空")
     private String name;
 
-    @Schema(title = "发行总量", required = true, example = "1024", description = "-1 - 则表示不限制发放数量")
+    @Schema(description = "发行总量,-1 - 则表示不限制发放数量", required = true, example = "1024")
     @NotNull(message = "发行总量不能为空")
     private Integer totalCount;
 
-    @Schema(title = "每人限领个数", required = true, example = "66", description = "-1 - 则表示不限制")
+    @Schema(description = "每人限领个数,-1 - 则表示不限制", required = true, example = "66")
     @NotNull(message = "每人限领个数不能为空")
     private Integer takeLimitCount;
 
-    @Schema(title = "领取方式", required = true, example = "1", description = "参见 CouponTakeTypeEnum 枚举类")
+    @Schema(description = "领取方式,参见 CouponTakeTypeEnum 枚举类", required = true, example = "1")
     @NotNull(message = "领取方式不能为空")
     private Integer takeType;
 
-    @Schema(title = "是否设置满多少金额可用", required = true, example = "100", description = "单位：分；0 - 不限制")
+    @Schema(description = "是否设置满多少金额可用,单位：分；0 - 不限制", required = true, example = "100")
     @NotNull(message = "是否设置满多少金额可用不能为空")
     private Integer usePrice;
 
-    @Schema(title = "商品范围", required = true, example = "1", description = "参见 PromotionProductScopeEnum 枚举类")
+    @Schema(description = "商品范围,参见 PromotionProductScopeEnum 枚举类", required = true, example = "1")
     @NotNull(message = "商品范围不能为空")
     @InEnum(PromotionProductScopeEnum.class)
     private Integer productScope;
 
-    @Schema(title = "商品 SPU 编号的数组", example = "1,3")
+    @Schema(description = "商品 SPU 编号的数组", example = "1,3")
     private List<Long> productSpuIds;
 
-    @Schema(title = "生效日期类型", required = true, example = "1")
+    @Schema(description = "生效日期类型", required = true, example = "1")
     @NotNull(message = "生效日期类型不能为空")
     @InEnum(CouponTemplateValidityTypeEnum.class)
     private Integer validityType;
 
-    @Schema(title = "固定日期 - 生效开始时间")
+    @Schema(description = "固定日期 - 生效开始时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
     private LocalDateTime validStartTime;
 
-    @Schema(title = "固定日期 - 生效结束时间")
+    @Schema(description = "固定日期 - 生效结束时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
     private LocalDateTime validEndTime;
 
-    @Schema(title = "领取日期 - 开始天数")
+    @Schema(description = "领取日期 - 开始天数")
     @Min(value = 0L, message = "开始天数必须大于 0")
     private Integer fixedStartTerm;
 
-    @Schema(title = "领取日期 - 结束天数")
+    @Schema(description = "领取日期 - 结束天数")
     @Min(value = 1L, message = "开始天数必须大于 1")
     private Integer fixedEndTerm;
 
-    @Schema(title = "优惠类型", required = true, example = "1", description = "参见 PromotionDiscountTypeEnum 枚举")
+    @Schema(description = "优惠类型,参见 PromotionDiscountTypeEnum 枚举", required = true, example = "1")
     @NotNull(message = "优惠类型不能为空")
     @InEnum(PromotionDiscountTypeEnum.class)
     private Integer discountType;
 
-    @Schema(title = "折扣百分比", example = "80", description = "例如说，80% 为 80")
+    @Schema(description = "折扣百分比,例如说，80% 为 80", example = "80")
     private Integer discountPercent;
 
-    @Schema(title = "优惠金额", example = "10", description = "单位：分")
+    @Schema(description = "优惠金额,单位：分", example = "10")
     @Min(value = 0, message = "优惠金额需要大于等于 0")
     private Integer discountPrice;
 
-    @Schema(title = "折扣上限", example = "100", description = "单位：分，仅在 discountType 为 PERCENT 使用")
+    @Schema(description = "折扣上限,单位：分，仅在 discountType 为 PERCENT 使用", example = "100")
     private Integer discountLimitPrice;
 
     @AssertTrue(message = "商品 SPU 编号的数组不能为空")

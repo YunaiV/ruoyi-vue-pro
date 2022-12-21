@@ -7,12 +7,12 @@ import lombok.EqualsAndHashCode;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-@Schema(title = "管理后台 - 参数配置创建 Request VO")
+@Schema(description = "管理后台 - 参数配置创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ConfigCreateReqVO extends ConfigBaseVO {
 
-    @Schema(title = "参数键名", required = true, example = "yunai.db.username")
+    @Schema(description = "参数键名", required = true, example = "yunai.db.username")
     @NotBlank(message = "参数键名长度不能为空")
     @Size(max = 100, message = "参数键名长度不能超过100个字符")
     private String key;

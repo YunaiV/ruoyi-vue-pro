@@ -6,14 +6,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Schema(title = "分页结果")
+@Schema(description = "分页结果")
 @Data
 public final class PageResult<T> implements Serializable {
 
-    @Schema(title = "数据", required = true)
+    @Schema(description = "数据", required = true)
     private List<T> list;
 
-    @Schema(title = "总量", required = true)
+    @Schema(description = "总量", required = true)
     private Long total;
 
     public PageResult() {

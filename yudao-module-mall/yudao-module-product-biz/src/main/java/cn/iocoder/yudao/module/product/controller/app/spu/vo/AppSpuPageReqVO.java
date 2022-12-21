@@ -6,12 +6,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@Schema(title = "App - 商品spu分页 Request VO")
+@Schema(description = "App - 商品spu分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class AppSpuPageReqVO extends PageParam {
 
-    @Schema(title = "分类id")
+    @Schema(description = "分类id")
     private Long categoryId;
 }

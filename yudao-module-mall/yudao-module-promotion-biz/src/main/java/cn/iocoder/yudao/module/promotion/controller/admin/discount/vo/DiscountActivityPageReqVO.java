@@ -11,19 +11,19 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(title = "管理后台 - 限时折扣活动分页 Request VO")
+@Schema(description = "管理后台 - 限时折扣活动分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class DiscountActivityPageReqVO extends PageParam {
 
-    @Schema(title = "活动标题", example = "一个标题")
+    @Schema(description = "活动标题", example = "一个标题")
     private String name;
 
-    @Schema(title = "活动状态", example = "1")
+    @Schema(description = "活动状态", example = "1")
     private Integer status;
 
-    @Schema(title = "创建时间")
+    @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 

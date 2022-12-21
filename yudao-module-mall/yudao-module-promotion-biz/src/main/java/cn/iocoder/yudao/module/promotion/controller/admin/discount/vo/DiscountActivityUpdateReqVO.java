@@ -10,13 +10,13 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Schema(title = "管理后台 - 限时折扣活动更新 Request VO")
+@Schema(description = "管理后台 - 限时折扣活动更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class DiscountActivityUpdateReqVO extends DiscountActivityBaseVO {
 
-    @Schema(title = "活动编号", required = true, example = "1024")
+    @Schema(description = "活动编号", required = true, example = "1024")
     @NotNull(message = "活动编号不能为空")
     private Long id;
 

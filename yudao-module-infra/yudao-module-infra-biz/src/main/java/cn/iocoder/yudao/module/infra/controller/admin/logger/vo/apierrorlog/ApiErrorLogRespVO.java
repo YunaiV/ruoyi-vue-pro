@@ -7,22 +7,22 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - API 错误日志 Response VO")
+@Schema(description = "管理后台 - API 错误日志 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ApiErrorLogRespVO extends ApiErrorLogBaseVO {
 
-    @Schema(title = "编号", required = true, example = "1024")
+    @Schema(description = "编号", required = true, example = "1024")
     private Integer id;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
-    @Schema(title = "处理时间", required = true)
+    @Schema(description = "处理时间", required = true)
     private LocalDateTime processTime;
 
-    @Schema(title = "处理用户编号", example = "233")
+    @Schema(description = "处理用户编号", example = "233")
     private Integer processUserId;
 
 }
