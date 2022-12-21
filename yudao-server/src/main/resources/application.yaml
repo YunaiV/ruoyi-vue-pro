@@ -35,6 +35,7 @@ spring:
       time-to-live: 1h # 设置过期时间为 1 小时
 
 springdoc:
+  show-actuator: true
   swagger-ui:
     path: /swagger-ui
 

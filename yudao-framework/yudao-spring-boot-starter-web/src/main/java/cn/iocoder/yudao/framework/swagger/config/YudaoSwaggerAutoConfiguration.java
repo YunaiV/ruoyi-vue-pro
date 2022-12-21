@@ -6,7 +6,10 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.*;
+import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
+import org.springdoc.core.customizers.ServerBaseUrlCustomizer;
+import org.springdoc.core.providers.JavadocProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,6 +18,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Swagger3 自动配置类
@@ -38,22 +43,36 @@ public class YudaoSwaggerAutoConfiguration {
                 .license(new License().name("MIT").url("https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE"));
         //鉴权组件(随便起名的)
         SecurityScheme securityScheme = new SecurityScheme()
-                .type(SecurityScheme.Type.OAUTH2)
+                .type(SecurityScheme.Type.APIKEY)
                 .scheme("bearer")//固定写法
                 .bearerFormat("JWT")
                 .in(SecurityScheme.In.HEADER)
                 .name(HttpHeaders.AUTHORIZATION);
         Components components = new Components()
-                .addSecuritySchemes("bearer", securityScheme);
+                .addSecuritySchemes("Bearer", securityScheme);
 
         //鉴权限制要求(随便起名的)
         SecurityRequirement securityRequirement = new SecurityRequirement()
-                .addList("bearer", Arrays.asList("read", "write"));
+                .addList(HttpHeaders.AUTHORIZATION, Arrays.asList("read", "write"));
 
         return new OpenAPI()
                 .info(info)
                 .components(components)
                 .addSecurityItem(securityRequirement);
+    }
+
+    /**
+     * 自定义 openapi 处理器
+     */
+    @Bean
+    public OpenAPIService openApiBuilder(Optional<OpenAPI> openAPI,
+                                         SecurityService securityParser,
+                                         SpringDocConfigProperties springDocConfigProperties,
+                                         PropertyResolverUtils propertyResolverUtils,
+                                         Optional<List<OpenApiBuilderCustomizer>> openApiBuilderCustomisers,
+                                         Optional<List<ServerBaseUrlCustomizer>> serverBaseUrlCustomisers,
+                                         Optional<JavadocProvider> javadocProvider) {
+        return new OpenAPIService(openAPI, securityParser, springDocConfigProperties, propertyResolverUtils, openApiBuilderCustomisers, serverBaseUrlCustomisers, javadocProvider);
     }
 
     @Bean
