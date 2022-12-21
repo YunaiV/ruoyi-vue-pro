@@ -1,6 +1,7 @@
 <template>
   <div class="change-avatar">
     <CropperAvatar
+      ref="cropperRef"
       :value="avatar"
       :showBtn="false"
       @change="handelUpload"
@@ -10,7 +11,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { propTypes } from '@/utils/propTypes'
 import { CropperAvatar } from '@/components/Cropper'
 import { uploadAvatarApi } from '@/api/system/user/profile'
@@ -21,8 +22,10 @@ const avatar = computed(() => {
   return props.img
 })
 
+const cropperRef = ref()
 const handelUpload = async ({ data }) => {
   await uploadAvatarApi({ avatarFile: data })
+  cropperRef.value.close()
 }
 </script>
 

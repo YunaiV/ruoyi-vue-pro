@@ -4,7 +4,11 @@
     <el-button :class="`${prefixCls}-upload-btn`" @click="open()" v-if="showBtn">
       {{ btnText ? btnText : t('cropper.selectImage') }}
     </el-button>
-    <CopperModal ref="cropperModel" @upload-success="handleUploadSuccess" :srcValue="sourceValue" />
+    <CopperModal
+      ref="cropperModelRef"
+      @upload-success="handleUploadSuccess"
+      :srcValue="sourceValue"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -29,7 +33,7 @@ const prefixCls = getPrefixCls('cropper-avatar')
 const message = useMessage()
 const { t } = useI18n()
 
-const cropperModel = ref()
+const cropperModelRef = ref()
 
 watchEffect(() => {
   sourceValue.value = props.value
@@ -49,8 +53,15 @@ function handleUploadSuccess({ source, data, filename }) {
 }
 
 function open() {
-  cropperModel.value.openModal()
+  cropperModelRef.value.openModal()
 }
+function close() {
+  cropperModelRef.value.closeModal()
+}
+defineExpose({
+  open,
+  close
+})
 </script>
 <style lang="scss" scoped>
 $prefix-cls: #{$namespace}--cropper-avatar;
