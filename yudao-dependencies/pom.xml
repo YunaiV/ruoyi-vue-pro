@@ -18,7 +18,7 @@
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.7.6</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>1.6.13</springdoc.version>
+        <springdoc.version>1.6.14</springdoc.version>
         <knife4j.version>3.0.3</knife4j.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
