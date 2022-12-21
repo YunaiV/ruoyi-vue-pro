@@ -145,7 +145,7 @@
             v-for="item in postOptions"
             :key="item.id"
             :label="item.name"
-            :value="item.id"
+            :value="(item.id as unknown as number)"
           />
         </el-select>
       </template>

@@ -12,8 +12,7 @@ export const rules = reactive({
   email: [required],
   phone: [
     {
-      min: 11,
-      max: 11,
+      len: 11,
       trigger: 'blur',
       message: '请输入正确的手机号码'
     }

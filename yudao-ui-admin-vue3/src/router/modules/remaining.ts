@@ -64,7 +64,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
         meta: {
           title: t('router.home'),
           icon: 'ep:home-filled',
-          noCache: true,
+          noCache: false,
           affix: true
         }
       }
@@ -85,7 +85,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
         meta: {
           canTo: true,
           hidden: true,
-          noTagsView: true,
+          noTagsView: false,
           icon: 'ep:user',
           title: t('common.profile')
         }

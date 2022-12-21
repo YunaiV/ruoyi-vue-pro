@@ -1,34 +1,8 @@
 <template>
   <ContentWrap>
-    <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true">
-      <el-form-item label="菜单名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入菜单名称" />
-      </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择菜单状态">
-          <el-option
-            v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <!-- 操作：搜索 -->
-        <XButton
-          type="primary"
-          preIcon="ep:search"
-          :title="t('common.query')"
-          @click="handleQuery()"
-        />
-        <!-- 操作：重置 -->
-        <XButton preIcon="ep:refresh-right" :title="t('common.reset')" @click="resetQuery()" />
-      </el-form-item>
-    </el-form>
-    <vxe-toolbar>
-      <template #buttons>
+    <!-- 列表 -->
+    <vxe-grid ref="xGrid" v-bind="gridOptions" show-overflow class="xtable-scrollbar">
+      <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
           type="primary"
@@ -37,63 +11,30 @@
           v-hasPermi="['system:menu:create']"
           @click="handleCreate()"
         />
-        <XButton title="展开所有" @click="xTable?.setAllTreeExpand(true)" />
-        <XButton title="关闭所有" @click="xTable?.clearTreeExpand()" />
+        <XButton title="展开所有" @click="xGrid?.setAllTreeExpand(true)" />
+        <XButton title="关闭所有" @click="xGrid?.clearTreeExpand()" />
       </template>
-    </vxe-toolbar>
-    <!-- 列表 -->
-    <vxe-table
-      show-overflow
-      keep-source
-      ref="xTable"
-      :loading="tableLoading"
-      :row-config="{ keyField: 'id' }"
-      :column-config="{ resizable: true }"
-      :tree-config="{ transform: true, rowField: 'id', parentField: 'parentId' }"
-      :print-config="{}"
-      :export-config="{}"
-      :data="tableData"
-    >
-      <vxe-column title="菜单名称" field="name" width="200" tree-node>
-        <template #default="{ row }">
-          <Icon :icon="row.icon" />
-          <span class="ml-3">{{ row.name }}</span>
-        </template>
-      </vxe-column>
-      <vxe-column title="菜单类型" field="type">
-        <template #default="{ row }">
-          <DictTag :type="DICT_TYPE.SYSTEM_MENU_TYPE" :value="row.type" />
-        </template>
-      </vxe-column>
-      <vxe-column title="路由地址" field="path" />
-      <vxe-column title="组件路径" field="component" />
-      <vxe-column title="权限标识" field="permission" />
-      <vxe-column title="排序" field="sort" />
-      <vxe-column title="状态" field="status">
-        <template #default="{ row }">
-          <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-        </template>
-      </vxe-column>
-      <vxe-column title="创建时间" field="createTime" formatter="formatDate" />
-      <vxe-column title="操作" width="200">
-        <template #default="{ row }">
-          <!-- 操作：修改 -->
-          <XTextButton
-            preIcon="ep:edit"
-            :title="t('action.edit')"
-            v-hasPermi="['system:menu:update']"
-            @click="handleUpdate(row.id)"
-          />
-          <!-- 操作：删除 -->
-          <XTextButton
-            preIcon="ep:delete"
-            :title="t('action.del')"
-            v-hasPermi="['system:menu:delete']"
-            @click="handleDelete(row.id)"
-          />
-        </template>
-      </vxe-column>
-    </vxe-table>
+      <template #name_default="{ row }">
+        <Icon :icon="row.icon" />
+        <span class="ml-3">{{ row.name }}</span>
+      </template>
+      <template #actionbtns_default="{ row }">
+        <!-- 操作：修改 -->
+        <XTextButton
+          preIcon="ep:edit"
+          :title="t('action.edit')"
+          v-hasPermi="['system:menu:update']"
+          @click="handleUpdate(row.id)"
+        />
+        <!-- 操作：删除 -->
+        <XTextButton
+          preIcon="ep:delete"
+          :title="t('action.del')"
+          v-hasPermi="['system:menu:delete']"
+          @click="handleDelete(row.id)"
+        />
+      </template>
+    </vxe-grid>
   </ContentWrap>
   <!-- 添加或修改菜单对话框 -->
   <XModal id="menuModel" v-model="dialogVisible" :title="dialogTitle">
@@ -124,7 +65,7 @@
         <el-radio-group v-model="menuForm.type">
           <el-radio-button
             v-for="dict in getIntDictOptions(DICT_TYPE.SYSTEM_MENU_TYPE)"
-            :key="dict.value"
+            :key="dict.label"
             :label="dict.value"
           >
             {{ dict.label }}
@@ -178,7 +119,7 @@
             <el-radio
               border
               v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
-              :key="dict.value"
+              :key="dict.label"
               :label="dict.value"
             >
               {{ dict.label }}
@@ -235,7 +176,7 @@
 </template>
 <script setup lang="ts" name="Menu">
 // 全局相关的 import
-import { onMounted, reactive, ref } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { useMessage } from '@/hooks/web/useMessage'
@@ -245,9 +186,7 @@ import {
   ElFormItem,
   ElInput,
   ElInputNumber,
-  ElSelect,
   ElTreeSelect,
-  ElOption,
   ElRadio,
   ElRadioGroup,
   ElRadioButton,
@@ -255,21 +194,33 @@ import {
 } from 'element-plus'
 import { Tooltip } from '@/components/Tooltip'
 import { IconSelect } from '@/components/Icon'
-import { VxeTableInstance } from 'vxe-table'
+import { VxeGridInstance } from 'vxe-table'
 // 业务相关的 import
-import * as MenuApi from '@/api/system/menu'
-import { required } from '@/utils/formRules.js'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
 import { handleTree, defaultProps } from '@/utils/tree'
+import * as MenuApi from '@/api/system/menu'
+import { allSchemas, rules } from './menu.data'
+import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 const { wsCache } = useCache()
 // 列表相关的变量
-const xTable = ref<VxeTableInstance>()
-const tableLoading = ref(false)
-const tableData = ref()
+// 列表相关的变量
+const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
+const treeConfig = {
+  transform: true,
+  rowField: 'id',
+  parentField: 'parentId',
+  expandAll: false
+}
+const { gridOptions, getList, deleteData } = useVxeGrid<MenuApi.MenuVO>({
+  allSchemas: allSchemas,
+  treeConfig: treeConfig,
+  getListApi: MenuApi.getMenuListApi,
+  deleteApi: MenuApi.deleteMenuApi
+})
 // 弹窗相关的变量
 const dialogVisible = ref(false) // 是否显示弹出层
 const dialogTitle = ref('edit') // 弹出层标题
@@ -292,13 +243,6 @@ const menuForm = ref<MenuApi.MenuVO>({
   keepAlive: true,
   createTime: new Date()
 })
-// 新增和修改的表单校验
-const rules = reactive({
-  name: [required],
-  sort: [required],
-  path: [required],
-  status: [required]
-})
 
 // ========== 下拉框[上级菜单] ==========
 const menuOptions = ref<any[]>([]) // 树形结构
@@ -309,31 +253,6 @@ const getTree = async () => {
   let menu: Tree = { id: 0, name: '主类目', children: [] }
   menu.children = handleTree(res)
   menuOptions.value.push(menu)
-}
-
-// ========== 查询 ==========
-const queryParams = reactive<MenuApi.MenuPageReqVO>({
-  name: undefined,
-  status: undefined
-})
-// 执行查询
-const getList = async () => {
-  tableLoading.value = true
-  const res = await MenuApi.getMenuListApi(queryParams)
-  tableData.value = res
-  tableLoading.value = false
-}
-
-// 查询操作
-const handleQuery = async () => {
-  await getList()
-}
-
-// 重置操作
-const resetQuery = async () => {
-  queryParams.name = undefined
-  queryParams.status = undefined
-  await getList()
 }
 
 // ========== 新增/修改 ==========
@@ -407,7 +326,7 @@ const submitForm = async () => {
     actionLoading.value = false
     wsCache.delete(CACHE_KEY.ROLE_ROUTERS)
     // 操作成功，重新加载列表
-    await getList()
+    await getList(xGrid)
   }
 }
 
@@ -419,15 +338,6 @@ const isExternal = (path: string) => {
 // ========== 删除 ==========
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  message.delConfirm().then(async () => {
-    await MenuApi.deleteMenuApi(rowId)
-    message.success(t('common.delSuccess'))
-    await getList()
-  })
+  await deleteData(xGrid, rowId)
 }
-
-// ========== 初始化 ==========
-onMounted(async () => {
-  await getList()
-})
 </script>

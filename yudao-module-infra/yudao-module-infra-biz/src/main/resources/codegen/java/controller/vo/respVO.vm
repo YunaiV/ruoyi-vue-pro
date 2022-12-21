@@ -4,6 +4,7 @@ import lombok.*;
 #foreach ($column in $columns)
 #if (${column.javaType} == "LocalDateTime")
 import java.time.LocalDateTime;
+#break
 #end
 #end
 import io.swagger.annotations.*;

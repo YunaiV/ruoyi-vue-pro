@@ -14,7 +14,7 @@ import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { getInfoApi } from '@/api/login'
 import { listSimpleDictDataApi } from '@/api/system/dict/dict.data'
 
-const { wsCache } = useCache('sessionStorage')
+const { wsCache } = useCache()
 
 const { start, done } = useNProgress()
 

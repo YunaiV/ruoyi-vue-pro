@@ -426,5 +426,19 @@ export default {
       cfPwdMsg: 'Please Enter Confirm Password',
       diffPwd: 'The Passwords Entered Twice No Match'
     }
+  },
+  cropper: {
+    selectImage: 'Select Image',
+    uploadSuccess: 'Uploaded success!',
+    modalTitle: 'Avatar upload',
+    okText: 'Confirm and upload',
+    btn_reset: 'Reset',
+    btn_rotate_left: 'Counterclockwise rotation',
+    btn_rotate_right: 'Clockwise rotation',
+    btn_scale_x: 'Flip horizontal',
+    btn_scale_y: 'Flip vertical',
+    btn_zoom_in: 'Zoom in',
+    btn_zoom_out: 'Zoom out',
+    preview: 'Preivew'
   }
 }

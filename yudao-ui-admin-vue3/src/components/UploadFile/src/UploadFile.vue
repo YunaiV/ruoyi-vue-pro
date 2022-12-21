@@ -32,8 +32,8 @@
     </el-upload>
   </div>
 </template>
-<script setup lang="ts">
-import { ref, watch } from 'vue'
+<script setup lang="ts" name="UploadFile">
+import { PropType, ref } from 'vue'
 import { useMessage } from '@/hooks/web/useMessage'
 import { propTypes } from '@/utils/propTypes'
 import { getAccessToken, getTenantId } from '@/utils/auth'
@@ -43,7 +43,10 @@ const message = useMessage() // 消息弹窗
 const emit = defineEmits(['update:modelValue'])
 
 const props = defineProps({
-  modelValue: propTypes.oneOfType([String, Object, Array]),
+  modelValue: {
+    type: Array as PropType<UploadUserFile[]>,
+    required: true
+  },
   title: propTypes.string.def('文件上传'),
   updateUrl: propTypes.string.def(import.meta.env.VITE_UPLOAD_URL),
   fileType: propTypes.array.def(['doc', 'xls', 'ppt', 'txt', 'pdf']), // 文件类型, 例如['png', 'jpg', 'jpeg']
@@ -57,40 +60,12 @@ const props = defineProps({
 const valueRef = ref(props.modelValue)
 const uploadRef = ref<UploadInstance>()
 const uploadList = ref<UploadUserFile[]>([])
-const fileList = ref<UploadUserFile[]>([])
+const fileList = ref<UploadUserFile[]>(props.modelValue)
 const uploadNumber = ref<number>(0)
 const uploadHeaders = ref({
   Authorization: 'Bearer ' + getAccessToken(),
   'tenant-id': getTenantId()
 })
-watch(
-  () => props.modelValue,
-  (val) => {
-    if (val) {
-      // 首先将值转为数组, 当只穿了一个图片时，会报map方法错误
-      const list = Array.isArray(props.modelValue)
-        ? props.modelValue
-        : Array.isArray(props.modelValue?.split(','))
-        ? props.modelValue?.split(',')
-        : Array.of(props.modelValue)
-      // 然后将数组转为对象数组
-      fileList.value = list.map((item) => {
-        if (typeof item === 'string') {
-          // edit by 芋道源码
-          item = { name: item, url: item }
-        }
-        return item
-      })
-    } else {
-      fileList.value = []
-      return []
-    }
-  },
-  {
-    deep: true,
-    immediate: true
-  }
-)
 // 文件上传之前判断
 const beforeUpload: UploadProps['beforeUpload'] = (file: UploadRawFile) => {
   if (fileList.value.length >= props.limit) {

@@ -10,12 +10,10 @@ export const rules = reactive({
   username: [required],
   nickname: [required],
   email: [required],
-  postIds: [required],
   status: [required],
   mobile: [
     {
-      min: 11,
-      max: 11,
+      len: 11,
       trigger: 'blur',
       message: '请输入正确的手机号码'
     }

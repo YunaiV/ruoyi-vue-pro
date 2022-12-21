@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 /**
  * 字典类型表
  *
@@ -46,5 +48,10 @@ public class DictTypeDO extends BaseDO {
      * 备注
      */
     private String remark;
+
+    /**
+     * 删除时间
+     */
+    private LocalDateTime deletedTime;
 
 }

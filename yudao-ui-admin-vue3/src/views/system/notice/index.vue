@@ -53,7 +53,7 @@
       :data="detailData"
     >
       <template #content="{ row }">
-        <Editor :model-value="row.content" read-only="true" />
+        <Editor :model-value="row.content" :readonly="true" />
       </template>
     </Descriptions>
     <template #footer>

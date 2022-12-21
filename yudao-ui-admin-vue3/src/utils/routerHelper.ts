@@ -56,7 +56,13 @@ export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecord
       title: route.name,
       icon: route.icon,
       hidden: !route.visible,
-      noCache: !route.keepAlive
+      noCache: !route.keepAlive,
+      alwaysShow:
+        route.children &&
+        route.children.length === 1 &&
+        import.meta.env.VITE_ROUTE_ALWAYSSHOW_ENABLE === 'true'
+          ? true
+          : false
     }
     // 路由地址转首字母大写驼峰，作为路由名称，适配keepAlive
     let data: AppRouteRecordRaw = {
@@ -71,6 +77,7 @@ export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecord
       data.meta = {}
       data.name = toCamelCase(route.path, true) + 'Parent'
       data.redirect = ''
+      meta.alwaysShow = true
       const childrenData: AppRouteRecordRaw = {
         path: '',
         name: toCamelCase(route.path, true),

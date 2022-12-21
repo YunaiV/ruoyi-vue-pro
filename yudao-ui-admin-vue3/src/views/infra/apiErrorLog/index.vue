@@ -95,9 +95,8 @@ const handleProcessClick = (
   message
     .confirm('确认标记为' + type + '?', t('common.reminder'))
     .then(async () => {
-      ApiErrorLogApi.updateApiErrorLogPageApi(row.id, processSttatus).then(() => {
-        message.success(t('common.updateSuccess'))
-      })
+      await ApiErrorLogApi.updateApiErrorLogPageApi(row.id, processSttatus)
+      message.success(t('common.updateSuccess'))
     })
     .finally(async () => {
       // 刷新列表
