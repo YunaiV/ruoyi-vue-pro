@@ -85,7 +85,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
         meta: {
           canTo: true,
           hidden: true,
-          noTagsView: true,
+          noTagsView: false,
           icon: 'ep:user',
           title: t('common.profile')
         }

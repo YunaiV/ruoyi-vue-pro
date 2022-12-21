@@ -161,6 +161,7 @@ $prefix-cls: #{$namespace}-menu;
     // 设置子菜单悬停的高亮和背景色
     .#{$elNamespace}-sub-menu__title,
     .#{$elNamespace}-menu-item {
+      height: 59px;
       &:hover {
         color: var(--left-menu-text-active-color) !important;
         background-color: var(--left-menu-bg-color) !important;
@@ -170,6 +171,7 @@ $prefix-cls: #{$namespace}-menu;
     // 设置选中时的高亮背景和高亮颜色
     .#{$elNamespace}-sub-menu.is-active,
     .#{$elNamespace}-menu-item.is-active {
+      height: 59px;
       color: var(--left-menu-text-active-color) !important;
       background-color: var(--left-menu-bg-active-color) !important;
 
