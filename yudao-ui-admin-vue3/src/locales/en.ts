@@ -80,6 +80,7 @@ export default {
     screenfullIcon: 'Screenfull icon',
     sizeIcon: 'Size icon',
     localeIcon: 'Locale icon',
+    messageIcon: 'Message icon',
     tagsView: 'Tags view',
     logo: 'Logo',
     greyMode: 'Grey mode',
