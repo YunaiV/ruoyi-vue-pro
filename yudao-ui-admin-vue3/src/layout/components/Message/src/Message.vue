@@ -1,61 +1,8 @@
-<template>
-  <div class="message">
-    <el-popover placement="bottom" :width="310" trigger="click">
-      <template #reference>
-        <el-badge :value="noticeList.length" class="item">
-          <Icon icon="ep:bell" :size="18" class="cursor-pointer" />
-        </el-badge>
-      </template>
-      <el-tabs v-model="activeName">
-        <el-tab-pane label="通知(5)" name="first">
-          <div class="message-list">
-            <template v-for="item in noticeList" :key="item.id">
-              <div class="message-item">
-                <img src="@/assets/imgs/avatar.gif" alt="" class="message-icon" />
-                <div class="message-content">
-                  <span class="message-title">{{ item.title }}</span>
-                  <span class="message-date">{{ item.date }}</span>
-                </div>
-              </div>
-            </template>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="消息(0)" name="second">
-          <div class="message-list">
-            <template v-for="item in messageList" :key="item.id">
-              <div class="message-item">
-                <img src="@/assets/imgs/avatar.gif" alt="" class="message-icon" />
-                <div class="message-content">
-                  <span class="message-title">{{ item.title }}</span>
-                  <span class="message-date">{{ item.date }}</span>
-                </div>
-              </div>
-            </template>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="代办(0)" name="third">
-          <div class="message-list">
-            <template v-for="item in needList" :key="item.id">
-              <div class="message-item">
-                <img src="@/assets/imgs/avatar.gif" alt="" class="message-icon" />
-                <div class="message-content">
-                  <span class="message-title">{{ item.title }}</span>
-                  <span class="message-date">{{ item.date }}</span>
-                </div>
-              </div>
-            </template>
-          </div>
-        </el-tab-pane>
-      </el-tabs>
-    </el-popover>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ElTabs, ElTabPane, ElPopover, ElBadge } from 'element-plus'
 
-const activeName = ref('first')
+const activeName = ref('notice')
 
 const noticeList = ref([
   { id: 1, title: '版本升级1', date: '2022-12-12 10:00:00' },
@@ -79,7 +26,58 @@ const needList = ref([
   { id: 5, title: '审批5', date: '2022-12-12 10:00:00' }
 ])
 </script>
-
+<template>
+  <div class="message">
+    <ElPopover placement="bottom" :width="310" trigger="click">
+      <template #reference>
+        <ElBadge :value="noticeList.length" class="item">
+          <Icon icon="ep:bell" :size="18" class="cursor-pointer" />
+        </ElBadge>
+      </template>
+      <ElTabs v-model="activeName">
+        <ElTabPane label="通知(5)" name="notice">
+          <div class="message-list">
+            <template v-for="item in noticeList" :key="item.id">
+              <div class="message-item">
+                <img src="@/assets/imgs/avatar.gif" alt="" class="message-icon" />
+                <div class="message-content">
+                  <span class="message-title">{{ item.title }}</span>
+                  <span class="message-date">{{ item.date }}</span>
+                </div>
+              </div>
+            </template>
+          </div>
+        </ElTabPane>
+        <ElTabPane label="消息(0)" name="message">
+          <div class="message-list">
+            <template v-for="item in messageList" :key="item.id">
+              <div class="message-item">
+                <img src="@/assets/imgs/avatar.gif" alt="" class="message-icon" />
+                <div class="message-content">
+                  <span class="message-title">{{ item.title }}</span>
+                  <span class="message-date">{{ item.date }}</span>
+                </div>
+              </div>
+            </template>
+          </div>
+        </ElTabPane>
+        <ElTabPane label="代办(0)" name="need">
+          <div class="message-list">
+            <template v-for="item in needList" :key="item.id">
+              <div class="message-item">
+                <img src="@/assets/imgs/avatar.gif" alt="" class="message-icon" />
+                <div class="message-content">
+                  <span class="message-title">{{ item.title }}</span>
+                  <span class="message-date">{{ item.date }}</span>
+                </div>
+              </div>
+            </template>
+          </div>
+        </ElTabPane>
+      </ElTabs>
+    </ElPopover>
+  </div>
+</template>
 <style scoped lang="scss">
 .message-empty {
   display: flex;
