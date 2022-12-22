@@ -90,7 +90,7 @@
       </template>
       <template v-if="menuForm.type === 2">
         <el-col :span="16">
-          <el-form-item label="路由地址" prop="component">
+          <el-form-item label="组件地址" prop="component">
             <el-input v-model="menuForm.component" placeholder="请输入组件地址" clearable />
           </el-form-item>
         </el-col>
