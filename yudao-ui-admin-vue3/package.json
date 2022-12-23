@@ -1,6 +1,6 @@
 {
   "name": "yudao-ui-admin-vue3",
-  "version": "1.6.5.1878",
+  "version": "1.6.5.1879",
   "description": "基于vue3、vite4、element-plus、typesScript",
   "author": "xingyu",
   "private": false,
@@ -57,7 +57,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
     "@commitlint/config-conventional": "^17.3.0",
-    "@iconify/json": "^2.1.155",
+    "@iconify/json": "^2.1.156",
     "@intlify/unplugin-vue-i18n": "^0.8.1",
     "@purge-icons/generated": "^0.9.0",
     "@types/intro.js": "^5.1.0",
@@ -84,7 +84,7 @@
     "postcss-scss": "^4.0.6",
     "prettier": "^2.8.1",
     "rimraf": "^3.0.2",
-    "rollup": "^3.8.0",
+    "rollup": "^3.8.1",
     "sass": "^1.57.1",
     "stylelint": "^14.16.0",
     "stylelint-config-html": "^1.1.0",
