@@ -43,7 +43,6 @@ public class RedisPendingMessageResendJob {
     @Scheduled(cron = "35 * * * * ?")
     public void messageResend() {
         RLock lock = redissonClient.getLock(LOCK_KEY);
-        log.info("[messageResend][尝试获取锁]");
         // 尝试加锁
         if (lock.tryLock()) {
             try {
