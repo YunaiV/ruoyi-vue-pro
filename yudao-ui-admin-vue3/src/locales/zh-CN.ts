@@ -80,6 +80,7 @@ export default {
     screenfullIcon: '全屏图标',
     sizeIcon: '尺寸图标',
     localeIcon: '多语言图标',
+    messageIcon: '消息图标',
     tagsView: '标签页',
     logo: '标志',
     greyMode: '灰色模式',
@@ -419,5 +420,19 @@ export default {
       pwdRules: '长度在 6 到 20 个字符',
       diffPwd: '两次输入密码不一致'
     }
+  },
+  cropper: {
+    selectImage: '选择图片',
+    uploadSuccess: '上传成功',
+    modalTitle: '头像上传',
+    okText: '确认并上传',
+    btn_reset: '重置',
+    btn_rotate_left: '逆时针旋转',
+    btn_rotate_right: '顺时针旋转',
+    btn_scale_x: '水平翻转',
+    btn_scale_y: '垂直翻转',
+    btn_zoom_in: '放大',
+    btn_zoom_out: '缩小',
+    preview: '预览'
   }
 }

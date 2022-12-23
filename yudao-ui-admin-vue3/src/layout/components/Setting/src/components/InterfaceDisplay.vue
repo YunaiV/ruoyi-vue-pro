@@ -57,6 +57,13 @@ const localeChange = (show: boolean) => {
   appStore.setLocale(show)
 }
 
+// 消息图标
+const message = ref(appStore.getMessage)
+
+const messageChange = (show: boolean) => {
+  appStore.setMessage(show)
+}
+
 // 标签页
 const tagsView = ref(appStore.getTagsView)
 
@@ -162,6 +169,11 @@ watch(
     <div class="flex justify-between items-center">
       <span class="text-14px">{{ t('setting.localeIcon') }}</span>
       <ElSwitch v-model="locale" @change="localeChange" />
+    </div>
+
+    <div class="flex justify-between items-center">
+      <span class="text-14px">{{ t('setting.messageIcon') }}</span>
+      <ElSwitch v-model="message" @change="messageChange" />
     </div>
 
     <div class="flex justify-between items-center">

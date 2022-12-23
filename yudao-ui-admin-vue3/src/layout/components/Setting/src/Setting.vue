@@ -122,6 +122,8 @@ const copyConfig = async () => {
       size: ${appStore.getSize},
       // 多语言图标
       locale: ${appStore.getLocale},
+      // 消息图标
+      message: ${appStore.getMessage},
       // 标签页
       tagsView: ${appStore.getTagsView},
       // 标签页图标
