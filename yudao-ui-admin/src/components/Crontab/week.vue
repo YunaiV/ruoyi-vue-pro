@@ -144,25 +144,25 @@ export default {
 
 		// 周期两个值变化时
 		cycleChange() {
-			if (this.radioValue == '3') {
+			if (this.radioValue === '3') {
 				this.$emit('update', 'week', this.cycleTotal);
 			}
 		},
 		// 平均两个值变化时
 		averageChange() {
-			if (this.radioValue == '4') {
+			if (this.radioValue === '4') {
 				this.$emit('update', 'week', this.averageTotal);
 			}
 		},
 		// 最近工作日值变化时
 		weekdayChange() {
-			if (this.radioValue == '5') {
+			if (this.radioValue === '5') {
 				this.$emit('update', 'week', this.weekday + 'L');
 			}
 		},
 		// checkbox值变化时
 		checkboxChange() {
-			if (this.radioValue == '6') {
+			if (this.radioValue === '6') {
 				this.$emit('update', 'week', this.checkboxString);
 			}
 		},
@@ -195,7 +195,7 @@ export default {
 		// 计算勾选的checkbox值合集
 		checkboxString: function () {
 			let str = this.checkboxList.join();
-			return str == '' ? '*' : str;
+			return str === '' ? '*' : str;
 		}
 	}
 }

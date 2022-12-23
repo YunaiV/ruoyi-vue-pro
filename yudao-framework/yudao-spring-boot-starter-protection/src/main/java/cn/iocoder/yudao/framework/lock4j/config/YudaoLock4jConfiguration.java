@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.framework.lock4j.config;
 
 import cn.hutool.core.util.ClassUtil;
+import com.baomidou.lock.spring.boot.autoconfigure.LockAutoConfiguration;
 import cn.iocoder.yudao.framework.lock4j.core.DefaultLockFailureStrategy;
 import cn.iocoder.yudao.framework.lock4j.core.Lock4jRedisKeyConstants;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@AutoConfiguration(before = LockAutoConfiguration.class)
 public class YudaoLock4jConfiguration {
 
     static {

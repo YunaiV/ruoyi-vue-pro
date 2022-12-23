@@ -54,11 +54,25 @@ public class CollectionUtils {
         return from.stream().map(func).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+    public static <T, U> List<U> convertList(Collection<T> from, Function<T, U> func, Predicate<T> filter) {
+        if (CollUtil.isEmpty(from)) {
+            return new ArrayList<>();
+        }
+        return from.stream().filter(filter).map(func).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
     public static <T, U> Set<U> convertSet(Collection<T> from, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return new HashSet<>();
         }
         return from.stream().map(func).filter(Objects::nonNull).collect(Collectors.toSet());
+    }
+
+    public static <T, U> Set<U> convertSet(Collection<T> from, Function<T, U> func, Predicate<T> filter) {
+        if (CollUtil.isEmpty(from)) {
+            return new HashSet<>();
+        }
+        return from.stream().filter(filter).map(func).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     public static <T, K> Map<K, T> convertMap(Collection<T> from, Function<T, K> keyFunc) {
@@ -157,6 +171,23 @@ public class CollectionUtils {
         assert from.size() > 0; // 断言，避免告警
         T t = from.stream().max(Comparator.comparing(valueFunc)).get();
         return valueFunc.apply(t);
+    }
+
+    public static <T, V extends Comparable<? super V>> V getMinValue(List<T> from, Function<T, V> valueFunc) {
+        if (CollUtil.isEmpty(from)) {
+            return null;
+        }
+        assert from.size() > 0; // 断言，避免告警
+        T t = from.stream().min(Comparator.comparing(valueFunc)).get();
+        return valueFunc.apply(t);
+    }
+
+    public static <T, V extends Comparable<? super V>> V getSumValue(List<T> from, Function<T, V> valueFunc, BinaryOperator<V> accumulator) {
+        if (CollUtil.isEmpty(from)) {
+            return null;
+        }
+        assert from.size() > 0; // 断言，避免告警
+        return from.stream().map(valueFunc).reduce(accumulator).get();
     }
 
     public static <T> void addIfNotNull(Collection<T> coll, T item) {

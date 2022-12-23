@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 登录日志 Excel 导出响应 VO
@@ -35,6 +35,6 @@ public class LoginLogExcelVO {
     private String userAgent;
 
     @ExcelProperty("登录时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

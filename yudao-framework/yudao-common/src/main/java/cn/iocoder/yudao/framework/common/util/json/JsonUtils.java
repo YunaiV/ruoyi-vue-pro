@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class JsonUtils {
 
     static {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        objectMapper.registerModules(new JavaTimeModule()); // 解决 LocalDateTime 的序列化
     }
 
     /**
@@ -51,6 +53,10 @@ public class JsonUtils {
         return objectMapper.writeValueAsBytes(object);
     }
 
+    @SneakyThrows
+    public static String toJsonPrettyString(Object object) {
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+    }
 
     public static <T> T parseObject(String text, Class<T> clazz) {
         if (StrUtil.isEmpty(text)) {
@@ -113,8 +119,7 @@ public class JsonUtils {
         }
     }
 
-    // TODO @Li：和上面的风格保持一致哈。parseTree
-    public static JsonNode readTree(String text) {
+    public static JsonNode parseTree(String text) {
         try {
             return objectMapper.readTree(text);
         } catch (IOException e) {
@@ -123,13 +128,17 @@ public class JsonUtils {
         }
     }
 
-    public static JsonNode readTree(byte[] text) {
+    public static JsonNode parseTree(byte[] text) {
         try {
             return objectMapper.readTree(text);
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
         }
+    }
+
+    public static boolean isJson(String text) {
+        return JSONUtil.isTypeJSON(text);
     }
 
 }

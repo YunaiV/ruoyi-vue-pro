@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.infra.service.logger;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiAccessLogCreateReqDTO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.module.infra.api.logger.dto.ApiAccessLogCreateReqDTO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog.ApiAccessLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog.ApiAccessLogPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiAccessLogDO;
@@ -16,10 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,7 +40,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         int userType = UserTypeEnum.ADMIN.getValue();
         String applicationName = "yudao-test";
         String requestUrl = "foo";
-        Date beginTime = buildTime(2021, 3, 13);
+        LocalDateTime beginTime = buildTime(2021, 3, 13);
         int duration = 1000;
         int resultCode = GlobalErrorCodeConstants.SUCCESS.getCode();
 
@@ -77,8 +77,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserType(userType);
         reqVO.setApplicationName(applicationName);
         reqVO.setRequestUrl(requestUrl);
-        reqVO.setBeginBeginTime(buildTime(2021, 3, 12));
-        reqVO.setEndBeginTime(buildTime(2021, 3, 14));
+        reqVO.setBeginTime((new LocalDateTime[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
         reqVO.setDuration(duration);
         reqVO.setResultCode(resultCode);
 
@@ -98,7 +97,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         int userType = UserTypeEnum.ADMIN.getValue();
         String applicationName = "yudao-test";
         String requestUrl = "foo";
-        Date beginTime = buildTime(2021, 3, 13);
+        LocalDateTime beginTime = buildTime(2021, 3, 13);
         int duration = 1000;
         int resultCode = GlobalErrorCodeConstants.SUCCESS.getCode();
 
@@ -135,8 +134,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserType(userType);
         reqVO.setApplicationName(applicationName);
         reqVO.setRequestUrl(requestUrl);
-        reqVO.setBeginBeginTime(buildTime(2021, 3, 12));
-        reqVO.setEndBeginTime(buildTime(2021, 3, 14));
+        reqVO.setBeginTime((new LocalDateTime[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
         reqVO.setDuration(duration);
         reqVO.setResultCode(resultCode);
 
@@ -155,7 +153,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
                 dto -> dto.setUserType(RandomUtil.randomEle(UserTypeEnum.values()).getValue()));
 
         // 调用
-        apiAccessLogService.createApiAccessLogAsync(createDTO);
+        apiAccessLogService.createApiAccessLog(createDTO);
         // 断言
         ApiAccessLogDO infApiAccessLogDO = apiAccessLogMapper.selectOne(null);
         assertNotNull(infApiAccessLogDO);

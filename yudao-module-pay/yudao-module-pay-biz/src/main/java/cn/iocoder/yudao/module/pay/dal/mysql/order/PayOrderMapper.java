@@ -27,7 +27,7 @@ public interface PayOrderMapper extends BaseMapperX<PayOrderDO> {
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("refund_status", reqVO.getRefundStatus())
                 .likeIfPresent("channel_order_no", reqVO.getChannelOrderNo())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("id"));
     }
 
@@ -42,7 +42,7 @@ public interface PayOrderMapper extends BaseMapperX<PayOrderDO> {
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("refund_status", reqVO.getRefundStatus())
                 .likeIfPresent("channel_order_no", reqVO.getChannelOrderNo())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("id"));
     }
 

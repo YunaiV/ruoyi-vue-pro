@@ -18,13 +18,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -59,7 +59,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         // 调用
         smsChannelService.initSmsClients();
         // 校验 maxUpdateTime 属性
-        Date maxUpdateTime = (Date) BeanUtil.getFieldValue(smsChannelService, "maxUpdateTime");
+        LocalDateTime maxUpdateTime = (LocalDateTime) BeanUtil.getFieldValue(smsChannelService, "maxUpdateTime");
         assertEquals(max(smsChannelDO01.getUpdateTime(), smsChannelDO02.getUpdateTime()), maxUpdateTime);
         // 校验调用
         verify(smsClientFactory, times(1)).createOrUpdateSmsClient(
@@ -172,8 +172,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
        SmsChannelPageReqVO reqVO = new SmsChannelPageReqVO();
        reqVO.setSignature("芋道");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setBeginCreateTime(buildTime(2020, 12, 1));
-       reqVO.setEndCreateTime(buildTime(2020, 12, 24));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)}));
 
        // 调用
        PageResult<SmsChannelDO> pageResult = smsChannelService.getSmsChannelPage(reqVO);

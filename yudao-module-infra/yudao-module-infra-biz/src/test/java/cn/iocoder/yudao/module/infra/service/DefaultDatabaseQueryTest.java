@@ -27,8 +27,8 @@ public class DefaultDatabaseQueryTest {
             if (StrUtil.startWithAny(tableInfo.getName().toLowerCase(), "act_", "flw_", "qrtz_")) {
                 continue;
             }
-//            System.out.println(String.format("CREATE SEQUENCE %s_seq MINVALUE 0;", tableInfo.getName()));
-            System.out.println(String.format("DELETE FROM %s WHERE deleted = '1';", tableInfo.getName()));
+            System.out.println(String.format("CREATE SEQUENCE %s_seq MINVALUE 1;", tableInfo.getName()));
+//            System.out.println(String.format("DELETE FROM %s WHERE deleted = '1';", tableInfo.getName()));
         }
         System.out.println(tableInfos.size());
         System.out.println(System.currentTimeMillis() - time);

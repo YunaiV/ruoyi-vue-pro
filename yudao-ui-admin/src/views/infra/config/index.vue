@@ -17,9 +17,9 @@
                      :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
-          range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -41,28 +41,28 @@
 
     <el-table v-loading="loading" :data="configList">
       <el-table-column label="参数主键" align="center" prop="id" />
-      <el-table-column label="参数分类" align="center" prop="group" />
+      <el-table-column label="参数分类" align="center" prop="category" />
       <el-table-column label="参数名称" align="center" prop="name" :show-overflow-tooltip="true" />
       <el-table-column label="参数键名" align="center" prop="key" :show-overflow-tooltip="true" />
       <el-table-column label="参数键值" align="center" prop="value" />
       <el-table-column label="系统内置" align="center" prop="type">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_CONFIG_TYPE" :value="scope.row.type" />
         </template>
       </el-table-column>
       <el-table-column label="是否可见" align="center" prop="visible">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ scope.row.visible ? '是' : '否' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['infra:config:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -129,15 +129,14 @@ export default {
       open: false,
       // 类型数据字典
       typeOptions: [],
-      // 日期范围
-      dateRange: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
         pageSize: 10,
         name: undefined,
         key: undefined,
-        type: undefined
+        type: undefined,
+        createTime: []
       },
       // 表单参数
       form: {},
@@ -165,10 +164,7 @@ export default {
     /** 查询参数列表 */
     getList() {
       this.loading = true;
-      listConfig(this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ])).then(response => {
+      listConfig(this.queryParams).then(response => {
           this.configList = response.data.list;
           this.total = response.data.total;
           this.loading = false;
@@ -198,7 +194,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -250,13 +245,13 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ]);
       this.$modal.confirm('是否确认导出所有参数数据项?').then(() => {
+          // 处理查询参数
+          let params = {...this.queryParams};
+          params.pageNo = undefined;
+          params.pageSize = undefined;
           this.exportLoading = true;
-          return exportConfig(queryParams);
+          return exportConfig(params);
         }).then(response => {
           this.$download.excel(response, '参数配置.xls');
           this.exportLoading = false;

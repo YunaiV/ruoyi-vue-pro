@@ -24,7 +24,8 @@ public interface PostMapper extends BaseMapperX<PostDO> {
         return selectPage(reqVO, new QueryWrapperX<PostDO>()
                 .likeIfPresent("code", reqVO.getCode())
                 .likeIfPresent("name", reqVO.getName())
-                .eqIfPresent("status", reqVO.getStatus()));
+                .eqIfPresent("status", reqVO.getStatus())
+                .orderByDesc("id"));
     }
 
     default List<PostDO> selectList(PostExportReqVO reqVO) {

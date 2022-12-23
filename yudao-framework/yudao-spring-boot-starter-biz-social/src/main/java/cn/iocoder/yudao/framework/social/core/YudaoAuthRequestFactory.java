@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.social.core;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.social.core.enums.AuthExtendSource;
-import cn.iocoder.yudao.framework.social.core.request.AuthWeChatMiniProgramRequest;
+import cn.iocoder.yudao.framework.social.core.request.AuthWeChatMiniAppRequest;
 import com.xkcoding.justauth.AuthRequestFactory;
 import com.xkcoding.justauth.autoconfigure.JustAuthProperties;
 import me.zhyd.oauth.cache.AuthStateCache;
@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
  * @author timfruit
  * @date 2021-10-31
  */
-// TODO @timfruit：单测
 public class YudaoAuthRequestFactory extends AuthRequestFactory {
 
     protected JustAuthProperties properties;
@@ -44,6 +43,7 @@ public class YudaoAuthRequestFactory extends AuthRequestFactory {
      * @param source {@link AuthSource}
      * @return {@link AuthRequest}
      */
+    @Override
     public AuthRequest get(String source) {
         // 先尝试获取自定义扩展的
         AuthRequest authRequest = getExtendRequest(source);
@@ -69,15 +69,14 @@ public class YudaoAuthRequestFactory extends AuthRequestFactory {
         if (config == null) {
             return null;
         }
-        // 配置 http config
-        ReflectUtil.invoke(this, configureHttpConfigMethod,
-                authExtendSource.name(), config, properties.getHttpConfig());
+        // 反射调用，配置 http config
+        ReflectUtil.invoke(this, configureHttpConfigMethod, authExtendSource.name(), config, properties.getHttpConfig());
 
         // 获得拓展的 Request
         // noinspection SwitchStatementWithTooFewBranches
         switch (authExtendSource) {
-            case WECHAT_MINI_PROGRAM:
-                return new AuthWeChatMiniProgramRequest(config, authStateCache);
+            case WECHAT_MINI_APP:
+                return new AuthWeChatMiniAppRequest(config, authStateCache);
             default:
                 return null;
         }

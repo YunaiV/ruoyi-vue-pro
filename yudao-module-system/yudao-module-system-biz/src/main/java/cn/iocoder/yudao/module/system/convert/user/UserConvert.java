@@ -14,7 +14,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface UserConvert {
@@ -52,7 +51,5 @@ public interface UserConvert {
     AdminUserRespDTO convert4(AdminUserDO bean);
 
     List<AdminUserRespDTO> convertList4(List<AdminUserDO> users);
-
-    Map<Long, AdminUserRespDTO> convertMap4(Map<Long, AdminUserDO> map);
 
 }

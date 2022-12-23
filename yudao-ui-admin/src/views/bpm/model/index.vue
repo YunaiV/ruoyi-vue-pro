@@ -40,19 +40,19 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="流程标识" align="center" prop="key" />
       <el-table-column label="流程名称" align="center" prop="name" width="200">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button type="text" @click="handleBpmnDetail(scope.row)">
             <span>{{ scope.row.name }}</span>
           </el-button>
         </template>
       </el-table-column>
       <el-table-column label="流程分类" align="center" prop="category" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.BPM_MODEL_CATEGORY" :value="scope.row.category" />
         </template>
       </el-table-column>
       <el-table-column label="表单信息" align="center" prop="formType" width="200">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button v-if="scope.row.formId" type="text" @click="handleFormDetail(scope.row)">
             <span>{{ scope.row.formName }}</span>
           </el-button>
@@ -63,31 +63,31 @@
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="最新部署的流程定义" align="center">
         <el-table-column label="流程版本" align="center" prop="processDefinition.version" width="80">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-tag size="medium" v-if="scope.row.processDefinition">v{{ scope.row.processDefinition.version }}</el-tag>
             <el-tag size="medium" type="warning" v-else>未部署</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="激活状态" align="center" prop="processDefinition.version" width="80">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-switch v-if="scope.row.processDefinition" v-model="scope.row.processDefinition.suspensionState"
                        :active-value="1" :inactive-value="2" @change="handleChangeState(scope.row)" />
           </template>
         </el-table-column>
         <el-table-column label="部署时间" align="center" prop="deploymentTime" width="180">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <span v-if="scope.row.processDefinition">{{ parseTime(scope.row.processDefinition.deploymentTime) }}</span>
           </template>
         </el-table-column>
       </el-table-column>
       <el-table-column label="操作" align="center" width="450" fixed="right">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['bpm:model:update']">修改流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-setting" @click="handleDesign(scope.row)"
@@ -121,7 +121,7 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="110px">
         <el-form-item label="流程标识" prop="key">
-          <el-input v-model="form.key" placeholder="请输入流标标识" style="width: 330px;" :disabled="form.id" />
+          <el-input v-model="form.key" placeholder="请输入流标标识" style="width: 330px;" :disabled="!!form.id" />
           <el-tooltip v-if="!form.id" class="item" effect="light" content="新建后，流程标识不可修改！" placement="top">
             <i style="padding-left: 5px;" class="el-icon-question" />
           </el-tooltip>
@@ -130,7 +130,7 @@
           </el-tooltip>
         </el-form-item>
         <el-form-item label="流程名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入流程名称" :disabled="form.id" clearable />
+          <el-input v-model="form.name" placeholder="请输入流程名称" :disabled="!!form.id" clearable />
         </el-form-item>
         <el-form-item v-if="form.id" label="流程分类" prop="category">
           <el-select v-model="form.category" placeholder="请选择流程分类" clearable style="width: 100%">
@@ -259,7 +259,7 @@ export default {
       showBpmnOpen: false,
       bpmnXML: null,
       bpmnControlForm: {
-        prefix: "activiti"
+        prefix: "flowable"
       },
 
       // 流程表单详情
@@ -429,7 +429,7 @@ export default {
       this.$modal.confirm('是否删除该流程！！').then(function() {
         deleteModel(row.id).then(response => {
           that.getList();
-          that.msgSuccess("删除成功");
+          that.$modal.msgSuccess("删除成功");
         })
       }).catch(() => {});
     },
@@ -439,7 +439,7 @@ export default {
       this.$modal.confirm('是否部署该流程！！').then(function() {
         deployModel(row.id).then(response => {
           that.getList();
-          that.msgSuccess("部署成功");
+          that.$modal.msgSuccess("部署成功");
         })
       }).catch(() => {});
     },
@@ -489,7 +489,10 @@ export default {
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess(statusState + "成功");
-      }).catch(() => {});
+      }).catch(() => {
+        // 取消后，进行恢复按钮
+        row.processDefinition.suspensionState = (state === 1 ? 2 : 1);
+      });
     },
     /** 导入按钮操作 */
     handleImport() {

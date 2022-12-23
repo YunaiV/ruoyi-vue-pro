@@ -1,0 +1,2 @@
+cn.iocoder.yudao.framework.security.config.YudaoSecurityAutoConfiguration
+cn.iocoder.yudao.framework.security.config.YudaoWebSecurityConfigurerAdapter

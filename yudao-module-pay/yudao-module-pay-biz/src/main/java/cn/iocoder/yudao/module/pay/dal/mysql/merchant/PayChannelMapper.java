@@ -10,8 +10,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -22,7 +22,7 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
     }
 
     @Select("SELECT COUNT(*) FROM pay_channel WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
+    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
     default PageResult<PayChannelDO> selectPage(PayChannelPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<PayChannelDO>()
@@ -32,7 +32,7 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
                 .eqIfPresent("fee_rate", reqVO.getFeeRate())
                 .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("id"));
     }
 
@@ -44,7 +44,7 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
                 .eqIfPresent("fee_rate", reqVO.getFeeRate())
                 .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("id"));
     }
 

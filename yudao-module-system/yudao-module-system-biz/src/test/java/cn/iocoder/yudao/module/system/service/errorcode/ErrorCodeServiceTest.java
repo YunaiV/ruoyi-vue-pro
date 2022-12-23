@@ -1,32 +1,33 @@
 package cn.iocoder.yudao.module.system.service.errorcode;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.dal.dataobject.errorcode.ErrorCodeDO;
-import cn.iocoder.yudao.module.system.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeAutoGenerateReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeUpdateReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.errorcode.ErrorCodeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.errorcode.ErrorCodeMapper;
 import cn.iocoder.yudao.module.system.enums.errorcode.ErrorCodeTypeEnum;
-import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.ERROR_CODE_DUPLICATE;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.ERROR_CODE_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.ERROR_CODE_DUPLICATE;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.ERROR_CODE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Import(ErrorCodeServiceImpl.class)
@@ -95,8 +96,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
        reqVO.setApplicationName("tu");
        reqVO.setCode(1);
        reqVO.setMessage("ma");
-       reqVO.setBeginCreateTime(buildTime(2020, 11, 1));
-       reqVO.setEndCreateTime(buildTime(2020, 11, 30));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
 
        // 调用
        PageResult<ErrorCodeDO> pageResult = errorCodeService.getErrorCodePage(reqVO);
@@ -141,8 +141,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
         reqVO.setApplicationName("tu");
         reqVO.setCode(1);
         reqVO.setMessage("ma");
-        reqVO.setBeginCreateTime(buildTime(2020, 11, 1));
-        reqVO.setEndCreateTime(buildTime(2020, 11, 30));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
 
         // 调用
         List<ErrorCodeDO> list = errorCodeService.getErrorCodeList(reqVO);

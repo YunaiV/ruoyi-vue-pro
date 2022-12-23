@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
+import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
@@ -9,14 +10,13 @@ import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthUpdatePasswo
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
-import cn.iocoder.yudao.module.system.api.auth.UserSessionApi;
+import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.logger.LoginLogApi;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.Resource;
@@ -38,8 +38,11 @@ import static org.mockito.Mockito.when;
 @Import({MemberAuthServiceImpl.class, YudaoRedisAutoConfiguration.class})
 public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
 
-    @MockBean
-    private AuthenticationManager authenticationManager;
+    // TODO @芋艿：登录相关的单测，待补全
+
+    @Resource
+    private MemberAuthServiceImpl authService;
+
     @MockBean
     private MemberUserService userService;
     @MockBean
@@ -47,15 +50,16 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
     @MockBean
     private LoginLogApi loginLogApi;
     @MockBean
-    private UserSessionApi userSessionApi;
+    private OAuth2TokenApi oauth2TokenApi;
     @MockBean
     private SocialUserApi socialUserApi;
     @MockBean
+    private WxMaService wxMaService;
+    @MockBean
     private PasswordEncoder passwordEncoder;
+
     @Resource
     private MemberUserMapper memberUserMapper;
-    @Resource
-    private MemberAuthServiceImpl authService;
 
     @Test
     public void testUpdatePassword_success(){

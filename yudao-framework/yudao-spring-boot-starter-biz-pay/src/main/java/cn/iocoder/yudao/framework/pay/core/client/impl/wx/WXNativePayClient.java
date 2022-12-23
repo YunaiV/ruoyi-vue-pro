@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.wx;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
@@ -11,6 +12,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.*;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
+import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyV3Result;
 import com.github.binarywang.wxpay.bean.order.WxPayNativeOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderV3Request;
@@ -28,9 +30,14 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.CODE_SUCCESS;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.MESSAGE_SUCCESS;
 
-
+/**
+ * 微信 App 支付
+ *
+ * @author zwy
+ */
 @Slf4j
 public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
+
     private WxPayService client;
 
     public WXNativePayClient(Long channelId, WXPayClientConfig config) {
@@ -61,7 +68,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
     @Override
     public PayCommonResult<String> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         // 这里原生的返回的是支付的 url 所以直接使用string接收
-        //"invokeResponse": "weixin://wxpay/bizpayurl?pr=EGYAem7zz"
+        // "invokeResponse": "weixin://wxpay/bizpayurl?pr=EGYAem7zz"
         String responseV3;
         try {
             switch (config.getApiVersion()) {
@@ -84,7 +91,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
 
     private WxPayNativeOrderResult unifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         //前端
-        String trade_type = reqDTO.getChannelExtras().get("trade_type");
+        String tradeType = reqDTO.getChannelExtras().get("trade_type");
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderRequest request = WxPayUnifiedOrderRequest
                 .newBuilder()
@@ -94,7 +101,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
                 .spbillCreateIp(reqDTO.getUserIp())
                 .notifyUrl(reqDTO.getNotifyUrl())
-                .productId(trade_type)
+                .productId(tradeType)
                 .build();
         // 执行请求
         return client.createOrder(request);
@@ -109,33 +116,72 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
         request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         // 执行请求
-//        log.info("支付字段request:{}",request.getTimeExpire());
-
         return client.createOrderV3(TradeTypeEnum.NATIVE, request);
     }
 
-
+    /**
+     *
+     * 微信支付回调 分v2 和v3 的处理方式
+     *
+     * @param data 通知结果
+     * @return 支付回调对象
+     * @throws WxPayException 微信异常类
+     */
     @Override
     public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws WxPayException {
+        log.info("微信支付回调data数据:{}", data.getBody());
+        // 微信支付 v2 回调结果处理
+        switch (config.getApiVersion()) {
+            case WXPayClientConfig.API_VERSION_V2:
+                return parseOrderNotifyV2(data);
+            case WXPayClientConfig.API_VERSION_V3:
+                return parseOrderNotifyV3(data);
+            default:
+                throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+        }
+    }
+
+    private PayOrderNotifyRespDTO parseOrderNotifyV3(PayNotifyDataDTO data) throws WxPayException {
+        WxPayOrderNotifyV3Result wxPayOrderNotifyV3Result = client.parseOrderNotifyV3Result(data.getBody(), null);
+        WxPayOrderNotifyV3Result.DecryptNotifyResult result = wxPayOrderNotifyV3Result.getResult();
+        // 转换结果
+        Assert.isTrue(Objects.equals(wxPayOrderNotifyV3Result.getResult().getTradeState(), "SUCCESS"),
+                "支付结果非 SUCCESS");
+        return PayOrderNotifyRespDTO
+                .builder()
+                .orderExtensionNo(result.getOutTradeNo())
+                .channelOrderNo(result.getTradeState())
+                .successTime(LocalDateTimeUtil.parse(result.getSuccessTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
+                .data(data.getBody())
+                .build();
+    }
+
+    private PayOrderNotifyRespDTO parseOrderNotifyV2(PayNotifyDataDTO data) throws WxPayException {
         WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(data.getBody());
         Assert.isTrue(Objects.equals(notifyResult.getResultCode(), "SUCCESS"), "支付结果非 SUCCESS");
         // 转换结果
-        return PayOrderNotifyRespDTO.builder().orderExtensionNo(notifyResult.getOutTradeNo())
-                .channelOrderNo(notifyResult.getTransactionId()).channelUserId(notifyResult.getOpenid())
-                .successTime(DateUtil.parse(notifyResult.getTimeEnd(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
-                .data(data.getBody()).build();
+        return PayOrderNotifyRespDTO
+                .builder()
+                .orderExtensionNo(notifyResult.getOutTradeNo())
+                .channelOrderNo(notifyResult.getTransactionId())
+                .channelUserId(notifyResult.getOpenid())
+                .successTime(LocalDateTimeUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"))
+                .data(data.getBody())
+                .build();
+
     }
 
     @Override
     public PayRefundNotifyDTO parseRefundNotify(PayNotifyDataDTO notifyData) {
-        //TODO 需要实现
+        // TODO 需要实现
         throw new UnsupportedOperationException("需要实现");
     }
 
 
     @Override
     protected PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
-        //TODO 需要实现
+        // TODO 需要实现
         throw new UnsupportedOperationException();
     }
+
 }

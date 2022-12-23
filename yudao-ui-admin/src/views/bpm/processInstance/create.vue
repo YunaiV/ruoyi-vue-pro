@@ -4,25 +4,25 @@
     <div v-if="!selectProcessInstance">
       <el-table v-loading="loading" :data="list">
         <el-table-column label="流程名称" align="center" prop="name" width="200">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button type="text" @click="handleBpmnDetail(scope.row)">
               <span>{{ scope.row.name }}</span>
             </el-button>
           </template>
         </el-table-column>
         <el-table-column label="流程分类" align="center" prop="category" width="100">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <dict-tag :type="DICT_TYPE.BPM_MODEL_CATEGORY" :value="scope.row.category" />
           </template>
         </el-table-column>
         <el-table-column label="流程版本" align="center" prop="processDefinition.version" width="80">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-tag size="medium" v-if="scope.row">v{{ scope.row.version }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="流程描述" align="center" prop="description" width="300" show-overflow-tooltip />
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button type="text" size="small" icon="el-icon-plus" @click="handleSelect(scope.row)">选择</el-button>
           </template>
         </el-table-column>
@@ -55,10 +55,9 @@
 <script>
 import {getProcessDefinitionBpmnXML, getProcessDefinitionList} from "@/api/bpm/definition";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
-import {createProcessInstance, getMyProcessInstancePage} from "@/api/bpm/processInstance";
+import {createProcessInstance} from "@/api/bpm/processInstance";
 
 // 流程实例的发起
 export default {
@@ -81,7 +80,7 @@ export default {
       // BPMN 数据
       bpmnXML: null,
       bpmnControlForm: {
-        prefix: "activiti"
+        prefix: "flowable"
       },
 
       // 流程表单

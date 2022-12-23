@@ -31,8 +31,8 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +60,7 @@ public class FileConfigServiceImpl implements FileConfigService {
      * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     @Getter
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private FileClientFactory fileClientFactory;
@@ -118,7 +118,7 @@ public class FileConfigServiceImpl implements FileConfigService {
      * @param maxUpdateTime 当前文件配置的最大更新时间
      * @return 文件配置列表
      */
-    private List<FileConfigDO> loadFileConfigIfUpdate(Date maxUpdateTime) {
+    private List<FileConfigDO> loadFileConfigIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadFileConfigIfUpdate][首次加载全量文件配置]");
@@ -230,7 +230,7 @@ public class FileConfigServiceImpl implements FileConfigService {
         this.validateFileConfigExists(id);
         // 上传文件
         byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
-        return fileClientFactory.getFileClient(id).upload(content, IdUtil.fastSimpleUUID() + ".jpg");
+        return fileClientFactory.getFileClient(id).upload(content, IdUtil.fastSimpleUUID() + ".jpg", "image/jpeg");
     }
 
     @Override

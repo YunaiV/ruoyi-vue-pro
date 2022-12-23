@@ -8,6 +8,7 @@ spring:
   autoconfigure:
     exclude:
       - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure # 排除 Druid 的自动配置，使用 dynamic-datasource-spring-boot-starter 配置多数据源
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration # 排除积木报表带来的 MongoDB 的自动配置
   datasource:
     druid: # Druid 【监控】相关的全局配置
       web-stat-filter:
@@ -44,13 +45,13 @@ spring:
       datasource:
         master:
           name: ruoyi-vue-pro
-          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT&nullCatalogMeansCurrent=true
           driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: 3WLiVUBEwTbvAfsh
         slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
           name: ruoyi-vue-pro
-          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT&nullCatalogMeansCurrent=true
           driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: 3WLiVUBEwTbvAfsh
@@ -61,10 +62,6 @@ spring:
     port: 6379 # 端口
     database: 1 # 数据库索引
 #    password: 123456 # 密码，建议生产环境开启
-
-jasypt:
-  encryptor:
-    password: yuanma # 加解密的秘钥
 
 --- #################### 定时任务相关配置 ####################
 
@@ -96,20 +93,6 @@ spring:
             class: org.quartz.simpl.SimpleThreadPool # 线程池类型
     jdbc: # 使用 JDBC 的 JobStore 的时候，JDBC 的配置
       initialize-schema: NEVER # 是否自动使用 SQL 初始化 Quartz 表结构。这里设置成 never ，我们手动创建表结构。
-
---- #################### 配置中心相关配置 ####################
-
-# Apollo 配置中心
-apollo:
-  bootstrap:
-    enabled: true # 设置 Apollo 在启动阶段生效
-    eagerLoad:
-      enabled: true # 设置 Apollo 在日志初始化前生效，可以实现日志的动态级别配置
-  jdbc: # 自定义的 JDBC 配置项，用于数据库的地址
-    dao: cn.iocoder.yudao.module.infra.dal.mysql.config.ConfigDAOImpl
-    url: ${spring.datasource.dynamic.datasource.master.url}
-    username: ${spring.datasource.dynamic.datasource.master.username}
-    password: ${spring.datasource.dynamic.datasource.master.password}
 
 --- #################### 服务保障相关配置 ####################
 
@@ -146,7 +129,7 @@ spring:
       client:
         url: http://127.0.0.1:${server.port}/${spring.boot.admin.context-path} # 设置 Spring Boot Admin Server 地址
         instance:
-          prefer-ip: true # 注册实例时，优先使用 IP
+          service-host-type: IP # 注册实例时，优先使用 IP [IP, HOST_NAME, CANONICAL_HOST_NAME]
       # Spring Boot Admin Server 服务端的相关配置
       context-path: /admin # 配置 Spring
 
@@ -166,17 +149,18 @@ wx: # 参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-sta
       type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
       key-prefix: wx # Redis Key 的前缀 TODO 芋艿：解决下 Redis key 管理的配置
       http-client-type: HttpClient # 采用 HttpClient 请求微信公众号平台
+  miniapp: # 小程序配置（必填），参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-miniapp-spring-boot-starter/README.md 文档
+    appid: wx63c280fe3248a3e7
+    secret: 6f270509224a7ae1296bbf1c8cb97aed
+    config-storage:
+      type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
+      key-prefix: wa # Redis Key 的前缀 TODO 芋艿：解决下 Redis key 管理的配置
+      http-client-type: HttpClient # 采用 HttpClient 请求微信公众号平台
 
 --- #################### 芋道相关配置 ####################
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
-  security:
-    token-header: Authorization
-    token-timeout: 1d
-    session-timeout: 30m
-    mock-enable: true
-    mock-secret: test
   xss:
     enable: false
     exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系

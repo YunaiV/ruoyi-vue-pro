@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.URL;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -68,7 +68,7 @@ public class PayOrderUnifiedReqDTO {
      * 支付过期时间
      */
     @NotNull(message = "支付过期时间不能为空")
-    private Date expireTime;
+    private LocalDateTime expireTime;
 
     // ========== 拓展参数 ==========
     /**

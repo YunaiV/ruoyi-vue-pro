@@ -12,9 +12,9 @@
         <el-input v-model="queryParams.tableComment" placeholder="请输入表描述" clearable
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
-                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -38,17 +38,17 @@
       <el-table-column label="表描述" align="center" prop="tableComment" :show-overflow-tooltip="true" width="120"/>
       <el-table-column label="实体" align="center" prop="className" width="200"/>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="更新时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="300px" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button type="text" size="small" icon="el-icon-view" @click="handlePreview(scope.row)" v-hasPermi="['infra:codegen:preview']">预览</el-button>
           <el-button type="text" size="small" icon="el-icon-edit" @click="handleEditTable(scope.row)" v-hasPermi="['infra:codegen:update']">编辑</el-button>
           <el-button type="text" size="small" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['infra:codegen:delete']">删除</el-button>
@@ -85,7 +85,7 @@
 
 <script>
 import { getCodegenTablePage, previewCodegen, downloadCodegen, deleteCodegen,
-  syncCodegenFromDB, syncCodegenFromSQL, createCodegenListFromSQL } from "@/api/infra/codegen";
+  syncCodegenFromDB } from "@/api/infra/codegen";
 
 import importTable from "./importTable";
 // 代码高亮插件
@@ -98,7 +98,7 @@ hljs.registerLanguage("html", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("vue", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("javascript", require("highlight.js/lib/languages/javascript"));
 hljs.registerLanguage("sql", require("highlight.js/lib/languages/sql"));
-
+hljs.registerLanguage("typescript", require("highlight.js/lib/languages/typescript"));
 export default {
   name: "Codegen",
   components: { importTable },
@@ -123,7 +123,8 @@ export default {
         pageNo: 1,
         pageSize: 10,
         tableName: undefined,
-        tableComment: undefined
+        tableComment: undefined,
+        createTime: []
       },
       // 预览参数
       preview: {
@@ -155,10 +156,7 @@ export default {
     /** 查询表集合 */
     getList() {
       this.loading = true;
-      getCodegenTablePage(this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ], 'CreateTime')).then(response => {
+      getCodegenTablePage(this.queryParams).then(response => {
             this.tableList = response.data.list;
             this.total = response.data.total;
             this.loading = false;
@@ -192,7 +190,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -212,12 +209,12 @@ export default {
     highlightedCode(item) {
       // const vmName = key.substring(key.lastIndexOf("/") + 1, key.indexOf(".vm"));
       // var language = vmName.substring(vmName.indexOf(".") + 1, vmName.length);
-      var language = item.filePath.substring(item.filePath.lastIndexOf(".") + 1);
+      const language = item.filePath.substring(item.filePath.lastIndexOf('.') + 1)
       const result = hljs.highlight(language, item.code || "", true);
       return result.value || '&nbsp;';
     },
     /** 复制代码成功 */
-    clipboardSuccess(){
+    clipboardSuccess() {
       this.$modal.msgSuccess("复制成功");
     },
     /** 生成 files 目录 **/
@@ -292,7 +289,9 @@ export default {
     /** 修改按钮操作 */
     handleEditTable(row) {
       const tableId = row.id;
-      this.$router.push("/codegen/edit/" + tableId);
+      const tableName = row.tableName || this.tableNames[0];
+      const params = { pageNum: this.queryParams.pageNum };
+      this.$tab.openPage("修改[" + tableName + "]生成配置", '/codegen/edit/' + tableId, params);
     },
     /** 删除按钮操作 */
     handleDelete(row) {

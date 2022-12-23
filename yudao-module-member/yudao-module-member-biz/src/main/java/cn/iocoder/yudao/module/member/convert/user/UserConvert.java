@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper
 public interface UserConvert {
 
@@ -14,4 +16,7 @@ public interface UserConvert {
     AppUserInfoRespVO convert(MemberUserDO bean);
 
     UserRespDTO convert2(MemberUserDO bean);
+
+    List<UserRespDTO> convertList2(List<MemberUserDO> list);
+
 }

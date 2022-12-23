@@ -6,19 +6,19 @@
         <el-table-column label="任务名" align="center" prop="taskDefinitionName" width="120" fixed />
         <el-table-column label="任务标识" align="center" prop="taskDefinitionKey" width="120" show-tooltip-when-overflow />
         <el-table-column label="规则类型" align="center" prop="type" width="120">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <dict-tag :type="DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE" :value="scope.row.type" />
           </template>
         </el-table-column>
         <el-table-column label="规则范围" align="center" prop="options" width="440px">
-          <template slot-scope="scope">
-            <el-tag size="medium" v-if="scope.row.options" v-for="option in scope.row.options">
+          <template v-slot="scope">
+            <el-tag size="medium" v-if="scope.row.options" :key="option" v-for="option in scope.row.options">
               {{ getAssignRuleOptionName(scope.row.type, option) }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column v-if="modelId" label="操作" align="center" width="80" fixed="right">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdateTaskAssignRule(scope.row)"
                        v-hasPermi="['bpm:task-assign-rule:update']">修改</el-button>
           </template>
@@ -53,7 +53,7 @@
             <el-option v-for="item in postOptions" :key="parseInt(item.id)" :label="item.name" :value="parseInt(item.id)" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="form.type === 30" label="指定用户" prop="userIds">
+        <el-form-item v-if="form.type === 30 || form.type === 31 || form.type === 32" label="指定用户" prop="userIds">
           <el-select v-model="form.userIds" multiple clearable style="width: 100%">
             <el-option v-for="item in userOptions" :key="parseInt(item.id)" :label="item.nickname" :value="parseInt(item.id)" />
           </el-select>
@@ -215,7 +215,7 @@ export default {
         this.form.deptIds.push(...row.options);
       } else if (row.type === 22) {
         this.form.postIds.push(...row.options);
-      } else if (row.type === 30) {
+      } else if (row.type === 30 || row.type === 31 || row.type === 32) {
         this.form.userIds.push(...row.options);
       } else if (row.type === 40) {
         this.form.userGroupIds.push(...row.options);
@@ -240,7 +240,7 @@ export default {
             form.options = form.deptIds;
           } else if (form.type === 22) {
             form.options = form.postIds;
-          } else if (form.type === 30) {
+          } else if (form.type === 30 || form.type === 31 || form.type === 32) {
             form.options = form.userIds;
           } else if (form.type === 40) {
             form.options = form.userGroupIds;
@@ -302,7 +302,7 @@ export default {
             return postOption.name;
           }
         }
-      } else if (type === 30) {
+      } else if (type === 30 || type === 31 || type === 32) {
         for (const userOption of this.userOptions) {
           if (userOption.id === option) {
             return userOption.nickname;

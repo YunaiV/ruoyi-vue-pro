@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -26,7 +26,7 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
                 .likeIfPresent(TenantDO::getContactName, reqVO.getContactName())
                 .likeIfPresent(TenantDO::getContactMobile, reqVO.getContactMobile())
                 .eqIfPresent(TenantDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(TenantDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(TenantDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(TenantDO::getId));
     }
 
@@ -36,7 +36,7 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
                 .likeIfPresent(TenantDO::getContactName, reqVO.getContactName())
                 .likeIfPresent(TenantDO::getContactMobile, reqVO.getContactMobile())
                 .eqIfPresent(TenantDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(TenantDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(TenantDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(TenantDO::getId));
     }
 
@@ -53,6 +53,6 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
     }
 
     @Select("SELECT COUNT(*) FROM system_tenant WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
+    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

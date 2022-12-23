@@ -11,8 +11,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.lang.Nullable;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -23,7 +23,8 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
                 .likeIfPresent(RoleDO::getName, reqVO.getName())
                 .likeIfPresent(RoleDO::getCode, reqVO.getCode())
                 .eqIfPresent(RoleDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(BaseDO::getCreateTime, reqVO.getBeginTime(), reqVO.getEndTime()));
+                .betweenIfPresent(BaseDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(RoleDO::getId));
     }
 
     default List<RoleDO> selectList(RoleExportReqVO reqVO) {
@@ -31,7 +32,7 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
                 .likeIfPresent(RoleDO::getName, reqVO.getName())
                 .likeIfPresent(RoleDO::getCode, reqVO.getCode())
                 .eqIfPresent(RoleDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(BaseDO::getCreateTime, reqVO.getBeginTime(), reqVO.getEndTime()));
+                .betweenIfPresent(BaseDO::getCreateTime, reqVO.getCreateTime()));
     }
 
     default RoleDO selectByName(String name) {
@@ -47,6 +48,6 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
     }
 
     @Select("SELECT COUNT(*) FROM system_role WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
+    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

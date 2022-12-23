@@ -6,9 +6,9 @@
       <el-form-item label="文件路径" prop="path">
         <el-input v-model="queryParams.path" placeholder="请输入文件路径" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -26,26 +26,32 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="文件名" align="center" prop="path" />
-      <el-table-column label="URL" align="center" prop="url" />
-      <el-table-column label="文件大小" align="center" prop="size" width="120" :formatter="sizeFormat" />
-      <el-table-column label="文件类型" align="center" prop="type" width="80" />
-<!--      <el-table-column label="文件内容" align="center" prop="content">-->
-<!--        <template slot-scope="scope">-->
-<!--          <img v-if="scope.row.type === 'jpg' || scope.row.type === 'png' || scope.row.type === 'gif'"-->
-<!--               width="200px" :src="getFileUrl + scope.row.id">-->
-<!--          <i v-else>非图片，无法预览</i>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-      <el-table-column label="上传时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+      <el-table-column label="文件名" :show-overflow-tooltip="true" align="center" min-width="200px" prop="name"/>
+      <el-table-column label="文件路径" :show-overflow-tooltip="true" align="center" min-width="250px" prop="path"/>
+      <el-table-column label="文件 URL" :show-overflow-tooltip="true" align="center" min-width="300px" prop="url"/>
+      <el-table-column label="文件大小" align="center" prop="size" min-width="120px" :formatter="sizeFormat"/>
+      <el-table-column label="文件类型" :show-overflow-tooltip="true" align="center" prop="type" width="180px"/>
+      <el-table-column label="文件内容" align="center" prop="content" min-width="150px">
+        <template v-slot="scope">
+          <image-preview v-if="scope.row.type&&scope.row.type.indexOf('image/') === 0" :src="scope.row.url"
+                         :width="'100px'"></image-preview>
+          <i v-else>无法预览，点击
+            <el-link type="primary" :underline="false" style="font-size:12px;vertical-align: baseline;" target="_blank"
+                     :href="getFileUrl + scope.row.configId + '/get/' + scope.row.path">下载
+            </el-link>
+          </i>
+        </template>
+      </el-table-column>
+      <el-table-column label="上传时间" align="center" prop="createTime" min-width="170px">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="100">
-        <template slot-scope="scope">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" min-width="100px">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                     v-hasPermi="['infra:file:delete']">删除</el-button>
+                     v-hasPermi="['infra:file:delete']">删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -76,14 +82,18 @@
 </template>
 
 <script>
-import { deleteFile, getFilePage } from "@/api/infra/file";
-import {getToken} from "@/utils/auth";
+import {deleteFile, getFilePage} from "@/api/infra/file";
+import {getAccessToken} from "@/utils/auth";
+import ImagePreview from "@/components/ImagePreview";
 
 export default {
   name: "File",
+  components: {
+    ImagePreview
+  },
   data() {
     return {
-      getFileUrl: process.env.VUE_APP_BASE_API + '/admin-api/infra/file/get/',
+      getFileUrl: process.env.VUE_APP_BASE_API + '/admin-api/infra/file/',
       // 遮罩层
       loading: true,
       // 显示搜索条件
@@ -94,13 +104,13 @@ export default {
       list: [],
       // 弹出层标题
       title: "",
-      dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
         pageSize: 10,
         path: null,
         type: null,
+        createTime: []
       },
       // 用户导入参数
       upload: {
@@ -108,7 +118,7 @@ export default {
         title: "", // 弹出层标题
         isUploading: false, // 是否禁用上传
         url: process.env.VUE_APP_BASE_API + "/admin-api/infra/file/upload", // 请求地址
-        headers: { Authorization: "Bearer " + getToken() }, // 设置上传的请求头部
+        headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
         data: {} // 上传的额外数据，用于文件名
       },
     };
@@ -120,11 +130,8 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
-      getFilePage(params).then(response => {
+      getFilePage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -149,7 +156,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -160,7 +166,7 @@ export default {
     },
     /** 处理上传的文件发生变化 */
     handleFileChange(file, fileList) {
-      this.upload.data.path = file.name;
+
     },
     /** 处理文件上传中 */
     handleFileUploadProgress(event, file, fileList) {

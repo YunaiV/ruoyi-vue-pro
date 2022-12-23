@@ -19,14 +19,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomBoolean;
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -74,11 +74,11 @@ public class SmsLogServiceTest extends BaseDbUnitTest {
        reqVO.setTemplateId(10L);
        reqVO.setMobile("156");
        reqVO.setSendStatus(SmsSendStatusEnum.INIT.getStatus());
-       reqVO.setBeginSendTime(buildTime(2020, 11, 1));
-       reqVO.setEndSendTime(buildTime(2020, 11, 30));
+       reqVO.setSendTime((new LocalDateTime[]{buildTime(2020, 11, 1),
+               buildTime(2020, 11, 30)}));
        reqVO.setReceiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
-       reqVO.setBeginReceiveTime(buildTime(2021, 11, 1));
-       reqVO.setEndReceiveTime(buildTime(2021, 11, 30));
+       reqVO.setReceiveTime((new LocalDateTime[]{buildTime(2021, 11, 1),
+               buildTime(2021, 11, 30)}));
 
        // 调用
        PageResult<SmsLogDO> pageResult = smsLogService.getSmsLogPage(reqVO);
@@ -121,11 +121,11 @@ public class SmsLogServiceTest extends BaseDbUnitTest {
         reqVO.setTemplateId(10L);
         reqVO.setMobile("156");
         reqVO.setSendStatus(SmsSendStatusEnum.INIT.getStatus());
-        reqVO.setBeginSendTime(buildTime(2020, 11, 1));
-        reqVO.setEndSendTime(buildTime(2020, 11, 30));
+        reqVO.setSendTime((new LocalDateTime[]{buildTime(2020, 11, 1),
+                buildTime(2020, 11, 30)}));
         reqVO.setReceiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
-        reqVO.setBeginReceiveTime(buildTime(2021, 11, 1));
-        reqVO.setEndReceiveTime(buildTime(2021, 11, 30));
+        reqVO.setReceiveTime((new LocalDateTime[]{buildTime(2021, 11, 1),
+                buildTime(2021, 11, 30)}));
 
        // 调用
        List<SmsLogDO> list = smsLogService.getSmsLogList(reqVO);
@@ -206,7 +206,7 @@ public class SmsLogServiceTest extends BaseDbUnitTest {
         // 准备参数
         Long id = dbSmsLog.getId();
         Boolean success = randomBoolean();
-        Date receiveTime = randomDate();
+        LocalDateTime receiveTime = randomLocalDateTime();
         String apiReceiveCode = randomString();
         String apiReceiveMsg = randomString();
 

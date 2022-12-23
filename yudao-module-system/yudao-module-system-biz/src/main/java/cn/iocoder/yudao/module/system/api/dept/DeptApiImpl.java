@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * 部门 API 实现类
@@ -38,12 +36,6 @@ public class DeptApiImpl implements DeptApi {
     @Override
     public void validDepts(Collection<Long> ids) {
         deptService.validDepts(ids);
-    }
-
-    @Override
-    public Map<Long, DeptRespDTO> getDeptMap(Set<Long> ids) {
-        Map<Long, DeptDO> depts = deptService.getDeptMap(ids);
-        return DeptConvert.INSTANCE.convertMap(depts);
     }
 
 }

@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -31,12 +31,8 @@ public class ApiErrorLogPageReqVO extends PageParam {
     private String requestUrl;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始异常发生时间")
-    private Date beginExceptionTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束异常发生时间")
-    private Date endExceptionTime;
+    @ApiModelProperty(value = "异常发生时间")
+    private LocalDateTime[] exceptionTime;
 
     @ApiModelProperty(value = "处理状态", example = "0")
     private Integer processStatus;

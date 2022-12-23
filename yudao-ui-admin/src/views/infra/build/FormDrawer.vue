@@ -84,7 +84,7 @@ import {
 } from '@/components/generator/html'
 import { makeUpJs } from '@/components/generator/js'
 import { makeUpCss } from '@/components/generator/css'
-import { exportDefault, beautifierConf, titleCase } from '@/utils/index'
+import { exportDefault, beautifierConf } from '@/utils'
 import ResourceDialog from './ResourceDialog'
 import loadMonaco from '@/utils/loadMonaco'
 import loadBeautifier from '@/utils/loadBeautifier'
@@ -325,7 +325,7 @@ export default {
   }
 }
 @include action-bar;
-::v-deep .el-drawer__header {
+:deep(.el-drawer__header) {
   display: none;
 }
 </style>

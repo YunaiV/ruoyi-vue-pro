@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.dal.dataobject.social;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -21,6 +22,11 @@ import lombok.*;
 @AllArgsConstructor
 public class SocialUserBindDO extends BaseDO {
 
+    /**
+     * 编号
+     */
+    @TableId
+    private Long id;
     /**
      * 关联的用户编号
      *

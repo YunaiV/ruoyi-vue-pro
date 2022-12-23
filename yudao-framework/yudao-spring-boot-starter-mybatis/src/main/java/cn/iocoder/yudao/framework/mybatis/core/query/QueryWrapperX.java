@@ -94,6 +94,19 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
         return this;
     }
 
+    public QueryWrapperX<T> betweenIfPresent(String column, Object[] values) {
+        if (values!= null && values.length != 0 && values[0] != null && values[1] != null) {
+            return (QueryWrapperX<T>) super.between(column, values[0], values[1]);
+        }
+        if (values!= null && values.length != 0 && values[0] != null) {
+            return (QueryWrapperX<T>) ge(column, values[0]);
+        }
+        if (values!= null && values.length != 0 && values[1] != null) {
+            return (QueryWrapperX<T>) le(column, values[1]);
+        }
+        return this;
+    }
+
     // ========== 重写父类方法，方便链式调用 ==========
 
     @Override
@@ -139,6 +152,10 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
             case ORACLE:
             case ORACLE_12C:
                 super.eq("ROWNUM", 1);
+                break;
+            case SQL_SERVER:
+            case SQL_SERVER2005:
+                super.select("TOP 1 *"); // 由于 SQL Server 是通过 SELECT TOP 1 实现限制一条，所以只好使用 * 查询剩余字段
                 break;
             default:
                 super.last("LIMIT 1");

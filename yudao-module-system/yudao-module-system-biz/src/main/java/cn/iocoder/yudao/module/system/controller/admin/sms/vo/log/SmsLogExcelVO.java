@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -61,7 +61,7 @@ public class SmsLogExcelVO {
     private Integer sendStatus;
 
     @ExcelProperty("发送时间")
-    private Date sendTime;
+    private LocalDateTime sendTime;
 
     @ExcelProperty("发送结果的编码")
     private Integer sendCode;
@@ -86,7 +86,7 @@ public class SmsLogExcelVO {
     private Integer receiveStatus;
 
     @ExcelProperty("接收时间")
-    private Date receiveTime;
+    private LocalDateTime receiveTime;
 
     @ExcelProperty("API 接收结果的编码")
     private String apiReceiveCode;
@@ -95,6 +95,6 @@ public class SmsLogExcelVO {
     private String apiReceiveMsg;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

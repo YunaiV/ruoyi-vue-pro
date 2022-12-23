@@ -10,9 +10,8 @@ import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessageListener;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisServerCommands;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
@@ -25,6 +24,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.stream.DefaultStreamMessageListenerContainerX;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Properties;
@@ -34,9 +34,8 @@ import java.util.Properties;
  *
  * @author 芋道源码
  */
-@Configuration
-@AutoConfigureAfter(YudaoRedisAutoConfiguration.class)
 @Slf4j
+@AutoConfiguration(after = YudaoRedisAutoConfiguration.class)
 public class YudaoMQAutoConfiguration {
 
     @Bean
@@ -95,6 +94,8 @@ public class YudaoMQAutoConfiguration {
         // 第二步，注册监听器，消费对应的 Stream 主题
         String consumerName = buildConsumerName();
         listeners.parallelStream().forEach(listener -> {
+            log.info("[redisStreamMessageListenerContainer][开始注册 StreamKey({}) 对应的监听器({})]",
+                    listener.getStreamKey(), listener.getClass().getName());
             // 创建 listener 对应的消费者分组
             try {
                 redisTemplate.opsForStream().createGroup(listener.getStreamKey(), listener.getGroup());
@@ -111,6 +112,8 @@ public class YudaoMQAutoConfiguration {
                     .autoAcknowledge(false) // 不自动 ack
                     .cancelOnError(throwable -> false); // 默认配置，发生异常就取消消费，显然不符合预期；因此，我们设置为 false
             container.register(builder.build(), listener);
+            log.info("[redisStreamMessageListenerContainer][完成注册 StreamKey({}) 对应的监听器({})]",
+                    listener.getStreamKey(), listener.getClass().getName());
         });
         return container;
     }

@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -130,7 +130,7 @@ public class PayRefundServiceImpl implements PayRefundService {
         } else {
             // 成功，插入退款单 状态为生成.没有和渠道交互
             // TODO @jason：搞到 convert 里。一些额外的自动，手动 set 下；
-            payRefundDO = PayRefundDO.builder().channelOrderNo(order.getChannelOrderNo())
+            payRefundDO = PayRefundDO.builder()
                     .appId(order.getAppId())
                     .channelOrderNo(order.getChannelOrderNo())
                     .channelCode(order.getChannelCode())
@@ -223,7 +223,7 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setSuccessTime(refundNotify.getRefundSuccessTime())
                 .setChannelRefundNo(refundNotify.getChannelOrderNo())
                 .setTradeNo(refundNotify.getTradeNo())
-                .setNotifyTime(new Date())
+                .setNotifyTime(LocalDateTime.now())
                 .setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
         refundMapper.updateById(updateRefundDO);
 

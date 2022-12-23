@@ -19,7 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
@@ -52,6 +55,11 @@ public class MemberUserServiceImpl implements MemberUserService {
     }
 
     @Override
+    public List<MemberUserDO> getUserListByNickname(String nickname) {
+        return memberUserMapper.selectListByNicknameLike(nickname);
+    }
+
+    @Override
     public MemberUserDO createUserIfAbsent(String mobile, String registerIp) {
         // 用户已经存在
         MemberUserDO user = memberUserMapper.selectByMobile(mobile);
@@ -69,7 +77,7 @@ public class MemberUserServiceImpl implements MemberUserService {
         MemberUserDO user = new MemberUserDO();
         user.setMobile(mobile);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
-        user.setPassword(passwordEncoder.encode(password)); // 加密密码
+        user.setPassword(encodePassword(password)); // 加密密码
         user.setRegisterIp(registerIp);
         memberUserMapper.insert(user);
         return user;
@@ -78,12 +86,17 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Override
     public void updateUserLogin(Long id, String loginIp) {
         memberUserMapper.updateById(new MemberUserDO().setId(id)
-                .setLoginIp(loginIp).setLoginDate(new Date()));
+                .setLoginIp(loginIp).setLoginDate(LocalDateTime.now()));
     }
 
     @Override
     public MemberUserDO getUser(Long id) {
         return memberUserMapper.selectById(id);
+    }
+
+    @Override
+    public List<MemberUserDO> getUserList(Collection<Long> ids) {
+        return memberUserMapper.selectBatchIds(ids);
     }
 
     @Override
@@ -125,6 +138,21 @@ public class MemberUserServiceImpl implements MemberUserService {
 
         // 更新用户手机
         memberUserMapper.updateById(MemberUserDO.builder().id(userId).mobile(reqVO.getMobile()).build());
+    }
+
+    @Override
+    public boolean isPasswordMatch(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    /**
+     * 对密码进行加密
+     *
+     * @param password 密码
+     * @return 加密后的密码
+     */
+    private String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
 
     @VisibleForTesting

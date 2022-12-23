@@ -47,12 +47,9 @@
                      :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="dateRangeCreateTime" style="width: 350px"
-          value-format="yyyy-MM-dd HH:mm:ss" type="datetimerange"  range-separator="-"
-          :default-time="['00:00:00','23:59:59']" start-placeholder="开始日期" end-placeholder="结束日期">
-        </el-date-picker>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -97,48 +94,48 @@
 <!--      <el-table-column label="渠道订单号" align="center" prop="channelOrderNo" width="140"/>-->
       <el-table-column label="商品标题" align="center" prop="subject" width="180" :show-overflow-tooltip="true"/>
       <el-table-column label="支付金额" align="center" prop="amount" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           ￥{{ parseFloat(scope.row.amount / 100).toFixed(2) }}
         </template>
       </el-table-column>
       <el-table-column label="手续金额" align="center" prop="channelFeeAmount" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           ￥{{ parseFloat(scope.row.channelFeeAmount / 100).toFixed(2) }}
         </template>
       </el-table-column>
       <el-table-column label="退款金额" align="center" prop="refundAmount" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           ￥{{ parseFloat(scope.row.refundAmount / 100).toFixed(2) }}
         </template>
       </el-table-column>
       <el-table-column label="支付状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.PAY_ORDER_STATUS" :value="scope.row.status" />
         </template>
 
       </el-table-column>
 <!--      <el-table-column label="退款状态" align="center" prop="refundStatus">-->
-<!--        <template slot-scope="scope">-->
+<!--        <template v-slot="scope">-->
 <!--          <span>{{ getDictDataLabel(DICT_TYPE.PAY_ORDER_REFUND_STATUS, scope.row.refundStatus) }}</span>-->
 <!--        </template>-->
 <!--      </el-table-column>-->
       <el-table-column label="回调状态" align="center" prop="notifyStatus" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.PAY_ORDER_NOTIFY_STATUS" :value="scope.row.notifyStatus" />
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="支付时间" align="center" prop="successTime" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.successTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-search" @click="handleQueryDetails(scope.row)"
                      v-hasPermi="['pay:order:query']">查看详情
           </el-button>
@@ -222,7 +219,6 @@ import {getOrder, getOrderPage, exportOrderExcel} from "@/api/pay/order";
 import {getMerchantListByName} from "@/api/pay/merchant";
 import {getAppListByMerchantId} from "@/api/pay/app";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {PayOrderNotifyStatusEnum, PayOrderRefundStatusEnum, PayOrderStatusEnum} from "@/utils/constants";
 import { getNowDateTime} from "@/utils/ruoyi";
 
 const defaultOrderDetail = {
@@ -270,10 +266,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      dateRangeExpireTime: [],
-      dateRangeSuccessTime: [],
-      dateRangeNotifyTime: [],
-      dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -298,6 +290,10 @@ export default {
         refundAmount: null,
         channelUserId: null,
         channelOrderNo: null,
+        expireTime: [],
+        successTime: [],
+        notifyTime: [],
+        createTime: []
       },
       // 商户加载遮罩层
       merchantLoading: false,
@@ -324,32 +320,25 @@ export default {
   },
   methods: {
     initTime(){
-      this.dateRangeCreateTime = [getNowDateTime("00:00:00"), getNowDateTime("23:59:59")];
+      this.queryParams.createTime = [getNowDateTime("00:00:00"), getNowDateTime("23:59:59")];
     },
     /** 查询列表 */
     getList() {
       // 判断选择的日期是否超过了一个月
       let oneMonthTime = 31 * 24 * 3600 * 1000;
-      if (this.dateRangeCreateTime == null){
+      if (this.queryParams.createTime == null){
         this.initTime();
       } else {
-        let minDateTime = new Date(this.dateRangeCreateTime[0]).getTime();
-        let maxDateTime = new Date(this.dateRangeCreateTime[1]).getTime()
+        let minDateTime = new Date(this.queryParams.createTime[0]).getTime();
+        let maxDateTime = new Date(this.queryParams.createTime[1]).getTime()
         if (maxDateTime - minDateTime > oneMonthTime) {
           this.$message.error('时间范围最大为 31 天！');
           return false;
         }
       }
-
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeExpireTime, 'expireTime');
-      this.addBeginAndEndTime(params, this.dateRangeSuccessTime, 'successTime');
-      this.addBeginAndEndTime(params, this.dateRangeNotifyTime, 'notifyTime');
-      this.addDateRange(params, this.dateRangeCreateTime, 'CreateTime');
       // 执行查询
-      getOrderPage(params).then(response => {
+      getOrderPage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -366,9 +355,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeSuccessTime = [];
-      this.dateRangeNotifyTime = [];
-      this.dateRangeExpireTime = [];
       this.resetForm("queryForm");
       this.initTime();
       this.handleQuery();
@@ -393,10 +379,6 @@ export default {
       let params = {...this.queryParams};
       params.pageNo = undefined;
       params.pageSize = undefined;
-      this.addBeginAndEndTime(params, this.dateRangeExpireTime, 'expireTime');
-      this.addBeginAndEndTime(params, this.dateRangeSuccessTime, 'successTime');
-      this.addBeginAndEndTime(params, this.dateRangeNotifyTime, 'notifyTime');
-      this.addDateRange(params, this.dateRangeCreateTime, 'CreateTime');
       // 执行导出
       this.$modal.confirm('是否确认导出所有支付订单数据项?').then(function () {
         return exportOrderExcel(params);

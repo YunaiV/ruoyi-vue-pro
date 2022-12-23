@@ -12,7 +12,7 @@
  Target Server Version : 15004198
  File Encoding         : 65001
 
- Date: 02/05/2022 17:53:51
+ Date: 15/06/2022 08:15:45
 */
 
 
@@ -2634,13 +2634,14 @@ CREATE TABLE [dbo].[infra_file] (
   [config_id] bigint  NULL,
   [path] nvarchar(512) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [url] nvarchar(1024) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [type] nvarchar(63) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [type] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [size] int  NOT NULL,
   [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [create_time] datetime2(7)  NOT NULL,
   [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [update_time] datetime2(7)  NOT NULL,
-  [deleted] bit DEFAULT 0 NOT NULL
+  [deleted] bit DEFAULT 0 NOT NULL,
+  [name] nvarchar(512) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL
 )
 GO
 
@@ -2676,7 +2677,7 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'文件类型',
+'MS_Description', N'文件 MIME 类型',
 'SCHEMA', N'dbo',
 'TABLE', N'infra_file',
 'COLUMN', N'type'
@@ -2722,6 +2723,13 @@ EXEC sp_addextendedproperty
 'SCHEMA', N'dbo',
 'TABLE', N'infra_file',
 'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'文件路径',
+'SCHEMA', N'dbo',
+'TABLE', N'infra_file',
+'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
@@ -5537,11 +5545,7 @@ GO
 INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'63', N'1', N'已处理', N'1', N'infra_api_error_log_process_status', N'0', N'success', N'', NULL, N'', N'2021-02-26 07:07:26.0000000', N'1', N'2022-02-16 20:14:08.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'64', N'2', N'已忽略', N'2', N'infra_api_error_log_process_status', N'0', N'danger', N'', NULL, N'', N'2021-02-26 07:07:34.0000000', N'1', N'2022-02-16 20:14:14.0000000', N'0')
-GO
 
-INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'65', N'1', N'云片', N'YUN_PIAN', N'system_sms_channel_code', N'0', N'success', N'', NULL, N'1', N'2021-04-05 01:05:14.0000000', N'1', N'2022-02-16 10:09:55.0000000', N'0')
-GO
 
 INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'66', N'2', N'阿里云', N'ALIYUN', N'system_sms_channel_code', N'0', N'primary', N'', NULL, N'1', N'2021-04-05 01:05:26.0000000', N'1', N'2022-02-16 10:09:52.0000000', N'0')
 GO
@@ -5591,13 +5595,7 @@ GO
 INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'81', N'101', N'社交登录', N'101', N'system_login_type', N'0', N'info', N'', N'社交登录', N'1', N'2021-10-06 00:52:17.0000000', N'1', N'2022-02-16 13:11:40.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'82', N'102', N'Mock 登录', N'102', N'system_login_type', N'0', N'danger', N'', N'Mock 登录', N'1', N'2021-10-06 00:52:32.0000000', N'1', N'2022-02-16 13:11:44.0000000', N'0')
-GO
-
 INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'83', N'200', N'主动登出', N'200', N'system_login_type', N'0', N'primary', N'', N'主动登出', N'1', N'2021-10-06 00:52:58.0000000', N'1', N'2022-02-16 13:11:49.0000000', N'0')
-GO
-
-INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'84', N'201', N'超时登出', N'201', N'system_login_type', N'0', N'info', N'', N'超时登出', N'1', N'2021-10-06 00:53:17.0000000', N'1', N'2022-02-16 13:11:53.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'85', N'202', N'强制登出', N'202', N'system_login_type', N'0', N'danger', N'', N'强制退出', N'1', N'2021-10-06 00:53:41.0000000', N'1', N'2022-02-16 13:11:57.0000000', N'0')
@@ -5783,6 +5781,24 @@ GO
 INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1154', N'20', N'S3 对象存储', N'20', N'infra_file_storage', N'0', N'default', N'', NULL, N'1', N'2022-03-15 00:26:31.0000000', N'1', N'2022-03-15 00:26:45.0000000', N'0')
 GO
 
+INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1155', N'103', N'短信登录', N'103', N'system_login_type', N'0', N'default', N'', NULL, N'1', N'2022-05-09 23:57:58.0000000', N'1', N'2022-05-09 23:58:09.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1156', N'1', N'password', N'password', N'system_oauth2_grant_type', N'0', N'default', N'', N'密码模式', N'1', N'2022-05-12 00:22:05.0000000', N'1', N'2022-05-11 16:26:01.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1157', N'2', N'authorization_code', N'authorization_code', N'system_oauth2_grant_type', N'0', N'primary', N'', N'授权码模式', N'1', N'2022-05-12 00:22:59.0000000', N'1', N'2022-05-11 16:26:02.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1158', N'3', N'implicit', N'implicit', N'system_oauth2_grant_type', N'0', N'success', N'', N'简化模式', N'1', N'2022-05-12 00:23:40.0000000', N'1', N'2022-05-11 16:26:05.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1159', N'4', N'client_credentials', N'client_credentials', N'system_oauth2_grant_type', N'0', N'default', N'', N'客户端模式', N'1', N'2022-05-12 00:23:51.0000000', N'1', N'2022-05-11 16:26:08.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1160', N'5', N'refresh_token', N'refresh_token', N'system_oauth2_grant_type', N'0', N'info', N'', N'刷新模式', N'1', N'2022-05-12 00:24:02.0000000', N'1', N'2022-05-11 16:26:11.0000000', N'0')
+GO
+
 SET IDENTITY_INSERT [dbo].[system_dict_data] OFF
 GO
 
@@ -5797,18 +5813,51 @@ IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[sy
 	DROP TABLE [dbo].[system_dict_type]
 GO
 
-CREATE TABLE [dbo].[system_dict_type] (
-  [id] bigint  IDENTITY(1,1) NOT NULL,
-  [name] nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [type] nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [status] tinyint  NOT NULL,
-  [remark] nvarchar(500) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
-  [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
-  [create_time] datetime2(7)  NOT NULL,
-  [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
-  [update_time] datetime2(7)  NOT NULL,
-  [deleted] bit DEFAULT 0 NOT NULL
-)
+CREATE TABLE [dbo].[system_dict_type]
+(
+    [
+    id]
+    bigint
+    IDENTITY
+(
+    1,
+    1
+) NOT NULL,
+    [name] nvarchar
+(
+    100
+) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+    [type] nvarchar
+(
+    100
+) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+    [status] tinyint NOT NULL,
+    [remark] nvarchar
+(
+    500
+) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+    [creator] nvarchar
+(
+    64
+) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+    [create_time] datetime2
+(
+    7
+) NOT NULL,
+    [updater] nvarchar
+(
+    64
+) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+    [update_time] datetime2
+(
+    7
+) NOT NULL,
+    [deleted_time] datetime2
+(
+    7
+),
+    [deleted] bit DEFAULT 0 NOT NULL
+    )
 GO
 
 ALTER TABLE [dbo].[system_dict_type] SET (LOCK_ESCALATION = TABLE)
@@ -5866,26 +5915,29 @@ GO
 EXEC sp_addextendedproperty
 'MS_Description', N'更新者',
 'SCHEMA', N'dbo',
-'TABLE', N'system_dict_type',
-'COLUMN', N'updater'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'更新时间',
-'SCHEMA', N'dbo',
-'TABLE', N'system_dict_type',
-'COLUMN', N'update_time'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'是否删除',
-'SCHEMA', N'dbo',
-'TABLE', N'system_dict_type',
-'COLUMN', N'deleted'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'字典类型表',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'updater'
+    GO
+    EXEC sp_addextendedproperty
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'update_time'
+    GO
+    EXEC sp_addextendedproperty
+    'MS_Description', N'删除时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'deleted_time'
+    GO
+    EXEC sp_addextendedproperty
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'deleted'
+    GO
+    EXEC sp_addextendedproperty
+    'MS_Description', N'字典类型表',
 'SCHEMA', N'dbo',
 'TABLE', N'system_dict_type'
 GO
@@ -6015,6 +6067,9 @@ INSERT INTO [dbo].[system_dict_type] ([id], [name], [type], [status], [remark], 
 GO
 
 INSERT INTO [dbo].[system_dict_type] ([id], [name], [type], [status], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'146', N'文件存储器', N'infra_file_storage', N'0', N'文件存储器', N'1', N'2022-03-15 00:24:38.0000000', N'1', N'2022-03-15 00:24:38.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_dict_type] ([id], [name], [type], [status], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'147', N'OAuth 2.0 授权类型', N'system_oauth2_grant_type', N'0', N'OAuth 2.0 授权类型（模式）', N'1', N'2022-05-12 00:20:52.0000000', N'1', N'2022-05-11 16:25:49.0000000', N'0')
 GO
 
 SET IDENTITY_INSERT [dbo].[system_dict_type] OFF
@@ -6472,13 +6527,13 @@ GO
 SET IDENTITY_INSERT [dbo].[system_menu] ON
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1', N'系统管理', N'', N'1', N'10', N'0', N'/system', N'system', NULL, N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1', N'系统管理', N'', N'1', N'10', N'0', N'/system', N'system', N'', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'2', N'基础设施', N'', N'1', N'20', N'0', N'/infra', N'monitor', NULL, N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'2', N'基础设施', N'', N'1', N'20', N'0', N'/infra', N'monitor', N'', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'5', N'OA 示例', N'', N'1', N'40', N'1185', N'oa', N'people', NULL, N'0', N'1', N'1', N'admin', N'2021-09-20 16:26:19.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'5', N'OA 示例', N'', N'1', N'40', N'1185', N'oa', N'people', N'', N'0', N'1', N'1', N'admin', N'2021-09-20 16:26:19.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'100', N'用户管理', N'system:user:list', N'2', N'1', N'1', N'user', N'user', N'system/user/index', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
@@ -6508,7 +6563,7 @@ GO
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'108', N'审计日志', N'', N'1', N'9', N'1', N'log', N'log', N'', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'109', N'在线用户', N'system:user-session:list', N'2', N'10', N'1', N'user-session', N'online', N'system/session/index', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'109', N'令牌管理', N'', N'2', N'2', N'1261', N'token', N'online', N'system/oauth2/token/index', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'1', N'2022-05-11 23:31:42.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'110', N'定时任务', N'', N'2', N'12', N'2', N'job', N'job', N'infra/job/index', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
@@ -6667,10 +6722,10 @@ GO
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1045', N'日志导出', N'system:login-log:export', N'3', N'3', N'501', N'#', N'#', N'', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1046', N'在线查询', N'system:user-session:list', N'3', N'1', N'109', N'', N'', N'', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1046', N'令牌列表', N'system:oauth2-token:page', N'3', N'1', N'109', N'', N'', N'', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'1', N'2022-05-09 23:54:42.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1048', N'单条强退', N'system:user-session:delete', N'3', N'3', N'109', N'', N'', N'', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1048', N'令牌删除', N'system:oauth2-token:delete', N'3', N'2', N'109', N'', N'', N'', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'1', N'2022-05-09 23:54:53.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1050', N'任务新增', N'infra:job:create', N'3', N'2', N'110', N'', N'', N'', N'0', N'1', N'1', N'admin', N'2021-01-05 17:03:48.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
@@ -6748,7 +6803,7 @@ GO
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1082', N'日志导出', N'infra:api-access-log:export', N'3', N'2', N'1078', N'', N'', N'', N'0', N'1', N'1', N'', N'2021-02-26 01:32:59.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1083', N'API 日志', N'', N'2', N'8', N'2', N'log', N'log', NULL, N'0', N'1', N'1', N'', N'2021-02-26 02:18:24.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1083', N'API 日志', N'', N'2', N'8', N'2', N'log', N'log', N'', N'0', N'1', N'1', N'', N'2021-02-26 02:18:24.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1084', N'错误日志', N'infra:api-error-log:query', N'2', N'2', N'1083', N'api-error-log', N'log', N'infra/apiErrorLog/index', N'0', N'1', N'1', N'', N'2021-02-26 07:53:20.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
@@ -6778,7 +6833,7 @@ GO
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1092', N'文件删除', N'infra:file:delete', N'3', N'4', N'1090', N'', N'', N'', N'0', N'1', N'1', N'', N'2021-03-12 20:16:20.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1093', N'短信管理', N'', N'1', N'11', N'1', N'sms', N'validCode', NULL, N'0', N'1', N'1', N'1', N'2021-04-05 01:10:16.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1093', N'短信管理', N'', N'1', N'11', N'1', N'sms', N'validCode', N'', N'0', N'1', N'1', N'1', N'2021-04-05 01:10:16.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1094', N'短信渠道', N'', N'2', N'0', N'1093', N'sms-channel', N'phone', N'system/sms/smsChannel', N'0', N'1', N'1', N'', N'2021-04-01 11:07:15.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
@@ -6844,7 +6899,7 @@ GO
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1115', N'错误码导出', N'system:error-code:export', N'3', N'5', N'1110', N'', N'', N'', N'0', N'1', N'1', N'', N'2021-04-13 21:46:42.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1117', N'支付管理', N'', N'1', N'11', N'0', N'/pay', N'money', NULL, N'0', N'1', N'1', N'1', N'2021-12-25 16:43:41.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1117', N'支付管理', N'', N'1', N'11', N'0', N'/pay', N'money', N'', N'0', N'1', N'1', N'1', N'2021-12-25 16:43:41.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1118', N'请假查询', N'', N'2', N'0', N'5', N'leave', N'user', N'bpm/oa/leave/index', N'0', N'1', N'1', N'', N'2021-09-20 08:51:03.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
@@ -6967,10 +7022,10 @@ GO
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1184', N'支付商户信息导出', N'pay:merchant:export', N'3', N'5', N'1179', N'', N'', N'', N'0', N'1', N'1', N'', N'2021-12-25 09:01:44.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1185', N'工作流程', N'', N'1', N'50', N'0', N'/bpm', N'tool', NULL, N'0', N'1', N'1', N'1', N'2021-12-30 20:26:36.0000000', N'103', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1185', N'工作流程', N'', N'1', N'50', N'0', N'/bpm', N'tool', N'', N'0', N'1', N'1', N'1', N'2021-12-30 20:26:36.0000000', N'103', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1186', N'流程管理', N'', N'1', N'10', N'1185', N'manager', N'nested', NULL, N'0', N'1', N'1', N'1', N'2021-12-30 20:28:30.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1186', N'流程管理', N'', N'1', N'10', N'1185', N'manager', N'nested', N'', N'0', N'1', N'1', N'1', N'2021-12-30 20:28:30.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1187', N'流程表单', N'', N'2', N'0', N'1186', N'form', N'form', N'bpm/form/index', N'0', N'1', N'1', N'', N'2021-12-30 12:38:22.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
@@ -7012,7 +7067,7 @@ GO
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1199', N'模型发布', N'bpm:model:deploy', N'3', N'6', N'1193', N'', N'', N'', N'0', N'1', N'1', N'1', N'2022-01-03 19:03:24.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1200', N'任务管理', N'', N'1', N'20', N'1185', N'task', N'cascader', NULL, N'0', N'1', N'1', N'1', N'2022-01-07 23:51:48.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1200', N'任务管理', N'', N'1', N'20', N'1185', N'task', N'cascader', N'', N'0', N'1', N'1', N'1', N'2022-01-07 23:51:48.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1201', N'我的流程', N'', N'2', N'0', N'1200', N'my', N'people', N'bpm/processInstance/index', N'0', N'1', N'1', N'', N'2022-01-07 15:53:44.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
@@ -7066,7 +7121,7 @@ GO
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1222', N'流程任务的更新', N'bpm:task:update', N'3', N'2', N'1207', N'', N'', N'', N'0', N'1', N'1', N'1', N'2022-01-23 00:39:24.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1224', N'租户管理', N'', N'2', N'0', N'1', N'tenant', N'peoples', NULL, N'0', N'1', N'1', N'1', N'2022-02-20 01:41:13.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1224', N'租户管理', N'', N'2', N'0', N'1', N'tenant', N'peoples', N'', N'0', N'1', N'1', N'1', N'2022-02-20 01:41:13.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1225', N'租户套餐', N'', N'2', N'0', N'1224', N'package', N'eye', N'system/tenantPackage/index', N'0', N'1', N'1', N'', N'2022-02-19 17:44:06.0000000', N'1', N'2022-04-21 01:21:25.0000000', N'0')
@@ -7102,7 +7157,7 @@ GO
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1242', N'文件配置导出', N'infra:file-config:export', N'3', N'5', N'1237', N'', N'', N'', N'0', N'1', N'1', N'', N'2022-03-15 14:35:28.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1243', N'文件管理', N'', N'2', N'5', N'2', N'file', N'download', NULL, N'0', N'1', N'1', N'1', N'2022-03-16 23:47:40.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1243', N'文件管理', N'', N'2', N'5', N'2', N'file', N'download', N'', N'0', N'1', N'1', N'1', N'2022-03-16 23:47:40.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1247', N'敏感词管理', N'', N'2', N'13', N'1', N'sensitive-word', N'education', N'system/sensitiveWord/index', N'0', N'1', N'1', N'', N'2022-04-07 16:55:03.0000000', N'1', N'2022-04-20 17:03:10.0000000', N'0')
@@ -7123,7 +7178,7 @@ GO
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1252', N'敏感词导出', N'system:sensitive-word:export', N'3', N'5', N'1247', N'', N'', N'', N'0', N'1', N'1', N'', N'2022-04-07 16:55:03.0000000', N'', N'2022-04-20 17:03:10.0000000', N'0')
 GO
 
-INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1254', N'作者动态', N'', N'1', N'0', N'0', N'https://www.iocoder.cn', N'people', NULL, N'0', N'1', N'1', N'1', N'2022-04-23 01:03:15.0000000', N'1', N'2022-05-02 02:32:12.6190000', N'0')
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1254', N'作者动态', N'', N'1', N'0', N'0', N'https://www.iocoder.cn', N'people', N'', N'0', N'1', N'1', N'1', N'2022-04-23 01:03:15.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1255', N'数据源配置', N'', N'2', N'1', N'2', N'data-source-config', N'rate', N'infra/dataSourceConfig/index', N'0', N'1', N'1', N'', N'2022-04-27 14:37:32.0000000', N'1', N'2022-04-27 22:42:06.0000000', N'0')
@@ -7142,6 +7197,24 @@ INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [pa
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1260', N'数据源配置导出', N'infra:data-source-config:export', N'3', N'5', N'1255', N'', N'', N'', N'0', N'1', N'1', N'', N'2022-04-27 14:37:32.0000000', N'', N'2022-04-27 14:37:32.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1261', N'OAuth 2.0', N'', N'1', N'10', N'1', N'oauth2', N'people', N'', N'0', N'1', N'1', N'1', N'2022-05-09 23:38:17.0000000', N'1', N'2022-05-12 18:11:34.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1263', N'应用管理', N'', N'2', N'0', N'1261', N'oauth2/application', N'tool', N'system/oauth2/client/index', N'0', N'1', N'1', N'', N'2022-05-10 16:26:33.0000000', N'1', N'2022-05-11 23:31:36.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1264', N'客户端查询', N'system:oauth2-client:query', N'3', N'1', N'1263', N'', N'', N'', N'0', N'1', N'1', N'', N'2022-05-10 16:26:33.0000000', N'1', N'2022-05-11 00:31:06.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1265', N'客户端创建', N'system:oauth2-client:create', N'3', N'2', N'1263', N'', N'', N'', N'0', N'1', N'1', N'', N'2022-05-10 16:26:33.0000000', N'1', N'2022-05-11 00:31:23.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1266', N'客户端更新', N'system:oauth2-client:update', N'3', N'3', N'1263', N'', N'', N'', N'0', N'1', N'1', N'', N'2022-05-10 16:26:33.0000000', N'1', N'2022-05-11 00:31:28.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1267', N'客户端删除', N'system:oauth2-client:delete', N'3', N'4', N'1263', N'', N'', N'', N'0', N'1', N'1', N'', N'2022-05-10 16:26:33.0000000', N'1', N'2022-05-11 00:31:33.0000000', N'0')
 GO
 
 SET IDENTITY_INSERT [dbo].[system_menu] OFF
@@ -7279,6 +7352,802 @@ INSERT INTO [dbo].[system_notice] ([id], [title], [content], [type], [status], [
 GO
 
 SET IDENTITY_INSERT [dbo].[system_notice] OFF
+GO
+
+COMMIT
+GO
+
+
+-- ----------------------------
+-- Table structure for system_oauth2_access_token
+-- ----------------------------
+IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[system_oauth2_access_token]') AND type IN ('U'))
+	DROP TABLE [dbo].[system_oauth2_access_token]
+GO
+
+CREATE TABLE [dbo].[system_oauth2_access_token] (
+  [id] bigint  IDENTITY(1,1) NOT NULL,
+  [user_id] bigint  NOT NULL,
+  [access_token] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [refresh_token] nvarchar(32) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [user_type] tinyint  NOT NULL,
+  [client_id] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [expires_time] datetime2(7)  NOT NULL,
+  [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [create_time] datetime2(7)  NOT NULL,
+  [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [update_time] datetime2(7)  NOT NULL,
+  [deleted] bit DEFAULT 0 NOT NULL,
+  [tenant_id] bigint DEFAULT 0 NOT NULL,
+  [scopes] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT '' NULL
+)
+GO
+
+ALTER TABLE [dbo].[system_oauth2_access_token] SET (LOCK_ESCALATION = TABLE)
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'用户编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'user_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'访问令牌',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'access_token'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'刷新令牌',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'refresh_token'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'用户类型',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'user_type'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'客户端编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'client_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'过期时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'expires_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'创建者',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'creator'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'创建时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'create_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'更新者',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'updater'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'更新时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'update_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'是否删除',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'租户编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'授权范围',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token',
+'COLUMN', N'scopes'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'刷新令牌',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_access_token'
+GO
+
+
+-- ----------------------------
+-- Records of system_oauth2_access_token
+-- ----------------------------
+BEGIN TRANSACTION
+GO
+
+SET IDENTITY_INSERT [dbo].[system_oauth2_access_token] ON
+GO
+
+SET IDENTITY_INSERT [dbo].[system_oauth2_access_token] OFF
+GO
+
+COMMIT
+GO
+
+
+-- ----------------------------
+-- Table structure for system_oauth2_approve
+-- ----------------------------
+IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[system_oauth2_approve]') AND type IN ('U'))
+	DROP TABLE [dbo].[system_oauth2_approve]
+GO
+
+CREATE TABLE [dbo].[system_oauth2_approve] (
+  [id] bigint  IDENTITY(1,1) NOT NULL,
+  [user_id] bigint  NOT NULL,
+  [user_type] tinyint  NOT NULL,
+  [client_id] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [scope] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [approved] varchar(1) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [expires_time] datetime2(7)  NOT NULL,
+  [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [create_time] datetime2(7)  NOT NULL,
+  [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [update_time] datetime2(7)  NOT NULL,
+  [deleted] bit DEFAULT 0 NOT NULL,
+  [tenant_id] bigint  NOT NULL
+)
+GO
+
+ALTER TABLE [dbo].[system_oauth2_approve] SET (LOCK_ESCALATION = TABLE)
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'用户编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'user_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'用户类型',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'user_type'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'客户端编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'client_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'授权范围',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'scope'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'是否接受',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'approved'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'过期时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'expires_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'创建者',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'creator'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'创建时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'create_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'更新者',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'updater'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'更新时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'update_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'是否删除',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'租户编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve',
+'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'OAuth2 批准表',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_approve'
+GO
+
+
+-- ----------------------------
+-- Records of system_oauth2_approve
+-- ----------------------------
+BEGIN TRANSACTION
+GO
+
+SET IDENTITY_INSERT [dbo].[system_oauth2_approve] ON
+GO
+
+SET IDENTITY_INSERT [dbo].[system_oauth2_approve] OFF
+GO
+
+COMMIT
+GO
+
+
+-- ----------------------------
+-- Table structure for system_oauth2_client
+-- ----------------------------
+IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[system_oauth2_client]') AND type IN ('U'))
+	DROP TABLE [dbo].[system_oauth2_client]
+GO
+
+CREATE TABLE [dbo].[system_oauth2_client] (
+  [id] bigint  IDENTITY(1,1) NOT NULL,
+  [client_id] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [secret] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [name] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [logo] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [description] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [status] tinyint  NOT NULL,
+  [access_token_validity_seconds] int  NOT NULL,
+  [refresh_token_validity_seconds] int  NOT NULL,
+  [redirect_uris] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [auto_approve_scopes] nvarchar(max) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT '' NOT NULL,
+  [authorized_grant_types] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [scopes] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT '' NULL,
+  [authorities] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [resource_ids] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [additional_information] nvarchar(max) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [create_time] datetime2(7)  NOT NULL,
+  [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [update_time] datetime2(7)  NOT NULL,
+  [deleted] bit DEFAULT 0 NOT NULL
+)
+GO
+
+ALTER TABLE [dbo].[system_oauth2_client] SET (LOCK_ESCALATION = TABLE)
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'客户端编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'client_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'客户端密钥',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'secret'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'应用名',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'name'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'应用图标',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'logo'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'应用描述',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'description'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'状态',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'status'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'访问令牌的有效期',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'access_token_validity_seconds'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'刷新令牌的有效期',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'refresh_token_validity_seconds'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'可重定向的 URI 地址',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'redirect_uris'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'自动通过的授权范围',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'auto_approve_scopes'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'授权类型',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'authorized_grant_types'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'授权范围',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'scopes'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'权限',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'authorities'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'资源',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'resource_ids'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'附加信息',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'additional_information'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'创建者',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'creator'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'创建时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'create_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'更新者',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'updater'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'更新时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'update_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'是否删除',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client',
+'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'OAuth2 客户端表',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_client'
+GO
+
+
+-- ----------------------------
+-- Records of system_oauth2_client
+-- ----------------------------
+BEGIN TRANSACTION
+GO
+
+SET IDENTITY_INSERT [dbo].[system_oauth2_client] ON
+GO
+
+INSERT INTO [dbo].[system_oauth2_client] ([id], [client_id], [secret], [name], [logo], [description], [status], [access_token_validity_seconds], [refresh_token_validity_seconds], [redirect_uris], [auto_approve_scopes], [authorized_grant_types], [scopes], [authorities], [resource_ids], [additional_information], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1', N'default', N'admin123', N'芋道源码', N'http://test.yudao.iocoder.cn/a5e2e244368878a366b516805a4aabf1.png', N'我是描述', N'0', N'180', N'8640', N'["https://www.iocoder.cn","https://doc.iocoder.cn"]', N'', N'["password","authorization_code","implicit","refresh_token"]', N'["user.read", "user.write"]', N'["system:user:query"]', N'[]', N'{}', N'1', N'2022-05-11 21:47:12.0000000', N'1', N'2022-05-13 10:50:16.9620000', N'0')
+GO
+
+SET IDENTITY_INSERT [dbo].[system_oauth2_client] OFF
+GO
+
+COMMIT
+GO
+
+
+-- ----------------------------
+-- Table structure for system_oauth2_code
+-- ----------------------------
+IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[system_oauth2_code]') AND type IN ('U'))
+	DROP TABLE [dbo].[system_oauth2_code]
+GO
+
+CREATE TABLE [dbo].[system_oauth2_code] (
+  [id] bigint  IDENTITY(1,1) NOT NULL,
+  [user_id] bigint  NOT NULL,
+  [user_type] tinyint  NOT NULL,
+  [code] nvarchar(32) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [client_id] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [scopes] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [expires_time] datetime2(7)  NOT NULL,
+  [redirect_uri] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [state] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT '' NOT NULL,
+  [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [create_time] datetime2(7)  NOT NULL,
+  [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [update_time] datetime2(7)  NOT NULL,
+  [deleted] bit DEFAULT 0 NOT NULL,
+  [tenant_id] bigint  NOT NULL
+)
+GO
+
+ALTER TABLE [dbo].[system_oauth2_code] SET (LOCK_ESCALATION = TABLE)
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'用户编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'user_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'用户类型',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'user_type'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'授权码',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'code'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'客户端编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'client_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'授权范围',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'scopes'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'过期时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'expires_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'可重定向的 URI 地址',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'redirect_uri'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'状态',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'state'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'创建者',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'creator'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'创建时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'create_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'更新者',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'updater'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'更新时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'update_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'是否删除',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'租户编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code',
+'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'OAuth2 授权码表',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_code'
+GO
+
+
+-- ----------------------------
+-- Records of system_oauth2_code
+-- ----------------------------
+BEGIN TRANSACTION
+GO
+
+SET IDENTITY_INSERT [dbo].[system_oauth2_code] ON
+GO
+
+SET IDENTITY_INSERT [dbo].[system_oauth2_code] OFF
+GO
+
+COMMIT
+GO
+
+
+-- ----------------------------
+-- Table structure for system_oauth2_refresh_token
+-- ----------------------------
+IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[system_oauth2_refresh_token]') AND type IN ('U'))
+	DROP TABLE [dbo].[system_oauth2_refresh_token]
+GO
+
+CREATE TABLE [dbo].[system_oauth2_refresh_token] (
+  [id] bigint  IDENTITY(1,1) NOT NULL,
+  [user_id] bigint  NOT NULL,
+  [refresh_token] nvarchar(32) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [user_type] tinyint  NOT NULL,
+  [client_id] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [expires_time] datetime2(7)  NOT NULL,
+  [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [create_time] datetime2(7)  NOT NULL,
+  [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [update_time] datetime2(7)  NOT NULL,
+  [deleted] bit DEFAULT 0 NOT NULL,
+  [tenant_id] bigint  NOT NULL,
+  [scopes] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT '' NULL
+)
+GO
+
+ALTER TABLE [dbo].[system_oauth2_refresh_token] SET (LOCK_ESCALATION = TABLE)
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'用户编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'user_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'刷新令牌',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'refresh_token'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'用户类型',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'user_type'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'客户端编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'client_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'过期时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'expires_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'创建者',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'creator'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'创建时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'create_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'更新者',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'updater'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'更新时间',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'update_time'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'是否删除',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'租户编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'授权范围',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token',
+'COLUMN', N'scopes'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'刷新令牌',
+'SCHEMA', N'dbo',
+'TABLE', N'system_oauth2_refresh_token'
+GO
+
+
+-- ----------------------------
+-- Records of system_oauth2_refresh_token
+-- ----------------------------
+BEGIN TRANSACTION
+GO
+
+SET IDENTITY_INSERT [dbo].[system_oauth2_refresh_token] ON
+GO
+
+SET IDENTITY_INSERT [dbo].[system_oauth2_refresh_token] OFF
 GO
 
 COMMIT
@@ -7855,26 +8724,19 @@ IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[sy
 GO
 
 CREATE TABLE [dbo].[system_role_menu] (
-  [id] bigint  IDENTITY(1,1) NOT NULL,
   [role_id] bigint  NOT NULL,
   [menu_id] bigint  NOT NULL,
   [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [create_time] datetime2(7)  NOT NULL,
   [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [update_time] datetime2(7)  NOT NULL,
-  [tenant_id] bigint  NOT NULL,
-  [deleted] bit DEFAULT 0 NOT NULL
+  [tenant_id] bigint DEFAULT 0 NOT NULL,
+  [deleted] bit DEFAULT 0 NOT NULL,
+  [id] bigint  IDENTITY(1,1) NOT NULL
 )
 GO
 
 ALTER TABLE [dbo].[system_role_menu] SET (LOCK_ESCALATION = TABLE)
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'自增编号',
-'SCHEMA', N'dbo',
-'TABLE', N'system_role_menu',
-'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
@@ -7934,6 +8796,13 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
+'MS_Description', N'自增编号',
+'SCHEMA', N'dbo',
+'TABLE', N'system_role_menu',
+'COLUMN', N'id'
+GO
+
+EXEC sp_addextendedproperty
 'MS_Description', N'角色和菜单关联表',
 'SCHEMA', N'dbo',
 'TABLE', N'system_role_menu'
@@ -7949,577 +8818,577 @@ GO
 SET IDENTITY_INSERT [dbo].[system_role_menu] ON
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'263', N'109', N'1', N'1', N'2022-02-22 00:56:14.0000000', N'1', N'2022-02-22 00:56:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1', N'1', N'2022-02-22 00:56:14.0000000', N'1', N'2022-02-22 00:56:14.0000000', N'121', N'0', N'1')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'434', N'2', N'1', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'2')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'454', N'2', N'1093', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1093', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'3')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'455', N'2', N'1094', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1094', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'4')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'460', N'2', N'1100', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1100', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'5')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'467', N'2', N'1107', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1107', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'6')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'470', N'2', N'1110', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1110', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'7')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'476', N'2', N'1117', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1117', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'8')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'477', N'2', N'100', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'100', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'9')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'478', N'2', N'101', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'101', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'10')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'479', N'2', N'102', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'102', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'11')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'480', N'2', N'1126', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1126', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'12')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'481', N'2', N'103', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'103', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'13')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'483', N'2', N'104', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'104', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'14')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'485', N'2', N'105', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'105', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'15')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'488', N'2', N'107', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'107', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'16')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'490', N'2', N'108', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'108', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'17')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'492', N'2', N'109', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'109', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'18')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'498', N'2', N'1138', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1138', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'19')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'523', N'2', N'1224', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1224', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'20')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'524', N'2', N'1225', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1225', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'21')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'541', N'2', N'500', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'500', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'22')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'543', N'2', N'501', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'501', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'2022-02-22 13:09:12.0000000', N'1', N'0', N'23')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'675', N'2', N'2', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'2', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0', N'24')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'689', N'2', N'1077', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1077', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0', N'25')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'690', N'2', N'1078', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1078', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0', N'26')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'692', N'2', N'1083', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1083', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0', N'27')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'693', N'2', N'1084', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1084', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0', N'28')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'699', N'2', N'1090', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'1090', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0', N'29')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'703', N'2', N'106', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'106', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0', N'30')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'704', N'2', N'110', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'110', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0', N'31')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'705', N'2', N'111', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'111', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0', N'32')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'706', N'2', N'112', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'112', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0', N'33')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'707', N'2', N'113', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'2', N'113', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'2022-02-22 13:16:57.0000000', N'1', N'0', N'34')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1296', N'110', N'1', N'110', N'2022-02-23 00:23:55.0000000', N'110', N'2022-02-23 00:23:55.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'110', N'1', N'110', N'2022-02-23 00:23:55.0000000', N'110', N'2022-02-23 00:23:55.0000000', N'121', N'0', N'35')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1486', N'109', N'103', N'1', N'2022-02-23 19:32:14.0000000', N'1', N'2022-02-23 19:32:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'103', N'1', N'2022-02-23 19:32:14.0000000', N'1', N'2022-02-23 19:32:14.0000000', N'121', N'0', N'36')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1487', N'109', N'104', N'1', N'2022-02-23 19:32:14.0000000', N'1', N'2022-02-23 19:32:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'104', N'1', N'2022-02-23 19:32:14.0000000', N'1', N'2022-02-23 19:32:14.0000000', N'121', N'0', N'37')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1489', N'1', N'1', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'38')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1490', N'1', N'2', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'2', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'39')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1494', N'1', N'1077', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1077', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'40')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1495', N'1', N'1078', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1078', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'41')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1496', N'1', N'1083', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1083', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'42')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1497', N'1', N'1084', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1084', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'43')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1498', N'1', N'1090', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1090', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'44')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1499', N'1', N'1093', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1093', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'45')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1500', N'1', N'1094', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1094', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'46')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1501', N'1', N'1100', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1100', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'47')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1502', N'1', N'1107', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1107', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'48')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1503', N'1', N'1110', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1110', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'49')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1505', N'1', N'1117', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1117', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'50')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1506', N'1', N'100', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'100', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'51')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1507', N'1', N'101', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'101', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'52')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1508', N'1', N'102', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'102', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'53')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1509', N'1', N'1126', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1126', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'54')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1510', N'1', N'103', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'103', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'55')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1511', N'1', N'104', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'104', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'56')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1512', N'1', N'105', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'105', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'57')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1513', N'1', N'106', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'106', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'58')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1514', N'1', N'107', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'107', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'59')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1515', N'1', N'108', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'108', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'60')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1516', N'1', N'109', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'109', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'61')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1517', N'1', N'110', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'110', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'62')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1518', N'1', N'111', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'111', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'63')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1519', N'1', N'112', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'112', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'64')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1520', N'1', N'113', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'113', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'65')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1522', N'1', N'1138', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1138', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'66')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1525', N'1', N'1224', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1224', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'67')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1526', N'1', N'1225', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'1225', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'68')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1527', N'1', N'500', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'500', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'69')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1528', N'1', N'501', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'1', N'501', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'2022-02-23 20:03:57.0000000', N'1', N'0', N'70')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1529', N'109', N'1024', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1024', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0', N'71')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1530', N'109', N'1025', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1025', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0', N'72')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1536', N'109', N'1017', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1017', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0', N'73')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1537', N'109', N'1018', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1018', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0', N'74')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1538', N'109', N'1019', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1019', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0', N'75')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1539', N'109', N'1020', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1020', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0', N'76')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1540', N'109', N'1021', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1021', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0', N'77')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1541', N'109', N'1022', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1022', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0', N'78')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1542', N'109', N'1023', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1023', N'1', N'2022-02-23 20:30:14.0000000', N'1', N'2022-02-23 20:30:14.0000000', N'121', N'0', N'79')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1576', N'111', N'1024', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1024', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'80')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1577', N'111', N'1025', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1025', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'81')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1578', N'111', N'1', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'82')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1584', N'111', N'103', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'103', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'83')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1585', N'111', N'104', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'104', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'84')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1587', N'111', N'1017', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1017', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'85')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1588', N'111', N'1018', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1018', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'86')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1589', N'111', N'1019', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1019', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'87')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1590', N'111', N'1020', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1020', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'88')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1591', N'111', N'1021', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1021', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'89')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1592', N'111', N'1022', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1022', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'90')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1593', N'111', N'1023', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1023', N'1', N'2022-03-07 21:37:58.0000000', N'1', N'2022-03-07 21:37:58.0000000', N'122', N'0', N'91')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1594', N'109', N'102', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'102', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'121', N'0', N'92')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1595', N'109', N'1013', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1013', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'121', N'0', N'93')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1596', N'109', N'1014', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1014', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'121', N'0', N'94')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1597', N'109', N'1015', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1015', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'121', N'0', N'95')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1598', N'109', N'1016', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'121', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'109', N'1016', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'121', N'0', N'96')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1599', N'111', N'102', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'102', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'122', N'0', N'97')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1600', N'111', N'1013', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1013', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'122', N'0', N'98')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1601', N'111', N'1014', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1014', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'122', N'0', N'99')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1602', N'111', N'1015', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1015', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'122', N'0', N'100')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1603', N'111', N'1016', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'122', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'111', N'1016', N'1', N'2022-03-19 18:39:13.0000000', N'1', N'2022-03-19 18:39:13.0000000', N'122', N'0', N'101')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1604', N'101', N'1216', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1216', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'102')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1605', N'101', N'1217', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1217', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'103')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1606', N'101', N'1218', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1218', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'104')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1607', N'101', N'1219', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1219', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'105')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1608', N'101', N'1220', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1220', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'106')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1609', N'101', N'1221', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1221', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'107')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1610', N'101', N'5', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'5', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'108')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1611', N'101', N'1222', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1222', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'109')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1612', N'101', N'1118', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1118', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'110')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1613', N'101', N'1119', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1119', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'111')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1614', N'101', N'1120', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1120', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'112')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1615', N'101', N'1185', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1185', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'113')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1616', N'101', N'1186', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1186', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'114')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1617', N'101', N'1187', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1187', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'115')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1618', N'101', N'1188', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1188', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'116')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1619', N'101', N'1189', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1189', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'117')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1620', N'101', N'1190', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1190', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'118')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1621', N'101', N'1191', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1191', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'119')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1622', N'101', N'1192', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1192', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'120')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1623', N'101', N'1193', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1193', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'121')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1624', N'101', N'1194', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1194', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'122')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1625', N'101', N'1195', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1195', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'123')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1626', N'101', N'1196', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1196', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'124')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1627', N'101', N'1197', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1197', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'125')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1628', N'101', N'1198', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1198', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'126')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1629', N'101', N'1199', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1199', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'127')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1630', N'101', N'1200', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1200', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'128')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1631', N'101', N'1201', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1201', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'129')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1632', N'101', N'1202', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1202', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'130')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1633', N'101', N'1207', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1207', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'131')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1634', N'101', N'1208', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1208', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'132')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1635', N'101', N'1209', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1209', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'133')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1636', N'101', N'1210', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1210', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'134')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1637', N'101', N'1211', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1211', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'135')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1638', N'101', N'1212', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1212', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'136')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1639', N'101', N'1213', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1213', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'137')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1640', N'101', N'1215', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1215', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'2022-03-19 21:45:52.0000000', N'1', N'0', N'138')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1641', N'101', N'2', N'1', N'2022-04-01 22:21:24.0000000', N'1', N'2022-04-01 22:21:24.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'2', N'1', N'2022-04-01 22:21:24.0000000', N'1', N'2022-04-01 22:21:24.0000000', N'1', N'0', N'139')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1642', N'101', N'1031', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1031', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'140')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1643', N'101', N'1032', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1032', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'141')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1644', N'101', N'1033', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1033', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'142')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1645', N'101', N'1034', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1034', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'143')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1646', N'101', N'1035', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1035', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'144')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1647', N'101', N'1050', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1050', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'145')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1648', N'101', N'1051', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1051', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'146')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1649', N'101', N'1052', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1052', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'147')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1650', N'101', N'1053', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1053', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'148')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1651', N'101', N'1054', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1054', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'149')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1652', N'101', N'1056', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1056', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'150')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1653', N'101', N'1057', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1057', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'151')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1654', N'101', N'1058', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1058', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'152')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1655', N'101', N'1059', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1059', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'153')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1656', N'101', N'1060', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1060', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'154')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1657', N'101', N'1066', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1066', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'155')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1658', N'101', N'1067', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1067', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'156')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1659', N'101', N'1070', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1070', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'157')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1660', N'101', N'1071', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1071', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'158')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1661', N'101', N'1072', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1072', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'159')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1662', N'101', N'1073', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1073', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'160')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1663', N'101', N'1074', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1074', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'161')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1664', N'101', N'1075', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1075', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'162')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1665', N'101', N'1076', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1076', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'163')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1666', N'101', N'1077', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1077', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'164')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1667', N'101', N'1078', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1078', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'165')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1668', N'101', N'1082', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1082', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'166')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1669', N'101', N'1083', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1083', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'167')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1670', N'101', N'1084', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1084', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'168')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1671', N'101', N'1085', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1085', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'169')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1672', N'101', N'1086', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1086', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'170')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1673', N'101', N'1087', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1087', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'171')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1674', N'101', N'1088', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1088', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'172')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1675', N'101', N'1089', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1089', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'173')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1676', N'101', N'1090', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1090', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'174')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1677', N'101', N'1091', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1091', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'175')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1678', N'101', N'1092', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1092', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'176')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1679', N'101', N'1237', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1237', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'177')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1680', N'101', N'1238', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1238', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'178')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1681', N'101', N'1239', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1239', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'179')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1682', N'101', N'1240', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1240', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'180')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1683', N'101', N'1241', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1241', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'181')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1684', N'101', N'1242', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1242', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'182')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1685', N'101', N'1243', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'1243', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'183')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1687', N'101', N'106', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'106', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'184')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1688', N'101', N'110', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'110', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'185')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1689', N'101', N'111', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'111', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'186')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1690', N'101', N'112', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'112', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'187')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1691', N'101', N'113', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'113', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'188')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1692', N'101', N'114', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'114', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'189')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1693', N'101', N'115', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'115', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'190')
 GO
 
-INSERT INTO [dbo].[system_role_menu] ([id], [role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1694', N'101', N'116', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_role_menu] ([role_id], [menu_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted], [id]) VALUES (N'101', N'116', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'2022-04-01 22:21:37.0000000', N'1', N'0', N'191')
 GO
 
 SET IDENTITY_INSERT [dbo].[system_role_menu] OFF
@@ -8661,7 +9530,7 @@ GO
 
 CREATE TABLE [dbo].[system_sms_channel] (
   [id] bigint  IDENTITY(1,1) NOT NULL,
-  [signature] nvarchar(10) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [signature] nvarchar(12) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [code] nvarchar(63) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [status] tinyint  NOT NULL,
   [remark] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
@@ -8784,9 +9653,6 @@ BEGIN TRANSACTION
 GO
 
 SET IDENTITY_INSERT [dbo].[system_sms_channel] ON
-GO
-
-INSERT INTO [dbo].[system_sms_channel] ([id], [signature], [code], [status], [remark], [api_key], [api_secret], [callback_url], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1', N'芋道', N'YUN_PIAN', N'0', N'呵呵呵哒', N'1555a14277cb8a608cf45a9e6a80d510', NULL, N'http://vdwapu.natappfree.cc/admin-api/system/sms/callback/yunpian', N'', N'2021-03-31 06:12:20.0000000', N'1', N'2022-02-23 16:48:44.0000000', N'0')
 GO
 
 INSERT INTO [dbo].[system_sms_channel] ([id], [signature], [code], [status], [remark], [api_key], [api_secret], [callback_url], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'2', N'Ballcat', N'ALIYUN', N'0', N'啦啦啦', N'LTAI5tCnKso2uG3kJ5gRav88', N'fGJ5SNXL7P1NHNRmJ7DJaMJGPyE55C', NULL, N'', N'2021-03-31 11:53:10.0000000', N'1', N'2021-04-14 00:08:37.0000000', N'0')
@@ -10222,22 +11088,22 @@ GO
 SET IDENTITY_INSERT [dbo].[system_user_role] ON
 GO
 
-INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1', N'1', N'1', N'', NULL, N'', NULL, N'1', N'0')
+INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1', N'1', N'1', N'', N'2022-01-11 13:19:45.0000000', N'', N'2022-01-11 13:19:45.0000000', N'1', N'0')
 GO
 
-INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'2', N'2', N'2', N'', NULL, N'', NULL, N'1', N'0')
+INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'2', N'2', N'2', N'', N'2022-01-11 13:19:45.0000000', N'', N'2022-01-11 13:19:45.0000000', N'1', N'0')
 GO
 
-INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'4', N'100', N'101', N'', NULL, N'', NULL, N'1', N'0')
+INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'4', N'100', N'101', N'', N'2022-01-11 13:19:45.0000000', N'', N'2022-01-11 13:19:45.0000000', N'1', N'0')
 GO
 
-INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'5', N'100', N'1', N'', NULL, N'', NULL, N'1', N'0')
+INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'5', N'100', N'1', N'', N'2022-01-11 13:19:45.0000000', N'', N'2022-01-11 13:19:45.0000000', N'1', N'0')
 GO
 
-INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'6', N'100', N'2', N'', NULL, N'', NULL, N'1', N'0')
+INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'6', N'100', N'2', N'', N'2022-01-11 13:19:45.0000000', N'', N'2022-01-11 13:19:45.0000000', N'1', N'0')
 GO
 
-INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'7', N'104', N'101', N'', NULL, N'', NULL, N'1', N'0')
+INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'7', N'104', N'101', N'', N'2022-01-11 13:19:45.0000000', N'', N'2022-01-11 13:19:45.0000000', N'1', N'0')
 GO
 
 INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'10', N'103', N'1', N'1', N'2022-01-11 13:19:45.0000000', N'1', N'2022-01-11 13:19:45.0000000', N'1', N'0')
@@ -10265,155 +11131,6 @@ INSERT INTO [dbo].[system_user_role] ([id], [user_id], [role_id], [creator], [cr
 GO
 
 SET IDENTITY_INSERT [dbo].[system_user_role] OFF
-GO
-
-COMMIT
-GO
-
-
--- ----------------------------
--- Table structure for system_user_session
--- ----------------------------
-IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[system_user_session]') AND type IN ('U'))
-	DROP TABLE [dbo].[system_user_session]
-GO
-
-CREATE TABLE [dbo].[system_user_session] (
-  [id] bigint  IDENTITY(1,1) NOT NULL,
-  [token] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [user_id] bigint  NOT NULL,
-  [user_type] tinyint  NOT NULL,
-  [session_timeout] datetime2(7)  NOT NULL,
-  [username] nvarchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [user_ip] nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [user_agent] nvarchar(512) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
-  [create_time] datetime2(7)  NOT NULL,
-  [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
-  [update_time] datetime2(7)  NOT NULL,
-  [tenant_id] bigint  NOT NULL,
-  [deleted] bit DEFAULT 0 NOT NULL
-)
-GO
-
-ALTER TABLE [dbo].[system_user_session] SET (LOCK_ESCALATION = TABLE)
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'ID 编号',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'id'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'Token 编号',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'token'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'用户编号',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'user_id'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'用户类型',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'user_type'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'会话超时时间',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'session_timeout'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'用户账号',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'username'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'用户 IP',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'user_ip'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'浏览器 UA',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'user_agent'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'创建者',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'creator'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'创建时间',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'create_time'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'更新者',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'updater'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'更新时间',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'update_time'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'租户编号',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'tenant_id'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'是否删除',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session',
-'COLUMN', N'deleted'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'用户在线 Session',
-'SCHEMA', N'dbo',
-'TABLE', N'system_user_session'
-GO
-
-
--- ----------------------------
--- Records of system_user_session
--- ----------------------------
-BEGIN TRANSACTION
-GO
-
-SET IDENTITY_INSERT [dbo].[system_user_session] ON
-GO
-
-SET IDENTITY_INSERT [dbo].[system_user_session] OFF
 GO
 
 COMMIT
@@ -10610,10 +11327,10 @@ GO
 SET IDENTITY_INSERT [dbo].[system_users] ON
 GO
 
-INSERT INTO [dbo].[system_users] ([id], [username], [password], [nickname], [remark], [dept_id], [post_ids], [email], [mobile], [sex], [avatar], [status], [login_ip], [login_date], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1', N'admin', N'$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', N'芋道源码', N'管理员', N'103', N'[1]', N'aoteman@126.com', N'15612345678', N'1', N'http://test.yudao.iocoder.cn/48934f2f-92d4-4250-b917-d10d2b262c6a', N'0', N'127.0.0.1', N'2022-05-02 17:16:18.5800000', N'admin', N'2021-01-05 17:03:47.0000000', N'1', N'2022-05-02 17:18:53.7370000', N'1', N'0')
+INSERT INTO [dbo].[system_users] ([id], [username], [password], [nickname], [remark], [dept_id], [post_ids], [email], [mobile], [sex], [avatar], [status], [login_ip], [login_date], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1', N'admin', N'$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', N'芋道源码', N'管理员', N'103', N'[1]', N'aoteman@126.com', N'15612345678', N'1', N'http://test.yudao.iocoder.cn/48934f2f-92d4-4250-b917-d10d2b262c6a', N'0', N'127.0.0.1', N'2022-05-26 00:51:15.3820000', N'admin', N'2021-01-05 17:03:47.0000000', NULL, N'2022-05-26 00:51:15.3870000', N'1', N'0')
 GO
 
-INSERT INTO [dbo].[system_users] ([id], [username], [password], [nickname], [remark], [dept_id], [post_ids], [email], [mobile], [sex], [avatar], [status], [login_ip], [login_date], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'100', N'yudao', N'$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', N'芋道', N'不要吓我', N'104', N'[1]', N'yudao@iocoder.cn', N'15601691300', N'1', N'', N'1', N'', NULL, N'', N'2021-01-07 09:07:17.0000000', N'104', N'2021-12-16 09:26:10.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_users] ([id], [username], [password], [nickname], [remark], [dept_id], [post_ids], [email], [mobile], [sex], [avatar], [status], [login_ip], [login_date], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'100', N'yudao', N'$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', N'芋道', N'不要吓我', N'104', N'[1]', N'yudao@iocoder.cn', N'15601691300', N'1', N'', N'1', N'127.0.0.1', N'2022-05-03 16:49:24.6860000', N'', N'2021-01-07 09:07:17.0000000', NULL, N'2022-05-03 16:49:24.6860000', N'1', N'0')
 GO
 
 INSERT INTO [dbo].[system_users] ([id], [username], [password], [nickname], [remark], [dept_id], [post_ids], [email], [mobile], [sex], [avatar], [status], [login_ip], [login_date], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'103', N'yuanma', N'$2a$10$wWoPT7sqriM2O1YXRL.je.GiL538OR6ZTN8aQZr9JAGdnpCH2tpYe', N'源码', NULL, N'106', NULL, N'yuanma@iocoder.cn', N'15601701300', N'0', N'', N'0', N'127.0.0.1', N'2022-01-18 00:33:40.0000000', N'', N'2021-01-13 23:50:35.0000000', NULL, N'2022-01-18 00:33:40.0000000', N'1', N'0')
@@ -10660,7 +11377,7 @@ GO
 -- Primary Key structure for table QRTZ_CALENDARS
 -- ----------------------------
 ALTER TABLE [dbo].[QRTZ_CALENDARS] ADD CONSTRAINT [PK_QRTZ_CALENDARS] PRIMARY KEY CLUSTERED ([SCHED_NAME], [CALENDAR_NAME])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10681,7 +11398,7 @@ GO
 -- Primary Key structure for table QRTZ_CRON_TRIGGERS
 -- ----------------------------
 ALTER TABLE [dbo].[QRTZ_CRON_TRIGGERS] ADD CONSTRAINT [PK_QRTZ_CRON_TRIGGERS] PRIMARY KEY CLUSTERED ([SCHED_NAME], [TRIGGER_NAME], [TRIGGER_GROUP])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10690,7 +11407,7 @@ GO
 -- Primary Key structure for table QRTZ_FIRED_TRIGGERS
 -- ----------------------------
 ALTER TABLE [dbo].[QRTZ_FIRED_TRIGGERS] ADD CONSTRAINT [PK_QRTZ_FIRED_TRIGGERS] PRIMARY KEY CLUSTERED ([SCHED_NAME], [ENTRY_ID])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10699,7 +11416,7 @@ GO
 -- Primary Key structure for table QRTZ_JOB_DETAILS
 -- ----------------------------
 ALTER TABLE [dbo].[QRTZ_JOB_DETAILS] ADD CONSTRAINT [PK_QRTZ_JOB_DETAILS] PRIMARY KEY CLUSTERED ([SCHED_NAME], [JOB_NAME], [JOB_GROUP])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10708,7 +11425,7 @@ GO
 -- Primary Key structure for table QRTZ_LOCKS
 -- ----------------------------
 ALTER TABLE [dbo].[QRTZ_LOCKS] ADD CONSTRAINT [PK_QRTZ_LOCKS] PRIMARY KEY CLUSTERED ([SCHED_NAME], [LOCK_NAME])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10717,7 +11434,7 @@ GO
 -- Primary Key structure for table QRTZ_PAUSED_TRIGGER_GRPS
 -- ----------------------------
 ALTER TABLE [dbo].[QRTZ_PAUSED_TRIGGER_GRPS] ADD CONSTRAINT [PK_QRTZ_PAUSED_TRIGGER_GRPS] PRIMARY KEY CLUSTERED ([SCHED_NAME], [TRIGGER_GROUP])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10726,7 +11443,7 @@ GO
 -- Primary Key structure for table QRTZ_SCHEDULER_STATE
 -- ----------------------------
 ALTER TABLE [dbo].[QRTZ_SCHEDULER_STATE] ADD CONSTRAINT [PK_QRTZ_SCHEDULER_STATE] PRIMARY KEY CLUSTERED ([SCHED_NAME], [INSTANCE_NAME])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10747,7 +11464,7 @@ GO
 -- Primary Key structure for table QRTZ_SIMPLE_TRIGGERS
 -- ----------------------------
 ALTER TABLE [dbo].[QRTZ_SIMPLE_TRIGGERS] ADD CONSTRAINT [PK_QRTZ_SIMPLE_TRIGGERS] PRIMARY KEY CLUSTERED ([SCHED_NAME], [TRIGGER_NAME], [TRIGGER_GROUP])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10768,7 +11485,7 @@ GO
 -- Primary Key structure for table QRTZ_SIMPROP_TRIGGERS
 -- ----------------------------
 ALTER TABLE [dbo].[QRTZ_SIMPROP_TRIGGERS] ADD CONSTRAINT [PK_QRTZ_SIMPROP_TRIGGERS] PRIMARY KEY CLUSTERED ([SCHED_NAME], [TRIGGER_NAME], [TRIGGER_GROUP])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10789,7 +11506,7 @@ GO
 -- Primary Key structure for table QRTZ_TRIGGERS
 -- ----------------------------
 ALTER TABLE [dbo].[QRTZ_TRIGGERS] ADD CONSTRAINT [PK_QRTZ_TRIGGERS] PRIMARY KEY CLUSTERED ([SCHED_NAME], [TRIGGER_NAME], [TRIGGER_GROUP])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10805,7 +11522,7 @@ GO
 -- Primary Key structure for table bpm_form
 -- ----------------------------
 ALTER TABLE [dbo].[bpm_form] ADD CONSTRAINT [PK__bpm_form__3213E83F86C2B27F] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10821,7 +11538,7 @@ GO
 -- Primary Key structure for table bpm_oa_leave
 -- ----------------------------
 ALTER TABLE [dbo].[bpm_oa_leave] ADD CONSTRAINT [PK__bpm_oa_l__3213E83F3569F596] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10837,7 +11554,7 @@ GO
 -- Primary Key structure for table bpm_process_definition_ext
 -- ----------------------------
 ALTER TABLE [dbo].[bpm_process_definition_ext] ADD CONSTRAINT [PK__bpm_proc__3213E83F0A8AB015] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10853,7 +11570,7 @@ GO
 -- Primary Key structure for table bpm_process_instance_ext
 -- ----------------------------
 ALTER TABLE [dbo].[bpm_process_instance_ext] ADD CONSTRAINT [PK__bpm_proc__3213E83FFD88328F] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10869,7 +11586,7 @@ GO
 -- Primary Key structure for table bpm_task_assign_rule
 -- ----------------------------
 ALTER TABLE [dbo].[bpm_task_assign_rule] ADD CONSTRAINT [PK__bpm_task__3213E83F474371C5] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10885,7 +11602,7 @@ GO
 -- Primary Key structure for table bpm_task_ext
 -- ----------------------------
 ALTER TABLE [dbo].[bpm_task_ext] ADD CONSTRAINT [PK__bpm_task__3213E83FD8AFE1F9] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10901,7 +11618,7 @@ GO
 -- Primary Key structure for table bpm_user_group
 -- ----------------------------
 ALTER TABLE [dbo].[bpm_user_group] ADD CONSTRAINT [PK__bpm_user__3213E83F25E4725B] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10909,7 +11626,7 @@ GO
 -- ----------------------------
 -- Auto increment value for infra_api_access_log
 -- ----------------------------
-DBCC CHECKIDENT ('[dbo].[infra_api_access_log]', RESEED, 40316)
+DBCC CHECKIDENT ('[dbo].[infra_api_access_log]', RESEED, 40615)
 GO
 
 
@@ -10917,7 +11634,7 @@ GO
 -- Primary Key structure for table infra_api_access_log
 -- ----------------------------
 ALTER TABLE [dbo].[infra_api_access_log] ADD CONSTRAINT [PK__infra_ap__3213E83F04F27A05] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10925,7 +11642,7 @@ GO
 -- ----------------------------
 -- Auto increment value for infra_api_error_log
 -- ----------------------------
-DBCC CHECKIDENT ('[dbo].[infra_api_error_log]', RESEED, 2014)
+DBCC CHECKIDENT ('[dbo].[infra_api_error_log]', RESEED, 2021)
 GO
 
 
@@ -10933,7 +11650,7 @@ GO
 -- Primary Key structure for table infra_api_error_log
 -- ----------------------------
 ALTER TABLE [dbo].[infra_api_error_log] ADD CONSTRAINT [PK__infra_ap__3213E83FCA2446D4] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10949,7 +11666,7 @@ GO
 -- Primary Key structure for table infra_codegen_column
 -- ----------------------------
 ALTER TABLE [dbo].[infra_codegen_column] ADD CONSTRAINT [PK__infra_co__3213E83FA9EC5005] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10965,7 +11682,7 @@ GO
 -- Primary Key structure for table infra_codegen_table
 -- ----------------------------
 ALTER TABLE [dbo].[infra_codegen_table] ADD CONSTRAINT [PK__infra_co__3213E83F555031D0] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10974,7 +11691,7 @@ GO
 -- Primary Key structure for table infra_config
 -- ----------------------------
 ALTER TABLE [dbo].[infra_config] ADD CONSTRAINT [PK__infra_co__3213E83FF4C71E85] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -10990,7 +11707,7 @@ GO
 -- Primary Key structure for table infra_data_source_config
 -- ----------------------------
 ALTER TABLE [dbo].[infra_data_source_config] ADD CONSTRAINT [PK__infra_da__3213E83F02D21AEB] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11013,7 +11730,7 @@ GO
 -- Primary Key structure for table infra_file_config
 -- ----------------------------
 ALTER TABLE [dbo].[infra_file_config] ADD CONSTRAINT [PK__infra_fi__3213E83F8A7903EA] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11029,7 +11746,7 @@ GO
 -- Primary Key structure for table infra_file_content
 -- ----------------------------
 ALTER TABLE [dbo].[infra_file_content] ADD CONSTRAINT [PK__infra_fi__3213E83F033E6045] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11045,7 +11762,7 @@ GO
 -- Primary Key structure for table infra_job
 -- ----------------------------
 ALTER TABLE [dbo].[infra_job] ADD CONSTRAINT [PK__infra_jo__3213E83F3C7DE10C] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11061,7 +11778,7 @@ GO
 -- Primary Key structure for table infra_job_log
 -- ----------------------------
 ALTER TABLE [dbo].[infra_job_log] ADD CONSTRAINT [PK__infra_jo__3213E83F4CA8F353] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11084,7 +11801,7 @@ GO
 -- Primary Key structure for table member_user
 -- ----------------------------
 ALTER TABLE [dbo].[member_user] ADD CONSTRAINT [PK__member_u__3213E83F0A9AEC0B] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11100,7 +11817,7 @@ GO
 -- Primary Key structure for table pay_app
 -- ----------------------------
 ALTER TABLE [dbo].[pay_app] ADD CONSTRAINT [PK__pay_app__3213E83FB26E0A6B] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11116,7 +11833,7 @@ GO
 -- Primary Key structure for table pay_channel
 -- ----------------------------
 ALTER TABLE [dbo].[pay_channel] ADD CONSTRAINT [PK__pay_chan__3213E83F2556A7FC] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11132,7 +11849,7 @@ GO
 -- Primary Key structure for table pay_merchant
 -- ----------------------------
 ALTER TABLE [dbo].[pay_merchant] ADD CONSTRAINT [PK__pay_merc__3213E83F010D02B8] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11148,7 +11865,7 @@ GO
 -- Primary Key structure for table pay_notify_log
 -- ----------------------------
 ALTER TABLE [dbo].[pay_notify_log] ADD CONSTRAINT [PK__pay_noti__3213E83F5F4B3447] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11164,7 +11881,7 @@ GO
 -- Primary Key structure for table pay_notify_task
 -- ----------------------------
 ALTER TABLE [dbo].[pay_notify_task] ADD CONSTRAINT [PK__pay_noti__3213E83FB9215103] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11180,7 +11897,7 @@ GO
 -- Primary Key structure for table pay_order
 -- ----------------------------
 ALTER TABLE [dbo].[pay_order] ADD CONSTRAINT [PK__pay_orde__3213E83F34C95271] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11196,7 +11913,7 @@ GO
 -- Primary Key structure for table pay_order_extension
 -- ----------------------------
 ALTER TABLE [dbo].[pay_order_extension] ADD CONSTRAINT [PK__pay_orde__3213E83F5ACB776F] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11212,7 +11929,7 @@ GO
 -- Primary Key structure for table pay_refund
 -- ----------------------------
 ALTER TABLE [dbo].[pay_refund] ADD CONSTRAINT [PK__pay_refu__3213E83FBE1B54AC] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11228,7 +11945,7 @@ GO
 -- Primary Key structure for table system_dept
 -- ----------------------------
 ALTER TABLE [dbo].[system_dept] ADD CONSTRAINT [PK__system_d__3213E83FFA72847C] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11236,7 +11953,7 @@ GO
 -- ----------------------------
 -- Auto increment value for system_dict_data
 -- ----------------------------
-DBCC CHECKIDENT ('[dbo].[system_dict_data]', RESEED, 1154)
+DBCC CHECKIDENT ('[dbo].[system_dict_data]', RESEED, 1160)
 GO
 
 
@@ -11244,7 +11961,7 @@ GO
 -- Primary Key structure for table system_dict_data
 -- ----------------------------
 ALTER TABLE [dbo].[system_dict_data] ADD CONSTRAINT [PK__system_d__3213E83F20407597] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11252,7 +11969,7 @@ GO
 -- ----------------------------
 -- Auto increment value for system_dict_type
 -- ----------------------------
-DBCC CHECKIDENT ('[dbo].[system_dict_type]', RESEED, 146)
+DBCC CHECKIDENT ('[dbo].[system_dict_type]', RESEED, 147)
 GO
 
 
@@ -11260,7 +11977,7 @@ GO
 -- Primary Key structure for table system_dict_type
 -- ----------------------------
 ALTER TABLE [dbo].[system_dict_type] ADD CONSTRAINT [PK__system_d__3213E83F7C36B1FD] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11268,7 +11985,7 @@ GO
 -- ----------------------------
 -- Auto increment value for system_error_code
 -- ----------------------------
-DBCC CHECKIDENT ('[dbo].[system_error_code]', RESEED, 15452)
+DBCC CHECKIDENT ('[dbo].[system_error_code]', RESEED, 15466)
 GO
 
 
@@ -11276,7 +11993,7 @@ GO
 -- Primary Key structure for table system_error_code
 -- ----------------------------
 ALTER TABLE [dbo].[system_error_code] ADD CONSTRAINT [PK__system_e__3213E83F68B8DFD0] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11284,7 +12001,7 @@ GO
 -- ----------------------------
 -- Auto increment value for system_login_log
 -- ----------------------------
-DBCC CHECKIDENT ('[dbo].[system_login_log]', RESEED, 9)
+DBCC CHECKIDENT ('[dbo].[system_login_log]', RESEED, 24)
 GO
 
 
@@ -11292,7 +12009,7 @@ GO
 -- Primary Key structure for table system_login_log
 -- ----------------------------
 ALTER TABLE [dbo].[system_login_log] ADD CONSTRAINT [PK__system_l__3213E83F717953E9] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11300,7 +12017,7 @@ GO
 -- ----------------------------
 -- Auto increment value for system_menu
 -- ----------------------------
-DBCC CHECKIDENT ('[dbo].[system_menu]', RESEED, 1260)
+DBCC CHECKIDENT ('[dbo].[system_menu]', RESEED, 1267)
 GO
 
 
@@ -11308,7 +12025,7 @@ GO
 -- Primary Key structure for table system_menu
 -- ----------------------------
 ALTER TABLE [dbo].[system_menu] ADD CONSTRAINT [PK__system_m__3213E83F14175801] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11324,7 +12041,69 @@ GO
 -- Primary Key structure for table system_notice
 -- ----------------------------
 ALTER TABLE [dbo].[system_notice] ADD CONSTRAINT [PK__system_n__3213E83FA158BA8D] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+ON [PRIMARY]
+GO
+
+
+-- ----------------------------
+-- Auto increment value for system_oauth2_access_token
+-- ----------------------------
+DBCC CHECKIDENT ('[dbo].[system_oauth2_access_token]', RESEED, 5)
+GO
+
+
+-- ----------------------------
+-- Auto increment value for system_oauth2_approve
+-- ----------------------------
+DBCC CHECKIDENT ('[dbo].[system_oauth2_approve]', RESEED, 2)
+GO
+
+
+-- ----------------------------
+-- Primary Key structure for table system_oauth2_approve
+-- ----------------------------
+ALTER TABLE [dbo].[system_oauth2_approve] ADD CONSTRAINT [PK__system_o__3213E83F7CC08ED6] PRIMARY KEY CLUSTERED ([id])
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+ON [PRIMARY]
+GO
+
+
+-- ----------------------------
+-- Auto increment value for system_oauth2_client
+-- ----------------------------
+DBCC CHECKIDENT ('[dbo].[system_oauth2_client]', RESEED, 1)
+GO
+
+
+-- ----------------------------
+-- Auto increment value for system_oauth2_code
+-- ----------------------------
+DBCC CHECKIDENT ('[dbo].[system_oauth2_code]', RESEED, 4)
+GO
+
+
+-- ----------------------------
+-- Primary Key structure for table system_oauth2_code
+-- ----------------------------
+ALTER TABLE [dbo].[system_oauth2_code] ADD CONSTRAINT [PK__system_o__3213E83F38C13543] PRIMARY KEY CLUSTERED ([id])
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+ON [PRIMARY]
+GO
+
+
+-- ----------------------------
+-- Auto increment value for system_oauth2_refresh_token
+-- ----------------------------
+DBCC CHECKIDENT ('[dbo].[system_oauth2_refresh_token]', RESEED, 3)
+GO
+
+
+-- ----------------------------
+-- Primary Key structure for table system_oauth2_refresh_token
+-- ----------------------------
+ALTER TABLE [dbo].[system_oauth2_refresh_token] ADD CONSTRAINT [PK__system_o__3213E83FCFB541CC] PRIMARY KEY CLUSTERED ([id])
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11332,7 +12111,7 @@ GO
 -- ----------------------------
 -- Auto increment value for system_operate_log
 -- ----------------------------
-DBCC CHECKIDENT ('[dbo].[system_operate_log]', RESEED, 17)
+DBCC CHECKIDENT ('[dbo].[system_operate_log]', RESEED, 19)
 GO
 
 
@@ -11340,7 +12119,7 @@ GO
 -- Primary Key structure for table system_operate_log
 -- ----------------------------
 ALTER TABLE [dbo].[system_operate_log] ADD CONSTRAINT [PK__system_o__3213E83F85EC81FD] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11356,7 +12135,7 @@ GO
 -- Primary Key structure for table system_post
 -- ----------------------------
 ALTER TABLE [dbo].[system_post] ADD CONSTRAINT [PK__system_p__3213E83FBC098F34] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11372,7 +12151,7 @@ GO
 -- Primary Key structure for table system_role
 -- ----------------------------
 ALTER TABLE [dbo].[system_role] ADD CONSTRAINT [PK__system_r__3213E83F209B43F2] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11380,15 +12159,15 @@ GO
 -- ----------------------------
 -- Auto increment value for system_role_menu
 -- ----------------------------
-DBCC CHECKIDENT ('[dbo].[system_role_menu]', RESEED, 1694)
+DBCC CHECKIDENT ('[dbo].[system_role_menu]', RESEED, 191)
 GO
 
 
 -- ----------------------------
 -- Primary Key structure for table system_role_menu
 -- ----------------------------
-ALTER TABLE [dbo].[system_role_menu] ADD CONSTRAINT [PK__system_r__3213E83F3C38A7EE] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+ALTER TABLE [dbo].[system_role_menu] ADD CONSTRAINT [PK__system_r__3213E83F6F1E4A9B] PRIMARY KEY CLUSTERED ([id])
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11404,7 +12183,7 @@ GO
 -- Primary Key structure for table system_sensitive_word
 -- ----------------------------
 ALTER TABLE [dbo].[system_sensitive_word] ADD CONSTRAINT [PK__system_s__3213E83FFFD8E555] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11420,7 +12199,7 @@ GO
 -- Primary Key structure for table system_sms_channel
 -- ----------------------------
 ALTER TABLE [dbo].[system_sms_channel] ADD CONSTRAINT [PK__system_s__3213E83FA96B966E] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11428,7 +12207,7 @@ GO
 -- ----------------------------
 -- Auto increment value for system_sms_code
 -- ----------------------------
-DBCC CHECKIDENT ('[dbo].[system_sms_code]', RESEED, 466)
+DBCC CHECKIDENT ('[dbo].[system_sms_code]', RESEED, 470)
 GO
 
 
@@ -11436,7 +12215,7 @@ GO
 -- Primary Key structure for table system_sms_code
 -- ----------------------------
 ALTER TABLE [dbo].[system_sms_code] ADD CONSTRAINT [PK__system_s__3213E83F825CBCB9] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11444,7 +12223,7 @@ GO
 -- ----------------------------
 -- Auto increment value for system_sms_log
 -- ----------------------------
-DBCC CHECKIDENT ('[dbo].[system_sms_log]', RESEED, 2)
+DBCC CHECKIDENT ('[dbo].[system_sms_log]', RESEED, 6)
 GO
 
 
@@ -11452,7 +12231,7 @@ GO
 -- Primary Key structure for table system_sms_log
 -- ----------------------------
 ALTER TABLE [dbo].[system_sms_log] ADD CONSTRAINT [PK__system_s__3213E83F5F1968A9] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11468,7 +12247,7 @@ GO
 -- Primary Key structure for table system_sms_template
 -- ----------------------------
 ALTER TABLE [dbo].[system_sms_template] ADD CONSTRAINT [PK__system_s__3213E83F5C91CA37] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11484,7 +12263,7 @@ GO
 -- Primary Key structure for table system_social_user
 -- ----------------------------
 ALTER TABLE [dbo].[system_social_user] ADD CONSTRAINT [PK__system_s__3213E83F6EF3863C] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11500,7 +12279,7 @@ GO
 -- Primary Key structure for table system_social_user_bind
 -- ----------------------------
 ALTER TABLE [dbo].[system_social_user_bind] ADD CONSTRAINT [PK__system_s__3213E83F21F44049] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11516,7 +12295,7 @@ GO
 -- Primary Key structure for table system_tenant
 -- ----------------------------
 ALTER TABLE [dbo].[system_tenant] ADD CONSTRAINT [PK__system_t__3213E83FAF444092] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11532,7 +12311,7 @@ GO
 -- Primary Key structure for table system_tenant_package
 -- ----------------------------
 ALTER TABLE [dbo].[system_tenant_package] ADD CONSTRAINT [PK__system_t__3213E83FA2213DB5] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11548,7 +12327,7 @@ GO
 -- Primary Key structure for table system_user_post
 -- ----------------------------
 ALTER TABLE [dbo].[system_user_post] ADD CONSTRAINT [PK__system_u__3213E83F56DD4107] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11564,23 +12343,7 @@ GO
 -- Primary Key structure for table system_user_role
 -- ----------------------------
 ALTER TABLE [dbo].[system_user_role] ADD CONSTRAINT [PK__system_u__3213E83F3593F652] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
-ON [PRIMARY]
-GO
-
-
--- ----------------------------
--- Auto increment value for system_user_session
--- ----------------------------
-DBCC CHECKIDENT ('[dbo].[system_user_session]', RESEED, 1)
-GO
-
-
--- ----------------------------
--- Primary Key structure for table system_user_session
--- ----------------------------
-ALTER TABLE [dbo].[system_user_session] ADD CONSTRAINT [PK__system_u__3213E83F42C4B10F] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 
@@ -11596,7 +12359,7 @@ GO
 -- Primary Key structure for table system_users
 -- ----------------------------
 ALTER TABLE [dbo].[system_users] ADD CONSTRAINT [PK__system_u__3213E83F7CF2516E] PRIMARY KEY CLUSTERED ([id])
-WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)  
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ON [PRIMARY]
 GO
 

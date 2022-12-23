@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
@@ -22,10 +24,11 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -204,20 +207,20 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
        // mock 数据
        FileConfigDO dbFileConfig = randomFileConfigDO().setName("芋道源码")
                .setStorage(FileStorageEnum.LOCAL.getStorage());
-       dbFileConfig.setCreateTime(buildTime(2022, 11, 11));// 等会查询到
+       dbFileConfig.setCreateTime(LocalDateTimeUtil.parse("2020-01-23", DatePattern.NORM_DATE_PATTERN));// 等会查询到
        fileConfigMapper.insert(dbFileConfig);
        // 测试 name 不匹配
        fileConfigMapper.insert(cloneIgnoreId(dbFileConfig, o -> o.setName("源码")));
        // 测试 storage 不匹配
        fileConfigMapper.insert(cloneIgnoreId(dbFileConfig, o -> o.setStorage(FileStorageEnum.DB.getStorage())));
        // 测试 createTime 不匹配
-       fileConfigMapper.insert(cloneIgnoreId(dbFileConfig, o -> o.setCreateTime(buildTime(2022, 12, 12))));
+       fileConfigMapper.insert(cloneIgnoreId(dbFileConfig, o -> o.setCreateTime(LocalDateTimeUtil.parse("2020-11-23", DatePattern.NORM_DATE_PATTERN))));
        // 准备参数
        FileConfigPageReqVO reqVO = new FileConfigPageReqVO();
        reqVO.setName("芋道");
        reqVO.setStorage(FileStorageEnum.LOCAL.getStorage());
-       reqVO.setBeginCreateTime(buildTime(2022, 11, 10));
-       reqVO.setEndCreateTime(buildTime(2022, 11, 12));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 1, 1),
+               buildTime(2020, 1, 24)}));
 
        // 调用
        PageResult<FileConfigDO> pageResult = fileConfigService.getFileConfigPage(reqVO);
@@ -237,7 +240,7 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         // mock 获得 Client
         FileClient fileClient = mock(FileClient.class);
         when(fileClientFactory.getFileClient(eq(id))).thenReturn(fileClient);
-        when(fileClient.upload(any(), any())).thenReturn("https://www.iocoder.cn");
+        when(fileClient.upload(any(), any(), any())).thenReturn("https://www.iocoder.cn");
 
         // 调用，并断言
         assertEquals("https://www.iocoder.cn", fileConfigService.testFileConfig(id));

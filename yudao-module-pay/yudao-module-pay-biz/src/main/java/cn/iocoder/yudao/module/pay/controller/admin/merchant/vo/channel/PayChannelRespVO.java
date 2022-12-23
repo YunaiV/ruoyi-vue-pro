@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel;
 
 import lombok.*;
-import java.util.*;
+
+import java.time.LocalDateTime;
 import io.swagger.annotations.*;
 
 @ApiModel("管理后台 - 支付渠道 Response VO")
@@ -14,7 +15,7 @@ public class PayChannelRespVO extends PayChannelBaseVO {
     private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ApiModelProperty(value = "配置", required = true)
     private String config;

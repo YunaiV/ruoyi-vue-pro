@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * API 访问日志
@@ -84,11 +84,11 @@ public class ApiAccessLogDO extends BaseDO {
     /**
      * 开始请求时间
      */
-    private Date beginTime;
+    private LocalDateTime beginTime;
     /**
      * 结束请求时间
      */
-    private Date endTime;
+    private LocalDateTime endTime;
     /**
      * 执行时长，单位：毫秒
      */

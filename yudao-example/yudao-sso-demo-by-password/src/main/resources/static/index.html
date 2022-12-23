@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>首页</title>
+	<!-- jQuery：操作 dom、发起请求等 -->
+	<script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/2.1.2/jquery.min.js" type="application/javascript"></script>
+
+	<script type="application/javascript">
+
+    /**
+     * 跳转单点登录
+     */
+    function passwordLogin() {
+      window.location.href = '/login.html'
+    }
+
+    /**
+     * 修改昵称
+     */
+    function updateNickname() {
+      const nickname = prompt("请输入新的昵称", "");
+      if (!nickname) {
+        return;
+      }
+      // 更新用户的昵称
+      const accessToken = localStorage.getItem('ACCESS-TOKEN');
+      $.ajax({
+        url: "http://127.0.0.1:18080/user/update?nickname=" + nickname,
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        },
+        success: function (result) {
+          if (result.code !== 0) {
+            alert('更新昵称失败，原因：' + result.msg)
+            return;
+          }
+          alert('更新昵称成功！');
+          $('#nicknameSpan').html(nickname);
+        }
+      });
+    }
+
+    /**
+     * 刷新令牌
+     */
+    function refreshToken() {
+      const refreshToken = localStorage.getItem('REFRESH-TOKEN');
+      if (!refreshToken) {
+        alert("获取不到刷新令牌");
+        return;
+      }
+      $.ajax({
+        url: "http://127.0.0.1:18080/auth/refresh-token?refreshToken=" + refreshToken,
+        method: 'POST',
+        success: function (result) {
+          if (result.code !== 0) {
+            alert('刷新访问令牌失败，原因：' + result.msg)
+            return;
+          }
+          alert('更新访问令牌成功！');
+          $('#accessTokenSpan').html(result.data.access_token);
+
+          // 设置到 localStorage 中
+          localStorage.setItem('ACCESS-TOKEN', result.data.access_token);
+          localStorage.setItem('REFRESH-TOKEN', result.data.refresh_token);
+        }
+      });
+    }
+
+    /**
+     * 登出，删除访问令牌
+     */
+    function logout() {
+      const accessToken = localStorage.getItem('ACCESS-TOKEN');
+      if (!accessToken) {
+        location.reload();
+        return;
+      }
+      $.ajax({
+        url: "http://127.0.0.1:18080/auth/logout",
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        },
+        success: function (result) {
+          if (result.code !== 0) {
+            alert('退出登录失败，原因：' + result.msg)
+            return;
+          }
+          alert('退出登录成功！');
+          // 删除 localStorage 中
+          localStorage.removeItem('ACCESS-TOKEN');
+          localStorage.removeItem('REFRESH-TOKEN');
+
+          location.reload();
+        }
+      });
+    }
+
+    $(function () {
+      const accessToken = localStorage.getItem('ACCESS-TOKEN');
+      // 情况一：未登录
+      if (!accessToken) {
+        $('#noLoginDiv').css("display", "block");
+        return;
+      }
+
+      // 情况二：已登录
+      $('#yesLoginDiv').css("display", "block");
+      $('#accessTokenSpan').html(accessToken);
+      // 获得登录用户的信息
+      $.ajax({
+        url: "http://127.0.0.1:18080/user/get",
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        },
+        success: function (result) {
+          if (result.code !== 0) {
+            alert('获得个人信息失败，原因：' + result.msg)
+            return;
+          }
+          $('#nicknameSpan').html(result.data.nickname);
+        }
+      });
+    })
+	</script>
+</head>
+<body>
+<!-- 情况一：未登录：1）跳转 ruoyi-vue-pro 的 SSO 登录页 -->
+<div id="noLoginDiv" style="display: none">
+	您未登录，点击 <a href="#" onclick="passwordLogin()">跳转 </a> 账号密码登录
+</div>
+
+<!-- 情况二：已登录：1）展示用户信息；2）刷新访问令牌；3）退出登录 -->
+<div id="yesLoginDiv" style="display: none">
+	您已登录！<button onclick="logout()">退出登录</button> <br />
+	昵称：<span id="nicknameSpan"> 加载中... </span> <button onclick="updateNickname()">修改昵称</button> <br />
+	访问令牌：<span id="accessTokenSpan"> 加载中... </span> <button onclick="refreshToken()">刷新令牌</button> <br />
+</div>
+</body>
+<style>
+    body { /** 页面居中 */
+        border-radius: 20px;
+        height: 350px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+    }
+</style>
+</html>

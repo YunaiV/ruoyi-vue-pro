@@ -14,57 +14,58 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.6.2-snapshot</revision>
+        <revision>1.6.5-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.5.12</spring.boot.version>
+        <spring.boot.version>2.7.6</spring.boot.version>
         <!-- Web 相关 -->
-        <knife4j.version>3.0.2</knife4j.version>
-        <swagger-annotations.version>1.5.22</swagger-annotations.version>
+        <knife4j.version>3.0.3</knife4j.version>
+        <swagger-annotations.version>1.6.8</swagger-annotations.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
-        <mysql.version>5.1.46</mysql.version>
-        <druid.version>1.2.8</druid.version>
-        <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
+        <druid.version>1.2.15</druid.version>
+        <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
-        <dynamic-datasource.version>3.5.0</dynamic-datasource.version>
-        <redisson.version>3.17.0</redisson.version>
-        <!-- Config 配置中心相关 -->
-        <apollo.version>1.9.2</apollo.version>
-        <!-- Job 定时任务相关 -->
+        <dynamic-datasource.version>3.6.0</dynamic-datasource.version>
+        <redisson.version>3.18.0</redisson.version>
         <!-- 服务保障相关 -->
-        <lock4j.version>2.2.0</lock4j.version>
-        <resilience4j.version>1.7.0</resilience4j.version>
+        <lock4j.version>2.2.3</lock4j.version>
+        <resilience4j.version>1.7.1</resilience4j.version>
         <!-- 监控相关 -->
-        <skywalking.version>8.7.0</skywalking.version>
-        <spring-boot-admin.version>2.6.2</spring-boot-admin.version>
-        <opentracing.version>0.31.0</opentracing.version>
+        <skywalking.version>8.12.0</skywalking.version>
+        <spring-boot-admin.version>2.7.9</spring-boot-admin.version>
+        <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
-        <podam.version>7.2.6.RELEASE</podam.version>
-        <jedis-mock.version>0.1.16</jedis-mock.version>
-        <mockito-inline.version>3.9.0</mockito-inline.version>
+        <podam.version>7.2.11.RELEASE</podam.version>
+        <jedis-mock.version>1.0.5</jedis-mock.version>
+        <mockito-inline.version>4.8.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
-        <activiti.version>7.1.0.M6</activiti.version>
-        <flowable.version>6.7.0</flowable.version>
+        <flowable.version>6.7.2</flowable.version>
         <!-- 工具类相关 -->
-        <jasypt-spring-boot-starter.version>3.0.4</jasypt-spring-boot-starter.version>
-        <lombok.version>1.18.20</lombok.version>
-        <mapstruct.version>1.4.1.Final</mapstruct.version>
-        <hutool.version>5.6.1</hutool.version>
-        <easyexcel.verion>2.2.7</easyexcel.verion>
-        <velocity.version>2.2</velocity.version>
+        <lombok.version>1.18.24</lombok.version>
+        <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <hutool.version>5.8.10</hutool.version>
+        <easyexcel.verion>3.1.3</easyexcel.verion>
+        <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
-        <guava.version>30.1.1-jre</guava.version>
+        <fastjson.version>1.2.83</fastjson.version>
+        <guava.version>31.1-jre</guava.version>
         <guice.version>5.1.0</guice.version>
-        <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
+        <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
+        <tika-core.version>2.6.0</tika-core.version>
+        <aj-captcha.version>1.3.0</aj-captcha.version>
+        <netty-all.version>4.1.85.Final</netty-all.version>
         <!-- 三方云服务相关 -->
-        <minio.version>8.2.2</minio.version>
-        <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
-        <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
-        <tencentcloud-sdk-java.version>3.1.471</tencentcloud-sdk-java.version>
-        <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
+        <okio.version>3.0.0</okio.version>
+        <okhttp3.version>4.10.0</okhttp3.version>
+        <minio.version>8.4.6</minio.version>
+        <aliyun-java-sdk-core.version>4.6.3</aliyun-java-sdk-core.version>
+        <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
+        <tencentcloud-sdk-java.version>3.1.637</tencentcloud-sdk-java.version>
         <justauth.version>1.4.0</justauth.version>
+        <jimureport.version>1.5.6</jimureport.version>
+        <xercesImpl.version>2.12.2</xercesImpl.version>
     </properties>
 
     <dependencyManagement>
@@ -76,15 +77,14 @@
                 <version>${spring.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>mysql</groupId>
-                        <artifactId>mysql-connector-java</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- 业务组件 -->
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-banner</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
@@ -123,6 +123,16 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-social</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-biz-error-code</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-captcha</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -180,11 +190,6 @@
             </dependency>
 
             <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
@@ -218,17 +223,6 @@
             </dependency>
 
             <!-- Config 配置中心相关 -->
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-config</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.ctrip.framework.apollo</groupId>
-                <artifactId>apollo-client</artifactId> <!-- 引入 Apollo Client 库，实现内嵌的配置中心 -->
-                <version>${apollo.version}</version>
-            </dependency>
 
             <!-- Job 定时任务相关 -->
             <dependency>
@@ -377,48 +371,13 @@
 
             <!-- 工作流相关 -->
             <dependency>
-                <groupId>org.activiti</groupId>
-                <artifactId>activiti-spring-boot-starter</artifactId>
-                <version>${activiti.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>de.odysseus.juel</groupId>
-                        <artifactId>juel-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>de.odysseus.juel</groupId>
-                        <artifactId>juel-spi</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.mybatis</groupId>
-                        <artifactId>mybatis</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>el-api</artifactId>
-                        <groupId>javax.el</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.activiti</groupId>
-                <artifactId>activiti-image-generator</artifactId>
-                <version>${activiti.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-activiti</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <!-- 工作流相关 flowable -->
-            <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-flowable</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
-                <artifactId>flowable-spring-boot-starter-basic</artifactId>
+                <artifactId>flowable-spring-boot-starter-process</artifactId>
                 <version>${flowable.version}</version>
             </dependency>
             <dependency>
@@ -433,12 +392,6 @@
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-common</artifactId>
                 <version>${revision}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.ulisesbocchio</groupId>
-                <artifactId>jasypt-spring-boot-starter</artifactId> <!-- 加解密 -->
-                <version>${jasypt-spring-boot-starter.version}</version>
             </dependency>
 
             <dependency>
@@ -482,9 +435,27 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId> <!-- 文件类型的识别 -->
+                <version>${tika-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.anji-plus</groupId>
+                <artifactId>spring-boot-starter-captcha</artifactId>
+                <version>${aj-captcha.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.apache.velocity</groupId>
                 <artifactId>velocity-engine-core</artifactId>
                 <version>${velocity.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
             </dependency>
 
             <dependency>
@@ -495,6 +466,10 @@
                     <exclusion>
                         <groupId>org.freemarker</groupId>
                         <artifactId>freemarker</artifactId> <!-- 移除 Freemarker 依赖，采用 Velocity 作为模板引擎 -->
+                    </exclusion>
+				    <exclusion>
+                        <groupId>com.alibaba</groupId>
+                        <artifactId>fastjson</artifactId> <!-- 最新版screw-core1.0.5依赖fastjson1.2.73存在漏洞，移除。 -->
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -522,13 +497,30 @@
                 <artifactId>commons-net</artifactId> <!-- 解决 ftp 连接 -->
                 <version>${commons-net.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.jcraft</groupId>
                 <artifactId>jsch</artifactId> <!-- 解决 sftp 连接 -->
                 <version>${jsch.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty-all.version}</version>
+            </dependency>
+
             <!-- 三方云服务相关 -->
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio</artifactId>
+                <version>${okio.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp3.version}</version>
+            </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-file</artifactId>
@@ -541,11 +533,6 @@
             </dependency>
 
             <!-- SMS SDK begin -->
-            <dependency>
-                <groupId>com.yunpian.sdk</groupId>
-                <artifactId>yunpian-java-sdk</artifactId>
-                <version>${yunpian-java-sdk.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.aliyun</groupId>
                 <artifactId>aliyun-java-sdk-core</artifactId>
@@ -568,7 +555,7 @@
             </dependency>
             <dependency>
                 <groupId>com.tencentcloudapi</groupId>
-                <artifactId>tencentcloud-sdk-java</artifactId>
+                <artifactId>tencentcloud-sdk-java-sms</artifactId>
                 <version>${tencentcloud-sdk-java.version}</version>
             </dependency>
             <!-- SMS SDK end -->
@@ -579,6 +566,23 @@
                 <version>${justauth.version}</version>
             </dependency>
 
+            <!-- 积木报表-->
+            <dependency>
+                <groupId>org.jeecgframework.jimureport</groupId>
+                <artifactId>jimureport-spring-boot-starter</artifactId>
+                <version>${jimureport.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.alibaba</groupId>
+                        <artifactId>druid</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xercesImpl.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

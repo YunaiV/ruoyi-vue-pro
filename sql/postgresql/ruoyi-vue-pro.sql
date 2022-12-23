@@ -12,37 +12,15 @@
  Target Server Version : 140002
  File Encoding         : 65001
 
- Date: 02/05/2022 16:42:43
+ Date: 28/07/2022 23:48:10
 */
 
-
--- ----------------------------
--- Sequence structure for act_evt_log_log_nr__seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "act_evt_log_log_nr__seq";
-CREATE SEQUENCE "act_evt_log_log_nr__seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 2147483647
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for act_hi_tsk_log_id__seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "act_hi_tsk_log_id__seq";
-CREATE SEQUENCE "act_hi_tsk_log_id__seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 2147483647
-START 1
-CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for bpm_form_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_form_seq";
-CREATE SEQUENCE "bpm_form_seq" 
+CREATE SEQUENCE "bpm_form_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -51,7 +29,7 @@ CACHE 1;
 -- Sequence structure for bpm_oa_leave_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_oa_leave_seq";
-CREATE SEQUENCE "bpm_oa_leave_seq" 
+CREATE SEQUENCE "bpm_oa_leave_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -60,7 +38,7 @@ CACHE 1;
 -- Sequence structure for bpm_process_definition_ext_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_process_definition_ext_seq";
-CREATE SEQUENCE "bpm_process_definition_ext_seq" 
+CREATE SEQUENCE "bpm_process_definition_ext_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -69,7 +47,7 @@ CACHE 1;
 -- Sequence structure for bpm_process_instance_ext_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_process_instance_ext_seq";
-CREATE SEQUENCE "bpm_process_instance_ext_seq" 
+CREATE SEQUENCE "bpm_process_instance_ext_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -78,7 +56,7 @@ CACHE 1;
 -- Sequence structure for bpm_task_assign_rule_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_task_assign_rule_seq";
-CREATE SEQUENCE "bpm_task_assign_rule_seq" 
+CREATE SEQUENCE "bpm_task_assign_rule_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -87,7 +65,7 @@ CACHE 1;
 -- Sequence structure for bpm_task_ext_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_task_ext_seq";
-CREATE SEQUENCE "bpm_task_ext_seq" 
+CREATE SEQUENCE "bpm_task_ext_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -96,7 +74,7 @@ CACHE 1;
 -- Sequence structure for bpm_user_group_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_user_group_seq";
-CREATE SEQUENCE "bpm_user_group_seq" 
+CREATE SEQUENCE "bpm_user_group_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -105,7 +83,7 @@ CACHE 1;
 -- Sequence structure for infra_api_access_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_api_access_log_seq";
-CREATE SEQUENCE "infra_api_access_log_seq" 
+CREATE SEQUENCE "infra_api_access_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -114,7 +92,7 @@ CACHE 1;
 -- Sequence structure for infra_api_error_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_api_error_log_seq";
-CREATE SEQUENCE "infra_api_error_log_seq" 
+CREATE SEQUENCE "infra_api_error_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -123,7 +101,7 @@ CACHE 1;
 -- Sequence structure for infra_codegen_column_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_codegen_column_seq";
-CREATE SEQUENCE "infra_codegen_column_seq" 
+CREATE SEQUENCE "infra_codegen_column_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -132,7 +110,7 @@ CACHE 1;
 -- Sequence structure for infra_codegen_table_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_codegen_table_seq";
-CREATE SEQUENCE "infra_codegen_table_seq" 
+CREATE SEQUENCE "infra_codegen_table_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -141,7 +119,7 @@ CACHE 1;
 -- Sequence structure for infra_config_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_config_seq";
-CREATE SEQUENCE "infra_config_seq" 
+CREATE SEQUENCE "infra_config_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -150,7 +128,7 @@ CACHE 1;
 -- Sequence structure for infra_data_source_config_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_data_source_config_seq";
-CREATE SEQUENCE "infra_data_source_config_seq" 
+CREATE SEQUENCE "infra_data_source_config_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -159,7 +137,7 @@ CACHE 1;
 -- Sequence structure for infra_file_config_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_file_config_seq";
-CREATE SEQUENCE "infra_file_config_seq" 
+CREATE SEQUENCE "infra_file_config_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -168,7 +146,7 @@ CACHE 1;
 -- Sequence structure for infra_file_content_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_file_content_seq";
-CREATE SEQUENCE "infra_file_content_seq" 
+CREATE SEQUENCE "infra_file_content_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -177,7 +155,7 @@ CACHE 1;
 -- Sequence structure for infra_file_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_file_seq";
-CREATE SEQUENCE "infra_file_seq" 
+CREATE SEQUENCE "infra_file_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -186,7 +164,7 @@ CACHE 1;
 -- Sequence structure for infra_job_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_job_log_seq";
-CREATE SEQUENCE "infra_job_log_seq" 
+CREATE SEQUENCE "infra_job_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -195,7 +173,7 @@ CACHE 1;
 -- Sequence structure for infra_job_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_job_seq";
-CREATE SEQUENCE "infra_job_seq" 
+CREATE SEQUENCE "infra_job_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -204,7 +182,7 @@ CACHE 1;
 -- Sequence structure for infra_test_demo_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_test_demo_seq";
-CREATE SEQUENCE "infra_test_demo_seq" 
+CREATE SEQUENCE "infra_test_demo_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -213,7 +191,7 @@ CACHE 1;
 -- Sequence structure for member_user_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "member_user_seq";
-CREATE SEQUENCE "member_user_seq" 
+CREATE SEQUENCE "member_user_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -222,7 +200,7 @@ CACHE 1;
 -- Sequence structure for pay_app_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_app_seq";
-CREATE SEQUENCE "pay_app_seq" 
+CREATE SEQUENCE "pay_app_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -231,7 +209,7 @@ CACHE 1;
 -- Sequence structure for pay_channel_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_channel_seq";
-CREATE SEQUENCE "pay_channel_seq" 
+CREATE SEQUENCE "pay_channel_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -240,7 +218,7 @@ CACHE 1;
 -- Sequence structure for pay_merchant_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_merchant_seq";
-CREATE SEQUENCE "pay_merchant_seq" 
+CREATE SEQUENCE "pay_merchant_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -249,7 +227,7 @@ CACHE 1;
 -- Sequence structure for pay_notify_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_notify_log_seq";
-CREATE SEQUENCE "pay_notify_log_seq" 
+CREATE SEQUENCE "pay_notify_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -258,7 +236,7 @@ CACHE 1;
 -- Sequence structure for pay_notify_task_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_notify_task_seq";
-CREATE SEQUENCE "pay_notify_task_seq" 
+CREATE SEQUENCE "pay_notify_task_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -267,7 +245,7 @@ CACHE 1;
 -- Sequence structure for pay_order_extension_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_order_extension_seq";
-CREATE SEQUENCE "pay_order_extension_seq" 
+CREATE SEQUENCE "pay_order_extension_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -276,7 +254,7 @@ CACHE 1;
 -- Sequence structure for pay_order_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_order_seq";
-CREATE SEQUENCE "pay_order_seq" 
+CREATE SEQUENCE "pay_order_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -285,7 +263,7 @@ CACHE 1;
 -- Sequence structure for pay_refund_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_refund_seq";
-CREATE SEQUENCE "pay_refund_seq" 
+CREATE SEQUENCE "pay_refund_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -294,7 +272,7 @@ CACHE 1;
 -- Sequence structure for system_dept_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_dept_seq";
-CREATE SEQUENCE "system_dept_seq" 
+CREATE SEQUENCE "system_dept_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -303,7 +281,7 @@ CACHE 1;
 -- Sequence structure for system_dict_data_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_dict_data_seq";
-CREATE SEQUENCE "system_dict_data_seq" 
+CREATE SEQUENCE "system_dict_data_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -312,7 +290,7 @@ CACHE 1;
 -- Sequence structure for system_dict_type_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_dict_type_seq";
-CREATE SEQUENCE "system_dict_type_seq" 
+CREATE SEQUENCE "system_dict_type_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -321,7 +299,7 @@ CACHE 1;
 -- Sequence structure for system_error_code_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_error_code_seq";
-CREATE SEQUENCE "system_error_code_seq" 
+CREATE SEQUENCE "system_error_code_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -330,7 +308,7 @@ CACHE 1;
 -- Sequence structure for system_login_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_login_log_seq";
-CREATE SEQUENCE "system_login_log_seq" 
+CREATE SEQUENCE "system_login_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -339,7 +317,7 @@ CACHE 1;
 -- Sequence structure for system_menu_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_menu_seq";
-CREATE SEQUENCE "system_menu_seq" 
+CREATE SEQUENCE "system_menu_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -348,16 +326,71 @@ CACHE 1;
 -- Sequence structure for system_notice_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_notice_seq";
-CREATE SEQUENCE "system_notice_seq" 
+CREATE SEQUENCE "system_notice_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for system_oauth2_access_token_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "system_oauth2_access_token_seq";
+CREATE SEQUENCE "system_oauth2_access_token_seq"
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 9223372036854775807
+START 1
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for system_oauth2_approve_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "system_oauth2_approve_seq";
+CREATE SEQUENCE "system_oauth2_approve_seq"
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 9223372036854775807
+START 1
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for system_oauth2_client_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "system_oauth2_client_seq";
+CREATE SEQUENCE "system_oauth2_client_seq"
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 9223372036854775807
+START 1
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for system_oauth2_code_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "system_oauth2_code_seq";
+CREATE SEQUENCE "system_oauth2_code_seq"
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 9223372036854775807
+START 1
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for system_oauth2_refresh_token_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "system_oauth2_refresh_token_seq";
+CREATE SEQUENCE "system_oauth2_refresh_token_seq"
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 9223372036854775807
+START 1
 CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for system_operate_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_operate_log_seq";
-CREATE SEQUENCE "system_operate_log_seq" 
+CREATE SEQUENCE "system_operate_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -366,7 +399,7 @@ CACHE 1;
 -- Sequence structure for system_post_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_post_seq";
-CREATE SEQUENCE "system_post_seq" 
+CREATE SEQUENCE "system_post_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -375,7 +408,7 @@ CACHE 1;
 -- Sequence structure for system_role_menu_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_role_menu_seq";
-CREATE SEQUENCE "system_role_menu_seq" 
+CREATE SEQUENCE "system_role_menu_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -384,7 +417,7 @@ CACHE 1;
 -- Sequence structure for system_role_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_role_seq";
-CREATE SEQUENCE "system_role_seq" 
+CREATE SEQUENCE "system_role_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -393,7 +426,7 @@ CACHE 1;
 -- Sequence structure for system_sensitive_word_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_sensitive_word_seq";
-CREATE SEQUENCE "system_sensitive_word_seq" 
+CREATE SEQUENCE "system_sensitive_word_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -402,7 +435,7 @@ CACHE 1;
 -- Sequence structure for system_sms_channel_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_sms_channel_seq";
-CREATE SEQUENCE "system_sms_channel_seq" 
+CREATE SEQUENCE "system_sms_channel_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -411,7 +444,7 @@ CACHE 1;
 -- Sequence structure for system_sms_code_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_sms_code_seq";
-CREATE SEQUENCE "system_sms_code_seq" 
+CREATE SEQUENCE "system_sms_code_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -420,7 +453,7 @@ CACHE 1;
 -- Sequence structure for system_sms_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_sms_log_seq";
-CREATE SEQUENCE "system_sms_log_seq" 
+CREATE SEQUENCE "system_sms_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -429,7 +462,7 @@ CACHE 1;
 -- Sequence structure for system_sms_template_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_sms_template_seq";
-CREATE SEQUENCE "system_sms_template_seq" 
+CREATE SEQUENCE "system_sms_template_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -438,7 +471,7 @@ CACHE 1;
 -- Sequence structure for system_social_user_bind_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_social_user_bind_seq";
-CREATE SEQUENCE "system_social_user_bind_seq" 
+CREATE SEQUENCE "system_social_user_bind_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -447,7 +480,7 @@ CACHE 1;
 -- Sequence structure for system_social_user_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_social_user_seq";
-CREATE SEQUENCE "system_social_user_seq" 
+CREATE SEQUENCE "system_social_user_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -456,7 +489,7 @@ CACHE 1;
 -- Sequence structure for system_tenant_package_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_tenant_package_seq";
-CREATE SEQUENCE "system_tenant_package_seq" 
+CREATE SEQUENCE "system_tenant_package_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -465,7 +498,7 @@ CACHE 1;
 -- Sequence structure for system_tenant_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_tenant_seq";
-CREATE SEQUENCE "system_tenant_seq" 
+CREATE SEQUENCE "system_tenant_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -474,7 +507,7 @@ CACHE 1;
 -- Sequence structure for system_user_post_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_user_post_seq";
-CREATE SEQUENCE "system_user_post_seq" 
+CREATE SEQUENCE "system_user_post_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -483,7 +516,7 @@ CACHE 1;
 -- Sequence structure for system_user_role_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_user_role_seq";
-CREATE SEQUENCE "system_user_role_seq" 
+CREATE SEQUENCE "system_user_role_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -492,45 +525,10 @@ CACHE 1;
 -- Sequence structure for system_user_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_user_seq";
-CREATE SEQUENCE "system_user_seq" 
+CREATE SEQUENCE "system_user_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
-
--- ----------------------------
--- Sequence structure for system_user_session_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "system_user_session_seq";
-CREATE SEQUENCE "system_user_session_seq" 
-INCREMENT 1
-MAXVALUE 9223372036854775807
-CACHE 1;
-
--- ----------------------------
--- Table structure for act_evt_log
--- ----------------------------
-DROP TABLE IF EXISTS "act_evt_log";
-CREATE TABLE "act_evt_log" (
-  "log_nr_" int4 NOT NULL DEFAULT nextval('act_evt_log_log_nr__seq'::regclass),
-  "type_" varchar(64) COLLATE "pg_catalog"."default",
-  "proc_def_id_" varchar(64) COLLATE "pg_catalog"."default",
-  "proc_inst_id_" varchar(64) COLLATE "pg_catalog"."default",
-  "execution_id_" varchar(64) COLLATE "pg_catalog"."default",
-  "task_id_" varchar(64) COLLATE "pg_catalog"."default",
-  "time_stamp_" timestamp(6) NOT NULL,
-  "user_id_" varchar(255) COLLATE "pg_catalog"."default",
-  "data_" bytea,
-  "lock_owner_" varchar(255) COLLATE "pg_catalog"."default",
-  "lock_time_" timestamp(6),
-  "is_processed_" int2 DEFAULT 0
-)
-;
-
--- ----------------------------
--- Records of act_evt_log
--- ----------------------------
-BEGIN;
-COMMIT;
 
 -- ----------------------------
 -- Table structure for bpm_form
@@ -614,7 +612,6 @@ COMMENT ON TABLE "bpm_oa_leave" IS 'OA 请假申请表';
 -- Records of bpm_oa_leave
 -- ----------------------------
 BEGIN;
-INSERT INTO "bpm_oa_leave" ("id", "user_id", "type", "reason", "start_time", "end_time", "day", "result", "process_instance_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (1, 1, 2, '222', '2022-04-04 00:00:00', '2022-04-19 00:00:00', 15, 2, '0d23cbd6-c893-11ec-8a1d-3e2374911326', '1', '2022-04-30 22:37:24.589', '1', '2022-04-30 22:40:30.538', 0, 1);
 COMMIT;
 
 -- ----------------------------
@@ -663,7 +660,6 @@ COMMENT ON TABLE "bpm_process_definition_ext" IS 'Bpm 流程定义的拓展表
 -- Records of bpm_process_definition_ext
 -- ----------------------------
 BEGIN;
-INSERT INTO "bpm_process_definition_ext" ("id", "process_definition_id", "model_id", "description", "form_type", "form_id", "form_conf", "form_fields", "form_custom_create_path", "form_custom_view_path", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (0, 'oa_leave:1:934362e3-c892-11ec-a15b-3e2374911326', '2d3151fa-c892-11ec-a15b-3e2374911326', NULL, 20, NULL, NULL, NULL, '/bpm/oa/leave/create', '/bpm/oa/leave/detail', '1', '2022-04-30 22:34:00.342', '1', '2022-04-30 22:34:00.342', 0, 1);
 COMMIT;
 
 -- ----------------------------
@@ -711,7 +707,6 @@ COMMENT ON TABLE "bpm_process_instance_ext" IS '工作流的流程实例的拓�
 -- Records of bpm_process_instance_ext
 -- ----------------------------
 BEGIN;
-INSERT INTO "bpm_process_instance_ext" ("id", "start_user_id", "name", "process_instance_id", "process_definition_id", "category", "status", "result", "end_time", "form_variables", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (0, 1, 'OA 请假', '0d23cbd6-c893-11ec-8a1d-3e2374911326', 'oa_leave:1:934362e3-c892-11ec-a15b-3e2374911326', '2', 2, 2, '2022-04-30 22:40:30.428', '{"day":15}', '1', '2022-04-30 22:37:24.802', '1', '2022-04-30 22:40:30.432', 0, 1);
 COMMIT;
 
 -- ----------------------------
@@ -751,8 +746,6 @@ COMMENT ON TABLE "bpm_task_assign_rule" IS 'Bpm 任务规则表';
 -- Records of bpm_task_assign_rule
 -- ----------------------------
 BEGIN;
-INSERT INTO "bpm_task_assign_rule" ("id", "model_id", "process_definition_id", "task_definition_key", "type", "options", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (0, '2d3151fa-c892-11ec-a15b-3e2374911326', '', 'task01', 30, '[1]', '1', '2022-04-30 22:32:55.005', '1', '2022-04-30 22:32:55.005', 0, 1);
-INSERT INTO "bpm_task_assign_rule" ("id", "model_id", "process_definition_id", "task_definition_key", "type", "options", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (1, '2d3151fa-c892-11ec-a15b-3e2374911326', 'oa_leave:1:934362e3-c892-11ec-a15b-3e2374911326', 'task01', 30, '[1]', '1', '2022-04-30 22:34:00.401', '1', '2022-04-30 22:34:00.401', 0, 1);
 COMMIT;
 
 -- ----------------------------
@@ -798,7 +791,6 @@ COMMENT ON TABLE "bpm_task_ext" IS '工作流的流程任务的拓展表';
 -- Records of bpm_task_ext
 -- ----------------------------
 BEGIN;
-INSERT INTO "bpm_task_ext" ("id", "assignee_user_id", "name", "task_id", "result", "reason", "end_time", "process_instance_id", "process_definition_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (0, 1, 'task01', '0d2f167e-c893-11ec-8a1d-3e2374911326', 2, 'A', '2022-04-30 22:40:30.328', '0d23cbd6-c893-11ec-8a1d-3e2374911326', 'oa_leave:1:934362e3-c892-11ec-a15b-3e2374911326', '1', '2022-04-30 22:37:24.822', '1', '2022-04-30 22:40:30.687', 0, 1);
 COMMIT;
 
 -- ----------------------------
@@ -1011,19 +1003,19 @@ CREATE TABLE "infra_codegen_column" (
   "column_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
   "data_type" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
   "column_comment" varchar(500) COLLATE "pg_catalog"."default" NOT NULL,
-  "nullable" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
-  "primary_key" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
-  "auto_increment" char(1) COLLATE "pg_catalog"."default" NOT NULL,
+  "nullable" bool NOT NULL,
+  "primary_key" bool NOT NULL,
+  "auto_increment" bool NOT NULL,
   "ordinal_position" int4 NOT NULL,
   "java_type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL,
   "java_field" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
   "dict_type" varchar(200) COLLATE "pg_catalog"."default",
-  "example" varchar(64) COLLATE "pg_catalog"."default",
-  "create_operation" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
-  "update_operation" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
-  "list_operation" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
+  "example" varchar(255) COLLATE "pg_catalog"."default",
+  "create_operation" bool NOT NULL,
+  "update_operation" bool NOT NULL,
+  "list_operation" bool NOT NULL,
   "list_operation_condition" varchar(32) COLLATE "pg_catalog"."default" NOT NULL,
-  "list_operation_result" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
+  "list_operation_result" bool NOT NULL,
   "html_type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL,
   "creator" varchar(64) COLLATE "pg_catalog"."default",
   "create_time" timestamp(6) NOT NULL,
@@ -1126,7 +1118,7 @@ CREATE TABLE "infra_config" (
   "name" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
   "config_key" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
   "value" varchar(500) COLLATE "pg_catalog"."default" NOT NULL,
-  "visible" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
+  "visible" varchar(5) COLLATE "pg_catalog"."default" NOT NULL,
   "remark" varchar(500) COLLATE "pg_catalog"."default",
   "creator" varchar(64) COLLATE "pg_catalog"."default",
   "create_time" timestamp(6) NOT NULL,
@@ -1206,13 +1198,14 @@ CREATE TABLE "infra_file" (
   "config_id" int8,
   "path" varchar(512) COLLATE "pg_catalog"."default" NOT NULL,
   "url" varchar(1024) COLLATE "pg_catalog"."default" NOT NULL,
-  "type" varchar(63) COLLATE "pg_catalog"."default",
+  "type" varchar(127) COLLATE "pg_catalog"."default",
   "size" int4 NOT NULL,
   "creator" varchar(64) COLLATE "pg_catalog"."default",
   "create_time" timestamp(6) NOT NULL,
   "updater" varchar(64) COLLATE "pg_catalog"."default",
   "update_time" timestamp(6) NOT NULL,
-  "deleted" int2 NOT NULL DEFAULT 0
+  "deleted" int2 NOT NULL DEFAULT 0,
+  "name" varchar(255) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "infra_file"."id" IS '文件编号';
@@ -1226,6 +1219,7 @@ COMMENT ON COLUMN "infra_file"."create_time" IS '创建时间';
 COMMENT ON COLUMN "infra_file"."updater" IS '更新者';
 COMMENT ON COLUMN "infra_file"."update_time" IS '更新时间';
 COMMENT ON COLUMN "infra_file"."deleted" IS '是否删除';
+COMMENT ON COLUMN "infra_file"."name" IS '文件名';
 COMMENT ON TABLE "infra_file" IS '文件表';
 
 -- ----------------------------
@@ -1243,7 +1237,7 @@ CREATE TABLE "infra_file_config" (
   "name" varchar(63) COLLATE "pg_catalog"."default" NOT NULL,
   "storage" int2 NOT NULL,
   "remark" varchar(255) COLLATE "pg_catalog"."default",
-  "master" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
+  "master" bool NOT NULL,
   "config" varchar(4096) COLLATE "pg_catalog"."default" NOT NULL,
   "creator" varchar(64) COLLATE "pg_catalog"."default",
   "create_time" timestamp(6) NOT NULL,
@@ -1269,9 +1263,9 @@ COMMENT ON TABLE "infra_file_config" IS '文件配置表';
 -- Records of infra_file_config
 -- ----------------------------
 BEGIN;
-INSERT INTO "infra_file_config" ("id", "name", "storage", "remark", "master", "config", "creator", "create_time", "updater", "update_time", "deleted") VALUES (4, '数据库', 1, '我是数据库', '0', '{"@class":"cn.iocoder.yudao.framework.file.core.client.db.DBFileClientConfig","domain":"http://127.0.0.1:48080"}', '1', '2022-03-15 23:56:24', '1', '2022-03-26 21:39:26', 0);
-INSERT INTO "infra_file_config" ("id", "name", "storage", "remark", "master", "config", "creator", "create_time", "updater", "update_time", "deleted") VALUES (5, '本地磁盘', 10, '测试下本地存储', '0', '{"@class":"cn.iocoder.yudao.framework.file.core.client.local.LocalFileClientConfig","basePath":"/Users/yunai/file_test","domain":"http://127.0.0.1:48080"}', '1', '2022-03-15 23:57:00', '1', '2022-03-26 21:39:26', 0);
-INSERT INTO "infra_file_config" ("id", "name", "storage", "remark", "master", "config", "creator", "create_time", "updater", "update_time", "deleted") VALUES (11, 'S3 - 七牛云', 20, NULL, '1', '{"@class":"cn.iocoder.yudao.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3-cn-south-1.qiniucs.com","domain":"http://test.yudao.iocoder.cn","bucket":"ruoyi-vue-pro","accessKey":"b7yvuhBSAGjmtPhMFcn9iMOxUOY_I06cA_p0ZUx8","accessSecret":"kXM1l5ia1RvSX3QaOEcwI3RLz3Y2rmNszWonKZtP"}', '1', '2022-03-19 18:00:03', '1', '2022-03-26 21:39:26', 0);
+INSERT INTO "infra_file_config" ("id", "name", "storage", "remark", "master", "config", "creator", "create_time", "updater", "update_time", "deleted") VALUES (4, '数据库', 1, '我是数据库', 'f', '{"@class":"cn.iocoder.yudao.framework.file.core.client.db.DBFileClientConfig","domain":"http://127.0.0.1:48080"}', '1', '2022-03-15 23:56:24', '1', '2022-03-26 21:39:26', 0);
+INSERT INTO "infra_file_config" ("id", "name", "storage", "remark", "master", "config", "creator", "create_time", "updater", "update_time", "deleted") VALUES (5, '本地磁盘', 10, '测试下本地存储', 'f', '{"@class":"cn.iocoder.yudao.framework.file.core.client.local.LocalFileClientConfig","basePath":"/Users/yunai/file_test","domain":"http://127.0.0.1:48080"}', '1', '2022-03-15 23:57:00', '1', '2022-03-26 21:39:26', 0);
+INSERT INTO "infra_file_config" ("id", "name", "storage", "remark", "master", "config", "creator", "create_time", "updater", "update_time", "deleted") VALUES (11, 'S3 - 七牛云', 20, NULL, 't', '{"@class":"cn.iocoder.yudao.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3-cn-south-1.qiniucs.com","domain":"http://test.yudao.iocoder.cn","bucket":"ruoyi-vue-pro","accessKey":"b7yvuhBSAGjmtPhMFcn9iMOxUOY_I06cA_p0ZUx8","accessSecret":"kXM1l5ia1RvSX3QaOEcwI3RLz3Y2rmNszWonKZtP"}', '1', '2022-03-19 18:00:03', '1', '2022-05-26 00:03:47.17', 0);
 COMMIT;
 
 -- ----------------------------
@@ -1348,7 +1342,7 @@ COMMENT ON TABLE "infra_job" IS '定时任务表';
 -- Records of infra_job
 -- ----------------------------
 BEGIN;
-INSERT INTO "infra_job" ("id", "name", "status", "handler_name", "handler_param", "cron_expression", "retry_count", "retry_interval", "monitor_timeout", "creator", "create_time", "updater", "update_time", "deleted") VALUES (2, '用户 Session 超时 Job', 1, 'userSessionTimeoutJob', NULL, '0 * * * * ? *', 3, 2000, 0, '1', '2022-04-30 21:51:00.454', '1', '2022-04-30 22:22:06.037', 0);
+INSERT INTO "infra_job" ("id", "name", "status", "handler_name", "handler_param", "cron_expression", "retry_count", "retry_interval", "monitor_timeout", "creator", "create_time", "updater", "update_time", "deleted") VALUES (5, '支付通知 Job', 2, 'payNotifyJob', NULL, '* * * * * ?', 0, 0, 0, '1', '2021-10-27 08:34:42', '1', '2022-04-03 20:35:25', 0);
 COMMIT;
 
 -- ----------------------------
@@ -1942,7 +1936,6 @@ CREATE TABLE "qrtz_cron_triggers" (
 -- Records of qrtz_cron_triggers
 -- ----------------------------
 BEGIN;
-INSERT INTO "qrtz_cron_triggers" ("sched_name", "trigger_name", "trigger_group", "cron_expression", "time_zone_id") VALUES ('schedulerName', 'userSessionTimeoutJob', 'DEFAULT', '0 * * * * ? *', 'Asia/Shanghai');
 COMMIT;
 
 -- ----------------------------
@@ -2274,7 +2267,6 @@ INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "st
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (62, 0, '未处理', '0', 'infra_api_error_log_process_status', 0, 'primary', '', NULL, '', '2021-02-26 07:07:19', '1', '2022-02-16 20:14:17', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (63, 1, '已处理', '1', 'infra_api_error_log_process_status', 0, 'success', '', NULL, '', '2021-02-26 07:07:26', '1', '2022-02-16 20:14:08', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (64, 2, '已忽略', '2', 'infra_api_error_log_process_status', 0, 'danger', '', NULL, '', '2021-02-26 07:07:34', '1', '2022-02-16 20:14:14', 0);
-INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (65, 1, '云片', 'YUN_PIAN', 'system_sms_channel_code', 0, 'success', '', NULL, '1', '2021-04-05 01:05:14', '1', '2022-02-16 10:09:55', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (66, 2, '阿里云', 'ALIYUN', 'system_sms_channel_code', 0, 'primary', '', NULL, '1', '2021-04-05 01:05:26', '1', '2022-02-16 10:09:52', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (67, 1, '验证码', '1', 'system_sms_template_type', 0, 'warning', '', NULL, '1', '2021-04-05 21:50:57', '1', '2022-02-16 12:48:30', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (68, 2, '通知', '2', 'system_sms_template_type', 0, 'primary', '', NULL, '1', '2021-04-05 21:51:08', '1', '2022-02-16 12:48:27', 0);
@@ -2291,9 +2283,7 @@ INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "st
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (79, 2, '手动编辑', '2', 'system_error_code_type', 0, 'primary', '', NULL, '1', '2021-04-21 00:07:14', '1', '2022-02-16 13:57:24', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (80, 100, '账号登录', '100', 'system_login_type', 0, 'primary', '', '账号登录', '1', '2021-10-06 00:52:02', '1', '2022-02-16 13:11:34', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (81, 101, '社交登录', '101', 'system_login_type', 0, 'info', '', '社交登录', '1', '2021-10-06 00:52:17', '1', '2022-02-16 13:11:40', 0);
-INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (82, 102, 'Mock 登录', '102', 'system_login_type', 0, 'danger', '', 'Mock 登录', '1', '2021-10-06 00:52:32', '1', '2022-02-16 13:11:44', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (83, 200, '主动登出', '200', 'system_login_type', 0, 'primary', '', '主动登出', '1', '2021-10-06 00:52:58', '1', '2022-02-16 13:11:49', 0);
-INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (84, 201, '超时登出', '201', 'system_login_type', 0, 'info', '', '超时登出', '1', '2021-10-06 00:53:17', '1', '2022-02-16 13:11:53', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (85, 202, '强制登出', '202', 'system_login_type', 0, 'danger', '', '强制退出', '1', '2021-10-06 00:53:41', '1', '2022-02-16 13:11:57', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (86, 0, '病假', '1', 'bpm_oa_leave_type', 0, 'primary', '', NULL, '1', '2021-09-21 22:35:28', '1', '2022-02-16 10:00:41', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (87, 1, '事假', '2', 'bpm_oa_leave_type', 0, 'info', '', NULL, '1', '2021-09-21 22:36:11', '1', '2022-02-16 10:00:49', 0);
@@ -2355,44 +2345,70 @@ INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "st
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1152, 11, 'FTP 服务器', '11', 'infra_file_storage', 0, 'default', '', NULL, '1', '2022-03-15 00:26:06', '1', '2022-03-15 00:26:10', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1153, 12, 'SFTP 服务器', '12', 'infra_file_storage', 0, 'default', '', NULL, '1', '2022-03-15 00:26:22', '1', '2022-03-15 00:26:22', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1154, 20, 'S3 对象存储', '20', 'infra_file_storage', 0, 'default', '', NULL, '1', '2022-03-15 00:26:31', '1', '2022-03-15 00:26:45', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1155, 103, '短信登录', '103', 'system_login_type', 0, 'default', '', NULL, '1', '2022-05-09 23:57:58', '1', '2022-05-09 23:58:09', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1156, 1, 'password', 'password', 'system_oauth2_grant_type', 0, 'default', '', '密码模式', '1', '2022-05-12 00:22:05', '1', '2022-05-11 16:26:01', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1157, 2, 'authorization_code', 'authorization_code', 'system_oauth2_grant_type', 0, 'primary', '', '授权码模式', '1', '2022-05-12 00:22:59', '1', '2022-05-11 16:26:02', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1158, 3, 'implicit', 'implicit', 'system_oauth2_grant_type', 0, 'success', '', '简化模式', '1', '2022-05-12 00:23:40', '1', '2022-05-11 16:26:05', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1159, 4, 'client_credentials', 'client_credentials', 'system_oauth2_grant_type', 0, 'default', '', '客户端模式', '1', '2022-05-12 00:23:51', '1', '2022-05-11 16:26:08', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1160, 5, 'refresh_token', 'refresh_token', 'system_oauth2_grant_type', 0, 'info', '', '刷新模式', '1', '2022-05-12 00:24:02', '1', '2022-05-11 16:26:11', 0);
 COMMIT;
 
 -- ----------------------------
 -- Table structure for system_dict_type
 -- ----------------------------
 DROP TABLE IF EXISTS "system_dict_type";
-CREATE TABLE "system_dict_type" (
-  "id" int8 NOT NULL,
-  "name" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "type" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "status" int2 NOT NULL,
-  "remark" varchar(500) COLLATE "pg_catalog"."default",
-  "creator" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6) NOT NULL,
-  "updater" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6) NOT NULL,
-  "deleted" int2 NOT NULL DEFAULT 0
+CREATE TABLE "system_dict_type"(
+                                   "id"           int8                                        NOT NULL,
+                                   "name"         varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
+                                   "type"         varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
+                                   "status"       int2                                        NOT NULL,
+                                   "remark"       varchar(500) COLLATE "pg_catalog"."default",
+                                   "creator"      varchar(64) COLLATE "pg_catalog"."default",
+                                   "create_time"  timestamp(6)                                NOT NULL,
+                                   "updater"      varchar(64) COLLATE "pg_catalog"."default",
+                                   "update_time"  timestamp(6)                                NOT NULL,
+                                   "deleted_time" timestamp(6),
+                                   "deleted"      int2                                        NOT NULL DEFAULT 0
 )
 ;
-COMMENT ON COLUMN "system_dict_type"."id" IS '字典主键';
-COMMENT ON COLUMN "system_dict_type"."name" IS '字典名称';
-COMMENT ON COLUMN "system_dict_type"."type" IS '字典类型';
-COMMENT ON COLUMN "system_dict_type"."status" IS '状态（0正常 1停用）';
-COMMENT ON COLUMN "system_dict_type"."remark" IS '备注';
-COMMENT ON COLUMN "system_dict_type"."creator" IS '创建者';
-COMMENT ON COLUMN "system_dict_type"."create_time" IS '创建时间';
-COMMENT ON COLUMN "system_dict_type"."updater" IS '更新者';
-COMMENT ON COLUMN "system_dict_type"."update_time" IS '更新时间';
-COMMENT ON COLUMN "system_dict_type"."deleted" IS '是否删除';
-COMMENT ON TABLE "system_dict_type" IS '字典类型表';
+COMMENT
+ON COLUMN "system_dict_type"."id" IS '字典主键';
+COMMENT
+ON COLUMN "system_dict_type"."name" IS '字典名称';
+COMMENT
+ON COLUMN "system_dict_type"."type" IS '字典类型';
+COMMENT
+ON COLUMN "system_dict_type"."status" IS '状态（0正常 1停用）';
+COMMENT
+ON COLUMN "system_dict_type"."remark" IS '备注';
+COMMENT
+ON COLUMN "system_dict_type"."creator" IS '创建者';
+COMMENT
+ON COLUMN "system_dict_type"."create_time" IS '创建时间';
+COMMENT
+ON COLUMN "system_dict_type"."updater" IS '更新者';
+COMMENT
+ON COLUMN "system_dict_type"."update_time" IS '更新时间';
+COMMENT
+ON COLUMN "system_dict_type"."deleted_time" IS '删除时间';
+COMMENT
+ON COLUMN "system_dict_type"."deleted" IS '是否删除';
+COMMENT
+ON TABLE "system_dict_type" IS '字典类型表';
 
 -- ----------------------------
 -- Records of system_dict_type
 -- ----------------------------
 BEGIN;
-INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1, '用户性别', 'system_user_sex', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:30:31', 0);
-INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (6, '参数类型', 'infra_config_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:36:54', 0);
-INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (7, '通知类型', 'system_notice_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:35:26', 0);
+INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater",
+                                "update_time", "deleted")
+VALUES (1, '用户性别', 'system_user_sex', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:30:31', 0);
+INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater",
+                                "update_time", "deleted")
+VALUES (6, '参数类型', 'infra_config_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:36:54', 0);
+INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater",
+                                "update_time", "deleted")
+VALUES (7, '通知类型', 'system_notice_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:35:26', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (9, '操作类型', 'system_operate_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '1', '2022-02-16 09:32:21', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (10, '系统状态', 'common_status', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:21:28', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (11, 'Boolean 是否类型', 'infra_boolean_string', 0, 'boolean 转是否', '', '2021-01-19 03:20:08', '', '2022-02-01 16:37:10', 0);
@@ -2429,6 +2445,7 @@ INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creat
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (144, '代码生成的场景枚举', 'infra_codegen_scene', 0, '代码生成的场景枚举', '1', '2022-02-02 13:14:45', '1', '2022-03-10 16:33:46', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (145, '角色类型', 'system_role_type', 0, '角色类型', '1', '2022-02-16 13:01:46', '1', '2022-02-16 13:01:46', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (146, '文件存储器', 'infra_file_storage', 0, '文件存储器', '1', '2022-03-15 00:24:38', '1', '2022-03-15 00:24:38', 0);
+INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (147, 'OAuth 2.0 授权类型', 'system_oauth2_grant_type', 0, 'OAuth 2.0 授权类型（模式）', '1', '2022-05-12 00:20:52', '1', '2022-05-11 16:25:49', 0);
 COMMIT;
 
 -- ----------------------------
@@ -2528,8 +2545,8 @@ CREATE TABLE "system_menu" (
   "icon" varchar(100) COLLATE "pg_catalog"."default",
   "component" varchar(255) COLLATE "pg_catalog"."default",
   "status" int2 NOT NULL,
-  "visible" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
-  "keep_alive" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
+  "visible" bool NOT NULL,
+  "keep_alive" bool NOT NULL,
   "creator" varchar(64) COLLATE "pg_catalog"."default",
   "create_time" timestamp(6) NOT NULL,
   "updater" varchar(64) COLLATE "pg_catalog"."default",
@@ -2560,230 +2577,236 @@ COMMENT ON TABLE "system_menu" IS '菜单权限表';
 -- Records of system_menu
 -- ----------------------------
 BEGIN;
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1, '系统管理', '', 1, 10, 0, '/system', 'system', NULL, 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (2, '基础设施', '', 1, 20, 0, '/infra', 'monitor', NULL, 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (5, 'OA 示例', '', 1, 40, 1185, 'oa', 'people', NULL, 0, '1', '1', 'admin', '2021-09-20 16:26:19', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (100, '用户管理', 'system:user:list', 2, 1, 1, 'user', 'user', 'system/user/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (101, '角色管理', '', 2, 2, 1, 'role', 'peoples', 'system/role/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (102, '菜单管理', '', 2, 3, 1, 'menu', 'tree-table', 'system/menu/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (103, '部门管理', '', 2, 4, 1, 'dept', 'tree', 'system/dept/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (104, '岗位管理', '', 2, 5, 1, 'post', 'post', 'system/post/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (105, '字典管理', '', 2, 6, 1, 'dict', 'dict', 'system/dict/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (106, '配置管理', '', 2, 6, 2, 'config', 'edit', 'infra/config/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (107, '通知公告', '', 2, 8, 1, 'notice', 'message', 'system/notice/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (108, '审计日志', '', 1, 9, 1, 'log', 'log', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (109, '在线用户', 'system:user-session:list', 2, 10, 1, 'user-session', 'online', 'system/session/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (110, '定时任务', '', 2, 12, 2, 'job', 'job', 'infra/job/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (111, 'MySQL 监控', '', 2, 9, 2, 'druid', 'druid', 'infra/druid/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (112, 'Java 监控', '', 2, 11, 2, 'admin-server', 'server', 'infra/server/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (113, 'Redis 监控', '', 2, 10, 2, 'redis', 'redis', 'infra/redis/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (114, '表单构建', 'infra:build:list', 2, 2, 2, 'build', 'build', 'infra/build/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (115, '代码生成', 'infra:codegen:query', 2, 1, 2, 'codegen', 'code', 'infra/codegen/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (116, '系统接口', 'infra:swagger:list', 2, 3, 2, 'swagger', 'swagger', 'infra/swagger/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (500, '操作日志', '', 2, 1, 108, 'operate-log', 'form', 'system/operatelog/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (501, '登录日志', '', 2, 2, 108, 'login-log', 'logininfor', 'system/loginlog/index', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1001, '用户查询', 'system:user:query', 3, 1, 100, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1002, '用户新增', 'system:user:create', 3, 2, 100, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1003, '用户修改', 'system:user:update', 3, 3, 100, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1004, '用户删除', 'system:user:delete', 3, 4, 100, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1005, '用户导出', 'system:user:export', 3, 5, 100, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1006, '用户导入', 'system:user:import', 3, 6, 100, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1007, '重置密码', 'system:user:update-password', 3, 7, 100, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1008, '角色查询', 'system:role:query', 3, 1, 101, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1009, '角色新增', 'system:role:create', 3, 2, 101, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1010, '角色修改', 'system:role:update', 3, 3, 101, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1011, '角色删除', 'system:role:delete', 3, 4, 101, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1012, '角色导出', 'system:role:export', 3, 5, 101, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1013, '菜单查询', 'system:menu:query', 3, 1, 102, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1014, '菜单新增', 'system:menu:create', 3, 2, 102, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1015, '菜单修改', 'system:menu:update', 3, 3, 102, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1016, '菜单删除', 'system:menu:delete', 3, 4, 102, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1017, '部门查询', 'system:dept:query', 3, 1, 103, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1018, '部门新增', 'system:dept:create', 3, 2, 103, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1019, '部门修改', 'system:dept:update', 3, 3, 103, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1020, '部门删除', 'system:dept:delete', 3, 4, 103, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1021, '岗位查询', 'system:post:query', 3, 1, 104, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1022, '岗位新增', 'system:post:create', 3, 2, 104, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1023, '岗位修改', 'system:post:update', 3, 3, 104, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1024, '岗位删除', 'system:post:delete', 3, 4, 104, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1025, '岗位导出', 'system:post:export', 3, 5, 104, '', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1026, '字典查询', 'system:dict:query', 3, 1, 105, '#', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1027, '字典新增', 'system:dict:create', 3, 2, 105, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1028, '字典修改', 'system:dict:update', 3, 3, 105, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1029, '字典删除', 'system:dict:delete', 3, 4, 105, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1030, '字典导出', 'system:dict:export', 3, 5, 105, '#', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1031, '配置查询', 'infra:config:query', 3, 1, 106, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1032, '配置新增', 'infra:config:create', 3, 2, 106, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1033, '配置修改', 'infra:config:update', 3, 3, 106, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1034, '配置删除', 'infra:config:delete', 3, 4, 106, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1035, '配置导出', 'infra:config:export', 3, 5, 106, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1036, '公告查询', 'system:notice:query', 3, 1, 107, '#', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1037, '公告新增', 'system:notice:create', 3, 2, 107, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1038, '公告修改', 'system:notice:update', 3, 3, 107, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1039, '公告删除', 'system:notice:delete', 3, 4, 107, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1040, '操作查询', 'system:operate-log:query', 3, 1, 500, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1042, '日志导出', 'system:operate-log:export', 3, 2, 500, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1043, '登录查询', 'system:login-log:query', 3, 1, 501, '#', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1045, '日志导出', 'system:login-log:export', 3, 3, 501, '#', '#', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1046, '在线查询', 'system:user-session:list', 3, 1, 109, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1048, '单条强退', 'system:user-session:delete', 3, 3, 109, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1050, '任务新增', 'infra:job:create', 3, 2, 110, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1051, '任务修改', 'infra:job:update', 3, 3, 110, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1052, '任务删除', 'infra:job:delete', 3, 4, 110, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1053, '状态修改', 'infra:job:update', 3, 5, 110, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1054, '任务导出', 'infra:job:export', 3, 7, 110, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1056, '生成修改', 'infra:codegen:update', 3, 2, 115, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1057, '生成删除', 'infra:codegen:delete', 3, 3, 115, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1058, '导入代码', 'infra:codegen:create', 3, 2, 115, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1059, '预览代码', 'infra:codegen:preview', 3, 4, 115, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1060, '生成代码', 'infra:codegen:download', 3, 5, 115, '', '', '', 0, '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1063, '设置角色菜单权限', 'system:permission:assign-role-menu', 3, 6, 101, '', '', '', 0, '1', '1', '', '2021-01-06 17:53:44', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1064, '设置角色数据权限', 'system:permission:assign-role-data-scope', 3, 7, 101, '', '', '', 0, '1', '1', '', '2021-01-06 17:56:31', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1065, '设置用户角色', 'system:permission:assign-user-role', 3, 8, 101, '', '', '', 0, '1', '1', '', '2021-01-07 10:23:28', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1066, '获得 Redis 监控信息', 'infra:redis:get-monitor-info', 3, 1, 113, '', '', '', 0, '1', '1', '', '2021-01-26 01:02:31', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1067, '获得 Redis Key 列表', 'infra:redis:get-key-list', 3, 2, 113, '', '', '', 0, '1', '1', '', '2021-01-26 01:02:52', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1070, '代码生成示例', 'infra:test-demo:query', 2, 1, 2, 'test-demo', 'validCode', 'infra/testDemo/index', 0, '1', '1', '', '2021-02-06 12:42:49', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1071, '测试示例表创建', 'infra:test-demo:create', 3, 1, 1070, '', '', '', 0, '1', '1', '', '2021-02-06 12:42:49', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1072, '测试示例表更新', 'infra:test-demo:update', 3, 2, 1070, '', '', '', 0, '1', '1', '', '2021-02-06 12:42:49', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1073, '测试示例表删除', 'infra:test-demo:delete', 3, 3, 1070, '', '', '', 0, '1', '1', '', '2021-02-06 12:42:49', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1074, '测试示例表导出', 'infra:test-demo:export', 3, 4, 1070, '', '', '', 0, '1', '1', '', '2021-02-06 12:42:49', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1075, '任务触发', 'infra:job:trigger', 3, 8, 110, '', '', '', 0, '1', '1', '', '2021-02-07 13:03:10', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1076, '数据库文档', '', 2, 4, 2, 'db-doc', 'table', 'infra/dbDoc/index', 0, '1', '1', '', '2021-02-08 01:41:47', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1077, '监控平台', '', 2, 13, 2, 'skywalking', 'eye-open', 'infra/skywalking/index', 0, '1', '1', '', '2021-02-08 20:41:31', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1078, '访问日志', '', 2, 1, 1083, 'api-access-log', 'log', 'infra/apiAccessLog/index', 0, '1', '1', '', '2021-02-26 01:32:59', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1082, '日志导出', 'infra:api-access-log:export', 3, 2, 1078, '', '', '', 0, '1', '1', '', '2021-02-26 01:32:59', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1083, 'API 日志', '', 2, 8, 2, 'log', 'log', NULL, 0, '1', '1', '', '2021-02-26 02:18:24', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1084, '错误日志', 'infra:api-error-log:query', 2, 2, 1083, 'api-error-log', 'log', 'infra/apiErrorLog/index', 0, '1', '1', '', '2021-02-26 07:53:20', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1085, '日志处理', 'infra:api-error-log:update-status', 3, 2, 1084, '', '', '', 0, '1', '1', '', '2021-02-26 07:53:20', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1086, '日志导出', 'infra:api-error-log:export', 3, 3, 1084, '', '', '', 0, '1', '1', '', '2021-02-26 07:53:20', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1087, '任务查询', 'infra:job:query', 3, 1, 110, '', '', '', 0, '1', '1', '1', '2021-03-10 01:26:19', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1088, '日志查询', 'infra:api-access-log:query', 3, 1, 1078, '', '', '', 0, '1', '1', '1', '2021-03-10 01:28:04', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1089, '日志查询', 'infra:api-error-log:query', 3, 1, 1084, '', '', '', 0, '1', '1', '1', '2021-03-10 01:29:09', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1090, '文件列表', '', 2, 5, 1243, 'file', 'upload', 'infra/file/index', 0, '1', '1', '', '2021-03-12 20:16:20', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1091, '文件查询', 'infra:file:query', 3, 1, 1090, '', '', '', 0, '1', '1', '', '2021-03-12 20:16:20', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1092, '文件删除', 'infra:file:delete', 3, 4, 1090, '', '', '', 0, '1', '1', '', '2021-03-12 20:16:20', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1093, '短信管理', '', 1, 11, 1, 'sms', 'validCode', NULL, 0, '1', '1', '1', '2021-04-05 01:10:16', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1094, '短信渠道', '', 2, 0, 1093, 'sms-channel', 'phone', 'system/sms/smsChannel', 0, '1', '1', '', '2021-04-01 11:07:15', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1095, '短信渠道查询', 'system:sms-channel:query', 3, 1, 1094, '', '', '', 0, '1', '1', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1096, '短信渠道创建', 'system:sms-channel:create', 3, 2, 1094, '', '', '', 0, '1', '1', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1097, '短信渠道更新', 'system:sms-channel:update', 3, 3, 1094, '', '', '', 0, '1', '1', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1098, '短信渠道删除', 'system:sms-channel:delete', 3, 4, 1094, '', '', '', 0, '1', '1', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1100, '短信模板', '', 2, 1, 1093, 'sms-template', 'phone', 'system/sms/smsTemplate', 0, '1', '1', '', '2021-04-01 17:35:17', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1101, '短信模板查询', 'system:sms-template:query', 3, 1, 1100, '', '', '', 0, '1', '1', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1102, '短信模板创建', 'system:sms-template:create', 3, 2, 1100, '', '', '', 0, '1', '1', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1103, '短信模板更新', 'system:sms-template:update', 3, 3, 1100, '', '', '', 0, '1', '1', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1104, '短信模板删除', 'system:sms-template:delete', 3, 4, 1100, '', '', '', 0, '1', '1', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1105, '短信模板导出', 'system:sms-template:export', 3, 5, 1100, '', '', '', 0, '1', '1', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1106, '发送测试短信', 'system:sms-template:send-sms', 3, 6, 1100, '', '', '', 0, '1', '1', '1', '2021-04-11 00:26:40', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1107, '短信日志', '', 2, 2, 1093, 'sms-log', 'phone', 'system/sms/smsLog', 0, '1', '1', '', '2021-04-11 08:37:05', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1108, '短信日志查询', 'system:sms-log:query', 3, 1, 1107, '', '', '', 0, '1', '1', '', '2021-04-11 08:37:05', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1109, '短信日志导出', 'system:sms-log:export', 3, 5, 1107, '', '', '', 0, '1', '1', '', '2021-04-11 08:37:05', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1110, '错误码管理', '', 2, 12, 1, 'error-code', 'code', 'system/errorCode/index', 0, '1', '1', '', '2021-04-13 21:46:42', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1111, '错误码查询', 'system:error-code:query', 3, 1, 1110, '', '', '', 0, '1', '1', '', '2021-04-13 21:46:42', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1112, '错误码创建', 'system:error-code:create', 3, 2, 1110, '', '', '', 0, '1', '1', '', '2021-04-13 21:46:42', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1113, '错误码更新', 'system:error-code:update', 3, 3, 1110, '', '', '', 0, '1', '1', '', '2021-04-13 21:46:42', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1114, '错误码删除', 'system:error-code:delete', 3, 4, 1110, '', '', '', 0, '1', '1', '', '2021-04-13 21:46:42', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1115, '错误码导出', 'system:error-code:export', 3, 5, 1110, '', '', '', 0, '1', '1', '', '2021-04-13 21:46:42', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1117, '支付管理', '', 1, 11, 0, '/pay', 'money', NULL, 0, '1', '1', '1', '2021-12-25 16:43:41', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1118, '请假查询', '', 2, 0, 5, 'leave', 'user', 'bpm/oa/leave/index', 0, '1', '1', '', '2021-09-20 08:51:03', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1119, '请假申请查询', 'bpm:oa-leave:query', 3, 1, 1118, '', '', '', 0, '1', '1', '', '2021-09-20 08:51:03', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1120, '请假申请创建', 'bpm:oa-leave:create', 3, 2, 1118, '', '', '', 0, '1', '1', '', '2021-09-20 08:51:03', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1126, '应用信息', '', 2, 1, 1117, 'app', 'table', 'pay/app/index', 0, '1', '1', '', '2021-11-10 01:13:30', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1127, '支付应用信息查询', 'pay:app:query', 3, 1, 1126, '', '', '', 0, '1', '1', '', '2021-11-10 01:13:31', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1128, '支付应用信息创建', 'pay:app:create', 3, 2, 1126, '', '', '', 0, '1', '1', '', '2021-11-10 01:13:31', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1129, '支付应用信息更新', 'pay:app:update', 3, 3, 1126, '', '', '', 0, '1', '1', '', '2021-11-10 01:13:31', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1130, '支付应用信息删除', 'pay:app:delete', 3, 4, 1126, '', '', '', 0, '1', '1', '', '2021-11-10 01:13:31', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1131, '支付应用信息导出', 'pay:app:export', 3, 5, 1126, '', '', '', 0, '1', '1', '', '2021-11-10 01:13:31', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1132, '秘钥解析', 'pay:channel:parsing', 3, 6, 1129, '', '', '', 0, '1', '1', '1', '2021-11-08 15:15:47', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1133, '支付商户信息查询', 'pay:merchant:query', 3, 1, 1132, '', '', '', 0, '1', '1', '', '2021-11-10 01:13:41', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1134, '支付商户信息创建', 'pay:merchant:create', 3, 2, 1132, '', '', '', 0, '1', '1', '', '2021-11-10 01:13:41', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1135, '支付商户信息更新', 'pay:merchant:update', 3, 3, 1132, '', '', '', 0, '1', '1', '', '2021-11-10 01:13:41', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1136, '支付商户信息删除', 'pay:merchant:delete', 3, 4, 1132, '', '', '', 0, '1', '1', '', '2021-11-10 01:13:41', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1137, '支付商户信息导出', 'pay:merchant:export', 3, 5, 1132, '', '', '', 0, '1', '1', '', '2021-11-10 01:13:41', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1138, '租户列表', '', 2, 0, 1224, 'list', 'peoples', 'system/tenant/index', 0, '1', '1', '', '2021-12-14 12:31:43', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1139, '租户查询', 'system:tenant:query', 3, 1, 1138, '', '', '', 0, '1', '1', '', '2021-12-14 12:31:44', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1140, '租户创建', 'system:tenant:create', 3, 2, 1138, '', '', '', 0, '1', '1', '', '2021-12-14 12:31:44', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1141, '租户更新', 'system:tenant:update', 3, 3, 1138, '', '', '', 0, '1', '1', '', '2021-12-14 12:31:44', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1142, '租户删除', 'system:tenant:delete', 3, 4, 1138, '', '', '', 0, '1', '1', '', '2021-12-14 12:31:44', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1143, '租户导出', 'system:tenant:export', 3, 5, 1138, '', '', '', 0, '1', '1', '', '2021-12-14 12:31:44', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1150, '秘钥解析', '', 3, 6, 1129, '', '', '', 0, '1', '1', '1', '2021-11-08 15:15:47', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1161, '退款订单', '', 2, 3, 1117, 'refund', 'order', 'pay/refund/index', 0, '1', '1', '', '2021-12-25 08:29:07', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1162, '退款订单查询', 'pay:refund:query', 3, 1, 1161, '', '', '', 0, '1', '1', '', '2021-12-25 08:29:07', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1163, '退款订单创建', 'pay:refund:create', 3, 2, 1161, '', '', '', 0, '1', '1', '', '2021-12-25 08:29:07', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1164, '退款订单更新', 'pay:refund:update', 3, 3, 1161, '', '', '', 0, '1', '1', '', '2021-12-25 08:29:07', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1165, '退款订单删除', 'pay:refund:delete', 3, 4, 1161, '', '', '', 0, '1', '1', '', '2021-12-25 08:29:07', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1166, '退款订单导出', 'pay:refund:export', 3, 5, 1161, '', '', '', 0, '1', '1', '', '2021-12-25 08:29:07', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1173, '支付订单', '', 2, 2, 1117, 'order', 'pay', 'pay/order/index', 0, '1', '1', '', '2021-12-25 08:49:43', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1174, '支付订单查询', 'pay:order:query', 3, 1, 1173, '', '', '', 0, '1', '1', '', '2021-12-25 08:49:43', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1175, '支付订单创建', 'pay:order:create', 3, 2, 1173, '', '', '', 0, '1', '1', '', '2021-12-25 08:49:43', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1176, '支付订单更新', 'pay:order:update', 3, 3, 1173, '', '', '', 0, '1', '1', '', '2021-12-25 08:49:43', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1177, '支付订单删除', 'pay:order:delete', 3, 4, 1173, '', '', '', 0, '1', '1', '', '2021-12-25 08:49:43', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1178, '支付订单导出', 'pay:order:export', 3, 5, 1173, '', '', '', 0, '1', '1', '', '2021-12-25 08:49:43', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1179, '商户信息', '', 2, 0, 1117, 'merchant', 'merchant', 'pay/merchant/index', 0, '1', '1', '', '2021-12-25 09:01:44', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1180, '支付商户信息查询', 'pay:merchant:query', 3, 1, 1179, '', '', '', 0, '1', '1', '', '2021-12-25 09:01:44', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1181, '支付商户信息创建', 'pay:merchant:create', 3, 2, 1179, '', '', '', 0, '1', '1', '', '2021-12-25 09:01:44', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1182, '支付商户信息更新', 'pay:merchant:update', 3, 3, 1179, '', '', '', 0, '1', '1', '', '2021-12-25 09:01:44', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1183, '支付商户信息删除', '', 3, 4, 1179, '', '', '', 0, '1', '1', '', '2021-12-25 09:01:44', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1184, '支付商户信息导出', 'pay:merchant:export', 3, 5, 1179, '', '', '', 0, '1', '1', '', '2021-12-25 09:01:44', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1185, '工作流程', '', 1, 50, 0, '/bpm', 'tool', NULL, 0, '1', '1', '1', '2021-12-30 20:26:36', '103', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1186, '流程管理', '', 1, 10, 1185, 'manager', 'nested', NULL, 0, '1', '1', '1', '2021-12-30 20:28:30', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1187, '流程表单', '', 2, 0, 1186, 'form', 'form', 'bpm/form/index', 0, '1', '1', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1188, '表单查询', 'bpm:form:query', 3, 1, 1187, '', '', '', 0, '1', '1', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1189, '表单创建', 'bpm:form:create', 3, 2, 1187, '', '', '', 0, '1', '1', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1190, '表单更新', 'bpm:form:update', 3, 3, 1187, '', '', '', 0, '1', '1', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1191, '表单删除', 'bpm:form:delete', 3, 4, 1187, '', '', '', 0, '1', '1', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1192, '表单导出', 'bpm:form:export', 3, 5, 1187, '', '', '', 0, '1', '1', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1193, '流程模型', '', 2, 5, 1186, 'model', 'guide', 'bpm/model/index', 0, '1', '1', '1', '2021-12-31 23:24:58', '103', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1194, '模型查询', 'bpm:model:query', 3, 1, 1193, '', '', '', 0, '1', '1', '1', '2022-01-03 19:01:10', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1195, '模型创建', 'bpm:model:create', 3, 2, 1193, '', '', '', 0, '1', '1', '1', '2022-01-03 19:01:24', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1196, '模型导入', 'bpm:model:import', 3, 3, 1193, '', '', '', 0, '1', '1', '1', '2022-01-03 19:01:35', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1197, '模型更新', 'bpm:model:update', 3, 4, 1193, '', '', '', 0, '1', '1', '1', '2022-01-03 19:02:28', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1198, '模型删除', 'bpm:model:delete', 3, 5, 1193, '', '', '', 0, '1', '1', '1', '2022-01-03 19:02:43', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1199, '模型发布', 'bpm:model:deploy', 3, 6, 1193, '', '', '', 0, '1', '1', '1', '2022-01-03 19:03:24', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1200, '任务管理', '', 1, 20, 1185, 'task', 'cascader', NULL, 0, '1', '1', '1', '2022-01-07 23:51:48', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1201, '我的流程', '', 2, 0, 1200, 'my', 'people', 'bpm/processInstance/index', 0, '1', '1', '', '2022-01-07 15:53:44', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1202, '流程实例的查询', 'bpm:process-instance:query', 3, 1, 1201, '', '', '', 0, '1', '1', '', '2022-01-07 15:53:44', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1207, '待办任务', '', 2, 10, 1200, 'todo', 'eye-open', 'bpm/task/todo', 0, '1', '1', '1', '2022-01-08 10:33:37', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1208, '已办任务', '', 2, 20, 1200, 'done', 'eye', 'bpm/task/done', 0, '1', '1', '1', '2022-01-08 10:34:13', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1209, '用户分组', '', 2, 2, 1186, 'user-group', 'people', 'bpm/group/index', 0, '1', '1', '', '2022-01-14 02:14:20', '103', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1210, '用户组查询', 'bpm:user-group:query', 3, 1, 1209, '', '', '', 0, '1', '1', '', '2022-01-14 02:14:20', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1211, '用户组创建', 'bpm:user-group:create', 3, 2, 1209, '', '', '', 0, '1', '1', '', '2022-01-14 02:14:20', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1212, '用户组更新', 'bpm:user-group:update', 3, 3, 1209, '', '', '', 0, '1', '1', '', '2022-01-14 02:14:20', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1213, '用户组删除', 'bpm:user-group:delete', 3, 4, 1209, '', '', '', 0, '1', '1', '', '2022-01-14 02:14:20', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1215, '流程定义查询', 'bpm:process-definition:query', 3, 10, 1193, '', '', '', 0, '1', '1', '1', '2022-01-23 00:21:43', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1216, '流程任务分配规则查询', 'bpm:task-assign-rule:query', 3, 20, 1193, '', '', '', 0, '1', '1', '1', '2022-01-23 00:26:53', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1217, '流程任务分配规则创建', 'bpm:task-assign-rule:create', 3, 21, 1193, '', '', '', 0, '1', '1', '1', '2022-01-23 00:28:15', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1218, '流程任务分配规则更新', 'bpm:task-assign-rule:update', 3, 22, 1193, '', '', '', 0, '1', '1', '1', '2022-01-23 00:28:41', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1219, '流程实例的创建', 'bpm:process-instance:create', 3, 2, 1201, '', '', '', 0, '1', '1', '1', '2022-01-23 00:36:15', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1220, '流程实例的取消', 'bpm:process-instance:cancel', 3, 3, 1201, '', '', '', 0, '1', '1', '1', '2022-01-23 00:36:33', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1221, '流程任务的查询', 'bpm:task:query', 3, 1, 1207, '', '', '', 0, '1', '1', '1', '2022-01-23 00:38:52', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1222, '流程任务的更新', 'bpm:task:update', 3, 2, 1207, '', '', '', 0, '1', '1', '1', '2022-01-23 00:39:24', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1224, '租户管理', '', 2, 0, 1, 'tenant', 'peoples', NULL, 0, '1', '1', '1', '2022-02-20 01:41:13', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1225, '租户套餐', '', 2, 0, 1224, 'package', 'eye', 'system/tenantPackage/index', 0, '1', '1', '', '2022-02-19 17:44:06', '1', '2022-04-21 01:21:25', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1226, '租户套餐查询', 'system:tenant-package:query', 3, 1, 1225, '', '', '', 0, '1', '1', '', '2022-02-19 17:44:06', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1227, '租户套餐创建', 'system:tenant-package:create', 3, 2, 1225, '', '', '', 0, '1', '1', '', '2022-02-19 17:44:06', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1228, '租户套餐更新', 'system:tenant-package:update', 3, 3, 1225, '', '', '', 0, '1', '1', '', '2022-02-19 17:44:06', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1229, '租户套餐删除', 'system:tenant-package:delete', 3, 4, 1225, '', '', '', 0, '1', '1', '', '2022-02-19 17:44:06', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1237, '文件配置', '', 2, 0, 1243, 'file-config', 'config', 'infra/fileConfig/index', 0, '1', '1', '', '2022-03-15 14:35:28', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1238, '文件配置查询', 'infra:file-config:query', 3, 1, 1237, '', '', '', 0, '1', '1', '', '2022-03-15 14:35:28', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1239, '文件配置创建', 'infra:file-config:create', 3, 2, 1237, '', '', '', 0, '1', '1', '', '2022-03-15 14:35:28', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1240, '文件配置更新', 'infra:file-config:update', 3, 3, 1237, '', '', '', 0, '1', '1', '', '2022-03-15 14:35:28', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1241, '文件配置删除', 'infra:file-config:delete', 3, 4, 1237, '', '', '', 0, '1', '1', '', '2022-03-15 14:35:28', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1242, '文件配置导出', 'infra:file-config:export', 3, 5, 1237, '', '', '', 0, '1', '1', '', '2022-03-15 14:35:28', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1243, '文件管理', '', 2, 5, 2, 'file', 'download', NULL, 0, '1', '1', '1', '2022-03-16 23:47:40', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1247, '敏感词管理', '', 2, 13, 1, 'sensitive-word', 'education', 'system/sensitiveWord/index', 0, '1', '1', '', '2022-04-07 16:55:03', '1', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1248, '敏感词查询', 'system:sensitive-word:query', 3, 1, 1247, '', '', '', 0, '1', '1', '', '2022-04-07 16:55:03', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1249, '敏感词创建', 'system:sensitive-word:create', 3, 2, 1247, '', '', '', 0, '1', '1', '', '2022-04-07 16:55:03', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1250, '敏感词更新', 'system:sensitive-word:update', 3, 3, 1247, '', '', '', 0, '1', '1', '', '2022-04-07 16:55:03', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1251, '敏感词删除', 'system:sensitive-word:delete', 3, 4, 1247, '', '', '', 0, '1', '1', '', '2022-04-07 16:55:03', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1252, '敏感词导出', 'system:sensitive-word:export', 3, 5, 1247, '', '', '', 0, '1', '1', '', '2022-04-07 16:55:03', '', '2022-04-20 17:03:10', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1254, '作者动态', '', 1, 0, 0, 'https://www.iocoder.cn', 'people', NULL, 0, '1', '1', '1', '2022-04-23 01:03:15', '1', '2022-04-23 01:03:15', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1255, '数据源配置', '', 2, 1, 2, 'data-source-config', 'rate', 'infra/dataSourceConfig/index', 0, '1', '1', '', '2022-04-27 14:37:32', '1', '2022-04-27 22:42:06', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1256, '数据源配置查询', 'infra:data-source-config:query', 3, 1, 1255, '', '', '', 0, '1', '1', '', '2022-04-27 14:37:32', '', '2022-04-27 14:37:32', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1257, '数据源配置创建', 'infra:data-source-config:create', 3, 2, 1255, '', '', '', 0, '1', '1', '', '2022-04-27 14:37:32', '', '2022-04-27 14:37:32', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1258, '数据源配置更新', 'infra:data-source-config:update', 3, 3, 1255, '', '', '', 0, '1', '1', '', '2022-04-27 14:37:32', '', '2022-04-27 14:37:32', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1259, '数据源配置删除', 'infra:data-source-config:delete', 3, 4, 1255, '', '', '', 0, '1', '1', '', '2022-04-27 14:37:32', '', '2022-04-27 14:37:32', 0);
-INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1260, '数据源配置导出', 'infra:data-source-config:export', 3, 5, 1255, '', '', '', 0, '1', '1', '', '2022-04-27 14:37:32', '', '2022-04-27 14:37:32', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (2, '基础设施', '', 1, 20, 0, '/infra', 'monitor', NULL, 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (5, 'OA 示例', '', 1, 40, 1185, 'oa', 'people', NULL, 0, 't', 't', 'admin', '2021-09-20 16:26:19', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (100, '用户管理', 'system:user:list', 2, 1, 1, 'user', 'user', 'system/user/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (101, '角色管理', '', 2, 2, 1, 'role', 'peoples', 'system/role/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (102, '菜单管理', '', 2, 3, 1, 'menu', 'tree-table', 'system/menu/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (103, '部门管理', '', 2, 4, 1, 'dept', 'tree', 'system/dept/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (104, '岗位管理', '', 2, 5, 1, 'post', 'post', 'system/post/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (105, '字典管理', '', 2, 6, 1, 'dict', 'dict', 'system/dict/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (106, '配置管理', '', 2, 6, 2, 'config', 'edit', 'infra/config/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (107, '通知公告', '', 2, 8, 1, 'notice', 'message', 'system/notice/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (108, '审计日志', '', 1, 9, 1, 'log', 'log', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (109, '令牌管理', '', 2, 2, 1261, 'token', 'online', 'system/oauth2/token/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-05-11 23:31:42', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (110, '定时任务', '', 2, 12, 2, 'job', 'job', 'infra/job/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (111, 'MySQL 监控', '', 2, 9, 2, 'druid', 'druid', 'infra/druid/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (112, 'Java 监控', '', 2, 11, 2, 'admin-server', 'server', 'infra/server/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (113, 'Redis 监控', '', 2, 10, 2, 'redis', 'redis', 'infra/redis/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (114, '表单构建', 'infra:build:list', 2, 2, 2, 'build', 'build', 'infra/build/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (115, '代码生成', 'infra:codegen:query', 2, 1, 2, 'codegen', 'code', 'infra/codegen/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (116, '系统接口', 'infra:swagger:list', 2, 3, 2, 'swagger', 'swagger', 'infra/swagger/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (500, '操作日志', '', 2, 1, 108, 'operate-log', 'form', 'system/operatelog/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (501, '登录日志', '', 2, 2, 108, 'login-log', 'logininfor', 'system/loginlog/index', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1001, '用户查询', 'system:user:query', 3, 1, 100, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1002, '用户新增', 'system:user:create', 3, 2, 100, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1003, '用户修改', 'system:user:update', 3, 3, 100, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1004, '用户删除', 'system:user:delete', 3, 4, 100, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1005, '用户导出', 'system:user:export', 3, 5, 100, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1006, '用户导入', 'system:user:import', 3, 6, 100, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1007, '重置密码', 'system:user:update-password', 3, 7, 100, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1008, '角色查询', 'system:role:query', 3, 1, 101, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1009, '角色新增', 'system:role:create', 3, 2, 101, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1010, '角色修改', 'system:role:update', 3, 3, 101, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1011, '角色删除', 'system:role:delete', 3, 4, 101, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1012, '角色导出', 'system:role:export', 3, 5, 101, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1013, '菜单查询', 'system:menu:query', 3, 1, 102, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1014, '菜单新增', 'system:menu:create', 3, 2, 102, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1015, '菜单修改', 'system:menu:update', 3, 3, 102, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1016, '菜单删除', 'system:menu:delete', 3, 4, 102, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1017, '部门查询', 'system:dept:query', 3, 1, 103, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1018, '部门新增', 'system:dept:create', 3, 2, 103, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1019, '部门修改', 'system:dept:update', 3, 3, 103, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1020, '部门删除', 'system:dept:delete', 3, 4, 103, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1021, '岗位查询', 'system:post:query', 3, 1, 104, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1022, '岗位新增', 'system:post:create', 3, 2, 104, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1023, '岗位修改', 'system:post:update', 3, 3, 104, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1024, '岗位删除', 'system:post:delete', 3, 4, 104, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1025, '岗位导出', 'system:post:export', 3, 5, 104, '', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1026, '字典查询', 'system:dict:query', 3, 1, 105, '#', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1027, '字典新增', 'system:dict:create', 3, 2, 105, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1028, '字典修改', 'system:dict:update', 3, 3, 105, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1029, '字典删除', 'system:dict:delete', 3, 4, 105, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1030, '字典导出', 'system:dict:export', 3, 5, 105, '#', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1031, '配置查询', 'infra:config:query', 3, 1, 106, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1032, '配置新增', 'infra:config:create', 3, 2, 106, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1033, '配置修改', 'infra:config:update', 3, 3, 106, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1034, '配置删除', 'infra:config:delete', 3, 4, 106, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1035, '配置导出', 'infra:config:export', 3, 5, 106, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1036, '公告查询', 'system:notice:query', 3, 1, 107, '#', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1037, '公告新增', 'system:notice:create', 3, 2, 107, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1038, '公告修改', 'system:notice:update', 3, 3, 107, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1039, '公告删除', 'system:notice:delete', 3, 4, 107, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1040, '操作查询', 'system:operate-log:query', 3, 1, 500, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1042, '日志导出', 'system:operate-log:export', 3, 2, 500, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1043, '登录查询', 'system:login-log:query', 3, 1, 501, '#', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1045, '日志导出', 'system:login-log:export', 3, 3, 501, '#', '#', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1046, '令牌列表', 'system:oauth2-token:page', 3, 1, 109, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-05-09 23:54:42', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1048, '令牌删除', 'system:oauth2-token:delete', 3, 2, 109, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-05-09 23:54:53', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1050, '任务新增', 'infra:job:create', 3, 2, 110, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1051, '任务修改', 'infra:job:update', 3, 3, 110, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1052, '任务删除', 'infra:job:delete', 3, 4, 110, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1053, '状态修改', 'infra:job:update', 3, 5, 110, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1054, '任务导出', 'infra:job:export', 3, 7, 110, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1056, '生成修改', 'infra:codegen:update', 3, 2, 115, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1057, '生成删除', 'infra:codegen:delete', 3, 3, 115, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1058, '导入代码', 'infra:codegen:create', 3, 2, 115, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1059, '预览代码', 'infra:codegen:preview', 3, 4, 115, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1060, '生成代码', 'infra:codegen:download', 3, 5, 115, '', '', '', 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1063, '设置角色菜单权限', 'system:permission:assign-role-menu', 3, 6, 101, '', '', '', 0, 't', 't', '', '2021-01-06 17:53:44', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1064, '设置角色数据权限', 'system:permission:assign-role-data-scope', 3, 7, 101, '', '', '', 0, 't', 't', '', '2021-01-06 17:56:31', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1065, '设置用户角色', 'system:permission:assign-user-role', 3, 8, 101, '', '', '', 0, 't', 't', '', '2021-01-07 10:23:28', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1066, '获得 Redis 监控信息', 'infra:redis:get-monitor-info', 3, 1, 113, '', '', '', 0, 't', 't', '', '2021-01-26 01:02:31', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1067, '获得 Redis Key 列表', 'infra:redis:get-key-list', 3, 2, 113, '', '', '', 0, 't', 't', '', '2021-01-26 01:02:52', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1070, '代码生成示例', 'infra:test-demo:query', 2, 1, 2, 'test-demo', 'validCode', 'infra/testDemo/index', 0, 't', 't', '', '2021-02-06 12:42:49', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1071, '测试示例表创建', 'infra:test-demo:create', 3, 1, 1070, '', '', '', 0, 't', 't', '', '2021-02-06 12:42:49', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1072, '测试示例表更新', 'infra:test-demo:update', 3, 2, 1070, '', '', '', 0, 't', 't', '', '2021-02-06 12:42:49', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1073, '测试示例表删除', 'infra:test-demo:delete', 3, 3, 1070, '', '', '', 0, 't', 't', '', '2021-02-06 12:42:49', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1074, '测试示例表导出', 'infra:test-demo:export', 3, 4, 1070, '', '', '', 0, 't', 't', '', '2021-02-06 12:42:49', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1075, '任务触发', 'infra:job:trigger', 3, 8, 110, '', '', '', 0, 't', 't', '', '2021-02-07 13:03:10', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1076, '数据库文档', '', 2, 4, 2, 'db-doc', 'table', 'infra/dbDoc/index', 0, 't', 't', '', '2021-02-08 01:41:47', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1077, '监控平台', '', 2, 13, 2, 'skywalking', 'eye-open', 'infra/skywalking/index', 0, 't', 't', '', '2021-02-08 20:41:31', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1078, '访问日志', '', 2, 1, 1083, 'api-access-log', 'log', 'infra/apiAccessLog/index', 0, 't', 't', '', '2021-02-26 01:32:59', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1082, '日志导出', 'infra:api-access-log:export', 3, 2, 1078, '', '', '', 0, 't', 't', '', '2021-02-26 01:32:59', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1083, 'API 日志', '', 2, 8, 2, 'log', 'log', NULL, 0, 't', 't', '', '2021-02-26 02:18:24', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1084, '错误日志', 'infra:api-error-log:query', 2, 2, 1083, 'api-error-log', 'log', 'infra/apiErrorLog/index', 0, 't', 't', '', '2021-02-26 07:53:20', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1085, '日志处理', 'infra:api-error-log:update-status', 3, 2, 1084, '', '', '', 0, 't', 't', '', '2021-02-26 07:53:20', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1086, '日志导出', 'infra:api-error-log:export', 3, 3, 1084, '', '', '', 0, 't', 't', '', '2021-02-26 07:53:20', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1087, '任务查询', 'infra:job:query', 3, 1, 110, '', '', '', 0, 't', 't', '1', '2021-03-10 01:26:19', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1088, '日志查询', 'infra:api-access-log:query', 3, 1, 1078, '', '', '', 0, 't', 't', '1', '2021-03-10 01:28:04', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1089, '日志查询', 'infra:api-error-log:query', 3, 1, 1084, '', '', '', 0, 't', 't', '1', '2021-03-10 01:29:09', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1090, '文件列表', '', 2, 5, 1243, 'file', 'upload', 'infra/file/index', 0, 't', 't', '', '2021-03-12 20:16:20', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1091, '文件查询', 'infra:file:query', 3, 1, 1090, '', '', '', 0, 't', 't', '', '2021-03-12 20:16:20', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1092, '文件删除', 'infra:file:delete', 3, 4, 1090, '', '', '', 0, 't', 't', '', '2021-03-12 20:16:20', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1093, '短信管理', '', 1, 11, 1, 'sms', 'validCode', NULL, 0, 't', 't', '1', '2021-04-05 01:10:16', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1094, '短信渠道', '', 2, 0, 1093, 'sms-channel', 'phone', 'system/sms/smsChannel', 0, 't', 't', '', '2021-04-01 11:07:15', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1095, '短信渠道查询', 'system:sms-channel:query', 3, 1, 1094, '', '', '', 0, 't', 't', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1096, '短信渠道创建', 'system:sms-channel:create', 3, 2, 1094, '', '', '', 0, 't', 't', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1097, '短信渠道更新', 'system:sms-channel:update', 3, 3, 1094, '', '', '', 0, 't', 't', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1098, '短信渠道删除', 'system:sms-channel:delete', 3, 4, 1094, '', '', '', 0, 't', 't', '', '2021-04-01 11:07:15', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1100, '短信模板', '', 2, 1, 1093, 'sms-template', 'phone', 'system/sms/smsTemplate', 0, 't', 't', '', '2021-04-01 17:35:17', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1101, '短信模板查询', 'system:sms-template:query', 3, 1, 1100, '', '', '', 0, 't', 't', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1102, '短信模板创建', 'system:sms-template:create', 3, 2, 1100, '', '', '', 0, 't', 't', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1103, '短信模板更新', 'system:sms-template:update', 3, 3, 1100, '', '', '', 0, 't', 't', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1104, '短信模板删除', 'system:sms-template:delete', 3, 4, 1100, '', '', '', 0, 't', 't', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1105, '短信模板导出', 'system:sms-template:export', 3, 5, 1100, '', '', '', 0, 't', 't', '', '2021-04-01 17:35:17', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1106, '发送测试短信', 'system:sms-template:send-sms', 3, 6, 1100, '', '', '', 0, 't', 't', '1', '2021-04-11 00:26:40', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1107, '短信日志', '', 2, 2, 1093, 'sms-log', 'phone', 'system/sms/smsLog', 0, 't', 't', '', '2021-04-11 08:37:05', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1108, '短信日志查询', 'system:sms-log:query', 3, 1, 1107, '', '', '', 0, 't', 't', '', '2021-04-11 08:37:05', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1109, '短信日志导出', 'system:sms-log:export', 3, 5, 1107, '', '', '', 0, 't', 't', '', '2021-04-11 08:37:05', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1110, '错误码管理', '', 2, 12, 1, 'error-code', 'code', 'system/errorCode/index', 0, 't', 't', '', '2021-04-13 21:46:42', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1111, '错误码查询', 'system:error-code:query', 3, 1, 1110, '', '', '', 0, 't', 't', '', '2021-04-13 21:46:42', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1112, '错误码创建', 'system:error-code:create', 3, 2, 1110, '', '', '', 0, 't', 't', '', '2021-04-13 21:46:42', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1113, '错误码更新', 'system:error-code:update', 3, 3, 1110, '', '', '', 0, 't', 't', '', '2021-04-13 21:46:42', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1114, '错误码删除', 'system:error-code:delete', 3, 4, 1110, '', '', '', 0, 't', 't', '', '2021-04-13 21:46:42', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1115, '错误码导出', 'system:error-code:export', 3, 5, 1110, '', '', '', 0, 't', 't', '', '2021-04-13 21:46:42', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1118, '请假查询', '', 2, 0, 5, 'leave', 'user', 'bpm/oa/leave/index', 0, 't', 't', '', '2021-09-20 08:51:03', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1119, '请假申请查询', 'bpm:oa-leave:query', 3, 1, 1118, '', '', '', 0, 't', 't', '', '2021-09-20 08:51:03', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1120, '请假申请创建', 'bpm:oa-leave:create', 3, 2, 1118, '', '', '', 0, 't', 't', '', '2021-09-20 08:51:03', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1126, '应用信息', '', 2, 1, 1117, 'app', 'table', 'pay/app/index', 0, 't', 't', '', '2021-11-10 01:13:30', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1127, '支付应用信息查询', 'pay:app:query', 3, 1, 1126, '', '', '', 0, 't', 't', '', '2021-11-10 01:13:31', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1128, '支付应用信息创建', 'pay:app:create', 3, 2, 1126, '', '', '', 0, 't', 't', '', '2021-11-10 01:13:31', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1129, '支付应用信息更新', 'pay:app:update', 3, 3, 1126, '', '', '', 0, 't', 't', '', '2021-11-10 01:13:31', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1130, '支付应用信息删除', 'pay:app:delete', 3, 4, 1126, '', '', '', 0, 't', 't', '', '2021-11-10 01:13:31', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1131, '支付应用信息导出', 'pay:app:export', 3, 5, 1126, '', '', '', 0, 't', 't', '', '2021-11-10 01:13:31', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1132, '秘钥解析', 'pay:channel:parsing', 3, 6, 1129, '', '', '', 0, 't', 't', '1', '2021-11-08 15:15:47', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1133, '支付商户信息查询', 'pay:merchant:query', 3, 1, 1132, '', '', '', 0, 't', 't', '', '2021-11-10 01:13:41', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1134, '支付商户信息创建', 'pay:merchant:create', 3, 2, 1132, '', '', '', 0, 't', 't', '', '2021-11-10 01:13:41', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1135, '支付商户信息更新', 'pay:merchant:update', 3, 3, 1132, '', '', '', 0, 't', 't', '', '2021-11-10 01:13:41', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1136, '支付商户信息删除', 'pay:merchant:delete', 3, 4, 1132, '', '', '', 0, 't', 't', '', '2021-11-10 01:13:41', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1137, '支付商户信息导出', 'pay:merchant:export', 3, 5, 1132, '', '', '', 0, 't', 't', '', '2021-11-10 01:13:41', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1138, '租户列表', '', 2, 0, 1224, 'list', 'peoples', 'system/tenant/index', 0, 't', 't', '', '2021-12-14 12:31:43', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1139, '租户查询', 'system:tenant:query', 3, 1, 1138, '', '', '', 0, 't', 't', '', '2021-12-14 12:31:44', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1140, '租户创建', 'system:tenant:create', 3, 2, 1138, '', '', '', 0, 't', 't', '', '2021-12-14 12:31:44', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1141, '租户更新', 'system:tenant:update', 3, 3, 1138, '', '', '', 0, 't', 't', '', '2021-12-14 12:31:44', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1142, '租户删除', 'system:tenant:delete', 3, 4, 1138, '', '', '', 0, 't', 't', '', '2021-12-14 12:31:44', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1143, '租户导出', 'system:tenant:export', 3, 5, 1138, '', '', '', 0, 't', 't', '', '2021-12-14 12:31:44', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1150, '秘钥解析', '', 3, 6, 1129, '', '', '', 0, 't', 't', '1', '2021-11-08 15:15:47', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1161, '退款订单', '', 2, 3, 1117, 'refund', 'order', 'pay/refund/index', 0, 't', 't', '', '2021-12-25 08:29:07', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1162, '退款订单查询', 'pay:refund:query', 3, 1, 1161, '', '', '', 0, 't', 't', '', '2021-12-25 08:29:07', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1163, '退款订单创建', 'pay:refund:create', 3, 2, 1161, '', '', '', 0, 't', 't', '', '2021-12-25 08:29:07', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1164, '退款订单更新', 'pay:refund:update', 3, 3, 1161, '', '', '', 0, 't', 't', '', '2021-12-25 08:29:07', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1165, '退款订单删除', 'pay:refund:delete', 3, 4, 1161, '', '', '', 0, 't', 't', '', '2021-12-25 08:29:07', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1166, '退款订单导出', 'pay:refund:export', 3, 5, 1161, '', '', '', 0, 't', 't', '', '2021-12-25 08:29:07', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1173, '支付订单', '', 2, 2, 1117, 'order', 'pay', 'pay/order/index', 0, 't', 't', '', '2021-12-25 08:49:43', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1174, '支付订单查询', 'pay:order:query', 3, 1, 1173, '', '', '', 0, 't', 't', '', '2021-12-25 08:49:43', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1175, '支付订单创建', 'pay:order:create', 3, 2, 1173, '', '', '', 0, 't', 't', '', '2021-12-25 08:49:43', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1176, '支付订单更新', 'pay:order:update', 3, 3, 1173, '', '', '', 0, 't', 't', '', '2021-12-25 08:49:43', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1177, '支付订单删除', 'pay:order:delete', 3, 4, 1173, '', '', '', 0, 't', 't', '', '2021-12-25 08:49:43', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1178, '支付订单导出', 'pay:order:export', 3, 5, 1173, '', '', '', 0, 't', 't', '', '2021-12-25 08:49:43', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1179, '商户信息', '', 2, 0, 1117, 'merchant', 'merchant', 'pay/merchant/index', 0, 't', 't', '', '2021-12-25 09:01:44', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1180, '支付商户信息查询', 'pay:merchant:query', 3, 1, 1179, '', '', '', 0, 't', 't', '', '2021-12-25 09:01:44', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1181, '支付商户信息创建', 'pay:merchant:create', 3, 2, 1179, '', '', '', 0, 't', 't', '', '2021-12-25 09:01:44', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1182, '支付商户信息更新', 'pay:merchant:update', 3, 3, 1179, '', '', '', 0, 't', 't', '', '2021-12-25 09:01:44', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1183, '支付商户信息删除', '', 3, 4, 1179, '', '', '', 0, 't', 't', '', '2021-12-25 09:01:44', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1184, '支付商户信息导出', 'pay:merchant:export', 3, 5, 1179, '', '', '', 0, 't', 't', '', '2021-12-25 09:01:44', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1185, '工作流程', '', 1, 50, 0, '/bpm', 'tool', NULL, 0, 't', 't', '1', '2021-12-30 20:26:36', '103', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1186, '流程管理', '', 1, 10, 1185, 'manager', 'nested', NULL, 0, 't', 't', '1', '2021-12-30 20:28:30', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1187, '流程表单', '', 2, 0, 1186, 'form', 'form', 'bpm/form/index', 0, 't', 't', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1188, '表单查询', 'bpm:form:query', 3, 1, 1187, '', '', '', 0, 't', 't', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1189, '表单创建', 'bpm:form:create', 3, 2, 1187, '', '', '', 0, 't', 't', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1190, '表单更新', 'bpm:form:update', 3, 3, 1187, '', '', '', 0, 't', 't', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1191, '表单删除', 'bpm:form:delete', 3, 4, 1187, '', '', '', 0, 't', 't', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1192, '表单导出', 'bpm:form:export', 3, 5, 1187, '', '', '', 0, 't', 't', '', '2021-12-30 12:38:22', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1193, '流程模型', '', 2, 5, 1186, 'model', 'guide', 'bpm/model/index', 0, 't', 't', '1', '2021-12-31 23:24:58', '103', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1194, '模型查询', 'bpm:model:query', 3, 1, 1193, '', '', '', 0, 't', 't', '1', '2022-01-03 19:01:10', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1195, '模型创建', 'bpm:model:create', 3, 2, 1193, '', '', '', 0, 't', 't', '1', '2022-01-03 19:01:24', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1196, '模型导入', 'bpm:model:import', 3, 3, 1193, '', '', '', 0, 't', 't', '1', '2022-01-03 19:01:35', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1197, '模型更新', 'bpm:model:update', 3, 4, 1193, '', '', '', 0, 't', 't', '1', '2022-01-03 19:02:28', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1198, '模型删除', 'bpm:model:delete', 3, 5, 1193, '', '', '', 0, 't', 't', '1', '2022-01-03 19:02:43', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1199, '模型发布', 'bpm:model:deploy', 3, 6, 1193, '', '', '', 0, 't', 't', '1', '2022-01-03 19:03:24', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1200, '任务管理', '', 1, 20, 1185, 'task', 'cascader', NULL, 0, 't', 't', '1', '2022-01-07 23:51:48', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1201, '我的流程', '', 2, 0, 1200, 'my', 'people', 'bpm/processInstance/index', 0, 't', 't', '', '2022-01-07 15:53:44', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1202, '流程实例的查询', 'bpm:process-instance:query', 3, 1, 1201, '', '', '', 0, 't', 't', '', '2022-01-07 15:53:44', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1207, '待办任务', '', 2, 10, 1200, 'todo', 'eye-open', 'bpm/task/todo', 0, 't', 't', '1', '2022-01-08 10:33:37', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1208, '已办任务', '', 2, 20, 1200, 'done', 'eye', 'bpm/task/done', 0, 't', 't', '1', '2022-01-08 10:34:13', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1209, '用户分组', '', 2, 2, 1186, 'user-group', 'people', 'bpm/group/index', 0, 't', 't', '', '2022-01-14 02:14:20', '103', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1210, '用户组查询', 'bpm:user-group:query', 3, 1, 1209, '', '', '', 0, 't', 't', '', '2022-01-14 02:14:20', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1211, '用户组创建', 'bpm:user-group:create', 3, 2, 1209, '', '', '', 0, 't', 't', '', '2022-01-14 02:14:20', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1212, '用户组更新', 'bpm:user-group:update', 3, 3, 1209, '', '', '', 0, 't', 't', '', '2022-01-14 02:14:20', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1213, '用户组删除', 'bpm:user-group:delete', 3, 4, 1209, '', '', '', 0, 't', 't', '', '2022-01-14 02:14:20', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1215, '流程定义查询', 'bpm:process-definition:query', 3, 10, 1193, '', '', '', 0, 't', 't', '1', '2022-01-23 00:21:43', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1216, '流程任务分配规则查询', 'bpm:task-assign-rule:query', 3, 20, 1193, '', '', '', 0, 't', 't', '1', '2022-01-23 00:26:53', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1217, '流程任务分配规则创建', 'bpm:task-assign-rule:create', 3, 21, 1193, '', '', '', 0, 't', 't', '1', '2022-01-23 00:28:15', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1218, '流程任务分配规则更新', 'bpm:task-assign-rule:update', 3, 22, 1193, '', '', '', 0, 't', 't', '1', '2022-01-23 00:28:41', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1219, '流程实例的创建', 'bpm:process-instance:create', 3, 2, 1201, '', '', '', 0, 't', 't', '1', '2022-01-23 00:36:15', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1220, '流程实例的取消', 'bpm:process-instance:cancel', 3, 3, 1201, '', '', '', 0, 't', 't', '1', '2022-01-23 00:36:33', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1221, '流程任务的查询', 'bpm:task:query', 3, 1, 1207, '', '', '', 0, 't', 't', '1', '2022-01-23 00:38:52', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1222, '流程任务的更新', 'bpm:task:update', 3, 2, 1207, '', '', '', 0, 't', 't', '1', '2022-01-23 00:39:24', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1224, '租户管理', '', 2, 0, 1, 'tenant', 'peoples', NULL, 0, 't', 't', '1', '2022-02-20 01:41:13', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1225, '租户套餐', '', 2, 0, 1224, 'package', 'eye', 'system/tenantPackage/index', 0, 't', 't', '', '2022-02-19 17:44:06', '1', '2022-04-21 01:21:25', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1226, '租户套餐查询', 'system:tenant-package:query', 3, 1, 1225, '', '', '', 0, 't', 't', '', '2022-02-19 17:44:06', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1227, '租户套餐创建', 'system:tenant-package:create', 3, 2, 1225, '', '', '', 0, 't', 't', '', '2022-02-19 17:44:06', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1228, '租户套餐更新', 'system:tenant-package:update', 3, 3, 1225, '', '', '', 0, 't', 't', '', '2022-02-19 17:44:06', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1229, '租户套餐删除', 'system:tenant-package:delete', 3, 4, 1225, '', '', '', 0, 't', 't', '', '2022-02-19 17:44:06', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1237, '文件配置', '', 2, 0, 1243, 'file-config', 'config', 'infra/fileConfig/index', 0, 't', 't', '', '2022-03-15 14:35:28', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1238, '文件配置查询', 'infra:file-config:query', 3, 1, 1237, '', '', '', 0, 't', 't', '', '2022-03-15 14:35:28', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1239, '文件配置创建', 'infra:file-config:create', 3, 2, 1237, '', '', '', 0, 't', 't', '', '2022-03-15 14:35:28', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1240, '文件配置更新', 'infra:file-config:update', 3, 3, 1237, '', '', '', 0, 't', 't', '', '2022-03-15 14:35:28', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1241, '文件配置删除', 'infra:file-config:delete', 3, 4, 1237, '', '', '', 0, 't', 't', '', '2022-03-15 14:35:28', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1242, '文件配置导出', 'infra:file-config:export', 3, 5, 1237, '', '', '', 0, 't', 't', '', '2022-03-15 14:35:28', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1243, '文件管理', '', 2, 5, 2, 'file', 'download', NULL, 0, 't', 't', '1', '2022-03-16 23:47:40', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1247, '敏感词管理', '', 2, 13, 1, 'sensitive-word', 'education', 'system/sensitiveWord/index', 0, 't', 't', '', '2022-04-07 16:55:03', '1', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1248, '敏感词查询', 'system:sensitive-word:query', 3, 1, 1247, '', '', '', 0, 't', 't', '', '2022-04-07 16:55:03', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1249, '敏感词创建', 'system:sensitive-word:create', 3, 2, 1247, '', '', '', 0, 't', 't', '', '2022-04-07 16:55:03', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1250, '敏感词更新', 'system:sensitive-word:update', 3, 3, 1247, '', '', '', 0, 't', 't', '', '2022-04-07 16:55:03', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1251, '敏感词删除', 'system:sensitive-word:delete', 3, 4, 1247, '', '', '', 0, 't', 't', '', '2022-04-07 16:55:03', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1252, '敏感词导出', 'system:sensitive-word:export', 3, 5, 1247, '', '', '', 0, 't', 't', '', '2022-04-07 16:55:03', '', '2022-04-20 17:03:10', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1254, '作者动态', '', 1, 0, 0, 'https://www.iocoder.cn', 'people', NULL, 0, 't', 't', '1', '2022-04-23 01:03:15', '1', '2022-04-23 01:03:15', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1255, '数据源配置', '', 2, 1, 2, 'data-source-config', 'rate', 'infra/dataSourceConfig/index', 0, 't', 't', '', '2022-04-27 14:37:32', '1', '2022-04-27 22:42:06', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1256, '数据源配置查询', 'infra:data-source-config:query', 3, 1, 1255, '', '', '', 0, 't', 't', '', '2022-04-27 14:37:32', '', '2022-04-27 14:37:32', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1257, '数据源配置创建', 'infra:data-source-config:create', 3, 2, 1255, '', '', '', 0, 't', 't', '', '2022-04-27 14:37:32', '', '2022-04-27 14:37:32', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1258, '数据源配置更新', 'infra:data-source-config:update', 3, 3, 1255, '', '', '', 0, 't', 't', '', '2022-04-27 14:37:32', '', '2022-04-27 14:37:32', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1259, '数据源配置删除', 'infra:data-source-config:delete', 3, 4, 1255, '', '', '', 0, 't', 't', '', '2022-04-27 14:37:32', '', '2022-04-27 14:37:32', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1260, '数据源配置导出', 'infra:data-source-config:export', 3, 5, 1255, '', '', '', 0, 't', 't', '', '2022-04-27 14:37:32', '', '2022-04-27 14:37:32', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1261, 'OAuth 2.0', '', 1, 10, 1, 'oauth2', 'people', NULL, 0, 't', 't', '1', '2022-05-09 23:38:17', '1', '2022-05-11 23:51:46', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1263, '应用管理', '', 2, 0, 1261, 'oauth2/application', 'tool', 'system/oauth2/client/index', 0, 't', 't', '', '2022-05-10 16:26:33', '1', '2022-05-11 23:31:36', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1264, '客户端查询', 'system:oauth2-client:query', 3, 1, 1263, '', '', '', 0, 't', 't', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:06', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1265, '客户端创建', 'system:oauth2-client:create', 3, 2, 1263, '', '', '', 0, 't', 't', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:23', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1266, '客户端更新', 'system:oauth2-client:update', 3, 3, 1263, '', '', '', 0, 't', 't', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:28', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1267, '客户端删除', 'system:oauth2-client:delete', 3, 4, 1263, '', '', '', 0, 't', 't', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:33', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1117, '支付管理', '', 1, 11, 0, '/pay', 'money', NULL, 0, 't', 't', '1', '2021-12-25 16:43:41', '1', '2022-05-13 01:02:25.244', 0);
+INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1, '系统管理', '', 1, 10, 0, '/system', 'system', NULL, 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-05-13 01:02:57.073', 0);
 COMMIT;
 
 -- ----------------------------
@@ -2821,9 +2844,238 @@ COMMENT ON TABLE "system_notice" IS '通知公告表';
 -- Records of system_notice
 -- ----------------------------
 BEGIN;
-INSERT INTO "system_notice" ("id", "title", "content", "type", "status", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (1, '温馨提醒：2018-07-01 若依新版本发布啦', '<p>新版本内容133</p>', 2, 0, 'admin', '2021-01-05 17:03:48', '1', '2022-02-15 19:47:20', 0, 1);
-INSERT INTO "system_notice" ("id", "title", "content", "type", "status", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (2, '维护通知：2018-07-01 若依系统凌晨维护', '维护内容', 1, 0, 'admin', '2021-01-05 17:03:48', '', '2021-12-15 05:02:22', 0, 1);
+INSERT INTO "system_notice" ("id", "title", "content", "type", "status", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (1, '芋道的公众', '<p>新版本内容133</p>', 1, 0, 'admin', '2021-01-05 17:03:48', '1', '2022-05-04 21:00:20', 0, 1);
+INSERT INTO "system_notice" ("id", "title", "content", "type", "status", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (2, '维护通知：2018-07-01 若依系统凌晨维护', '<p><img src="http://test.yudao.iocoder.cn/b7cb3cf49b4b3258bf7309a09dd2f4e5.jpg">维护内容</p>', 2, 1, 'admin', '2021-01-05 17:03:48', '1', '2022-05-11 12:34:24', 0, 1);
 INSERT INTO "system_notice" ("id", "title", "content", "type", "status", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (4, '我是测试标题', '<p>哈哈哈哈123</p>', 1, 0, '110', '2022-02-22 01:01:25', '110', '2022-02-22 01:01:46', 0, 121);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for system_oauth2_access_token
+-- ----------------------------
+DROP TABLE IF EXISTS "system_oauth2_access_token";
+CREATE TABLE "system_oauth2_access_token" (
+  "id" int8 NOT NULL,
+  "user_id" int8 NOT NULL,
+  "access_token" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "refresh_token" varchar(32) COLLATE "pg_catalog"."default" NOT NULL,
+  "user_type" int2 NOT NULL,
+  "client_id" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "expires_time" timestamp(6) NOT NULL,
+  "creator" varchar(64) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL,
+  "updater" varchar(64) COLLATE "pg_catalog"."default",
+  "update_time" timestamp(6) NOT NULL,
+  "deleted" int2 NOT NULL DEFAULT 0,
+  "tenant_id" int8 NOT NULL,
+  "scopes" varchar(255) COLLATE "pg_catalog"."default" DEFAULT ''::character varying
+)
+;
+COMMENT ON COLUMN "system_oauth2_access_token"."id" IS '编号';
+COMMENT ON COLUMN "system_oauth2_access_token"."user_id" IS '用户编号';
+COMMENT ON COLUMN "system_oauth2_access_token"."access_token" IS '访问令牌';
+COMMENT ON COLUMN "system_oauth2_access_token"."refresh_token" IS '刷新令牌';
+COMMENT ON COLUMN "system_oauth2_access_token"."user_type" IS '用户类型';
+COMMENT ON COLUMN "system_oauth2_access_token"."client_id" IS '客户端编号';
+COMMENT ON COLUMN "system_oauth2_access_token"."expires_time" IS '过期时间';
+COMMENT ON COLUMN "system_oauth2_access_token"."creator" IS '创建者';
+COMMENT ON COLUMN "system_oauth2_access_token"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_oauth2_access_token"."updater" IS '更新者';
+COMMENT ON COLUMN "system_oauth2_access_token"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_oauth2_access_token"."deleted" IS '是否删除';
+COMMENT ON COLUMN "system_oauth2_access_token"."tenant_id" IS '租户编号';
+COMMENT ON COLUMN "system_oauth2_access_token"."scopes" IS '授权范围';
+COMMENT ON TABLE "system_oauth2_access_token" IS '刷新令牌';
+
+-- ----------------------------
+-- Records of system_oauth2_access_token
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for system_oauth2_approve
+-- ----------------------------
+DROP TABLE IF EXISTS "system_oauth2_approve";
+CREATE TABLE "system_oauth2_approve" (
+  "id" int8 NOT NULL,
+  "user_id" int8 NOT NULL,
+  "user_type" int2 NOT NULL,
+  "client_id" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "scope" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "approved" bool NOT NULL,
+  "expires_time" timestamp(6) NOT NULL,
+  "creator" varchar(64) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL,
+  "updater" varchar(64) COLLATE "pg_catalog"."default",
+  "update_time" timestamp(6) NOT NULL,
+  "deleted" int2 NOT NULL DEFAULT 0,
+  "tenant_id" int8 NOT NULL
+)
+;
+COMMENT ON COLUMN "system_oauth2_approve"."id" IS '编号';
+COMMENT ON COLUMN "system_oauth2_approve"."user_id" IS '用户编号';
+COMMENT ON COLUMN "system_oauth2_approve"."user_type" IS '用户类型';
+COMMENT ON COLUMN "system_oauth2_approve"."client_id" IS '客户端编号';
+COMMENT ON COLUMN "system_oauth2_approve"."scope" IS '授权范围';
+COMMENT ON COLUMN "system_oauth2_approve"."approved" IS '是否接受';
+COMMENT ON COLUMN "system_oauth2_approve"."expires_time" IS '过期时间';
+COMMENT ON COLUMN "system_oauth2_approve"."creator" IS '创建者';
+COMMENT ON COLUMN "system_oauth2_approve"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_oauth2_approve"."updater" IS '更新者';
+COMMENT ON COLUMN "system_oauth2_approve"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_oauth2_approve"."deleted" IS '是否删除';
+COMMENT ON COLUMN "system_oauth2_approve"."tenant_id" IS '租户编号';
+COMMENT ON TABLE "system_oauth2_approve" IS 'OAuth2 批准表';
+
+-- ----------------------------
+-- Records of system_oauth2_approve
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for system_oauth2_client
+-- ----------------------------
+DROP TABLE IF EXISTS "system_oauth2_client";
+CREATE TABLE "system_oauth2_client" (
+  "id" int8 NOT NULL,
+  "client_id" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "secret" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "logo" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "description" varchar(255) COLLATE "pg_catalog"."default",
+  "status" int2 NOT NULL,
+  "access_token_validity_seconds" int4 NOT NULL,
+  "refresh_token_validity_seconds" int4 NOT NULL,
+  "redirect_uris" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "authorized_grant_types" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "scopes" varchar(255) COLLATE "pg_catalog"."default",
+  "authorities" varchar(255) COLLATE "pg_catalog"."default",
+  "resource_ids" varchar(255) COLLATE "pg_catalog"."default",
+  "additional_information" varchar(4096) COLLATE "pg_catalog"."default",
+  "creator" varchar(64) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL,
+  "updater" varchar(64) COLLATE "pg_catalog"."default",
+  "update_time" timestamp(6) NOT NULL,
+  "deleted" int2 NOT NULL DEFAULT 0,
+  "auto_approve_scopes" varchar(255) COLLATE "pg_catalog"."default"
+)
+;
+COMMENT ON COLUMN "system_oauth2_client"."id" IS '编号';
+COMMENT ON COLUMN "system_oauth2_client"."client_id" IS '客户端编号';
+COMMENT ON COLUMN "system_oauth2_client"."secret" IS '客户端密钥';
+COMMENT ON COLUMN "system_oauth2_client"."name" IS '应用名';
+COMMENT ON COLUMN "system_oauth2_client"."logo" IS '应用图标';
+COMMENT ON COLUMN "system_oauth2_client"."description" IS '应用描述';
+COMMENT ON COLUMN "system_oauth2_client"."status" IS '状态';
+COMMENT ON COLUMN "system_oauth2_client"."access_token_validity_seconds" IS '访问令牌的有效期';
+COMMENT ON COLUMN "system_oauth2_client"."refresh_token_validity_seconds" IS '刷新令牌的有效期';
+COMMENT ON COLUMN "system_oauth2_client"."redirect_uris" IS '可重定向的 URI 地址';
+COMMENT ON COLUMN "system_oauth2_client"."authorized_grant_types" IS '授权类型';
+COMMENT ON COLUMN "system_oauth2_client"."scopes" IS '授权范围';
+COMMENT ON COLUMN "system_oauth2_client"."authorities" IS '权限';
+COMMENT ON COLUMN "system_oauth2_client"."resource_ids" IS '资源';
+COMMENT ON COLUMN "system_oauth2_client"."additional_information" IS '附加信息';
+COMMENT ON COLUMN "system_oauth2_client"."creator" IS '创建者';
+COMMENT ON COLUMN "system_oauth2_client"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_oauth2_client"."updater" IS '更新者';
+COMMENT ON COLUMN "system_oauth2_client"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_oauth2_client"."deleted" IS '是否删除';
+COMMENT ON COLUMN "system_oauth2_client"."auto_approve_scopes" IS '自动通过的授权范围';
+COMMENT ON TABLE "system_oauth2_client" IS 'OAuth2 客户端表';
+
+-- ----------------------------
+-- Records of system_oauth2_client
+-- ----------------------------
+BEGIN;
+INSERT INTO "system_oauth2_client" ("id", "client_id", "secret", "name", "logo", "description", "status", "access_token_validity_seconds", "refresh_token_validity_seconds", "redirect_uris", "authorized_grant_types", "scopes", "authorities", "resource_ids", "additional_information", "creator", "create_time", "updater", "update_time", "deleted", "auto_approve_scopes") VALUES (1, 'default', 'admin123', '芋道源码', 'http://test.yudao.iocoder.cn/a5e2e244368878a366b516805a4aabf1.png', '我是描述', 0, 180, 8640, '["https://www.iocoder.cn","https://doc.iocoder.cn"]', '["password","authorization_code","implicit","refresh_token"]', '["user.read","user.write"]', '["system:user:query"]', '[]', '{}', '1', '2022-05-11 21:47:12', '1', '2022-05-12 01:00:20', 0, NULL);
+INSERT INTO "system_oauth2_client" ("id", "client_id", "secret", "name", "logo", "description", "status", "access_token_validity_seconds", "refresh_token_validity_seconds", "redirect_uris", "authorized_grant_types", "scopes", "authorities", "resource_ids", "additional_information", "creator", "create_time", "updater", "update_time", "deleted", "auto_approve_scopes") VALUES (40, 'test', 'test2', 'biubiu', 'http://test.yudao.iocoder.cn/277a899d573723f1fcdfb57340f00379.png', NULL, 0, 1800, 43200, '["https://www.iocoder.cn"]', '["password","authorization_code","implicit"]', '[]', '[]', '[]', '{}', '1', '2022-05-12 00:28:20', '1', '2022-05-25 23:45:33.005', 0, '[]');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for system_oauth2_code
+-- ----------------------------
+DROP TABLE IF EXISTS "system_oauth2_code";
+CREATE TABLE "system_oauth2_code" (
+  "id" int8 NOT NULL,
+  "user_id" int8 NOT NULL,
+  "user_type" int2 NOT NULL,
+  "code" varchar(32) COLLATE "pg_catalog"."default" NOT NULL,
+  "client_id" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "scopes" varchar(255) COLLATE "pg_catalog"."default",
+  "expires_time" timestamp(6) NOT NULL,
+  "redirect_uri" varchar(255) COLLATE "pg_catalog"."default",
+  "state" varchar(255) COLLATE "pg_catalog"."default",
+  "creator" varchar(64) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL,
+  "updater" varchar(64) COLLATE "pg_catalog"."default",
+  "update_time" timestamp(6) NOT NULL,
+  "deleted" int2 NOT NULL DEFAULT 0,
+  "tenant_id" int8 NOT NULL
+)
+;
+COMMENT ON COLUMN "system_oauth2_code"."id" IS '编号';
+COMMENT ON COLUMN "system_oauth2_code"."user_id" IS '用户编号';
+COMMENT ON COLUMN "system_oauth2_code"."user_type" IS '用户类型';
+COMMENT ON COLUMN "system_oauth2_code"."code" IS '授权码';
+COMMENT ON COLUMN "system_oauth2_code"."client_id" IS '客户端编号';
+COMMENT ON COLUMN "system_oauth2_code"."scopes" IS '授权范围';
+COMMENT ON COLUMN "system_oauth2_code"."expires_time" IS '过期时间';
+COMMENT ON COLUMN "system_oauth2_code"."redirect_uri" IS '可重定向的 URI 地址';
+COMMENT ON COLUMN "system_oauth2_code"."state" IS '状态';
+COMMENT ON COLUMN "system_oauth2_code"."creator" IS '创建者';
+COMMENT ON COLUMN "system_oauth2_code"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_oauth2_code"."updater" IS '更新者';
+COMMENT ON COLUMN "system_oauth2_code"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_oauth2_code"."deleted" IS '是否删除';
+COMMENT ON COLUMN "system_oauth2_code"."tenant_id" IS '租户编号';
+COMMENT ON TABLE "system_oauth2_code" IS 'OAuth2 授权码表';
+
+-- ----------------------------
+-- Records of system_oauth2_code
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for system_oauth2_refresh_token
+-- ----------------------------
+DROP TABLE IF EXISTS "system_oauth2_refresh_token";
+CREATE TABLE "system_oauth2_refresh_token" (
+  "id" int8 NOT NULL,
+  "user_id" int8 NOT NULL,
+  "refresh_token" varchar(32) COLLATE "pg_catalog"."default" NOT NULL,
+  "user_type" int2 NOT NULL,
+  "client_id" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "expires_time" timestamp(6) NOT NULL,
+  "creator" varchar(64) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL,
+  "updater" varchar(64) COLLATE "pg_catalog"."default",
+  "update_time" timestamp(6) NOT NULL,
+  "deleted" int2 NOT NULL DEFAULT 0,
+  "tenant_id" int8 NOT NULL,
+  "scopes" varchar(255) COLLATE "pg_catalog"."default" DEFAULT ''::character varying
+)
+;
+COMMENT ON COLUMN "system_oauth2_refresh_token"."id" IS '编号';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."user_id" IS '用户编号';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."refresh_token" IS '刷新令牌';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."user_type" IS '用户类型';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."client_id" IS '客户端编号';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."expires_time" IS '过期时间';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."creator" IS '创建者';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."updater" IS '更新者';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."deleted" IS '是否删除';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."tenant_id" IS '租户编号';
+COMMENT ON COLUMN "system_oauth2_refresh_token"."scopes" IS '授权范围';
+COMMENT ON TABLE "system_oauth2_refresh_token" IS '刷新令牌';
+
+-- ----------------------------
+-- Records of system_oauth2_refresh_token
+-- ----------------------------
+BEGIN;
 COMMIT;
 
 -- ----------------------------
@@ -2932,7 +3184,7 @@ COMMENT ON TABLE "system_post" IS '岗位信息表';
 BEGIN;
 INSERT INTO "system_post" ("id", "code", "name", "sort", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (1, 'ceo', '董事长', 1, 0, '', 'admin', '2021-01-06 17:03:48', '1', '2022-04-19 16:53:39', 0, 1);
 INSERT INTO "system_post" ("id", "code", "name", "sort", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (2, 'se', '项目经理', 2, 0, '', 'admin', '2021-01-05 17:03:48', '1', '2021-12-12 10:47:47', 0, 1);
-INSERT INTO "system_post" ("id", "code", "name", "sort", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (4, 'user', '普通员工', 4, 0, '111', 'admin', '2021-01-05 17:03:48', '1', '2022-04-20 00:59:35', 0, 1);
+INSERT INTO "system_post" ("id", "code", "name", "sort", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (4, 'user', '普通员工', 4, 0, '111', 'admin', '2021-01-05 17:03:48', '1', '2022-05-04 22:46:35', 0, 1);
 COMMIT;
 
 -- ----------------------------
@@ -3253,7 +3505,7 @@ COMMIT;
 DROP TABLE IF EXISTS "system_sms_channel";
 CREATE TABLE "system_sms_channel" (
   "id" int8 NOT NULL,
-  "signature" varchar(10) COLLATE "pg_catalog"."default" NOT NULL,
+  "signature" varchar(12) COLLATE "pg_catalog"."default" NOT NULL,
   "code" varchar(63) COLLATE "pg_catalog"."default" NOT NULL,
   "status" int2 NOT NULL,
   "remark" varchar(255) COLLATE "pg_catalog"."default",
@@ -3286,7 +3538,6 @@ COMMENT ON TABLE "system_sms_channel" IS '短信渠道';
 -- Records of system_sms_channel
 -- ----------------------------
 BEGIN;
-INSERT INTO "system_sms_channel" ("id", "signature", "code", "status", "remark", "api_key", "api_secret", "callback_url", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1, '芋道', 'YUN_PIAN', 0, '呵呵呵哒', '1555a14277cb8a608cf45a9e6a80d510', NULL, 'http://vdwapu.natappfree.cc/admin-api/system/sms/callback/yunpian', '', '2021-03-31 06:12:20', '1', '2022-02-23 16:48:44', 0);
 INSERT INTO "system_sms_channel" ("id", "signature", "code", "status", "remark", "api_key", "api_secret", "callback_url", "creator", "create_time", "updater", "update_time", "deleted") VALUES (2, 'Ballcat', 'ALIYUN', 0, '啦啦啦', 'LTAI5tCnKso2uG3kJ5gRav88', 'fGJ5SNXL7P1NHNRmJ7DJaMJGPyE55C', NULL, '', '2021-03-31 11:53:10', '1', '2021-04-14 00:08:37', 0);
 INSERT INTO "system_sms_channel" ("id", "signature", "code", "status", "remark", "api_key", "api_secret", "callback_url", "creator", "create_time", "updater", "update_time", "deleted") VALUES (4, '测试渠道', 'DEBUG_DING_TALK', 0, '123', '696b5d8ead48071237e4aa5861ff08dbadb2b4ded1c688a7b7c9afc615579859', 'SEC5c4e5ff888bc8a9923ae47f59e7ccd30af1f14d93c55b4e2c9cb094e35aeed67', NULL, '1', '2021-04-13 00:23:14', '1', '2022-03-27 20:29:49', 0);
 INSERT INTO "system_sms_channel" ("id", "signature", "code", "status", "remark", "api_key", "api_secret", "callback_url", "creator", "create_time", "updater", "update_time", "deleted") VALUES (6, '测试演示', 'DEBUG_DING_TALK', 0, NULL, '696b5d8ead48071237e4aa5861ff08dbadb2b4ded1c688a7b7c9afc615579859', 'SEC5c4e5ff888bc8a9923ae47f59e7ccd30af1f14d93c55b4e2c9cb094e35aeed67', NULL, '1', '2022-04-10 23:07:59', '1', '2022-04-10 23:07:59', 0);
@@ -3303,7 +3554,7 @@ CREATE TABLE "system_sms_code" (
   "create_ip" varchar(15) COLLATE "pg_catalog"."default" NOT NULL,
   "scene" int2 NOT NULL,
   "today_index" int2 NOT NULL,
-  "used" int2 NOT NULL,
+  "used" bool NOT NULL,
   "used_time" timestamp(6),
   "used_ip" varchar(255) COLLATE "pg_catalog"."default",
   "creator" varchar(64) COLLATE "pg_catalog"."default",
@@ -3461,9 +3712,9 @@ INSERT INTO "system_sms_template" ("id", "type", "status", "code", "name", "cont
 INSERT INTO "system_sms_template" ("id", "type", "status", "code", "name", "content", "params", "remark", "api_template_id", "channel_id", "channel_code", "creator", "create_time", "updater", "update_time", "deleted") VALUES (7, 3, 0, 'test-04', '测试下', '老鸡{name}，牛逼{code}', '["name","code"]', NULL, 'suibian', 4, 'DEBUG_DING_TALK', '1', '2021-04-13 00:29:53', '1', '2021-04-14 00:30:38', 0);
 INSERT INTO "system_sms_template" ("id", "type", "status", "code", "name", "content", "params", "remark", "api_template_id", "channel_id", "channel_code", "creator", "create_time", "updater", "update_time", "deleted") VALUES (8, 1, 0, 'user-sms-login', '前台用户短信登录', '您的验证码是{code}', '["code"]', NULL, '4372216', 1, 'YUN_PIAN', '1', '2021-10-11 08:10:00', '1', '2021-10-11 08:10:00', 0);
 INSERT INTO "system_sms_template" ("id", "type", "status", "code", "name", "content", "params", "remark", "api_template_id", "channel_id", "channel_code", "creator", "create_time", "updater", "update_time", "deleted") VALUES (9, 2, 0, 'bpm_task_assigned', '【工作流】任务被分配', '您收到了一条新的待办任务：{processInstanceName}-{taskName}，申请人：{startUserNickname}，处理链接：{detailUrl}', '["processInstanceName","taskName","startUserNickname","detailUrl"]', NULL, 'suibian', 4, 'DEBUG_DING_TALK', '1', '2022-01-21 22:31:19', '1', '2022-01-22 00:03:36', 0);
+INSERT INTO "system_sms_template" ("id", "type", "status", "code", "name", "content", "params", "remark", "api_template_id", "channel_id", "channel_code", "creator", "create_time", "updater", "update_time", "deleted") VALUES (10, 2, 0, 'bpm_process_instance_reject', '【工作流】流程被不通过', '您的流程被审批不通过：{processInstanceName}，原因：{reason}，查看链接：{detailUrl}', '["processInstanceName","reason","detailUrl"]', NULL, 'suibian', 4, 'DEBUG_DING_TALK', '1', '2022-01-22 00:03:31', '1', '2022-05-01 12:33:14', 0);
 INSERT INTO "system_sms_template" ("id", "type", "status", "code", "name", "content", "params", "remark", "api_template_id", "channel_id", "channel_code", "creator", "create_time", "updater", "update_time", "deleted") VALUES (11, 2, 0, 'bpm_process_instance_approve', '【工作流】流程被通过', '您的流程被审批通过：{processInstanceName}，查看链接：{detailUrl}', '["processInstanceName","detailUrl"]', NULL, 'suibian', 4, 'DEBUG_DING_TALK', '1', '2022-01-22 00:04:31', '1', '2022-03-27 20:32:21', 0);
 INSERT INTO "system_sms_template" ("id", "type", "status", "code", "name", "content", "params", "remark", "api_template_id", "channel_id", "channel_code", "creator", "create_time", "updater", "update_time", "deleted") VALUES (12, 2, 0, 'demo', '演示模板', '我就是测试一下下', '[]', NULL, 'biubiubiu', 6, 'DEBUG_DING_TALK', '1', '2022-04-10 23:22:49', '1', '2022-04-10 23:22:49', 0);
-INSERT INTO "system_sms_template" ("id", "type", "status", "code", "name", "content", "params", "remark", "api_template_id", "channel_id", "channel_code", "creator", "create_time", "updater", "update_time", "deleted") VALUES (10, 2, 0, 'bpm_process_instance_reject', '【工作流】流程被不通过', '您的流程被审批不通过：{processInstanceName}，原因：{reason}，查看链接：{detailUrl}', '["processInstanceName","reason","detailUrl"]', NULL, 'suibian', 4, 'DEBUG_DING_TALK', '1', '2022-01-22 00:03:31', '1', '2022-01-22 00:24:31', 0);
 INSERT INTO "system_sms_template" ("id", "type", "status", "code", "name", "content", "params", "remark", "api_template_id", "channel_id", "channel_code", "creator", "create_time", "updater", "update_time", "deleted") VALUES (13, 1, 0, 'admin-sms-login', '后台用户短信登录', '您的验证码是{code}', '["code"]', '', '4372216', 1, 'YUN_PIAN', '1', '2021-10-11 08:10:00', '1', '2021-10-11 08:10:00', 0);
 COMMIT;
 
@@ -3702,12 +3953,12 @@ COMMENT ON TABLE "system_user_role" IS '用户和角色关联表';
 -- Records of system_user_role
 -- ----------------------------
 BEGIN;
-INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (1, 1, 1, '', NULL, '', NULL, 0, 1);
-INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (2, 2, 2, '', NULL, '', NULL, 0, 1);
-INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (4, 100, 101, '', NULL, '', NULL, 0, 1);
-INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (5, 100, 1, '', NULL, '', NULL, 0, 1);
-INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (6, 100, 2, '', NULL, '', NULL, 0, 1);
-INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (7, 104, 101, '', NULL, '', NULL, 0, 1);
+INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (1, 1, 1, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:17', 0, 1);
+INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (2, 2, 2, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:13', 0, 1);
+INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (4, 100, 101, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:13', 0, 1);
+INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (5, 100, 1, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:12', 0, 1);
+INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (6, 100, 2, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:11', 0, 1);
+INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (7, 104, 101, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:11', 0, 1);
 INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (10, 103, 1, '1', '2022-01-11 13:19:45', '1', '2022-01-11 13:19:45', 0, 1);
 INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (11, 107, 106, '1', '2022-02-20 22:59:33', '1', '2022-02-20 22:59:33', 0, 118);
 INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (12, 108, 107, '1', '2022-02-20 23:00:50', '1', '2022-02-20 23:00:50', 0, 119);
@@ -3716,21 +3967,28 @@ INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_t
 INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (15, 111, 110, '110', '2022-02-23 13:14:38', '110', '2022-02-23 13:14:38', 0, 121);
 INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (16, 113, 111, '1', '2022-03-07 21:37:58', '1', '2022-03-07 21:37:58', 0, 122);
 INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (17, 114, 101, '1', '2022-03-19 21:51:13', '1', '2022-03-19 21:51:13', 0, 1);
+INSERT INTO "system_user_role" ("id", "user_id", "role_id", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (18, 1, 2, '1', '2022-05-12 20:39:29', '1', '2022-05-12 20:39:29', 0, 1);
 COMMIT;
 
 -- ----------------------------
--- Table structure for system_user_session
+-- Table structure for system_users
 -- ----------------------------
-DROP TABLE IF EXISTS "system_user_session";
-CREATE TABLE "system_user_session" (
+DROP TABLE IF EXISTS "system_users";
+CREATE TABLE "system_users" (
   "id" int8 NOT NULL,
-  "token" varchar(32) COLLATE "pg_catalog"."default" NOT NULL,
-  "user_id" int8 NOT NULL,
-  "user_type" int2 NOT NULL,
-  "session_timeout" timestamp(6) NOT NULL,
   "username" varchar(30) COLLATE "pg_catalog"."default" NOT NULL,
-  "user_ip" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "user_agent" varchar(512) COLLATE "pg_catalog"."default" NOT NULL,
+  "password" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
+  "nickname" varchar(30) COLLATE "pg_catalog"."default" NOT NULL,
+  "remark" varchar(500) COLLATE "pg_catalog"."default",
+  "dept_id" int8,
+  "post_ids" varchar(255) COLLATE "pg_catalog"."default",
+  "email" varchar(50) COLLATE "pg_catalog"."default",
+  "mobile" varchar(11) COLLATE "pg_catalog"."default",
+  "sex" int2,
+  "avatar" varchar(100) COLLATE "pg_catalog"."default",
+  "status" int2 NOT NULL,
+  "login_ip" varchar(50) COLLATE "pg_catalog"."default",
+  "login_date" timestamp(6),
   "creator" varchar(64) COLLATE "pg_catalog"."default",
   "create_time" timestamp(6) NOT NULL,
   "updater" varchar(64) COLLATE "pg_catalog"."default",
@@ -3739,18 +3997,780 @@ CREATE TABLE "system_user_session" (
   "tenant_id" int8 NOT NULL DEFAULT 0
 )
 ;
-COMMENT ON COLUMN "system_user_session"."id" IS '会话编号';
-COMMENT ON COLUMN "system_user_session"."token" IS 'Token 令牌';
-COMMENT ON COLUMN "system_user_session"."user_id" IS '用户编号';
-COMMENT ON COLUMN "system_user_session"."user_type" IS '用户类型';
-COMMENT ON COLUMN "system_user_session"."session_timeout" IS '会话超时时间';
-COMMENT ON COLUMN "system_user_session"."username" IS '用户账号';
-COMMENT ON COLUMN "system_user_session"."user_ip" IS '用户 IP';
-COMMENT ON COLUMN "system_user_session"."user_agent" IS '浏览器 UA';
-COMMENT ON COLUMN "system_user_session"."creator" IS '创建者';
-COMMENT ON COLUMN "system_user_session"."create_time" IS '创建时间';
-COMMENT ON COLUMN "system_user_session"."updater" IS '更新者';
-COMMENT ON COLUMN "system_user_session"."update_time" IS '更新时间';
-COMMENT ON COLUMN "system_user_session"."deleted" IS '是否删除';
-COMMENT ON COLUMN "system_user_session"."tenant_id" IS '租户编号';
-COMMENT ON TABLE "system_user_session" IS '用户在线 Session';
+COMMENT ON COLUMN "system_users"."id" IS '用户ID';
+COMMENT ON COLUMN "system_users"."username" IS '用户账号';
+COMMENT ON COLUMN "system_users"."password" IS '密码';
+COMMENT ON COLUMN "system_users"."nickname" IS '用户昵称';
+COMMENT ON COLUMN "system_users"."remark" IS '备注';
+COMMENT ON COLUMN "system_users"."dept_id" IS '部门ID';
+COMMENT ON COLUMN "system_users"."post_ids" IS '岗位编号数组';
+COMMENT ON COLUMN "system_users"."email" IS '用户邮箱';
+COMMENT ON COLUMN "system_users"."mobile" IS '手机号码';
+COMMENT ON COLUMN "system_users"."sex" IS '用户性别';
+COMMENT ON COLUMN "system_users"."avatar" IS '头像地址';
+COMMENT ON COLUMN "system_users"."status" IS '帐号状态（0正常 1停用）';
+COMMENT ON COLUMN "system_users"."login_ip" IS '最后登录IP';
+COMMENT ON COLUMN "system_users"."login_date" IS '最后登录时间';
+COMMENT ON COLUMN "system_users"."creator" IS '创建者';
+COMMENT ON COLUMN "system_users"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_users"."updater" IS '更新者';
+COMMENT ON COLUMN "system_users"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_users"."deleted" IS '是否删除';
+COMMENT ON COLUMN "system_users"."tenant_id" IS '租户编号';
+COMMENT ON TABLE "system_users" IS '用户信息表';
+
+-- ----------------------------
+-- Records of system_users
+-- ----------------------------
+BEGIN;
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (100, 'yudao', '$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', '芋道', '不要吓我', 104, '[1]', 'yudao@iocoder.cn', '15601691300', 1, '', 1, '', NULL, '', '2021-01-07 09:07:17', '104', '2021-12-16 09:26:10', 0, 1);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (103, 'yuanma', '$2a$10$wWoPT7sqriM2O1YXRL.je.GiL538OR6ZTN8aQZr9JAGdnpCH2tpYe', '源码', NULL, 106, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '127.0.0.1', '2022-01-18 00:33:40', '', '2021-01-13 23:50:35', NULL, '2022-01-18 00:33:40', 0, 1);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (104, 'test', '$2a$10$e5RpuDCC0GYSt0Hvd2.CjujIXwgGct4SnXi6dVGxdgFsnqgEryk5a', '测试号', NULL, 107, '[]', '111@qq.com', '15601691200', 1, '', 0, '127.0.0.1', '2022-03-19 21:46:19', '', '2021-01-21 02:13:53', NULL, '2022-03-19 21:46:19', 0, 1);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (107, 'admin107', '$2a$10$dYOOBKMO93v/.ReCqzyFg.o67Tqk.bbc2bhrpyBGkIw9aypCtr2pm', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, '', 0, '', NULL, '1', '2022-02-20 22:59:33', '1', '2022-02-27 08:26:51', 0, 118);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (108, 'admin108', '$2a$10$y6mfvKoNYL1GXWak8nYwVOH.kCWqjactkzdoIDgiKl93WN3Ejg.Lu', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, '', 0, '', NULL, '1', '2022-02-20 23:00:50', '1', '2022-02-27 08:26:53', 0, 119);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (109, 'admin109', '$2a$10$JAqvH0tEc0I7dfDVBI7zyuB4E3j.uH6daIjV53.vUS6PknFkDJkuK', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, '', 0, '', NULL, '1', '2022-02-20 23:11:50', '1', '2022-02-27 08:26:56', 0, 120);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (110, 'admin110', '$2a$10$qYxoXs0ogPHgYllyEneYde9xcCW5hZgukrxeXZ9lmLhKse8TK6IwW', '小王', NULL, NULL, NULL, '', '15601691300', 0, '', 0, '127.0.0.1', '2022-02-23 19:36:28', '1', '2022-02-22 00:56:14', NULL, '2022-02-27 08:26:59', 0, 121);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (111, 'test', '$2a$10$mExveopHUx9Q4QiLtAzhDeH3n4/QlNLzEsM4AqgxKrU.ciUZDXZCy', '测试用户', NULL, NULL, '[]', '', '', 0, '', 0, '', NULL, '110', '2022-02-23 13:14:33', '110', '2022-02-23 13:14:33', 0, 121);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (112, 'newobject', '$2a$10$jh5MsR.ud/gKe3mVeUp5t.nEXGDSmHyv5OYjWQwHO8wlGmMSI9Twy', '新对象', NULL, NULL, '[]', '', '', 0, '', 0, '', NULL, '1', '2022-02-23 19:08:03', '1', '2022-02-23 19:08:03', 0, 1);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (113, 'aoteman', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道', NULL, NULL, NULL, '', '15601691300', 0, '', 0, '127.0.0.1', '2022-03-19 18:38:51', '1', '2022-03-07 21:37:58', NULL, '2022-03-19 18:38:51', 0, 122);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (114, 'hrmgr', '$2a$10$TR4eybBioGRhBmDBWkqWLO6NIh3mzYa8KBKDDB5woiGYFVlRAi.fu', 'hr 小姐姐', NULL, NULL, '[3]', '', '', 0, '', 0, '127.0.0.1', '2022-03-19 22:15:43', '1', '2022-03-19 21:50:58', NULL, '2022-03-19 22:15:43', 0, 1);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (115, 'aotemane', '$2a$10$/WCwGHu1eq0wOVDd/u8HweJ0gJCHyLS6T7ndCqI8UXZAQom1etk2e', '1', '11', 100, '[]', '', '', 0, '', 0, '', NULL, '1', '2022-04-30 02:55:43', '1', '2022-04-30 02:55:43', 0, 1);
+INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://test.yudao.iocoder.cn/48934f2f-92d4-4250-b917-d10d2b262c6a', 0, '127.0.0.1', '2022-05-25 23:44:33.003', 'admin', '2021-01-05 17:03:47', NULL, '2022-05-25 23:44:33.003', 0, 1);
+COMMIT;
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"bpm_oa_leave_seq"', 1, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"bpm_task_assign_rule_seq"', 1, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"infra_api_access_log_seq"', 537, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"infra_api_error_log_seq"', 73, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"infra_job_log_seq"', 1, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"infra_job_seq"', 2, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"system_error_code_seq"', 186, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"system_login_log_seq"', 23, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"system_oauth2_access_token_seq"', 11, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"system_oauth2_approve_seq"', 4, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"system_oauth2_client_seq"', 1, false);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"system_oauth2_code_seq"', 4, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"system_oauth2_refresh_token_seq"', 1, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"system_operate_log_seq"', 44, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+SELECT setval('"system_sms_log_seq"', 1, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+
+-- ----------------------------
+-- Primary Key structure for table bpm_form
+-- ----------------------------
+ALTER TABLE "bpm_form" ADD CONSTRAINT "bpm_form_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table bpm_oa_leave
+-- ----------------------------
+ALTER TABLE "bpm_oa_leave" ADD CONSTRAINT "bpm_oa_leave_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table bpm_process_definition_ext
+-- ----------------------------
+ALTER TABLE "bpm_process_definition_ext" ADD CONSTRAINT "bpm_process_definition_ext_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table bpm_process_instance_ext
+-- ----------------------------
+ALTER TABLE "bpm_process_instance_ext" ADD CONSTRAINT "bpm_process_instance_ext_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table bpm_task_assign_rule
+-- ----------------------------
+ALTER TABLE "bpm_task_assign_rule" ADD CONSTRAINT "bpm_task_assign_rule_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table bpm_task_ext
+-- ----------------------------
+ALTER TABLE "bpm_task_ext" ADD CONSTRAINT "bpm_task_ext_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table bpm_user_group
+-- ----------------------------
+ALTER TABLE "bpm_user_group" ADD CONSTRAINT "bpm_user_group_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_api_access_log
+-- ----------------------------
+ALTER TABLE "infra_api_access_log" ADD CONSTRAINT "infra_api_access_log_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_api_error_log
+-- ----------------------------
+ALTER TABLE "infra_api_error_log" ADD CONSTRAINT "infra_api_error_log_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_codegen_column
+-- ----------------------------
+ALTER TABLE "infra_codegen_column" ADD CONSTRAINT "infra_codegen_column_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_codegen_table
+-- ----------------------------
+ALTER TABLE "infra_codegen_table" ADD CONSTRAINT "infra_codegen_table_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_config
+-- ----------------------------
+ALTER TABLE "infra_config" ADD CONSTRAINT "infra_config_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_data_source_config
+-- ----------------------------
+ALTER TABLE "infra_data_source_config" ADD CONSTRAINT "infra_data_source_config_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_file
+-- ----------------------------
+ALTER TABLE "infra_file" ADD CONSTRAINT "infra_file_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_file_config
+-- ----------------------------
+ALTER TABLE "infra_file_config" ADD CONSTRAINT "infra_file_config_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_file_content
+-- ----------------------------
+ALTER TABLE "infra_file_content" ADD CONSTRAINT "infra_file_content_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_job
+-- ----------------------------
+ALTER TABLE "infra_job" ADD CONSTRAINT "infra_job_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_job_log
+-- ----------------------------
+ALTER TABLE "infra_job_log" ADD CONSTRAINT "infra_job_log_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table infra_test_demo
+-- ----------------------------
+ALTER TABLE "infra_test_demo" ADD CONSTRAINT "infra_test_demo_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Indexes structure for table member_user
+-- ----------------------------
+CREATE UNIQUE INDEX "uk_mobile" ON "member_user" USING btree (
+  "mobile" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+COMMENT ON INDEX "uk_mobile" IS '手机号';
+
+-- ----------------------------
+-- Primary Key structure for table member_user
+-- ----------------------------
+ALTER TABLE "member_user" ADD CONSTRAINT "member_user_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table pay_app
+-- ----------------------------
+ALTER TABLE "pay_app" ADD CONSTRAINT "pay_app_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table pay_channel
+-- ----------------------------
+ALTER TABLE "pay_channel" ADD CONSTRAINT "pay_channel_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table pay_merchant
+-- ----------------------------
+ALTER TABLE "pay_merchant" ADD CONSTRAINT "pay_merchant_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table pay_notify_log
+-- ----------------------------
+ALTER TABLE "pay_notify_log" ADD CONSTRAINT "pay_notify_log_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table pay_notify_task
+-- ----------------------------
+ALTER TABLE "pay_notify_task" ADD CONSTRAINT "pay_notify_task_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table pay_order
+-- ----------------------------
+ALTER TABLE "pay_order" ADD CONSTRAINT "pay_order_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table pay_order_extension
+-- ----------------------------
+ALTER TABLE "pay_order_extension" ADD CONSTRAINT "pay_order_extension_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table pay_refund
+-- ----------------------------
+ALTER TABLE "pay_refund" ADD CONSTRAINT "pay_refund_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table qrtz_blob_triggers
+-- ----------------------------
+ALTER TABLE "qrtz_blob_triggers" ADD CONSTRAINT "qrtz_blob_triggers_pkey" PRIMARY KEY ("sched_name", "trigger_name", "trigger_group");
+
+-- ----------------------------
+-- Primary Key structure for table qrtz_calendars
+-- ----------------------------
+ALTER TABLE "qrtz_calendars" ADD CONSTRAINT "qrtz_calendars_pkey" PRIMARY KEY ("sched_name", "calendar_name");
+
+-- ----------------------------
+-- Primary Key structure for table qrtz_cron_triggers
+-- ----------------------------
+ALTER TABLE "qrtz_cron_triggers" ADD CONSTRAINT "qrtz_cron_triggers_pkey" PRIMARY KEY ("sched_name", "trigger_name", "trigger_group");
+
+-- ----------------------------
+-- Indexes structure for table qrtz_fired_triggers
+-- ----------------------------
+CREATE INDEX "idx_qrtz_ft_inst_job_req_rcvry" ON "qrtz_fired_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "instance_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "requests_recovery" "pg_catalog"."bool_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_ft_j_g" ON "qrtz_fired_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "job_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "job_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_ft_jg" ON "qrtz_fired_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "job_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_ft_t_g" ON "qrtz_fired_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_ft_tg" ON "qrtz_fired_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_ft_trig_inst_name" ON "qrtz_fired_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "instance_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+
+-- ----------------------------
+-- Primary Key structure for table qrtz_fired_triggers
+-- ----------------------------
+ALTER TABLE "qrtz_fired_triggers" ADD CONSTRAINT "qrtz_fired_triggers_pkey" PRIMARY KEY ("sched_name", "entry_id");
+
+-- ----------------------------
+-- Indexes structure for table qrtz_job_details
+-- ----------------------------
+CREATE INDEX "idx_qrtz_j_grp" ON "qrtz_job_details" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "job_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_j_req_recovery" ON "qrtz_job_details" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "requests_recovery" "pg_catalog"."bool_ops" ASC NULLS LAST
+);
+
+-- ----------------------------
+-- Primary Key structure for table qrtz_job_details
+-- ----------------------------
+ALTER TABLE "qrtz_job_details" ADD CONSTRAINT "qrtz_job_details_pkey" PRIMARY KEY ("sched_name", "job_name", "job_group");
+
+-- ----------------------------
+-- Primary Key structure for table qrtz_locks
+-- ----------------------------
+ALTER TABLE "qrtz_locks" ADD CONSTRAINT "qrtz_locks_pkey" PRIMARY KEY ("sched_name", "lock_name");
+
+-- ----------------------------
+-- Primary Key structure for table qrtz_paused_trigger_grps
+-- ----------------------------
+ALTER TABLE "qrtz_paused_trigger_grps" ADD CONSTRAINT "qrtz_paused_trigger_grps_pkey" PRIMARY KEY ("sched_name", "trigger_group");
+
+-- ----------------------------
+-- Primary Key structure for table qrtz_scheduler_state
+-- ----------------------------
+ALTER TABLE "qrtz_scheduler_state" ADD CONSTRAINT "qrtz_scheduler_state_pkey" PRIMARY KEY ("sched_name", "instance_name");
+
+-- ----------------------------
+-- Primary Key structure for table qrtz_simple_triggers
+-- ----------------------------
+ALTER TABLE "qrtz_simple_triggers" ADD CONSTRAINT "qrtz_simple_triggers_pkey" PRIMARY KEY ("sched_name", "trigger_name", "trigger_group");
+
+-- ----------------------------
+-- Primary Key structure for table qrtz_simprop_triggers
+-- ----------------------------
+ALTER TABLE "qrtz_simprop_triggers" ADD CONSTRAINT "qrtz_simprop_triggers_pkey" PRIMARY KEY ("sched_name", "trigger_name", "trigger_group");
+
+-- ----------------------------
+-- Indexes structure for table qrtz_triggers
+-- ----------------------------
+CREATE INDEX "idx_qrtz_t_c" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "calendar_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_t_g" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_t_j" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "job_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "job_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_t_jg" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "job_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_t_n_g_state" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_state" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_t_n_state" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_state" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_t_next_fire_time" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "next_fire_time" "pg_catalog"."int8_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_t_nft_misfire" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "misfire_instr" "pg_catalog"."int2_ops" ASC NULLS LAST,
+  "next_fire_time" "pg_catalog"."int8_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_t_nft_st" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_state" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "next_fire_time" "pg_catalog"."int8_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_t_nft_st_misfire" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "misfire_instr" "pg_catalog"."int2_ops" ASC NULLS LAST,
+  "next_fire_time" "pg_catalog"."int8_ops" ASC NULLS LAST,
+  "trigger_state" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_t_nft_st_misfire_grp" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "misfire_instr" "pg_catalog"."int2_ops" ASC NULLS LAST,
+  "next_fire_time" "pg_catalog"."int8_ops" ASC NULLS LAST,
+  "trigger_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_state" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "idx_qrtz_t_state" ON "qrtz_triggers" USING btree (
+  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "trigger_state" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+
+-- ----------------------------
+-- Primary Key structure for table qrtz_triggers
+-- ----------------------------
+ALTER TABLE "qrtz_triggers" ADD CONSTRAINT "qrtz_triggers_pkey" PRIMARY KEY ("sched_name", "trigger_name", "trigger_group");
+
+-- ----------------------------
+-- Primary Key structure for table system_dept
+-- ----------------------------
+ALTER TABLE "system_dept" ADD CONSTRAINT "system_dept_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_dict_data
+-- ----------------------------
+ALTER TABLE "system_dict_data" ADD CONSTRAINT "system_dict_data_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Indexes structure for table system_dict_type
+-- ----------------------------
+CREATE UNIQUE INDEX "dict_type" ON "system_dict_type" USING btree (
+  "type" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+
+-- ----------------------------
+-- Primary Key structure for table system_dict_type
+-- ----------------------------
+ALTER TABLE "system_dict_type" ADD CONSTRAINT "system_dict_type_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_error_code
+-- ----------------------------
+ALTER TABLE "system_error_code" ADD CONSTRAINT "system_error_code_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_login_log
+-- ----------------------------
+ALTER TABLE "system_login_log" ADD CONSTRAINT "system_login_log_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_menu
+-- ----------------------------
+ALTER TABLE "system_menu" ADD CONSTRAINT "system_menu_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_notice
+-- ----------------------------
+ALTER TABLE "system_notice" ADD CONSTRAINT "system_notice_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_oauth2_access_token
+-- ----------------------------
+ALTER TABLE "system_oauth2_access_token" ADD CONSTRAINT "system_oauth2_access_token_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_oauth2_approve
+-- ----------------------------
+ALTER TABLE "system_oauth2_approve" ADD CONSTRAINT "system_oauth2_approve_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_oauth2_client
+-- ----------------------------
+ALTER TABLE "system_oauth2_client" ADD CONSTRAINT "system_oauth2_client_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_oauth2_code
+-- ----------------------------
+ALTER TABLE "system_oauth2_code" ADD CONSTRAINT "system_oauth2_code_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_oauth2_refresh_token
+-- ----------------------------
+ALTER TABLE "system_oauth2_refresh_token" ADD CONSTRAINT "system_oauth2_refresh_token_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_operate_log
+-- ----------------------------
+ALTER TABLE "system_operate_log" ADD CONSTRAINT "system_operate_log_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_post
+-- ----------------------------
+ALTER TABLE "system_post" ADD CONSTRAINT "system_post_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_role
+-- ----------------------------
+ALTER TABLE "system_role" ADD CONSTRAINT "system_role_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_role_menu
+-- ----------------------------
+ALTER TABLE "system_role_menu" ADD CONSTRAINT "system_role_menu_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_sensitive_word
+-- ----------------------------
+ALTER TABLE "system_sensitive_word" ADD CONSTRAINT "system_sensitive_word_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_sms_channel
+-- ----------------------------
+ALTER TABLE "system_sms_channel" ADD CONSTRAINT "system_sms_channel_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Indexes structure for table system_sms_code
+-- ----------------------------
+CREATE INDEX "idx_mobile" ON "system_sms_code" USING btree (
+  "mobile" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+COMMENT ON INDEX "idx_mobile" IS '手机号';
+
+-- ----------------------------
+-- Primary Key structure for table system_sms_code
+-- ----------------------------
+ALTER TABLE "system_sms_code" ADD CONSTRAINT "system_sms_code_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_sms_log
+-- ----------------------------
+ALTER TABLE "system_sms_log" ADD CONSTRAINT "system_sms_log_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_sms_template
+-- ----------------------------
+ALTER TABLE "system_sms_template" ADD CONSTRAINT "system_sms_template_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_social_user
+-- ----------------------------
+ALTER TABLE "system_social_user" ADD CONSTRAINT "system_social_user_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_social_user_bind
+-- ----------------------------
+ALTER TABLE "system_social_user_bind" ADD CONSTRAINT "system_social_user_bind_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_tenant
+-- ----------------------------
+ALTER TABLE "system_tenant" ADD CONSTRAINT "system_tenant_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_tenant_package
+-- ----------------------------
+ALTER TABLE "system_tenant_package" ADD CONSTRAINT "system_tenant_package_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_user_post
+-- ----------------------------
+ALTER TABLE "system_user_post" ADD CONSTRAINT "system_user_post_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table system_user_role
+-- ----------------------------
+ALTER TABLE "system_user_role" ADD CONSTRAINT "system_user_role_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Indexes structure for table system_users
+-- ----------------------------
+CREATE UNIQUE INDEX "idx_username" ON "system_users" USING btree (
+  "username" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+  "update_time" "pg_catalog"."timestamp_ops" ASC NULLS LAST,
+  "tenant_id" "pg_catalog"."int8_ops" ASC NULLS LAST
+);
+
+-- ----------------------------
+-- Primary Key structure for table system_users
+-- ----------------------------
+ALTER TABLE "system_users" ADD CONSTRAINT "system_user_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Foreign Keys structure for table qrtz_blob_triggers
+-- ----------------------------
+ALTER TABLE "qrtz_blob_triggers" ADD CONSTRAINT "qrtz_blob_triggers_sched_name_trigger_name_trigger_group_fkey" FOREIGN KEY ("sched_name", "trigger_name", "trigger_group") REFERENCES "qrtz_triggers" ("sched_name", "trigger_name", "trigger_group") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- ----------------------------
+-- Foreign Keys structure for table qrtz_cron_triggers
+-- ----------------------------
+ALTER TABLE "qrtz_cron_triggers" ADD CONSTRAINT "qrtz_cron_triggers_sched_name_trigger_name_trigger_group_fkey" FOREIGN KEY ("sched_name", "trigger_name", "trigger_group") REFERENCES "qrtz_triggers" ("sched_name", "trigger_name", "trigger_group") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- ----------------------------
+-- Foreign Keys structure for table qrtz_simple_triggers
+-- ----------------------------
+ALTER TABLE "qrtz_simple_triggers" ADD CONSTRAINT "qrtz_simple_triggers_sched_name_trigger_name_trigger_group_fkey" FOREIGN KEY ("sched_name", "trigger_name", "trigger_group") REFERENCES "qrtz_triggers" ("sched_name", "trigger_name", "trigger_group") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- ----------------------------
+-- Foreign Keys structure for table qrtz_simprop_triggers
+-- ----------------------------
+ALTER TABLE "qrtz_simprop_triggers" ADD CONSTRAINT "qrtz_simprop_triggers_sched_name_trigger_name_trigger_grou_fkey" FOREIGN KEY ("sched_name", "trigger_name", "trigger_group") REFERENCES "qrtz_triggers" ("sched_name", "trigger_name", "trigger_group") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- ----------------------------
+-- Foreign Keys structure for table qrtz_triggers
+-- ----------------------------
+ALTER TABLE "qrtz_triggers" ADD CONSTRAINT "qrtz_triggers_sched_name_job_name_job_group_fkey" FOREIGN KEY ("sched_name", "job_name", "job_group") REFERENCES "qrtz_job_details" ("sched_name", "job_name", "job_group") ON DELETE NO ACTION ON UPDATE NO ACTION;

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.pay.service.notify;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.http.HttpUtil;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyLogDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyTaskDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
@@ -29,12 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import static cn.iocoder.yudao.module.pay.framework.job.config.PayJobConfiguration.NOTIFY_THREAD_POOL_TASK_EXECUTOR;
 
 /**
  * 支付通知 Core Service 实现类
@@ -67,8 +69,8 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     @Resource
     private PayNotifyLogCoreMapper payNotifyLogCoreMapper;
 
-    @Resource
-    private ThreadPoolTaskExecutor threadPoolTaskExecutor; // TODO 芋艿：未来提供独立的线程池
+    @Resource(name = NOTIFY_THREAD_POOL_TASK_EXECUTOR)
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Resource
     private PayNotifyLockRedisDAO payNotifyLockCoreRedisDAO;
@@ -81,7 +83,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     public void createPayNotifyTask(PayNotifyTaskCreateReqDTO reqDTO) {
         PayNotifyTaskDO task = new PayNotifyTaskDO();
         task.setType(reqDTO.getType()).setDataId(reqDTO.getDataId());
-        task.setStatus(PayNotifyStatusEnum.WAITING.getStatus()).setNextNotifyTime(new Date())
+        task.setStatus(PayNotifyStatusEnum.WAITING.getStatus()).setNextNotifyTime(LocalDateTime.now())
                 .setNotifyTimes(0).setMaxNotifyTimes(PayNotifyTaskDO.NOTIFY_FREQUENCY.length + 1);
         // 补充 merchantId + appId + notifyUrl 字段
         if (Objects.equals(task.getType(), PayNotifyTypeEnum.ORDER.getType())) {
@@ -119,7 +121,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             }
         }));
         // 等待完成
-        this.awaitExecuteNotify(latch);
+        awaitExecuteNotify(latch);
         // 返回执行完成的任务数（成功 + 失败)
         return tasks.size();
     }
@@ -163,7 +165,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             // 校验，当前任务是否已经被通知过
             // 虽然已经通过分布式加锁，但是可能同时满足通知的条件，然后都去获得锁。此时，第一个执行完后，第二个还是能拿到锁，然后会再执行一次。
             PayNotifyTaskDO dbTask = payNotifyTaskCoreMapper.selectById(task.getId());
-            if (DateUtils.afterNow(dbTask.getNextNotifyTime())) {
+            if (LocalDateTimeUtils.afterNow(dbTask.getNextNotifyTime())) {
                 log.info("[executeNotify][dbTask({}) 任务被忽略，原因是未到达下次通知时间，可能是因为并发执行了]", JsonUtils.toJsonString(dbTask));
                 return;
             }
@@ -230,7 +232,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         // 设置通用的更新 PayNotifyTaskDO 的字段
         PayNotifyTaskDO updateTask = new PayNotifyTaskDO()
                 .setId(task.getId())
-                .setLastExecuteTime(new Date())
+                .setLastExecuteTime(LocalDateTime.now())
                 .setNotifyTimes(task.getNotifyTimes() + 1);
 
         // 情况一：调用成功
@@ -245,7 +247,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             return updateTask.getStatus();
         }
         // 2.2 未超过最大回调次数
-        updateTask.setNextNotifyTime(DateUtils.addDate(Calendar.SECOND, PayNotifyTaskDO.NOTIFY_FREQUENCY[updateTask.getNotifyTimes()]));
+        updateTask.setNextNotifyTime(LocalDateTime.now().plusSeconds(PayNotifyTaskDO.NOTIFY_FREQUENCY[updateTask.getNotifyTimes()]));
         updateTask.setStatus(invokeException != null ? PayNotifyStatusEnum.REQUEST_FAILURE.getStatus()
                 : PayNotifyStatusEnum.REQUEST_SUCCESS.getStatus());
         return updateTask.getStatus();

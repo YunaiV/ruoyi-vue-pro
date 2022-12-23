@@ -2,6 +2,14 @@ package ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.busines
 
 import lombok.*;
 import java.util.*;
+#foreach ($column in $columns)
+#if (${column.javaType} == "BigDecimal")
+import java.math.BigDecimal;
+#end
+#if (${column.javaType} == "LocalDateTime")
+import java.time.LocalDateTime;
+#end
+#end
 import com.baomidou.mybatisplus.annotation.*;
 import ${BaseDOClassName};
 
@@ -30,7 +38,7 @@ public class ${table.className}DO extends BaseDO {
     #end
      */
     #if (${column.primaryKey})##处理主键
-    @TableId#if (${column.javaType} == 'String')type = IdType.INPUT)#end
+    @TableId#if (${column.javaType} == 'String')(type = IdType.INPUT)#end
     #end
     private ${column.javaType} ${column.javaField};
 #end

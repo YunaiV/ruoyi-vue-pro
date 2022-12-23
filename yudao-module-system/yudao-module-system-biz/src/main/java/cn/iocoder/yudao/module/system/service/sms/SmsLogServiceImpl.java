@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,13 +61,13 @@ public class SmsLogServiceImpl implements SmsLogService {
         SmsSendStatusEnum sendStatus = CommonResult.isSuccess(sendCode) ?
                 SmsSendStatusEnum.SUCCESS : SmsSendStatusEnum.FAILURE;
         smsLogMapper.updateById(SmsLogDO.builder().id(id).sendStatus(sendStatus.getStatus())
-                .sendTime(new Date()).sendCode(sendCode).sendMsg(sendMsg)
+                .sendTime(LocalDateTime.now()).sendCode(sendCode).sendMsg(sendMsg)
                 .apiSendCode(apiSendCode).apiSendMsg(apiSendMsg)
                 .apiRequestId(apiRequestId).apiSerialNo(apiSerialNo).build());
     }
 
     @Override
-    public void updateSmsReceiveResult(Long id, Boolean success, Date receiveTime,
+    public void updateSmsReceiveResult(Long id, Boolean success, LocalDateTime receiveTime,
                                        String apiReceiveCode, String apiReceiveMsg) {
         SmsReceiveStatusEnum receiveStatus = Objects.equals(success, true) ?
                 SmsReceiveStatusEnum.SUCCESS : SmsReceiveStatusEnum.FAILURE;

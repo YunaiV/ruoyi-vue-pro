@@ -1,15 +1,10 @@
 package cn.iocoder.yudao.framework.common.util.collection;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.TypeUtil;
-import org.springframework.cglib.core.TypeUtils;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -50,7 +45,14 @@ public class ArrayUtils {
         if (CollectionUtil.isEmpty(from)) {
             return (T[]) (new Object[0]);
         }
-        return ArrayUtil.toArray(from, (Class<T>) CollectionUtil.getElementType(from.iterator()));
+        return ArrayUtil.toArray(from, (Class<T>) IterUtil.getElementType(from.iterator()));
+    }
+
+    public static <T> T get(T[] array, int index) {
+        if (null == array || index >= array.length) {
+            return null;
+        }
+        return array[index];
     }
 
 }

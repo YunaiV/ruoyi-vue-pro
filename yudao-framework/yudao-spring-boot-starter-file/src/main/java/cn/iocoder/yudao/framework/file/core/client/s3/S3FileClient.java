@@ -75,16 +75,18 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
         // 阿里云必须有 region，否则会报错
         if (config.getEndpoint().contains(ENDPOINT_ALIYUN)) {
             return StrUtil.subBefore(config.getEndpoint(), '.', false)
-                    .replaceAll("-internal", ""); // 去除内网 Endpoint 的后缀
+                    .replaceAll("-internal", "")// 去除内网 Endpoint 的后缀
+                    .replaceAll("https://", "");
         }
         return null;
     }
 
     @Override
-    public String upload(byte[] content, String path) throws Exception {
+    public String upload(byte[] content, String path, String type) throws Exception {
         // 执行上传
         client.putObject(PutObjectArgs.builder()
                 .bucket(config.getBucket()) // bucket 必须传递
+                .contentType(type)
                 .object(path) // 相对路径作为 key
                 .stream(new ByteArrayInputStream(content), content.length, -1) // 文件内容
                 .build());

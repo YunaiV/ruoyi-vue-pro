@@ -23,6 +23,7 @@ export const DICT_TYPE = {
   SYSTEM_SMS_SEND_STATUS: 'system_sms_send_status',
   SYSTEM_SMS_RECEIVE_STATUS: 'system_sms_receive_status',
   SYSTEM_ERROR_CODE_TYPE: 'system_error_code_type',
+  SYSTEM_OAUTH2_GRANT_TYPE: 'system_oauth2_grant_type',
 
   // ========== INFRA 模块 ==========
   INFRA_BOOLEAN_STRING: 'infra_boolean_string',
@@ -55,6 +56,18 @@ export const DICT_TYPE = {
   PAY_ORDER_REFUND_STATUS: 'pay_order_refund_status', // 商户支付订单退款状态
   PAY_REFUND_ORDER_STATUS: 'pay_refund_order_status', // 退款订单状态
   PAY_REFUND_ORDER_TYPE: 'pay_refund_order_type', // 退款订单类别
+
+  // ========== MALL - PRODUCT 模块 ==========
+  PRODUCT_SPU_STATUS: 'product_spu_status', // 商品 SPU 状态
+
+  // ========== MALL - PROMOTION 模块 ==========
+  PROMOTION_DISCOUNT_TYPE: 'promotion_discount_type', // 优惠类型
+  PROMOTION_PRODUCT_SCOPE: 'promotion_product_scope', // 营销的商品范围
+  PROMOTION_COUPON_TEMPLATE_VALIDITY_TYPE: 'promotion_coupon_template_validity_type', // 优惠劵模板的有限期类型
+  PROMOTION_COUPON_STATUS: 'promotion_coupon_status', // 优惠劵的状态
+  PROMOTION_COUPON_TAKE_TYPE: 'promotion_coupon_take_type', // 优惠劵的领取方式
+  PROMOTION_ACTIVITY_STATUS: 'promotion_activity_status', // 优惠活动的状态
+  PROMOTION_CONDITION_TYPE: 'promotion_condition_type', // 营销的条件类型枚举
 }
 
 /**
@@ -112,7 +125,4 @@ export function getDictData(dictType, value) {
 export function getDictDataLabel(dictType, value) {
   const dict = getDictData(dictType, value);
   return dict ? dict.label : '';
-}
-
-export class getDictDataL {
 }
