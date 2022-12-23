@@ -41,6 +41,9 @@ export const useForm = (props?: FormProps) => {
     setProps: async (props: FormProps = {}) => {
       const form = await getForm()
       form?.setProps(props)
+      if (props.model) {
+        form?.setValues(props.model)
+      }
     },
 
     setValues: async (data: Recordable) => {

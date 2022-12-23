@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -123,7 +123,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
             o.setPayNotifyUrl("https://www.hc.com");
             o.setRefundNotifyUrl("https://www.xm.com");
             o.setMerchantId(merchantId);
-            o.setCreateTime(buildLocalDateTime(2021,11,20));
+            o.setCreateTime(buildTime(2021,11,20));
         });
 
         // mock 数据
@@ -134,7 +134,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
             o.setShortName("灿灿子");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
             o.setRemark("灿哥的杂货铺");
-            o.setCreateTime(buildLocalDateTime(2021,11,3));
+            o.setCreateTime(buildTime(2021,11,3));
         });
 
         Mockito.when(payMerchantMapper.getMerchantListByName(dbMerchant.getName()))
@@ -154,7 +154,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         // 测试 merchantId 不匹配
         appMapper.insert(cloneIgnoreId(dbApp, o -> o.setMerchantId(mismatchMerchantId)));
         // 测试 createTime 不匹配
-        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setCreateTime(buildLocalDateTime(2021,12,21))));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setCreateTime(buildTime(2021,12,21))));
         // 准备参数
         PayAppPageReqVO reqVO = new PayAppPageReqVO();
         reqVO.setName("灿灿姐的杂货铺");
@@ -163,7 +163,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         reqVO.setPayNotifyUrl("https://www.hc.com");
         reqVO.setRefundNotifyUrl("https://www.xm.com");
         reqVO.setMerchantName(dbMerchant.getName());
-        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021,11,19),buildLocalDateTime(2021,11,21)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021,11,19),buildTime(2021,11,21)}));
 
         // 调用
         PageResult<PayAppDO> pageResult = appService.getAppPage(reqVO);
@@ -186,7 +186,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
             o.setPayNotifyUrl("https://www.hc.com");
             o.setRefundNotifyUrl("https://www.xm.com");
             o.setMerchantId(merchantId);
-            o.setCreateTime(buildLocalDateTime(2021,11,20));
+            o.setCreateTime(buildTime(2021,11,20));
         });
 
         // mock 数据
@@ -197,7 +197,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
             o.setShortName("灿灿子");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
             o.setRemark("灿哥的杂货铺");
-            o.setCreateTime(buildLocalDateTime(2021,11,3));
+            o.setCreateTime(buildTime(2021,11,3));
         });
 
         Mockito.when(payMerchantMapper.getMerchantListByName(dbMerchant.getName()))
@@ -217,7 +217,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         // 测试 merchantId 不匹配
         appMapper.insert(cloneIgnoreId(dbApp, o -> o.setMerchantId(mismatchMerchantId)));
         // 测试 createTime 不匹配
-        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setCreateTime(buildLocalDateTime(2021,12,21))));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setCreateTime(buildTime(2021,12,21))));
         // 准备参数
         PayAppExportReqVO reqVO = new PayAppExportReqVO();
         reqVO.setName("灿灿姐的杂货铺");
@@ -226,7 +226,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         reqVO.setPayNotifyUrl("https://www.hc.com");
         reqVO.setRefundNotifyUrl("https://www.xm.com");
         reqVO.setMerchantName(dbMerchant.getName());
-        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021,11,19),buildLocalDateTime(2021,11,21)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021,11,19),buildTime(2021,11,21)}));
 
         // 调用
         List<PayAppDO> list = appService.getAppList(reqVO);

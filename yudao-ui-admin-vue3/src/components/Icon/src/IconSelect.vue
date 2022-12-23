@@ -168,7 +168,7 @@ watch(
 
           <ElPagination
             small
-            :total="copyIconList[currentActiveType].length"
+            :total="copyIconList[currentActiveType].length as unknown as number"
             :page-size="pageSize"
             :current-page="currentPage"
             background
@@ -182,7 +182,7 @@ watch(
   </div>
 </template>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .el-divider--horizontal {
   margin: 1px auto !important;
 }

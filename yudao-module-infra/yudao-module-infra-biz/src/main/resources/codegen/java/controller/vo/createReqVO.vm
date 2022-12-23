@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 #if (${column.createOperation} && (!${column.updateOperation} || !${column.listOperationResult})
     && ${column.javaType} == "LocalDateTime")## 时间类型
 import org.springframework.format.annotation.DateTimeFormat;
-
+import java.time.LocalDateTime;
 import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 #break
 #end

@@ -2,7 +2,7 @@
 import { computed, defineComponent, unref } from 'vue'
 import { useAppStore } from '@/store/modules/app'
 import { Backtop } from '@/components/Backtop'
-import { Setting } from '@/components/Setting'
+import { Setting } from '@/layout/components/Setting'
 import { useRenderLayout } from './components/useRenderLayout'
 import { useDesign } from '@/hooks/web/useDesign'
 
@@ -66,12 +66,12 @@ export default defineComponent({
 })
 </script>
 
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-layout';
+<style lang="scss" scoped>
+$prefix-cls: #{$namespace}-layout;
 
-.@{prefix-cls} {
-  background-color: var(--app-contnet-bg-color);
-  :deep(.@{elNamespace}-scrollbar__view) {
+.#{$prefix-cls} {
+  background-color: var(--app-content-bg-color);
+  :deep(.#{$elNamespace}-scrollbar__view) {
     height: 100% !important;
   }
 }

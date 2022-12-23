@@ -1,6 +1,6 @@
 {
   "name": "yudao-ui-admin",
-  "version": "1.6.4-snapshot",
+  "version": "1.6.5-snapshot",
   "description": "芋道管理系统",
   "author": "芋道",
   "license": "MIT",
@@ -60,7 +60,7 @@
     "screenfull": "5.0.2",
     "sortablejs": "1.10.2",
     "throttle-debounce": "2.1.0",
-    "vue": "2.7.0",
+    "vue": "2.7.14",
     "vue-count-to": "1.0.13",
     "vue-cropper": "0.5.8",
     "vue-meta": "^2.4.0",

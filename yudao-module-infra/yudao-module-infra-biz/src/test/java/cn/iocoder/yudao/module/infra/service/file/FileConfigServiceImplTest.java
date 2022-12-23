@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -219,8 +219,8 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
        FileConfigPageReqVO reqVO = new FileConfigPageReqVO();
        reqVO.setName("芋道");
        reqVO.setStorage(FileStorageEnum.LOCAL.getStorage());
-       reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2020, 1, 1),
-               buildLocalDateTime(2020, 1, 24)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 1, 1),
+               buildTime(2020, 1, 24)}));
 
        // 调用
        PageResult<FileConfigDO> pageResult = fileConfigService.getFileConfigPage(reqVO);
@@ -240,7 +240,7 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         // mock 获得 Client
         FileClient fileClient = mock(FileClient.class);
         when(fileClientFactory.getFileClient(eq(id))).thenReturn(fileClient);
-        when(fileClient.upload(any(), any())).thenReturn("https://www.iocoder.cn");
+        when(fileClient.upload(any(), any(), any())).thenReturn("https://www.iocoder.cn");
 
         // 调用，并断言
         assertEquals("https://www.iocoder.cn", fileConfigService.testFileConfig(id));

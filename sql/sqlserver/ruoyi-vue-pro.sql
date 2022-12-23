@@ -5813,18 +5813,51 @@ IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[sy
 	DROP TABLE [dbo].[system_dict_type]
 GO
 
-CREATE TABLE [dbo].[system_dict_type] (
-  [id] bigint  IDENTITY(1,1) NOT NULL,
-  [name] nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [type] nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [status] tinyint  NOT NULL,
-  [remark] nvarchar(500) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
-  [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
-  [create_time] datetime2(7)  NOT NULL,
-  [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
-  [update_time] datetime2(7)  NOT NULL,
-  [deleted] bit DEFAULT 0 NOT NULL
-)
+CREATE TABLE [dbo].[system_dict_type]
+(
+    [
+    id]
+    bigint
+    IDENTITY
+(
+    1,
+    1
+) NOT NULL,
+    [name] nvarchar
+(
+    100
+) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+    [type] nvarchar
+(
+    100
+) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+    [status] tinyint NOT NULL,
+    [remark] nvarchar
+(
+    500
+) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+    [creator] nvarchar
+(
+    64
+) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+    [create_time] datetime2
+(
+    7
+) NOT NULL,
+    [updater] nvarchar
+(
+    64
+) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+    [update_time] datetime2
+(
+    7
+) NOT NULL,
+    [deleted_time] datetime2
+(
+    7
+),
+    [deleted] bit DEFAULT 0 NOT NULL
+    )
 GO
 
 ALTER TABLE [dbo].[system_dict_type] SET (LOCK_ESCALATION = TABLE)
@@ -5882,26 +5915,29 @@ GO
 EXEC sp_addextendedproperty
 'MS_Description', N'更新者',
 'SCHEMA', N'dbo',
-'TABLE', N'system_dict_type',
-'COLUMN', N'updater'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'更新时间',
-'SCHEMA', N'dbo',
-'TABLE', N'system_dict_type',
-'COLUMN', N'update_time'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'是否删除',
-'SCHEMA', N'dbo',
-'TABLE', N'system_dict_type',
-'COLUMN', N'deleted'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'字典类型表',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'updater'
+    GO
+    EXEC sp_addextendedproperty
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'update_time'
+    GO
+    EXEC sp_addextendedproperty
+    'MS_Description', N'删除时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'deleted_time'
+    GO
+    EXEC sp_addextendedproperty
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'deleted'
+    GO
+    EXEC sp_addextendedproperty
+    'MS_Description', N'字典类型表',
 'SCHEMA', N'dbo',
 'TABLE', N'system_dict_type'
 GO

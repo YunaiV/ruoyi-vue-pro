@@ -2357,38 +2357,58 @@ COMMIT;
 -- Table structure for system_dict_type
 -- ----------------------------
 DROP TABLE IF EXISTS "system_dict_type";
-CREATE TABLE "system_dict_type" (
-  "id" int8 NOT NULL,
-  "name" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "type" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "status" int2 NOT NULL,
-  "remark" varchar(500) COLLATE "pg_catalog"."default",
-  "creator" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6) NOT NULL,
-  "updater" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6) NOT NULL,
-  "deleted" int2 NOT NULL DEFAULT 0
+CREATE TABLE "system_dict_type"(
+                                   "id"           int8                                        NOT NULL,
+                                   "name"         varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
+                                   "type"         varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
+                                   "status"       int2                                        NOT NULL,
+                                   "remark"       varchar(500) COLLATE "pg_catalog"."default",
+                                   "creator"      varchar(64) COLLATE "pg_catalog"."default",
+                                   "create_time"  timestamp(6)                                NOT NULL,
+                                   "updater"      varchar(64) COLLATE "pg_catalog"."default",
+                                   "update_time"  timestamp(6)                                NOT NULL,
+                                   "deleted_time" timestamp(6),
+                                   "deleted"      int2                                        NOT NULL DEFAULT 0
 )
 ;
-COMMENT ON COLUMN "system_dict_type"."id" IS '字典主键';
-COMMENT ON COLUMN "system_dict_type"."name" IS '字典名称';
-COMMENT ON COLUMN "system_dict_type"."type" IS '字典类型';
-COMMENT ON COLUMN "system_dict_type"."status" IS '状态（0正常 1停用）';
-COMMENT ON COLUMN "system_dict_type"."remark" IS '备注';
-COMMENT ON COLUMN "system_dict_type"."creator" IS '创建者';
-COMMENT ON COLUMN "system_dict_type"."create_time" IS '创建时间';
-COMMENT ON COLUMN "system_dict_type"."updater" IS '更新者';
-COMMENT ON COLUMN "system_dict_type"."update_time" IS '更新时间';
-COMMENT ON COLUMN "system_dict_type"."deleted" IS '是否删除';
-COMMENT ON TABLE "system_dict_type" IS '字典类型表';
+COMMENT
+ON COLUMN "system_dict_type"."id" IS '字典主键';
+COMMENT
+ON COLUMN "system_dict_type"."name" IS '字典名称';
+COMMENT
+ON COLUMN "system_dict_type"."type" IS '字典类型';
+COMMENT
+ON COLUMN "system_dict_type"."status" IS '状态（0正常 1停用）';
+COMMENT
+ON COLUMN "system_dict_type"."remark" IS '备注';
+COMMENT
+ON COLUMN "system_dict_type"."creator" IS '创建者';
+COMMENT
+ON COLUMN "system_dict_type"."create_time" IS '创建时间';
+COMMENT
+ON COLUMN "system_dict_type"."updater" IS '更新者';
+COMMENT
+ON COLUMN "system_dict_type"."update_time" IS '更新时间';
+COMMENT
+ON COLUMN "system_dict_type"."deleted_time" IS '删除时间';
+COMMENT
+ON COLUMN "system_dict_type"."deleted" IS '是否删除';
+COMMENT
+ON TABLE "system_dict_type" IS '字典类型表';
 
 -- ----------------------------
 -- Records of system_dict_type
 -- ----------------------------
 BEGIN;
-INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1, '用户性别', 'system_user_sex', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:30:31', 0);
-INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (6, '参数类型', 'infra_config_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:36:54', 0);
-INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (7, '通知类型', 'system_notice_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:35:26', 0);
+INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater",
+                                "update_time", "deleted")
+VALUES (1, '用户性别', 'system_user_sex', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:30:31', 0);
+INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater",
+                                "update_time", "deleted")
+VALUES (6, '参数类型', 'infra_config_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:36:54', 0);
+INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater",
+                                "update_time", "deleted")
+VALUES (7, '通知类型', 'system_notice_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:35:26', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (9, '操作类型', 'system_operate_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '1', '2022-02-16 09:32:21', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (10, '系统状态', 'common_status', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:21:28', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (11, 'Boolean 是否类型', 'infra_boolean_string', 0, 'boolean 转是否', '', '2021-01-19 03:20:08', '', '2022-02-01 16:37:10', 0);

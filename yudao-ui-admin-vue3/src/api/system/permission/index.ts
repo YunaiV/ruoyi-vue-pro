@@ -1,9 +1,20 @@
 import request from '@/config/axios'
-import type {
-  PermissionAssignRoleDataScopeReqVO,
-  PermissionAssignRoleMenuReqVO,
-  PermissionAssignUserRoleReqVO
-} from './types'
+
+export interface PermissionAssignUserRoleReqVO {
+  userId: number
+  roleIds: number[]
+}
+
+export interface PermissionAssignRoleMenuReqVO {
+  roleId: number
+  menuIds: number[]
+}
+
+export interface PermissionAssignRoleDataScopeReqVO {
+  roleId: number
+  dataScope: number
+  dataScopeDeptIds: number[]
+}
 
 // 查询角色拥有的菜单权限
 export const listRoleMenusApi = async (roleId: number) => {

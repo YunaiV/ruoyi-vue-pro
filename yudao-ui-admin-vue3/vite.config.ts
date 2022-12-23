@@ -1,19 +1,9 @@
 import { resolve } from 'path'
 import { loadEnv } from 'vite'
 import type { UserConfig, ConfigEnv } from 'vite'
-import Vue from '@vitejs/plugin-vue'
-import WindiCSS from 'vite-plugin-windicss'
-import VueJsx from '@vitejs/plugin-vue-jsx'
-import EslintPlugin from 'vite-plugin-eslint'
-import VueI18n from '@intlify/vite-plugin-vue-i18n'
-import { createStyleImportPlugin, ElementPlusResolve, VxeTableResolve } from 'vite-plugin-style-import'
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
-import PurgeIcons from 'vite-plugin-purge-icons'
-import { createHtmlPlugin } from 'vite-plugin-html'
-import viteCompression from 'vite-plugin-compression'
-import VueMarcos from 'unplugin-vue-macros/vite'
-
-// 当前执行node命令时文件夹的地址（工作目录）
+import { createVitePlugins } from './build/vite'
+import { include, exclude } from "./build/vite/optimize"
+// 当前执行node命令时文件夹的地址(工作目录)
 const root = process.cwd()
 
 // 路径查找
@@ -40,81 +30,29 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       // 端口号
       port: env.VITE_PORT,
       host: "0.0.0.0",
-      open: env.VITE_OPEN,
+      open: env.VITE_OPEN === 'true',
       // 本地跨域代理
       proxy: {
-        ['/dev-api']: {
+        ['/admin-api']: {
           target: env.VITE_BASE_URL,
           ws: false,
           changeOrigin: true,
-          rewrite: (path) => path.replace(new RegExp(`^/dev-api`), ''),
+          rewrite: (path) => path.replace(new RegExp(`^/admin-api`), ''),
         },
       },
     },
-    plugins: [
-      Vue(),
-      VueJsx(),
-      WindiCSS(),
-      createStyleImportPlugin({
-        resolves: [ElementPlusResolve(),VxeTableResolve()],
-        libs: [{
-          libraryName: 'element-plus',
-          esModule: true,
-          resolveStyle: (name) => {
-            return `element-plus/es/components/${name.substring(3)}/style/css`
-          }
-        },{
-          libraryName: 'vxe-table',
-          esModule: true,
-          resolveStyle: (name) => {
-            return `vxe-table/es/${name}/style.css`
-          }
-        }]
-      }),
-      EslintPlugin({
-        cache: false,
-        include: ['src/**/*.vue', 'src/**/*.ts', 'src/**/*.tsx'] // 检查的文件
-      }),
-      VueI18n({
-        runtimeOnly: true,
-        compositionOnly: true,
-        include: [resolve(__dirname, 'src/locales/**')]
-      }),
-      createSvgIconsPlugin({
-        iconDirs: [pathResolve('src/assets/svgs')],
-        symbolId: 'icon-[dir]-[name]',
-        svgoOptions: true
-      }),
-      PurgeIcons(),
-      VueMarcos(),
-      viteCompression({
-        verbose: true, // 是否在控制台输出压缩结果
-        disable: true, // 是否禁用
-        threshold: 10240, // 体积大于 threshold 才会被压缩,单位 b
-        algorithm: 'gzip', // 压缩算法,可选 [ 'gzip' , 'brotliCompress' ,'deflate' , 'deflateRaw']
-        ext: '.gz', // 生成的压缩包后缀
-        deleteOriginFile: false //压缩后是否删除源文件
-      }),
-      createHtmlPlugin({
-        inject: {
-          data: {
-            title: env.VITE_APP_TITLE,
-            injectScript: `<script src="./inject.js"></script>`
-          }
-        }
-      })
-    ],
-
+    // 项目使用的vite插件。 单独提取到build/vite/plugin中管理
+    plugins: createVitePlugins(env.VITE_APP_TITLE),
     css: {
       preprocessorOptions: {
-        less: {
-          additionalData: '@import "./src/styles/variables.module.less";',
+        scss: {
+          additionalData: '@import "./src/styles/variables.scss";',
           javascriptEnabled: true
         }
       }
     },
     resolve: {
-      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.less', '.css'],
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.scss', '.css'],
       alias: [
         {
           find: 'vue-i18n',
@@ -138,29 +76,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         }
       }
     },
-    optimizeDeps: {
-      include: [
-        'vue',
-        'vue-router',
-        'vue-types',
-        'vue-i18n',
-        'element-plus/es',
-        'element-plus/es/locale/lang/zh-cn',
-        'element-plus/es/locale/lang/en',
-        '@iconify/iconify',
-        '@vueuse/core',
-        'axios',
-        'qs',
-        'dayjs',
-        'echarts',
-        'echarts-wordcloud',
-        'intro.js',
-        'qrcode',
-        'pinia',
-        'crypto-js',
-        '@wangeditor/editor',
-        '@wangeditor/editor-for-vue'
-      ]
-    }
+    optimizeDeps: { include, exclude }
   }
 }

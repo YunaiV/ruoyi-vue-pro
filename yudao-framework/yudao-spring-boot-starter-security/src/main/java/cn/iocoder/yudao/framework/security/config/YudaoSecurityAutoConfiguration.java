@@ -11,9 +11,9 @@ import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +30,7 @@ import javax.annotation.Resource;
  *
  * @author 芋道源码
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(SecurityProperties.class)
 public class YudaoSecurityAutoConfiguration {
 

@@ -236,38 +236,37 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  ::v-deep .order-table{
-    border-bottom: none;
-    &::before{
-      height: 0;
-    }
-    .el-table__row{
-      .el-table__cell{
-        border-bottom: none;
-        .cell{
-          .el-table {
-            .el-table__row{
-              >.el-table__cell{
-                .goods-info{
-                  display: flex;
-                  img{
-                    margin-right: 10px;
-                    width: 60px;
-                    height: 60px;
-                    border: 1px solid #e2e2e2;
-                  }
+::v-deep .order-table{
+  border-bottom: none;
+  &::before{
+    height: 0;
+  }
+  .el-table__row{
+    .el-table__cell{
+      border-bottom: none;
+      .cell{
+        .el-table {
+          .el-table__row{
+            >.el-table__cell{
+              .goods-info{
+                display: flex;
+                img{
+                  margin-right: 10px;
+                  width: 60px;
+                  height: 60px;
+                  border: 1px solid #e2e2e2;
                 }
-                .ellipsis-2{
-                  display: -webkit-box;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  white-space: normal;
-                  -webkit-line-clamp: 2; /* 要显示的行数 */
-                  -webkit-box-orient: vertical;
-                  word-break: break-all;
-                  line-height: 22px !important;
-                  max-height: 44px !important;
-                }
+              }
+              .ellipsis-2{
+                display: -webkit-box;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: normal;
+                -webkit-line-clamp: 2; /* 要显示的行数 */
+                -webkit-box-orient: vertical;
+                word-break: break-all;
+                line-height: 22px !important;
+                max-height: 44px !important;
               }
             }
           }
@@ -275,4 +274,5 @@ export default {
       }
     }
   }
+}
 </style>

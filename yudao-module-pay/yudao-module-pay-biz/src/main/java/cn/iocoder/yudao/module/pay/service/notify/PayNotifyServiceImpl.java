@@ -212,7 +212,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         Object request;
         if (Objects.equals(task.getType(), PayNotifyTypeEnum.ORDER.getType())) {
             request = PayOrderNotifyReqDTO.builder().merchantOrderId(task.getMerchantOrderId())
-                            .payOrderId(task.getDataId()).build();
+                    .payOrderId(task.getDataId()).build();
         } else if (Objects.equals(task.getType(), PayNotifyTypeEnum.REFUND.getType())) {
             request = PayRefundNotifyReqDTO.builder().merchantOrderId(task.getMerchantOrderId())
                     .payRefundId(task.getDataId()).build();

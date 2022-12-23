@@ -21,6 +21,7 @@ import {
 } from 'element-plus'
 import { InputPassword } from '@/components/InputPassword'
 import { Editor } from '@/components/Editor'
+import { UploadImg, UploadImgs, UploadFile } from '@/components/UploadFile'
 import { ComponentName } from '@/types/components'
 
 const componentMap: Recordable<Component, ComponentName> = {
@@ -45,7 +46,10 @@ const componentMap: Recordable<Component, ComponentName> = {
   TreeSelect: ElTreeSelect,
   RadioButton: ElRadioGroup,
   InputPassword: InputPassword,
-  Editor: Editor
+  Editor: Editor,
+  UploadImg: UploadImg,
+  UploadImgs: UploadImgs,
+  UploadFile: UploadFile
 }
 
 export { componentMap }

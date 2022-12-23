@@ -4,22 +4,26 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { DICT_TYPE } from '@/utils/dict'
 import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
+
 // 表单校验
 export const rules = reactive({
   applicationName: [required],
   code: [required],
   message: [required]
 })
+
 // 新增 + 修改
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
   primaryType: 'seq',
+  primaryTitle: '编号',
   action: true,
   columns: [
     {
       title: '错误码类型',
       field: 'type',
       dictType: DICT_TYPE.SYSTEM_ERROR_CODE_TYPE,
+      dictClass: 'number',
       isSearch: true
     },
     {
@@ -34,15 +38,16 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '错误码错误提示',
-      field: 'message'
+      field: 'message',
+      isSearch: true
     },
     {
       title: t('common.createTime'),
       field: 'createTime',
       formatter: 'formatDate',
       isForm: false,
-      isSearch: true,
       search: {
+        show: true,
         itemRender: {
           name: 'XDataTimePicker'
         }

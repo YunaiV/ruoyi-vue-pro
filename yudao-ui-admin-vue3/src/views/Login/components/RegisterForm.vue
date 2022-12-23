@@ -1,20 +1,56 @@
+<template>
+  <Form
+    :schema="schema"
+    :rules="rules"
+    label-position="top"
+    hide-required-asterisk
+    size="large"
+    v-show="getShow"
+    class="dark:(border-1 border-[var(--el-border-color)] border-solid)"
+    @register="register"
+  >
+    <template #title>
+      <LoginFormTitle style="width: 100%" />
+    </template>
+
+    <template #code="form">
+      <div class="w-[100%] flex">
+        <el-input v-model="form['code']" :placeholder="t('login.codePlaceholder')" />
+      </div>
+    </template>
+
+    <template #register>
+      <div class="w-[100%]">
+        <XButton
+          :loading="loading"
+          type="primary"
+          class="w-[100%]"
+          :title="t('login.register')"
+          @click="loginRegister()"
+        />
+      </div>
+      <div class="w-[100%] mt-15px">
+        <XButton class="w-[100%]" :title="t('login.hasUser')" @click="handleBackLogin()" />
+      </div>
+    </template>
+  </Form>
+</template>
 <script setup lang="ts">
-import { Form } from '@/components/Form'
 import { computed, reactive, ref, unref } from 'vue'
+import { ElInput, FormRules } from 'element-plus'
+import { Form } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useForm } from '@/hooks/web/useForm'
-import { ElInput, FormRules } from 'element-plus'
 import { useValidator } from '@/hooks/web/useValidator'
-import { useLoginState, LoginStateEnum } from './useLogin'
 import LoginFormTitle from './LoginFormTitle.vue'
+import { useLoginState, LoginStateEnum } from './useLogin'
 import { FormSchema } from '@/types/form'
 
+const { t } = useI18n()
+const { required } = useValidator()
 const { register, elFormRef } = useForm()
 const { handleBackLogin, getLoginState } = useLoginState()
 const getShow = computed(() => unref(getLoginState) === LoginStateEnum.REGISTER)
-const { t } = useI18n()
-
-const { required } = useValidator()
 
 const schema = reactive<FormSchema[]>([
   {
@@ -104,39 +140,3 @@ const loginRegister = async () => {
   })
 }
 </script>
-
-<template>
-  <Form
-    :schema="schema"
-    :rules="rules"
-    label-position="top"
-    hide-required-asterisk
-    size="large"
-    v-show="getShow"
-    class="dark:(border-1 border-[var(--el-border-color)] border-solid)"
-    @register="register"
-  >
-    <template #title>
-      <LoginFormTitle style="width: 100%" />
-    </template>
-
-    <template #code="form">
-      <div class="w-[100%] flex">
-        <el-input v-model="form['code']" :placeholder="t('login.codePlaceholder')" />
-      </div>
-    </template>
-
-    <template #register>
-      <div class="w-[100%]">
-        <el-button type="primary" class="w-[100%]" :loading="loading" @click="loginRegister">
-          {{ t('login.register') }}
-        </el-button>
-      </div>
-      <div class="w-[100%] mt-15px">
-        <el-button class="w-[100%]" @click="handleBackLogin">
-          {{ t('login.hasUser') }}
-        </el-button>
-      </div>
-    </template>
-  </Form>
-</template>

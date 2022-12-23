@@ -1,8 +1,8 @@
 import { reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
 import { DICT_TYPE } from '@/utils/dict'
+import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 
 // 表单校验
@@ -15,66 +15,61 @@ export const rules = reactive({
 })
 
 // CrudSchema
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: 'seq',
+  primaryTitle: '编号',
+  action: true,
+  columns: [
+    {
+      title: '应用名',
+      field: 'name',
+      isSearch: true
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '应用名',
-    field: 'name',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '商户名称',
-    field: 'payMerchant',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: t('common.status'),
-    field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: t('common.createTime'),
-    field: 'createTime',
-    form: {
-      show: false
+    {
+      title: '商户名称',
+      field: 'payMerchant',
+      isSearch: true
     },
-    search: {
-      show: true,
-      component: 'DatePicker',
-      componentProps: {
-        type: 'datetimerange',
-        valueFormat: 'YYYY-MM-DD HH:mm:ss',
-        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '支付结果的回调地址',
+      field: 'payNotifyUrl',
+      isSearch: true
+    },
+    {
+      title: '退款结果的回调地址',
+      field: 'refundNotifyUrl',
+      isSearch: true
+    },
+    {
+      title: '商户名称',
+      field: 'merchantName',
+      isSearch: true
+    },
+    {
+      title: '备注',
+      field: 'remark',
+      isTable: false,
+      isSearch: true
+    },
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      isForm: false,
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
       }
     }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '240px',
-    form: {
-      show: false
-    },
-    detail: {
-      show: false
-    }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

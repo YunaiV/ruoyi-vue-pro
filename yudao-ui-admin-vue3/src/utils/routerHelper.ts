@@ -18,7 +18,7 @@ export const getParentLayout = () => {
 }
 
 // 按照路由中meta下的rank等级升序来排序路由
-export function ascending(arr: any[]) {
+export const ascending = (arr: any[]) => {
   arr.forEach((v) => {
     if (v?.meta?.rank === null) v.meta.rank = undefined
     if (v?.meta?.rank === 0) {
@@ -56,7 +56,13 @@ export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecord
       title: route.name,
       icon: route.icon,
       hidden: !route.visible,
-      noCache: !route.keepAlive
+      noCache: !route.keepAlive,
+      alwaysShow:
+        route.children &&
+        route.children.length === 1 &&
+        import.meta.env.VITE_ROUTE_ALWAYSSHOW_ENABLE === 'true'
+          ? true
+          : false
     }
     // 路由地址转首字母大写驼峰，作为路由名称，适配keepAlive
     let data: AppRouteRecordRaw = {
@@ -71,6 +77,7 @@ export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecord
       data.meta = {}
       data.name = toCamelCase(route.path, true) + 'Parent'
       data.redirect = ''
+      meta.alwaysShow = true
       const childrenData: AppRouteRecordRaw = {
         path: '',
         name: toCamelCase(route.path, true),
@@ -109,7 +116,7 @@ export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecord
         data.children = generateRoute(route.children)
       }
     }
-    res.push(data)
+    res.push(data as AppRouteRecordRaw)
   }
   return res
 }
@@ -203,7 +210,7 @@ const addToChildren = (
     }
   }
 }
-function toCamelCase(str: string, upperCaseFirst: boolean) {
+const toCamelCase = (str: string, upperCaseFirst: boolean) => {
   str = (str || '').toLowerCase().replace(/-(.)/g, function (group1: string) {
     return group1.toUpperCase()
   })

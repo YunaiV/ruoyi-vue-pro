@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { store } from '../index'
 import { setCssVar, humpToUnderline } from '@/utils'
 import { ElMessage } from 'element-plus'
-import { useCache } from '@/hooks/web/useCache'
+import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { ElementPlusSize } from '@/types/elementPlus'
 import { LayoutType } from '@/types/layout'
 import { ThemeTypes } from '@/types/theme'
@@ -18,6 +18,7 @@ interface AppState {
   screenfull: boolean
   size: boolean
   locale: boolean
+  message: boolean
   tagsView: boolean
   tagsViewIcon: boolean
   logo: boolean
@@ -53,6 +54,7 @@ export const useAppStore = defineStore('app', {
       screenfull: true, // 全屏图标
       size: true, // 尺寸图标
       locale: true, // 多语言图标
+      message: true, // 消息图标
       tagsView: true, // 标签页
       tagsViewIcon: true, // 是否显示标签图标
       logo: true, // logo
@@ -61,10 +63,10 @@ export const useAppStore = defineStore('app', {
       greyMode: false, // 是否开始灰色模式，用于特殊悼念日
       fixedMenu: wsCache.get('fixedMenu') || false, // 是否固定菜单
 
-      layout: wsCache.get('layout') || 'classic', // layout布局
-      isDark: wsCache.get('isDark') || false, // 是否是暗黑模式
+      layout: wsCache.get(CACHE_KEY.LAYOUT) || 'classic', // layout布局
+      isDark: wsCache.get(CACHE_KEY.IS_DARK) || false, // 是否是暗黑模式
       currentSize: wsCache.get('default') || 'default', // 组件尺寸
-      theme: wsCache.get('theme') || {
+      theme: wsCache.get(CACHE_KEY.THEME) || {
         // 主题色
         elColorPrimary: '#409eff',
         // 左侧菜单边框颜色
@@ -120,6 +122,9 @@ export const useAppStore = defineStore('app', {
     },
     getLocale(): boolean {
       return this.locale
+    },
+    getMessage(): boolean {
+      return this.message
     },
     getTagsView(): boolean {
       return this.tagsView
@@ -195,6 +200,9 @@ export const useAppStore = defineStore('app', {
     setLocale(locale: boolean) {
       this.locale = locale
     },
+    setMessage(message: boolean) {
+      this.message = message
+    },
     setTagsView(tagsView: boolean) {
       this.tagsView = tagsView
     },
@@ -223,7 +231,7 @@ export const useAppStore = defineStore('app', {
         return
       }
       this.layout = layout
-      wsCache.set('layout', this.layout)
+      wsCache.set(CACHE_KEY.LAYOUT, this.layout)
     },
     setTitle(title: string) {
       this.title = title
@@ -237,7 +245,7 @@ export const useAppStore = defineStore('app', {
         document.documentElement.classList.add('light')
         document.documentElement.classList.remove('dark')
       }
-      wsCache.set('isDark', this.isDark)
+      wsCache.set(CACHE_KEY.IS_DARK, this.isDark)
     },
     setCurrentSize(currentSize: ElementPlusSize) {
       this.currentSize = currentSize
@@ -248,7 +256,7 @@ export const useAppStore = defineStore('app', {
     },
     setTheme(theme: ThemeTypes) {
       this.theme = Object.assign(this.theme, theme)
-      wsCache.set('theme', this.theme)
+      wsCache.set(CACHE_KEY.THEME, this.theme)
     },
     setCssVarTheme() {
       for (const key in this.theme) {

@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -26,7 +26,7 @@ public class CouponPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date[] createTime;
+    private LocalDateTime[] createTime;
 
     @ApiModelProperty(value = "用户昵称", example = "芋艿", notes = "模糊匹配")
     private String nickname;

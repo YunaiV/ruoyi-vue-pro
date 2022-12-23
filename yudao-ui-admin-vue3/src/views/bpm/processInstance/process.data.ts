@@ -28,6 +28,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '流程分类',
     field: 'category',
     dictType: DICT_TYPE.BPM_MODEL_CATEGORY,
+    dictClass: 'number',
     search: {
       show: true
     }
@@ -40,6 +41,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: t('common.status'),
     field: 'status',
     dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS,
+    dictClass: 'number',
     search: {
       show: true
     }
@@ -48,6 +50,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '结果',
     field: 'result',
     dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
+    dictClass: 'number',
     search: {
       show: true
     }

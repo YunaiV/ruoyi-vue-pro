@@ -17,6 +17,7 @@ export default {
     cancel: 'Cancel',
     close: 'Close',
     reload: 'Reload current',
+    success: 'Success',
     closeTab: 'Close current',
     closeTheLeftTab: 'Close left',
     closeTheRightTab: 'Close right',
@@ -79,6 +80,7 @@ export default {
     screenfullIcon: 'Screenfull icon',
     sizeIcon: 'Size icon',
     localeIcon: 'Locale icon',
+    messageIcon: 'Message icon',
     tagsView: 'Tags view',
     logo: 'Logo',
     greyMode: 'Grey mode',
@@ -92,7 +94,6 @@ export default {
     footer: 'Footer',
     uniqueOpened: 'Unique opened',
     tagsViewIcon: 'Tags view icon',
-    dynamicRouter: 'Dynamic router',
     reExperienced: 'Please exit the login experience again',
     fixedMenu: 'Fixed menu'
   },
@@ -189,7 +190,6 @@ export default {
     access: 'Project access',
     toDo: 'To do',
     introduction: 'A serious introduction',
-    more: 'More',
     shortcutOperation: 'Quick entry',
     operation: 'Operation',
     index: 'Index',
@@ -284,6 +284,7 @@ export default {
     edit: 'Edit',
     update: 'Update',
     preview: 'Preview',
+    more: 'More',
     sync: 'Sync',
     save: 'Save',
     detail: 'Detail',
@@ -426,5 +427,19 @@ export default {
       cfPwdMsg: 'Please Enter Confirm Password',
       diffPwd: 'The Passwords Entered Twice No Match'
     }
+  },
+  cropper: {
+    selectImage: 'Select Image',
+    uploadSuccess: 'Uploaded success!',
+    modalTitle: 'Avatar upload',
+    okText: 'Confirm and upload',
+    btn_reset: 'Reset',
+    btn_rotate_left: 'Counterclockwise rotation',
+    btn_rotate_right: 'Clockwise rotation',
+    btn_scale_x: 'Flip horizontal',
+    btn_scale_y: 'Flip vertical',
+    btn_zoom_in: 'Zoom in',
+    btn_zoom_out: 'Zoom out',
+    preview: 'Preivew'
   }
 }

@@ -1,8 +1,33 @@
 import request from '@/config/axios'
-import type { ConfigVO } from './types'
+
+export interface ConfigVO {
+  id: number
+  category: string
+  name: string
+  key: string
+  value: string
+  type: number
+  visible: boolean
+  remark: string
+  createTime: Date
+}
+
+export interface ConfigPageReqVO extends PageParam {
+  name?: string
+  key?: string
+  type?: number
+  createTime?: Date[]
+}
+
+export interface ConfigExportReqVO {
+  name?: string
+  key?: string
+  type?: number
+  createTime?: Date[]
+}
 
 // 查询参数列表
-export const getConfigPageApi = (params) => {
+export const getConfigPageApi = (params: ConfigPageReqVO) => {
   return request.get({ url: '/infra/config/page', params })
 }
 
@@ -32,6 +57,6 @@ export const deleteConfigApi = (id: number) => {
 }
 
 // 导出参数
-export const exportConfigApi = (params) => {
+export const exportConfigApi = (params: ConfigExportReqVO) => {
   return request.download({ url: '/infra/config/export', params })
 }

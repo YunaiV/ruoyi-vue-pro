@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 
 import java.time.LocalDateTime;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -107,7 +107,7 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
        ProductBrandDO dbBrand = randomPojo(ProductBrandDO.class, o -> { // 等会查询到
            o.setName("芋道源码");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-           o.setCreateTime(buildLocalDateTime(2022, 2, 1));
+           o.setCreateTime(buildTime(2022, 2, 1));
        });
        brandMapper.insert(dbBrand);
        // 测试 name 不匹配
@@ -115,12 +115,12 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
        // 测试 status 不匹配
        brandMapper.insert(cloneIgnoreId(dbBrand, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
        // 测试 createTime 不匹配
-       brandMapper.insert(cloneIgnoreId(dbBrand, o -> o.setCreateTime(buildLocalDateTime(2022, 3, 1))));
+       brandMapper.insert(cloneIgnoreId(dbBrand, o -> o.setCreateTime(buildTime(2022, 3, 1))));
        // 准备参数
        ProductBrandPageReqVO reqVO = new ProductBrandPageReqVO();
        reqVO.setName("芋道");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2022, 1, 1), buildLocalDateTime(2022, 2, 25)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 1, 1), buildTime(2022, 2, 25)}));
 
        // 调用
        PageResult<ProductBrandDO> pageResult = brandService.getBrandPage(reqVO);

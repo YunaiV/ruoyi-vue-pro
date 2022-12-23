@@ -15,39 +15,56 @@ const dictStore = useDictStoreWithOut()
 export interface DictDataType {
   dictType: string
   label: string
-  value: string | number
+  value: string | number | boolean
   colorType: ElementPlusInfoType | '' | 'default' | 'primary'
   cssClass: string
 }
 
 export const getDictOptions = (dictType: string) => {
-  const dictOptions: DictDataType[] = []
-  dictStore.getDictMap.forEach((dict: DictDataType) => {
-    if (dict.dictType + '' === dictType) {
-      dictOptions.push(dict)
-    }
-  })
-  return dictOptions
+  return dictStore.getDictMap[dictType]
 }
 
-// TODO @芋艿：暂时提供这个方法，主要考虑 ElSelect。下拉如果可以解，就可以不用这个方法
 export const getIntDictOptions = (dictType: string) => {
-  const dictOptions: DictDataType[] = []
-  dictStore.getDictMap.forEach((dict: DictDataType) => {
-    if (dict.dictType + '' === dictType) {
-      dictOptions.push({
-        ...dict,
-        value: parseInt(dict.value + '')
-      })
-    }
-  })
-  return dictOptions
-}
-
-export const getDictObj = (dictType: string, value: string) => {
+  const dictOption: DictDataType[] = []
   const dictOptions: DictDataType[] = getDictOptions(dictType)
   dictOptions.forEach((dict: DictDataType) => {
-    if (dict.value === value) {
+    dictOption.push({
+      ...dict,
+      value: parseInt(dict.value + '')
+    })
+  })
+
+  return dictOption
+}
+
+export const getStrDictOptions = (dictType: string) => {
+  const dictOption: DictDataType[] = []
+  const dictOptions: DictDataType[] = getDictOptions(dictType)
+  dictOptions.forEach((dict: DictDataType) => {
+    dictOption.push({
+      ...dict,
+      value: dict.value + ''
+    })
+  })
+  return dictOption
+}
+
+export const getBoolDictOptions = (dictType: string) => {
+  const dictOption: DictDataType[] = []
+  const dictOptions: DictDataType[] = getDictOptions(dictType)
+  dictOptions.forEach((dict: DictDataType) => {
+    dictOption.push({
+      ...dict,
+      value: dict.value + '' === 'true' ? true : false
+    })
+  })
+  return dictOption
+}
+
+export const getDictObj = (dictType: string, value: any) => {
+  const dictOptions: DictDataType[] = getDictOptions(dictType)
+  dictOptions.forEach((dict: DictDataType) => {
+    if (dict.value === value.toString()) {
       return dict
     }
   })

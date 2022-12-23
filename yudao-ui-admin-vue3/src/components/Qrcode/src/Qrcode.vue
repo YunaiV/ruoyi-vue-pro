@@ -64,7 +64,7 @@ const initQrcode = async () => {
       options.errorCorrectionLevel || getErrorCorrectionLevel(unref(renderText))
     const _width: number = await getOriginWidth(unref(renderText), options)
     options.scale = props.width === 0 ? undefined : (props.width / _width) * 4
-    const canvasRef: HTMLCanvasElement = await toCanvas(
+    const canvasRef: HTMLCanvasElement | any = await toCanvas(
       unref(wrapRef) as HTMLCanvasElement,
       unref(renderText),
       options
@@ -237,10 +237,10 @@ const disabledClick = () => {
   </div>
 </template>
 
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-qrcode';
+<style lang="scss" scoped>
+$prefix-cls: #{$namespace}-qrcode;
 
-.@{prefix-cls} {
+.#{$prefix-cls} {
   &--disabled {
     background: rgba(255, 255, 255, 0.95);
 

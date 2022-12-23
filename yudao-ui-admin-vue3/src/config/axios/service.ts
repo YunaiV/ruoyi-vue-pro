@@ -112,6 +112,7 @@ service.interceptors.response.use(
     const { t } = useI18n()
     // 未设置状态码则默认成功状态
     const code = data.code || result_code
+    // 二进制数据则直接返回
     if (
       response.request.responseType === 'blob' ||
       response.request.responseType === 'arraybuffer'
@@ -133,7 +134,7 @@ service.interceptors.response.use(
         }
         // 2. 进行刷新访问令牌
         try {
-          const refreshTokenRes = refreshToken()
+          const refreshTokenRes = await refreshToken()
           // 2.1 刷新成功，则回放队列的请求 + 当前请求
           setToken((await refreshTokenRes).data.data)
           config.headers!.Authorization = 'Bearer ' + getAccessToken()
@@ -167,15 +168,19 @@ service.interceptors.response.use(
       ElMessage.error(t('sys.api.errMsg500'))
       return Promise.reject(new Error(msg))
     } else if (code === 901) {
-      ElMessage.error(
-        '<div>' +
+      ElMessage.error({
+        duration: 5,
+        offset: 300,
+        dangerouslyUseHTMLString: true,
+        message:
+          '<div>' +
           t('sys.api.errMsg901') +
           '</div>' +
           '<div> &nbsp; </div>' +
           '<div>参考 https://doc.iocoder.cn/ 教程</div>' +
           '<div> &nbsp; </div>' +
           '<div>5 分钟搭建本地环境</div>'
-      )
+      })
       return Promise.reject(new Error(msg))
     } else if (code !== 200) {
       if (msg === '无效的刷新令牌') {
@@ -206,6 +211,7 @@ service.interceptors.response.use(
 )
 
 const refreshToken = async () => {
+  axios.defaults.headers.common['tenant-id'] = getTenantId()
   return await axios.post(base_url + '/system/auth/refresh-token?refreshToken=' + getRefreshToken())
 }
 const handleAuthorized = () => {

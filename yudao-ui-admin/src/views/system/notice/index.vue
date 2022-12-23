@@ -4,12 +4,9 @@
       <el-form-item label="公告标题" prop="title">
         <el-input v-model="queryParams.title" placeholder="请输入公告标题" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="操作人员" prop="createBy">
-        <el-input v-model="queryParams.createBy" placeholder="请输入操作人员" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="公告类型" clearable>
-          <el-option v-for="dict in noticeTypeDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
+      <el-form-item label="公告状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="公告状态" clearable>
+          <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -136,7 +133,6 @@ export default {
         pageNo: 1,
         pageSize: 10,
         title: undefined,
-        createBy: undefined,
         status: undefined
       },
       // 表单参数

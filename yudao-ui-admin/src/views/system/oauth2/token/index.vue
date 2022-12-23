@@ -6,6 +6,9 @@
       <el-form-item label="用户编号" prop="userId">
         <el-input v-model="queryParams.userId" placeholder="请输入用户编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="客户端编号" prop="clientId">
+        <el-input v-model="queryParams.clientId" placeholder="请输入客户端编号" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item label="用户类型" prop="userType">
         <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
@@ -68,7 +71,8 @@ export default {
         pageNo: 1,
         pageSize: 10,
         userId: undefined,
-        userType: undefined
+        userType: undefined,
+        clientId: undefined
       }
     };
   },

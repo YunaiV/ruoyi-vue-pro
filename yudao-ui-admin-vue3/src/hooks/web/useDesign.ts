@@ -1,18 +1,18 @@
-import variables from '@/styles/variables.module.less'
+import variables from '@/styles/global.module.scss'
 
 export const useDesign = () => {
-  const lessVariables = variables
+  const scssVariables = variables
 
   /**
    * @param scope 类名
    * @returns 返回空间名-类名
    */
   const getPrefixCls = (scope: string) => {
-    return `${lessVariables.namespace}-${scope}`
+    return `${scssVariables.namespace}-${scope}`
   }
 
   return {
-    variables: lessVariables,
+    variables: scssVariables,
     getPrefixCls
   }
 }

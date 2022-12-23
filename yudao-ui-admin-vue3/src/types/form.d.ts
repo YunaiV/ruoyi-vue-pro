@@ -1,6 +1,5 @@
 import type { CSSProperties } from 'vue'
 import { ColProps, ComponentProps, ComponentName } from '@/types/components'
-import { FormValueType, FormValueType } from '@/types/form'
 import type { AxiosPromise } from 'axios'
 
 export type FormSetPropsType = {
