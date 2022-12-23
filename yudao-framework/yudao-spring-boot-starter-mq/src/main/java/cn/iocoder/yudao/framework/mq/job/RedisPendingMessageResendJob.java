@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.mq.scheduler;
+package cn.iocoder.yudao.framework.mq.job;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;

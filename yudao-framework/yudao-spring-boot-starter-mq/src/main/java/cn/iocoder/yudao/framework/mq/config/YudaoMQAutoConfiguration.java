@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import cn.iocoder.yudao.framework.mq.core.interceptor.RedisMessageInterceptor;
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessageListener;
-import cn.iocoder.yudao.framework.mq.scheduler.RedisPendingMessageResendJob;
+import cn.iocoder.yudao.framework.mq.job.RedisPendingMessageResendJob;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
