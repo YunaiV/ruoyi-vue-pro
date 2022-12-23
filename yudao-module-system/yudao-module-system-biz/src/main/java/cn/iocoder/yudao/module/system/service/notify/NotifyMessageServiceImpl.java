@@ -163,15 +163,17 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
         }
     }
 
-
     /**
      * 批量修改阅读状态为已读
-     * @param ids
+     *
+     * @param ids 站内变编号数组
      */
     private void batchUpdateReadStatus(Collection<Long> ids) {
         NotifyMessageDO updateObj = new NotifyMessageDO();
         updateObj.setReadStatus(true);
         updateObj.setReadTime(new Date());
+        // TODO @luowenfeng：涉及到 mybatis 的操作，都要隐藏到 mapper 中；
         notifyMessageMapper.update(updateObj, new LambdaQueryWrapperX<NotifyMessageDO>().in(NotifyMessageDO::getId, ids));
     }
+
 }

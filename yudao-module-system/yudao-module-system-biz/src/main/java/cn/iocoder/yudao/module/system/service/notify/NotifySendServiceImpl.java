@@ -19,6 +19,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.NOTICE_NOT_FOUND;
 
+// TODO @luowenfeng：可以直接合并到 NotifyMessageService 中；之前 sms 台复杂，所以没合并。
 /**
  * 站内信发送 Service 实现类
  *
@@ -40,7 +41,6 @@ public class NotifySendServiceImpl implements NotifySendService {
 
     @Override
     public Long sendSingleNotifyToAdmin(Long userId, String templateCode, Map<String, Object> templateParams) {
-
         return sendSingleNotify(userId, UserTypeEnum.ADMIN.getValue(), templateCode, templateParams);
     }
 
@@ -54,9 +54,10 @@ public class NotifySendServiceImpl implements NotifySendService {
         // 校验短信模板是否合法
         NotifyTemplateDO template = this.checkNotifyTemplateValid(templateCode);
         String content = notifyTemplateService.formatNotifyTemplateContent(template.getContent(), templateParams);
+        // 获得用户
         AdminUserDO sendUser = userService.getUser(getLoginUserId());
 
-        // todo 模板状态未开启时的业务
+        // todo 模板状态未开启时的业务；如果未开启，就直接 return 好了；
         NotifyMessageDO notifyMessageDO = new NotifyMessageDO();
         notifyMessageDO.setContent(content);
         notifyMessageDO.setTitle(template.getTitle());

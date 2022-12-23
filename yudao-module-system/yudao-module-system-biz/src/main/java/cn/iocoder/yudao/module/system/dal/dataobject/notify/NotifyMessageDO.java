@@ -61,10 +61,12 @@ public class NotifyMessageDO extends BaseDO {
      * 内容
      */
     private String content;
+    // TODO @luowenfeng：是不是创建时间，直接作为发送时间；
     /**
      * 发送时间
      */
     private Date sendTime;
+    // TODO @luowenfeng：是不是不用发送 id 和名字😑？
     /**
      * 发送用户id
      */

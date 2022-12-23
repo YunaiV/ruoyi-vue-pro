@@ -5,14 +5,13 @@ import cn.iocoder.yudao.module.system.controller.admin.notify.vo.log.NotifyLogPa
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
 
 /**
- * <p>
  * 站内信日志 Service 接口
- * </p>
  *
  * @author LuoWenFeng
  */
 public interface NotifyLogService {
 
+    // TODO @LuoWenFeng：NotifyLogService=》NotifyMessageService
 
     /**
      * 获得站内信发送分页
@@ -21,4 +20,5 @@ public interface NotifyLogService {
      * @return 站内信分页
      */
     PageResult<NotifyMessageDO> getNotifyMessageSendPage(NotifyLogPageReqVO pageReqVO);
+
 }

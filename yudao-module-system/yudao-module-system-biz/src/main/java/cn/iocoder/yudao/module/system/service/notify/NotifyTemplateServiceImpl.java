@@ -85,7 +85,6 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
         notifyTemplateCache = CollectionUtils.convertMap(notifyTemplateList, NotifyTemplateDO::getCode);
         maxUpdateTime = CollectionUtils.getMaxValue(notifyTemplateList, NotifyTemplateDO::getUpdateTime);
         log.info("[initLocalCache][初始化 NotifyTemplate 数量为 {}]", notifyTemplateList.size());
-
     }
 
     /**
