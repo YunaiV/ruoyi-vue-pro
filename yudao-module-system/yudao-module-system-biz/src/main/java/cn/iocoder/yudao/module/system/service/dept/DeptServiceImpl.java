@@ -116,12 +116,12 @@ public class DeptServiceImpl implements DeptService {
     protected List<DeptDO> loadDeptIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadMenuIfUpdate][首次加载全量部门]");
+            log.info("[loadDeptIfUpdate][首次加载全量部门]");
         } else { // 判断数据库中是否有更新的部门
             if (deptMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
-            log.info("[loadMenuIfUpdate][增量加载全量部门]");
+            log.info("[loadDeptIfUpdate][增量加载全量部门]");
         }
         // 第二步，如果有更新，则从数据库加载所有部门
         return deptMapper.selectList();
