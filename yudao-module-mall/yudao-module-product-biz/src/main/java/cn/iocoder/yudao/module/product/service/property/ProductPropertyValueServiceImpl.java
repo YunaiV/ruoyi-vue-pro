@@ -42,9 +42,11 @@ public class ProductPropertyValueServiceImpl implements ProductPropertyValueServ
 
     @Override
     public Long createPropertyValue(ProductPropertyValueCreateReqVO createReqVO) {
-        // 校验名字唯一
-        if (productPropertyValueMapper.selectByName(createReqVO.getPropertyId(), createReqVO.getName()) != null) {
-            throw exception(PROPERTY_VALUE_EXISTS);
+        // 如果已经添加过该属性值，直接返回
+        ProductPropertyValueDO dbValue = productPropertyValueMapper.selectByName(
+                createReqVO.getPropertyId(), createReqVO.getName());
+        if (dbValue != null) {
+            return dbValue.getId();
         }
 
         // 新增

@@ -8,10 +8,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
@@ -149,53 +150,6 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    void getSpuDetail() {
-        // 准备spu参数
-        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o -> {
-            o.setSpecType(ProductSpuSpecTypeEnum.DISABLE.getType());
-        });
-        productSpuMapper.insert(createReqVO);
-
-        // 创建两个属性
-        ArrayList<ProductPropertyRespVO> productPropertyRespVOS = Lists.newArrayList(
-                randomPojo(ProductPropertyRespVO.class),
-                randomPojo(ProductPropertyRespVO.class));
-
-        // 所有属性值
-        ArrayList<ProductPropertyValueRespVO> productPropertyValueRespVO = new ArrayList<>();
-
-        // 每个属性创建属性值
-        productPropertyRespVOS.forEach(v -> {
-            ProductPropertyValueRespVO productPropertyValueRespVO1 = randomPojo(ProductPropertyValueRespVO.class, o -> o.setPropertyId(v.getId()));
-            productPropertyValueRespVO.add(productPropertyValueRespVO1);
-        });
-
-        // 属性值建立笛卡尔积
-        Map<Long, List<ProductPropertyValueRespVO>> collect = productPropertyValueRespVO.stream().collect(Collectors.groupingBy(ProductPropertyValueRespVO::getPropertyId));
-        List<List<ProductPropertyValueRespVO>> lists = cartesianProduct(Lists.newArrayList(collect.values()));
-
-        // 准备sku参数
-        ArrayList<ProductSkuDO> productSkuDOS = Lists.newArrayList();
-        lists.forEach(pp -> {
-            List<ProductSkuDO.Property> property = pp.stream().map(ppv -> new ProductSkuDO.Property(ppv.getPropertyId(), ppv.getId())).collect(Collectors.toList());
-            ProductSkuDO productSkuDO = randomPojo(ProductSkuDO.class, o -> {
-                o.setProperties(property);
-            });
-            productSkuDOS.add(productSkuDO);
-
-        });
-
-        Mockito.when(productSkuService.getSkuListBySpuId(createReqVO.getId())).thenReturn(productSkuDOS);
-//        Mockito.when(productPropertyValueService.getPropertyValueListByPropertyId(new ArrayList<>(collect.keySet()))).thenReturn(productPropertyValueRespVO);
-//        Mockito.when(productPropertyService.getPropertyVOList(new ArrayList<>(collect.keySet()))).thenReturn(productPropertyRespVOS);
-//
-        // 调用
-        ProductSpuDetailRespVO spuDetail = productSpuService.getSpuDetail(createReqVO.getId());
-
-        assertPojoEquals(createReqVO, spuDetail);
-    }
-
-    @Test
     void getSpu() {
         // 准备参数
         ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class);
@@ -222,7 +176,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
         productSpuPageReqVO.setAlarmStock(true);
 
-        PageResult<ProductSpuRespVO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
+        PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
         PageResult<Object> result = PageResult.empty();
         Assertions.assertIterableEquals(result.getList(), spuPage.getList());
@@ -271,7 +225,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
         productSpuPageReqVO.setAlarmStock(true);
-        PageResult<ProductSpuRespVO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
+        PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
         PageResult<ProductSpuRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, alarmStockSpuIds));
         Assertions.assertIterableEquals(result.getList(), spuPage.getList());
@@ -323,7 +277,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         productSpuPageReqVO.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
         productSpuPageReqVO.setCategoryId(categoryId);
 
-        PageResult<ProductSpuRespVO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
+        PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
         PageResult<ProductSpuRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, (Set<Long>) null));
         assertEquals(result, spuPage);

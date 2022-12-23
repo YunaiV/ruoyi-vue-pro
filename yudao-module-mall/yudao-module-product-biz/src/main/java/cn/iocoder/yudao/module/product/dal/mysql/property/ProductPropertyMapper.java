@@ -21,8 +21,7 @@ public interface ProductPropertyMapper extends BaseMapperX<ProductPropertyDO> {
     }
 
     default ProductPropertyDO selectByName(String name) {
-        return selectOne(new LambdaQueryWrapperX<ProductPropertyDO>()
-                .eqIfPresent(ProductPropertyDO::getName, name));
+        return selectOne(ProductPropertyDO::getName, name);
     }
 
     default List<ProductPropertyDO> selectList(ProductPropertyListReqVO listReqVO) {

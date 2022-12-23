@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.ip.core.utils;
 
 import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.text.csv.CsvRow;
 import cn.hutool.core.text.csv.CsvUtil;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -50,6 +51,7 @@ public class AreaUtils {
         for (CsvRow row : rows) {
             Area area = areas.get(Integer.valueOf(row.get(0))); // 自己
             Area parent = areas.get(Integer.valueOf(row.get(3))); // 父
+            Assert.isTrue(area != parent, "{}:父子节点相同", area.getName());
             area.setParent(parent);
             parent.getChildren().add(area);
         }

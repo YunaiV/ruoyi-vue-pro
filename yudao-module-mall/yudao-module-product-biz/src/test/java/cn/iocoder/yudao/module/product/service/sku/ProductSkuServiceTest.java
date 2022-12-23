@@ -19,11 +19,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_STOCK_NOT_ENOUGH;
 import static java.util.Collections.singletonList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 
@@ -145,4 +146,26 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
                 SKU_STOCK_NOT_ENOUGH);
     }
 
+    @Test
+    public void testDeleteSku_success() {
+        // mock 数据
+        ProductSkuDO dbSku = randomPojo(ProductSkuDO.class);
+        productSkuMapper.insert(dbSku);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbSku.getId();
+
+        // 调用
+        productSkuService.deleteSku(id);
+        // 校验数据不存在了
+        assertNull(productSkuMapper.selectById(id));
+    }
+
+    @Test
+    public void testDeleteSku_notExists() {
+        // 准备参数
+        Long id = 1L;
+
+        // 调用, 并断言异常
+        assertServiceException(() -> productSkuService.deleteSku(id), SKU_NOT_EXISTS);
+    }
 }

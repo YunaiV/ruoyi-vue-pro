@@ -4,9 +4,8 @@
     <el-tabs v-model="activeName" class="tabs">
       <!-- 基础设置 -->
       <!-- TODO @luowenfeng：基础设置，分成基础信息、配送信息 -->
-      <!-- TODO @luowenfeng：base=》basic 会更好哈 -->
-      <el-tab-pane label="基础设置" name="base">
-        <el-form ref="base" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
+      <el-tab-pane label="基础设置" name="basic">
+        <el-form ref="basic" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
           <el-form-item label="商品名称" prop="name">
             <el-input v-model="baseForm.name" placeholder="请输入商品名称" />
           </el-form-item>
@@ -155,9 +154,8 @@
       </el-tab-pane>
 
       <!-- 商品详情 -->
-      <!-- TODO @luowenfeng：third=》detail 会更好哈 -->
-      <el-tab-pane label="商品详情" name="third">
-        <el-form ref="third" :model="baseForm" :rules="rules">
+      <el-tab-pane label="商品详情" name="detail">
+        <el-form ref="detail" :model="baseForm" :rules="rules">
           <el-form-item prop="description">
             <editor v-model="baseForm.description" :min-height="380"/>
           </el-form-item>
@@ -165,9 +163,8 @@
       </el-tab-pane>
 
       <!-- 销售设置 -->
-      <!-- TODO @luowenfeng：fourth=》senior 会更好哈 -->
-      <el-tab-pane label="高级设置" name="fourth">
-        <el-form ref="fourth" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
+      <el-tab-pane label="高级设置" name="senior">
+        <el-form ref="senior" :model="baseForm" :rules="rules" label-width="100px" style="width: 95%">
           <el-form-item label="排序字段">
             <el-input v-model="baseForm.sort" placeholder="请输入排序字段" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')"/>
           </el-form-item>
@@ -208,7 +205,7 @@ export default {
   data() {
     return {
       specSwitch: false,
-      activeName: "base",
+      activeName: "basic",
       propName: {
         checkStrictly: true,
         label: "name",

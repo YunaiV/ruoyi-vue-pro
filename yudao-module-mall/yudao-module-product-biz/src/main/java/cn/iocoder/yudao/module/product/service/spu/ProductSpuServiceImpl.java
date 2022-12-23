@@ -1,27 +1,19 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyViewRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
-import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
-import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
-import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
-import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -29,8 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -50,17 +44,12 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private ProductSpuMapper productSpuMapper;
 
     @Resource
-    private ProductCategoryService categoryService;
-
-    @Resource
     @Lazy // 循环依赖，避免报错
     private ProductSkuService productSkuService;
     @Resource
-    private ProductPropertyService productPropertyService;
-    @Resource
-    private ProductPropertyValueService productPropertyValueService;
-    @Resource
     private ProductBrandService brandService;
+    @Resource
+    private ProductCategoryService categoryService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -149,46 +138,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    // TODO @芋艿：需要再 review 下
-    public ProductSpuDetailRespVO getSpuDetail(Long id) {
-        ProductSpuDO spu = productSpuMapper.selectById(id);
-        ProductSpuDetailRespVO respVO = BeanUtil.copyProperties(spu, ProductSpuDetailRespVO.class);
-        if (null != spu) {
-            List<ProductSpuDetailRespVO.Sku> skuReqs = ProductSkuConvert.INSTANCE.convertList03(productSkuService.getSkuListBySpuId(id));
-            respVO.setSkus(skuReqs);
-            // 组合 sku 属性
-            if (spu.getSpecType().equals(ProductSpuSpecTypeEnum.DISABLE.getType())) {
-                List<ProductSkuRespVO.Property> properties = new ArrayList<>();
-                for (ProductSpuDetailRespVO.Sku productSkuRespVO : skuReqs) {
-                    properties.addAll(productSkuRespVO.getProperties());
-                }
-                Map<Long, List<ProductSkuBaseVO.Property>> propertyMaps = properties.stream().collect(Collectors.groupingBy(ProductSkuBaseVO.Property::getPropertyId));
-
-                List<ProductPropertyValueDO> propertyValueList = productPropertyValueService.getPropertyValueListByPropertyId(propertyMaps.keySet());
-                List<ProductPropertyDO> propertyList = productPropertyService.getPropertyList(propertyMaps.keySet());
-                // 装载组装过后的属性
-                List<ProductPropertyViewRespVO> productPropertyViews = new ArrayList<>();
-                propertyList.forEach(p -> {
-                    ProductPropertyViewRespVO productPropertyViewRespVO = new ProductPropertyViewRespVO();
-                    productPropertyViewRespVO.setPropertyId(p.getId());
-                    productPropertyViewRespVO.setName(p.getName());
-                    List<ProductPropertyViewRespVO.Tuple2> propertyValues = new ArrayList<>();
-                    // 转换成map是为了能快速获取
-                    Map<Long, ProductPropertyValueDO> propertyValueMaps = convertMap(propertyValueList, ProductPropertyValueDO::getId);
-                    propertyMaps.get(p.getId()).forEach(pv -> {
-                        ProductPropertyViewRespVO.Tuple2 tuple2 = new ProductPropertyViewRespVO.Tuple2(pv.getValueId(), propertyValueMaps.get(pv.getValueId()).getName());
-                        propertyValues.add(tuple2);
-                    });
-                    productPropertyViewRespVO.setPropertyValues(propertyValues.stream().distinct().collect(Collectors.toList()));
-                    productPropertyViews.add(productPropertyViewRespVO);
-                });
-                respVO.setProductPropertyViews(productPropertyViews);
-            }
-        }
-        return respVO;
-    }
-
-    @Override
     public ProductSpuDO getSpu(Long id) {
         return productSpuMapper.selectById(id);
     }
@@ -203,9 +152,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         return productSpuMapper.selectList();
     }
 
-    // TODO 芋艿：改成 DO 返回
     @Override
-    public PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
+    public PageResult<ProductSpuDO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
         // 库存告警的 SPU 编号的集合
         Set<Long> alarmStockSpuIds = null;
         if (Boolean.TRUE.equals(pageReqVO.getAlarmStock())) {
@@ -215,7 +163,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
             }
         }
         // 分页查询
-        return ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(pageReqVO, alarmStockSpuIds));
+        return productSpuMapper.selectPage(pageReqVO, alarmStockSpuIds);
     }
 
     @Override

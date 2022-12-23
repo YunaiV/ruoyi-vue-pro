@@ -9,7 +9,7 @@ import java.util.List;
 
 @ApiModel("用户 App - 商品 SPU 明细 Response VO")
 @Data
-public class AppSpuDetailRespVO {
+public class AppProductSpuDetailRespVO {
 
     @ApiModelProperty(value = "商品 SPU 编号", required = true, example = "1")
     private Long id;

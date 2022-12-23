@@ -3,8 +3,13 @@ package cn.iocoder.yudao.module.product.controller.admin.spu;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
+import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
+import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
+import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -15,10 +20,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 
 @Api(tags = "管理后台 - 商品 SPU")
 @RestController
@@ -28,6 +34,10 @@ public class ProductSpuController {
 
     @Resource
     private ProductSpuService productSpuService;
+    @Resource
+    private ProductSkuService productSkuService;
+    @Resource
+    private ProductPropertyValueService productPropertyValueService;
 
     @PostMapping("/create")
     @ApiOperation("创建商品 SPU")
@@ -53,31 +63,24 @@ public class ProductSpuController {
         return success(true);
     }
 
-    // TODO 芋艿：修改接口
-    @GetMapping("/get/detail")
-    @ApiOperation("获得商品 SPU")
+    @GetMapping("/get-detail")
+    @ApiOperation("获得商品 SPU 明细")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<ProductSpuDetailRespVO> getSpuDetail(@RequestParam("id") Long id) {
-        return success(productSpuService.getSpuDetail(id));
-    }
+        // 获得商品 SPU
+        ProductSpuDO spu = productSpuService.getSpu(id);
+        if (spu == null) {
+            throw exception(SPU_NOT_EXISTS);
+        }
 
-    @GetMapping("/get")
-    @ApiOperation("获得商品 SPU")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<ProductSpuDO> getSpu(@RequestParam("id") Long id) {
-        return success(productSpuService.getSpu(id));
-    }
-
-
-    @GetMapping("/list")
-    @ApiOperation("获得商品 SPU 列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<List<ProductSpuDO>> getSpuList(@RequestParam("ids") Collection<Long> ids) {
-        List<ProductSpuDO> list = productSpuService.getSpuList(ids);
-        return success(ProductSpuConvert.INSTANCE.convertList(list));
+        // 查询商品 SKU
+        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuIdAndStatus(spu.getId(), null);
+        // 查询商品属性
+        List<ProductPropertyValueDetailRespBO> propertyValues = productPropertyValueService
+                .getPropertyValueDetailList(ProductSkuConvert.INSTANCE.convertPropertyValueIds(skus));
+        // 拼接
+        return success(ProductSpuConvert.INSTANCE.convert03(spu, skus, propertyValues));
     }
 
     @GetMapping("/get-simple-list")
@@ -92,7 +95,7 @@ public class ProductSpuController {
     @ApiOperation("获得商品 SPU 分页")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<PageResult<ProductSpuRespVO>> getSpuPage(@Valid ProductSpuPageReqVO pageVO) {
-        return success(productSpuService.getSpuPage(pageVO));
+        return success(ProductSpuConvert.INSTANCE.convertPage(productSpuService.getSpuPage(pageVO)));
     }
 
 }

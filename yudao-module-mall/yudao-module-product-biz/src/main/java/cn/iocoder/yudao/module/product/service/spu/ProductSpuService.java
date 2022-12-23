@@ -42,14 +42,6 @@ public interface ProductSpuService {
     void deleteSpu(Long id);
 
     /**
-     * 获得商品 SPU 详情
-     *
-     * @param id 编号
-     * @return 商品 SPU
-     */
-    ProductSpuDetailRespVO getSpuDetail(Long id);
-
-    /**
      * 获得商品 SPU
      *
      * @param id 编号
@@ -88,7 +80,7 @@ public interface ProductSpuService {
      * @param pageReqVO 分页查询
      * @return 商品spu分页
      */
-    PageResult<ProductSpuRespVO> getSpuPage(ProductSpuPageReqVO pageReqVO);
+    PageResult<ProductSpuDO> getSpuPage(ProductSpuPageReqVO pageReqVO);
 
     /**
      * 获得商品 SPU 分页

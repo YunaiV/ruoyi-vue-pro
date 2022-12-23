@@ -40,9 +40,10 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createProperty(ProductPropertyCreateReqVO createReqVO) {
-        // 校验名字重复
-        if (productPropertyMapper.selectByName(createReqVO.getName()) != null) {
-            throw exception(PROPERTY_EXISTS);
+        // 如果已经添加过该属性项，直接返回
+        ProductPropertyDO dbProperty = productPropertyMapper.selectByName(createReqVO.getName());
+        if (dbProperty != null) {
+            return dbProperty.getId();
         }
 
         // 插入
