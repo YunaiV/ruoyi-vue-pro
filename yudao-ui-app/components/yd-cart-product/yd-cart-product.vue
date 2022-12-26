@@ -49,7 +49,7 @@ export default {
   methods: {
     handleProductItemClick(productId) {
       uni.$u.route('/pages/product/product', {
-        productId: productId
+        id: productId
       })
     },
     handleItemCartClick(productId) {

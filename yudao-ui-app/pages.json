@@ -62,12 +62,12 @@
         "navigationBarTitleText": "账户设置"
       }
     },
-		{
-			"path": "pages/product/product",
-			"style": {
-				"navigationBarTitleText": "商品详情"
-			}
-		},
+    {
+        "path": "pages/product/product",
+        "style": {
+            "navigationBarTitleText": "商品详情"
+        }
+    },
     {
       "path": "pages/checkout/checkout",
       "style": {

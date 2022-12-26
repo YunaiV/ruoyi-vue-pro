@@ -62,7 +62,7 @@ export default {
   methods: {
     handleProdItemClick(productId) {
       uni.$u.route('/pages/product/product', {
-        productId: productId
+        id: productId
       })
     }
   }
