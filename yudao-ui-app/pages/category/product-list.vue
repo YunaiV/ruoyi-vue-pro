@@ -3,10 +3,13 @@
     <u-navbar :title="title" :autoBack="true" placeholder="true" titleStyle="font-size: 28rpx">
     </u-navbar>
     <view class="context">
+      <!-- 分类列表 -->
+      <!-- TODO @Luowenfeng：不应该展示商品分类；应该是上面一个筛选；之后是【综合】【销量】【价格】的排序 -->
       <view class="tabs-top">
         <u-tabs :list="categoryList" @click="changeTabs" :current="current" lineHeight="2" lineWidth="85rpx"
           itemStyle="padding-left: 15px; padding-right: 15px; height: 85rpx;"></u-tabs>
       </view>
+      <!-- 商品列表 -->
       <scroll-view scroll-y="true" class="product-list" enable-flex="true">
         <view class="flex-box">
           <block v-for="(item, index) in productList[current]" :key="index">
@@ -52,7 +55,7 @@
     },
     methods: {
       changeTabs(item) {
-        if (item.index != this.current) {
+        if (item.index !== this.current) {
           this.handleProductSpu(item.index)
         }
       },
