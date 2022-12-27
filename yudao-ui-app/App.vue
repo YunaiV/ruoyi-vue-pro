@@ -23,7 +23,10 @@ export default {
 </script>
 
 <style lang="scss">
-/* 引入uView基础样式 */
+/** 引入全局基本样式 */
+@import 'styles/base.scss';
+
+/* 引入 uView 基础样式 */
 @import '@/uni_modules/uview-ui/index.scss';
 
 /*每个页面公共scss */

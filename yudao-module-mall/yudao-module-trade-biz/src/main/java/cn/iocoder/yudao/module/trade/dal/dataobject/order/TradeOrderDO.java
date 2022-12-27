@@ -4,7 +4,8 @@ import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO.OrderItem;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderDeliveryStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -44,9 +45,9 @@ public class TradeOrderDO extends BaseDO {
      *
      * 枚举 {@link TradeOrderTypeEnum}
      */
-    private Integer type; // TODO order_promotion_type
+    private Integer type;
     /**
-     * 订单来源终端
+     * 订单来源
      *
      * 枚举 {@link TerminalEnum}
      */
@@ -71,7 +72,6 @@ public class TradeOrderDO extends BaseDO {
      * 枚举 {@link TradeOrderStatusEnum}
      */
     private Integer status;
-    // TODO 芋艿：要不要存储 prod_name 购买的商品名门？
     /**
      * 购买的商品数量
      */
@@ -96,6 +96,17 @@ public class TradeOrderDO extends BaseDO {
     private String remark;
 
     // ========== 价格 + 支付基本信息 ==========
+
+    // 价格文档 - 淘宝：https://open.taobao.com/docV3.htm?docId=108471&docType=1
+    // 价格文档 - 京东到家：https://openo2o.jddj.com/api/getApiDetail/182/4d1494c5e7ac4679bfdaaed950c5bc7f.htm
+    // 价格文档 - 有赞：https://doc.youzanyun.com/detail/API/0/906
+
+    /**
+     * 支付订单编号
+     *
+     * 对接 pay-module-biz 支付服务的支付订单编号，即 PayOrderDO 的 id 编号
+     */
+    private Long payOrderId;
     /**
      * 是否已支付
      *
@@ -107,11 +118,12 @@ public class TradeOrderDO extends BaseDO {
      * 付款时间
      */
     private LocalDateTime payTime;
-
-    // ========== 价格 + 支付基本信息 ==========
-    // 价格文档 - 淘宝：https://open.taobao.com/docV3.htm?docId=108471&docType=1
-    // 价格文档 - 京东到家：https://openo2o.jddj.com/api/getApiDetail/182/4d1494c5e7ac4679bfdaaed950c5bc7f.htm
-    // 价格文档 - 有赞：https://doc.youzanyun.com/detail/API/0/906
+    /**
+     * 支付渠道
+     *
+     * 对应 PayChannelEnum 枚举
+     */
+    private String payChannelCode;
 
     /**
      * 商品原价（总），单位：分
@@ -157,18 +169,6 @@ public class TradeOrderDO extends BaseDO {
      * + {@link #adjustPrice}
      */
     private Integer payPrice;
-    /**
-     * 支付订单编号
-     *
-     * 对接 pay-module-biz 支付服务的支付订单编号，即 PayOrderDO 的 id 编号
-     */
-    private Long payOrderId;
-    /**
-     * 支付成功的支付渠道
-     *
-     * 对应 PayChannelEnum 枚举
-     */
-    private Integer payChannel;
 
     // ========== 收件 + 物流基本信息 ==========
     /**
@@ -178,20 +178,24 @@ public class TradeOrderDO extends BaseDO {
      */
     private Long deliveryTemplateId;
     /**
-     * 物流公司单号
+     * 发货物流公司编号
      */
-    private String expressNo;
+    private Long logisticsId;
+    /**
+     * 发货物流单号
+     */
+    private String logisticsNo;
     /**
      * 发货状态
      *
-     * true - 已发货
-     * false - 未发货
+     * 枚举 {@link TradeOrderDeliveryStatusEnum}
      */
-    private Boolean deliveryStatus;
+    private Integer deliveryStatus;
     /**
      * 发货时间
      */
     private LocalDateTime deliveryTime;
+
     /**
      * 收货时间
      */
@@ -207,7 +211,7 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 收件人地区编号
      */
-    private Long receiverAreaId;
+    private Integer receiverAreaId;
     /**
      * 收件人邮编
      */
@@ -217,13 +221,13 @@ public class TradeOrderDO extends BaseDO {
      */
     private String receiverDetailAddress;
 
-    // ========== 退款基本信息 ==========
+    // ========== 售后基本信息 ==========
     /**
-     * 退款状态
+     * 收货状态
      *
-     * 枚举 {@link TradeOrderRefundStatusEnum}
+     * 枚举 {@link TradeOrderAfterSaleStatusEnum}
      */
-    private Integer refundStatus;
+    private Integer afterSaleStatus;
     /**
      * 退款金额，单位：分
      *

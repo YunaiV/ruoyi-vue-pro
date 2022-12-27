@@ -26,18 +26,10 @@ export function deleteSpu(id) {
   })
 }
 
-// 获得商品spu
-export function getSpu(id) {
-  return request({
-    url: '/product/spu/get?id=' + id,
-    method: 'get'
-  })
-}
-
 // 获得商品 SPU 详情
 export function getSpuDetail(id) {
   return request({
-    url: '/product/spu/get/detail?id=' + id,
+    url: '/product/spu/get-detail?id=' + id,
     method: 'get'
   })
 }

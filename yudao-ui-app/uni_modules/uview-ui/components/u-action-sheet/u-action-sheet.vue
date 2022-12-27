@@ -15,7 +15,7 @@
 				<text class="u-action-sheet__header__title u-line-1">{{title}}</text>
 				<view
 				    class="u-action-sheet__header__icon-wrap"
-				    @tap.stop="close"
+				    @tap.stop="cancel"
 				>
 					<u-icon
 					    name="close"

@@ -56,12 +56,42 @@
 				"navigationBarTitleText": "个人资料"
 			}
 		},
-		{
-			"path": "pages/product/product",
-			"style": {
-				"navigationBarTitleText": "商品详情"
-			}
-		},
+    {
+      "path": "pages/setting/setting",
+      "style": {
+        "navigationBarTitleText": "账户设置"
+      }
+    },
+    {
+        "path": "pages/product/product",
+        "style": {
+            "navigationBarTitleText": "商品详情"
+        }
+    },
+    {
+      "path": "pages/checkout/checkout",
+      "style": {
+        "navigationBarTitleText": "填写订单"
+      }
+    },
+    {
+      "path": "pages/order/list",
+      "style": {
+        "navigationBarTitleText": "我的订单"
+      }
+    },
+    {
+      "path": "pages/order/detail",
+      "style": {
+        "navigationBarTitleText": "订单详情"
+      }
+    },
+    {
+      "path": "pages/order/confirm",
+      "style": {
+        "navigationBarTitleText": "确认订单"
+      }
+    },
     {
       "path": "pages/address/list",
       "style": {

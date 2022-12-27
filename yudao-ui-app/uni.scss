@@ -28,14 +28,14 @@ $custom-border-style: 1rpx solid #f3f3f3;
   display: flex;
   flex-direction: $direction;
   align-items: center;
-  justify-content: left;
+  justify-content: flex-start;
 }
 
 @mixin flex-right($direction: row) {
   display: flex;
   flex-direction: $direction;
   align-items: center;
-  justify-content: right;
+  justify-content: flex-end;
 }
 
 @mixin flex-center($direction: row) {

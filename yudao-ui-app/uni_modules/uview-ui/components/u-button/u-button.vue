@@ -28,7 +28,7 @@
         <template v-if="loading">
             <u-loading-icon
                 :mode="loadingMode"
-                :size="textSize * 1.15"
+                :size="loadingSize * 1.15"
                 :color="loadingColor"
             ></u-loading-icon>
             <text
@@ -75,7 +75,7 @@
         <template v-if="loading">
             <u-loading-icon
                 :mode="loadingMode"
-                :size="textSize * 1.15"
+                :size="loadingSize * 1.15"
                 :color="loadingColor"
             ></u-loading-icon>
             <text

@@ -1,19 +1,13 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="规格名称" prop="propertyId">
+      <el-form-item label="属性项" prop="propertyId">
         <el-select v-model="queryParams.propertyId">
-          <el-option v-for="item in propertyOptions" :key="item.id" :label="item.id +'-'+ item.name" :value="item.id"/>
+          <el-option v-for="item in propertyOptions" :key="item.id" :label="item.name" :value="item.id"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="规格值" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入规格值" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                     :key="dict.value" :label="dict.label" :value="dict.value"/>
-        </el-select>
+      <el-form-item label="名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -27,21 +21,12 @@
                    v-hasPermi="['system:dict:create']">新增
         </el-button>
       </el-col>
-      <!-- <el-col :span="1.5">
-        <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
-                   v-hasPermi="['system:dict:export']">导出</el-button>
-      </el-col> -->
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="dataList">
-      <el-table-column label="规格值id" align="center" prop="id"/>
-      <el-table-column label="规格值" align="center" prop="name"/>
-      <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
-        </template>
-      </el-table-column>
+      <el-table-column label="编号" align="center" prop="id"/>
+      <el-table-column label="名称" align="center" prop="name"/>
       <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true"/>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
@@ -66,18 +51,11 @@
     <!-- 添加或修改参数配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="90px">
-        <el-form-item label="规格值编码">
+        <el-form-item label="属性项">
           <el-input v-model="form.propertyId" :disabled="true"/>
         </el-form-item>
-        <el-form-item label="规格值" prop="name">
-          <el-input v-model="form.name" placeholder="请输入数据标签"/>
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                      :key="dict.value" :label="parseInt(dict.value)">{{ dict.label }}
-            </el-radio>
-          </el-radio-group>
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入名称"/>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
@@ -108,8 +86,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -130,17 +106,13 @@ export default {
         pageSize: 10,
         propertyId: undefined,
         name: undefined,
-        status: undefined
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         name: [
-          {required: true, message: "规格值不能为空", trigger: "blur"}
-        ],
-        status: [
-          {required: true, message: "状态不能为空", trigger: "blur"}
+          {required: true, message: "名称不能为空", trigger: "blur"}
         ]
       },
 
@@ -186,7 +158,6 @@ export default {
         id: undefined,
         propertyId: undefined,
         name: undefined,
-        status: undefined,
         remark: undefined
       };
       this.resetForm("form");
@@ -206,17 +177,17 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加规格值";
+      this.title = "添加属性值";
       this.form.propertyId = this.queryParams.propertyId;
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const id = row.id || this.ids
+      const id = row.id;
       getPropertyValue(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改规格值";
+        this.title = "修改属性值";
       });
     },
     /** 提交按钮 */

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -31,6 +32,7 @@ public class AppTradeOrderCreateReqVO {
      * 订单商品项列表
      */
     @NotEmpty(message = "必须选择购买的商品")
+    @Valid
     private List<Item> items;
 
     @ApiModel(value = "订单商品项")

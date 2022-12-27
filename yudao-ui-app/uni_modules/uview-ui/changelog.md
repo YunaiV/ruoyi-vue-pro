@@ -1,3 +1,42 @@
+## 2.0.34（2022-09-25）
+# uView2.0重磅发布，利剑出鞘，一统江湖
+
+1. `u-input`、`u-textarea`增加`ignoreCompositionEvent`属性
+2. 修复`route`方法调用可能报错的问题
+3. 修复`u-no-network`组件`z-index`无效的问题
+4. 修复`textarea`组件在h5上confirmType=""报错的问题
+5. `u-rate`适配`nvue`
+6. 优化验证手机号码的正则表达式(根据工信部发布的《电信网编号计划（2017年版）》进行修改。)
+7. `form-item`添加`labelPosition`属性
+8. `u-calendar`修复`maxDate`设置为当前日期，并且当前时间大于08：00时无法显示日期列表的问题 (#724)
+9. `u-radio`增加一个默认插槽用于自定义修改label内容 (#680)
+10. 修复`timeFormat`函数在safari重的兼容性问题 (#664)
+## 2.0.33（2022-06-17）
+# uView2.0重磅发布，利剑出鞘，一统江湖
+
+1. 修复`loadmore`组件`lineColor`类型错误问题
+2. 修复`u-parse`组件`imgtap`、`linktap`不生效问题
+## 2.0.32（2022-06-16）
+# uView2.0重磅发布，利剑出鞘，一统江湖
+1. `u-loadmore`新增自定义颜色、虚/实线
+2. 修复`u-swiper-action`组件部分平台不能上下滑动的问题
+3. 修复`u-list`回弹问题
+4. 修复`notice-bar`组件动画在低端安卓机可能会抖动的问题
+5. `u-loading-page`添加控制图标大小的属性`iconSize`
+6. 修复`u-tooltip`组件`color`参数不生效的问题
+7. 修复`u--input`组件使用`blur`事件输出为`undefined`的bug
+8. `u-code-input`组件新增键盘弹起时，是否自动上推页面参数`adjustPosition`
+9. 修复`image`组件`load`事件无回调对象问题
+10. 修复`button`组件`loadingSize`设置无效问题
+10. 其他修复
+## 2.0.31（2022-04-19）
+# uView2.0重磅发布，利剑出鞘，一统江湖
+
+1. 修复`upload`在`vue`页面上传成功后没有成功标志的问题
+2. 解决演示项目中微信小程序模拟上传图片一直出于上传中问题
+3. 修复`u-code-input`组件在`nvue`页面编译到`app`平台上光标异常问题（`app`去除此功能）
+4. 修复`actionSheet`组件标题关闭按钮点击事件名称错误的问题
+5. 其他修复
 ## 2.0.30（2022-04-04）
 # uView2.0重磅发布，利剑出鞘，一统江湖
 

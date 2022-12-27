@@ -24,7 +24,7 @@ export default {
             type: [String, Number],
             default: uni.$u.props.line.margin
         },
-        // 是否虚线，true-实线，false-虚线
+        // 是否虚线，true-虚线，false-实线
         dashed: {
             type: Boolean,
             default: uni.$u.props.line.dashed

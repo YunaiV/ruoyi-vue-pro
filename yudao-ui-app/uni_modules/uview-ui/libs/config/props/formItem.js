@@ -13,6 +13,7 @@ export default {
         label: '',
         prop: '',
         borderBottom: '',
+        labelPosition: '',
         labelWidth: '',
         rightIcon: '',
         leftIcon: '',

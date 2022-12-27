@@ -14,6 +14,7 @@ export default {
         bgColor: 'transparent',
         icon: true,
         fontSize: 14,
+		iconSize: 17,
         color: '#606266',
         loadingIcon: 'spinner',
         loadmoreText: '加载更多',
@@ -24,6 +25,8 @@ export default {
         marginTop: 10,
         marginBottom: 10,
         height: 'auto',
-        line: false
+        line: false,
+		lineColor: '#E6E8EB',
+		dashed: false,
     }
 }
