@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.pay.service.merchant;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -10,7 +9,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelPageReqVO;
@@ -20,7 +19,6 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.merchant.PayChannelMapper;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -66,53 +64,47 @@ public class PayChannelServiceImpl implements PayChannelService {
     @Resource
     private Validator validator;
 
-    @Resource
-    @Lazy // 注入自己，所以延迟加载
-    private PayChannelService self;
-
+    /**
+     * 初始化 {@link #payClientFactory} 缓存
+     */
     @Override
     @PostConstruct
-    @TenantIgnore // 忽略自动化租户，全局初始化本地缓存
-    public void initPayClients() {
-        // 获取支付渠道，如果有更新
-        List<PayChannelDO> payChannels = loadPayChannelIfUpdate(maxUpdateTime);
-        if (CollUtil.isEmpty(payChannels)) {
-            return;
-        }
-
-        // 创建或更新支付 Client
-        payChannels.forEach(payChannel -> payClientFactory.createOrUpdatePayClient(payChannel.getId(),
-                payChannel.getCode(), payChannel.getConfig()));
-
-        // 写入缓存
-        maxUpdateTime = CollectionUtils.getMaxValue(payChannels, PayChannelDO::getUpdateTime);
-        log.info("[initPayClients][初始化 PayChannel 数量为 {}]", payChannels.size());
+    public void initLocalCache() {
+        initLocalCacheIfUpdate(null);
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        self.initPayClients();
+        initLocalCacheIfUpdate(this.maxUpdateTime);
     }
 
     /**
-     * 如果支付渠道发生变化，从数据库中获取最新的全量支付渠道。
-     * 如果未发生变化，则返回空
+     * 刷新本地缓存
      *
-     * @param maxUpdateTime 当前支付渠道的最大更新时间
-     * @return 支付渠道列表
+     * @param maxUpdateTime 最大更新时间
+     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
+     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
      */
-    private List<PayChannelDO> loadPayChannelIfUpdate(LocalDateTime maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadPayChannelIfUpdate][首次加载全量支付渠道]");
-        } else { // 判断数据库中是否有更新的支付渠道
-            if (channelMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
+    private void initLocalCacheIfUpdate(LocalDateTime maxUpdateTime) {
+        // 注意：忽略自动多租户，因为要全局初始化缓存
+        TenantUtils.executeIgnore(() -> {
+            // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
+            // 如果没有增量的数据变化，则不进行本地缓存的刷新
+            if (maxUpdateTime != null
+                    && channelMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
+                log.info("[initLocalCacheIfUpdate][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
+                return;
             }
-            log.info("[loadPayChannelIfUpdate][增量加载全量支付渠道]");
-        }
-        // 第二步，如果有更新，则从数据库加载所有支付渠道
-        return channelMapper.selectList();
+            List<PayChannelDO> channels = channelMapper.selectList();
+            log.info("[initLocalCacheIfUpdate][缓存支付渠道，数量为:{}]", channels.size());
+
+            // 第二步：构建缓存。创建或更新支付 Client
+            channels.forEach(payChannel -> payClientFactory.createOrUpdatePayClient(payChannel.getId(),
+                    payChannel.getCode(), payChannel.getConfig()));
+
+            // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
+            this.maxUpdateTime = CollectionUtils.getMaxValue(channels, PayChannelDO::getUpdateTime);
+        });
     }
 
     @Override

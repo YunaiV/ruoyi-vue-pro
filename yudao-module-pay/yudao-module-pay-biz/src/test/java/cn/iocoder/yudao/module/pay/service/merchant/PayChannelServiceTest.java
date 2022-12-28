@@ -49,7 +49,6 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreateWechatVersion2Channel_success() {
         // 准备参数
-
         WXPayClientConfig v2Config = getV2Config();
         PayChannelCreateReqVO reqVO = randomPojo(PayChannelCreateReqVO.class, o -> {
             o.setCode(PayChannelEnum.WX_PUB.getCode());

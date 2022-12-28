@@ -37,6 +37,22 @@ public class TenantUtils {
     }
 
     /**
+     * 忽略租户，执行对应的逻辑
+     *
+     * @param runnable 逻辑
+     */
+    public static void executeIgnore(Runnable runnable) {
+        Boolean oldIgnore = TenantContextHolder.isIgnore();
+        try {
+            TenantContextHolder.setIgnore(true);
+            // 执行逻辑
+            runnable.run();
+        } finally {
+            TenantContextHolder.setIgnore(oldIgnore);
+        }
+    }
+
+    /**
      * 将多租户编号，添加到 header 中
      *
      * @param headers HTTP 请求 headers

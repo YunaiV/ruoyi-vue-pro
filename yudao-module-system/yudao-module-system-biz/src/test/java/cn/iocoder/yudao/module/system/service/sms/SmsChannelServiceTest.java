@@ -57,7 +57,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         smsChannelMapper.insert(smsChannelDO02);
 
         // 调用
-        smsChannelService.initSmsClients();
+        smsChannelService.initLocalCache();
         // 校验 maxUpdateTime 属性
         LocalDateTime maxUpdateTime = (LocalDateTime) BeanUtil.getFieldValue(smsChannelService, "maxUpdateTime");
         assertEquals(max(smsChannelDO01.getUpdateTime(), smsChannelDO02.getUpdateTime()), maxUpdateTime);

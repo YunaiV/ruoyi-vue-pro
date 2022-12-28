@@ -102,6 +102,7 @@ public class MenuServiceImpl implements MenuService {
      *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
      */
     private void initLocalCacheIfUpdate(LocalDateTime maxUpdateTime) {
+        // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
         // 如果没有增量的数据变化，则不进行本地缓存的刷新
         if (maxUpdateTime != null
             && menuMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
@@ -111,7 +112,7 @@ public class MenuServiceImpl implements MenuService {
         List<MenuDO> menuList = menuMapper.selectList();
         log.info("[initLocalCacheIfUpdate][缓存菜单，数量为:{}]", menuList.size());
 
-        // 构建缓存
+        // 第二步：构建缓存。
         ImmutableMap.Builder<Long, MenuDO> menuCacheBuilder = ImmutableMap.builder();
         ImmutableMultimap.Builder<String, MenuDO> permMenuCacheBuilder = ImmutableMultimap.builder();
         menuList.forEach(menuDO -> {
@@ -123,7 +124,7 @@ public class MenuServiceImpl implements MenuService {
         menuCache = menuCacheBuilder.build();
         permissionMenuCache = permMenuCacheBuilder.build();
 
-        // 设置最新的 maxUpdateTime，用于下次的增量判断
+        // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
         this.maxUpdateTime = CollectionUtils.getMaxValue(menuList, MenuDO::getUpdateTime);
     }
 
