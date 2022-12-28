@@ -7,7 +7,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { FormSchema } from '@/types/form'
 import { TableColumn } from '@/types/table'
 import { DescriptionsSchema } from '@/types/descriptions'
-import { ComponentOptions } from '@/types/components'
+import { ComponentOptions, ComponentProps } from '@/types/components'
 
 export type CrudSchema = Omit<TableColumn, 'children'> & {
   isSearch?: boolean // 是否在查询显示
@@ -98,7 +98,7 @@ const filterSearchSchema = (crudSchema: CrudSchema[], allSchemas: AllSchemas): F
     if (schemaItem?.isSearch || schemaItem.search?.show) {
       let component = schemaItem?.search?.component || 'Input'
       const options: ComponentOptions[] = []
-      let comonentProps = {}
+      let comonentProps: ComponentProps = {}
       if (schemaItem.dictType) {
         const allOptions: ComponentOptions = { label: '全部', value: '' }
         options.push(allOptions)
@@ -187,7 +187,7 @@ const filterFormSchema = (crudSchema: CrudSchema[], allSchemas: AllSchemas): For
           defaultValue = 0
         }
       }
-      let comonentProps = {}
+      let comonentProps: ComponentProps = {}
       if (schemaItem.dictType) {
         const options: ComponentOptions[] = []
         if (schemaItem.dictClass && schemaItem.dictClass === 'number') {
@@ -264,7 +264,8 @@ const filterDescriptionsSchema = (crudSchema: CrudSchema[]): DescriptionsSchema[
         descriptionsSchemaItem.dictType = schemaItem.dictType
       }
       if (schemaItem.detail?.dateFormat || schemaItem.formatter == 'formatDate') {
-        descriptionsSchemaItem.dateFormat = schemaItem.dateFormat
+        // 优先使用 detail 下的配置，如果没有默认为 YYYY-MM-DD HH:mm:ss
+        descriptionsSchemaItem.dateFormat = schemaItem?.detail?.dateFormat
           ? schemaItem?.detail?.dateFormat
           : 'YYYY-MM-DD HH:mm:ss'
       }
