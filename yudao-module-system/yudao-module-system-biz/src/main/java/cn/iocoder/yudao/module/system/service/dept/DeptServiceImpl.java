@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
@@ -198,12 +199,19 @@ public class DeptServiceImpl implements DeptService {
         if (recursiveCount == 0) {
             return;
         }
+
         // 获得子部门
         Collection<DeptDO> depts = parentDeptMap.get(parentId);
         if (CollUtil.isEmpty(depts)) {
             return;
         }
+        // 针对多租户，过滤掉非当前租户的部门
+        Long tenantId = TenantContextHolder.getTenantId();
+        if (tenantId != null) {
+            depts = CollUtil.filterNew(depts, dept -> tenantId.equals(dept.getTenantId()));
+        }
         result.addAll(depts);
+
         // 继续递归
         depts.forEach(dept -> getDeptsByParentIdFromCache(result, dept.getId(),
                 recursiveCount - 1, parentDeptMap));
