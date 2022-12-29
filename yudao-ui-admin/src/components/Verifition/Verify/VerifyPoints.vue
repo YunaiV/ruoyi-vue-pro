@@ -60,7 +60,7 @@
  * */
 import { resetSize } from './../utils/util'
 import { aesEncrypt } from '@/utils/ase'
-import { reqGet, reqCheck } from './../api/index'
+import { reqGet, reqCheck } from '@/api/login'
 
 export default {
   name: 'VerifyPoints',
@@ -223,7 +223,6 @@ export default {
       this.checkPosArr.splice(0, this.checkPosArr.length)
       this.num = 1
       this.getPictrue()
-      this.text = '验证失败'
       this.showRefresh = true
     },
 

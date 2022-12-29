@@ -1,127 +1,127 @@
 <template>
-	<view class="u-drawdown">
-		<view
-			class="u-dropdown__menu"
-			:style="{
+  <view class="u-drawdown">
+    <view
+      class="u-dropdown__menu"
+      :style="{
 				height: $u.addUnit(height)
 			}"
-			ref="u-dropdown__menu"
-		>
-			<view
-				class="u-dropdown__menu__item"
-				v-for="(item, index) in menuList"
-				:key="index"
-				@tap.stop="clickHandler(item, index)"
-			>
-				<view class="u-dropdown__menu__item__content">
-					<text
-						class="u-dropdown__menu__item__content__text"
-						:style="[index === current ? activeStyle : inactiveStyle]"
-					>{{item.title}}</text>
-					<view
-						class="u-dropdown__menu__item__content__arrow"
-						:class="[index === current && 'u-dropdown__menu__item__content__arrow--rotate']"
-					>
-						<u-icon
-							:name="menuIcon"
-							:size="$u.addUnit(menuIconSize)"
-						></u-icon>
-					</view>
-				</view>
-			</view>
-		</view>
-		<view class="u-dropdown__content">
-			<slot />
-		</view>
-	</view>
+      ref="u-dropdown__menu"
+    >
+      <view
+        class="u-dropdown__menu__item"
+        v-for="(item, index) in menuList"
+        :key="index"
+        @tap.stop="clickHandler(item, index)"
+      >
+        <view class="u-dropdown__menu__item__content">
+          <text
+            class="u-dropdown__menu__item__content__text"
+            :style="[index === current ? activeStyle : inactiveStyle]"
+          >{{item.title}}</text>
+          <view
+            class="u-dropdown__menu__item__content__arrow"
+            :class="[index === current && 'u-dropdown__menu__item__content__arrow--rotate']"
+          >
+            <u-icon
+              :name="menuIcon"
+              :size="$u.addUnit(menuIconSize)"
+            ></u-icon>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="u-dropdown__content">
+      <slot />
+    </view>
+  </view>
 </template>
 
 <script>
-	import props from './props.js';
-	/**
-	 * Dropdown  
-	 * @description 
-	 * @tutorial url
-	 * @property {String}
-	 * @event {Function}
-	 * @example
-	 */
-	export default {
-		name: 'u-dropdown',
-		mixins: [uni.$u.mixin, props],
-		data() {
-			return {
-				// ²Ëµ¥Êý×é
-				menuList: [],
-				current: 0
-			}
-		},
-		computed: {
-		
-		},
-		created() {
-			// ÒýÓÃËùÓÐ×Ó×é¼þ(u-dropdown-item)µÄthis£¬²»ÄÜÔÚdataÖÐÉùÃ÷±äÁ¿£¬·ñÔòÔÚÎ¢ÐÅÐ¡³ÌÐò»áÔì³ÉÑ­»·ÒýÓÃ¶ø±¨´í
-			this.children = [];
-		},
-		methods: {
-			clickHandler(item, index) {
-				this.children.map(child => {
-					if(child.title === item.title) {
-						// this.queryRect('u-dropdown__menu').then(size => {
-							child.$emit('click')
-							child.setContentAnimate(child.show ? 0 : 300)
-							child.show = !child.show
-						// })
-					} else {
-						child.show = false
-						child.setContentAnimate(0)
-					}
-				})
-			},
-			// »ñÈ¡±êÇ©µÄ³ß´çÎ»ÖÃ
-			queryRect(el) {
-				// #ifndef APP-NVUE
-				// $uGetRectÎªuView×Ô´øµÄ½Úµã²éÑ¯¼ò»¯·½·¨£¬Ïê¼ûÎÄµµ½éÉÜ£ºhttps://www.uviewui.com/js/getRect.html
-				// ×é¼þÄÚ²¿Ò»°ãÓÃthis.$uGetRect£¬¶ÔÍâµÄÎªthis.$u.getRect£¬¶þÕß¹¦ÄÜÒ»ÖÂ£¬Ãû³Æ²»Í¬
-				return new Promise(resolve => {
-					this.$uGetRect(`.${el}`).then(size => {
-						resolve(size)
-					})
-				})
-				// #endif
-			
-				// #ifdef APP-NVUE 
-				// nvueÏÂ£¬Ê¹ÓÃdomÄ£¿é²éÑ¯ÔªËØ¸ß¶È
-				// ·µ»ØÒ»¸öpromise£¬ÈÃµ÷ÓÃ´Ë·½·¨µÄÖ÷ÌåÄÜÊ¹ÓÃthen»Øµ÷
-				return new Promise(resolve => {
-					dom.getComponentRect(this.$refs[el], res => {
-						resolve(res.size)
-					})
-				})
-				// #endif
-			},
-		},
-	}
+import props from './props.js';
+/**
+ * Dropdown
+ * @description
+ * @tutorial url
+ * @property {String}
+ * @event {Function}
+ * @example
+ */
+export default {
+  name: 'u-dropdown',
+  mixins: [uni.$u.mixin, props],
+  data() {
+    return {
+      // ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½
+      menuList: [],
+      current: 0
+    }
+  },
+  computed: {
+  
+  },
+  created() {
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(u-dropdown-item)ï¿½ï¿½thisï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½dataï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¢ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½ï¿½ï¿½ï¿½
+    this.children = [];
+  },
+  methods: {
+    clickHandler(item, index) {
+      this.children.map(child => {
+        if(child.title === item.title) {
+          // this.queryRect('u-dropdown__menu').then(size => {
+          child.$emit('click')
+          child.setContentAnimate(child.show ? 0 : 300)
+          child.show = !child.show
+          // })
+        } else {
+          child.show = false
+          child.setContentAnimate(0)
+        }
+      })
+    },
+    // ï¿½ï¿½È¡ï¿½ï¿½Ç©ï¿½Ä³ß´ï¿½Î»ï¿½ï¿½
+    queryRect(el) {
+      // #ifndef APP-NVUE
+      // $uGetRectÎªuViewï¿½Ô´ï¿½ï¿½Ä½Úµï¿½ï¿½Ñ¯ï¿½ò»¯·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½Ü£ï¿½https://www.uviewui.com/js/getRect.html
+      // ï¿½ï¿½ï¿½ï¿½Ú²ï¿½Ò»ï¿½ï¿½ï¿½ï¿½this.$uGetRectï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªthis.$u.getRectï¿½ï¿½ï¿½ï¿½ï¿½ß¹ï¿½ï¿½ï¿½Ò»ï¿½Â£ï¿½ï¿½ï¿½ï¿½Æ²ï¿½Í¬
+      return new Promise(resolve => {
+        this.$uGetRect(`.${el}`).then(size => {
+          resolve(size)
+        })
+      })
+      // #endif
+      
+      // #ifdef APP-NVUE
+      // nvueï¿½Â£ï¿½Ê¹ï¿½ï¿½domÄ£ï¿½ï¿½ï¿½Ñ¯Ôªï¿½Ø¸ß¶ï¿½
+      // ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½promiseï¿½ï¿½ï¿½Ãµï¿½ï¿½Ã´Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½thenï¿½Øµï¿½
+      return new Promise(resolve => {
+        dom.getComponentRect(this.$refs[el], res => {
+          resolve(res.size)
+        })
+      })
+      // #endif
+    },
+  },
+}
 </script>
 
 <style lang="scss">
-	@import '../../libs/css/components.scss';
+@import '../../libs/css/components.scss';
 
-	.u-dropdown {
-
-		&__menu {
-			@include flex;
-
-			&__item {
-				flex: 1;
-				@include flex;
-				justify-content: center;
-
-				&__content {
-					@include flex;
-					align-items: center;
-				}
-			}
-		}
-	}
+.u-dropdown {
+  
+  &__menu {
+    @include flex;
+    
+    &__item {
+      flex: 1;
+      @include flex;
+      justify-content: center;
+      
+      &__content {
+        @include flex;
+        align-items: center;
+      }
+    }
+  }
+}
 </style>

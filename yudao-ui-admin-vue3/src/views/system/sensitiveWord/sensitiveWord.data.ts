@@ -1,8 +1,8 @@
 import { reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
 import { DICT_TYPE } from '@/utils/dict'
+import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 
 // 表单校验
@@ -12,68 +12,67 @@ export const rules = reactive({
 })
 
 // CrudSchema
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: 'seq',
+  primaryTitle: '敏感词编号',
+  action: true,
+  columns: [
+    {
+      title: '敏感词',
+      field: 'name',
+      isSearch: true
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '敏感词',
-    field: 'name',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '标签',
-    field: 'tags'
-  },
-  {
-    label: t('common.status'),
-    field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '描述',
-    field: 'description',
-    form: {
-      component: 'Input',
-      componentProps: {
-        type: 'textarea',
-        rows: 4
-      },
-      colProps: {
-        span: 24
+    {
+      title: '标签',
+      field: 'tag',
+      isTable: false,
+      isForm: false,
+      isDetail: false,
+      isSearch: true
+    },
+    {
+      title: '标签',
+      field: 'tags',
+      table: {
+        slots: {
+          default: 'tags_default'
+        }
+      }
+    },
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '描述',
+      field: 'description',
+      form: {
+        component: 'Input',
+        componentProps: {
+          type: 'textarea',
+          rows: 4
+        },
+        colProps: {
+          span: 24
+        }
+      }
+    },
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate',
+      isForm: false,
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
       }
     }
-  },
-  {
-    label: t('common.createTime'),
-    field: 'createTime',
-    form: {
-      show: false
-    }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '240px',
-    form: {
-      show: false
-    },
-    detail: {
-      show: false
-    }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

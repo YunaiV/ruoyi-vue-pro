@@ -26,6 +26,10 @@ export default {
     const res = await request({ method: 'POST', ...option })
     return res.data as unknown as T
   },
+  postOriginal: async (option: any) => {
+    const res = await request({ method: 'POST', ...option })
+    return res
+  },
   delete: async <T = any>(option: any) => {
     const res = await request({ method: 'DELETE', ...option })
     return res.data as unknown as T
@@ -40,7 +44,7 @@ export default {
   },
   upload: async <T = any>(option: any) => {
     option.headersType = 'multipart/form-data'
-    const res = await request({ method: 'PUT', ...option })
+    const res = await request({ method: 'POST', ...option })
     return res as unknown as Promise<T>
   }
 }

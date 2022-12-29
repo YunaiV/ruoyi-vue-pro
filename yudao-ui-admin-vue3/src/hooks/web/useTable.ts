@@ -18,6 +18,8 @@ interface UseTableConfig<T = any> {
   exportListApi?: (option: any) => Promise<T>
   // 返回数据格式配置
   response?: ResponseType
+  // 默认传递的参数
+  defaultParams?: Recordable
   props?: TableProps
 }
 
@@ -43,7 +45,9 @@ export const useTable = <T = any>(config?: UseTableConfig<T>) => {
     // 表格数据
     tableList: [],
     // AxiosConfig 配置
-    params: {},
+    params: {
+      ...(config?.defaultParams || {})
+    },
     // 加载中
     loading: true,
     // 导出加载中

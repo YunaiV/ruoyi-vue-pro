@@ -33,7 +33,8 @@ const crudSchemas = reactive<CrudSchema[]>([
   {
     label: t('common.status'),
     field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS
+    dictType: DICT_TYPE.COMMON_STATUS,
+    dictClass: 'number'
   },
   {
     label: '备注',

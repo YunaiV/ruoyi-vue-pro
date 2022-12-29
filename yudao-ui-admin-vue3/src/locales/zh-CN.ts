@@ -17,6 +17,7 @@ export default {
     cancel: '取消',
     close: '关闭',
     reload: '重新加载',
+    success: '成功',
     closeTab: '关闭标签页',
     closeTheLeftTab: '关闭左侧标签页',
     closeTheRightTab: '关闭右侧标签页',
@@ -79,6 +80,7 @@ export default {
     screenfullIcon: '全屏图标',
     sizeIcon: '尺寸图标',
     localeIcon: '多语言图标',
+    messageIcon: '消息图标',
     tagsView: '标签页',
     logo: '标志',
     greyMode: '灰色模式',
@@ -92,7 +94,6 @@ export default {
     footer: '页脚',
     uniqueOpened: '菜单手风琴',
     tagsViewIcon: '标签页图标',
-    dynamicRouter: '动态路由',
     reExperienced: '请重新退出登录体验',
     fixedMenu: '固定菜单'
   },
@@ -189,7 +190,6 @@ export default {
     access: '项目访问',
     toDo: '待办',
     introduction: '一个正经的简介',
-    more: '更多',
     shortcutOperation: '快捷入口',
     operation: '操作',
     index: '指数',
@@ -284,6 +284,7 @@ export default {
     edit: '编辑',
     update: '编辑',
     preview: '预览',
+    more: '更多',
     sync: '同步',
     save: '保存',
     detail: '详情',
@@ -419,5 +420,19 @@ export default {
       pwdRules: '长度在 6 到 20 个字符',
       diffPwd: '两次输入密码不一致'
     }
+  },
+  cropper: {
+    selectImage: '选择图片',
+    uploadSuccess: '上传成功',
+    modalTitle: '头像上传',
+    okText: '确认并上传',
+    btn_reset: '重置',
+    btn_rotate_left: '逆时针旋转',
+    btn_rotate_right: '顺时针旋转',
+    btn_scale_x: '水平翻转',
+    btn_scale_y: '垂直翻转',
+    btn_zoom_in: '放大',
+    btn_zoom_out: '缩小',
+    preview: '预览'
   }
 }

@@ -1,18 +1,7 @@
-<!--
- * @Descripttion: cron规则生成器
- * @version: 1.0
- * @Author: sakuya
- * @Date: 2021年12月29日15:23:54
- * @LastEditors:
- * @LastEditTime:
--->
 <script setup lang="ts">
 import {
   ElInput,
   ElInputNumber,
-  ElDropdown,
-  ElDropdownMenu,
-  ElDropdownItem,
   ElDialog,
   ElTabs,
   ElTabPane,
@@ -360,14 +349,19 @@ onMounted(() => {
   defaultValue.value = props.modelValue
 })
 const emit = defineEmits(['update:modelValue'])
-const handleShortcuts = (command) => {
-  if (command == 'custom') {
-    open()
-  } else {
-    defaultValue.value = command
-    emit('update:modelValue', defaultValue.value)
+const select = ref()
+watch(
+  () => select.value,
+  () => {
+    console.info(select.value)
+    if (select.value == 'custom') {
+      open()
+    } else {
+      defaultValue.value = select.value
+      emit('update:modelValue', defaultValue.value)
+    }
   }
-}
+)
 const open = () => {
   set()
   dialogVisible.value = true
@@ -518,32 +512,23 @@ const submit = () => {
 }
 </script>
 <template>
-  <el-input v-model="defaultValue" v-bind="$attrs">
+  <el-input v-model="defaultValue" v-bind="$attrs" class="input-with-select">
     <template #append>
-      <el-dropdown split-button trigger="click" @command="handleShortcuts">
-        生成器
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="0 * * * * ?">每分钟</el-dropdown-item>
-            <el-dropdown-item command="0 0 * * * ?">每小时</el-dropdown-item>
-            <el-dropdown-item command="0 0 0 * * ?">每天零点</el-dropdown-item>
-            <el-dropdown-item command="0 0 0 1 * ?">每月一号零点</el-dropdown-item>
-            <el-dropdown-item command="0 0 0 L * ?">每月最后一天零点</el-dropdown-item>
-            <el-dropdown-item command="0 0 0 ? * 1">每周星期日零点</el-dropdown-item>
-            <el-dropdown-item
-              v-for="(item, index) in shortcuts"
-              :key="item.value"
-              :divided="index == 0"
-              :command="item.value"
-            >
-              {{ item.text }}
-            </el-dropdown-item>
-            <el-dropdown-item divided command="custom">
-              <Icon icon="ep:menu" />自定义
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+      <el-select v-model="select" placeholder="生成器" style="width: 115px">
+        <el-option label="每分钟" value="0 * * * * ?" />
+        <el-option label="每小时" value="0 0 * * * ?" />
+        <el-option label="每天零点" value="0 0 0 * * ?" />
+        <el-option label="每月一号零点" value="0 0 0 1 * ?" />
+        <el-option label="每月最后一天零点" value="0 0 0 L * ?" />
+        <el-option label="每周星期日零点" value="0 0 0 ? * 1" />
+        <el-option
+          v-for="(item, index) in shortcuts"
+          :key="index"
+          :label="item.text"
+          :value="item.value"
+        />
+        <el-option label="自定义" value="custom" />
+      </el-select>
     </template>
   </el-input>
 
@@ -1018,8 +1003,10 @@ const submit = () => {
   background: var(--el-color-primary);
   color: #fff;
 }
-
 [data-theme='dark'] .sc-cron-num h4 {
   background: var(--el-color-white);
+}
+.input-with-select .el-input-group__prepend {
+  background-color: var(--el-fill-color-blank);
 }
 </style>

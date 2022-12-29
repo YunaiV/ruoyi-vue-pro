@@ -12,8 +12,8 @@ export type CodegenTableVO = {
   className: string
   classComment: string
   author: string
-  createTime: string
-  updateTime: string
+  createTime: Date
+  updateTime: Date
   templateType: number
   parentMenuId: number
 }

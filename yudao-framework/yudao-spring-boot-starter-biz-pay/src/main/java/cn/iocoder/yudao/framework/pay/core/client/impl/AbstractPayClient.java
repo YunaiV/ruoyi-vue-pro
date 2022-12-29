@@ -69,7 +69,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         this.init();
     }
 
-    protected Double calculateAmount(Long amount) {
+    protected Double calculateAmount(Integer amount) {
         return amount / 100.0;
     }
 

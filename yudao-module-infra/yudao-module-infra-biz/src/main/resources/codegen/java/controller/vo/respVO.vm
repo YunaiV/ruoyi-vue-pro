@@ -1,7 +1,12 @@
 package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
 
 import lombok.*;
-import java.util.*;
+#foreach ($column in $columns)
+#if (${column.javaType} == "LocalDateTime")
+import java.time.LocalDateTime;
+#break
+#end
+#end
 import io.swagger.annotations.*;
 
 @ApiModel("${sceneEnum.name} - ${table.classComment} Response VO")

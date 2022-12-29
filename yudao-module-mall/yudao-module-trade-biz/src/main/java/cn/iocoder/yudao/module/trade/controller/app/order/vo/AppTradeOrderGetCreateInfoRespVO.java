@@ -56,7 +56,7 @@ public class AppTradeOrderGetCreateInfoRespVO {
          */
         private String picURL;
 //        /**
-//         * 规格值数组
+//         * 属性数组
 //         */
 //        private List<ProductAttrKeyValueRespVO> attrs; // TODO 后面改下
         /**

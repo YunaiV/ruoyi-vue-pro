@@ -34,7 +34,7 @@ import static cn.hutool.core.bean.BeanUtil.getFieldValue;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -205,7 +205,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
            o.setContent("芋道源码");
            o.setApiTemplateId("yunai");
            o.setChannelId(1L);
-           o.setCreateTime(buildLocalDateTime(2021, 11, 11));
+           o.setCreateTime(buildTime(2021, 11, 11));
        });
        smsTemplateMapper.insert(dbSmsTemplate);
        // 测试 type 不匹配
@@ -221,7 +221,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
        // 测试 channelId 不匹配
        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setChannelId(2L)));
        // 测试 createTime 不匹配
-       smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setCreateTime(buildLocalDateTime(2021, 12, 12))));
+       smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setCreateTime(buildTime(2021, 12, 12))));
        // 准备参数
        SmsTemplatePageReqVO reqVO = new SmsTemplatePageReqVO();
        reqVO.setType(SmsTemplateTypeEnum.PROMOTION.getType());
@@ -230,7 +230,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
        reqVO.setContent("芋道");
        reqVO.setApiTemplateId("yu");
        reqVO.setChannelId(1L);
-       reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021, 11, 1),buildLocalDateTime(2021, 12, 1)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 11, 1),buildTime(2021, 12, 1)}));
 
        // 调用
        PageResult<SmsTemplateDO> pageResult = smsTemplateService.getSmsTemplatePage(reqVO);
@@ -250,7 +250,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
             o.setContent("芋道源码");
             o.setApiTemplateId("yunai");
             o.setChannelId(1L);
-            o.setCreateTime(buildLocalDateTime(2021, 11, 11));
+            o.setCreateTime(buildTime(2021, 11, 11));
         });
         smsTemplateMapper.insert(dbSmsTemplate);
         // 测试 type 不匹配
@@ -266,7 +266,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
         // 测试 channelId 不匹配
         smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setChannelId(2L)));
         // 测试 createTime 不匹配
-        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setCreateTime(buildLocalDateTime(2021, 12, 12))));
+        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setCreateTime(buildTime(2021, 12, 12))));
         // 准备参数
         SmsTemplateExportReqVO reqVO = new SmsTemplateExportReqVO();
         reqVO.setType(SmsTemplateTypeEnum.PROMOTION.getType());
@@ -275,7 +275,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
         reqVO.setContent("芋道");
         reqVO.setApiTemplateId("yu");
         reqVO.setChannelId(1L);
-        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021, 11, 1),buildLocalDateTime(2021, 12, 1)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 11, 1),buildTime(2021, 12, 1)}));
 
        // 调用
        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplateList(reqVO);

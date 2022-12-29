@@ -1,21 +1,65 @@
+<template>
+  <!-- 导入表 -->
+  <XModal title="导入表" v-model="visible">
+    <el-form :model="queryParams" ref="queryRef" :inline="true">
+      <el-form-item label="数据源" prop="dataSourceConfigId">
+        <el-select v-model="queryParams.dataSourceConfigId" placeholder="请选择数据源" clearable>
+          <el-option
+            v-for="config in dataSourceConfigs"
+            :key="config.id"
+            :label="config.name"
+            :value="config.id"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="表名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入表名称" clearable />
+      </el-form-item>
+      <el-form-item label="表描述" prop="comment">
+        <el-input v-model="queryParams.comment" placeholder="请输入表描述" clearable />
+      </el-form-item>
+      <el-form-item>
+        <XButton
+          type="primary"
+          preIcon="ep:search"
+          :title="t('common.query')"
+          @click="handleQuery()"
+        />
+        <XButton preIcon="ep:refresh-right" :title="t('common.reset')" @click="resetQuery()" />
+      </el-form-item>
+    </el-form>
+    <vxe-table
+      ref="xTable"
+      :data="dbTableList"
+      v-loading="dbLoading"
+      :checkbox-config="{ highlight: true, range: true }"
+      height="260px"
+      class="xtable-scrollbar"
+    >
+      <vxe-column type="checkbox" width="60" />
+      <vxe-column field="name" title="表名称" />
+      <vxe-column field="comment" title="表描述" />
+    </vxe-table>
+    <template #footer>
+      <div class="dialog-footer">
+        <XButton type="primary" :title="t('action.import')" @click="handleImportTable()" />
+        <XButton :title="t('dialog.close')" @click="handleClose()" />
+      </div>
+    </template>
+  </XModal>
+</template>
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { getSchemaTableListApi, createCodegenListApi } from '@/api/infra/codegen'
-import {
-  ElMessage,
-  ElTable,
-  ElTableColumn,
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElSelect,
-  ElOption
-} from 'element-plus'
+import { ref, reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
-import { getDataSourceConfigListApi } from '@/api/infra/dataSourceConfig'
-import type { DataSourceConfigVO } from '@/api/infra/dataSourceConfig/types'
+import { useMessage } from '@/hooks/web/useMessage'
+import { VxeTableInstance } from 'vxe-table'
+import { ElForm, ElFormItem, ElInput, ElSelect, ElOption } from 'element-plus'
 import type { DatabaseTableVO } from '@/api/infra/codegen/types'
+import { getSchemaTableListApi, createCodegenListApi } from '@/api/infra/codegen'
+import { getDataSourceConfigListApi, DataSourceConfigVO } from '@/api/infra/dataSourceConfig'
+
 const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
 const emit = defineEmits(['ok'])
 // ======== 显示页面 ========
 const visible = ref(false)
@@ -54,76 +98,32 @@ const resetQuery = async () => {
   queryParams.dataSourceConfigId = 0
   await getList()
 }
+const xTable = ref<VxeTableInstance>()
 /** 多选框选中数据 */
 const tables = ref<string[]>([])
-const handleSelectionChange = (val: DatabaseTableVO[]) => {
-  tables.value = val.map((item) => item.name)
-}
+
 /** 导入按钮操作 */
 const handleImportTable = async () => {
-  if (tables.value.length === 0) {
-    ElMessage.error('请选择要导入的表')
+  if (xTable.value?.getCheckboxRecords().length === 0) {
+    message.error('请选择要导入的表')
     return
   }
+  xTable.value?.getCheckboxRecords().forEach((item) => {
+    tables.value.push(item.name)
+  })
   await createCodegenListApi({
     dataSourceConfigId: queryParams.dataSourceConfigId,
     tableNames: tables.value
   })
-  ElMessage.success('导入成功')
-  visible.value = false
+  message.success('导入成功')
   emit('ok')
+  handleClose()
+}
+const handleClose = () => {
+  visible.value = false
+  tables.value = []
 }
 defineExpose({
   show
 })
 </script>
-<template>
-  <!-- 导入表 -->
-  <Dialog title="导入表" v-model="visible" maxHeight="500px" width="50%">
-    <el-form :model="queryParams" ref="queryRef" :inline="true">
-      <el-form-item label="数据源" prop="dataSourceConfigId">
-        <el-select v-model="queryParams.dataSourceConfigId" placeholder="请选择数据源" clearable>
-          <el-option
-            v-for="config in dataSourceConfigs"
-            :key="config.id"
-            :label="config.name"
-            :value="config.id"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="表名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入表名称" clearable />
-      </el-form-item>
-      <el-form-item label="表描述" prop="comment">
-        <el-input v-model="queryParams.comment" placeholder="请输入表描述" clearable />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleQuery">
-          <Icon icon="ep:search" class="mr-5px" />
-          {{ t('common.query') }}
-        </el-button>
-        <el-button @click="resetQuery">
-          <Icon icon="ep:refresh-right" class="mr-5px" />
-          {{ t('common.reset') }}
-        </el-button>
-      </el-form-item>
-    </el-form>
-    <el-table
-      ref="table"
-      :data="dbTableList"
-      @selection-change="handleSelectionChange"
-      v-loading="dbLoading"
-      height="400px"
-    >
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="name" label="表名称" :show-overflow-tooltip="true" />
-      <el-table-column prop="comment" label="表描述" :show-overflow-tooltip="true" />
-    </el-table>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button type="primary" @click="handleImportTable">{{ t('action.import') }}</el-button>
-        <el-button @click="visible = false">{{ t('dialog.close') }}</el-button>
-      </div>
-    </template>
-  </Dialog>
-</template>

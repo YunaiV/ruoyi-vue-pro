@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.property;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,7 +8,7 @@ import lombok.*;
 
 
 /**
- * 规格值 DO
+ * 商品属性值 DO
  *
  * @author 芋道源码
  */
@@ -29,21 +28,15 @@ public class ProductPropertyValueDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 规格键编号
+     * 属性项的编号
      *
      * 关联 {@link ProductPropertyDO#getId()}
      */
     private Long propertyId;
     /**
-     * 规格值名字
+     * 名称
      */
     private String name;
-    /**
-     * 状态
-     *
-     * 枚举 {@link CommonStatusEnum}
-     */
-    private Integer status;
     /**
      * 备注
      *

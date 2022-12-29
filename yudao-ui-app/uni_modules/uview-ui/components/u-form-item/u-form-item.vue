@@ -4,7 +4,7 @@
 			class="u-form-item__body"
 			@tap="clickHandler"
 			:style="[$u.addStyle(customStyle), {
-				flexDirection: parentData.labelPosition === 'left' ? 'row' : 'column'
+				flexDirection: (labelPosition || parentData.labelPosition) === 'left' ? 'row' : 'column'
 			}]"
 		>
 			<!-- 微信小程序中，将一个参数设置空字符串，结果会变成字符串"true" -->

@@ -23,7 +23,7 @@ import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildLocalDateTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -49,7 +49,6 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreateWechatVersion2Channel_success() {
         // 准备参数
-
         WXPayClientConfig v2Config = getV2Config();
         PayChannelCreateReqVO reqVO = randomPojo(PayChannelCreateReqVO.class, o -> {
             o.setCode(PayChannelEnum.WX_PUB.getCode());
@@ -215,7 +214,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
             o.setMerchantId(1L);
             o.setAppId(1L);
             o.setConfig(payClientConfig);
-            o.setCreateTime(buildLocalDateTime(2021,11,20));
+            o.setCreateTime(buildTime(2021,11,20));
         });
         channelMapper.insert(dbChannel);
         // 执行拷贝的时候会出现异常，所以在插入后要重置为null 后续在写入新的
@@ -253,7 +252,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         // 测试 createTime 不匹配
         channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
-            o.setCreateTime(buildLocalDateTime(2021, 10, 20));
+            o.setCreateTime(buildTime(2021, 10, 20));
         }));
         // 准备参数
         PayChannelPageReqVO reqVO = new PayChannelPageReqVO();
@@ -264,7 +263,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         reqVO.setMerchantId(1L);
         reqVO.setAppId(1L);
         reqVO.setConfig(JSON.toJSONString(payClientConfig));
-        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021,11,19),buildLocalDateTime(2021,11,21)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021,11,19),buildTime(2021,11,21)}));
 
         // 调用
         PageResult<PayChannelDO> pageResult = channelService.getChannelPage(reqVO);
@@ -288,7 +287,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
             o.setMerchantId(1L);
             o.setAppId(1L);
             o.setConfig(payClientConfig);
-            o.setCreateTime(buildLocalDateTime(2021,11,20));
+            o.setCreateTime(buildTime(2021,11,20));
         });
         channelMapper.insert(dbChannel);
         // 执行拷贝的时候会出现异常，所以在插入后要重置为null 后续在写入新的
@@ -326,7 +325,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         // 测试 createTime 不匹配
         channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
-            o.setCreateTime(buildLocalDateTime(2021, 10, 20));
+            o.setCreateTime(buildTime(2021, 10, 20));
         }));
         // 准备参数
         PayChannelExportReqVO reqVO = new PayChannelExportReqVO();
@@ -337,7 +336,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         reqVO.setMerchantId(1L);
         reqVO.setAppId(1L);
         reqVO.setConfig(JSON.toJSONString(payClientConfig));
-        reqVO.setCreateTime((new LocalDateTime[]{buildLocalDateTime(2021,11,19),buildLocalDateTime(2021,11,21)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021,11,19),buildTime(2021,11,21)}));
 
         // 调用
         List<PayChannelDO> list = channelService.getChannelList(reqVO);

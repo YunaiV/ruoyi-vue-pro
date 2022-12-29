@@ -19,16 +19,16 @@ public class ProductSkuRespDTO {
      */
     private Long id;
     /**
-     * 商品 SKU 名字
-     */
-    private String name;
-    /**
      * SPU 编号
      */
     private Long spuId;
+    /**
+     * SPU 名字
+     */
+    private String spuName;
 
     /**
-     * 规格值数组，JSON 格式
+     * 属性数组，JSON 格式
      */
     private List<Property> properties;
     /**

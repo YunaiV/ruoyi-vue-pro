@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" name="Done">
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import { DICT_TYPE } from '@/utils/dict'

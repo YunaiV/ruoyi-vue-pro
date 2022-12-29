@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -20,7 +19,6 @@ import cn.iocoder.yudao.module.infra.dal.mysql.file.FileConfigMapper;
 import cn.iocoder.yudao.module.infra.mq.producer.file.FileConfigProducer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,20 +77,36 @@ public class FileConfigServiceImpl implements FileConfigService {
     @Resource
     private Validator validator;
 
-    @Resource
-    @Lazy // 注入自己，所以延迟加载
-    private FileConfigService self;
-
     @Override
     @PostConstruct
     public void initFileClients() {
-        // 获取文件配置，如果有更新
-        List<FileConfigDO> configs = loadFileConfigIfUpdate(maxUpdateTime);
-        if (CollUtil.isEmpty(configs)) {
+        initLocalCacheIfUpdate(null);
+    }
+
+    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
+    public void schedulePeriodicRefresh() {
+        initLocalCacheIfUpdate(this.maxUpdateTime);
+    }
+
+    /**
+     * 刷新本地缓存
+     *
+     * @param maxUpdateTime 最大更新时间
+     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
+     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
+     */
+    private void initLocalCacheIfUpdate(LocalDateTime maxUpdateTime) {
+        // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
+        // 如果没有增量的数据变化，则不进行本地缓存的刷新
+        if (maxUpdateTime != null
+                && fileConfigMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
+            log.info("[initLocalCacheIfUpdate][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
             return;
         }
+        List<FileConfigDO> configs = fileConfigMapper.selectList();
+        log.info("[initLocalCacheIfUpdate][缓存文件配置，数量为:{}]", configs.size());
 
-        // 创建或更新支付 Client
+        // 第二步：构建缓存。创建或更新文件 Client
         configs.forEach(config -> {
             fileClientFactory.createOrUpdateFileClient(config.getId(), config.getStorage(), config.getConfig());
             // 如果是 master，进行设置
@@ -101,35 +115,8 @@ public class FileConfigServiceImpl implements FileConfigService {
             }
         });
 
-        // 写入缓存
-        maxUpdateTime = CollectionUtils.getMaxValue(configs, FileConfigDO::getUpdateTime);
-        log.info("[initFileClients][初始化 FileConfig 数量为 {}]", configs.size());
-    }
-
-    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
-    public void schedulePeriodicRefresh() {
-        self.initFileClients();
-    }
-
-    /**
-     * 如果文件配置发生变化，从数据库中获取最新的全量文件配置。
-     * 如果未发生变化，则返回空
-     *
-     * @param maxUpdateTime 当前文件配置的最大更新时间
-     * @return 文件配置列表
-     */
-    private List<FileConfigDO> loadFileConfigIfUpdate(LocalDateTime maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadFileConfigIfUpdate][首次加载全量文件配置]");
-        } else { // 判断数据库中是否有更新的文件配置
-            if (fileConfigMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
-            }
-            log.info("[loadFileConfigIfUpdate][增量加载全量文件配置]");
-        }
-        // 第二步，如果有更新，则从数据库加载所有文件配置
-        return fileConfigMapper.selectList();
+        // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
+        this.maxUpdateTime = CollectionUtils.getMaxValue(configs, FileConfigDO::getUpdateTime);
     }
 
     @Override
@@ -230,7 +217,7 @@ public class FileConfigServiceImpl implements FileConfigService {
         this.validateFileConfigExists(id);
         // 上传文件
         byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
-        return fileClientFactory.getFileClient(id).upload(content, IdUtil.fastSimpleUUID() + ".jpg");
+        return fileClientFactory.getFileClient(id).upload(content, IdUtil.fastSimpleUUID() + ".jpg", "image/jpeg");
     }
 
     @Override

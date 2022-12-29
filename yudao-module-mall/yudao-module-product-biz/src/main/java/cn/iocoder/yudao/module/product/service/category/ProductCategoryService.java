@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCateg
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -47,12 +46,19 @@ public interface ProductCategoryService {
     ProductCategoryDO getCategory(Long id);
 
     /**
-     * 获得商品分类列表
+     * 校验商品分类
      *
-     * @param ids 编号
-     * @return 商品分类列表
+     * @param id 分类编号
      */
-    List<ProductCategoryDO> getEnableCategoryList(Collection<Long> ids);
+    void validateCategory(Long id);
+
+    /**
+     * 获得商品分类的层级
+     *
+     * @param id 编号
+     * @return 商品分类的层级
+     */
+    Integer getCategoryLevel(Long id);
 
     /**
      * 获得商品分类列表
@@ -61,14 +67,6 @@ public interface ProductCategoryService {
      * @return 商品分类列表
      */
     List<ProductCategoryDO> getEnableCategoryList(ProductCategoryListReqVO listReqVO);
-
-    /**
-     * 验证选择的商品分类的级别是否合法
-     * 例如说，商品发布的时候，必须在第 3 级别
-     *
-     * @param id 分类编号
-     */
-    void validateCategoryLevel(Long id);
 
     /**
      * 获得开启状态的商品分类列表

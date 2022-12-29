@@ -1,105 +1,85 @@
 import { reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
 import { DICT_TYPE } from '@/utils/dict'
+import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 
 // CrudSchema
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: 'seq',
+  primaryTitle: '日志编号',
+  action: true,
+  columns: [
+    {
+      title: '手机号',
+      field: 'mobile',
+      isSearch: true
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '手机号',
-    field: 'mobile',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '短信内容',
-    field: 'templateContent'
-  },
-  {
-    label: '短信渠道',
-    field: 'channelId',
-    dictType: DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '发送状态',
-    field: 'sendStatus',
-    dictType: DICT_TYPE.SYSTEM_SMS_SEND_STATUS,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '接收状态',
-    field: 'receiveTime',
-    dictType: DICT_TYPE.SYSTEM_SMS_RECEIVE_STATUS,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '模板编号',
-    field: 'templateId',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '短信类型',
-    field: 'channelId',
-    dictType: DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '接收时间',
-    field: 'receiveTime',
-    form: {
-      show: false
-    }
-  },
-  {
-    label: t('common.createTime'),
-    field: 'createTime',
-    form: {
-      show: false
+    {
+      title: '短信内容',
+      field: 'templateContent'
     },
-    search: {
-      show: true,
-      component: 'DatePicker',
-      componentProps: {
-        type: 'daterange',
-        valueFormat: 'YYYY-MM-DD HH:mm:ss',
-        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]
+    {
+      title: '模板编号',
+      field: 'templateId',
+      isSearch: true
+    },
+    {
+      title: '短信渠道',
+      field: 'channelId',
+      dictType: DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '发送状态',
+      field: 'sendStatus',
+      dictType: DICT_TYPE.SYSTEM_SMS_SEND_STATUS,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '发送时间',
+      field: 'sendTime',
+      formatter: 'formatDate',
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
       }
-    }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '80px',
-    form: {
-      show: false
     },
-    detail: {
-      show: false
+    {
+      title: '短信类型',
+      field: 'templateType',
+      dictType: DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '接收状态',
+      field: 'receiveStatus',
+      dictType: DICT_TYPE.SYSTEM_SMS_RECEIVE_STATUS,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '接收时间',
+      field: 'receiveTime',
+      formatter: 'formatDate',
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
+      }
+    },
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate'
     }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

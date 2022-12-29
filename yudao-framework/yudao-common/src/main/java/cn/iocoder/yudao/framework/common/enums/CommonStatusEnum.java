@@ -20,7 +20,6 @@ public enum CommonStatusEnum implements IntArrayValuable {
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CommonStatusEnum::getStatus).toArray();
 
-
     /**
      * 状态值
      */

@@ -292,15 +292,15 @@ if (!String.prototype.padStart) {
   else if (typeof dateTime === 'string' && /^\d+$/.test(dateTime.trim())) {
     date = new Date(Number(dateTime))
   }
-  // 其他都认为符合 RFC 2822 规范
-  else {
-    // 处理平台性差异，在Safari/Webkit中，new Date仅支持/作为分割符的字符串时间
-    date = new Date(
-      typeof dateTime === 'string'
-        ? dateTime.replace(/-/g, '/')
-        : dateTime
-    )
-  }
+	// 处理平台性差异，在Safari/Webkit中，new Date仅支持/作为分割符的字符串时间
+	// 处理 '2022-07-10 01:02:03'，跳过 '2022-07-10T01:02:03'
+	else if (typeof dateTime === 'string' && dateTime.includes('-') && !dateTime.includes('T')) {
+		date = new Date(dateTime.replace(/-/g, '/'))
+	}
+	// 其他都认为符合 RFC 2822 规范
+	else {
+		date = new Date(dateTime)
+	}
 
 	const timeSource = {
 		'y': date.getFullYear().toString(), // 年

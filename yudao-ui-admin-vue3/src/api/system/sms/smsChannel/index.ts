@@ -1,8 +1,26 @@
 import request from '@/config/axios'
-import type { SmsChannelVO } from './types'
+
+export interface SmsChannelVO {
+  id: number
+  code: string
+  status: number
+  signature: string
+  remark: string
+  apiKey: string
+  apiSecret: string
+  callbackUrl: string
+  createTime: Date
+}
+
+export interface SmsChannelPageReqVO extends PageParam {
+  signature?: string
+  code?: string
+  status?: number
+  createTime?: Date[]
+}
 
 // 查询短信渠道列表
-export const getSmsChannelPageApi = (params) => {
+export const getSmsChannelPageApi = (params: SmsChannelPageReqVO) => {
   return request.get({ url: '/system/sms-channel/page', params })
 }
 

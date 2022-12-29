@@ -35,14 +35,15 @@
 * 工作流使用 Flowable，支持动态表单、在线设计流程、会签 / 或签、多种任务分配方式
 * 高效率开发，使用代码生成器可以一键生成前后端代码 + 单元测试 + Swagger 接口文档 + Validator 参数校验
 * 集成微信小程序、微信公众号、企业微信、钉钉等三方登陆，集成支付宝、微信等支付与退款
-* 集成阿里云、腾讯云、云片等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务
+* 集成阿里云、腾讯云等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务
 * 集成报表设计器，支持数据报表、图形报表、打印设计等
 
-| 项目名                | 说明                     | 传说门                                                                                                                                 |
-|--------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| `ruoyi-vue-pro`    | Spring Boot 多模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro)     |
-| `yudao-cloud`  | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)         |
+| 项目名                | 说明                     | 传送门                                                                                                                               |
+|--------------------|------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `ruoyi-vue-pro`    | Spring Boot 多模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro)   |
+| `yudao-cloud`  | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)       |
 | `Spring-Boot-Labs` | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/zhijiantianya/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/SpringBoot-Labs) |
+ | `ruoyi-vue-pro-mini` | 精简版 移除工作流 支付等模块| **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini)**  |
 
 ## 😎 开源协议
 
@@ -90,12 +91,12 @@
 | 🚀  | 租户管理  | 配置系统租户，支持 SaaS 场景下的多租户功能        |
 | 🚀  | 租户套餐  | 配置租户套餐，自定每个租户的菜单、操作、按钮的权限       |
 |     | 字典管理  | 对系统中经常使用的一些较为固定的数据进行维护          |
-| 🚀  | 短信管理  | 短信渠道、短息模板、短信日志，对接阿里云、云片等主流短信平台  |
+| 🚀  | 短信管理  | 短信渠道、短息模板、短信日志，对接阿里云、腾讯云等主流短信平台 |
 | 🚀  | 操作日志  | 系统正常操作日志记录和查询，集成 Swagger 生成日志内容 |
 | ⭐️  | 登录日志  | 系统登录日志记录查询，包含登录异常               |
 | 🚀  | 错误码管理 | 系统所有错误码的管理，可在线修改错误提示，无需重启服务     |
 |     | 通知公告  | 系统通知公告信息发布维护                    |
-| 🚀  | 敏感词  | 配置系统敏感词，支持标签分组                    |
+| 🚀  | 敏感词  | 配置系统敏感词，支持标签分组                  |
 | 🚀  | 应用管理  | 管理 SSO 单点登录的应用，支持多种 OAuth2 授权方式 |
 
 ### 工作流程
@@ -168,42 +169,42 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 ## 🐨 技术栈
 
-| 项目                    | 说明                 |
-|-----------------------|--------------------|
-| `yudao-dependencies`  | Maven 依赖版本管理       |
-| `yudao-framework`     | Java 框架拓展          |
-| `yudao-server`        | 管理后台 + 用户 APP 的服务端 |
-| `yudao-ui-admin`      | 管理后台的 Vue2 前端项目        |
-| `yudao-ui-admin-vue3`      | 管理后台的 Vue3 前端项目        |
-| `yudao-ui-admin-uniapp`      | 管理后台的 uni-app 多端项目        |
-| `yudao-ui-app`       | 用户 APP 的 UI 界面     |
-| `yudao-module-system` | 系统功能的 Module 模块    |
-| `yudao-module-member` | 会员中心的 Module 模块    |
-| `yudao-module-infra`  | 基础设施的 Module 模块    |
-| `yudao-module-tool`   | 研发工具的 Module 模块    |
-| `yudao-module-bpm`    | 工作流程的 Module 模块    |
-| `yudao-module-pay`    | 支付系统的 Module 模块    |
+| 项目                      | 说明                 |
+|-------------------------|-----------------------|
+| `yudao-dependencies`    | Maven 依赖版本管理       |
+| `yudao-framework`       | Java 框架拓展          |
+| `yudao-server`          | 管理后台 + 用户 APP 的服务端 |
+| `yudao-ui-admin`        | 管理后台的 Vue2 前端项目     |
+| `yudao-ui-admin-vue3`   | 管理后台的 Vue3 前端项目     |
+| `yudao-ui-admin-uniapp` | 管理后台的 uni-app 多端项目  |
+| `yudao-ui-app`          | 用户 APP 的 UI 界面     |
+| `yudao-module-system`   | 系统功能的 Module 模块    |
+| `yudao-module-member`   | 会员中心的 Module 模块    |
+| `yudao-module-infra`    | 基础设施的 Module 模块    |
+| `yudao-module-tool`     | 研发工具的 Module 模块    |
+| `yudao-module-bpm`      | 工作流程的 Module 模块    |
+| `yudao-module-pay`      | 支付系统的 Module 模块    |
 
 ### 后端
 
 | 框架                                                                                         | 说明                   | 版本          | 学习指南                                                           |
 |---------------------------------------------------------------------------------------------|-----------------------|-------------|----------------------------------------------------------------|
-| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架             | 2.6.13      | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
+| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架             | 2.7.6       | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
 | [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器             | 5.7 / 8.0+  |                                                                |
-| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件     | 1.2.14      | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件     | 1.2.15      | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包       | 3.5.2       | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
-| [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源               | 3.5.2       | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源               | 3.6.0       | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/)                                                                  | key-value 数据库        | 5.0 / 6.0   |                                                                |
-| [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端            | 3.17.7      | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
-| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架               | 5.3.23      | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
-| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架         | 5.6.8       | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
-| [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件             | 6.2.3       | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
+| [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端            | 3.18.0      | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
+| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架               | 5.3.24      | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
+| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架         | 5.7.5       | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
+| [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件             | 6.2.5       | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
 | [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎               | 6.7.2       | [文档](https://doc.iocoder.cn/bpm/)                                                     |
 | [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件             | 2.3.2       | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
 | [Knife4j](https://gitee.com/xiaoym/knife4j)                                                 | Swagger 增强 UI 实现    | 3.0.3       | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
 | [Resilience4j](https://github.com/resilience4j/resilience4j)                                | 服务保障组件             | 1.7.1       | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao)    |
-| [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.5.0       | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao)      |
-| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台    | 2.6.9       | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
+| [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.12.0      | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao)      |
+| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台    | 2.7.9       | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
 | [Jackson](https://github.com/FasterXML/jackson)                                             | JSON 工具库             | 2.13.3      |                                                                |
 | [MapStruct](https://mapstruct.org/)                                                         | Java Bean 转换         | 1.5.3.Final | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao)       |
 | [Lombok](https://projectlombok.org/)                                                        | 消除冗长的 Java 代码     | 1.18.24     | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao)          |
@@ -212,23 +213,22 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 ### [管理后台 Vue2 前端](./yudao-ui-admin)
 
-| 框架                                                                           | 说明            | 版本    |
-|------------------------------------------------------------------------------|---------------|-------|
-| [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.7.0 |
-| [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -     |
+| 框架                                                                           | 说明            | 版本     |
+|------------------------------------------------------------------------------|---------------|--------|
+| [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.7.14 |
+| [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -      |
 
 ### [管理后台 Vue3 前端](./yudao-ui-admin-vue3)
 
-| 框架                                                                  | 说明             | 版本     |
-|----------------------------------------------------------------------|-----------------|--------|
-| [Vue](https://staging-cn.vuejs.org/)                                 | Vue 框架         | 3.2.44 |
-| [Vite](https://cn.vitejs.dev//)                                      | 开发与构建工具     | 3.2.3  |
-| [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus    | 2.2.20 |
-| [TypeScript](https://www.typescriptlang.org/docs/)                   | TypeScript      | 4.8.4  |
-| [pinia](https://pinia.vuejs.org/)                                    | vuex5           | 2.0.23 |
-| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化             | 9.2.2  |
-| [windicss](https://cn.windicss.org/)                                 | 下一代工具优先的 CSS 框架 | 3.5.6  |
-| [iconify](https://icon-sets.iconify.design/)                         | 在线图标库           | 3.0.0  |
+| 框架                                                                  |     说明      |   版本   |
+|----------------------------------------------------------------------|:------------:|:------:|
+| [Vue](https://staging-cn.vuejs.org/)                                 |   Vue 框架    | 3.2.45 |
+| [Vite](https://cn.vitejs.dev//)                                      | 开发与构建工具  | 4.0.3  |
+| [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus | 2.2.27 |
+| [TypeScript](https://www.typescriptlang.org/docs/)                   |  TypeScript  | 4.9.4  |
+| [pinia](https://pinia.vuejs.org/)                                    |    vuex5     | 2.0.28 |
+| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) |    国际化     | 9.2.2  |
+| [vxe-table](https://vxetable.cn/)                                    |  vue最强表单  | 4.3.7  |
 
 ### [管理后台 uni-app 跨端](./yudao-ui-admin-uniapp)
 
@@ -242,15 +242,15 @@ ps：核心功能已经实现，正在对接微信小程序中...
 ### 系统功能
 
 | 模块       | biu                                                                | biu                                                              | biu                                                              |
-|----------|--------------------------------------------------------------------|------------------------------------------------------------------|------------------------------------------------------------------|
+|------------|--------------------------------------------------------------------|------------------------------------------------------------------|------------------------------------------------------------------|
 | 登录 & 首页  | ![登录](https://static.iocoder.cn/images/ruoyi-vue-pro/登录.jpg?imageView2/2/format/webp/w/1280)       | ![首页](https://static.iocoder.cn/images/ruoyi-vue-pro/首页.jpg?imageView2/2/format/webp/w/1280)     | ![个人中心](https://static.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg?imageView2/2/format/webp/w/1280) |
-| 用户 & 应用      | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg?imageView2/2/format/webp/w/1280)   | ![令牌管理](https://static.iocoder.cn/images/ruoyi-vue-pro/令牌管理.jpg?imageView2/2/format/webp/w/1280) | ![应用管理](https://static.iocoder.cn/images/ruoyi-vue-pro/应用管理.jpg?imageView2/2/format/webp/w/1280)                                                                |
+| 用户 & 应用  | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg?imageView2/2/format/webp/w/1280)   | ![令牌管理](https://static.iocoder.cn/images/ruoyi-vue-pro/令牌管理.jpg?imageView2/2/format/webp/w/1280) | ![应用管理](https://static.iocoder.cn/images/ruoyi-vue-pro/应用管理.jpg?imageView2/2/format/webp/w/1280)                                                                |
 | 租户 & 套餐  | ![租户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/租户管理.jpg?imageView2/2/format/webp/w/1280)   | ![租户套餐](https://static.iocoder.cn/images/ruoyi-vue-pro/租户套餐.png) | -                                                                |
 | 部门 & 岗位  | ![部门管理](https://static.iocoder.cn/images/ruoyi-vue-pro/部门管理.jpg?imageView2/2/format/webp/w/1280)   | ![岗位管理](https://static.iocoder.cn/images/ruoyi-vue-pro/岗位管理.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 | 菜单 & 角色  | ![菜单管理](https://static.iocoder.cn/images/ruoyi-vue-pro/菜单管理.jpg?imageView2/2/format/webp/w/1280)   | ![角色管理](https://static.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 | 审计日志     | ![操作日志](https://static.iocoder.cn/images/ruoyi-vue-pro/操作日志.jpg?imageView2/2/format/webp/w/1280)   | ![登录日志](https://static.iocoder.cn/images/ruoyi-vue-pro/登录日志.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 | 短信       | ![短信渠道](https://static.iocoder.cn/images/ruoyi-vue-pro/短信渠道.jpg?imageView2/2/format/webp/w/1280)   | ![短信模板](https://static.iocoder.cn/images/ruoyi-vue-pro/短信模板.jpg?imageView2/2/format/webp/w/1280) | ![短信日志](https://static.iocoder.cn/images/ruoyi-vue-pro/短信日志.jpg?imageView2/2/format/webp/w/1280) |
-| 字典 & 敏感词      | ![字典类型](https://static.iocoder.cn/images/ruoyi-vue-pro/字典类型.jpg?imageView2/2/format/webp/w/1280)   | ![字典数据](https://static.iocoder.cn/images/ruoyi-vue-pro/字典数据.jpg?imageView2/2/format/webp/w/1280) | ![敏感词](https://static.iocoder.cn/images/ruoyi-vue-pro/敏感词.jpg?imageView2/2/format/webp/w/1280)                                                                |
+| 字典 & 敏感词 | ![字典类型](https://static.iocoder.cn/images/ruoyi-vue-pro/字典类型.jpg?imageView2/2/format/webp/w/1280)   | ![字典数据](https://static.iocoder.cn/images/ruoyi-vue-pro/字典数据.jpg?imageView2/2/format/webp/w/1280) | ![敏感词](https://static.iocoder.cn/images/ruoyi-vue-pro/敏感词.jpg?imageView2/2/format/webp/w/1280)                                                                |
 | 错误码 & 通知 | ![错误码管理](https://static.iocoder.cn/images/ruoyi-vue-pro/错误码管理.jpg?imageView2/2/format/webp/w/1280) | ![通知公告](https://static.iocoder.cn/images/ruoyi-vue-pro/通知公告.jpg?imageView2/2/format/webp/w/1280) | -                                                                |
 
 ### 工作流程

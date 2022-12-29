@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.client.impl.aliyun.AliyunSmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.impl.debug.DebugDingTalkSmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.impl.tencent.TencentSmsClient;
-import cn.iocoder.yudao.framework.sms.core.client.impl.yunpian.YunpianSmsClient;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +79,6 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
         // 创建客户端
         switch (channelEnum) {
             case ALIYUN: return new AliyunSmsClient(properties);
-            case YUN_PIAN: return new YunpianSmsClient(properties);
             case DEBUG_DING_TALK: return new DebugDingTalkSmsClient(properties);
             case TENCENT: return new TencentSmsClient(properties);
         }

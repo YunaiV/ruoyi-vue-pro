@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.service.dict;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypePageReqVO;
@@ -13,6 +14,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -57,7 +59,8 @@ public class DictTypeServiceImpl implements DictTypeService {
         // 校验正确性
         checkCreateOrUpdate(null, reqVO.getName(), reqVO.getType());
         // 插入字典类型
-        DictTypeDO dictType = DictTypeConvert.INSTANCE.convert(reqVO);
+        DictTypeDO dictType = DictTypeConvert.INSTANCE.convert(reqVO)
+                .setDeletedTime(LocalDateTimeUtils.EMPTY); // 唯一索引，避免 null 值
         dictTypeMapper.insert(dictType);
         return dictType.getId();
     }
@@ -80,7 +83,7 @@ public class DictTypeServiceImpl implements DictTypeService {
             throw exception(DICT_TYPE_HAS_CHILDREN);
         }
         // 删除字典类型
-        dictTypeMapper.deleteById(id);
+        dictTypeMapper.updateToDelete(id, LocalDateTime.now());
     }
 
     @Override

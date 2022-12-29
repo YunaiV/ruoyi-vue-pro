@@ -1,11 +1,13 @@
+<template>
+  <Form :rules="rules" @register="register" />
+</template>
 <script setup lang="ts">
 import { PropType, reactive, watch } from 'vue'
 import { required } from '@/utils/formRules'
-import { CodegenTableVO } from '@/api/infra/codegen/types'
-import { Form } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
+import { Form } from '@/components/Form'
 import { FormSchema } from '@/types/form'
-
+import { CodegenTableVO } from '@/api/infra/codegen/types'
 const props = defineProps({
   basicInfo: {
     type: Object as PropType<Nullable<CodegenTableVO>>,
@@ -85,6 +87,3 @@ defineExpose({
   getFormData: methods.getFormData
 })
 </script>
-<template>
-  <Form :rules="rules" @register="register" />
-</template>

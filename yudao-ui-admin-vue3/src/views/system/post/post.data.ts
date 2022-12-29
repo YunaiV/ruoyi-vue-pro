@@ -16,6 +16,7 @@ export const rules = reactive({
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
   primaryType: 'seq',
+  primaryTitle: '岗位编号',
   action: true,
   columns: [
     {
@@ -36,6 +37,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: t('common.status'),
       field: 'status',
       dictType: DICT_TYPE.COMMON_STATUS,
+      dictClass: 'number',
       isSearch: true
     },
     {

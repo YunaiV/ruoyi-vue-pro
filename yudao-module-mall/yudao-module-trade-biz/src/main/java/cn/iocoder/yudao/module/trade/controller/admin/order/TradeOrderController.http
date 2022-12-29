@@ -1,0 +1,9 @@
+### 获得交易订单分页 => 成功
+GET {{baseUrl}}/trade/order/page?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 获得交易订单分页 => 成功
+GET {{baseUrl}}/trade/order/get-detail?id=21
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}

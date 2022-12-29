@@ -209,12 +209,13 @@ export default {
 			}
 		},
 		init() {
-			// 校验maxDate，不能小于当前时间
+			// 校验maxDate，不能小于minDate
 			if (
 				this.innerMaxDate &&
-				new Date(this.innerMaxDate).getTime() <= Date.now()
+				this.innerMinDate &&
+				new Date(this.innerMaxDate).getTime() < new Date(this.innerMinDate).getTime()
 			) {
-				return uni.$u.error('maxDate不能小于当前时间')
+				return uni.$u.error('maxDate不能小于minDate')
 			}
 			// 滚动区域的高度
 			this.listHeight = this.rowHeight * 5 + 30

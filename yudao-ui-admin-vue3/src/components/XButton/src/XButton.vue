@@ -35,7 +35,7 @@ const getBindValue = computed(() => {
     <Icon :icon="postIcon" v-if="postIcon" class="mr-1px" />
   </el-button>
 </template>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 :deep(.el-button.is-text) {
   margin-left: 0;
   padding: 8px 4px;

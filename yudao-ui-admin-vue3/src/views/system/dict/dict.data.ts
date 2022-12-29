@@ -2,130 +2,101 @@ import { reactive } from 'vue'
 import { DICT_TYPE } from '@/utils/dict'
 import { required } from '@/utils/formRules'
 import { useI18n } from '@/hooks/web/useI18n'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
+import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 // 国际化
 const { t } = useI18n()
 // 表单校验
 export const dictDataRules = reactive({
-  label: [required],
+  title: [required],
   value: [required],
   sort: [required]
 })
 // crudSchemas
-export const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+export const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: null,
+  action: true,
+  actionWidth: '140px',
+  searchSpan: 12,
+  columns: [
+    {
+      title: '字典类型',
+      field: 'dictType',
+      isTable: false,
+      isForm: false
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '字典类型',
-    field: 'dictType',
-    table: {
-      show: false
+    {
+      title: '数据标签',
+      field: 'label',
+      isSearch: true
     },
-    form: {
-      show: false
-    }
-  },
-  {
-    label: '数据标签',
-    field: 'label',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '数据键值',
-    field: 'value'
-  },
-  {
-    label: '颜色类型',
-    field: 'colorType',
-    form: {
-      component: 'Select',
-      componentProps: {
-        options: [
-          {
-            label: 'default',
-            value: ''
-          },
-          {
-            label: 'success',
-            value: 'success'
-          },
-          {
-            label: 'info',
-            value: 'info'
-          },
-          {
-            label: 'warning',
-            value: 'warning'
-          },
-          {
-            label: 'danger',
-            value: 'danger'
-          }
-        ]
-      }
+    {
+      title: '数据键值',
+      field: 'value'
     },
-    table: {
-      show: false
-    }
-  },
-  {
-    label: 'CSS Class',
-    field: 'cssClass',
-    table: {
-      show: false
-    }
-  },
-  {
-    label: '显示排序',
-    field: 'sort',
-    table: {
-      show: false
-    }
-  },
-  {
-    label: t('common.status'),
-    field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS
-  },
-  {
-    label: t('form.remark'),
-    field: 'remark',
-    form: {
-      component: 'Input',
-      componentProps: {
-        type: 'textarea',
-        rows: 4
+    {
+      title: '颜色类型',
+      field: 'colorType',
+      form: {
+        component: 'Select',
+        componentProps: {
+          options: [
+            {
+              label: 'default',
+              value: ''
+            },
+            {
+              label: 'success',
+              value: 'success'
+            },
+            {
+              label: 'info',
+              value: 'info'
+            },
+            {
+              label: 'warning',
+              value: 'warning'
+            },
+            {
+              label: 'danger',
+              value: 'danger'
+            }
+          ]
+        }
       },
-      colProps: {
-        span: 24
-      }
+      isTable: false
     },
-    table: {
-      show: false
-    }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '180px',
-    form: {
-      show: false
+    {
+      title: 'CSS Class',
+      field: 'cssClass',
+      isTable: false
     },
-    detail: {
-      show: false
+    {
+      title: '显示排序',
+      field: 'sort',
+      isTable: false
+    },
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      dictClass: 'number'
+    },
+    {
+      title: t('form.remark'),
+      field: 'remark',
+      form: {
+        component: 'Input',
+        componentProps: {
+          type: 'textarea',
+          rows: 4
+        },
+        colProps: {
+          span: 24
+        }
+      },
+      isTable: false
     }
-  }
-])
-
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

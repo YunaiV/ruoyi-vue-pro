@@ -3,13 +3,14 @@ import { TokenType } from '@/api/login/types'
 import { decrypt, encrypt } from '@/utils/jsencrypt'
 
 const { wsCache } = useCache()
+
 const AccessTokenKey = 'ACCESS_TOKEN'
 const RefreshTokenKey = 'REFRESH_TOKEN'
 
 // 获取token
 export const getAccessToken = () => {
   // 此处与TokenKey相同，此写法解决初始化时Cookies中不存在TokenKey报错
-  return wsCache.get('ACCESS_TOKEN')
+  return wsCache.get(AccessTokenKey) ? wsCache.get(AccessTokenKey) : wsCache.get('ACCESS_TOKEN')
 }
 
 // 刷新token
@@ -28,6 +29,11 @@ export const removeToken = () => {
   wsCache.delete(AccessTokenKey)
   wsCache.delete(RefreshTokenKey)
 }
+
+/** 格式化token（jwt格式） */
+export const formatToken = (token: string): string => {
+  return 'Bearer ' + token
+}
 // ========== 账号相关 ==========
 
 const UsernameKey = 'USERNAME'
@@ -39,7 +45,7 @@ export const getUsername = () => {
 }
 
 export const setUsername = (username: string) => {
-  wsCache.set(UsernameKey, username)
+  wsCache.set(UsernameKey, username, { exp: 30 * 24 * 60 * 60 })
 }
 
 export const removeUsername = () => {
@@ -52,7 +58,7 @@ export const getPassword = () => {
 }
 
 export const setPassword = (password: string) => {
-  wsCache.set(PasswordKey, encrypt(password))
+  wsCache.set(PasswordKey, encrypt(password), { exp: 30 * 24 * 60 * 60 })
 }
 
 export const removePassword = () => {
@@ -60,11 +66,11 @@ export const removePassword = () => {
 }
 
 export const getRememberMe = () => {
-  return wsCache.get(RememberMeKey) === 'true'
+  return wsCache.get(RememberMeKey) === true
 }
 
-export const setRememberMe = (rememberMe: string) => {
-  wsCache.set(RememberMeKey, rememberMe)
+export const setRememberMe = (rememberMe: boolean) => {
+  wsCache.set(RememberMeKey, rememberMe, { exp: 30 * 24 * 60 * 60 })
 }
 
 export const removeRememberMe = () => {
@@ -81,7 +87,7 @@ export const getTenantName = () => {
 }
 
 export const setTenantName = (username: string) => {
-  wsCache.set(TenantNameKey, username)
+  wsCache.set(TenantNameKey, username, { exp: 30 * 24 * 60 * 60 })
 }
 
 export const removeTenantName = () => {

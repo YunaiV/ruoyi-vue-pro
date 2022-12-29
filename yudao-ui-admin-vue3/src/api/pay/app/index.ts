@@ -1,8 +1,44 @@
 import request from '@/config/axios'
-import type { AppVO } from './types'
+
+export interface AppVO {
+  id: number
+  name: string
+  status: number
+  remark: string
+  payNotifyUrl: string
+  refundNotifyUrl: string
+  merchantId: number
+  merchantName: string
+  createTime: Date
+}
+
+export interface AppPageReqVO extends PageParam {
+  name?: string
+  status?: number
+  remark?: string
+  payNotifyUrl?: string
+  refundNotifyUrl?: string
+  merchantName?: string
+  createTime?: Date[]
+}
+
+export interface AppExportReqVO {
+  name?: string
+  status?: number
+  remark?: string
+  payNotifyUrl?: string
+  refundNotifyUrl?: string
+  merchantName?: string
+  createTime?: Date[]
+}
+
+export interface AppUpdateStatusReqVO {
+  id: number
+  status: number
+}
 
 // 查询列表支付应用
-export const getAppPageApi = (params) => {
+export const getAppPageApi = (params: AppPageReqVO) => {
   return request.get({ url: '/pay/app/page', params })
 }
 
@@ -22,11 +58,7 @@ export const updateAppApi = (data: AppVO) => {
 }
 
 // 支付应用信息状态修改
-export const changeAppStatusApi = (id: number, status: number) => {
-  const data = {
-    id,
-    status
-  }
+export const changeAppStatusApi = (data: AppUpdateStatusReqVO) => {
   return request.put({ url: '/pay/app/update-status', data: data })
 }
 
@@ -36,7 +68,7 @@ export const deleteAppApi = (id: number) => {
 }
 
 // 导出支付应用
-export const exportAppApi = (params) => {
+export const exportAppApi = (params: AppExportReqVO) => {
   return request.download({ url: '/pay/app/export-excel', params })
 }
 

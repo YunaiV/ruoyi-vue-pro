@@ -1,8 +1,8 @@
 import { reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
 import { DICT_TYPE } from '@/utils/dict'
+import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 
 // 表单校验
@@ -14,104 +14,81 @@ export const rules = reactive({
 })
 
 // CrudSchema
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: null,
+  action: true,
+  columns: [
+    {
+      title: '参数分类',
+      field: 'category'
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '参数分类',
-    field: 'category'
-  },
-  {
-    label: '参数名称',
-    field: 'name',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '参数键名',
-    field: 'key',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '参数键值',
-    field: 'value'
-  },
-  {
-    label: '系统内置',
-    field: 'type',
-    dictType: DICT_TYPE.INFRA_CONFIG_TYPE,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '是否可见',
-    field: 'visible',
-    form: {
-      component: 'RadioButton',
-      componentProps: {
-        options: [
-          { label: '是', value: true },
-          { label: '否', value: false }
-        ]
-      }
-    }
-  },
-  {
-    label: t('form.remark'),
-    field: 'remark',
-    form: {
-      component: 'Input',
-      componentProps: {
-        type: 'textarea',
-        rows: 4
+    {
+      title: '参数名称',
+      field: 'name',
+      isSearch: true
+    },
+    {
+      title: '参数键名',
+      field: 'key',
+      isSearch: true
+    },
+    {
+      title: '参数键值',
+      field: 'value'
+    },
+    {
+      title: '系统内置',
+      field: 'type',
+      dictType: DICT_TYPE.INFRA_CONFIG_TYPE,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '是否可见',
+      field: 'visible',
+      table: {
+        slots: {
+          default: 'visible_default'
+        }
       },
-      colProps: {
-        span: 24
+      form: {
+        component: 'RadioButton',
+        componentProps: {
+          options: [
+            { label: '是', value: true },
+            { label: '否', value: false }
+          ]
+        }
       }
     },
-    table: {
-      show: false
-    }
-  },
-  {
-    label: t('common.createTime'),
-    field: 'createTime',
-    form: {
-      show: false
+    {
+      title: t('form.remark'),
+      field: 'remark',
+      isTable: false,
+      form: {
+        component: 'Input',
+        componentProps: {
+          type: 'textarea',
+          rows: 4
+        },
+        colProps: {
+          span: 24
+        }
+      }
     },
-    search: {
-      show: true,
-      component: 'DatePicker',
-      componentProps: {
-        type: 'datetimerange',
-        valueFormat: 'YYYY-MM-DD HH:mm:ss',
-        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate',
+      isForm: false,
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
       }
     }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '240px',
-    form: {
-      show: false
-    },
-    detail: {
-      show: false
-    }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

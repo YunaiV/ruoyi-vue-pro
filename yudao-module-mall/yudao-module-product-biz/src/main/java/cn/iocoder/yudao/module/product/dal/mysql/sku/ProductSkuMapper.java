@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -20,6 +21,17 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
 
     default List<ProductSkuDO> selectListBySpuId(Long spuId) {
         return selectList(ProductSkuDO::getSpuId, spuId);
+    }
+
+    default List<ProductSkuDO> selectListBySpuIdAndStatus(Long spuId,
+                                                          Integer status) {
+        return selectList(new LambdaQueryWrapperX<ProductSkuDO>()
+                .eq(ProductSkuDO::getSpuId, spuId)
+                .eqIfPresent(ProductSkuDO::getStatus, status));
+    }
+
+    default List<ProductSkuDO> selectListBySpuId(Collection<Long> spuIds) {
+        return selectList(ProductSkuDO::getSpuId, spuIds);
     }
 
     default void deleteBySpuId(Long spuId) {

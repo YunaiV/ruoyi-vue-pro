@@ -20,15 +20,17 @@
 				/>
 			</slot>
 		</view>
-		<text
-			class="u-radio__text"
-		    @tap.stop="labelClickHandler"
-		    :style="{
-				color: elDisabled ? elInactiveColor : elLabelColor,
-				fontSize: elLabelSize,
-				lineHeight: elLabelSize
-			}"
-		>{{label}}</text>
+		<slot>
+			<text
+				class="u-radio__text"
+				@tap.stop="labelClickHandler"
+				:style="{
+					color: elDisabled ? elInactiveColor : elLabelColor,
+					fontSize: elLabelSize,
+					lineHeight: elLabelSize
+				}"
+			>{{label}}</text>
+		</slot>
 	</view>
 </template>
 
