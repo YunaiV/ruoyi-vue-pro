@@ -1,6 +1,4 @@
-**严肃声明：现在、未来都不会有商业版本，所有功能全部开源！**
-
-**拒绝虚假开源，售卖商业版，程序员不骗程序员！！**
+**严肃声明：现在、未来都不会有商业版本，所有代码全部开源！**
 
 **「我喜欢写代码，乐此不疲」**  
 **「我喜欢做开源，以此为乐」**
@@ -181,7 +179,6 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | `yudao-module-system`   | 系统功能的 Module 模块    |
 | `yudao-module-member`   | 会员中心的 Module 模块    |
 | `yudao-module-infra`    | 基础设施的 Module 模块    |
-| `yudao-module-tool`     | 研发工具的 Module 模块    |
 | `yudao-module-bpm`      | 工作流程的 Module 模块    |
 | `yudao-module-pay`      | 支付系统的 Module 模块    |
 

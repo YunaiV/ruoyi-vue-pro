@@ -99,7 +99,8 @@
                       <img :src="row.picUrl"/>
                       <span class="ellipsis-2" :title="row.spuName">{{row.spuName}}</span>
                       <!-- TODO @小程：下面是商品属性，想当度一行，放在商品名下面 -->
-                      <el-tag size="medium" v-for="property in row.properties">{{property.propertyName}}：{{property.valueName}}</el-tag>
+                      <el-tag size="medium" v-for="property in row.properties" :key="property.propertyId">
+                        {{property.propertyName}}：{{property.valueName}}</el-tag>
                     </div>
                   </template>
                 </el-table-column>

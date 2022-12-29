@@ -57,7 +57,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
         // 准备参数
         DictDataPageReqVO reqVO = new DictDataPageReqVO();
         reqVO.setLabel("芋");
-        reqVO.setDictType("yu");
+        reqVO.setDictType("yunai");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
 
         // 调用
@@ -86,7 +86,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
         // 准备参数
         DictDataExportReqVO reqVO = new DictDataExportReqVO();
         reqVO.setLabel("芋");
-        reqVO.setDictType("yu");
+        reqVO.setDictType("yunai");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
 
         // 调用

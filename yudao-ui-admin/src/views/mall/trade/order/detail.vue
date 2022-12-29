@@ -58,7 +58,8 @@
           <el-table-column prop="spuName" label="商品" width="700">
             <template slot-scope="{ row }">
               {{row.spuName}}
-              <el-tag size="medium" v-for="property in row.properties">{{property.propertyName}}：{{property.valueName}}</el-tag>
+              <el-tag size="medium" v-for="property in row.properties" :key="property.propertyId">
+                {{property.propertyName}}：{{property.valueName}}</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="originalUnitPrice" label="单价(元)" width="180">
@@ -79,7 +80,7 @@
           </el-table-column>
         </el-table>
       </el-descriptions-item>
-      <el-descriptions-item v-for="(item,index) in 5" label-class-name="no-colon" /> <!-- 占位 -->
+      <el-descriptions-item v-for="(item,index) in 5" label-class-name="no-colon" :key="item" /> <!-- 占位 -->
       <el-descriptions-item label="商品总额">￥{{ (order.originalPrice / 100.0).toFixed(2) }}</el-descriptions-item>
       <el-descriptions-item label="运费金额">￥{{ (order.deliveryPrice / 100.0).toFixed(2) }}</el-descriptions-item>
       <el-descriptions-item label="订单调价">￥{{ (order.adjustPrice / 100.0).toFixed(2) }}</el-descriptions-item>
@@ -92,7 +93,7 @@
       <el-descriptions-item label="积分抵扣" label-style="color: red">
         ￥{{ (order.pointPrice / 100.0).toFixed(2) }}
       </el-descriptions-item>
-      <el-descriptions-item v-for="(item,index) in 5" label-class-name="no-colon" /> <!-- 占位 -->
+      <el-descriptions-item v-for="(item,index) in 5" label-class-name="no-colon" :key="item" /> <!-- 占位 -->
       <el-descriptions-item label="应付金额">
         ￥{{ (order.payPrice / 100.0).toFixed(2) }}
       </el-descriptions-item>

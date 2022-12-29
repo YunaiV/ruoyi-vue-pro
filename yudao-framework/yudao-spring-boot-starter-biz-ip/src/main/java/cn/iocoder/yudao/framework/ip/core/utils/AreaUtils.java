@@ -28,7 +28,9 @@ public class AreaUtils {
     @SuppressWarnings("InstantiationOfUtilityClass")
     private final static AreaUtils INSTANCE = new AreaUtils();
 
-
+    /**
+     * Area 内存缓存，提升访问速度
+     */
     private static Map<Integer, Area> areas;
 
     private AreaUtils() {
