@@ -30,7 +30,7 @@ public class FileContentDAOImpl implements DBFileContentFrameworkDAO {
     @Override
     public byte[] selectContent(Long configId, String path) {
         List<FileContentDO> fileContentDOs = fileContentMapper.selectList(
-                buildQuery(configId, path).select(FileContentDO::getContent));
+                buildQuery(configId, path).select(FileContentDO::getContent).orderByDesc(FileContentDO::getId));
         return CollUtil.isNotEmpty(fileContentDOs) ? CollUtil.getFirst(fileContentDOs).getContent() : null;
     }
 
