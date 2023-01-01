@@ -22,7 +22,12 @@ public class MpOpenController {
     @Resource
     private MpServiceFactory mpServiceFactory;
 
-    @ApiOperation("校验签名") // 参见 https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html 文档
+    /**
+     * 接收微信公众号的校验签名
+     *
+     * 对应 <a href="https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html">文档</a>
+     */
+    @ApiOperation("校验签名") // 参见
     @GetMapping(value = "/{appId}", produces = "text/plain;charset=utf-8")
     public String checkSignature(@PathVariable("appId") String appId,
                                  MpOpenCheckSignatureReqVO reqVO) {
@@ -35,6 +40,17 @@ public class MpOpenController {
         }
         // 校验不通过
         return "非法请求";
+    }
+
+    /**
+     * 接收微信公众号的消息推送
+     *
+     * <a href="https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_standard_messages.html">文档</a>
+     */
+    @ApiOperation("处理消息")
+    @PostMapping(value = "/{appId}", produces = "application/xml; charset=UTF-8")
+    public String handleMessage() {
+        return "123";
     }
 
 }
