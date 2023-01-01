@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -61,28 +61,16 @@ public class PayOrderPageReqVO extends PageParam {
     private String userIp;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始订单失效时间")
-    private Date beginExpireTime;
+    @ApiModelProperty(value = "订单失效时间")
+    private LocalDateTime[] expireTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束订单失效时间")
-    private Date endExpireTime;
+    @ApiModelProperty(value = "订单支付成功时间")
+    private LocalDateTime[] successTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始订单支付成功时间")
-    private Date beginSuccessTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束订单支付成功时间")
-    private Date endSuccessTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始订单支付通知时间")
-    private Date beginNotifyTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束订单支付通知时间")
-    private Date endNotifyTime;
+    @ApiModelProperty(value = "订单支付通知时间")
+    private LocalDateTime[] notifyTime;
 
     @ApiModelProperty(value = "支付成功的订单拓展单编号")
     private Long successExtensionId;
@@ -103,11 +91,7 @@ public class PayOrderPageReqVO extends PageParam {
     private String channelOrderNo;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始创建时间")
-    private Date beginCreateTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束创建时间")
-    private Date endCreateTime;
+    @ApiModelProperty(value = "创建时间")
+    private LocalDateTime[] createTime;
 
 }

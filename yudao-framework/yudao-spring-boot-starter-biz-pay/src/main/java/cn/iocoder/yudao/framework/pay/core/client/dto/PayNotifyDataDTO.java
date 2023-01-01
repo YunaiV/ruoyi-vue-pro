@@ -21,9 +21,9 @@ public class PayNotifyDataDTO {
      */
     private String body;
 
-
     /**
      * HTTP 回调接口 content type 为 application/x-www-form-urlencoded 的所有参数
      */
     private Map<String,String> params;
+
 }

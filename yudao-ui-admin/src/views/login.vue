@@ -1,4 +1,4 @@
-<template>
+<template xmlns="">
   <div class="container">
     <div class="logo"></div>
     <!-- 登录区域 -->
@@ -36,18 +36,9 @@
                 </el-form-item>
                 <el-form-item prop="password">
                   <el-input v-model="loginForm.password" type="password" auto-complete="off" placeholder="密码"
-                            @keyup.enter.native="handleLogin">
+                            @keyup.enter.native="getCode">
                     <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
                   </el-input>
-                </el-form-item>
-                <el-form-item prop="code" v-if="captchaEnable">
-                  <el-input v-model="loginForm.code" auto-complete="off" placeholder="验证码" style="width: 63%"
-                            @keyup.enter.native="handleLogin">
-                    <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon"/>
-                  </el-input>
-                  <div class="login-code">
-                    <img :src="codeUrl" @click="getCode" class="login-code-img"/>
-                  </div>
                 </el-form-item>
                 <el-checkbox v-model="loginForm.rememberMe" style="margin:0 0 25px 0;">记住密码</el-checkbox>
               </div>
@@ -62,10 +53,10 @@
                 <el-form-item prop="mobileCode">
                   <el-input v-model="loginForm.mobileCode" type="text" auto-complete="off" placeholder="短信验证码"
                             @keyup.enter.native="handleLogin">
-                    <template slot="icon">
+                    <template v-slot="icon">
                       <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
                     </template>
-                    <template slot="append">
+                    <template v-slot="append">
                       <span v-if="mobileCodeTimer <= 0" class="getMobileCode" @click="getSmsCode" style="cursor: pointer;">获取验证码</span>
                       <span v-if="mobileCodeTimer > 0" class="getMobileCode">{{ mobileCodeTimer }}秒后可重新获取</span>
                     </template>
@@ -76,7 +67,7 @@
               <!-- 下方的登录按钮 -->
               <el-form-item style="width:100%;">
                 <el-button :loading="loading" size="medium" type="primary" style="width:100%;"
-                    @click.native.prevent="handleLogin">
+                    @click.native.prevent="getCode">
                   <span v-if="!loading">登 录</span>
                   <span v-else>登 录 中...</span>
                 </el-button>
@@ -96,6 +87,11 @@
         </div>
       </div>
     </div>
+
+    <!-- 图形验证码 -->
+    <Verify ref="verify" :captcha-type="'blockPuzzle'" :img-size="{width:'400px',height:'200px'}"
+            @success="handleLogin" />
+
     <!-- footer -->
     <div class="footer">
       Copyright © 2020-2022 iocoder.cn All Rights Reserved.
@@ -104,11 +100,10 @@
 </template>
 
 <script>
-import {getCodeImg, sendSmsCode, socialAuthRedirect} from "@/api/login";
+import {sendSmsCode, socialAuthRedirect} from "@/api/login";
 import {getTenantIdByName} from "@/api/system/tenant";
-import Cookies from "js-cookie";
 import {SystemUserSocialTypeEnum} from "@/utils/constants";
-import {getTenantEnable} from "@/utils/ruoyi";
+import {getCaptchaEnable, getTenantEnable} from "@/utils/ruoyi";
 import {
   getPassword,
   getRememberMe, getTenantName,
@@ -119,8 +114,14 @@ import {
   setUsername
 } from "@/utils/auth";
 
+import Verify from '@/components/Verifition/Verify';
+import {resetUserPwd} from "@/api/system/user";
+
 export default {
   name: "Login",
+  components: {
+    Verify
+  },
   data() {
     return {
       codeUrl: "",
@@ -131,11 +132,10 @@ export default {
         loginType: "uname",
         username: "admin",
         password: "admin123",
+        captchaVerification: "",
         mobile: "",
         mobileCode: "",
         rememberMe: false,
-        code: "",
-        uuid: "",
         tenantName: "芋道源码",
       },
       scene: 21,
@@ -147,12 +147,11 @@ export default {
         password: [
           {required: true, trigger: "blur", message: "密码不能为空"}
         ],
-        code: [{required: true, trigger: "change", message: "验证码不能为空"}],
         mobile: [
           {required: true, trigger: "blur", message: "手机号不能为空"},
           {
             validator: function (rule, value, callback) {
-              if (/^1[0-9]\d{9}$/.test(value) == false) {
+              if (/^(?:(?:\+|00)86)?1(?:3[\d]|4[5-79]|5[0-35-9]|6[5-7]|7[0-8]|8[\d]|9[189])\d{8}$/.test(value) === false) {
                 callback(new Error("手机号格式错误"));
               } else {
                 callback();
@@ -186,37 +185,34 @@ export default {
       SysUserSocialTypeEnum: SystemUserSocialTypeEnum,
     };
   },
-  // watch: {
-  //   $route: {
-  //     handler: function(route) {
-  //       this.redirect = route.query && route.query.redirect;
-  //     },
-  //     immediate: true
-  //   }
-  // },
   created() {
     // 租户开关
     this.tenantEnable = getTenantEnable();
+    if (this.tenantEnable) {
+      getTenantIdByName(this.loginForm.tenantName).then(res => { // 设置租户
+        const tenantId = res.data;
+        if (tenantId && tenantId >= 0) {
+          setTenantId(tenantId)
+        }
+      });
+    }
+    // 验证码开关
+    this.captchaEnable = getCaptchaEnable();
     // 重定向地址
-    this.redirect = this.$route.query.redirect;
-    this.getCode();
+    this.redirect = this.$route.query.redirect ? decodeURIComponent(this.$route.query.redirect) : undefined;
     this.getCookie();
   },
   methods: {
     getCode() {
-      // 只有开启的状态，才加载验证码。默认开启
+      // 情况一，未开启：则直接登录
       if (!this.captchaEnable) {
+        this.handleLogin({})
         return;
       }
-      // 请求远程，获得验证码
-      getCodeImg().then(res => {
-        res = res.data;
-        this.captchaEnable = res.enable;
-        if (this.captchaEnable) {
-          this.codeUrl = "data:image/gif;base64," + res.img;
-          this.loginForm.uuid = res.uuid;
-        }
-      });
+
+      // 情况二，已开启：则展示验证码；只有完成验证码的情况，才进行登录
+      // 弹出验证码
+      this.$refs.verify.show()
     },
     getCookie() {
       const username = getUsername();
@@ -231,7 +227,7 @@ export default {
         tenantName: tenantName ? tenantName : this.loginForm.tenantName,
       };
     },
-    handleLogin() {
+    handleLogin(captchaParams) {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true;
@@ -247,6 +243,7 @@ export default {
             removeRememberMe()
             removeTenantName()
           }
+          this.loginForm.captchaVerification = captchaParams.captchaVerification
           // 发起登陆
           // console.log("发起登录", this.loginForm);
           this.$store.dispatch(this.loginForm.loginType === "sms" ? "SmsLogin" : "Login", this.loginForm).then(() => {
@@ -254,23 +251,44 @@ export default {
             });
           }).catch(() => {
             this.loading = false;
-            this.getCode();
           });
         }
       });
     },
-    doSocialLogin(socialTypeEnum) {
+    async doSocialLogin(socialTypeEnum) {
       // 设置登录中
       this.loading = true;
-      // 计算 redirectUri
-      const redirectUri = location.origin + '/social-login?type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/"); // 重定向不能丢
-      // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
-      // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
-      // 进行跳转
-      socialAuthRedirect(socialTypeEnum.type, encodeURIComponent(redirectUri)).then((res) => {
-        // console.log(res.url);
-        window.location.href = res.data;
-      });
+      let tenant = false;
+      if (this.tenantEnable) {
+        await this.$prompt('请输入租户名称', "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消"
+        }).then(({value}) => {
+          getTenantIdByName(value).then(res => {
+            const tenantId = res.data;
+            tenant = true
+            if (tenantId && tenantId >= 0) {
+              setTenantId(tenantId)
+            }
+          });
+        }).catch(() => {
+          return false
+        });
+      } else {
+        tenant = true
+      }
+     if(tenant){
+       // 计算 redirectUri
+       const redirectUri = location.origin + '/social-login?'
+         + encodeURIComponent('type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/")); // 重定向不能丢
+       // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
+       // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
+       // 进行跳转
+       socialAuthRedirect(socialTypeEnum.type, encodeURIComponent(redirectUri)).then((res) => {
+         // console.log(res.url);
+         window.location.href = res.data;
+       });
+     }
     },
     /** ========== 以下为升级短信登录 ========== */
     getSmsCode() {
@@ -298,7 +316,7 @@ export default {
 
 .oauth-login {
   display: flex;
-  align-items: cen;
+  align-items: center;
   cursor:pointer;
 }
 .oauth-login-item {

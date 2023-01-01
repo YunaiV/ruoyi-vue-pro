@@ -1,0 +1,81 @@
+// 修改样式变量
+//@import 'vxe-table/styles/variable.scss';
+
+/*font*/
+$vxe-font-color: #e5e7eb;
+// $vxe-font-size: 14px !default;
+// $vxe-font-size-medium: 16px !default;
+// $vxe-font-size-small: 14px !default;
+// $vxe-font-size-mini: 12px !default;
+
+/*color*/
+$vxe-primary-color: #409eff !default;
+$vxe-success-color: #67c23a !default;
+$vxe-info-color: #909399 !default;
+$vxe-warning-color: #e6a23c !default;
+$vxe-danger-color: #f56c6c !default;
+$vxe-disabled-color: #bfbfbf !default;
+$vxe-primary-disabled-color: #c0c4cc !default;
+
+/*loading*/
+$vxe-loading-color: $vxe-primary-color !default;
+$vxe-loading-background-color: #1d1e1f !default;
+$vxe-loading-z-index: 999 !default;
+
+/*icon*/
+$vxe-icon-font-family: Verdana, Arial, Tahoma !default;
+$vxe-icon-background-color: #e5e7eb !default;
+
+/*toolbar*/
+$vxe-toolbar-background-color: #1d1e1f !default;
+$vxe-toolbar-button-border: #dcdfe6 !default;
+$vxe-toolbar-custom-active-background-color: #d9dadb !default;
+$vxe-toolbar-panel-background-color: #e5e7eb !default;
+
+$vxe-table-font-color: #e5e7eb;
+$vxe-table-header-background-color: #1d1e1f;
+$vxe-table-body-background-color: #141414;
+$vxe-table-row-striped-background-color: #1d1d1d;
+$vxe-table-row-hover-background-color: #1d1e1f;
+$vxe-table-row-hover-striped-background-color: #1e1e1e;
+$vxe-table-footer-background-color: #1d1e1f;
+$vxe-table-row-current-background-color: #302d2d;
+$vxe-table-column-current-background-color: #302d2d;
+$vxe-table-column-hover-background-color: #302d2d;
+$vxe-table-row-hover-current-background-color: #302d2d;
+$vxe-table-row-checkbox-checked-background-color: #3e3c37 !default;
+$vxe-table-row-hover-checkbox-checked-background-color: #615a4a !default;
+$vxe-table-menu-background-color: #1d1e1f;
+$vxe-table-border-width: 1px !default;
+$vxe-table-border-color: #4c4d4f !default;
+$vxe-table-fixed-left-scrolling-box-shadow: 8px 0px 10px -5px rgba(0, 0, 0, 0.12) !default;
+$vxe-table-fixed-right-scrolling-box-shadow: -8px 0px 10px -5px rgba(0, 0, 0, 0.12) !default;
+
+$vxe-form-background-color: #141414;
+
+/*pager*/
+$vxe-pager-background-color: #1d1e1f !default;
+$vxe-pager-perfect-background-color: #262727 !default;
+$vxe-pager-perfect-button-background-color: #a7a3a3 !default;
+
+$vxe-input-background-color: #141414;
+$vxe-input-border-color: #4c4d4f !default;
+
+$vxe-select-option-hover-background-color: #262626 !default;
+$vxe-select-panel-background-color: #141414 !default;
+$vxe-select-empty-color: #262626 !default;
+$vxe-optgroup-title-color: #909399 !default;
+
+/*button*/
+$vxe-button-default-background-color: #262626;
+$vxe-button-dropdown-panel-background-color: #141414;
+
+/*modal*/
+$vxe-modal-header-background-color: #141414;
+$vxe-modal-body-background-color: #141414;
+$vxe-modal-border-color: #3b3b3b;
+
+/*pulldown*/
+$vxe-pulldown-panel-background-color: #262626 !default;
+
+@import 'vxe-table/styles/index';

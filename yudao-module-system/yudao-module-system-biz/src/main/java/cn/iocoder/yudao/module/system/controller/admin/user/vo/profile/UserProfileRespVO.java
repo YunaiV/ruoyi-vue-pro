@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -29,10 +29,10 @@ public class UserProfileRespVO extends UserBaseVO {
     private String loginIp;
 
     @ApiModelProperty(value = "最后登录时间", required = true, example = "时间戳格式")
-    private Date loginDate;
+    private LocalDateTime loginDate;
 
     @ApiModelProperty(value = "创建时间", required = true, example = "时间戳格式")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 所属角色

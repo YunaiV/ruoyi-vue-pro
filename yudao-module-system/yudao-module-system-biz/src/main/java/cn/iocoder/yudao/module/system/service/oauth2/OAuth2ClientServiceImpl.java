@@ -23,7 +23,10 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -59,7 +62,7 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
      * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     @Getter
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private OAuth2ClientMapper oauth2ClientMapper;
@@ -73,42 +76,37 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
     @Override
     @PostConstruct
     public void initLocalCache() {
-        // 获取客户端列表，如果有更新
-        List<OAuth2ClientDO> tenantList = loadOAuth2ClientIfUpdate(maxUpdateTime);
-        if (CollUtil.isEmpty(tenantList)) {
-            return;
-        }
-
-        // 写入缓存
-        clientCache = convertMap(tenantList, OAuth2ClientDO::getClientId);
-        maxUpdateTime = getMaxValue(tenantList, OAuth2ClientDO::getUpdateTime);
-        log.info("[initLocalCache][初始化 OAuth2Client 数量为 {}]", tenantList.size());
+        initLocalCacheIfUpdate(null);
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        initLocalCache();
+        initLocalCacheIfUpdate(this.maxUpdateTime);
     }
 
     /**
-     * 如果客户端发生变化，从数据库中获取最新的全量客户端。
-     * 如果未发生变化，则返回空
+     * 刷新本地缓存
      *
-     * @param maxUpdateTime 当前客户端的最大更新时间
-     * @return 客户端列表
+     * @param maxUpdateTime 最大更新时间
+     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
+     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
      */
-    private List<OAuth2ClientDO> loadOAuth2ClientIfUpdate(Date maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadOAuth2ClientIfUpdate][首次加载全量客户端]");
-        } else { // 判断数据库中是否有更新的客户端
-            if (oauth2ClientMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
-            }
-            log.info("[loadOAuth2ClientIfUpdate][增量加载全量客户端]");
+    private void initLocalCacheIfUpdate(LocalDateTime maxUpdateTime) {
+        // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
+        // 如果没有增量的数据变化，则不进行本地缓存的刷新
+        if (maxUpdateTime != null
+                && oauth2ClientMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
+            log.info("[initLocalCacheIfUpdate][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
+            return;
         }
-        // 第二步，如果有更新，则从数据库加载所有客户端
-        return oauth2ClientMapper.selectList();
+        List<OAuth2ClientDO> clients = oauth2ClientMapper.selectList();
+        log.info("[initLocalCacheIfUpdate][缓存 OAuth2 客户端，数量为:{}]", clients.size());
+
+        // 第二步：构建缓存。
+        clientCache = convertMap(clients, OAuth2ClientDO::getClientId);
+
+        // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
+        this.maxUpdateTime = getMaxValue(clients, OAuth2ClientDO::getUpdateTime);
     }
 
     @Override

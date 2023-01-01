@@ -18,9 +18,9 @@
       <el-form-item label="错误码提示" prop="message">
         <el-input v-model="queryParams.message" placeholder="请输入错误码提示" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -45,7 +45,7 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="类型" align="center" prop="type" width="80">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.SYSTEM_ERROR_CODE_TYPE" :value="scope.row.type" />
         </template>
       </el-table-column>
@@ -54,12 +54,12 @@
       <el-table-column label="错误码提示" align="center" prop="message" width="300" />
       <el-table-column label="备注" align="center" prop="memo" width="200" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:error-code:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -118,7 +118,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -127,6 +126,7 @@ export default {
         applicationName: null,
         code: null,
         message: null,
+        createTime: []
       },
       // 表单参数
       form: {},
@@ -145,11 +145,8 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
-      getErrorCodePage(params).then(response => {
+      getErrorCodePage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -178,7 +175,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -237,7 +233,6 @@ export default {
       let params = {...this.queryParams};
       params.pageNo = undefined;
       params.pageSize = undefined;
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行导出
       this.$modal.confirm('是否确认导出所有错误码数据项?').then(() => {
         this.exportLoading = true;

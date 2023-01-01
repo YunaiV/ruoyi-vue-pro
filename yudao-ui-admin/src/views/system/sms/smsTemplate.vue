@@ -28,9 +28,9 @@
                      :label="channel.signature + '【' + getDictDataLabel(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE, channel.code) + '】'" />
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -57,30 +57,30 @@
       <el-table-column label="模板名称" align="center" prop="name" />
       <el-table-column label="模板内容" align="center" prop="content" width="300" />
       <el-table-column label="短信类型" align="center" prop="type">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE" :value="scope.row.type"/>
         </template>
       </el-table-column>
       <el-table-column label="开启状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="短信 API 的模板编号" align="center" prop="apiTemplateId" width="180" />
       <el-table-column label="短信渠道" align="center" width="120">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <div>{{ formatChannelSignature(scope.row.channelId) }}</div>
           <dict-tag :type="DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE" :value="scope.row.channelCode"/>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-share" @click="handleSendSms(scope.row)"
                      v-hasPermi="['system:sms-template:send-sms']">测试</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -183,7 +183,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -194,6 +193,7 @@ export default {
         content: null,
         apiTemplateId: null,
         channelId: null,
+        createTime: []
       },
       // 表单参数
       form: {},
@@ -232,11 +232,8 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
-      getSmsTemplatePage(params).then(response => {
+      getSmsTemplatePage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -269,7 +266,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -328,7 +324,6 @@ export default {
       let params = {...this.queryParams};
       params.pageNo = undefined;
       params.pageSize = undefined;
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行导出
       this.$modal.confirm('是否确认导出所有短信模板数据项?', "警告").then(() => {
         this.exportLoading = true;

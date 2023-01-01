@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -25,12 +25,8 @@ public class LoginLogPageReqVO extends PageParam {
     @ApiModelProperty(value = "操作状态", example = "true")
     private Boolean status;
 
-    @ApiModelProperty(value = "开始时间", example = "2020-10-24")
+    @ApiModelProperty(value = "登录时间", example = "[2022-07-01 00:00:00,2022-07-01 23:59:59]")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date beginTime;
-
-    @ApiModelProperty(value = "结束时间", example = "2020-10-24")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date endTime;
+    private LocalDateTime[] createTime;
 
 }

@@ -10,7 +10,6 @@ import cn.iocoder.yudao.framework.file.core.client.AbstractFileClient;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 
 /**
  * Ftp 文件客户端
@@ -39,7 +38,7 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
     }
 
     @Override
-    public String upload(byte[] content, String path) {
+    public String upload(byte[] content, String path, String type) {
         // 执行写入
         String filePath = getFilePath(path);
         String fileName = FileUtil.getName(filePath);

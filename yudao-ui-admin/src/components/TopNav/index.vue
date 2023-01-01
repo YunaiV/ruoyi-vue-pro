@@ -5,10 +5,10 @@
     @select="handleSelect"
   >
     <template v-for="(item, index) in topMenus">
-      <el-menu-item :style="{'--theme': theme}" :index="item.path" :key="index" v-if="index < visibleNumber"
-      ><svg-icon :icon-class="item.meta.icon" />
-        {{ item.meta.title }}</el-menu-item
-      >
+      <el-menu-item :style="{'--theme': theme}" :index="item.path" :key="index" v-if="index < visibleNumber">
+        <svg-icon :icon-class="item.meta.icon"/>
+        {{ item.meta.title }}
+      </el-menu-item>
     </template>
 
     <!-- 顶部菜单超出数量折叠 -->
@@ -19,9 +19,10 @@
           :index="item.path"
           :key="index"
           v-if="index >= visibleNumber"
-        ><svg-icon :icon-class="item.meta.icon" />
-          {{ item.meta.title }}</el-menu-item
         >
+          <svg-icon :icon-class="item.meta.icon"/>
+          {{ item.meta.title }}
+        </el-menu-item>
       </template>
     </el-submenu>
   </el-menu>
@@ -30,13 +31,14 @@
 <script>
 import { constantRoutes } from "@/router";
 
+// 隐藏侧边栏路由
+const hideList = ['/index', '/user/profile'];
+
 export default {
   data() {
     return {
       // 顶部栏初始数
       visibleNumber: 5,
-      // 是否为首次加载
-      isFrist: false,
       // 当前激活菜单的 index
       currentIndex: undefined
     };
@@ -66,9 +68,9 @@ export default {
     },
     // 设置子路由
     childrenMenus() {
-      var childrenMenus = [];
+      const childrenMenus = [];
       this.routers.map((router) => {
-        for (var item in router.children) {
+        for (let item in router.children) {
           if (router.children[item].parentPath === undefined) {
             if(router.path === "/") {
               router.children[item].path = "/" + router.children[item].path;
@@ -88,17 +90,12 @@ export default {
     activeMenu() {
       const path = this.$route.path;
       let activePath = path;
-      if (path.lastIndexOf("/") > 0) {
+      if (path !== undefined && path.lastIndexOf("/") > 0 && hideList.indexOf(path) === -1) {
         const tmpPath = path.substring(1, path.length);
         activePath = "/" + tmpPath.substring(0, tmpPath.indexOf("/"));
-        this.$store.dispatch('app/toggleSideBarHide', false);
-      } else if ("/index" == path || "" == path) {
-        if (!this.isFrist) {
-          this.isFrist = true;
-        } else {
-          activePath = "index";
+        if (!this.$route.meta.link) {
+          this.$store.dispatch('app/toggleSideBarHide', false)
         }
-        this.$store.dispatch('app/toggleSideBarHide', true);
       } else if(!this.$route.children) {
         activePath = path;
         this.$store.dispatch('app/toggleSideBarHide', true);
@@ -141,16 +138,18 @@ export default {
     },
     // 当前激活的路由
     activeRoutes(key) {
-      var routes = [];
+      const routes = []
       if (this.childrenMenus && this.childrenMenus.length > 0) {
         this.childrenMenus.map((item) => {
-          if (key == item.parentPath || (key == "index" && "" == item.path)) {
+          if (key === item.parentPath || (key === "index" && "" === item.path)) {
             routes.push(item);
           }
         });
       }
       if(routes.length > 0) {
         this.$store.commit("SET_SIDEBAR_ROUTERS", routes);
+      } else {
+        this.$store.dispatch("app/toggleSideBarHide", true);
       }
     },
     ishttp(url) {

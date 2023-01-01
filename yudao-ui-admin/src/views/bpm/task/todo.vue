@@ -7,9 +7,9 @@
       <el-form-item label="流程名" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入流程名" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -24,18 +24,18 @@
       <el-table-column label="所属流程" align="center" prop="processInstance.name" />
       <el-table-column label="流程发起人" align="center" prop="processInstance.startUserNickname" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="version" width="80">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-tag type="success" v-if="scope.row.suspensionState === 1">激活</el-tag>
           <el-tag type="warning" v-if="scope.row.suspensionState === 2">挂起</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)"
                      v-hasPermi="['bpm:task:update']">审批</el-button>
         </template>
@@ -50,7 +50,6 @@
 
 <script>
 import {getTodoTaskPage} from '@/api/bpm/task'
-import {listSimpleUsers} from "@/api/system/user";
 
 export default {
   name: "Todo",
@@ -67,11 +66,11 @@ export default {
       // 待办任务列表
       list: [],
       // 查询参数
-      dateRangeCreateTime: [],
       queryParams: {
         pageNo: 1,
         pageSize: 10,
         name: null,
+        createTime: []
       },
     };
   },
@@ -83,9 +82,7 @@ export default {
     getList() {
       this.loading = true;
       // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
-      getTodoTaskPage(params).then(response => {
+      getTodoTaskPage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -98,7 +95,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },

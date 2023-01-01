@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 文件配置 Mapper
@@ -22,11 +22,11 @@ public interface FileConfigMapper extends BaseMapperX<FileConfigDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<FileConfigDO>()
                 .likeIfPresent(FileConfigDO::getName, reqVO.getName())
                 .eqIfPresent(FileConfigDO::getStorage, reqVO.getStorage())
-                .betweenIfPresent(FileConfigDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(FileConfigDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(FileConfigDO::getId));
     }
 
     @Select("SELECT COUNT(*) FROM infra_file_config WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
+    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

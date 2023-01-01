@@ -53,9 +53,8 @@ public class AlipayQrPayClientTest extends BaseMockitoUnitTest {
                 "lrsYhKkVK2OxwM3kFqjoBBY0CZoZCsSQ3LDH5WeZqPArlsS6xa2zqJBuuoKjMrdpELl3eXSjP8K54eDJCbeetCZNKWLL3DPahTPB7LZ" +
                 "ikfYmslb0QUvCgGapD0xkS7eVq70NaL1G57MWABs4tbfWgxike4Daj3EfUrzIVspQxj7w8HEj9WozJPgL88kSJSits0pqD3n5r8HSuseQIDAQAB");
 
-    // TODO @tina：= 前后要有空格哈
     @InjectMocks
-    AlipayQrPayClient client=new AlipayQrPayClient(10L,config);
+    AlipayQrPayClient client = new AlipayQrPayClient(10L,config);
 
     @Mock
     private DefaultAlipayClient defaultAlipayClient;
@@ -74,7 +73,7 @@ public class AlipayQrPayClientTest extends BaseMockitoUnitTest {
         Long shopOrderId = System.currentTimeMillis();
         PayOrderUnifiedReqDTO reqDTO=new PayOrderUnifiedReqDTO();
         reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
-        reqDTO.setAmount(1L);
+        reqDTO.setAmount(1);
         reqDTO.setBody("内容：" + shopOrderId);
         reqDTO.setSubject("标题："+shopOrderId);
         String notify="http://niubi.natapp1.cc/api/pay/order/notify";

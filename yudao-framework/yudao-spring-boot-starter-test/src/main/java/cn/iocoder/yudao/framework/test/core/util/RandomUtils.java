@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.test.core.util;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -8,6 +9,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +42,7 @@ public class RandomUtils {
         // Integer
         PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(Integer.class, (dataProviderStrategy, attributeMetadata, map) -> {
             // 如果是 status 的字段，返回 0 或 1
-            if (attributeMetadata.getAttributeName().equals("status")) {
+            if ("status".equals(attributeMetadata.getAttributeName())) {
                 return RandomUtil.randomEle(CommonStatusEnum.values()).getStatus();
             }
             // 如果是 type、status 结尾的字段，返回 tinyint 范围
@@ -53,7 +55,7 @@ public class RandomUtils {
         // Boolean
         PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(Boolean.class, (dataProviderStrategy, attributeMetadata, map) -> {
             // 如果是 deleted 的字段，返回非删除
-            if (attributeMetadata.getAttributeName().equals("deleted")) {
+            if ("deleted".equals(attributeMetadata.getAttributeName())) {
                 return false;
             }
             return RandomUtil.randomBoolean();
@@ -74,6 +76,10 @@ public class RandomUtils {
 
     public static Date randomDate() {
         return RandomUtil.randomDay(0, RANDOM_DATE_MAX);
+    }
+
+    public static LocalDateTime randomLocalDateTime() {
+        return LocalDateTimeUtil.of(randomDate());
     }
 
     public static Short randomShort() {

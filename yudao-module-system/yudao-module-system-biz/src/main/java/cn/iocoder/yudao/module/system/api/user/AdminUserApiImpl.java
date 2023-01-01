@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,6 +29,12 @@ public class AdminUserApiImpl implements AdminUserApi {
     }
 
     @Override
+    public List<AdminUserRespDTO> getUsers(Collection<Long> ids) {
+        List<AdminUserDO> users = userService.getUsers(ids);
+        return UserConvert.INSTANCE.convertList4(users);
+    }
+
+    @Override
     public List<AdminUserRespDTO> getUsersByDeptIds(Collection<Long> deptIds) {
         List<AdminUserDO> users = userService.getUsersByDeptIds(deptIds);
         return UserConvert.INSTANCE.convertList4(users);
@@ -39,12 +44,6 @@ public class AdminUserApiImpl implements AdminUserApi {
     public List<AdminUserRespDTO> getUsersByPostIds(Collection<Long> postIds) {
         List<AdminUserDO> users = userService.getUsersByPostIds(postIds);
         return UserConvert.INSTANCE.convertList4(users);
-    }
-
-    @Override
-    public Map<Long, AdminUserRespDTO> getUserMap(Collection<Long> ids) {
-        Map<Long, AdminUserDO> userMap = userService.getUserMap(ids);
-        return UserConvert.INSTANCE.convertMap4(userMap);
     }
 
     @Override

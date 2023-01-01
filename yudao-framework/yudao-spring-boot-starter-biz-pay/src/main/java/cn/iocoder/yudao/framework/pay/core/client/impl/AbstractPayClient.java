@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl;
 
-import cn.hutool.extra.validation.ValidationUtil;
 import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
@@ -9,6 +8,8 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayRefundUnifiedRespDTO;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.validation.Validation;
 
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
@@ -68,7 +69,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         this.init();
     }
 
-    protected Double calculateAmount(Long amount) {
+    protected Double calculateAmount(Integer amount) {
         return amount / 100.0;
     }
 
@@ -79,7 +80,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
 
     @Override
     public final PayCommonResult<?> unifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
-        ValidationUtil.validate(reqDTO);
+        Validation.buildDefaultValidatorFactory().getValidator().validate(reqDTO);
         // 执行短信发送
         PayCommonResult<?> result;
         try {

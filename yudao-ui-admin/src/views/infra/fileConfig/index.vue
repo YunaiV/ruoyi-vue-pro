@@ -12,9 +12,9 @@
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -36,23 +36,23 @@
       <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="配置名" align="center" prop="name" />
       <el-table-column label="存储器" align="center" prop="storage">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_FILE_STORAGE" :value="scope.row.storage" />
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="主配置" align="center" prop="primary">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.master" />
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="240">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['infra:file-config:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-attract" @click="handleMaster(scope.row)"
@@ -77,7 +77,7 @@
           <el-input v-model="form.remark" placeholder="请输入备注" />
         </el-form-item>
         <el-form-item label="存储器" prop="storage">
-          <el-select v-model="form.storage" placeholder="请选择存储器" :disabled="form.id">
+          <el-select v-model="form.storage" placeholder="请选择存储器" :disabled="form.id !== undefined">
             <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_FILE_STORAGE)"
                        :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
           </el-select>
@@ -91,7 +91,7 @@
           <el-input v-model="form.config.host" placeholder="请输入主机地址" />
         </el-form-item>
         <el-form-item v-if="form.storage >= 11 && form.storage <= 12" label="主机端口" prop="config.port">
-          <el-input-number min="0" v-model="form.config.port" placeholder="请输入主机端口" />
+          <el-input-number :min="0" v-model="form.config.port" placeholder="请输入主机端口" />
         </el-form-item>
         <el-form-item v-if="form.storage >= 11 && form.storage <= 12" label="用户名" prop="config.username">
           <el-input v-model="form.config.username" placeholder="请输入密码" />
@@ -162,13 +162,13 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
         pageSize: 10,
         name: null,
         storage: null,
+        createTime: []
       },
       // 表单参数
       form: {
@@ -202,11 +202,8 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
-      getFileConfigPage(params).then(response => {
+      getFileConfigPage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -235,7 +232,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },

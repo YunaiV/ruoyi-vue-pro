@@ -60,6 +60,10 @@
   color: inherit;
 }
 
+.el-message-box__status + .el-message-box__message{
+  word-break: break-word;
+}
+
 .el-dialog:not(.is-fullscreen) {
   margin-top: 6vh !important;
 }
@@ -69,6 +73,16 @@
   overflow-x: hidden;
   max-height: 70vh;
   padding: 10px 20px 0;
+}
+
+.el-dialog{
+  display: flex;
+  flex-direction: column;
+  max-width: calc(100% - 30px);
+  max-height: calc(100% - 70px);
+  .el-dialog__body {
+    overflow: auto;
+  }
 }
 
 .el-table {
@@ -135,9 +149,8 @@
 }
 
 /** 表格更多操作下拉样式 */
-.el-table .el-dropdown-link {
+.el-table .el-dropdown-link,.el-table .el-dropdown-selfdefine {
   cursor: pointer;
-  color: #409EFF;
   margin-left: 5px;
 }
 

@@ -25,7 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -34,7 +34,7 @@ import static cn.hutool.core.bean.BeanUtil.getFieldValue;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -77,7 +77,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
         assertPojoEquals(smsTemplate01, smsTemplateCache.get(smsTemplate01.getCode()));
         assertPojoEquals(smsTemplate02, smsTemplateCache.get(smsTemplate02.getCode()));
         // 断言 maxUpdateTime 缓存
-        Date maxUpdateTime = (Date) getFieldValue(smsTemplateService, "maxUpdateTime");
+        LocalDateTime maxUpdateTime = (LocalDateTime) getFieldValue(smsTemplateService, "maxUpdateTime");
         assertEquals(max(smsTemplate01.getUpdateTime(), smsTemplate02.getUpdateTime()), maxUpdateTime);
     }
 
@@ -230,8 +230,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
        reqVO.setContent("芋道");
        reqVO.setApiTemplateId("yu");
        reqVO.setChannelId(1L);
-       reqVO.setBeginCreateTime(buildTime(2021, 11, 1));
-       reqVO.setEndCreateTime(buildTime(2021, 12, 1));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 11, 1),buildTime(2021, 12, 1)}));
 
        // 调用
        PageResult<SmsTemplateDO> pageResult = smsTemplateService.getSmsTemplatePage(reqVO);
@@ -276,8 +275,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
         reqVO.setContent("芋道");
         reqVO.setApiTemplateId("yu");
         reqVO.setChannelId(1L);
-        reqVO.setBeginCreateTime(buildTime(2021, 11, 1));
-        reqVO.setEndCreateTime(buildTime(2021, 12, 1));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 11, 1),buildTime(2021, 12, 1)}));
 
        // 调用
        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplateList(reqVO);

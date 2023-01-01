@@ -35,7 +35,7 @@
       <el-col v-if="this.processInstance.processDefinition && this.processInstance.processDefinition.formType === 10"
               :span="16" :offset="6">
         <div >
-          <parser :key="new Date().getTime()" :form-conf="detailForm" @submit="submitForm" />
+          <parser :key="new Date().getTime()" :form-conf="detailForm" />
         </div>
       </el-col>
       <div v-if="this.processInstance.processDefinition && this.processInstance.processDefinition.formType === 20">
@@ -45,6 +45,8 @@
         </router-link>
       </div>
     </el-card>
+
+    <!-- 审批记录 -->
     <el-card class="box-card" v-loading="tasksLoad">
       <div slot="header" class="clearfix">
         <span class="el-icon-picture-outline">审批记录</span>
@@ -60,7 +62,7 @@
                   审批人：{{ item.assigneeUser.nickname }}
                   <el-tag type="info" size="mini">{{ item.assigneeUser.deptName }}</el-tag>
                 </label>
-                <label style="font-weight: normal">创建时间：</label>
+                <label style="font-weight: normal" v-if="item.createTime">创建时间：</label>
                 <label style="color:#8a909c; font-weight: normal">{{ parseTime(item.createTime) }}</label>
                 <label v-if="item.endTime" style="margin-left: 30px;font-weight: normal">审批时间：</label>
                 <label v-if="item.endTime" style="color:#8a909c;font-weight: normal"> {{ parseTime(item.endTime) }}</label>
@@ -108,7 +110,7 @@ import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import store from "@/store";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
-import {createProcessInstance, getProcessInstance} from "@/api/bpm/processInstance";
+import {getProcessInstance} from "@/api/bpm/processInstance";
 import {approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssignee} from "@/api/bpm/task";
 import {getDate} from "@/utils/dateUtils";
 import {listSimpleUsers} from "@/api/system/user";
@@ -136,7 +138,7 @@ export default {
       // BPMN 数据
       bpmnXML: null,
       bpmnControlForm: {
-        prefix: "activiti"
+        prefix: "flowable"
       },
       activityList: [],
 
@@ -232,7 +234,13 @@ export default {
       this.auditForms = [];
       getTaskListByProcessInstanceId(this.id).then(response => {
         // 审批记录
-        this.tasks = response.data;
+        this.tasks = [];
+        // 移除已取消的审批
+        response.data.forEach(task => {
+          if (task.result !== 4) {
+            this.tasks.push(task);
+          }
+        });
         // 排序，将未完成的排在前面，已完成的排在后面；
         this.tasks.sort((a, b) => {
           // 有已完成的情况，按照完成时间倒序
@@ -283,31 +291,6 @@ export default {
         this.$router.push({ path: row.formCustomCreatePath});
         // 这里暂时无需加载流程图，因为跳出到另外个 Tab；
       }
-    },
-    /** 提交按钮 */
-    submitForm(params) {
-      if (!params) {
-        return;
-      }
-      // 设置表单禁用
-      const conf = params.conf;
-      conf.disabled = true; // 表单禁用
-      conf.formBtns = false; // 按钮隐藏
-
-      // 提交表单，创建流程
-      const variables = params.values;
-      createProcessInstance({
-        processDefinitionId: this.selectProcessInstance.id,
-        variables: variables
-      }).then(response => {
-        this.$modal.msgSuccess("发起流程成功");
-        // 关闭当前窗口
-        this.$tab.closeOpenPage();
-        this.$router.go(-1);
-      }).catch(() => {
-        conf.disabled = false; // 表单开启
-        conf.formBtns = true; // 按钮展示
-      })
     },
     getDateStar(ms) {
       return getDate(ms);
@@ -407,6 +390,15 @@ export default {
     /** 处理审批退回的操作 */
     handleBack(task) {
       this.$modal.msgError("暂不支持【退回】功能！");
+      // 可参考 http://blog.wya1.com/article/636697030/details/7296
+      // const data = {
+      //   id: task.id,
+      //   assigneeUserId: 1
+      // }
+      // backTask(data).then(response => {
+      //   this.$modal.msgSuccess("回退成功！");
+      //   this.getDetail(); // 获得最新详情
+      // });
     }
   }
 };

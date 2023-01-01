@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.social;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.social.core.YudaoAuthRequestFactory;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserBindDO;
@@ -8,7 +9,6 @@ import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserBindMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserMapper;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
-import com.xkcoding.justauth.AuthRequestFactory;
 import me.zhyd.oauth.enums.AuthResponseStatus;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
@@ -46,7 +46,7 @@ public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
     private SocialUserBindMapper socialUserBindMapper;
 
     @MockBean
-    private AuthRequestFactory authRequestFactory;
+    private YudaoAuthRequestFactory authRequestFactory;
 
     @Test
     public void testGetAuthorizeUrl() {
@@ -64,7 +64,7 @@ public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
             // 调用
             String url = socialUserService.getAuthorizeUrl(type, redirectUri);
             // 断言
-            assertEquals("https://www.iocoder.cn/?redirect_uri=sss", url);
+            assertEquals("https://www.iocoder.cn?redirect_uri=sss", url);
         }
     }
 

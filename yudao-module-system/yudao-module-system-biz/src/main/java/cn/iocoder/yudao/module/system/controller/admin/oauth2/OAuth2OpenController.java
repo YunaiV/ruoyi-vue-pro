@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.system.convert.oauth2.OAuth2OpenConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ApproveDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
-import cn.iocoder.yudao.module.system.enums.auth.OAuth2GrantTypeEnum;
+import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2GrantTypeEnum;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ApproveService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ClientService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2GrantService;
@@ -31,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
@@ -82,6 +83,7 @@ public class OAuth2OpenController {
      * 注意，默认需要传递 client_id + client_secret 参数
      */
     @PostMapping("/token")
+    @PermitAll
     @ApiOperation(value = "获得访问令牌", notes = "适合 code 授权码模式，或者 implicit 简化模式；在 sso.vue 单点登录界面被【获取】调用")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "grant_type", required = true, value = "授权类型", example = "code", dataTypeClass = String.class),
@@ -104,7 +106,7 @@ public class OAuth2OpenController {
                                                                      @RequestParam(value = "scope", required = false) String scope, // 密码模式
                                                                      @RequestParam(value = "refresh_token", required = false) String refreshToken) { // 刷新模式
         List<String> scopes = OAuth2Utils.buildScopes(scope);
-        // 授权类型
+        // 1.1 校验授权类型
         OAuth2GrantTypeEnum grantTypeEnum = OAuth2GrantTypeEnum.getByGranType(grantType);
         if (grantTypeEnum == null) {
             throw exception0(BAD_REQUEST.getCode(), StrUtil.format("未知授权类型({})", grantType));
@@ -113,12 +115,12 @@ public class OAuth2OpenController {
             throw exception0(BAD_REQUEST.getCode(), "Token 接口不支持 implicit 授权模式");
         }
 
-        // 校验客户端
+        // 1.2 校验客户端
         String[] clientIdAndSecret = obtainBasicAuthorization(request);
         OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientIdAndSecret[0], clientIdAndSecret[1],
                 grantType, scopes, redirectUri);
 
-        // 根据授权模式，获取访问令牌
+        // 2. 根据授权模式，获取访问令牌
         OAuth2AccessTokenDO accessTokenDO;
         switch (grantTypeEnum) {
             case AUTHORIZATION_CODE:
@@ -141,6 +143,7 @@ public class OAuth2OpenController {
     }
 
     @DeleteMapping("/token")
+    @PermitAll
     @ApiOperation(value = "删除访问令牌")
     @ApiImplicitParam(name = "token", required = true, value = "访问令牌", example = "biu", dataTypeClass = String.class)
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
@@ -159,6 +162,7 @@ public class OAuth2OpenController {
      * 对应 Spring Security OAuth 的 CheckTokenEndpoint 类的 checkToken 方法
      */
     @PostMapping("/check-token")
+    @PermitAll
     @ApiOperation(value = "校验访问令牌")
     @ApiImplicitParam(name = "token", required = true, value = "访问令牌", example = "biu", dataTypeClass = String.class)
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志

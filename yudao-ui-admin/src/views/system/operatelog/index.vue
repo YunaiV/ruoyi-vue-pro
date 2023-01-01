@@ -23,9 +23,9 @@
           <el-option :key="false" label="失败" :value="false"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="操作时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd"
-          type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
+      <el-form-item label="操作时间" prop="startTime">
+        <el-date-picker v-model="queryParams.startTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -46,28 +46,28 @@
       <el-table-column label="操作模块" align="center" prop="module" />
       <el-table-column label="操作名" align="center" prop="name" width="180" />
       <el-table-column label="操作类型" align="center" prop="type">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.SYSTEM_OPERATE_TYPE" :value="scope.row.type"/>
         </template>
       </el-table-column>
       <el-table-column label="操作人" align="center" prop="userNickname" />
       <el-table-column label="操作结果" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ scope.row.resultCode === 0 ? '成功' : '失败' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作日期" align="center" prop="startTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.startTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="执行时长" align="center" prop="startTime">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ scope.row.duration }}  ms</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row,scope.index)"
                      v-hasPermi="['system:operate-log:query']">详细</el-button>
         </template>
@@ -148,10 +148,6 @@ export default {
       open: false,
       // 类型数据字典
       typeOptions: [],
-      // 类型数据字典
-      statusOptions: [],
-      // 日期范围
-      dateRange: [],
       // 表单参数
       form: {},
       // 查询参数
@@ -161,7 +157,8 @@ export default {
         title: undefined,
         operName: undefined,
         businessType: undefined,
-        status: undefined
+        status: undefined,
+        startTime: []
       },
     };
   },
@@ -172,10 +169,7 @@ export default {
     /** 查询登录日志 */
     getList() {
       this.loading = true;
-      listOperateLog(this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ])).then( response => {
+      listOperateLog(this.queryParams).then( response => {
           this.list = response.data.list;
           this.total = response.data.total;
           this.loading = false;
@@ -189,7 +183,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -200,13 +193,13 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ])
       this.$modal.confirm('是否确认导出所有操作日志数据项?').then(() => {
+          // 处理查询参数
+          let params = {...this.queryParams};
+          params.pageNo = undefined;
+          params.pageSize = undefined;
           this.exportLoading = true;
-          return exportOperateLog(queryParams);
+          return exportOperateLog(params);
         }).then(response => {
           this.$download.excel(response, '操作日志.xls');
           this.exportLoading = false;

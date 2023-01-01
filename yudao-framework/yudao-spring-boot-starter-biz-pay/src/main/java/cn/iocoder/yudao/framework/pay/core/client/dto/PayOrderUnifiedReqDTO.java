@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.URL;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -62,13 +62,13 @@ public class PayOrderUnifiedReqDTO {
      */
     @NotNull(message = "支付金额不能为空")
     @DecimalMin(value = "0", inclusive = false, message = "支付金额必须大于零")
-    private Long amount;
+    private Integer amount;
 
     /**
      * 支付过期时间
      */
     @NotNull(message = "支付过期时间不能为空")
-    private Date expireTime;
+    private LocalDateTime expireTime;
 
     // ========== 拓展参数 ==========
     /**

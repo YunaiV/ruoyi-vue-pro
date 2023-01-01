@@ -13,7 +13,7 @@
             :show-overflow-tooltip="true"
           />
           <el-table-column label="字段描述" min-width="10%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-input v-model="scope.row.columnComment"></el-input>
             </template>
           </el-table-column>
@@ -24,45 +24,45 @@
             :show-overflow-tooltip="true"
           />
           <el-table-column label="Java类型" min-width="11%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-select v-model="scope.row.javaType">
                 <el-option label="Long" value="Long" />
                 <el-option label="String" value="String" />
                 <el-option label="Integer" value="Integer" />
                 <el-option label="Double" value="Double" />
                 <el-option label="BigDecimal" value="BigDecimal" />
-                <el-option label="Date" value="Date" />
+                <el-option label="LocalDateTime" value="LocalDateTime" />
                 <el-option label="Boolean" value="Boolean" />
               </el-select>
             </template>
           </el-table-column>
           <el-table-column label="java属性" min-width="10%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-input v-model="scope.row.javaField"></el-input>
             </template>
           </el-table-column>
           <el-table-column label="插入" min-width="4%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-checkbox true-label="true" false-label="false" v-model="scope.row.createOperation"></el-checkbox>
             </template>
           </el-table-column>
           <el-table-column label="编辑" min-width="4%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-checkbox true-label="true" false-label="false" v-model="scope.row.updateOperation"></el-checkbox>
             </template>
           </el-table-column>
           <el-table-column label="列表" min-width="4%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-checkbox true-label="true" false-label="false" v-model="scope.row.listOperationResult"></el-checkbox>
             </template>
           </el-table-column>
           <el-table-column label="查询" min-width="4%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-checkbox true-label="true" false-label="false" v-model="scope.row.listOperation"></el-checkbox>
             </template>
           </el-table-column>
           <el-table-column label="查询方式" min-width="10%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-select v-model="scope.row.listOperationCondition">
                 <el-option label="=" value="=" />
                 <el-option label="!=" value="!=" />
@@ -76,12 +76,12 @@
             </template>
           </el-table-column>
           <el-table-column label="允许空" min-width="5%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-checkbox true-label="true" false-label="false" v-model="scope.row.nullable"></el-checkbox>
             </template>
           </el-table-column>
           <el-table-column label="显示类型" min-width="12%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-select v-model="scope.row.htmlType">
                 <el-option label="文本框" value="input" />
                 <el-option label="文本域" value="textarea" />
@@ -96,7 +96,7 @@
             </template>
           </el-table-column>
           <el-table-column label="字典类型" min-width="12%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-select v-model="scope.row.dictType" clearable filterable placeholder="请选择">
                 <el-option
                     v-for="dict in dictOptions"
@@ -108,7 +108,7 @@
             </template>
           </el-table-column>
           <el-table-column label="示例" min-width="10%">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-input v-model="scope.row.example"></el-input>
             </template>
           </el-table-column>

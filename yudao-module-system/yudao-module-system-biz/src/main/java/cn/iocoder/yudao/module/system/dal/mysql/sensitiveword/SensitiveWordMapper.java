@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWord
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -25,7 +25,7 @@ public interface SensitiveWordMapper extends BaseMapperX<SensitiveWordDO> {
                 .likeIfPresent(SensitiveWordDO::getName, reqVO.getName())
                 .likeIfPresent(SensitiveWordDO::getTags, reqVO.getTag())
                 .eqIfPresent(SensitiveWordDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(SensitiveWordDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(SensitiveWordDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SensitiveWordDO::getId));
     }
 
@@ -34,7 +34,7 @@ public interface SensitiveWordMapper extends BaseMapperX<SensitiveWordDO> {
                 .likeIfPresent(SensitiveWordDO::getName, reqVO.getName())
                 .likeIfPresent(SensitiveWordDO::getTags, reqVO.getTag())
                 .eqIfPresent(SensitiveWordDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(SensitiveWordDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .betweenIfPresent(SensitiveWordDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SensitiveWordDO::getId));
     }
 
@@ -43,6 +43,6 @@ public interface SensitiveWordMapper extends BaseMapperX<SensitiveWordDO> {
     }
 
     @Select("SELECT COUNT(*) FROM system_sensitive_word WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
+    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

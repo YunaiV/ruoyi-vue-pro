@@ -10,18 +10,18 @@ F.prototype = PaletteProvider.prototype; // 核心，将父类的原型赋值给
 
 // 利用中介函数重写原型链方法
 F.prototype.getPaletteEntries = function() {
-  var actions = {},
+  const actions = {},
     create = this._create,
     elementFactory = this._elementFactory,
     spaceTool = this._spaceTool,
     lassoTool = this._lassoTool,
     handTool = this._handTool,
     globalConnect = this._globalConnect,
-    translate = this._translate;
+    translate = this._translate
 
   function createAction(type, group, className, title, options) {
     function createListener(event) {
-      var shape = elementFactory.createShape(assign({ type: type }, options));
+      const shape = elementFactory.createShape(assign({ type: type }, options))
 
       if (options) {
         shape.businessObject.di.isExpanded = options.isExpanded;
@@ -30,7 +30,7 @@ F.prototype.getPaletteEntries = function() {
       create.start(event, shape);
     }
 
-    var shortType = type.replace(/^bpmn:/, "");
+    const shortType = type.replace(/^bpmn:/, '')
 
     return {
       group: group,
@@ -44,19 +44,19 @@ F.prototype.getPaletteEntries = function() {
   }
 
   function createSubprocess(event) {
-    var subProcess = elementFactory.createShape({
-      type: "bpmn:SubProcess",
+    const subProcess = elementFactory.createShape({
+      type: 'bpmn:SubProcess',
       x: 0,
       y: 0,
       isExpanded: true
-    });
+    })
 
-    var startEvent = elementFactory.createShape({
-      type: "bpmn:StartEvent",
+    const startEvent = elementFactory.createShape({
+      type: 'bpmn:StartEvent',
       x: 40,
       y: 82,
       parent: subProcess
-    });
+    })
 
     create.start(event, [subProcess, startEvent], {
       hints: {

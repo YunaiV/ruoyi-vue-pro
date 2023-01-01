@@ -15,7 +15,6 @@ import lombok.Getter;
 public enum SmsChannelEnum {
 
     DEBUG_DING_TALK("DEBUG_DING_TALK", "调试(钉钉)"),
-    YUN_PIAN("YUN_PIAN", "云片"),
     ALIYUN("ALIYUN", "阿里云"),
     TENCENT("TENCENT", "腾讯云"),
 //    HUA_WEI("HUA_WEI", "华为云"),

@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
-import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
@@ -16,31 +16,26 @@ import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantMapper;
 import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
-import cn.iocoder.yudao.module.system.mq.producer.tenant.TenantProducer;
 import cn.iocoder.yudao.module.system.service.permission.MenuService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -78,35 +73,11 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
     private MenuService menuService;
     @MockBean
     private PermissionService permissionService;
-    @MockBean
-    private TenantProducer tenantProducer;
 
     @BeforeEach
     public void setUp() {
-        // 清理缓存
-        ReflectUtil.setFieldValue(tenantService, "tenantCache", Collections.emptyMap());
-        ReflectUtil.setFieldValue(tenantService, "maxUpdateTime", null);
         // 清理租户上下文
         TenantContextHolder.clear();
-    }
-
-    @Test
-    public void testInitLocalCache() {
-        // mock 数据
-        TenantDO tenantDO1 = randomPojo(TenantDO.class);
-        tenantMapper.insert(tenantDO1);
-        TenantDO tenantDO2 = randomPojo(TenantDO.class);
-        tenantMapper.insert(tenantDO2);
-
-        // 调用
-        tenantService.initLocalCache();
-        // 断言 tenantCache 缓存
-        Map<Long, TenantDO> tenantCache = tenantService.getTenantCache();
-        assertEquals(2, tenantCache.size());
-        assertPojoEquals(tenantDO1, tenantCache.get(tenantDO1.getId()));
-        assertPojoEquals(tenantDO2, tenantCache.get(tenantDO2.getId()));
-        // 断言 maxUpdateTime 缓存
-        assertEquals(max(tenantDO1.getUpdateTime(), tenantDO2.getUpdateTime()), tenantService.getMaxUpdateTime());
     }
 
     @Test
@@ -114,7 +85,6 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         TenantDO tenant = randomPojo(TenantDO.class, o -> o.setId(1L));
         tenantMapper.insert(tenant);
-        tenantService.initLocalCache();
 
         // 调用，并断言业务异常
         List<Long> result = tenantService.getTenantIds();
@@ -131,7 +101,6 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         TenantDO tenant = randomPojo(TenantDO.class, o -> o.setId(1L).setStatus(CommonStatusEnum.DISABLE.getStatus()));
         tenantMapper.insert(tenant);
-        tenantService.initLocalCache();
 
         // 调用，并断言业务异常
         assertServiceException(() -> tenantService.validTenant(1L), TENANT_DISABLE, tenant.getName());
@@ -143,7 +112,6 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         TenantDO tenant = randomPojo(TenantDO.class, o -> o.setId(1L).setStatus(CommonStatusEnum.ENABLE.getStatus())
                 .setExpireTime(buildTime(2020, 2, 2)));
         tenantMapper.insert(tenant);
-        tenantService.initLocalCache();
 
         // 调用，并断言业务异常
         assertServiceException(() -> tenantService.validTenant(1L), TENANT_EXPIRE, tenant.getName());
@@ -153,9 +121,8 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
     public void testValidTenant_success() {
         // mock 数据
         TenantDO tenant = randomPojo(TenantDO.class, o -> o.setId(1L).setStatus(CommonStatusEnum.ENABLE.getStatus())
-                .setExpireTime(addTime(Duration.ofDays(1))));
+                .setExpireTime(LocalDateTime.now().plusDays(1)));
         tenantMapper.insert(tenant);
-        tenantService.initLocalCache();
 
         // 调用，并断言业务异常
         tenantService.validTenant(1L);
@@ -206,8 +173,6 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         verify(permissionService).assignRoleMenu(eq(200L), same(tenantPackage.getMenuIds()));
         // verify 分配角色
         verify(permissionService).assignUserRole(eq(300L), eq(singleton(200L)));
-        // verify 发送刷新消息
-        verify(tenantProducer).sendTenantRefreshMessage();
     }
 
     @Test
@@ -240,8 +205,6 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         // 校验是否更新正确
         TenantDO tenant = tenantMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, tenant);
-        // verify 发送刷新消息
-        verify(tenantProducer).sendTenantRefreshMessage();
         // verify 设置角色权限
         verify(permissionService).assignRoleMenu(eq(100L), eq(asSet(200L, 201L)));
         verify(permissionService).assignRoleMenu(eq(101L), eq(asSet(201L)));
@@ -347,8 +310,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         reqVO.setContactName("艿");
         reqVO.setContactMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setBeginCreateTime(buildTime(2020, 12, 1));
-        reqVO.setEndCreateTime(buildTime(2020, 12, 24));
+        reqVO.setCreateTime(new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)});
 
         // 调用
         PageResult<TenantDO> pageResult = tenantService.getTenantPage(reqVO);
@@ -385,8 +347,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         reqVO.setContactName("艿");
         reqVO.setContactMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setBeginCreateTime(buildTime(2020, 12, 1));
-        reqVO.setEndCreateTime(buildTime(2020, 12, 24));
+        reqVO.setCreateTime(new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)});
 
         // 调用
         List<TenantDO> list = tenantService.getTenantList(reqVO);

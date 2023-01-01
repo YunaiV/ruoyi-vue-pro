@@ -7,9 +7,10 @@ import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstant
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
@@ -17,20 +18,18 @@ import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.OperateLogMapper;
 import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,7 +48,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
     private AdminUserService userService;
 
     @Test
-    public void testCreateOperateLogAsync() throws InterruptedException, ExecutionException {
+    public void testCreateOperateLogAsync() {
         String traceId = TracerUtils.getTraceId();
         OperateLogCreateReqDTO reqVO = RandomUtils.randomPojo(OperateLogCreateReqDTO.class, o -> {
             o.setTraceId(traceId);
@@ -59,8 +58,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         });
 
         // 执行service方法
-        Future<Boolean> future = operateLogServiceImpl.createOperateLogAsync(reqVO);
-        future.get();
+        operateLogServiceImpl.createOperateLog(reqVO);
         // 断言插入是否正确
         OperateLogDO sysOperateLogDO = operateLogMapper.selectOne("trace_id", traceId);
         assertPojoEquals(reqVO, sysOperateLogDO);
@@ -106,8 +104,8 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserNickname("wangkai");
         reqVO.setModule("order");
         reqVO.setType(OperateTypeEnum.CREATE.getType());
-        reqVO.setBeginTime(buildTime(2021, 3, 5));
-        reqVO.setEndTime(buildTime(2021, 3, 7));
+        reqVO.setStartTime((new LocalDateTime[]{buildTime(2021, 3, 5),
+                buildTime(2021, 3, 7)}));
         reqVO.setSuccess(true);
 
         // 调用service方法
@@ -158,8 +156,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserNickname("wangkai");
         reqVO.setModule("order");
         reqVO.setType(OperateTypeEnum.CREATE.getType());
-        reqVO.setBeginTime(buildTime(2021, 3, 5));
-        reqVO.setEndTime(buildTime(2021, 3, 7));
+        reqVO.setStartTime((new LocalDateTime[]{buildTime(2021, 3, 5),buildTime(2021, 3, 7)}));
         reqVO.setSuccess(true);
 
         // 调用 service 方法

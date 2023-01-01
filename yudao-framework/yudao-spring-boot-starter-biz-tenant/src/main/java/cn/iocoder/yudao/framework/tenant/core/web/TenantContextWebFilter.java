@@ -18,8 +18,6 @@ import java.io.IOException;
  */
 public class TenantContextWebFilter extends OncePerRequestFilter {
 
-    private static final String HEADER_TENANT_ID = "tenant-id";
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {

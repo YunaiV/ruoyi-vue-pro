@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -24,12 +24,8 @@ public class CodegenTablePageReqVO extends PageParam {
     @ApiModelProperty(value = "表描述", example = "芋道", notes = "模糊匹配")
     private String tableComment;
 
-    @ApiModelProperty(value = "开始创建时间", example = "2020-10-24 00:00:00")
+    @ApiModelProperty(value = "创建时间", example = "[2022-07-01 00:00:00,2022-07-01 23:59:59]")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date beginCreateTime;
-
-    @ApiModelProperty(value = "结束创建时间", example = "2020-10-24 23:59:59")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date endCreateTime;
+    private LocalDateTime[] createTime;
 
 }

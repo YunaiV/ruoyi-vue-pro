@@ -42,15 +42,15 @@ public interface MemberAuthService {
      * @param reqVO 登录信息
      * @return 登录结果
      */
-    AppAuthLoginRespVO socialQuickLogin(@Valid AppAuthSocialQuickLoginReqVO reqVO);
+    AppAuthLoginRespVO socialLogin(@Valid AppAuthSocialLoginReqVO reqVO);
 
     /**
-     * 社交登录，使用 手机号 + 手机验证码
+     * 微信小程序的一键登录
      *
      * @param reqVO 登录信息
      * @return 登录结果
      */
-    AppAuthLoginRespVO socialBindLogin(@Valid AppAuthSocialBindLoginReqVO reqVO);
+    AppAuthLoginRespVO weixinMiniAppLogin(AppAuthWeixinMiniAppLoginReqVO reqVO);
 
     /**
      * 获得社交认证 URL
@@ -89,4 +89,5 @@ public interface MemberAuthService {
      * @return 登录结果
      */
     AppAuthLoginRespVO refreshToken(String refreshToken);
+
 }

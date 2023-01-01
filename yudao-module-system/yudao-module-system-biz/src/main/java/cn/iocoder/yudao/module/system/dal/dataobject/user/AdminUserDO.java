@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -52,7 +52,7 @@ public class AdminUserDO extends TenantBaseDO {
      */
     private String remark;
     /**
-     * 部门ID
+     * 部门 ID
      */
     private Long deptId;
     /**
@@ -91,6 +91,6 @@ public class AdminUserDO extends TenantBaseDO {
     /**
      * 最后登录时间
      */
-    private Date loginDate;
+    private LocalDateTime loginDate;
 
 }

@@ -1,0 +1,10 @@
+### /pay/create 提交支付订单
+POST {{appApi}}/pay/order/submit
+Content-Type: application/json
+Authorization: Bearer {{appToken}}
+tenant-id: {{appTenentId}}
+
+{
+  "id": 125,
+  "channelCode": "alipay_qr"
+}

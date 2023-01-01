@@ -6,8 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
@@ -15,13 +14,13 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleUp
 import cn.iocoder.yudao.module.system.convert.permission.RoleConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMapper;
+import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.RoleProducer;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,7 +65,7 @@ public class RoleServiceImpl implements RoleService {
      * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     @Getter
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private PermissionService permissionService;
@@ -76,53 +76,46 @@ public class RoleServiceImpl implements RoleService {
     @Resource
     private RoleProducer roleProducer;
 
-    @Resource
-    @Lazy // 注入自己，所以延迟加载
-    private RoleService self;
-
     /**
      * 初始化 {@link #roleCache} 缓存
      */
     @Override
     @PostConstruct
-    @TenantIgnore // 忽略自动多租户，全局初始化缓存
     public void initLocalCache() {
-        // 获取角色列表，如果有更新
-        List<RoleDO> roleList = loadRoleIfUpdate(maxUpdateTime);
-        if (CollUtil.isEmpty(roleList)) {
-            return;
-        }
-
-        // 写入缓存
-        roleCache = CollectionUtils.convertMap(roleList, RoleDO::getId);
-        maxUpdateTime = CollectionUtils.getMaxValue(roleList, RoleDO::getUpdateTime);
-        log.info("[initLocalCache][初始化 Role 数量为 {}]", roleList.size());
+        initLocalCacheIfUpdate(null);
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-       self.initLocalCache();
+        initLocalCacheIfUpdate(this.maxUpdateTime);
     }
 
     /**
-     * 如果角色发生变化，从数据库中获取最新的全量角色。
-     * 如果未发生变化，则返回空
+     * 刷新本地缓存
      *
-     * @param maxUpdateTime 当前角色的最大更新时间
-     * @return 角色列表
+     * @param maxUpdateTime 最大更新时间
+     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
+     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
      */
-    private List<RoleDO> loadRoleIfUpdate(Date maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadRoleIfUpdate][首次加载全量角色]");
-        } else { // 判断数据库中是否有更新的角色
-            if (roleMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
+    private void initLocalCacheIfUpdate(LocalDateTime maxUpdateTime) {
+        // 注意：忽略自动多租户，因为要全局初始化缓存
+        TenantUtils.executeIgnore(() -> {
+            // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
+            // 如果没有增量的数据变化，则不进行本地缓存的刷新
+            if (maxUpdateTime != null
+                    && roleMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
+                log.info("[initLocalCacheIfUpdate][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
+                return;
             }
-            log.info("[loadRoleIfUpdate][增量加载全量角色]");
-        }
-        // 第二步，如果有更新，则从数据库加载所有角色
-        return roleMapper.selectList();
+            List<RoleDO> roleList = roleMapper.selectList();
+            log.info("[initLocalCacheIfUpdate][缓存角色，数量为:{}]", roleList.size());
+
+            // 第二步：构建缓存。
+            roleCache = CollectionUtils.convertMap(roleList, RoleDO::getId);
+
+            // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
+            this.maxUpdateTime = CollectionUtils.getMaxValue(roleList, RoleDO::getUpdateTime);
+        });
     }
 
     @Override

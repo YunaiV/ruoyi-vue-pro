@@ -2,14 +2,14 @@ package cn.iocoder.yudao.framework.quartz.config;
 
 import cn.iocoder.yudao.framework.quartz.core.scheduler.SchedulerManager;
 import org.quartz.Scheduler;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 定时任务 Configuration
  */
-@Configuration
+@AutoConfiguration
 @EnableScheduling // 开启 Spring 自带的定时任务
 public class YudaoQuartzAutoConfiguration {
 

@@ -1,14 +1,17 @@
 import request from '@/utils/request'
-import {getRefreshToken} from "@/utils/auth";
-import service from "@/utils/request";
+import { getRefreshToken } from '@/utils/auth'
+import service from '@/utils/request'
 
 // 登录方法
-export function login(username, password, code, uuid) {
+export function login(username, password, captchaVerification, socialType, socialCode, socialState) {
   const data = {
     username,
     password,
-    code,
-    uuid
+    captchaVerification,
+    // 社交相关
+    socialType,
+    socialCode,
+    socialState
   }
   return request({
     url: '/system/auth/login',
@@ -33,15 +36,6 @@ export function logout() {
   })
 }
 
-// 获取验证码
-export function getCodeImg() {
-  return request({
-    url: '/system/captcha/get-image',
-    method: 'get',
-    timeout: 20000
-  })
-}
-
 // 社交授权的跳转
 export function socialAuthRedirect(type, redirectUri) {
   return request({
@@ -51,29 +45,14 @@ export function socialAuthRedirect(type, redirectUri) {
 }
 
 // 社交快捷登录，使用 code 授权码
-export function socialQuickLogin(type, code, state) {
+export function socialLogin(type, code, state) {
   return request({
-    url: '/system/auth/social-quick-login',
+    url: '/system/auth/social-login',
     method: 'post',
     data: {
       type,
       code,
       state
-    }
-  })
-}
-
-// 社交绑定登录，使用 code 授权码 + + 账号密码
-export function socialBindLogin(type, code, state, username, password) {
-  return request({
-    url: '/system/auth/social-bind-login',
-    method: 'post',
-    data: {
-      type,
-      code,
-      state,
-      username,
-      password
     }
   })
 }
@@ -120,20 +99,20 @@ export function getAuthorize(clientId) {
 }
 
 export function authorize(responseType, clientId, redirectUri, state,
-                          autoApprove, checkedScopes, uncheckedScopes) {
+  autoApprove, checkedScopes, uncheckedScopes) {
   // 构建 scopes
-  const scopes = {};
+  const scopes = {}
   for (const scope of checkedScopes) {
-    scopes[scope] = true;
+    scopes[scope] = true
   }
   for (const scope of uncheckedScopes) {
-    scopes[scope] = false;
+    scopes[scope] = false
   }
   // 发起请求
   return service({
     url: '/system/oauth2/authorize',
-    headers:{
-      'Content-type': 'application/x-www-form-urlencoded',
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded'
     },
     params: {
       response_type: responseType,
@@ -145,4 +124,25 @@ export function authorize(responseType, clientId, redirectUri, state,
     },
     method: 'post'
   })
+}
+
+// 获取验证图片  以及token
+export function reqGet(data) {
+  return request({
+    url: 'system/captcha/get',
+    method: 'post',
+    data
+  })
+}
+
+// 滑动或者点选验证
+export function reqCheck(data) {
+  return request({
+    url: '/system/captcha/check',
+    method: 'post',
+    data
+  })
+}
+
+export class socialBindLogin {
 }

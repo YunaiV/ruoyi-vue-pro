@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -77,35 +77,19 @@ public class PayRefundExportReqVO {
     private String channelExtras;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始退款失效时间")
-    private Date beginExpireTime;
+    @ApiModelProperty(value = "退款失效时间")
+    private LocalDateTime[] expireTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束退款失效时间")
-    private Date endExpireTime;
+    @ApiModelProperty(value = "退款成功时间")
+    private LocalDateTime[] successTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始退款成功时间")
-    private Date beginSuccessTime;
+    @ApiModelProperty(value = "退款通知时间")
+    private LocalDateTime[] notifyTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束退款成功时间")
-    private Date endSuccessTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始退款通知时间")
-    private Date beginNotifyTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束退款通知时间")
-    private Date endNotifyTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始创建时间")
-    private Date beginCreateTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束创建时间")
-    private Date endCreateTime;
+    @ApiModelProperty(value = "创建时间")
+    private LocalDateTime[] createTime;
 
 }

@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -21,15 +21,11 @@ public class FilePageReqVO extends PageParam {
     @ApiModelProperty(value = "文件路径", example = "yudao", notes = "模糊匹配")
     private String path;
 
-    @ApiModelProperty(value = "文件类型", example = "jpg", notes = "模糊匹配")
+    @ApiModelProperty(value = "文件类型", example = "application/octet-stream", notes = "模糊匹配")
     private String type;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始创建时间")
-    private Date beginCreateTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束创建时间")
-    private Date endCreateTime;
+    @ApiModelProperty(value = "创建时间")
+    private LocalDateTime[] createTime;
 
 }

@@ -32,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -39,7 +40,7 @@ import java.util.function.Consumer;
 import static cn.hutool.core.util.RandomUtil.randomBytes;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -225,7 +226,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         ByteArrayInputStream avatarFile = new ByteArrayInputStream(avatarFileBytes);
         // mock 方法
         String avatar = randomString();
-        when(fileApi.createFile(eq(avatarFileBytes))).thenReturn(avatar);
+        when(fileApi.createFile(eq( avatarFileBytes))).thenReturn(avatar);
 
         // 调用
         userService.updateUserAvatar(userId, avatarFile);
@@ -294,8 +295,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         reqVO.setUsername("tu");
         reqVO.setMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setBeginTime(buildTime(2020, 12, 1));
-        reqVO.setEndTime(buildTime(2020, 12, 24));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)}));
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
         List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));
@@ -318,8 +318,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         reqVO.setUsername("tu");
         reqVO.setMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setBeginTime(buildTime(2020, 12, 1));
-        reqVO.setEndTime(buildTime(2020, 12, 24));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)}));
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
         List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));

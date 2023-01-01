@@ -5,12 +5,20 @@ spring:
   profiles:
     active: local
 
+  main:
+    allow-circular-references: true # 允许循环依赖，因为项目是三层架构，无法避免这个情况。
+
   # Servlet 配置
   servlet:
     # 文件上传相关配置项
     multipart:
       max-file-size: 16MB # 单个文件大小
       max-request-size: 32MB # 设置总上传的文件大小
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER # 解决 SpringFox 与 SpringBoot 2.6.x 不兼容的问题，参见 SpringFoxHandlerProviderBeanPostProcessor 类
+#    throw-exception-if-no-handler-found: true # 404 错误时抛出异常，方便统一处理
+#    static-path-pattern: /static/** # 静态资源路径; 注意：如果不配置，则 throw-exception-if-no-handler-found 不生效！！！ TODO 芋艿：不能配置，会导致 swagger 不生效
 
   # Jackson 配置项
   jackson:
@@ -25,17 +33,6 @@ spring:
     type: REDIS
     redis:
       time-to-live: 1h # 设置过期时间为 1 小时
-
-  # 工作流 Activiti 配置
-  activiti:
-    # 1. false: 默认值，activiti启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
-    # 2. true: 启动时会对数据库中所有表进行更新操作，如果表存在，不做处理，反之，自动创建表
-    # 3. create_drop: 启动时自动创建表，关闭时自动删除表
-    # 4. drop_create: 启动时，删除旧表，再创建新表
-    database-schema-update: true # 设置为 false，可通过 sql/activiti.sql 初始化
-    db-history-used: true # activiti7 默认 false 不生成历史信息表，需手动设置开启
-    check-process-definitions: false # 设置为 false，禁用 /resources/processes 自动部署 BPMN XML 流程
-    history-level: full # full：保存历史数据的最高级别，可保存全部流程相关细节，包括流程流转各节点参数
 
 # 工作流 Flowable 配置
 flowable:
@@ -61,6 +58,27 @@ mybatis-plus:
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
   type-aliases-package: ${yudao.info.base-package}.module.*.dal.dataobject
+  encryptor:
+    password: XDV71a+xqStEA3WH # 加解密的秘钥，可使用 https://www.imaegoo.com/2020/aes-key-generator/ 网站生成
+
+--- #################### 验证码相关配置 ####################
+
+aj:
+  captcha:
+    jigsaw: classpath:images/jigsaw # 滑动验证，底图路径，不配置将使用默认图片；以 classpath: 开头，取 resource 目录下路径
+    pic-click: classpath:images/pic-click # 滑动验证，底图路径，不配置将使用默认图片；以 classpath: 开头，取 resource 目录下路径
+    cache-type: redis # 缓存 local/redis...
+    cache-number: 1000 # local 缓存的阈值,达到这个值，清除缓存
+    timing-clear: 180 # local定时清除过期缓存(单位秒),设置为0代表不执行
+    type: blockPuzzle # 验证码类型 default两种都实例化。 blockPuzzle 滑块拼图 clickWord 文字点选
+    water-mark: 芋道源码 # 右下角水印文字(我的水印)，可使用 https://tool.chinaz.com/tools/unicode.aspx 中文转 Unicode，Linux 可能需要转 unicode
+    interference-options: 0 # 滑动干扰项(0/1/2)
+    req-frequency-limit-enable: false # 接口请求次数一分钟限制是否开启 true|false
+    req-get-lock-limit: 5 # 验证失败 5 次，get接口锁定
+    req-get-lock-seconds: 10 # 验证失败后，锁定时间间隔
+    req-get-minute-limit: 30 # get 接口一分钟内请求数限制
+    req-check-minute-limit: 60 # check 接口一分钟内请求数限制
+    req-verify-minute-limit: 60 # verify 接口一分钟内请求数限制
 
 --- #################### 芋道相关配置 ####################
 
@@ -69,23 +87,18 @@ yudao:
     version: 1.0.0
     base-package: cn.iocoder.yudao
   web:
-    admin-api:
-      prefix: /admin-api
-      controller: '**.controller.admin.**'
-    app-api:
-      prefix: /app-api
-      controller: '**.controller.app.**'
     admin-ui:
       url: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
+  security:
+    permit-all_urls:
+      - /admin-ui/** # /resources/admin-ui 目录下的静态资源
   swagger:
     title: 管理后台
     description: 提供管理员管理的所有功能
     version: ${yudao.info.version}
     base-package: ${yudao.info.base-package}
   captcha:
-    timeout: 5m
-    width: 160
-    height: 60
+    enable: true # 验证码的开关，默认为 true
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
@@ -100,9 +113,12 @@ yudao:
     enable: true
     ignore-urls:
       - /admin-api/system/tenant/get-id-by-name # 基于名字获取租户，不许带租户编号
-      - /admin-api/system/captcha/get-image # 获取图片验证码，和租户无关
+      - /admin-api/system/captcha/get # 获取图片验证码，和租户无关
+      - /admin-api/system/captcha/check # 校验图片验证码，和租户无关
       - /admin-api/infra/file/*/get/** # 获取图片，和租户无关
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
+      - /admin-api/pay/notify/callback/* # 支付回调通知，不携带租户编号
+      - /jmreport/* # 积木报表，无法携带租户编号
     ignore-tables:
       - system_tenant
       - system_tenant_package
@@ -126,11 +142,36 @@ yudao:
       - infra_job_log
       - infra_job_log
       - infra_data_source_config
+      - jimu_dict
+      - jimu_dict_item
+      - jimu_report
+      - jimu_report_data_source
+      - jimu_report_db
+      - jimu_report_db_field
+      - jimu_report_db_param
+      - jimu_report_link
+      - jimu_report_map
+      - jimu_report_share
+      - rep_demo_dxtj
+      - rep_demo_employee
+      - rep_demo_gongsi
+      - rep_demo_jianpiao
+      - tmp_report_data_1
+      - tmp_report_data_income
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
     send-maximum-quantity-per-day: 10
     begin-code: 9999 # 这里配置 9999 的原因是，测试方便。
     end-code: 9999 # 这里配置 9999 的原因是，测试方便。
+  trade:
+    order:
+      app-id: 1 # 商户编号
+      expire-time: 2h # 支付的过期时间
 
 debug: false
+
+#积木报表配置
+minidao :
+  base-package: org.jeecg.modules.jmreport.desreport.dao*
+  db-type: mysql

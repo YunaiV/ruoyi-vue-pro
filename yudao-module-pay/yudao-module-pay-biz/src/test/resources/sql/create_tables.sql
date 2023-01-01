@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS "pay_channel" (
     "updater"     varchar(64)    NULL     DEFAULT '',
     "update_time" datetime       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     "deleted"     bit(1)         NOT NULL DEFAULT FALSE,
+    "tenant_id" bigint not null default  '0',
     PRIMARY KEY ("id")
 ) COMMENT = '支付渠道';
 

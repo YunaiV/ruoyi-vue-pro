@@ -31,6 +31,4 @@ public interface DeptConvert {
 
     DeptRespDTO convert03(DeptDO bean);
 
-    Map<Long, DeptRespDTO> convertMap(Map<Long, DeptDO> map);
-
 }

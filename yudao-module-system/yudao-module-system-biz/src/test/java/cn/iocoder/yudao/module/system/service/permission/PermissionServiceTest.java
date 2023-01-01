@@ -27,6 +27,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
@@ -70,7 +71,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     private PermissionProducer permissionProducer;
 
     @Test
-    public void testInitRoleMenuLocalCache() {
+    public void testInitLocalCacheIfUpdateForRoleMenu() {
         // mock 数据
         RoleMenuDO roleMenuDO01 = randomPojo(RoleMenuDO.class, o -> o.setRoleId(1L).setMenuId(10L));
         roleMenuMapper.insert(roleMenuDO01);
@@ -78,7 +79,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         roleMenuMapper.insert(roleMenuDO02);
 
         // 调用
-        permissionService.initRoleMenuLocalCache();
+        permissionService.initLocalCacheIfUpdateForRoleMenu(null);
         // 断言 roleMenuCache 缓存
         assertEquals(1, permissionService.getRoleMenuCache().keySet().size());
         assertEquals(asList(10L, 20L), permissionService.getRoleMenuCache().get(1L));
@@ -87,12 +88,12 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         assertEquals(singletonList(1L), permissionService.getMenuRoleCache().get(10L));
         assertEquals(singletonList(1L), permissionService.getMenuRoleCache().get(20L));
         // 断言 maxUpdateTime 缓存
-        Date maxUpdateTime = permissionService.getRoleMenuMaxUpdateTime();
+        LocalDateTime maxUpdateTime = permissionService.getRoleMenuMaxUpdateTime();
         assertEquals(ObjectUtils.max(roleMenuDO01.getUpdateTime(), roleMenuDO02.getUpdateTime()), maxUpdateTime);
     }
 
     @Test
-    public void testInitUserRoleLocalCache() {
+    public void testInitLocalCacheIfUpdateForUserRole() {
         // mock 数据
         UserRoleDO userRoleDO01 = randomPojo(UserRoleDO.class, o -> o.setUserId(1L).setRoleId(10L));
         userRoleMapper.insert(userRoleDO01);
@@ -100,12 +101,12 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         userRoleMapper.insert(roleMenuDO02);
 
         // 调用
-        permissionService.initUserRoleLocalCache();
+        permissionService.initLocalCacheIfUpdateForUserRole(null);
         // 断言 roleMenuCache 缓存
         assertEquals(1, permissionService.getUserRoleCache().size());
         assertEquals(asSet(10L, 20L), permissionService.getUserRoleCache().get(1L));
         // 断言 maxUpdateTime 缓存
-        Date maxUpdateTime = permissionService.getUserRoleMaxUpdateTime();
+        LocalDateTime maxUpdateTime = permissionService.getUserRoleMaxUpdateTime();
         assertEquals(ObjectUtils.max(userRoleDO01.getUpdateTime(), roleMenuDO02.getUpdateTime()), maxUpdateTime);
     }
 

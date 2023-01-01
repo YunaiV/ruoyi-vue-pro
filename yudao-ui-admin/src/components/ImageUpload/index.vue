@@ -1,21 +1,21 @@
 <template>
   <div class="component-upload-image">
     <el-upload
-      multiple
-      :action="uploadFileUrl"
-      list-type="picture-card"
-      :on-success="handleUploadSuccess"
-      :before-upload="handleBeforeUpload"
-      :limit="limit"
-      :on-error="handleUploadError"
-      :on-exceed="handleExceed"
-      name="file"
-      :on-remove="handleRemove"
-      :show-file-list="true"
-      :headers="headers"
-      :file-list="fileList"
-      :on-preview="handlePictureCardPreview"
-      :class="{hide: this.fileList.length >= this.limit}"
+        multiple
+        :action="uploadFileUrl"
+        list-type="picture-card"
+        :on-success="handleUploadSuccess"
+        :before-upload="handleBeforeUpload"
+        :limit="limit"
+        :on-error="handleUploadError"
+        :on-exceed="handleExceed"
+        name="file"
+        :on-remove="handleRemove"
+        :show-file-list="true"
+        :headers="headers"
+        :file-list="fileList"
+        :on-preview="handlePictureCardPreview"
+        :class="{hide: this.fileList.length >= this.limit}"
     >
       <i class="el-icon-plus"></i>
     </el-upload>
@@ -29,14 +29,14 @@
     </div>
 
     <el-dialog
-      :visible.sync="dialogVisible"
-      title="预览"
-      width="800"
-      append-to-body
+        :visible.sync="dialogVisible"
+        title="预览"
+        width="800"
+        append-to-body
     >
       <img
-        :src="dialogImageUrl"
-        style="display: block; max-width: 100%; margin: 0 auto"
+          :src="dialogImageUrl"
+          style="display: block; max-width: 100%; margin: 0 auto"
       />
     </el-dialog>
   </div>
@@ -85,8 +85,8 @@ export default {
     value: {
       handler(val) {
         if (val) {
-          // 首先将值转为数组
-          const list = Array.isArray(val) ? val : this.value.split(',');
+          // 首先将值转为数组, 当只穿了一个图片时，会报map方法错误
+          const list = Array.isArray(val) ? val :  Array.isArray(this.value.split(',')) ? this.value.split(','): Array.of(this.value);
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
             if (typeof item === "string") {
@@ -141,8 +141,7 @@ export default {
         }
         isImg = this.fileType.some(type => {
           if (file.type.indexOf(type) > -1) return true;
-          if (fileExtension && fileExtension.indexOf(type) > -1) return true;
-          return false;
+          return !!(fileExtension && fileExtension.indexOf(type) > -1);
         });
       } else {
         isImg = file.type.indexOf("image") > -1;
@@ -190,16 +189,15 @@ export default {
 </script>
 <style scoped lang="scss">
 // .el-upload--picture-card 控制加号部分
-::v-deep.hide .el-upload--picture-card {
+:deep(.hide .el-upload--picture-card) {
   display: none;
 }
 // 去掉动画效果
-::v-deep .el-list-enter-active,
-::v-deep .el-list-leave-active {
+:deep(.el-list-enter-active, .el-list-leave-active) {
   transition: all 0s;
 }
 
-::v-deep .el-list-enter, .el-list-leave-active {
+:deep(.el-list-enter, .el-list-leave-active) {
   opacity: 0;
   transform: translateY(0);
 }
