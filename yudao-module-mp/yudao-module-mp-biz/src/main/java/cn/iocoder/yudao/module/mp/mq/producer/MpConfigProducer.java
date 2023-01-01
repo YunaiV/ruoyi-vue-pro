@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.mp.mq.producer;
 
 import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
-import cn.iocoder.yudao.module.mp.mq.message.WxConfigDataRefreshMessage;
+import cn.iocoder.yudao.module.mp.mq.message.MpConfigRefreshMessage;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -10,16 +10,16 @@ import javax.annotation.Resource;
  * 微信配置数据相关消息的 Producer
  */
 @Component
-public class WxMpConfigDataProducer {
+public class MpConfigProducer {
 
     @Resource
     private RedisMQTemplate redisMQTemplate;
 
     /**
-     * 发送 {@link WxConfigDataRefreshMessage} 消息
+     * 发送 {@link MpConfigRefreshMessage} 消息
      */
     public void sendDictDataRefreshMessage() {
-        WxConfigDataRefreshMessage message = new WxConfigDataRefreshMessage();
+        MpConfigRefreshMessage message = new MpConfigRefreshMessage();
         redisMQTemplate.send(message);
     }
 

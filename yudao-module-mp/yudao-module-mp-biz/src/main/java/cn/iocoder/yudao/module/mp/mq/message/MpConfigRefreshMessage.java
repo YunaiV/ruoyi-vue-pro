@@ -9,11 +9,11 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class WxConfigDataRefreshMessage extends AbstractChannelMessage {
+public class MpConfigRefreshMessage extends AbstractChannelMessage {
 
     @Override
     public String getChannel() {
-        return "wechat-mp.wx-config-data.refresh";
+        return "mp.config-data.refresh";
     }
 
 }

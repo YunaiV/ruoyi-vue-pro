@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.handler;
+package cn.iocoder.yudao.module.mp.service.handler;
 
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpMessageHandler;
@@ -11,6 +11,11 @@ import java.util.Map;
 
 import static me.chanjar.weixin.common.api.WxConsts.MenuButtonType;
 
+/**
+ * 自定义菜单的事件处理器
+ *
+ * // TODO 芋艿：待实现
+ */
 @Component
 public class MenuHandler implements WxMpMessageHandler {
 

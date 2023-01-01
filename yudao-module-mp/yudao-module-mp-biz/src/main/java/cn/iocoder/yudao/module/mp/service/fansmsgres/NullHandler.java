@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.handler;
+package cn.iocoder.yudao.module.mp.service.fansmsgres;
 
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpMessageHandler;
@@ -9,14 +9,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * 点击菜单连接的事件处理器
+ */
 @Component
-public class KfSessionHandler implements WxMpMessageHandler {
+public class NullHandler implements WxMpMessageHandler {
 
     @Override
-    public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
-                                    Map<String, Object> context, WxMpService wxMpService,
-                                    WxSessionManager sessionManager) {
-        //TODO 对会话做处理
+    public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context,
+                                    WxMpService wxMpService, WxSessionManager sessionManager) {
         return null;
     }
 

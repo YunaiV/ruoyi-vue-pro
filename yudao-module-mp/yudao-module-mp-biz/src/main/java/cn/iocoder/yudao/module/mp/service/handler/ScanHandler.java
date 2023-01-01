@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.handler;
+package cn.iocoder.yudao.module.mp.service.handler;
 
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * 扫码的事件处理器
+ */
 @Component
 public class ScanHandler implements WxMpMessageHandler {
 

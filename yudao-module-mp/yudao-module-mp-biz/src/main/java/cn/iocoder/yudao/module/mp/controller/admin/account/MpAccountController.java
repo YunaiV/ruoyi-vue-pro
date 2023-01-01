@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.mp.controller.admin.account.vo.*;
 import cn.iocoder.yudao.module.mp.convert.account.MpAccountConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
-import cn.iocoder.yudao.module.mp.service.account.WxAccountService;
+import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class MpAccountController {
 
     @Resource
-    private WxAccountService wxAccountService;
+    private MpAccountService wxAccountService;
 
     @PostMapping("/create")
     @ApiOperation("创建公众号账户")

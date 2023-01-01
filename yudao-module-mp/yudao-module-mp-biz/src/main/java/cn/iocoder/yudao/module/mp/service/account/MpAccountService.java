@@ -14,7 +14,12 @@ import javax.validation.Valid;
  *
  * @author 芋道源码
  */
-public interface WxAccountService {
+public interface MpAccountService {
+
+    /**
+     * 初始化缓存
+     */
+    void initLocalCache();
 
     /**
      * 创建公众号账户
@@ -64,8 +69,4 @@ public interface WxAccountService {
      */
     MpAccountDO findBy(SFunction<MpAccountDO, ?> field, Object val);
 
-    /**
-     * 初始化
-     */
-    void initLoadWxMpConfigStorages();
 }

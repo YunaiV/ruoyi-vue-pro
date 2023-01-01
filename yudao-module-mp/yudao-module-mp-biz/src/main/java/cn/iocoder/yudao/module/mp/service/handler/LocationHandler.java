@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.handler;
+package cn.iocoder.yudao.module.mp.service.handler;
 
 import cn.iocoder.yudao.module.mp.builder.TextBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -13,14 +13,18 @@ import java.util.Map;
 
 import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
 
+/**
+ * 上报地理位置的事件处理器
+ *
+ * // TODO @芋艿：需要实现一下~
+ */
 @Component
 @Slf4j
 public class LocationHandler implements WxMpMessageHandler {
 
     @Override
-    public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
-                                    Map<String, Object> context, WxMpService wxMpService,
-                                    WxSessionManager sessionManager) {
+    public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context,
+                                    WxMpService wxMpService, WxSessionManager sessionManager) {
         if (wxMessage.getMsgType().equals(XmlMsgType.LOCATION)) {
             //TODO 接收处理用户发送的地理位置消息
             try {

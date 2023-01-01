@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.handler;
+package cn.iocoder.yudao.module.mp.service.handler;
 
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpMessageHandler;
@@ -10,8 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * 门店审核事件处理
- *
+ * 门店审核事件的事件处理器
  */
 @Component
 public class StoreCheckNotifyHandler implements WxMpMessageHandler {

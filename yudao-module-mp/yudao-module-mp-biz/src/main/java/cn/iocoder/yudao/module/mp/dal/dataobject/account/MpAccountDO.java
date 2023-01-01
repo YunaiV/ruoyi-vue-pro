@@ -63,13 +63,4 @@ public class MpAccountDO extends BaseDO {
      */
     private String remark;
 
-    // TODO 芋艿：需要迁移走
-    public WxMpConfigStorage toWxMpConfigStorage(RedisTemplateWxRedisOps redisTemplateWxRedisOps, WxMpProperties wxMpProperties) {
-        WxMpRedisConfigImpl wxMpRedisConfig = new WxMpRedisConfigImpl(redisTemplateWxRedisOps, wxMpProperties.getConfigStorage().getKeyPrefix());
-        wxMpRedisConfig.setAppId(appId);
-        wxMpRedisConfig.setSecret(appSecret);
-        wxMpRedisConfig.setToken(token);
-        wxMpRedisConfig.setAesKey(aesKey);
-        return wxMpRedisConfig;
-    }
 }

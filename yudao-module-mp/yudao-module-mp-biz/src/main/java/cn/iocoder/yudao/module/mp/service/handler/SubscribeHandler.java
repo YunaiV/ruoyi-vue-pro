@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.handler;
+package cn.iocoder.yudao.module.mp.service.handler;
 
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.accountfans.WxAccountFansDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.subscribetext.WxSubscribeTextDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.texttemplate.WxTextTemplateDO;
-import cn.iocoder.yudao.module.mp.service.account.WxAccountService;
+import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
 import cn.iocoder.yudao.module.mp.service.accountfans.WxAccountFansService;
 import cn.iocoder.yudao.module.mp.service.accountfanstag.WxAccountFansTagService;
 import cn.iocoder.yudao.module.mp.service.subscribetext.WxSubscribeTextService;
@@ -23,11 +23,18 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
+/**
+ * 关注的事件处理器
+ *
+ * // TODO 芋艿：待实现
+ */
 @Component
 @Slf4j
 public class SubscribeHandler implements WxMpMessageHandler {
@@ -35,8 +42,9 @@ public class SubscribeHandler implements WxMpMessageHandler {
     @Autowired
     private WxTextTemplateService wxTextTemplateService;
 
-    @Autowired
-    private WxAccountService wxAccountService;
+    @Resource
+    @Lazy // 延迟加载，解决循环依赖的问题
+    private MpAccountService mpAccountService;
 
     @Autowired
     private WxSubscribeTextService wxSubscribeTextService;
@@ -60,7 +68,7 @@ public class SubscribeHandler implements WxMpMessageHandler {
                     .userInfo(wxMessage.getFromUser(), null);
             if (wxmpUser != null) {
                 // 可以添加关注用户到本地数据库
-                MpAccountDO wxAccount = wxAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
+                MpAccountDO wxAccount = mpAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
                 if (wxAccount != null) {
                     WxAccountFansDO wxAccountFans = wxAccountFansService.findBy(WxAccountFansDO::getOpenid, wxmpUser.getOpenId());
                     if (wxAccountFans == null) {//insert
@@ -128,7 +136,7 @@ public class SubscribeHandler implements WxMpMessageHandler {
 
         try {
             String content = "感谢关注！";//默认
-            MpAccountDO wxAccount = wxAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
+            MpAccountDO wxAccount = mpAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
             if (wxAccount != null) {
                 WxSubscribeTextDO wxSubscribeText = wxSubscribeTextService.findBy(WxSubscribeTextDO::getWxAccountId, String.valueOf(wxAccount.getId()));
                 if (wxSubscribeText != null) {
