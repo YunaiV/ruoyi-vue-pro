@@ -3,24 +3,24 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>yudao</artifactId>
+        <artifactId>yudao-module-mp</artifactId>
         <groupId>cn.iocoder.boot</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <artifactId>yudao-module-mp-api</artifactId>
+    <packaging>jar</packaging>
 
-    <artifactId>yudao-module-wechat</artifactId>
-    <packaging>pom</packaging>
-
+    <name>${project.artifactId}</name>
     <description>
-        wechat 模块，主要实现微信平台的相关业务。
-        例如：微信公众号、企业微信 SCRM 等
+        mp 模块 API，暴露给其它模块调用
     </description>
-    <modules>
-        <module>yudao-module-mp-api</module>
-        <module>yudao-module-mp-biz</module>
-        <module>yudao-module-work-biz</module>
-        <module>yudao-module-work-api</module>
-    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-common</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
