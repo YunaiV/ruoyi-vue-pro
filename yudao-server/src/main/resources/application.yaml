@@ -92,6 +92,7 @@ yudao:
   security:
     permit-all_urls:
       - /admin-ui/** # /resources/admin-ui 目录下的静态资源
+      - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，不需要登录
   swagger:
     title: 管理后台
     description: 提供管理员管理的所有功能
@@ -119,6 +120,7 @@ yudao:
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
       - /admin-api/pay/notify/callback/* # 支付回调通知，不携带租户编号
       - /jmreport/* # 积木报表，无法携带租户编号
+      - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
     ignore-tables:
       - system_tenant
       - system_tenant_package

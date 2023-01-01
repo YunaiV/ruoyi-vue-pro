@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.mp.framework.mp.core;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -27,6 +28,12 @@ public interface MpServiceFactory {
      * @return WxMpService 实例
      */
     WxMpService getMpService(String appId);
+
+    default WxMpService getRequiredMpService(String appId) {
+        WxMpService wxMpService = getMpService(appId);
+        Assert.notNull(wxMpService, "找到对应 appId({}) 的 WxMpService，请核实！", appId);
+        return wxMpService;
+    }
 
     /**
      * 获得 appId 对应的 WxMpMessageRouter 实例
