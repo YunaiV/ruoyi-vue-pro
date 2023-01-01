@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
  * @author fengdan
  */
 @Data
-public class WxAccountBaseVO {
+public class MpAccountBaseVO {
 
     @ApiModelProperty(value = "公众号名称", required = true)
     @NotNull(message = "公众号名称不能为空")
@@ -22,15 +22,15 @@ public class WxAccountBaseVO {
     @NotNull(message = "公众号账户不能为空")
     private String account;
 
-    @ApiModelProperty(value = "公众号appid", required = true)
-    @NotNull(message = "公众号appid不能为空")
+    @ApiModelProperty(value = "公众号 appid", required = true)
+    @NotNull(message = "公众号 appid 不能为空")
     private String appId;
 
     @ApiModelProperty(value = "公众号密钥", required = true)
     @NotNull(message = "公众号密钥不能为空")
     private String appSecret;
 
-    @ApiModelProperty(value = "公众号token")
+    @ApiModelProperty(value = "公众号 token", required = true)
     private String token;
 
     @ApiModelProperty(value = "加密密钥")

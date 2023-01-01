@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.mp.builder.TextBuilder;
 import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansCreateReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansUpdateReqVO;
-import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.accountfans.WxAccountFansDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.subscribetext.WxSubscribeTextDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.texttemplate.WxTextTemplateDO;
@@ -60,7 +60,7 @@ public class SubscribeHandler implements WxMpMessageHandler {
                     .userInfo(wxMessage.getFromUser(), null);
             if (wxmpUser != null) {
                 // 可以添加关注用户到本地数据库
-                WxAccountDO wxAccount = wxAccountService.findBy(WxAccountDO::getAccount, wxMessage.getToUser());
+                MpAccountDO wxAccount = wxAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
                 if (wxAccount != null) {
                     WxAccountFansDO wxAccountFans = wxAccountFansService.findBy(WxAccountFansDO::getOpenid, wxmpUser.getOpenId());
                     if (wxAccountFans == null) {//insert
@@ -128,7 +128,7 @@ public class SubscribeHandler implements WxMpMessageHandler {
 
         try {
             String content = "感谢关注！";//默认
-            WxAccountDO wxAccount = wxAccountService.findBy(WxAccountDO::getAccount, wxMessage.getToUser());
+            MpAccountDO wxAccount = wxAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
             if (wxAccount != null) {
                 WxSubscribeTextDO wxSubscribeText = wxSubscribeTextService.findBy(WxSubscribeTextDO::getWxAccountId, String.valueOf(wxAccount.getId()));
                 if (wxSubscribeText != null) {

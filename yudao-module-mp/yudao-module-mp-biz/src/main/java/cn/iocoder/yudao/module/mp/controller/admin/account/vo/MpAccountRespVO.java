@@ -15,13 +15,10 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class WxAccountRespVO extends WxAccountBaseVO {
+public class MpAccountRespVO extends MpAccountBaseVO {
 
     @ApiModelProperty(value = "编号", required = true)
     private Long id;
-
-    @ApiModelProperty(value = "公众号url")
-    private String url;
 
     @ApiModelProperty(value = "二维码图片URL")
     private String qrCodeUrl;
@@ -31,4 +28,5 @@ public class WxAccountRespVO extends WxAccountBaseVO {
 
     @ApiModelProperty(value = "公众号密钥", required = true)
     private String appSecret;
+
 }

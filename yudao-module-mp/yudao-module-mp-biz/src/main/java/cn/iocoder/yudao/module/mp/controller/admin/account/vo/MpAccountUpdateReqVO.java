@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class WxAccountUpdateReqVO extends WxAccountBaseVO {
+public class MpAccountUpdateReqVO extends MpAccountBaseVO {
 
     @ApiModelProperty(value = "编号", required = true)
     @NotNull(message = "编号不能为空")

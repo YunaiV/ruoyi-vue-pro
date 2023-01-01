@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 创建公众号账户
 export function createAccount(data) {
   return request({
-    url: '/wechatMp/account/create',
+    url: '/mp/account/create',
     method: 'post',
     data: data
   })
@@ -12,7 +12,7 @@ export function createAccount(data) {
 // 更新公众号账户
 export function updateAccount(data) {
   return request({
-    url: '/wechatMp/account/update',
+    url: '/mp/account/update',
     method: 'put',
     data: data
   })
@@ -21,7 +21,7 @@ export function updateAccount(data) {
 // 删除公众号账户
 export function deleteAccount(id) {
   return request({
-    url: '/wechatMp/account/delete?id=' + id,
+    url: '/mp/account/delete?id=' + id,
     method: 'delete'
   })
 }
@@ -29,7 +29,7 @@ export function deleteAccount(id) {
 // 获得公众号账户
 export function getAccount(id) {
   return request({
-    url: '/wechatMp/account/get?id=' + id,
+    url: '/mp/account/get?id=' + id,
     method: 'get'
   })
 }
@@ -37,7 +37,7 @@ export function getAccount(id) {
 // 获得公众号账户分页
 export function getAccountPage(query) {
   return request({
-    url: '/wechatMp/account/page',
+    url: '/mp/account/page',
     method: 'get',
     params: query
   })
@@ -46,7 +46,7 @@ export function getAccountPage(query) {
 // 导出公众号账户 Excel
 export function exportAccountExcel(query) {
   return request({
-    url: '/wechatMp/account/export-excel',
+    url: '/mp/account/export-excel',
     method: 'get',
     params: query,
     responseType: 'blob'

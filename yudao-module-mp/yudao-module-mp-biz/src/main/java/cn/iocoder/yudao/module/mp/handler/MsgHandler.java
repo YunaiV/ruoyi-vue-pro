@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.mp.builder.TextBuilder;
 import cn.iocoder.yudao.module.mp.controller.admin.fansmsg.vo.WxFansMsgCreateReqVO;
-import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.service.account.WxAccountService;
 import cn.iocoder.yudao.module.mp.service.fansmsg.WxFansMsgService;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +55,7 @@ public class MsgHandler implements WxMpMessageHandler {
                 WxMpUser wxmpUser = weixinService.getUserService()
                         .userInfo(wxMessage.getFromUser(), null);
                 if (wxmpUser != null) {
-                    WxAccountDO wxAccount = wxAccountService.findBy(WxAccountDO::getAccount, wxMessage.getToUser());
+                    MpAccountDO wxAccount = wxAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
                     if (wxAccount != null) {
 
                         if (wxMessage.getMsgType().equals(WxConsts.XmlMsgType.TEXT)) {

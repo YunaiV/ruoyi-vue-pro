@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.mp.handler;
 
 import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansUpdateReqVO;
-import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.accountfans.WxAccountFansDO;
 import cn.iocoder.yudao.module.mp.service.account.WxAccountService;
 import cn.iocoder.yudao.module.mp.service.accountfans.WxAccountFansService;
@@ -34,7 +34,7 @@ public class UnsubscribeHandler implements WxMpMessageHandler {
         log.info("取消关注用户 OPENID: " + openId);
         // TODO 可以更新本地数据库为取消关注状态
 
-        WxAccountDO wxAccountDO = wxAccountService.findBy(WxAccountDO::getAccount, wxMessage.getToUser());
+        MpAccountDO wxAccountDO = wxAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
         if (wxAccountDO != null) {
             WxAccountFansDO wxAccountFansDO = wxAccountFansService.findBy(WxAccountFansDO::getOpenid, openId);
             if (wxAccountFansDO != null) {

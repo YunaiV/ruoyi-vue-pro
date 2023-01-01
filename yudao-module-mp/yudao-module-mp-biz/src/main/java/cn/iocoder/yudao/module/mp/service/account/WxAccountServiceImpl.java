@@ -3,13 +3,12 @@ package cn.iocoder.yudao.module.mp.service.account;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.module.mp.controller.admin.account.vo.WxAccountCreateReqVO;
-import cn.iocoder.yudao.module.mp.controller.admin.account.vo.WxAccountExportReqVO;
-import cn.iocoder.yudao.module.mp.controller.admin.account.vo.WxAccountPageReqVO;
-import cn.iocoder.yudao.module.mp.controller.admin.account.vo.WxAccountUpdateReqVO;
-import cn.iocoder.yudao.module.mp.convert.account.WxAccountConvert;
-import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
-import cn.iocoder.yudao.module.mp.dal.mysql.account.WxAccountMapper;
+import cn.iocoder.yudao.module.mp.controller.admin.account.vo.MpAccountCreateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.account.vo.MpAccountPageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.account.vo.MpAccountUpdateReqVO;
+import cn.iocoder.yudao.module.mp.convert.account.MpAccountConvert;
+import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
+import cn.iocoder.yudao.module.mp.dal.mysql.account.MpAccountMapper;
 import cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.mp.mq.producer.WxMpConfigDataProducer;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -27,7 +26,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +42,9 @@ import java.util.Map;
 public class WxAccountServiceImpl implements WxAccountService {
 
     private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
+
     @Resource
-    private WxAccountMapper wxAccountMapper;
+    private MpAccountMapper wxAccountMapper;
     @Resource
     private WxMpConfigDataProducer wxMpConfigDataProducer;
     @Resource
@@ -59,31 +58,39 @@ public class WxAccountServiceImpl implements WxAccountService {
     private WxAccountService self;
 
     @Override
-    public Long createWxAccount(WxAccountCreateReqVO createReqVO) {
+    public Long createAccount(MpAccountCreateReqVO createReqVO) {
+        // TODO 芋艿：校验唯一性
         // 插入
-        WxAccountDO wxAccount = WxAccountConvert.INSTANCE.convert(createReqVO);
+        MpAccountDO wxAccount = MpAccountConvert.INSTANCE.convert(createReqVO);
         wxAccountMapper.insert(wxAccount);
+
+        // TODO 芋艿：刷新的方式
         wxMpConfigDataProducer.sendDictDataRefreshMessage();
         // 返回
         return wxAccount.getId();
     }
 
     @Override
-    public void updateWxAccount(WxAccountUpdateReqVO updateReqVO) {
+    public void updateAccount(MpAccountUpdateReqVO updateReqVO) {
+        // TODO 芋艿：校验唯一性
         // 校验存在
-        this.validateWxAccountExists(updateReqVO.getId());
+        validateWxAccountExists(updateReqVO.getId());
         // 更新
-        WxAccountDO updateObj = WxAccountConvert.INSTANCE.convert(updateReqVO);
+        MpAccountDO updateObj = MpAccountConvert.INSTANCE.convert(updateReqVO);
         wxAccountMapper.updateById(updateObj);
+
+        // TODO 芋艿：刷新的方式
         wxMpConfigDataProducer.sendDictDataRefreshMessage();
     }
 
     @Override
-    public void deleteWxAccount(Long id) {
+    public void deleteAccount(Long id) {
         // 校验存在
-        this.validateWxAccountExists(id);
+        validateWxAccountExists(id);
         // 删除
         wxAccountMapper.deleteById(id);
+
+        // TODO 芋艿：刷新的方式
         wxMpConfigDataProducer.sendDictDataRefreshMessage();
     }
 
@@ -94,27 +101,17 @@ public class WxAccountServiceImpl implements WxAccountService {
     }
 
     @Override
-    public WxAccountDO getWxAccount(Long id) {
+    public MpAccountDO getAccount(Long id) {
         return wxAccountMapper.selectById(id);
     }
 
     @Override
-    public List<WxAccountDO> getWxAccountList(Collection<Long> ids) {
-        return wxAccountMapper.selectBatchIds(ids);
-    }
-
-    @Override
-    public PageResult<WxAccountDO> getWxAccountPage(WxAccountPageReqVO pageReqVO) {
+    public PageResult<MpAccountDO> getAccountPage(MpAccountPageReqVO pageReqVO) {
         return wxAccountMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<WxAccountDO> getWxAccountList(WxAccountExportReqVO exportReqVO) {
-        return wxAccountMapper.selectList(exportReqVO);
-    }
-
-    @Override
-    public WxAccountDO findBy(SFunction<WxAccountDO, ?> field, Object val) {
+    public MpAccountDO findBy(SFunction<MpAccountDO, ?> field, Object val) {
         return wxAccountMapper.selectOne(field, val);
     }
 
@@ -122,7 +119,8 @@ public class WxAccountServiceImpl implements WxAccountService {
     @TenantIgnore
     @Override
     public void initLoadWxMpConfigStorages() {
-        List<WxAccountDO> wxAccountList = this.wxAccountMapper.selectList();
+        // TODO 芋艿：刷新的方式
+        List<MpAccountDO> wxAccountList = this.wxAccountMapper.selectList();
         if (CollectionUtils.isEmpty(wxAccountList)) {
             log.info("未读取到公众号配置，请在管理后台添加");
             return;
@@ -137,7 +135,7 @@ public class WxAccountServiceImpl implements WxAccountService {
      *
      * @param account 公众号
      */
-    private synchronized void addAccountToRuntime(WxAccountDO account, RedisTemplateWxRedisOps redisOps) {
+    private synchronized void addAccountToRuntime(MpAccountDO account, RedisTemplateWxRedisOps redisOps) {
         String appId = account.getAppId();
         WxMpConfigStorage wxMpRedisConfig = account.toWxMpConfigStorage(redisOps, wxMpProperties);
         try {

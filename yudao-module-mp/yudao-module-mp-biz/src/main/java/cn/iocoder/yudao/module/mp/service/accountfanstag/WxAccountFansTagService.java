@@ -4,7 +4,7 @@ import java.util.*;
 import javax.validation.*;
 
 import cn.iocoder.yudao.module.mp.controller.admin.accountfanstag.vo.*;
-import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.accountfanstag.WxAccountFansTagDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
@@ -70,5 +70,5 @@ public interface WxAccountFansTagService {
      */
     List<WxAccountFansTagDO> getWxAccountFansTagList(WxAccountFansTagExportReqVO exportReqVO);
 
-    void processFansTags(WxAccountDO wxAccount, WxMpUser wxmpUser);
+    void processFansTags(MpAccountDO wxAccount, WxMpUser wxmpUser);
 }

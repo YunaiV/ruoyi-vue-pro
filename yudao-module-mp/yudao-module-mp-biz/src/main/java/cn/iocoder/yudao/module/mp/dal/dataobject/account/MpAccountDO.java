@@ -10,21 +10,20 @@ import me.chanjar.weixin.common.redis.RedisTemplateWxRedisOps;
 import me.chanjar.weixin.mp.config.WxMpConfigStorage;
 import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
 
-// TODO 亚洲：这个模块的相关类，使用 Mp 作为前缀哈
 /**
  * 公众号账户 DO
  *
  * @author 芋道源码
  */
-@TableName("wx_account")
-@KeySequence("wx_account_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("mp_account")
+@KeySequence("mp_account_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WxAccountDO extends BaseDO {
+public class MpAccountDO extends BaseDO {
 
     /**
      * 编号
@@ -48,10 +47,6 @@ public class WxAccountDO extends BaseDO {
      */
     private String appSecret;
     /**
-     * 公众号url
-     */
-    private String url;
-    /**
      * 公众号token
      */
     private String token;
@@ -68,6 +63,7 @@ public class WxAccountDO extends BaseDO {
      */
     private String remark;
 
+    // TODO 芋艿：需要迁移走
     public WxMpConfigStorage toWxMpConfigStorage(RedisTemplateWxRedisOps redisTemplateWxRedisOps, WxMpProperties wxMpProperties) {
         WxMpRedisConfigImpl wxMpRedisConfig = new WxMpRedisConfigImpl(redisTemplateWxRedisOps, wxMpProperties.getConfigStorage().getKeyPrefix());
         wxMpRedisConfig.setAppId(appId);

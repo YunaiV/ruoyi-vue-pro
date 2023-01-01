@@ -4,7 +4,6 @@ import java.util.*;
 import javax.validation.*;
 
 import cn.iocoder.yudao.module.mp.controller.admin.subscribetext.vo.*;
-import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.subscribetext.WxSubscribeTextDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;

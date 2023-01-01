@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.mp.service.accountfanstag;
 
-import cn.hutool.core.date.DateUtil;
-import cn.iocoder.yudao.module.mp.dal.dataobject.account.WxAccountDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
 import org.springframework.stereotype.Service;
 
@@ -86,7 +85,7 @@ public class WxAccountFansTagServiceImpl implements WxAccountFansTagService {
     }
 
     @Override
-    public void processFansTags(WxAccountDO wxAccountDO, WxMpUser wxmpUser) {
+    public void processFansTags(MpAccountDO wxAccountDO, WxMpUser wxmpUser) {
         WxAccountFansTagExportReqVO wxAccountFansTagTpl = new WxAccountFansTagExportReqVO();
         wxAccountFansTagTpl.setOpenid(wxmpUser.getOpenId());
         List<WxAccountFansTagDO> wxAccountFansTagList = this.getWxAccountFansTagList(wxAccountFansTagTpl);

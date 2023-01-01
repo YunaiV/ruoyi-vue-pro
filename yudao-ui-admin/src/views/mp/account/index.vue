@@ -4,12 +4,8 @@
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入公众号名称" clearable
+        <el-input v-model="queryParams.name" placeholder="请输入名称" clearable
                   @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -21,13 +17,7 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-                   v-hasPermi="['wechatMp:account:create']">新增
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
-                   :loading="exportLoading"
-                   v-hasPermi="['wechatMp:account:export']">导出
+                   v-hasPermi="['mp:account:create']">新增
         </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -35,13 +25,12 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="编号" align="center" prop="id"/>
       <el-table-column label="名称" align="center" prop="name"/>
-      <el-table-column label="微信原始ID" align="center" prop="account"/>
-      <el-table-column label="appId" align="center" prop="appId"/>
-      <el-table-column label="url" align="center" prop="url"/>
+      <el-table-column label="微信号" align="center" prop="account" width="180"/>
+      <el-table-column label="appId" align="center" prop="appId" width="180"/>
+      <el-table-column label="appSecret" align="center" prop="appSecret" width="180"/>
       <el-table-column label="Token" align="center" prop="token"/>
-      <el-table-column label="加密密钥" align="center" prop="aesKey"/>
+      <el-table-column label="密钥" align="center" prop="aesKey"/>
       <el-table-column label="二维码" align="center" prop="qrCodeUrl"/>
       <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -52,10 +41,10 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                     v-hasPermi="['wechatMp:account:update']">修改
+                     v-hasPermi="['mp:account:update']">修改
           </el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                     v-hasPermi="['wechatMp:account:delete']">删除
+                     v-hasPermi="['mp:account:delete']">删除
           </el-button>
         </template>
       </el-table-column>
@@ -66,35 +55,37 @@
 
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="公众号名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入公众号名称"/>
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入名称"/>
         </el-form-item>
-
-        <el-tooltip class="item" effect="dark"
-                    content="在微信公众平台（mp.weixin.qq.com）的菜单【设置】-【公众号设置】-【帐号详情】中能找到原始ID"
-                    placement="right">
-          <el-form-item label="微信原始ID" prop="account">
-            <el-input v-model="form.account" placeholder="请输入微信原始ID" :disabled='disabled'/>
-          </el-form-item>
-        </el-tooltip>
-
-        <el-tooltip class="item" effect="dark"
-                    content="在微信公众平台（mp.weixin.qq.com）的菜单【开发】-【基本配置】中能找到AppID "
-                    placement="right">
-          <el-form-item label="AppID" prop="appId">
-            <el-input v-model="form.appId" placeholder="请输入公众号appId" :disabled='disabled'/>
-          </el-form-item>
-        </el-tooltip>
-
-        <el-tooltip class="item" effect="dark"
-                    content="在微信公众平台（mp.weixin.qq.com）的菜单【开发】-【基本配置】中能找到AppSecret"
-                    placement="right">
-          <el-form-item label="AppSecret" prop="appSecret">
-            <el-input v-model="form.appSecret" placeholder="请输入公众号密钥" :disabled='disabled'/>
-          </el-form-item>
-        </el-tooltip>
-
+        <el-form-item label="微信号" prop="account">
+         <span slot="label">
+           <el-tooltip content="在微信公众平台（mp.weixin.qq.com）的菜单【设置】-【公众号设置】-【帐号详情】中能找到原始ID" placement="top">
+              <i class="el-icon-question" />
+           </el-tooltip>
+           微信号
+          </span>
+          <el-input v-model="form.account" placeholder="请输入微信号"/>
+        </el-form-item>
+        <el-form-item label="appId" prop="appId">
+          <span slot="label">
+            <el-tooltip content="在微信公众平台（mp.weixin.qq.com）的菜单【开发】-【基本配置】中能找到 appId" placement="top">
+              <i class="el-icon-question" />
+            </el-tooltip>
+            appId
+          </span>
+          <el-input v-model="form.appId" placeholder="请输入公众号 appId"/>
+        </el-form-item>
+        <el-form-item label="密钥" prop="appSecret">
+          <span slot="label">
+            <el-tooltip content="在微信公众平台（mp.weixin.qq.com）的菜单【开发】-【基本配置】中能找到密钥" placement="top">
+              <i class="el-icon-question" />
+            </el-tooltip>
+            密钥
+          </span>
+          <el-input v-model="form.appSecret" placeholder="请输入公众号 appSecret"/>
+        </el-form-item>
         <el-form-item label="token" prop="token">
           <el-input v-model="form.token" placeholder="请输入公众号token"/>
         </el-form-item>
@@ -114,17 +105,10 @@
 </template>
 
 <script>
-import {
-  createAccount,
-  deleteAccount,
-  exportAccountExcel,
-  getAccount,
-  getAccountPage,
-  updateAccount
-} from '@/api/wechatMp/wxAccount'
+import { createAccount, deleteAccount, getAccount, getAccountPage, updateAccount} from '@/api/mp/account'
 
 export default {
-  name: 'wxAccount',
+  name: 'mpAccount',
   components: {},
   data() {
     return {
@@ -142,7 +126,6 @@ export default {
       title: '',
       // 是否显示弹出层
       open: false,
-      dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -155,10 +138,11 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        name: [{required: true, message: '公众号名称不能为空', trigger: 'blur'}],
+        name: [{required: true, message: '名称不能为空', trigger: 'blur'}],
         account: [{required: true, message: '公众号账户不能为空', trigger: 'blur'}],
-        appId: [{required: true, message: '公众号appid不能为空', trigger: 'blur'}],
+        appId: [{required: true, message: '公众号 appId 不能为空', trigger: 'blur'}],
         appSecret: [{required: true, message: '公众号密钥不能为空', trigger: 'blur'}],
+        token: [{required: true, message: '公众号 token 不能为空', trigger: 'blur'}],
       },
       // 禁用属性
       disabled: false,
@@ -173,7 +157,6 @@ export default {
       this.loading = true
       // 处理查询参数
       let params = {...this.queryParams}
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime')
       // 执行查询
       getAccountPage(params).then(response => {
         this.list = response.data.list
@@ -255,7 +238,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id
-      this.$modal.confirm('是否确认删除公众号账户编号为"' + id + '"的数据项?').then(function () {
+      this.$modal.confirm('是否确认删除公众号账户编号为"' + row.name + '"的数据项?').then(function () {
         return deleteAccount(id)
       }).then(() => {
         this.getList()
@@ -263,23 +246,6 @@ export default {
       }).catch(() => {
       })
     },
-    /** 导出按钮操作 */
-    handleExport() {
-      // 处理查询参数
-      let params = {...this.queryParams}
-      params.pageNo = undefined
-      params.pageSize = undefined
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime')
-      // 执行导出
-      this.$modal.confirm('是否确认导出所有公众号账户数据项?').then(() => {
-        this.exportLoading = true
-        return exportAccountExcel(params)
-      }).then(response => {
-        this.$download.excel(response, '公众号账户.xls')
-        this.exportLoading = false
-      }).catch(() => {
-      })
-    }
   }
 }
 </script>

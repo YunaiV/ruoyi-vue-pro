@@ -104,7 +104,7 @@ import {
   getWxFansTagList,
   updateWxFansTag
 } from '@/api/wechatMp/wxFansTag'
-import {getAccountPage} from '@/api/wechatMp/wxAccount'
+import {getAccountPage} from '@/api/mp/account'
 
 export default {
   name: 'WxFansTag',
