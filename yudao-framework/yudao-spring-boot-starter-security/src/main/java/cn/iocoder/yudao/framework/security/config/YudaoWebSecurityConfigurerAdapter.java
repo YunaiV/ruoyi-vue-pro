@@ -129,6 +129,8 @@ public class YudaoWebSecurityConfigurerAdapter {
                 .antMatchers(buildAppApi("/**")).permitAll()
                 // 1.5 验证码captcha 允许匿名访问
                 .antMatchers("/captcha/get", "/captcha/check").permitAll()
+                // 1.6 webSocket 允许匿名访问
+                .antMatchers("/websocket/message").permitAll()
                 // ②：每个项目的自定义规则
                 .and().authorizeRequests(registry -> // 下面，循环设置自定义规则
                         authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(registry)))
