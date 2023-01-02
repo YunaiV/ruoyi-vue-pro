@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.mp.framework.mp.core;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.service.fansmsgres.NullHandler;
 import cn.iocoder.yudao.module.mp.service.handler.*;
+import cn.iocoder.yudao.module.mp.service.handler.user.SubscribeHandler;
+import cn.iocoder.yudao.module.mp.service.handler.user.UnsubscribeHandler;
 import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
 import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;

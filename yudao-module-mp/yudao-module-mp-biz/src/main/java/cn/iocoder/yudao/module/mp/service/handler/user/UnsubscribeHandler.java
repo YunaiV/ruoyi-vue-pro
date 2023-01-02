@@ -1,10 +1,10 @@
-package cn.iocoder.yudao.module.mp.service.handler;
+package cn.iocoder.yudao.module.mp.service.handler.user;
 
-import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansUpdateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.user.vo.WxAccountFansUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
-import cn.iocoder.yudao.module.mp.dal.dataobject.accountfans.WxAccountFansDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
-import cn.iocoder.yudao.module.mp.service.accountfans.WxAccountFansService;
+import cn.iocoder.yudao.module.mp.service.user.MpUserService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpMessageHandler;
@@ -21,6 +21,8 @@ import java.util.Map;
 /**
  * 取消关注的事件处理器
  *
+ * @author 芋道源码
+ *
  * // TODO 芋艿：待实现
  */
 @Component
@@ -32,7 +34,7 @@ public class UnsubscribeHandler implements WxMpMessageHandler {
     private MpAccountService mpAccountService;
 
     @Autowired
-    private WxAccountFansService wxAccountFansService;
+    private MpUserService wxAccountFansService;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
@@ -44,7 +46,7 @@ public class UnsubscribeHandler implements WxMpMessageHandler {
 
         MpAccountDO wxAccountDO = mpAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
         if (wxAccountDO != null) {
-            WxAccountFansDO wxAccountFansDO = wxAccountFansService.findBy(WxAccountFansDO::getOpenid, openId);
+            MpUserDO wxAccountFansDO = wxAccountFansService.findBy(MpUserDO::getOpenid, openId);
             if (wxAccountFansDO != null) {
                 WxAccountFansUpdateReqVO wxAccountFansUpdateReqVO = new WxAccountFansUpdateReqVO();
                 wxAccountFansUpdateReqVO.setId(wxAccountDO.getId());

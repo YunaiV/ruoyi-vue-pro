@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.mq.costomer;
+package cn.iocoder.yudao.module.mp.mq.consumer;
 
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.module.mp.mq.message.MpConfigRefreshMessage;

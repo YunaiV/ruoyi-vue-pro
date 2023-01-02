@@ -1,28 +1,29 @@
-package cn.iocoder.yudao.module.mp.dal.dataobject.accountfans;
+package cn.iocoder.yudao.module.mp.dal.dataobject.user;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 微信公众号粉丝 DO
  *
  * @author 芋道源码
  */
-// TODO @亚洲：WxUserDO
-@TableName("wx_account_fans")
-@KeySequence("wx_account_fans_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("mp_user")
+@KeySequence("mp_user_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WxAccountFansDO extends BaseDO {
+public class MpUserDO extends BaseDO {
 
     /**
      * 编号
@@ -34,25 +35,32 @@ public class WxAccountFansDO extends BaseDO {
      */
     private String openid;
     /**
-     * 订阅状态，0未关注，1已关注
+     * 关注状态
+     *
+     * 枚举 {@link CommonStatusEnum}
+     * 1. 开启 - 已关注
+     * 2. 禁用 - 取消关注
      */
-    // TODO @亚洲：Integer 然后写个枚举哈
-    private String subscribeStatus;
+    private Integer subscribeStatus;
     /**
-     * 订阅时间
+     * 关注时间
      */
-    // TODO @亚洲：增加一个取消关注的事件
-    private Date subscribeTime;
+    private LocalDateTime subscribeTime;
+    /**
+     * 取消关注时间
+     */
+    private LocalDateTime unsubscribeTime;
     /**
      * 昵称
      */
-    // TODO @亚洲：String
-    private byte[] nickname;
+    private String nickname;
     /**
-     * 性别，1男，2女，0未知
+     * 性别
+     *
+     * 1- 男
+     * 2- 女
      */
-    // TODO @亚洲：Integer
-    private String gender;
+    private Integer gender;
     /**
      * 语言
      */
@@ -72,21 +80,23 @@ public class WxAccountFansDO extends BaseDO {
     /**
      * 头像地址
      */
-    // TODO @亚洲：headImageUrl
-    private String headimgUrl;
+    private String headImageUrl;
     /**
      * 备注
      */
     private String remark;
 
-    // TODO @亚洲：是不是只要存储 WxAccountDO 的 id 呀？
     /**
      * 微信公众号 ID
+     *
+     * 关联 {@link MpAccountDO#getId()}
      */
-    private String wxAccountId;
+    private String accountId;
     /**
      * 微信公众号 appid
+     *
+     * 冗余{@link MpAccountDO#getAppId()}
      */
-    private String wxAccountAppid;
+    private String appId;
 
 }

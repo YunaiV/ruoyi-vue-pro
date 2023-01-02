@@ -1,16 +1,16 @@
-package cn.iocoder.yudao.module.mp.service.handler;
+package cn.iocoder.yudao.module.mp.service.handler.user;
 
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.mp.builder.TextBuilder;
-import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansCreateReqVO;
-import cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo.WxAccountFansUpdateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.user.vo.WxAccountFansCreateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.user.vo.WxAccountFansUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
-import cn.iocoder.yudao.module.mp.dal.dataobject.accountfans.WxAccountFansDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.subscribetext.WxSubscribeTextDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.texttemplate.WxTextTemplateDO;
 import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
-import cn.iocoder.yudao.module.mp.service.accountfans.WxAccountFansService;
+import cn.iocoder.yudao.module.mp.service.user.MpUserService;
 import cn.iocoder.yudao.module.mp.service.accountfanstag.WxAccountFansTagService;
 import cn.iocoder.yudao.module.mp.service.subscribetext.WxSubscribeTextService;
 import cn.iocoder.yudao.module.mp.service.texttemplate.WxTextTemplateService;
@@ -33,6 +33,8 @@ import java.util.Map;
 /**
  * 关注的事件处理器
  *
+ * @author 芋道源码
+ *
  * // TODO 芋艿：待实现
  */
 @Component
@@ -50,7 +52,7 @@ public class SubscribeHandler implements WxMpMessageHandler {
     private WxSubscribeTextService wxSubscribeTextService;
 
     @Autowired
-    private WxAccountFansService wxAccountFansService;
+    private MpUserService wxAccountFansService;
 
     @Autowired
     private WxAccountFansTagService wxAccountFansTagService;
@@ -70,7 +72,7 @@ public class SubscribeHandler implements WxMpMessageHandler {
                 // 可以添加关注用户到本地数据库
                 MpAccountDO wxAccount = mpAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
                 if (wxAccount != null) {
-                    WxAccountFansDO wxAccountFans = wxAccountFansService.findBy(WxAccountFansDO::getOpenid, wxmpUser.getOpenId());
+                    MpUserDO wxAccountFans = wxAccountFansService.findBy(MpUserDO::getOpenid, wxmpUser.getOpenId());
                     if (wxAccountFans == null) {//insert
                         WxAccountFansCreateReqVO wxAccountFansCreateReqVO = new WxAccountFansCreateReqVO();
                         wxAccountFansCreateReqVO.setOpenid(wxmpUser.getOpenId());

@@ -4,6 +4,8 @@ import cn.iocoder.yudao.module.mp.framework.mp.core.DefaultMpServiceFactory;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import cn.iocoder.yudao.module.mp.service.fansmsgres.NullHandler;
 import cn.iocoder.yudao.module.mp.service.handler.*;
+import cn.iocoder.yudao.module.mp.service.handler.user.SubscribeHandler;
+import cn.iocoder.yudao.module.mp.service.handler.user.UnsubscribeHandler;
 import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
 import me.chanjar.weixin.common.redis.RedisTemplateWxRedisOps;
 import org.springframework.context.annotation.Bean;

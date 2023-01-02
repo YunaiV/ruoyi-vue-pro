@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.controller.admin.accountfans.vo;
+package cn.iocoder.yudao.module.mp.controller.admin.user.vo;
 
 import lombok.*;
 import java.util.*;
@@ -8,7 +8,7 @@ import io.swagger.annotations.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class WxAccountFansRespVO extends WxAccountFansBaseVO {
+public class MpUserRespVO extends MpUserBaseVO {
 
     @ApiModelProperty(value = "编号", required = true)
     private Long id;

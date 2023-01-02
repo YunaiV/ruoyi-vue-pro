@@ -49,9 +49,8 @@ public class DefaultMessageHandler implements WxMpMessageHandler {
     private FileApi fileApi;
 
     @Override
-    public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
-                                    Map<String, Object> context, WxMpService weixinService,
-                                    WxSessionManager sessionManager) {
+    public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context,
+                                    WxMpService weixinService, WxSessionManager sessionManager) {
         log.info("收到信息内容:｛｝", JsonUtils.toJsonString(wxMessage));
         log.info("关键字:｛｝", wxMessage.getContent());
 
@@ -148,7 +147,7 @@ public class DefaultMessageHandler implements WxMpMessageHandler {
 
     //处理回复信息，优先级，关键字、智能机器人、默认值
     String processContent(WxMpXmlMessage wxMessage) {
-        String content = "";
+        String content = "你猜";
        /* content = processReceiveTextContent(wxMessage);
         if(StringUtils.isNotBlank( content )){
             return content;
