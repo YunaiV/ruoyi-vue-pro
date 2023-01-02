@@ -100,6 +100,9 @@ public class MpOpenController {
         // 第二步，处理消息
         WxMpMessageRouter mpMessageRouter = mpServiceFactory.getRequiredMpMessageRouter(appId);
         WxMpXmlOutMessage outMessage = mpMessageRouter.route(inMessage);
+        if (outMessage == null) {
+            return "";
+        }
 
         // 第三步，返回消息
         if (StrUtil.isBlank(reqVO.getEncrypt_type())) { // 明文模式
@@ -107,7 +110,7 @@ public class MpOpenController {
         } else if (Objects.equals(reqVO.getEncrypt_type(), MpOpenHandleMessageReqVO.ENCRYPT_TYPE_AES)) { // AES 加密模式
             return outMessage.toEncryptedXml(mppService.getWxMpConfigStorage());
         }
-        return null;
+        return "";
     }
 
 }

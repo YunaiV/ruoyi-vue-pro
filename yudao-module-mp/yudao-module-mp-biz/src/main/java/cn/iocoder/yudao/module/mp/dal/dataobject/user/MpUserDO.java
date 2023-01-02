@@ -52,15 +52,16 @@ public class MpUserDO extends BaseDO {
     private LocalDateTime unsubscribeTime;
     /**
      * 昵称
+     *
+     * 注意，2021-12-27 公众号接口不再返回头像和昵称，只能通过微信公众号的网页登录获取
      */
     private String nickname;
     /**
-     * 性别
+     * 头像地址
      *
-     * 1- 男
-     * 2- 女
+     * 注意，2021-12-27 公众号接口不再返回头像和昵称，只能通过微信公众号的网页登录获取
      */
-    private Integer gender;
+    private String headImageUrl;
     /**
      * 语言
      */
@@ -78,10 +79,6 @@ public class MpUserDO extends BaseDO {
      */
     private String city;
     /**
-     * 头像地址
-     */
-    private String headImageUrl;
-    /**
      * 备注
      */
     private String remark;
@@ -91,7 +88,7 @@ public class MpUserDO extends BaseDO {
      *
      * 关联 {@link MpAccountDO#getId()}
      */
-    private String accountId;
+    private Long accountId;
     /**
      * 微信公众号 appid
      *

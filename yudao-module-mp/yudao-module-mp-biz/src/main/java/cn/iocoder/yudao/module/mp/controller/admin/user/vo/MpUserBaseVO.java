@@ -31,9 +31,6 @@ public class MpUserBaseVO {
     @ApiModelProperty(value = "昵称")
     private String nickname;
 
-    @ApiModelProperty(value = "性别，1男，2女，0未知")
-    private Integer gender;
-
     @ApiModelProperty(value = "语言")
     private String language;
 
