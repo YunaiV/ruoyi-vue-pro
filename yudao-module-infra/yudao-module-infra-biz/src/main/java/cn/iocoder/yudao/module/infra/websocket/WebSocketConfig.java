@@ -6,14 +6,11 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 /**
  * websocket 配置
- *
  */
 @Configuration
-public class WebSocketConfig
-{
+public class WebSocketConfig {
     @Bean
-    public ServerEndpointExporter serverEndpointExporter()
-    {
+    public ServerEndpointExporter serverEndpointExporter() {
         return new ServerEndpointExporter();
     }
 }
