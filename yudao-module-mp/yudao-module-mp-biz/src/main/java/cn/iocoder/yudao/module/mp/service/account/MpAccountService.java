@@ -52,6 +52,14 @@ public interface MpAccountService {
     MpAccountDO getAccount(Long id);
 
     /**
+     * 从缓存中，获得公众号账户
+     *
+     * @param appId 微信公众号 appId
+     * @return 公众号账户
+     */
+    MpAccountDO getAccountFromCache(String appId);
+
+    /**
      * 获得公众号账户分页
      *
      * @param pageReqVO 分页查询

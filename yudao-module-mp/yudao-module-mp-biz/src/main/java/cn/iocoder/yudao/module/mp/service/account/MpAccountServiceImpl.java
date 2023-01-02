@@ -25,6 +25,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -43,6 +44,14 @@ public class MpAccountServiceImpl implements MpAccountService {
      */
     private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
 
+    /**
+     * 账号缓存
+     * key：账号编号 {@link MpAccountDO#getAppId()}
+     *
+     * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
+     */
+    @Getter
+    private volatile Map<String, MpAccountDO> accountCache;
     /**
      * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
@@ -92,6 +101,7 @@ public class MpAccountServiceImpl implements MpAccountService {
 
             // 第二步：构建缓存。创建或更新支付 Client
             mpServiceFactory.init(accounts);
+            accountCache = CollectionUtils.convertMap(accounts, MpAccountDO::getAppId);
 
             // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
             this.maxUpdateTime = CollectionUtils.getMaxValue(accounts, MpAccountDO::getUpdateTime);
@@ -144,6 +154,11 @@ public class MpAccountServiceImpl implements MpAccountService {
     @Override
     public MpAccountDO getAccount(Long id) {
         return mpAccountMapper.selectById(id);
+    }
+
+    @Override
+    public MpAccountDO getAccountFromCache(String appId) {
+        return accountCache.get(appId);
     }
 
     @Override

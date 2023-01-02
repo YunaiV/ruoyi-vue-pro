@@ -42,4 +42,11 @@ public interface MpServiceFactory {
      * @return WxMpMessageRouter 实例
      */
     WxMpMessageRouter getMpMessageRouter(String appId);
+
+    default WxMpMessageRouter getRequiredMpMessageRouter(String appId) {
+        WxMpMessageRouter wxMpMessageRouter = getMpMessageRouter(appId);
+        Assert.notNull(wxMpMessageRouter, "找到对应 appId({}) 的 WxMpMessageRouter，请核实！", appId);
+        return wxMpMessageRouter;
+    }
+
 }
