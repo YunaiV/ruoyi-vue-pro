@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.service.file.FileService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -61,9 +62,13 @@ public class FileController {
     @GetMapping("/{configId}/get/**")
     @PermitAll
     @ApiOperation("下载文件")
-    @ApiImplicitParam(name = "configId", value = "配置编号",  required = true, dataTypeClass = Long.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "configId", value = "配置编号", required = true, dataTypeClass = Long.class),
+            @ApiImplicitParam(name = "fileName", value = "文件实际名称", dataTypeClass = String.class)
+    })
     public void getFileContent(HttpServletRequest request,
                                HttpServletResponse response,
+                               String fileName,
                                @PathVariable("configId") Long configId) throws Exception {
         // 获取请求的路径
         String path = StrUtil.subAfter(request.getRequestURI(), "/get/", false);
@@ -78,7 +83,10 @@ public class FileController {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
-        ServletUtils.writeAttachment(response, path, content);
+        if (StrUtil.isBlank(fileName)) {
+            fileName = StrUtil.subAfter(path, "/", true);
+        }
+        ServletUtils.writeAttachment(response, fileName, content);
     }
 
     @GetMapping("/page")
