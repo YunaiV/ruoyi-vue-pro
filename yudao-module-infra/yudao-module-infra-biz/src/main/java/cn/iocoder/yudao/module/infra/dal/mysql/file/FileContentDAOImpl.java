@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class FileContentDAOImpl implements DBFileContentFrameworkDAO {
@@ -29,9 +30,11 @@ public class FileContentDAOImpl implements DBFileContentFrameworkDAO {
 
     @Override
     public byte[] selectContent(Long configId, String path) {
-        List<FileContentDO> fileContentDOs = fileContentMapper.selectList(
+        List<FileContentDO> list = fileContentMapper.selectList(
                 buildQuery(configId, path).select(FileContentDO::getContent).orderByDesc(FileContentDO::getId));
-        return CollUtil.isNotEmpty(fileContentDOs) ? CollUtil.getFirst(fileContentDOs).getContent() : null;
+        return Optional.ofNullable(CollUtil.getFirst(list))
+                .map(FileContentDO::getContent)
+                .orElse(null);
     }
 
     private LambdaQueryWrapper<FileContentDO> buildQuery(Long configId, String path) {
