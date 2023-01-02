@@ -2,8 +2,14 @@ package cn.iocoder.yudao.module.mp.framework.mp.config;
 
 import cn.iocoder.yudao.module.mp.framework.mp.core.DefaultMpServiceFactory;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
-import cn.iocoder.yudao.module.mp.service.fansmsgres.NullHandler;
-import cn.iocoder.yudao.module.mp.service.handler.*;
+import cn.iocoder.yudao.module.mp.service.handler.menu.MenuHandler;
+import cn.iocoder.yudao.module.mp.service.handler.message.MessageLogHandler;
+import cn.iocoder.yudao.module.mp.service.handler.message.MessageAutoReplyHandler;
+import cn.iocoder.yudao.module.mp.service.handler.other.KfSessionHandler;
+import cn.iocoder.yudao.module.mp.service.handler.other.NullHandler;
+import cn.iocoder.yudao.module.mp.service.handler.other.ScanHandler;
+import cn.iocoder.yudao.module.mp.service.handler.other.StoreCheckNotifyHandler;
+import cn.iocoder.yudao.module.mp.service.handler.user.LocationHandler;
 import cn.iocoder.yudao.module.mp.service.handler.user.SubscribeHandler;
 import cn.iocoder.yudao.module.mp.service.handler.user.UnsubscribeHandler;
 import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
@@ -30,7 +36,7 @@ public class MpConfiguration {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public MpServiceFactory mpServiceFactory(RedisTemplateWxRedisOps redisTemplateWxRedisOps,
                                              WxMpProperties wxMpProperties,
-                                             LogHandler logHandler,
+                                             MessageLogHandler logHandler,
                                              KfSessionHandler kfSessionHandler,
                                              StoreCheckNotifyHandler storeCheckNotifyHandler,
                                              MenuHandler menuHandler,
@@ -39,7 +45,7 @@ public class MpConfiguration {
                                              UnsubscribeHandler unsubscribeHandler,
                                              LocationHandler locationHandler,
                                              ScanHandler scanHandler,
-                                             DefaultMessageHandler msgHandler) {
+                                             MessageAutoReplyHandler msgHandler) {
         return new DefaultMpServiceFactory(redisTemplateWxRedisOps, wxMpProperties,
                 logHandler, kfSessionHandler, storeCheckNotifyHandler, menuHandler,
                 nullHandler, subscribeHandler, unsubscribeHandler, locationHandler, scanHandler, msgHandler);

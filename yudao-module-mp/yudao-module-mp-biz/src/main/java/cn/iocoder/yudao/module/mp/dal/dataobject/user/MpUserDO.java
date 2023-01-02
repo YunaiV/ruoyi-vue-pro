@@ -92,7 +92,7 @@ public class MpUserDO extends BaseDO {
     /**
      * 微信公众号 appid
      *
-     * 冗余{@link MpAccountDO#getAppId()}
+     * 冗余 {@link MpAccountDO#getAppId()}
      */
     private String appId;
 

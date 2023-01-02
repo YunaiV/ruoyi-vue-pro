@@ -1,8 +1,14 @@
 package cn.iocoder.yudao.module.mp.framework.mp.core;
 
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
-import cn.iocoder.yudao.module.mp.service.fansmsgres.NullHandler;
-import cn.iocoder.yudao.module.mp.service.handler.*;
+import cn.iocoder.yudao.module.mp.service.handler.menu.MenuHandler;
+import cn.iocoder.yudao.module.mp.service.handler.message.MessageLogHandler;
+import cn.iocoder.yudao.module.mp.service.handler.message.MessageAutoReplyHandler;
+import cn.iocoder.yudao.module.mp.service.handler.other.KfSessionHandler;
+import cn.iocoder.yudao.module.mp.service.handler.other.NullHandler;
+import cn.iocoder.yudao.module.mp.service.handler.other.ScanHandler;
+import cn.iocoder.yudao.module.mp.service.handler.other.StoreCheckNotifyHandler;
+import cn.iocoder.yudao.module.mp.service.handler.user.LocationHandler;
 import cn.iocoder.yudao.module.mp.service.handler.user.SubscribeHandler;
 import cn.iocoder.yudao.module.mp.service.handler.user.UnsubscribeHandler;
 import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
@@ -43,7 +49,7 @@ public class DefaultMpServiceFactory implements MpServiceFactory {
 
     // ========== 各种 Handler ==========
 
-    private final LogHandler logHandler;
+    private final MessageLogHandler logHandler;
     private final KfSessionHandler kfSessionHandler;
     private final StoreCheckNotifyHandler storeCheckNotifyHandler;
     private final MenuHandler menuHandler;
@@ -52,7 +58,7 @@ public class DefaultMpServiceFactory implements MpServiceFactory {
     private final UnsubscribeHandler unsubscribeHandler;
     private final LocationHandler locationHandler;
     private final ScanHandler scanHandler;
-    private final DefaultMessageHandler msgHandler;
+    private final MessageAutoReplyHandler msgHandler;
 
     @Override
     public void init(List<MpAccountDO> list) {
