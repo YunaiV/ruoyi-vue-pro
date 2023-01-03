@@ -8,14 +8,14 @@ export interface tableMethod {
   exportList: (fileName?: string) => void
 }
 
-export function useXTable(props: XTableProps): [Function, tableMethod] {
+export const useXTable = (props: XTableProps): [Function, tableMethod] => {
   const tableRef = ref<Nullable<tableMethod>>(null)
 
-  function register(instance) {
+  const register = (instance) => {
     tableRef.value = instance
     props && instance.setProps(props)
   }
-  function getInstance(): tableMethod {
+  const getInstance = (): tableMethod => {
     const table = unref(tableRef)
     if (!table) {
       console.error('表格实例不存在')
