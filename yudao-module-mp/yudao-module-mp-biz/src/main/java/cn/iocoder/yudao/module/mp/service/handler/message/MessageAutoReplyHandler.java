@@ -46,6 +46,10 @@ public class MessageAutoReplyHandler implements WxMpMessageHandler {
     @Resource
     private FileApi fileApi;
 
+    // auto reply
+    // createMessage
+    // outmessage
+
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context,
                                     WxMpService weixinService, WxSessionManager sessionManager) {

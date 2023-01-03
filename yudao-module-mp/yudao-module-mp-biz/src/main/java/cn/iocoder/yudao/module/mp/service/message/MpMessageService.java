@@ -12,6 +12,7 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
  */
 public interface MpMessageService {
 
+    // TODO 芋艿：方法名要优化下
     /**
      * 获得粉丝消息表分页
      *

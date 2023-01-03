@@ -20,9 +20,6 @@ import me.chanjar.weixin.common.api.WxConsts;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class MpMessageDO extends BaseDO {
 
     /**
