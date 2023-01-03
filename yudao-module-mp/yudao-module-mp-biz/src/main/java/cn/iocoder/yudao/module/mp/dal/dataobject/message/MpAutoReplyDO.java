@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.mp.dal.dataobject.message;
 
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.enums.message.MpAutoReplyMatchEnum;
@@ -13,6 +14,8 @@ import lombok.ToString;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
 
+import java.util.Set;
+
 /**
  * 微信消息自动回复 DO
  *
@@ -24,6 +27,10 @@ import me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class MpAutoReplyDO extends BaseDO {
+
+    public static Set<String> REQUEST_MESSAGE_TYPE = SetUtils.asSet(WxConsts.XmlMsgType.TEXT, WxConsts.XmlMsgType.IMAGE,
+            WxConsts.XmlMsgType.VOICE, WxConsts.XmlMsgType.VIDEO, WxConsts.XmlMsgType.SHORTVIDEO,
+            WxConsts.XmlMsgType.LOCATION, WxConsts.XmlMsgType.LINK);
 
     /**
      * 主键
@@ -72,7 +79,7 @@ public class MpAutoReplyDO extends BaseDO {
      *
      * 当 {@link #type} 为 {@link MpAutoReplyTypeEnum#MESSAGE}
      *
-     * 枚举 {@link XmlMsgType} 中的 TEXT、IMAGE、VOICE、VIDEO、SHORTVIDEO、LOCATION、LINK
+     * 枚举 {@link XmlMsgType} 中的 {@link #REQUEST_MESSAGE_TYPE}
      */
     private String requestMessageType;
 

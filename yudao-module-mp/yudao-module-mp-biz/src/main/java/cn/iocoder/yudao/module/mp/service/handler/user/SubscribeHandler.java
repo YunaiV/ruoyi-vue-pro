@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.mp.service.handler.user;
 
-import cn.iocoder.yudao.module.mp.builder.TextBuilder;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import cn.iocoder.yudao.module.mp.framework.mp.core.context.MpContextHolder;
 import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
@@ -56,7 +55,8 @@ public class SubscribeHandler implements WxMpMessageHandler {
         }
 
         // 第三步，回复关注的欢迎语  TODO 芋艿：关注的欢迎语
-        return new TextBuilder().build("感谢关注", wxMessage, weixinService);
+//        return new TextBuilder().build("感谢关注", wxMessage, weixinService);
+        return null;
     }
 
     /**

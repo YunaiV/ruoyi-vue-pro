@@ -27,6 +27,7 @@ public interface MpMessageConvert {
 
     @Mappings(value = {
             @Mapping(source = "msgType", target = "type"),
+            @Mapping(target = "createTime", ignore = true),
     })
     MpMessageDO convert(WxMpXmlMessage wxMessage);
 
