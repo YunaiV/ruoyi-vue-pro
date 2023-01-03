@@ -38,7 +38,7 @@
 | [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) | 国际化 | 9.2.2  |
 | [vue-router](https://router.vuejs.org/) | vue 路由 | 4.1.6  |
 | [windicss](https://cn.windicss.org/) | 下一代工具优先的 CSS 框架 | 3.5.6  |
-| [iconify](https://icon-sets.iconify.design/) | 在线图标库 | 3.0.0  |
+| [iconify](https://icon-sets.iconify.design/) | 在线图标库 | 3.0.1  |
 | [wangeditor](https://www.wangeditor.com/) | 富文本编辑器 | 5.1.23 |
 
 ### 推荐 VScode 开发，插件如下
