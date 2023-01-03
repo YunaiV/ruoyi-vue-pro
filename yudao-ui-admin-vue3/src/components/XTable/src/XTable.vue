@@ -118,45 +118,64 @@ const getColumnsConfig = (options: XTableProps) => {
 
 // 动态请求
 const getProxyConfig = (options: XTableProps) => {
-  const { getListApi, proxyConfig, data } = options
+  const { getListApi, proxyConfig, data, isList } = options
   if (proxyConfig || data) return
-  if (getListApi && isFunction(getListApi)) {
-    options.proxyConfig = {
-      seq: true, // 启用动态序号代理（分页之后索引自动计算为当前页的起始序号）
-      form: proxyForm, // 启用表单代理，当点击表单提交按钮时会自动触发 reload 行为
-      props: { result: 'list', total: 'total' },
-      ajax: {
-        query: async ({ page, form }) => {
-          let queryParams: any = Object.assign({}, JSON.parse(JSON.stringify(form)))
-          if (options.params) {
-            queryParams = Object.assign(queryParams, options.params)
-          }
-          if (!options?.treeConfig) {
-            queryParams.pageSize = page.pageSize
-            queryParams.pageNo = page.currentPage
-          }
-          return new Promise(async (resolve) => {
-            resolve(await getListApi(queryParams))
-          })
-        },
-        delete: ({ body }) => {
-          return new Promise(async (resolve) => {
-            if (options.deleteApi) {
-              resolve(await options.deleteApi(JSON.stringify(body)))
-            } else {
-              Promise.reject('未设置deleteApi')
+  if (getListApi && isFunction(getListApi) && !isList) {
+    if (!isList) {
+      options.proxyConfig = {
+        seq: true, // 启用动态序号代理（分页之后索引自动计算为当前页的起始序号）
+        form: proxyForm, // 启用表单代理，当点击表单提交按钮时会自动触发 reload 行为
+        props: { result: 'list', total: 'total' },
+        ajax: {
+          query: async ({ page, form }) => {
+            let queryParams: any = Object.assign({}, JSON.parse(JSON.stringify(form)))
+            if (options.params) {
+              queryParams = Object.assign(queryParams, options.params)
             }
-          })
-        },
-        queryAll: ({ form }) => {
-          const queryParams = Object.assign({}, JSON.parse(JSON.stringify(form)))
-          return new Promise(async (resolve) => {
-            if (options.getAllListApi) {
-              resolve(await options.getAllListApi(queryParams))
-            } else {
+            if (!options?.treeConfig) {
+              queryParams.pageSize = page.pageSize
+              queryParams.pageNo = page.currentPage
+            }
+            return new Promise(async (resolve) => {
               resolve(await getListApi(queryParams))
+            })
+          },
+          delete: ({ body }) => {
+            return new Promise(async (resolve) => {
+              if (options.deleteApi) {
+                resolve(await options.deleteApi(JSON.stringify(body)))
+              } else {
+                Promise.reject('未设置deleteApi')
+              }
+            })
+          },
+          queryAll: ({ form }) => {
+            const queryParams = Object.assign({}, JSON.parse(JSON.stringify(form)))
+            return new Promise(async (resolve) => {
+              if (options.getAllListApi) {
+                resolve(await options.getAllListApi(queryParams))
+              } else {
+                resolve(await getListApi(queryParams))
+              }
+            })
+          }
+        }
+      }
+    } else {
+      options.proxyConfig = {
+        seq: true, // 启用动态序号代理（分页之后索引自动计算为当前页的起始序号）
+        form: true, // 启用表单代理，当点击表单提交按钮时会自动触发 reload 行为
+        props: { result: 'data' },
+        ajax: {
+          query: ({ form }) => {
+            let queryParams: any = Object.assign({}, JSON.parse(JSON.stringify(form)))
+            if (options?.params) {
+              queryParams = Object.assign(queryParams, options.params)
             }
-          })
+            return new Promise(async (resolve) => {
+              resolve(await getListApi(queryParams))
+            })
+          }
         }
       }
     }
@@ -232,14 +251,14 @@ const getPageConfig = (options: XTableProps) => {
 
 // tool bar
 const getToolBarConfig = (options: XTableProps) => {
-  const { toolBar, toolbarConfig } = options
+  const { toolBar, toolbarConfig, topActionSlots } = options
   if (toolbarConfig) return
   if (toolBar) {
     if (!isBoolean(toolBar)) {
       options.toolbarConfig = toolBar
       return
     }
-  } else {
+  } else if (!topActionSlots) {
     options.toolbarConfig = {
       slots: { buttons: 'toolbar_buttons' }
     }

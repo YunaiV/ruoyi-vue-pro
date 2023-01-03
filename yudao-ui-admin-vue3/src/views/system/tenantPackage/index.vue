@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <XButton
           type="primary"
@@ -14,7 +14,7 @@
         <XTextButton preIcon="ep:edit" :title="t('action.edit')" @click="handleUpdate(row.id)" />
         <XTextButton preIcon="ep:delete" :title="t('action.del')" @click="handleDelete(row.id)" />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
@@ -69,8 +69,7 @@ import { onMounted, ref, unref } from 'vue'
 import { handleTree, defaultProps } from '@/utils/tree'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 import { FormExpose } from '@/components/Form'
 import { ElCard, ElSwitch, ElTree } from 'element-plus'
 // 业务相关的 import
@@ -86,7 +85,6 @@ const menuExpand = ref(false)
 const menuNodeAll = ref(false)
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const treeNodeAll = ref(false)
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
 const formRef = ref<FormExpose>() // 表单 Ref
 const loading = ref(false) // 遮罩层
 const actionType = ref('') // 操作按钮的类型
@@ -102,7 +100,7 @@ const getTree = async () => {
   menuOptions.value = handleTree(res)
 }
 
-const { gridOptions, getList, deleteData } = useVxeGrid<TenantPackageApi.TenantPackageVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   getListApi: TenantPackageApi.getTenantPackageTypePageApi,
   deleteApi: TenantPackageApi.deleteTenantPackageTypeApi
@@ -136,7 +134,7 @@ const handleUpdate = async (rowId: number) => {
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
+  await deleteData(rowId)
 }
 
 // 提交按钮
@@ -162,7 +160,7 @@ const submitForm = async () => {
       } finally {
         loading.value = false
         // 刷新列表
-        await getList(xGrid)
+        await reload()
       }
     }
   })

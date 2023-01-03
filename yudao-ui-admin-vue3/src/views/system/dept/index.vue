@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" show-overflow class="xtable-scrollbar">
+    <XTable @register="registerTable" show-overflow>
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -33,7 +33,7 @@
           @click="handleDelete(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <!-- 添加或修改菜单对话框 -->
   <XModal id="deptModel" v-model="dialogVisible" :title="dialogTitle">
@@ -81,7 +81,7 @@ import { VxeGridInstance } from 'vxe-table'
 import { handleTree, defaultProps } from '@/utils/tree'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { useXTable } from '@/hooks/web/useXTable'
 import { FormExpose } from '@/components/Form'
 import { allSchemas, rules } from './dept.data'
 import * as DeptApi from '@/api/system/dept'
@@ -119,7 +119,7 @@ const getTree = async () => {
   dept.children = handleTree(res)
   deptOptions.value.push(dept)
 }
-const { gridOptions, getList, deleteData } = useVxeGrid<DeptApi.DeptVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   treeConfig: treeConfig,
   getListApi: DeptApi.getDeptPageApi,
@@ -168,7 +168,7 @@ const submitForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
-        await getList(xGrid)
+        await reload()
       }
     }
   })
@@ -176,7 +176,7 @@ const submitForm = async () => {
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
+  await deleteData(rowId)
 }
 
 const userNicknameFormat = (row) => {

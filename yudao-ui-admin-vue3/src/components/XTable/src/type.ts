@@ -6,6 +6,7 @@ export type XTableProps<D = any> = VxeGridProps<D> & {
   height?: number // 高度 默认730
   topActionSlots?: boolean // 是否开启表格内顶部操作栏插槽
   treeConfig?: VxeTablePropTypes.TreeConfig // 树形表单配置
+  isList?: boolean // 是否不带分页的list
   getListApi?: Function
   getAllListApi?: Function
   deleteApi?: Function
