@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.mp.framework.mp.config;
 import cn.iocoder.yudao.module.mp.framework.mp.core.DefaultMpServiceFactory;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import cn.iocoder.yudao.module.mp.service.handler.menu.MenuHandler;
-import cn.iocoder.yudao.module.mp.service.handler.message.MessageLogHandler;
+import cn.iocoder.yudao.module.mp.service.handler.message.MessageReceiveHandler;
 import cn.iocoder.yudao.module.mp.service.handler.message.MessageAutoReplyHandler;
 import cn.iocoder.yudao.module.mp.service.handler.other.KfSessionHandler;
 import cn.iocoder.yudao.module.mp.service.handler.other.NullHandler;
@@ -36,7 +36,7 @@ public class MpConfiguration {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public MpServiceFactory mpServiceFactory(RedisTemplateWxRedisOps redisTemplateWxRedisOps,
                                              WxMpProperties wxMpProperties,
-                                             MessageLogHandler logHandler,
+                                             MessageReceiveHandler logHandler,
                                              KfSessionHandler kfSessionHandler,
                                              StoreCheckNotifyHandler storeCheckNotifyHandler,
                                              MenuHandler menuHandler,

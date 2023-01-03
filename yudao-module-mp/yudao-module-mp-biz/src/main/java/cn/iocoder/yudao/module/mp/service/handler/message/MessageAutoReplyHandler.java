@@ -52,91 +52,91 @@ public class MessageAutoReplyHandler implements WxMpMessageHandler {
         log.info("收到信息内容:｛｝", JsonUtils.toJsonString(wxMessage));
         log.info("关键字:｛｝", wxMessage.getContent());
 
-        if (!wxMessage.getMsgType().equals(WxConsts.XmlMsgType.EVENT)) {
-            //可以选择将消息保存到本地
-
-            // 获取微信用户基本信息
-            try {
-                WxMpUser wxmpUser = weixinService.getUserService()
-                        .userInfo(wxMessage.getFromUser(), null);
-                if (wxmpUser != null) {
-                    MpAccountDO wxAccount = mpAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
-                    if (wxAccount != null) {
-
-                        if (wxMessage.getMsgType().equals(WxConsts.XmlMsgType.TEXT)) {
-                            WxFansMsgCreateReqVO wxFansMsg = new WxFansMsgCreateReqVO();
-                            wxFansMsg.setOpenid(wxmpUser.getOpenId());
-                            try {
-                                wxFansMsg.setNickname(wxmpUser.getNickname().getBytes("UTF-8"));
-                            } catch (UnsupportedEncodingException e) {
-                                e.printStackTrace();
-                            }
-                            wxFansMsg.setHeadimgUrl(wxmpUser.getHeadImgUrl());
-                            wxFansMsg.setWxAccountId(String.valueOf(wxAccount.getId()));
-                            wxFansMsg.setMsgType(wxMessage.getMsgType());
-                            wxFansMsg.setContent(wxMessage.getContent());
-                            wxFansMsg.setIsRes("1");
-
-                            //组装回复消息
-                            String content = processContent(wxMessage);
-                            content = HtmlUtil.escape(content);
-                            wxFansMsg.setResContent(content);
-
-                            mpMessageService.createWxFansMsg(wxFansMsg);
-                            return new TextBuilder().build(content, wxMessage, weixinService);
-
-                        }
-                        if (wxMessage.getMsgType().equals(WxConsts.XmlMsgType.IMAGE)) {
-                            WxFansMsgCreateReqVO wxFansMsg = new WxFansMsgCreateReqVO();
-                            wxFansMsg.setOpenid(wxmpUser.getOpenId());
-                            try {
-                                wxFansMsg.setNickname(wxmpUser.getNickname().getBytes("UTF-8"));
-                            } catch (UnsupportedEncodingException e) {
-                                e.printStackTrace();
-                            }
-                            wxFansMsg.setHeadimgUrl(wxmpUser.getHeadImgUrl());
-                            wxFansMsg.setWxAccountId(String.valueOf(wxAccount.getId()));
-                            wxFansMsg.setMsgType(wxMessage.getMsgType());
-                            wxFansMsg.setMediaId(wxMessage.getMediaId());
-                            wxFansMsg.setPicUrl(wxMessage.getPicUrl());
-                            String downloadDirStr = fileApi.createFile(HttpUtil.downloadBytes(wxMessage.getPicUrl()));
-                            File downloadDir = new File(downloadDirStr);
-                            if (!downloadDir.exists()) {
-                                downloadDir.mkdirs();
-                            }
-                            String filepath = downloadDirStr + System.currentTimeMillis() + ".png";
-                            //微信pic url下载到本地，防止失效
-                            long size = HttpUtil.downloadFile(wxMessage.getPicUrl(), FileUtil.file(filepath));
-                            log.info("download pic size : {}", size);
-                            wxFansMsg.setPicPath(filepath);
-                            wxFansMsg.setIsRes("0");
-                            mpMessageService.createWxFansMsg(wxFansMsg);
-                        }
-
-                    }
-                }
-            } catch (WxErrorException e) {
-                if (e.getError().getErrorCode() == 48001) {
-                    log.info("该公众号没有获取用户信息权限！");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        //当用户输入关键词如“你好”，“客服”等，并且有客服在线时，把消息转发给在线客服
-        try {
-            if (StringUtils.startsWithAny(wxMessage.getContent(), "你好", "客服")
-                    && weixinService.getKefuService().kfOnlineList()
-                    .getKfOnlineList().size() > 0) {
-                return WxMpXmlOutMessage.TRANSFER_CUSTOMER_SERVICE()
-                        .fromUser(wxMessage.getToUser())
-                        .toUser(wxMessage.getFromUser()).build();
-            }
-        } catch (WxErrorException e) {
-            e.printStackTrace();
-        }
+//        if (!wxMessage.getMsgType().equals(WxConsts.XmlMsgType.EVENT)) {
+//            //可以选择将消息保存到本地
+//
+//            // 获取微信用户基本信息
+//            try {
+//                WxMpUser wxmpUser = weixinService.getUserService()
+//                        .userInfo(wxMessage.getFromUser(), null);
+//                if (wxmpUser != null) {
+//                    MpAccountDO wxAccount = mpAccountService.findBy(MpAccountDO::getAccount, wxMessage.getToUser());
+//                    if (wxAccount != null) {
+//
+//                        if (wxMessage.getMsgType().equals(WxConsts.XmlMsgType.TEXT)) {
+//                            WxFansMsgCreateReqVO wxFansMsg = new WxFansMsgCreateReqVO();
+//                            wxFansMsg.setOpenid(wxmpUser.getOpenId());
+//                            try {
+//                                wxFansMsg.setNickname(wxmpUser.getNickname().getBytes("UTF-8"));
+//                            } catch (UnsupportedEncodingException e) {
+//                                e.printStackTrace();
+//                            }
+//                            wxFansMsg.setHeadimgUrl(wxmpUser.getHeadImgUrl());
+//                            wxFansMsg.setWxAccountId(String.valueOf(wxAccount.getId()));
+//                            wxFansMsg.setMsgType(wxMessage.getMsgType());
+//                            wxFansMsg.setContent(wxMessage.getContent());
+//                            wxFansMsg.setIsRes("1");
+//
+//                            //组装回复消息
+//                            String content = processContent(wxMessage);
+//                            content = HtmlUtil.escape(content);
+//                            wxFansMsg.setResContent(content);
+//
+//                            mpMessageService.createWxFansMsg(wxFansMsg);
+//                            return new TextBuilder().build(content, wxMessage, weixinService);
+//
+//                        }
+//                        if (wxMessage.getMsgType().equals(WxConsts.XmlMsgType.IMAGE)) {
+//                            WxFansMsgCreateReqVO wxFansMsg = new WxFansMsgCreateReqVO();
+//                            wxFansMsg.setOpenid(wxmpUser.getOpenId());
+//                            try {
+//                                wxFansMsg.setNickname(wxmpUser.getNickname().getBytes("UTF-8"));
+//                            } catch (UnsupportedEncodingException e) {
+//                                e.printStackTrace();
+//                            }
+//                            wxFansMsg.setHeadimgUrl(wxmpUser.getHeadImgUrl());
+//                            wxFansMsg.setWxAccountId(String.valueOf(wxAccount.getId()));
+//                            wxFansMsg.setMsgType(wxMessage.getMsgType());
+//                            wxFansMsg.setMediaId(wxMessage.getMediaId());
+//                            wxFansMsg.setPicUrl(wxMessage.getPicUrl());
+//                            String downloadDirStr = fileApi.createFile(HttpUtil.downloadBytes(wxMessage.getPicUrl()));
+//                            File downloadDir = new File(downloadDirStr);
+//                            if (!downloadDir.exists()) {
+//                                downloadDir.mkdirs();
+//                            }
+//                            String filepath = downloadDirStr + System.currentTimeMillis() + ".png";
+//                            //微信pic url下载到本地，防止失效
+//                            long size = HttpUtil.downloadFile(wxMessage.getPicUrl(), FileUtil.file(filepath));
+//                            log.info("download pic size : {}", size);
+//                            wxFansMsg.setPicPath(filepath);
+//                            wxFansMsg.setIsRes("0");
+//                            mpMessageService.createWxFansMsg(wxFansMsg);
+//                        }
+//
+//                    }
+//                }
+//            } catch (WxErrorException e) {
+//                if (e.getError().getErrorCode() == 48001) {
+//                    log.info("该公众号没有获取用户信息权限！");
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//        }
+//
+//        //当用户输入关键词如“你好”，“客服”等，并且有客服在线时，把消息转发给在线客服
+//        try {
+//            if (StringUtils.startsWithAny(wxMessage.getContent(), "你好", "客服")
+//                    && weixinService.getKefuService().kfOnlineList()
+//                    .getKfOnlineList().size() > 0) {
+//                return WxMpXmlOutMessage.TRANSFER_CUSTOMER_SERVICE()
+//                        .fromUser(wxMessage.getToUser())
+//                        .toUser(wxMessage.getFromUser()).build();
+//            }
+//        } catch (WxErrorException e) {
+//            e.printStackTrace();
+//        }
 
         //组装默认回复消息
         return new TextBuilder().build("测试", wxMessage, weixinService);

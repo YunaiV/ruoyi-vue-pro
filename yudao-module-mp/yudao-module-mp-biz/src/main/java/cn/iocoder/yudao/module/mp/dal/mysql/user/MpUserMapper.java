@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.dal.mysql.accountfans;
+package cn.iocoder.yudao.module.mp.dal.mysql.user;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;

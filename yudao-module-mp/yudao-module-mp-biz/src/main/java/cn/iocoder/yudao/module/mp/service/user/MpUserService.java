@@ -24,6 +24,15 @@ public interface MpUserService {
     MpUserDO getUser(Long id);
 
     /**
+     * 使用 appId + openId，获得微信公众号粉丝
+     *
+     * @param appId 微信公众号 appId
+     * @param openId 微信公众号 openId
+     * @return 微信公众号粉丝
+     */
+    MpUserDO getUser(String appId, String openId);
+
+    /**
      * 获得微信公众号粉丝列表
      *
      * @param ids 编号

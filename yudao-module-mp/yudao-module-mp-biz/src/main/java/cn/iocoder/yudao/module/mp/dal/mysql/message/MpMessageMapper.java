@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.dal.mysql.fansmsg;
+package cn.iocoder.yudao.module.mp.dal.mysql.message;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -13,7 +13,7 @@ public interface MpMessageMapper extends BaseMapperX<MpMessageDO> {
     default PageResult<MpMessageDO> selectPage(MpMessagePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<MpMessageDO>()
                 .eqIfPresent(MpMessageDO::getAccountId, reqVO.getAccountId())
-                .eqIfPresent(MpMessageDO::getOpenId, reqVO.getOpenId())
+                .eqIfPresent(MpMessageDO::getOpenid, reqVO.getOpenId())
 //                .likeIfPresent(MpMessageDO::getNickname, reqVO.getNickname())
                 .eqIfPresent(MpMessageDO::getType, reqVO.getType())
                 .orderByDesc(MpMessageDO::getId));

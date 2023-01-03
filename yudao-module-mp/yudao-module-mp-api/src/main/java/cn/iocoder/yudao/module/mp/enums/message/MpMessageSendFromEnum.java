@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum MpMessageSendFrom {
+public enum MpMessageSendFromEnum {
 
     USER_TO_MP(1, "用户发送给公众号"),
     MP_TO_USER(2, "公众号发给用户"),

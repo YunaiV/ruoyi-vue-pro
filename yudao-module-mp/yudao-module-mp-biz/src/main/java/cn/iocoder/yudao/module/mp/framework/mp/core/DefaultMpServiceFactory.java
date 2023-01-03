@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.mp.framework.mp.core;
 
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.service.handler.menu.MenuHandler;
-import cn.iocoder.yudao.module.mp.service.handler.message.MessageLogHandler;
+import cn.iocoder.yudao.module.mp.service.handler.message.MessageReceiveHandler;
 import cn.iocoder.yudao.module.mp.service.handler.message.MessageAutoReplyHandler;
 import cn.iocoder.yudao.module.mp.service.handler.other.KfSessionHandler;
 import cn.iocoder.yudao.module.mp.service.handler.other.NullHandler;
@@ -49,7 +49,7 @@ public class DefaultMpServiceFactory implements MpServiceFactory {
 
     // ========== 各种 Handler ==========
 
-    private final MessageLogHandler logHandler;
+    private final MessageReceiveHandler logHandler;
     private final KfSessionHandler kfSessionHandler;
     private final StoreCheckNotifyHandler storeCheckNotifyHandler;
     private final MenuHandler menuHandler;

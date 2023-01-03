@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserPageReqVO;
 import cn.iocoder.yudao.module.mp.convert.user.MpUserConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
-import cn.iocoder.yudao.module.mp.dal.mysql.accountfans.MpUserMapper;
+import cn.iocoder.yudao.module.mp.dal.mysql.user.MpUserMapper;
 import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
@@ -39,6 +39,11 @@ public class MpUserServiceImpl implements MpUserService {
     @Override
     public MpUserDO getUser(Long id) {
         return mpUserMapper.selectById(id);
+    }
+
+    @Override
+    public MpUserDO getUser(String appId, String openId) {
+        return mpUserMapper.selectByAppIdAndOpenid(appId, openId);
     }
 
     @Override
