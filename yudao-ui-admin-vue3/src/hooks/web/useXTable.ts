@@ -4,6 +4,8 @@ import { XTableProps } from '@/components/XTable/src/type'
 export interface tableMethod {
   reload: () => void
   setProps: (props: XTableProps) => void
+  deleteData: (ids: string | number) => void
+  exportList: (fileName?: string) => void
 }
 
 export function useXTable(props: XTableProps): [Function, tableMethod] {
@@ -22,7 +24,9 @@ export function useXTable(props: XTableProps): [Function, tableMethod] {
   }
   const methods: tableMethod = {
     reload: () => getInstance().reload(),
-    setProps: (props) => getInstance().setProps(props)
+    setProps: (props) => getInstance().setProps(props),
+    deleteData: (ids: string | number) => getInstance().deleteData(ids),
+    exportList: (fileName?: string) => getInstance().exportList(fileName)
   }
   return [register, methods]
 }
