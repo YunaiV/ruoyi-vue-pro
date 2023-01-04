@@ -142,7 +142,11 @@ const submitForm = async () => {
       // 提交请求
       try {
         const data = unref(formRef)?.formModel as TenantPackageApi.TenantPackageVO
-        data.menuIds = treeRef.value!.getCheckedKeys(false) as number[]
+        data.menuIds = [
+          ...(treeRef.value!.getCheckedKeys(false) as unknown as Array<number>),
+          ...(treeRef.value!.getHalfCheckedKeys() as unknown as Array<number>)
+        ]
+        console.info(data.menuIds)
         if (actionType.value === 'create') {
           await TenantPackageApi.createTenantPackageTypeApi(data)
           message.success(t('common.createSuccess'))
