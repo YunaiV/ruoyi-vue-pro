@@ -6,18 +6,21 @@ import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.enums.message.MpAutoReplyMatchEnum;
 import cn.iocoder.yudao.module.mp.enums.message.MpAutoReplyTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
 
+import java.util.List;
 import java.util.Set;
 
 /**
- * 微信消息自动回复 DO
+ * 公众号消息自动回复 DO
  *
  * @author 芋道源码
  */
@@ -99,4 +102,35 @@ public class MpAutoReplyDO extends BaseDO {
      */
     private String responseContent;
 
+    /**
+     * 回复的媒体 id
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 IMAGE、VOICE、VIDEO
+     */
+    private String responseMediaId;
+    /**
+     * 回复的媒体 URL
+     */
+    private String responseMediaUrl;
+
+    /**
+     * 回复的标题
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO
+     */
+    private String responseTitle;
+    /**
+     * 回复的描述
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO
+     */
+    private String responseDescription;
+
+    /**
+     * 回复的图文消息
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private MpMessageDO.Article responseArticle;
 }

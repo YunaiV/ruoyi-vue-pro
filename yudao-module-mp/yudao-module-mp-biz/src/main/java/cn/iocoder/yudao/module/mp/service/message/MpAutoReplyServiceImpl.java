@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.mp.service.message;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.module.mp.builder.TextBuilder;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpAutoReplyDO;
 import cn.iocoder.yudao.module.mp.dal.mysql.message.MpAutoReplyMapper;
 import cn.iocoder.yudao.module.mp.enums.message.MpAutoReplyMatchEnum;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -17,18 +19,21 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@Resource
+@Service
 @Validated
 public class MpAutoReplyServiceImpl implements MpAutoReplyService {
 
     @Resource
-    private MpAutoReplyService mpAutoReplyService;
+    private MpMessageService mpMessageService;
 
     @Resource
     private MpAutoReplyMapper mpAutoReplyMapper;
 
     @Override
     public WxMpXmlOutMessage replyForMessage(String appId, WxMpXmlMessage wxMessage) {
+//        if (true) {
+//            return new TextBuilder().build("nihao", wxMessage, null);
+//        }
         // 第一步，匹配自动回复
         List<MpAutoReplyDO> replies = null;
         // 1.1 关键字
@@ -47,12 +52,10 @@ public class MpAutoReplyServiceImpl implements MpAutoReplyService {
         if (CollUtil.isEmpty(replies)) {
             return null;
         }
+        MpAutoReplyDO reply = CollUtil.getFirst(replies);
 
         // 第二步，基于自动回复，创建消息
-
-
-        // 第三步，将消息转换成 WxMpXmlOutMessage 返回
-        return null;
+        return mpMessageService.createFromAutoReply(wxMessage.getFromUser(), reply);
     }
 
 }

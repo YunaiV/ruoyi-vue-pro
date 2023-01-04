@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 微信消息自动回复的匹配模式
+ * 公众号消息自动回复的匹配模式
  *
  * @author 芋道源码
  */

@@ -1,17 +1,23 @@
 package cn.iocoder.yudao.module.mp.dal.dataobject.message;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import cn.iocoder.yudao.module.mp.enums.message.MpMessageSendFromEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import lombok.*;
 import me.chanjar.weixin.common.api.WxConsts;
 
+import java.io.Serializable;
+import java.util.List;
+
 /**
- * 微信消息 DO
+ * 公众号消息 DO
  *
  * @author 芋道源码
  */
@@ -160,6 +166,14 @@ public class MpMessageDO extends BaseDO {
      */
     private String label;
 
+    /**
+     * 图文消息数组
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
+     */
+    @TableField(typeHandler = ArticleTypeHandler.class)
+    private List<Article> articles;
+
     // ========= 事件推送 https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_event_pushes.html
 
     /**
@@ -176,4 +190,45 @@ public class MpMessageDO extends BaseDO {
      */
     private String eventKey;
 
+    /**
+     * 文章
+     */
+    @Data
+    public static class Article implements Serializable {
+
+        /**
+         * 图文消息标题
+         */
+        private String title;
+        /**
+         * 图文消息描述
+         */
+        private String description;
+        /**
+         * 图片链接
+         *
+         * 支持JPG、PNG格式，较好的效果为大图 360*200，小图 200*200
+         */
+        private String picUrl;
+        /**
+         * 点击图文消息跳转链接
+         */
+        private String url;
+
+    }
+
+    // TODO @芋艿：可以找一些新的思路
+    public static class ArticleTypeHandler extends AbstractJsonTypeHandler<List<Article>> {
+
+        @Override
+        protected List<Article> parse(String json) {
+            return JsonUtils.parseArray(json, Article.class);
+        }
+
+        @Override
+        protected String toJson(List<Article> obj) {
+            return JsonUtils.toJsonString(obj);
+        }
+
+    }
 }

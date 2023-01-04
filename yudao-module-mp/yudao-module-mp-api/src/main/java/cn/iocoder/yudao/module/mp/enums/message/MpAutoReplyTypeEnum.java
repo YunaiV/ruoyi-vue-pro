@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 微信消息自动回复的类型
+ * 公众号消息自动回复的类型
  *
  * @author 芋道源码
  */
@@ -14,7 +14,7 @@ public enum MpAutoReplyTypeEnum {
 
     SUBSCRIBE(1, "关注时回复"),
     MESSAGE(2, "收到消息回复"),
-    KEYWORD(2, "关键词回复"),
+    KEYWORD(3, "关键词回复"),
     ;
 
     /**

@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.mp.convert.message.MpMessageConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpAutoReplyDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import cn.iocoder.yudao.module.mp.enums.message.MpMessageSendFromEnum;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
+import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +76,7 @@ public class MpMessageServiceImpl implements MpMessageService {
         MpAccountDO account = mpAccountService.getAccountFromCache(appId);
         Assert.notNull(account, "公众号账号({}) 不存在", appId);
         MpUserDO user = mpUserService.getUser(appId, wxMessage.getFromUser());
-        Assert.notNull(account, "公众号粉丝({}/{}) 不存在", appId, wxMessage.getFromUser());
+        Assert.notNull(user, "公众号粉丝({}/{}) 不存在", appId, wxMessage.getFromUser());
 
         // 记录消息
         MpMessageDO message = MpMessageConvert.INSTANCE.convert(wxMessage, account, user);
@@ -92,6 +94,23 @@ public class MpMessageServiceImpl implements MpMessageService {
 
 //        WxConsts.MenuButtonType.CLICK
 //          wxMessage.getEventKey()
+    }
+
+    @Override
+    public WxMpXmlOutMessage createFromAutoReply(String openid, MpAutoReplyDO reply) {
+        // 获得关联信息
+        MpAccountDO account = mpAccountService.getAccountFromCache(reply.getAppId());
+        Assert.notNull(account, "公众号账号({}) 不存在", reply.getAppId());
+        MpUserDO user = mpUserService.getUser(reply.getAppId(), openid);
+        Assert.notNull(user, "公众号粉丝({}/{}) 不存在", reply.getAppId(), openid);
+
+        // 记录消息
+        MpMessageDO message = MpMessageConvert.INSTANCE.convert(reply, account, user);
+        message.setSendFrom(MpMessageSendFromEnum.MP_TO_USER.getFrom());
+        mpMessageMapper.insert(message);
+
+        // 转换返回 WxMpXmlOutMessage 对象
+        return MpMessageConvert.INSTANCE.convert02(message, account);
     }
 
     /**
