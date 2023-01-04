@@ -24,7 +24,7 @@
         <!-- DB 相关 -->
         <druid.version>1.2.15</druid.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
-        <mybatis-plus-generator.version>3.5.3</mybatis-plus-generator.version>
+        <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.6.0</dynamic-datasource.version>
         <redisson.version>3.18.0</redisson.version>
         <!-- 服务保障相关 -->
@@ -56,6 +56,7 @@
         <tika-core.version>2.6.0</tika-core.version>
         <aj-captcha.version>1.3.0</aj-captcha.version>
         <netty-all.version>4.1.85.Final</netty-all.version>
+        <ip2region.version>2.6.6</ip2region.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.0.0</okio.version>
         <okhttp3.version>4.10.0</okhttp3.version>
@@ -128,6 +129,11 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-error-code</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-biz-ip</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -501,6 +507,12 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty-all.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>${ip2region.version}</version>
             </dependency>
 
             <!-- 三方云服务相关 -->

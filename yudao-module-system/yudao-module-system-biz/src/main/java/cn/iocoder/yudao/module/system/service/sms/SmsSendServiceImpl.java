@@ -113,7 +113,7 @@ public class SmsSendServiceImpl implements SmsSendService {
         SmsChannelDO channelDO = smsChannelService.getSmsChannel(channelId);
         // 短信模板不存在
         if (channelDO == null) {
-            throw exception(SMS_SEND_TEMPLATE_NOT_EXISTS);
+            throw exception(SMS_CHANNEL_NOT_EXISTS);
         }
         return channelDO;
     }

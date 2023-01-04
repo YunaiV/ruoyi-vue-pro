@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -91,30 +90,39 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
-    public void validateCategoryLevel(Long id) {
-        // TODO @芋艿：在看看，杂能优化下
-        Long parentId = id;
-        int i = 2;
-        for (; i >= 0; --i) {
-            ProductCategoryDO category = productCategoryMapper.selectById(parentId);
-            parentId = category.getParentId();
-            if(Objects.equals(parentId, ProductCategoryDO.PARENT_ID_NULL)){
-                break;
-            }
-        }
-        if (!Objects.equals(parentId, ProductCategoryDO.PARENT_ID_NULL) || i != 0) {
-            throw exception(CATEGORY_LEVEL_ERROR);
-        }
-    }
-
-    @Override
     public ProductCategoryDO getCategory(Long id) {
         return productCategoryMapper.selectById(id);
     }
 
     @Override
-    public List<ProductCategoryDO> getEnableCategoryList(Collection<Long> ids) {
-        return productCategoryMapper.selectBatchIds(ids);
+    public void validateCategory(Long id) {
+        ProductCategoryDO category = productCategoryMapper.selectById(id);
+        if (category == null) {
+            throw exception(CATEGORY_NOT_EXISTS);
+        }
+        if (Objects.equals(category.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+            throw exception(CATEGORY_DISABLED, category.getName());
+        }
+    }
+
+    @Override
+    public Integer getCategoryLevel(Long id) {
+        if (Objects.equals(id, ProductCategoryDO.PARENT_ID_NULL)) {
+            return 0;
+        }
+        int level = 1;
+        for (int i = 0; i < 100; i++) {
+            ProductCategoryDO category = productCategoryMapper.selectById(id);
+            // 如果没有父节点，break 结束
+            if (category == null
+                    || Objects.equals(category.getParentId(), ProductCategoryDO.PARENT_ID_NULL)) {
+                break;
+            }
+            // 继续递归父节点
+            level++;
+            id = category.getParentId();
+        }
+        return level;
     }
 
     @Override

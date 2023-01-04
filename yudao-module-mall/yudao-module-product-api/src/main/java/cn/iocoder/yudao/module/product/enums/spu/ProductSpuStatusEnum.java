@@ -35,4 +35,14 @@ public enum ProductSpuStatusEnum implements IntArrayValuable {
         return ARRAYS;
     }
 
+    /**
+     * 判断是否处于【上架】状态
+     *
+     * @param status 状态
+     * @return 是否处于【上架】状态
+     */
+    public static boolean isEnable(Integer status) {
+        return ENABLE.getStatus().equals(status);
+    }
+
 }

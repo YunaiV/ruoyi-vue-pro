@@ -21,7 +21,7 @@ public class ProductSkuRespVO extends ProductSkuBaseVO {
     private LocalDateTime createTime;
 
     /**
-     * 规格值数组
+     * 属性数组
      */
     private List<Property> properties;
 

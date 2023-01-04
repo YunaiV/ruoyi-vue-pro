@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.product.controller.admin.property.vo.value;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import javax.validation.constraints.*;
 
-@Schema(description = "管理后台 - 规格值更新 Request VO")
+@Schema(description = "管理后台 - 商品属性值更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

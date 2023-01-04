@@ -27,7 +27,7 @@ public class AppProductSkuBaseRespVO {
     private Integer stock;
 
     /**
-     * 规格数组
+     * 属性数组
      */
     private List<AppProductPropertyValueDetailRespVO> properties;
 

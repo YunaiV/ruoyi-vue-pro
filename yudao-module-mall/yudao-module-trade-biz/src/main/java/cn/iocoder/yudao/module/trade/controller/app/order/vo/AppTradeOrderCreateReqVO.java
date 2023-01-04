@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -30,6 +31,7 @@ public class AppTradeOrderCreateReqVO {
      * 订单商品项列表
      */
     @NotEmpty(message = "必须选择购买的商品")
+    @Valid
     private List<Item> items;
 
     @Schema(description = "订单商品项")

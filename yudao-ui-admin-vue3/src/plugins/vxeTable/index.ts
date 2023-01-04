@@ -1,9 +1,7 @@
-import { App, unref, watch } from 'vue'
+import { App, unref } from 'vue'
 import XEUtils from 'xe-utils'
-import './index.scss'
 import './renderer'
 import { i18n } from '@/plugins/vueI18n'
-import { useAppStore } from '@/store/modules/app'
 import zhCN from 'vxe-table/lib/locale/lang/zh-CN'
 import enUS from 'vxe-table/lib/locale/lang/en-US'
 import {
@@ -46,18 +44,6 @@ import {
   Table
 } from 'vxe-table'
 
-const appStore = useAppStore()
-watch(
-  () => appStore.getIsDark,
-  () => {
-    if (appStore.getIsDark) {
-      import('./theme/dark.scss')
-    } else {
-      import('./theme/light.scss')
-    }
-  },
-  { deep: true }
-)
 // 全局默认参数
 VXETable.setup({
   size: 'medium', // 全局尺寸

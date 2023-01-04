@@ -21,6 +21,7 @@
             :holdKeyboard="holdKeyboard"
             :maxlength="maxlength"
             :confirmType="confirmType"
+            :ignoreCompositionEvent="ignoreCompositionEvent"
             @focus="onFocus"
             @blur="onBlur"
             @linechange="onLinechange"
@@ -68,6 +69,7 @@ import props from "./props.js";
  * @property {Boolean}				holdKeyboard			focus时，点击页面的时候不收起键盘，只微信小程序有效（默认 false ）
  * @property {String | Number}		maxlength				最大输入长度，设置为 -1 的时候不限制最大长度（默认 140 ）
  * @property {String}				border					边框类型，surround-四周边框，none-无边框，bottom-底部边框（默认 'surround' ）
+ * @property {Boolean}				ignoreCompositionEvent	是否忽略组件内对文本合成系统事件的处理
  *
  * @event {Function(e)} focus					输入框聚焦时触发，event.detail = { value, height }，height 为键盘高度
  * @event {Function(e)} blur					输入框失去焦点时触发，event.detail = {value, cursor}

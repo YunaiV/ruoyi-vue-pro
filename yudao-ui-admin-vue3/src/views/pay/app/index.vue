@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -43,7 +43,7 @@
           @click="handleDelete(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
 
   <XModal v-model="dialogVisible" :title="dialogTitle">
@@ -79,8 +79,7 @@
 import { ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 import { FormExpose } from '@/components/Form'
 import { rules, allSchemas } from './app.data'
 import * as AppApi from '@/api/pay/app'
@@ -89,8 +88,7 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData, exportList } = useVxeGrid<AppApi.AppVO>({
+const [registerTable, { reload, deleteData, exportList }] = useXTable({
   allSchemas: allSchemas,
   getListApi: AppApi.getAppPageApi,
   deleteApi: AppApi.deleteAppApi,
@@ -119,7 +117,7 @@ const handleCreate = () => {
 
 // 导出操作
 const handleExport = async () => {
-  await exportList(xGrid, '应用信息.xls')
+  await exportList('应用信息.xls')
 }
 
 // 修改操作
@@ -139,7 +137,7 @@ const handleDetail = async (rowId: number) => {
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
+  await deleteData(rowId)
 }
 
 // 提交按钮
@@ -163,7 +161,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        await getList(xGrid)
+        await reload()
       }
     }
   })

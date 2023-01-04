@@ -7,17 +7,13 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.Produc
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
-/**
- * 规格值 Mapper
- *
- * @author 芋道源码
- */
 @Mapper
 public interface ProductPropertyValueMapper extends BaseMapperX<ProductPropertyValueDO> {
 
-    default List<ProductPropertyValueDO> selectListByPropertyId(List<Long> propertyIds) {
+    default List<ProductPropertyValueDO> selectListByPropertyId(Collection<Long> propertyIds) {
         return selectList(new LambdaQueryWrapperX<ProductPropertyValueDO>()
                 .inIfPresent(ProductPropertyValueDO::getPropertyId, propertyIds));
     }
@@ -28,17 +24,20 @@ public interface ProductPropertyValueMapper extends BaseMapperX<ProductPropertyV
                 .eq(ProductPropertyValueDO::getName, name));
     }
 
-    default void deletePropertyValueByPropertyId(Long propertyId) {
-        delete(new LambdaQueryWrapperX<ProductPropertyValueDO>().eq(ProductPropertyValueDO::getPropertyId, propertyId)
-                .eq(ProductPropertyValueDO::getDeleted, false));
+    default void deleteByPropertyId(Long propertyId) {
+        delete(new LambdaQueryWrapperX<ProductPropertyValueDO>()
+                .eq(ProductPropertyValueDO::getPropertyId, propertyId));
     }
 
     default PageResult<ProductPropertyValueDO> selectPage(ProductPropertyValuePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ProductPropertyValueDO>()
                 .eqIfPresent(ProductPropertyValueDO::getPropertyId, reqVO.getPropertyId())
                 .likeIfPresent(ProductPropertyValueDO::getName, reqVO.getName())
-                .eqIfPresent(ProductPropertyValueDO::getStatus, reqVO.getStatus())
                 .orderByDesc(ProductPropertyValueDO::getId));
+    }
+
+    default Integer selectCountByPropertyId(Long propertyId) {
+        return selectCount(ProductPropertyValueDO::getPropertyId, propertyId).intValue();
     }
 
 }

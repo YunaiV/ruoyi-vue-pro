@@ -150,7 +150,7 @@ export default {
     },
     // 上传成功回调
     handleUploadSuccess(res, file) {
-      if (res.code === 200) {
+      if (res.code === 0) {
         // edit by 芋道源码
         this.uploadList.push({ name: res.data, url: res.data });
         this.uploadedSuccessfully();

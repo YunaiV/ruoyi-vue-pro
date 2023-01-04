@@ -14,12 +14,12 @@
         <module>yudao-server</module>
         <!-- 各种 module 拓展 -->
         <module>yudao-module-member</module>
-        <module>yudao-module-bpm</module>
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
         <module>yudao-module-pay</module>
-        <module>yudao-module-mall</module>
+<!--        <module>yudao-module-bpm</module>-->
         <module>yudao-module-visualization</module>
+<!--        <module>yudao-module-mall</module>-->
         <!-- 示例项目 -->
         <module>yudao-example</module>
     </modules>

@@ -67,8 +67,8 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
             o.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
             o.setType(PayRefundTypeEnum.SOME.getStatus());
-            o.setPayAmount(100L);
-            o.setRefundAmount(500L);
+            o.setPayAmount(100);
+            o.setRefundAmount(500);
             o.setReason("就是想退款了，你有意见吗");
             o.setUserIp("127.0.0.1");
             o.setChannelOrderNo("CH0000001");
@@ -136,8 +136,8 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
             o.setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
             o.setType(PayRefundTypeEnum.SOME.getStatus());
-            o.setPayAmount(100L);
-            o.setRefundAmount(500L);
+            o.setPayAmount(100);
+            o.setRefundAmount(500);
             o.setReason("就是想退款了，你有意见吗");
             o.setUserIp("127.0.0.1");
             o.setChannelOrderNo("CH0000001");

@@ -18,13 +18,13 @@ public class ProductSpuPageReqVO extends PageParam {
     @Schema(description = "商品编码", example = "yudaoyuanma")
     private String code;
 
-    @Schema(description = "分类id", example = "1")
+    @Schema(description = "分类编号", example = "1")
     private Long categoryId;
 
     @Schema(description = "商品品牌编号", example = "1")
     private Long brandId;
 
-    @Schema(description = "上下架状态,参见 ProductSpuStatusEnum 枚举值", example = "1")
+    @Schema(description = "上下架状态 参见 ProductSpuStatusEnum 枚举值", example = "1")
     private Integer status;
 
     @Schema(description = "销量最小值", example = "1")

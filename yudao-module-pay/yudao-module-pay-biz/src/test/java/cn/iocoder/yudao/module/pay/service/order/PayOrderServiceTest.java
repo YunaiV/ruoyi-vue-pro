@@ -76,7 +76,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setBody("斌斌子送给灿灿子的炸弹猫");
             o.setNotifyUrl("https://hc.com/lbh");
             o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
-            o.setAmount(10000L);
+            o.setAmount(10000);
             o.setChannelFeeRate(0.01);
             o.setChannelFeeAmount(1L);
             o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());
@@ -148,7 +148,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
             o.setBody("斌斌子送给灿灿子的炸弹猫");
             o.setNotifyUrl("https://hc.com/lbh");
             o.setNotifyStatus(PayOrderNotifyStatusEnum.SUCCESS.getStatus());
-            o.setAmount(10000L);
+            o.setAmount(10000);
             o.setChannelFeeRate(0.01);
             o.setChannelFeeAmount(1L);
             o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus());

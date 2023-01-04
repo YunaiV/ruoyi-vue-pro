@@ -1,6 +1,8 @@
 import request from '@/utils/request'
 
-// 创建规格名称
+// ------------------------ 属性项 -------------------
+
+// 创建属性项
 export function createProperty(data) {
   return request({
     url: '/product/property/create',
@@ -9,7 +11,7 @@ export function createProperty(data) {
   })
 }
 
-// 更新规格名称
+// 更新属性项
 export function updateProperty(data) {
   return request({
     url: '/product/property/update',
@@ -18,7 +20,7 @@ export function updateProperty(data) {
   })
 }
 
-// 删除规格名称
+// 删除属性项
 export function deleteProperty(id) {
   return request({
     url: '/product/property/delete?id=' + id,
@@ -26,7 +28,7 @@ export function deleteProperty(id) {
   })
 }
 
-// 获得规格名称
+// 获得属性项
 export function getProperty(id) {
   return request({
     url: '/product/property/get?id=' + id,
@@ -34,7 +36,7 @@ export function getProperty(id) {
   })
 }
 
-// 获得规格名称分页
+// 获得属性项分页
 export function getPropertyPage(query) {
   return request({
     url: '/product/property/page',
@@ -43,7 +45,7 @@ export function getPropertyPage(query) {
   })
 }
 
-// 获得规格名称列表
+// 获得属性项列表
 export function getPropertyList(query) {
   return request({
     url: '/product/property/list',
@@ -52,29 +54,18 @@ export function getPropertyList(query) {
   })
 }
 
-// 获得规格名称列表
+// 获得属性项列表
 export function getPropertyListAndValue(query) {
   return request({
-    url: '/product/property/listAndValue',
+    url: '/product/property/get-value-list',
     method: 'get',
     params: query
   })
 }
 
+// ------------------------ 属性值 -------------------
 
-// 导出规格名称 Excel
-export function exportPropertyExcel(query) {
-  return request({
-    url: '/product/property/export-excel',
-    method: 'get',
-    params: query,
-    responseType: 'blob'
-  })
-}
-
-// ------------------------ 规格名称值 -------------------
-
-// 获得规格名称值分页
+// 获得属性值分页
 export function getPropertyValuePage(query) {
   return request({
     url: '/product/property/value/page',
@@ -83,7 +74,7 @@ export function getPropertyValuePage(query) {
   })
 }
 
-// 获得规格名称值
+// 获得属性值
 export function getPropertyValue(id) {
   return request({
     url: '/product/property/value/get?id=' + id,
@@ -92,7 +83,7 @@ export function getPropertyValue(id) {
 }
 
 
-// 创建规格名称值
+// 创建属性值
 export function createPropertyValue(data) {
   return request({
     url: '/product/property/value/create',
@@ -101,7 +92,7 @@ export function createPropertyValue(data) {
   })
 }
 
-// 更新规格名称值
+// 更新属性值
 export function updatePropertyValue(data) {
   return request({
     url: '/product/property/value/update',
@@ -110,10 +101,13 @@ export function updatePropertyValue(data) {
   })
 }
 
-// 删除规格名称
+// 删除属性值
 export function deletePropertyValue(id) {
   return request({
     url: '/product/property/value/delete?id=' + id,
     method: 'delete'
   })
+}
+
+export class exportPropertyExcel {
 }

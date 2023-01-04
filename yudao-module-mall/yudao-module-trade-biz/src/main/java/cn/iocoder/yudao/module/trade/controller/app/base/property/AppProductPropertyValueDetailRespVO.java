@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.controller.app.base.property;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@Schema(description = "用户 App - 规格 + 规格值 Response VO")
+@Schema(description ="用户 App - 商品属性值的明细 Response VO")
 @Data
 public class AppProductPropertyValueDetailRespVO {
 

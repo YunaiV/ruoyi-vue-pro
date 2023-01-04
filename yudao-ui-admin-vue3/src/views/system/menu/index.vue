@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" show-overflow class="xtable-scrollbar">
+    <XTable @register="registerTable" show-overflow>
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -34,7 +34,7 @@
           @click="handleDelete(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <!-- 添加或修改菜单对话框 -->
   <XModal id="menuModel" v-model="dialogVisible" :title="dialogTitle">
@@ -90,7 +90,7 @@
       </template>
       <template v-if="menuForm.type === 2">
         <el-col :span="16">
-          <el-form-item label="路由地址" prop="component">
+          <el-form-item label="组件地址" prop="component">
             <el-input v-model="menuForm.component" placeholder="请输入组件地址" clearable />
           </el-form-item>
         </el-col>
@@ -201,7 +201,7 @@ import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
 import { handleTree, defaultProps } from '@/utils/tree'
 import * as MenuApi from '@/api/system/menu'
 import { allSchemas, rules } from './menu.data'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
+import { useXTable } from '@/hooks/web/useXTable'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
@@ -215,7 +215,7 @@ const treeConfig = {
   parentField: 'parentId',
   expandAll: false
 }
-const { gridOptions, getList, deleteData } = useVxeGrid<MenuApi.MenuVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   treeConfig: treeConfig,
   getListApi: MenuApi.getMenuListApi,
@@ -326,7 +326,7 @@ const submitForm = async () => {
     actionLoading.value = false
     wsCache.delete(CACHE_KEY.ROLE_ROUTERS)
     // 操作成功，重新加载列表
-    await getList(xGrid)
+    await reload()
   }
 }
 
@@ -338,6 +338,6 @@ const isExternal = (path: string) => {
 // ========== 删除 ==========
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
+  await deleteData(rowId)
 }
 </script>

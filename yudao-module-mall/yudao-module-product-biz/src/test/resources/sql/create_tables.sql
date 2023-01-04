@@ -1,8 +1,7 @@
 CREATE TABLE IF NOT EXISTS `product_sku` (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
     `spu_id` bigint NOT NULL COMMENT 'spu编号',
-    `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-    `name` varchar DEFAULT NULL COMMENT '商品 SKU 名字',
+    `spu_name` varchar DEFAULT NULL COMMENT '商品 SPU 名字',
     `properties` varchar DEFAULT NULL COMMENT '规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]',
     `price` int NOT NULL DEFAULT '-1' COMMENT '销售价格，单位：分',
     `market_price` int DEFAULT NULL COMMENT '市场价',
@@ -52,3 +51,19 @@ CREATE TABLE IF NOT EXISTS `product_spu` (
     `deleted` bit(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
 PRIMARY KEY (`id`)
 ) COMMENT '商品spu';
+
+CREATE TABLE IF NOT EXISTS `product_category` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '分类编号',
+    `parent_id` bigint DEFAULT NULL COMMENT '父分类编号',
+    `name` varchar(128) NOT NULL COMMENT '分类名称',
+    `description` varchar(128) NOT NULL COMMENT '分类描述',
+    `pic_url` varchar DEFAULT NULL COMMENT '分类图片',
+    `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段',
+    `status` bit(1) DEFAULT NULL COMMENT '状态',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `creator` varchar DEFAULT NULL COMMENT '创建人',
+    `updater` varchar DEFAULT NULL COMMENT '更新人',
+    `deleted` bit(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
+    PRIMARY KEY (`id`)
+) COMMENT '商品分类';

@@ -139,7 +139,6 @@ export default {
       let slider = 'slider' + '-' + s.join('')
       let point = 'point' + '-' + s.join('')
       // 判断下是否存在 slider
-      console.log(localStorage.getItem('slider'))
       if (!localStorage.getItem('slider')) {
         localStorage.setItem('slider', slider)
       }

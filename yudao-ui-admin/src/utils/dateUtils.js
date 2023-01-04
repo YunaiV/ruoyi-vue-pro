@@ -24,3 +24,11 @@ export function getDate(ms) {
     return 0 + "秒";
   }
 }
+
+export function beginOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+export function endOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+}

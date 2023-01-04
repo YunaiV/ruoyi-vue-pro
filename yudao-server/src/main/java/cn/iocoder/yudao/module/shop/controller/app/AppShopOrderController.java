@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.shop.controller.app;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.pay.service.notify.vo.PayNotifyOrderReqVO;
-import cn.iocoder.yudao.module.pay.service.notify.vo.PayRefundOrderReqVO;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
-import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.util.PaySeqUtils;
 import cn.iocoder.yudao.module.shop.controller.app.vo.AppShopOrderCreateRespVO;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -58,14 +58,14 @@ public class AppShopOrderController {
 
     @PostMapping("/pay-notify")
     @Operation(summary = "支付回调")
-    public CommonResult<Boolean> payNotify(@RequestBody @Valid PayNotifyOrderReqVO reqVO) {
+    public CommonResult<Boolean> payNotify(@RequestBody @Valid PayOrderNotifyReqDTO reqVO) {
         log.info("[payNotify][回调成功]");
         return success(true);
     }
 
     @PostMapping("/refund-notify")
     @Operation(summary = "退款回调")
-    public CommonResult<Boolean> refundNotify(@RequestBody @Valid PayRefundOrderReqVO reqVO) {
+    public CommonResult<Boolean> refundNotify(@RequestBody @Valid PayRefundNotifyReqDTO reqVO) {
         log.info("[refundNotify][回调成功]");
         return success(true);
     }

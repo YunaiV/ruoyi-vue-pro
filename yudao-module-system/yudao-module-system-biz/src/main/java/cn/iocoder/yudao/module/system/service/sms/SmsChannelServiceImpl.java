@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelCreateReqVO;
@@ -23,14 +21,14 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
 
 /**
- * 短信渠道Service实现类
+ * 短信渠道 Service 实现类
  *
  * @author zzf
- * @date 2021/1/25 9:25
  */
 @Service
 @Slf4j
@@ -61,46 +59,39 @@ public class SmsChannelServiceImpl implements SmsChannelService {
 
     @Override
     @PostConstruct
-    public void initSmsClients() {
-        // 获取短信渠道，如果有更新
-        List<SmsChannelDO> smsChannels = this.loadSmsChannelIfUpdate(maxUpdateTime);
-        if (CollUtil.isEmpty(smsChannels)) {
-            return;
-        }
-
-        // 创建或更新短信 Client
-        List<SmsChannelProperties> propertiesList = SmsChannelConvert.INSTANCE.convertList02(smsChannels);
-        propertiesList.forEach(properties -> smsClientFactory.createOrUpdateSmsClient(properties));
-
-        // 写入缓存
-        maxUpdateTime = CollectionUtils.getMaxValue(smsChannels, SmsChannelDO::getUpdateTime);
-        log.info("[initSmsClients][初始化 SmsChannel 数量为 {}]", smsChannels.size());
+    public void initLocalCache() {
+        initLocalCacheIfUpdate(null);
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        initSmsClients();
+        initLocalCacheIfUpdate(this.maxUpdateTime);
     }
 
     /**
-     * 如果短信渠道发生变化，从数据库中获取最新的全量短信渠道。
-     * 如果未发生变化，则返回空
+     * 刷新本地缓存
      *
-     * @param maxUpdateTime 当前短信渠道的最大更新时间
-     * @return 短信渠道列表
+     * @param maxUpdateTime 最大更新时间
+     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
+     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
      */
-    private List<SmsChannelDO> loadSmsChannelIfUpdate(LocalDateTime maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadSmsChannelIfUpdate][首次加载全量短信渠道]");
-        } else { // 判断数据库中是否有更新的短信渠道
-            if (smsChannelMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
-            }
-            log.info("[loadSmsChannelIfUpdate][增量加载全量短信渠道]");
+    private void initLocalCacheIfUpdate(LocalDateTime maxUpdateTime) {
+        // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
+        // 如果没有增量的数据变化，则不进行本地缓存的刷新
+        if (maxUpdateTime != null
+                && smsChannelMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
+            log.info("[initLocalCacheIfUpdate][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
+            return;
         }
-        // 第二步，如果有更新，则从数据库加载所有短信渠道
-        return smsChannelMapper.selectList();
+        List<SmsChannelDO> channels = smsChannelMapper.selectList();
+        log.info("[initLocalCacheIfUpdate][缓存短信渠道，数量为:{}]", channels.size());
+
+        // 第二步：构建缓存。创建或更新短信 Client
+        List<SmsChannelProperties> propertiesList = SmsChannelConvert.INSTANCE.convertList02(channels);
+        propertiesList.forEach(properties -> smsClientFactory.createOrUpdateSmsClient(properties));
+
+        // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
+        this.maxUpdateTime = getMaxValue(channels, SmsChannelDO::getUpdateTime);
     }
 
     @Override

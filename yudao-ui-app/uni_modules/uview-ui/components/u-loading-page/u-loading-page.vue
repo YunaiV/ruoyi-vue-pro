@@ -19,11 +19,15 @@
                         :src="image"
                         class="u-loading-page__warpper__loading-icon__img"
                         mode="widthFit"
+						:style="{
+							width: $u.addUnit(iconSize),
+						    height: $u.addUnit(iconSize)
+						}"
                     ></image>
                     <u-loading-icon
                         v-else
                         :mode="loadingMode"
-                        size="28"
+                        :size="$u.addUnit(iconSize)"
                         :color="loadingColor"
                     ></u-loading-icon>
                 </view>
@@ -55,6 +59,7 @@ import props from "./props.js";
  * @property {String}			bgColor			背景色 （默认 '#ffffff' ）
  * @property {String}			color			文字颜色 （默认 '#C8C8C8' ）
  * @property {String | Number}	fontSize		文字大小 （默认 19 ）
+ * @property {String | Number}	iconSize		图标大小 （默认 28 ）
  * @property {String}			loadingColor	加载中图标的颜色，只能rgb或者十六进制颜色值 （默认 '#C8C8C8' ）
  * @property {Object}			customStyle		自定义样式
  * @example <u-loading mode="circle"></u-loading>

@@ -22,7 +22,7 @@ public interface PayChannelService {
     /**
      * 初始化支付客户端
      */
-    void initPayClients();
+    void initLocalCache();
 
     /**
      * 创建支付渠道

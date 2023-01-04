@@ -5,9 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypePageReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
-import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
@@ -43,10 +41,8 @@ public interface DictTypeMapper extends BaseMapperX<DictTypeDO> {
         return selectOne(DictTypeDO::getName, name);
     }
 
-    @Update("UPDATE system_dict_type SET DELETED = 1,DELETED_TIME=#{deletedTime} WHERE id = #{id}")
     int deleteById(@Param("id") Long id, @Param("deletedTime") LocalDateTime deletedTime);
 
-    default int deleteById(Long id) {
-        return deleteById(id, LocalDateTime.now());
-    }
+    @Update("UPDATE system_dict_type SET deleted = 1, deleted_time = #{deletedTime} WHERE id = #{id}")
+    void updateToDelete(@Param("id") Long id, @Param("deletedTime") LocalDateTime deletedTime);
 }

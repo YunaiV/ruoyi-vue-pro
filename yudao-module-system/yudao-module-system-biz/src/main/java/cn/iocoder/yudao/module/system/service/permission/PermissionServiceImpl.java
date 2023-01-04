@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
@@ -31,7 +32,6 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,106 +126,84 @@ public class PermissionServiceImpl implements PermissionService {
     @Resource
     private PermissionProducer permissionProducer;
 
-    @Resource
-    @Lazy // 注入自己，所以延迟加载
-    private PermissionService self;
-
     @Override
     @PostConstruct
-    @TenantIgnore // 初始化缓存，无需租户过滤
     public void initLocalCache() {
-        initUserRoleLocalCache();
-        initRoleMenuLocalCache();
-    }
-
-    /**
-     * 初始化 {@link #roleMenuCache} 和 {@link #menuRoleCache} 缓存
-     */
-    @VisibleForTesting
-    void initRoleMenuLocalCache() {
-        // 获取角色与菜单的关联列表，如果有更新
-        List<RoleMenuDO> roleMenuList = loadRoleMenuIfUpdate(roleMenuMaxUpdateTime);
-        if (CollUtil.isEmpty(roleMenuList)) {
-            return;
-        }
-
-        // 初始化 roleMenuCache 和 menuRoleCache 缓存
-        ImmutableMultimap.Builder<Long, Long> roleMenuCacheBuilder = ImmutableMultimap.builder();
-        ImmutableMultimap.Builder<Long, Long> menuRoleCacheBuilder = ImmutableMultimap.builder();
-        roleMenuList.forEach(roleMenuDO -> {
-            roleMenuCacheBuilder.put(roleMenuDO.getRoleId(), roleMenuDO.getMenuId());
-            menuRoleCacheBuilder.put(roleMenuDO.getMenuId(), roleMenuDO.getRoleId());
-        });
-        roleMenuCache = roleMenuCacheBuilder.build();
-        menuRoleCache = menuRoleCacheBuilder.build();
-        roleMenuMaxUpdateTime = getMaxValue(roleMenuList, RoleMenuDO::getUpdateTime);
-        log.info("[initRoleMenuLocalCache][初始化角色与菜单的关联数量为 {}]", roleMenuList.size());
-    }
-
-    /**
-     * 初始化 {@link #userRoleCache} 缓存
-     */
-    @VisibleForTesting
-    void initUserRoleLocalCache() {
-        // 获取用户与角色的关联列表，如果有更新
-        List<UserRoleDO> userRoleList = loadUserRoleIfUpdate(userRoleMaxUpdateTime);
-        if (CollUtil.isEmpty(userRoleList)) {
-            return;
-        }
-
-        // 初始化 userRoleCache 缓存
-        ImmutableMultimap.Builder<Long, Long> userRoleCacheBuilder = ImmutableMultimap.builder();
-        userRoleList.forEach(userRoleDO -> userRoleCacheBuilder.put(userRoleDO.getUserId(), userRoleDO.getRoleId()));
-        userRoleCache = CollectionUtils.convertMultiMap2(userRoleList, UserRoleDO::getUserId, UserRoleDO::getRoleId);
-        userRoleMaxUpdateTime = getMaxValue(userRoleList, UserRoleDO::getUpdateTime);
-        log.info("[initUserRoleLocalCache][初始化用户与角色的关联数量为 {}]", userRoleList.size());
+        initLocalCacheIfUpdateForRoleMenu(null);
+        initLocalCacheIfUpdateForUserRole(null);
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        self.initLocalCache();
+        initLocalCacheIfUpdateForRoleMenu(this.roleMenuMaxUpdateTime);
+        initLocalCacheIfUpdateForUserRole(this.userRoleMaxUpdateTime);
     }
 
     /**
-     * 如果角色与菜单的关联发生变化，从数据库中获取最新的全量角色与菜单的关联。
-     * 如果未发生变化，则返回空
+     * 刷新 RoleMenu 本地缓存
      *
-     * @param maxUpdateTime 当前角色与菜单的关联的最大更新时间
-     * @return 角色与菜单的关联列表
+     * @param maxUpdateTime 最大更新时间
+     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
+     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
      */
-    protected List<RoleMenuDO> loadRoleMenuIfUpdate(LocalDateTime maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadRoleMenuIfUpdate][首次加载全量角色与菜单的关联]");
-        } else { // 判断数据库中是否有更新的角色与菜单的关联
-            if (roleMenuMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
+    @VisibleForTesting
+    void initLocalCacheIfUpdateForRoleMenu(LocalDateTime maxUpdateTime) {
+        // 注意：忽略自动多租户，因为要全局初始化缓存
+        TenantUtils.executeIgnore(() -> {
+            // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
+            // 如果没有增量的数据变化，则不进行本地缓存的刷新
+            if (maxUpdateTime != null
+                    && roleMenuMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
+                log.info("[initLocalCacheIfUpdateForRoleMenu][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
+                return;
             }
-            log.info("[loadRoleMenuIfUpdate][增量加载全量角色与菜单的关联]");
-        }
-        // 第二步，如果有更新，则从数据库加载所有角色与菜单的关联
-        return roleMenuMapper.selectList();
+            List<RoleMenuDO> roleMenus = roleMenuMapper.selectList();
+            log.info("[initLocalCacheIfUpdateForRoleMenu][缓存角色与菜单，数量为:{}]", roleMenus.size());
+
+            // 第二步：构建缓存。
+            ImmutableMultimap.Builder<Long, Long> roleMenuCacheBuilder = ImmutableMultimap.builder();
+            ImmutableMultimap.Builder<Long, Long> menuRoleCacheBuilder = ImmutableMultimap.builder();
+            roleMenus.forEach(roleMenuDO -> {
+                roleMenuCacheBuilder.put(roleMenuDO.getRoleId(), roleMenuDO.getMenuId());
+                menuRoleCacheBuilder.put(roleMenuDO.getMenuId(), roleMenuDO.getRoleId());
+            });
+            roleMenuCache = roleMenuCacheBuilder.build();
+            menuRoleCache = menuRoleCacheBuilder.build();
+
+            // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
+            this.roleMenuMaxUpdateTime = getMaxValue(roleMenus, RoleMenuDO::getUpdateTime);
+        });
     }
 
     /**
-     * 如果用户与角色的关联发生变化，从数据库中获取最新的全量用户与角色的关联。
-     * 如果未发生变化，则返回空
+     * 刷新 UserRole 本地缓存
      *
-     * @param maxUpdateTime 当前角色与菜单的关联的最大更新时间
-     * @return 角色与菜单的关联列表
+     * @param maxUpdateTime 最大更新时间
+     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
+     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
      */
-    protected List<UserRoleDO> loadUserRoleIfUpdate(LocalDateTime maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadUserRoleIfUpdate][首次加载全量用户与角色的关联]");
-        } else { // 判断数据库中是否有更新的用户与角色的关联
-            if (userRoleMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
+    @VisibleForTesting
+    void initLocalCacheIfUpdateForUserRole(LocalDateTime maxUpdateTime) {
+        // 注意：忽略自动多租户，因为要全局初始化缓存
+        TenantUtils.executeIgnore(() -> {
+            // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
+            // 如果没有增量的数据变化，则不进行本地缓存的刷新
+            if (maxUpdateTime != null
+                    && userRoleMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
+                log.info("[initLocalCacheIfUpdateForUserRole][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
+                return;
             }
-            log.info("[loadUserRoleIfUpdate][增量加载全量用户与角色的关联]");
-        }
-        // 第二步，如果有更新，则从数据库加载所有用户与角色的关联
-        return userRoleMapper.selectList();
+            List<UserRoleDO> userRoles = userRoleMapper.selectList();
+            log.info("[initLocalCacheIfUpdateForUserRole][缓存用户与角色，数量为:{}]", userRoles.size());
+
+            // 第二步：构建缓存。
+            ImmutableMultimap.Builder<Long, Long> userRoleCacheBuilder = ImmutableMultimap.builder();
+            userRoles.forEach(userRoleDO -> userRoleCacheBuilder.put(userRoleDO.getUserId(), userRoleDO.getRoleId()));
+            userRoleCache = CollectionUtils.convertMultiMap2(userRoles, UserRoleDO::getUserId, UserRoleDO::getRoleId);
+
+            // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
+            this.userRoleMaxUpdateTime = getMaxValue(userRoles, UserRoleDO::getUpdateTime);
+        });
     }
 
     @Override

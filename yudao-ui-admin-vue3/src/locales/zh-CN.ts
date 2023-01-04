@@ -80,6 +80,7 @@ export default {
     screenfullIcon: '全屏图标',
     sizeIcon: '尺寸图标',
     localeIcon: '多语言图标',
+    messageIcon: '消息图标',
     tagsView: '标签页',
     logo: '标志',
     greyMode: '灰色模式',
