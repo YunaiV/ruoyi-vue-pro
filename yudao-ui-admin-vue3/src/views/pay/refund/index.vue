@@ -9,7 +9,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['pay:refund:export']"
-          @click="handleExport()"
+          @click="exportList('退款订单.xls')"
         />
       </template>
       <template #actionbtns_default="{ row }">
@@ -48,11 +48,6 @@ const [registerTable, { exportList }] = useXTable({
   getListApi: RefundApi.getRefundPageApi,
   exportListApi: RefundApi.exportRefundApi
 })
-
-// 导出操作
-const handleExport = async () => {
-  await exportList('退款订单.xls')
-}
 
 // ========== CRUD 相关 ==========
 const dialogVisible = ref(false) // 是否显示弹出层

@@ -9,7 +9,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['system:operate-log:export']"
-          @click="handleExport()"
+          @click="exportList('操作日志.xls')"
         />
       </template>
       <template #duration="{ row }">
@@ -67,10 +67,5 @@ const handleDetail = (row: OperateLogApi.OperateLogVO) => {
   // 设置数据
   detailData.value = row
   dialogVisible.value = true
-}
-
-// 导出操作
-const handleExport = async () => {
-  await exportList('操作日志.xls')
 }
 </script>

@@ -30,7 +30,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:dept:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -171,11 +171,6 @@ const submitForm = async () => {
       }
     }
   })
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 const userNicknameFormat = (row) => {

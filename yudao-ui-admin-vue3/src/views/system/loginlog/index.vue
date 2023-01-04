@@ -8,7 +8,7 @@
           type="warning"
           preIcon="ep:download"
           :title="t('action.export')"
-          @click="handleExport()"
+          @click="exportList('登录列表.xls')"
         />
       </template>
       <template #actionbtns_default="{ row }">
@@ -53,10 +53,5 @@ const handleDetail = async (row: LoginLogVO) => {
   // 设置数据
   detailData.value = row
   dialogVisible.value = true
-}
-
-// 导出操作
-const handleExport = async () => {
-  await exportList('登录列表.xls')
 }
 </script>

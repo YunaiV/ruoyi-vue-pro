@@ -31,7 +31,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:menu:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -333,11 +333,5 @@ const submitForm = async () => {
 // 判断 path 是不是外部的 HTTP 等链接
 const isExternal = (path: string) => {
   return /^(https?:|mailto:|tel:)/.test(path)
-}
-
-// ========== 删除 ==========
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 </script>

@@ -17,7 +17,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['pay:order:export']"
-          @click="handleExport()"
+          @click="exportList('订单数据.xls')"
         />
       </template>
       <template #actionbtns_default="{ row }">
@@ -71,10 +71,6 @@ const setDialogTile = (type: string) => {
 // 新增操作
 const handleCreate = () => {
   setDialogTile('create')
-}
-// 导出操作
-const handleExport = async () => {
-  await exportList('订单数据.xls')
 }
 
 // 详情操作

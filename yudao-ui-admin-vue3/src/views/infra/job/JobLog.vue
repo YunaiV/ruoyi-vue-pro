@@ -8,7 +8,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['infra:job:export']"
-          @click="handleExport()"
+          @click="exportList('定时任务详情.xls')"
         />
       </template>
       <template #beginTime_default="{ row }">
@@ -76,9 +76,5 @@ const handleDetail = async (row: JobLogApi.JobLogVO) => {
   detailData.value = res
   dialogTitle.value = t('action.detail')
   dialogVisible.value = true
-}
-// 导出操作
-const handleExport = async () => {
-  await exportList('定时任务详情.xls')
 }
 </script>

@@ -32,7 +32,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['infra:codegen:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
         <!-- 操作：同步 -->
         <XTextButton
@@ -52,7 +52,7 @@
     </XTable>
   </ContentWrap>
   <!-- 弹窗：导入表 -->
-  <ImportTable ref="importRef" @ok="handleQuery()" />
+  <ImportTable ref="importRef" @ok="reload()" />
   <!-- 弹窗：预览代码 -->
   <Preview ref="previewRef" />
 </template>
@@ -103,17 +103,10 @@ const handleSynchDb = (row: CodegenTableVO) => {
       message.success('同步成功')
     })
 }
+
 // 生成代码操作
 const handleGenTable = async (row: CodegenTableVO) => {
   const res = await CodegenApi.downloadCodegenApi(row.id)
   download.zip(res, 'codegen-' + row.className + '.zip')
-}
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
-}
-// 查询操作
-const handleQuery = async () => {
-  await reload()
 }
 </script>

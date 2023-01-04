@@ -12,7 +12,7 @@
       </template>
       <template #actionbtns_default="{ row }">
         <XTextButton preIcon="ep:edit" :title="t('action.edit')" @click="handleUpdate(row.id)" />
-        <XTextButton preIcon="ep:delete" :title="t('action.del')" @click="handleDelete(row.id)" />
+        <XTextButton preIcon="ep:delete" :title="t('action.del')" @click="deleteData(row.id)" />
       </template>
     </XTable>
   </ContentWrap>
@@ -130,11 +130,6 @@ const handleUpdate = async (rowId: number) => {
   unref(formRef)?.setValues(res)
   // 设置选中
   unref(treeRef)?.setCheckedKeys(res.menuIds)
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 // 提交按钮

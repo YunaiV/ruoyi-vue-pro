@@ -5,7 +5,7 @@
       <template #actionbtns_default="{ row }">
         <!-- 操作：详情 -->
         <XTextButton preIcon="ep:view" :title="t('action.detail')" @click="handleDetail(row)" />
-        <!-- 操作：删除 -->
+        <!-- 操作：登出 -->
         <XTextButton
           preIcon="ep:delete"
           :title="t('action.logout')"
