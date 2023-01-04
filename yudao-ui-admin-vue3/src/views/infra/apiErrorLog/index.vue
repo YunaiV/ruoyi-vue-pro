@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <!-- 操作：导出 -->
       <template #toolbar_buttons>
         <XButton
@@ -40,7 +40,7 @@
           @click="handleProcessClick(row, InfraApiErrorLogProcessStatusEnum.IGNORE, '已忽略')"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
@@ -54,18 +54,17 @@
 <script setup lang="ts" name="ApiErrorLog">
 import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 import { allSchemas } from './apiErrorLog.data'
 import * as ApiErrorLogApi from '@/api/infra/apiErrorLog'
 import { InfraApiErrorLogProcessStatusEnum } from '@/utils/constants'
 import { useMessage } from '@/hooks/web/useMessage'
-const message = useMessage()
+
 const { t } = useI18n() // 国际化
+const message = useMessage()
 
 // ========== 列表相关 ==========
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, exportList } = useVxeGrid<ApiErrorLogApi.ApiErrorLogVO>({
+const [registerTable, { reload, exportList }] = useXTable({
   allSchemas: allSchemas,
   getListApi: ApiErrorLogApi.getApiErrorLogPageApi,
   exportListApi: ApiErrorLogApi.exportApiErrorLogApi
@@ -84,7 +83,7 @@ const handleDetail = (row: ApiErrorLogApi.ApiErrorLogVO) => {
 }
 // 导出
 const handleExport = async () => {
-  await exportList(xGrid, '错误数据.xls')
+  await exportList('错误数据.xls')
 }
 // 异常处理操作
 const handleProcessClick = (
@@ -100,7 +99,7 @@ const handleProcessClick = (
     })
     .finally(async () => {
       // 刷新列表
-      await getList(xGrid)
+      await reload()
     })
     .catch(() => {})
 }

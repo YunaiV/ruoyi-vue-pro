@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -51,7 +51,7 @@
           @click="handleDelete(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <!-- 弹窗 -->
   <XModal id="postModel" v-model="dialogVisible" :title="dialogTitle">
@@ -135,8 +135,7 @@ import { ref, unref } from 'vue'
 import { ElTag } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 import { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as ClientApi from '@/api/system/oauth2/client'
@@ -146,8 +145,7 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData } = useVxeGrid<ClientApi.OAuth2ClientVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   getListApi: ClientApi.getOAuth2ClientPageApi,
   deleteApi: ClientApi.deleteOAuth2ClientApi
@@ -188,7 +186,7 @@ const handleDetail = async (rowId: number) => {
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
+  await deleteData(rowId)
 }
 
 // 提交新增/修改的表单
@@ -212,7 +210,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        await getList(xGrid)
+        await reload()
       }
     }
   })

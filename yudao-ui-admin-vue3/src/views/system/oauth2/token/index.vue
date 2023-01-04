@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #actionbtns_default="{ row }">
         <!-- 操作：详情 -->
         <XTextButton preIcon="ep:view" :title="t('action.detail')" @click="handleDetail(row)" />
@@ -13,7 +13,7 @@
           @click="handleForceLogout(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
@@ -28,8 +28,7 @@
 import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 
 import { allSchemas } from './token.data'
 import * as TokenApi from '@/api/system/oauth2/token'
@@ -37,8 +36,7 @@ import * as TokenApi from '@/api/system/oauth2/token'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList } = useVxeGrid<TokenApi.OAuth2TokenVO>({
+const [registerTable, { reload }] = useXTable({
   allSchemas: allSchemas,
   topActionSlots: false,
   getListApi: TokenApi.getAccessTokenPageApi
@@ -65,7 +63,7 @@ const handleForceLogout = (rowId: number) => {
     })
     .finally(async () => {
       // 刷新列表
-      await getList(xGrid)
+      await reload()
     })
 }
 </script>

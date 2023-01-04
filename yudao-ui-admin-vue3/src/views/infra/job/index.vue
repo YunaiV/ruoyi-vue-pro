@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -83,7 +83,7 @@
           </template>
         </el-dropdown>
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
@@ -134,8 +134,7 @@ import { useRouter } from 'vue-router'
 import { ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 import { FormExpose } from '@/components/Form'
 import { Crontab } from '@/components/Crontab'
 import * as JobApi from '@/api/infra/job'
@@ -147,8 +146,7 @@ const message = useMessage() // 消息弹窗
 const { push } = useRouter()
 
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData, exportList } = useVxeGrid<JobApi.JobVO>({
+const [registerTable, { reload, deleteData, exportList }] = useXTable({
   allSchemas: allSchemas,
   getListApi: JobApi.getJobPageApi,
   deleteApi: JobApi.deleteJobApi,
@@ -183,7 +181,7 @@ const handleCreate = () => {
 
 // 导出操作
 const handleExport = async () => {
-  await exportList(xGrid, '定时任务.xls')
+  await exportList('定时任务.xls')
 }
 
 // 修改操作
@@ -252,7 +250,7 @@ const parseTime = (time) => {
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
+  await deleteData(rowId)
 }
 const handleChangeStatus = async (row: JobApi.JobVO) => {
   const text = row.status === InfraJobStatusEnum.STOP ? '开启' : '关闭'
@@ -267,7 +265,7 @@ const handleChangeStatus = async (row: JobApi.JobVO) => {
           : InfraJobStatusEnum.STOP
       await JobApi.updateJobStatusApi(row.id, status)
       message.success(text + '成功')
-      await getList(xGrid)
+      await reload()
     })
     .catch(() => {
       row.status =
@@ -289,7 +287,7 @@ const handleRun = (row: JobApi.JobVO) => {
   message.confirm('确认要立即执行一次' + row.name + '?', t('common.reminder')).then(async () => {
     await JobApi.runJobApi(row.id)
     message.success('执行成功')
-    await getList(xGrid)
+    await reload()
   })
 }
 // 提交按钮
@@ -312,7 +310,7 @@ const submitForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
-        await getList(xGrid)
+        await reload()
       }
     }
   })

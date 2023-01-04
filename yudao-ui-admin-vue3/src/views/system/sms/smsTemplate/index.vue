@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <!-- 操作：新增 -->
       <template #toolbar_buttons>
         <XButton
@@ -41,7 +41,7 @@
           @click="handleDelete(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal id="smsTemplate" v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
@@ -113,8 +113,7 @@
 import { ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 import { FormExpose } from '@/components/Form'
 import { ElForm, ElFormItem, ElInput } from 'element-plus'
 // 业务相关的 import
@@ -125,8 +124,7 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData } = useVxeGrid<SmsTemplateApi.SmsTemplateVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   getListApi: SmsTemplateApi.getSmsTemplatePageApi,
   deleteApi: SmsTemplateApi.deleteSmsTemplateApi
@@ -170,7 +168,7 @@ const handleDetail = async (rowId: number) => {
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
+  await deleteData(rowId)
 }
 
 // 提交按钮
@@ -194,7 +192,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        await getList(xGrid)
+        await reload()
       }
     }
   })

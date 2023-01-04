@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <XButton
           type="primary"
@@ -24,7 +24,7 @@
           @click="handleDelete(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
@@ -85,8 +85,7 @@
 import { ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 import { ElUpload, ElImage, UploadInstance, UploadRawFile } from 'element-plus'
 // 业务相关的 import
 import { allSchemas } from './fileList.data'
@@ -98,8 +97,7 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData } = useVxeGrid<FileApi.FileVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   getListApi: FileApi.getFilePageApi,
   deleteApi: FileApi.deleteFileApi
@@ -145,7 +143,7 @@ const handleFileSuccess = async (response: any): Promise<void> => {
   message.success('上传成功')
   uploadDialogVisible.value = false
   uploadDisabled.value = false
-  await getList(xGrid)
+  await reload()
 }
 // 文件数超出提示
 const handleExceed = (): void => {
@@ -166,7 +164,7 @@ const handleDetail = (row: FileApi.FileVO) => {
 
 // 删除操作
 const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
+  await deleteData(rowId)
 }
 
 // ========== 复制相关 ==========

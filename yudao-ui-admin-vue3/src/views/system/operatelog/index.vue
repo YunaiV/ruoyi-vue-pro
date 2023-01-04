@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -22,7 +22,7 @@
         <!-- 操作：详情 -->
         <XTextButton preIcon="ep:view" :title="t('action.detail')" @click="handleDetail(row)" />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <!-- 弹窗 -->
   <XModal id="postModel" v-model="dialogVisible" :title="t('action.detail')">
@@ -45,16 +45,14 @@
 // 全局相关的 import
 import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 // 业务相关的 import
 import * as OperateLogApi from '@/api/system/operatelog'
 import { allSchemas } from './operatelog.data'
 
 const { t } = useI18n() // 国际化
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, exportList } = useVxeGrid<OperateLogApi.OperateLogVO>({
+const [registerTable, { exportList }] = useXTable({
   allSchemas: allSchemas,
   getListApi: OperateLogApi.getOperateLogPageApi,
   exportListApi: OperateLogApi.exportOperateLogApi
@@ -73,6 +71,6 @@ const handleDetail = (row: OperateLogApi.OperateLogVO) => {
 
 // 导出操作
 const handleExport = async () => {
-  await exportList(xGrid, '操作日志.xls')
+  await exportList('操作日志.xls')
 }
 </script>
