@@ -12,7 +12,7 @@
       </template>
       <template #actionbtns_default="{ row }">
         <XTextButton preIcon="ep:edit" :title="t('action.edit')" @click="handleUpdate(row.id)" />
-        <XTextButton preIcon="ep:delete" :title="t('action.del')" @click="handleDelete(row.id)" />
+        <XTextButton preIcon="ep:delete" :title="t('action.del')" @click="deleteData(row.id)" />
       </template>
     </XTable>
   </ContentWrap>
@@ -132,11 +132,6 @@ const handleUpdate = async (rowId: number) => {
   unref(treeRef)?.setCheckedKeys(res.menuIds)
 }
 
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
-}
-
 // 提交按钮
 const submitForm = async () => {
   const elForm = unref(formRef)?.getElFormRef()
@@ -147,7 +142,11 @@ const submitForm = async () => {
       // 提交请求
       try {
         const data = unref(formRef)?.formModel as TenantPackageApi.TenantPackageVO
-        data.menuIds = treeRef.value!.getCheckedKeys(false) as number[]
+        data.menuIds = [
+          ...(treeRef.value!.getCheckedKeys(false) as unknown as Array<number>),
+          ...(treeRef.value!.getHalfCheckedKeys() as unknown as Array<number>)
+        ]
+        console.info(data.menuIds)
         if (actionType.value === 'create') {
           await TenantPackageApi.createTenantPackageTypeApi(data)
           message.success(t('common.createSuccess'))

@@ -17,7 +17,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['pay:merchant:export']"
-          @click="handleExport()"
+          @click="exportList('商户列表.xls')"
         />
       </template>
       <template #actionbtns_default="{ row }">
@@ -40,7 +40,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['pay:merchant:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -113,11 +113,6 @@ const handleCreate = () => {
   setDialogTile('create')
 }
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('商户列表.xls')
-}
-
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -131,11 +126,6 @@ const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
   const res = await MerchantApi.getMerchantApi(rowId)
   detailData.value = res
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 // 提交按钮

@@ -17,7 +17,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['infra:config:export']"
-          @click="handleExport()"
+          @click="exportList('配置.xls')"
         />
       </template>
       <template #visible_default="{ row }">
@@ -43,7 +43,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['infra:config:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -123,11 +123,6 @@ const handleCreate = () => {
   setDialogTile('create')
 }
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('配置.xls')
-}
-
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -141,11 +136,6 @@ const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
   const res = await ConfigApi.getConfigApi(rowId)
   detailData.value = res
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 // 提交按钮

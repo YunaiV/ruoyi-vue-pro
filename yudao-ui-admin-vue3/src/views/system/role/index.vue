@@ -46,7 +46,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:role:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -215,11 +215,6 @@ const handleDetail = async (rowId: number) => {
   // 设置数据
   const res = await RoleApi.getRoleApi(rowId)
   detailData.value = res
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 // 提交按钮

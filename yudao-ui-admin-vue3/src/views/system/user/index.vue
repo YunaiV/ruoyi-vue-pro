@@ -112,7 +112,7 @@
                     preIcon="ep:delete"
                     :title="t('action.del')"
                     v-hasPermi="['system:user:delete']"
-                    @click="handleDelete(row.id)"
+                    @click="deleteData(row.id)"
                   />
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -405,10 +405,7 @@ const handleDetail = async (rowId: number) => {
   detailData.value = res
   await setDialogTile('detail')
 }
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
-}
+
 // 提交按钮
 const submitForm = async () => {
   loading.value = true
