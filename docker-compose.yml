@@ -1,0 +1,33 @@
+version: '3.3'
+services:
+  adminer:
+    image: adminer:4.8.1
+    restart: always
+    ports:
+      - 7777:8080
+  dbmysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'ruoyi-vue-pro'
+      MYSQL_ROOT_PASSWORD: '123456'
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - '3306:3306'
+    command: --init-file /data/application/init.sql --default-authentication-plugin=mysql_native_password
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
+      # Where our data will be persisted
+    volumes:
+      - my-db:/var/lib/mysql
+      - ./init.sql:/data/application/init.sql
+  redis:
+    image: redis
+    command: redis-server
+    restart: always
+    ports:
+      - '6379:6379'
+# Names our volume
+volumes:
+  my-db:
