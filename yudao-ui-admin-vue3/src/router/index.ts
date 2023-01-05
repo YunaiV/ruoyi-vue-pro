@@ -6,15 +6,11 @@ import { isRelogin } from '@/config/axios/service'
 import { getAccessToken } from '@/utils/auth'
 import { useTitle } from '@/hooks/web/useTitle'
 import { useNProgress } from '@/hooks/web/useNProgress'
-import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { usePageLoading } from '@/hooks/web/usePageLoading'
 import { useDictStoreWithOut } from '@/store/modules/dict'
 import { useUserStoreWithOut } from '@/store/modules/user'
 import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { getInfoApi } from '@/api/login'
-import { listSimpleDictDataApi } from '@/api/system/dict/dict.data'
-
-const { wsCache } = useCache()
 
 const { start, done } = useNProgress()
 
@@ -50,12 +46,11 @@ router.beforeEach(async (to, from, next) => {
       const dictStore = useDictStoreWithOut()
       const userStore = useUserStoreWithOut()
       const permissionStore = usePermissionStoreWithOut()
-      const dictMap = wsCache.get(CACHE_KEY.DICT_CACHE)
-      if (!dictMap) {
-        const res = await listSimpleDictDataApi()
-        dictStore.setDictMap(res)
+      if (!dictStore.getIsSetDict) {
+        dictStore.setDictMap()
       }
       if (!userStore.getIsSetUser) {
+        console.info(1)
         isRelogin.show = true
         const res = await getInfoApi()
         await userStore.setUserInfoAction(res)
