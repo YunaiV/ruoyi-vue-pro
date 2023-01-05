@@ -215,13 +215,15 @@ const getTenantId = async () => {
 }
 // 记住我
 const getCookie = () => {
-  const { username, password, rememberMe, tenantName } = authUtil.getLoginForm()
-  loginData.loginForm = {
-    ...loginData.loginForm,
-    username: username ? username : loginData.loginForm.username,
-    password: password ? password : loginData.loginForm.password,
-    rememberMe: rememberMe ? true : false,
-    tenantName: tenantName ? tenantName : loginData.loginForm.tenantName
+  const loginForm = authUtil.getLoginForm()
+  if (loginForm) {
+    loginData.loginForm = {
+      ...loginData.loginForm,
+      username: loginForm.username ? loginForm.username : loginData.loginForm.username,
+      password: loginForm.password ? loginForm.password : loginData.loginForm.password,
+      rememberMe: loginForm.rememberMe ? true : false,
+      tenantName: loginForm.tenantName ? loginForm.tenantName : loginData.loginForm.tenantName
+    }
   }
 }
 // 登录

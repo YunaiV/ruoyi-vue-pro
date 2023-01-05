@@ -47,7 +47,9 @@ export type LoginFormType = {
 
 export const getLoginForm = () => {
   const loginForm: LoginFormType = wsCache.get(LoginFormKey)
-  loginForm.password = decrypt(loginForm.password) as string
+  if (loginForm) {
+    loginForm.password = decrypt(loginForm.password) as string
+  }
   return loginForm
 }
 
