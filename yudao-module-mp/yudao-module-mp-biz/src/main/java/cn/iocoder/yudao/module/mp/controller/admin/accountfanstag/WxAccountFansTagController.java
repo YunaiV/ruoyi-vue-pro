@@ -88,16 +88,4 @@ public class WxAccountFansTagController {
         return success(WxAccountFansTagConvert.INSTANCE.convertPage(pageResult));
     }
 
-    @GetMapping("/export-excel")
-    @ApiOperation("导出粉丝标签关联 Excel")
-    @PreAuthorize("@ss.hasPermission('wechatMp:wx-account-fans-tag:export')")
-    @OperateLog(type = EXPORT)
-    public void exportWxAccountFansTagExcel(@Valid WxAccountFansTagExportReqVO exportReqVO,
-                                            HttpServletResponse response) throws IOException {
-        List<WxAccountFansTagDO> list = wxAccountFansTagService.getWxAccountFansTagList(exportReqVO);
-        // 导出 Excel
-        List<WxAccountFansTagExcelVO> datas = WxAccountFansTagConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "粉丝标签关联.xls", "数据", WxAccountFansTagExcelVO.class, datas);
-    }
-
 }

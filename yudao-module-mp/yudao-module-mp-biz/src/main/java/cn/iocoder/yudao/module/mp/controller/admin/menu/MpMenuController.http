@@ -1,0 +1,20 @@
+### 请求 /login 接口 => 成功
+POST {{baseUrl}}/mp/menu/save
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "accountId": "1",
+  "buttons": [
+    {
+      "type":"click",
+      "name":"今日歌曲",
+      "key":"V1001_TODAY_MUSIC"
+    },
+    {
+      "name":"搜索",
+      "type":"view",
+      "url":"http://www.soso.com/"
+    }]
+}

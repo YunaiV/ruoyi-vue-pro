@@ -22,8 +22,8 @@ public class MpAccountBaseVO {
     @NotNull(message = "公众号账户不能为空")
     private String account;
 
-    @ApiModelProperty(value = "公众号 appid", required = true)
-    @NotNull(message = "公众号 appid 不能为空")
+    @ApiModelProperty(value = "公众号 appId", required = true, example = "wx5b23ba7a5589ecbb")
+    @NotNull(message = "公众号 appId 不能为空")
     private String appId;
 
     @ApiModelProperty(value = "公众号密钥", required = true)

@@ -10,10 +10,10 @@ import io.swagger.annotations.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class WxMenuRespVO extends WxMenuBaseVO {
+public class MpMenuRespVO extends MpMenuBaseVO {
 
     @ApiModelProperty(value = "主键", required = true)
-    private Integer id;
+    private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;
