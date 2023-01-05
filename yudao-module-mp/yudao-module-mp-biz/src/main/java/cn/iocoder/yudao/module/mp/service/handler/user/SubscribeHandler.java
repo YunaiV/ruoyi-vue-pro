@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.mp.service.handler.user;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import cn.iocoder.yudao.module.mp.framework.mp.core.context.MpContextHolder;
 import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
+import cn.iocoder.yudao.module.mp.service.message.MpAutoReplyService;
 import cn.iocoder.yudao.module.mp.service.user.MpUserService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -22,19 +23,15 @@ import java.util.Map;
  * 关注的事件处理器
  *
  * @author 芋道源码
- *
- * // TODO 芋艿：待实现
  */
 @Component
 @Slf4j
 public class SubscribeHandler implements WxMpMessageHandler {
 
     @Resource
-    @Lazy // 延迟加载，解决循环依赖的问题
-    private MpAccountService mpAccountService;
-
-    @Resource
     private MpUserService mpUserService;
+    @Resource
+    private MpAutoReplyService mpAutoReplyService;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context,
@@ -49,24 +46,10 @@ public class SubscribeHandler implements WxMpMessageHandler {
         }
 
         // 第二步，保存用户信息
-        MpUserDO mpUser = null;
-        if (wxMpUser != null) {
-            mpUser = mpUserService.saveUser(MpContextHolder.getAppId(), wxMpUser);
-        }
+        mpUserService.saveUser(MpContextHolder.getAppId(), wxMpUser);
 
-        // 第三步，回复关注的欢迎语  TODO 芋艿：关注的欢迎语
-//        return new TextBuilder().build("感谢关注", wxMessage, weixinService);
-        return null;
-    }
-
-    /**
-     * 处理特殊请求，比如如果是扫码进来的，可以做相应处理
-     */
-    private WxMpXmlOutMessage handleSpecial(WxMpXmlMessage wxMessage)
-            throws Exception {
-
-        //TODO
-        return null;
+        // 第三步，回复关注的欢迎语
+        return mpAutoReplyService.replyForSubscribe(MpContextHolder.getAppId(), wxMessage);
     }
 
 }

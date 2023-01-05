@@ -1,6 +1,11 @@
 package cn.iocoder.yudao.module.mp.service.handler.user;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.module.mp.framework.mp.core.context.MpContextHolder;
+import cn.iocoder.yudao.module.mp.service.message.MpAutoReplyService;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpMessageHandler;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -8,38 +13,37 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Map;
 
 /**
  * 上报地理位置的事件处理器
  *
- * // TODO @芋艿：需要实现一下~
+ * 触发操作：打开微信公众号 -> 点击 + 号 -> 选择「语音」
+ *
+ * 逻辑：用户上传地理位置时，也可以触发自动回复
+ *
+ * @author 芋道源码
  */
 @Component
 @Slf4j
 public class LocationHandler implements WxMpMessageHandler {
 
+    @Resource
+    private MpAutoReplyService mpAutoReplyService;
+
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context,
                                     WxMpService wxMpService, WxSessionManager sessionManager) {
-//        if (wxMessage.getMsgType().equals(XmlMsgType.LOCATION)) {
-//            //TODO 接收处理用户发送的地理位置消息
-//            try {
-//                String content = "感谢反馈，您的的地理位置已收到！";
-//                return new TextBuilder().build(content, wxMessage, null);
-//            } catch (Exception e) {
-//                log.error("位置消息接收处理失败", e);
-//                return null;
-//            }
-//        }
-//
-//        //上报地理位置事件
-//       log.info("上报地理位置，纬度 : {}，经度 : {}，精度 : {}",
-//            wxMessage.getLatitude(), wxMessage.getLongitude(), String.valueOf(wxMessage.getPrecision()));
+        // 防御性编程：必须是 LOCATION 消息
+        if (ObjectUtil.notEqual(wxMessage.getMsgType(), WxConsts.XmlMsgType.LOCATION)) {
+            return null;
+        }
+        log.info("[handle][上报地理位置，纬度({})、经度({})、精度({})", wxMessage.getLatitude(),
+                wxMessage.getLongitude(), wxMessage.getPrecision());
 
-        //TODO  可以将用户地理位置信息保存到本地数据库，以便以后使用
-
-        return null;
+        // 自动回复
+        return mpAutoReplyService.replyForMessage(MpContextHolder.getAppId(), wxMessage);
     }
 
 }

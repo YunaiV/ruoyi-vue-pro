@@ -89,7 +89,7 @@ public class MpMessageServiceImpl implements MpMessageService {
         }
         mpMessageMapper.insert(message);
 
-//        WxConsts.MenuButtonType.VIEW
+//        WxConsts.MenuButtonType.VIEW TODO 芋艿：待测试
 //        wxMessage.getEventKey()
 
 //        WxConsts.MenuButtonType.CLICK

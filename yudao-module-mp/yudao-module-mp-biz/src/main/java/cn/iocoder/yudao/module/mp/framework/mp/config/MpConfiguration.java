@@ -36,7 +36,7 @@ public class MpConfiguration {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public MpServiceFactory mpServiceFactory(RedisTemplateWxRedisOps redisTemplateWxRedisOps,
                                              WxMpProperties wxMpProperties,
-                                             MessageReceiveHandler logHandler,
+                                             MessageReceiveHandler messageReceiveHandler,
                                              KfSessionHandler kfSessionHandler,
                                              StoreCheckNotifyHandler storeCheckNotifyHandler,
                                              MenuHandler menuHandler,
@@ -45,10 +45,10 @@ public class MpConfiguration {
                                              UnsubscribeHandler unsubscribeHandler,
                                              LocationHandler locationHandler,
                                              ScanHandler scanHandler,
-                                             MessageAutoReplyHandler msgHandler) {
+                                             MessageAutoReplyHandler messageAutoReplyHandler) {
         return new DefaultMpServiceFactory(redisTemplateWxRedisOps, wxMpProperties,
-                logHandler, kfSessionHandler, storeCheckNotifyHandler, menuHandler,
-                nullHandler, subscribeHandler, unsubscribeHandler, locationHandler, scanHandler, msgHandler);
+                messageReceiveHandler, kfSessionHandler, storeCheckNotifyHandler, menuHandler,
+                nullHandler, subscribeHandler, unsubscribeHandler, locationHandler, scanHandler, messageAutoReplyHandler);
     }
 
 }

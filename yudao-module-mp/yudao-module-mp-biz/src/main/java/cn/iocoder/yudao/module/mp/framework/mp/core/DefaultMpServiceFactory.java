@@ -49,7 +49,7 @@ public class DefaultMpServiceFactory implements MpServiceFactory {
 
     // ========== 各种 Handler ==========
 
-    private final MessageReceiveHandler logHandler;
+    private final MessageReceiveHandler messageReceiveHandler;
     private final KfSessionHandler kfSessionHandler;
     private final StoreCheckNotifyHandler storeCheckNotifyHandler;
     private final MenuHandler menuHandler;
@@ -58,7 +58,7 @@ public class DefaultMpServiceFactory implements MpServiceFactory {
     private final UnsubscribeHandler unsubscribeHandler;
     private final LocationHandler locationHandler;
     private final ScanHandler scanHandler;
-    private final MessageAutoReplyHandler msgHandler;
+    private final MessageAutoReplyHandler messageAutoReplyHandler;
 
     @Override
     public void init(List<MpAccountDO> list) {
@@ -108,7 +108,7 @@ public class DefaultMpServiceFactory implements MpServiceFactory {
     private WxMpMessageRouter buildMpMessageRouter(WxMpService mpService) {
         WxMpMessageRouter router = new WxMpMessageRouter(mpService);
         // 记录所有事件的日志（异步执行）
-        router.rule().handler(logHandler).next();
+        router.rule().handler(messageReceiveHandler).next();
 
         // 接收客服会话管理事件
         router.rule().async(false).msgType(WxConsts.XmlMsgType.EVENT)
@@ -159,7 +159,7 @@ public class DefaultMpServiceFactory implements MpServiceFactory {
                 .event(WxConsts.EventType.SCAN).handler(scanHandler).end();
 
         // 默认
-        router.rule().async(false).handler(msgHandler).end();
+        router.rule().async(false).handler(messageAutoReplyHandler).end();
         return router;
     }
 

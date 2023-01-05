@@ -34,4 +34,11 @@ public interface MpAutoReplyMapper extends BaseMapperX<MpAutoReplyDO> {
                 .eq(MpAutoReplyDO::getType, MpAutoReplyTypeEnum.MESSAGE.getType())
                 .eq(MpAutoReplyDO::getRequestMessageType, requestMessageType));
     }
+
+    default List<MpAutoReplyDO> selectListByAppIdAndSubscribe(String appId) {
+        return selectList(new LambdaQueryWrapperX<MpAutoReplyDO>()
+                .eq(MpAutoReplyDO::getAppId, appId)
+                .eq(MpAutoReplyDO::getType, MpAutoReplyTypeEnum.SUBSCRIBE.getType()));
+    }
+
 }
