@@ -23,8 +23,8 @@
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
         <druid.version>1.2.15</druid.version>
-        <mybatis-plus.version>3.5.3</mybatis-plus.version>
-        <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
+        <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <mybatis-plus-generator.version>3.5.3.1</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.6.1</dynamic-datasource.version>
         <redisson.version>3.18.0</redisson.version>
         <!-- 服务保障相关 -->
