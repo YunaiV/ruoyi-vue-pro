@@ -11,6 +11,8 @@ import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCheckRespD
 import lombok.RequiredArgsConstructor;
 import org.jeecg.modules.jmreport.api.JmReportTokenServiceI;
 
+import java.util.Objects;
+
 /**
  * {@link JmReportTokenServiceI} 实现类，提供积木报表的 Token 校验、用户信息的查询等功能
  *
@@ -29,8 +31,40 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
      */
     @Override
     public Boolean verifyToken(String token) {
+        Long userId = SecurityFrameworkUtils.getLoginUserId();
+        if (!Objects.isNull(userId)) {
+            return true;
+        }
+        return injectUserInfoByToken(token) != null;
+    }
+
+    /**
+     * 获得用户编号
+     * <p>
+     * 虽然方法名获得的是 username，实际对应到项目中是用户编号
+     *
+     * @param token JmReport 前端传递的 token
+     * @return 用户编号
+     */
+    @Override
+    public String getUsername(String token) {
+        Long userId = SecurityFrameworkUtils.getLoginUserId();
+        if (Objects.isNull(userId)) {
+            LoginUser user = injectUserInfoByToken(token);
+            return user == null ? null : String.valueOf(user.getId());
+        }
+        return String.valueOf(userId);
+    }
+
+    /**
+     * 注入用户信息
+     *
+     * @param token token
+     * @return 返回 token 对应的用户信息
+     */
+    private LoginUser injectUserInfoByToken(String token) {
         if (StrUtil.isEmpty(token)) {
-            return false;
+            return null;
         }
         // TODO 如下的实现不算特别优雅，主要咱是不想搞的太复杂，所以参考对应的 Filter 先实现了
 
@@ -41,7 +75,7 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
         try {
             OAuth2AccessTokenCheckRespDTO accessToken = oauth2TokenApi.checkAccessToken(token);
             if (accessToken == null) {
-                return false;
+                return null;
             }
             user = new LoginUser().setId(accessToken.getUserId()).setUserType(accessToken.getUserType())
                     .setTenantId(accessToken.getTenantId()).setScopes(accessToken.getScopes());
@@ -49,7 +83,7 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
             // do nothing：如果报错，说明认证失败，则返回 false 即可
         }
         if (user == null) {
-            return false;
+            return null;
         }
         SecurityFrameworkUtils.setLoginUser(user, WebFrameworkUtils.getRequest());
 
@@ -57,21 +91,7 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
         // 目的：基于 LoginUser 获得到的租户编号，设置到 Tenant 上下文，避免查询数据库时的报错
         TenantContextHolder.setIgnore(false);
         TenantContextHolder.setTenantId(user.getTenantId());
-        return true;
-    }
-
-    /**
-     * 获得用户编号
-     *
-     * 虽然方法名获得的是 username，实际对应到项目中是用户编号
-     *
-     * @param token JmReport 前端传递的 token
-     * @return 用户编号
-     */
-    @Override
-    public String getUsername(String token) {
-        Long userId = SecurityFrameworkUtils.getLoginUserId();
-        return userId != null ? String.valueOf(userId) : null;
+        return user;
     }
 
 }
