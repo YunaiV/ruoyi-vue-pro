@@ -12,7 +12,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import lombok.*;
 import me.chanjar.weixin.common.api.WxConsts;
+import me.chanjar.weixin.mp.builder.kefu.NewsBuilder;
 
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.List;
 
@@ -199,20 +201,24 @@ public class MpMessageDO extends BaseDO {
         /**
          * 图文消息标题
          */
+        @NotEmpty(message = "图文消息标题不能为空", groups = NewsBuilder.class)
         private String title;
         /**
          * 图文消息描述
          */
+        @NotEmpty(message = "图文消息描述不能为空", groups = NewsBuilder.class)
         private String description;
         /**
          * 图片链接
          *
-         * 支持JPG、PNG格式，较好的效果为大图 360*200，小图 200*200
+         * 支持 JPG、PNG 格式，较好的效果为大图 360*200，小图 200*200
          */
+        @NotEmpty(message = "图片链接不能为空", groups = NewsBuilder.class)
         private String picUrl;
         /**
          * 点击图文消息跳转链接
          */
+        @NotEmpty(message = "点击图文消息跳转链接不能为空", groups = NewsBuilder.class)
         private String url;
 
     }

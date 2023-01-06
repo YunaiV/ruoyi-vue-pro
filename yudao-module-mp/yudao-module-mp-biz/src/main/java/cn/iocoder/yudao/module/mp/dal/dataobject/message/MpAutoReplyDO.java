@@ -16,7 +16,6 @@ import lombok.ToString;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
 
-import java.util.List;
 import java.util.Set;
 
 /**

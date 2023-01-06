@@ -1,20 +1,16 @@
 package cn.iocoder.yudao.module.mp.convert.message;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessageRespVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
-import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpAutoReplyDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
+import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutNewsMessage;
 import me.chanjar.weixin.mp.builder.outxml.BaseBuilder;
-import me.chanjar.weixin.mp.builder.outxml.TextBuilder;
-import me.chanjar.weixin.mp.builder.outxml.VideoBuilder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -51,23 +47,27 @@ public interface MpMessageConvert {
         return message;
     }
 
-    default MpMessageDO convert(MpAutoReplyDO reply, MpAccountDO account, MpUserDO user) {
+    default MpMessageDO convert(MpMessageSendOutReqBO sendReqBO, MpAccountDO account, MpUserDO user) {
         // 构建消息
         MpMessageDO message = new MpMessageDO();
-        message.setType(reply.getResponseMessageType());
-        // 1. 文本
-        if (StrUtil.equals(reply.getResponseMessageType(), WxConsts.XmlMsgType.TEXT)) {
-            message.setContent(reply.getResponseContent());
-        } else if (ObjectUtils.equalsAny(reply.getResponseMessageType(), WxConsts.XmlMsgType.IMAGE,  // 2. 图片
-                WxConsts.XmlMsgType.VOICE)) { // 3. 语音
-            message.setMediaId(reply.getResponseMediaId()).setMediaUrl(reply.getResponseMediaUrl());
-        } else if (StrUtil.equals(reply.getResponseMessageType(), WxConsts.XmlMsgType.VIDEO)) { // 4. 视频
-            message.setMediaId(reply.getResponseMediaId()).setMediaUrl(reply.getResponseMediaUrl())
-                    .setTitle(reply.getResponseTitle()).setDescription(reply.getResponseDescription());
-        } else if (StrUtil.equals(reply.getResponseMessageType(), WxConsts.XmlMsgType.NEWS)) { // 5. 图文
-            message.setArticles(Collections.singletonList(reply.getResponseArticle()));
-        } else {
-            throw new IllegalArgumentException("不支持的消息类型：" + message.getType());
+        message.setType(sendReqBO.getType());
+        switch (sendReqBO.getType()) {
+            case WxConsts.XmlMsgType.TEXT: // 1. 文本
+                message.setContent(sendReqBO.getContent());
+                break;
+            case WxConsts.XmlMsgType.IMAGE: // 2. 图片
+            case WxConsts.XmlMsgType.VOICE: // 3. 语音
+                message.setMediaId(sendReqBO.getMediaId()).setMediaUrl(sendReqBO.getMediaUrl());
+                break;
+            case WxConsts.XmlMsgType.VIDEO: // 4. 视频
+                message.setMediaId(sendReqBO.getMediaId()).setMediaUrl(sendReqBO.getMediaUrl())
+                        .setTitle(sendReqBO.getTitle()).setDescription(sendReqBO.getDescription());
+                break;
+            case WxConsts.XmlMsgType.NEWS: // 5. 图文
+                message.setArticles(Collections.singletonList(sendReqBO.getArticle()));
+                break;
+            default:
+                throw new IllegalArgumentException("不支持的消息类型：" + message.getType());
         }
 
         // 其它字段

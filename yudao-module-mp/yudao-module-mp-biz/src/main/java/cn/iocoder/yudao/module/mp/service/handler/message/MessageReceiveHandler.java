@@ -29,7 +29,7 @@ public class MessageReceiveHandler implements WxMpMessageHandler {
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context,
                                     WxMpService wxMpService, WxSessionManager sessionManager) {
         log.info("[handle][接收到请求消息，内容：{}]", wxMessage);
-        mpMessageService.createFromUser(MpContextHolder.getAppId(), wxMessage);
+        mpMessageService.receiveMessage(MpContextHolder.getAppId(), wxMessage);
         return null;
     }
 

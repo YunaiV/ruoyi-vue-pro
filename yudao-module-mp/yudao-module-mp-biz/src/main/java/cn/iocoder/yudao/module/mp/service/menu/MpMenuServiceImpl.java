@@ -1,11 +1,18 @@
 package cn.iocoder.yudao.module.mp.service.menu;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.mp.convert.menu.MpMenuConvert;
+import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.menu.MpMenuDO;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
+import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
+import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.menu.WxMenu;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +34,7 @@ import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
+@Slf4j
 public class MpMenuServiceImpl implements MpMenuService {
 
     @Resource
@@ -75,6 +83,51 @@ public class MpMenuServiceImpl implements MpMenuService {
     @Override
     public MpMenuDO getMenu(Long id) {
         return mpMenuMapper.selectById(id);
+    }
+
+    @Override
+    public WxMpXmlOutMessage reply(String appId, String key, String openid) {
+        // 获得菜单
+        MpMenuDO menu = mpMenuMapper.selectByAppId(appId);
+        if (menu == null) {
+            log.error("[reply][appId({}) 找不到对应的菜单]", appId);
+            return null;
+        }
+        // 匹配对应的按钮
+        MpMenuDO.Button button = getMenuButton(menu, key);
+        if (button == null) {
+            log.error("[reply][appId({}) key({}) 找不到对应的菜单按钮]", appId, key);
+            return null;
+        }
+        // 按钮必须要有消息类型，不然后续无法回复消息
+        if (StrUtil.isEmpty(button.getMessageType())) {
+            log.error("[reply][appId({}) key({}) 不存在消息类型({})]", appId, key, button);
+            return null;
+        }
+
+        // 回复消息
+        return null;
+    }
+
+    private MpMenuDO.Button getMenuButton(MpMenuDO menu, String key) {
+        // 先查询子按钮
+        for (MpMenuDO.Button button : menu.getButtons()) {
+            if (CollUtil.isEmpty(button.getSubButtons())) {
+                continue;
+            }
+            for (MpMenuDO.Button subButton : button.getSubButtons()) {
+                if (StrUtil.equals(subButton.getKey(), key)) {
+                    return subButton;
+                }
+            }
+        }
+        // 再查询父按钮
+        for (MpMenuDO.Button button : menu.getButtons()) {
+            if (StrUtil.equals(button.getKey(), key)) {
+                return button;
+            }
+        }
+        return null;
     }
 
 }

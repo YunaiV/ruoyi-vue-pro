@@ -2,11 +2,13 @@ package cn.iocoder.yudao.module.mp.service.message;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.module.mp.convert.message.MpAutoReplyConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpAutoReplyDO;
 import cn.iocoder.yudao.module.mp.dal.mysql.message.MpAutoReplyMapper;
 import cn.iocoder.yudao.module.mp.enums.message.MpAutoReplyTypeEnum;
 import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
+import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
@@ -58,7 +60,8 @@ public class MpAutoReplyServiceImpl implements MpAutoReplyService {
         MpAutoReplyDO reply = CollUtil.getFirst(replies);
 
         // 第二步，基于自动回复，创建消息
-        return mpMessageService.createFromAutoReply(wxMessage.getFromUser(), reply);
+        MpMessageSendOutReqBO sendReqBO = MpAutoReplyConvert.INSTANCE.convert(wxMessage.getFromUser(), reply);
+        return mpMessageService.sendOutMessage(sendReqBO);
     }
 
     @Override
@@ -69,7 +72,8 @@ public class MpAutoReplyServiceImpl implements MpAutoReplyService {
                 : buildDefaultSubscribeAutoReply(appId); // 如果不存在，提供一个默认末班
 
         // 第二步，基于自动回复，创建消息
-        return mpMessageService.createFromAutoReply(wxMessage.getFromUser(), reply);
+        MpMessageSendOutReqBO sendReqBO = MpAutoReplyConvert.INSTANCE.convert(wxMessage.getFromUser(), reply);
+        return mpMessageService.sendOutMessage(sendReqBO);
     }
 
     private MpAutoReplyDO buildDefaultSubscribeAutoReply(String appId) {

@@ -7,4 +7,8 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface MpMenuMapper extends BaseMapperX<MpMenuDO> {
 
+    default MpMenuDO selectByAppId(String appId) {
+        return selectOne(MpMenuDO::getAppId, appId);
+    }
+
 }
