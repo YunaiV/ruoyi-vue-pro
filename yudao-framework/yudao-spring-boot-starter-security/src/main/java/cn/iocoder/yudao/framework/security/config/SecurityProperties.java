@@ -20,8 +20,6 @@ public class SecurityProperties {
     @NotEmpty(message = "Token Header 不能为空")
     private String tokenHeader = "Authorization";
 
-    private String jmTokenHeader = "X-Access-Token";
-
     /**
      * mock 模式的开关
      */
