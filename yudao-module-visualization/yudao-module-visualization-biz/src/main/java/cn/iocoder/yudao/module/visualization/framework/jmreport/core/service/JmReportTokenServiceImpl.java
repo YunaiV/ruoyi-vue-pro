@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.visualization.framework.jmreport.core.service;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -35,7 +36,7 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
         if (!Objects.isNull(userId)) {
             return true;
         }
-        return injectUserInfoByToken(token) != null;
+        return buildLoginUserByToken(token) != null;
     }
 
     /**
@@ -49,20 +50,20 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
     @Override
     public String getUsername(String token) {
         Long userId = SecurityFrameworkUtils.getLoginUserId();
-        if (Objects.isNull(userId)) {
-            LoginUser user = injectUserInfoByToken(token);
-            return user == null ? null : String.valueOf(user.getId());
+        if (ObjectUtil.isNotNull(userId)) {
+            return String.valueOf(userId);
         }
-        return String.valueOf(userId);
+        LoginUser user = buildLoginUserByToken(token);
+        return user == null ? null : String.valueOf(user.getId());
     }
 
     /**
-     * 注入用户信息
+     * 基于 token 构建登录用户
      *
      * @param token token
      * @return 返回 token 对应的用户信息
      */
-    private LoginUser injectUserInfoByToken(String token) {
+    private LoginUser buildLoginUserByToken(String token) {
         if (StrUtil.isEmpty(token)) {
             return null;
         }
