@@ -104,7 +104,7 @@
     "vite-plugin-svg-icons": "^2.0.1",
     "vite-plugin-vue-setup-extend": "^0.4.0",
     "vite-plugin-windicss": "^1.8.10",
-    "vue-tsc": "^1.0.20",
+    "vue-tsc": "^1.0.22",
     "windicss": "^3.5.6"
   },
   "engines": {

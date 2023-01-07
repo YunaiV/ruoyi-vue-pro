@@ -92,6 +92,11 @@ yudao:
   security:
     permit-all_urls:
       - /admin-ui/** # /resources/admin-ui 目录下的静态资源
+  websocket:
+    enable: true # websocket的开关
+    path: /websocket/message # 路径
+    maxOnlineCount: 0 # 最大连接人数
+    sessionMap: true # 保存sessionMap
   swagger:
     title: 管理后台
     description: 提供管理员管理的所有功能
