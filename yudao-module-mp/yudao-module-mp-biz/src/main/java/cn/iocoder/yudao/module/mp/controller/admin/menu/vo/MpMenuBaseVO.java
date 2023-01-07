@@ -18,7 +18,4 @@ public class MpMenuBaseVO {
     @NotNull(message = "公众号账号的编号不能为空")
     private Long accountId;
 
-    @NotNull(message = "按钮不能为空")
-    private List<WxMenuButton> buttons;
-
 }

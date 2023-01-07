@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.mp.service.menu;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.mp.convert.menu.MpMenuConvert;
-import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.menu.MpMenuDO;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
-import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
+import cn.iocoder.yudao.module.mp.service.message.MpMessageService;
+import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.menu.WxMenu;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -36,6 +34,9 @@ import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.*;
 @Validated
 @Slf4j
 public class MpMenuServiceImpl implements MpMenuService {
+
+    @Resource
+    private MpMessageService mpMessageService;
 
     @Resource
     @Lazy // 延迟加载，避免循环引用报错
@@ -87,47 +88,21 @@ public class MpMenuServiceImpl implements MpMenuService {
 
     @Override
     public WxMpXmlOutMessage reply(String appId, String key, String openid) {
-        // 获得菜单
-        MpMenuDO menu = mpMenuMapper.selectByAppId(appId);
+        // 第一步，获得菜单
+        MpMenuDO menu = mpMenuMapper.selectByAppIdAndMenuKey(appId, key);
         if (menu == null) {
-            log.error("[reply][appId({}) 找不到对应的菜单]", appId);
-            return null;
-        }
-        // 匹配对应的按钮
-        MpMenuDO.Button button = getMenuButton(menu, key);
-        if (button == null) {
-            log.error("[reply][appId({}) key({}) 找不到对应的菜单按钮]", appId, key);
+            log.error("[reply][appId({}) key({}) 找不到对应的菜单]", appId, key);
             return null;
         }
         // 按钮必须要有消息类型，不然后续无法回复消息
-        if (StrUtil.isEmpty(button.getMessageType())) {
-            log.error("[reply][appId({}) key({}) 不存在消息类型({})]", appId, key, button);
+        if (StrUtil.isEmpty(menu.getReplyMessageType())) {
+            log.error("[reply][menu({}) 不存在对应的消息类型]", menu);
             return null;
         }
 
-        // 回复消息
-        return null;
-    }
-
-    private MpMenuDO.Button getMenuButton(MpMenuDO menu, String key) {
-        // 先查询子按钮
-        for (MpMenuDO.Button button : menu.getButtons()) {
-            if (CollUtil.isEmpty(button.getSubButtons())) {
-                continue;
-            }
-            for (MpMenuDO.Button subButton : button.getSubButtons()) {
-                if (StrUtil.equals(subButton.getKey(), key)) {
-                    return subButton;
-                }
-            }
-        }
-        // 再查询父按钮
-        for (MpMenuDO.Button button : menu.getButtons()) {
-            if (StrUtil.equals(button.getKey(), key)) {
-                return button;
-            }
-        }
-        return null;
+        // 第二步，回复消息
+        MpMessageSendOutReqBO sendReqBO = MpMenuConvert.INSTANCE.convert(openid, menu);
+        return mpMessageService.sendOutMessage(sendReqBO);
     }
 
 }

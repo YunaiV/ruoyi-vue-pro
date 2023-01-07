@@ -64,7 +64,7 @@ public interface MpMessageConvert {
                         .setTitle(sendReqBO.getTitle()).setDescription(sendReqBO.getDescription());
                 break;
             case WxConsts.XmlMsgType.NEWS: // 5. 图文
-                message.setArticles(Collections.singletonList(sendReqBO.getArticle()));
+                message.setArticles(sendReqBO.getArticles());
                 break;
             default:
                 throw new IllegalArgumentException("不支持的消息类型：" + message.getType());

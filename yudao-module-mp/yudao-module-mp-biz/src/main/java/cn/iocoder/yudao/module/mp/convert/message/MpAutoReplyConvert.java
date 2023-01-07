@@ -20,7 +20,7 @@ public interface MpAutoReplyConvert {
             @Mapping(source = "reply.responseMediaUrl", target = "mediaUrl"),
             @Mapping(source = "reply.responseTitle", target = "title"),
             @Mapping(source = "reply.responseDescription", target = "description"),
-            @Mapping(source = "reply.responseArticle", target = "article"),
+            @Mapping(source = "reply.responseArticles", target = "articles"),
     })
     MpMessageSendOutReqBO convert(String openid, MpAutoReplyDO reply);
 

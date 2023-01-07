@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.mp.dal.dataobject.menu;
 
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
@@ -8,7 +7,6 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -20,8 +18,6 @@ import java.util.List;
 /**
  * 微信菜单 DO
  *
- * 一个公众号，只有一个 MpMenuDO 记录。一个公众号的多个菜单，对应到就是 {@link #buttons} 多个按钮
- *
  * @author 芋道源码
  */
 @TableName(value = "mp_menu", autoResultMap = true)
@@ -32,7 +28,12 @@ import java.util.List;
 public class MpMenuDO extends BaseDO {
 
     /**
-     * 主键
+     * 编号 - 顶级菜单
+     */
+    public static final Long ID_ROOT = 0L;
+
+    /**
+     * 编号
      */
     @TableId
     private Long id;
@@ -50,127 +51,105 @@ public class MpMenuDO extends BaseDO {
     private String appId;
 
     /**
-     * 按钮列表
+     * 菜单名称
      */
-    @TableField(typeHandler = ButtonTypeHandler.class)
-    private List<Button> buttons;
+    private String name;
     /**
-     * 同步状态
+     * 菜单标识
      *
-     * true - 已同步
-     * false - 未同步
+     * 支持多 DB 类型时，无法直接使用 key + @TableField("menuKey") 来实现转换，原因是 "menuKey" AS key 而存在报错
      */
-    private Boolean syncStatus;
+    private String menuKey;
+    /**
+     * 父菜单编号
+     */
+    private Long parentId;
+    /**
+     * 排序
+     */
+    private Integer sort;
+
+    // ========== 按钮操作 ==========
 
     /**
-     * 按钮
+     * 按钮类型
+     *
+     * 枚举 {@link MenuButtonType}
      */
-    @Data
-    public static class Button {
+    private String type;
 
-        /**
-         * 类型
-         *
-         * 枚举 {@link MenuButtonType}
-         */
-        private String type;
-        /**
-         * 消息类型
-         *
-         * 当 {@link #type} 为 CLICK、SCANCODE_WAITMSG
-         *
-         * 枚举 {@link WxConsts.XmlMsgType} 中的 TEXT、IMAGE、VOICE、VIDEO、NEWS
-         */
-        private String messageType;
-        /**
-         * 名称
-         */
-        private String name;
-        /**
-         * 标识
-         */
-        private String key;
-        /**
-         * 二级菜单列表
-         */
-        private List<Button> subButtons;
-        /**
-         * 网页链接
-         *
-         * 用户点击菜单可打开链接，不超过 1024 字节
-         *
-         * 类型为 {@link WxConsts.XmlMsgType} 的 VIEW、MINIPROGRAM
-         */
-        private String url;
+    /**
+     * 网页链接
+     *
+     * 用户点击菜单可打开链接，不超过 1024 字节
+     *
+     * 类型为 {@link WxConsts.XmlMsgType} 的 VIEW、MINIPROGRAM
+     */
+    private String url;
 
-        /**
-         * 小程序的 appId
-         *
-         * 类型为 {@link WxConsts.XmlMsgType} 的 MINIPROGRAM
-         */
-        private String appId;
+    /**
+     * 小程序的 appId
+     *
+     * 类型为 {@link MenuButtonType} 的 MINIPROGRAM
+     */
+    private String miniProgramAppId;
+    /**
+     * 小程序的页面路径
+     *
+     * 类型为 {@link MenuButtonType} 的 MINIPROGRAM
+     */
+    private String miniProgramPagePath;
 
-        /**
-         * 小程序的页面路径
-         *
-         * 类型为 {@link WxConsts.XmlMsgType} 的 MINIPROGRAM
-         */
-        private String pagePath;
+    // ========== 消息内容 ==========
 
-        /**
-         * 消息内容
-         *
-         * 消息类型为 {@link WxConsts.XmlMsgType} 的 TEXT
-         */
-        private String content;
+    /**
+     * 消息类型
+     *
+     * 当 {@link #type} 为 CLICK、SCANCODE_WAITMSG
+     *
+     * 枚举 {@link WxConsts.XmlMsgType} 中的 TEXT、IMAGE、VOICE、VIDEO、NEWS
+     */
+    private String replyMessageType;
 
-        /**
-         * 媒体 id
-         *
-         * 消息类型为 {@link WxConsts.XmlMsgType} 的 IMAGE、VOICE、VIDEO
-         */
-        private String mediaId;
-        /**
-         * 媒体 URL
-         *
-         * 消息类型为 {@link WxConsts.XmlMsgType} 的 IMAGE、VOICE、VIDEO
-         */
-        private String mediaUrl;
+    /**
+     * 回复的消息内容
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 TEXT
+     */
+    private String replyContent;
 
-        /**
-         * 回复的标题
-         *
-         * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO
-         */
-        private String title;
-        /**
-         * 回复的描述
-         *
-         * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO
-         */
-        private String description;
+    /**
+     * 回复的媒体 id
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 IMAGE、VOICE、VIDEO
+     */
+    private String replyMediaId;
+    /**
+     * 回复的媒体 URL
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 IMAGE、VOICE、VIDEO
+     */
+    private String replyMediaUrl;
 
-        /**
-         * 图文消息
-         *
-         * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
-         */
-        private MpMessageDO.Article article;
+    /**
+     * 回复的标题
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO
+     */
+    private String replyTitle;
+    /**
+     * 回复的描述
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO
+     */
+    private String replyDescription;
 
-    }
+    /**
+     * 回复的图文消息数组
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
+     */
+    @TableField(typeHandler = MpMessageDO.ArticleTypeHandler.class)
+    private List<MpMessageDO.Article> replyArticles;
 
-    // TODO @芋艿：可以找一些新的思路
-    public static class ButtonTypeHandler extends AbstractJsonTypeHandler<List<Button>> {
-
-        @Override
-        protected List<Button> parse(String json) {
-            return JsonUtils.parseArray(json, Button.class);
-        }
-
-        @Override
-        protected String toJson(List<Button> obj) {
-            return JsonUtils.toJsonString(obj);
-        }
-
-    }
 }

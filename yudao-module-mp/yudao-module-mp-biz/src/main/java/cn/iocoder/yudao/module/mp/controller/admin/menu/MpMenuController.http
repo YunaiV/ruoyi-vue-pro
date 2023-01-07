@@ -16,5 +16,19 @@ tenant-id: {{adminTenentId}}
       "name":"搜索",
       "type":"view",
       "url":"http://www.soso.com/"
+    },
+    {
+      "name": "父按钮",
+      "subButtons": [
+        {
+          "type":"click",
+          "name":"归去来兮",
+          "key":"MUSIC"
+        },
+        {
+          "name":"不说",
+          "type":"view",
+          "url":"https://www.soso.com/"
+        }]
     }]
 }

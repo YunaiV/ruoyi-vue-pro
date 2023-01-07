@@ -16,6 +16,7 @@ import lombok.ToString;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -130,6 +131,6 @@ public class MpAutoReplyDO extends BaseDO {
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private MpMessageDO.Article responseArticle;
+    @TableField(typeHandler = MpMessageDO.ArticleTypeHandler.class)
+    private List<MpMessageDO.Article> responseArticles;
 }

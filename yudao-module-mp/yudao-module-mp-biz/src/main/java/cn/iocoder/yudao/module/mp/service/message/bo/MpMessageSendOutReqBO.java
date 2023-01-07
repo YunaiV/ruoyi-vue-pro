@@ -9,6 +9,7 @@ import me.chanjar.weixin.common.api.WxConsts;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * 公众号消息发送 Request BO
@@ -85,6 +86,6 @@ public class MpMessageSendOutReqBO {
      */
     @Valid
     @NotNull(message = "图文消息不能为空", groups = NewsGroup.class)
-    private MpMessageDO.Article article;
+    private List<MpMessageDO.Article> articles;
 
 }
