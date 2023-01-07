@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
@@ -25,31 +26,35 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
 
-    private static final String JM_TOKEN_HEADER = "X-Access-Token";
     /**
-     * 系统内置请求头
+     * 积木 token head 头
      */
-    private static final String TOKEN_HEADER = "Authorization";
+    private static final String JM_TOKEN_HEADER = "X-Access-Token";
     /**
      * auth 相关格式
      */
-    private static final String AUTHORIZATION_FORMAT = "Bearer %s";
+    private static final String AUTHORIZATION_FORMAT = SecurityFrameworkUtils.AUTHORIZATION_BEARER + " %s";
 
     private final OAuth2TokenApi oauth2TokenApi;
 
+    private final SecurityProperties securityProperties;
+
     /**
-     * 修改请求的 head
+     * 自定义 API 数据集appian自定义 Header，解决 Token 传递。
+     * 参考 <a href="http://report.jeecg.com/2222224">api数据集token机制详解</a> 文档
      *
      * @return 新 head
      */
     @Override
     public HttpHeaders customApiHeader() {
-        HttpHeaders header = new HttpHeaders();
+        // 读取积木标标系统的 token
         HttpServletRequest request = ServletUtils.getRequest();
         String token = request.getHeader(JM_TOKEN_HEADER);
 
-        header.add(TOKEN_HEADER, String.format(AUTHORIZATION_FORMAT, token));
-        return header;
+        // 设置到 yudao 系统的 token
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(securityProperties.getTokenHeader(), String.format(AUTHORIZATION_FORMAT, token));
+        return headers;
     }
 
     /**
