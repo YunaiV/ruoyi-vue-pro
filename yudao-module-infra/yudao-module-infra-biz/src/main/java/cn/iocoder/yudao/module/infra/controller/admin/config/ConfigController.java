@@ -75,7 +75,7 @@ public class ConfigController {
         if (config == null) {
             return null;
         }
-        if (config.getVisible()) {
+        if (!config.getVisible()) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_VISIBLE);
         }
         return success(config.getValue());

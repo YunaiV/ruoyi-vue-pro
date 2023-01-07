@@ -30,7 +30,7 @@ module.exports = vm => {
         if (!isRefreshToken) {
           isRefreshToken = true
           // 1. 如果获取不到刷新令牌，则只能执行登出操作
-          if (!vm.$store.getters.refreshToken()) {
+          if (!vm.$store.getters.refreshToken) {
             vm.$store.commit('CLEAR_LOGIN_INFO')
             return Promise.reject(res)
           }
