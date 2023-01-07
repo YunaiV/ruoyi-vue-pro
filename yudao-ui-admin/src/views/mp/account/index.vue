@@ -28,16 +28,25 @@
       <el-table-column label="名称" align="center" prop="name"/>
       <el-table-column label="微信号" align="center" prop="account" width="180"/>
       <el-table-column label="appId" align="center" prop="appId" width="180"/>
-      <el-table-column label="appSecret" align="center" prop="appSecret" width="180"/>
-      <el-table-column label="Token" align="center" prop="token"/>
-      <el-table-column label="密钥" align="center" prop="aesKey"/>
-      <el-table-column label="二维码" align="center" prop="qrCodeUrl"/>
-      <el-table-column label="备注" align="center" prop="remark"/>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
+<!--      <el-table-column label="appSecret" align="center" prop="appSecret" width="180"/>-->
+<!--      <el-table-column label="token" align="center" prop="token"/>-->
+<!--      <el-table-column label="消息加解密密钥" align="center" prop="aesKey"/>-->
+      <el-table-column label="服务器地址(URL)" align="center" prop="appId" width="360">
+        <template v-slot="scope">
+          {{  'http://服务端地址/mp/open/' + scope.row.appId }}
         </template>
       </el-table-column>
+      <el-table-column label="二维码" align="center" prop="qrCodeUrl">
+        <template v-slot="scope">
+          <img v-if="scope.row.qrCodeUrl" :src="scope.row.qrCodeUrl" alt="二维码" style="height: 100px;" />
+        </template>
+      </el-table-column>
+      <el-table-column label="备注" align="center" prop="remark"/>
+<!--      <el-table-column label="创建时间" align="center" prop="createTime" width="180">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ parseTime(scope.row.createTime) }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -45,6 +54,12 @@
           </el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['mp:account:delete']">删除
+          </el-button>
+          <el-button size="mini" type="text" icon="el-icon-refresh" @click="handleGenerateQrCode(scope.row)"
+                     v-hasPermi="['mp:account:qr-code']">生成二维码
+          </el-button>
+          <el-button size="mini" type="text" icon="el-icon-share" @click="handleCleanQuota(scope.row)"
+                     v-hasPermi="['mp:account:clear-quota']">清空 API 配额
           </el-button>
         </template>
       </el-table-column>
@@ -55,13 +70,13 @@
 
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入名称"/>
         </el-form-item>
         <el-form-item label="微信号" prop="account">
          <span slot="label">
-           <el-tooltip content="在微信公众平台（mp.weixin.qq.com）的菜单【设置】-【公众号设置】-【帐号详情】中能找到原始ID" placement="top">
+           <el-tooltip content="在微信公众平台（mp.weixin.qq.com）的菜单 [设置与开发 - 公众号设置 - 账号详情] 中能找到「微信号」" placement="top">
               <i class="el-icon-question" />
            </el-tooltip>
            微信号
@@ -70,30 +85,30 @@
         </el-form-item>
         <el-form-item label="appId" prop="appId">
           <span slot="label">
-            <el-tooltip content="在微信公众平台（mp.weixin.qq.com）的菜单【开发】-【基本配置】中能找到 appId" placement="top">
+            <el-tooltip content="在微信公众平台（mp.weixin.qq.com）的菜单 [设置与开发 - 公众号设置 - 基本设置] 中能找到「开发者ID(AppID)」" placement="top">
               <i class="el-icon-question" />
             </el-tooltip>
             appId
           </span>
           <el-input v-model="form.appId" placeholder="请输入公众号 appId"/>
         </el-form-item>
-        <el-form-item label="密钥" prop="appSecret">
+        <el-form-item label="appSecret" prop="appSecret">
           <span slot="label">
-            <el-tooltip content="在微信公众平台（mp.weixin.qq.com）的菜单【开发】-【基本配置】中能找到密钥" placement="top">
+            <el-tooltip content="在微信公众平台（mp.weixin.qq.com）的菜单 [设置与开发 - 公众号设置 - 基本设置] 中能找到「开发者密码(AppSecret)」" placement="top">
               <i class="el-icon-question" />
             </el-tooltip>
-            密钥
+            appSecret
           </span>
           <el-input v-model="form.appSecret" placeholder="请输入公众号 appSecret"/>
         </el-form-item>
         <el-form-item label="token" prop="token">
           <el-input v-model="form.token" placeholder="请输入公众号token"/>
         </el-form-item>
-        <el-form-item label="加密密钥" prop="aesKey">
-          <el-input v-model="form.aesKey" placeholder="请输入加密密钥"/>
+        <el-form-item label="消息加解密密钥" prop="aesKey">
+          <el-input v-model="form.aesKey" placeholder="请输入消息加解密密钥"/>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" placeholder="请输入备注"/>
+          <el-input type="textarea" v-model="form.remark" placeholder="请输入备注"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -105,7 +120,15 @@
 </template>
 
 <script>
-import { createAccount, deleteAccount, getAccount, getAccountPage, updateAccount} from '@/api/mp/account'
+import {
+  clearAccountQuota,
+  createAccount,
+  deleteAccount,
+  generateAccountQrCode,
+  getAccount,
+  getAccountPage,
+  updateAccount
+} from '@/api/mp/account'
 
 export default {
   name: 'mpAccount',
@@ -120,7 +143,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 公众号账户列表
+      // 公众号账号列表
       list: [],
       // 弹出层标题
       title: '',
@@ -139,7 +162,7 @@ export default {
       // 表单校验
       rules: {
         name: [{required: true, message: '名称不能为空', trigger: 'blur'}],
-        account: [{required: true, message: '公众号账户不能为空', trigger: 'blur'}],
+        account: [{required: true, message: '公众号账号不能为空', trigger: 'blur'}],
         appId: [{required: true, message: '公众号 appId 不能为空', trigger: 'blur'}],
         appSecret: [{required: true, message: '公众号密钥不能为空', trigger: 'blur'}],
         token: [{required: true, message: '公众号 token 不能为空', trigger: 'blur'}],
@@ -199,7 +222,7 @@ export default {
     handleAdd() {
       this.reset()
       this.open = true
-      this.title = '添加公众号账户'
+      this.title = '添加公众号账号'
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -208,7 +231,7 @@ export default {
       getAccount(id).then(response => {
         this.form = response.data
         this.open = true
-        this.title = '修改公众号账户'
+        this.title = '修改公众号账号'
         this.disabled = true
       })
     },
@@ -238,11 +261,32 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id
-      this.$modal.confirm('是否确认删除公众号账户编号为"' + row.name + '"的数据项?').then(function () {
+      this.$modal.confirm('是否确认删除公众号账号编号为"' + row.name + '"的数据项?').then(function () {
         return deleteAccount(id)
       }).then(() => {
         this.getList()
         this.$modal.msgSuccess('删除成功')
+      }).catch(() => {
+      })
+    },
+    /** 生成二维码的按钮操作 */
+    handleGenerateQrCode(row) {
+      const id = row.id
+      this.$modal.confirm('是否确认生成公众号账号编号为"' + row.name + '"的二维码?').then(function () {
+        return generateAccountQrCode(id)
+      }).then(() => {
+        this.getList()
+        this.$modal.msgSuccess('生成二维码成功')
+      }).catch(() => {
+      })
+    },
+    /** 清空二维码 API 配额的按钮操作 */
+    handleCleanQuota(row) {
+      const id = row.id
+      this.$modal.confirm('是否清空生成公众号账号编号为"' + row.name + '"的 API 配额?').then(function () {
+        return clearAccountQuota(id)
+      }).then(() => {
+        this.$modal.msgSuccess('清空 API 配额成功')
       }).catch(() => {
       })
     },

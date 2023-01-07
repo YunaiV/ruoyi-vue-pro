@@ -7,7 +7,7 @@ import javax.validation.constraints.*;
 /**
  * @author fengdan
  */
-@ApiModel("管理后台 - 公众号账户更新 Request VO")
+@ApiModel("管理后台 - 公众号账号更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

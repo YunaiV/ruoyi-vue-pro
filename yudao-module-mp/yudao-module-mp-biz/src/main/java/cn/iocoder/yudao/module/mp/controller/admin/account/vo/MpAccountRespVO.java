@@ -8,25 +8,19 @@ import lombok.ToString;
 
 import java.util.Date;
 
-/**
- * @author fengdan
- */
-@ApiModel("管理后台 - 公众号账户 Response VO")
+@ApiModel("管理后台 - 公众号账号 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class MpAccountRespVO extends MpAccountBaseVO {
 
-    @ApiModelProperty(value = "编号", required = true)
+    @ApiModelProperty(value = "编号", required = true, example = "1024")
     private Long id;
 
-    @ApiModelProperty(value = "二维码图片URL")
+    @ApiModelProperty(value = "二维码图片URL", example = "https://www.iocoder.cn/1024.png")
     private String qrCodeUrl;
 
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;
-
-    @ApiModelProperty(value = "公众号密钥", required = true)
-    private String appSecret;
 
 }

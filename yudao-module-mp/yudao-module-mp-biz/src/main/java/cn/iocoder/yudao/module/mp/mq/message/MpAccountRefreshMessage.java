@@ -5,15 +5,17 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 微信配置数据刷新 Message
+ * 公众号账号刷新 Message
+ *
+ * @author 芋道源码
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class MpConfigRefreshMessage extends AbstractChannelMessage {
+public class MpAccountRefreshMessage extends AbstractChannelMessage {
 
     @Override
     public String getChannel() {
-        return "mp.config-data.refresh";
+        return "mp.account.refresh";
     }
 
 }

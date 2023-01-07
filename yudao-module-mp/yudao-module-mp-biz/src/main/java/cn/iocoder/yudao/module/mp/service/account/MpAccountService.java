@@ -5,12 +5,11 @@ import cn.iocoder.yudao.module.mp.controller.admin.account.vo.MpAccountCreateReq
 import cn.iocoder.yudao.module.mp.controller.admin.account.vo.MpAccountPageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.account.vo.MpAccountUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import javax.validation.Valid;
 
 /**
- * 公众号账户 Service 接口
+ * 公众号账号 Service 接口
  *
  * @author 芋道源码
  */
@@ -22,7 +21,7 @@ public interface MpAccountService {
     void initLocalCache();
 
     /**
-     * 创建公众号账户
+     * 创建公众号账号
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -30,51 +29,57 @@ public interface MpAccountService {
     Long createAccount(@Valid MpAccountCreateReqVO createReqVO);
 
     /**
-     * 更新公众号账户
+     * 更新公众号账号
      *
      * @param updateReqVO 更新信息
      */
     void updateAccount(@Valid MpAccountUpdateReqVO updateReqVO);
 
     /**
-     * 删除公众号账户
+     * 删除公众号账号
      *
      * @param id 编号
      */
     void deleteAccount(Long id);
 
     /**
-     * 获得公众号账户
+     * 获得公众号账号
      *
      * @param id 编号
-     * @return 公众号账户
+     * @return 公众号账号
      */
     MpAccountDO getAccount(Long id);
 
     /**
-     * 从缓存中，获得公众号账户
+     * 从缓存中，获得公众号账号
      *
      * @param appId 微信公众号 appId
-     * @return 公众号账户
+     * @return 公众号账号
      */
     MpAccountDO getAccountFromCache(String appId);
 
     /**
-     * 获得公众号账户分页
+     * 获得公众号账号分页
      *
      * @param pageReqVO 分页查询
-     * @return 公众号账户分页
+     * @return 公众号账号分页
      */
     PageResult<MpAccountDO> getAccountPage(MpAccountPageReqVO pageReqVO);
 
-    // TODO 芋艿：去除这样的方法
     /**
-     * 查询账户
+     * 生成公众号账号的二维码
      *
-     * @param field
-     * @param val
-     * @return
+     * @param id 编号
      */
-    MpAccountDO findBy(SFunction<MpAccountDO, ?> field, Object val);
+    void generateAccountQrCode(Long id);
+
+    /**
+     * 清空公众号账号的 API 配额
+     *
+     * 参考文档：<a href="https://developers.weixin.qq.com/doc/offiaccount/Message_Management/API_Call_Limits.html">接口调用频次限制说明</a>
+     *
+     * @param id 编号
+     */
+    void clearAccountQuota(Long id);
 
 }

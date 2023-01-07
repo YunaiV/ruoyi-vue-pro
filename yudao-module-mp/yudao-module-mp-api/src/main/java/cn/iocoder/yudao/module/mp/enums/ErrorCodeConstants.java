@@ -9,9 +9,12 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  */
 public interface ErrorCodeConstants {
 
-    // ========== 用户相关  1004001000============
-    ErrorCode WX_ACCOUNT_NOT_EXISTS = new ErrorCode(1006001000, "公众号账户不存在");
-    ErrorCode WX_ACCOUNT_FANS_NOT_EXISTS = new ErrorCode(1006001001, "粉丝账号不存在");
+    // ========== 公众号账号 1006000000============
+    ErrorCode ACCOUNT_NOT_EXISTS = new ErrorCode(1006000000, "公众号账号不存在");
+    ErrorCode ACCOUNT_GENERATE_QR_CODE_FAIL = new ErrorCode(1006000001, "生成公众号二维码失败，原因：{}");
+    ErrorCode ACCOUNT_CLEAR_QUOTA_FAIL = new ErrorCode(1006000001, "清空公众号的 API 配额失败，原因：{}");
+
+    // TODO 要处理下
     ErrorCode COMMON_NOT_EXISTS = new ErrorCode(1006001002, "用户不存在");
 
 }
