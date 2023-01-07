@@ -38,7 +38,11 @@ public class DefaultMpServiceFactory implements MpServiceFactory {
     /**
      * 微信 appId 与 WxMpService 的映射
      */
-    private volatile Map<String, WxMpService> mpServices;
+    private volatile Map<String, WxMpService> appId2MpServices;
+    /**
+     * 公众号账号 id 与 WxMpService 的映射
+     */
+    private volatile Map<Long, WxMpService> id2MpServices;
     /**
      * 微信 appId 与 WxMpMessageRouter 的映射
      */
@@ -62,26 +66,34 @@ public class DefaultMpServiceFactory implements MpServiceFactory {
 
     @Override
     public void init(List<MpAccountDO> list) {
-        Map<String, WxMpService> mpServices = Maps.newHashMap();
+        Map<String, WxMpService> appId2MpServices = Maps.newHashMap();
+        Map<Long, WxMpService> id2MpServices = Maps.newHashMap();
         Map<String, WxMpMessageRouter> mpMessageRouters = Maps.newHashMap();
         // 处理 list
         list.forEach(account -> {
             // 构建 WxMpService 对象
             WxMpService mpService = buildMpService(account);
-            mpServices.put(account.getAppId(), mpService);
+            appId2MpServices.put(account.getAppId(), mpService);
+            id2MpServices.put(account.getId(), mpService);
             // 构建 WxMpMessageRouter 对象
             WxMpMessageRouter mpMessageRouter = buildMpMessageRouter(mpService);
             mpMessageRouters.put(account.getAppId(), mpMessageRouter);
         });
 
         // 设置到缓存
-        this.mpServices = mpServices;
+        this.appId2MpServices = appId2MpServices;
+        this.id2MpServices = id2MpServices;
         this.mpMessageRouters = mpMessageRouters;
     }
 
     @Override
+    public WxMpService getMpService(Long id) {
+        return id2MpServices.get(id);
+    }
+
+    @Override
     public WxMpService getMpService(String appId) {
-        return mpServices.get(appId);
+        return appId2MpServices.get(appId);
     }
 
     @Override

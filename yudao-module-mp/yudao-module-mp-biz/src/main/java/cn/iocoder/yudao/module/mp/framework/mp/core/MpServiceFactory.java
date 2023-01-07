@@ -22,6 +22,20 @@ public interface MpServiceFactory {
     void init(List<MpAccountDO> list);
 
     /**
+     * 获得 id 对应的 WxMpService 实例
+     *
+     * @param id 微信公众号的编号
+     * @return WxMpService 实例
+     */
+    WxMpService getMpService(Long id);
+
+    default WxMpService getRequiredMpService(Long id) {
+        WxMpService wxMpService = getMpService(id);
+        Assert.notNull(wxMpService, "找到对应 id({}) 的 WxMpService，请核实！", id);
+        return wxMpService;
+    }
+
+    /**
      * 获得 appId 对应的 WxMpService 实例
      *
      * @param appId 微信公众号 appId

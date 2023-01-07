@@ -33,14 +33,14 @@ public class MpAccountController {
     @PostMapping("/create")
     @ApiOperation("创建公众号账号")
     @PreAuthorize("@ss.hasPermission('mp:account:create')")
-    public CommonResult<Long> createWxAccount(@Valid @RequestBody MpAccountCreateReqVO createReqVO) {
+    public CommonResult<Long> createAccount(@Valid @RequestBody MpAccountCreateReqVO createReqVO) {
         return success(mpAccountService.createAccount(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新公众号账号")
     @PreAuthorize("@ss.hasPermission('mp:account:update')")
-    public CommonResult<Boolean> updateWxAccount(@Valid @RequestBody MpAccountUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateAccount(@Valid @RequestBody MpAccountUpdateReqVO updateReqVO) {
         mpAccountService.updateAccount(updateReqVO);
         return success(true);
     }
@@ -49,7 +49,7 @@ public class MpAccountController {
     @ApiOperation("删除公众号账号")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('mp:account:delete')")
-    public CommonResult<Boolean> deleteWxAccount(@RequestParam("id") Long id) {
+    public CommonResult<Boolean> deleteAccount(@RequestParam("id") Long id) {
         mpAccountService.deleteAccount(id);
         return success(true);
     }
@@ -58,7 +58,7 @@ public class MpAccountController {
     @ApiOperation("获得公众号账号")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('mp:account:query')")
-    public CommonResult<MpAccountRespVO> getWxAccount(@RequestParam("id") Long id) {
+    public CommonResult<MpAccountRespVO> getAccount(@RequestParam("id") Long id) {
         MpAccountDO wxAccount = mpAccountService.getAccount(id);
         return success(MpAccountConvert.INSTANCE.convert(wxAccount));
     }
@@ -66,7 +66,7 @@ public class MpAccountController {
     @GetMapping("/page")
     @ApiOperation("获得公众号账号分页")
     @PreAuthorize("@ss.hasPermission('mp:account:query')")
-    public CommonResult<PageResult<MpAccountRespVO>> getWxAccountPage(@Valid MpAccountPageReqVO pageVO) {
+    public CommonResult<PageResult<MpAccountRespVO>> getAccountPage(@Valid MpAccountPageReqVO pageVO) {
         PageResult<MpAccountDO> pageResult = mpAccountService.getAccountPage(pageVO);
         return success(MpAccountConvert.INSTANCE.convertPage(pageResult));
     }
