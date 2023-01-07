@@ -34,17 +34,14 @@ export function endOfDay(date) {
 }
 
 export function betweenDay(date1, date2) {
-  // 适配 string 字符串的日期
-  if (typeof date1 === 'string') {
-    date1 = new Date(date1);
-  }
-  if (typeof date2 === 'string') {
-    date2 = new Date(date2);
-  }
+  date1 = convertDate(date1);
+  date2 = convertDate(date2);
+  // 计算差值
   return Math.floor((date2.getTime() - date1.getTime()) / (24 * 3600 * 1000));
 }
 
 export function formatDate(date, fmt) {
+  date = convertDate(date);
   const o = {
     "M+": date.getMonth() + 1, //月份
     "d+": date.getDate(), //日
@@ -63,4 +60,16 @@ export function formatDate(date, fmt) {
     }
   }
   return fmt;
+}
+
+export function addTime(date, time) {
+  date = convertDate(date);
+  return new Date(date.getTime() + time);
+}
+
+export function convertDate(date) {
+  if (typeof date === 'string') {
+    return new Date(date);
+  }
+  return date;
 }

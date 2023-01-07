@@ -1,11 +1,16 @@
 package cn.iocoder.yudao.module.mp.controller.admin.statistics;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsGetReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsUpstreamMessageRespVO;
+import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsUserCumulateRespVO;
+import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsUserSummaryRespVO;
 import cn.iocoder.yudao.module.mp.convert.statistics.MpStatisticsConvert;
 import cn.iocoder.yudao.module.mp.service.statistics.MpStatisticsService;
-import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsGetReqVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import me.chanjar.weixin.mp.bean.datacube.WxDataCubeMsgResult;
+import me.chanjar.weixin.mp.bean.datacube.WxDataCubeUserCumulate;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeUserSummary;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -30,9 +35,28 @@ public class MpStatisticsController {
     @GetMapping("/user-summary")
     @ApiOperation("获得用户增减数据")
     @PreAuthorize("@ss.hasPermission('mp:statistics:query')")
-    public CommonResult<List<WxDataCubeUserSummary>> getAccount(MpStatisticsGetReqVO getReqVO) {
-        List<WxDataCubeUserSummary> list = mpStatisticsService.getUserSummary(getReqVO.getId(), getReqVO.getDate());
+    public CommonResult<List<MpStatisticsUserSummaryRespVO>> getUserSummary(MpStatisticsGetReqVO getReqVO) {
+        List<WxDataCubeUserSummary> list = mpStatisticsService.getUserSummary(
+                getReqVO.getAccountId(), getReqVO.getDate());
         return success(MpStatisticsConvert.INSTANCE.convertList01(list));
+    }
+
+    @GetMapping("/user-cumulate")
+    @ApiOperation("获得用户累计数据")
+    @PreAuthorize("@ss.hasPermission('mp:statistics:query')")
+    public CommonResult<List<MpStatisticsUserCumulateRespVO>> getUserCumulate(MpStatisticsGetReqVO getReqVO) {
+        List<WxDataCubeUserCumulate> list = mpStatisticsService.getUserCumulate(
+                getReqVO.getAccountId(), getReqVO.getDate());
+        return success(MpStatisticsConvert.INSTANCE.convertList02(list));
+    }
+
+    @GetMapping("/upstream-message")
+    @ApiOperation("获取消息发送概况数据")
+    @PreAuthorize("@ss.hasPermission('mp:statistics:query')")
+    public CommonResult<List<MpStatisticsUpstreamMessageRespVO>> getUpstreamMessage(MpStatisticsGetReqVO getReqVO) {
+        List<WxDataCubeMsgResult> list = mpStatisticsService.getUpstreamMessage(
+                getReqVO.getAccountId(), getReqVO.getDate());
+        return success(MpStatisticsConvert.INSTANCE.convertList03(list));
     }
 
 }

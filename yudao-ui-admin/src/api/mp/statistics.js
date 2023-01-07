@@ -1,15 +1,15 @@
 import request from '@/utils/request'
 
-// TODO 获得公众号账号分页
-export function getInterfaceSummary(query) {
+// 获取消息发送概况数据
+export function getUpstreamMessage(query) {
   return request({
-    url: '/mp/account/page',
+    url: '/mp/statistics/upstream-message',
     method: 'get',
     params: query
   })
 }
 
-// TODO 获得公众号账号分页
+// 用户增减数据
 export function getUserSummary(query) {
   return request({
     url: '/mp/statistics/user-summary',
@@ -18,10 +18,10 @@ export function getUserSummary(query) {
   })
 }
 
-// TODO 获得公众号账号分页
+// 获得用户累计数据
 export function getUserCumulate(query) {
   return request({
-    url: '/mp/account/page',
+    url: '/mp/statistics/user-cumulate',
     method: 'get',
     params: query
   })

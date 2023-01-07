@@ -16,7 +16,7 @@ public class MpStatisticsGetReqVO {
 
     @ApiModelProperty(value = "公众号账号的编号", required = true, example = "1024")
     @NotNull(message = "公众号账号的编号不能为空")
-    private Long id;
+    private Long accountId;
 
     @ApiModelProperty(value = "查询时间范围")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
