@@ -136,8 +136,8 @@
 
 <script>
 import {getCache, getKeyDefineList, getKeyList, getKeyValue, deleteKey, deleteKeys} from "@/api/infra/redis";
-import echarts from "echarts";
-
+import * as echarts from 'echarts'
+require('echarts/theme/macarons') // echarts theme
 export default {
   name: "Server",
   data () {

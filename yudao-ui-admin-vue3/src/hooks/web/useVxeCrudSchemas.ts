@@ -165,7 +165,7 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
     // 添加搜索按钮
     const buttons: VxeFormItemProps = {
       span: 24,
-      align: 'center',
+      align: 'right',
       collapseNode: searchSchema.length > spanLength,
       itemRender: {
         name: '$buttons',

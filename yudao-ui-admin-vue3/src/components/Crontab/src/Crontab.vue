@@ -353,7 +353,6 @@ const select = ref()
 watch(
   () => select.value,
   () => {
-    console.info(select.value)
     if (select.value == 'custom') {
       open()
     } else {
