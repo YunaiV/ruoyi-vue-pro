@@ -2,8 +2,8 @@ package cn.iocoder.yudao.framework.common.enums;
 
 /**
  * Web 过滤器顺序的枚举类，保证过滤器按照符合我们的预期
- * <p>
- * 考虑到每个 starter 都需要用到该工具类，所以放到 common 模块下的 enums 包下
+ *
+ *  考虑到每个 starter 都需要用到该工具类，所以放到 common 模块下的 enums 包下
  *
  * @author 芋道源码
  */
@@ -17,9 +17,7 @@ public interface WebFilterOrderEnum {
 
     // OrderedRequestContextFilter 默认为 -105，用于国际化上下文等等
 
-    int JM_TOKEN_FILTER = -105; // 需要保证在  Spring Security 过滤前面
-
-    int TENANT_CONTEXT_FILTER = -104; // 需要保证在 ApiAccessLogFilter 前面
+    int TENANT_CONTEXT_FILTER = - 104; // 需要保证在 ApiAccessLogFilter 前面
 
     int API_ACCESS_LOG_FILTER = -103; // 需要保证在 RequestBodyCacheFilter 后面
 
