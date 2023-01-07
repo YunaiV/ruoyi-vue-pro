@@ -1,63 +1,70 @@
 <template>
   <div class="app-container">
-    <el-card class="box-card">
-      <div slot="header" class="clearfix">
-        <span class="demonstration">时间范围</span>
+    <!-- 搜索工作栏 -->
+    <el-form ref="queryForm" size="small" :inline="true" label-width="68px">
+      <el-form-item label="公众号" prop="accountId">
+        <el-select v-model="accountId" @change="getSummary">
+          <el-option v-for="item in accounts" :key="parseInt(item.id)" :label="item.name" :value="parseInt(item.id)" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="时间范围" prop="date">
         <el-date-picker v-model="date" style="width: 260px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"
                         :picker-options="datePickerOptions" :default-time="['00:00:00', '23:59:59']"
-                        @change="changeDate"  >
+                        @change="getSummary">
         </el-date-picker>
-      </div>
-<!--      <el-row>-->
-<!--        <el-col :span="12">-->
-<!--          <div id="interfaceSummaryChart" :style="{width: '80%', height: '500px'}"></div>-->
-<!--        </el-col>-->
-<!--        <el-col :span="12">-->
-<!--          <div id="interfaceSummaryChart2" :style="{width: '80%', height: '500px'}"></div>-->
-<!--        </el-col>-->
-<!--      </el-row>-->
+      </el-form-item>
+    </el-form>
 
-      <el-row>
-        <el-col :span="12" class="card-box">
-          <el-card>
-            <div slot="header">
-              <span>用户增减数据</span>
-            </div>
-            <div class="el-table el-table--enable-row-hover el-table--medium">
-              <div ref="userSummaryChart" style="height: 420px" />
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="12" class="card-box">
-          <el-card>
-            <div slot="header">
-              <span>累计用户数据</span>
-            </div>
-            <div class="el-table el-table--enable-row-hover el-table--medium">
-              <div ref="userCumulateChart" style="height: 420px" />
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="12" class="card-box">
-          <el-card>
-            <div slot="header">
-              <span>消息概况数据</span>
-            </div>
-            <div class="el-table el-table--enable-row-hover el-table--medium">
-              <div ref="upstreamMessageChart" style="height: 420px" />
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </el-card>
+    <!-- 图表 -->
+    <el-row>
+      <el-col :span="12" class="card-box">
+        <el-card>
+          <div slot="header">
+            <span>用户增减数据</span>
+          </div>
+          <div class="el-table el-table--enable-row-hover el-table--medium">
+            <div ref="userSummaryChart" style="height: 420px" />
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="12" class="card-box">
+        <el-card>
+          <div slot="header">
+            <span>累计用户数据</span>
+          </div>
+          <div class="el-table el-table--enable-row-hover el-table--medium">
+            <div ref="userCumulateChart" style="height: 420px" />
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="12" class="card-box">
+        <el-card>
+          <div slot="header">
+            <span>消息概况数据</span>
+          </div>
+          <div class="el-table el-table--enable-row-hover el-table--medium">
+            <div ref="upstreamMessageChart" style="height: 420px" />
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="12" class="card-box">
+        <el-card>
+          <div slot="header">
+            <span>接口分析数据</span>
+          </div>
+          <div class="el-table el-table--enable-row-hover el-table--medium">
+            <div ref="interfaceSummaryChart" style="height: 420px" />
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
 // 引入基本模板
 import * as echarts from 'echarts'
-
 // 引入柱状图组件
 require('echarts/lib/chart/bar')
 // 引入柱拆线组件
@@ -67,9 +74,10 @@ require('echarts/lib/component/tooltip')
 require('echarts/lib/component/title')
 require('echarts/lib/component/legend')
 
-import {getInterfaceSummary, getUserSummary, getUserCumulate, getUpstreamMessage} from '@/api/mp/statistics'
+import { getInterfaceSummary, getUserSummary, getUserCumulate, getUpstreamMessage} from '@/api/mp/statistics'
 import { datePickerOptions } from "@/utils/constants";
 import {addTime, beginOfDay, betweenDay, endOfDay, formatDate} from "@/utils/dateUtils";
+import {getSimpleAccounts} from "@/api/mp/account";
 
 export default {
   name: 'mpStatistics',
@@ -77,7 +85,8 @@ export default {
     return {
       date : [beginOfDay(new Date(new Date().getTime() - 3600 * 1000 * 24 * 7)), // -7 天
         endOfDay(new Date(new Date().getTime() - 3600 * 1000 * 24))], // -1 天
-      accountId: 1,
+      accountId: undefined,
+      accounts: [],
 
       xAxisDate: [], // X 轴的日期范围
       userSummaryOption: { // 用户增减数据
@@ -170,25 +179,78 @@ export default {
           data: [] // 用户发送条数的数据
         }]
       },
+      interfaceSummaryOption: {  // 接口分析况数据
+        color: ['#67C23A', '#e5323e', '#E6A23C', '#409EFF'],
+        legend: {
+          data: ['被动回复用户消息的次数','失败次数', '最大耗时','总耗时']
+        },
+        tooltip: {},
+        xAxis: {
+          data: [] // X 轴的日期范围
+        },
+        yAxis: {},
+        series: [{
+          name: '被动回复用户消息的次数',
+          type: 'bar',
+          label: {
+            normal: {
+              show: true
+            }
+          },
+          barGap: 0,
+          data: [] // 被动回复用户消息的次数的数据
+        }, {
+          name: '失败次数',
+          type: 'bar',
+          label: {
+            normal: {
+              show: true
+            }
+          },
+          data: [] // 失败次数的数据
+        }, {
+          name: '最大耗时',
+          type: 'bar',
+          label: {
+            normal: {
+              show: true
+            }
+          },
+          data: [] // 最大耗时的数据
+        }, {
+          name: '总耗时',
+          type: 'bar',
+          label: {
+            normal: {
+              show: true
+            }
+          },
+          data: [] // 总耗时的数据
+        }]
+      },
 
       // 静态变量
       datePickerOptions: datePickerOptions,
     }
   },
   created() {
-
-  },
-  mounted: function() {
-    this.getSummary()
-  },
-  computed: {
-
+    getSimpleAccounts().then(response => {
+      this.accounts = response.data;
+      // 默认选中第一个
+      if (this.accounts.length > 0) {
+        this.accountId = this.accounts[0].id;
+      }
+      // 加载数据
+      this.getSummary();
+    })
   },
   methods: {
-    changeDate() {
-      this.getSummary()
-    },
     getSummary() {
+      // 如果没有选中公众号账号，则进行提示。
+      if (!this.accountId) {
+        this.$message.error('未选中公众号，无法统计数据')
+        return false
+      }
       // 必须选择 7 天内，因为公众号有时间跨度限制为 7
       if (betweenDay(this.date[0], this.date[1]) >= 7) {
         this.$message.error('时间间隔 7 天以内，请重新选择')
@@ -204,93 +266,7 @@ export default {
       this.initUserSummaryChart();
       this.initUserCumulateChart();
       this.initUpstreamMessageChart();
-      //
-      // //获取接口数据
-      // getInterfaceSummary({
-      //   startDate: this.startDate,
-      //   endDate: this.endDate
-      // }).then(response => {
-      //   response.data.forEach((item, index, arr) => {
-      //     this.$set(this.seriesData1, index, item.callbackCount)
-      //     this.$set(this.seriesData2, index, item.maxTimeCost)
-      //     this.$set(this.seriesData3, index, item.totalTimeCost)
-      //     this.$set(this.seriesData4, index, item.failCount)
-      //   })
-      //   // 基于准备好的dom，初始化echarts实例
-      //   let interfaceSummaryChart = echarts.init(document.getElementById('interfaceSummaryChart'))
-      //   // 绘制图表
-      //   interfaceSummaryChart.setOption({
-      //     title: { text: '接口分析数据' },
-      //     color: ['#67C23A', '#e5323e'],
-      //     legend: {
-      //       data: ['被动回复用户消息的次数','失败次数']
-      //     },
-      //     tooltip: {},
-      //     xAxis: {
-      //       data: this.xAxisData
-      //     },
-      //     yAxis: {},
-      //     series: [{
-      //       name: '被动回复用户消息的次数',
-      //       type: 'bar',
-      //       label: {
-      //         normal: {
-      //           show: true
-      //         }
-      //       },
-      //       barGap: 0,
-      //       data: this.seriesData1
-      //     },
-      //       {
-      //         name: '失败次数',
-      //         type: 'bar',
-      //         label: {
-      //           normal: {
-      //             show: true
-      //           }
-      //         },
-      //         data: this.seriesData4
-      //       }]
-      //   })
-      //
-      //   // 基于准备好的dom，初始化echarts实例
-      //   let interfaceSummaryChart2 = echarts.init(document.getElementById('interfaceSummaryChart2'))
-      //   // 绘制图表
-      //   interfaceSummaryChart2.setOption({
-      //     title: { text: '接口分析数据' },
-      //     color: ['#E6A23C', '#409EFF'],
-      //     legend: {
-      //       data: ['最大耗时','总耗时']
-      //     },
-      //     tooltip: {},
-      //     xAxis: {
-      //       data: this.xAxisData
-      //     },
-      //     yAxis: {},
-      //     series: [
-      //       {
-      //         name: '最大耗时',
-      //         type: 'bar',
-      //         label: {
-      //           normal: {
-      //             show: true
-      //           }
-      //         },
-      //         data: this.seriesData2
-      //       },
-      //       {
-      //         name: '总耗时',
-      //         type: 'bar',
-      //         label: {
-      //           normal: {
-      //             show: true
-      //           }
-      //         },
-      //         data: this.seriesData3
-      //       }]
-      //   })
-      // }).catch(() => {
-      // })
+      this.interfaceSummaryChart();
     },
     initUserSummaryChart() {
       this.userSummaryOption.xAxis.data = [];
@@ -356,14 +332,31 @@ export default {
         const upstreamMessageChart = echarts.init(this.$refs.upstreamMessageChart);
         upstreamMessageChart.setOption(this.upstreamMessageOption);
       }).catch(() => {})
+    },
+    interfaceSummaryChart() {
+      this.interfaceSummaryOption.xAxis.data = [];
+      this.interfaceSummaryOption.series[0].data = [];
+      this.interfaceSummaryOption.series[1].data = [];
+      this.interfaceSummaryOption.series[2].data = [];
+      this.interfaceSummaryOption.series[3].data = [];
+      // 发起请求
+      getInterfaceSummary({
+        accountId: this.accountId,
+        date: [formatDate(this.date[0], 'yyyy-MM-dd HH:mm:ss'), formatDate(this.date[1], 'yyyy-MM-dd HH:mm:ss'),]
+      }).then(response => {
+        this.interfaceSummaryOption.xAxis.data = this.xAxisDate;
+        // 处理数据
+        response.data.forEach((item, index) => {
+          this.interfaceSummaryOption.series[0].data[index] = item.callbackCount;
+          this.interfaceSummaryOption.series[1].data[index] = item.failCount;
+          this.interfaceSummaryOption.series[2].data[index] = item.maxTimeCost;
+          this.interfaceSummaryOption.series[3].data[index] = item.totalTimeCost;
+        })
+        // 绘制图表
+        const interfaceSummaryChart = echarts.init(this.$refs.interfaceSummaryChart);
+        interfaceSummaryChart.setOption(this.interfaceSummaryOption);
+      }).catch(() => {})
     }
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.demonstration{
-  font-size: 15px;
-  margin-right: 10px;
-}
-</style>

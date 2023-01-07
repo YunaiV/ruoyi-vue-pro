@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.bean.datacube.WxDataCubeInterfaceResult;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeMsgResult;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeUserCumulate;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeUserSummary;
@@ -59,6 +60,17 @@ public class MpStatisticsServiceImpl implements MpStatisticsService {
                     DateUtil.date(date[0]), DateUtil.date(date[1]));
         } catch (WxErrorException e) {
             throw exception(STATISTICS_GET_UPSTREAM_MESSAGE_FAIL, e.getError().getErrorMsg());
+        }
+    }
+
+    @Override
+    public List<WxDataCubeInterfaceResult> getInterfaceSummary(Long accountId, LocalDateTime[] date) {
+        WxMpService mpService = mpServiceFactory.getRequiredMpService(accountId);
+        try {
+            return mpService.getDataCubeService().getInterfaceSummary(
+                    DateUtil.date(date[0]), DateUtil.date(date[1]));
+        } catch (WxErrorException e) {
+            throw exception(STATISTICS_GET_INTERFACE_SUMMARY_FAIL, e.getError().getErrorMsg());
         }
     }
 

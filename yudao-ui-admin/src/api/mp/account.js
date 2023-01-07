@@ -43,6 +43,14 @@ export function getAccountPage(query) {
   })
 }
 
+// 获取公众号账号精简信息列表
+export function getSimpleAccounts() {
+  return request({
+    url: '/mp/account/list-all-simple',
+    method: 'get',
+  })
+}
+
 // 生成公众号二维码
 export function generateAccountQrCode(id) {
   return request({

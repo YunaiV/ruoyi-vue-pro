@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.mp.service.statistics;
 
+import me.chanjar.weixin.mp.bean.datacube.WxDataCubeInterfaceResult;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeMsgResult;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeUserCumulate;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeUserSummary;
@@ -40,5 +41,14 @@ public interface MpStatisticsService {
      * @return 消息发送概况数据
      */
     List<WxDataCubeMsgResult> getUpstreamMessage(Long accountId, LocalDateTime[] date);
+
+    /**
+     * 获取接口分析数据
+     *
+     * @param accountId 公众号账号编号
+     * @param date 时间区间
+     * @return 接口分析数据
+     */
+    List<WxDataCubeInterfaceResult> getInterfaceSummary(Long accountId, LocalDateTime[] date);
 
 }

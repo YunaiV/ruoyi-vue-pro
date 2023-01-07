@@ -1,14 +1,12 @@
 package cn.iocoder.yudao.module.mp.controller.admin.statistics;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsGetReqVO;
-import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsUpstreamMessageRespVO;
-import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsUserCumulateRespVO;
-import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsUserSummaryRespVO;
+import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.*;
 import cn.iocoder.yudao.module.mp.convert.statistics.MpStatisticsConvert;
 import cn.iocoder.yudao.module.mp.service.statistics.MpStatisticsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import me.chanjar.weixin.mp.bean.datacube.WxDataCubeInterfaceResult;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeMsgResult;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeUserCumulate;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeUserSummary;
@@ -59,4 +57,12 @@ public class MpStatisticsController {
         return success(MpStatisticsConvert.INSTANCE.convertList03(list));
     }
 
+    @GetMapping("/interface-summary")
+    @ApiOperation("获取消息发送概况数据")
+    @PreAuthorize("@ss.hasPermission('mp:statistics:query')")
+    public CommonResult<List<MpStatisticsInterfaceSummaryRespVO>> getInterfaceSummary(MpStatisticsGetReqVO getReqVO) {
+        List<WxDataCubeInterfaceResult> list = mpStatisticsService.getInterfaceSummary(
+                getReqVO.getAccountId(), getReqVO.getDate());
+        return success(MpStatisticsConvert.INSTANCE.convertList04(list));
+    }
 }

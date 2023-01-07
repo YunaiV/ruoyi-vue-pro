@@ -26,3 +26,12 @@ export function getUserCumulate(query) {
     params: query
   })
 }
+
+// 获得接口分析数据
+export function getInterfaceSummary(query) {
+  return request({
+    url: '/mp/statistics/interface-summary',
+    method: 'get',
+    params: query
+  })
+}

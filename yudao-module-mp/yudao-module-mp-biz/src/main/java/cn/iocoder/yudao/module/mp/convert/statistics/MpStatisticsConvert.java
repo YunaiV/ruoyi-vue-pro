@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.mp.convert.statistics;
 
+import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsInterfaceSummaryRespVO;
 import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsUpstreamMessageRespVO;
 import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsUserCumulateRespVO;
 import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.MpStatisticsUserSummaryRespVO;
+import me.chanjar.weixin.mp.bean.datacube.WxDataCubeInterfaceResult;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeMsgResult;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeUserCumulate;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeUserSummary;
@@ -31,4 +33,8 @@ public interface MpStatisticsConvert {
     })
     MpStatisticsUpstreamMessageRespVO convert(WxDataCubeMsgResult bean);
 
+    List<MpStatisticsInterfaceSummaryRespVO> convertList04(List<WxDataCubeInterfaceResult> list);
+
+    @Mapping(source = "refDate", target = "refDate", dateFormat = "yyyy-MM-dd")
+    MpStatisticsInterfaceSummaryRespVO convert(WxDataCubeInterfaceResult bean);
 }

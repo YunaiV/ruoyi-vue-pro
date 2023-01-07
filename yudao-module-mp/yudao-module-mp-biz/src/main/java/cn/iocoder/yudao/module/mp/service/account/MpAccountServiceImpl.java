@@ -156,6 +156,11 @@ public class MpAccountServiceImpl implements MpAccountService {
     }
 
     @Override
+    public List<MpAccountDO> getAccountList() {
+        return mpAccountMapper.selectList();
+    }
+
+    @Override
     public void generateAccountQrCode(Long id) {
         // 校验存在
         MpAccountDO account = validateAccountExists(id);

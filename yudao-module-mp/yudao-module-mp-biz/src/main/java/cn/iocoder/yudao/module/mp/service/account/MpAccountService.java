@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.mp.controller.admin.account.vo.MpAccountUpdateReq
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 公众号账号 Service 接口
@@ -65,6 +66,13 @@ public interface MpAccountService {
      * @return 公众号账号分页
      */
     PageResult<MpAccountDO> getAccountPage(MpAccountPageReqVO pageReqVO);
+
+    /**
+     * 获得公众号账号列表
+     *
+     * @return 公众号账号列表
+     */
+    List<MpAccountDO> getAccountList();
 
     /**
      * 生成公众号账号的二维码
