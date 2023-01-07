@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.visualization.framework.jmreport.core.service;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
@@ -10,6 +11,9 @@ import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCheckRespDTO;
 import lombok.RequiredArgsConstructor;
 import org.jeecg.modules.jmreport.api.JmReportTokenServiceI;
+import org.springframework.http.HttpHeaders;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * {@link JmReportTokenServiceI} 实现类，提供积木报表的 Token 校验、用户信息的查询等功能
@@ -18,8 +22,32 @@ import org.jeecg.modules.jmreport.api.JmReportTokenServiceI;
  */
 @RequiredArgsConstructor
 public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
+    private static final String JM_TOKEN_HEADER = "X-Access-Token";
+    /**
+     * 系统内置请求头
+     */
+    private static final String TOKEN_HEADER = "Authorization";
+    /**
+     * auth 相关格式
+     */
+    private static final String AUTHORIZATION_FORMAT = "Bearer %s";
 
     private final OAuth2TokenApi oauth2TokenApi;
+
+    /**
+     * 修改请求的 head
+     *
+     * @return 新 head
+     */
+    @Override
+    public HttpHeaders customApiHeader() {
+        HttpHeaders header = new HttpHeaders();
+        HttpServletRequest request = ServletUtils.getRequest();
+        String token = request.getHeader(JM_TOKEN_HEADER);
+
+        header.add(TOKEN_HEADER, String.format(AUTHORIZATION_FORMAT, token));
+        return header;
+    }
 
     /**
      * 校验 Token 是否有效，即验证通过
@@ -62,7 +90,7 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
 
     /**
      * 获得用户编号
-     *
+     * <p>
      * 虽然方法名获得的是 username，实际对应到项目中是用户编号
      *
      * @param token JmReport 前端传递的 token
