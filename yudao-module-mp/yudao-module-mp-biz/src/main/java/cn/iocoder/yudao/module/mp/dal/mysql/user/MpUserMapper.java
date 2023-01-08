@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserPageReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface MpUserMapper extends BaseMapperX<MpUserDO> {
 
@@ -18,9 +20,16 @@ public interface MpUserMapper extends BaseMapperX<MpUserDO> {
                 .orderByDesc(MpUserDO::getId));
     }
 
-    default MpUserDO selectByAppIdAndOpenid(String appId, String openId) {
+    default MpUserDO selectByAppIdAndOpenid(String appId, String openid) {
         return selectOne(MpUserDO::getAppId, appId,
-                MpUserDO::getOpenid, openId);
+                MpUserDO::getOpenid, openid);
+    }
+
+    default List<MpUserDO> selectListByAppIdAndOpenid(String appId, List<String> openids) {
+        return selectList(new LambdaQueryWrapperX<MpUserDO>()
+                .eq(MpUserDO::getAppId, appId)
+                .in(MpUserDO::getOpenid, openids));
+
     }
 
 }

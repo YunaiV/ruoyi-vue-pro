@@ -63,8 +63,8 @@ public class MpTagController {
     }
 
     @PostMapping("/sync")
-    @ApiOperation("同步公众标签")
-    @ApiImplicitParam(name = "id", value = "公众号账号的编号", required = true, dataTypeClass = Long.class)
+    @ApiOperation("同步公众号标签")
+    @ApiImplicitParam(name = "accountId", value = "公众号账号的编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('mp:tag:sync')")
     public CommonResult<Boolean> syncTag(@RequestParam("accountId") Long accountId) {
         mpTagService.syncTag(accountId);

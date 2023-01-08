@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.mp.convert.user.MpUserConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import cn.iocoder.yudao.module.mp.service.user.MpUserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -32,6 +33,15 @@ public class MpUserController {
     public CommonResult<PageResult<MpUserRespVO>> getUserPage(@Valid MpUserPageReqVO pageVO) {
         PageResult<MpUserDO> pageResult = mpUserService.getUserPage(pageVO);
         return success(MpUserConvert.INSTANCE.convertPage(pageResult));
+    }
+
+    @PostMapping("/sync")
+    @ApiOperation("同步公众号粉丝")
+    @ApiImplicitParam(name = "accountId", value = "公众号账号的编号", required = true, dataTypeClass = Long.class)
+    @PreAuthorize("@ss.hasPermission('mp:user:sync')")
+    public CommonResult<Boolean> syncUser(@RequestParam("accountId") Long accountId) {
+        mpUserService.syncUser(accountId);
+        return success(true);
     }
 
 }

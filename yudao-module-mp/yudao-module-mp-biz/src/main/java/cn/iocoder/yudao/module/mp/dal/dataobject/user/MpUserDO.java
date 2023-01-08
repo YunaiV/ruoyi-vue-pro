@@ -2,20 +2,24 @@ package cn.iocoder.yudao.module.mp.dal.dataobject.user;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
+import cn.iocoder.yudao.module.mp.dal.dataobject.tag.MpTagDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 微信公众号粉丝 DO
  *
  * @author 芋道源码
  */
-@TableName("mp_user")
+@TableName(value = "mp_user", autoResultMap = true)
 @KeySequence("mp_user_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -82,6 +86,13 @@ public class MpUserDO extends BaseDO {
      * 备注
      */
     private String remark;
+    /**
+     * 标签编号数组
+     *
+     * 注意，对应的是 {@link MpTagDO#getTagId()} 字段
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> tagIds;
 
     /**
      * 微信公众号 ID

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.mp.convert.user;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserRespVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
@@ -42,6 +43,10 @@ public interface MpUserConvert {
             user.setAppId(account.getAppId());
         }
         return user;
+    }
+
+    default List<MpUserDO> convertList(MpAccountDO account, List<WxMpUser> wxUsers) {
+        return CollectionUtils.convertList(wxUsers, wxUser -> convert(account, wxUser));
     }
 
 }

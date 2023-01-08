@@ -1,0 +1,5 @@
+### 请求 /mp/user/sync 接口 => 成功
+POST {{baseUrl}}/mp/user/sync?accountId=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
