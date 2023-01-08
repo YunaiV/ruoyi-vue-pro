@@ -13,16 +13,17 @@
       </div>
       <!-- 消息列表 -->
       <div class="execution" v-for="item in tableData" :key='item.id'>
-        <div class="avue-comment" :class="item.sendFrom == '2' ? 'avue-comment--reverse' : ''">
+        <div class="avue-comment" :class="item.sendFrom === 2 ? 'avue-comment--reverse' : ''">
           <div class="avatar-div">
-            <img :src="item.sendFrom == '1' ? item.headimgUrl : item.appLogo" class="avue-comment__avatar">
-            <div class="avue-comment__author">{{item.sendFrom == '1' ? item.nickName : item.appName}}</div>
+            <img :src="item.sendFrom === 1 ? item.headimgUrl : item.appLogo" class="avue-comment__avatar">
+<!--            <div class="avue-comment__author">{{item.sendFrom === 1 ? item.nickName : item.appName}}</div>-->
+            <div class="avue-comment__author">{{item.sendFrom === 1 ? '用户' : '公众号' }}</div>
           </div>
           <div class="avue-comment__main">
             <div class="avue-comment__header">
               <div class="avue-comment__create_time">{{ parseTime(item.createTime) }}</div>
             </div>
-            <div class="avue-comment__body" :style="item.sendFrom == '2' ? 'background: #6BED72;' : ''">
+            <div class="avue-comment__body" :style="item.sendFrom === 2 ? 'background: #6BED72;' : ''">
               <!-- 【事件】区域 -->
               <div v-if="item.type === 'event' && item.event === 'subscribe'">
                 <el-tag type="success" size="mini">关注</el-tag>
@@ -96,7 +97,6 @@
 </template>
 
 <script>
-  // import { getMessagePage, addObj } from '@/api/mp/message'
   import { getMessagePage } from '@/api/mp/message'
   // import WxReplySelect from '@/components/wx-reply/main.vue'
   // import WxNews from '@/components/wx-news/main.vue'
@@ -228,46 +228,130 @@
     }
   };
 </script>
-
 <style lang="scss" scoped>
-  .msg-main{
-    margin-top: -30px;
-    padding: 10px;
+/* 来自 https://github.com/nmxiaowei/avue/blob/master/styles/src/element-ui/comment.scss  */
+/* 因为 joolun 实现依赖 avue 组件，该页面使用了 comment.scss  */
+.avue-comment{
+  margin-bottom: 30px;
+  display: flex;
+  align-items: flex-start;
+  &--reverse{
+    flex-direction:row-reverse;
+    .avue-comment__main{
+      &:before,&:after{
+        left: auto;
+        right: -8px;
+        border-width: 8px 0 8px 8px;
+      }
+      &:before{
+        border-left-color: #dedede;
+      }
+      &:after{
+        border-left-color: #f8f8f8;
+        margin-right: 1px;
+        margin-left: auto;
+      }
+    }
   }
-  .msg-div{
-    height: 50vh;
-    overflow: auto;
-    background-color: #eaeaea;
+  &__avatar{
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    vertical-align: middle;
   }
-  .msg-send{
-    padding: 10px;
+  &__header{
+    padding: 5px 15px;
+    background: #f8f8f8;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
-  .avue-comment__main{
-    flex: unset!important;
-    border-radius: 5px!important;
-    margin: 0 8px!important;
+  &__author{
+    font-weight: 700;
+    font-size: 14px;
+    color: #999;
   }
-  .avue-comment--reverse {
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: reverse;
-    -ms-flex-direction: row-reverse;
-    flex-direction: row-reverse;
+  &__main{
+    flex:1;
+    margin: 0 20px;
+    position: relative;
+    border: 1px solid #dedede;
+    border-radius: 2px;
+    &:before,&:after{
+      position: absolute;
+      top: 10px;
+      left: -8px;
+      right: 100%;
+      width: 0;
+      height: 0;
+      display: block;
+      content: " ";
+      border-color: transparent;
+      border-style: solid solid outset;
+      border-width: 8px 8px 8px 0;
+      pointer-events: none;
+    }
+    &:before {
+      border-right-color: #dedede;
+      z-index: 1;
+    }
+    &:after{
+      border-right-color: #f8f8f8;
+      margin-left: 1px;
+      z-index: 2;
+    }
   }
-  .avue-comment__header{
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+  &__body{
+    padding: 15px;
+    overflow: hidden;
+    background: #fff;
+    font-family: Segoe UI,Lucida Grande,Helvetica,Arial,Microsoft YaHei,FreeSans,Arimo,Droid Sans,wenquanyi micro hei,Hiragino Sans GB,Hiragino Sans GB W3,FontAwesome,sans-serif;color: #333;
+    font-size: 14px;
   }
-  .avue-comment__body {
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
+  blockquote{
+    margin:0;
+    font-family: Georgia,Times New Roman,Times,Kai,Kaiti SC,KaiTi,BiauKai,FontAwesome,serif;
+    padding: 1px 0 1px 15px;
+    border-left: 4px solid #ddd;
   }
-  .avatar-div{
-    text-align: center;
-    width: 80px;
-  }
-  .send-but{
-    float: right;
-    margin-top: 8px!important;
-  }
+}
+</style>
+<style lang="scss" scoped>
+.msg-main{
+  margin-top: -30px;
+  padding: 10px;
+}
+.msg-div{
+  height: 50vh;
+  overflow: auto;
+  background-color: #eaeaea;
+}
+.msg-send{
+  padding: 10px;
+}
+.avue-comment__main{
+  flex: unset!important;
+  border-radius: 5px!important;
+  margin: 0 8px!important;
+}
+.avue-comment__header{
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+.avue-comment__body {
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+.avatar-div{
+  text-align: center;
+  width: 80px;
+}
+.send-but{
+  float: right;
+  margin-top: 8px!important;
+}
 </style>
 
