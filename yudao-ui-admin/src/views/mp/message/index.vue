@@ -46,7 +46,13 @@
       </el-table-column>
       <el-table-column label="消息类型" align="center" prop="type"/>
       <el-table-column label="用户标识" align="center" prop="openid"/>
-      <el-table-column label="内容" align="center" prop="content"/>
+      <el-table-column label="内容" align="center" prop="content">
+        <template slot-scope="scope">
+          <div v-if="scope.row.type === 'video'">
+            <wx-video-player :url="scope.row.mediaUrl" style="margin-top: 10px" />
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
 <!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"-->
@@ -112,11 +118,13 @@ import {
   getMessagePage,
 } from "@/api/mp/message";
 import Editor from '@/components/Editor/index.vue';
+import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
 
 export default {
   name: "WxFansMsg",
   components: {
     Editor,
+    WxVideoPlayer,
   },
   data() {
     return {
@@ -154,7 +162,10 @@ export default {
       // 表单参数
       form: {},
       // 表单校验
-      rules: {}
+      rules: {},
+
+      // 公众号账号列表
+      accounts: []
     };
   },
   created() {
