@@ -137,8 +137,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -167,8 +165,6 @@ export default {
         appSecret: [{required: true, message: '公众号密钥不能为空', trigger: 'blur'}],
         token: [{required: true, message: '公众号 token 不能为空', trigger: 'blur'}],
       },
-      // 禁用属性
-      disabled: false,
     }
   },
   created() {
@@ -190,7 +186,6 @@ export default {
     /** 取消按钮 */
     cancel() {
       this.open = false
-      this.disabled = false
       this.reset()
     },
     /** 表单重置 */
@@ -232,7 +227,6 @@ export default {
         this.form = response.data
         this.open = true
         this.title = '修改公众号账号'
-        this.disabled = true
       })
     },
     /** 提交按钮 */
@@ -283,7 +277,7 @@ export default {
     /** 清空二维码 API 配额的按钮操作 */
     handleCleanQuota(row) {
       const id = row.id
-      this.$modal.confirm('是否清空生成公众号账号编号为"' + row.name + '"的 API 配额?').then(function () {
+      this.$modal.confirm('是否确认清空生成公众号账号编号为"' + row.name + '"的 API 配额?').then(function () {
         return clearAccountQuota(id)
       }).then(() => {
         this.$modal.msgSuccess('清空 API 配额成功')
