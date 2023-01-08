@@ -5,66 +5,84 @@
 <template>
   <div class="msg-main" v-loading="mainLoading">
     <div class="msg-div" :id="'msg-div'+nowStr">
+      <!-- 加载更多 -->
       <div v-loading="tableLoading"></div>
       <div v-if="!tableLoading">
         <div class="el-table__empty-block" v-if="loadMore" @click="loadingMore"><span class="el-table__empty-text">点击加载更多</span></div>
         <div class="el-table__empty-block" v-if="!loadMore"><span class="el-table__empty-text">没有更多了</span></div>
       </div>
+      <!-- 消息列表 -->
       <div class="execution" v-for="item in tableData" :key='item.id'>
-        <div class="avue-comment" :class="item.type == '2' ? 'avue-comment--reverse' : ''">
+        <div class="avue-comment" :class="item.sendFrom == '2' ? 'avue-comment--reverse' : ''">
           <div class="avatar-div">
-            <img :src="item.type == '1' ? item.headimgUrl : item.appLogo" class="avue-comment__avatar">
-            <div class="avue-comment__author">{{item.type == '1' ? item.nickName : item.appName}}</div>
+            <img :src="item.sendFrom == '1' ? item.headimgUrl : item.appLogo" class="avue-comment__avatar">
+            <div class="avue-comment__author">{{item.sendFrom == '1' ? item.nickName : item.appName}}</div>
           </div>
           <div class="avue-comment__main">
             <div class="avue-comment__header">
-              <div class="avue-comment__create_time">{{item.createTime}}</div>
+              <div class="avue-comment__create_time">{{ parseTime(item.createTime) }}</div>
             </div>
-            <div class="avue-comment__body" :style="item.type == '2' ? 'background: #6BED72;' : ''">
-              <div v-if="item.repType == 'event' && item.repEvent == 'subscribe'"><el-tag type="success" size="mini">关注</el-tag></div>
-              <div v-if="item.repType == 'event' && item.repEvent == 'unsubscribe'"><el-tag type="danger" size="mini">取消关注</el-tag></div>
-              <div v-if="item.repType == 'event' && item.repEvent == 'CLICK'"><el-tag size="mini">点击菜单</el-tag>：【{{item.repName}}】</div>
-              <div v-if="item.repType == 'event' && item.repEvent == 'VIEW'"><el-tag size="mini">点击菜单链接</el-tag>：【{{item.repUrl}}】</div>
-              <div v-if="item.repType == 'event' && item.repEvent == 'scancode_waitmsg'"><el-tag size="mini">扫码结果：</el-tag>：【{{item.repContent}}】</div>
-              <div v-if="item.repType == 'text'">{{item.repContent}}</div>
-              <div v-if="item.repType == 'image'">
-                <a target="_blank" :href="item.repUrl"><img :src="item.repUrl" style="width: 100px"></a>
+            <div class="avue-comment__body" :style="item.sendFrom == '2' ? 'background: #6BED72;' : ''">
+              <!-- 【事件】区域 -->
+              <div v-if="item.type === 'event' && item.event === 'subscribe'">
+                <el-tag type="success" size="mini">关注</el-tag>
               </div>
-              <div v-if="item.repType == 'voice'">
-                <WxVoicePlayer :objData="item"></WxVoicePlayer>
+              <div v-else-if="item.type === 'event' && item.event === 'unsubscribe'">
+                <el-tag type="danger" size="mini">取消关注</el-tag>
               </div>
-              <div v-if="item.repType == 'video'" style="text-align: center">
-                <WxVideoPlayer :objData="item"></WxVideoPlayer>
+              <div v-else-if="item.type === 'event' && item.event === 'CLICK'">
+                <el-tag size="mini">点击菜单</el-tag>【{{ item.eventKey }}】
               </div>
-              <div v-if="item.repType == 'shortvideo'" style="text-align: center">
-                <WxVideoPlayer :objData="item"></WxVideoPlayer>
+              <div v-else-if="item.type === 'event' && item.event === 'VIEW'">
+                <el-tag size="mini">点击菜单链接</el-tag>【{{ item.eventKey }}】
               </div>
-              <div v-if="item.repType == 'location'">
-                <el-link type="primary" target="_blank" :href="'https://map.qq.com/?type=marker&isopeninfowin=1&markertype=1&pointx='+item.repLocationY+'&pointy='+item.repLocationX+'&name='+item.repContent+'&ref=joolun'">
-                  <img :src="'https://apis.map.qq.com/ws/staticmap/v2/?zoom=10&markers=color:blue|label:A|'+item.repLocationX+','+item.repLocationY+'&key='+qqMapKey+'&size=250*180'">
-                  <p/><i class="el-icon-map-location"></i>{{item.repContent}}
+              <div v-else-if="item.type === 'event' && item.event === 'scancode_waitmsg'"> <!-- TODO 芋艿：需要测试下 -->
+                <el-tag size="mini">扫码结果</el-tag>【{{ item.eventKey }}】
+              </div>
+              <div v-else-if="item.type === 'event'">
+                <el-tag type="danger" size="mini">未知事件类型</el-tag>
+              </div>
+              <!-- 【消息】区域 -->
+              <div v-else-if="item.type === 'text'">{{ item.content }}</div>
+              <div v-else-if="item.type === 'voice'">
+                <wx-voice-player :url="item.mediaUrl" :content="item.recognition" />
+              </div>
+              <div v-else-if="item.type === 'image'">
+                <a target="_blank" :href="item.mediaUrl">
+                  <img :src="item.mediaUrl" style="width: 100px">
+                </a>
+              </div>
+              <div v-else-if="item.type === 'video' || item.type === 'shortvideo'" style="text-align: center">
+                <wx-video-player :url="item.mediaUrl" />
+              </div>
+              <div v-if="item.type === 'link'" class="avue-card__detail">
+                <el-link type="success" :underline="false" target="_blank" :href="item.url">
+                  <div class="avue-card__title"><i class="el-icon-link"></i>{{ item.title }}</div>
                 </el-link>
+                <div class="avue-card__info" style="height: unset">{{item.description}}</div>
               </div>
-              <div v-if="item.repType == 'link'" class="avue-card__detail">
-                <el-link type="success" :underline="false" target="_blank" :href="item.repUrl">
-                  <div class="avue-card__title"><i class="el-icon-link"></i>{{item.repName}}</div>
-                </el-link>
-                <div class="avue-card__info" style="height: unset">{{item.repDesc}}</div>
-              </div>
-              <div v-if="item.repType == 'news'" style="width: 300px">
-                <WxNews :objData="item.content.articles"></WxNews>
-              </div>
-              <div v-if="item.repType == 'music'">
-                <el-link type="success" :underline="false" target="_blank" :href="item.repUrl">
-                  <div class="avue-card__body" style="padding:10px;background-color: #fff;border-radius: 5px">
-                    <div class="avue-card__avatar"><img :src="item.repThumbUrl" alt=""></div>
-                    <div class="avue-card__detail">
-                      <div class="avue-card__title" style="margin-bottom:unset">{{item.repName}}</div>
-                      <div class="avue-card__info" style="height: unset">{{item.repDesc}}</div>
-                    </div>
-                  </div>
-                </el-link>
-              </div>
+<!--              <div v-if="item.repType == 'location'">-->
+<!--                <el-link type="primary" target="_blank" :href="'https://map.qq.com/?type=marker&isopeninfowin=1&markertype=1&pointx='+item.repLocationY+'&pointy='+item.repLocationX+'&name='+item.repContent+'&ref=joolun'">-->
+<!--                  <img :src="'https://apis.map.qq.com/ws/staticmap/v2/?zoom=10&markers=color:blue|label:A|'+item.repLocationX+','+item.repLocationY+'&key='+qqMapKey+'&size=250*180'">-->
+<!--                  <p/><i class="el-icon-map-location"></i>{{item.repContent}}-->
+<!--                </el-link>-->
+<!--              </div>-->
+
+<!--              <div v-if="item.repType == 'news'" style="width: 300px">-->
+<!--                <WxNews :objData="item.content.articles"></WxNews>-->
+<!--              </div>-->
+
+<!--              <div v-if="item.repType == 'music'">-->
+<!--                <el-link type="success" :underline="false" target="_blank" :href="item.repUrl">-->
+<!--                  <div class="avue-card__body" style="padding:10px;background-color: #fff;border-radius: 5px">-->
+<!--                    <div class="avue-card__avatar"><img :src="item.repThumbUrl" alt=""></div>-->
+<!--                    <div class="avue-card__detail">-->
+<!--                      <div class="avue-card__title" style="margin-bottom:unset">{{item.repName}}</div>-->
+<!--                      <div class="avue-card__info" style="height: unset">{{item.repDesc}}</div>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </el-link>-->
+<!--              </div>-->
             </div>
           </div>
         </div>
@@ -78,26 +96,24 @@
 </template>
 
 <script>
-  import { getPage, addObj, putObj } from '@/api/wxmp/wxmsg'
-  import SockJS from 'sockjs-client';
-  import Stomp from 'stompjs';
-  import { getToken } from '@/utils/auth'
-  import WxReplySelect from '@/components/wx-reply/main.vue'
-  import WxNews from '@/components/wx-news/main.vue'
-  import WxVideoPlayer from '@/components/wx-video-play/main.vue'
-  import WxVoicePlayer from '@/components/wx-voice-play/main.vue'
+  // import { getMessagePage, addObj } from '@/api/mp/message'
+  import { getMessagePage } from '@/api/mp/message'
+  // import WxReplySelect from '@/components/wx-reply/main.vue'
+  // import WxNews from '@/components/wx-news/main.vue'
+  import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
+  import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
 
   export default {
     name: "wxMsg",
     components: {
-      WxReplySelect,
-      WxNews,
+      // WxReplySelect,
+      // WxNews,
       WxVideoPlayer,
       WxVoicePlayer
     },
     props: {
-      wxUserId:{
-        type:String
+      wxUserId: {
+        type: String
       }
     },
     data() {
@@ -110,10 +126,10 @@
         sendLoading:false,
         tableLoading:false,
         loadMore: true,
-        tableData: [],
+        tableData: [], // 消息列表
         page: {
           total: 0, // 总页数
-          currentPage: 1, // 当前页数
+          pageNo: 1, // 当前页数
           pageSize: 14, // 每页显示多少条
           ascs:[],//升序字段
           descs:'create_time'//降序字段
@@ -130,69 +146,7 @@
     created() {
       this.refreshChange()
     },
-    destroyed: function() {
-      this.disconnect()
-    },
-    mounted(){
-      //开源版接口没有实现websocket，固隐藏
-      // this.initWebSocket()
-    },
-    beforeDestroy() {
-      // 页面离开时断开连接,清除定时器
-      this.disconnect();
-      clearInterval(this.timer);
-    },
-    computed: {
-
-    },
     methods:{
-      initWebSocket() {
-        this.connection();
-        let self = this;
-        //断开重连机制,尝试发送消息,捕获异常发生时重连
-        this.timer = setInterval(() => {
-          try {
-            self.stompClient.send("test");
-          } catch (err) {
-            console.log("断线了: " + err);
-            self.connection();
-          }
-        }, 5000);
-      },
-      connection() {
-        let token = getToken()
-        let headers = {
-          'Authorization': 'Bearer ' + token
-        }
-        // 建立连接对象
-        this.socket = new SockJS('/weixin/ws');//连接服务端提供的通信接口，连接以后才可以订阅广播消息和个人消息
-        // 获取STOMP子协议的客户端对象
-        this.stompClient = Stomp.over(this.socket);
-
-        // 向服务器发起websocket连接
-        this.stompClient.connect(headers, () => {
-          this.stompClient.subscribe('/weixin/wx_msg'+this.wxUserId, (msg) => { // 订阅服务端提供的某个topic;
-            let data = JSON.parse(msg.body)
-            this.tableData = [...this.tableData , ...[data]]//刷新消息
-            this.scrollToBottom()
-            //标记为已读
-            if(data.type == '1'){
-              putObj({
-                id: data.id,
-                readFlag: '0'
-              }).then(data => {})
-            }
-          });
-        }, (err) => {
-
-        });
-      },
-      disconnect() {
-        if (this.stompClient != null) {
-          this.stompClient.disconnect();
-          console.log("Disconnected");
-        }
-      },
       sendMsg(){
         if(this.objData){
           if(this.objData.repType == 'news'){
@@ -226,14 +180,14 @@
         })
       },
       loadingMore(){
-        this.page.currentPage++
+        this.page.pageNo++
         this.getPage(this.page)
       },
       getPage(page, params) {
         this.tableLoading = true
-        getPage(Object.assign({
-          current: page.currentPage,
-          size: page.pageSize,
+        getMessagePage(Object.assign({
+          pageNo: page.pageNo,
+          pageSize: page.pageSize,
           descs:page.descs,
           ascs: page.ascs,
           wxUserId: this.wxUserId
@@ -243,14 +197,14 @@
           if(msgDiv){
             scrollHeight = msgDiv.scrollHeight
           }
-          let data = response.data.records.reverse()
+          let data = response.data.list.reverse()
           this.tableData = [...data , ...this.tableData]
           this.page.total = response.data.total
           this.tableLoading = false
-          if(data.length < this.page.pageSize || data.length == 0){
+          if(data.length < this.page.pageSize || data.length === 0){
             this.loadMore = false
           }
-          if(this.page.currentPage == 1){//定位到消息底部
+          if(this.page.pageNo == 1){//定位到消息底部
             this.scrollToBottom()
           }else{
             if(data.length != 0){
@@ -261,7 +215,7 @@
               })
             }
           }
-          this.page.currentPage = page.currentPage
+          this.page.pageNo = page.pageNo
           this.page.pageSize = page.pageSize
         })
       },
@@ -292,6 +246,12 @@
     flex: unset!important;
     border-radius: 5px!important;
     margin: 0 8px!important;
+  }
+  .avue-comment--reverse {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    -ms-flex-direction: row-reverse;
+    flex-direction: row-reverse;
   }
   .avue-comment__header{
     border-top-left-radius: 5px;

@@ -29,11 +29,6 @@
 
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-                   v-hasPermi="['mp:message:create']">新增
-        </el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -102,68 +97,25 @@
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
-    <!-- 对话框(添加 / 修改) -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="用户标识" prop="openid">
-          <el-input v-model="form.openid" placeholder="请输入用户标识"/>
-        </el-form-item>
-        <el-form-item label="昵称" prop="nickname">
-          <el-input v-model="form.nickname" placeholder="请输入昵称"/>
-        </el-form-item>
-        <el-form-item label="头像地址" prop="headimgUrl">
-          <el-input v-model="form.headimgUrl" placeholder="请输入头像地址"/>
-        </el-form-item>
-        <el-form-item label="微信账号ID" prop="wxAccountId">
-          <el-input v-model="form.wxAccountId" placeholder="请输入微信账号ID"/>
-        </el-form-item>
-        <el-form-item label="消息类型" prop="msgType">
-          <el-select v-model="form.msgType" placeholder="请选择消息类型">
-            <el-option label="请选择字典生成" value=""/>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="内容">
-          <editor v-model="form.content" :min-height="192"/>
-        </el-form-item>
-        <el-form-item label="最近一条回复内容">
-          <editor v-model="form.resContent" :min-height="192"/>
-        </el-form-item>
-        <el-form-item label="是否已回复" prop="isRes">
-          <el-input v-model="form.isRes" placeholder="请输入是否已回复"/>
-        </el-form-item>
-        <el-form-item label="微信素材ID" prop="mediaId">
-          <el-input v-model="form.mediaId" placeholder="请输入微信素材ID"/>
-        </el-form-item>
-        <el-form-item label="微信图片URL" prop="picUrl">
-          <el-input v-model="form.picUrl" placeholder="请输入微信图片URL"/>
-        </el-form-item>
-        <el-form-item label="本地图片路径" prop="picPath">
-          <el-input v-model="form.picPath" placeholder="请输入本地图片路径"/>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
+    <el-dialog title="用户消息" :visible.sync="open" width="40%">
+      <wx-msg wxUserId="1" v-if="true" />
     </el-dialog>
+
   </div>
 </template>
 
 <script>
-import {
-  createWxFansMsg,
-  getMessagePage,
-} from "@/api/mp/message";
-import Editor from '@/components/Editor/index.vue';
+import { getMessagePage } from "@/api/mp/message";
 import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
 import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
+import WxMsg from '@/views/mp/components/wx-msg/main.vue';
 
 export default {
   name: "WxFansMsg",
   components: {
-    Editor,
     WxVideoPlayer,
-    WxVoicePlayer
+    WxVoicePlayer,
+    WxMsg
   },
   data() {
     return {
@@ -180,9 +132,9 @@ export default {
       // 弹出层标题
       title: "",
       // 是否显示弹出层
-      open: false,
-      dateRangeCreateTime: [],
+      open: true,
       // 查询参数
+      dateRangeCreateTime: [],
       queryParams: {
         pageNo: 1,
         pageSize: 10,
@@ -257,26 +209,6 @@ export default {
       this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
-    },
-    /** 新增按钮操作 */
-    handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加粉丝消息表 ";
-    },
-    /** 提交按钮 */
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (!valid) {
-          return;
-        }
-        // 添加的提交
-        createWxFansMsg(this.form).then(response => {
-          this.$modal.msgSuccess("新增成功");
-          this.open = false;
-          this.getList();
-        });
-      });
     },
   }
 };
