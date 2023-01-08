@@ -9,6 +9,9 @@ import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import javax.validation.Valid;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.ACCOUNT_NOT_EXISTS;
+
 /**
  * 公众号账号 Service 接口
  *
@@ -50,6 +53,20 @@ public interface MpAccountService {
      * @return 公众号账号
      */
     MpAccountDO getAccount(Long id);
+
+    /**
+     * 获得公众号账号。若不存在，则抛出业务异常
+     *
+     * @param id 编号
+     * @return 公众号账号
+     */
+    default MpAccountDO getRequiredAccount(Long id) {
+        MpAccountDO account = getAccount(id);
+        if (account == null) {
+            throw exception(ACCOUNT_NOT_EXISTS);
+        }
+        return account;
+    }
 
     /**
      * 从缓存中，获得公众号账号

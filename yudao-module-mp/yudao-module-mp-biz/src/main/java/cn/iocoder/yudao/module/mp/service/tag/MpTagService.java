@@ -45,4 +45,11 @@ public interface MpTagService {
      */
     PageResult<MpTagDO> getTagPage(MpTagPageReqVO pageReqVO);
 
+    /**
+     * 同步公众号标签
+     *
+     * @param accountId 公众号账号的编号
+     */
+    void syncTag(Long accountId);
+
 }

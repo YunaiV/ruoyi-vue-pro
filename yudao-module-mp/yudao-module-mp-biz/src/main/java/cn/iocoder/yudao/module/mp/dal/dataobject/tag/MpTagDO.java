@@ -5,6 +5,7 @@ import lombok.*;
 
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import me.chanjar.weixin.mp.bean.tag.WxUserTag;
 
 /**
  * 公众号标签 DO
@@ -31,6 +32,12 @@ public class MpTagDO extends BaseDO {
      * 标签名
      */
     private String name;
+    /**
+     * 此标签下粉丝数
+     *
+     * 冗余：{@link WxUserTag#getCount()} 字段，需要管理员点击【同步】后，更新该字段
+     */
+    private Integer count;
 
     /**
      * 微信公众号 ID

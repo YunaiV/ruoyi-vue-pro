@@ -1,4 +1,4 @@
-### 请求 /login 接口 => 成功
+### 请求 /mp/menu/save 接口 => 成功
 POST {{baseUrl}}/mp/menu/save
 Content-Type: application/json
 Authorization: Bearer {{token}}
