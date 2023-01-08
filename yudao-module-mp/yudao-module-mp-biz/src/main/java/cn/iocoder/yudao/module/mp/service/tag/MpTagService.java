@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.tag.MpTagDO;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 公众号标签 Service 接口
@@ -44,6 +45,8 @@ public interface MpTagService {
      * @return 公众号标签分页
      */
     PageResult<MpTagDO> getTagPage(MpTagPageReqVO pageReqVO);
+
+    List<MpTagDO> getTagList();
 
     /**
      * 同步公众号标签

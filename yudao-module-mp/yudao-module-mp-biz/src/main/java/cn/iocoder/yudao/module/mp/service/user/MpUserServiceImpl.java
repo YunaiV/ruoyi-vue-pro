@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserPageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserUpdateReqVO;
 import cn.iocoder.yudao.module.mp.convert.user.MpUserConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
@@ -28,6 +29,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.USER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.USER_UPDATE_TAG_FAIL;
 
 /**
  * 微信公众号粉丝 Service 实现类
@@ -156,14 +161,55 @@ public class MpUserServiceImpl implements MpUserService {
     }
 
     @Override
-    public void updateUserUnsubscribe(String appId, String openId) {
-        MpUserDO dbUser = mpUserMapper.selectByAppIdAndOpenid(appId, openId);
+    public void updateUserUnsubscribe(String appId, String openid) {
+        MpUserDO dbUser = mpUserMapper.selectByAppIdAndOpenid(appId, openid);
         if (dbUser == null) {
-            log.error("[updateUserUnsubscribe][微信公众号粉丝 appId({}) openId({}) 不存在]", appId, openId);
+            log.error("[updateUserUnsubscribe][微信公众号粉丝 appId({}) openid({}) 不存在]", appId, openid);
             return;
         }
         mpUserMapper.updateById(new MpUserDO().setId(dbUser.getId()).setSubscribeStatus(CommonStatusEnum.DISABLE.getStatus())
-                .setSubscribeTime(LocalDateTime.now()));
+                .setUnsubscribeTime(LocalDateTime.now()));
+    }
+
+    @Override
+    public void updateUser(MpUserUpdateReqVO updateReqVO) {
+        // 校验存在
+        MpUserDO user = validateUserExists(updateReqVO.getId());
+
+        // 第一步，更新标签到公众号
+        updateUserTag(user.getAppId(), user.getOpenid(), updateReqVO.getTagIds());
+
+        // 第二步，更新基本信息到数据库
+        MpUserDO updateObj = MpUserConvert.INSTANCE.convert(updateReqVO).setId(user.getId());
+        mpUserMapper.updateById(updateObj);
+    }
+
+    private MpUserDO validateUserExists(Long id) {
+        MpUserDO user = mpUserMapper.selectById(id);
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+        return user;
+    }
+
+    private void updateUserTag(String appId, String openid, List<Long> tagIds) {
+        WxMpService mpService = mpServiceFactory.getRequiredMpService(appId);
+        try {
+            // 第一步，先取消原来的标签
+            List<Long> oldTagIds = mpService.getUserTagService().userTagList(openid);
+            for (Long tagId : oldTagIds) {
+                mpService.getUserTagService().batchUntagging(tagId, new String[]{openid});
+            }
+            // 第二步，再设置新的标签
+            if (CollUtil.isEmpty(tagIds)) {
+                return;
+            }
+            for (Long tagId: tagIds) {
+                mpService.getUserTagService().batchTagging(tagId, new String[]{openid});
+            }
+        } catch (WxErrorException e) {
+            throw exception(USER_UPDATE_TAG_FAIL, e.getError().getErrorMsg());
+        }
     }
 
 }

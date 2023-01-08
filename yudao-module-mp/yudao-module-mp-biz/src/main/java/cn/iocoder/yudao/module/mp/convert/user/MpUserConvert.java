@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserRespVO;
+import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
@@ -48,5 +49,7 @@ public interface MpUserConvert {
     default List<MpUserDO> convertList(MpAccountDO account, List<WxMpUser> wxUsers) {
         return CollectionUtils.convertList(wxUsers, wxUser -> convert(account, wxUser));
     }
+
+    MpUserDO convert(MpUserUpdateReqVO bean);
 
 }

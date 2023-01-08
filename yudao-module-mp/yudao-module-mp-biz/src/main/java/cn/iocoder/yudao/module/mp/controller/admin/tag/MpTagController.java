@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.mp.controller.admin.tag;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagCreateReqVO;
-import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagPageReqVO;
-import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagRespVO;
-import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagUpdateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.*;
 import cn.iocoder.yudao.module.mp.convert.tag.MpTagConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.tag.MpTagDO;
 import cn.iocoder.yudao.module.mp.service.tag.MpTagService;
@@ -18,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -60,6 +58,14 @@ public class MpTagController {
     public CommonResult<PageResult<MpTagRespVO>> getTagPage(MpTagPageReqVO pageReqVO) {
         PageResult<MpTagDO> pageResult = mpTagService.getTagPage(pageReqVO);
         return success(MpTagConvert.INSTANCE.convertPage(pageResult));
+    }
+
+    @GetMapping("/list-all-simple")
+    @ApiOperation(value = "获取公众号账号精简信息列表")
+    @PreAuthorize("@ss.hasPermission('mp:account:query')")
+    public CommonResult<List<MpTagSimpleRespVO>> getSimpleTags() {
+        List<MpTagDO> list = mpTagService.getTagList();
+        return success(MpTagConvert.INSTANCE.convertList02(list));
     }
 
     @PostMapping("/sync")

@@ -117,6 +117,11 @@ public class MpTagServiceImpl implements MpTagService {
     }
 
     @Override
+    public List<MpTagDO> getTagList() {
+        return mpTagMapper.selectList();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void syncTag(Long accountId) {
         MpAccountDO account = mpAccountService.getRequiredAccount(accountId);
@@ -127,7 +132,7 @@ public class MpTagServiceImpl implements MpTagService {
         try {
             wxTags = mpService.getUserTagService().tagGet();
         } catch (WxErrorException e) {
-            throw new RuntimeException(e);
+            throw exception(TAG_GET_FAIL, e.getError().getErrorMsg());
         }
 
         // 第二步，合并更新回自己的数据库；由于标签只有 100 个，所以直接 for 循环操作

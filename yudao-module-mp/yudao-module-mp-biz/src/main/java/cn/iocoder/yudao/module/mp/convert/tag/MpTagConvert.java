@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.mp.convert.tag;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagRespVO;
+import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagSimpleRespVO;
 import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.tag.MpTagDO;
@@ -35,5 +36,7 @@ public interface MpTagConvert {
             @Mapping(source = "account.appId", target = "appId"),
     })
     MpTagDO convert(WxUserTag tag, MpAccountDO account);
+
+    List<MpTagSimpleRespVO> convertList02(List<MpTagDO> list);
 
 }

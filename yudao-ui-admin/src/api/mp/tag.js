@@ -43,6 +43,14 @@ export function getTagPage(query) {
   })
 }
 
+// 获取公众号标签精简信息列表
+export function getSimpleTags() {
+  return request({
+    url: '/mp/tag/list-all-simple',
+    method: 'get',
+  })
+}
+
 // 同步公众号标签
 export function syncTag(accountId) {
   return request({
