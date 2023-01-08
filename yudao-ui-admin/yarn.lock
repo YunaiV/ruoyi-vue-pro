@@ -2327,6 +2327,18 @@
   dependencies:
     "tweetnacl" "^0.14.3"
 
+"benz-amr-recorder@^1.1.5":
+  "integrity" "sha512-NepctcNTsZHK8NxBb5uKO5p8S+xkbm+vD6GLSkCYdJeEsriexvgumLHpDkanX4QJBcLRMVtg16buWMs+gUPB3g=="
+  "resolved" "https://registry.npmmirror.com/benz-amr-recorder/-/benz-amr-recorder-1.1.5.tgz"
+  "version" "1.1.5"
+  dependencies:
+    "benz-recorderjs" "^1.0.5"
+
+"benz-recorderjs@^1.0.5":
+  "integrity" "sha512-EwedOQo9KLti7HxDi/eZY51PSRbAXnOdEZmLvJ6ro3QQSoF9Y3AXBt57MIllGvVz5vtFYMeikG+GD7qTm3+p9w=="
+  "resolved" "https://registry.npmmirror.com/benz-recorderjs/-/benz-recorderjs-1.0.5.tgz"
+  "version" "1.0.5"
+
 "bfj@^6.1.1":
   "integrity" "sha512-BmBJa4Lip6BPRINSZ0BPEIfB1wUY/9rwbwvIHQA1KjX9om29B6id0wnWXq7m3bn5JrUVjeOTnVuhPT1FiHwPGw=="
   "resolved" "https://registry.npmmirror.com/bfj/-/bfj-6.1.2.tgz"

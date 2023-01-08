@@ -70,7 +70,9 @@
           </div>
           <!-- 【消息】区域 -->
           <div v-else-if="scope.row.type === 'text'">{{ scope.row.content }}</div>
-          <!-- TODO 语音 -->
+          <div v-else-if="scope.row.type === 'voice'">
+            <wx-voice-player :url="scope.row.mediaUrl" :content="scope.row.recognition" />
+          </div>
           <div v-else-if="scope.row.type === 'image'">
             <a target="_blank" :href="scope.row.mediaUrl">
               <img :src="scope.row.mediaUrl" style="width: 100px">
@@ -154,12 +156,14 @@ import {
 } from "@/api/mp/message";
 import Editor from '@/components/Editor/index.vue';
 import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
+import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
 
 export default {
   name: "WxFansMsg",
   components: {
     Editor,
     WxVideoPlayer,
+    WxVoicePlayer
   },
   data() {
     return {
