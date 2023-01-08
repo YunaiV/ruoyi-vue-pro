@@ -44,12 +44,47 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="消息类型" align="center" prop="type"/>
-      <el-table-column label="用户标识" align="center" prop="openid"/>
-      <el-table-column label="内容" align="center" prop="content">
+      <el-table-column label="消息类型" align="center" prop="type" width="80"/>
+      <el-table-column label="用户标识" align="center" prop="openid" width="300" />
+      <!-- TODO 芋艿：发送/接收 -->
+      <el-table-column label="内容" prop="content">
         <template slot-scope="scope">
-          <div v-if="scope.row.type === 'video'">
+          <!-- 【事件】区域 -->
+          <div v-if="scope.row.type === 'event' && scope.row.event === 'subscribe'">
+            <el-tag type="success" size="mini">关注</el-tag>
+          </div>
+          <div v-else-if="scope.row.type === 'event' && scope.row.event === 'unsubscribe'">
+            <el-tag type="danger" size="mini">取消关注</el-tag>
+          </div>
+          <div v-else-if="scope.row.type === 'event' && scope.row.event === 'CLICK'">
+            <el-tag size="mini">点击菜单</el-tag>【{{ scope.row.eventKey }}】
+          </div>
+          <div v-else-if="scope.row.type === 'event' && scope.row.event === 'VIEW'">
+            <el-tag size="mini">点击菜单链接</el-tag>【{{ scope.row.eventKey }}】
+          </div>
+          <div v-else-if="scope.row.type === 'event' && scope.row.event === 'scancode_waitmsg'"> <!-- TODO 芋艿：需要测试下 -->
+            <el-tag size="mini">扫码结果</el-tag>【{{ scope.row.eventKey }}】
+          </div>
+          <div v-else-if="scope.row.type === 'event'">
+            <el-tag type="danger" size="mini">未知事件类型</el-tag>
+          </div>
+          <!-- 【消息】区域 -->
+          <div v-else-if="scope.row.type === 'text'">{{ scope.row.content }}</div>
+          <!-- TODO 语音 -->
+          <div v-else-if="scope.row.type === 'image'">
+            <a target="_blank" :href="scope.row.mediaUrl">
+              <img :src="scope.row.mediaUrl" style="width: 100px">
+            </a>
+          </div>
+          <div v-else-if="scope.row.type === 'video' || scope.row.type === 'shortvideo'">
             <wx-video-player :url="scope.row.mediaUrl" style="margin-top: 10px" />
+          </div>
+          <div v-else-if="scope.row.type === 'link'">
+            <el-tag size="mini">链接</el-tag>：
+            <a :href="scope.row.url" target="_blank">{{scope.row.title}}</a>
+          </div>
+          <div v-else>
+            <el-tag type="danger" size="mini">未知消息类型</el-tag>
           </div>
         </template>
       </el-table-column>
