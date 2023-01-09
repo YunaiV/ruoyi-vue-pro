@@ -1,10 +1,13 @@
 <!--
   - Copyright (C) 2018-2019
   - All rights reserved, Designed By www.joolun.com
+  芋道源码：
+  ① 移除暂时用不到的 websocket
+  ② 代码优化，补充注释，提升阅读性
 -->
 <template>
-  <div class="msg-main" v-loading="mainLoading">
-    <div class="msg-div" :id="'msg-div'+nowStr">
+  <div class="msg-main">
+    <div class="msg-div" :id="'msg-div' + nowStr">
       <!-- 加载更多 -->
       <div v-loading="tableLoading"></div>
       <div v-if="!tableLoading">
@@ -15,9 +18,8 @@
       <div class="execution" v-for="item in tableData" :key='item.id'>
         <div class="avue-comment" :class="item.sendFrom === 2 ? 'avue-comment--reverse' : ''">
           <div class="avatar-div">
-            <img :src="item.sendFrom === 1 ? item.headimgUrl : item.appLogo" class="avue-comment__avatar">
-<!--            <div class="avue-comment__author">{{item.sendFrom === 1 ? item.nickName : item.appName}}</div>-->
-            <div class="avue-comment__author">{{item.sendFrom === 1 ? '用户' : '公众号' }}</div>
+            <img :src="item.sendFrom === 1 ? user.avatar : mp.avatar" class="avue-comment__avatar">
+            <div class="avue-comment__author">{{item.sendFrom === 1 ? user.nickname : mp.nickname }}</div>
           </div>
           <div class="avue-comment__main">
             <div class="avue-comment__header">
@@ -62,6 +64,7 @@
                 </el-link>
                 <div class="avue-card__info" style="height: unset">{{item.description}}</div>
               </div>
+              <!-- TODO 芋艿：待完善 -->
 <!--              <div v-if="item.repType == 'location'">-->
 <!--                <el-link type="primary" target="_blank" :href="'https://map.qq.com/?type=marker&isopeninfowin=1&markertype=1&pointx='+item.repLocationY+'&pointy='+item.repLocationX+'&name='+item.repContent+'&ref=joolun'">-->
 <!--                  <img :src="'https://apis.map.qq.com/ws/staticmap/v2/?zoom=10&markers=color:blue|label:A|'+item.repLocationX+','+item.repLocationY+'&key='+qqMapKey+'&size=250*180'">-->
@@ -118,28 +121,25 @@
     },
     data() {
       return {
-        nowStr: new Date().getTime(),
+        nowStr: new Date().getTime(), // 当前的时间戳，用于每次消息加载后，回到原位置；具体见 :id="'msg-div' + nowStr" 处
         objData:{
           repType: 'text'
         },
-        mainLoading:false,
-        sendLoading:false,
-        tableLoading:false,
-        loadMore: true,
+        sendLoading: false, // 发送消息是否加载中
+        tableLoading: false, // 消息列表是否正在加载中
+        loadMore: true, // 是否可以加载更多
         tableData: [], // 消息列表
         page: {
-          total: 0, // 总页数
           pageNo: 1, // 当前页数
           pageSize: 14, // 每页显示多少条
-          ascs:[],//升序字段
-          descs:'create_time'//降序字段
         },
-        option: {
-          props: {
-            avatar: 'avatar',
-            author: 'author',
-            body: 'body'
-          }
+        user: { // 由于微信不再提供昵称，直接使用“用户”展示
+          nickname: '用户',
+          avatar: require("@/assets/images/profile.jpg"),
+        },
+        mp: {
+          nickname: '公众号',
+          avatar: require("@/assets/images/wechat.png"),
         }
       }
     },
@@ -148,8 +148,8 @@
     },
     methods:{
       sendMsg(){
-        if(this.objData){
-          if(this.objData.repType == 'news'){
+        if (this.objData) {
+          if(this.objData.repType === 'news'){
             this.objData.content.articles = [this.objData.content.articles[0]]
             this.$message({
               showClose: true,
@@ -173,13 +173,7 @@
           })
         }
       },
-      scrollToBottom: function () {
-        this.$nextTick(() => {
-          let div = document.getElementById('msg-div'+this.nowStr)
-          div.scrollTop = div.scrollHeight
-        })
-      },
-      loadingMore(){
+      loadingMore() {
         this.page.pageNo++
         this.getPage(this.page)
       },
@@ -188,35 +182,35 @@
         getMessagePage(Object.assign({
           pageNo: page.pageNo,
           pageSize: page.pageSize,
-          descs:page.descs,
-          ascs: page.ascs,
           wxUserId: this.wxUserId
         }, params)).then(response => {
-          let msgDiv = document.getElementById('msg-div'+this.nowStr)
+          // 计算当前的滚动高度
+          const msgDiv = document.getElementById('msg-div' + this.nowStr);
           let scrollHeight = 0
           if(msgDiv){
             scrollHeight = msgDiv.scrollHeight
           }
-          let data = response.data.list.reverse()
-          this.tableData = [...data , ...this.tableData]
-          this.page.total = response.data.total
+
+          // 处理数据
+          const data = response.data.list.reverse();
+          this.tableData = [...data, ...this.tableData]
           this.tableLoading = false
-          if(data.length < this.page.pageSize || data.length === 0){
+          if (data.length < this.page.pageSize || data.length === 0){
             this.loadMore = false
-          }
-          if(this.page.pageNo == 1){//定位到消息底部
-            this.scrollToBottom()
-          }else{
-            if(data.length != 0){
-              this.$nextTick(() => {//定位滚动条
-                if(scrollHeight != 0){
-                  msgDiv.scrollTop = document.getElementById('msg-div'+this.nowStr).scrollHeight - scrollHeight - 100
-                }
-              })
-            }
           }
           this.page.pageNo = page.pageNo
           this.page.pageSize = page.pageSize
+
+          // 滚动到原来的位置
+          if(this.page.pageNo === 1) { // 定位到消息底部
+            this.scrollToBottom()
+          } else if (data.length !== 0) { // 定位滚动条
+            this.$nextTick(() => {
+              if (scrollHeight !== 0){
+                msgDiv.scrollTop = document.getElementById('msg-div'+this.nowStr).scrollHeight - scrollHeight - 100
+              }
+            })
+          }
         })
       },
       /**
@@ -224,120 +218,40 @@
        */
       refreshChange() {
         this.getPage(this.page)
-      }
+      },
+      /** 定位到消息底部 */
+      scrollToBottom: function () {
+        this.$nextTick(() => {
+          let div = document.getElementById('msg-div' + this.nowStr)
+          div.scrollTop = div.scrollHeight
+        })
+      },
     }
   };
 </script>
 <style lang="scss" scoped>
-/* 来自 https://github.com/nmxiaowei/avue/blob/master/styles/src/element-ui/comment.scss  */
-/* 因为 joolun 实现依赖 avue 组件，该页面使用了 comment.scss  */
-.avue-comment{
-  margin-bottom: 30px;
-  display: flex;
-  align-items: flex-start;
-  &--reverse{
-    flex-direction:row-reverse;
-    .avue-comment__main{
-      &:before,&:after{
-        left: auto;
-        right: -8px;
-        border-width: 8px 0 8px 8px;
-      }
-      &:before{
-        border-left-color: #dedede;
-      }
-      &:after{
-        border-left-color: #f8f8f8;
-        margin-right: 1px;
-        margin-left: auto;
-      }
-    }
-  }
-  &__avatar{
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 1px solid transparent;
-    box-sizing: border-box;
-    vertical-align: middle;
-  }
-  &__header{
-    padding: 5px 15px;
-    background: #f8f8f8;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  &__author{
-    font-weight: 700;
-    font-size: 14px;
-    color: #999;
-  }
-  &__main{
-    flex:1;
-    margin: 0 20px;
-    position: relative;
-    border: 1px solid #dedede;
-    border-radius: 2px;
-    &:before,&:after{
-      position: absolute;
-      top: 10px;
-      left: -8px;
-      right: 100%;
-      width: 0;
-      height: 0;
-      display: block;
-      content: " ";
-      border-color: transparent;
-      border-style: solid solid outset;
-      border-width: 8px 8px 8px 0;
-      pointer-events: none;
-    }
-    &:before {
-      border-right-color: #dedede;
-      z-index: 1;
-    }
-    &:after{
-      border-right-color: #f8f8f8;
-      margin-left: 1px;
-      z-index: 2;
-    }
-  }
-  &__body{
-    padding: 15px;
-    overflow: hidden;
-    background: #fff;
-    font-family: Segoe UI,Lucida Grande,Helvetica,Arial,Microsoft YaHei,FreeSans,Arimo,Droid Sans,wenquanyi micro hei,Hiragino Sans GB,Hiragino Sans GB W3,FontAwesome,sans-serif;color: #333;
-    font-size: 14px;
-  }
-  blockquote{
-    margin:0;
-    font-family: Georgia,Times New Roman,Times,Kai,Kaiti SC,KaiTi,BiauKai,FontAwesome,serif;
-    padding: 1px 0 1px 15px;
-    border-left: 4px solid #ddd;
-  }
-}
-</style>
-<style lang="scss" scoped>
-.msg-main{
+/* 因为 joolun 实现依赖 avue 组件，该页面使用了 comment.scss、card.scc  */
+@import './comment.scss';
+@import './card.scss';
+
+.msg-main {
   margin-top: -30px;
   padding: 10px;
 }
-.msg-div{
+.msg-div {
   height: 50vh;
   overflow: auto;
   background-color: #eaeaea;
 }
-.msg-send{
+.msg-send {
   padding: 10px;
 }
-.avue-comment__main{
+.avue-comment__main {
   flex: unset!important;
   border-radius: 5px!important;
   margin: 0 8px!important;
 }
-.avue-comment__header{
+.avue-comment__header {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
@@ -345,11 +259,11 @@
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
 }
-.avatar-div{
+.avatar-div {
   text-align: center;
   width: 80px;
 }
-.send-but{
+.send-but {
   float: right;
   margin-top: 8px!important;
 }
