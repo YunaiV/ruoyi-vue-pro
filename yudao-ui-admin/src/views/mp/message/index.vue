@@ -86,6 +86,9 @@
             <el-tag size="mini">链接</el-tag>：
             <a :href="scope.row.url" target="_blank">{{scope.row.title}}</a>
           </div>
+          <div v-else-if="scope.row.type === 'location'">
+            <wx-location :label="scope.row.label" :location-y="scope.row.locationY" :location-x="scope.row.locationX" />
+          </div>
           <div v-else>
             <el-tag type="danger" size="mini">未知消息类型</el-tag>
           </div>
@@ -115,13 +118,15 @@ import { getMessagePage } from "@/api/mp/message";
 import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
 import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
 import WxMsg from '@/views/mp/components/wx-msg/main.vue';
+import WxLocation from '@/views/mp/components/wx-location/main.vue';
 
 export default {
   name: "WxFansMsg",
   components: {
     WxVideoPlayer,
     WxVoicePlayer,
-    WxMsg
+    WxMsg,
+    WxLocation
   },
   data() {
     return {

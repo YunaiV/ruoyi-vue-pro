@@ -58,23 +58,20 @@
               <div v-else-if="item.type === 'video' || item.type === 'shortvideo'" style="text-align: center">
                 <wx-video-player :url="item.mediaUrl" />
               </div>
-              <div v-if="item.type === 'link'" class="avue-card__detail">
+              <div v-else-if="item.type === 'link'" class="avue-card__detail">
                 <el-link type="success" :underline="false" target="_blank" :href="item.url">
                   <div class="avue-card__title"><i class="el-icon-link"></i>{{ item.title }}</div>
                 </el-link>
                 <div class="avue-card__info" style="height: unset">{{item.description}}</div>
               </div>
               <!-- TODO 芋艿：待完善 -->
-<!--              <div v-if="item.repType == 'location'">-->
-<!--                <el-link type="primary" target="_blank" :href="'https://map.qq.com/?type=marker&isopeninfowin=1&markertype=1&pointx='+item.repLocationY+'&pointy='+item.repLocationX+'&name='+item.repContent+'&ref=joolun'">-->
-<!--                  <img :src="'https://apis.map.qq.com/ws/staticmap/v2/?zoom=10&markers=color:blue|label:A|'+item.repLocationX+','+item.repLocationY+'&key='+qqMapKey+'&size=250*180'">-->
-<!--                  <p/><i class="el-icon-map-location"></i>{{item.repContent}}-->
-<!--                </el-link>-->
-<!--              </div>-->
+              <div v-else-if="item.type === 'location'">
+                <wx-location :label="item.label" :location-y="item.locationY" :location-x="item.locationX" />
+              </div>
 
-<!--              <div v-if="item.repType == 'news'" style="width: 300px">-->
-<!--                <WxNews :objData="item.content.articles"></WxNews>-->
-<!--              </div>-->
+              <div v-else-if="item.type === 'news'" style="width: 300px"> <!-- TODO 芋艿：待测试；详情页也存在类似的情况 -->
+                <wx-news :articles="item.articles" />
+              </div>
 
 <!--              <div v-if="item.repType == 'music'">-->
 <!--                <el-link type="success" :underline="false" target="_blank" :href="item.repUrl">-->
@@ -105,14 +102,17 @@
   // import WxNews from '@/components/wx-news/main.vue'
   import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
   import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
+  import WxNews from '@/views/mp/components/wx-news/main.vue';
+  import WxLocation from '@/views/mp/components/wx-location/main.vue';
 
   export default {
     name: "wxMsg",
     components: {
       // WxReplySelect,
-      // WxNews,
       WxVideoPlayer,
-      WxVoicePlayer
+      WxVoicePlayer,
+      WxNews,
+      WxLocation
     },
     props: {
       wxUserId: {
@@ -140,7 +140,8 @@
         mp: {
           nickname: '公众号',
           avatar: require("@/assets/images/wechat.png"),
-        }
+        },
+        qqMapKey: '' //
       }
     },
     created() {
