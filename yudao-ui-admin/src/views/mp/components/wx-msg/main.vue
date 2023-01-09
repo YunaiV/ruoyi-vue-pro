@@ -89,17 +89,16 @@
         </div>
       </div>
     </div>
-<!--    <div class="msg-send" v-loading="sendLoading">-->
-<!--      <WxReplySelect :objData="objData"></WxReplySelect>-->
-<!--      <el-button type="success" size="small" class="send-but" @click="sendMsg">发送(S)</el-button>-->
-<!--    </div>-->
+    <div class="msg-send" v-loading="sendLoading">
+      <WxReplySelect :objData="objData"></WxReplySelect>
+      <el-button type="success" size="small" class="send-but" @click="sendMsg">发送(S)</el-button>
+    </div>
   </div>
 </template>
 
 <script>
   import { getMessagePage } from '@/api/mp/message'
-  // import WxReplySelect from '@/components/wx-reply/main.vue'
-  // import WxNews from '@/components/wx-news/main.vue'
+  import WxReplySelect from '@/views/mp/components/wx-reply/main.vue'
   import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
   import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
   import WxNews from '@/views/mp/components/wx-news/main.vue';
@@ -108,7 +107,7 @@
   export default {
     name: "wxMsg",
     components: {
-      // WxReplySelect,
+      WxReplySelect,
       WxVideoPlayer,
       WxVoicePlayer,
       WxNews,
