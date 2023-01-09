@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.convert.codegen;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenDetailRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenPreviewRespVO;
@@ -33,7 +34,15 @@ public interface CodegenConvert {
     })
     CodegenTableDO convert(TableInfo bean);
 
-    List<CodegenColumnDO> convertList(List<TableField> list);
+    default List<CodegenColumnDO> convertList(List<TableField> list){
+       return CollUtil.map(list,t->convert(t),true);
+    }
+
+    default CodegenColumnDO convert(TableField bean) {
+        CodegenColumnDO codegenColumnDO = convert0(bean);
+        codegenColumnDO.setDataType(bean.getColumnType().getType());
+        return codegenColumnDO;
+    }
 
     @Mappings({
             @Mapping(source = "name", target = "columnName"),
@@ -45,7 +54,7 @@ public interface CodegenConvert {
             @Mapping(source = "columnType.type", target = "javaType"),
             @Mapping(source = "propertyName", target = "javaField"),
     })
-    CodegenColumnDO convert(TableField bean);
+    CodegenColumnDO convert0(TableField bean);
 
     // ========== CodegenTableDO 相关 ==========
 
