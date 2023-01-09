@@ -41,6 +41,7 @@
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.8.0</flowable.version>
         <!-- 工具类相关 -->
+        <jsoup.version>1.15.3</jsoup.version>
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <hutool.version>5.8.11</hutool.version>
@@ -394,6 +395,11 @@
             <!-- 工作流相关结束 -->
 
             <!-- 工具类相关 -->
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoup.version}</version>
+            </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-common</artifactId>
