@@ -41,6 +41,7 @@
         <module>yudao-spring-boot-starter-flowable</module>
         <module>yudao-spring-boot-starter-captcha</module>
         <module>yudao-spring-boot-starter-websocket</module>
+        <module>yudao-spring-boot-starter-biz-desensitize</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>
