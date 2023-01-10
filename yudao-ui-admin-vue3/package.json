@@ -1,6 +1,6 @@
 {
   "name": "yudao-ui-admin-vue3",
-  "version": "1.6.5-snapshot.1901",
+  "version": "1.6.6-snapshot.1901",
   "description": "基于vue3、vite4、element-plus、typesScript",
   "author": "xingyu",
   "private": false,
@@ -104,7 +104,7 @@
     "vite-plugin-svg-icons": "^2.0.1",
     "vite-plugin-vue-setup-extend": "^0.4.0",
     "vite-plugin-windicss": "^1.8.10",
-    "vue-tsc": "^1.0.20",
+    "vue-tsc": "^1.0.22",
     "windicss": "^3.5.6"
   },
   "engines": {
