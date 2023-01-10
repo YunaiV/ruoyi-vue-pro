@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -17,7 +17,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['system:post:export']"
-          @click="handleExport()"
+          @click="exportList('岗位列表.xls')"
         />
       </template>
       <template #actionbtns_default="{ row }">
@@ -40,10 +40,10 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:post:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <!-- 弹窗 -->
   <XModal id="postModel" :loading="modelLoading" v-model="modelVisible" :title="modelTitle">
@@ -79,8 +79,7 @@
 import { ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 import { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as PostApi from '@/api/system/post'
@@ -89,8 +88,7 @@ import { rules, allSchemas } from './post.data'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData, exportList } = useVxeGrid<PostApi.PostVO>({
+const [registerTable, { reload, deleteData, exportList }] = useXTable({
   allSchemas: allSchemas,
   getListApi: PostApi.getPostPageApi,
   deleteApi: PostApi.deletePostApi,
@@ -119,11 +117,6 @@ const handleCreate = () => {
   modelLoading.value = false
 }
 
-// 导出操作
-const handleExport = async () => {
-  await exportList(xGrid, '岗位列表.xls')
-}
-
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -139,11 +132,6 @@ const handleDetail = async (rowId: number) => {
   const res = await PostApi.getPostApi(rowId)
   detailData.value = res
   modelLoading.value = false
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
 }
 
 // 提交新增/修改的表单
@@ -167,7 +155,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        await getList(xGrid)
+        await reload()
       }
     }
   })

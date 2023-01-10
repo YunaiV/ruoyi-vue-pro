@@ -36,45 +36,30 @@ export const formatToken = (token: string): string => {
 }
 // ========== 账号相关 ==========
 
-const UsernameKey = 'USERNAME'
-const PasswordKey = 'PASSWORD'
-const RememberMeKey = 'REMEMBER_ME'
+const LoginFormKey = 'LOGINFORM'
 
-export const getUsername = () => {
-  return wsCache.get(UsernameKey)
+export type LoginFormType = {
+  tenantName: string
+  username: string
+  password: string
+  rememberMe: boolean
 }
 
-export const setUsername = (username: string) => {
-  wsCache.set(UsernameKey, username, { exp: 30 * 24 * 60 * 60 })
+export const getLoginForm = () => {
+  const loginForm: LoginFormType = wsCache.get(LoginFormKey)
+  if (loginForm) {
+    loginForm.password = decrypt(loginForm.password) as string
+  }
+  return loginForm
 }
 
-export const removeUsername = () => {
-  wsCache.delete(UsernameKey)
+export const setLoginForm = (loginForm: LoginFormType) => {
+  loginForm.password = encrypt(loginForm.password) as string
+  wsCache.set(LoginFormKey, loginForm, { exp: 30 * 24 * 60 * 60 })
 }
 
-export const getPassword = () => {
-  const password = wsCache.get(PasswordKey)
-  return password ? decrypt(password) : undefined
-}
-
-export const setPassword = (password: string) => {
-  wsCache.set(PasswordKey, encrypt(password), { exp: 30 * 24 * 60 * 60 })
-}
-
-export const removePassword = () => {
-  wsCache.delete(PasswordKey)
-}
-
-export const getRememberMe = () => {
-  return wsCache.get(RememberMeKey) === true
-}
-
-export const setRememberMe = (rememberMe: boolean) => {
-  wsCache.set(RememberMeKey, rememberMe, { exp: 30 * 24 * 60 * 60 })
-}
-
-export const removeRememberMe = () => {
-  wsCache.delete(RememberMeKey)
+export const removeLoginForm = () => {
+  wsCache.delete(LoginFormKey)
 }
 
 // ========== 租户相关 ==========

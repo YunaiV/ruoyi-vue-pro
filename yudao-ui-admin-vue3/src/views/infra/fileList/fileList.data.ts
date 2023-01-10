@@ -23,7 +23,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'url',
       table: {
         cellRender: {
-          name: 'XImg'
+          name: 'XPreview'
         }
       }
     },

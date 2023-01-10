@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -16,7 +16,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['system:tenant:export']"
-          @click="handleExport()"
+          @click="exportList('租户列表.xls')"
         />
       </template>
       <template #accountCount_default="{ row }">
@@ -46,10 +46,10 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:tenant:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
@@ -89,8 +89,7 @@
 import { ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 import { ElTag } from 'element-plus'
 import { FormExpose } from '@/components/Form'
 import * as TenantApi from '@/api/system/tenant'
@@ -99,8 +98,7 @@ import { rules, allSchemas, tenantPackageOption } from './tenant.data'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData, exportList } = useVxeGrid<TenantApi.TenantVO>({
+const [registerTable, { reload, deleteData, exportList }] = useXTable({
   allSchemas: allSchemas,
   getListApi: TenantApi.getTenantPageApi,
   deleteApi: TenantApi.deleteTenantApi,
@@ -151,16 +149,6 @@ const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
 }
 
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
-}
-
-// 导出操作
-const handleExport = async () => {
-  await exportList(xGrid, '租户列表.xls')
-}
-
 // 提交按钮
 const submitForm = async () => {
   const elForm = unref(formRef)?.getElFormRef()
@@ -183,7 +171,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        await getList(xGrid)
+        await reload()
       }
     }
   })

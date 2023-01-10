@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -41,10 +41,10 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['infra:file-config:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
@@ -173,8 +173,7 @@ import {
 } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 // 业务相关的 import
 import * as FileConfigApi from '@/api/infra/fileConfig'
 import { rules, allSchemas } from './fileConfig.data'
@@ -183,8 +182,7 @@ import { getIntDictOptions, DICT_TYPE } from '@/utils/dict'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData } = useVxeGrid<FileConfigApi.FileConfigVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   getListApi: FileConfigApi.getFileConfigPageApi,
   deleteApi: FileConfigApi.deleteFileConfigApi
@@ -276,18 +274,13 @@ const handleMaster = (row: FileConfigApi.FileConfigVO) => {
     .confirm('是否确认修改配置【 ' + row.name + ' 】为主配置?', t('common.reminder'))
     .then(async () => {
       await FileConfigApi.updateFileConfigMasterApi(row.id)
-      await getList(xGrid)
+      await reload()
     })
 }
 
 const handleTest = async (rowId: number) => {
   const res = await FileConfigApi.testFileConfigApi(rowId)
   message.alert('测试通过，上传文件成功！访问地址：' + res)
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
 }
 
 // 提交按钮
@@ -308,7 +301,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
-        await getList(xGrid)
+        await reload()
       }
     }
   })

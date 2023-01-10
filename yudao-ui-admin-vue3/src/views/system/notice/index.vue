@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <!-- 操作：新增 -->
       <template #toolbar_buttons>
         <XButton
@@ -32,10 +32,10 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:notice:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <!-- 弹窗 -->
   <XModal id="noticeModel" v-model="dialogVisible" :title="dialogTitle">
@@ -75,8 +75,7 @@
 import { ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 import { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as NoticeApi from '@/api/system/notice'
@@ -86,8 +85,7 @@ import { Editor } from '@/components/Editor'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData } = useVxeGrid<NoticeApi.NoticeVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   getListApi: NoticeApi.getNoticePageApi,
   deleteApi: NoticeApi.deleteNoticeApi
@@ -128,11 +126,6 @@ const handleDetail = async (rowId: number) => {
   detailData.value = res
 }
 
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
-}
-
 // 提交新增/修改的表单
 const submitForm = async () => {
   const elForm = unref(formRef)?.getElFormRef()
@@ -153,7 +146,7 @@ const submitForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
-        await getList(xGrid)
+        await reload()
       }
     }
   })

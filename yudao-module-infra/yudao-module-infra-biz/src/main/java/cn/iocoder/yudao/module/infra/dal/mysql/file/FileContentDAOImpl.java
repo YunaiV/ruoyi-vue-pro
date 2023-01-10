@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.infra.dal.mysql.file;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.file.core.client.db.DBFileContentFrameworkDAO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileContentDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class FileContentDAOImpl implements DBFileContentFrameworkDAO {
@@ -27,9 +30,11 @@ public class FileContentDAOImpl implements DBFileContentFrameworkDAO {
 
     @Override
     public byte[] selectContent(Long configId, String path) {
-        FileContentDO fileContentDO = fileContentMapper.selectOne(
-                buildQuery(configId, path).select(FileContentDO::getContent));
-        return fileContentDO != null ? fileContentDO.getContent() : null;
+        List<FileContentDO> list = fileContentMapper.selectList(
+                buildQuery(configId, path).select(FileContentDO::getContent).orderByDesc(FileContentDO::getId));
+        return Optional.ofNullable(CollUtil.getFirst(list))
+                .map(FileContentDO::getContent)
+                .orElse(null);
     }
 
     private LambdaQueryWrapper<FileContentDO> buildQuery(Long configId, String path) {

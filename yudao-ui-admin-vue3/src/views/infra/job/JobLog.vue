@@ -1,14 +1,14 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <XButton
           type="warning"
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['infra:job:export']"
-          @click="handleExport()"
+          @click="exportList('定时任务详情.xls')"
         />
       </template>
       <template #beginTime_default="{ row }">
@@ -29,7 +29,7 @@
           @click="handleDetail(row)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
@@ -51,15 +51,13 @@
 import { ref } from 'vue'
 import dayjs from 'dayjs'
 import { useI18n } from '@/hooks/web/useI18n'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
+import { useXTable } from '@/hooks/web/useXTable'
 import * as JobLogApi from '@/api/infra/jobLog'
 import { allSchemas } from './jobLog.data'
 
 const { t } = useI18n() // 国际化
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, exportList } = useVxeGrid<JobLogApi.JobLogVO>({
+const [registerTable, { exportList }] = useXTable({
   allSchemas: allSchemas,
   getListApi: JobLogApi.getJobLogPageApi,
   exportListApi: JobLogApi.exportJobLogApi
@@ -78,9 +76,5 @@ const handleDetail = async (row: JobLogApi.JobLogVO) => {
   detailData.value = res
   dialogTitle.value = t('action.detail')
   dialogVisible.value = true
-}
-// 导出操作
-const handleExport = async () => {
-  await exportList(xGrid, '定时任务详情.xls')
 }
 </script>

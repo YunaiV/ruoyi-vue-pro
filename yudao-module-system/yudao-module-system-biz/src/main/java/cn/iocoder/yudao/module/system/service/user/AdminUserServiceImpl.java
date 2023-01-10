@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
@@ -72,6 +73,10 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Resource
     private FileApi fileApi;
 
+    @Resource
+    @Lazy // 循环依赖（自己依赖自己），避免报错
+    private AdminUserServiceImpl self;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createUser(UserCreateReqVO reqVO) {
@@ -83,7 +88,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             }
         });
         // 校验正确性
-        checkCreateOrUpdate(null, reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
+        self.checkCreateOrUpdate(null, reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
                 reqVO.getDeptId(), reqVO.getPostIds());
         // 插入用户
         AdminUserDO user = UserConvert.INSTANCE.convert(reqVO);
@@ -102,7 +107,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Transactional(rollbackFor = Exception.class)
     public void updateUser(UserUpdateReqVO reqVO) {
         // 校验正确性
-        checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
+        self.checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
                 reqVO.getDeptId(), reqVO.getPostIds());
         // 更新用户
         AdminUserDO updateObj = UserConvert.INSTANCE.convert(reqVO);
@@ -299,7 +304,8 @@ public class AdminUserServiceImpl implements AdminUserService {
         return deptIds;
     }
 
-    private void checkCreateOrUpdate(Long id, String username, String mobile, String email,
+    @DataPermission(enable = false) // 关闭数据权限，避免因为没有数据权限，查询不到数据，进而导致唯一校验不正确
+    public void checkCreateOrUpdate(Long id, String username, String mobile, String email,
                                      Long deptId, Set<Long> postIds) {
         // 校验用户存在
         checkUserExists(id);
