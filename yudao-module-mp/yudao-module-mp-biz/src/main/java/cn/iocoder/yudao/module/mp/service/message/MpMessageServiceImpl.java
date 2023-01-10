@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessagePageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessageSendReqVO;
 import cn.iocoder.yudao.module.mp.convert.message.MpMessageConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
@@ -21,6 +22,7 @@ import cn.iocoder.yudao.module.mp.service.user.MpUserService;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.bean.kefu.WxMpKefuMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import org.springframework.context.annotation.Lazy;
@@ -77,12 +79,7 @@ public class MpMessageServiceImpl implements MpMessageService {
         // 记录消息
         MpMessageDO message = MpMessageConvert.INSTANCE.convert(wxMessage, account, user);
         message.setSendFrom(MpMessageSendFromEnum.USER_TO_MP.getFrom());
-        if (StrUtil.isNotEmpty(message.getMediaId())) {
-            message.setMediaUrl(mediaDownload(mpService, message.getMediaId()));
-        }
-        if (StrUtil.isNotEmpty(message.getThumbMediaId())) {
-            message.setThumbMediaUrl(mediaDownload(mpService, message.getThumbMediaId()));
-        }
+        downloadMessageMedia(mpService, message);
         mpMessageMapper.insert(message);
     }
 
@@ -106,6 +103,48 @@ public class MpMessageServiceImpl implements MpMessageService {
         return MpMessageConvert.INSTANCE.convert02(message, account);
     }
 
+    @Override
+    public Long sendKefuMessage(MpMessageSendReqVO sendReqVO) {
+        // 校验消息格式
+        MpUtils.validateMessage(validator, sendReqVO.getType(), sendReqVO);
+
+        // 获得关联信息
+        MpUserDO user = mpUserService.getRequiredUser(sendReqVO.getUserId());
+        MpAccountDO account = mpAccountService.getRequiredAccount(user.getAccountId());
+
+        // 发送客服消息
+        WxMpKefuMessage wxMessage = MpMessageConvert.INSTANCE.convert(sendReqVO, user);
+        WxMpService mpService = mpServiceFactory.getRequiredMpService(user.getAppId());
+        try {
+            boolean result = mpService.getKefuService().sendKefuMessage(wxMessage);
+            System.out.println(result);
+        } catch (WxErrorException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 记录消息
+        MpMessageDO message = MpMessageConvert.INSTANCE.convert(wxMessage, account, user);
+        message.setSendFrom(MpMessageSendFromEnum.USER_TO_MP.getFrom());
+        downloadMessageMedia(mpService, message);
+        mpMessageMapper.insert(message);
+        return message.getId();
+    }
+
+    /**
+     * 下载消息使用到的媒体文件，并上传到文件服务
+     *
+     * @param mpService 公众号 Service
+     * @param message 消息
+     */
+    private void downloadMessageMedia(WxMpService mpService, MpMessageDO message) {
+        if (StrUtil.isNotEmpty(message.getMediaId())) {
+            message.setMediaUrl(downloadMedia(mpService, message.getMediaId()));
+        }
+        if (StrUtil.isNotEmpty(message.getThumbMediaId())) {
+            message.setThumbMediaUrl(downloadMedia(mpService, message.getThumbMediaId()));
+        }
+    }
+
     /**
      * 下载微信媒体文件的内容，并上传到文件服务
      *
@@ -115,7 +154,7 @@ public class MpMessageServiceImpl implements MpMessageService {
      * @param mediaId 媒体文件编号
      * @return 上传后的 URL
      */
-    private String mediaDownload(WxMpService mpService, String mediaId) {
+    private String downloadMedia(WxMpService mpService, String mediaId) {
         try {
             // 第一步，从公众号下载媒体文件
             File file = mpService.getMaterialService().mediaDownload(mediaId);

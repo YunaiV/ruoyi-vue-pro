@@ -40,6 +40,11 @@ public class MpUtils {
     public interface NewsGroup {}
 
     /**
+     * Music 类型的消息，参数校验 Group
+     */
+    public interface MusicGroup {}
+
+    /**
      * 校验消息的格式是否符合要求
      *
      * @param type 类型
@@ -63,6 +68,9 @@ public class MpUtils {
                 break;
             case WxConsts.XmlMsgType.NEWS:
                 group = NewsGroup.class;
+                break;
+            case WxConsts.XmlMsgType.MUSIC:
+                group = MusicGroup.class;
                 break;
             default:
                 log.error("[validateMessage][未知的消息类型({})]", message);

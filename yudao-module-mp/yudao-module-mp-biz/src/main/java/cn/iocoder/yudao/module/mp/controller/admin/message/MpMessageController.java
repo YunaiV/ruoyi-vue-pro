@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessagePageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessageRespVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessageSendReqVO;
 import cn.iocoder.yudao.module.mp.convert.message.MpMessageConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import cn.iocoder.yudao.module.mp.service.message.MpMessageService;
@@ -11,9 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -35,6 +34,13 @@ public class MpMessageController {
     public CommonResult<PageResult<MpMessageRespVO>> getWxFansMsgPage(@Valid MpMessagePageReqVO pageVO) {
         PageResult<MpMessageDO> pageResult = mpMessageService.getWxFansMsgPage(pageVO);
         return success(MpMessageConvert.INSTANCE.convertPage(pageResult));
+    }
+
+    @PostMapping("/send")
+//    @ApiOperation("获得粉丝消息表分页")
+//    @PreAuthorize("@ss.hasPermission('mp:message:query')")
+    public CommonResult<Long> sendMessage(@Valid @RequestBody MpMessageSendReqVO reqVO) {
+        return success(mpMessageService.sendKefuMessage(reqVO));
     }
 
 }

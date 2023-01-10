@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.mp.service.message;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessagePageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessageSendReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
@@ -44,5 +45,15 @@ public interface MpMessageService {
      * @return 微信回复消息 XML
      */
     WxMpXmlOutMessage sendOutMessage(@Valid MpMessageSendOutReqBO sendReqBO);
+
+    /**
+     * 使用公众号，给用户发送【客服】消息
+     *
+     * 注意，该方法会真实发送消息
+     *
+     * @param sendReqVO 消息内容
+     * @return 消息编号
+     */
+    Long sendKefuMessage(MpMessageSendReqVO sendReqVO);
 
 }

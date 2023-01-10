@@ -9,6 +9,9 @@ import me.chanjar.weixin.mp.bean.result.WxMpUser;
 import java.util.Collection;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.USER_NOT_EXISTS;
+
 /**
  * 公众号粉丝 Service 接口
  *
@@ -32,6 +35,20 @@ public interface MpUserService {
      * @return 公众号粉丝
      */
     MpUserDO getUser(String appId, String openId);
+
+    /**
+     * 获得公众号粉丝
+     *
+     * @param id 编号
+     * @return 公众号粉丝
+     */
+    default MpUserDO getRequiredUser(Long id) {
+        MpUserDO user = getUser(id);
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+        return user;
+    }
 
     /**
      * 获得公众号粉丝列表

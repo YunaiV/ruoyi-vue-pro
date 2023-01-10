@@ -140,7 +140,6 @@
           nickname: '公众号',
           avatar: require("@/assets/images/wechat.png"),
         },
-        qqMapKey: '' //
       }
     },
     created() {

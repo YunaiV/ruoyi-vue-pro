@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.mp.service.message.bo;
 
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
-import cn.iocoder.yudao.module.mp.framework.mp.core.util.MpUtils;
 import cn.iocoder.yudao.module.mp.framework.mp.core.util.MpUtils.*;
 import lombok.Data;
 import me.chanjar.weixin.common.api.WxConsts;
@@ -36,7 +35,7 @@ public class MpMessageSendOutReqBO {
     /**
      * 消息类型
      *
-     * 枚举 {@link WxConsts.XmlMsgType} 中的 TEXT、IMAGE、VOICE、VIDEO、NEWS
+     * 枚举 {@link WxConsts.XmlMsgType} 中的 TEXT、IMAGE、VOICE、VIDEO、NEWS、MUSIC
      */
     @NotEmpty(message = "消息类型不能为空")
     public String type;
@@ -56,6 +55,7 @@ public class MpMessageSendOutReqBO {
      */
     @NotEmpty(message = "消息内容不能为空", groups = {ImageGroup.class, VoiceGroup.class, VideoGroup.class})
     private String mediaId;
+    // TODO 芋艿：考虑去掉
     /**
      * 媒体 URL
      *
@@ -63,6 +63,15 @@ public class MpMessageSendOutReqBO {
      */
     @NotEmpty(message = "消息内容不能为空", groups = {ImageGroup.class, VoiceGroup.class, VideoGroup.class})
     private String mediaUrl;
+
+    /**
+     * 缩略图的媒体 id
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO、MUSIC
+     */
+    @NotEmpty(message = "消息内容不能为空", groups = {MusicGroup.class})
+    private String thumbMediaId;
+    // TODO 芋艿：考虑去掉
 
     /**
      * 标题
@@ -87,5 +96,19 @@ public class MpMessageSendOutReqBO {
     @Valid
     @NotNull(message = "图文消息不能为空", groups = NewsGroup.class)
     private List<MpMessageDO.Article> articles;
+
+    /**
+     * 音乐链接
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
+     */
+    private String musicUrl;
+
+    /**
+     * 高质量音乐链接
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
+     */
+    private String hqMusicUrl;
 
 }

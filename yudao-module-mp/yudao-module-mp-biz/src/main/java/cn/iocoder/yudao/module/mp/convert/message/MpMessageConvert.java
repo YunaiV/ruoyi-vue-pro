@@ -2,11 +2,13 @@ package cn.iocoder.yudao.module.mp.convert.message;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessageRespVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessageSendReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import me.chanjar.weixin.common.api.WxConsts;
+import me.chanjar.weixin.mp.bean.kefu.WxMpKefuMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutNewsMessage;
@@ -16,7 +18,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
-import java.util.Collections;
 import java.util.List;
 
 @Mapper
@@ -30,12 +31,6 @@ public interface MpMessageConvert {
 
     PageResult<MpMessageRespVO> convertPage(PageResult<MpMessageDO> page);
 
-    @Mappings(value = {
-            @Mapping(source = "msgType", target = "type"),
-            @Mapping(target = "createTime", ignore = true),
-    })
-    MpMessageDO convert(WxMpXmlMessage wxMessage);
-
     default MpMessageDO convert(WxMpXmlMessage wxMessage, MpAccountDO account, MpUserDO user) {
         MpMessageDO message = convert(wxMessage);
         if (account != null) {
@@ -46,6 +41,11 @@ public interface MpMessageConvert {
         }
         return message;
     }
+    @Mappings(value = {
+            @Mapping(source = "msgType", target = "type"),
+            @Mapping(target = "createTime", ignore = true),
+    })
+    MpMessageDO convert(WxMpXmlMessage bean);
 
     default MpMessageDO convert(MpMessageSendOutReqBO sendReqBO, MpAccountDO account, MpUserDO user) {
         // 构建消息
@@ -65,6 +65,11 @@ public interface MpMessageConvert {
                 break;
             case WxConsts.XmlMsgType.NEWS: // 5. 图文
                 message.setArticles(sendReqBO.getArticles());
+            case WxConsts.XmlMsgType.MUSIC: // 6. 音乐
+                message.setTitle(sendReqBO.getTitle()).setDescription(sendReqBO.getDescription())
+                        .setMusicUrl(sendReqBO.getMusicUrl()).setHqMusicUrl(sendReqBO.getHqMusicUrl())
+                        .setThumbMediaId(sendReqBO.getThumbMediaId());
+//                        .setThumbMediaUrl(sendReqBO.getThumbMediaUrl()); TODO 芋艿：url 待确定
                 break;
             default:
                 throw new IllegalArgumentException("不支持的消息类型：" + message.getType());
@@ -81,33 +86,88 @@ public interface MpMessageConvert {
     }
 
     default WxMpXmlOutMessage convert02(MpMessageDO message, MpAccountDO account) {
-        BaseBuilder<?, ? extends WxMpXmlOutMessage> messageBuilder;
+        BaseBuilder<?, ? extends WxMpXmlOutMessage> builder;
         // 个性化字段
         switch (message.getType()) {
             case WxConsts.XmlMsgType.TEXT:
-                messageBuilder = WxMpXmlOutMessage.TEXT().content(message.getContent());
+                builder = WxMpXmlOutMessage.TEXT().content(message.getContent());
                 break;
             case WxConsts.XmlMsgType.IMAGE:
-                messageBuilder = WxMpXmlOutMessage.IMAGE().mediaId(message.getMediaId());
+                builder = WxMpXmlOutMessage.IMAGE().mediaId(message.getMediaId());
                 break;
             case WxConsts.XmlMsgType.VOICE:
-                messageBuilder = WxMpXmlOutMessage.VOICE().mediaId(message.getMediaId());
+                builder = WxMpXmlOutMessage.VOICE().mediaId(message.getMediaId());
                 break;
             case WxConsts.XmlMsgType.VIDEO:
-                messageBuilder = WxMpXmlOutMessage.VIDEO().mediaId(message.getMediaId())
+                builder = WxMpXmlOutMessage.VIDEO().mediaId(message.getMediaId())
                         .title(message.getTitle()).description(message.getDescription());
                 break;
             case WxConsts.XmlMsgType.NEWS:
-                messageBuilder = WxMpXmlOutMessage.NEWS().articles(convertList02(message.getArticles()));
+                builder = WxMpXmlOutMessage.NEWS().articles(convertList02(message.getArticles()));
+                break;
+            case WxConsts.XmlMsgType.MUSIC:
+                builder = WxMpXmlOutMessage.MUSIC().title(message.getTitle()).description(message.getDescription())
+                        .musicUrl(message.getMusicUrl()).hqMusicUrl(message.getHqMusicUrl())
+                        .thumbMediaId(message.getThumbMediaId());
                 break;
             default:
                 throw new IllegalArgumentException("不支持的消息类型：" + message.getType());
         }
         // 通用字段
-        messageBuilder.fromUser(account.getAccount());
-        messageBuilder.toUser(message.getOpenid());
-        return messageBuilder.build();
+        builder.fromUser(account.getAccount());
+        builder.toUser(message.getOpenid());
+        return builder.build();
     }
     List<WxMpXmlOutNewsMessage.Item> convertList02(List<MpMessageDO.Article> list);
+
+    default WxMpKefuMessage convert(MpMessageSendReqVO sendReqVO, MpUserDO user) {
+        me.chanjar.weixin.mp.builder.kefu.BaseBuilder<?> builder;
+        // 个性化字段
+        switch (sendReqVO.getType()) {
+            case WxConsts.KefuMsgType.TEXT:
+                builder = WxMpKefuMessage.TEXT().content(sendReqVO.getContent());
+                break;
+            case WxConsts.KefuMsgType.IMAGE:
+                builder = WxMpKefuMessage.IMAGE().mediaId(sendReqVO.getMediaId());
+                break;
+            case WxConsts.KefuMsgType.VOICE:
+                builder = WxMpKefuMessage.VOICE().mediaId(sendReqVO.getMediaId());
+                break;
+            case WxConsts.KefuMsgType.VIDEO:
+                builder = WxMpKefuMessage.VIDEO().mediaId(sendReqVO.getMediaId())
+                        .title(sendReqVO.getTitle()).description(sendReqVO.getDescription());
+                break;
+            case WxConsts.KefuMsgType.NEWS:
+                builder = WxMpKefuMessage.NEWS().articles(convertList03(sendReqVO.getArticles()));
+                break;
+            case WxConsts.KefuMsgType.MUSIC:
+                builder = WxMpKefuMessage.MUSIC().title(sendReqVO.getTitle()).description(sendReqVO.getDescription())
+                        .thumbMediaId(sendReqVO.getThumbMediaId())
+                        .musicUrl(sendReqVO.getMusicUrl()).hqMusicUrl(sendReqVO.getHqMusicUrl());
+                break;
+            default:
+                throw new IllegalArgumentException("不支持的消息类型：" + sendReqVO.getType());
+        }
+        // 通用字段
+        builder.toUser(user.getOpenid());
+        return builder.build();
+    }
+    List<WxMpKefuMessage.WxArticle> convertList03(List<MpMessageDO.Article> list);
+
+    default MpMessageDO convert(WxMpKefuMessage wxMessage, MpAccountDO account, MpUserDO user) {
+        MpMessageDO message = convert(wxMessage);
+        if (account != null) {
+            message.setAccountId(account.getId()).setAppId(account.getAppId());
+        }
+        if (user != null) {
+            message.setUserId(user.getId()).setOpenid(user.getOpenid());
+        }
+        return message;
+    }
+    @Mappings(value = {
+            @Mapping(source = "msgType", target = "type"),
+            @Mapping(target = "createTime", ignore = true),
+    })
+    MpMessageDO convert(WxMpKefuMessage bean);
 
 }

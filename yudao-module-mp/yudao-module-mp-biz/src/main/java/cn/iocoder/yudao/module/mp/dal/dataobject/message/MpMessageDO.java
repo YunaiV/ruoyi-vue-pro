@@ -124,7 +124,7 @@ public class MpMessageDO extends BaseDO {
     /**
      * 缩略图的媒体 id，通过素材管理中的接口上传多媒体文件，得到的 id
      *
-     * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
      */
     private String thumbMediaId;
     /**
@@ -175,6 +175,21 @@ public class MpMessageDO extends BaseDO {
      */
     @TableField(typeHandler = ArticleTypeHandler.class)
     private List<Article> articles;
+
+    /**
+     * 音乐链接
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
+     */
+    private String musicUrl;
+    /**
+     * 高质量音乐链接
+     *
+     * WIFI 环境优先使用该链接播放音乐
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
+     */
+    private String hqMusicUrl;
 
     // ========= 事件推送 https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_event_pushes.html
 
