@@ -131,8 +131,8 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
      *
      * @return XssCleaner
      */
-    @ConditionalOnMissingBean(XssCleaner.class)
     @Bean
+    @ConditionalOnMissingBean(XssCleaner.class)
     public XssCleaner xssCleaner() {
         return new JsoupXssCleaner();
     }
@@ -145,11 +145,11 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
     @Bean
     @ConditionalOnMissingBean(name = "xssJacksonCustomizer")
     @ConditionalOnBean(ObjectMapper.class)
-    public Jackson2ObjectMapperBuilderCustomizer xssJacksonCustomizer(XssCleaner xssCleaner, XssProperties xssProperties) {
+    @ConditionalOnProperty(value = "yudao.xss.enable", havingValue = "true")
+    public Jackson2ObjectMapperBuilderCustomizer xssJacksonCustomizer(XssCleaner xssCleaner) {
         // 在反序列化时进行 xss 过滤，可以替换使用 XssStringJsonSerializer，在序列化时进行处理
-        return builder -> builder.deserializerByType(String.class, new XssStringJsonDeserializer(xssCleaner, xssProperties));
+        return builder -> builder.deserializerByType(String.class, new XssStringJsonDeserializer(xssCleaner));
     }
-
 
     private static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
         FilterRegistrationBean<T> bean = new FilterRegistrationBean<>(filter);

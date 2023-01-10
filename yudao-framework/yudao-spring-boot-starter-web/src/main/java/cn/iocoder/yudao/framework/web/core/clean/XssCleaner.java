@@ -4,6 +4,7 @@ package cn.iocoder.yudao.framework.web.core.clean;
  * 对 html 文本中的有 Xss 风险的数据进行清理
  */
 public interface XssCleaner {
+
     /**
      * 清理有 Xss 风险的文本
      *

@@ -4,6 +4,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Safelist;
 
+/**
+ * jsonp 过滤字符串
+ */
 public class JsoupXssCleaner implements XssCleaner {
 
     private final Safelist safelist;
@@ -37,19 +40,15 @@ public class JsoupXssCleaner implements XssCleaner {
     }
 
     /**
-     * <p>
      * 构建一个 Xss 清理的 Safelist 规则。
-     * </p>
-     *
-     * <ul>
      * 基于 Safelist#relaxed() 的基础上:
-     * <li>扩展支持了 style 和 class 属性</li>
-     * <li>a 标签额外支持了 target 属性</li>
-     * <li>img 标签额外支持了 data 协议，便于支持 base64</li>
-     * </ul>
+     * 1. 扩展支持了 style 和 class 属性
+     * 2. a 标签额外支持了 target 属性
+     * 3. img 标签额外支持了 data 协议，便于支持 base64
+     *
      * @return Safelist
      */
-    protected Safelist buildSafelist() {
+    private Safelist buildSafelist() {
         // 使用 jsoup 提供的默认的
         Safelist relaxedSafelist = Safelist.relaxed();
         // 富文本编辑时一些样式是使用 style 来进行实现的

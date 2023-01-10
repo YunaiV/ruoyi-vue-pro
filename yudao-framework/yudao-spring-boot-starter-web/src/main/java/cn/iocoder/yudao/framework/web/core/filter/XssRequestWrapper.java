@@ -20,6 +20,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
         this.xssCleaner = xssCleaner;
     }
 
+    // ============================ parameter ============================
     @Override
     public Map<String, String[]> getParameterMap() {
         Map<String, String[]> map = new LinkedHashMap<>();
@@ -57,6 +58,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
         return xssCleaner.clean(value);
     }
 
+    // ============================ attribute ============================
     @Override
     public Object getAttribute(String name) {
         Object value = super.getAttribute(name);
@@ -66,6 +68,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
         return value;
     }
 
+    // ============================ header ============================
     @Override
     public String getHeader(String name) {
         String value = super.getHeader(name);
@@ -75,6 +78,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
         return xssCleaner.clean(value);
     }
 
+    // ============================ queryString ============================
     @Override
     public String getQueryString() {
         String value = super.getQueryString();

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.web.core.json;
 
-import cn.iocoder.yudao.framework.web.config.XssProperties;
 import cn.iocoder.yudao.framework.web.core.clean.XssCleaner;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -12,21 +11,21 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 
 /**
- * XSS过滤 jackson 反序列化器
+ * XSS 过滤 jackson 反序列化器。
+ * 在反序列化的过程中，会对字符串进行 XSS 过滤。
  *
- * 参考 ballcat 实现
+ * @author Hccake
  */
 @Slf4j
 @AllArgsConstructor
 public class XssStringJsonDeserializer extends StringDeserializer {
 
     private final XssCleaner xssCleaner;
-    private final XssProperties xssProperties;
 
     @Override
     public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         if (p.hasToken(JsonToken.VALUE_STRING)) {
-            return getCleanText(p.getText());
+            return xssCleaner.clean(p.getText());
         }
         JsonToken t = p.currentToken();
         // [databind#381]
@@ -49,22 +48,12 @@ public class XssStringJsonDeserializer extends StringDeserializer {
         if (t == JsonToken.START_OBJECT) {
             return ctxt.extractScalarFromObject(p, this, _valueClass);
         }
-        // allow coercions for other scalar types
-        // 17-Jan-2018, tatu: Related to [databind#1853] avoid FIELD_NAME by ensuring it's
-        // "real" scalar
+
         if (t.isScalarValue()) {
             String text = p.getValueAsString();
-            return getCleanText(text);
+            return xssCleaner.clean(text);
         }
         return (String) ctxt.handleUnexpectedToken(_valueClass, p);
     }
-
-    private String getCleanText(String text) {
-        if (text == null) {
-            return null;
-        }
-        return xssProperties.isEnable() ? xssCleaner.clean(text) : text;
-    }
-
 }
 
