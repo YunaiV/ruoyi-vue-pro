@@ -52,8 +52,8 @@ public interface MpMessageService {
      * 注意，该方法会真实发送消息
      *
      * @param sendReqVO 消息内容
-     * @return 消息编号
+     * @return 消息
      */
-    Long sendKefuMessage(MpMessageSendReqVO sendReqVO);
+    MpMessageDO sendKefuMessage(MpMessageSendReqVO sendReqVO);
 
 }

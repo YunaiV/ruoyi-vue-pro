@@ -88,7 +88,7 @@
 </template>
 
 <script>
-  import { getMessagePage } from '@/api/mp/message'
+import {getMessagePage, sendMessage} from '@/api/mp/message'
   import WxReplySelect from '@/views/mp/components/wx-reply/main.vue'
   import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
   import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
@@ -107,16 +107,14 @@
       WxMusic
     },
     props: {
-      wxUserId: {
-        type: String
+      userId: {
+        type: String,
+        required: true
       }
     },
     data() {
       return {
         nowStr: new Date().getTime(), // 当前的时间戳，用于每次消息加载后，回到原位置；具体见 :id="'msg-div' + nowStr" 处
-        objData:{
-          repType: 'text'
-        },
         sendLoading: false, // 发送消息是否加载中
         tableLoading: false, // 消息列表是否正在加载中
         loadMore: true, // 是否可以加载更多
@@ -133,6 +131,9 @@
           nickname: '公众号',
           avatar: require("@/assets/images/wechat.png"),
         },
+        objData:{ // 微信发送消息
+          repType: 'text'
+        },
       }
     },
     created() {
@@ -140,30 +141,37 @@
     },
     methods:{
       sendMsg(){
-        if (this.objData) {
-          if(this.objData.repType === 'news'){
-            this.objData.content.articles = [this.objData.content.articles[0]]
-            this.$message({
-              showClose: true,
-              message: '图文消息条数限制在1条以内，已默认发送第一条',
-              type: 'success'
-            })
-          }
-          this.sendLoading = true
-          addObj(Object.assign({
-            wxUserId: this.wxUserId
-          },this.objData)).then(data => {
-            this.sendLoading = false
-            data = data.data
-            this.tableData = [...this.tableData , ...[data] ]
-            this.scrollToBottom()
-            this.objData = {
-              repType: 'text'
-            }
-          }).catch(() => {
-            this.sendLoading = false
+        if (!this.objData) {
+          return;
+        }
+        if (this.objData.repType === 'news') {
+          this.objData.content.articles = [this.objData.content.articles[0]]
+          this.$message({
+            showClose: true,
+            message: '图文消息条数限制在1条以内，已默认发送第一条',
+            type: 'success'
           })
         }
+        this.sendLoading = true
+        sendMessage(Object.assign({
+          userId: this.userId
+        }, {
+          ...this.objData,
+          type: this.objData.repType,
+          content: this.objData.repContent,
+          // TODO 芋艿：临时适配，保证可用
+        })).then(response => {
+          this.sendLoading = false
+          // 添加到消息列表，并滚动
+          this.tableData = [...this.tableData , ...[response.data] ]
+          this.scrollToBottom()
+          // 重置 objData 状态
+          this.objData = {
+            repType: 'text'
+          }
+        }).catch(() => {
+          this.sendLoading = false
+        })
       },
       loadingMore() {
         this.page.pageNo++
@@ -174,7 +182,7 @@
         getMessagePage(Object.assign({
           pageNo: page.pageNo,
           pageSize: page.pageSize,
-          wxUserId: this.wxUserId
+          userId: this.userId
         }, params)).then(response => {
           // 计算当前的滚动高度
           const msgDiv = document.getElementById('msg-div' + this.nowStr);

@@ -104,7 +104,7 @@ public class MpMessageServiceImpl implements MpMessageService {
     }
 
     @Override
-    public Long sendKefuMessage(MpMessageSendReqVO sendReqVO) {
+    public MpMessageDO sendKefuMessage(MpMessageSendReqVO sendReqVO) {
         // 校验消息格式
         MpUtils.validateMessage(validator, sendReqVO.getType(), sendReqVO);
 
@@ -116,18 +116,17 @@ public class MpMessageServiceImpl implements MpMessageService {
         WxMpKefuMessage wxMessage = MpMessageConvert.INSTANCE.convert(sendReqVO, user);
         WxMpService mpService = mpServiceFactory.getRequiredMpService(user.getAppId());
         try {
-            boolean result = mpService.getKefuService().sendKefuMessage(wxMessage);
-            System.out.println(result);
+            mpService.getKefuService().sendKefuMessageWithResponse(wxMessage);
         } catch (WxErrorException e) {
             throw new RuntimeException(e);
         }
 
         // 记录消息
         MpMessageDO message = MpMessageConvert.INSTANCE.convert(wxMessage, account, user);
-        message.setSendFrom(MpMessageSendFromEnum.USER_TO_MP.getFrom());
+        message.setSendFrom(MpMessageSendFromEnum.MP_TO_USER.getFrom());
         downloadMessageMedia(mpService, message);
         mpMessageMapper.insert(message);
-        return message.getId();
+        return message;
     }
 
     /**

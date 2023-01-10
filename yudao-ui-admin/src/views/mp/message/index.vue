@@ -111,7 +111,7 @@
                 @pagination="getList"/>
 
     <el-dialog title="用户消息" :visible.sync="open" width="40%">
-      <wx-msg wxUserId="1" v-if="true" />
+      <wx-msg user-id="3" v-if="true" />
     </el-dialog>
 
   </div>

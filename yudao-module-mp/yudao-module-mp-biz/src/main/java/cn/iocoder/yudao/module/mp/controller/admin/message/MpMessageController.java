@@ -37,10 +37,11 @@ public class MpMessageController {
     }
 
     @PostMapping("/send")
-//    @ApiOperation("获得粉丝消息表分页")
-//    @PreAuthorize("@ss.hasPermission('mp:message:query')")
-    public CommonResult<Long> sendMessage(@Valid @RequestBody MpMessageSendReqVO reqVO) {
-        return success(mpMessageService.sendKefuMessage(reqVO));
+    @ApiOperation("给粉丝发送消息")
+    @PreAuthorize("@ss.hasPermission('mp:message:send')")
+    public CommonResult<MpMessageRespVO> sendMessage(@Valid @RequestBody MpMessageSendReqVO reqVO) {
+        MpMessageDO message = mpMessageService.sendKefuMessage(reqVO);
+        return success(MpMessageConvert.INSTANCE.convert(message));
     }
 
 }
