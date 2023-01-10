@@ -10,6 +10,7 @@ import me.chanjar.weixin.common.api.WxConsts;
 
 import java.util.List;
 
+// TODO 芋艿：VO 的注解
 /**
  * 粉丝消息表  Base VO，提供给添加、修改、详细的子 VO 使用
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
@@ -157,6 +158,21 @@ public class MpMessageBaseVO {
      */
     @TableField(typeHandler = MpMessageDO.ArticleTypeHandler.class)
     private List<MpMessageDO.Article> articles;
+
+    /**
+     * 音乐链接
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
+     */
+    private String musicUrl;
+    /**
+     * 高质量音乐链接
+     *
+     * WIFI 环境优先使用该链接播放音乐
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
+     */
+    private String hqMusicUrl;
 
     // ========= 事件推送 https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_event_pushes.html
 

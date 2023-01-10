@@ -84,3 +84,18 @@
     }
   }
 }
+
+/** joolun 额外加的 */
+.avue-comment__main {
+  flex: unset!important;
+  border-radius: 5px!important;
+  margin: 0 8px!important;
+}
+.avue-comment__header {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+.avue-comment__body {
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+}

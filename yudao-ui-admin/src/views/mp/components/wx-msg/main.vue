@@ -68,22 +68,13 @@
               <div v-else-if="item.type === 'location'">
                 <wx-location :label="item.label" :location-y="item.locationY" :location-x="item.locationX" />
               </div>
-
               <div v-else-if="item.type === 'news'" style="width: 300px"> <!-- TODO 芋艿：待测试；详情页也存在类似的情况 -->
                 <wx-news :articles="item.articles" />
               </div>
-
-<!--              <div v-if="item.repType == 'music'">-->
-<!--                <el-link type="success" :underline="false" target="_blank" :href="item.repUrl">-->
-<!--                  <div class="avue-card__body" style="padding:10px;background-color: #fff;border-radius: 5px">-->
-<!--                    <div class="avue-card__avatar"><img :src="item.repThumbUrl" alt=""></div>-->
-<!--                    <div class="avue-card__detail">-->
-<!--                      <div class="avue-card__title" style="margin-bottom:unset">{{item.repName}}</div>-->
-<!--                      <div class="avue-card__info" style="height: unset">{{item.repDesc}}</div>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </el-link>-->
-<!--              </div>-->
+              <div v-else-if="item.type === 'music'">
+                <wx-music :title="item.title" :description="item.description" :thumb-media-url="item.thumbMediaUrl"
+                  :music-url="item.musicUrl" :hq-music-url="item.hqMusicUrl" />
+              </div>
             </div>
           </div>
         </div>
@@ -103,6 +94,7 @@
   import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
   import WxNews from '@/views/mp/components/wx-news/main.vue';
   import WxLocation from '@/views/mp/components/wx-location/main.vue';
+  import WxMusic from '@/views/mp/components/wx-music/main.vue';
 
   export default {
     name: "wxMsg",
@@ -111,7 +103,8 @@
       WxVideoPlayer,
       WxVoicePlayer,
       WxNews,
-      WxLocation
+      WxLocation,
+      WxMusic
     },
     props: {
       wxUserId: {
@@ -244,19 +237,6 @@
 }
 .msg-send {
   padding: 10px;
-}
-.avue-comment__main {
-  flex: unset!important;
-  border-radius: 5px!important;
-  margin: 0 8px!important;
-}
-.avue-comment__header {
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-}
-.avue-comment__body {
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
 }
 .avatar-div {
   text-align: center;

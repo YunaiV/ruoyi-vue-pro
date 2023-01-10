@@ -89,6 +89,10 @@
           <div v-else-if="scope.row.type === 'location'">
             <wx-location :label="scope.row.label" :location-y="scope.row.locationY" :location-x="scope.row.locationX" />
           </div>
+          <div v-else-if="scope.row.type === 'music'">
+            <wx-music :title="scope.row.title" :description="scope.row.description" :thumb-media-url="scope.row.thumbMediaUrl"
+                      :music-url="scope.row.musicUrl" :hq-music-url="scope.row.hqMusicUrl" />
+          </div>
           <div v-else>
             <el-tag type="danger" size="mini">未知消息类型</el-tag>
           </div>
@@ -119,6 +123,7 @@ import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
 import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
 import WxMsg from '@/views/mp/components/wx-msg/main.vue';
 import WxLocation from '@/views/mp/components/wx-location/main.vue';
+import WxMusic from '@/views/mp/components/wx-music/main.vue';
 
 export default {
   name: "WxFansMsg",
@@ -126,7 +131,8 @@ export default {
     WxVideoPlayer,
     WxVoicePlayer,
     WxMsg,
-    WxLocation
+    WxLocation,
+    WxMusic
   },
   data() {
     return {
