@@ -1,11 +1,8 @@
 package cn.iocoder.yudao.module.mp.service.message;
 
-import cn.hutool.core.io.FileTypeUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessagePageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessageSendReqVO;
 import cn.iocoder.yudao.module.mp.convert.message.MpMessageConvert;
@@ -17,9 +14,11 @@ import cn.iocoder.yudao.module.mp.enums.message.MpMessageSendFromEnum;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import cn.iocoder.yudao.module.mp.framework.mp.core.util.MpUtils;
 import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
+import cn.iocoder.yudao.module.mp.service.material.MpMaterialService;
 import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import cn.iocoder.yudao.module.mp.service.user.MpUserService;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.kefu.WxMpKefuMessage;
@@ -31,7 +30,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
-import java.io.File;
 
 /**
  * 粉丝消息表 Service 实现类
@@ -48,6 +46,8 @@ public class MpMessageServiceImpl implements MpMessageService {
     private MpAccountService mpAccountService;
     @Resource
     private MpUserService mpUserService;
+    @Resource
+    private MpMaterialService mpMaterialService;
 
     @Resource
     private MpMessageMapper mpMessageMapper;
@@ -55,9 +55,6 @@ public class MpMessageServiceImpl implements MpMessageService {
     @Resource
     @Lazy // 延迟加载，解决循环依赖的问题
     private MpServiceFactory mpServiceFactory;
-
-    @Resource
-    private FileApi fileApi;
 
     @Resource
     private Validator validator;
@@ -69,7 +66,6 @@ public class MpMessageServiceImpl implements MpMessageService {
 
     @Override
     public void receiveMessage(String appId, WxMpXmlMessage wxMessage) {
-        WxMpService mpService = mpServiceFactory.getRequiredMpService(appId);
         // 获得关联信息
         MpAccountDO account = mpAccountService.getAccountFromCache(appId);
         Assert.notNull(account, "公众号账号({}) 不存在", appId);
@@ -79,7 +75,7 @@ public class MpMessageServiceImpl implements MpMessageService {
         // 记录消息
         MpMessageDO message = MpMessageConvert.INSTANCE.convert(wxMessage, account, user);
         message.setSendFrom(MpMessageSendFromEnum.USER_TO_MP.getFrom());
-        downloadMessageMedia(mpService, message);
+        downloadMessageMedia(message);
         mpMessageMapper.insert(message);
     }
 
@@ -97,6 +93,7 @@ public class MpMessageServiceImpl implements MpMessageService {
         // 记录消息
         MpMessageDO message = MpMessageConvert.INSTANCE.convert(sendReqBO, account, user);
         message.setSendFrom(MpMessageSendFromEnum.MP_TO_USER.getFrom());
+        // TODO 芋艿：downloadMessageMedia
         mpMessageMapper.insert(message);
 
         // 转换返回 WxMpXmlOutMessage 对象
@@ -124,7 +121,7 @@ public class MpMessageServiceImpl implements MpMessageService {
         // 记录消息
         MpMessageDO message = MpMessageConvert.INSTANCE.convert(wxMessage, account, user);
         message.setSendFrom(MpMessageSendFromEnum.MP_TO_USER.getFrom());
-        downloadMessageMedia(mpService, message);
+        downloadMessageMedia(message);
         mpMessageMapper.insert(message);
         return message;
     }
@@ -132,38 +129,17 @@ public class MpMessageServiceImpl implements MpMessageService {
     /**
      * 下载消息使用到的媒体文件，并上传到文件服务
      *
-     * @param mpService 公众号 Service
      * @param message 消息
      */
-    private void downloadMessageMedia(WxMpService mpService, MpMessageDO message) {
+    private void downloadMessageMedia(MpMessageDO message) {
         if (StrUtil.isNotEmpty(message.getMediaId())) {
-            message.setMediaUrl(downloadMedia(mpService, message.getMediaId()));
+            message.setMediaUrl(mpMaterialService.downloadMaterialUrl(message.getAccountId(),
+                    message.getMediaId(), MpUtils.getMediaFileType(message.getType())));
         }
         if (StrUtil.isNotEmpty(message.getThumbMediaId())) {
-            message.setThumbMediaUrl(downloadMedia(mpService, message.getThumbMediaId()));
+            message.setThumbMediaUrl(mpMaterialService.downloadMaterialUrl(message.getAccountId(),
+                    message.getThumbMediaId(), WxConsts.MediaFileType.THUMB));
         }
-    }
-
-    /**
-     * 下载微信媒体文件的内容，并上传到文件服务
-     *
-     * 为什么要下载？媒体文件在微信后台保存时间为 3 天，即 3 天后 media_id 失效。
-     *
-     * @param mpService 微信公众号 Service
-     * @param mediaId 媒体文件编号
-     * @return 上传后的 URL
-     */
-    private String downloadMedia(WxMpService mpService, String mediaId) {
-        try {
-            // 第一步，从公众号下载媒体文件
-            File file = mpService.getMaterialService().mediaDownload(mediaId);
-            // 第二步，上传到文件服务
-            String path = mediaId + "." + FileTypeUtil.getType(file);
-            return fileApi.createFile(path, FileUtil.readBytes(file));
-        } catch (WxErrorException e) {
-            log.error("[mediaDownload][media({}) 下载失败]", mediaId);
-        }
-        return null;
     }
 
 }

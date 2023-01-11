@@ -80,4 +80,25 @@ public class MpUtils {
         ValidationUtils.validate(validator, message, group);
     }
 
+    /**
+     * 根据消息类型，获得对应的媒体文件类型
+     *
+     * 注意，不会返回 WxConsts.MediaFileType.THUMB，因为该类型会有明确标注
+     *
+     * @param messageType 消息类型 {@link  WxConsts.XmlMsgType}
+     * @return 媒体文件类型 {@link WxConsts.MediaFileType}
+     */
+    public static String getMediaFileType(String messageType) {
+        switch (messageType) {
+            case WxConsts.XmlMsgType.IMAGE:
+                return WxConsts.MediaFileType.IMAGE;
+            case WxConsts.XmlMsgType.VOICE:
+                return WxConsts.MediaFileType.VOICE;
+            case WxConsts.XmlMsgType.VIDEO:
+                return WxConsts.MediaFileType.VIDEO;
+            default:
+                return WxConsts.MediaFileType.FILE;
+        }
+    }
+
 }

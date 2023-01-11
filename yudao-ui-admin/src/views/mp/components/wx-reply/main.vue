@@ -4,15 +4,12 @@
 -->
 <template>
   <el-tabs type="border-card" v-model="objData.repType" @tab-click="handleClick">
+    <!-- 类型 1：文本 -->
     <el-tab-pane name="text">
       <span slot="label"><i class="el-icon-document"></i> 文本</span>
-      <el-input
-        type="textarea"
-        :rows="5"
-        placeholder="请输入内容"
-        v-model="objData.repContent">
-      </el-input>
+      <el-input type="textarea" :rows="5" placeholder="请输入内容" v-model="objData.content" />
     </el-tab-pane>
+    <!-- 类型 2：图片 -->
     <el-tab-pane name="image">
       <span slot="label"><i class="el-icon-picture"></i> 图片</span>
       <el-row>
@@ -29,19 +26,10 @@
               <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
             </el-col>
             <el-col :span="12" class="col-add">
-              <el-upload
-                :action="actionUrl"
-                :headers="headers"
-                multiple
-                :limit="1"
-                :on-success="handleUploadSuccess"
-                :file-list="fileList"
-                :before-upload="beforeImageUpload"
-                :data="uploadData">
+              <el-upload :action="actionUrl" :headers="headers" multiple :limit="1" :file-list="fileList" :data="uploadData"
+                         :before-upload="beforeImageUpload" :on-success="handleUploadSuccess">
                 <el-button type="primary">上传图片</el-button>
-                <div slot="tip" class="el-upload__tip">
-                  支持bmp/png/jpeg/jpg/gif格式，大小不超过2M
-                </div>
+                <div slot="tip" class="el-upload__tip">支持 bmp/png/jpeg/jpg/gif 格式，大小不超过 2M</div>
               </el-upload>
             </el-col>
           </el-row>
@@ -69,12 +57,7 @@
               <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
             </el-col>
             <el-col :span="12" class="col-add">
-              <el-upload
-                :action="actionUrl"
-                :headers="headers"
-                multiple
-                :limit="1"
-                :on-success="handleUploadSuccess"
+              <el-upload :action="actionUrl" :headers="headers" multiple :limit="1" :on-success="handleUploadSuccess"
                 :file-list="fileList"
                 :before-upload="beforeVoiceUpload"
                 :data="uploadData">
@@ -188,9 +171,9 @@
     },
     props: {
       objData:{
-        type:Object
+        type: Object
       },
-      //图文类型：1、已发布图文；2、草稿箱图文
+      // 图文类型：1、已发布图文；2、草稿箱图文
       newsType:{
         type: String,
         default: "1"

@@ -158,7 +158,7 @@ import {getMessagePage, sendMessage} from '@/api/mp/message'
         }, {
           ...this.objData,
           type: this.objData.repType,
-          content: this.objData.repContent,
+          // content: this.objData.repContent,
           // TODO 芋艿：临时适配，保证可用
         })).then(response => {
           this.sendLoading = false
