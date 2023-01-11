@@ -19,6 +19,7 @@
         <!-- 情况一：已经选择好素材、或者上传好图片 -->
         <div class="select-item" v-if="objData.url">
           <img class="material-img" :src="objData.url">
+          <p class="item-name" v-if="objData.repName">{{objData.repName}}</p> <!-- TODO 芋艿：永久素材，name 字段 -->
           <el-row class="ope-row">
             <el-button type="danger" icon="el-icon-delete" circle @click="deleteObj"></el-button>
           </el-row>
@@ -46,32 +47,29 @@
         </el-dialog>
       </el-row>
     </el-tab-pane>
+    <!-- 类型 3：语音 -->
     <el-tab-pane name="voice">
       <span slot="label"><i class="el-icon-phone"></i> 语音</span>
       <el-row>
-        <div class="select-item2" v-if="objData.repName">
-          <p class="item-name">{{objData.repName}}</p>
+        <div class="select-item2" v-if="objData.url">
+          <p class="item-name">{{objData.repName}}</p> <!-- TODO 芋艿：永久素材，name 字段 -->
           <div class="item-infos">
-            <WxVoicePlayer :objData="Object.assign(tempPlayerObj,{repMediaId: objData.media_id, repName: objData.repName})"></WxVoicePlayer>
+            <wx-voice-player :url="objData.url" />
           </div>
           <el-row class="ope-row">
             <el-button type="danger" icon="el-icon-delete" circle @click="deleteObj"></el-button>
           </el-row>
         </div>
-        <div v-if="!objData.repName">
+        <div v-else>
           <el-row style="text-align: center">
             <el-col :span="12" class="col-select">
               <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
             </el-col>
             <el-col :span="12" class="col-add">
-              <el-upload :action="actionUrl" :headers="headers" multiple :limit="1" :on-success="handleUploadSuccess"
-                :file-list="fileList"
-                :before-upload="beforeVoiceUpload"
-                :data="uploadData">
+              <el-upload :action="actionUrl" :headers="headers" multiple :limit="1" :file-list="fileList" :data="uploadData"
+                         :before-upload="beforeVoiceUpload" :on-success="handleUploadSuccess">
                 <el-button type="primary">点击上传</el-button>
-                <div slot="tip" class="el-upload__tip">
-                  格式支持mp3/wma/wav/amr，文件大小不超过2M，播放长度不超过60s
-                </div>
+                <div slot="tip" class="el-upload__tip">格式支持 mp3/wma/wav/amr，文件大小不超过 2M，播放长度不超过 60s</div>
               </el-upload>
             </el-col>
           </el-row>
@@ -247,11 +245,12 @@
         this.tableLoading = true
         // 校验格式
         const isType = file.type === 'audio/mp3'
+            || file.type === 'audio/mpeg'
             || file.type === 'audio/wma'
             || file.type === 'audio/wav'
             || file.type === 'audio/amr';
         if (!isType) {
-          this.$message.error('上传语音格式不对!');
+          this.$message.error('上传语音格式不对!' + file.type);
           return false;
         }
         // 校验大小
@@ -314,9 +313,10 @@
         let tempObjItem = this.tempObj.get(this.objData.type)
         // console.log(this.objData.type)
         // console.log(tempObjItem)
-        console.log(this.objData)
+        // console.log(this.objData)
         // console.log(this.tempObj)
         if (tempObjItem) {
+          console.log(this.tempObj)
           this.objData.content = tempObjItem.content ? tempObjItem.content : null
           this.objData.mediaId = tempObjItem.mediaId ? tempObjItem.mediaId : null
           this.objData.url = tempObjItem.url ? tempObjItem.url : null
@@ -329,6 +329,7 @@
         }
         // 如果获取不到，需要把 objData 复原
         this.objData.mediaId = undefined;
+        this.objData.url = undefined;
         this.objData.content = undefined;
         // this.$delete(this.objData,'repName')
         // this.$delete(this.objData,'repMediaId')
@@ -348,8 +349,7 @@
 
         // 创建 tempObjItem 对象，并设置对应的值
         let tempObjItem = {}
-        tempObjItem.type = this.objData.type
-        tempObjItem.mediaId = item.mediaId
+
         // tempObjItem.repMediaId = item.mediaId // TODO 芋艿：应该可以注释吧？
         // tempObjItem.content = item.content // TODO 芋艿：应该可以注释吧？
 
@@ -363,6 +363,9 @@
           this.objData.repThumbUrl = item.url
           this.dialogThumbVisible = false // TODO 芋艿：这里为什么单独写？？？
         } else{
+          tempObjItem.type = this.objData.type;
+          tempObjItem.mediaId = item.mediaId;
+          tempObjItem.url = item.url;
           // tempObjItem.repName = item.name
           // tempObjItem.url = item.url
           // this.objData.repName = item.name
@@ -408,12 +411,11 @@
       deleteObj() {
         if (this.objData.type === 'news') {
           // TODO 芋艿，待实现
-        } else if(this.objData.type === 'image') {
+        } else if(this.objData.type === 'image'
+            || this.objData.type === 'voice') {
           this.$delete(this.objData, 'url')
           this.$delete(this.objData, 'mediaId')
-        } else if(this.objData.type === 'voice') {
-          // TODO 芋艿，待实现
-        } else if(this.objData.type === 'video') {
+        }  else if(this.objData.type === 'video') {
           // TODO 芋艿，待实现
         } else if(this.objData.type === 'music') {
           // TODO 芋艿，待实现
@@ -443,7 +445,7 @@
        *
        * why？不确定为什么 v-model="objData.content" 不能自动缓存，所以通过这样的方式
        */
-      inputContent() {
+      inputContent(str) {
         let tempObjItem = {...this.objData};
         this.tempObj.set(this.objData.type, tempObjItem);
       }
