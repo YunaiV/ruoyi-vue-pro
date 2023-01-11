@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnListConditionEnu
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.generator.config.po.TableField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -42,6 +43,7 @@ public class CodegenColumnDO extends BaseDO {
     private String columnName;
     /**
      * 字段类型
+     * 关联 {@link TableField#getColumnType()}}
      */
     private String dataType;
     /**
