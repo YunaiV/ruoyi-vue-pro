@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.web.core.filter;
 
 import cn.iocoder.yudao.framework.web.config.XssProperties;
+import cn.iocoder.yudao.framework.web.core.clean.XssCleaner;
 import lombok.AllArgsConstructor;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -13,7 +14,7 @@ import java.io.IOException;
 
 /**
  * Xss 过滤器
- *
+ * <p>
  * 对 Xss 不了解的胖友，可以看看 http://www.iocoder.cn/Fight/The-new-girl-asked-me-why-AJAX-requests-are-not-secure-I-did-not-answer/
  *
  * @author 芋道源码
@@ -30,10 +31,12 @@ public class XssFilter extends OncePerRequestFilter {
      */
     private final PathMatcher pathMatcher;
 
+    private final XssCleaner xssCleaner;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
-        filterChain.doFilter(new XssRequestWrapper(request), response);
+        filterChain.doFilter(new XssRequestWrapper(request, xssCleaner), response);
     }
 
     @Override

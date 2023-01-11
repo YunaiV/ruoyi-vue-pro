@@ -2,15 +2,22 @@ package cn.iocoder.yudao.framework.web.config;
 
 import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
+import cn.iocoder.yudao.framework.web.core.clean.JsoupXssCleaner;
+import cn.iocoder.yudao.framework.web.core.clean.XssCleaner;
 import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyFilter;
 import cn.iocoder.yudao.framework.web.core.filter.DemoFilter;
 import cn.iocoder.yudao.framework.web.core.filter.XssFilter;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalResponseBodyHandler;
+import cn.iocoder.yudao.framework.web.core.json.XssStringJsonDeserializer;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -48,7 +55,7 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
      * 设置 API 前缀，仅仅匹配 controller 包下的
      *
      * @param configurer 配置
-     * @param api API 配置
+     * @param api        API 配置
      */
     private void configurePathMatch(PathMatchConfigurer configurer, WebProperties.Api api) {
         AntPathMatcher antPathMatcher = new AntPathMatcher(".");
@@ -104,8 +111,9 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
      * 创建 XssFilter Bean，解决 Xss 安全问题
      */
     @Bean
-    public FilterRegistrationBean<XssFilter> xssFilter(XssProperties properties, PathMatcher pathMatcher) {
-        return createFilterBean(new XssFilter(properties, pathMatcher), WebFilterOrderEnum.XSS_FILTER);
+    @ConditionalOnBean(XssCleaner.class)
+    public FilterRegistrationBean<XssFilter> xssFilter(XssProperties properties, PathMatcher pathMatcher, XssCleaner xssCleaner) {
+        return createFilterBean(new XssFilter(properties, pathMatcher, xssCleaner), WebFilterOrderEnum.XSS_FILTER);
     }
 
     /**
@@ -115,6 +123,32 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
     @ConditionalOnProperty(value = "yudao.demo", havingValue = "true")
     public FilterRegistrationBean<DemoFilter> demoFilter() {
         return createFilterBean(new DemoFilter(), WebFilterOrderEnum.DEMO_FILTER);
+    }
+
+
+    /**
+     * Xss 清理者
+     *
+     * @return XssCleaner
+     */
+    @Bean
+    @ConditionalOnMissingBean(XssCleaner.class)
+    public XssCleaner xssCleaner() {
+        return new JsoupXssCleaner();
+    }
+
+    /**
+     * 注册 Jackson 的序列化器，用于处理 json 类型参数的 xss 过滤
+     *
+     * @return Jackson2ObjectMapperBuilderCustomizer
+     */
+    @Bean
+    @ConditionalOnMissingBean(name = "xssJacksonCustomizer")
+    @ConditionalOnBean(ObjectMapper.class)
+    @ConditionalOnProperty(value = "yudao.xss.enable", havingValue = "true")
+    public Jackson2ObjectMapperBuilderCustomizer xssJacksonCustomizer(XssCleaner xssCleaner) {
+        // 在反序列化时进行 xss 过滤，可以替换使用 XssStringJsonSerializer，在序列化时进行处理
+        return builder -> builder.deserializerByType(String.class, new XssStringJsonDeserializer(xssCleaner));
     }
 
     private static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
