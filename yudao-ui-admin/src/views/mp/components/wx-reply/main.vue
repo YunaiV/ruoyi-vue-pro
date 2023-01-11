@@ -1,30 +1,36 @@
 <!--
   - Copyright (C) 2018-2019
   - All rights reserved, Designed By www.joolun.com
+  芋道源码：
+  ① 移除多余的 rep 为前缀的变量，让 message 消息更简单
+  ② 代码优化，补充注释，提升阅读性
 -->
 <template>
-  <el-tabs type="border-card" v-model="objData.repType" @tab-click="handleClick">
+  <el-tabs type="border-card" v-model="objData.type" @tab-click="handleClick">
     <!-- 类型 1：文本 -->
     <el-tab-pane name="text">
       <span slot="label"><i class="el-icon-document"></i> 文本</span>
-      <el-input type="textarea" :rows="5" placeholder="请输入内容" v-model="objData.content" />
+      <el-input type="textarea" :rows="5" placeholder="请输入内容" v-model="objData.content" @input="inputContent" />
     </el-tab-pane>
     <!-- 类型 2：图片 -->
     <el-tab-pane name="image">
       <span slot="label"><i class="el-icon-picture"></i> 图片</span>
       <el-row>
-        <div class="select-item" v-if="objData.repUrl">
-          <img class="material-img" :src="objData.repUrl">
-          <p class="item-name" v-if="objData.repName">{{objData.repName}}</p>
+        <!-- 情况一：已经选择好素材、或者上传好图片 -->
+        <div class="select-item" v-if="objData.url">
+          <img class="material-img" :src="objData.url">
           <el-row class="ope-row">
             <el-button type="danger" icon="el-icon-delete" circle @click="deleteObj"></el-button>
           </el-row>
         </div>
-        <div v-if="!objData.repUrl">
+        <!-- 情况二：未做完上述操作 -->
+        <div v-else>
           <el-row style="text-align: center">
+            <!-- 选择素材 -->
             <el-col :span="12" class="col-select">
               <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
             </el-col>
+            <!-- 文件上传 -->
             <el-col :span="12" class="col-add">
               <el-upload :action="actionUrl" :headers="headers" multiple :limit="1" :file-list="fileList" :data="uploadData"
                          :before-upload="beforeImageUpload" :on-success="handleUploadSuccess">
@@ -34,6 +40,7 @@
             </el-col>
           </el-row>
         </div>
+        <!-- 点击选择素材，会打开下面的弹窗 -->
         <el-dialog title="选择图片" :visible.sync="dialogImageVisible" width="90%" append-to-body>
           <WxMaterialSelect :objData="objData" @selectMaterial="selectMaterial"></WxMaterialSelect>
         </el-dialog>
@@ -82,7 +89,7 @@
         <el-input v-model="objData.repDesc" placeholder="请输入描述"></el-input>
         <div style="margin: 20px 0;"></div>
         <div style="text-align: center;">
-          <a target="_blank" v-if="objData.repUrl" :href="objData.repUrl"><i class="icon-shipinbofang">&nbsp;播放视频</i></a>
+          <a target="_blank" v-if="objData.url" :href="objData.url"><i class="icon-shipinbofang">&nbsp;播放视频</i></a>
         </div>
         <div style="margin: 20px 0;"></div>
         <div style="text-align: center">
@@ -138,7 +145,7 @@
             </div>
           </div>
           <el-dialog title="选择图片" :visible.sync="dialogThumbVisible" width="80%" append-to-body>
-            <WxMaterialSelect :objData="{repType:'image'}" @selectMaterial="selectMaterial"></WxMaterialSelect>
+            <WxMaterialSelect :objData="{type:'image'}" @selectMaterial="selectMaterial"></WxMaterialSelect>
           </el-dialog>
         </el-col>
         <el-col :span="18">
@@ -148,7 +155,7 @@
         </el-col>
       </el-row>
       <div style="margin: 20px 0;"></div>
-      <el-input v-model="objData.repUrl" placeholder="请输入音乐链接"></el-input>
+      <el-input v-model="objData.url" placeholder="请输入音乐链接"></el-input>
       <div style="margin: 20px 0;"></div>
       <el-input v-model="objData.repHqUrl" placeholder="请输入高质量音乐链接"></el-input>
     </el-tab-pane>
@@ -160,7 +167,7 @@
   import WxNews from '@/views/mp/components/wx-news/main.vue'
   // import WxMaterialSelect from '@/components/wx-material-select/main.vue'
   import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
-  import { getToken } from '@/utils/auth'
+  import {getAccessToken, getToken} from '@/utils/auth'
 
   export default {
     name: "wxReplySelect",
@@ -170,11 +177,11 @@
       WxVoicePlayer
     },
     props: {
-      objData:{
-        type: Object
+      objData: { // 消息对象。
+        type: Object, // 设置为 Object 的原因，方便属性的传递
+        required: true,
       },
-      // 图文类型：1、已发布图文；2、草稿箱图文
-      newsType:{
+      newsType:{ // 图文类型：1、已发布图文；2、草稿箱图文
         type: String,
         default: "1"
       },
@@ -193,124 +200,176 @@
           descs:[]//降序字段
         },
         tableLoading: false,
-        dialogNewsVisible:false,
-        dialogImageVisible:false,
-        dialogVoiceVisible:false,
-        dialogVideoVisible:false,
-        dialogThumbVisible:false,
-        tempObj: new Map().set(this.objData.repType,Object.assign({},this.objData)),
-        fileList:[],
-        uploadData:{
-          "mediaType":this.objData.repType,
+
+        tempObj: new Map().set( // 临时缓存，切换消息类型的 tab 的时候，可以保存对应的数据；
+            this.objData.type, // 消息类型
+            Object.assign({}, this.objData)), // 消息内容
+
+        // ========== 素材选择的弹窗，是否可见 ==========
+        dialogNewsVisible: false, // 图文
+        dialogImageVisible: false, // 图片
+        dialogVoiceVisible: false, // 语音
+        dialogVideoVisible: false, // 视频
+        dialogThumbVisible: false, // 缩略图
+
+        // ========== 文件上传（图片、语音、视频） ==========
+        fileList: [], // 文件列表
+        uploadData: {
+          "accountId": undefined,
+          "type": this.objData.type,
           "title":'',
           "introduction":''
         },
-        actionUrl: process.env.VUE_APP_BASE_API +'/wxmaterial/materialFileUpload',
-        headers: {
-          Authorization: 'Bearer ' + getToken()
-        }
+        actionUrl: process.env.VUE_APP_BASE_API +'/admin-api/mp/material/upload-temporary',
+        headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
       }
-    },
-    computed: {
-
     },
     methods:{
       beforeThumbImageUpload(file){
-        const isType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif' || file.type === 'image/bmp' || file.type === 'image/jpg';
-        const isLt = file.size / 1024 / 1024 < 2;
+        const isType = file.type === 'image/jpeg'
+            || file.type === 'image/png'
+            || file.type === 'image/gif'
+            || file.type === 'image/bmp'
+            || file.type === 'image/jpg';
         if (!isType) {
           this.$message.error('上传图片格式不对!');
+          return false;
         }
+        const isLt = file.size / 1024 / 1024 < 2;
         if (!isLt) {
-          this.$message.error('上传图片大小不能超过2M!');
+          this.$message.error('上传图片大小不能超过 2M!');
+          return false;
         }
-        return isType && isLt;
-      },
-      deleteObj(){
-        this.$delete(this.objData,'repName')
-        this.$delete(this.objData,'repUrl')
-        this.$delete(this.objData,'content')
+        this.uploadData.accountId = this.objData.accountId;
+        return true;
       },
       beforeVoiceUpload(file){
         this.tableLoading = true
-        const isType = file.type === 'audio/mp3' || file.type === 'audio/wma' || file.type === 'audio/wav' || file.type === 'audio/amr';
-        const isLt = file.size / 1024 / 1024 < 2;
+        // 校验格式
+        const isType = file.type === 'audio/mp3'
+            || file.type === 'audio/wma'
+            || file.type === 'audio/wav'
+            || file.type === 'audio/amr';
         if (!isType) {
           this.$message.error('上传语音格式不对!');
+          return false;
         }
+        // 校验大小
+        const isLt = file.size / 1024 / 1024 < 2;
         if (!isLt) {
-          this.$message.error('上传语音大小不能超过2M!');
+          this.$message.error('上传语音大小不能超过 2M!');
+          return false;
         }
-        return isType && isLt;
+        this.uploadData.accountId = this.objData.accountId;
+        return true;
       },
       beforeImageUpload(file){
-        const isType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif' || file.type === 'image/bmp' || file.type === 'image/jpg';
-        const isLt = file.size / 1024 / 1024 < 2;
+        // 校验格式
+        const isType = file.type === 'image/jpeg'
+            || file.type === 'image/png'
+            || file.type === 'image/gif'
+            || file.type === 'image/bmp'
+            || file.type === 'image/jpg';
         if (!isType) {
           this.$message.error('上传图片格式不对!');
+          return false;
         }
+        // 校验大小
+        const isLt = file.size / 1024 / 1024 < 2;
         if (!isLt) {
-          this.$message.error('上传图片大小不能超过2M!');
+          this.$message.error('上传图片大小不能超过 2M!');
+          return false;
         }
-        return isType && isLt;
+        this.uploadData.accountId = this.objData.accountId;
+        return true;
       },
-      handleUploadSuccess(response, file, fileList){
-        if(response.code == 200){
-          this.fileList = []
-          this.uploadData.title = ''
-          this.uploadData.introduction = ''
-          let item = response.data
-          this.selectMaterial(item)
-        }else{
+      handleUploadSuccess(response, file, fileList) {
+        if (response.code !== 0) {
           this.$message.error('上传出错：' + response.msg)
+          return false;
         }
-      },
-      handleClick(tab, event){
-        this.uploadData.mediaType = this.objData.repType
-        let tempObjItem = this.tempObj.get(this.objData.repType)
-        if(tempObjItem){
-          this.objData.repName = tempObjItem.repName ? tempObjItem.repName : null
-          this.objData.repMediaId = tempObjItem.repMediaId ? tempObjItem.repMediaId : null
-          this.objData.media_id = tempObjItem.media_id ? tempObjItem.media_id : null
-          this.objData.repUrl = tempObjItem.repUrl ? tempObjItem.repUrl : null
-          this.objData.content = tempObjItem.content ? tempObjItem.content : null
-          this.objData.repDesc = tempObjItem.repDesc ? tempObjItem.repDesc : null
-        }else{
-          this.$delete(this.objData,'repName')
-          this.$delete(this.objData,'repMediaId')
-          this.$delete(this.objData,'media_id')
-          this.$delete(this.objData,'repUrl')
-          this.$delete(this.objData,'content')
-          this.$delete(this.objData,'repDesc')
-        }
-      },
-      selectMaterial(item){
-        let tempObjItem = {}
-        tempObjItem.repType = this.objData.repType
-        tempObjItem.repMediaId = item.mediaId
-        tempObjItem.media_id = item.mediaId
-        tempObjItem.content = item.content
 
-        this.dialogNewsVisible = false
-        this.dialogImageVisible = false
-        this.dialogVoiceVisible = false
-        this.dialogVideoVisible = false
-        this.objData.repMediaId = item.mediaId
-        this.objData.media_id = item.mediaId
+        // 清空上传时的各种数据
+        this.fileList = []
+        this.uploadData.title = ''
+        this.uploadData.introduction = ''
+
+        // 上传好的文件，本质是个素材，所以可以进行选中
+        let item = response.data
+        this.selectMaterial(item)
+      },
+      /**
+       * 切换消息类型的 tab
+       *
+       * @param tab tab
+       */
+      handleClick(tab) {
+        // 设置后续文件上传的文件类型
+        this.uploadData.type = this.objData.type;
+        if (this.uploadData.type === 'music') { // 【音乐】上传的是缩略图
+          this.uploadData.type = 'thumb';
+        }
+
+        // 从 tempObj 临时缓存中，获取对应的数据，并设置回 objData
+        let tempObjItem = this.tempObj.get(this.objData.type)
+        // console.log(this.objData.type)
+        // console.log(tempObjItem)
+        console.log(this.objData)
+        // console.log(this.tempObj)
+        if (tempObjItem) {
+          this.objData.content = tempObjItem.content ? tempObjItem.content : null
+          this.objData.mediaId = tempObjItem.mediaId ? tempObjItem.mediaId : null
+          this.objData.url = tempObjItem.url ? tempObjItem.url : null
+
+          // TODO 芋艿：临时注释掉，看看有没用
+          // this.objData.repName = tempObjItem.repName ? tempObjItem.repName : null
+          // this.objData.repMediaId = tempObjItem.repMediaId ? tempObjItem.repMediaId : null
+          // this.objData.repDesc = tempObjItem.repDesc ? tempObjItem.repDesc : null
+          return;
+        }
+        // 如果获取不到，需要把 objData 复原
+        this.objData.mediaId = undefined;
+        this.objData.content = undefined;
+        // this.$delete(this.objData,'repName')
+        // this.$delete(this.objData,'repMediaId')
+        // this.$delete(this.objData,'mediaId')
+        // this.$delete(this.objData,'url')
+        // this.$delete(this.objData,'content') // TODO 芋艿：貌似删除了，文本无法输入
+        // this.$delete(this.objData,'repDesc')
+      },
+      /**
+       * 选择素材，将设置设置到 objData 变量
+       *
+       * @param item 素材
+       */
+      selectMaterial(item) {
+        // 选择好素材，所以隐藏弹窗
+        this.closeMaterial();
+
+        // 创建 tempObjItem 对象，并设置对应的值
+        let tempObjItem = {}
+        tempObjItem.type = this.objData.type
+        tempObjItem.mediaId = item.mediaId
+        // tempObjItem.repMediaId = item.mediaId // TODO 芋艿：应该可以注释吧？
+        // tempObjItem.content = item.content // TODO 芋艿：应该可以注释吧？
+
+        // this.objData.repMediaId = item.mediaId
+        this.objData.mediaId = item.mediaId
         this.objData.content = item.content
-        if(this.objData.repType == 'music'){
+        if (this.objData.type === 'music') {
           tempObjItem.repThumbMediaId = item.mediaId
           tempObjItem.repThumbUrl = item.url
           this.objData.repThumbMediaId = item.mediaId
           this.objData.repThumbUrl = item.url
-          this.dialogThumbVisible = false
-        }else{
-          tempObjItem.repName = item.name
-          tempObjItem.repUrl = item.url
-          this.objData.repName = item.name
-          this.objData.repUrl = item.url
+          this.dialogThumbVisible = false // TODO 芋艿：这里为什么单独写？？？
+        } else{
+          // tempObjItem.repName = item.name
+          // tempObjItem.url = item.url
+          // this.objData.repName = item.name
+          this.objData.mediaId = item.mediaId
+          this.objData.url = item.url
         }
-        if(this.objData.repType == 'video'){
+        if(this.objData.type == 'video'){
           // getMaterialVideo({
           //   mediaId:item.mediaId
           // }).then(response => {
@@ -318,25 +377,46 @@
           //     let data = response.data
           //     this.$set(this.objData,'repName',data.title)
           //     this.$set(this.objData,'repDesc',data.description)
-          //     this.$set(this.objData,'repUrl',data.downUrl)
+          //     this.$set(this.objData,'url',data.downUrl)
           //     tempObjItem.repDesc = data.description
-          //     tempObjItem.repUrl = data.downUrl
+          //     tempObjItem.url = data.downUrl
           //   }
           // })
         }
-        this.tempObj.set(this.objData.repType,tempObjItem)
+        // 最终设置到临时缓存
+        this.tempObj.set(this.objData.type, tempObjItem)
       },
-      openMaterial(){
-        if(this.objData.repType == 'news'){
+      openMaterial() {
+        if (this.objData.type === 'news') {
           this.dialogNewsVisible = true
-        }else if(this.objData.repType == 'image'){
+        } else if(this.objData.type === 'image') {
           this.dialogImageVisible = true
-        }else if(this.objData.repType == 'voice'){
+        } else if(this.objData.type === 'voice') {
           this.dialogVoiceVisible = true
-        }else if(this.objData.repType == 'video'){
+        } else if(this.objData.type === 'video') {
           this.dialogVideoVisible = true
-        }else if(this.objData.repType == 'music'){
+        } else if(this.objData.type === 'music') {
           this.dialogThumbVisible = true
+        }
+      },
+      closeMaterial() {
+        this.dialogNewsVisible = false
+        this.dialogImageVisible = false
+        this.dialogVoiceVisible = false
+        this.dialogVideoVisible = false
+      },
+      deleteObj() {
+        if (this.objData.type === 'news') {
+          // TODO 芋艿，待实现
+        } else if(this.objData.type === 'image') {
+          this.$delete(this.objData, 'url')
+          this.$delete(this.objData, 'mediaId')
+        } else if(this.objData.type === 'voice') {
+          // TODO 芋艿，待实现
+        } else if(this.objData.type === 'video') {
+          // TODO 芋艿，待实现
+        } else if(this.objData.type === 'music') {
+          // TODO 芋艿，待实现
         }
       },
       getPage(page, params) {
@@ -344,7 +424,7 @@
         // getPage(Object.assign({
         //   current: page.currentPage,
         //   size: page.pageSize,
-        //   type:this.objData.repType
+        //   type:this.objData.type
         // }, params)).then(response => {
         //   this.tableData = response.data.items
         //   this.page.total = response.data.totalCount
@@ -357,6 +437,15 @@
         this.page.currentPage = 1
         this.page.pageSize = val
         this.getPage(this.page)
+      },
+      /**
+       * 输入时，缓存每次 objData 到 tempObj 中
+       *
+       * why？不确定为什么 v-model="objData.content" 不能自动缓存，所以通过这样的方式
+       */
+      inputContent() {
+        let tempObjItem = {...this.objData};
+        this.tempObj.set(this.objData.type, tempObjItem);
       }
     }
   };

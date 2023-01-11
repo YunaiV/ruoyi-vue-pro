@@ -81,7 +81,7 @@
       </div>
     </div>
     <div class="msg-send" v-loading="sendLoading">
-      <WxReplySelect :objData="objData"></WxReplySelect>
+      <wx-reply-select :objData="objData" />
       <el-button type="success" size="small" class="send-but" @click="sendMsg">发送(S)</el-button>
     </div>
   </div>
@@ -95,6 +95,7 @@ import {getMessagePage, sendMessage} from '@/api/mp/message'
   import WxNews from '@/views/mp/components/wx-news/main.vue';
   import WxLocation from '@/views/mp/components/wx-location/main.vue';
   import WxMusic from '@/views/mp/components/wx-music/main.vue';
+import {getUser} from "@/api/mp/user";
 
   export default {
     name: "wxMsg",
@@ -110,7 +111,7 @@ import {getMessagePage, sendMessage} from '@/api/mp/message'
       userId: {
         type: String,
         required: true
-      }
+      },
     },
     data() {
       return {
@@ -126,17 +127,27 @@ import {getMessagePage, sendMessage} from '@/api/mp/message'
         user: { // 由于微信不再提供昵称，直接使用“用户”展示
           nickname: '用户',
           avatar: require("@/assets/images/profile.jpg"),
+          accountId: 0, // 公众号账号编号
         },
         mp: {
           nickname: '公众号',
           avatar: require("@/assets/images/wechat.png"),
         },
-        objData:{ // 微信发送消息
-          repType: 'text'
+        objData: { // 微信发送消息
+          type: 'text',
         },
       }
     },
     created() {
+      // 获得用户信息
+      getUser(this.userId).then(response => {
+        this.user.nickname = response.data.nickname | this.user.nickname;
+        this.user.avatar = response.data.avatar | this.user.avatar;
+        // 设置公众号账号编号
+        this.objData.accountId = response.data.accountId;
+      })
+
+      // 加载消息
       this.refreshChange()
     },
     methods:{
@@ -144,7 +155,7 @@ import {getMessagePage, sendMessage} from '@/api/mp/message'
         if (!this.objData) {
           return;
         }
-        if (this.objData.repType === 'news') {
+        if (this.objData.type === 'news') {
           this.objData.content.articles = [this.objData.content.articles[0]]
           this.$message({
             showClose: true,
@@ -157,7 +168,6 @@ import {getMessagePage, sendMessage} from '@/api/mp/message'
           userId: this.userId
         }, {
           ...this.objData,
-          type: this.objData.repType,
           // content: this.objData.repContent,
           // TODO 芋艿：临时适配，保证可用
         })).then(response => {
@@ -167,7 +177,8 @@ import {getMessagePage, sendMessage} from '@/api/mp/message'
           this.scrollToBottom()
           // 重置 objData 状态
           this.objData = {
-            repType: 'text'
+            type: 'text',
+            content: '',
           }
         }).catch(() => {
           this.sendLoading = false
