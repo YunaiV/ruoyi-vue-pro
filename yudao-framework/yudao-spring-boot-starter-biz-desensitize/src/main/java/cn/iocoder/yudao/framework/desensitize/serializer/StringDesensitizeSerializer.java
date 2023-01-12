@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 /**
@@ -64,7 +65,7 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
         // 滑动处理器
         SliderDesensitize sliderDesensitize = ArrayUtil.firstNonNull(AnnotationUtil.getCombinationAnnotations(field, SliderDesensitize.class));
         if (sliderDesensitize != null) {
-            value = this.desensitizationHandler.desensitize(value, sliderDesensitize.prefixKeep(), sliderDesensitize.suffixKeep(), sliderDesensitize.replacer());
+            value = this.desensitizationHandler.desensitize(value, this.desensitizationHandler.getAnnotationArgs(sliderDesensitize));
             gen.writeString(value);
             return;
         }
@@ -72,15 +73,24 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
         // 正则处理器
         RegexDesensitize regexDesensitize = ArrayUtil.firstNonNull(AnnotationUtil.getCombinationAnnotations(field, RegexDesensitize.class));
         if (regexDesensitize != null) {
-            value = this.desensitizationHandler.desensitize(value, regexDesensitize.regex(), regexDesensitize.replacer());
+            value = this.desensitizationHandler.desensitize(value, this.desensitizationHandler.getAnnotationArgs(regexDesensitize));
             gen.writeString(value);
             return;
         }
 
         // 自定义处理器
-        Desensitize desensitize = ArrayUtil.firstNonNull(AnnotationUtil.getCombinationAnnotations(field, Desensitize.class));
-        if (desensitize != null) {
-            value = this.desensitizationHandler.desensitize(value);
+        Desensitize[] annotations = AnnotationUtil.getCombinationAnnotations(field, Desensitize.class);
+        if (ArrayUtil.isEmpty(annotations)) {
+            gen.writeString(value);
+            return;
+        }
+
+        for (Annotation annotation : field.getAnnotations()) {
+            if (AnnotationUtil.hasAnnotation(annotation.annotationType(), Desensitize.class)) {
+                value = this.desensitizationHandler.desensitize(value, this.desensitizationHandler.getAnnotationArgs(annotation));
+                gen.writeString(value);
+                return;
+            }
         }
 
         gen.writeString(value);

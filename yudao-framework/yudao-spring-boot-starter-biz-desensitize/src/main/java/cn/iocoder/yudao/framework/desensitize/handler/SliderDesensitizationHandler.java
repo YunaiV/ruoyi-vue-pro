@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.framework.desensitize.handler;
 
+import cn.iocoder.yudao.framework.desensitize.annotation.SliderDesensitize;
+
 /**
  * 滑动脱敏处理器
  */
-public class SliderDesensitizationHandler implements DesensitizationHandler {
+public class SliderDesensitizationHandler implements DesensitizationHandler<SliderDesensitize> {
 
     @Override
     public String desensitize(String origin, Object... arg) {
@@ -27,6 +29,11 @@ public class SliderDesensitizationHandler implements DesensitizationHandler {
         return origin.substring(0, prefixKeep) +
                 buildReplacerByLength(replacer, interval) +
                 origin.substring(prefixKeep + interval);
+    }
+
+    @Override
+    public Object[] getAnnotationArgs(SliderDesensitize anno) {
+        return new Object[]{anno.prefixKeep(), anno.suffixKeep(), anno.replacer()};
     }
 
     /**
