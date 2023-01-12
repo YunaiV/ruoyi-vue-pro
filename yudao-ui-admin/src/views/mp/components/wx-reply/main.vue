@@ -111,7 +111,7 @@
         <div v-if="!objData.content">
           <el-row style="text-align: center">
             <el-col :span="24" class="col-select2">
-              <el-button type="success" @click="openMaterial">{{newsType == '1' ? '选择已发布图文' : '选择草稿箱图文'}}<i class="el-icon-circle-check el-icon--right"></i></el-button>
+              <el-button type="success" @click="openMaterial">{{newsType === '1' ? '选择已发布图文' : '选择草稿箱图文'}}<i class="el-icon-circle-check el-icon--right"></i></el-button>
             </el-col>
           </el-row>
         </div>
@@ -125,18 +125,11 @@
       <el-row>
         <el-col :span="6">
           <div class="thumb-div">
-            <img style="width: 100px" v-if="objData.repThumbUrl" :src="objData.repThumbUrl">
+            <img style="width: 100px" v-if="objData.thumbMediaUrl" :src="objData.thumbMediaUrl">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             <div class="thumb-but">
-              <el-upload
-                :action="actionUrl"
-                :headers="headers"
-                multiple
-                :limit="1"
-                :on-success="handleUploadSuccess"
-                :file-list="fileList"
-                :before-upload="beforeThumbImageUpload"
-                :data="uploadData">
+              <el-upload :action="actionUrl" :headers="headers" multiple :limit="1" :file-list="fileList" :data="uploadData"
+                         :before-upload="beforeThumbImageUpload" :on-success="handleUploadSuccess">
                 <el-button slot="trigger" size="mini" type="text">本地上传</el-button>
                 <el-button size="mini" type="text" @click="openMaterial" style="margin-left: 5px">素材库选择</el-button>
               </el-upload>
@@ -147,15 +140,15 @@
           </el-dialog>
         </el-col>
         <el-col :span="18">
-          <el-input v-model="objData.repName" placeholder="请输入标题"></el-input>
+          <el-input v-model="objData.title" placeholder="请输入标题" @input="inputContent" />
           <div style="margin: 20px 0;"></div>
-          <el-input v-model="objData.repDesc" placeholder="请输入描述"></el-input>
+          <el-input v-model="objData.description" placeholder="请输入描述" @input="inputContent" />
         </el-col>
       </el-row>
       <div style="margin: 20px 0;"></div>
-      <el-input v-model="objData.url" placeholder="请输入音乐链接"></el-input>
+      <el-input v-model="objData.musicUrl" placeholder="请输入音乐链接"></el-input>
       <div style="margin: 20px 0;"></div>
-      <el-input v-model="objData.repHqUrl" placeholder="请输入高质量音乐链接"></el-input>
+      <el-input v-model="objData.hqMusicUrl" placeholder="请输入高质量音乐链接"></el-input>
     </el-tab-pane>
   </el-tabs>
 </template>
@@ -165,7 +158,7 @@
   import WxNews from '@/views/mp/components/wx-news/main.vue'
   // import WxMaterialSelect from '@/components/wx-material-select/main.vue'
   import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
-  import {getAccessToken, getToken} from '@/utils/auth'
+  import {getAccessToken} from '@/utils/auth'
 
   export default {
     name: "wxReplySelect",
@@ -349,30 +342,26 @@
 
         // 创建 tempObjItem 对象，并设置对应的值
         let tempObjItem = {}
-
-        // tempObjItem.repMediaId = item.mediaId // TODO 芋艿：应该可以注释吧？
-        // tempObjItem.content = item.content // TODO 芋艿：应该可以注释吧？
-
-        // this.objData.repMediaId = item.mediaId
-        this.objData.mediaId = item.mediaId
-        this.objData.content = item.content
-        if (this.objData.type === 'music') {
-          tempObjItem.repThumbMediaId = item.mediaId
-          tempObjItem.repThumbUrl = item.url
-          this.objData.repThumbMediaId = item.mediaId
-          this.objData.repThumbUrl = item.url
-          this.dialogThumbVisible = false // TODO 芋艿：这里为什么单独写？？？
-        } else{
-          tempObjItem.type = this.objData.type;
+        tempObjItem.type = this.objData.type;
+        if (this.objData.type === 'music') { // 音乐需要特殊处理，因为选择的是图片的缩略图
+          tempObjItem.thumbMediaId = item.mediaId
+          this.objData.thumbMediaId = item.mediaId
+          tempObjItem.thumbMediaUrl = item.url
+          this.objData.thumbMediaUrl = item.url
+          // title、introduction、musicUrl、hqMusicUrl
+          tempObjItem.title = this.objData.title
+          tempObjItem.introduction = this.objData.introduction
+          tempObjItem.musicUrl = this.objData.musicUrl
+          tempObjItem.hqMusicUrl = this.objData.hqMusicUrl
+        } else if (this.objData.type === 'image'
+            || this.objData.type === 'voice') {
           tempObjItem.mediaId = item.mediaId;
-          tempObjItem.url = item.url;
-          // tempObjItem.repName = item.name
-          // tempObjItem.url = item.url
-          // this.objData.repName = item.name
           this.objData.mediaId = item.mediaId
+          tempObjItem.url = item.url;
           this.objData.url = item.url
-        }
-        if(this.objData.type == 'video'){
+          // tempObjItem.repName = item.name
+          // this.objData.repName = item.name
+        } else if (this.objData.type === 'video') {
           // getMaterialVideo({
           //   mediaId:item.mediaId
           // }).then(response => {
@@ -407,6 +396,7 @@
         this.dialogImageVisible = false
         this.dialogVoiceVisible = false
         this.dialogVideoVisible = false
+        this.dialogThumbVisible = false
       },
       deleteObj() {
         if (this.objData.type === 'news') {
@@ -416,8 +406,6 @@
           this.$delete(this.objData, 'url')
           this.$delete(this.objData, 'mediaId')
         }  else if(this.objData.type === 'video') {
-          // TODO 芋艿，待实现
-        } else if(this.objData.type === 'music') {
           // TODO 芋艿，待实现
         }
       },
