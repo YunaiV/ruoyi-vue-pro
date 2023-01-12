@@ -8,6 +8,6 @@ public interface DesensitizationHandler {
      * @param origin 原始字符串
      * @return 脱敏后的字符串
      */
-    String handle(String origin);
+    String desensitize(String origin, Object... arg);
 
 }

@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.framework.desensitize.annotation;
 
-import cn.iocoder.yudao.framework.desensitize.enums.DesensitizationStrategyEnum;
 import cn.iocoder.yudao.framework.desensitize.handler.DesensitizationHandler;
+import cn.iocoder.yudao.framework.desensitize.serializer.StringDesensitizeSerializer;
+import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -11,40 +13,18 @@ import java.lang.annotation.Target;
 
 
 /**
- * Desensitize 注解配置会覆盖 DesensitizationStrategyEnum 配置
+ * Desensitize 顶级脱敏注解
  */
-@Target({ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@JacksonAnnotationsInside
+@JsonSerialize(using = StringDesensitizeSerializer.class)
 public @interface Desensitize {
-
-    /**
-     * 脱敏策略
-     */
-    DesensitizationStrategyEnum strategy();
-
-    /**
-     * 脱敏替换字符
-     */
-    String replacer();
-
-    /**
-     * 正则表达式
-     */
-    String regex();
-
-    /**
-     * 前缀保留长度
-     */
-    int preKeep();
-
-    /**
-     * 后缀保留长度
-     */
-    int suffixKeep();
 
     /**
      * 脱敏处理器
      */
-    Class<? extends DesensitizationHandler> handler();
+    Class<? extends DesensitizationHandler> desensitizationHandler();
+
 }
