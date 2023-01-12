@@ -4,6 +4,8 @@
   芋道源码：
   ① 移除多余的 rep 为前缀的变量，让 message 消息更简单
   ② 代码优化，补充注释，提升阅读性
+  ③ 优化消息的临时缓存策略，发送消息时，只清理被发送消息的 tab，不会强制切回到 text 输入
+  ④ 支持发送【视频】消息时，支持新建视频
 -->
 <template>
   <el-tabs type="border-card" v-model="objData.type" @tab-click="handleClick">
@@ -32,6 +34,9 @@
               <el-button type="success" @click="openMaterial">
                 素材库选择<i class="el-icon-circle-check el-icon--right"></i>
               </el-button>
+              <el-dialog title="选择图片" :visible.sync="dialogImageVisible" width="90%" append-to-body>
+                <wx-material-select :obj-data="objData" @selectMaterial="selectMaterial" />
+              </el-dialog>
             </el-col>
             <!-- 文件上传 -->
             <el-col :span="12" class="col-add">
@@ -43,10 +48,6 @@
             </el-col>
           </el-row>
         </div>
-        <!-- 点击选择素材，会打开下面的弹窗 -->
-        <el-dialog title="选择图片" :visible.sync="dialogImageVisible" width="90%" append-to-body>
-          <wx-material-select :obj-data="objData" @selectMaterial="selectMaterial" />
-        </el-dialog>
       </el-row>
     </el-tab-pane>
     <!-- 类型 3：语音 -->
@@ -64,9 +65,16 @@
         </div>
         <div v-else>
           <el-row style="text-align: center">
+            <!-- 选择素材 -->
             <el-col :span="12" class="col-select">
-              <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
+              <el-button type="success" @click="openMaterial">
+                素材库选择<i class="el-icon-circle-check el-icon--right"></i>
+              </el-button>
+              <el-dialog title="选择语音" :visible.sync="dialogVoiceVisible" width="90%" append-to-body>
+                <WxMaterialSelect :objData="objData" @selectMaterial="selectMaterial"></WxMaterialSelect>
+              </el-dialog>
             </el-col>
+            <!-- 文件上传 -->
             <el-col :span="12" class="col-add">
               <el-upload :action="actionUrl" :headers="headers" multiple :limit="1" :file-list="fileList" :data="uploadData"
                          :before-upload="beforeVoiceUpload" :on-success="handleUploadSuccess">
@@ -76,9 +84,6 @@
             </el-col>
           </el-row>
         </div>
-        <el-dialog title="选择语音" :visible.sync="dialogVoiceVisible" width="90%" append-to-body>
-          <WxMaterialSelect :objData="objData" @selectMaterial="selectMaterial"></WxMaterialSelect>
-        </el-dialog>
       </el-row>
     </el-tab-pane>
     <!-- 类型 4：视频 -->
@@ -93,13 +98,24 @@
           <wx-video-player v-if="objData.url" :url="objData.url" />
         </div>
         <div style="margin: 20px 0;"></div>
-        <div style="text-align: center">
-          <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
-<!--          <el-button type="primary" v-if="permissions.wxmp_wxmaterial_add">新建视频<i class="el-icon-upload el-icon&#45;&#45;right"></i></el-button>-->
-        </div>
-        <el-dialog title="选择视频" :visible.sync="dialogVideoVisible" width="90%" append-to-body>
-          <WxMaterialSelect :objData="objData" @selectMaterial="selectMaterial"></WxMaterialSelect>
-        </el-dialog>
+        <el-row style="text-align: center">
+          <!-- 选择素材 -->
+          <el-col :span="12">
+            <el-button type="success" @click="openMaterial">
+              素材库选择<i class="el-icon-circle-check el-icon--right"></i>
+            </el-button>
+            <el-dialog title="选择视频" :visible.sync="dialogVideoVisible" width="90%" append-to-body>
+              <wx-material-select :objData="objData" @selectMaterial="selectMaterial" />
+            </el-dialog>
+          </el-col>
+          <!-- 文件上传 -->
+          <el-col :span="12">
+            <el-upload :action="actionUrl" :headers="headers" multiple :limit="1" :file-list="fileList" :data="uploadData"
+                       :before-upload="beforeVideoUpload" :on-success="handleUploadSuccess">
+              <el-button type="primary">新建视频<i class="el-icon-upload el-icon--right"></i></el-button>
+            </el-upload>
+          </el-col>
+        </el-row>
       </el-row>
     </el-tab-pane>
     <el-tab-pane name="news">
@@ -123,6 +139,7 @@
         </el-dialog>
       </el-row>
     </el-tab-pane>
+    <!-- 类型 6：音乐 -->
     <el-tab-pane name="music">
       <span slot="label"><i class="el-icon-service"></i> 音乐</span>
       <el-row>
@@ -139,7 +156,7 @@
             </div>
           </div>
           <el-dialog title="选择图片" :visible.sync="dialogThumbVisible" width="80%" append-to-body>
-            <WxMaterialSelect :objData="{type:'image'}" @selectMaterial="selectMaterial"></WxMaterialSelect>
+            <wx-material-select :objData="{type:'image'}" @selectMaterial="selectMaterial" />
           </el-dialog>
         </el-col>
         <el-col :span="18">
@@ -280,6 +297,22 @@
         this.uploadData.accountId = this.objData.accountId;
         return true;
       },
+      beforeVideoUpload(file){
+        // 校验格式
+        const isType = file.type === 'video/mp4';
+        if (!isType) {
+          this.$message.error('上传视频格式不对!');
+          return false;
+        }
+        // 校验大小
+        const isLt = file.size / 1024 / 1024 < 10;
+        if (!isLt) {
+          this.$message.error('上传视频大小不能超过 10M!');
+          return false;
+        }
+        this.uploadData.accountId = this.objData.accountId;
+        return true;
+      },
       handleUploadSuccess(response, file, fileList) {
         if (response.code !== 0) {
           this.$message.error('上传出错：' + response.msg)
@@ -362,10 +395,14 @@
           tempObjItem.name = item.name
           this.objData.name = item.name
           // title、introduction：从 item 到 tempObjItem，因为素材里有 title、introduction
-          this.objData.title = item.title || ''
-          tempObjItem.title = item.title || ''
-          this.objData.description = item.introduction || '' // 消息使用的是 description，素材使用的是 introduction，所以转换下
-          tempObjItem.description = item.introduction || ''
+          if (item.title) {
+            this.objData.title = item.title || ''
+            tempObjItem.title = item.title || ''
+          }
+          if (item.introduction) {
+            this.objData.description = item.introduction || '' // 消息使用的是 description，素材使用的是 introduction，所以转换下
+            tempObjItem.description = item.introduction || ''
+          }
         } else if (this.objData.type === 'text') {
           this.objData.content = item.content || ''
         }
