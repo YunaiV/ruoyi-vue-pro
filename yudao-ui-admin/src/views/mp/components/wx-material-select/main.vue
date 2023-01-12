@@ -1,6 +1,8 @@
 <!--
   - Copyright (C) 2018-2019
   - All rights reserved, Designed By www.joolun.com
+  芋道源码：
+  ① 移除 avue 组件，使用 ElementUI 原生组件
 -->
 <template>
   <!-- 类型：图片 -->

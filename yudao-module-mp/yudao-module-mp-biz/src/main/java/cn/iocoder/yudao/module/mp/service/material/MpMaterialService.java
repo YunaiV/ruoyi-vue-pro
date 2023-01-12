@@ -9,6 +9,8 @@ import me.chanjar.weixin.common.api.WxConsts;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 公众号素材 Service 接口
@@ -54,5 +56,13 @@ public interface MpMaterialService {
      * @return 素材分页
      */
     PageResult<MpMaterialDO> getMaterialPage(MpMaterialPageReqVO pageReqVO);
+
+    /**
+     * 获得素材列表
+     *
+     * @param mediaIds 素材 mediaId 列表
+     * @return 素材列表
+     */
+    List<MpMaterialDO> getMaterialListByMediaId(Collection<String> mediaIds);
 
 }

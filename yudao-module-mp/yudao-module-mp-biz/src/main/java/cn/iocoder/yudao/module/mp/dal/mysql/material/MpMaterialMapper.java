@@ -7,6 +7,9 @@ import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialPageReq
 import cn.iocoder.yudao.module.mp.dal.dataobject.material.MpMaterialDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
+import java.util.List;
+
 @Mapper
 public interface MpMaterialMapper extends BaseMapperX<MpMaterialDO> {
 
@@ -19,6 +22,10 @@ public interface MpMaterialMapper extends BaseMapperX<MpMaterialDO> {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<MpMaterialDO>()
                 .eqIfPresent(MpMaterialDO::getPermanent, pageReqVO.getPermanent())
                 .eqIfPresent(MpMaterialDO::getType, pageReqVO.getType()));
+    }
+
+    default List<MpMaterialDO> selectListByMediaId(Collection<String> mediaIds) {
+        return selectList(MpMaterialDO::getMediaId, mediaIds);
     }
 
 }

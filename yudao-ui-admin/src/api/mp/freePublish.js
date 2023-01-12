@@ -8,3 +8,11 @@ export function getFreePublishPage(query) {
     params: query
   })
 }
+
+// 删除公众号素材
+export function deleteFreePublish(accountId, articleId) {
+  return request({
+    url: '/mp/free-publish/delete?accountId=' + accountId + '&articleId=' + articleId,
+    method: 'delete'
+  })
+}

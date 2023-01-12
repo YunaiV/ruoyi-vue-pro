@@ -27,6 +27,8 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MATERIAL_UPLOAD_FAIL;
@@ -144,6 +146,11 @@ public class MpMaterialServiceImpl implements MpMaterialService {
     @Override
     public PageResult<MpMaterialDO> getMaterialPage(MpMaterialPageReqVO pageReqVO) {
         return mpMaterialMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<MpMaterialDO> getMaterialListByMediaId(Collection<String> mediaIds) {
+        return mpMaterialMapper.selectListByMediaId(mediaIds);
     }
 
     /**

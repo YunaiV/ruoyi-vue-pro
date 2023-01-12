@@ -40,6 +40,7 @@ public interface ErrorCodeConstants {
     // ========== 公众号发布能力 1006006000============
     ErrorCode FREE_PUBLISH_LIST_FAIL = new ErrorCode(1006006000, "获得已成功发布列表失败，原因：{}");
     ErrorCode FREE_PUBLISH_SUBMIT_FAIL = new ErrorCode(1006006001, "提交发布失败，原因：{}");
+    ErrorCode FREE_PUBLISH_DELETE_FAIL = new ErrorCode(1006006001, "删除发布失败，原因：{}");
 
     // ========== 公众号草稿 1006007000============
     ErrorCode DRAFT_LIST_FAIL = new ErrorCode(1006007000, "获得草稿列表失败，原因：{}");
