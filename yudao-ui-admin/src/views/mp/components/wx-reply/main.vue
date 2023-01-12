@@ -19,7 +19,7 @@
         <!-- 情况一：已经选择好素材、或者上传好图片 -->
         <div class="select-item" v-if="objData.url">
           <img class="material-img" :src="objData.url">
-          <p class="item-name" v-if="objData.repName">{{objData.repName}}</p> <!-- TODO 芋艿：永久素材，name 字段 -->
+          <p class="item-name" v-if="objData.name">{{objData.name}}</p>
           <el-row class="ope-row">
             <el-button type="danger" icon="el-icon-delete" circle @click="deleteObj"></el-button>
           </el-row>
@@ -54,7 +54,7 @@
       <span slot="label"><i class="el-icon-phone"></i> 语音</span>
       <el-row>
         <div class="select-item2" v-if="objData.url">
-          <p class="item-name">{{objData.repName}}</p> <!-- TODO 芋艿：永久素材，name 字段 -->
+          <p class="item-name">{{objData.name}}</p>
           <div class="item-infos">
             <wx-voice-player :url="objData.url" />
           </div>
@@ -315,22 +315,17 @@
           this.objData.content = tempObjItem.content ? tempObjItem.content : null
           this.objData.mediaId = tempObjItem.mediaId ? tempObjItem.mediaId : null
           this.objData.url = tempObjItem.url ? tempObjItem.url : null
+          this.objData.name = tempObjItem.url ? tempObjItem.name : null
 
           // TODO 芋艿：临时注释掉，看看有没用
-          // this.objData.repName = tempObjItem.repName ? tempObjItem.repName : null
-          // this.objData.repMediaId = tempObjItem.repMediaId ? tempObjItem.repMediaId : null
           // this.objData.repDesc = tempObjItem.repDesc ? tempObjItem.repDesc : null
           return;
         }
         // 如果获取不到，需要把 objData 复原
+        this.objData.content = undefined;
         this.objData.mediaId = undefined;
         this.objData.url = undefined;
-        this.objData.content = undefined;
-        // this.$delete(this.objData,'repName')
-        // this.$delete(this.objData,'repMediaId')
-        // this.$delete(this.objData,'mediaId')
-        // this.$delete(this.objData,'url')
-        // this.$delete(this.objData,'content') // TODO 芋艿：貌似删除了，文本无法输入
+        this.objData.name = undefined;
         // this.$delete(this.objData,'repDesc')
       },
       /**
@@ -357,12 +352,16 @@
           tempObjItem.hqMusicUrl = this.objData.hqMusicUrl
         } else if (this.objData.type === 'image'
             || this.objData.type === 'voice') {
-          tempObjItem.mediaId = item.mediaId;
+          tempObjItem.mediaId = item.mediaId
           this.objData.mediaId = item.mediaId
-          tempObjItem.url = item.url;
-          this.objData.url = item.url
-          // tempObjItem.repName = item.name
-          // this.objData.repName = item.name
+          if (item.url) {
+            tempObjItem.url = item.url;
+            this.objData.url = item.url;
+          } else { // 必须使用 $delete 删除，否则 vue 监听不到数据
+            this.$delete(this.objData, 'url');
+          }
+          tempObjItem.name = item.name
+          this.objData.name = item.name
         } else if (this.objData.type === 'video') {
           // getMaterialVideo({
           //   mediaId:item.mediaId
@@ -401,6 +400,7 @@
         this.dialogThumbVisible = false
       },
       deleteObj() {
+        console.log('删除！');
         if (this.objData.type === 'news') {
           // TODO 芋艿，待实现
         } else if(this.objData.type === 'image'

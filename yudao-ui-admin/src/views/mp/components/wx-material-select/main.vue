@@ -23,45 +23,59 @@
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getMaterialPage"/>
   </div>
-  <div v-else-if="objData.type == 'voice'">
-    <!-- TODO 芋艿：需要翻译 -->
-<!--    <avue-crud ref="crud"-->
-<!--               :page="page"-->
-<!--               :data="tableData"-->
-<!--               :table-loading="tableLoading"-->
-<!--               :option="tableOptionVoice"-->
-<!--               @on-load="getPage"-->
-<!--               @size-change="sizeChange"-->
-<!--               @refresh-change="refreshChange">-->
-<!--      <template slot-scope="scope"-->
-<!--                slot="menu">-->
-<!--        <el-button type="text"-->
-<!--                   icon="el-icon-circle-plus"-->
-<!--                   size="small"-->
-<!--                   plain-->
-<!--                   @click="selectMaterial(scope.row)">选择</el-button>-->
-<!--      </template>-->
-<!--    </avue-crud>-->
+  <!-- 类型：语音 -->
+  <div v-else-if="objData.type === 'voice'">
+    <!-- 列表 -->
+    <el-table v-loading="loading" :data="list">
+      <el-table-column label="编号" align="center" prop="mediaId" />
+      <el-table-column label="名字" align="center" prop="name" />
+      <el-table-column label="语音" align="center">
+        <template v-slot="scope">
+          <wx-voice-player :url="scope.row.url" />
+        </template>
+      </el-table-column>
+      <el-table-column label="上传时间" align="center" prop="createTime" width="180">
+        <template v-slot="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
+        <template v-slot="scope">
+          <el-button size="mini" type="text" icon="el-icon-circle-plus"
+                     @click="selectMaterial(scope.row)">选择</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 分页组件 -->
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                @pagination="getMaterialPage"/>
   </div>
-  <div v-else-if="objData.type == 'video'">
-    <!-- TODO 芋艿：需要翻译 -->
-    <!--    <avue-crud ref="crud"-->
-<!--               :page="page"-->
-<!--               :data="tableData"-->
-<!--               :table-loading="tableLoading"-->
-<!--               :option="tableOptionVideo"-->
-<!--               @on-load="getPage"-->
-<!--               @size-change="sizeChange"-->
-<!--               @refresh-change="refreshChange">-->
-<!--      <template slot-scope="scope"-->
-<!--                slot="menu">-->
-<!--        <el-button type="text"-->
-<!--                   icon="el-icon-circle-plus"-->
-<!--                   size="small"-->
-<!--                   plain-->
-<!--                   @click="selectMaterial(scope.row)">选择</el-button>-->
-<!--      </template>-->
-<!--    </avue-crud>-->
+  <div v-else-if="objData.type === 'video'">
+    <!-- 列表 -->
+    <el-table v-loading="loading" :data="list">
+      <el-table-column label="编号" align="center" prop="mediaId" />
+      <el-table-column label="标题" align="center" prop="title" />
+      <el-table-column label="介绍" align="center" prop="introduction" />
+      <el-table-column label="视频" align="center">
+        <template v-slot="scope">
+          <wx-video-player :url="scope.row.url" />
+        </template>
+      </el-table-column>
+      <el-table-column label="上传时间" align="center" prop="createTime" width="180">
+        <template v-slot="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
+        <template v-slot="scope">
+          <el-button size="mini" type="text" icon="el-icon-circle-plus"
+                     @click="selectMaterial(scope.row)">选择</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 分页组件 -->
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                @pagination="getMaterialPage"/>
   </div>
   <div v-else-if="objData.type == 'news'">
     <div class="waterfall" v-loading="loading">
@@ -95,6 +109,8 @@
   // import { tableOptionVoice } from '@/const/crud/wxmp/wxmaterial_voice'
   // import { tableOptionVideo } from '@/const/crud/wxmp/wxmaterial_video'
   import WxNews from '@/views/mp/components/wx-news/main.vue';
+  import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
+  import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
   import { getMaterialPage } from "@/api/mp/material";
   // import {getPage as getPageNews} from '@/api/wxmp/wxfreepublish'
   // import {getPage as getPageNewsDraft} from '@/api/wxmp/wxdraft'
@@ -102,7 +118,9 @@
   export default {
     name: "wxMaterialSelect",
     components: {
-      WxNews
+      WxNews,
+      WxVoicePlayer,
+      WxVideoPlayer
     },
     props: {
       objData: {

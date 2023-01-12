@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Date;
+
 @ApiModel("管理后台 - 公众号素材 Response VO")
 @Data
 public class MpMaterialRespVO {
@@ -39,4 +41,8 @@ public class MpMaterialRespVO {
     private String title;
     @ApiModelProperty(value = "视频素材的描述", example = "我是介绍", notes = "只有【永久素材】使用")
     private String introduction;
+
+    @ApiModelProperty(value = "创建时间", required = true)
+    private Date createTime;
+
 }
