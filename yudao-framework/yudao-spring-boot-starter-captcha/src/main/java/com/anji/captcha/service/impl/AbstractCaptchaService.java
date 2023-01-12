@@ -6,6 +6,7 @@
  */
 package com.anji.captcha.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.anji.captcha.model.common.Const;
 import com.anji.captcha.model.common.RepCodeEnum;
 import com.anji.captcha.model.common.ResponseModel;
@@ -13,29 +14,28 @@ import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaCacheService;
 import com.anji.captcha.service.CaptchaService;
 import com.anji.captcha.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
  * Created by raodeming on 2019/12/25.
  */
+@Slf4j
 public abstract class AbstractCaptchaService implements CaptchaService {
-
-    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     protected static final String IMAGE_TYPE_PNG = "png";
 
-	protected static int HAN_ZI_SIZE = 25;
+    protected static int HAN_ZI_SIZE = 25;
 
-	protected static int HAN_ZI_SIZE_HALF = HAN_ZI_SIZE / 2;
+    protected static int HAN_ZI_SIZE_HALF = HAN_ZI_SIZE / 2;
     //check校验坐标
     protected static String REDIS_CAPTCHA_KEY = "RUNNING:CAPTCHA:%s";
 
@@ -73,7 +73,7 @@ public abstract class AbstractCaptchaService implements CaptchaService {
             ImageUtils.cacheImage(config.getProperty(Const.ORIGINAL_PATH_JIGSAW),
                     config.getProperty(Const.ORIGINAL_PATH_PIC_CLICK));
         }
-        logger.info("--->>>初始化验证码底图<<<---" + captchaType());
+        log.info("--->>>初始化验证码底图<<<---" + captchaType());
         waterMark = config.getProperty(Const.CAPTCHA_WATER_MARK, "我的水印");
         slipOffset = config.getProperty(Const.CAPTCHA_SLIP_OFFSET, "5");
         waterMarkFontStr = config.getProperty(Const.CAPTCHA_WATER_FONT, "WenQuanZhengHei.ttf");
@@ -88,13 +88,13 @@ public abstract class AbstractCaptchaService implements CaptchaService {
         // 通过加载resources下的font字体解决，无需在linux中安装字体
         loadWaterMarkFont();
 
-        if (cacheType.equals("local")) {
-            logger.info("初始化local缓存...");
+        if ("local".equals(cacheType)) {
+            log.info("初始化local缓存...");
             CacheUtil.init(Integer.parseInt(config.getProperty(Const.CAPTCHA_CACAHE_MAX_NUMBER, "1000")),
                     Long.parseLong(config.getProperty(Const.CAPTCHA_TIMING_CLEAR_SECOND, "180")));
         }
-        if (config.getProperty(Const.HISTORY_DATA_CLEAR_ENABLE, "0").equals("1")) {
-            logger.info("历史资源清除开关...开启..." + captchaType());
+        if ("1".equals(config.getProperty(Const.HISTORY_DATA_CLEAR_ENABLE, "0"))) {
+            log.info("历史资源清除开关...开启..." + captchaType());
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -102,9 +102,9 @@ public abstract class AbstractCaptchaService implements CaptchaService {
                 }
             }));
         }
-        if (config.getProperty(Const.REQ_FREQUENCY_LIMIT_ENABLE, "0").equals("1")) {
+        if ("1".equals(config.getProperty(Const.REQ_FREQUENCY_LIMIT_ENABLE, "0"))) {
             if (limitHandler == null) {
-                logger.info("接口分钟内限流开关...开启...");
+                log.info("接口分钟内限流开关...开启...");
                 limitHandler = new FrequencyLimitHandler.DefaultLimitHandler(config, getCacheService(cacheType));
             }
         }
@@ -150,7 +150,7 @@ public abstract class AbstractCaptchaService implements CaptchaService {
         if (captchaVO == null) {
             return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
-        if (StringUtils.isEmpty(captchaVO.getCaptchaVerification())) {
+        if (StrUtil.isEmpty(captchaVO.getCaptchaVerification())) {
             return RepCodeEnum.NULL_ERROR.parseError("captchaVerification");
         }
         if (limitHandler != null) {
@@ -163,17 +163,17 @@ public abstract class AbstractCaptchaService implements CaptchaService {
         return resp == null || resp.isSuccess();
     }
 
-	protected String getValidateClientId(CaptchaVO req){
-    	// 以服务端获取的客户端标识 做识别标志
-		if(StringUtils.isNotEmpty(req.getBrowserInfo())){
-			return MD5Util.md5(req.getBrowserInfo());
-		}
-		// 以客户端Ui组件id做识别标志
-		if(StringUtils.isNotEmpty(req.getClientUid())){
-			return req.getClientUid();
-		}
-    	return null;
-	}
+    protected String getValidateClientId(CaptchaVO req) {
+        // 以服务端获取的客户端标识 做识别标志
+        if (StrUtil.isNotEmpty(req.getBrowserInfo())) {
+            return MD5Util.md5(req.getBrowserInfo());
+        }
+        // 以客户端Ui组件id做识别标志
+        if (StrUtil.isNotEmpty(req.getClientUid())) {
+            return req.getClientUid();
+        }
+        return null;
+    }
 
     protected void afterValidateFail(CaptchaVO data) {
         if (limitHandler != null) {
@@ -197,14 +197,14 @@ public abstract class AbstractCaptchaService implements CaptchaService {
             if (waterMarkFontStr.toLowerCase().endsWith(".ttf") || waterMarkFontStr.toLowerCase().endsWith(".ttc")
                     || waterMarkFontStr.toLowerCase().endsWith(".otf")) {
                 this.waterMarkFont = Font.createFont(Font.TRUETYPE_FONT,
-                        getClass().getResourceAsStream("/fonts/" + waterMarkFontStr))
+                                Objects.requireNonNull(getClass().getResourceAsStream("/fonts/" + waterMarkFontStr)))
                         .deriveFont(Font.BOLD, HAN_ZI_SIZE / 2);
             } else {
                 this.waterMarkFont = new Font(waterMarkFontStr, Font.BOLD, HAN_ZI_SIZE / 2);
             }
 
         } catch (Exception e) {
-            logger.error("load font error:{}", e);
+            log.error("load font error:{}", e);
         }
     }
 
@@ -228,7 +228,7 @@ public abstract class AbstractCaptchaService implements CaptchaService {
             if (!tempFile.getParentFile().exists()) {
                 tempFile.getParentFile().mkdirs();
             }
-            OutputStream out = new FileOutputStream(tempFile);
+            OutputStream out = Files.newOutputStream(tempFile.toPath());
             out.write(b);
             out.flush();
             out.close();

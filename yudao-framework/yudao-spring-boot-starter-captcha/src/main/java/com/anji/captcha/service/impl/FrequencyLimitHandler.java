@@ -1,11 +1,11 @@
 package com.anji.captcha.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.anji.captcha.model.common.Const;
 import com.anji.captcha.model.common.RepCodeEnum;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaCacheService;
-import com.anji.captcha.util.StringUtils;
 
 import java.util.Objects;
 import java.util.Properties;
@@ -66,15 +66,15 @@ public interface FrequencyLimitHandler {
         }
 
         private String getClientCId(CaptchaVO input, String type) {
-            return String.format(LIMIT_KEY ,type,input.getClientUid());
+            return String.format(LIMIT_KEY, type, input.getClientUid());
         }
 
         @Override
         public ResponseModel validateGet(CaptchaVO d) {
-        	// 无客户端身份标识，不限制
-        	if(StringUtils.isEmpty(d.getClientUid())){
-        		return null;
-			}
+            // 无客户端身份标识，不限制
+            if (StrUtil.isEmpty(d.getClientUid())) {
+                return null;
+            }
             String getKey = getClientCId(d, "GET");
             String lockKey = getClientCId(d, "LOCK");
             // 失败次数过多，锁定
@@ -88,7 +88,7 @@ public interface FrequencyLimitHandler {
             }
             cacheService.increment(getKey, 1);
             // 1分钟内请求次数过多
-            if (Long.valueOf(getCnts) > Long.parseLong(config.getProperty(Const.REQ_GET_MINUTE_LIMIT, "120"))) {
+            if (Long.parseLong(getCnts) > Long.parseLong(config.getProperty(Const.REQ_GET_MINUTE_LIMIT, "120"))) {
                 return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_GET_ERROR);
             }
 
@@ -100,9 +100,9 @@ public interface FrequencyLimitHandler {
                 return null;
             }
             // 1分钟内失败5次
-            if (Long.valueOf(failCnts) > Long.parseLong(config.getProperty(Const.REQ_GET_LOCK_LIMIT, "5"))) {
+            if (Long.parseLong(failCnts) > Long.parseLong(config.getProperty(Const.REQ_GET_LOCK_LIMIT, "5"))) {
                 // get接口锁定5分钟
-                cacheService.set(lockKey, "1", Long.valueOf(config.getProperty(Const.REQ_GET_LOCK_SECONDS, "300")));
+                cacheService.set(lockKey, "1", Long.parseLong(config.getProperty(Const.REQ_GET_LOCK_SECONDS, "300")));
                 return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LOCK_GET_ERROR);
             }
             return null;
@@ -110,10 +110,10 @@ public interface FrequencyLimitHandler {
 
         @Override
         public ResponseModel validateCheck(CaptchaVO d) {
-			// 无客户端身份标识，不限制
-			if(StringUtils.isEmpty(d.getClientUid())){
-				return null;
-			}
+            // 无客户端身份标识，不限制
+            if (StrUtil.isEmpty(d.getClientUid())) {
+                return null;
+            }
             /*String getKey = getClientCId(d, "GET");
             if(Objects.isNull(cacheService.get(getKey))){
                 return ResponseModel.errorMsg(RepCodeEnum.API_REQ_INVALID);
@@ -125,7 +125,7 @@ public interface FrequencyLimitHandler {
                 v = "1";
             }
             cacheService.increment(key, 1);
-            if (Long.valueOf(v) > Long.valueOf(config.getProperty(Const.REQ_CHECK_MINUTE_LIMIT, "600"))) {
+            if (Long.parseLong(v) > Long.parseLong(config.getProperty(Const.REQ_CHECK_MINUTE_LIMIT, "600"))) {
                 return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_CHECK_ERROR);
             }
             return null;
@@ -144,7 +144,7 @@ public interface FrequencyLimitHandler {
                 v = "1";
             }
             cacheService.increment(key, 1);
-            if (Long.valueOf(v) > Long.valueOf(config.getProperty(Const.REQ_VALIDATE_MINUTE_LIMIT, "600"))) {
+            if (Long.parseLong(v) > Long.parseLong(config.getProperty(Const.REQ_VALIDATE_MINUTE_LIMIT, "600"))) {
                 return ResponseModel.errorMsg(RepCodeEnum.API_REQ_LIMIT_VERIFY_ERROR);
             }
             return null;

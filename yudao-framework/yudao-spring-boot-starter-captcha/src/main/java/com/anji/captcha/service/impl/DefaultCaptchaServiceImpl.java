@@ -6,17 +6,19 @@
  */
 package com.anji.captcha.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.anji.captcha.model.common.RepCodeEnum;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
-import com.anji.captcha.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Properties;
 
 /**
  * Created by raodeming on 2019/12/25.
  */
+@Slf4j
 public class DefaultCaptchaServiceImpl extends AbstractCaptchaService{
 
     @Override
@@ -53,7 +55,7 @@ public class DefaultCaptchaServiceImpl extends AbstractCaptchaService{
         if (captchaVO == null) {
             return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
-        if (StringUtils.isEmpty(captchaVO.getCaptchaType())) {
+        if (StrUtil.isEmpty(captchaVO.getCaptchaType())) {
             return RepCodeEnum.NULL_ERROR.parseError("类型");
         }
         return getService(captchaVO.getCaptchaType()).get(captchaVO);
@@ -64,10 +66,10 @@ public class DefaultCaptchaServiceImpl extends AbstractCaptchaService{
         if (captchaVO == null) {
             return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
-        if (StringUtils.isEmpty(captchaVO.getCaptchaType())) {
+        if (StrUtil.isEmpty(captchaVO.getCaptchaType())) {
             return RepCodeEnum.NULL_ERROR.parseError("类型");
         }
-        if (StringUtils.isEmpty(captchaVO.getToken())) {
+        if (StrUtil.isEmpty(captchaVO.getToken())) {
             return RepCodeEnum.NULL_ERROR.parseError("token");
         }
         return getService(captchaVO.getCaptchaType()).check(captchaVO);
@@ -78,7 +80,7 @@ public class DefaultCaptchaServiceImpl extends AbstractCaptchaService{
         if (captchaVO == null) {
             return RepCodeEnum.NULL_ERROR.parseError("captchaVO");
         }
-        if (StringUtils.isEmpty(captchaVO.getCaptchaVerification())) {
+        if (StrUtil.isEmpty(captchaVO.getCaptchaVerification())) {
             return RepCodeEnum.NULL_ERROR.parseError("二次校验参数");
         }
         try {
@@ -89,7 +91,7 @@ public class DefaultCaptchaServiceImpl extends AbstractCaptchaService{
             //二次校验取值后，即刻失效
             CaptchaServiceFactory.getCache(cacheType).delete(codeKey);
         } catch (Exception e) {
-            logger.error("验证码坐标解析失败", e);
+            log.error("验证码坐标解析失败", e);
             return ResponseModel.errorMsg(e.getMessage());
         }
         return ResponseModel.success();

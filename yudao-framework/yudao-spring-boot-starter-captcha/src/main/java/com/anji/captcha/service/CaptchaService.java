@@ -13,6 +13,7 @@ import java.util.Properties;
 
 /**
  * 验证码服务接口
+ *
  * @author lide1202@hotmail.com
  * @date 2020-05-12
  */
@@ -24,6 +25,7 @@ public interface CaptchaService {
 
     /**
      * 获取验证码
+     *
      * @param captchaVO
      * @return
      */
@@ -31,6 +33,7 @@ public interface CaptchaService {
 
     /**
      * 核对验证码(前端)
+     *
      * @param captchaVO
      * @return
      */
@@ -38,6 +41,7 @@ public interface CaptchaService {
 
     /**
      * 二次校验验证码(后端)
+     *
      * @param captchaVO
      * @return
      */
@@ -50,9 +54,10 @@ public interface CaptchaService {
      */
     String captchaType();
 
-	/**
-	 * 历史资源清除(过期的图片文件，生成的临时图片...)
-	 * @param config 配置项 控制资源清理的粒度
-	 */
-	void destroy(Properties config);
+    /**
+     * 历史资源清除(过期的图片文件，生成的临时图片...)
+     *
+     * @param config 配置项 控制资源清理的粒度
+     */
+    void destroy(Properties config);
 }
