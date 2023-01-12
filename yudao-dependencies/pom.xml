@@ -32,7 +32,7 @@
         <resilience4j.version>1.7.1</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>8.12.0</skywalking.version>
-        <spring-boot-admin.version>2.7.9</spring-boot-admin.version>
+        <spring-boot-admin.version>2.7.10</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>7.2.11.RELEASE</podam.version>
@@ -45,7 +45,7 @@
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <hutool.version>5.8.11</hutool.version>
-        <easyexcel.verion>3.1.4</easyexcel.verion>
+        <easyexcel.verion>3.1.5</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
@@ -55,16 +55,15 @@
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.6.0</tika-core.version>
-        <aj-captcha.version>1.3.0</aj-captcha.version>
         <netty-all.version>4.1.86.Final</netty-all.version>
         <ip2region.version>2.6.6</ip2region.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.0.0</okio.version>
         <okhttp3.version>4.10.0</okhttp3.version>
-        <minio.version>8.4.6</minio.version>
+        <minio.version>8.5.1</minio.version>
         <aliyun-java-sdk-core.version>4.6.3</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
-        <tencentcloud-sdk-java.version>3.1.660</tencentcloud-sdk-java.version>
+        <tencentcloud-sdk-java.version>3.1.667</tencentcloud-sdk-java.version>
         <justauth.version>1.4.0</justauth.version>
         <jimureport.version>1.5.6</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
@@ -445,12 +444,6 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId> <!-- 文件类型的识别 -->
                 <version>${tika-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.anji-plus</groupId>
-                <artifactId>spring-boot-starter-captcha</artifactId>
-                <version>${aj-captcha.version}</version>
             </dependency>
 
             <dependency>
