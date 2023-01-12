@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.framework.desensitize.handler;
 
+/**
+ * 脱敏处理器接口
+ */
 public interface DesensitizationHandler {
 
     /**

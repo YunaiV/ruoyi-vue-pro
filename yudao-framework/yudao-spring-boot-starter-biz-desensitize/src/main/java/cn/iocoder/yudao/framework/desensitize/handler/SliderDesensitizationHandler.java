@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.framework.desensitize.handler;
 
+/**
+ * 滑动脱敏处理器
+ */
 public class SliderDesensitizationHandler implements DesensitizationHandler {
 
     @Override

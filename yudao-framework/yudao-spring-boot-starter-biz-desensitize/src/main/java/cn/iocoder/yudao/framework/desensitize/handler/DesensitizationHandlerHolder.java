@@ -5,6 +5,9 @@ import cn.hutool.core.util.ReflectUtil;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 脱敏处理器 Holder
+ */
 public class DesensitizationHandlerHolder {
     /**
      * handler 缓存，默认初始化内置的处理器
