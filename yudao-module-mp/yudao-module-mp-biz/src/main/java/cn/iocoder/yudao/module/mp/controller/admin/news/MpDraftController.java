@@ -36,7 +36,7 @@ public class MpDraftController {
     @GetMapping("/page")
     @ApiOperation("获得草稿分页")
     public CommonResult<PageResult<WxMpDraftItem>> getDraftPage(MpDraftPageReqVO reqVO) {
-        // 从公众号查询已发布的图文列表
+        // 从公众号查询草稿箱
         WxMpService mpService = mpServiceFactory.getRequiredMpService(reqVO.getAccountId());
         WxMpDraftList draftList;
         try {

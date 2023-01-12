@@ -106,7 +106,7 @@
   import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
   import { getMaterialPage } from "@/api/mp/material";
   import { getFreePublishPage } from "@/api/mp/freePublish";
-  import {getDraftPage} from "@/api/mp/draft";
+  import { getDraftPage } from "@/api/mp/draft";
 
   export default {
     name: "wxMaterialSelect",
