@@ -38,7 +38,7 @@ public class MpMessageSendReqVO {
     private String title;
 
     @ApiModelProperty(value = "描述", required = true, example = "你猜")
-    @NotEmpty(message = "消息内容不能为空", groups = VideoGroup.class)
+    @NotEmpty(message = "消息描述不能为空", groups = VideoGroup.class)
     private String description;
 
     @ApiModelProperty(value = "缩略图的媒体 id", required = true, example = "qqc_2Fot30Jse-HDoZmo5RrUDijz2nGUkP")

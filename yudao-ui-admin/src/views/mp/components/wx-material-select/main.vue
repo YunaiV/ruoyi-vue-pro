@@ -28,7 +28,7 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="编号" align="center" prop="mediaId" />
-      <el-table-column label="名字" align="center" prop="name" />
+      <el-table-column label="文件名" align="center" prop="name" />
       <el-table-column label="语音" align="center">
         <template v-slot="scope">
           <wx-voice-player :url="scope.row.url" />
@@ -54,6 +54,7 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="编号" align="center" prop="mediaId" />
+      <el-table-column label="文件名" align="center" prop="name" />
       <el-table-column label="标题" align="center" prop="title" />
       <el-table-column label="介绍" align="center" prop="introduction" />
       <el-table-column label="视频" align="center">

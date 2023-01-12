@@ -81,15 +81,16 @@
         </el-dialog>
       </el-row>
     </el-tab-pane>
+    <!-- 类型 4：视频 -->
     <el-tab-pane name="video">
       <span slot="label"><i class="el-icon-share"></i> 视频</span>
       <el-row>
-        <el-input v-model="objData.repName" placeholder="请输入标题"></el-input>
+        <el-input v-model="objData.title" placeholder="请输入标题"></el-input>
         <div style="margin: 20px 0;"></div>
-        <el-input v-model="objData.repDesc" placeholder="请输入描述"></el-input>
+        <el-input v-model="objData.description" placeholder="请输入描述"></el-input>
         <div style="margin: 20px 0;"></div>
         <div style="text-align: center;">
-          <a target="_blank" v-if="objData.url" :href="objData.url"><i class="icon-shipinbofang">&nbsp;播放视频</i></a>
+          <wx-video-player v-if="objData.url" :url="objData.url" />
         </div>
         <div style="margin: 20px 0;"></div>
         <div style="text-align: center">
@@ -161,13 +162,15 @@
   import WxNews from '@/views/mp/components/wx-news/main.vue'
   import WxMaterialSelect from '@/views/mp/components/wx-material-select/main.vue'
   import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
+  import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
 
   export default {
     name: "wxReplySelect",
     components: {
       WxNews,
       WxMaterialSelect,
-      WxVoicePlayer
+      WxVoicePlayer,
+      WxVideoPlayer
     },
     props: {
       objData: { // 消息对象。
@@ -354,27 +357,22 @@
             || this.objData.type === 'voice') {
           tempObjItem.mediaId = item.mediaId
           this.objData.mediaId = item.mediaId
-          if (item.url) {
-            tempObjItem.url = item.url;
-            this.objData.url = item.url;
-          } else { // 必须使用 $delete 删除，否则 vue 监听不到数据
-            this.$delete(this.objData, 'url');
-          }
+          tempObjItem.url = item.url;
+          this.objData.url = item.url;
           tempObjItem.name = item.name
           this.objData.name = item.name
         } else if (this.objData.type === 'video') {
-          // getMaterialVideo({
-          //   mediaId:item.mediaId
-          // }).then(response => {
-          //   if(response.code == 200){
-          //     let data = response.data
-          //     this.$set(this.objData,'repName',data.title)
-          //     this.$set(this.objData,'repDesc',data.description)
-          //     this.$set(this.objData,'url',data.downUrl)
-          //     tempObjItem.repDesc = data.description
-          //     tempObjItem.url = data.downUrl
-          //   }
-          // })
+          tempObjItem.mediaId = item.mediaId
+          this.objData.mediaId = item.mediaId
+          tempObjItem.url = item.url;
+          this.objData.url = item.url;
+          tempObjItem.name = item.name
+          this.objData.name = item.name
+          // title、introduction
+          this.objData.title = item.title
+          tempObjItem.title = this.objData.title
+          this.objData.description = item.introduction // 消息使用的是 description，素材使用的是 introduction，所以转换下
+          tempObjItem.description = this.objData.introduction
         }
         // 最终设置到临时缓存
         this.tempObj.set(this.objData.type, tempObjItem)
@@ -400,15 +398,8 @@
         this.dialogThumbVisible = false
       },
       deleteObj() {
-        console.log('删除！');
-        if (this.objData.type === 'news') {
-          // TODO 芋艿，待实现
-        } else if(this.objData.type === 'image'
-            || this.objData.type === 'voice') {
-          this.selectMaterial({}) // 选择一个空的素材
-        }  else if(this.objData.type === 'video') {
-          // TODO 芋艿，待实现
-        }
+        // this.$delete(this.objData, 'url'); TODO 芋艿：重新实现清空；还有 reset
+        this.selectMaterial({}) // 选择一个空的素材
       },
       getPage(page, params) {
         this.tableLoading = true
