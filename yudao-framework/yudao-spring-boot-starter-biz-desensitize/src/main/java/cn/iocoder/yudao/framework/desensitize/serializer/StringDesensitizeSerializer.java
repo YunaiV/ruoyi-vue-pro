@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.desensitize.serializer;
 
+import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.desensitize.annotation.Desensitize;
@@ -22,13 +24,19 @@ import java.lang.reflect.Field;
  * 脱敏序列化器
  */
 public class StringDesensitizeSerializer extends StdSerializer<String> implements ContextualSerializer {
-    private final DesensitizationHandler desensitizationHandler;
+    private DesensitizationHandler desensitizationHandler;
 
-    protected StringDesensitizeSerializer(DesensitizationHandler desensitizationHandler) {
+    protected StringDesensitizeSerializer() {
         super(String.class);
-        this.desensitizationHandler = desensitizationHandler;
     }
 
+    public DesensitizationHandler getDesensitizationHandler() {
+        return desensitizationHandler;
+    }
+
+    public void setDesensitizationHandler(DesensitizationHandler desensitizationHandler) {
+        this.desensitizationHandler = desensitizationHandler;
+    }
 
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
@@ -36,8 +44,9 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
         if (annotation == null) {
             return this;
         }
-
-        return new StringDesensitizeSerializer(DesensitizationHandlerHolder.getDesensitizationHandler(annotation.desensitizationHandler()));
+        StringDesensitizeSerializer serializer = new StringDesensitizeSerializer();
+        serializer.setDesensitizationHandler(DesensitizationHandlerHolder.getDesensitizationHandler(annotation.desensitizationHandler()));
+        return serializer;
     }
 
     @Override
@@ -53,19 +62,23 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
         Field field = ReflectUtil.getField(currentValueClass, currentName);
 
         // 滑动处理器
-        SliderDesensitize sliderDesensitize = field.getAnnotation(SliderDesensitize.class);
+        SliderDesensitize sliderDesensitize = ArrayUtil.firstNonNull(AnnotationUtil.getCombinationAnnotations(field, SliderDesensitize.class));
         if (sliderDesensitize != null) {
             value = this.desensitizationHandler.desensitize(value, sliderDesensitize.prefixKeep(), sliderDesensitize.suffixKeep(), sliderDesensitize.replacer());
+            gen.writeString(value);
+            return;
         }
 
         // 正则处理器
-        RegexDesensitize regexDesensitize = field.getAnnotation(RegexDesensitize.class);
+        RegexDesensitize regexDesensitize = ArrayUtil.firstNonNull(AnnotationUtil.getCombinationAnnotations(field, RegexDesensitize.class));
         if (regexDesensitize != null) {
             value = this.desensitizationHandler.desensitize(value, regexDesensitize.regex(), regexDesensitize.replacer());
+            gen.writeString(value);
+            return;
         }
 
         // 自定义处理器
-        Desensitize desensitize = field.getAnnotation(Desensitize.class);
+        Desensitize desensitize = ArrayUtil.firstNonNull(AnnotationUtil.getCombinationAnnotations(field, Desensitize.class));
         if (desensitize != null) {
             value = this.desensitizationHandler.desensitize(value);
         }
