@@ -11,7 +11,7 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import javax.validation.Valid;
 
 /**
- * 粉丝消息表 Service 接口
+ * 粉丝消息 Service 接口
  *
  * @author 芋道源码
  */
@@ -19,10 +19,10 @@ public interface MpMessageService {
 
     // TODO 芋艿：方法名要优化下
     /**
-     * 获得粉丝消息表分页
+     * 获得粉丝消息分页
      *
      * @param pageReqVO 分页查询
-     * @return 粉丝消息表 分页
+     * @return 粉丝消息分页
      */
     PageResult<MpMessageDO> getWxFansMsgPage(MpMessagePageReqVO pageReqVO);
 

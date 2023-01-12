@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 获得粉丝消息表分页
+// 获得粉丝消息分页
 export function getMessagePage(query) {
   return request({
     url: '/mp/message/page',

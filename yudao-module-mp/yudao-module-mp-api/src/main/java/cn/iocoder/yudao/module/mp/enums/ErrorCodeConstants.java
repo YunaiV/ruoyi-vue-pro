@@ -34,8 +34,16 @@ public interface ErrorCodeConstants {
     // ========== 公众号素材 1006004000============
     ErrorCode MATERIAL_UPLOAD_FAIL = new ErrorCode(1006004000, "上传素材失败，原因：{}");
 
-    // ========== 公众号素材 1006005000============
+    // ========== 公众号消息 1006005000============
     ErrorCode MESSAGE_SEND_FAIL = new ErrorCode(1006005000, "发送消息失败，原因：{}");
+
+    // ========== 公众号发布能力 1006006000============
+    ErrorCode FREE_PUBLISH_LIST_FAIL = new ErrorCode(1006006000, "获得已成功发布列表失败，原因：{}");
+    ErrorCode FREE_PUBLISH_SUBMIT_FAIL = new ErrorCode(1006006001, "提交发布失败，原因：{}");
+
+    // ========== 公众号草稿 1006007000============
+    ErrorCode DRAFT_LIST_FAIL = new ErrorCode(1006007000, "获得草稿列表失败，原因：{}");
+    ErrorCode DRAFT_CREATE_FAIL = new ErrorCode(1006007001, "创建草稿失败，原因：{}");
 
     // TODO 要处理下
     ErrorCode MENU_NOT_EXISTS = new ErrorCode(1006001002, "菜单不存在");

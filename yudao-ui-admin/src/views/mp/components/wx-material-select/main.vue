@@ -113,8 +113,6 @@
   import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
   import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
   import { getMaterialPage } from "@/api/mp/material";
-  // import {getPage as getPageNews} from '@/api/wxmp/wxfreepublish'
-  // import {getPage as getPageNewsDraft} from '@/api/wxmp/wxdraft'
 
   export default {
     name: "wxMaterialSelect",
@@ -128,8 +126,7 @@
         type: Object,
         required: true
       },
-      //图文类型：1、已发布图文；2、草稿箱图文
-      newsType:{
+      newsType:{ // 图文类型：1、已发布图文；2、草稿箱图文
         type: String,
         default: "1"
       },

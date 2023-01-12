@@ -5,7 +5,7 @@ import lombok.*;
 import io.swagger.annotations.*;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
-@ApiModel("管理后台 - 粉丝消息表分页 Request VO")
+@ApiModel("管理后台 - 粉丝消息分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

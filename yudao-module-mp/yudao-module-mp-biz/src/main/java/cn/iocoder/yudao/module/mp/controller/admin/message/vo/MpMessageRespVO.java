@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.mp.controller.admin.message.vo;
 
-import lombok.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-import java.util.*;
+import java.util.Date;
 
-import io.swagger.annotations.*;
-
-@ApiModel("管理后台 - 粉丝消息表  Response VO")
+@ApiModel("管理后台 - 粉丝消息 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

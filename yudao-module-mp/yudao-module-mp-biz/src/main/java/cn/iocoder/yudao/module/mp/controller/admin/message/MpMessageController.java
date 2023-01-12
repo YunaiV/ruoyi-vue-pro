@@ -19,7 +19,7 @@ import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - 粉丝消息表")
+@Api(tags = "管理后台 - 粉丝消息")
 @RestController
 @RequestMapping("/mp/message")
 @Validated
@@ -29,7 +29,7 @@ public class MpMessageController {
     private MpMessageService mpMessageService;
 
     @GetMapping("/page")
-    @ApiOperation("获得粉丝消息表分页")
+    @ApiOperation("获得粉丝消息分页")
     @PreAuthorize("@ss.hasPermission('mp:message:query')")
     public CommonResult<PageResult<MpMessageRespVO>> getWxFansMsgPage(@Valid MpMessagePageReqVO pageVO) {
         PageResult<MpMessageDO> pageResult = mpMessageService.getWxFansMsgPage(pageVO);

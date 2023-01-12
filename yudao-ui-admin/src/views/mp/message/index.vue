@@ -144,7 +144,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 粉丝消息表 列表
+      // 粉丝消息列表
       list: [],
       // 弹出层标题
       title: "",

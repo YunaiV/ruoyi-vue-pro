@@ -35,7 +35,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MESSAGE_SEND_FAIL;
 
 /**
- * 粉丝消息表 Service 实现类
+ * 粉丝消息 Service 实现类
  *
  * @author 芋道源码
  */
