@@ -38,7 +38,7 @@
       <!-- @星语：分页和列表重叠在一起了 -->
     </el-card>
     <!-- ====== 字典数据 ====== -->
-    <el-card class="w-1/2 dict" style="margin-left: 10px" :gutter="12" shadow="hover">
+    <el-card class="w-1/2 dict ml-3" :gutter="12" shadow="hover">
       <template #header>
         <div class="card-header">
           <span>字典数据</span>

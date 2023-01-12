@@ -61,7 +61,7 @@
         <!-- 三方云服务相关 -->
         <okio.version>3.0.0</okio.version>
         <okhttp3.version>4.10.0</okhttp3.version>
-        <minio.version>8.4.6</minio.version>
+        <minio.version>8.5.1</minio.version>
         <aliyun-java-sdk-core.version>4.6.3</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
         <tencentcloud-sdk-java.version>3.1.667</tencentcloud-sdk-java.version>
