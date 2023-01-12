@@ -103,7 +103,8 @@
   import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
   import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
   import { getMaterialPage } from "@/api/mp/material";
-  import {getFreePublishPage} from "@/api/mp/freePublish";
+  import { getFreePublishPage } from "@/api/mp/freePublish";
+  import {getDraftPage} from "@/api/mp/draft";
 
   export default {
     name: "wxMaterialSelect",
@@ -136,8 +137,6 @@
           pageSize: 10,
           accountId: this.objData.accountId,
         },
-        // tableOptionVoice: tableOptionVoice,
-        // tableOptionVideo: tableOptionVideo,
       }
     },
     created() {
@@ -152,22 +151,7 @@
         if (this.objData.type === 'news' && this.newsType === '1') { // 【图文】+ 【已发布】
           this.getFreePublishPage();
         } else if (this.objData.type === 'news' && this.newsType === '2') { // 【图文】+ 【草稿】
-          getPageNewsDraft(Object.assign({
-            current: page.currentPage,
-            size: page.pageSize,
-            appId:this.appId,
-          }, params)).then(response => {
-            let tableData = response.data.items
-            tableData.forEach(item => {
-              item.mediaId = item.mediaId
-              item.content.articles = item.content.newsItem
-            })
-            this.list = tableData
-            this.page.total = response.data.totalCount
-            this.page.currentPage = page.currentPage
-            this.page.pageSize = page.pageSize
-            this.loading = false
-          })
+          this.getDraftPage();
         } else { // 【素材】
           this.getMaterialPage();
         }
@@ -185,6 +169,21 @@
       },
       getFreePublishPage() {
         getFreePublishPage(this.queryParams).then(response => {
+          // 将 thumbUrl 转成 picUrl，保证 wx-news 组件可以预览封面
+          response.data.list.forEach(item => {
+            const newsItem = item.content.newsItem;
+            newsItem.forEach(article => {
+              article.picUrl = article.thumbUrl;
+            })
+          })
+          this.list = response.data.list
+          this.total = response.data.total
+        }).finally(() => {
+          this.loading = false
+        })
+      },
+      getDraftPage() {
+        getDraftPage((this.queryParams)).then(response => {
           // 将 thumbUrl 转成 picUrl，保证 wx-news 组件可以预览封面
           response.data.list.forEach(item => {
             const newsItem = item.content.newsItem;

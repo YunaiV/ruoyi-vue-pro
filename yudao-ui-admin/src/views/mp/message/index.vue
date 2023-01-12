@@ -93,6 +93,9 @@
             <wx-music :title="scope.row.title" :description="scope.row.description" :thumb-media-url="scope.row.thumbMediaUrl"
                       :music-url="scope.row.musicUrl" :hq-music-url="scope.row.hqMusicUrl" />
           </div>
+          <div v-else-if="scope.row.type === 'news'">
+            <wx-news :articles="scope.row.articles" />
+          </div>
           <div v-else>
             <el-tag type="danger" size="mini">未知消息类型</el-tag>
           </div>
@@ -100,6 +103,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <!-- TODO 芋艿：增加消息按钮 -->
 <!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"-->
 <!--                     v-hasPermi="['mp:message:update']">修改-->
 <!--          </el-button>-->
@@ -124,6 +128,7 @@ import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
 import WxMsg from '@/views/mp/components/wx-msg/main.vue';
 import WxLocation from '@/views/mp/components/wx-location/main.vue';
 import WxMusic from '@/views/mp/components/wx-music/main.vue';
+import WxNews from '@/views/mp/components/wx-news/main.vue';
 
 export default {
   name: "WxFansMsg",
@@ -132,7 +137,8 @@ export default {
     WxVoicePlayer,
     WxMsg,
     WxLocation,
-    WxMusic
+    WxMusic,
+    WxNews
   },
   data() {
     return {
