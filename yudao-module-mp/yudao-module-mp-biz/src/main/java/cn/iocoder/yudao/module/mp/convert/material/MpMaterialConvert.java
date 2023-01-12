@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.mp.convert.material;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialRespVO;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadRespVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.material.MpMaterialDO;
@@ -20,8 +22,10 @@ public interface MpMaterialConvert {
             @Mapping(target = "id", ignore = true),
             @Mapping(source = "account.id", target = "accountId"),
             @Mapping(source = "account.appId", target = "appId"),
+            @Mapping(source = "name", target = "name")
     })
-    MpMaterialDO convert(String mediaId, String type, String url, MpAccountDO account);
+    MpMaterialDO convert(String mediaId, String type, String url, MpAccountDO account,
+                         String name);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
@@ -37,5 +41,7 @@ public interface MpMaterialConvert {
     default WxMpMaterial convert(String name, File file, String title, String introduction) {
         return new WxMpMaterial(name, file, title, introduction);
     }
+
+    PageResult<MpMaterialRespVO> convertPage(PageResult<MpMaterialDO> page);
 
 }

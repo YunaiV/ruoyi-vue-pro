@@ -5,8 +5,8 @@
 <template>
   <!-- 类型：图片 -->
   <div v-if="objData.type === 'image'">
-    <div class="waterfall" v-loading="tableLoading">
-      <div class="waterfall-item" v-for="item in tableData" :key="item.mediaId">
+    <div class="waterfall" v-loading="loading">
+      <div class="waterfall-item" v-for="item in list" :key="item.mediaId">
         <img class="material-img" :src="item.url">
         <p class="item-name">{{item.name}}</p>
         <el-row class="ope-row">
@@ -16,16 +16,14 @@
         </el-row>
       </div>
     </div>
-    <div v-if="tableData.length <= 0 && !tableLoading" class="el-table__empty-block">
+    <!-- 分页组件 -->
+    <div v-if="list.length <= 0 && !loading" class="el-table__empty-block">
       <span class="el-table__empty-text">暂无数据</span>
     </div>
-    <span slot="footer" class="dialog-footer">
-      <el-pagination @size-change="sizeChange" @current-change="currentChange" :current-page.sync="page.currentPage"
-                     :page-sizes="[10, 20]" :page-size="page.pageSize" layout="total, sizes, prev, pager, next, jumper"
-                     :total="page.total" class="pagination" />
-    </span>
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                @pagination="getMaterialPage"/>
   </div>
-  <div v-else-if="objData.repType == 'voice'">
+  <div v-else-if="objData.type == 'voice'">
     <!-- TODO 芋艿：需要翻译 -->
 <!--    <avue-crud ref="crud"-->
 <!--               :page="page"-->
@@ -45,7 +43,7 @@
 <!--      </template>-->
 <!--    </avue-crud>-->
   </div>
-  <div v-else-if="objData.repType == 'video'">
+  <div v-else-if="objData.type == 'video'">
     <!-- TODO 芋艿：需要翻译 -->
     <!--    <avue-crud ref="crud"-->
 <!--               :page="page"-->
@@ -65,16 +63,16 @@
 <!--      </template>-->
 <!--    </avue-crud>-->
   </div>
-  <div v-else-if="objData.repType == 'news'">
-    <div class="waterfall" v-loading="tableLoading">
-      <div class="waterfall-item" v-for="item in tableData" :key="item.mediaId" v-if="item.content && item.content.articles">
+  <div v-else-if="objData.type == 'news'">
+    <div class="waterfall" v-loading="loading">
+      <div class="waterfall-item" v-for="item in list" :key="item.mediaId" v-if="item.content && item.content.articles">
         <WxNews :objData="item.content.articles"></WxNews>
         <el-row class="ope-row">
           <el-button size="mini" type="success" @click="selectMaterial(item)">选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
         </el-row>
       </div>
     </div>
-    <div v-if="tableData.length <=0 && !tableLoading" class="el-table__empty-block">
+    <div v-if="list.length <=0 && !loading" class="el-table__empty-block">
       <span class="el-table__empty-text">暂无数据</span>
     </div>
     <span slot="footer" class="dialog-footer">
@@ -93,12 +91,13 @@
 </template>
 
 <script>
-  import { getPage, getMaterialVideo } from '@/api/wxmp/wxmaterial'
+
   // import { tableOptionVoice } from '@/const/crud/wxmp/wxmaterial_voice'
   // import { tableOptionVideo } from '@/const/crud/wxmp/wxmaterial_video'
   import WxNews from '@/views/mp/components/wx-news/main.vue';
-  import {getPage as getPageNews} from '@/api/wxmp/wxfreepublish'
-  import {getPage as getPageNewsDraft} from '@/api/wxmp/wxdraft'
+  import { getMaterialPage } from "@/api/mp/material";
+  // import {getPage as getPageNews} from '@/api/wxmp/wxfreepublish'
+  // import {getPage as getPageNewsDraft} from '@/api/wxmp/wxdraft'
 
   export default {
     name: "wxMaterialSelect",
@@ -118,14 +117,16 @@
     },
     data() {
       return {
-        tableLoading: false,
-        tableData: [],
-        page: {
-          total: 0, // 总页数
-          currentPage: 1, // 当前页数
-          pageSize: 20, // 每页显示多少条
-          ascs:[],//升序字段
-          descs:[]//降序字段
+        // 遮罩层
+        loading: false,
+        // 总条数
+        total: 0,
+        // 数据列表
+        list: [],
+        // 查询参数
+        queryParams: {
+          pageNo: 1,
+          pageSize: 10,
         },
         // tableOptionVoice: tableOptionVoice,
         // tableOptionVideo: tableOptionVideo,
@@ -139,8 +140,8 @@
         this.$emit('selectMaterial', item)
       },
       getPage(page, params) {
-        this.tableLoading = true
-        if(this.objData.repType == 'news'){
+        this.loading = true
+        if(this.objData.type == 'news'){ // 【图文】
           if(this.newsType == '1'){
             getPageNews(Object.assign({
               current: page.currentPage,
@@ -152,11 +153,11 @@
                 item.mediaId = item.articleId
                 item.content.articles = item.content.newsItem
               })
-              this.tableData = tableData
+              this.list = tableData
               this.page.total = response.data.totalCount
               this.page.currentPage = page.currentPage
               this.page.pageSize = page.pageSize
-              this.tableLoading = false
+              this.loading = false
             })
           }else if(this.newsType == '2'){
             getPageNewsDraft(Object.assign({
@@ -169,27 +170,27 @@
                 item.mediaId = item.mediaId
                 item.content.articles = item.content.newsItem
               })
-              this.tableData = tableData
+              this.list = tableData
               this.page.total = response.data.totalCount
               this.page.currentPage = page.currentPage
               this.page.pageSize = page.pageSize
-              this.tableLoading = false
+              this.loading = false
             })
           }
-        }else{
-          getPage(Object.assign({
-            current: page.currentPage,
-            size: page.pageSize,
-            appId:this.appId,
-            type:this.objData.repType
-          }, params)).then(response => {
-            this.tableData = response.data.items
-            this.page.total = response.data.totalCount
-            this.page.currentPage = page.currentPage
-            this.page.pageSize = page.pageSize
-            this.tableLoading = false
-          })
+        } else { // 【素材】
+          this.getMaterialPage();
         }
+      },
+      getMaterialPage() {
+        getMaterialPage({
+          ...this.queryParams,
+          type: this.objData.type
+        }).then(response => {
+          this.list = response.data.list
+          this.total = response.data.total
+        }).finally(() => {
+          this.loading = false
+        })
       },
       sizeChange(val) {
         this.page.currentPage = 1

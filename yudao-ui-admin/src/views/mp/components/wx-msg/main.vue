@@ -81,21 +81,21 @@
       </div>
     </div>
     <div class="msg-send" v-loading="sendLoading">
-      <wx-reply-select :objData="objData" />
+      <wx-reply-select ref="replySelect" :objData="objData" />
       <el-button type="success" size="small" class="send-but" @click="sendMsg">发送(S)</el-button>
     </div>
   </div>
 </template>
 
 <script>
-import {getMessagePage, sendMessage} from '@/api/mp/message'
+import { getMessagePage, sendMessage } from '@/api/mp/message'
   import WxReplySelect from '@/views/mp/components/wx-reply/main.vue'
   import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
   import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
   import WxNews from '@/views/mp/components/wx-news/main.vue';
   import WxLocation from '@/views/mp/components/wx-location/main.vue';
   import WxMusic from '@/views/mp/components/wx-music/main.vue';
-import {getUser} from "@/api/mp/user";
+import { getUser } from "@/api/mp/user";
 
   export default {
     name: "wxMsg",
@@ -176,6 +176,7 @@ import {getUser} from "@/api/mp/user";
           this.tableData = [...this.tableData , ...[response.data] ]
           this.scrollToBottom()
           // 重置 objData 状态
+          this.$refs['replySelect'].deleteObj(); // 重置，避免 tab 的数据未清理
           this.objData = {
             type: 'text',
             content: '',

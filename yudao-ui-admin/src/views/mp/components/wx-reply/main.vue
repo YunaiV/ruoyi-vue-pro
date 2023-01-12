@@ -29,7 +29,9 @@
           <el-row style="text-align: center">
             <!-- 选择素材 -->
             <el-col :span="12" class="col-select">
-              <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
+              <el-button type="success" @click="openMaterial">
+                素材库选择<i class="el-icon-circle-check el-icon--right"></i>
+              </el-button>
             </el-col>
             <!-- 文件上传 -->
             <el-col :span="12" class="col-add">
@@ -43,7 +45,7 @@
         </div>
         <!-- 点击选择素材，会打开下面的弹窗 -->
         <el-dialog title="选择图片" :visible.sync="dialogImageVisible" width="90%" append-to-body>
-          <WxMaterialSelect :objData="objData" @selectMaterial="selectMaterial"></WxMaterialSelect>
+          <wx-material-select :obj-data="objData" @selectMaterial="selectMaterial" />
         </el-dialog>
       </el-row>
     </el-tab-pane>
@@ -155,16 +157,16 @@
 
 <script>
   // import { getPage, getMaterialVideo } from '@/api/wxmp/wxmaterial'
-  import WxNews from '@/views/mp/components/wx-news/main.vue'
-  // import WxMaterialSelect from '@/components/wx-material-select/main.vue'
-  import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
   import {getAccessToken} from '@/utils/auth'
+  import WxNews from '@/views/mp/components/wx-news/main.vue'
+  import WxMaterialSelect from '@/views/mp/components/wx-material-select/main.vue'
+  import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
 
   export default {
     name: "wxReplySelect",
     components: {
       WxNews,
-      // WxMaterialSelect,
+      WxMaterialSelect,
       WxVoicePlayer
     },
     props: {
@@ -403,8 +405,7 @@
           // TODO 芋艿，待实现
         } else if(this.objData.type === 'image'
             || this.objData.type === 'voice') {
-          this.$delete(this.objData, 'url')
-          this.$delete(this.objData, 'mediaId')
+          this.selectMaterial({}) // 选择一个空的素材
         }  else if(this.objData.type === 'video') {
           // TODO 芋艿，待实现
         }

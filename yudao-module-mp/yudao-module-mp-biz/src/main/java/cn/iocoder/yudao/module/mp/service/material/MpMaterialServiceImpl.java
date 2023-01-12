@@ -4,7 +4,9 @@ import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialPageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadPermanentReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadTemporaryReqVO;
 import cn.iocoder.yudao.module.mp.convert.material.MpMaterialConvert;
@@ -67,7 +69,7 @@ public class MpMaterialServiceImpl implements MpMaterialService {
             return null;
         }
         MpAccountDO account = mpAccountService.getRequiredAccount(accountId);
-        material = MpMaterialConvert.INSTANCE.convert(mediaId, type, url, account)
+        material = MpMaterialConvert.INSTANCE.convert(mediaId, type, url, account, null)
                 .setPermanent(false);
         mpMaterialMapper.insert(material);
 
@@ -100,8 +102,8 @@ public class MpMaterialServiceImpl implements MpMaterialService {
 
         // 第二步，存储到数据库
         MpAccountDO account = mpAccountService.getRequiredAccount(reqVO.getAccountId());
-        MpMaterialDO material = MpMaterialConvert.INSTANCE.convert(mediaId, reqVO.getType(), url, account)
-                .setPermanent(false);
+        MpMaterialDO material = MpMaterialConvert.INSTANCE.convert(mediaId, reqVO.getType(), url, account,
+                        reqVO.getFile().getName()).setPermanent(false);
         mpMaterialMapper.insert(material);
         return material;
     }
@@ -137,6 +139,11 @@ public class MpMaterialServiceImpl implements MpMaterialService {
                         name, reqVO.getTitle(), reqVO.getIntroduction(), result.getUrl()).setPermanent(true);
         mpMaterialMapper.insert(material);
         return material;
+    }
+
+    @Override
+    public PageResult<MpMaterialDO> getMaterialPage(MpMaterialPageReqVO pageReqVO) {
+        return mpMaterialMapper.selectPage(pageReqVO);
     }
 
     /**
