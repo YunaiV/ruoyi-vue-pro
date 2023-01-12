@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.mp.controller.admin.material;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadPermanentReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadRespVO;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadTemporaryReqVO;
 import cn.iocoder.yudao.module.mp.convert.material.MpMaterialConvert;
@@ -33,6 +34,14 @@ public class MpMaterialController {
     public CommonResult<MpMaterialUploadRespVO> uploadTemporaryMaterial(
             @Valid MpMaterialUploadTemporaryReqVO reqVO) throws IOException {
         MpMaterialDO material = mpMaterialService.uploadTemporaryMaterial(reqVO);
+        return success(MpMaterialConvert.INSTANCE.convert(material));
+    }
+
+    @ApiOperation("上传永久素材")
+    @PostMapping("/upload-permanent")
+    public CommonResult<MpMaterialUploadRespVO> uploadPermanentMaterial(
+            @Valid MpMaterialUploadPermanentReqVO reqVO) throws IOException {
+        MpMaterialDO material = mpMaterialService.uploadPermanentMaterial(reqVO);
         return success(MpMaterialConvert.INSTANCE.convert(material));
     }
 

@@ -77,7 +77,7 @@ public class MpMenuServiceImpl implements MpMenuService {
     private void validateMenuExists(Long id) {
         if (mpMenuMapper.selectById(id) == null) {
             // TODO 芋艿：错误码不太对
-            throw exception(COMMON_NOT_EXISTS);
+            throw exception(MENU_NOT_EXISTS);
         }
     }
 

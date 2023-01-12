@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.mp.service.material;
 import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadPermanentReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadTemporaryReqVO;
 import cn.iocoder.yudao.module.mp.convert.material.MpMaterialConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.result.WxMediaUploadResult;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.bean.material.WxMpMaterialUploadResult;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +25,9 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MATERIAL_UPLOAD_FAIL;
 
 /**
  * 公众号素材 Service 接口
@@ -87,8 +93,7 @@ public class MpMaterialServiceImpl implements MpMaterialService {
             mediaId = ObjUtil.defaultIfNull(result.getMediaId(), result.getThumbMediaId());
             url = uploadFile(mediaId, file);
         } catch (WxErrorException e) {
-            // TODO yunai：待完善
-            throw new RuntimeException(e);
+            throw exception(MATERIAL_UPLOAD_FAIL, e.getError().getErrorMsg());
         } finally {
             FileUtil.del(file);
         }
@@ -97,6 +102,39 @@ public class MpMaterialServiceImpl implements MpMaterialService {
         MpAccountDO account = mpAccountService.getRequiredAccount(reqVO.getAccountId());
         MpMaterialDO material = MpMaterialConvert.INSTANCE.convert(mediaId, reqVO.getType(), url, account)
                 .setPermanent(false);
+        mpMaterialMapper.insert(material);
+        return material;
+    }
+
+    @Override
+    public MpMaterialDO uploadPermanentMaterial(MpMaterialUploadPermanentReqVO reqVO) throws IOException {
+        WxMpService mpService = mpServiceFactory.getRequiredMpService(reqVO.getAccountId());
+        // 第一步，上传到公众号
+        String name = StrUtil.blankToDefault(reqVO.getName(), reqVO.getFile().getName());
+        File file = null;
+        WxMpMaterialUploadResult result;
+        String mediaId;
+        String url;
+        try {
+            // 写入到临时文件
+            file = FileUtil.newFile(FileUtil.getTmpDirPath() + reqVO.getFile().getOriginalFilename());
+            reqVO.getFile().transferTo(file);
+            // 上传到公众号
+            result = mpService.getMaterialService().materialFileUpload(reqVO.getType(),
+                    MpMaterialConvert.INSTANCE.convert(name, file, reqVO.getTitle(), reqVO.getIntroduction()));
+            // 上传到文件服务
+            mediaId = ObjUtil.defaultIfNull(result.getMediaId(), result.getMediaId());
+            url = uploadFile(mediaId, file);
+        } catch (WxErrorException e) {
+            throw exception(MATERIAL_UPLOAD_FAIL, e.getError().getErrorMsg());
+        } finally {
+            FileUtil.del(file);
+        }
+
+        // 第二步，存储到数据库
+        MpAccountDO account = mpAccountService.getRequiredAccount(reqVO.getAccountId());
+        MpMaterialDO material = MpMaterialConvert.INSTANCE.convert(mediaId, reqVO.getType(), url, account,
+                        name, reqVO.getTitle(), reqVO.getIntroduction(), result.getUrl()).setPermanent(true);
         mpMaterialMapper.insert(material);
         return material;
     }

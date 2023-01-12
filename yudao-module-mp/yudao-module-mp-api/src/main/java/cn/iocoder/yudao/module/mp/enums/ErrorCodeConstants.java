@@ -27,11 +27,14 @@ public interface ErrorCodeConstants {
     ErrorCode TAG_DELETE_FAIL = new ErrorCode(1006002001, "删除标签失败，原因：{}");
     ErrorCode TAG_GET_FAIL = new ErrorCode(1006002001, "获得标签失败，原因：{}");
 
-    // ========== 公众号标签 1006003000============
+    // ========== 公众号粉丝 1006003000============
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1006003000, "用户不存在");
     ErrorCode USER_UPDATE_TAG_FAIL = new ErrorCode(1006003001, "更新用户标签失败，原因：{}");
 
+    // ========== 公众号素材 1006004000============
+    ErrorCode MATERIAL_UPLOAD_FAIL = new ErrorCode(1006004000, "上传素材失败，原因：{}");
+
     // TODO 要处理下
-    ErrorCode COMMON_NOT_EXISTS = new ErrorCode(1006001002, "用户不存在");
+    ErrorCode MENU_NOT_EXISTS = new ErrorCode(1006001002, "菜单不存在");
 
 }

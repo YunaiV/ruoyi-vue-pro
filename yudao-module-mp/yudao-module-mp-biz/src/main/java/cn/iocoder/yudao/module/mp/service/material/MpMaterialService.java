@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.mp.service.material;
 
+import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadPermanentReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadTemporaryReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.material.MpMaterialDO;
 import me.chanjar.weixin.common.api.WxConsts;
@@ -26,5 +27,22 @@ public interface MpMaterialService {
      */
     String downloadMaterialUrl(Long accountId, String mediaId, String type);
 
+    /**
+     * 上传临时素材
+     *
+     * @param reqVO 请求
+     * @return 素材
+     * @throws IOException 文件操作发生异常
+     */
     MpMaterialDO uploadTemporaryMaterial(@Valid MpMaterialUploadTemporaryReqVO reqVO) throws IOException;
+
+    /**
+     * 上传永久素材
+     *
+     * @param reqVO 请求
+     * @return 素材
+     * @throws IOException 文件操作发生异常
+     */
+    MpMaterialDO uploadPermanentMaterial(@Valid MpMaterialUploadPermanentReqVO reqVO) throws IOException;
+
 }
