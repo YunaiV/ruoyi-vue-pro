@@ -44,6 +44,7 @@ public class MpFreePublishController {
         } catch (WxErrorException e) {
             throw exception(FREE_PUBLISH_LIST_FAIL, e.getError().getErrorMsg());
         }
+        // todo 芋艿：需要查询对应的缩略图，不然前端无法展示
 
         // 返回分页
         return success(new PageResult<>(publicationRecords.getItems(), publicationRecords.getTotalCount().longValue()));

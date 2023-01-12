@@ -155,21 +155,23 @@ import { getUser } from "@/api/mp/user";
         if (!this.objData) {
           return;
         }
-        if (this.objData.type === 'news') {
-          this.objData.content.articles = [this.objData.content.articles[0]]
+        // 公众号限制：客服消息，公众号只允许发送一条
+        if (this.objData.type === 'news'
+          && this.objData.articles.length > 1) {
+          this.objData.articles = [this.objData.articles[0]]
           this.$message({
             showClose: true,
-            message: '图文消息条数限制在1条以内，已默认发送第一条',
+            message: '图文消息条数限制在 1 条以内，已默认发送第一条',
             type: 'success'
           })
         }
+
+        // 执行发送
         this.sendLoading = true
         sendMessage(Object.assign({
           userId: this.userId
         }, {
-          ...this.objData,
-          // content: this.objData.repContent,
-          // TODO 芋艿：临时适配，保证可用
+          ...this.objData
         })).then(response => {
           this.sendLoading = false
           // 添加到消息列表，并滚动

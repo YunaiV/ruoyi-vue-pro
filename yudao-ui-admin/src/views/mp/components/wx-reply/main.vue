@@ -118,18 +118,20 @@
         </el-row>
       </el-row>
     </el-tab-pane>
+    <!-- 类型 5：图文 -->
     <el-tab-pane name="news">
       <span slot="label"><i class="el-icon-news"></i> 图文</span>
       <el-row>
-        <div class="select-item" v-if="objData.content">
-          <WxNews :objData="objData.content.articles"></WxNews>
+        <div class="select-item" v-if="objData.articles">
+          <wx-news :articles="objData.articles" />
           <el-row class="ope-row">
-            <el-button type="danger" icon="el-icon-delete" circle @click="deleteObj"></el-button>
+            <el-button type="danger" icon="el-icon-delete" circle @click="deleteObj" />
           </el-row>
         </div>
+        <!-- 选择素材 -->
         <div v-if="!objData.content">
           <el-row style="text-align: center">
-            <el-col :span="24" class="col-select2">
+            <el-col :span="24">
               <el-button type="success" @click="openMaterial">{{newsType === '1' ? '选择已发布图文' : '选择草稿箱图文'}}<i class="el-icon-circle-check el-icon--right"></i></el-button>
             </el-col>
           </el-row>
@@ -369,7 +371,10 @@
         // 创建 tempObjItem 对象，并设置对应的值
         let tempObjItem = {}
         tempObjItem.type = this.objData.type;
-        if (this.objData.type === 'music') { // 音乐需要特殊处理，因为选择的是图片的缩略图
+        if (this.objData.type === 'news') {
+          tempObjItem.articles = item.content.newsItem
+          this.objData.articles = item.content.newsItem
+        } else if (this.objData.type === 'music') { // 音乐需要特殊处理，因为选择的是图片的缩略图
           tempObjItem.thumbMediaId = item.mediaId
           this.objData.thumbMediaId = item.mediaId
           tempObjItem.thumbMediaUrl = item.url
@@ -431,7 +436,7 @@
       },
       deleteObj() {
         if (this.objData.type === 'news') {
-          this.objData.articles = []
+          this.$delete(this.objData, 'articles');
         } else if(this.objData.type === 'image') {
           this.objData.mediaId = null
           this.objData.url = null

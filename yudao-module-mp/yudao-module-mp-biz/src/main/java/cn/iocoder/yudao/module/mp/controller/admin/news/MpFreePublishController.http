@@ -5,7 +5,7 @@ Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
 
 ### 请求 /mp/free-publish/submit 接口 => 成功
-POST {{baseUrl}}/mp/free-publish/submit?accountId=1&mediaId=r6ryvl6LrxBU0miaST4Y-pEm50d1qKxNPkZVzrRZthSJHKCgiylCf4tARZfybZ_O
+POST {{baseUrl}}/mp/free-publish/submit?accountId=1&mediaId=r6ryvl6LrxBU0miaST4Y-vilmd7iS51D8IPddxflWrau0hIQ2ovY8YanO5jlgUcM
 Content-Type: application/json
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}

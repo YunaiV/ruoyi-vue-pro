@@ -48,7 +48,7 @@
     </el-table>
     <!-- 分页组件 -->
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
-                @pagination="getMaterialPage"/>
+                @pagination="getPage"/>
   </div>
   <div v-else-if="objData.type === 'video'">
     <!-- 列表 -->
@@ -78,41 +78,32 @@
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getMaterialPage"/>
   </div>
-  <div v-else-if="objData.type == 'news'">
+  <div v-else-if="objData.type === 'news'">
     <div class="waterfall" v-loading="loading">
-      <div class="waterfall-item" v-for="item in list" :key="item.mediaId" v-if="item.content && item.content.articles">
-        <WxNews :objData="item.content.articles"></WxNews>
+      <div class="waterfall-item" v-for="item in list" :key="item.mediaId" v-if="item.content && item.content.newsItem">
+        <wx-news :articles="item.content.newsItem" />
         <el-row class="ope-row">
-          <el-button size="mini" type="success" @click="selectMaterial(item)">选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
+          <el-button size="mini" type="success" @click="selectMaterial(item)">
+            选择<i class="el-icon-circle-check el-icon--right"></i>
+          </el-button>
         </el-row>
       </div>
     </div>
-    <div v-if="list.length <=0 && !loading" class="el-table__empty-block">
+    <!-- 分页组件 -->
+    <div v-if="list.length <= 0 && !loading" class="el-table__empty-block">
       <span class="el-table__empty-text">暂无数据</span>
     </div>
-    <span slot="footer" class="dialog-footer">
-      <el-pagination
-        @size-change="sizeChange"
-        :current-page.sync="page.currentPage"
-        :page-sizes="[10, 20]"
-        :page-size="page.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="page.total"
-        class="pagination"
-      >
-      </el-pagination>
-    </span>
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                @pagination="getMaterialPage"/>
   </div>
 </template>
 
 <script>
-
-  // import { tableOptionVoice } from '@/const/crud/wxmp/wxmaterial_voice'
-  // import { tableOptionVideo } from '@/const/crud/wxmp/wxmaterial_video'
   import WxNews from '@/views/mp/components/wx-news/main.vue';
   import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
   import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
   import { getMaterialPage } from "@/api/mp/material";
+  import {getFreePublishPage} from "@/api/mp/freePublish";
 
   export default {
     name: "wxMaterialSelect",
@@ -143,56 +134,40 @@
         queryParams: {
           pageNo: 1,
           pageSize: 10,
+          accountId: this.objData.accountId,
         },
         // tableOptionVoice: tableOptionVoice,
         // tableOptionVideo: tableOptionVideo,
       }
     },
     created() {
-      this.getPage(this.page)
+      this.getPage()
     },
     methods:{
-      selectMaterial(item){
+      selectMaterial(item) {
         this.$emit('selectMaterial', item)
       },
-      getPage(page, params) {
+      getPage() {
         this.loading = true
-        if(this.objData.type == 'news'){ // 【图文】
-          if(this.newsType == '1'){
-            getPageNews(Object.assign({
-              current: page.currentPage,
-              size: page.pageSize,
-              appId:this.appId,
-            }, params)).then(response => {
-              let tableData = response.data.items
-              tableData.forEach(item => {
-                item.mediaId = item.articleId
-                item.content.articles = item.content.newsItem
-              })
-              this.list = tableData
-              this.page.total = response.data.totalCount
-              this.page.currentPage = page.currentPage
-              this.page.pageSize = page.pageSize
-              this.loading = false
+        if (this.objData.type === 'news' && this.newsType === '1') { // 【图文】+ 【已发布】
+          this.getFreePublishPage();
+        } else if (this.objData.type === 'news' && this.newsType === '2') { // 【图文】+ 【草稿】
+          getPageNewsDraft(Object.assign({
+            current: page.currentPage,
+            size: page.pageSize,
+            appId:this.appId,
+          }, params)).then(response => {
+            let tableData = response.data.items
+            tableData.forEach(item => {
+              item.mediaId = item.mediaId
+              item.content.articles = item.content.newsItem
             })
-          }else if(this.newsType == '2'){
-            getPageNewsDraft(Object.assign({
-              current: page.currentPage,
-              size: page.pageSize,
-              appId:this.appId,
-            }, params)).then(response => {
-              let tableData = response.data.items
-              tableData.forEach(item => {
-                item.mediaId = item.mediaId
-                item.content.articles = item.content.newsItem
-              })
-              this.list = tableData
-              this.page.total = response.data.totalCount
-              this.page.currentPage = page.currentPage
-              this.page.pageSize = page.pageSize
-              this.loading = false
-            })
-          }
+            this.list = tableData
+            this.page.total = response.data.totalCount
+            this.page.currentPage = page.currentPage
+            this.page.pageSize = page.pageSize
+            this.loading = false
+          })
         } else { // 【素材】
           this.getMaterialPage();
         }
@@ -208,20 +183,20 @@
           this.loading = false
         })
       },
-      sizeChange(val) {
-        this.page.currentPage = 1
-        this.page.pageSize = val
-        this.getPage(this.page)
-      },
-      currentChange(val) {
-        this.page.currentPage = val
-        this.getPage(this.page)
-      },
-      /**
-       * 刷新回调
-       */
-      refreshChange(page) {
-        this.getPage(this.page)
+      getFreePublishPage() {
+        getFreePublishPage(this.queryParams).then(response => {
+          // 将 thumbUrl 转成 picUrl，保证 wx-news 组件可以预览封面
+          response.data.list.forEach(item => {
+            const newsItem = item.content.newsItem;
+            newsItem.forEach(article => {
+              article.picUrl = article.thumbUrl;
+            })
+          })
+          this.list = response.data.list
+          this.total = response.data.total
+        }).finally(() => {
+          this.loading = false
+        })
       }
     }
   };
