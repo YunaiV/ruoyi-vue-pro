@@ -85,9 +85,9 @@
     <el-tab-pane name="video">
       <span slot="label"><i class="el-icon-share"></i> 视频</span>
       <el-row>
-        <el-input v-model="objData.title" placeholder="请输入标题"></el-input>
+        <el-input v-model="objData.title" placeholder="请输入标题" @input="inputContent" />
         <div style="margin: 20px 0;"></div>
-        <el-input v-model="objData.description" placeholder="请输入描述"></el-input>
+        <el-input v-model="objData.description" placeholder="请输入描述" @input="inputContent" />
         <div style="margin: 20px 0;"></div>
         <div style="text-align: center;">
           <wx-video-player v-if="objData.url" :url="objData.url" />
@@ -149,9 +149,9 @@
         </el-col>
       </el-row>
       <div style="margin: 20px 0;"></div>
-      <el-input v-model="objData.musicUrl" placeholder="请输入音乐链接"></el-input>
+      <el-input v-model="objData.musicUrl" placeholder="请输入音乐链接" @input="inputContent" />
       <div style="margin: 20px 0;"></div>
-      <el-input v-model="objData.hqMusicUrl" placeholder="请输入高质量音乐链接"></el-input>
+      <el-input v-model="objData.hqMusicUrl" placeholder="请输入高质量音乐链接" @input="inputContent" />
     </el-tab-pane>
   </el-tabs>
 </template>
@@ -309,27 +309,20 @@
 
         // 从 tempObj 临时缓存中，获取对应的数据，并设置回 objData
         let tempObjItem = this.tempObj.get(this.objData.type)
-        // console.log(this.objData.type)
-        // console.log(tempObjItem)
-        // console.log(this.objData)
-        // console.log(this.tempObj)
         if (tempObjItem) {
-          console.log(this.tempObj)
           this.objData.content = tempObjItem.content ? tempObjItem.content : null
           this.objData.mediaId = tempObjItem.mediaId ? tempObjItem.mediaId : null
           this.objData.url = tempObjItem.url ? tempObjItem.url : null
           this.objData.name = tempObjItem.url ? tempObjItem.name : null
-
-          // TODO 芋艿：临时注释掉，看看有没用
-          // this.objData.repDesc = tempObjItem.repDesc ? tempObjItem.repDesc : null
+          this.objData.title = tempObjItem.title ? tempObjItem.title : null
+          this.objData.description = tempObjItem.description ? tempObjItem.description : null
           return;
         }
         // 如果获取不到，需要把 objData 复原
-        this.objData.content = undefined;
-        this.objData.mediaId = undefined;
-        this.objData.url = undefined;
-        this.objData.name = undefined;
-        // this.$delete(this.objData,'repDesc')
+        // 必须使用 $set 赋值，不然 input 无法输入内容
+        this.$set(this.objData, 'content', '');
+        this.$set(this.objData, 'title', '');
+        this.$set(this.objData, 'description', '');
       },
       /**
        * 选择素材，将设置设置到 objData 变量
@@ -348,11 +341,11 @@
           this.objData.thumbMediaId = item.mediaId
           tempObjItem.thumbMediaUrl = item.url
           this.objData.thumbMediaUrl = item.url
-          // title、introduction、musicUrl、hqMusicUrl
-          tempObjItem.title = this.objData.title
-          tempObjItem.introduction = this.objData.introduction
-          tempObjItem.musicUrl = this.objData.musicUrl
-          tempObjItem.hqMusicUrl = this.objData.hqMusicUrl
+          // title、introduction、musicUrl、hqMusicUrl：从 objData 到 tempObjItem，避免上传素材后，被覆盖掉
+          tempObjItem.title = this.objData.title || ''
+          tempObjItem.introduction = this.objData.introduction  || ''
+          tempObjItem.musicUrl = this.objData.musicUrl  || ''
+          tempObjItem.hqMusicUrl = this.objData.hqMusicUrl  || ''
         } else if (this.objData.type === 'image'
             || this.objData.type === 'voice') {
           tempObjItem.mediaId = item.mediaId
@@ -368,11 +361,13 @@
           this.objData.url = item.url;
           tempObjItem.name = item.name
           this.objData.name = item.name
-          // title、introduction
-          this.objData.title = item.title
-          tempObjItem.title = this.objData.title
-          this.objData.description = item.introduction // 消息使用的是 description，素材使用的是 introduction，所以转换下
-          tempObjItem.description = this.objData.introduction
+          // title、introduction：从 item 到 tempObjItem，因为素材里有 title、introduction
+          this.objData.title = item.title || ''
+          tempObjItem.title = item.title || ''
+          this.objData.description = item.introduction || '' // 消息使用的是 description，素材使用的是 introduction，所以转换下
+          tempObjItem.description = item.introduction || ''
+        } else if (this.objData.type === 'text') {
+          this.objData.content = item.content || ''
         }
         // 最终设置到临时缓存
         this.tempObj.set(this.objData.type, tempObjItem)
@@ -398,8 +393,34 @@
         this.dialogThumbVisible = false
       },
       deleteObj() {
-        // this.$delete(this.objData, 'url'); TODO 芋艿：重新实现清空；还有 reset
-        this.selectMaterial({}) // 选择一个空的素材
+        if (this.objData.type === 'news') {
+          this.objData.articles = []
+        } else if(this.objData.type === 'image') {
+          this.objData.mediaId = null
+          this.objData.url = null
+          this.objData.name = null
+        } else if(this.objData.type === 'voice') {
+          this.objData.mediaId = null
+          this.objData.url = null
+          this.objData.name = null
+        } else if(this.objData.type === 'video') {
+          this.objData.mediaId = null
+          this.objData.url = null
+          this.objData.name = null
+          this.objData.title = null
+          this.objData.description = null
+        } else if(this.objData.type === 'music') {
+          this.objData.thumbMediaId = null
+          this.objData.thumbMediaUrl = null
+          this.objData.title = null
+          this.objData.description = null
+          this.objData.musicUrl = null
+          this.objData.hqMusicUrl = null
+        } else if(this.objData.type === 'text') {
+          this.objData.content = null
+        }
+        // 覆盖缓存
+        this.tempObj.set(this.objData.type, Object.assign({}, this.objData));
       },
       getPage(page, params) {
         this.tableLoading = true
@@ -426,8 +447,8 @@
        * why？不确定为什么 v-model="objData.content" 不能自动缓存，所以通过这样的方式
        */
       inputContent(str) {
-        let tempObjItem = {...this.objData};
-        this.tempObj.set(this.objData.type, tempObjItem);
+        // 覆盖缓存
+        this.tempObj.set(this.objData.type, Object.assign({}, this.objData));
       }
     }
   };

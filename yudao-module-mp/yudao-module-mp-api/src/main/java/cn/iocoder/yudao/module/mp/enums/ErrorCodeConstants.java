@@ -34,6 +34,9 @@ public interface ErrorCodeConstants {
     // ========== 公众号素材 1006004000============
     ErrorCode MATERIAL_UPLOAD_FAIL = new ErrorCode(1006004000, "上传素材失败，原因：{}");
 
+    // ========== 公众号素材 1006005000============
+    ErrorCode MESSAGE_SEND_FAIL = new ErrorCode(1006005000, "发送消息失败，原因：{}");
+
     // TODO 要处理下
     ErrorCode MENU_NOT_EXISTS = new ErrorCode(1006001002, "菜单不存在");
 

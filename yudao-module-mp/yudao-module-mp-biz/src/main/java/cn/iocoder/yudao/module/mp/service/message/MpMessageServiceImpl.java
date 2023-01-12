@@ -31,6 +31,9 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import javax.validation.Validator;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MESSAGE_SEND_FAIL;
+
 /**
  * 粉丝消息表 Service 实现类
  *
@@ -115,7 +118,7 @@ public class MpMessageServiceImpl implements MpMessageService {
         try {
             mpService.getKefuService().sendKefuMessageWithResponse(wxMessage);
         } catch (WxErrorException e) {
-            throw new RuntimeException(e);
+            throw exception(MESSAGE_SEND_FAIL, e.getError().getErrorMsg());
         }
 
         // 记录消息

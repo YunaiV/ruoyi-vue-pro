@@ -177,10 +177,6 @@ import { getUser } from "@/api/mp/user";
           this.scrollToBottom()
           // 重置 objData 状态
           this.$refs['replySelect'].deleteObj(); // 重置，避免 tab 的数据未清理
-          this.objData = {
-            type: 'text',
-            content: '',
-          }
         }).catch(() => {
           this.sendLoading = false
         })
