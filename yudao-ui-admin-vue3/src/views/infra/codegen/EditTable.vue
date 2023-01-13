@@ -48,8 +48,8 @@ const getList = async () => {
   if (id) {
     // 获取表详细信息
     const res = await getCodegenTableApi(id)
-    tableCurrentRow.value = res.table
     title.value = '修改[ ' + res.table.tableName + ' ]生成配置'
+    tableCurrentRow.value = res.table
     cloumCurrentRow.value = res.columns
   }
 }
