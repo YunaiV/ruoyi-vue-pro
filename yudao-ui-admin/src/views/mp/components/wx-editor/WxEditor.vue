@@ -6,7 +6,7 @@
   <div id="wxEditor">
     <div v-loading="quillUpdateImg" element-loading-text="请稍等，图片上传中">
       <!-- 图片上传组件辅助-->
-      <el-upload class="avatar-uploader" name="file" :action="serverUrl" :headers="header"
+      <el-upload class="avatar-uploader" name="file" :action="actionUrl" :headers="headers"
                  :show-file-list="false" :data="uploadData"
                  :on-success="uploadSuccess" :on-error="uploadError" :before-upload="beforeUpload">
       </el-upload>
@@ -95,7 +95,7 @@ export default {
           }
         }
       },
-      serverUrl: process.env.VUE_APP_BASE_API +'/wxmaterial/newsImgUpload', // 这里写你要上传的图片服务器地址
+      actionUrl: process.env.VUE_APP_BASE_API +'/admin-api/mp/material/upload-news-image', // 这里写你要上传的图片服务器地址
       headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
     }
   },
@@ -107,31 +107,34 @@ export default {
 
     // 富文本图片上传前
     beforeUpload() {
-      // 显示loading动画
+      // 显示 loading 动画
       this.quillUpdateImg = true
     },
 
+    // 图片上传成功
+    // 注意！由于微信公众号的图片有访问限制，所以会显示“此图片来自微信公众号，未经允许不可引用”
     uploadSuccess(res, file) {
       // res为图片服务器返回的数据
       // 获取富文本组件实例
       let quill = this.$refs.myQuillEditor.quill
       // 如果上传成功
-      if(res.link){
+      const link = res.data
+      if (link){
         // 获取光标所在位置
         let length = quill.getSelection().index;
         // 插入图片  res.info为服务器返回的图片地址
-        quill.insertEmbed(length, 'image', res.link)
+        quill.insertEmbed(length, 'image', link)
         // 调整光标到最后
         quill.setSelection(length + 1)
       } else {
         this.$message.error('图片插入失败')
       }
-      // loading动画消失
+      // loading 动画消失
       this.quillUpdateImg = false;
     },
     // 富文本图片上传失败
     uploadError() {
-      // loading动画消失
+      // loading 动画消失
       this.quillUpdateImg = false;
       this.$message.error("图片插入失败");
     }

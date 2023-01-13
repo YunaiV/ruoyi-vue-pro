@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialPageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadNewsImageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadPermanentReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadTemporaryReqVO;
 import cn.iocoder.yudao.module.mp.convert.material.MpMaterialConvert;
@@ -31,6 +32,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MATERIAL_IMAGE_UPLOAD_FAIL;
 import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MATERIAL_UPLOAD_FAIL;
 
 /**
@@ -141,6 +143,23 @@ public class MpMaterialServiceImpl implements MpMaterialService {
                         name, reqVO.getTitle(), reqVO.getIntroduction(), result.getUrl()).setPermanent(true);
         mpMaterialMapper.insert(material);
         return material;
+    }
+
+    @Override
+    public String uploadNewsImage(MpMaterialUploadNewsImageReqVO reqVO) throws IOException {
+        WxMpService mpService = mpServiceFactory.getRequiredMpService(reqVO.getAccountId());
+        File file = null;
+        try {
+            // 写入到临时文件
+            file = FileUtil.newFile(FileUtil.getTmpDirPath() + reqVO.getFile().getOriginalFilename());
+            reqVO.getFile().transferTo(file);
+            // 上传到公众号
+            return mpService.getMaterialService().mediaImgUpload(file).getUrl();
+        } catch (WxErrorException e) {
+            throw exception(MATERIAL_IMAGE_UPLOAD_FAIL, e.getError().getErrorMsg());
+        } finally {
+            FileUtil.del(file);
+        }
     }
 
     @Override

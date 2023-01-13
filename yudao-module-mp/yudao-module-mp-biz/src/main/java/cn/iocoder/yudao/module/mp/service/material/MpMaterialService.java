@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.mp.service.material;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialPageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadNewsImageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadPermanentReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.material.vo.MpMaterialUploadTemporaryReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.material.MpMaterialDO;
@@ -48,6 +49,14 @@ public interface MpMaterialService {
      * @throws IOException 文件操作发生异常
      */
     MpMaterialDO uploadPermanentMaterial(@Valid MpMaterialUploadPermanentReqVO reqVO) throws IOException;
+
+    /**
+     * 上传图文内容中的图片
+     *
+     * @param reqVO 上传请求
+     * @return 图片地址
+     */
+    String uploadNewsImage(MpMaterialUploadNewsImageReqVO reqVO) throws IOException;
 
     /**
      * 获得素材分页

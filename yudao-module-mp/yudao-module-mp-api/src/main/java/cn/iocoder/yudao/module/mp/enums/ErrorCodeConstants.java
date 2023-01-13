@@ -33,6 +33,7 @@ public interface ErrorCodeConstants {
 
     // ========== 公众号素材 1006004000============
     ErrorCode MATERIAL_UPLOAD_FAIL = new ErrorCode(1006004000, "上传素材失败，原因：{}");
+    ErrorCode MATERIAL_IMAGE_UPLOAD_FAIL = new ErrorCode(1006004000, "上传图片失败，原因：{}");
 
     // ========== 公众号消息 1006005000============
     ErrorCode MESSAGE_SEND_FAIL = new ErrorCode(1006005000, "发送消息失败，原因：{}");

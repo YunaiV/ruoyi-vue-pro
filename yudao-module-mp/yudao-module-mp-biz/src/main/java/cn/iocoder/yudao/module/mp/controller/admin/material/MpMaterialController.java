@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO @芋艿：权限
+
 @Api(tags = "管理后台 - 公众号素材")
 @RestController
 @RequestMapping("/mp/material")
@@ -45,11 +47,19 @@ public class MpMaterialController {
         return success(MpMaterialConvert.INSTANCE.convert(material));
     }
 
+    @ApiOperation("上传图文内容中的图片")
+    @PostMapping("/upload-news-image")
+    public CommonResult<String> uploadNewsImage(@Valid MpMaterialUploadNewsImageReqVO reqVO)
+            throws IOException {
+        return success(mpMaterialService.uploadNewsImage(reqVO));
+    }
+
     @ApiOperation("获得素材分页")
     @GetMapping("/page")
     public CommonResult<PageResult<MpMaterialRespVO>> getMaterialPage(@Valid MpMaterialPageReqVO pageReqVO) {
         PageResult<MpMaterialDO> pageResult = mpMaterialService.getMaterialPage(pageReqVO);
         return success(MpMaterialConvert.INSTANCE.convertPage(pageResult));
     }
+
 
 }
