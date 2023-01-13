@@ -41,6 +41,21 @@ const rules = reactive({
 })
 const schema = reactive<FormSchema[]>([
   {
+    label: '上级菜单',
+    field: 'parentMenuId',
+    component: 'TreeSelect',
+    componentProps: {
+      data: menuOptions,
+      props: defaultProps,
+      checkStrictly: true,
+      nodeKey: 'id'
+    },
+    labelMessage: '分配到指定菜单下，例如 系统管理',
+    colProps: {
+      span: 24
+    }
+  },
+  {
     label: '表名称',
     field: 'tableName',
     component: 'Input',
@@ -60,6 +75,15 @@ const schema = reactive<FormSchema[]>([
     label: '实体类名称',
     field: 'className',
     component: 'Input',
+    colProps: {
+      span: 12
+    }
+  },
+  {
+    label: '类名称',
+    field: 'className',
+    component: 'Input',
+    labelMessage: '类名称（首字母大写），例如SysUser、SysMenu、SysDictData 等等',
     colProps: {
       span: 12
     }
@@ -105,34 +129,10 @@ const schema = reactive<FormSchema[]>([
     }
   },
   {
-    label: '类名称',
-    field: 'className',
-    component: 'Input',
-    labelMessage: '类名称（首字母大写），例如SysUser、SysMenu、SysDictData 等等',
-    colProps: {
-      span: 12
-    }
-  },
-  {
     label: '类描述',
     field: 'classComment',
     component: 'Input',
     labelMessage: '用作类描述，例如 用户',
-    colProps: {
-      span: 12
-    }
-  },
-  {
-    label: '上级菜单',
-    field: 'parentMenuId',
-    component: 'TreeSelect',
-    componentProps: {
-      data: menuOptions,
-      props: defaultProps,
-      checkStrictly: true,
-      nodeKey: 'id'
-    },
-    labelMessage: '分配到指定菜单下，例如 系统管理',
     colProps: {
       span: 12
     }
@@ -154,7 +154,7 @@ const schema = reactive<FormSchema[]>([
       rows: 4
     },
     colProps: {
-      span: 12
+      span: 24
     }
   }
 ])
