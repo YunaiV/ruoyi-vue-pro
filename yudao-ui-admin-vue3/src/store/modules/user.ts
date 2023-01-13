@@ -2,6 +2,7 @@ import { store } from '../index'
 import { defineStore } from 'pinia'
 import { getAccessToken, removeToken } from '@/utils/auth'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
+import { getInfoApi } from '@/api/login'
 
 const { wsCache } = useCache()
 
@@ -43,10 +44,14 @@ export const useUserStore = defineStore('admin-user', {
     }
   },
   actions: {
-    async setUserInfoAction(userInfo: UserInfoVO) {
+    async setUserInfoAction() {
       if (!getAccessToken()) {
         this.resetState()
         return null
+      }
+      let userInfo = wsCache.get(CACHE_KEY.USER)
+      if (!userInfo) {
+        userInfo = await getInfoApi()
       }
       this.permissions = userInfo.permissions
       this.roles = userInfo.roles

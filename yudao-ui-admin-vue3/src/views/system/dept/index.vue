@@ -167,6 +167,7 @@ const submitForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
+        await getTree()
         await reload()
       }
     }

@@ -17,13 +17,12 @@ const propTypes = createTypes({
 
 // 需要自定义扩展的类型
 // see: https://dwightjack.github.io/vue-types/advanced/extending-vue-types.html#the-extend-method
-propTypes.extend([
-  {
-    name: 'style',
-    getter: true,
-    type: [String, Object],
-    default: undefined
-  }
-])
-
+// propTypes.extend([
+//   {
+//     name: 'style',
+//     getter: true,
+//     type: [String, Object],
+//     default: undefined
+//   }
+// ])
 export { propTypes }
