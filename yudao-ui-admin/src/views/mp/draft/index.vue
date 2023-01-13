@@ -117,7 +117,7 @@ SOFTWARE.
       <div class="right" v-loading="addMaterialLoading" v-if="articlesAdd.length > 0">
         <!--富文本编辑器组件-->
         <el-row>
-          <WxEditor v-model="articlesAdd[isActiveAddNews].content" :uploadData="uploadData"
+          <wx-editor v-model="articlesAdd[isActiveAddNews].content" :uploadData="uploadData"
                     v-if="hackResetEditor"/>
         </el-row>
         <br><br><br><br>
@@ -162,17 +162,17 @@ SOFTWARE.
 
 <script>
 // import { getPage as getPage1 } from '@/api/wxmp/wxmaterial'
-// import WxEditor from '@/components/Editor/WxEditor.vue'
+import WxEditor from '@/views/mp/components/wx-editor/WxEditor.vue';
 import WxNews from '@/views/mp/components/wx-news/main.vue';
 import WxMaterialSelect from '@/views/mp/components/wx-material-select/main.vue'
 import { getAccessToken } from '@/utils/auth'
-import {createDraft, getDraftPage} from "@/api/mp/draft";
-import {getSimpleAccounts} from "@/api/mp/account";
+import { createDraft, getDraftPage } from "@/api/mp/draft";
+import { getSimpleAccounts } from "@/api/mp/account";
 
 export default {
   name: 'mpDraft',
   components: {
-    // WxEditor,
+    WxEditor,
     WxNews,
     WxMaterialSelect
   },
@@ -234,7 +234,7 @@ export default {
         this.setAccountId(this.accounts[0].id);
       }
       // 加载数据
-      // this.getList();
+      // this.getList(); // TODO 芋艿：开发完，放出来
     })
   },
   methods: {

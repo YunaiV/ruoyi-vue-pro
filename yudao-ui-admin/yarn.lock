@@ -8410,7 +8410,7 @@
     "extend" "^3.0.2"
     "fast-diff" "1.1.2"
 
-"quill@1.3.7":
+"quill@^1.3.4", "quill@1.3.7":
   "integrity" "sha512-hG/DVzh/TiknWtE6QmWAF/pxoZKYxfe3J/d/+ShUWkDvvkZQVTPeVmUJVu1uE6DDooC4fWTiCLh84ul89oNz5g=="
   "resolved" "https://registry.npmmirror.com/quill/-/quill-1.3.7.tgz"
   "version" "1.3.7"
@@ -10478,6 +10478,14 @@
   "version" "2.4.0"
   dependencies:
     "deepmerge" "^4.2.2"
+
+"vue-quill-editor@^3.0.6":
+  "integrity" "sha512-g20oSZNWg8Hbu41Kinjd55e235qVWPLfg4NvsLW6d+DhgBTFbEuMpcWlUdrD6qT3+Noim6DRu18VLM9lVShXOQ=="
+  "resolved" "https://registry.npmmirror.com/vue-quill-editor/-/vue-quill-editor-3.0.6.tgz"
+  "version" "3.0.6"
+  dependencies:
+    "object-assign" "^4.1.1"
+    "quill" "^1.3.4"
 
 "vue-router@3.4.9":
   "integrity" "sha512-CGAKWN44RqXW06oC+u4mPgHLQQi2t6vLD/JbGRDAXm0YpMv0bgpKuU5bBd7AvMgfTz9kXVRIWKHqRwGEb8xFkA=="

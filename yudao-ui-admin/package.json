@@ -65,6 +65,7 @@
     "vue-count-to": "1.0.13",
     "vue-cropper": "0.5.8",
     "vue-meta": "^2.4.0",
+    "vue-quill-editor": "^3.0.6",
     "vue-router": "3.4.9",
     "vue-video-player": "^5.0.2",
     "vuedraggable": "2.24.3",
