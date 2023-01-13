@@ -39,7 +39,7 @@ SOFTWARE.
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAddNews"
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
                    v-hasPermi="['mp:draft:create']">新增
         </el-button>
       </el-col>
@@ -114,7 +114,7 @@ SOFTWARE.
           </div>
         </div>
       </div>
-      <div class="right" v-loading="addMaterialLoading">
+      <div class="right" v-loading="addMaterialLoading" v-if="articlesAdd.length > 0">
         <!--富文本编辑器组件-->
         <el-row>
           <WxEditor v-model="articlesAdd[isActiveAddNews].content" :uploadData="uploadData"
@@ -154,7 +154,7 @@ SOFTWARE.
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogNewsVisible = false">取 消</el-button>
-        <el-button type="primary" @click="subNews">提 交</el-button>
+        <el-button type="primary" @click="submitForm">提 交</el-button>
       </div>
     </el-dialog>
   </div>
@@ -212,18 +212,7 @@ export default {
       // ========== 草稿新建 or 修改 ==========
       dialogNewsVisible: false,
       addMaterialLoading: false, // 添加草稿的 loading 标识
-      articlesAdd: [{
-        "title": '',
-        "thumbMediaId": '',
-        "author": '',
-        "digest": '',
-        "showCoverPic": '',
-        "content": '123', // TODO 芋艿：临时测试
-        "contentSourceUrl": '',
-        "needOpenComment": '',
-        "onlyFansCanComment": '',
-        "thumbUrl": '',
-      }],
+      articlesAdd: [],
       isActiveAddNews: 0,
       dialogImageVisible: false,
       imageListData: [],
@@ -349,80 +338,14 @@ export default {
       }).catch(() => {
       })
     },
-    downNews(index){
-      let temp = this.articlesAdd[index]
-      this.articlesAdd[index] = this.articlesAdd[index+1]
-      this.articlesAdd[index+1] = temp
-      this.isActiveAddNews = index+1
-    },
-    upNews(index){
-      let temp = this.articlesAdd[index]
-      this.articlesAdd[index] = this.articlesAdd[index-1]
-      this.articlesAdd[index-1] = temp
-      this.isActiveAddNews = index-1
-    },
-    activeNews(index){
-      this.hackResetEditor = false//销毁组件
-      this.$nextTick(() => {
-        this.hackResetEditor = true//重建组件
-      })
-      this.isActiveAddNews = index
-    },
-    minusNews(index){
-      this.$confirm('确定删除该图文吗?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.articlesAdd.splice(index,1);
-        if(this.isActiveAddNews ===  index){
-          this.isActiveAddNews = 0
-        }
-      }).catch(() => {})
-    },
-    plusNews(){
-      this.articlesAdd.push(
-        {
-          "title": '',
-          "thumbMediaId": '',
-          "author": '',
-          "digest": '',
-          "showCoverPic": '',
-          "content": '',
-          "contentSourceUrl": '',
-          "needOpenComment":'',
-          "onlyFansCanComment":'',
-          "thumbUrl":''
-        }
-      )
-      this.isActiveAddNews = this.articlesAdd.length - 1
-    },
-    subNews() {
+    /** 提交按钮 */
+    submitForm() {
       this.addMaterialLoading = true
-      if(this.operateMaterial === 'add'){
+      if (this.operateMaterial === 'add') {
         createDraft(this.queryParams.accountId, this.articlesAdd).then(response => {
-          this.addMaterialLoading = false
-          this.dialogNewsVisible = false
-          if(response.code == 200){
-            this.isActiveAddNews = 0
-            this.articlesAdd = [
-              {
-                "title": '',
-                "thumbMediaId": '',
-                "author": '',
-                "digest": '',
-                "showCoverPic": '',
-                "content": '',
-                "contentSourceUrl": '',
-                "needOpenComment":'',
-                "onlyFansCanComment":'',
-                "thumbUrl":''
-              }
-            ]
-            this.getList()
-          } else {
-            this.$message.error('新增图文出错：' + response.msg)
-          }
+          this.$modal.msgSuccess("新增成功");
+          this.dialogNewsVisible = false;
+          this.getList()
         }).finally(() => {
           this.addMaterialLoading = false
         })
@@ -472,32 +395,77 @@ export default {
       this.articlesMediaId = item.mediaId
       this.dialogNewsVisible = true
     },
-    handleAddNews(){
+    /** 新增按钮操作 */
+    handleAdd() {
+      this.resetEditor();
+      this.reset();
+      // 打开表单，并设置初始化
+      this.operateMaterial = 'add'
+      this.dialogNewsVisible = true
+    },
+    // 表单重置
+    reset() {
+      this.isActiveAddNews = 0
+      this.articlesAdd = [this.buildEmptyArticle()]
+    },
+    // 表单 Editor 重置
+    resetEditor() {
       this.hackResetEditor = false // 销毁组件
       this.$nextTick(() => {
         this.hackResetEditor = true // 重建组件
       })
-      if(this.operateMaterial == 'edit'){
-        this.isActiveAddNews = 0
-        this.articlesAdd = [
-          {
-            "title": '',
-            "thumbMediaId": '',
-            "author": '',
-            "digest": '',
-            "showCoverPic": '',
-            "content": '',
-            "contentSourceUrl": '',
-            "needOpenComment":'',
-            "onlyFansCanComment":'',
-            "thumbUrl":''
-          }
-        ]
-      }
-      this.operateMaterial = 'add'
-      this.dialogNewsVisible = true
     },
-    beforeThumbImageUpload(file){
+    // 将图文向下移动
+    downNews(index) {
+      let temp = this.articlesAdd[index]
+      this.articlesAdd[index] = this.articlesAdd[index+1]
+      this.articlesAdd[index + 1] = temp
+      this.isActiveAddNews = index + 1
+    },
+    // 将图文向上移动
+    upNews(index) {
+      let temp = this.articlesAdd[index]
+      this.articlesAdd[index] = this.articlesAdd[index - 1]
+      this.articlesAdd[index - 1] = temp
+      this.isActiveAddNews = index - 1
+    },
+    // 选中指定 index 的图文
+    activeNews(index) {
+      this.resetEditor();
+      this.isActiveAddNews = index
+    },
+    // 删除指定 index 的图文
+    minusNews(index) {
+      this.$modal.confirm('确定删除该图文吗?').then(() => {
+        this.articlesAdd.splice(index,1);
+        if (this.isActiveAddNews ===  index) {
+          this.isActiveAddNews = 0
+        }
+      }).catch(() => {})
+    },
+    // 添加一个图文
+    plusNews() {
+      this.articlesAdd.push(this.buildEmptyArticle())
+      this.isActiveAddNews = this.articlesAdd.length - 1
+    },
+    // 创建空的 article
+    buildEmptyArticle() {
+      return {
+        "title": '',
+        "thumbMediaId": '',
+        "author": '',
+        "digest": '',
+        "showCoverPic": '',
+        "content": '',
+        "contentSourceUrl": '',
+        "needOpenComment":'',
+        "onlyFansCanComment":'',
+        "thumbUrl":''
+      }
+    },
+
+    // ======================== 文件上传 ========================
+    beforeThumbImageUpload(file) {
       this.addMaterialLoading = true
       const isType = file.type === 'image/jpeg'
           || file.type === 'image/png'
@@ -539,6 +507,8 @@ export default {
       this.articlesAdd[this.isActiveAddNews].thumbMediaId = item.mediaId
       this.articlesAdd[this.isActiveAddNews].thumbUrl = item.url
     },
+
+    // ======================== 草稿箱发布 ========================
     handlePublishNews(item){
       this.$confirm('你正在通过发布的方式发表内容。 发布不占用群发次数，一天可多次发布。已发布内容不会推送给用户，也不会展示在公众号主页中。 发布后，你可以前往发表记录获取链接，也可以将发布内容添加到自定义菜单、自动回复、话题和页面模板中。', '提示', {
         confirmButtonText: '确定',
