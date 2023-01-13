@@ -8,3 +8,14 @@ export function getDraftPage(query) {
     params: query
   })
 }
+
+// 创建草稿
+export function createDraft(accountId, articles) {
+  return request({
+    url: '/mp/draft/create?accountId=' + accountId,
+    method: 'post',
+    data: {
+      articles
+    }
+  })
+}

@@ -60,14 +60,14 @@ SOFTWARE.
       </div>
     </div>
     <!-- 分页记录 -->
-    <div v-if="list.length <=0 && !loading" class="el-table__empty-block">
+    <div v-if="list.length <= 0 && !loading" class="el-table__empty-block">
       <span class="el-table__empty-text">暂无数据</span>
     </div>
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
     <!-- TODO 芋艿：位置调整 -->
-    <el-dialog :title="operateMaterial === 'add'?'新建图文':'修改图文'"
+    <el-dialog :title="operateMaterial === 'add' ? '新建图文' : '修改图文'"
                append-to-body
                :before-close="dialogNewsClose"
                :close-on-click-modal="false"
@@ -103,13 +103,13 @@ SOFTWARE.
                            @click="downNews(index)">下移
                 </el-button>
                 <el-button type="mini" icon="el-icon-sort-up" @click="upNews(index)">上移</el-button>
-                <el-button v-if="operateMaterial=='add'" type="mini" icon="el-icon-delete"
+                <el-button v-if="operateMaterial=== 'add'" type="mini" icon="el-icon-delete"
                            @click="minusNews(index)">删除
                 </el-button>
               </div>
             </div>
           </div>
-          <div class="news-main-plus" @click="plusNews" v-if="articlesAdd.length<8 && operateMaterial=='add'">
+          <div class="news-main-plus" @click="plusNews" v-if="articlesAdd.length<8 && operateMaterial==='add'">
             <i class="el-icon-circle-plus icon-plus"></i>
           </div>
         </div>
@@ -121,40 +121,30 @@ SOFTWARE.
                     v-if="hackResetEditor"/>
         </el-row>
         <br><br><br><br>
+        <!-- 封面和摘要 -->
         <div class="input-tt">封面和摘要：</div>
         <div>
           <div class="thumb-div">
             <img class="material-img" v-if="articlesAdd[isActiveAddNews].thumbUrl"
-                 :src="articlesAdd[isActiveAddNews].thumbUrl" :class="isActiveAddNews == 0 ? 'avatar':'avatar1'">
+                 :src="articlesAdd[isActiveAddNews].thumbUrl" :class="isActiveAddNews === 0 ? 'avatar':'avatar1'">
             <i v-else class="el-icon-plus avatar-uploader-icon"
                :class="isActiveAddNews === 0 ? 'avatar':'avatar1'"></i>
             <div class="thumb-but">
-              <el-upload
-                :action="actionUrl"
-                :headers="headers"
-                multiple
-                :limit="1"
-                :on-success="handleUploadSuccess"
-                :file-list="fileList"
-                :before-upload="beforeThumbImageUpload"
-                :data="uploadData">
-                <el-button slot="trigger" size="mini" type="primary">
-                  本地上传
-                </el-button>
-                <el-button size="mini" type="primary"
-                           @click="openMaterial" style="margin-left: 5px">素材库选择
-                </el-button>
-                <div slot="tip" class="el-upload__tip">支持bmp/png/jpeg/jpg/gif格式，大小不超过2M</div>
+              <el-upload :action="actionUrl" :headers="headers" multiple :limit="1" :file-list="fileList" :data="uploadData"
+                         :before-upload="beforeThumbImageUpload" :on-success="handleUploadSuccess">
+                <el-button slot="trigger" size="mini" type="primary">本地上传</el-button>
+                <el-button size="mini" type="primary" @click="openMaterial" style="margin-left: 5px">素材库选择</el-button>
+                <div slot="tip" class="el-upload__tip">支持 bmp/png/jpeg/jpg/gif 格式，大小不超过 2M</div>
               </el-upload>
             </div>
           </div>
           <el-dialog title="选择图片" :visible.sync="dialogImageVisible" width="80%" append-to-body>
-            <WxMaterialSelect :objData="{repType:'image'}"
-                              @selectMaterial="selectMaterial"></WxMaterialSelect>
+            <WxMaterialSelect :objData="{repType:'image'}" @selectMaterial="selectMaterial" />
           </el-dialog>
           <el-input :rows="8" type="textarea" v-model="articlesAdd[isActiveAddNews].digest" placeholder="请输入摘要"
                     class="digest" maxlength="120"></el-input>
         </div>
+        <!-- 标题、作者、原文地址 -->
         <div class="input-tt">标题：</div>
         <el-input v-model="articlesAdd[isActiveAddNews].title" placeholder="请输入标题"></el-input>
         <div class="input-tt">作者：</div>
@@ -171,13 +161,12 @@ SOFTWARE.
 </template>
 
 <script>
-// import {getPage, addObj, delObj, putObj, publish} from '@/api/wxmp/wxdraft'
 // import { getPage as getPage1 } from '@/api/wxmp/wxmaterial'
 // import WxEditor from '@/components/Editor/WxEditor.vue'
 import WxNews from '@/views/mp/components/wx-news/main.vue';
 import WxMaterialSelect from '@/views/mp/components/wx-material-select/main.vue'
 import { getAccessToken } from '@/utils/auth'
-import { getDraftPage } from "@/api/mp/draft";
+import {createDraft, getDraftPage} from "@/api/mp/draft";
 import {getSimpleAccounts} from "@/api/mp/account";
 
 export default {
@@ -208,31 +197,33 @@ export default {
         currentPage: 1, // 当前页数
         pageSize: 10 // 每页显示多少条
       },
-      actionUrl: process.env.VUE_APP_BASE_API +'/wxmaterial/materialFileUpload',
+
+      // ========== 文件上传 ==========
+      actionUrl: process.env.VUE_APP_BASE_API + "/admin-api/mp/material/upload-permanent", // 上传永久素材的地址
       headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
       fileList: [],
-      dialogVideoVisible: false,
-      dialogNewsVisible: false,
-      addMaterialLoading: false,
       uploadData: {
-        "mediaType": 'image',
+        "type": 'image', // TODO 芋艿：试试要不要换成 thumb
         "title": '',
-        "introduction": ''
+        "introduction": '',
+        "accountId": 1,
       },
-      articlesAdd: [
-        {
-          "title": '',
-          "thumbMediaId": '',
-          "author": '',
-          "digest": '',
-          "showCoverPic": '',
-          "content": '',
-          "contentSourceUrl": '',
-          "needOpenComment": '',
-          "onlyFansCanComment": '',
-          "thumbUrl": ''
-        }
-      ],
+
+      // ========== 草稿新建 or 修改 ==========
+      dialogNewsVisible: false,
+      addMaterialLoading: false, // 添加草稿的 loading 标识
+      articlesAdd: [{
+        "title": '',
+        "thumbMediaId": '',
+        "author": '',
+        "digest": '',
+        "showCoverPic": '',
+        "content": '123', // TODO 芋艿：临时测试
+        "contentSourceUrl": '',
+        "needOpenComment": '',
+        "onlyFansCanComment": '',
+        "thumbUrl": '',
+      }],
       isActiveAddNews: 0,
       dialogImageVisible: false,
       imageListData: [],
@@ -251,12 +242,18 @@ export default {
       // 默认选中第一个
       if (this.accounts.length > 0) {
         this.queryParams.accountId = this.accounts[0].id;
+        this.setAccountId(this.accounts[0].id);
       }
       // 加载数据
-      this.getList();
+      // this.getList();
     })
   },
   methods: {
+    /** 设置账号编号 */
+    setAccountId(accountId) {
+      this.queryParams.accountId = accountId;
+      this.uploadData.accountId = accountId;
+    },
     /** 查询列表 */
     getList() {
       // 如果没有选中公众号账号，则进行提示。
@@ -279,6 +276,20 @@ export default {
       }).finally(() => {
         this.loading = false
       })
+    },
+    /** 搜索按钮操作 */
+    handleQuery() {
+      this.queryParams.pageNo = 1
+      this.getList()
+    },
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.resetForm('queryForm')
+      // 默认选中第一个
+      if (this.accounts.length > 0) {
+        this.setAccountId(this.accounts[0].id)
+      }
+      this.handleQuery()
     },
 
     delMaterial(item){
@@ -386,12 +397,10 @@ export default {
       )
       this.isActiveAddNews = this.articlesAdd.length - 1
     },
-    subNews(){
+    subNews() {
       this.addMaterialLoading = true
-      if(this.operateMaterial == 'add'){
-        addObj({
-          articles:this.articlesAdd
-        }).then(response => {
+      if(this.operateMaterial === 'add'){
+        createDraft(this.queryParams.accountId, this.articlesAdd).then(response => {
           this.addMaterialLoading = false
           this.dialogNewsVisible = false
           if(response.code == 200){
@@ -410,12 +419,11 @@ export default {
                 "thumbUrl":''
               }
             ]
-            this.queryParams.currentPage = 1
-            this.getList(this.queryParams)
-          }else{
+            this.getList()
+          } else {
             this.$message.error('新增图文出错：' + response.msg)
           }
-        }).catch(() => {
+        }).finally(() => {
           this.addMaterialLoading = false
         })
       }
@@ -452,11 +460,11 @@ export default {
       }
     },
     handleEditNews(item){
-      this.hackResetEditor = false//销毁组件
+      this.hackResetEditor = false // 销毁组件
       this.$nextTick(() => {
-        this.hackResetEditor = true//重建组件
+        this.hackResetEditor = true // 重建组件
       })
-      if(this.operateMaterial == 'add'){
+      if (this.operateMaterial == 'add') {
         this.isActiveAddNews = 0
       }
       this.operateMaterial = 'edit'
@@ -465,9 +473,9 @@ export default {
       this.dialogNewsVisible = true
     },
     handleAddNews(){
-      this.hackResetEditor = false//销毁组件
+      this.hackResetEditor = false // 销毁组件
       this.$nextTick(() => {
-        this.hackResetEditor = true//重建组件
+        this.hackResetEditor = true // 重建组件
       })
       if(this.operateMaterial == 'edit'){
         this.isActiveAddNews = 0
@@ -491,30 +499,40 @@ export default {
     },
     beforeThumbImageUpload(file){
       this.addMaterialLoading = true
-      const isType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif' || file.type === 'image/bmp' || file.type === 'image/jpg';
-      const isLt = file.size / 1024 / 1024 < 2
+      const isType = file.type === 'image/jpeg'
+          || file.type === 'image/png'
+          || file.type === 'image/gif'
+          || file.type === 'image/bmp'
+          || file.type === 'image/jpg';
       if (!isType) {
         this.$message.error('上传图片格式不对!')
+        this.addMaterialLoading = false
+        return false;
       }
+      const isLt = file.size / 1024 / 1024 < 2
       if (!isLt) {
-        this.$message.error('上传图片大小不能超过2M!')
+        this.$message.error('上传图片大小不能超过 2M!')
+        this.addMaterialLoading = false
+        return false;
       }
-      this.addMaterialLoading = false
-      return isType && isLt;
+      // 校验通过
+      return true;
     },
-    handleUploadSuccess(response, file, fileList){
-      this.loading = false
-      this.addMaterialLoading = false
-      if(response.code == 200){
-        this.dialogVideoVisible = false
-        this.fileList = []
-        this.uploadData.title = ''
-        this.uploadData.introduction = ''
-        this.articlesAdd[this.isActiveAddNews].thumbMediaId = response.data.mediaId
-        this.articlesAdd[this.isActiveAddNews].thumbUrl = response.data.url
-      }else{
+    handleUploadSuccess(response, file, fileList) {
+      this.addMaterialLoading = false // 关闭 loading
+      if (response.code !== 0) {
         this.$message.error('上传出错：' + response.msg)
+        return false;
       }
+
+      // 重置上传文件的表单
+      this.fileList = []
+      this.uploadData.title = ''
+      this.uploadData.introduction = ''
+
+      // 设置草稿的封面字段
+      this.articlesAdd[this.isActiveAddNews].thumbMediaId = response.data.mediaId
+      this.articlesAdd[this.isActiveAddNews].thumbUrl = response.data.url
     },
     selectMaterial(item){
       this.dialogImageVisible = false
