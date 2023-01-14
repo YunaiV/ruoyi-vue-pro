@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.mp.service.menu;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.mp.controller.admin.menu.vo.MpMenuSaveReqVO;
 import cn.iocoder.yudao.module.mp.convert.menu.MpMenuConvert;
+import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.menu.MpMenuDO;
 import cn.iocoder.yudao.module.mp.dal.mysql.menu.MpMenuMapper;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
+import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
 import cn.iocoder.yudao.module.mp.service.message.MpMessageService;
 import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import lombok.extern.slf4j.Slf4j;
@@ -15,13 +18,15 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MENU_NOT_EXISTS;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MENU_DELETE_FAIL;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MENU_SAVE_FAIL;
 
 /**
  * 公众号菜单 Service 实现类
@@ -35,6 +40,9 @@ public class MpMenuServiceImpl implements MpMenuService {
 
     @Resource
     private MpMessageService mpMessageService;
+    @Resource
+    @Lazy // 延迟加载，避免循环引用报错
+    private MpAccountService mpAccountService;
 
     @Resource
     @Lazy // 延迟加载，避免循环引用报错
@@ -44,43 +52,64 @@ public class MpMenuServiceImpl implements MpMenuService {
     private MpMenuMapper mpMenuMapper;
 
     @Override
-    public Long saveMenu(MpMenuSaveReqVO createReqVO) {
-        String appId = "wx5b23ba7a5589ecbb";
-        // 插入
-        MpMenuDO menu = MpMenuConvert.INSTANCE.convert(createReqVO);
-//        mpMenuMapper.insert(menu);
+    @Transactional(rollbackFor = Exception.class)
+    public void saveMenu(MpMenuSaveReqVO createReqVO) {
+        MpAccountDO account = mpAccountService.getRequiredAccount(createReqVO.getAccountId());
+        WxMpService mpService = mpServiceFactory.getRequiredMpService(createReqVO.getAccountId());
 
-        // TODO 同步菜单
-        WxMpService mpService = mpServiceFactory.getRequiredMpService(appId);
+        // 第一步，同步公众号
         WxMenu wxMenu = new WxMenu();
-        wxMenu.setButtons(createReqVO.getButtons());
+        wxMenu.setButtons(MpMenuConvert.INSTANCE.convert(createReqVO.getMenus()));
         try {
             mpService.getMenuService().menuCreate(wxMenu);
         } catch (WxErrorException e) {
-            throw new RuntimeException(e);
+            throw exception(MENU_SAVE_FAIL, e.getError().getErrorMsg());
         }
 
-        // 返回
-        return menu.getId();
+        // 第二步，存储到数据库
+        mpMenuMapper.deleteByAccountId(createReqVO.getAccountId());
+        createReqVO.getMenus().forEach(menu -> {
+            // 先保存顶级菜单
+            MpMenuDO menuDO = createMenu(menu, null, account);
+            // 再保存子菜单
+            if (CollUtil.isEmpty(menu.getChildren())) {
+                return;
+            }
+            menu.getChildren().forEach(childMenu -> createMenu(childMenu, menuDO, account));
+        });
     }
 
     @Override
-    public void deleteMenu(Long id) {
-        // 校验存在
-        validateMenuExists(id);
-        // 删除
-        mpMenuMapper.deleteById(id);
-    }
-
-    private void validateMenuExists(Long id) {
-        if (mpMenuMapper.selectById(id) == null) {
-            throw exception(MENU_NOT_EXISTS);
+    public void deleteMenuByAccountId(Long accountId) {
+        WxMpService mpService = mpServiceFactory.getRequiredMpService(accountId);
+        // 第一步，同步公众号
+        try {
+            mpService.getMenuService().menuDelete();
+        } catch (WxErrorException e) {
+            throw exception(MENU_DELETE_FAIL, e.getError().getErrorMsg());
         }
+
+        // 第二步，存储到数据库
+        mpMenuMapper.deleteByAccountId(accountId);
     }
 
-    @Override
-    public MpMenuDO getMenu(Long id) {
-        return mpMenuMapper.selectById(id);
+    private MpMenuDO createMenu(MpMenuSaveReqVO.Menu wxMenu, MpMenuDO parentMenu, MpAccountDO account) {
+        MpMenuDO menu = CollUtil.isNotEmpty(wxMenu.getChildren())
+                ? new MpMenuDO().setName(wxMenu.getName())
+                : MpMenuConvert.INSTANCE.convert02(wxMenu);
+        if (account != null) {
+            menu.setAccountId(account.getId()).setAppId(account.getAppId());
+        }
+        if (parentMenu != null) {
+            menu.setParentId(parentMenu.getId());
+        } else {
+            menu.setParentId(MpMenuDO.ID_ROOT);
+        }
+        if (StrUtil.isNotEmpty(wxMenu.getReplyMediaId())) {
+            throw new IllegalArgumentException("未实现");
+        }
+        mpMenuMapper.insert(menu);
+        return menu;
     }
 
     @Override

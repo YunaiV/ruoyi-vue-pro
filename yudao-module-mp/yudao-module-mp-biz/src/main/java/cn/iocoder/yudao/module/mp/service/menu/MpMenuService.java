@@ -18,24 +18,15 @@ public interface MpMenuService {
      * 保存公众号菜单
      *
      * @param createReqVO 创建信息
-     * @return 编号
      */
-    Long saveMenu(@Valid MpMenuSaveReqVO createReqVO);
+    void saveMenu(@Valid MpMenuSaveReqVO createReqVO);
 
     /**
      * 删除公众号菜单
      *
-     * @param id 编号
+     * @param accountId 公众号账号的编号
      */
-    void deleteMenu(Long id);
-
-    /**
-     * 获得公众号菜单
-     *
-     * @param id 编号
-     * @return 公众号菜单
-     */
-    MpMenuDO getMenu(Long id);
+    void deleteMenuByAccountId(Long accountId);
 
     /**
      * 用户点击菜单按钮时，回复对应的消息
@@ -50,7 +41,7 @@ public interface MpMenuService {
     /**
      * 获得公众号菜单列表
      *
-     * @param accountId 公众号编号
+     * @param accountId 公众号账号的编号
      * @return 公众号菜单列表
      */
     List<MpMenuDO> getMenuListByAccountId(Long accountId);

@@ -63,8 +63,8 @@ SOFTWARE.
           <div class="menu_bottom menu_addicon" v-if="this.menuList.length < 3" @click="addMenu"><i class="el-icon-plus"></i></div>
         </div>
         <div class="save_div">
-            <!--<el-button class="save_btn" type="warning" size="small" @click="saveFun">保存菜单</el-button>-->
-            <el-button class="save_btn" type="success" size="small" @click="handleSaveAndReleaseFun">保存并发布菜单</el-button>
+            <el-button class="save_btn" type="success" size="small" @click="handleSave">保存并发布菜单</el-button>
+            <el-button class="save_btn" type="danger" size="small" @click="handleDelete">清空菜单</el-button>
         </div>
       </div>
       <!--右边配置-->
@@ -141,7 +141,7 @@ SOFTWARE.
 import WxReplySelect from '@/views/mp/components/wx-news/main.vue'
 import WxNews from '@/views/mp/components/wx-news/main.vue';
 import WxMaterialSelect from '@/views/mp/components/wx-news/main.vue'
-import { getMenuList } from "@/api/mp/menu";
+import {deleteMenu, getMenuList, saveMenu} from "@/api/mp/menu";
 import { getSimpleAccounts } from "@/api/mp/account";
 
 export default {
@@ -164,11 +164,6 @@ export default {
         children: [],
       },
 
-      menu:{ // 横向菜单
-          button:[
-          ]
-      },
-
       // ======================== 菜单操作 ========================
       isActive: -1,// 一级菜单点中样式
       isSubMenuActive: -1, // 一级菜单点中样式
@@ -178,7 +173,7 @@ export default {
       showRightFlag: false, // 右边配置显示默认详情还是配置详情
       nameMaxLength: 0, // 菜单名称最大长度；1 级是 4 字符；2 级是 7 字符；
       showConfigureContent: true, // 是否展示配置内容；如果有子菜单，就不显示配置内容
-
+      hackResetWxReplySelect: false, // 重置 WxReplySelect 组件
 
       tempObj:{}, // 右边临时变量，作为中间值牵引关系
       tempSelfObj: { // 一些临时值放在这里进行判断，如果放在 tempObj，由于引用关系，menu 也会多了多余的参数
@@ -218,7 +213,6 @@ export default {
           label: '选择地理位置'
       }],
       dialogNewsVisible: false,
-      hackResetWxReplySelect: false,
 
       // 公众号账号列表
       accounts: [],
@@ -246,7 +240,6 @@ export default {
       this.loading = false;
       getMenuList(this.accountId).then(response => {
         this.menuList = this.handleTree(response.data, "id");
-        console.log(this.menuList)
       }).finally(() => {
         this.loading = false;
       })
@@ -354,31 +347,16 @@ export default {
     },
 
     // ======================== 菜单编辑 ========================
-    handleSaveAndReleaseFun(){
-      this.$confirm('确定要保证并发布该菜单吗?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
+    handleSave() {
+      this.$modal.confirm('确定要保证并发布该菜单吗？').then(() => {
         this.loading = true
-        saveAndRelease({
-          strWxMenu:this.menu
-        }).then(response => {
-          this.loading = false
-          if(response.code == 200){
-            this.$message({
-              showClose: true,
-              message: '发布成功',
-              type: 'success'
-            })
-          }else{
-            this.$message.error(response.data.msg)
-          }
-        }).catch(() => {
-          this.loading = false
-        })
-      }).catch(() => {
-      })
+        return saveMenu(this.accountId, this.menuList);
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("发布成功");
+      }).catch(() => {}).finally(() => {
+        this.loading = false
+      });
     },
     // 表单 Editor 重置
     resetEditor() {
@@ -386,6 +364,17 @@ export default {
       this.$nextTick(() => {
         this.hackResetEditor = true // 重建组件
       })
+    },
+    handleDelete() {
+      this.$modal.confirm('确定要清空所有菜单吗？').then(() => {
+        this.loading = true
+        return deleteMenu(this.accountId);
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("清空成功");
+      }).catch(() => {}).finally(() => {
+        this.loading = false
+      });
     },
 
     // TODO 芋艿：未归类
@@ -431,7 +420,7 @@ div{
   left:0px;
   width: 300px;
   height:64px;
-  background: transparent url(assets/menu_head.png) no-repeat 0 0;
+  background: transparent url("assets/menu_head.png") no-repeat 0 0;
   background-position: 0 0;
   background-size: 100%
 }
@@ -445,7 +434,7 @@ div{
   left: 0px;
 }
 .weixin-menu{
-  background: transparent url(assets/menu_foot.png) no-repeat 0 0;
+  background: transparent url("assets/menu_foot.png") no-repeat 0 0;
   padding-left: 43px;
   font-size: 12px
 }
@@ -581,26 +570,26 @@ div{
 <!--</style>-->
 <!--素材样式-->
 <style lang="scss" scoped>
-.pagination{
+.pagination {
     text-align: right;
     margin-right: 25px;
 }
-.select-item{
+.select-item {
     width: 280px;
     padding: 10px;
     margin: 0 auto 10px auto;
     border: 1px solid #eaeaea;
 }
-.select-item2{
+.select-item2 {
     padding: 10px;
     margin: 0 auto 10px auto;
     border: 1px solid #eaeaea;
 }
-.ope-row{
+.ope-row {
     padding-top: 10px;
     text-align: center;
 }
-.item-name{
+.item-name {
     font-size: 12px;
     overflow: hidden;
     text-overflow:ellipsis;

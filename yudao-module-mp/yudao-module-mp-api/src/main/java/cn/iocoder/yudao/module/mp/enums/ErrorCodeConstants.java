@@ -52,6 +52,7 @@ public interface ErrorCodeConstants {
     ErrorCode DRAFT_DELETE_FAIL = new ErrorCode(1006007002, "删除草稿失败，原因：{}");
 
     // ========== 公众号菜单 1006008000============
-    ErrorCode MENU_NOT_EXISTS = new ErrorCode(1006008000, "菜单不存在");
+    ErrorCode MENU_SAVE_FAIL = new ErrorCode(1006008000, "创建菜单失败，原因：{}");
+    ErrorCode MENU_DELETE_FAIL = new ErrorCode(1006008001, "删除菜单失败，原因：{}");
 
 }

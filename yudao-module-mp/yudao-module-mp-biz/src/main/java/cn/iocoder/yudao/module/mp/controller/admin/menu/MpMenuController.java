@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -32,26 +31,18 @@ public class MpMenuController {
     @PostMapping("/save")
     @ApiOperation("保存公众号菜单")
     @PreAuthorize("@ss.hasPermission('mp:menu:save')")
-    public CommonResult<Long> saveMenu(@Valid @RequestBody MpMenuSaveReqVO createReqVO) {
-        return success(mpMenuService.saveMenu(createReqVO));
+    public CommonResult<Boolean> saveMenu(@Valid @RequestBody MpMenuSaveReqVO createReqVO) {
+        mpMenuService.saveMenu(createReqVO);
+        return success(true);
     }
 
     @DeleteMapping("/delete")
     @ApiOperation("删除公众号菜单")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "accountId", value = "公众号账号的编号", required = true, example = "10", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('mp:menu:delete')")
-    public CommonResult<Boolean> deleteMenu(@RequestParam("id") Long id) {
-        mpMenuService.deleteMenu(id);
+    public CommonResult<Boolean> deleteMenu(@RequestParam("accountId") Long accountId) {
+        mpMenuService.deleteMenuByAccountId(accountId);
         return success(true);
-    }
-
-    @GetMapping("/get")
-    @ApiOperation("获得公众号菜单")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    @PreAuthorize("@ss.hasPermission('mp:menu:query')")
-    public CommonResult<MpMenuRespVO> getMenu(@RequestParam("id") Long id) {
-        MpMenuDO menu = mpMenuService.getMenu(id);
-        return success(MpMenuConvert.INSTANCE.convert(menu));
     }
 
     @GetMapping("/list")

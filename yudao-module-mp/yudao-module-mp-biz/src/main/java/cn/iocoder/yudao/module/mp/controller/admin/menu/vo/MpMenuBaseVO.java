@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.mp.controller.admin.menu.vo;
 
-import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import me.chanjar.weixin.common.api.WxConsts;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 // TODO 芋艿：完善 swagger 注解
@@ -16,17 +13,6 @@ import java.util.List;
  */
 @Data
 public class MpMenuBaseVO {
-
-    @ApiModelProperty(value = "公众号账号的编号", required = true, example = "2048")
-    @NotNull(message = "公众号账号的编号不能为空")
-    private Long accountId;
-
-    /**
-     * 微信公众号 appid
-     *
-     * 冗余 {@link MpAccountDO#getAppId()}
-     */
-    private String appId;
 
     /**
      * 菜单名称
@@ -42,10 +28,6 @@ public class MpMenuBaseVO {
      * 父菜单编号
      */
     private Long parentId;
-    /**
-     * 排序
-     */
-    private Integer sort;
 
     // ========== 按钮操作 ==========
 

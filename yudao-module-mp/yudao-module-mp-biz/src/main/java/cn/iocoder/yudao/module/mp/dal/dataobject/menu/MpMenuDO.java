@@ -64,10 +64,6 @@ public class MpMenuDO extends BaseDO {
      * 父菜单编号
      */
     private Long parentId;
-    /**
-     * 排序
-     */
-    private Integer sort;
 
     // ========== 按钮操作 ==========
 
