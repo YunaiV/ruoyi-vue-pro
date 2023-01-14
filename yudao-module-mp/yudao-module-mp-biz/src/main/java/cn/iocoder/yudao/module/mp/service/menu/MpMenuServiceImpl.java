@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.mp.service.menu;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.module.mp.controller.admin.menu.vo.MpMenuSaveReqVO;
 import cn.iocoder.yudao.module.mp.convert.menu.MpMenuConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.menu.MpMenuDO;
+import cn.iocoder.yudao.module.mp.dal.mysql.menu.MpMenuMapper;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import cn.iocoder.yudao.module.mp.service.message.MpMessageService;
 import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
@@ -13,20 +15,16 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-
 import org.springframework.validation.annotation.Validated;
 
-import cn.iocoder.yudao.module.mp.controller.admin.menu.vo.*;
-
-import cn.iocoder.yudao.module.mp.dal.mysql.menu.MpMenuMapper;
+import javax.annotation.Resource;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MENU_NOT_EXISTS;
 
 /**
- * 微信菜单 Service 实现类
+ * 公众号菜单 Service 实现类
  *
  * @author 芋道源码
  */
@@ -76,7 +74,6 @@ public class MpMenuServiceImpl implements MpMenuService {
 
     private void validateMenuExists(Long id) {
         if (mpMenuMapper.selectById(id) == null) {
-            // TODO 芋艿：错误码不太对
             throw exception(MENU_NOT_EXISTS);
         }
     }
@@ -103,6 +100,11 @@ public class MpMenuServiceImpl implements MpMenuService {
         // 第二步，回复消息
         MpMessageSendOutReqBO sendReqBO = MpMenuConvert.INSTANCE.convert(openid, menu);
         return mpMessageService.sendOutMessage(sendReqBO);
+    }
+
+    @Override
+    public List<MpMenuDO> getMenuListByAccountId(Long accountId) {
+        return mpMenuMapper.selectListByAccountId(accountId);
     }
 
 }

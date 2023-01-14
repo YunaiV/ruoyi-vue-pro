@@ -1,21 +1,21 @@
 package cn.iocoder.yudao.module.mp.service.menu;
 
-import javax.validation.*;
-
-import cn.iocoder.yudao.module.mp.controller.admin.menu.vo.*;
+import cn.iocoder.yudao.module.mp.controller.admin.menu.vo.MpMenuSaveReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.menu.MpMenuDO;
-import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 
+import javax.validation.Valid;
+import java.util.List;
+
 /**
- * 微信菜单 Service 接口
+ * 公众号菜单 Service 接口
  *
  * @author 芋道源码
  */
 public interface MpMenuService {
 
     /**
-     * 保存微信菜单
+     * 保存公众号菜单
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -23,17 +23,17 @@ public interface MpMenuService {
     Long saveMenu(@Valid MpMenuSaveReqVO createReqVO);
 
     /**
-     * 删除微信菜单
+     * 删除公众号菜单
      *
      * @param id 编号
      */
     void deleteMenu(Long id);
 
     /**
-     * 获得微信菜单
+     * 获得公众号菜单
      *
      * @param id 编号
-     * @return 微信菜单
+     * @return 公众号菜单
      */
     MpMenuDO getMenu(Long id);
 
@@ -46,5 +46,13 @@ public interface MpMenuService {
      * @return 消息
      */
     WxMpXmlOutMessage reply(String appId, String key, String openid);
+
+    /**
+     * 获得公众号菜单列表
+     *
+     * @param accountId 公众号编号
+     * @return 公众号菜单列表
+     */
+    List<MpMenuDO> getMenuListByAccountId(Long accountId);
 
 }
