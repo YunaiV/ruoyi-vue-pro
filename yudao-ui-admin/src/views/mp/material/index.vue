@@ -20,6 +20,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+  芋道源码：
+  ① 清理冗余 css 内容，清理冗余 data 变量
+  ② 美化样式，支持播放，提升使用体验
+  ③ 优化代码，特别是方法名和变量，提升可读性
 -->
 <template>
   <div class="app-container">
@@ -63,152 +67,102 @@ SOFTWARE.
         <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                     @pagination="getList"/>
       </el-tab-pane>
+
+      <!-- tab 2：语音  -->
       <el-tab-pane name="voice">
         <span slot="label"><i class="el-icon-microphone"></i> 语音</span>
-        <div class="add_but">
-          <el-upload
-                  :action="actionUrl"
-                  :headers="headers"
-                  multiple
-                  :limit="1"
-                  :on-success="handleUploadSuccess"
-                  :file-list="fileList"
-                  :before-upload="beforeVoiceUpload"
-                  :data="uploadData">
+        <div class="add_but" v-hasPermi="['mp:material:upload-permanent']">
+          <el-upload :action="actionUrl" :headers="headers" multiple :limit="1" :file-list="fileList" :data="uploadData"
+                  :on-success="handleUploadSuccess" :before-upload="beforeVoiceUpload">
             <el-button size="mini" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">
-              格式支持mp3/wma/wav/amr，文件大小不超过2M，播放长度不超过60s
-            </div>
+            <span slot="tip" class="el-upload__tip" style="margin-left: 5px">格式支持 mp3/wma/wav/amr，文件大小不超过 2M，播放长度不超过 60s</span>
           </el-upload>
         </div>
-        <el-table
-                :data="list"
-                stripe
-                border
-                v-loading="loading">
-          <el-table-column
-                  prop="mediaId"
-                  label="media_id">
+        <el-table :data="list" stripe border v-loading="loading" style="margin-top: 10px;">
+          <el-table-column label="编号" align="center" prop="mediaId" />
+          <el-table-column label="文件名" align="center" prop="name" />
+          <el-table-column label="语音" align="center">
+            <template v-slot="scope">
+              <wx-voice-player :url="scope.row.url" />
+            </template>
           </el-table-column>
-          <el-table-column
-                  prop="name"
-                  label="名称">
+          <el-table-column label="上传时间" align="center" prop="createTime" width="180">
+            <template v-slot="scope">
+              <span>{{ parseTime(scope.row.createTime) }}</span>
+            </template>
           </el-table-column>
-          <el-table-column
-                  prop="updateTime"
-                  label="更新时间">
-          </el-table-column>
-          <el-table-column
-                  fixed="right"
-                  label="操作">
+          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
-              <el-button type="text"
-                         icon="el-icon-download"
-                         size="small"
-                         plain
-                         @click="handleDown(scope.row)">下载</el-button>
-              <el-button type="text"
-                         icon="el-icon-delete"
-                         size="small"
-                         plain
-                         @click="handleDelete(scope.row)">删除</el-button>
+              <el-button type="text" icon="el-icon-download" size="small" plain @click="handleDownload(scope.row)">下载</el-button>
+              <el-button type="text" icon="el-icon-delete" size="small" plain @click="handleDelete(scope.row)"
+                         v-hasPermi="['mp:material:delete']">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination
-                @size-change="sizeChange"
-                @current-change="currentChange"
-                :current-page.sync="queryParams.currentPage"
-                :page-sizes="[10, 20]"
-                :page-size="queryParams.pageSize"
-                layout="total, sizes, prev, pager, next, jumper"
-                :total="queryParams.total"
-                class="pagination"
-        >
-        </el-pagination>
+        <!-- 分页组件 -->
+        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                    @pagination="getList"/>
       </el-tab-pane>
+
+      <!-- tab 3：视频 -->
       <el-tab-pane name="video">
         <span slot="label"><i class="el-icon-video-play"></i> 视频</span>
-        <div class="add_but">
-          <el-button size="mini" type="primary" @click="handleAddVideo">新建</el-button>
+        <div class="add_but" v-hasPermi="['mp:material:upload-permanent']">
+          <el-button size="mini" type="primary" @click="handleAddVideo">新建视频</el-button>
         </div>
-        <el-dialog title="新建视频" :visible.sync="dialogVideoVisible" v-loading="addMaterialLoading">
-          <el-upload
-                  ref="uploadVideo"
-                  :action="actionUrl"
-                  :headers="headers"
-                  multiple
-                  :limit="1"
-                  :on-success="handleUploadSuccess"
-                  :file-list="fileList"
-                  :before-upload="beforeVideoUpload"
-                  :auto-upload="false"
-                  :data="uploadData">
+        <!-- 新建视频的弹窗 -->
+        <el-dialog title="新建视频" :visible.sync="dialogVideoVisible" append-to-body width="600px"
+                   v-loading="addMaterialLoading">
+          <el-upload :action="actionUrl" :headers="headers" multiple :limit="1" :file-list="fileList" :data="uploadData"
+                     :before-upload="beforeVideoUpload" :on-success="handleUploadSuccess"
+                     ref="uploadVideo" :auto-upload="false">
             <el-button slot="trigger" size="mini" type="primary">选择视频</el-button>
-            <div class="el-upload__tip">
-              格式支持MP4，文件大小不超过10MB
-            </div>
+            <span class="el-upload__tip" style="margin-left: 10px;">格式支持 MP4，文件大小不超过 10MB</span>
           </el-upload>
-          <el-form :model="uploadData"
-                   :rules="uploadRules"
-                   ref="uploadForm">
-            <el-form-item label="标题" prop="title">
-              <el-input v-model="uploadData.title" placeholder="标题将展示在相关播放页面，建议填写清晰、准确、生动的标题"></el-input>
-            </el-form-item>
-            <el-form-item label="描述" prop="introduction">
-              <el-input :rows="3" type="textarea" v-model="uploadData.introduction" placeholder="介绍语将展示在相关播放页面，建议填写简洁明确、有信息量的内容"></el-input>
-            </el-form-item>
+          <el-form :model="uploadData" :rules="uploadRules" ref="uploadForm" label-width="80px">
+            <el-row>
+              <el-form-item label="标题" prop="title">
+                <el-input v-model="uploadData.title" placeholder="标题将展示在相关播放页面，建议填写清晰、准确、生动的标题" />
+              </el-form-item>
+            </el-row>
+            <el-row>
+              <el-form-item label="描述" prop="introduction">
+                <el-input :rows="3" type="textarea" v-model="uploadData.introduction"
+                          placeholder="介绍语将展示在相关播放页面，建议填写简洁明确、有信息量的内容" />
+              </el-form-item>
+            </el-row>
           </el-form>
           <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogVideoVisible = false">取 消</el-button>
-            <el-button type="primary" @click="subVideo">提 交</el-button>
+            <el-button @click="cancelVideo">取 消</el-button>
+            <el-button type="primary" @click="submitVideo">提 交</el-button>
           </div>
         </el-dialog>
-        <el-table
-                :data="list"
-                stripe
-                border
-                v-loading="loading">
-          <el-table-column
-                  prop="mediaId"
-                  label="media_id">
+        <el-table :data="list" stripe border v-loading="loading" style="margin-top: 10px;">
+          <el-table-column label="编号" align="center" prop="mediaId" />
+          <el-table-column label="文件名" align="center" prop="name" />
+          <el-table-column label="标题" align="center" prop="title" />
+          <el-table-column label="介绍" align="center" prop="introduction" />
+          <el-table-column label="视频" align="center">
+            <template v-slot="scope">
+              <wx-video-player :url="scope.row.url" />
+            </template>
           </el-table-column>
-          <el-table-column
-                  prop="name"
-                  label="名称">
+          <el-table-column label="上传时间" align="center" prop="createTime" width="180">
+            <template v-slot="scope">
+              <span>{{ parseTime(scope.row.createTime) }}</span>
+            </template>
           </el-table-column>
-          <el-table-column
-                  prop="updateTime"
-                  label="更新时间">
-          </el-table-column>
-          <el-table-column
-                  fixed="right"
-                  label="操作">
-            <template slot-scope="scope">
-              <el-button type="text"
-                         icon="el-icon-view"
-                         size="small"
-                         plain
-                         @click="handleInfo(scope.row)">查看</el-button>
-              <el-button type="text"
-                         icon="el-icon-delete"
-                         size="small"
-                         plain
-                         @click="handleDelete(scope.row)">删除</el-button>
+          <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
+            <template v-slot="scope">
+              <el-button type="text" icon="el-icon-download" size="small" plain @click="handleDownload(scope.row)">下载</el-button>
+              <el-button type="text" icon="el-icon-delete" size="small" plain @click="handleDelete(scope.row)"
+                         v-hasPermi="['mp:material:delete']">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination
-                @size-change="sizeChange"
-                @current-change="currentChange"
-                :current-page.sync="queryParams.currentPage"
-                :page-sizes="[10, 20]"
-                :page-size="queryParams.pageSize"
-                layout="total, sizes, prev, pager, next, jumper"
-                :total="queryParams.total"
-                class="pagination"
-        >
-        </el-pagination>
+        <!-- 分页组件 -->
+        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                    @pagination="getList"/>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -243,26 +197,23 @@ export default {
         pageNo: 1,
         pageSize: 10,
         accountId: undefined,
+        permanent: true,
       },
 
       actionUrl: process.env.VUE_APP_BASE_API  + '/admin-api/mp/material/upload-permanent',
       headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
       fileList:[],
-      dialogVideoVisible:false,
-      dialogNewsVisible:false,
-      addMaterialLoading:false,
       uploadData: {
         "type": 'image',
         "title":'',
         "introduction":''
       },
-      uploadRules:{
-        title: [
-          { required: true, message: '请输入标题', trigger: 'blur' }
-        ],
-        introduction: [
-          { required: true, message: '请输入描述', trigger: 'blur' }
-        ],
+      // === 视频上传，独有变量 ===
+      dialogVideoVisible: false,
+      addMaterialLoading: false,
+      uploadRules: { // 视频上传的校验规则
+        title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
+        introduction: [{ required: true, message: '请输入描述', trigger: 'blur' }],
       },
 
       // 公众号账号列表
@@ -284,7 +235,6 @@ export default {
     // ======================== 列表查询 ========================
     /** 设置账号编号 */
     setAccountId(accountId) {
-      console.log('奥特曼！')
       this.queryParams.accountId = accountId;
       this.uploadData.accountId = accountId;
     },
@@ -333,53 +283,6 @@ export default {
     },
 
     // ======================== 文件上传 ========================
-
-    handleInfo(row){
-      this.loading = true
-      getMaterialVideo({
-        mediaId:row.mediaId
-      }).then((response) => {
-        this.loading = false
-        if(response.code == 200){
-          let downUrl = response.data.downUrl
-          window.open(downUrl, '_blank');
-        }else{
-          this.$message.error('获取微信视频素材出错：' + response.data.msg)
-        }
-      }).catch(() => {
-        this.loading = false
-      })
-    },
-    handleDown(row){
-      this.loading = true
-      getMaterialOther({
-        mediaId:row.mediaId,
-        fileName:row.name
-      }).then(response => {
-        this.loading = false
-        let url = window.URL.createObjectURL(new Blob([response.data]))
-        let link = document.createElement('a')
-        link.style.display = 'none'
-        link.href = url
-        link.setAttribute('download', row.name)
-        document.body.appendChild(link)
-        link.click()
-      }).catch(() => {
-        this.loading = false
-      })
-    },
-    subVideo(){
-      this.$refs['uploadForm'].validate((valid) => {
-        if (valid) {
-          this.$refs.uploadVideo.submit()
-        } else {
-          return false
-        }
-      })
-    },
-    handleAddVideo(){
-      this.dialogVideoVisible = true
-    },
     beforeImageUpload(file) {
       const isType = file.type === 'image/jpeg'
           || file.type === 'image/png'
@@ -388,42 +291,46 @@ export default {
           || file.type === 'image/jpg';
       if (!isType) {
         this.$message.error('上传图片格式不对!')
-        this.loading = false
         return false;
       }
       const isLt = file.size / 1024 / 1024 < 2
       if (!isLt) {
         this.$message.error('上传图片大小不能超过 2M!')
-        this.loading = false
         return false;
       }
       this.loading = true
       return true;
     },
     beforeVoiceUpload(file){
-      const isType = file.type === 'audio/mp3' || file.type === 'audio/wma' || file.type === 'audio/wav' || file.type === 'audio/amr';
+      const isType = file.type === 'audio/mp3'
+          || file.type === 'audio/wma'
+          || file.type === 'audio/wav'
+          || file.type === 'audio/amr';
       const isLt = file.size / 1024 / 1024 < 2
       if (!isType) {
         this.$message.error('上传语音格式不对!')
+        return false;
       }
       if (!isLt) {
-        this.$message.error('上传语音大小不能超过2M!')
+        this.$message.error('上传语音大小不能超过 2M!')
+        return false;
       }
-      this.loading = false
-      return isType && isLt;
+      this.loading = true
+      return true;
     },
     beforeVideoUpload(file){
-      this.addMaterialLoading = true
       const isType = file.type === 'video/mp4'
-      const isLt = file.size / 1024 / 1024 < 10
       if (!isType) {
         this.$message.error('上传视频格式不对!')
+        return false;
       }
+      const isLt = file.size / 1024 / 1024 < 10
       if (!isLt) {
-        this.$message.error('上传视频大小不能超过10M!')
+        this.$message.error('上传视频大小不能超过 10M!')
+        return false
       }
-      this.addMaterialLoading = false
-      return isType && isLt;
+      this.addMaterialLoading = true
+      return  true
     },
     handleUploadSuccess(response, file, fileList) {
       this.loading = false
@@ -441,6 +348,35 @@ export default {
 
       // 加载数据
       this.getList()
+    },
+    // 下载文件
+    handleDownload(row) {
+      window.open(row.url,'_blank')
+    },
+    // 提交 video 新建的表单
+    submitVideo() {
+      this.$refs['uploadForm'].validate((valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.$refs.uploadVideo.submit()
+      })
+    },
+    handleAddVideo() {
+      this.resetVideo();
+      this.dialogVideoVisible = true
+    },
+    /** 取消按钮 */
+    cancelVideo() {
+      this.dialogVideoVisible = false;
+      this.resetVideo();
+    },
+    /** 表单重置 */
+    resetVideo() {
+      this.fileList = []
+      this.uploadData.title = ''
+      this.uploadData.introduction = ''
+      this.resetForm("uploadForm");
     },
 
     // ======================== 其它操作 ========================

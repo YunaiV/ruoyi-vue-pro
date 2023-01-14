@@ -12,7 +12,7 @@
 <template>
   <div class="wx-voice-div" @click="playVoice">
     <i :class="playing !== true ? 'el-icon-video-play': 'el-icon-video-pause'">
-      <span class="amr-duration" v-if="duration">{{ duration }}</span>
+      <span class="amr-duration" v-if="duration">{{ duration }} 秒</span>
     </i>
     <div v-if="content">
       <el-tag type="success" size="mini">语音识别</el-tag>
