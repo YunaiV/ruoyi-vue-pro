@@ -20,6 +20,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+  芋道源码：
+  ① 优化代码，和项目的代码保持一致
 -->
 <template>
   <div class="app-container">
@@ -54,7 +56,7 @@ SOFTWARE.
         <!-- TODO 芋艿：权限、样式（搜索框之类的） -->
         <el-row class="ope-row">
           <el-button type="success" circle @click="handlePublishNews(item)">发布</el-button>
-          <el-button type="primary" icon="el-icon-edit" circle @click="handleEditNews(item)"></el-button>
+          <el-button type="primary" icon="el-icon-edit" circle @click="handleUpdate(item)"></el-button>
           <el-button type="danger" icon="el-icon-delete" circle @click="delMaterial(item)"></el-button>
         </el-row>
       </div>
@@ -66,14 +68,10 @@ SOFTWARE.
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
-    <!-- TODO 芋艿：位置调整 -->
+    <!-- 添加或修改草稿对话框 -->
     <el-dialog :title="operateMaterial === 'add' ? '新建图文' : '修改图文'"
-               append-to-body
-               :before-close="dialogNewsClose"
-               :close-on-click-modal="false"
-               :visible.sync="dialogNewsVisible"
-               width="80%"
-               top="20px">
+               append-to-body width="80%" top="20px" :visible.sync="dialogNewsVisible"
+               :before-close="dialogNewsClose" :close-on-click-modal="false">
       <div class="left">
         <div class="select-item">
           <div v-for="(news, index) in articlesAdd" :key='news.id'>
@@ -115,12 +113,11 @@ SOFTWARE.
         </div>
       </div>
       <div class="right" v-loading="addMaterialLoading" v-if="articlesAdd.length > 0">
-        <!--富文本编辑器组件-->
-        <el-row>
-          <wx-editor v-model="articlesAdd[isActiveAddNews].content" :account-id="this.uploadData.accountId"
-                    v-if="hackResetEditor"/>
-        </el-row>
-        <br><br><br><br>
+        <br /> <br /> <br /> <br />
+        <!-- 标题、作者、原文地址 -->
+        <el-input v-model="articlesAdd[isActiveAddNews].title" placeholder="请输入标题（必填）" />
+        <el-input v-model="articlesAdd[isActiveAddNews].author" placeholder="请输入作者" style="margin-top: 5px;" />
+        <el-input v-model="articlesAdd[isActiveAddNews].contentSourceUrl" placeholder="请输入原文地址" style="margin-top: 5px;" />
         <!-- 封面和摘要 -->
         <div class="input-tt">封面和摘要：</div>
         <div>
@@ -137,20 +134,20 @@ SOFTWARE.
                 <div slot="tip" class="el-upload__tip">支持 bmp/png/jpeg/jpg/gif 格式，大小不超过 2M</div>
               </el-upload>
             </div>
+            <el-dialog title="选择图片" :visible.sync="dialogImageVisible" width="80%" append-to-body>
+              <wx-material-select ref="materialSelect" :objData="{type: 'image', accountId: this.queryParams.accountId}"
+                                  @selectMaterial="selectMaterial" />
+            </el-dialog>
           </div>
-          <el-dialog title="选择图片" :visible.sync="dialogImageVisible" width="80%" append-to-body>
-            <WxMaterialSelect :objData="{repType:'image'}" @selectMaterial="selectMaterial" />
-          </el-dialog>
           <el-input :rows="8" type="textarea" v-model="articlesAdd[isActiveAddNews].digest" placeholder="请输入摘要"
-                    class="digest" maxlength="120"></el-input>
+                    class="digest" maxlength="120" style="float: right" />
         </div>
-        <!-- 标题、作者、原文地址 -->
-        <div class="input-tt">标题：</div>
-        <el-input v-model="articlesAdd[isActiveAddNews].title" placeholder="请输入标题"></el-input>
-        <div class="input-tt">作者：</div>
-        <el-input v-model="articlesAdd[isActiveAddNews].author" placeholder="请输入作者"></el-input>
-        <div class="input-tt">原文地址：</div>
-        <el-input v-model="articlesAdd[isActiveAddNews].contentSourceUrl" placeholder="请输入原文地址"></el-input>
+        <!--富文本编辑器组件-->
+        <el-row>
+          <wx-editor v-model="articlesAdd[isActiveAddNews].content" :account-id="this.uploadData.accountId"
+                     v-if="hackResetEditor"/>
+        </el-row>
+        <!-- 原文地址 -->
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogNewsVisible = false">取 消</el-button>
@@ -166,7 +163,7 @@ import WxEditor from '@/views/mp/components/wx-editor/WxEditor.vue';
 import WxNews from '@/views/mp/components/wx-news/main.vue';
 import WxMaterialSelect from '@/views/mp/components/wx-material-select/main.vue'
 import { getAccessToken } from '@/utils/auth'
-import { createDraft, getDraftPage } from "@/api/mp/draft";
+import {createDraft, getDraftPage, updateDraft} from "@/api/mp/draft";
 import { getSimpleAccounts } from "@/api/mp/account";
 
 export default {
@@ -192,18 +189,12 @@ export default {
         accountId: undefined,
       },
 
-      page1: {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 10 // 每页显示多少条
-      },
-
       // ========== 文件上传 ==========
       actionUrl: process.env.VUE_APP_BASE_API + "/admin-api/mp/material/upload-permanent", // 上传永久素材的地址
       headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
       fileList: [],
       uploadData: {
-        "type": 'image', // TODO 芋艿：试试要不要换成 thumb
+        "type": 'image',
         // "accountId": 1,
       },
 
@@ -213,8 +204,6 @@ export default {
       articlesAdd: [],
       isActiveAddNews: 0,
       dialogImageVisible: false,
-      imageListData: [],
-      tableLoading1: false,
       operateMaterial: 'add',
       articlesMediaId: '',
       hackResetEditor: false,
@@ -236,6 +225,7 @@ export default {
     })
   },
   methods: {
+    // ======================== 列表查询 ========================
     /** 设置账号编号 */
     setAccountId(accountId) {
       this.queryParams.accountId = accountId;
@@ -267,6 +257,10 @@ export default {
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNo = 1
+      // 默认选中第一个
+      if (this.queryParams.accountId) {
+        this.setAccountId(this.queryParams.accountId)
+      }
       this.getList()
     },
     /** 重置按钮操作 */
@@ -279,62 +273,24 @@ export default {
       this.handleQuery()
     },
 
-    delMaterial(item){
-      this.$confirm('此操作将永久删除该草稿, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.loading = true
-        delObj({
-          id:item.mediaId
-        }).then(response => {
-          this.loading = false
-          if(response.code == 200){
-            this.getList(this.queryParams)
-          }else{
-            this.loading = false
-            this.$message.error('删除出错：' + response.msg)
-          }
-        }).catch(() => {
-          this.loading = false
-        })
-      })
+    // ======================== 新增/修改草稿 ========================
+    /** 新增按钮操作 */
+    handleAdd() {
+      this.resetEditor();
+      this.reset();
+      // 打开表单，并设置初始化
+      this.operateMaterial = 'add'
+      this.dialogNewsVisible = true
     },
-    getPage1(){
-      this.tableLoading1 = true
-      getPage1({
-        current: this.page1.currentPage,
-        size: this.page1.pageSize,
-        type:'image'
-      }).then(response => {
-        this.tableLoading1 = false
-        this.imageListData = response.data.items
-        this.page1.total = response.data.totalCount
-      }).catch(() => {
-        this.tableLoading1 = false
-      })
-    },
-    openMaterial(){
-      this.imageListData = null
-      this.page1.currentPage = 1
-      this.getPage1()
-      this.dialogImageVisible = true
-    },
-    dialogNewsClose(done){
-      this.$confirm('修改内容可能还未保存，确定关闭吗?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.hackResetEditor = false//销毁组件
-        this.$nextTick(() => {
-          this.hackResetEditor = true//重建组件
-        })
-        this.isActiveAddNews = 0
-        done()
-      }).catch(() => {
-      })
+    /** 更新按钮操作 */
+    handleUpdate(item){
+      this.resetEditor();
+      this.reset();
+      this.articlesMediaId = item.mediaId
+      this.articlesAdd = JSON.parse(JSON.stringify(item.content.newsItem))
+      // 打开表单，并设置初始化
+      this.operateMaterial = 'edit'
+      this.dialogNewsVisible = true
     },
     /** 提交按钮 */
     submitForm() {
@@ -347,59 +303,23 @@ export default {
         }).finally(() => {
           this.addMaterialLoading = false
         })
-      }
-      if(this.operateMaterial == 'edit'){
-        putObj({
-          articles:this.articlesAdd,
-          mediaId:this.articlesMediaId
-        }).then(response => {
-          this.addMaterialLoading = false
-          this.dialogNewsVisible = false
-          if(response.code == 200){
-            this.isActiveAddNews = 0
-            this.articlesAdd = [
-              {
-                "title": '',
-                "thumbMediaId": '',
-                "author": '',
-                "digest": '',
-                "showCoverPic": '',
-                "content": '',
-                "contentSourceUrl": '',
-                "needOpenComment":'',
-                "onlyFansCanComment":'',
-                "thumbUrl":''
-              }
-            ]
-            this.getList(this.queryParams)
-          }else{
-            this.$message.error('修改图文出错：' + response.msg)
-          }
-        }).catch(() => {
+      } else {
+        updateDraft(this.queryParams.accountId, this.articlesMediaId, this.articlesAdd).then(response => {
+          this.$modal.msgSuccess("更新成功");
+          this.dialogNewsVisible = false;
+          this.getList()
+        }).finally(() => {
           this.addMaterialLoading = false
         })
       }
     },
-    handleEditNews(item){
-      this.hackResetEditor = false // 销毁组件
-      this.$nextTick(() => {
-        this.hackResetEditor = true // 重建组件
-      })
-      if (this.operateMaterial == 'add') {
-        this.isActiveAddNews = 0
-      }
-      this.operateMaterial = 'edit'
-      this.articlesAdd = JSON.parse(JSON.stringify(item.content.newsItem))
-      this.articlesMediaId = item.mediaId
-      this.dialogNewsVisible = true
-    },
-    /** 新增按钮操作 */
-    handleAdd() {
-      this.resetEditor();
-      this.reset();
-      // 打开表单，并设置初始化
-      this.operateMaterial = 'add'
-      this.dialogNewsVisible = true
+    // 关闭弹窗
+    dialogNewsClose(done) {
+      this.$modal.confirm('修改内容可能还未保存，确定关闭吗?').then(() => {
+       this.reset()
+        this.resetEditor()
+        done()
+      }).catch(() => {})
     },
     // 表单重置
     reset() {
@@ -498,10 +418,19 @@ export default {
       this.articlesAdd[this.isActiveAddNews].thumbMediaId = response.data.mediaId
       this.articlesAdd[this.isActiveAddNews].thumbUrl = response.data.url
     },
-    selectMaterial(item){
+    // 选择 or 上传完素材，设置回草稿
+    selectMaterial(item) {
       this.dialogImageVisible = false
       this.articlesAdd[this.isActiveAddNews].thumbMediaId = item.mediaId
       this.articlesAdd[this.isActiveAddNews].thumbUrl = item.url
+    },
+    // 打开素材选择
+    openMaterial() {
+      this.dialogImageVisible = true
+      try {
+        this.$refs['materialSelect'].queryParams.accountId = this.queryParams.accountId // 强制设置下 accountId，避免二次查询不对
+        this.$refs['materialSelect'].handleQuery(); // 刷新列表，失败也无所谓
+      } catch (e) {}
     },
 
     // ======================== 草稿箱发布 ========================
@@ -521,248 +450,270 @@ export default {
         })
       }).catch(() => {
       })
-    }
+    },
+    delMaterial(item){
+      this.$confirm('此操作将永久删除该草稿, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.loading = true
+        delObj({
+          id:item.mediaId
+        }).then(response => {
+          this.loading = false
+          if(response.code == 200){
+            this.getList(this.queryParams)
+          }else{
+            this.loading = false
+            this.$message.error('删除出错：' + response.msg)
+          }
+        }).catch(() => {
+          this.loading = false
+        })
+      })
+    },
   }
 }
 </script>
 
 <style lang="scss" scoped>
-  .pagination {
-    float: right;
-    margin-right: 25px;
-  }
+.pagination {
+  float: right;
+  margin-right: 25px;
+}
 
-  .add_but {
-    padding: 10px;
-  }
+.add_but {
+  padding: 10px;
+}
 
-  .ope-row {
-    margin-top: 5px;
-    text-align: center;
-    border-top: 1px solid #eaeaea;
-    padding-top: 5px;
-  }
+.ope-row {
+  margin-top: 5px;
+  text-align: center;
+  border-top: 1px solid #eaeaea;
+  padding-top: 5px;
+}
 
-  .item-name {
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-align: center;
-  }
+.item-name {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
 
-  .el-upload__tip {
-    margin-left: 5px;
-  }
+.el-upload__tip {
+  margin-left: 5px;
+}
 
-  /*新增图文*/
-  .left {
-    display: inline-block;
-    width: 35%;
-    vertical-align: top;
-    margin-top: 200px;
-  }
+/*新增图文*/
+.left {
+  display: inline-block;
+  width: 35%;
+  vertical-align: top;
+  margin-top: 200px;
+}
 
-  .right {
-    display: inline-block;
-    width: 60%;
-    margin-top: -40px;
-  }
+.right {
+  display: inline-block;
+  width: 60%;
+  margin-top: -40px;
+}
 
-  .avatar-uploader {
-    width: 20%;
-    display: inline-block;
-  }
+.avatar-uploader {
+  width: 20%;
+  display: inline-block;
+}
 
-  .avatar-uploader .el-upload {
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    text-align: unset !important;
-  }
+.avatar-uploader .el-upload {
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  text-align: unset !important;
+}
 
-  .avatar-uploader .el-upload:hover {
-    border-color: #165dff;
-  }
+.avatar-uploader .el-upload:hover {
+  border-color: #165dff;
+}
 
-  .avatar-uploader-icon {
-    border: 1px solid #d9d9d9;
-    font-size: 28px;
-    color: #8c939d;
-    width: 120px;
-    height: 120px;
-    line-height: 120px;
-    text-align: center;
-  }
+.avatar-uploader-icon {
+  border: 1px solid #d9d9d9;
+  font-size: 28px;
+  color: #8c939d;
+  width: 120px;
+  height: 120px;
+  line-height: 120px;
+  text-align: center;
+}
 
-  .avatar {
-    width: 230px;
-    height: 120px;
-  }
+.avatar {
+  width: 230px;
+  height: 120px;
+}
 
-  .avatar1 {
-    width: 120px;
-    height: 120px;
-  }
+.avatar1 {
+  width: 120px;
+  height: 120px;
+}
 
-  .digest {
-    width: 60%;
-    display: inline-block;
-    vertical-align: top;
-  }
+.digest {
+  width: 60%;
+  display: inline-block;
+  vertical-align: top;
+}
 
-  /*新增图文*/
-  /*瀑布流样式*/
+/*新增图文*/
+/*瀑布流样式*/
+.waterfall {
+  width: 100%;
+  column-gap: 10px;
+  column-count: 5;
+  margin: 0 auto;
+}
+
+.waterfall-item {
+  padding: 10px;
+  margin-bottom: 10px;
+  break-inside: avoid;
+  border: 1px solid #eaeaea;
+}
+
+p {
+  line-height: 30px;
+}
+
+@media (min-width: 992px) and (max-width: 1300px) {
   .waterfall {
-    width: 100%;
-    column-gap: 10px;
-    column-count: 5;
-    margin: 0 auto;
+    column-count: 3;
   }
-
-  .waterfall-item {
-    padding: 10px;
-    margin-bottom: 10px;
-    break-inside: avoid;
-    border: 1px solid #eaeaea;
-  }
-
   p {
-    line-height: 30px;
+    color: red;
   }
+}
 
-  @media (min-width: 992px) and (max-width: 1300px) {
-    .waterfall {
-      column-count: 3;
-    }
-    p {
-      color: red;
-    }
+@media (min-width: 768px) and (max-width: 991px) {
+  .waterfall {
+    column-count: 2;
   }
+  p {
+    color: orange;
+  }
+}
 
-  @media (min-width: 768px) and (max-width: 991px) {
-    .waterfall {
-      column-count: 2;
-    }
-    p {
-      color: orange;
-    }
+@media (max-width: 767px) {
+  .waterfall {
+    column-count: 1;
   }
+}
 
-  @media (max-width: 767px) {
-    .waterfall {
-      column-count: 1;
-    }
-  }
+/*瀑布流样式*/
+.news-main {
+  background-color: #FFFFFF;
+  width: 100%;
+  margin: auto;
+  height: 120px;
+}
 
-  /*瀑布流样式*/
-  .news-main {
-    background-color: #FFFFFF;
-    width: 100%;
-    margin: auto;
-    height: 120px;
-  }
+.news-content {
+  background-color: #acadae;
+  width: 100%;
+  height: 120px;
+  position: relative;
+}
 
-  .news-content {
-    background-color: #acadae;
-    width: 100%;
-    height: 120px;
-    position: relative;
-  }
+.news-content-title {
+  display: inline-block;
+  font-size: 15px;
+  color: #FFFFFF;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  background-color: black;
+  width: 98%;
+  padding: 1%;
+  opacity: 0.65;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  height: 25px;
+}
 
-  .news-content-title {
-    display: inline-block;
-    font-size: 15px;
-    color: #FFFFFF;
-    position: absolute;
-    left: 0px;
-    bottom: 0px;
-    background-color: black;
-    width: 98%;
-    padding: 1%;
-    opacity: 0.65;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    height: 25px;
-  }
+.news-main-item {
+  background-color: #FFFFFF;
+  padding: 5px 0px;
+  border-top: 1px solid #eaeaea;
+  width: 100%;
+  margin: auto;
+}
 
-  .news-main-item {
-    background-color: #FFFFFF;
-    padding: 5px 0px;
-    border-top: 1px solid #eaeaea;
-    width: 100%;
-    margin: auto;
-  }
+.news-content-item {
+  position: relative;
+  margin-left: -3px
+}
 
-  .news-content-item {
-    position: relative;
-    margin-left: -3px
-  }
+.news-content-item-title {
+  display: inline-block;
+  font-size: 12px;
+  width: 70%;
+}
 
-  .news-content-item-title {
-    display: inline-block;
-    font-size: 12px;
-    width: 70%;
-  }
+.news-content-item-img {
+  display: inline-block;
+  width: 25%;
+  background-color: #acadae
+}
 
-  .news-content-item-img {
-    display: inline-block;
-    width: 25%;
-    background-color: #acadae
-  }
+.input-tt {
+  padding: 5px;
+}
 
-  .input-tt {
-    padding: 5px;
-  }
+.activeAddNews {
+  border: 5px solid #2bb673;
+}
 
-  .activeAddNews {
-    border: 5px solid #2bb673;
-  }
+.news-main-plus {
+  width: 280px;
+  text-align: center;
+  margin: auto;
+  height: 50px;
+}
 
-  .news-main-plus {
-    width: 280px;
-    text-align: center;
-    margin: auto;
-    height: 50px;
-  }
+.icon-plus {
+  margin: 10px;
+  font-size: 25px;
+}
 
-  .icon-plus {
-    margin: 10px;
-    font-size: 25px;
-  }
+.select-item {
+  width: 60%;
+  padding: 10px;
+  margin: 0 auto 10px auto;
+  border: 1px solid #eaeaea;
+}
 
-  .select-item {
-    width: 60%;
-    padding: 10px;
-    margin: 0 auto 10px auto;
-    border: 1px solid #eaeaea;
-  }
+.father .child {
+  display: none;
+  text-align: center;
+  position: relative;
+  bottom: 25px;
+}
 
-  .father .child {
-    display: none;
-    text-align: center;
-    position: relative;
-    bottom: 25px;
-  }
+.father:hover .child {
+  display: block;
+}
 
-  .father:hover .child {
-    display: block;
-  }
+.thumb-div {
+  display: inline-block;
+  width: 30%;
+  text-align: center;
+}
 
-  .thumb-div {
-    display: inline-block;
-    width: 30%;
-    text-align: center;
-  }
+.thumb-but {
+  margin: 5px;
+}
 
-  .thumb-but {
-    margin: 5px;
-  }
-
-  .material-img {
-    width: 100%;
-    height: 100%;
-  }
+.material-img {
+  width: 100%;
+  height: 100%;
+}
 </style>

@@ -30,3 +30,25 @@ tenant-id: {{adminTenentId}}
     }
   ]
 }
+
+### 请求 /mp/draft/create 接口 => 成功
+PUT {{baseUrl}}/mp/draft/update?accountId=1&mediaId=r6ryvl6LrxBU0miaST4Y-q-G9pdsmZw0OYG4FzHQkKfpLfEwIH51wy2bxisx8PvW
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+[{
+    "title": "我是标题（OOO）",
+    "author": "我是作者",
+    "digest": "我是摘要",
+    "content": "我是内容",
+    "contentSourceUrl": "https://www.iocoder.cn",
+    "thumbMediaId": "r6ryvl6LrxBU0miaST4Y-pIcmK-zAAId-9TGgy-DrSLhjVuWbuT3ZBjk9K1yQ0Dn"
+}, {
+  "title": "我是标题（XXX）",
+  "author": "我是作者",
+  "digest": "我是摘要",
+  "content": "我是内容",
+  "contentSourceUrl": "https://www.iocoder.cn",
+  "thumbMediaId": "r6ryvl6LrxBU0miaST4Y-pIcmK-zAAId-9TGgy-DrSLhjVuWbuT3ZBjk9K1yQ0Dn"
+}]

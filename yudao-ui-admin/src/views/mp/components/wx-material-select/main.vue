@@ -117,7 +117,7 @@
     },
     props: {
       objData: {
-        type: Object,
+        type: Object, // type - 类型；accountId - 公众号账号编号
         required: true
       },
       newsType:{ // 图文类型：1、已发布图文；2、草稿箱图文
@@ -147,6 +147,11 @@
     methods:{
       selectMaterial(item) {
         this.$emit('selectMaterial', item)
+      },
+      /** 搜索按钮操作 */
+      handleQuery() {
+        this.queryParams.pageNo = 1
+        this.getPage()
       },
       getPage() {
         this.loading = true

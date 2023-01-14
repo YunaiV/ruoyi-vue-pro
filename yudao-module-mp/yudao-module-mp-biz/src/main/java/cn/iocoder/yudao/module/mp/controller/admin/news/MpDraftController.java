@@ -7,21 +7,20 @@ import cn.iocoder.yudao.module.mp.controller.admin.news.vo.MpDraftPageReqVO;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
-import me.chanjar.weixin.mp.bean.draft.WxMpAddDraft;
-import me.chanjar.weixin.mp.bean.draft.WxMpDraftItem;
-import me.chanjar.weixin.mp.bean.draft.WxMpDraftList;
+import me.chanjar.weixin.mp.bean.draft.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.DRAFT_CREATE_FAIL;
-import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.DRAFT_LIST_FAIL;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.*;
 
 // TODO 芋艿：权限
 @Api(tags = "管理后台 - 公众号草稿")
@@ -54,13 +53,36 @@ public class MpDraftController {
     @ApiImplicitParam(name = "accountId", value = "公众号账号的编号", required = true,
             example = "1024", dataTypeClass = Long.class)
     public CommonResult<String> createDraft(@RequestParam("accountId") Long accountId,
-                                            @RequestBody WxMpAddDraft reqVO) {
+                                            @RequestBody WxMpAddDraft draft) {
         WxMpService mpService = mpServiceFactory.getRequiredMpService(accountId);
         try {
-            String mediaId = mpService.getDraftService().addDraft(reqVO);
+            String mediaId = mpService.getDraftService().addDraft(draft);
             return success(mediaId);
         } catch (WxErrorException e) {
             throw exception(DRAFT_CREATE_FAIL, e.getError().getErrorMsg());
+        }
+    }
+
+    @PutMapping("/update")
+    @ApiOperation("更新草稿")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "accountId", value = "公众号账号的编号", required = true,
+                    example = "1024", dataTypeClass = Long.class),
+            @ApiImplicitParam(name = "mediaId", value = "草稿素材的编号", required = true,
+                    example = "xxx", dataTypeClass = String.class),
+    })
+    public CommonResult<Boolean> createDraft(@RequestParam("accountId") Long accountId,
+                                             @RequestParam("mediaId") String mediaId,
+                                             @RequestBody List<WxMpDraftArticles> articles) {
+        WxMpService mpService = mpServiceFactory.getRequiredMpService(accountId);
+        try {
+            for (int i = 0; i < articles.size(); i++) {
+                WxMpDraftArticles article = articles.get(i);
+                mpService.getDraftService().updateDraft(new WxMpUpdateDraft(mediaId, i, article));
+            }
+            return success(true);
+        } catch (WxErrorException e) {
+            throw exception(DRAFT_UPDATE_FAIL, e.getError().getErrorMsg());
         }
     }
 

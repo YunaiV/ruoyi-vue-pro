@@ -19,3 +19,12 @@ export function createDraft(accountId, articles) {
     }
   })
 }
+
+// 更新草稿
+export function updateDraft(accountId, mediaId, articles) {
+  return request({
+    url: '/mp/draft/update?accountId=' + accountId + '&mediaId=' + mediaId,
+    method: 'put',
+    data: articles
+  })
+}
