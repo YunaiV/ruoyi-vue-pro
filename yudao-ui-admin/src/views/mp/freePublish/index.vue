@@ -51,9 +51,6 @@ SOFTWARE.
       </div>
     </div>
     <!-- 分页组件 -->
-    <div v-if="list.length <=0 && !loading" class="el-table__empty-block">
-      <span class="el-table__empty-text">暂无数据</span>
-    </div>
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
   </div>

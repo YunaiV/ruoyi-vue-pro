@@ -8,3 +8,11 @@ export function getMaterialPage(query) {
     params: query
   })
 }
+
+// 删除公众号永久素材
+export function deletePermanentMaterial(id) {
+  return request({
+    url: '/mp/material/delete-permanent?id=' + id,
+    method: 'delete'
+  })
+}

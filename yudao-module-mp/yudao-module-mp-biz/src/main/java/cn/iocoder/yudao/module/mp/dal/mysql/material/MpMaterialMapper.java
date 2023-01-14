@@ -22,7 +22,8 @@ public interface MpMaterialMapper extends BaseMapperX<MpMaterialDO> {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<MpMaterialDO>()
                 .eq(MpMaterialDO::getAccountId, pageReqVO.getAccountId())
                 .eqIfPresent(MpMaterialDO::getPermanent, pageReqVO.getPermanent())
-                .eqIfPresent(MpMaterialDO::getType, pageReqVO.getType()));
+                .eqIfPresent(MpMaterialDO::getType, pageReqVO.getType())
+                .orderByDesc(MpMaterialDO::getId));
     }
 
     default List<MpMaterialDO> selectListByMediaId(Collection<String> mediaIds) {

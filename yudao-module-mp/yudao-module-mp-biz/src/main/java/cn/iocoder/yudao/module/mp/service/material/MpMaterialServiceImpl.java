@@ -32,8 +32,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MATERIAL_IMAGE_UPLOAD_FAIL;
-import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MATERIAL_UPLOAD_FAIL;
+import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.*;
 
 /**
  * 公众号素材 Service 接口
@@ -170,6 +169,27 @@ public class MpMaterialServiceImpl implements MpMaterialService {
     @Override
     public List<MpMaterialDO> getMaterialListByMediaId(Collection<String> mediaIds) {
         return mpMaterialMapper.selectListByMediaId(mediaIds);
+    }
+
+    @Override
+    public void deleteMaterial(Long id) {
+        MpMaterialDO material = mpMaterialMapper.selectById(id);
+        if (material == null) {
+            throw exception(MATERIAL_NOT_EXISTS);
+        }
+
+        // 第一步，从公众号删除
+        if (material.getPermanent()) {
+            WxMpService mpService = mpServiceFactory.getRequiredMpService(material.getAppId());
+            try {
+                mpService.getMaterialService().materialDelete(material.getMediaId());
+            } catch (WxErrorException e) {
+                throw exception(MATERIAL_DELETE_FAIL, e.getError().getErrorMsg());
+            }
+        }
+
+        // 第二步，从数据库中删除
+        mpMaterialMapper.deleteById(id);
     }
 
     /**

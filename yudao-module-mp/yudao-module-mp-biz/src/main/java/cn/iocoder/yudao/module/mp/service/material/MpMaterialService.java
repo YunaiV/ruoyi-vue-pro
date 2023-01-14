@@ -74,4 +74,11 @@ public interface MpMaterialService {
      */
     List<MpMaterialDO> getMaterialListByMediaId(Collection<String> mediaIds);
 
+    /**
+     * 删除素材
+     *
+     * @param id 编号
+     */
+    void deleteMaterial(Long id);
+
 }

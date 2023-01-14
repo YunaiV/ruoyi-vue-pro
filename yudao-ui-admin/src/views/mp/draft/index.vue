@@ -64,9 +64,6 @@ SOFTWARE.
       </div>
     </div>
     <!-- 分页记录 -->
-    <div v-if="list.length <= 0 && !loading" class="el-table__empty-block">
-      <span class="el-table__empty-text">暂无数据</span>
-    </div>
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
@@ -218,7 +215,6 @@ export default {
       this.accounts = response.data;
       // 默认选中第一个
       if (this.accounts.length > 0) {
-        this.queryParams.accountId = this.accounts[0].id;
         this.setAccountId(this.accounts[0].id);
       }
       // 加载数据
@@ -241,7 +237,7 @@ export default {
       }
 
       this.loading = true
-      getDraftPage((this.queryParams)).then(response => {
+      getDraftPage(this.queryParams).then(response => {
         // 将 thumbUrl 转成 picUrl，保证 wx-news 组件可以预览封面
         response.data.list.forEach(item => {
           const newsItem = item.content.newsItem;

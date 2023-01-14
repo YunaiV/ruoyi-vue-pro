@@ -235,7 +235,7 @@
           "title":'',
           "introduction":''
         },
-        actionUrl: process.env.VUE_APP_BASE_API +'/admin-api/mp/material/upload-temporary',
+        actionUrl: process.env.VUE_APP_BASE_API + '/admin-api/mp/material/upload-temporary',
         headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
       }
     },
@@ -279,7 +279,7 @@
         this.uploadData.accountId = this.objData.accountId;
         return true;
       },
-      beforeImageUpload(file){
+      beforeImageUpload(file) {
         // 校验格式
         const isType = file.type === 'image/jpeg'
             || file.type === 'image/png'
