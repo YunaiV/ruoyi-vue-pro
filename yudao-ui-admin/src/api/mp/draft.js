@@ -28,3 +28,11 @@ export function updateDraft(accountId, mediaId, articles) {
     data: articles
   })
 }
+
+// 删除草稿
+export function deleteDraft(accountId, mediaId) {
+  return request({
+    url: '/mp/draft/delete?accountId=' + accountId + '&mediaId=' + mediaId,
+    method: 'delete',
+  })
+}

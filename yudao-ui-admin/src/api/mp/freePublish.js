@@ -16,3 +16,11 @@ export function deleteFreePublish(accountId, articleId) {
     method: 'delete'
   })
 }
+
+// 发布公众号素材
+export function submitFreePublish(accountId, mediaId) {
+  return request({
+    url: '/mp/free-publish/submit?accountId=' + accountId + '&mediaId=' + mediaId,
+    method: 'post'
+  })
+}

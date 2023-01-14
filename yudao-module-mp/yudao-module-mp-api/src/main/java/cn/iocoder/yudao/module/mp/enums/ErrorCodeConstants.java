@@ -47,6 +47,7 @@ public interface ErrorCodeConstants {
     ErrorCode DRAFT_LIST_FAIL = new ErrorCode(1006007000, "获得草稿列表失败，原因：{}");
     ErrorCode DRAFT_CREATE_FAIL = new ErrorCode(1006007001, "创建草稿失败，原因：{}");
     ErrorCode DRAFT_UPDATE_FAIL = new ErrorCode(1006007002, "更新草稿失败，原因：{}");
+    ErrorCode DRAFT_DELETE_FAIL = new ErrorCode(1006007002, "删除草稿失败，原因：{}");
 
     // TODO 要处理下
     ErrorCode MENU_NOT_EXISTS = new ErrorCode(1006001002, "菜单不存在");

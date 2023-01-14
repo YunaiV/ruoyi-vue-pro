@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
   芋道源码：
   ① 优化代码，和项目的代码保持一致
+  ② 清理冗余代码，保证代码整洁
+  ③ 增加注释，提升可读性
 -->
 <template>
   <div class="app-container">
@@ -53,11 +55,11 @@ SOFTWARE.
       <div v-if="item.content && item.content.newsItem" class="waterfall-item" v-for="item in list"
            :key='item.articleId'>
         <wx-news :articles="item.content.newsItem" />
-        <!-- TODO 芋艿：权限、样式（搜索框之类的） -->
+        <!-- 操作按钮 -->
         <el-row class="ope-row">
-          <el-button type="success" circle @click="handlePublishNews(item)">发布</el-button>
-          <el-button type="primary" icon="el-icon-edit" circle @click="handleUpdate(item)"></el-button>
-          <el-button type="danger" icon="el-icon-delete" circle @click="delMaterial(item)"></el-button>
+          <el-button type="success" circle @click="handlePublish(item)" v-hasPermi="['mp:free-publish:submit']">发布</el-button>
+          <el-button type="primary" icon="el-icon-edit" circle @click="handleUpdate(item)" v-hasPermi="['mp:draft:update']" />
+          <el-button type="danger" icon="el-icon-delete" circle @click="handleDelete(item)" v-hasPermi="['mp:draft:delete']" />
         </el-row>
       </div>
     </div>
@@ -147,7 +149,6 @@ SOFTWARE.
           <wx-editor v-model="articlesAdd[isActiveAddNews].content" :account-id="this.uploadData.accountId"
                      v-if="hackResetEditor"/>
         </el-row>
-        <!-- 原文地址 -->
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogNewsVisible = false">取 消</el-button>
@@ -158,13 +159,13 @@ SOFTWARE.
 </template>
 
 <script>
-// import { getPage as getPage1 } from '@/api/wxmp/wxmaterial'
 import WxEditor from '@/views/mp/components/wx-editor/WxEditor.vue';
 import WxNews from '@/views/mp/components/wx-news/main.vue';
 import WxMaterialSelect from '@/views/mp/components/wx-material-select/main.vue'
 import { getAccessToken } from '@/utils/auth'
-import {createDraft, getDraftPage, updateDraft} from "@/api/mp/draft";
+import {createDraft, deleteDraft, getDraftPage, updateDraft} from "@/api/mp/draft";
 import { getSimpleAccounts } from "@/api/mp/account";
+import {deleteFreePublish, submitFreePublish} from "@/api/mp/freePublish";
 
 export default {
   name: 'mpDraft',
@@ -221,7 +222,7 @@ export default {
         this.setAccountId(this.accounts[0].id);
       }
       // 加载数据
-      // this.getList(); // TODO 芋艿：开发完，放出来
+      this.getList();
     })
   },
   methods: {
@@ -434,44 +435,26 @@ export default {
     },
 
     // ======================== 草稿箱发布 ========================
-    handlePublishNews(item){
-      this.$confirm('你正在通过发布的方式发表内容。 发布不占用群发次数，一天可多次发布。已发布内容不会推送给用户，也不会展示在公众号主页中。 发布后，你可以前往发表记录获取链接，也可以将发布内容添加到自定义菜单、自动回复、话题和页面模板中。', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+    handlePublish(item) {
+      const accountId = this.queryParams.accountId;
+      const mediaId = item.mediaId;
+      const content = '你正在通过发布的方式发表内容。 发布不占用群发次数，一天可多次发布。已发布内容不会推送给用户，也不会展示在公众号主页中。 发布后，你可以前往发表记录获取链接，也可以将发布内容添加到自定义菜单、自动回复、话题和页面模板中。';
+      this.$modal.confirm(content).then(function() {
+        return submitFreePublish(accountId, mediaId);
       }).then(() => {
-        this.loading = true
-        publish(item.mediaId).then(response => {
-          this.loading = false
-          this.$message.success('发布任务提交成功')
-          this.getList(this.queryParams)
-        }).catch(() => {
-          this.loading = false
-        })
-      }).catch(() => {
-      })
+        this.getList();
+        this.$modal.msgSuccess("发布成功");
+      }).catch(() => {});
     },
-    delMaterial(item){
-      this.$confirm('此操作将永久删除该草稿, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+    handleDelete(item) {
+      const accountId = this.queryParams.accountId;
+      const mediaId = item.mediaId;
+      this.$modal.confirm('此操作将永久删除该草稿, 是否继续?').then(function() {
+        return deleteDraft(accountId, mediaId);
       }).then(() => {
-        this.loading = true
-        delObj({
-          id:item.mediaId
-        }).then(response => {
-          this.loading = false
-          if(response.code == 200){
-            this.getList(this.queryParams)
-          }else{
-            this.loading = false
-            this.$message.error('删除出错：' + response.msg)
-          }
-        }).catch(() => {
-          this.loading = false
-        })
-      })
+        this.getList();
+        this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     },
   }
 }
