@@ -117,7 +117,7 @@ SOFTWARE.
       <div class="right" v-loading="addMaterialLoading" v-if="articlesAdd.length > 0">
         <!--富文本编辑器组件-->
         <el-row>
-          <wx-editor v-model="articlesAdd[isActiveAddNews].content" :uploadData="uploadData"
+          <wx-editor v-model="articlesAdd[isActiveAddNews].content" :account-id="this.uploadData.accountId"
                     v-if="hackResetEditor"/>
         </el-row>
         <br><br><br><br>
@@ -204,9 +204,7 @@ export default {
       fileList: [],
       uploadData: {
         "type": 'image', // TODO 芋艿：试试要不要换成 thumb
-        "title": '',
-        "introduction": '',
-        "accountId": 1,
+        // "accountId": 1,
       },
 
       // ========== 草稿新建 or 修改 ==========
@@ -495,8 +493,6 @@ export default {
 
       // 重置上传文件的表单
       this.fileList = []
-      this.uploadData.title = ''
-      this.uploadData.introduction = ''
 
       // 设置草稿的封面字段
       this.articlesAdd[this.isActiveAddNews].thumbMediaId = response.data.mediaId

@@ -1,6 +1,8 @@
 <!--
   - Copyright (C) 2018-2019
   - All rights reserved, Designed By www.joolun.com
+  芋道源码：
+  ① 调整 uploadData 属性，只需要传入 accountId 即可
 -->
 <template>
   <div id="wxEditor">
@@ -44,14 +46,16 @@ import { getAccessToken } from "@/utils/auth";
 
 export default {
   props: {
-    uploadData: {
-      type: Object
+    /* 公众号账号编号 */
+    accountId: {
+      type: Number,
+      required: true
     },
-    /*编辑器的内容*/
+    /* 编辑器的内容 */
     value: {
       type: String
     },
-    /*图片大小*/
+    /* 图片大小 */
     maxSize: {
       type: Number,
       default: 4000 // kb
@@ -97,6 +101,10 @@ export default {
       },
       actionUrl: process.env.VUE_APP_BASE_API +'/admin-api/mp/material/upload-news-image', // 这里写你要上传的图片服务器地址
       headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
+      uploadData: {
+        "type": 'image', // TODO 芋艿：试试要不要换成 thumb
+        "accountId": this.accountId,
+      },
     }
   },
   methods: {
