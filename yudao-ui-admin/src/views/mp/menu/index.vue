@@ -60,11 +60,11 @@ SOFTWARE.
             </div>
           </div>
           <!-- 一级菜单加号 -->
-          <div class="menu_bottom menu_addicon" v-if="menuKeyLength < 3" @click="addMenu"><i class="el-icon-plus"></i></div>
+          <div class="menu_bottom menu_addicon" v-if="this.menuList.length < 3" @click="addMenu"><i class="el-icon-plus"></i></div>
         </div>
         <div class="save_div">
             <!--<el-button class="save_btn" type="warning" size="small" @click="saveFun">保存菜单</el-button>-->
-            <el-button class="save_btn" type="success" size="small" @click="saveAndReleaseFun">保存并发布菜单</el-button>
+            <el-button class="save_btn" type="success" size="small" @click="handleSaveAndReleaseFun">保存并发布菜单</el-button>
         </div>
       </div>
       <!--右边配置-->
@@ -75,9 +75,9 @@ SOFTWARE.
               </div>
               <div>
                   <span>菜单名称：</span>
-                  <el-input class="input_width" v-model="tempObj.name" placeholder="请输入菜单名称" :maxlength=nameMaxlength clearable></el-input>
+                  <el-input class="input_width" v-model="tempObj.name" placeholder="请输入菜单名称" :maxlength=nameMaxLength clearable></el-input>
               </div>
-              <div v-if="showConfigurContent">
+              <div v-if="showConfigureContent">
                   <div class="menu_content">
                       <span>菜单内容：</span>
                       <el-select v-model="tempObj.type" clearable placeholder="请选择" class="menu_option">
@@ -129,8 +129,8 @@ SOFTWARE.
               </div>
           </div>
       </div>
-      <!--一进页面就显示的默认页面，当点击左边按钮的时候，就不显示了-->
-      <div v-if="!showRightFlag" class="right">
+      <!-- 一进页面就显示的默认页面，当点击左边按钮的时候，就不显示了-->
+      <div v-else class="right">
           <p>请选择菜单配置</p>
       </div>
     </div>
@@ -138,12 +138,11 @@ SOFTWARE.
 </template>
 
 <script>
-// import { save, saveAndRelease ,getList} from '@/api/wxmp/wxmenu'
 import WxReplySelect from '@/views/mp/components/wx-news/main.vue'
 import WxNews from '@/views/mp/components/wx-news/main.vue';
 import WxMaterialSelect from '@/views/mp/components/wx-news/main.vue'
-import {getMenuList} from "@/api/mp/menu";
-import {getSimpleAccounts} from "@/api/mp/account";
+import { getMenuList } from "@/api/mp/menu";
+import { getSimpleAccounts } from "@/api/mp/account";
 
 export default {
   name: 'mpMenu',
@@ -154,6 +153,7 @@ export default {
   },
   data(){
     return {
+      // ======================== 列表查询 ========================
       // 遮罩层
       loading: true,
       // 显示搜索条件
@@ -164,24 +164,28 @@ export default {
         children: [],
       },
 
-      showRightFlag:false, // 右边配置显示默认详情还是配置详情
       menu:{ // 横向菜单
           button:[
           ]
       },
 
+      // ======================== 菜单操作 ========================
       isActive: -1,// 一级菜单点中样式
       isSubMenuActive: -1, // 一级菜单点中样式
       isSubMenuFlag: -1, // 二级菜单显示标志
+
+      // ======================== 菜单编辑 ========================
+      showRightFlag: false, // 右边配置显示默认详情还是配置详情
+      nameMaxLength: 0, // 菜单名称最大长度；1 级是 4 字符；2 级是 7 字符；
+      showConfigureContent: true, // 是否展示配置内容；如果有子菜单，就不显示配置内容
+
+
       tempObj:{}, // 右边临时变量，作为中间值牵引关系
-      tempSelfObj: {
-          // 一些临时值放在这里进行判断，如果放在 tempObj，由于引用关系，menu 也会多了多余的参数
+      tempSelfObj: { // 一些临时值放在这里进行判断，如果放在 tempObj，由于引用关系，menu 也会多了多余的参数
       },
       visible2: false, //素材内容  "选择素材"按钮弹框显示隐藏
       tableData:[], //素材内容弹框数据,
       menuName:'',
-      showConfigurContent:true,
-      nameMaxlength:0,//名称最大长度
       menuOptions: [{
           value: 'view',
           label: '跳转网页'
@@ -231,12 +235,6 @@ export default {
       this.getList();
     })
   },
-  computed: {
-    menuKeyLength:function() {
-      // menuObj 的长度，当长度小于 3 才显示一级菜单的加号
-      return this.menu.button.length;
-    }
-  },
   methods: {
     // ======================== 列表查询 ========================
     /** 设置账号编号 */
@@ -271,6 +269,125 @@ export default {
       this.handleQuery()
     },
 
+    // ======================== 菜单操作 ========================
+    // 一级菜单点击事件
+    menuClick(i, item) {
+      // 右侧的表单相关
+      this.resetEditor();
+      this.showRightFlag = true; // 右边菜单
+      this.tempObj = item; // 这个如果放在顶部，flag 会没有。因为重新赋值了。
+      this.tempSelfObj.grand = "1"; // 表示一级菜单
+      this.tempSelfObj.index = i; // 表示一级菜单索引
+      this.nameMaxLength = 4
+      this.showConfigureContent = !(item.children && item.children.length > 0); // 有子菜单，就不显示配置内容
+
+      // 左侧的选中
+      this.isActive = i; // 一级菜单选中样式
+      this.isSubMenuFlag = i; // 二级菜单显示标志
+      this.isSubMenuActive = -1; // 二级菜单去除选中样式
+    },
+    // 二级菜单点击事件
+    subMenuClick(subItem, index, k) {
+      // 右侧的表单相关
+      this.resetEditor();
+      this.showRightFlag = true; // 右边菜单
+      this.tempObj = subItem;//将点击的数据放到临时变量，对象有引用作用
+      this.tempSelfObj.grand = "2"; // 表示二级菜单
+      this.tempSelfObj.index = index; // 表示一级菜单索引
+      this.tempSelfObj.secondIndex = k; // 表示二级菜单索引
+      this.nameMaxLength = 7
+      this.showConfigureContent = true;
+
+      // 左侧的选中
+      this.isActive = -1; // 一级菜单去除样式
+      this.isSubMenuActive = index + "" + k; // 二级菜单选中样式
+    },
+    // 添加横向一级菜单
+    addMenu(){
+      const menuKeyLength = this.menuList.length;
+      const addButton = {
+        name: "菜单名称",
+        children: []
+      }
+      this.$set(this.menuList, menuKeyLength, addButton)
+      this.menuClick(this.menuKeyLength - 1, addButton)
+    },
+    // 添加横向二级菜单；item 表示要操作的父菜单
+    addSubMenu(i, item) {
+      if (!item.children || item.children.length <= 0){
+        this.$set( item, 'children',[])
+        // TODO 芋艿：需要搞的属性弄下
+        this.$delete( item, 'type')
+        this.$delete( item, 'pagepath')
+        this.$delete( item, 'url')
+        this.$delete( item, 'key')
+        this.$delete( item, 'article_id')
+        this.$delete( item, 'textContent')
+        this.showConfigureContent = false
+      }
+
+      let subMenuKeyLength = item.children.length; // 获取二级菜单key长度
+      let addButton = {
+        name: "子菜单名称"
+      }
+      this.$set(item.children, subMenuKeyLength, addButton);
+      this.subMenuClick(item.children[subMenuKeyLength], i, subMenuKeyLength)
+    },
+    // 删除当前菜单
+    deleteMenu(item) {
+      this.$modal.confirm('确定要删除吗?').then(() => {
+        // 删除数据
+        if (this.tempSelfObj.grand === "1") { // 一级菜单的删除方法
+          this.menuList.splice(this.tempSelfObj.index, 1);
+        } else if (this.tempSelfObj.grand === "2") {  // 二级菜单的删除方法
+          this.menuList[this.tempSelfObj.index].children.splice(this.tempSelfObj.secondIndex, 1);
+        }
+        // 提示
+        this.$modal.msgSuccess("删除成功");
+
+        // 处理菜单的选中
+        this.tempObj = {};
+        this.showRightFlag = false;
+        this.isActive = -1;
+        this.isSubMenuActive = -1;
+      }).catch(() => {});
+    },
+
+    // ======================== 菜单编辑 ========================
+    handleSaveAndReleaseFun(){
+      this.$confirm('确定要保证并发布该菜单吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.loading = true
+        saveAndRelease({
+          strWxMenu:this.menu
+        }).then(response => {
+          this.loading = false
+          if(response.code == 200){
+            this.$message({
+              showClose: true,
+              message: '发布成功',
+              type: 'success'
+            })
+          }else{
+            this.$message.error(response.data.msg)
+          }
+        }).catch(() => {
+          this.loading = false
+        })
+      }).catch(() => {
+      })
+    },
+    // 表单 Editor 重置
+    resetEditor() {
+      this.hackResetEditor = false // 销毁组件
+      this.$nextTick(() => {
+        this.hackResetEditor = true // 重建组件
+      })
+    },
+
     // TODO 芋艿：未归类
 
     deleteTempObj(){
@@ -295,131 +412,6 @@ export default {
         item.content.articles = item.content.articles.slice(0,1)
         this.tempObj.content = item.content
     },
-    handleClick(tab, event){
-        this.tempObj.mediaType = tab.name
-    },
-    saveAndReleaseFun(){
-        this.$confirm('确定要保证并发布该菜单吗?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-        }).then(() => {
-            this.loading = true
-            saveAndRelease({
-                strWxMenu:this.menu
-            }).then(response => {
-                this.loading = false
-                if(response.code == 200){
-                    this.$message({
-                        showClose: true,
-                        message: '发布成功',
-                        type: 'success'
-                    })
-                }else{
-                    this.$message.error(response.data.msg)
-                }
-            }).catch(() => {
-                this.loading = false
-            })
-        }).catch(() => {
-        })
-    },
-    // 一级菜单点击事件
-    menuClick(i, item){
-        this.hackResetWxReplySelect = false//销毁组件
-        this.$nextTick(() => {
-            this.hackResetWxReplySelect = true//重建组件
-        })
-        this.showRightFlag = true;//右边菜单
-        this.tempObj = item;//这个如果放在顶部，flag会没有。因为重新赋值了。
-        this.tempSelfObj.grand = "1";//表示一级菜单
-        this.tempSelfObj.index = i;//表示一级菜单索引
-        this.isActive = i; //一级菜单选中样式
-        this.isSubMenuFlag = i; //二级菜单显示标志
-        this.isSubMenuActive = -1; //二级菜单去除选中样式
-        this.nameMaxlength = 4
-        if(item.sub_button && item.sub_button.length > 0){
-            this.showConfigurContent = false
-        }else{
-            this.showConfigurContent = true
-        }
-    },
-    // 二级菜单点击事件
-    subMenuClick(subItem, index, k){
-        this.hackResetWxReplySelect = false//销毁组件
-        this.$nextTick(() => {
-            this.hackResetWxReplySelect = true//重建组件
-        })
-        this.showRightFlag = true;//右边菜单
-        this.tempObj = subItem;//将点击的数据放到临时变量，对象有引用作用
-        this.tempSelfObj.grand = "2";//表示二级菜单
-        this.tempSelfObj.index = index;//表示一级菜单索引
-        this.tempSelfObj.secondIndex = k;//表示二级菜单索引
-        this.isSubMenuActive = index + "" + k; //二级菜单选中样式
-        this.isActive = -1;//一级菜单去除样式
-        this.showConfigurContent = true;
-        this.nameMaxlength = 7
-    },
-    // 添加横向一级菜单
-    addMenu(){
-        let menuKeyLength = this.menuKeyLength
-        let addButton = {
-            name: "菜单名称",
-            sub_button: []
-        }
-        this.$set(this.menu.button,menuKeyLength,addButton)
-        this.menuClick(this.menuKeyLength-1, addButton)
-    },
-    // 添加横向二级菜单
-    addSubMenu(i,item){
-        if(!item.sub_button||item.sub_button.length<=0){
-            this.$set( item, 'sub_button',[])
-            this.$delete( item, 'type')
-            this.$delete( item, 'pagepath')
-            this.$delete( item, 'url')
-            this.$delete( item, 'key')
-            this.$delete( item, 'article_id')
-            this.$delete( item, 'textContent')
-            this.showConfigurContent = false
-        }
-        let subMenuKeyLength = item.sub_button.length;//获取二级菜单key长度
-        let addButton = {
-            name: "子菜单名称"
-        }
-        this.$set(item.sub_button,subMenuKeyLength,addButton);
-        this.subMenuClick(item.sub_button[subMenuKeyLength], i, subMenuKeyLength)
-    },
-    //删除当前菜单
-    deleteMenu(obj){
-        let _this = this;
-        this.$confirm('确定要删除吗?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-        }).then(() => {
-            _this.deleteData();// 删除菜单数据
-            _this.tempObj = {};
-            _this.showRightFlag = false;
-            this.isActive = -1;
-            this.isSubMenuActive = -1;
-        }).catch(() => {
-        });
-    },
-    // 删除菜单数据
-    deleteData(){
-        // 一级菜单的删除方法
-        if(this.tempSelfObj.grand == "1"){
-            this.menu.button.splice(this.tempSelfObj.index,1);
-        }
-        // 二级菜单的删除方法
-        if(this.tempSelfObj.grand == "2"){
-            this.menu.button[this.tempSelfObj.index].sub_button.splice(this.tempSelfObj.secondIndex, 1);
-        }
-        this.$message({
-            type: 'success',
-            message: '删除成功!'
-        });
-    }
   },
 }
 </script>
@@ -589,30 +581,30 @@ div{
 <!--</style>-->
 <!--素材样式-->
 <style lang="scss" scoped>
-    .pagination{
-        text-align: right;
-        margin-right: 25px;
-    }
-    .select-item{
-        width: 280px;
-        padding: 10px;
-        margin: 0 auto 10px auto;
-        border: 1px solid #eaeaea;
-    }
-    .select-item2{
-        padding: 10px;
-        margin: 0 auto 10px auto;
-        border: 1px solid #eaeaea;
-    }
-    .ope-row{
-        padding-top: 10px;
-        text-align: center;
-    }
-    .item-name{
-        font-size: 12px;
-        overflow: hidden;
-        text-overflow:ellipsis;
-        white-space: nowrap;
-        text-align: center;
-    }
+.pagination{
+    text-align: right;
+    margin-right: 25px;
+}
+.select-item{
+    width: 280px;
+    padding: 10px;
+    margin: 0 auto 10px auto;
+    border: 1px solid #eaeaea;
+}
+.select-item2{
+    padding: 10px;
+    margin: 0 auto 10px auto;
+    border: 1px solid #eaeaea;
+}
+.ope-row{
+    padding-top: 10px;
+    text-align: center;
+}
+.item-name{
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    text-align: center;
+}
 </style>
