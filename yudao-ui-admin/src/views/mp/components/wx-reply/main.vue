@@ -346,8 +346,11 @@ export default {
       // 如果获取不到，需要把 objData 复原
       // 必须使用 $set 赋值，不然 input 无法输入内容
       this.$set(this.objData, 'content', '');
+      this.$delete(this.objData, 'mediaId');
+      this.$delete(this.objData, 'url');
       this.$set(this.objData, 'title', '');
       this.$set(this.objData, 'description', '');
+
     },
     /**
      * 选择素材，将设置设置到 objData 变量
@@ -429,15 +432,15 @@ export default {
         this.$delete(this.objData, 'articles');
       } else if(this.objData.type === 'image') {
         this.objData.mediaId = null
-        this.objData.url = null
+        this.$delete(this.objData, 'url');
         this.objData.name = null
       } else if(this.objData.type === 'voice') {
         this.objData.mediaId = null
-        this.objData.url = null
+        this.$delete(this.objData, 'url');
         this.objData.name = null
       } else if(this.objData.type === 'video') {
         this.objData.mediaId = null
-        this.objData.url = null
+        this.$delete(this.objData, 'url');
         this.objData.name = null
         this.objData.title = null
         this.objData.description = null
