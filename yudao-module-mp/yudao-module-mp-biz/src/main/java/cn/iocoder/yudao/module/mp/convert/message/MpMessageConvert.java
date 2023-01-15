@@ -57,10 +57,14 @@ public interface MpMessageConvert {
                 break;
             case WxConsts.XmlMsgType.IMAGE: // 2. 图片
             case WxConsts.XmlMsgType.VOICE: // 3. 语音
-                message.setMediaId(sendReqBO.getMediaId()).setMediaUrl(sendReqBO.getMediaUrl());
+                message.setMediaId(sendReqBO.getMediaId())
+//                        .setMediaUrl(sendReqBO.getMediaUrl()) TODO 芋艿：去 url
+                ;
                 break;
             case WxConsts.XmlMsgType.VIDEO: // 4. 视频
-                message.setMediaId(sendReqBO.getMediaId()).setMediaUrl(sendReqBO.getMediaUrl())
+                message.setMediaId(sendReqBO.getMediaId())
+//                        .setMediaUrl(sendReqBO.getMediaUrl()) TODO 芋艿：去 url
+
                         .setTitle(sendReqBO.getTitle()).setDescription(sendReqBO.getDescription());
                 break;
             case WxConsts.XmlMsgType.NEWS: // 5. 图文
@@ -69,7 +73,7 @@ public interface MpMessageConvert {
                 message.setTitle(sendReqBO.getTitle()).setDescription(sendReqBO.getDescription())
                         .setMusicUrl(sendReqBO.getMusicUrl()).setHqMusicUrl(sendReqBO.getHqMusicUrl())
                         .setThumbMediaId(sendReqBO.getThumbMediaId());
-//                        .setThumbMediaUrl(sendReqBO.getThumbMediaUrl()); TODO 芋艿：url 待确定
+//                        .setThumbMediaUrl(sendReqBO.getThumbMediaUrl()); TODO 芋艿：去 url
                 break;
             default:
                 throw new IllegalArgumentException("不支持的消息类型：" + message.getType());

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import cn.iocoder.yudao.module.mp.framework.mp.core.util.MpUtils.*;
 import lombok.Data;
 import me.chanjar.weixin.common.api.WxConsts;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -45,7 +46,7 @@ public class MpMessageSendOutReqBO {
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 TEXT
      */
-    @NotEmpty(message = "消息内容不能为空", groups = TextGroup.class)
+    @NotEmpty(message = "消息内容不能为空", groups = TextMessageGroup.class)
     private String content;
 
     /**
@@ -53,39 +54,38 @@ public class MpMessageSendOutReqBO {
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 IMAGE、VOICE、VIDEO
      */
-    @NotEmpty(message = "消息内容不能为空", groups = {ImageGroup.class, VoiceGroup.class, VideoGroup.class})
+    @NotEmpty(message = "消息 mediaId 不能为空", groups = {ImageMessageGroup.class, VoiceMessageGroup.class, VideoMessageGroup.class})
     private String mediaId;
-    // TODO 芋艿：考虑去掉
-    /**
-     * 媒体 URL
-     *
-     * 消息类型为 {@link WxConsts.XmlMsgType} 的 IMAGE、VOICE、VIDEO
-     */
-    @NotEmpty(message = "消息内容不能为空", groups = {ImageGroup.class, VoiceGroup.class, VideoGroup.class})
-    private String mediaUrl;
+//    // TODO 芋艿：考虑去掉
+//    /**
+//     * 媒体 URL
+//     *
+//     * 消息类型为 {@link WxConsts.XmlMsgType} 的 IMAGE、VOICE、VIDEO
+//     */
+//    @NotEmpty(message = "消息内容不能为空", groups = {ImageMessageGroup.class, VoiceMessageGroup.class, VideoMessageGroup.class})
+//    private String mediaUrl;
 
     /**
      * 缩略图的媒体 id
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO、MUSIC
      */
-    @NotEmpty(message = "消息内容不能为空", groups = {MusicGroup.class})
+    @NotEmpty(message = "消息 thumbMediaId 不能为空", groups = {MusicMessageGroup.class})
     private String thumbMediaId;
-    // TODO 芋艿：考虑去掉
 
     /**
      * 标题
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO
      */
-    @NotEmpty(message = "消息内容不能为空", groups = VideoGroup.class)
+    @NotEmpty(message = "消息标题不能为空", groups = VideoMessageGroup.class)
     private String title;
     /**
      * 描述
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO
      */
-    @NotEmpty(message = "消息内容不能为空", groups = VideoGroup.class)
+    @NotEmpty(message = "消息描述不能为空", groups = VideoMessageGroup.class)
     private String description;
 
     /**
@@ -94,7 +94,7 @@ public class MpMessageSendOutReqBO {
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
      */
     @Valid
-    @NotNull(message = "图文消息不能为空", groups = NewsGroup.class)
+    @NotNull(message = "图文消息不能为空", groups = NewsMessageGroup.class)
     private List<MpMessageDO.Article> articles;
 
     /**
@@ -102,6 +102,8 @@ public class MpMessageSendOutReqBO {
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
      */
+    @NotEmpty(message = "音乐链接不能为空", groups = MusicMessageGroup.class)
+    @URL(message = "高质量音乐链接格式不正确", groups = MusicMessageGroup.class)
     private String musicUrl;
 
     /**
@@ -109,6 +111,8 @@ public class MpMessageSendOutReqBO {
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
      */
+    @NotEmpty(message = "高质量音乐链接不能为空", groups = MusicMessageGroup.class)
+    @URL(message = "高质量音乐链接格式不正确", groups = MusicMessageGroup.class)
     private String hqMusicUrl;
 
 }

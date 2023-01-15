@@ -76,8 +76,8 @@ public class MpMessageServiceImpl implements MpMessageService {
         Assert.notNull(user, "公众号粉丝({}/{}) 不存在", appId, wxMessage.getFromUser());
 
         // 记录消息
-        MpMessageDO message = MpMessageConvert.INSTANCE.convert(wxMessage, account, user);
-        message.setSendFrom(MpMessageSendFromEnum.USER_TO_MP.getFrom());
+        MpMessageDO message = MpMessageConvert.INSTANCE.convert(wxMessage, account, user)
+                .setSendFrom(MpMessageSendFromEnum.USER_TO_MP.getFrom());
         downloadMessageMedia(message);
         mpMessageMapper.insert(message);
     }
@@ -94,9 +94,9 @@ public class MpMessageServiceImpl implements MpMessageService {
         Assert.notNull(user, "公众号粉丝({}/{}) 不存在", sendReqBO.getAppId(), sendReqBO.getOpenid());
 
         // 记录消息
-        MpMessageDO message = MpMessageConvert.INSTANCE.convert(sendReqBO, account, user);
-        message.setSendFrom(MpMessageSendFromEnum.MP_TO_USER.getFrom());
-        // TODO 芋艿：downloadMessageMedia
+        MpMessageDO message = MpMessageConvert.INSTANCE.convert(sendReqBO, account, user).
+                setSendFrom(MpMessageSendFromEnum.MP_TO_USER.getFrom());
+        downloadMessageMedia(message);
         mpMessageMapper.insert(message);
 
         // 转换返回 WxMpXmlOutMessage 对象
@@ -122,8 +122,8 @@ public class MpMessageServiceImpl implements MpMessageService {
         }
 
         // 记录消息
-        MpMessageDO message = MpMessageConvert.INSTANCE.convert(wxMessage, account, user);
-        message.setSendFrom(MpMessageSendFromEnum.MP_TO_USER.getFrom());
+        MpMessageDO message = MpMessageConvert.INSTANCE.convert(wxMessage, account, user)
+                .setSendFrom(MpMessageSendFromEnum.MP_TO_USER.getFrom());
         downloadMessageMedia(message);
         mpMessageMapper.insert(message);
         return message;

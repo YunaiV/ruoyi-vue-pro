@@ -17,7 +17,6 @@ public interface MpAutoReplyConvert {
             @Mapping(source = "reply.responseMessageType", target = "type"),
             @Mapping(source = "reply.responseContent", target = "content"),
             @Mapping(source = "reply.responseMediaId", target = "mediaId"),
-            @Mapping(source = "reply.responseMediaUrl", target = "mediaUrl"),
             @Mapping(source = "reply.responseTitle", target = "title"),
             @Mapping(source = "reply.responseDescription", target = "description"),
             @Mapping(source = "reply.responseArticles", target = "articles"),

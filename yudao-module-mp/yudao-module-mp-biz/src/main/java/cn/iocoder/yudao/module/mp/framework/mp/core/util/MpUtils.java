@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.mp.framework.mp.core.util;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
@@ -15,36 +16,6 @@ import javax.validation.Validator;
 public class MpUtils {
 
     /**
-     * Text 类型的消息，参数校验 Group
-     */
-    public interface TextGroup {}
-
-    /**
-     * Image 类型的消息，参数校验 Group
-     */
-    public interface ImageGroup {}
-
-    /**
-     * Voice 类型的消息，参数校验 Group
-     */
-    public interface VoiceGroup {}
-
-    /**
-     * Video 类型的消息，参数校验 Group
-     */
-    public interface VideoGroup {}
-
-    /**
-     * News 类型的消息，参数校验 Group
-     */
-    public interface NewsGroup {}
-
-    /**
-     * Music 类型的消息，参数校验 Group
-     */
-    public interface MusicGroup {}
-
-    /**
      * 校验消息的格式是否符合要求
      *
      * @param type 类型
@@ -55,22 +26,22 @@ public class MpUtils {
         Class<?> group;
         switch (type) {
             case WxConsts.XmlMsgType.TEXT:
-                group = TextGroup.class;
+                group = TextMessageGroup.class;
                 break;
             case WxConsts.XmlMsgType.IMAGE:
-                group = ImageGroup.class;
+                group = ImageMessageGroup.class;
                 break;
             case WxConsts.XmlMsgType.VOICE:
-                group = VoiceGroup.class;
+                group = VoiceMessageGroup.class;
                 break;
             case WxConsts.XmlMsgType.VIDEO:
-                group = VideoGroup.class;
+                group = VideoMessageGroup.class;
                 break;
             case WxConsts.XmlMsgType.NEWS:
-                group = NewsGroup.class;
+                group = NewsMessageGroup.class;
                 break;
             case WxConsts.XmlMsgType.MUSIC:
-                group = MusicGroup.class;
+                group = MusicMessageGroup.class;
                 break;
             default:
                 log.error("[validateMessage][未知的消息类型({})]", message);
@@ -78,6 +49,35 @@ public class MpUtils {
         }
         // 执行校验
         ValidationUtils.validate(validator, message, group);
+    }
+
+    public static void validateButton(Validator validator, String type, String messageType, Object button) {
+        if (StrUtil.isBlank(type)) {
+            return;
+        }
+        // 获得对应的校验 group
+        Class<?> group;
+        switch (type) {
+            case WxConsts.MenuButtonType.CLICK:
+                group = ClickButtonGroup.class;
+                validateMessage(validator, messageType, button); // 需要额外校验回复的消息格式
+                break;
+            case WxConsts.MenuButtonType.VIEW:
+                group = ViewButtonGroup.class;
+                break;
+            case WxConsts.MenuButtonType.MINIPROGRAM:
+                group = MiniProgramButtonGroup.class;
+                break;
+            case WxConsts.MenuButtonType.SCANCODE_WAITMSG:
+                group = ScanCodeWaitMsgButtonGroup.class;
+                validateMessage(validator, messageType, button); // 需要额外校验回复的消息格式
+                break;
+            default:
+                log.error("[validateButton][未知的按钮({})]", button);
+                throw new IllegalArgumentException("不支持的按钮类型：" + type);
+        }
+        // 执行校验
+        ValidationUtils.validate(validator, button, group);
     }
 
     /**
@@ -101,4 +101,53 @@ public class MpUtils {
         }
     }
 
+    /**
+     * Text 类型的消息，参数校验 Group
+     */
+    public interface TextMessageGroup {}
+
+    /**
+     * Image 类型的消息，参数校验 Group
+     */
+    public interface ImageMessageGroup {}
+
+    /**
+     * Voice 类型的消息，参数校验 Group
+     */
+    public interface VoiceMessageGroup {}
+
+    /**
+     * Video 类型的消息，参数校验 Group
+     */
+    public interface VideoMessageGroup {}
+
+    /**
+     * News 类型的消息，参数校验 Group
+     */
+    public interface NewsMessageGroup {}
+
+    /**
+     * Music 类型的消息，参数校验 Group
+     */
+    public interface MusicMessageGroup {}
+
+    /**
+     * Click 类型的按钮，参数校验 Group
+     */
+    public interface ClickButtonGroup {}
+
+    /**
+     * View 类型的按钮，参数校验 Group
+     */
+    public interface ViewButtonGroup {}
+
+    /**
+     * MiniProgram 类型的按钮，参数校验 Group
+     */
+    public interface MiniProgramButtonGroup {}
+
+    /**
+     * SCANCODE_WAITMSG 类型的按钮，参数校验 Group
+     */
+    public interface ScanCodeWaitMsgButtonGroup {}
 }

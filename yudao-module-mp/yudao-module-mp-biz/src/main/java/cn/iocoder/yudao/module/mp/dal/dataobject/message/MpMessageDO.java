@@ -124,13 +124,13 @@ public class MpMessageDO extends BaseDO {
     /**
      * 缩略图的媒体 id，通过素材管理中的接口上传多媒体文件，得到的 id
      *
-     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC、VIDEO
      */
     private String thumbMediaId;
     /**
      * 缩略图的媒体 URL
      *
-     * 消息类型为 {@link WxConsts.XmlMsgType} 的 VIDEO
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC、VIDEO
      */
     private String thumbMediaUrl;
 

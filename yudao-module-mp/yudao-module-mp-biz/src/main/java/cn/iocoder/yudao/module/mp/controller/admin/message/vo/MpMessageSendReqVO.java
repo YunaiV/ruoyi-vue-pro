@@ -26,28 +26,28 @@ public class MpMessageSendReqVO {
     public String type;
 
     @ApiModelProperty(value = "消息内容", required = true, example = "你好呀")
-    @NotEmpty(message = "消息内容不能为空", groups = TextGroup.class)
+    @NotEmpty(message = "消息内容不能为空", groups = TextMessageGroup.class)
     private String content;
 
     @ApiModelProperty(value = "媒体 ID", required = true, example = "qqc_2Fot30Jse-HDoZmo5RrUDijz2nGUkP")
-    @NotEmpty(message = "消息内容不能为空", groups = {ImageGroup.class, VoiceGroup.class, VideoGroup.class})
+    @NotEmpty(message = "消息内容不能为空", groups = {ImageMessageGroup.class, VoiceMessageGroup.class, VideoMessageGroup.class})
     private String mediaId;
 
     @ApiModelProperty(value = "标题", required = true, example = "没有标题")
-    @NotEmpty(message = "消息内容不能为空", groups = VideoGroup.class)
+    @NotEmpty(message = "消息内容不能为空", groups = VideoMessageGroup.class)
     private String title;
 
     @ApiModelProperty(value = "描述", required = true, example = "你猜")
-    @NotEmpty(message = "消息描述不能为空", groups = VideoGroup.class)
+    @NotEmpty(message = "消息描述不能为空", groups = VideoMessageGroup.class)
     private String description;
 
     @ApiModelProperty(value = "缩略图的媒体 id", required = true, example = "qqc_2Fot30Jse-HDoZmo5RrUDijz2nGUkP")
-    @NotEmpty(message = "缩略图的媒体 id 不能为空", groups = MusicGroup.class)
+    @NotEmpty(message = "缩略图的媒体 id 不能为空", groups = MusicMessageGroup.class)
     private String thumbMediaId;
 
     @ApiModelProperty(value = "图文消息", required = true)
     @Valid
-    @NotNull(message = "图文消息不能为空", groups = NewsGroup.class)
+    @NotNull(message = "图文消息不能为空", groups = NewsMessageGroup.class)
     private List<MpMessageDO.Article> articles;
 
     @ApiModelProperty(value = "音乐链接", example = "https://www.iocoder.cn/music.mp3", notes = "消息类型为 MUSIC 时")

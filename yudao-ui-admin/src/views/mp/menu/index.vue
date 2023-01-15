@@ -20,6 +20,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+  芋道源码：
+  ① less 切到 scss，减少对 less 和 less-loader 的依赖
+  ②
 -->
 <template>
   <div class="app-container">
@@ -75,60 +78,64 @@ SOFTWARE.
               </div>
               <div>
                   <span>菜单名称：</span>
-                  <el-input class="input_width" v-model="tempObj.name" placeholder="请输入菜单名称" :maxlength="nameMaxLength"
-                            clearable />
+                  <el-input class="input_width" v-model="tempObj.name" placeholder="请输入菜单名称" :maxlength="nameMaxLength" clearable />
               </div>
               <div v-if="showConfigureContent">
-                  <div class="menu_content">
-                      <span>菜单内容：</span>
-                      <el-select v-model="tempObj.type" clearable placeholder="请选择" class="menu_option">
-                          <el-option v-for="item in menuOptions" :label="item.label" :value="item.value" :key="item.value" />
-                      </el-select>
+                <div class="menu_content">
+                  <span>菜单标识：</span>
+                  <el-input class="input_width" v-model="tempObj.menuKey" placeholder="请输入菜单 KEY" clearable />
+                </div>
+                <div class="menu_content">
+                  <span>菜单内容：</span>
+                  <el-select v-model="tempObj.type" clearable placeholder="请选择" class="menu_option">
+                      <el-option v-for="item in menuOptions" :label="item.label" :value="item.value" :key="item.value" />
+                  </el-select>
+                </div>
+                <div class="configur_content" v-if="tempObj.type === 'view'">
+                  <span>跳转链接：</span>
+                  <el-input class="input_width" v-model="tempObj.url" placeholder="请输入链接" clearable />
+                </div>
+                <div class="configur_content" v-if="tempObj.type === 'miniprogram'">
+                  <div class="applet">
+                    <span>小程序的 appid ：</span>
+                    <el-input class="input_width" v-model="tempObj.miniProgramAppId" placeholder="请输入小程序的appid" clearable />
                   </div>
-                  <div class="configur_content" v-if="tempObj.type === 'view'">
-                      <span>跳转链接：</span>
-                      <el-input class="input_width" v-model="tempObj.url" placeholder="请输入链接" clearable />
+                  <div class="applet">
+                    <span>小程序的页面路径：</span>
+                    <el-input class="input_width" v-model="tempObj.miniProgramPagePath"
+                              placeholder="请输入小程序的页面路径，如：pages/index" clearable />
                   </div>
-                  <div class="configur_content" v-if="tempObj.type === 'miniprogram'">
-                      <div class="applet">
-                          <span>小程序的appid：</span>
-                          <el-input class="input_width" v-model="tempObj.appid" placeholder="请输入小程序的appid" clearable></el-input>
-                      </div>
-                      <div class="applet">
-                          <span>小程序的页面路径：</span>
-                          <el-input class="input_width" v-model="tempObj.pagepath" placeholder="请输入小程序的页面路径，如：pages/index" clearable></el-input>
-                      </div>
-                      <div class="applet">
-                          <span>备用网页：</span>
-                          <el-input class="input_width" v-model="tempObj.url" placeholder="不支持小程序的老版本客户端将打开本网页" clearable></el-input>
-                      </div>
-                      <p class="blue">tips:需要和公众号进行关联才可以把小程序绑定带微信菜单上哟！</p>
+                  <div class="applet">
+                    <span>小程序的备用网页：</span>
+                    <el-input class="input_width" v-model="tempObj.url" placeholder="不支持小程序的老版本客户端将打开本网页" clearable />
                   </div>
-                  <div class="configur_content" v-if="tempObj.type === 'article_view_limited'">
-                      <el-row>
-                          <div class="select-item" v-if="tempObj && tempObj.content && tempObj.content.articles">
-                              <WxNews :objData="tempObj.content.articles"></WxNews>
-                              <el-row class="ope-row">
-                                  <el-button type="danger" icon="el-icon-delete" circle @click="deleteTempObj"></el-button>
-                              </el-row>
-                          </div>
-                          <div v-if="!tempObj.content || !tempObj.content.articles">
-                              <el-row>
-                                  <el-col :span="24" style="text-align: center">
-                                      <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
-                                  </el-col>
-                              </el-row>
-                          </div>
-                          <el-dialog title="选择图文" :visible.sync="dialogNewsVisible" width="90%">
-                              <WxMaterialSelect :objData="{repType:'news'}" @selectMaterial="selectMaterial"></WxMaterialSelect>
-                          </el-dialog>
-                      </el-row>
-                  </div>
-                  <div class="configur_content" v-if="tempObj.type === 'click' || tempObj.type === 'scancode_waitmsg'">
-                      <WxReplySelect :objData="tempObj" v-if="hackResetWxReplySelect"></WxReplySelect>
-                  </div>
-              </div>
-          </div>
+                  <p class="blue">tips:需要和公众号进行关联才可以把小程序绑定带微信菜单上哟！</p>
+                </div>
+                <div class="configur_content" v-if="tempObj.type === 'article_view_limited'">
+                    <el-row>
+                        <div class="select-item" v-if="tempObj && tempObj.content && tempObj.content.articles">
+                            <WxNews :objData="tempObj.content.articles"></WxNews>
+                            <el-row class="ope-row">
+                                <el-button type="danger" icon="el-icon-delete" circle @click="deleteTempObj"></el-button>
+                            </el-row>
+                        </div>
+                        <div v-if="!tempObj.content || !tempObj.content.articles">
+                            <el-row>
+                                <el-col :span="24" style="text-align: center">
+                                    <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
+                                </el-col>
+                            </el-row>
+                        </div>
+                        <el-dialog title="选择图文" :visible.sync="dialogNewsVisible" width="90%">
+                            <WxMaterialSelect :objData="{repType:'news'}" @selectMaterial="selectMaterial"></WxMaterialSelect>
+                        </el-dialog>
+                    </el-row>
+                </div>
+                <div class="configur_content" v-if="tempObj.type === 'click' || tempObj.type === 'scancode_waitmsg'">
+                    <wx-reply-select :objData="tempObj.reply" v-if="hackResetWxReplySelect" />
+                </div>
+            </div>
+        </div>
       </div>
       <!-- 一进页面就显示的默认页面，当点击左边按钮的时候，就不显示了-->
       <div v-else class="right">
@@ -139,10 +146,10 @@ SOFTWARE.
 </template>
 
 <script>
-import WxReplySelect from '@/views/mp/components/wx-news/main.vue'
+import WxReplySelect from '@/views/mp/components/wx-reply/main.vue'
 import WxNews from '@/views/mp/components/wx-news/main.vue';
 import WxMaterialSelect from '@/views/mp/components/wx-news/main.vue'
-import {deleteMenu, getMenuList, saveMenu} from "@/api/mp/menu";
+import { deleteMenu, getMenuList, saveMenu } from "@/api/mp/menu";
 import { getSimpleAccounts } from "@/api/mp/account";
 
 export default {
@@ -177,7 +184,7 @@ export default {
       showConfigureContent: true, // 是否展示配置内容；如果有子菜单，就不显示配置内容
       hackResetWxReplySelect: false, // 重置 WxReplySelect 组件
 
-      tempObj:{}, // 右边临时变量，作为中间值牵引关系
+      tempObj: {}, // 右边临时变量，作为中间值牵引关系
       tempSelfObj: { // 一些临时值放在这里进行判断，如果放在 tempObj，由于引用关系，menu 也会多了多余的参数
       },
       visible2: false, //素材内容  "选择素材"按钮弹框显示隐藏
@@ -240,6 +247,7 @@ export default {
     getList() {
       this.loading = false;
       getMenuList(this.accountId).then(response => {
+        response.data = this.convertMenuList(response.data);
         this.menuList = this.handleTree(response.data, "id");
       }).finally(() => {
         this.loading = false;
@@ -261,6 +269,39 @@ export default {
         this.setAccountId(this.accounts[0].id)
       }
       this.handleQuery()
+    },
+    // 将后端返回的 menuList，转换成前端的 menuList
+    convertMenuList(list) {
+      const menuList = [];
+      list.forEach(item => {
+        const menu = {
+          ...item,
+        };
+        if (item.type === 'click' || item.type === 'scancode_waitmsg') {
+          this.$delete(menu, 'replyMessageType');
+          this.$delete(menu, 'replyContent');
+          this.$delete(menu, 'replyMediaId');
+          this.$delete(menu, 'replyMediaUrl');
+          this.$delete(menu, 'replyDescription');
+          this.$delete(menu, 'replyArticles');
+          menu.reply = {
+            type: item.replyMessageType,
+            accountId: item.accountId,
+            content: item.replyContent,
+            mediaId: item.replyMediaId,
+            url: item.replyMediaUrl,
+            title: item.replyTitle,
+            description: item.replyDescription,
+            thumbMediaId: item.replyThumbMediaId,
+            thumbMediaUrl: item.replyThumbMediaUrl,
+            articles: item.replyArticles,
+            musicUrl: item.replyMusicUrl,
+            hqMusicUrl: item.replyHqMusicUrl,
+          }
+        }
+        menuList.push(menu);
+      });
+      return menuList;
     },
 
     // ======================== 菜单操作 ========================
@@ -285,7 +326,7 @@ export default {
       // 右侧的表单相关
       this.resetEditor();
       this.showRightFlag = true; // 右边菜单
-      this.tempObj = subItem;//将点击的数据放到临时变量，对象有引用作用
+      this.tempObj = subItem; // 将点击的数据放到临时变量，对象有引用作用
       this.tempSelfObj.grand = "2"; // 表示二级菜单
       this.tempSelfObj.index = index; // 表示一级菜单索引
       this.tempSelfObj.secondIndex = k; // 表示二级菜单索引
@@ -301,19 +342,27 @@ export default {
       const menuKeyLength = this.menuList.length;
       const addButton = {
         name: "菜单名称",
-        children: []
+        children: [],
+        reply: { // 用于存储回复内容
+          'type': 'text',
+          'accountId': this.accountId // 保证组件里，可以使用到对应的公众号
+        }
       }
       this.$set(this.menuList, menuKeyLength, addButton)
       this.menuClick(this.menuKeyLength - 1, addButton)
     },
     // 添加横向二级菜单；item 表示要操作的父菜单
     addSubMenu(i, item) {
-      if (!item.children || item.children.length <= 0){
+      // 清空父菜单的属性，因为它只需要 name 属性即可
+      if (!item.children || item.children.length <= 0) {
         this.$set( item, 'children',[])
-        // TODO 芋艿：需要搞的属性弄下
         this.$delete( item, 'type')
-        this.$delete( item, 'pagepath')
+        this.$delete( item, 'miniProgramAppId')
+        this.$delete( item, 'miniProgramPagePath')
         this.$delete( item, 'url')
+        this.$delete( item, 'reply')
+        // TODO 芋艿：需要搞的属性弄下
+
         this.$delete( item, 'key')
         this.$delete( item, 'article_id')
         this.$delete( item, 'textContent')
@@ -322,7 +371,11 @@ export default {
 
       let subMenuKeyLength = item.children.length; // 获取二级菜单key长度
       let addButton = {
-        name: "子菜单名称"
+        name: "子菜单名称",
+        reply: { // 用于存储回复内容
+          'type': 'text',
+          'accountId': this.accountId // 保证组件里，可以使用到对应的公众号
+        }
       }
       this.$set(item.children, subMenuKeyLength, addButton);
       this.subMenuClick(item.children[subMenuKeyLength], i, subMenuKeyLength)
@@ -352,19 +405,19 @@ export default {
     handleSave() {
       this.$modal.confirm('确定要保证并发布该菜单吗？').then(() => {
         this.loading = true
-        return saveMenu(this.accountId, this.menuList);
+        return saveMenu(this.accountId, this.convertMenuFormList());
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("发布成功");
-      }).catch(() => {}).finally(() => {
+      }).finally(() => {
         this.loading = false
       });
     },
     // 表单 Editor 重置
     resetEditor() {
-      this.hackResetEditor = false // 销毁组件
+      this.hackResetWxReplySelect = false // 销毁组件
       this.$nextTick(() => {
-        this.hackResetEditor = true // 重建组件
+        this.hackResetWxReplySelect = true // 重建组件
       })
     },
     handleDelete() {
@@ -377,6 +430,45 @@ export default {
       }).catch(() => {}).finally(() => {
         this.loading = false
       });
+    },
+    // 将前端的 menuList，转换成后端接收的 menuList
+    convertMenuFormList() {
+      const menuList = [];
+      this.menuList.forEach(item => {
+        let menu = this.convertMenuForm(item);
+        menuList.push(menu);
+        // 处理子菜单
+        if (!item.children || item.children.length <= 0) {
+          return;
+        }
+        item.children = [];
+        item.children.forEach(subItem => {
+          menu.children.push(this.convertMenuForm(subItem))
+        })
+      })
+      return menuList;
+    },
+    // 将前端的 menu，转换成后端接收的 menu
+    convertMenuForm(menu) {
+      let result = {
+        ...menu,
+        children: undefined, // 不处理子节点
+        reply: undefined, // 稍后复制
+      }
+      if (menu.type === 'click' || menu.type === 'scancode_waitmsg') {
+        result.replyMessageType = menu.reply.type;
+        result.replyContent = menu.reply.content;
+        result.replyMediaId = menu.reply.mediaId;
+        result.replyMediaUrl = menu.reply.url;
+        result.replyTitle = menu.reply.title;
+        result.replyDescription = menu.reply.description;
+        result.replyThumbMediaId = menu.reply.thumbMediaId;
+        result.replyThumbMediaUrl = menu.reply.thumbMediaUrl;
+        result.replyArticles = menu.reply.articles;
+        result.replyMusicUrl = menu.reply.musicUrl;
+        result.replyHqMusicUrl = menu.reply.hqMusicUrl;
+      }
+      return result;
     },
 
     // TODO 芋艿：未归类

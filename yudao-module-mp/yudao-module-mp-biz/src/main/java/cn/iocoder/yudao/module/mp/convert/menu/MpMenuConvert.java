@@ -26,9 +26,12 @@ public interface MpMenuConvert {
             @Mapping(source = "menu.replyMessageType", target = "type"),
             @Mapping(source = "menu.replyContent", target = "content"),
             @Mapping(source = "menu.replyMediaId", target = "mediaId"),
+            @Mapping(source = "menu.replyThumbMediaId", target = "thumbMediaId"),
             @Mapping(source = "menu.replyTitle", target = "title"),
             @Mapping(source = "menu.replyDescription", target = "description"),
             @Mapping(source = "menu.replyArticles", target = "articles"),
+            @Mapping(source = "menu.replyMusicUrl", target = "musicUrl"),
+            @Mapping(source = "menu.replyHqMusicUrl", target = "hqMusicUrl"),
     })
     MpMessageSendOutReqBO convert(String openid, MpMenuDO menu);
 

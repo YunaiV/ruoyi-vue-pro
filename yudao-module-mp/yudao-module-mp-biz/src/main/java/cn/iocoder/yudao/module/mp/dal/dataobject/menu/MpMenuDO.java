@@ -103,7 +103,7 @@ public class MpMenuDO extends BaseDO {
      *
      * 当 {@link #type} 为 CLICK、SCANCODE_WAITMSG
      *
-     * 枚举 {@link WxConsts.XmlMsgType} 中的 TEXT、IMAGE、VOICE、VIDEO、NEWS
+     * 枚举 {@link WxConsts.XmlMsgType} 中的 TEXT、IMAGE、VOICE、VIDEO、NEWS、MUSIC
      */
     private String replyMessageType;
 
@@ -141,11 +141,39 @@ public class MpMenuDO extends BaseDO {
     private String replyDescription;
 
     /**
+     * 缩略图的媒体 id，通过素材管理中的接口上传多媒体文件，得到的 id
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC、VIDEO
+     */
+    private String replyThumbMediaId;
+    /**
+     * 缩略图的媒体 URL
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC、VIDEO
+     */
+    private String replyThumbMediaUrl;
+
+    /**
      * 回复的图文消息数组
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
      */
     @TableField(typeHandler = MpMessageDO.ArticleTypeHandler.class)
     private List<MpMessageDO.Article> replyArticles;
+
+    /**
+     * 回复的音乐链接
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
+     */
+    private String replyMusicUrl;
+    /**
+     * 回复的高质量音乐链接
+     *
+     * WIFI 环境优先使用该链接播放音乐
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
+     */
+    private String replyHqMusicUrl;
 
 }
