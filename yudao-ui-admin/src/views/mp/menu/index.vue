@@ -73,68 +73,68 @@ SOFTWARE.
       <!--右边配置-->
       <div v-if="showRightFlag" class="right">
           <div class="configure_page">
-              <div class="delete_btn">
-                  <el-button size="mini"  type="danger" icon="el-icon-delete" @click="deleteMenu(tempObj)">删除当前菜单</el-button>
-              </div>
-              <div>
-                  <span>菜单名称：</span>
-                  <el-input class="input_width" v-model="tempObj.name" placeholder="请输入菜单名称" :maxlength="nameMaxLength" clearable />
-              </div>
-              <div v-if="showConfigureContent">
-                <div class="menu_content">
-                  <span>菜单标识：</span>
-                  <el-input class="input_width" v-model="tempObj.menuKey" placeholder="请输入菜单 KEY" clearable />
-                </div>
-                <div class="menu_content">
-                  <span>菜单内容：</span>
-                  <el-select v-model="tempObj.type" clearable placeholder="请选择" class="menu_option">
-                      <el-option v-for="item in menuOptions" :label="item.label" :value="item.value" :key="item.value" />
-                  </el-select>
-                </div>
-                <div class="configur_content" v-if="tempObj.type === 'view'">
-                  <span>跳转链接：</span>
-                  <el-input class="input_width" v-model="tempObj.url" placeholder="请输入链接" clearable />
-                </div>
-                <div class="configur_content" v-if="tempObj.type === 'miniprogram'">
-                  <div class="applet">
-                    <span>小程序的 appid ：</span>
-                    <el-input class="input_width" v-model="tempObj.miniProgramAppId" placeholder="请输入小程序的appid" clearable />
-                  </div>
-                  <div class="applet">
-                    <span>小程序的页面路径：</span>
-                    <el-input class="input_width" v-model="tempObj.miniProgramPagePath"
-                              placeholder="请输入小程序的页面路径，如：pages/index" clearable />
-                  </div>
-                  <div class="applet">
-                    <span>小程序的备用网页：</span>
-                    <el-input class="input_width" v-model="tempObj.url" placeholder="不支持小程序的老版本客户端将打开本网页" clearable />
-                  </div>
-                  <p class="blue">tips:需要和公众号进行关联才可以把小程序绑定带微信菜单上哟！</p>
-                </div>
-                <div class="configur_content" v-if="tempObj.type === 'article_view_limited'">
-                    <el-row>
-                        <div class="select-item" v-if="tempObj && tempObj.content && tempObj.content.articles">
-                            <WxNews :objData="tempObj.content.articles"></WxNews>
-                            <el-row class="ope-row">
-                                <el-button type="danger" icon="el-icon-delete" circle @click="deleteTempObj"></el-button>
-                            </el-row>
-                        </div>
-                        <div v-if="!tempObj.content || !tempObj.content.articles">
-                            <el-row>
-                                <el-col :span="24" style="text-align: center">
-                                    <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
-                                </el-col>
-                            </el-row>
-                        </div>
-                        <el-dialog title="选择图文" :visible.sync="dialogNewsVisible" width="90%">
-                            <WxMaterialSelect :objData="{repType:'news'}" @selectMaterial="selectMaterial"></WxMaterialSelect>
-                        </el-dialog>
-                    </el-row>
-                </div>
-                <div class="configur_content" v-if="tempObj.type === 'click' || tempObj.type === 'scancode_waitmsg'">
-                    <wx-reply-select :objData="tempObj.reply" v-if="hackResetWxReplySelect" />
-                </div>
+            <div class="delete_btn">
+                <el-button size="mini"  type="danger" icon="el-icon-delete" @click="deleteMenu(tempObj)">删除当前菜单</el-button>
             </div>
+            <div>
+                <span>菜单名称：</span>
+                <el-input class="input_width" v-model="tempObj.name" placeholder="请输入菜单名称" :maxlength="nameMaxLength" clearable />
+            </div>
+            <div v-if="showConfigureContent">
+              <div class="menu_content">
+                <span>菜单标识：</span>
+                <el-input class="input_width" v-model="tempObj.menuKey" placeholder="请输入菜单 KEY" clearable />
+              </div>
+              <div class="menu_content">
+                <span>菜单内容：</span>
+                <el-select v-model="tempObj.type" clearable placeholder="请选择" class="menu_option">
+                    <el-option v-for="item in menuOptions" :label="item.label" :value="item.value" :key="item.value" />
+                </el-select>
+              </div>
+              <div class="configur_content" v-if="tempObj.type === 'view'">
+                <span>跳转链接：</span>
+                <el-input class="input_width" v-model="tempObj.url" placeholder="请输入链接" clearable />
+              </div>
+              <div class="configur_content" v-if="tempObj.type === 'miniprogram'">
+                <div class="applet">
+                  <span>小程序的 appid ：</span>
+                  <el-input class="input_width" v-model="tempObj.miniProgramAppId" placeholder="请输入小程序的appid" clearable />
+                </div>
+                <div class="applet">
+                  <span>小程序的页面路径：</span>
+                  <el-input class="input_width" v-model="tempObj.miniProgramPagePath"
+                            placeholder="请输入小程序的页面路径，如：pages/index" clearable />
+                </div>
+                <div class="applet">
+                  <span>小程序的备用网页：</span>
+                  <el-input class="input_width" v-model="tempObj.url" placeholder="不支持小程序的老版本客户端将打开本网页" clearable />
+                </div>
+                <p class="blue">tips:需要和公众号进行关联才可以把小程序绑定带微信菜单上哟！</p>
+              </div>
+              <div class="configur_content" v-if="tempObj.type === 'article_view_limited'">
+                <el-row>
+                  <div class="select-item" v-if="tempObj && tempObj.content && tempObj.content.articles">
+                    <WxNews :objData="tempObj.content.articles"></WxNews>
+                    <el-row class="ope-row">
+                        <el-button type="danger" icon="el-icon-delete" circle @click="deleteTempObj" />
+                    </el-row>
+                  </div>
+                  <div v-if="!tempObj.content || !tempObj.content.articles">
+                    <el-row>
+                      <el-col :span="24" style="text-align: center">
+                        <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
+                      </el-col>
+                    </el-row>
+                  </div>
+                  <el-dialog title="选择图文" :visible.sync="dialogNewsVisible" width="90%">
+                    <WxMaterialSelect :objData="{repType:'news'}" @selectMaterial="selectMaterial"></WxMaterialSelect>
+                  </el-dialog>
+                </el-row>
+              </div>
+              <div class="configur_content" v-if="tempObj.type === 'click' || tempObj.type === 'scancode_waitmsg'">
+                <wx-reply-select :objData="tempObj.reply" v-if="hackResetWxReplySelect" />
+              </div>
+          </div>
         </div>
       </div>
       <!-- 一进页面就显示的默认页面，当点击左边按钮的时候，就不显示了-->
@@ -183,12 +183,10 @@ export default {
       nameMaxLength: 0, // 菜单名称最大长度；1 级是 4 字符；2 级是 7 字符；
       showConfigureContent: true, // 是否展示配置内容；如果有子菜单，就不显示配置内容
       hackResetWxReplySelect: false, // 重置 WxReplySelect 组件
-
       tempObj: {}, // 右边临时变量，作为中间值牵引关系
       tempSelfObj: { // 一些临时值放在这里进行判断，如果放在 tempObj，由于引用关系，menu 也会多了多余的参数
       },
-      visible2: false, //素材内容  "选择素材"按钮弹框显示隐藏
-      tableData:[], //素材内容弹框数据,
+      dialogNewsVisible: false, // 跳转图文时的素材选择弹窗
       menuOptions: [{
         value: 'view',
         label: '跳转网页'
@@ -220,7 +218,6 @@ export default {
           value: 'location_select',
           label: '选择地理位置'
       }],
-      dialogNewsVisible: false,
 
       // 公众号账号列表
       accounts: [],
@@ -357,13 +354,13 @@ export default {
       if (!item.children || item.children.length <= 0) {
         this.$set( item, 'children',[])
         this.$delete( item, 'type')
+        this.$delete( item, 'menuKey')
         this.$delete( item, 'miniProgramAppId')
         this.$delete( item, 'miniProgramPagePath')
         this.$delete( item, 'url')
         this.$delete( item, 'reply')
         // TODO 芋艿：需要搞的属性弄下
 
-        this.$delete( item, 'key')
         this.$delete( item, 'article_id')
         this.$delete( item, 'textContent')
         this.showConfigureContent = false
@@ -470,30 +467,28 @@ export default {
       }
       return result;
     },
-
-    // TODO 芋艿：未归类
-
-    deleteTempObj(){
+    // ======================== 菜单编辑（素材选择） ========================
+    openMaterial() {
+      this.dialogNewsVisible = true
+    },
+    selectMaterial(item){
+      if(item.content.articles.length>1){
+        this.$alert('您选择的是多图文，将默认跳转第一篇', '提示', {
+          confirmButtonText: '确定'
+        })
+      }
+      this.dialogNewsVisible = false
+      this.tempObj.article_id = item.articleId
+      this.tempObj.mediaName = item.name
+      this.tempObj.url = item.url
+      item.mediaType = this.tempObj.mediaType
+      item.content.articles = item.content.articles.slice(0,1)
+      this.tempObj.content = item.content
+    },
+    deleteTempObj() {
         this.$delete(this.tempObj,'repName')
         this.$delete(this.tempObj,'repUrl')
         this.$delete(this.tempObj,'content')
-    },
-    openMaterial(){
-        this.dialogNewsVisible = true
-    },
-    selectMaterial(item){
-        if(item.content.articles.length>1){
-            this.$alert('您选择的是多图文，将默认跳转第一篇', '提示', {
-                confirmButtonText: '确定'
-            })
-        }
-        this.dialogNewsVisible = false
-        this.tempObj.article_id = item.articleId
-        this.tempObj.mediaName = item.name
-        this.tempObj.url = item.url
-        item.mediaType = this.tempObj.mediaType
-        item.content.articles = item.content.articles.slice(0,1)
-        this.tempObj.content = item.content
     },
   },
 }
