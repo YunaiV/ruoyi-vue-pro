@@ -254,6 +254,7 @@ export default {
     },
     /** 搜索按钮操作 */
     handleQuery() {
+      this.resetForm();
       // 默认选中第一个
       if (this.accountId) {
         this.setAccountId(this.accountId)
@@ -262,7 +263,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.resetForm('queryForm')
+      this.resetForm();
       // 默认选中第一个
       if (this.accounts.length > 0) {
         this.setAccountId(this.accounts[0].id)
@@ -301,6 +302,23 @@ export default {
         menuList.push(menu);
       });
       return menuList;
+    },
+    // 重置表单，清空表单数据
+    resetForm() {
+      // 菜单操作
+      this.isActive = -1;
+      this.isSubMenuActive = -1;
+      this.isSubMenuFlag = -1;
+
+      // 菜单编辑
+      this.showRightFlag = false;
+      this.nameMaxLength = 0;
+      this.showConfigureContent = 0;
+      this.hackResetWxReplySelect = true;
+      this.hackResetWxReplySelect = false;
+      this.tempObj = {};
+      this.tempSelfObj = {};
+      this.dialogNewsVisible = false;
     },
 
     // ======================== 菜单操作 ========================
@@ -397,7 +415,6 @@ export default {
         this.isSubMenuActive = -1;
       }).catch(() => {});
     },
-    // TODO 切换公众号时，清空；或者清空菜单时，也要清空表单；
 
     // ======================== 菜单编辑 ========================
     handleSave() {
@@ -423,7 +440,7 @@ export default {
         this.loading = true
         return deleteMenu(this.accountId);
       }).then(() => {
-        this.getList();
+        this.handleQuery();
         this.$modal.msgSuccess("清空成功");
       }).catch(() => {}).finally(() => {
         this.loading = false
@@ -494,11 +511,6 @@ export default {
           url: article.url,
         })
       })
-      // this.tempObj.mediaName = item.name
-      // this.tempObj.url = item.url
-      // item.mediaType = this.tempObj.mediaType
-      // item.content.articles = item.content.articles.slice(0,1)
-      // this.tempObj.content = item.content
     },
     deleteMaterial() {
         this.$delete(this.tempObj,'articleId')
