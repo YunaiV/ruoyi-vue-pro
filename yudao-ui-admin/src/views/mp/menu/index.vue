@@ -40,7 +40,7 @@ SOFTWARE.
       <!--左边配置菜单-->
       <div class="left">
         <div class="weixin-hd">
-            <div class="weixin-title">{{menuName}}</div>
+            <div class="weixin-title">{{ name }}</div>
         </div>
         <div class="weixin-menu menu_main clearfix">
           <div class="menu_bottom" v-for="(item, i) of menuList" :key="i" >
@@ -75,18 +75,19 @@ SOFTWARE.
               </div>
               <div>
                   <span>菜单名称：</span>
-                  <el-input class="input_width" v-model="tempObj.name" placeholder="请输入菜单名称" :maxlength=nameMaxLength clearable></el-input>
+                  <el-input class="input_width" v-model="tempObj.name" placeholder="请输入菜单名称" :maxlength="nameMaxLength"
+                            clearable />
               </div>
               <div v-if="showConfigureContent">
                   <div class="menu_content">
                       <span>菜单内容：</span>
                       <el-select v-model="tempObj.type" clearable placeholder="请选择" class="menu_option">
-                          <el-option v-for="item in menuOptions" :label="item.label" :value="item.value" :key="item.value"></el-option>
+                          <el-option v-for="item in menuOptions" :label="item.label" :value="item.value" :key="item.value" />
                       </el-select>
                   </div>
                   <div class="configur_content" v-if="tempObj.type === 'view'">
                       <span>跳转链接：</span>
-                      <el-input class="input_width"  v-model="tempObj.url" placeholder="请输入链接" clearable></el-input>
+                      <el-input class="input_width" v-model="tempObj.url" placeholder="请输入链接" clearable />
                   </div>
                   <div class="configur_content" v-if="tempObj.type === 'miniprogram'">
                       <div class="applet">
@@ -103,7 +104,7 @@ SOFTWARE.
                       </div>
                       <p class="blue">tips:需要和公众号进行关联才可以把小程序绑定带微信菜单上哟！</p>
                   </div>
-                  <div class="configur_content" v-if="tempObj.type == 'article_view_limited'">
+                  <div class="configur_content" v-if="tempObj.type === 'article_view_limited'">
                       <el-row>
                           <div class="select-item" v-if="tempObj && tempObj.content && tempObj.content.articles">
                               <WxNews :objData="tempObj.content.articles"></WxNews>
@@ -123,7 +124,7 @@ SOFTWARE.
                           </el-dialog>
                       </el-row>
                   </div>
-                  <div class="configur_content" v-if="tempObj.type == 'click' || tempObj.type == 'scancode_waitmsg'">
+                  <div class="configur_content" v-if="tempObj.type === 'click' || tempObj.type === 'scancode_waitmsg'">
                       <WxReplySelect :objData="tempObj" v-if="hackResetWxReplySelect"></WxReplySelect>
                   </div>
               </div>
@@ -160,6 +161,7 @@ export default {
       showSearch: true,
       // 查询参数
       accountId: undefined,
+      name:'', // 公众号名
       menuList: {
         children: [],
       },
@@ -180,28 +182,27 @@ export default {
       },
       visible2: false, //素材内容  "选择素材"按钮弹框显示隐藏
       tableData:[], //素材内容弹框数据,
-      menuName:'',
       menuOptions: [{
-          value: 'view',
-          label: '跳转网页'
+        value: 'view',
+        label: '跳转网页'
       }, {
-          value: 'miniprogram',
-          label: '跳转小程序'
+        value: 'miniprogram',
+        label: '跳转小程序'
       }, {
-          value: 'click',
-          label: '点击回复'
+        value: 'click',
+        label: '点击回复'
       }, {
-          value: 'article_view_limited',
-          label: '跳转图文消息'
+        value: 'article_view_limited',
+        label: '跳转图文消息'
       }, {
-          value: 'scancode_push',
-          label: '扫码直接返回结果'
+        value: 'scancode_push',
+        label: '扫码直接返回结果'
       }, {
-          value: 'scancode_waitmsg',
-          label: '扫码回复'
+        value: 'scancode_waitmsg',
+        label: '扫码回复'
       }, {
-          value: 'pic_sysphoto',
-          label: '系统拍照发图'
+        value: 'pic_sysphoto',
+        label: '系统拍照发图'
       }, {
           value: 'pic_photo_or_album',
           label: '拍照或者相册'
@@ -234,7 +235,7 @@ export default {
     /** 设置账号编号 */
     setAccountId(accountId) {
       this.accountId = accountId;
-      // this.uploadData.accountId = accountId;
+      this.name = this.accounts.find(item => item.id === accountId)?.name;
     },
     getList() {
       this.loading = false;
@@ -296,7 +297,7 @@ export default {
       this.isSubMenuActive = index + "" + k; // 二级菜单选中样式
     },
     // 添加横向一级菜单
-    addMenu(){
+    addMenu() {
       const menuKeyLength = this.menuList.length;
       const addButton = {
         name: "菜单名称",
@@ -345,6 +346,7 @@ export default {
         this.isSubMenuActive = -1;
       }).catch(() => {});
     },
+    // TODO 切换公众号时，清空；或者清空菜单时，也要清空表单；
 
     // ======================== 菜单编辑 ========================
     handleSave() {
@@ -405,7 +407,7 @@ export default {
 }
 </script>
 <!--本组件样式-->
-<style lang="less" scoped="scoped">
+<style lang="scss" scoped="scoped">
 /* 公共颜色变量 */
 .clearfix{*zoom:1;}
 .clearfix::after{content: "";display: table; clear: both;}
@@ -515,7 +517,7 @@ div{
       }
   }
   /*右边菜单内容*/
-  .right{
+  .right {
       float: left;
       width: 63%;
       background-color: #e8e7e7;
@@ -523,21 +525,21 @@ div{
       margin-left: 20px;
       -webkit-box-sizing: border-box;
       box-sizing: border-box;
-      .configure_page{
-          .delete_btn{
+      .configure_page {
+          .delete_btn {
               text-align: right;
               margin-bottom: 15px;
           }
-          .menu_content{
+          .menu_content {
               margin-top: 20px;
           }
-          .configur_content{
+          .configur_content {
               margin-top: 20px;
               background-color: #fff;
               padding: 20px 10px;
               border-radius: 5px
           }
-          .blue{
+          .blue {
               color:#29b6f6;
               margin-top: 10px;
           }
@@ -546,6 +548,9 @@ div{
               span{
                   width: 20%;
               }
+          }
+          .input_width {
+            width: 40%;
           }
           .material{
               .input_width{
@@ -557,17 +562,12 @@ div{
           }
       }
   }
+  .el-input {
+    width: 70%;
+    margin-right: 2%;
+  }
 }
 </style>
-<!--修改UI框架样式-->
-<!--<style lang="less" scoped>-->
-<!--    .public-account-management{-->
-<!--        .el-input{-->
-<!--            width: 70%;-->
-<!--            margin-right: 2%;-->
-<!--        }-->
-<!--    }-->
-<!--</style>-->
 <!--素材样式-->
 <style lang="scss" scoped>
 .pagination {
