@@ -438,7 +438,7 @@ export default {
         if (!item.children || item.children.length <= 0) {
           return;
         }
-        item.children = [];
+        menu.children = [];
         item.children.forEach(subItem => {
           menu.children.push(this.convertMenuForm(subItem))
         })
