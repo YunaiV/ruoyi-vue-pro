@@ -42,9 +42,9 @@
         type: Array // title - 标题；description - 描述；picUrl - 图片连接；url - 跳转链接
       }
     },
-    created() {
-      console.log(this.articles)
-    },
+    // created() {
+    //   console.log(this.articles)
+    // },
   };
 </script>
 

@@ -72,6 +72,9 @@ public class MpUtils {
                 group = ScanCodeWaitMsgButtonGroup.class;
                 validateMessage(validator, messageType, button); // 需要额外校验回复的消息格式
                 break;
+            case "article_" + WxConsts.MenuButtonType.VIEW_LIMITED:
+                group = ViewLimitedButtonGroup.class;
+                break;
             case WxConsts.MenuButtonType.SCANCODE_PUSH: // 不用校验，直接 return 即可
             case WxConsts.MenuButtonType.PIC_SYSPHOTO:
             case WxConsts.MenuButtonType.PIC_PHOTO_OR_ALBUM:
@@ -156,4 +159,9 @@ public class MpUtils {
      * SCANCODE_WAITMSG 类型的按钮，参数校验 Group
      */
     public interface ScanCodeWaitMsgButtonGroup {}
+
+    /**
+     * VIEW_LIMITED 类型的按钮，参数校验 Group
+     */
+    public interface ViewLimitedButtonGroup {}
 }

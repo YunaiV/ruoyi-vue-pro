@@ -57,6 +57,10 @@ public class MpMenuBaseVO {
     @NotEmpty(message = "小程序的页面路径不能为空", groups = MiniProgramButtonGroup.class)
     private String miniProgramPagePath;
 
+    @ApiModelProperty(value ="跳转图文的媒体编号", example = "jCQk93AIIgp8ixClWcW_NXXqBKInNWNmq2XnPeDZl7IMVqWiNeL4FfELtggRXd83")
+    @NotEmpty(message = "跳转图文的媒体编号不能为空", groups = ViewLimitedButtonGroup.class)
+    private String articleId;
+
     // ========== 消息内容 ==========
 
     @ApiModelProperty(value = "消息类型", example = "text",
@@ -65,7 +69,7 @@ public class MpMenuBaseVO {
     private String replyMessageType;
 
     @ApiModelProperty(value = "回复的消息内容", example = "欢迎关注")
-    @NotEmpty(message = "回复的消息内容不能为空", groups = {TextMessageGroup.class})
+    @NotEmpty(message = "回复的消息内容不能为空", groups = TextMessageGroup.class)
     private String replyContent;
 
     @ApiModelProperty(value = "回复的媒体 id", example = "123456")
@@ -96,7 +100,7 @@ public class MpMenuBaseVO {
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
      */
-    @NotNull(message = "回复的图文消息不能为空", groups = NewsMessageGroup.class)
+    @NotNull(message = "回复的图文消息不能为空", groups = {NewsMessageGroup.class, ViewLimitedButtonGroup.class})
     @Valid
     private List<MpMessageDO.Article> replyArticles;
 

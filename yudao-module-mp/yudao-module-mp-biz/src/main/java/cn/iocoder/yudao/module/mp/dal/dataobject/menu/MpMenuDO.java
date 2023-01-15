@@ -96,6 +96,11 @@ public class MpMenuDO extends BaseDO {
      */
     private String miniProgramPagePath;
 
+    /**
+     * 跳转图文的媒体编号
+     */
+    private String articleId;
+
     // ========== 消息内容 ==========
 
     /**

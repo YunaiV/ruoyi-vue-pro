@@ -113,21 +113,23 @@ SOFTWARE.
               </div>
               <div class="configur_content" v-if="tempObj.type === 'article_view_limited'">
                 <el-row>
-                  <div class="select-item" v-if="tempObj && tempObj.content && tempObj.content.articles">
-                    <WxNews :objData="tempObj.content.articles"></WxNews>
+                  <div class="select-item" v-if="tempObj && tempObj.replyArticles">
+                    <wx-news :articles="tempObj.replyArticles" />
                     <el-row class="ope-row">
-                        <el-button type="danger" icon="el-icon-delete" circle @click="deleteTempObj" />
+                        <el-button type="danger" icon="el-icon-delete" circle @click="deleteMaterial" />
                     </el-row>
                   </div>
-                  <div v-if="!tempObj.content || !tempObj.content.articles">
+                  <div v-else>
                     <el-row>
                       <el-col :span="24" style="text-align: center">
-                        <el-button type="success" @click="openMaterial">素材库选择<i class="el-icon-circle-check el-icon--right"></i></el-button>
+                        <el-button type="success" @click="openMaterial">
+                          素材库选择<i class="el-icon-circle-check el-icon--right"></i>
+                        </el-button>
                       </el-col>
                     </el-row>
                   </div>
                   <el-dialog title="选择图文" :visible.sync="dialogNewsVisible" width="90%">
-                    <WxMaterialSelect :objData="{repType:'news'}" @selectMaterial="selectMaterial"></WxMaterialSelect>
+                    <wx-material-select :objData="{type: 'news', accountId: this.accountId}" @selectMaterial="selectMaterial" />
                   </el-dialog>
                 </el-row>
               </div>
@@ -148,7 +150,7 @@ SOFTWARE.
 <script>
 import WxReplySelect from '@/views/mp/components/wx-reply/main.vue'
 import WxNews from '@/views/mp/components/wx-news/main.vue';
-import WxMaterialSelect from '@/views/mp/components/wx-news/main.vue'
+import WxMaterialSelect from '@/views/mp/components/wx-material-select/main.vue'
 import { deleteMenu, getMenuList, saveMenu } from "@/api/mp/menu";
 import { getSimpleAccounts } from "@/api/mp/account";
 
@@ -359,10 +361,9 @@ export default {
         this.$delete( item, 'miniProgramPagePath')
         this.$delete( item, 'url')
         this.$delete( item, 'reply')
-        // TODO 芋艿：需要搞的属性弄下
-
-        this.$delete( item, 'article_id')
-        this.$delete( item, 'textContent')
+        this.$delete( item, 'articleId')
+        this.$delete( item, 'replyArticles')
+        // 关闭配置面板
         this.showConfigureContent = false
       }
 
@@ -471,24 +472,37 @@ export default {
     openMaterial() {
       this.dialogNewsVisible = true
     },
-    selectMaterial(item){
-      if(item.content.articles.length>1){
+    selectMaterial(item) {
+      const articleId = item.articleId;
+      const articles = item.content.newsItem;
+      // 提示，针对多图文
+      if (articles.length > 1) {
         this.$alert('您选择的是多图文，将默认跳转第一篇', '提示', {
           confirmButtonText: '确定'
         })
       }
       this.dialogNewsVisible = false
-      this.tempObj.article_id = item.articleId
-      this.tempObj.mediaName = item.name
-      this.tempObj.url = item.url
-      item.mediaType = this.tempObj.mediaType
-      item.content.articles = item.content.articles.slice(0,1)
-      this.tempObj.content = item.content
+
+      // 设置菜单的回复
+      this.tempObj.articleId = articleId;
+      this.tempObj.replyArticles = [];
+      articles.forEach(article => {
+        this.tempObj.replyArticles.push({
+          title: article.title,
+          description: article.digest,
+          picUrl: article.picUrl,
+          url: article.url,
+        })
+      })
+      // this.tempObj.mediaName = item.name
+      // this.tempObj.url = item.url
+      // item.mediaType = this.tempObj.mediaType
+      // item.content.articles = item.content.articles.slice(0,1)
+      // this.tempObj.content = item.content
     },
-    deleteTempObj() {
-        this.$delete(this.tempObj,'repName')
-        this.$delete(this.tempObj,'repUrl')
-        this.$delete(this.tempObj,'content')
+    deleteMaterial() {
+        this.$delete(this.tempObj,'articleId')
+        this.$delete(this.tempObj,'replyArticles')
     },
   },
 }
