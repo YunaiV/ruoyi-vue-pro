@@ -2,12 +2,9 @@ package cn.iocoder.yudao.framework.captcha.core.enums;
 
 import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
 import com.anji.captcha.model.vo.PointVO;
-import org.redisson.api.RLock;
 
 import java.time.Duration;
-import java.util.Map;
 
-import static cn.iocoder.yudao.framework.redis.core.RedisKeyDefine.KeyTypeEnum.HASH;
 import static cn.iocoder.yudao.framework.redis.core.RedisKeyDefine.KeyTypeEnum.STRING;
 
 /**

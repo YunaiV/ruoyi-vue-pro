@@ -1,3 +1,0 @@
-com.anji.captcha.service.impl.BlockPuzzleCaptchaServiceImpl
-com.anji.captcha.service.impl.ClickWordCaptchaServiceImpl
-com.anji.captcha.service.impl.DefaultCaptchaServiceImpl
