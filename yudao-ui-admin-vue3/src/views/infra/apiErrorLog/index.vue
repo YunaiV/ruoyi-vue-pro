@@ -8,7 +8,7 @@
           type="warning"
           preIcon="ep:download"
           :title="t('action.export')"
-          @click="handleExport()"
+          @click="exportList('错误数据.xls')"
         />
       </template>
       <template #duration_default="{ row }">
@@ -81,10 +81,7 @@ const handleDetail = (row: ApiErrorLogApi.ApiErrorLogVO) => {
   dialogTitle.value = t('action.detail')
   dialogVisible.value = true
 }
-// 导出
-const handleExport = async () => {
-  await exportList('错误数据.xls')
-}
+
 // 异常处理操作
 const handleProcessClick = (
   row: ApiErrorLogApi.ApiErrorLogVO,

@@ -41,7 +41,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['infra:file-config:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -281,11 +281,6 @@ const handleMaster = (row: FileConfigApi.FileConfigVO) => {
 const handleTest = async (rowId: number) => {
   const res = await FileConfigApi.testFileConfigApi(rowId)
   message.alert('测试通过，上传文件成功！访问地址：' + res)
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 // 提交按钮

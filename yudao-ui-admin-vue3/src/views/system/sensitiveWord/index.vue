@@ -17,7 +17,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['system:sensitive-word:export']"
-          @click="handleExport()"
+          @click="exportList('敏感词数据.xls')"
         />
       </template>
       <template #tags_default="{ row }">
@@ -50,7 +50,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:sensitive-word:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -147,11 +147,6 @@ const handleCreate = () => {
   setDialogTile('create')
 }
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('敏感词数据.xls')
-}
-
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -165,11 +160,6 @@ const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
   const res = await SensitiveWordApi.getSensitiveWordApi(rowId)
   detailData.value = res
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 // 提交按钮

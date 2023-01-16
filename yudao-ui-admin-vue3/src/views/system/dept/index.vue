@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <XTable @register="registerTable" show-overflow>
+    <XTable ref="xGrid" @register="registerTable" show-overflow>
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -11,8 +11,8 @@
           v-hasPermi="['system:dept:create']"
           @click="handleCreate()"
         />
-        <XButton title="展开所有" @click="xGrid?.setAllTreeExpand(true)" />
-        <XButton title="关闭所有" @click="xGrid?.clearTreeExpand()" />
+        <XButton title="展开所有" @click="xGrid?.Ref.setAllTreeExpand(true)" />
+        <XButton title="关闭所有" @click="xGrid?.Ref.clearTreeExpand()" />
       </template>
       <template #leaderUserId_default="{ row }">
         <span>{{ userNicknameFormat(row) }}</span>
@@ -30,7 +30,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:dept:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -77,7 +77,6 @@
 <script setup lang="ts" name="Dept">
 import { nextTick, onMounted, ref, unref } from 'vue'
 import { ElSelect, ElTreeSelect, ElOption } from 'element-plus'
-import { VxeGridInstance } from 'vxe-table'
 import { handleTree, defaultProps } from '@/utils/tree'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
@@ -90,7 +89,7 @@ import { getListSimpleUsersApi, UserVO } from '@/api/system/user'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
+const xGrid = ref<any>() // 列表 Grid Ref
 const treeConfig = {
   transform: true,
   rowField: 'id',
@@ -168,15 +167,11 @@ const submitForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
+        await getTree()
         await reload()
       }
     }
   })
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 const userNicknameFormat = (row) => {

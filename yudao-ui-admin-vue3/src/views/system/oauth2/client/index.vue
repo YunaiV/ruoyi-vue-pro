@@ -48,7 +48,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:oauth2-client:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -182,11 +182,6 @@ const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
   const res = await ClientApi.getOAuth2ClientApi(rowId)
   detailData.value = res
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 // 提交新增/修改的表单

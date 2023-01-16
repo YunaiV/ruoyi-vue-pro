@@ -31,14 +31,14 @@
             preIcon="ep:delete"
             :title="t('action.del')"
             v-hasPermi="['system:dict:delete']"
-            @click="handleTypeDelete(row.id)"
+            @click="typeDeleteData(row.id)"
           />
         </template>
       </XTable>
       <!-- @星语：分页和列表重叠在一起了 -->
     </el-card>
     <!-- ====== 字典数据 ====== -->
-    <el-card class="w-1/2 dict" style="margin-left: 10px" :gutter="12" shadow="hover">
+    <el-card class="w-1/2 dict ml-3" :gutter="12" shadow="hover">
       <template #header>
         <div class="card-header">
           <span>字典数据</span>
@@ -74,7 +74,7 @@
               v-hasPermi="['system:dict:delete']"
               preIcon="ep:delete"
               :title="t('action.del')"
-              @click="handleDataDelete(row.id)"
+              @click="dataDeleteData(row.id)"
             />
           </template>
         </XTable>
@@ -200,15 +200,6 @@ const setDialogTile = (type: string) => {
   dialogTitle.value = t('action.' + type)
   actionType.value = type
   dialogVisible.value = true
-}
-
-// 删除操作
-const handleTypeDelete = async (rowId: number) => {
-  await typeDeleteData(rowId)
-}
-
-const handleDataDelete = async (rowId: number) => {
-  await dataDeleteData(rowId)
 }
 
 // 提交按钮

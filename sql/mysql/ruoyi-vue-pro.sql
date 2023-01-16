@@ -1710,6 +1710,8 @@ INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_i
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1267, '客户端删除', 'system:oauth2-client:delete', 3, 4, 1263, '', '', '', 0, b'1', b'1', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:33', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1281, '可视化报表', '', 1, 12, 0, '/visualization', 'chart', NULL, 0, b'1', b'1', '1', '2022-07-10 20:22:15', '1', '2022-07-10 20:33:30', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1282, '积木报表', '', 2, 1, 1281, 'jimu-report', 'example', 'visualization/jmreport/index', 0, b'1', b'1', '1', '2022-07-10 20:26:36', '1', '2022-07-28 21:17:34', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1283, 'webSocket连接', '', 2, 14, 2, 'webSocket', 'message', 'infra/webSocket/index', 0, b'1', b'1', '1', '2023-01-01 11:43:04', '1', '2023-01-01 11:43:04', b'0');
+
 COMMIT;
 
 -- ----------------------------

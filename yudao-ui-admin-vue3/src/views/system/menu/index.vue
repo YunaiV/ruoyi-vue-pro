@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <XTable @register="registerTable" show-overflow>
+    <XTable ref="xGrid" @register="registerTable" show-overflow>
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -11,8 +11,8 @@
           v-hasPermi="['system:menu:create']"
           @click="handleCreate()"
         />
-        <XButton title="展开所有" @click="xGrid?.setAllTreeExpand(true)" />
-        <XButton title="关闭所有" @click="xGrid?.clearTreeExpand()" />
+        <XButton title="展开所有" @click="xGrid?.Ref.setAllTreeExpand(true)" />
+        <XButton title="关闭所有" @click="xGrid?.Ref.clearTreeExpand()" />
       </template>
       <template #name_default="{ row }">
         <Icon :icon="row.icon" />
@@ -31,7 +31,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:menu:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -194,7 +194,6 @@ import {
 } from 'element-plus'
 import { Tooltip } from '@/components/Tooltip'
 import { IconSelect } from '@/components/Icon'
-import { VxeGridInstance } from 'vxe-table'
 // 业务相关的 import
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
@@ -206,9 +205,10 @@ import { useXTable } from '@/hooks/web/useXTable'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 const { wsCache } = useCache()
+
+const xGrid = ref<any>(null)
+
 // 列表相关的变量
-// 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
 const treeConfig = {
   transform: true,
   rowField: 'id',
@@ -333,11 +333,5 @@ const submitForm = async () => {
 // 判断 path 是不是外部的 HTTP 等链接
 const isExternal = (path: string) => {
   return /^(https?:|mailto:|tel:)/.test(path)
-}
-
-// ========== 删除 ==========
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 </script>

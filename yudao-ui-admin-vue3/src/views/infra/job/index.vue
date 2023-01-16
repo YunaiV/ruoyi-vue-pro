@@ -17,14 +17,14 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['infra:job:export']"
-          @click="handleExport()"
+          @click="exportList('定时任务.xls')"
         />
         <XButton
           type="info"
           preIcon="ep:zoom-in"
           title="执行日志"
           v-hasPermi="['infra:job:query']"
-          @click="handleJobLog"
+          @click="handleJobLog()"
         />
       </template>
       <template #actionbtns_default="{ row }">
@@ -46,7 +46,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['infra:job:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
         <el-dropdown class="p-0.5" v-hasPermi="['infra:job:trigger', 'infra:job:query']">
           <XTextButton :title="t('action.more')" postIcon="ep:arrow-down" />
@@ -179,11 +179,6 @@ const handleCreate = () => {
   setDialogTile('create')
 }
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('定时任务.xls')
-}
-
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -248,10 +243,6 @@ const parseTime = (time) => {
   return time_str
 }
 
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
-}
 const handleChangeStatus = async (row: JobApi.JobVO) => {
   const text = row.status === InfraJobStatusEnum.STOP ? '开启' : '关闭'
   const status =
@@ -275,7 +266,7 @@ const handleChangeStatus = async (row: JobApi.JobVO) => {
     })
 }
 // 执行日志
-const handleJobLog = (rowId: number) => {
+const handleJobLog = (rowId?: number) => {
   if (rowId) {
     push('/job/job-log?id=' + rowId)
   } else {

@@ -30,13 +30,16 @@ module.exports = vm => {
         if (!isRefreshToken) {
           isRefreshToken = true
           // 1. 如果获取不到刷新令牌，则只能执行登出操作
-          if (!vm.$store.getters.refreshToken()) {
+          if (!vm.$store.getters.refreshToken) {
             vm.$store.commit('CLEAR_LOGIN_INFO')
             return Promise.reject(res)
           }
           // 2. 进行刷新访问令牌
           try {
-            const refreshTokenRes = await refreshToken()
+            let param = {}
+            let refreshToken =  uni.getStorageSync('REFRESH_TOKEN');
+            param.refreshToken = refreshToken;
+            const refreshTokenRes = await refreshToken(param)
             // 2.1 刷新成功，则回放队列的请求 + 当前请求
             vm.$store.commit('SET_TOKEN', refreshTokenRes.data)
             requestList.forEach(cb => cb())

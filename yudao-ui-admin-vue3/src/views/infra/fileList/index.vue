@@ -21,7 +21,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['infra:file:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -160,11 +160,6 @@ const handleDetail = (row: FileApi.FileVO) => {
   detailData.value = row
   dialogTitle.value = t('action.detail')
   dialogVisible.value = true
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 // ========== 复制相关 ==========

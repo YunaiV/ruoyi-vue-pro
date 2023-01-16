@@ -16,7 +16,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['system:tenant:export']"
-          @click="handleExport()"
+          @click="exportList('租户列表.xls')"
         />
       </template>
       <template #accountCount_default="{ row }">
@@ -46,7 +46,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:tenant:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -147,16 +147,6 @@ const handleDetail = async (rowId: number) => {
   const res = await TenantApi.getTenantApi(rowId)
   detailData.value = res
   setDialogTile('detail')
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
-}
-
-// 导出操作
-const handleExport = async () => {
-  await exportList('租户列表.xls')
 }
 
 // 提交按钮

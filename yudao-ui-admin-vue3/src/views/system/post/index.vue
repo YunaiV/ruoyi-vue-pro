@@ -17,7 +17,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['system:post:export']"
-          @click="handleExport()"
+          @click="exportList('岗位列表.xls')"
         />
       </template>
       <template #actionbtns_default="{ row }">
@@ -40,7 +40,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:post:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -117,11 +117,6 @@ const handleCreate = () => {
   modelLoading.value = false
 }
 
-// 导出操作
-const handleExport = async () => {
-  await exportList('岗位列表.xls')
-}
-
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -137,11 +132,6 @@ const handleDetail = async (rowId: number) => {
   const res = await PostApi.getPostApi(rowId)
   detailData.value = res
   modelLoading.value = false
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 // 提交新增/修改的表单

@@ -31,7 +31,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['infra:data-source-config:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
     </XTable>
@@ -119,11 +119,6 @@ const handleDetail = async (rowId: number) => {
   const res = await DataSourceConfiggApi.getDataSourceConfigApi(rowId)
   detailData.value = res
   setDialogTile('detail')
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(rowId)
 }
 
 // 提交按钮
