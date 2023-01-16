@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@Desensitize(desensitizationBy = BankCardDesensitization.class)// 银行卡号;比如：9988002866797031脱敏之后为998800********31
+@Desensitize(desensitizationBy = BankCardDesensitization.class)
 public @interface BankCard {
 
     /**
@@ -31,10 +31,7 @@ public @interface BankCard {
     int suffixKeep() default 2;
 
     /**
-     * 替换规则，会将前缀后缀保留后，全部替换成 replacer
-     * 例如：prefixKeep = 1; suffixKeep = 2; replacer = "*";
-     * 原始字符串  123456
-     * 脱敏后     1***56
+     * 替换规则，银行卡号;比如：9988002866797031脱敏之后为998800********31
      */
     String replacer() default "*";
 

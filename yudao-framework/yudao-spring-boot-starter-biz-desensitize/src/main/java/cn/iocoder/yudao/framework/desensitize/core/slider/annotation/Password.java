@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@Desensitize(desensitizationBy = PasswordDesensitization.class) // 密码;比如：123456脱敏之后为******
+@Desensitize(desensitizationBy = PasswordDesensitization.class)
 public @interface Password {
 
     /**
@@ -31,10 +31,7 @@ public @interface Password {
     int suffixKeep() default 0;
 
     /**
-     * 替换规则，会将前缀后缀保留后，全部替换成 replacer
-     * 例如：prefixKeep = 1; suffixKeep = 2; replacer = "*";
-     * 原始字符串  123456
-     * 脱敏后     1***56
+     * 替换规则，密码;比如：123456脱敏之后为******
      */
     String replacer() default "*";
 

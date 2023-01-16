@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@Desensitize(desensitizationBy = IdCardDesensitization.class) // 身份证号码;比如：530321199204074611脱敏之后为530321**********11
+@Desensitize(desensitizationBy = IdCardDesensitization.class)
 public @interface IdCard {
 
     /**
@@ -31,10 +31,7 @@ public @interface IdCard {
     int suffixKeep() default 2;
 
     /**
-     * 替换规则，会将前缀后缀保留后，全部替换成 replacer
-     * 例如：prefixKeep = 1; suffixKeep = 2; replacer = "*";
-     * 原始字符串  123456
-     * 脱敏后     1***56
+     * 替换规则，身份证号码;比如：530321199204074611脱敏之后为530321**********11
      */
     String replacer() default "*";
 

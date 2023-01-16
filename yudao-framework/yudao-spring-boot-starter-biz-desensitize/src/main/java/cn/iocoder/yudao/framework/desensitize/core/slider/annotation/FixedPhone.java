@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@Desensitize(desensitizationBy = FixedPhoneDesensitization.class) // 固定电话;比如：01086551122脱敏之后为0108*****22
+@Desensitize(desensitizationBy = FixedPhoneDesensitization.class)
 public @interface FixedPhone {
 
     /**
@@ -31,10 +31,7 @@ public @interface FixedPhone {
     int suffixKeep() default 2;
 
     /**
-     * 替换规则，会将前缀后缀保留后，全部替换成 replacer
-     * 例如：prefixKeep = 1; suffixKeep = 2; replacer = "*";
-     * 原始字符串  123456
-     * 脱敏后     1***56
+     * 替换规则，固定电话;比如：01086551122脱敏之后为0108*****22
      */
     String replacer() default "*";
 

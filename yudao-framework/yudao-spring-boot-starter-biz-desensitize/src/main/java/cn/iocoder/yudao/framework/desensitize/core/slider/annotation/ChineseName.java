@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@Desensitize(desensitizationBy = ChineseNameDesensitization.class) // 中文名;比如：刘子豪脱敏之后为刘**
+@Desensitize(desensitizationBy = ChineseNameDesensitization.class)
 public @interface ChineseName {
 
     /**
@@ -31,10 +31,7 @@ public @interface ChineseName {
     int suffixKeep() default 0;
 
     /**
-     * 替换规则，会将前缀后缀保留后，全部替换成 replacer
-     * 例如：prefixKeep = 1; suffixKeep = 2; replacer = "*";
-     * 原始字符串  123456
-     * 脱敏后     1***56
+     * 替换规则，中文名;比如：刘子豪脱敏之后为刘**
      */
     String replacer() default "*";
 

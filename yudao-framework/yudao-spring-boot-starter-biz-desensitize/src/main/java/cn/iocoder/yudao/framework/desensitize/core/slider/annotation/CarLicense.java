@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@Desensitize(desensitizationBy = CarLicenseDesensitization.class) // 车牌号;比如：粤A66666脱敏之后为粤A6***6
+@Desensitize(desensitizationBy = CarLicenseDesensitization.class)
 public @interface CarLicense {
 
     /**
@@ -31,10 +31,7 @@ public @interface CarLicense {
     int suffixKeep() default 1;
 
     /**
-     * 替换规则，会将前缀后缀保留后，全部替换成 replacer
-     * 例如：prefixKeep = 1; suffixKeep = 2; replacer = "*";
-     * 原始字符串  123456
-     * 脱敏后     1***56
+     * 替换规则，车牌号;比如：粤A66666脱敏之后为粤A6***6
      */
     String replacer() default "*";
 

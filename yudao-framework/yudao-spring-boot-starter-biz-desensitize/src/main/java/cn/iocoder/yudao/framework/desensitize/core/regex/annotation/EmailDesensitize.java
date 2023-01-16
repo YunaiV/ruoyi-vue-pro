@@ -17,18 +17,15 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@Desensitize(desensitizationBy = EmailDesensitizationHandler.class) // 邮箱;比如：example@gmail.com脱敏之后为e****@gmail.com
+@Desensitize(desensitizationBy = EmailDesensitizationHandler.class)
 public @interface EmailDesensitize {
     /**
-     * 匹配的正则表达式（默认匹配所有）
+     * 匹配的正则表达式
      */
     String regex() default  "(^.)[^@]*(@.*$)";
 
     /**
-     * 替换规则，会将匹配到的字符串全部替换成 replacer
-     * 例如：regex=123; replacer=******
-     * 原始字符串 123456789
-     * 脱敏后字符串 ******456789
+     * 替换规则，邮箱;比如：example@gmail.com脱敏之后为e****@gmail.com
      */
     String replacer() default "$1****$2";
 }
