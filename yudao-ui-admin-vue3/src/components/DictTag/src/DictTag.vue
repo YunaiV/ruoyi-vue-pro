@@ -17,6 +17,9 @@ const getDictObj = (dictType: string, value: string) => {
   const dictOptions = getDictOptions(dictType)
   dictOptions.forEach((dict: DictDataType) => {
     if (dict.value === value) {
+      if (dict.colorType + '' === 'primary' || dict.colorType + '' === 'default') {
+        dict.colorType = ''
+      }
       dictData.value = dict
     }
   })
@@ -31,25 +34,11 @@ onUpdated(() => {
 })
 </script>
 <template>
-  <!-- 默认样式 -->
-  <span
-    v-if="
-      dictData?.colorType === 'default' ||
-      dictData?.colorType === '' ||
-      dictData?.colorType === undefined
-    "
-    :key="dictData?.value.toString()"
-    :class="dictData?.cssClass"
-  >
-    {{ dictData?.label }}
-  </span>
-  <!-- Tag 样式 -->
   <ElTag
-    v-else
     :disable-transitions="true"
     :key="dictData?.value + ''"
-    :type="dictData?.colorType === 'primary' ? 'success' : dictData?.colorType"
-    :class="dictData?.cssClass"
+    :type="dictData?.colorType"
+    :color="dictData?.cssClass"
   >
     {{ dictData?.label }}
   </ElTag>

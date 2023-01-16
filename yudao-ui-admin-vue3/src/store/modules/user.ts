@@ -2,7 +2,7 @@ import { store } from '../index'
 import { defineStore } from 'pinia'
 import { getAccessToken, removeToken } from '@/utils/auth'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
-import { getInfoApi } from '@/api/login'
+import { getInfoApi, loginOutApi } from '@/api/login'
 
 const { wsCache } = useCache()
 
@@ -59,7 +59,8 @@ export const useUserStore = defineStore('admin-user', {
       this.isSetUser = true
       wsCache.set(CACHE_KEY.USER, userInfo)
     },
-    loginOut() {
+    async loginOut() {
+      await loginOutApi()
       removeToken()
       wsCache.clear()
       this.resetState()

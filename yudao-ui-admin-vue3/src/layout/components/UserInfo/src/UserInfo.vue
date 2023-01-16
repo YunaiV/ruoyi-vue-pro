@@ -35,7 +35,7 @@ const loginOut = () => {
     type: 'warning'
   })
     .then(async () => {
-      userStore.loginOut()
+      await userStore.loginOut()
       tagsViewStore.delAllViews()
       replace('/login?redirect=/index')
     })

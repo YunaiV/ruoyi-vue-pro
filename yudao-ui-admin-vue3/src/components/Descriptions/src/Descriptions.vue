@@ -25,7 +25,7 @@ const props = defineProps({
     default: () => []
   },
   data: {
-    type: Object as PropType<Recordable>,
+    type: Object as PropType<any>,
     default: () => ({})
   }
 })

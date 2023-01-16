@@ -99,6 +99,9 @@ const beforeUpload: UploadProps['beforeUpload'] = (file: UploadRawFile) => {
 // 文件上传成功
 const handleFileSuccess: UploadProps['onSuccess'] = (res: any): void => {
   message.success('上传成功')
+  const fileListNew = fileList.value
+  fileListNew.pop()
+  fileList.value = fileListNew
   uploadList.value.push({ name: res.data, url: res.data })
   if (uploadList.value.length == uploadNumber.value) {
     fileList.value = fileList.value.concat(uploadList.value)
