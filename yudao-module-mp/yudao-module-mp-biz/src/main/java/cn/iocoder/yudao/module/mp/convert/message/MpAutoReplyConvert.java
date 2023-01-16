@@ -27,4 +27,6 @@ public interface MpAutoReplyConvert {
 
     PageResult<MpAutoReplyRespVO> convertPage(PageResult<MpAutoReplyDO> page);
 
+    MpAutoReplyRespVO convert(MpAutoReplyDO bean);
+
 }

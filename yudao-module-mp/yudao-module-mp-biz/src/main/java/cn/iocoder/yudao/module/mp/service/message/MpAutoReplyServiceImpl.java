@@ -45,6 +45,11 @@ public class MpAutoReplyServiceImpl implements MpAutoReplyService {
     }
 
     @Override
+    public MpAutoReplyDO getAutoReply(Long id) {
+        return mpAutoReplyMapper.selectById(id);
+    }
+
+    @Override
     public WxMpXmlOutMessage replyForMessage(String appId, WxMpXmlMessage wxMessage) {
         // 第一步，匹配自动回复
         List<MpAutoReplyDO> replies = null;

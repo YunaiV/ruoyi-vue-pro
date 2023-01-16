@@ -30,7 +30,7 @@ public class MpAutoReplyBaseVO {
 
     @ApiModelProperty(value = "请求的关键字", example = "关键字", notes = "当 type 为 MpAutoReplyTypeEnum#KEYWORD 时，必填")
     private String requestKeyword;
-    @ApiModelProperty(value = "请求的关键字", example = "关键字", notes = "当 type 为 MpAutoReplyTypeEnum#KEYWORD 时，必填")
+    @ApiModelProperty(value = "请求的匹配方式", example = "1", notes = "当 type 为 MpAutoReplyTypeEnum#KEYWORD 时，必填")
     private Integer requestMatch;
 
     @ApiModelProperty(value = "请求的消息类型", example = "text", notes = "当 type 为 MpAutoReplyTypeEnum#MESSAGE 时，必填")

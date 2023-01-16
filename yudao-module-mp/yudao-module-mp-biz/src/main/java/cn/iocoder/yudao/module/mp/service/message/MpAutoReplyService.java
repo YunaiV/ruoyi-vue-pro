@@ -22,6 +22,14 @@ public interface MpAutoReplyService {
     PageResult<MpAutoReplyDO> getAutoReplyPage(MpMessagePageReqVO pageVO);
 
     /**
+     * 获得公众号自动回复
+     *
+     * @param id 编号
+     * @return 自动回复
+     */
+    MpAutoReplyDO getAutoReply(Long id);
+
+    /**
      * 当收到消息时，自动回复
      *
      * @param appId 微信公众号 appId

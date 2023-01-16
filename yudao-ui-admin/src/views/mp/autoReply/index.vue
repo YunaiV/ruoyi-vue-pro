@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
   芋道源码：
   ① 移除 avue 框架，使用 element-ui 重写
+  ② 重写代码，保持和现有项目保持一致
 -->
 <template>
   <div class="app-container">
@@ -44,10 +45,10 @@ SOFTWARE.
       <el-row :gutter="10" class="mb8">
         <el-col :span="1.5">
           <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-                     v-hasPermi="['mp:auto-reply:create']" v-if="list.length <= 0">新增
+                     v-hasPermi="['mp:auto-reply:create']" v-if="type !== '1' || list.length <= 0">新增
           </el-button>
         </el-col>
-        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
       </el-row>
       <!-- 列表 -->
       <el-tab-pane name="1">
@@ -97,7 +98,11 @@ SOFTWARE.
         <span slot="label"><i class="el-icon-news"></i> 关键词回复</span>
         <el-table v-loading="loading" :data="list">
           <el-table-column label="关键词" align="center" prop="requestKeyword"/>
-          <el-table-column label="匹配类型" align="center" prop="requestMatch"/>
+          <el-table-column label="匹配类型" align="center" prop="requestMatch">
+            <template v-slot="scope">
+              <dict-tag :type="DICT_TYPE.MP_AUTO_REPLY_REQUEST_MATCH" :value="scope.row.requestMatch"/>
+            </template>
+          </el-table-column>
           <el-table-column label="回复消息类型" align="center" prop="responseMessageType"/>
           <el-table-column label="创建时间" align="center" prop="createTime" width="180">
             <template slot-scope="scope">
@@ -118,39 +123,31 @@ SOFTWARE.
       </el-tab-pane>
     </el-tabs>
 
-    <el-dialog :title="handleType === 'add' ? '新增回复消息' : '修改回复消息'" :visible.sync="dialog1Visible" width="50%">
-      <el-form label-width="100px">
-        <el-form-item label="请求消息类型" v-if="type == '2'">
-          <el-select v-model="objData.reqType" placeholder="请选择">
-            <el-option
-              v-for="item in dictData.get('wx_req_type')"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-              :disabled="item.disabled"
-              v-if="item.value !== 'event'">
+    <!-- 添加或修改自动回复的对话框 -->
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="消息类型" prop="requestMessageType" v-if="type === '2'">
+          <el-select v-model="form.requestMessageType" placeholder="请选择">
+            <el-option v-for="item in dictData.get('wx_req_type')" :key="item.value" :label="item.label"
+              :value="item.value" :disabled="item.disabled" v-if="item.value !== 'event'">
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="匹配类型" v-if="type === '3'">
-          <el-select v-model="objData.repMate" placeholder="请选择" style="width: 100px">
-            <el-option
-              v-for="item in dictData.get('wx_rep_mate')"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
+        <el-form-item label="匹配类型" prop="requestMatch" v-if="type === '3'">
+          <el-select v-model="form.requestMatch" placeholder="请选择匹配类型" clearable size="small">
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.MP_AUTO_REPLY_REQUEST_MATCH)"
+                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="关键词" v-if="type === '3'">
-          <el-input placeholder="请输入内容" v-model="objData.reqKey" clearable> </el-input>
+        <el-form-item label="关键词" prop="requestKeyword" v-if="type === '3'">
+          <el-input v-model="form.requestKeyword" placeholder="请输入内容" clearable />
         </el-form-item>
         <el-form-item label="回复消息">
-          <WxReplySelect :objData="objData" v-if="hackResetWxReplySelect"></WxReplySelect>
+          <wx-reply-select :objData="objData" v-if="hackResetWxReplySelect" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialog1Visible = false">取 消</el-button>
+        <el-button @click="cancel">取 消</el-button>
         <el-button type="primary" @click="handleSubmit">确 定</el-button>
       </span>
     </el-dialog>
@@ -158,11 +155,9 @@ SOFTWARE.
 </template>
 
 <script>
-// import { getPage, getObj, addObj, putObj, delObj } from '@/api/wxmp/wxautoreply'
-// import { tableOption1, tableOption2, tableOption3 } from '@/const/crud/wxmp/wxautoreply'
 import WxReplySelect from '@/views/mp/components/wx-reply/main.vue'
 import { getSimpleAccounts } from "@/api/mp/account";
-import { getTagPage } from "@/api/mp/tag";
+import { createAutoReply, deleteAutoReply, getAutoReply, getAutoReplyPage, updateAutoReply } from "@/api/mp/autoReply";
 
 export default {
   name: 'mpAutoReply',
@@ -188,13 +183,24 @@ export default {
         accountId: undefined,
       },
 
-      dialog1Visible:false,
-      objData:{
-        repType : 'text'
+      // 弹出层标题
+      title: "",
+      // 是否显示弹出层
+      open: false,
+      // 表单参数
+      form: {},
+      // 回复消息
+      objData: {
+        type : 'text'
       },
-      handleType: null,
+      // 表单校验
+      rules: {
+        requestKeyword: [{ required: true, message: "请求的关键字不能为空", trigger: "blur" }],
+        requestMatch: [{ required: true, message: "请求的关键字的匹配不能为空", trigger: "blur" }],
+      },
+      hackResetWxReplySelect: false, // 重置 WxReplySelect 组件，解决无法清除的问题
+
       dictData: new Map(),
-      hackResetWxReplySelect: false,
 
       // 公众号账号列表
       accounts: []
@@ -211,14 +217,7 @@ export default {
       this.getList();
     })
 
-    // this.getPage(this.page)
-    this.dictData.set('wx_rep_mate',[{
-      value: '1',
-      label: '全匹配'
-    },{
-      value: '2',
-      label: '半匹配'
-    }])
+    // TODO 芋艿：字典数据，一起搞
     this.dictData.set('wx_req_type',[{
       value: 'text',
       label: '文本'
@@ -250,15 +249,18 @@ export default {
     getList() {
       // 如果没有选中公众号账号，则进行提示。
       if (!this.queryParams.accountId) {
-        this.$message.error('未选中公众号，无法查询标签')
+        this.$message.error('未选中公众号，无法查询自动回复')
         return false
       }
 
       this.loading = false
       // 处理查询参数
-      let params = {...this.queryParams}
+      let params = {
+        ...this.queryParams,
+        type: this.type
+      }
       // 执行查询
-      getTagPage(params).then(response => {
+      getAutoReplyPage(params).then(response => {
         this.list = response.data.list
         this.total = response.data.total
         this.loading = false
@@ -278,75 +280,122 @@ export default {
       }
       this.handleQuery()
     },
-
-    handleAdd(){
-      this.hackResetWxReplySelect = false//销毁组件
-      this.$nextTick(() => {
-        this.hackResetWxReplySelect = true//重建组件
-      })
-      this.handleType = 'add'
-      this.dialog1Visible = true
-      this.objData = {
-        repType : 'text'
-      }
-    },
-    handleEdit(row){
-      this.hackResetWxReplySelect = false//销毁组件
-      this.$nextTick(() => {
-        this.hackResetWxReplySelect = true//重建组件
-      })
-      this.handleType = 'edit'
-      this.dialog1Visible = true
-      this.objData = Object.assign({}, row)
-    },
-    handleClick(tab, event){
-      this.tableData = []
-      this.page.currentPage = 1
+    handleClick(tab, event) {
       this.type = tab.name
-      this.getPage(this.page)
+      this.handleQuery()
     },
-    handleDel: function(row, index) {
-      var _this = this
-      this.$confirm('是否确认删除此数据', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(function() {
-          return delObj(row.id)
-        }).then(data => {
-        _this.$message({
-          showClose: true,
-          message: '删除成功',
-          type: 'success'
-        })
-        this.getPage(this.page)
-      }).catch(function(err) { })
+
+    /** 新增按钮操作 */
+    handleAdd(){
+      this.reset();
+      this.resetEditor();
+      // 打开表单，并设置初始化
+      this.open = true
+      this.title = '新增自动回复';
+      this.objData = {
+        type : 'text'
+      }
     },
-    handleSubmit(row){
-      if(this.handleType === 'add'){
-        addObj(Object.assign({
-          type:this.type
-        }, this.objData)).then(data => {
-          this.$message({
-            showClose: true,
-            message: '添加成功',
-            type: 'success'
-          })
-          this.getPage(this.page)
-          this.dialog1Visible = false
-        })
-      }
-      if(this.handleType === 'edit'){
-        putObj(this.objData).then(data => {
-          this.$message({
-            showClose: true,
-            message: '修改成功',
-            type: 'success'
-          })
-          this.getPage(this.page)
-          this.dialog1Visible = false
-        })
-      }
+    /** 修改按钮操作 */
+    handleUpdate(row) {
+      this.reset();
+      this.resetEditor();
+      const id = row.id;
+      getAutoReply(id).then(response => {
+        // 设置属性
+        this.form = {...response.data}
+        this.$delete(this.form, 'responseMessageType');
+        this.$delete(this.form, 'responseContent');
+        this.$delete(this.form, 'responseMediaId');
+        this.$delete(this.form, 'responseMediaUrl');
+        this.$delete(this.form, 'responseDescription');
+        this.$delete(this.form, 'responseArticles');
+        this.objData = {
+          type: response.data.responseMessageType,
+          accountId: this.queryParams.accountId,
+          content: response.data.responseContent,
+          mediaId: response.data.responseMediaId,
+          url: response.data.responseMediaUrl,
+          title: response.data.responseTitle,
+          description: response.data.responseDescription,
+          thumbMediaId: response.data.responseThumbMediaId,
+          thumbMediaUrl: response.data.responseThumbMediaUrl,
+          articles: response.data.responseArticles,
+          musicUrl: response.data.responseMusicUrl,
+          hqMusicUrl: response.data.responseHqMusicUrl,
+        }
+
+        // 打开表单
+        this.open = true
+        this.title = '修改自动回复';
+      })
+    },
+    handleSubmit() {
+      this.$refs["form"].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        // 处理回复消息
+        const form = {...this.form};
+        form.responseMessageType = this.objData.type;
+        form.responseContent = this.objData.content;
+        form.responseMediaId = this.objData.mediaId;
+        form.responseMediaUrl = this.objData.url;
+        form.responseTitle = this.objData.title;
+        form.responseDescription = this.objData.description;
+        form.responseThumbMediaId = this.objData.thumbMediaId;
+        form.responseThumbMediaUrl = this.objData.thumbMediaUrl;
+        form.responseArticles = this.objData.articles;
+        form.responseMusicUrl = this.objData.musicUrl;
+        form.responseHqMusicUrl = this.objData.hqMusicUrl;
+
+        if (this.form.id !== undefined) {
+          updateAutoReply(form).then(response => {
+            this.$modal.msgSuccess("修改成功");
+            this.open = false;
+            this.getList();
+          });
+        } else {
+          createAutoReply(form).then(response => {
+            this.$modal.msgSuccess("新增成功");
+            this.open = false;
+            this.getList();
+          });
+        }
+      });
+    },
+    // 表单重置
+    reset() {
+      this.form = {
+        id: undefined,
+        accountId: this.queryParams.accountId,
+        type: this.type,
+        requestKeyword: undefined,
+        requestMatch: this.type === '3' ? 1 : undefined,
+        requestMessageType: undefined,
+      };
+      this.resetForm("form");
+    },
+    // 取消按钮
+    cancel() {
+      this.open = false;
+      this.reset();
+    },
+    // 表单 Editor 重置
+    resetEditor() {
+      this.hackResetWxReplySelect = false // 销毁组件
+      this.$nextTick(() => {
+        this.hackResetWxReplySelect = true // 重建组件
+      })
+    },
+    handleDelete: function(row) {
+      const ids = row.id;
+      this.$modal.confirm('是否确认删除此数据?').then(function() {
+        return deleteAutoReply(ids);
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     },
   }
 }
