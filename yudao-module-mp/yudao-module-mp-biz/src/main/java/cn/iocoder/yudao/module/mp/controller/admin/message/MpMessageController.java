@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.mp.controller.admin.message;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessagePageReqVO;
-import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessageRespVO;
-import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessageSendReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessagePageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessageRespVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessageSendReqVO;
 import cn.iocoder.yudao.module.mp.convert.message.MpMessageConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import cn.iocoder.yudao.module.mp.service.message.MpMessageService;
@@ -19,7 +19,7 @@ import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - 粉丝消息")
+@Api(tags = "管理后台 - 公众号消息")
 @RestController
 @RequestMapping("/mp/message")
 @Validated

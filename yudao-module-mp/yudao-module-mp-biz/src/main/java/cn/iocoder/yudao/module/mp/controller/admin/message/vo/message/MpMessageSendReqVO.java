@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.controller.admin.message.vo;
+package cn.iocoder.yudao.module.mp.controller.admin.message.vo.message;
 
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import cn.iocoder.yudao.module.mp.framework.mp.core.util.MpUtils.*;

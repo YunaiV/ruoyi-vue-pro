@@ -53,7 +53,6 @@ SOFTWARE.
       <el-tab-pane name="1">
         <span slot="label"><i class="el-icon-star-off"></i> 关注时回复</span>
         <el-table v-loading="loading" :data="list">
-          <el-table-column label="编号" align="center" prop="id"/>
           <el-table-column label="回复消息类型" align="center" prop="responseMessageType"/>
           <el-table-column label="创建时间" align="center" prop="createTime" width="180">
             <template slot-scope="scope">
@@ -75,7 +74,6 @@ SOFTWARE.
       <el-tab-pane name="2">
         <span slot="label"><i class="el-icon-chat-line-round"></i> 消息回复</span>
         <el-table v-loading="loading" :data="list">
-          <el-table-column label="编号" align="center" prop="id"/>
           <el-table-column label="请求消息类型" align="center" prop="requestMessageType"/>
           <el-table-column label="回复消息类型" align="center" prop="responseMessageType"/>
           <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -98,7 +96,6 @@ SOFTWARE.
       <el-tab-pane name="3">
         <span slot="label"><i class="el-icon-news"></i> 关键词回复</span>
         <el-table v-loading="loading" :data="list">
-          <el-table-column label="编号" align="center" prop="id"/>
           <el-table-column label="关键词" align="center" prop="requestKeyword"/>
           <el-table-column label="匹配类型" align="center" prop="requestMatch"/>
           <el-table-column label="回复消息类型" align="center" prop="responseMessageType"/>
@@ -175,7 +172,7 @@ export default {
   data() {
     return {
       // tab 类型（1、关注时回复；2、消息回复；3、关键词回复）
-      type:'1',
+      type: '3',
       // 遮罩层
       loading: true,
       // 显示搜索条件

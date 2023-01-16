@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.mp.convert.message;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.autoreply.MpAutoReplyRespVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpAutoReplyDO;
 import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import org.mapstruct.Mapper;
@@ -22,5 +24,7 @@ public interface MpAutoReplyConvert {
             @Mapping(source = "reply.responseArticles", target = "articles"),
     })
     MpMessageSendOutReqBO convert(String openid, MpAutoReplyDO reply);
+
+    PageResult<MpAutoReplyRespVO> convertPage(PageResult<MpAutoReplyDO> page);
 
 }

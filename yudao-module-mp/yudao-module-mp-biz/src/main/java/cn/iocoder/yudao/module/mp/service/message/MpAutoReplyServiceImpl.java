@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.mp.service.message;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessagePageReqVO;
 import cn.iocoder.yudao.module.mp.convert.message.MpAutoReplyConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpAutoReplyDO;
@@ -36,6 +38,11 @@ public class MpAutoReplyServiceImpl implements MpAutoReplyService {
 
     @Resource
     private MpAutoReplyMapper mpAutoReplyMapper;
+
+    @Override
+    public PageResult<MpAutoReplyDO> getAutoReplyPage(MpMessagePageReqVO pageVO) {
+        return mpAutoReplyMapper.selectPage(pageVO);
+    }
 
     @Override
     public WxMpXmlOutMessage replyForMessage(String appId, WxMpXmlMessage wxMessage) {

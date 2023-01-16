@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.mp.dal.mysql.message;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessagePageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessagePageReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import org.apache.ibatis.annotations.Mapper;
 

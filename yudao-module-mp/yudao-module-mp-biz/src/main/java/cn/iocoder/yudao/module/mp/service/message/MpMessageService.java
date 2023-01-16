@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.mp.service.message;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessagePageReqVO;
-import cn.iocoder.yudao.module.mp.controller.admin.message.vo.MpMessageSendReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessagePageReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessageSendReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;

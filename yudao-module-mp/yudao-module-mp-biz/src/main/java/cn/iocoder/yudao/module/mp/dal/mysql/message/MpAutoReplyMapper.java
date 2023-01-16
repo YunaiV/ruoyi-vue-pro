@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.mp.dal.mysql.message;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessagePageReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpAutoReplyDO;
 import cn.iocoder.yudao.module.mp.enums.message.MpAutoReplyMatchEnum;
 import cn.iocoder.yudao.module.mp.enums.message.MpAutoReplyTypeEnum;
@@ -11,6 +13,12 @@ import java.util.List;
 
 @Mapper
 public interface MpAutoReplyMapper extends BaseMapperX<MpAutoReplyDO> {
+
+    default PageResult<MpAutoReplyDO> selectPage(MpMessagePageReqVO pageVO) {
+        return selectPage(pageVO, new LambdaQueryWrapperX<MpAutoReplyDO>()
+                .eq(MpAutoReplyDO::getAccountId, pageVO.getAccountId())
+                .eqIfPresent(MpAutoReplyDO::getType, pageVO.getType()));
+    }
 
     default List<MpAutoReplyDO> selectListByAppIdAndKeywordAll(String appId, String requestKeyword) {
         return selectList(new LambdaQueryWrapperX<MpAutoReplyDO>()

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.mp.controller.admin.message.vo;
+package cn.iocoder.yudao.module.mp.controller.admin.message.vo.message;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
