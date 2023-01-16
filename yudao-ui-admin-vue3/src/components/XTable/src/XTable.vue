@@ -120,7 +120,7 @@ const getColumnsConfig = (options: XTableProps) => {
 const getProxyConfig = (options: XTableProps) => {
   const { getListApi, proxyConfig, data, isList } = options
   if (proxyConfig || data) return
-  if (getListApi && isFunction(getListApi) && !isList) {
+  if (getListApi && isFunction(getListApi)) {
     if (!isList) {
       options.proxyConfig = {
         seq: true, // 启用动态序号代理（分页之后索引自动计算为当前页的起始序号）
@@ -194,7 +194,8 @@ const getProxyConfig = (options: XTableProps) => {
 
 // 分页
 const getPageConfig = (options: XTableProps) => {
-  const { pagination, pagerConfig, treeConfig } = options
+  const { pagination, pagerConfig, treeConfig, isList } = options
+  if (isList) return
   if (treeConfig) {
     options.treeConfig = options.treeConfig
     return
