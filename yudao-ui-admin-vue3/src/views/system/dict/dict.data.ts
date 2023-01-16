@@ -7,7 +7,7 @@ import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n()
 // 表单校验
 export const dictDataRules = reactive({
-  title: [required],
+  label: [required],
   value: [required],
   sort: [required]
 })
@@ -35,7 +35,7 @@ export const crudSchemas = reactive<VxeCrudSchema>({
       field: 'value'
     },
     {
-      title: '颜色类型',
+      title: '标签类型',
       field: 'colorType',
       form: {
         component: 'Select',
@@ -67,9 +67,12 @@ export const crudSchemas = reactive<VxeCrudSchema>({
       isTable: false
     },
     {
-      title: 'CSS Class',
+      title: '颜色',
       field: 'cssClass',
-      isTable: false
+      isTable: false,
+      form: {
+        component: 'ColorPicker'
+      }
     },
     {
       title: '显示排序',
