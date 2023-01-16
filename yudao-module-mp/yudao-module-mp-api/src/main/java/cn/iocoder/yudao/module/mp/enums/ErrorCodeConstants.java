@@ -55,4 +55,10 @@ public interface ErrorCodeConstants {
     ErrorCode MENU_SAVE_FAIL = new ErrorCode(1006008000, "创建菜单失败，原因：{}");
     ErrorCode MENU_DELETE_FAIL = new ErrorCode(1006008001, "删除菜单失败，原因：{}");
 
+    // ========== 公众号自动回复 1006009000============
+    ErrorCode AUTO_REPLY_NOT_EXISTS = new ErrorCode(1006009000, "自动回复不存在");
+    ErrorCode AUTO_REPLY_ADD_SUBSCRIBE_FAIL_EXISTS = new ErrorCode(1006009001, "操作失败，原因：已存在关注时的回复");
+    ErrorCode AUTO_REPLY_ADD_MESSAGE_FAIL_EXISTS = new ErrorCode(1006009002, "操作失败，原因：已存在该消息类型的回复");
+    ErrorCode AUTO_REPLY_ADD_KEYWORD_FAIL_EXISTS = new ErrorCode(1006009003, "操作失败，原因：已关在该关键字的回复");
+
 }

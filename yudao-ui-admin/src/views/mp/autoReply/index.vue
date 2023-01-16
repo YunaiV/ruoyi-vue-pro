@@ -96,32 +96,34 @@ SOFTWARE.
       </el-tab-pane>
       <el-tab-pane name="3">
         <span slot="label"><i class="el-icon-news"></i> 关键词回复</span>
-        <el-table v-loading="loading" :data="list">
-          <el-table-column label="关键词" align="center" prop="requestKeyword"/>
-          <el-table-column label="匹配类型" align="center" prop="requestMatch">
-            <template v-slot="scope">
-              <dict-tag :type="DICT_TYPE.MP_AUTO_REPLY_REQUEST_MATCH" :value="scope.row.requestMatch"/>
-            </template>
-          </el-table-column>
-          <el-table-column label="回复消息类型" align="center" prop="responseMessageType"/>
-          <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-            <template slot-scope="scope">
-              <span>{{ parseTime(scope.row.createTime) }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
-              <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                         v-hasPermi="['mp:auto-reply:update']">修改
-              </el-button>
-              <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                         v-hasPermi="['mp:auto-reply:delete']">删除
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
       </el-tab-pane>
     </el-tabs>
+
+    <!-- 列表 -->
+    <el-table v-loading="loading" :data="list">
+      <el-table-column label="关键词" align="center" prop="requestKeyword"/>
+      <el-table-column label="匹配类型" align="center" prop="requestMatch">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.MP_AUTO_REPLY_REQUEST_MATCH" :value="scope.row.requestMatch"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="回复消息类型" align="center" prop="responseMessageType"/>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+                     v-hasPermi="['mp:auto-reply:update']">修改
+          </el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+                     v-hasPermi="['mp:auto-reply:delete']">删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
 
     <!-- 添加或修改自动回复的对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>

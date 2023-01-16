@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.mp.service.message;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.autoreply.MpAutoReplyCreateReqVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.autoreply.MpAutoReplyUpdateReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessagePageReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpAutoReplyDO;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
@@ -29,6 +31,29 @@ public interface MpAutoReplyService {
      */
     MpAutoReplyDO getAutoReply(Long id);
 
+
+    /**
+     * 创建公众号自动回复
+     *
+     * @param createReqVO 创建请求
+     * @return 自动回复的编号
+     */
+    Long createAutoReply(MpAutoReplyCreateReqVO createReqVO);
+
+    /**
+     * 更新公众号自动回复
+     *
+     * @param updateReqVO 更新请求
+     */
+    void updateAutoReply(MpAutoReplyUpdateReqVO updateReqVO);
+
+    /**
+     * 删除公众号自动回复
+     *
+     * @param id 自动回复的编号
+     */
+    void deleteAutoReply(Long id);
+
     /**
      * 当收到消息时，自动回复
      *
@@ -46,4 +71,5 @@ public interface MpAutoReplyService {
      * @return 回复的消息
      */
     WxMpXmlOutMessage replyForSubscribe(String appId, WxMpXmlMessage wxMessage);
+
 }

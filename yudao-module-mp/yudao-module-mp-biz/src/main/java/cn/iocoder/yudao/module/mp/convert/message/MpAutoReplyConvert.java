@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.mp.convert.message;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.autoreply.MpAutoReplyCreateReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.autoreply.MpAutoReplyRespVO;
+import cn.iocoder.yudao.module.mp.controller.admin.message.vo.autoreply.MpAutoReplyUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpAutoReplyDO;
 import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import org.mapstruct.Mapper;
@@ -29,4 +31,7 @@ public interface MpAutoReplyConvert {
 
     MpAutoReplyRespVO convert(MpAutoReplyDO bean);
 
+    MpAutoReplyDO convert(MpAutoReplyCreateReqVO bean);
+
+    MpAutoReplyDO convert(MpAutoReplyUpdateReqVO bean);
 }

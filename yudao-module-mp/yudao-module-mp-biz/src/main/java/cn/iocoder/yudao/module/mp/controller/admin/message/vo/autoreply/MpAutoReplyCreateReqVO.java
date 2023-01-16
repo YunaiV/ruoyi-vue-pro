@@ -18,8 +18,4 @@ public class MpAutoReplyCreateReqVO extends MpAutoReplyBaseVO {
     @NotNull(message = "微信公众号 ID不能为空")
     private Long accountId;
 
-    @ApiModelProperty(value = "回复类型", required = true, example = "1", notes = "参见 MpAutoReplyTypeEnum 枚举")
-    @NotNull(message = "回复类型不能为空")
-    private Integer type;
-
 }
