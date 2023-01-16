@@ -4,8 +4,8 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.*;
 import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
 import org.springdoc.core.customizers.ServerBaseUrlCustomizer;
@@ -44,21 +44,16 @@ public class YudaoSwaggerAutoConfiguration {
         //鉴权组件(随便起名的)
         SecurityScheme securityScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.APIKEY)
-                .scheme("bearer")//固定写法
+                .scheme("Bearer")//固定写法
                 .bearerFormat("JWT")
                 .in(SecurityScheme.In.HEADER)
                 .name(HttpHeaders.AUTHORIZATION);
         Components components = new Components()
-                .addSecuritySchemes("Bearer", securityScheme);
-
-        //鉴权限制要求(随便起名的)
-        SecurityRequirement securityRequirement = new SecurityRequirement()
-                .addList(HttpHeaders.AUTHORIZATION, Arrays.asList("read", "write"));
+                .addSecuritySchemes("bearer", securityScheme);
 
         return new OpenAPI()
                 .info(info)
-                .components(components)
-                .addSecurityItem(securityRequirement);
+                .components(components);
     }
 
     /**
@@ -92,3 +87,4 @@ public class YudaoSwaggerAutoConfiguration {
     }
 
 }
+

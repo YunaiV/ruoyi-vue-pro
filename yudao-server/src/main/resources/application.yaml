@@ -38,6 +38,13 @@ springdoc:
   show-actuator: true
   swagger-ui:
     path: /swagger-ui
+  api-docs:
+    path: /v3/api-docs
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
 
 # 工作流 Flowable 配置
 flowable:
