@@ -12,9 +12,12 @@ import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -27,6 +30,26 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
 
     @Resource
     private DataSourceConfigService dataSourceConfigService;
+
+    private final Map<Long, ConfigBuilder> ConfigBuilderMap = new HashMap<>();
+
+    @PostConstruct
+    public void initConfigBuilderMap() {
+        for (DataSourceConfigDO config : dataSourceConfigService.getDataSourceConfigList()) {
+            // 使用 MyBatis Plus Generator 解析表结构
+            DataSourceConfig dataSourceConfig = new DataSourceConfig.Builder(config.getUrl(), config.getUsername(),
+                    config.getPassword()).build();
+            StrategyConfig.Builder strategyConfig = new StrategyConfig.Builder();
+            // 移除工作流和定时任务前缀的表名 // TODO 未来做成可配置
+            strategyConfig.addExclude("ACT_[\\S\\s]+|QRTZ_[\\S\\s]+|FLW_[\\S\\s]+");
+
+            GlobalConfig globalConfig = new GlobalConfig.Builder().dateType(DateType.TIME_PACK).build(); // 只使用 Date 类型，不使用 LocalDate
+            ConfigBuilder builder = new ConfigBuilder(null, dataSourceConfig, strategyConfig.build(),
+                    null, globalConfig, null);
+
+            ConfigBuilderMap.put(config.getId(), builder);
+        }
+    }
 
     @Override
     public List<TableInfo> getTableList(Long dataSourceConfigId, String nameLike, String commentLike) {
@@ -42,24 +65,16 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
     }
 
     public List<TableInfo> getTableList0(Long dataSourceConfigId, String name) {
-        // 获得数据源配置
-        DataSourceConfigDO config = dataSourceConfigService.getDataSourceConfig(dataSourceConfigId);
-        Assert.notNull(config, "数据源({}) 不存在！", dataSourceConfigId);
+        ConfigBuilder builder = ConfigBuilderMap.get(dataSourceConfigId);
+        Assert.notNull(builder, "数据源({}) 不存在！", dataSourceConfigId);
 
-        // 使用 MyBatis Plus Generator 解析表结构
-        DataSourceConfig dataSourceConfig = new DataSourceConfig.Builder(config.getUrl(), config.getUsername(),
-                config.getPassword()).build();
-        StrategyConfig.Builder strategyConfig = new StrategyConfig.Builder();
-        if (StrUtil.isNotEmpty(name)) {
-            strategyConfig.addInclude(name);
-        }
-        GlobalConfig globalConfig = new GlobalConfig.Builder().dateType(DateType.TIME_PACK).build(); // 只使用 Date 类型，不使用 LocalDate
-        ConfigBuilder builder = new ConfigBuilder(null, dataSourceConfig, strategyConfig.build(),
-                null, globalConfig, null);
         // 按照名字排序
         List<TableInfo> tables = builder.getTableInfoList();
-        tables.sort(Comparator.comparing(TableInfo::getName));
-        return tables;
+        if (StrUtil.isBlank(name)) {
+            tables.sort(Comparator.comparing(TableInfo::getName));
+            return tables;
+        } else {
+            return CollUtil.filter(tables, tableInfo -> tableInfo.getName().equals(name));
+        }
     }
-
 }
