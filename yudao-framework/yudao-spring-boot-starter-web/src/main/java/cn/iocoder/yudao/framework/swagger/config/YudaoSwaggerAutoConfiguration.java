@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.framework.swagger.config;
 
-import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.media.IntegerSchema;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.*;
@@ -17,9 +20,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
 
 /**
  * Swagger3 自动配置类
@@ -40,20 +44,23 @@ public class YudaoSwaggerAutoConfiguration {
                 .title(properties.getTitle())
                 .description(properties.getDescription())
                 .version(properties.getVersion())
+                .contact(new Contact().name("xingyuv").url("xingyuv.com").email("xingyu4j@vip.qq.com"))
                 .license(new License().name("MIT").url("https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE"));
-        //鉴权组件(随便起名的)
-        SecurityScheme securityScheme = new SecurityScheme()
-                .type(SecurityScheme.Type.APIKEY)
-                .scheme("Bearer")//固定写法
-                .bearerFormat("JWT")
-                .in(SecurityScheme.In.HEADER)
-                .name(HttpHeaders.AUTHORIZATION);
-        Components components = new Components()
-                .addSecuritySchemes("bearer", securityScheme);
-
         return new OpenAPI()
                 .info(info)
-                .components(components);
+                .schemaRequirement(HttpHeaders.AUTHORIZATION, securityScheme())
+                .addSecurityItem(new SecurityRequirement().addList(HttpHeaders.AUTHORIZATION));
+    }
+
+    private SecurityScheme securityScheme() {
+        SecurityScheme securityScheme = new SecurityScheme();
+        //类型
+        securityScheme.setType(SecurityScheme.Type.APIKEY);
+        //请求头的name
+        securityScheme.setName(HttpHeaders.AUTHORIZATION);
+        //token所在未知
+        securityScheme.setIn(SecurityScheme.In.HEADER);
+        return securityScheme;
     }
 
     /**
@@ -74,6 +81,9 @@ public class YudaoSwaggerAutoConfiguration {
     public GroupedOpenApi appApi() {
         return GroupedOpenApi.builder()
                 .group("app")
+                .addOperationCustomizer((operation, handlerMethod) ->
+                        operation.addParametersItem(globalHeaderParameter())
+                )
                 .pathsToMatch("/app-api/**")
                 .build();
     }
@@ -82,8 +92,23 @@ public class YudaoSwaggerAutoConfiguration {
     public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
                 .group("admin")
+                .addOperationCustomizer((operation, handlerMethod) ->
+                        operation.addParametersItem(globalHeaderParameter())
+                )
                 .pathsToMatch("/admin-api/**")
                 .build();
+    }
+
+    private static Parameter globalHeaderParameter() {
+        return new Parameter()
+                .name(HEADER_TENANT_ID)
+                .description("租户编号")
+                .in(String.valueOf(SecurityScheme.In.HEADER))
+                .schema(new IntegerSchema()
+                        ._default(1L)
+                        .name(HEADER_TENANT_ID)
+                        .description("租户编号")
+                );
     }
 
 }

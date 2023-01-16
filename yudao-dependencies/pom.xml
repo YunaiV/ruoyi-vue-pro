@@ -18,7 +18,8 @@
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.7.7</spring.boot.version>
         <!-- Web 相关 -->
-        <knife4j.version>4.0.0</knife4j.version>
+        <springdoc.version>1.6.14</springdoc.version>
+        <!--        <knife4j.version>4.0.0</knife4j.version>-->
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
         <druid.version>1.2.15</druid.version>
@@ -163,10 +164,15 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!--            <dependency>-->
+            <!--                <groupId>com.github.xiaoymin</groupId>-->
+            <!--                <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>-->
+            <!--                <version>${knife4j.version}</version>-->
+            <!--            </dependency>-->
             <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
-                <version>${knife4j.version}</version>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc.version}</version>
             </dependency>
 
             <!-- DB 相关 -->
@@ -276,16 +282,16 @@
                 <groupId>org.apache.skywalking</groupId>
                 <artifactId>apm-toolkit-opentracing</artifactId>
                 <version>${skywalking.version}</version>
-<!--                <exclusions>-->
-<!--                    <exclusion>-->
-<!--                        <artifactId>opentracing-api</artifactId>-->
-<!--                        <groupId>io.opentracing</groupId>-->
-<!--                    </exclusion>-->
-<!--                    <exclusion>-->
-<!--                        <artifactId>opentracing-util</artifactId>-->
-<!--                        <groupId>io.opentracing</groupId>-->
-<!--                    </exclusion>-->
-<!--                </exclusions>-->
+                <!--                <exclusions>-->
+                <!--                    <exclusion>-->
+                <!--                        <artifactId>opentracing-api</artifactId>-->
+                <!--                        <groupId>io.opentracing</groupId>-->
+                <!--                    </exclusion>-->
+                <!--                    <exclusion>-->
+                <!--                        <artifactId>opentracing-util</artifactId>-->
+                <!--                        <groupId>io.opentracing</groupId>-->
+                <!--                    </exclusion>-->
+                <!--                </exclusions>-->
             </dependency>
             <dependency>
                 <groupId>io.opentracing</groupId>
@@ -448,7 +454,7 @@
                         <groupId>org.freemarker</groupId>
                         <artifactId>freemarker</artifactId> <!-- 移除 Freemarker 依赖，采用 Velocity 作为模板引擎 -->
                     </exclusion>
-				    <exclusion>
+                    <exclusion>
                         <groupId>com.alibaba</groupId>
                         <artifactId>fastjson</artifactId> <!-- 最新版screw-core1.0.5依赖fastjson1.2.73存在漏洞，移除。 -->
                     </exclusion>
