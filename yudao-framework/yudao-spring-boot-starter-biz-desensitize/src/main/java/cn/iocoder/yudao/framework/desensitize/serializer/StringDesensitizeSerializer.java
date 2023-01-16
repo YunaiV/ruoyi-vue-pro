@@ -4,11 +4,9 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.desensitize.annotation.Desensitize;
-import cn.iocoder.yudao.framework.desensitize.annotation.RegexDesensitize;
-import cn.iocoder.yudao.framework.desensitize.annotation.SliderDesensitize;
-import cn.iocoder.yudao.framework.desensitize.handler.DesensitizationHandler;
-import cn.iocoder.yudao.framework.desensitize.handler.DesensitizationHandlerHolder;
+import cn.iocoder.yudao.framework.desensitize.core.base.annotation.Desensitize;
+import cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler;
+import cn.iocoder.yudao.framework.desensitize.core.base.DesensitizationHandlerHolder;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -46,7 +44,7 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
             return this;
         }
         StringDesensitizeSerializer serializer = new StringDesensitizeSerializer();
-        serializer.setDesensitizationHandler(DesensitizationHandlerHolder.getDesensitizationHandler(annotation.desensitizationHandler()));
+        serializer.setDesensitizationHandler(DesensitizationHandlerHolder.getDesensitizationHandler(annotation.desensitizationBy()));
         return serializer;
     }
 
@@ -62,22 +60,6 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
         Class<?> currentValueClass = currentValue.getClass();
         Field field = ReflectUtil.getField(currentValueClass, currentName);
 
-        // 滑动处理器
-        SliderDesensitize sliderDesensitize = ArrayUtil.firstNonNull(AnnotationUtil.getCombinationAnnotations(field, SliderDesensitize.class));
-        if (sliderDesensitize != null) {
-            value = this.desensitizationHandler.desensitize(value, this.desensitizationHandler.getAnnotationArgs(sliderDesensitize));
-            gen.writeString(value);
-            return;
-        }
-
-        // 正则处理器
-        RegexDesensitize regexDesensitize = ArrayUtil.firstNonNull(AnnotationUtil.getCombinationAnnotations(field, RegexDesensitize.class));
-        if (regexDesensitize != null) {
-            value = this.desensitizationHandler.desensitize(value, this.desensitizationHandler.getAnnotationArgs(regexDesensitize));
-            gen.writeString(value);
-            return;
-        }
-
         // 自定义处理器
         Desensitize[] annotations = AnnotationUtil.getCombinationAnnotations(field, Desensitize.class);
         if (ArrayUtil.isEmpty(annotations)) {
@@ -86,8 +68,9 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
         }
 
         for (Annotation annotation : field.getAnnotations()) {
+
             if (AnnotationUtil.hasAnnotation(annotation.annotationType(), Desensitize.class)) {
-                value = this.desensitizationHandler.desensitize(value, this.desensitizationHandler.getAnnotationArgs(annotation));
+                value = this.desensitizationHandler.desensitize(value, annotation);
                 gen.writeString(value);
                 return;
             }

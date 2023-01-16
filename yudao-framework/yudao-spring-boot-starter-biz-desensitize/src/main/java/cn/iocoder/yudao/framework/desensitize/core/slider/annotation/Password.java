@@ -1,6 +1,7 @@
-package cn.iocoder.yudao.framework.desensitize.annotation;
+package cn.iocoder.yudao.framework.desensitize.core.slider.annotation;
 
-import cn.iocoder.yudao.framework.desensitize.handler.SliderDesensitizationHandler;
+import cn.iocoder.yudao.framework.desensitize.core.base.annotation.Desensitize;
+import cn.iocoder.yudao.framework.desensitize.core.slider.handler.PasswordDesensitization;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 
 import java.lang.annotation.Documented;
@@ -10,14 +11,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 滑动脱敏注解
+ * 密码
  */
 @Documented
-@Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@Desensitize(desensitizationHandler = SliderDesensitizationHandler.class)
-public @interface SliderDesensitize {
+@Desensitize(desensitizationBy = PasswordDesensitization.class) // 密码;比如：123456脱敏之后为******
+public @interface Password {
+
+    /**
+     * 前缀保留长度
+     */
+    int prefixKeep() default 0;
 
     /**
      * 后缀保留长度
@@ -32,8 +38,4 @@ public @interface SliderDesensitize {
      */
     String replacer() default "*";
 
-    /**
-     * 前缀保留长度
-     */
-    int prefixKeep() default 0;
 }

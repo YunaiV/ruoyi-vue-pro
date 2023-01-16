@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.framework.desensitize.annotation;
+package cn.iocoder.yudao.framework.desensitize.core.base.annotation;
 
-import cn.iocoder.yudao.framework.desensitize.handler.DesensitizationHandler;
+import cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler;
 import cn.iocoder.yudao.framework.desensitize.serializer.StringDesensitizeSerializer;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * Desensitize 顶级脱敏注解
  */
 @Documented
-@Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target({ ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
 @JsonSerialize(using = StringDesensitizeSerializer.class)
@@ -25,6 +25,5 @@ public @interface Desensitize {
     /**
      * 脱敏处理器
      */
-    Class<? extends DesensitizationHandler> desensitizationHandler();
-
+    Class<? extends DesensitizationHandler> desensitizationBy();
 }

@@ -1,17 +1,17 @@
-package cn.iocoder.yudao.framework.desensitize.handler;
+package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 
-import cn.iocoder.yudao.framework.desensitize.annotation.SliderDesensitize;
+import cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler;
 
-/**
- * 滑动脱敏处理器
- */
-public class SliderDesensitizationHandler implements DesensitizationHandler<SliderDesensitize> {
+import java.lang.annotation.Annotation;
+
+public abstract class AbstractDesensitizationHandler<T extends Annotation> implements DesensitizationHandler<T> {
 
     @Override
-    public String desensitize(String origin, Object... arg) {
-        int prefixKeep = (Integer) arg[0];
-        int suffixKeep = (Integer) arg[1];
-        String replacer = (String) arg[2];
+    public String desensitize(String origin, T anno) {
+        Object[] args = getArgs(anno);
+        int prefixKeep = (Integer) args[0];
+        int suffixKeep = (Integer) args[1];
+        String replacer = (String) args[2];
 
         int length = origin.length();
 
@@ -31,10 +31,13 @@ public class SliderDesensitizationHandler implements DesensitizationHandler<Slid
                 origin.substring(prefixKeep + interval);
     }
 
-    @Override
-    public Object[] getAnnotationArgs(SliderDesensitize anno) {
-        return new Object[]{anno.prefixKeep(), anno.suffixKeep(), anno.replacer()};
-    }
+    /**
+     * 获取注解的参数
+     *
+     * @param anno 注解信息
+     * @return 注解的参数
+     */
+    abstract Object[] getArgs(T anno);
 
     /**
      * 根据长度循环构建替换符

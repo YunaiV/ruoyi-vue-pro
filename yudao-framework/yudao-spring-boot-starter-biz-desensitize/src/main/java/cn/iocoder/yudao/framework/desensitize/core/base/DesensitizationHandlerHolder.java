@@ -1,6 +1,9 @@
-package cn.iocoder.yudao.framework.desensitize.handler;
+package cn.iocoder.yudao.framework.desensitize.core.base;
 
 import cn.hutool.core.util.ReflectUtil;
+import cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler;
+import cn.iocoder.yudao.framework.desensitize.core.regex.handler.DefaultRegexDesensitizationHandler;
+import cn.iocoder.yudao.framework.desensitize.core.slider.handler.DefaultDesensitizationHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,8 +16,8 @@ public class DesensitizationHandlerHolder {
      * handler 缓存，默认初始化内置的处理器
      */
     private static final Map<Class<? extends DesensitizationHandler>, DesensitizationHandler> HANDLER_MAP = new ConcurrentHashMap<>() {{
-        put(RegexDesensitizationHandler.class, new RegexDesensitizationHandler());
-        put(SliderDesensitizationHandler.class, new SliderDesensitizationHandler());
+        put(DefaultRegexDesensitizationHandler.class, new DefaultRegexDesensitizationHandler());
+        put(DefaultDesensitizationHandler.class, new DefaultDesensitizationHandler());
     }};
 
     public static DesensitizationHandler getDesensitizationHandler(Class<? extends DesensitizationHandler> clazz) {
