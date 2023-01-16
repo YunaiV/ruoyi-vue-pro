@@ -34,44 +34,47 @@ export const crudSchemas = reactive<VxeCrudSchema>({
       title: '数据键值',
       field: 'value'
     },
-    {
-      title: '标签类型',
-      field: 'colorType',
-      form: {
-        component: 'Select',
-        componentProps: {
-          options: [
-            {
-              label: 'default',
-              value: ''
-            },
-            {
-              label: 'success',
-              value: 'success'
-            },
-            {
-              label: 'info',
-              value: 'info'
-            },
-            {
-              label: 'warning',
-              value: 'warning'
-            },
-            {
-              label: 'danger',
-              value: 'danger'
-            }
-          ]
-        }
-      },
-      isTable: false
-    },
+    // {
+    //   title: '标签类型',
+    //   field: 'colorType',
+    //   form: {
+    //     component: 'Select',
+    //     componentProps: {
+    //       options: [
+    //         {
+    //           label: 'default',
+    //           value: ''
+    //         },
+    //         {
+    //           label: 'success',
+    //           value: 'success'
+    //         },
+    //         {
+    //           label: 'info',
+    //           value: 'info'
+    //         },
+    //         {
+    //           label: 'warning',
+    //           value: 'warning'
+    //         },
+    //         {
+    //           label: 'danger',
+    //           value: 'danger'
+    //         }
+    //       ]
+    //     }
+    //   },
+    //   isTable: false
+    // },
     {
       title: '颜色',
       field: 'cssClass',
       isTable: false,
       form: {
-        component: 'ColorPicker'
+        component: 'ColorPicker',
+        componentProps: {
+          predefine: ['#ffffff', '#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399', '#c71585']
+        }
       }
     },
     {
