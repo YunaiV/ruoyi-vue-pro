@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
 @DesensitizeBy(handler = DefaultRegexDesensitizationHandler.class)
-public @interface RegexDesensitize {
+public @interface Regex {
 
     /**
      * 匹配的正则表达式（默认匹配所有）

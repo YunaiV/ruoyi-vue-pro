@@ -1,21 +1,21 @@
 package cn.iocoder.yudao.framework.desensitize.core.regex.handler;
 
-import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.EmailDesensitize;
+import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.Email;
 
 /**
  * 邮箱脱敏处理器
  *
  * @author gaibu
  */
-public class EmailDesensitizationHandler extends AbstractRegexDesensitizationHandler<EmailDesensitize> {
+public class EmailDesensitizationHandler extends AbstractRegexDesensitizationHandler<Email> {
 
     @Override
-    String getRegex(EmailDesensitize annotation) {
+    String getRegex(Email annotation) {
         return annotation.regex();
     }
 
     @Override
-    String getReplacer(EmailDesensitize annotation) {
+    String getReplacer(Email annotation) {
         return annotation.replacer();
     }
 }

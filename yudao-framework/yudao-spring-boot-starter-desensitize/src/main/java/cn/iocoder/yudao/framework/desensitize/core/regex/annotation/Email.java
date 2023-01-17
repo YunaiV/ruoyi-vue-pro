@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
 @DesensitizeBy(handler = EmailDesensitizationHandler.class)
-public @interface EmailDesensitize {
+public @interface Email {
 
     /**
      * 匹配的正则表达式
