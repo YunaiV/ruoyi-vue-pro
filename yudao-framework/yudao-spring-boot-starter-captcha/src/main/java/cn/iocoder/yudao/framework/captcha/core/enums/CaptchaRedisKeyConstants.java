@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.captcha.core.enums;
 
 import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
-import com.anji.captcha.model.vo.PointVO;
+import com.xingyuv.captcha.model.vo.PointVO;
 
 import java.time.Duration;
 

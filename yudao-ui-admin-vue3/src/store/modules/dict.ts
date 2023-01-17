@@ -66,6 +66,12 @@ export const useDictStore = defineStore('dict', {
         wsCache.set(CACHE_KEY.DICT_CACHE, dictDataMap, { exp: 60 }) // 60 秒 过期
       }
     },
+    getDictByType(type: string) {
+      if (!this.isSetDict) {
+        this.setDictMap()
+      }
+      return this.dictMap[type]
+    },
     async resetDict() {
       wsCache.delete(CACHE_KEY.DICT_CACHE)
       const res = await listSimpleDictDataApi()

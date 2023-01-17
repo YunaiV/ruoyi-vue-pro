@@ -76,26 +76,26 @@ VXETable.setup({
     },
     pagerConfig: {
       border: false,
-      background: true,
+      background: false,
       autoHidden: true,
       perfect: true,
       pageSize: 10,
       pagerCount: 7,
       pageSizes: [5, 10, 15, 20, 50, 100, 200, 500],
       layouts: [
+        'Sizes',
         'PrevJump',
         'PrevPage',
-        'Jump',
-        'PageCount',
+        'Number',
         'NextPage',
         'NextJump',
-        'Sizes',
+        'FullJump',
         'Total'
       ]
     }
   },
   pager: {
-    background: true,
+    background: false,
     autoHidden: false,
     perfect: true,
     pageSize: 10,
