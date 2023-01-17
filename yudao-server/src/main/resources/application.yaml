@@ -43,11 +43,10 @@ springdoc:
     enabled: true
     path: /v3/api-docs
 
-
-#knife4j:
-#  enable: true
-#  setting:
-#    language: zh_cn
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
 
 # 工作流 Flowable 配置
 flowable:
@@ -117,6 +116,10 @@ yudao:
     description: 提供管理员管理的所有功能
     version: ${yudao.info.version}
     base-package: ${yudao.info.base-package}
+    url: ${yudao.web.admin-ui.url}
+    email: xingyu4j@vip.qq.com
+    license: MIT
+    license-url: https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE
   captcha:
     enable: true # 验证码的开关，默认为 true
   codegen:

@@ -44,8 +44,8 @@ public class YudaoSwaggerAutoConfiguration {
                 .title(properties.getTitle())
                 .description(properties.getDescription())
                 .version(properties.getVersion())
-                .contact(new Contact().name("xingyuv").url("xingyuv.com").email("xingyu4j@vip.qq.com"))
-                .license(new License().name("MIT").url("https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE"));
+                .contact(new Contact().name(properties.getAuthor()).url(properties.getUrl()).email(properties.getEmail()))
+                .license(new License().name(properties.getLicense()).url(properties.getLicenseUrl()));
         return new OpenAPI()
                 .info(info)
                 .schemaRequirement(HttpHeaders.AUTHORIZATION, securityScheme())
