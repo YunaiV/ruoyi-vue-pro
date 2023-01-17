@@ -276,7 +276,7 @@ const reload = () => {
 }
 
 // 删除
-const deleteData = async (ids: string | number) => {
+const deleteData = async (id: string | number) => {
   const g = unref(xGrid)
   if (!g) {
     return
@@ -288,12 +288,55 @@ const deleteData = async (ids: string | number) => {
   }
   return new Promise(async () => {
     message.delConfirm().then(async () => {
-      await (options?.deleteApi && options?.deleteApi(ids))
+      await (options?.deleteApi && options?.deleteApi(id))
       message.success(t('common.delSuccess'))
       // 刷新列表
       reload()
     })
   })
+}
+
+// 批量删除
+const deleteList = async () => {
+  const g = unref(xGrid)
+  if (!g) {
+    return
+  }
+  const rows = g.getCheckboxRecords() || g.getRadioRecord()
+  let ids: any[] = []
+  if (rows.length == 0) {
+    message.error('请选择数据')
+    return
+  } else {
+    rows.forEach((row) => {
+      ids.push(row.id)
+    })
+  }
+  const options = innerProps.value || props.options
+  if (options.deleteListApi) {
+    return new Promise(async () => {
+      message.delConfirm().then(async () => {
+        await (options?.deleteListApi && options?.deleteListApi(ids))
+        message.success(t('common.delSuccess'))
+        // 刷新列表
+        reload()
+      })
+    })
+  } else if (options.deleteApi) {
+    return new Promise(async () => {
+      message.delConfirm().then(async () => {
+        ids.forEach(async (id) => {
+          await (options?.deleteApi && options?.deleteApi(id))
+        })
+        message.success(t('common.delSuccess'))
+        // 刷新列表
+        reload()
+      })
+    })
+  } else {
+    console.error('未传入delListApi')
+    return
+  }
 }
 
 // 导出
@@ -360,6 +403,7 @@ emit('register', {
   getSearchData,
   setProps,
   deleteData,
+  deleteList,
   exportList,
   getCurrentColumn,
   getRadioRecord,
