@@ -15,6 +15,8 @@ public abstract class AbstractRegexDesensitizationHandler<T extends Annotation> 
         return origin.replaceAll(regex, replacer);
     }
 
+    // TODO @城：是不是抽象两个方法，一个拿 regex；一个拿 replacer
+
     /**
      * 获取注解的参数
      *

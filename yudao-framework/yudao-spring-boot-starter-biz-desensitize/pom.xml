@@ -9,8 +9,11 @@
         <version>${revision}</version>
     </parent>
 
+    <!-- TODO 城：yudao-spring-boot-starter-biz-desensitize =》yudao-spring-boot-starter-desensitize，不属于业务哈 -->
     <artifactId>yudao-spring-boot-starter-biz-desensitize</artifactId>
+    <!-- TODO 城：这个组件的说明； -->
 
+    <!-- TODO 城：这里去掉哈 -->
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>

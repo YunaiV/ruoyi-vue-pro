@@ -19,16 +19,19 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
+// TODO @城：挪到 base/serializer 包下
 /**
  * 脱敏序列化器
  */
 public class StringDesensitizeSerializer extends StdSerializer<String> implements ContextualSerializer {
+
     private DesensitizationHandler desensitizationHandler;
 
     protected StringDesensitizeSerializer() {
         super(String.class);
     }
 
+    // TODO @城：get 和 set 方法是必须的么？如果是的话，可以换成 lombok 注解哈，简洁一点~
     public DesensitizationHandler getDesensitizationHandler() {
         return desensitizationHandler;
     }
@@ -55,6 +58,7 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
             return;
         }
 
+        // TODO @城：抽个 private getField 方法。让这个方法的逻辑主干，更清晰
         String currentName = gen.getOutputContext().getCurrentName();
         Object currentValue = gen.getCurrentValue();
         Class<?> currentValueClass = currentValue.getClass();
@@ -66,16 +70,13 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
             gen.writeString(value);
             return;
         }
-
         for (Annotation annotation : field.getAnnotations()) {
-
             if (AnnotationUtil.hasAnnotation(annotation.annotationType(), Desensitize.class)) {
                 value = this.desensitizationHandler.desensitize(value, annotation);
                 gen.writeString(value);
                 return;
             }
         }
-
         gen.writeString(value);
     }
 
