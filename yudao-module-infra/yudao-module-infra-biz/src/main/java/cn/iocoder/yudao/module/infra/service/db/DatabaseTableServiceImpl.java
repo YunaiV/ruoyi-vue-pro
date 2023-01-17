@@ -52,7 +52,7 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
         StrategyConfig.Builder strategyConfig = new StrategyConfig.Builder();
         if (StrUtil.isNotEmpty(name)) {
             strategyConfig.addInclude(name);
-        }else{
+        } else {
             // 移除工作流和定时任务前缀的表名 // TODO 未来做成可配置
             strategyConfig.addExclude("ACT_[\\S\\s]+|QRTZ_[\\S\\s]+|FLW_[\\S\\s]+");
         }
