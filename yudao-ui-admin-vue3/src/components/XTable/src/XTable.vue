@@ -229,19 +229,19 @@ const getPageConfig = (options: XTableProps) => {
     if (pagination != false) {
       options.pagerConfig = {
         border: false, // 带边框
-        background: true, // 带背景颜色
+        background: false, // 带背景颜色
         perfect: false, // 配套的样式
         pageSize: 10, // 每页大小
         pagerCount: 7, // 显示页码按钮的数量
         autoHidden: false, // 当只有一页时自动隐藏
         pageSizes: [5, 10, 20, 30, 50, 100], // 每页大小选项列表
         layouts: [
+          'Sizes',
           'PrevJump',
           'PrevPage',
-          'JumpNumber',
+          'Number',
           'NextPage',
           'NextJump',
-          'Sizes',
           'FullJump',
           'Total'
         ]
@@ -324,12 +324,47 @@ const getSearchData = () => {
   return queryParams
 }
 
+// 获取当前列
+const getCurrentColumn = () => {
+  const g = unref(xGrid)
+  if (!g) {
+    return
+  }
+  return g.getCurrentColumn()
+}
+
+// 获取当前选中列，redio
+const getRadioRecord = () => {
+  const g = unref(xGrid)
+  if (!g) {
+    return
+  }
+  return g.getRadioRecord(false)
+}
+
+// 获取当前选中列，checkbox
+const getCheckboxRecords = () => {
+  const g = unref(xGrid)
+  if (!g) {
+    return
+  }
+  return g.getCheckboxRecords(false)
+}
 const setProps = (prop: Partial<XTableProps>) => {
   innerProps.value = { ...unref(innerProps), ...prop }
 }
 
 defineExpose({ reload, Ref: xGrid, getSearchData, deleteData, exportList })
-emit('register', { reload, getSearchData, setProps, deleteData, exportList })
+emit('register', {
+  reload,
+  getSearchData,
+  setProps,
+  deleteData,
+  exportList,
+  getCurrentColumn,
+  getRadioRecord,
+  getCheckboxRecords
+})
 </script>
 <style lang="scss">
 @import './style/index.scss';
