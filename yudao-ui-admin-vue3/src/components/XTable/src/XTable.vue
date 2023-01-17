@@ -205,7 +205,7 @@ const getPageConfig = (options: XTableProps) => {
     if (isBoolean(pagination)) {
       options.pagerConfig = {
         border: false, // 带边框
-        background: true, // 带背景颜色
+        background: false, // 带背景颜色
         perfect: false, // 配套的样式
         pageSize: 10, // 每页大小
         pagerCount: 7, // 显示页码按钮的数量

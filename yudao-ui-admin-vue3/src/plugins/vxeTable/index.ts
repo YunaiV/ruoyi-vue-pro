@@ -95,7 +95,7 @@ VXETable.setup({
     }
   },
   pager: {
-    background: true,
+    background: false,
     autoHidden: false,
     perfect: true,
     pageSize: 10,

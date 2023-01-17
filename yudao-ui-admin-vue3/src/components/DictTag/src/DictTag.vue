@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUpdated, PropType, ref } from 'vue'
 import { getDictOptions, DictDataType } from '@/utils/dict'
+import { isHexColor } from '@/utils/color'
 import { ElTag } from 'element-plus'
 const props = defineProps({
   type: {
@@ -38,7 +39,7 @@ onUpdated(() => {
     :disable-transitions="true"
     :key="dictData?.value + ''"
     :type="dictData?.colorType"
-    :color="dictData?.cssClass"
+    :color="dictData?.cssClass && isHexColor(dictData?.cssClass) ? dictData?.cssClass : ''"
   >
     {{ dictData?.label }}
   </ElTag>
