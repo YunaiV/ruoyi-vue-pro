@@ -21,7 +21,7 @@ export interface DictDataType {
 }
 
 export const getDictOptions = (dictType: string) => {
-  return dictStore.getDictMap[dictType]
+  return dictStore.getDictByType(dictType)
 }
 
 export const getIntDictOptions = (dictType: string) => {
