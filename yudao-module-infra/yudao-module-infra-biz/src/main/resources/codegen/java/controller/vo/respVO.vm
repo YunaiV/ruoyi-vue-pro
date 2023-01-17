@@ -1,5 +1,6 @@
 package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 #foreach ($column in $columns)
 #if (${column.javaType} == "LocalDateTime")
@@ -7,7 +8,6 @@ import java.time.LocalDateTime;
 #break
 #end
 #end
-import io.swagger.annotations.*;
 
 @Schema(description = "${sceneEnum.name} - ${table.classComment} Response VO")
 @Data

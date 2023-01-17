@@ -2,7 +2,7 @@ package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePac
 
 import lombok.*;
 import java.util.*;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import ${PageParamClassName};
 ## 处理 Date 字段的引入
 #foreach ($column in $columns)

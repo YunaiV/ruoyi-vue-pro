@@ -5,7 +5,9 @@ import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 #if ($sceneEnum.scene == 1)import org.springframework.security.access.prepost.PreAuthorize;#end
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 
 import javax.validation.constraints.*;
 import javax.validation.*;
