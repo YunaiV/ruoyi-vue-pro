@@ -11,23 +11,22 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import javax.validation.Valid;
 
 /**
- * 粉丝消息 Service 接口
+ * 公众号消息 Service 接口
  *
  * @author 芋道源码
  */
 public interface MpMessageService {
 
-    // TODO 芋艿：方法名要优化下
     /**
-     * 获得粉丝消息分页
+     * 获得公众号消息分页
      *
      * @param pageReqVO 分页查询
-     * @return 粉丝消息分页
+     * @return 公众号消息分页
      */
-    PageResult<MpMessageDO> getWxFansMsgPage(MpMessagePageReqVO pageReqVO);
+    PageResult<MpMessageDO> getMessagePage(MpMessagePageReqVO pageReqVO);
 
     /**
-     * 从公众号，接收到用户消息
+     * 从公众号，接收到粉丝消息
      *
      * @param appId 微信公众号 appId
      * @param wxMessage 消息
@@ -35,7 +34,7 @@ public interface MpMessageService {
     void receiveMessage(String appId, WxMpXmlMessage wxMessage);
 
     /**
-     * 使用公众号，给用户回复消息
+     * 使用公众号，给粉丝回复消息
      *
      * 例如说：自动回复、客服消息、菜单回复消息等场景
      *
@@ -47,7 +46,7 @@ public interface MpMessageService {
     WxMpXmlOutMessage sendOutMessage(@Valid MpMessageSendOutReqBO sendReqBO);
 
     /**
-     * 使用公众号，给用户发送【客服】消息
+     * 使用公众号，给粉丝发送【客服】消息
      *
      * 注意，该方法会真实发送消息
      *

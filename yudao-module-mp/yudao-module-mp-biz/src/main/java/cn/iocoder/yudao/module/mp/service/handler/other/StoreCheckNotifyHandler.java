@@ -16,11 +16,9 @@ import java.util.Map;
 public class StoreCheckNotifyHandler implements WxMpMessageHandler {
 
     @Override
-    public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
-                                    Map<String, Object> context, WxMpService wxMpService,
-                                    WxSessionManager sessionManager) {
-        // TODO 处理门店审核事件
-        return null;
+    public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context,
+                                    WxMpService wxMpService, WxSessionManager sessionManager) {
+        throw new UnsupportedOperationException("未实现该处理，请自行重写");
     }
 
 }

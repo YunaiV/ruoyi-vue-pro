@@ -32,13 +32,13 @@ public class MpMaterialDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 微信公众号 ID
+     * 公众号账号的编号
      *
      * 关联 {@link MpAccountDO#getId()}
      */
     private Long accountId;
     /**
-     * 微信公众号 appid
+     * 公众号 appId
      *
      * 冗余 {@link MpAccountDO#getAppId()}
      */
@@ -71,8 +71,8 @@ public class MpMaterialDO extends BaseDO {
      *
      * 永久素材：非空
      * 临时素材：可能为空。
-     *      1. 为空的情况：用户主动发送的图片、语音等
-     *      2. 非空的情况：主动发送给用户的图片、语音等
+     *      1. 为空的情况：粉丝主动发送的图片、语音等
+     *      2. 非空的情况：主动发送给粉丝的图片、语音等
      */
     private String name;
 

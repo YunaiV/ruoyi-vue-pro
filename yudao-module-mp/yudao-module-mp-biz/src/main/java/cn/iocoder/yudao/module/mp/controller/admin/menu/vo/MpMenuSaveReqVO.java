@@ -9,7 +9,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-// TODO 芋艿：swagger 文档
 @ApiModel("管理后台 - 公众号菜单保存 Request VO")
 @Data
 public class MpMenuSaveReqVO {
@@ -22,9 +21,13 @@ public class MpMenuSaveReqVO {
     @Valid
     private List<Menu> menus;
 
+    @ApiModel("管理后台 - 公众号菜单保存时的每个菜单")
     @Data
     public static class Menu extends MpMenuBaseVO {
 
+        /**
+         * 子菜单数组
+         */
         private List<Menu> children;
 
     }

@@ -19,10 +19,10 @@ public class MpUserPageReqVO extends PageParam {
     @NotNull(message = "公众号账号的编号不能为空")
     private Long accountId;
 
-    @ApiModelProperty(value = "公众号用户标识", example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M", notes = "模糊匹配")
+    @ApiModelProperty(value = "公众号粉丝标识", example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M", notes = "模糊匹配")
     private String openid;
 
-    @ApiModelProperty(value = "公众号用户昵称", example = "芋艿", notes = "模糊匹配")
+    @ApiModelProperty(value = "公众号粉丝昵称", example = "芋艿", notes = "模糊匹配")
     private String nickname;
 
 }

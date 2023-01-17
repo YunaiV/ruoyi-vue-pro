@@ -13,9 +13,9 @@ public interface MpMessageMapper extends BaseMapperX<MpMessageDO> {
     default PageResult<MpMessageDO> selectPage(MpMessagePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<MpMessageDO>()
                 .eqIfPresent(MpMessageDO::getAccountId, reqVO.getAccountId())
-                .eqIfPresent(MpMessageDO::getOpenid, reqVO.getOpenId())
-//                .likeIfPresent(MpMessageDO::getNickname, reqVO.getNickname())
                 .eqIfPresent(MpMessageDO::getType, reqVO.getType())
+                .eqIfPresent(MpMessageDO::getOpenid, reqVO.getOpenid())
+                .betweenIfPresent(MpMessageDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(MpMessageDO::getId));
     }
 

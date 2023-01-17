@@ -15,8 +15,8 @@ public interface ErrorCodeConstants {
     ErrorCode ACCOUNT_CLEAR_QUOTA_FAIL = new ErrorCode(1006000001, "清空公众号的 API 配额失败，原因：{}");
 
     // ========== 公众号统计 1006001000============
-    ErrorCode STATISTICS_GET_USER_SUMMARY_FAIL = new ErrorCode(1006001000, "获取用户增减数据失败，原因：{}");
-    ErrorCode STATISTICS_GET_USER_CUMULATE_FAIL = new ErrorCode(1006001001, "获得用户累计数据失败，原因：{}");
+    ErrorCode STATISTICS_GET_USER_SUMMARY_FAIL = new ErrorCode(1006001000, "获取粉丝增减数据失败，原因：{}");
+    ErrorCode STATISTICS_GET_USER_CUMULATE_FAIL = new ErrorCode(1006001001, "获得粉丝累计数据失败，原因：{}");
     ErrorCode STATISTICS_GET_UPSTREAM_MESSAGE_FAIL = new ErrorCode(1006001002, "获得消息发送概况数据失败，原因：{}");
     ErrorCode STATISTICS_GET_INTERFACE_SUMMARY_FAIL = new ErrorCode(1006001003, "获得接口分析数据失败，原因：{}");
 
@@ -28,8 +28,8 @@ public interface ErrorCodeConstants {
     ErrorCode TAG_GET_FAIL = new ErrorCode(1006002001, "获得标签失败，原因：{}");
 
     // ========== 公众号粉丝 1006003000============
-    ErrorCode USER_NOT_EXISTS = new ErrorCode(1006003000, "用户不存在");
-    ErrorCode USER_UPDATE_TAG_FAIL = new ErrorCode(1006003001, "更新用户标签失败，原因：{}");
+    ErrorCode USER_NOT_EXISTS = new ErrorCode(1006003000, "粉丝不存在");
+    ErrorCode USER_UPDATE_TAG_FAIL = new ErrorCode(1006003001, "更新粉丝标签失败，原因：{}");
 
     // ========== 公众号素材 1006004000============
     ErrorCode MATERIAL_NOT_EXISTS = new ErrorCode(1006004000, "素材不存在");

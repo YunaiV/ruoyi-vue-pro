@@ -29,11 +29,11 @@ public interface MpMenuService {
     void deleteMenuByAccountId(Long accountId);
 
     /**
-     * 用户点击菜单按钮时，回复对应的消息
+     * 粉丝点击菜单按钮时，回复对应的消息
      *
      * @param appId 公众号 AppId
      * @param key 菜单按钮的标识
-     * @param openid 用户的 openid
+     * @param openid 粉丝的 openid
      * @return 消息
      */
     WxMpXmlOutMessage reply(String appId, String key, String openid);

@@ -16,20 +16,20 @@ import java.util.List;
 public interface MpStatisticsService {
 
     /**
-     * 获取用户增减数据
+     * 获取粉丝增减数据
      *
      * @param accountId 公众号账号编号
      * @param date 时间区间
-     * @return 用户增减数据
+     * @return 粉丝增减数据
      */
     List<WxDataCubeUserSummary> getUserSummary(Long accountId, LocalDateTime[] date);
 
     /**
-     * 获取用户累计数据
+     * 获取粉丝累计数据
      *
      * @param accountId 公众号账号编号
      * @param date 时间区间
-     * @return 用户累计数据
+     * @return 粉丝累计数据
      */
     List<WxDataCubeUserCumulate> getUserCumulate(Long accountId, LocalDateTime[] date);
 

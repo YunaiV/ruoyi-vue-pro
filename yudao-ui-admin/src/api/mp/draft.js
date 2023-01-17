@@ -9,7 +9,7 @@ export function getDraftPage(query) {
   })
 }
 
-// 创建草稿
+// 创建公众号草稿
 export function createDraft(accountId, articles) {
   return request({
     url: '/mp/draft/create?accountId=' + accountId,
@@ -20,7 +20,7 @@ export function createDraft(accountId, articles) {
   })
 }
 
-// 更新草稿
+// 更新公众号草稿
 export function updateDraft(accountId, mediaId, articles) {
   return request({
     url: '/mp/draft/update?accountId=' + accountId + '&mediaId=' + mediaId,
@@ -29,7 +29,7 @@ export function updateDraft(accountId, mediaId, articles) {
   })
 }
 
-// 删除草稿
+// 删除公众号草稿
 export function deleteDraft(accountId, mediaId) {
   return request({
     url: '/mp/draft/delete?accountId=' + accountId + '&mediaId=' + mediaId,

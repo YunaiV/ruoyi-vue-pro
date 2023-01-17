@@ -99,11 +99,11 @@ public class MpUserServiceImpl implements MpUserService {
         // for 循环，避免递归出意外问题，导致死循环
         String nextOpenid = null;
         for (int i = 0; i < Short.MAX_VALUE; i++) {
-            log.info("[syncUser][第({}) 次加载公众号用户列表，nextOpenid({})]", i, nextOpenid);
+            log.info("[syncUser][第({}) 次加载公众号粉丝列表，nextOpenid({})]", i, nextOpenid);
             try {
                 nextOpenid = syncUser0(account, nextOpenid);
             } catch (WxErrorException e) {
-                log.error("[syncUser][第({}) 次同步用户异常]", i, e);
+                log.error("[syncUser][第({}) 次同步粉丝异常]", i, e);
                 break;
             }
             // 如果 nextOpenid 为空，表示已经同步完毕
@@ -114,17 +114,17 @@ public class MpUserServiceImpl implements MpUserService {
     }
 
     private String syncUser0(MpAccountDO account, String nextOpenid) throws WxErrorException {
-        // 第一步，从公众号流式加载用户
+        // 第一步，从公众号流式加载粉丝
         WxMpService mpService = mpServiceFactory.getRequiredMpService(account.getId());
         WxMpUserList wxUserList = mpService.getUserService().userList(nextOpenid);
         if (CollUtil.isEmpty(wxUserList.getOpenids())) {
             return null;
         }
 
-        // 第二步，分批加载用户信息
+        // 第二步，分批加载粉丝信息
         List<List<String>> openidsList = CollUtil.split(wxUserList.getOpenids(), 100);
         for (List<String> openids : openidsList) {
-            log.info("[syncUser][批量加载用户信息，openids({})]", openids);
+            log.info("[syncUser][批量加载粉丝信息，openids({})]", openids);
             List<WxMpUser> wxUsers = mpService.getUserService().userInfoList(openids);
             batchSaveUser(account, wxUsers);
         }
@@ -137,7 +137,7 @@ public class MpUserServiceImpl implements MpUserService {
         if (CollUtil.isEmpty(wxUsers)) {
             return;
         }
-        // 1. 获得数据库已保存的用户列表
+        // 1. 获得数据库已保存的粉丝列表
         List<MpUserDO> dbUsers = mpUserMapper.selectListByAppIdAndOpenid(account.getAppId(),
                 CollectionUtils.convertList(wxUsers, WxMpUser::getOpenId));
         Map<String, MpUserDO> openId2Users = CollectionUtils.convertMap(dbUsers, MpUserDO::getOpenid);

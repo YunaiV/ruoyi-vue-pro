@@ -9,13 +9,13 @@
   <div class="msg-main">
     <div class="msg-div" :id="'msg-div' + nowStr">
       <!-- 加载更多 -->
-      <div v-loading="tableLoading"></div>
-      <div v-if="!tableLoading">
+      <div v-loading="loading"></div>
+      <div v-if="!loading">
         <div class="el-table__empty-block" v-if="loadMore" @click="loadingMore"><span class="el-table__empty-text">点击加载更多</span></div>
         <div class="el-table__empty-block" v-if="!loadMore"><span class="el-table__empty-text">没有更多了</span></div>
       </div>
       <!-- 消息列表 -->
-      <div class="execution" v-for="item in tableData" :key='item.id'>
+      <div class="execution" v-for="item in list" :key='item.id'>
         <div class="avue-comment" :class="item.sendFrom === 2 ? 'avue-comment--reverse' : ''">
           <div class="avatar-div">
             <img :src="item.sendFrom === 1 ? user.avatar : mp.avatar" class="avue-comment__avatar">
@@ -124,20 +124,20 @@ import { getUser } from "@/api/mp/user";
     },
     props: {
       userId: {
-        type: String,
+        type: Number,
         required: true
       },
     },
     data() {
       return {
         nowStr: new Date().getTime(), // 当前的时间戳，用于每次消息加载后，回到原位置；具体见 :id="'msg-div' + nowStr" 处
-        sendLoading: false, // 发送消息是否加载中
-        tableLoading: false, // 消息列表是否正在加载中
+        loading: false, // 消息列表是否正在加载中
         loadMore: true, // 是否可以加载更多
-        tableData: [], // 消息列表
-        page: {
+        list: [], // 消息列表
+        queryParams: {
           pageNo: 1, // 当前页数
           pageSize: 14, // 每页显示多少条
+          accountId: undefined,
         },
         user: { // 由于微信不再提供昵称，直接使用“用户”展示
           nickname: '用户',
@@ -148,6 +148,9 @@ import { getUser } from "@/api/mp/user";
           nickname: '公众号',
           avatar: require("@/assets/images/wechat.png"),
         },
+
+        // ========= 消息发送 =========
+        sendLoading: false, // 发送消息是否加载中
         objData: { // 微信发送消息
           type: 'text',
         },
@@ -156,14 +159,19 @@ import { getUser } from "@/api/mp/user";
     created() {
       // 获得用户信息
       getUser(this.userId).then(response => {
-        this.user.nickname = response.data.nickname | this.user.nickname;
-        this.user.avatar = response.data.avatar | this.user.avatar;
+        this.user.nickname = response.data.nickname && response.data.nickname.length > 0 ?
+            response.data.nickname : this.user.nickname;
+        this.user.avatar = response.data.avatar && this.user.avatar.length > 0 ?
+            response.data.avatar : this.user.avatar;
+        this.user.accountId = response.data.accountId;
         // 设置公众号账号编号
+        this.queryParams.accountId = response.data.accountId;
         this.objData.accountId = response.data.accountId;
-      })
 
-      // 加载消息
-      this.refreshChange()
+        // 加载消息
+        console.log(this.queryParams)
+        this.refreshChange()
+      })
     },
     methods:{
       sendMsg(){
@@ -190,7 +198,7 @@ import { getUser } from "@/api/mp/user";
         })).then(response => {
           this.sendLoading = false
           // 添加到消息列表，并滚动
-          this.tableData = [...this.tableData , ...[response.data] ]
+          this.list = [...this.list , ...[response.data] ]
           this.scrollToBottom()
           // 重置 objData 状态
           this.$refs['replySelect'].deleteObj(); // 重置，避免 tab 的数据未清理
@@ -199,15 +207,16 @@ import { getUser } from "@/api/mp/user";
         })
       },
       loadingMore() {
-        this.page.pageNo++
-        this.getPage(this.page)
+        this.queryParams.pageNo++
+        this.getPage(this.queryParams)
       },
       getPage(page, params) {
-        this.tableLoading = true
+        this.loading = true
         getMessagePage(Object.assign({
           pageNo: page.pageNo,
           pageSize: page.pageSize,
-          userId: this.userId
+          userId: this.userId,
+          accountId: page.accountId,
         }, params)).then(response => {
           // 计算当前的滚动高度
           const msgDiv = document.getElementById('msg-div' + this.nowStr);
@@ -218,16 +227,16 @@ import { getUser } from "@/api/mp/user";
 
           // 处理数据
           const data = response.data.list.reverse();
-          this.tableData = [...data, ...this.tableData]
-          this.tableLoading = false
-          if (data.length < this.page.pageSize || data.length === 0){
+          this.list = [...data, ...this.list]
+          this.loading = false
+          if (data.length < this.queryParams.pageSize || data.length === 0){
             this.loadMore = false
           }
-          this.page.pageNo = page.pageNo
-          this.page.pageSize = page.pageSize
+          this.queryParams.pageNo = page.pageNo
+          this.queryParams.pageSize = page.pageSize
 
           // 滚动到原来的位置
-          if(this.page.pageNo === 1) { // 定位到消息底部
+          if(this.queryParams.pageNo === 1) { // 定位到消息底部
             this.scrollToBottom()
           } else if (data.length !== 0) { // 定位滚动条
             this.$nextTick(() => {
@@ -242,7 +251,7 @@ import { getUser } from "@/api/mp/user";
        * 刷新回调
        */
       refreshChange() {
-        this.getPage(this.page)
+        this.getPage(this.queryParams)
       },
       /** 定位到消息底部 */
       scrollToBottom: function () {
@@ -267,6 +276,8 @@ import { getUser } from "@/api/mp/user";
   height: 50vh;
   overflow: auto;
   background-color: #eaeaea;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 .msg-send {
   padding: 10px;

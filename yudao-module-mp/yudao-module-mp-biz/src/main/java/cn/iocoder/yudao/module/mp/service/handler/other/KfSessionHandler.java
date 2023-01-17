@@ -20,8 +20,7 @@ public class KfSessionHandler implements WxMpMessageHandler {
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context,
                                     WxMpService wxMpService, WxSessionManager sessionManager) {
-        // TODO 对会话做处理
-        return null;
+        throw new UnsupportedOperationException("未实现该处理，请自行重写");
     }
 
 }

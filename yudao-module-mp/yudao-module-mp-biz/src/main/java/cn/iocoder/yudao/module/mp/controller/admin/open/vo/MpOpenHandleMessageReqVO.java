@@ -4,7 +4,6 @@ package cn.iocoder.yudao.module.mp.controller.admin.open.vo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.constraints.NotEmpty;
 
@@ -26,8 +25,8 @@ public class MpOpenHandleMessageReqVO {
     @NotEmpty(message = "随机数不能为空")
     private String nonce;
 
-    @ApiModelProperty(value = "用户 openid", required = true, example = "oz-Jdtyn-WGm4C4I5Z-nvBMO_ZfY")
-    @NotEmpty(message = "用户 openid 不能为空")
+    @ApiModelProperty(value = "粉丝 openid", required = true, example = "oz-Jdtyn-WGm4C4I5Z-nvBMO_ZfY")
+    @NotEmpty(message = "粉丝 openid 不能为空")
     private String openid;
 
     @ApiModelProperty(value = "消息加密类型", example = "aes")

@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.mp.service.handler.user;
 
-import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import cn.iocoder.yudao.module.mp.framework.mp.core.context.MpContextHolder;
-import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
 import cn.iocoder.yudao.module.mp.service.message.MpAutoReplyService;
 import cn.iocoder.yudao.module.mp.service.user.MpUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +11,6 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -36,16 +33,16 @@ public class SubscribeHandler implements WxMpMessageHandler {
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage, Map<String, Object> context,
                                     WxMpService weixinService, WxSessionManager sessionManager) throws WxErrorException {
-        // 第一步，从公众号平台，获取用户信息
-        log.info("[handle][用户({}) 关注]", wxMessage.getFromUser());
+        // 第一步，从公众号平台，获取粉丝信息
+        log.info("[handle][粉丝({}) 关注]", wxMessage.getFromUser());
         WxMpUser wxMpUser = null;
         try {
             wxMpUser = weixinService.getUserService().userInfo(wxMessage.getFromUser());
         } catch (WxErrorException e) {
-            log.error("[handle][用户({})] 获取用户信息失败！", wxMessage.getFromUser(), e);
+            log.error("[handle][粉丝({})] 获取粉丝信息失败！", wxMessage.getFromUser(), e);
         }
 
-        // 第二步，保存用户信息
+        // 第二步，保存粉丝信息
         mpUserService.saveUser(MpContextHolder.getAppId(), wxMpUser);
 
         // 第三步，回复关注的欢迎语

@@ -40,13 +40,13 @@ public class MpAutoReplyDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 微信公众号 ID
+     * 公众号账号的编号
      *
      * 关联 {@link MpAccountDO#getId()}
      */
     private Long accountId;
     /**
-     * 微信公众号 appid
+     * 公众号 appId
      *
      * 冗余 {@link MpAccountDO#getAppId()}
      */
@@ -126,11 +126,39 @@ public class MpAutoReplyDO extends BaseDO {
     private String responseDescription;
 
     /**
+     * 回复的缩略图的媒体 id，通过素材管理中的接口上传多媒体文件，得到的 id
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC、VIDEO
+     */
+    private String responseThumbMediaId;
+    /**
+     * 回复的缩略图的媒体 URL
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC、VIDEO
+     */
+    private String responseThumbMediaUrl;
+
+    /**
      * 回复的图文消息
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
      */
     @TableField(typeHandler = MpMessageDO.ArticleTypeHandler.class)
     private List<MpMessageDO.Article> responseArticles;
+
+    /**
+     * 回复的音乐链接
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
+     */
+    private String responseMusicUrl;
+    /**
+     * 回复的高质量音乐链接
+     *
+     * WIFI 环境优先使用该链接播放音乐
+     *
+     * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC
+     */
+    private String responseHqMusicUrl;
 
 }

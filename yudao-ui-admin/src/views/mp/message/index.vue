@@ -8,18 +8,19 @@
           <el-option v-for="item in accounts" :key="parseInt(item.id)" :label="item.name" :value="parseInt(item.id)" />
         </el-select>
       </el-form-item>
-      <!-- 等待处理 -->
-      <el-form-item label="消息类型" prop="msgType">
-        <el-select v-model="queryParams.msgType" placeholder="请选择消息类型" clearable size="small">
-          <el-option label="请选择字典生成" value=""/>
+      <!-- TODO 等待处理 -->
+      <el-form-item label="消息类型" prop="type">
+        <el-select v-model="queryParams.type" placeholder="请选择消息类型" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.MP_MESSAGE_TYPE)"
+                     :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="用户标识" prop="openid">
         <el-input v-model="queryParams.openid" placeholder="请输入用户标识" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -42,12 +43,11 @@
       <el-table-column label="消息类型" align="center" prop="type" width="80"/>
       <el-table-column label="发送方" align="center" prop="sendFrom" width="80">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.sendFrom === 1" type="success">用户</el-tag>
+          <el-tag v-if="scope.row.sendFrom === 1" type="success">粉丝</el-tag>
           <el-tag v-else type="info">公众号</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="用户标识" align="center" prop="openid" width="300" />
-      <!-- TODO 芋艿：发送/接收 -->
       <el-table-column label="内容" prop="content">
         <template slot-scope="scope">
           <!-- 【事件】区域 -->
@@ -118,10 +118,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <!-- TODO 芋艿：增加消息按钮 -->
-<!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"-->
-<!--                     v-hasPermi="['mp:message:update']">修改-->
-<!--          </el-button>-->
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleSend(scope.row)"
+                     v-hasPermi="['mp:message:send']">消息
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -129,24 +128,26 @@
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
-    <el-dialog title="用户消息" :visible.sync="open" width="40%">
-      <wx-msg user-id="3" v-if="true" />
+    <!-- 发送消息的弹窗 -->
+    <el-dialog title="粉丝消息列表" :visible.sync="open" width="50%">
+      <wx-msg :user-id="userId" v-if="open" />
     </el-dialog>
 
   </div>
 </template>
 
 <script>
-import { getMessagePage } from "@/api/mp/message";
 import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
 import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
 import WxMsg from '@/views/mp/components/wx-msg/main.vue';
 import WxLocation from '@/views/mp/components/wx-location/main.vue';
 import WxMusic from '@/views/mp/components/wx-music/main.vue';
 import WxNews from '@/views/mp/components/wx-news/main.vue';
+import { getMessagePage } from "@/api/mp/message";
+import { getSimpleAccounts } from "@/api/mp/account";
 
 export default {
-  name: "WxFansMsg",
+  name: "MpMessage",
   components: {
     WxVideoPlayer,
     WxVoicePlayer,
@@ -167,75 +168,51 @@ export default {
       total: 0,
       // 粉丝消息列表
       list: [],
-      // 弹出层标题
-      title: "",
       // 是否显示弹出层
-      open: true,
+      open: false,
       // 查询参数
-      dateRangeCreateTime: [],
       queryParams: {
         pageNo: 1,
         pageSize: 10,
         openid: null,
-        nickname: null,
-        headimgUrl: null,
-        wxAccountId: null,
-        msgType: null,
-        content: null,
-        resContent: null,
-        isRes: null,
-        mediaId: null,
-        picUrl: null,
-        picPath: null,
+        accountId: null,
+        type: null,
+        createTime: []
       },
-      // 表单参数
-      form: {},
-      // 表单校验
-      rules: {},
+      // 操作的用户编号
+      userId: 0,
 
       // 公众号账号列表
       accounts: []
     };
   },
   created() {
-    this.getList();
+    getSimpleAccounts().then(response => {
+      this.accounts = response.data;
+      // 默认选中第一个
+      if (this.accounts.length > 0) {
+        this.queryParams.accountId = this.accounts[0].id;
+      }
+      // 加载数据
+      this.getList();
+    })
   },
   methods: {
     /** 查询列表 */
     getList() {
+      // 如果没有选中公众号账号，则进行提示。
+      if (!this.queryParams.accountId) {
+        this.$message.error('未选中公众号，无法查询消息')
+        return false
+      }
+
       this.loading = true;
-      // 处理查询参数
-      let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
-      getMessagePage(params).then(response => {
+      getMessagePage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
       });
-    },
-    /** 取消按钮 */
-    cancel() {
-      this.open = false;
-      this.reset();
-    },
-    /** 表单重置 */
-    reset() {
-      this.form = {
-        id: undefined,
-        openid: undefined,
-        nickname: undefined,
-        headimgUrl: undefined,
-        wxAccountId: undefined,
-        msgType: undefined,
-        content: undefined,
-        resContent: undefined,
-        isRes: undefined,
-        mediaId: undefined,
-        picUrl: undefined,
-        picPath: undefined,
-      };
-      this.resetForm("form");
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -244,9 +221,16 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
+      // 默认选中第一个
+      if (this.accounts.length > 0) {
+        this.queryParams.accountId = this.accounts[0].id;
+      }
       this.handleQuery();
+    },
+    handleSend(row) {
+      this.userId = row.userId;
+      this.open = true;
     },
   }
 };

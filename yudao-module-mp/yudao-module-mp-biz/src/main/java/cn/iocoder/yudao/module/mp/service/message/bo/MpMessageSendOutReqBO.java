@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 公众号消息发送 Request BO
  *
- * 为什么要有该 BO 呢？在自动回复、客服消息、菜单回复消息等场景，都涉及到 MP 给用户发送消息，所以使用该 BO 统一承接
+ * 为什么要有该 BO 呢？在自动回复、客服消息、菜单回复消息等场景，都涉及到 MP 给粉丝发送消息，所以使用该 BO 统一承接
  *
  * @author 芋道源码
  */
@@ -27,9 +27,9 @@ public class MpMessageSendOutReqBO {
     @NotEmpty(message = "公众号 appId 不能为空")
     private String appId;
     /**
-     * 公众号用户 openid
+     * 公众号粉丝 openid
      */
-    @NotEmpty(message = "公众号用户 openid 不能为空")
+    @NotEmpty(message = "公众号粉丝 openid 不能为空")
     private String openid;
 
     // ========== 消息内容 ==========

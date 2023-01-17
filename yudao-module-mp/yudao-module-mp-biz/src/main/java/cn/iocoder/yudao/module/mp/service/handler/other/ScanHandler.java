@@ -17,9 +17,9 @@ import java.util.Map;
 public class ScanHandler implements WxMpMessageHandler {
 
     @Override
-    public WxMpXmlOutMessage handle(WxMpXmlMessage wxMpXmlMessage, Map<String, Object> map,
+    public WxMpXmlOutMessage handle(WxMpXmlMessage wxMpXmlMessage, Map<String, Object> context,
                                     WxMpService wxMpService, WxSessionManager wxSessionManager) throws WxErrorException {
-        // 扫码事件处理
-        return null;
+        throw new UnsupportedOperationException("未实现该处理，请自行重写");
     }
+
 }

@@ -16,7 +16,7 @@ import me.chanjar.weixin.common.api.WxConsts.MenuButtonType;
 import java.util.List;
 
 /**
- * 微信菜单 DO
+ * 公众号菜单 DO
  *
  * @author 芋道源码
  */
@@ -38,13 +38,13 @@ public class MpMenuDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 微信公众号 ID
+     * 公众号账号的编号
      *
      * 关联 {@link MpAccountDO#getId()}
      */
     private Long accountId;
     /**
-     * 微信公众号 appid
+     * 公众号 appId
      *
      * 冗余 {@link MpAccountDO#getAppId()}
      */
@@ -77,7 +77,7 @@ public class MpMenuDO extends BaseDO {
     /**
      * 网页链接
      *
-     * 用户点击菜单可打开链接，不超过 1024 字节
+     * 粉丝点击菜单可打开链接，不超过 1024 字节
      *
      * 类型为 {@link WxConsts.XmlMsgType} 的 VIEW、MINIPROGRAM
      */
@@ -146,13 +146,13 @@ public class MpMenuDO extends BaseDO {
     private String replyDescription;
 
     /**
-     * 缩略图的媒体 id，通过素材管理中的接口上传多媒体文件，得到的 id
+     * 回复的缩略图的媒体 id，通过素材管理中的接口上传多媒体文件，得到的 id
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC、VIDEO
      */
     private String replyThumbMediaId;
     /**
-     * 缩略图的媒体 URL
+     * 回复的缩略图的媒体 URL
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 MUSIC、VIDEO
      */

@@ -31,7 +31,7 @@ public class MpStatisticsController {
     private MpStatisticsService mpStatisticsService;
 
     @GetMapping("/user-summary")
-    @ApiOperation("获得用户增减数据")
+    @ApiOperation("获得粉丝增减数据")
     @PreAuthorize("@ss.hasPermission('mp:statistics:query')")
     public CommonResult<List<MpStatisticsUserSummaryRespVO>> getUserSummary(MpStatisticsGetReqVO getReqVO) {
         List<WxDataCubeUserSummary> list = mpStatisticsService.getUserSummary(
@@ -40,7 +40,7 @@ public class MpStatisticsController {
     }
 
     @GetMapping("/user-cumulate")
-    @ApiOperation("获得用户累计数据")
+    @ApiOperation("获得粉丝累计数据")
     @PreAuthorize("@ss.hasPermission('mp:statistics:query')")
     public CommonResult<List<MpStatisticsUserCumulateRespVO>> getUserCumulate(MpStatisticsGetReqVO getReqVO) {
         List<WxDataCubeUserCumulate> list = mpStatisticsService.getUserCumulate(

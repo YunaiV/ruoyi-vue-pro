@@ -40,25 +40,25 @@ public class MpMessageDO extends BaseDO {
      */
     private Long msgId;
     /**
-     * 微信公众号 ID
+     * 公众号账号的 ID
      *
      * 关联 {@link MpAccountDO#getId()}
      */
     private Long accountId;
     /**
-     * 微信公众号 appid
+     * 公众号 appid
      *
      * 冗余 {@link MpAccountDO#getAppId()}
      */
     private String appId;
     /**
-     * 微信用户编号
+     * 公众号粉丝的编号
      *
      * 关联 {@link MpUserDO#getId()}
      */
     private Long userId;
     /**
-     * 用户标识
+     * 公众号粉丝标志
      *
      * 冗余 {@link MpUserDO#getOpenid()}
      */
@@ -87,7 +87,7 @@ public class MpMessageDO extends BaseDO {
     private String content;
 
     /**
-     * 通过素材管理中的接口上传多媒体文件，得到的 id
+     * 媒体文件的编号
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 IMAGE、VOICE、VIDEO
      */

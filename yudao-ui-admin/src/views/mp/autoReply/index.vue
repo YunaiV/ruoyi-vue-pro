@@ -50,49 +50,12 @@ SOFTWARE.
         </el-col>
         <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
       </el-row>
-      <!-- 列表 -->
+      <!-- tab 项 -->
       <el-tab-pane name="1">
         <span slot="label"><i class="el-icon-star-off"></i> 关注时回复</span>
-        <el-table v-loading="loading" :data="list">
-          <el-table-column label="回复消息类型" align="center" prop="responseMessageType"/>
-          <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-            <template slot-scope="scope">
-              <span>{{ parseTime(scope.row.createTime) }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
-              <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                         v-hasPermi="['mp:auto-reply:update']">修改
-              </el-button>
-              <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                         v-hasPermi="['mp:auto-reply:delete']">删除
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
       </el-tab-pane>
       <el-tab-pane name="2">
         <span slot="label"><i class="el-icon-chat-line-round"></i> 消息回复</span>
-        <el-table v-loading="loading" :data="list">
-          <el-table-column label="请求消息类型" align="center" prop="requestMessageType"/>
-          <el-table-column label="回复消息类型" align="center" prop="responseMessageType"/>
-          <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-            <template slot-scope="scope">
-              <span>{{ parseTime(scope.row.createTime) }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
-              <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                         v-hasPermi="['mp:auto-reply:update']">修改
-              </el-button>
-              <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                         v-hasPermi="['mp:auto-reply:delete']">删除
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
       </el-tab-pane>
       <el-tab-pane name="3">
         <span slot="label"><i class="el-icon-news"></i> 关键词回复</span>
@@ -101,13 +64,42 @@ SOFTWARE.
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="关键词" align="center" prop="requestKeyword"/>
-      <el-table-column label="匹配类型" align="center" prop="requestMatch">
+      <el-table-column label="请求消息类型" align="center" prop="requestMessageType" v-if="type === '2'" />
+      <el-table-column label="关键词" align="center" prop="requestKeyword" v-if="type === '3'" />
+      <el-table-column label="匹配类型" align="center" prop="requestMatch" v-if="type === '3'">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.MP_AUTO_REPLY_REQUEST_MATCH" :value="scope.row.requestMatch"/>
         </template>
       </el-table-column>
-      <el-table-column label="回复消息类型" align="center" prop="responseMessageType"/>
+      <el-table-column label="回复消息类型" align="center">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.MP_MESSAGE_TYPE" :value="scope.row.responseMessageType"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="回复内容" align="center">
+        <template slot-scope="scope">
+          <div v-if="scope.row.responseMessageType === 'text'">{{ scope.row.responseContent }}</div>
+          <div v-else-if="scope.row.responseMessageType === 'voice'">
+            <wx-voice-player :url="scope.row.responseMediaUrl" />
+          </div>
+          <div v-else-if="scope.row.responseMessageType === 'image'">
+            <a target="_blank" :href="scope.row.responseMediaUrl">
+              <img :src="scope.row.responseMediaUrl" style="width: 100px">
+            </a>
+          </div>
+          <div v-else-if="scope.row.responseMessageType === 'video' || scope.row.responseMessageType === 'shortvideo'">
+            <wx-video-player :url="scope.row.responseMediaUrl" style="margin-top: 10px" />
+          </div>
+          <div v-else-if="scope.row.responseMessageType === 'news'">
+            <wx-news :articles="scope.row.responseArticles" />
+          </div>
+          <div v-else-if="scope.row.responseMessageType === 'music'">
+            <wx-music :title="scope.row.responseTitle" :description="scope.row.responseDescription"
+                      :thumb-media-url="scope.row.responseThumbMediaUrl"
+                      :music-url="scope.row.responseMusicUrl" :hq-music-url="scope.row.responseHqMusicUrl" />
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -130,9 +122,9 @@ SOFTWARE.
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="消息类型" prop="requestMessageType" v-if="type === '2'">
           <el-select v-model="form.requestMessageType" placeholder="请选择">
-            <el-option v-for="item in dictData.get('wx_req_type')" :key="item.value" :label="item.label"
-              :value="item.value" :disabled="item.disabled" v-if="item.value !== 'event'">
-            </el-option>
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.MP_MESSAGE_TYPE)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"
+                       v-if="requestMessageTypes.includes(dict.value)"/>
           </el-select>
         </el-form-item>
         <el-form-item label="匹配类型" prop="requestMatch" v-if="type === '3'">
@@ -157,6 +149,12 @@ SOFTWARE.
 </template>
 
 <script>
+import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
+import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
+import WxMsg from '@/views/mp/components/wx-msg/main.vue';
+import WxLocation from '@/views/mp/components/wx-location/main.vue';
+import WxMusic from '@/views/mp/components/wx-music/main.vue';
+import WxNews from '@/views/mp/components/wx-news/main.vue';
 import WxReplySelect from '@/views/mp/components/wx-reply/main.vue'
 import { getSimpleAccounts } from "@/api/mp/account";
 import { createAutoReply, deleteAutoReply, getAutoReply, getAutoReplyPage, updateAutoReply } from "@/api/mp/autoReply";
@@ -164,12 +162,20 @@ import { createAutoReply, deleteAutoReply, getAutoReply, getAutoReplyPage, updat
 export default {
   name: 'mpAutoReply',
   components: {
+    WxVideoPlayer,
+    WxVoicePlayer,
+    WxMsg,
+    WxLocation,
+    WxMusic,
+    WxNews,
     WxReplySelect
   },
   data() {
     return {
       // tab 类型（1、关注时回复；2、消息回复；3、关键词回复）
       type: '3',
+      // 允许选择的请求消息类型
+      requestMessageTypes: ['text', 'image', 'voice', 'video', 'shortvideo', 'location', 'link'],
       // 遮罩层
       loading: true,
       // 显示搜索条件
@@ -202,8 +208,6 @@ export default {
       },
       hackResetWxReplySelect: false, // 重置 WxReplySelect 组件，解决无法清除的问题
 
-      dictData: new Map(),
-
       // 公众号账号列表
       accounts: []
     }
@@ -218,33 +222,6 @@ export default {
       // 加载数据
       this.getList();
     })
-
-    // TODO 芋艿：字典数据，一起搞
-    this.dictData.set('wx_req_type',[{
-      value: 'text',
-      label: '文本'
-    },{
-      value: 'image',
-      label: '图片'
-    },{
-      value: 'voice',
-      label: '语音'
-    },{
-      value: 'video',
-      label: '视频'
-    },{
-      value: 'shortvideo',
-      label: '小视频'
-    },{
-      value: 'location',
-      label: '地理位置'
-    },{
-      value: 'link',
-      label: '链接消息'
-    },{
-      value: 'event',
-      label: '事件推送'
-    }])
   },
   methods: {
     /** 查询列表 */
@@ -295,7 +272,8 @@ export default {
       this.open = true
       this.title = '新增自动回复';
       this.objData = {
-        type : 'text'
+        type : 'text',
+        accountId: this.queryParams.accountId,
       }
     },
     /** 修改按钮操作 */

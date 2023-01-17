@@ -63,7 +63,7 @@ public class MpMessageServiceImpl implements MpMessageService {
     private Validator validator;
 
     @Override
-    public PageResult<MpMessageDO> getWxFansMsgPage(MpMessagePageReqVO pageReqVO) {
+    public PageResult<MpMessageDO> getMessagePage(MpMessagePageReqVO pageReqVO) {
         return mpMessageMapper.selectPage(pageReqVO);
     }
 

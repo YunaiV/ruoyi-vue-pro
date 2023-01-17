@@ -66,8 +66,8 @@ SOFTWARE.
           <div class="menu_bottom menu_addicon" v-if="this.menuList.length < 3" @click="addMenu"><i class="el-icon-plus"></i></div>
         </div>
         <div class="save_div">
-            <el-button class="save_btn" type="success" size="small" @click="handleSave">保存并发布菜单</el-button>
-            <el-button class="save_btn" type="danger" size="small" @click="handleDelete">清空菜单</el-button>
+            <el-button class="save_btn" type="success" size="small" @click="handleSave" v-hasPermi="['mp:menu:save']">保存并发布菜单</el-button>
+            <el-button class="save_btn" type="danger" size="small" @click="handleDelete" v-hasPermi="['mp:menu:delete']">清空菜单</el-button>
         </div>
       </div>
       <!--右边配置-->

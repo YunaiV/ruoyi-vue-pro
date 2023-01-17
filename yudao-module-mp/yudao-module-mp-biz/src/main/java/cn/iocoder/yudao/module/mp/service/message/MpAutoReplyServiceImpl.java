@@ -136,7 +136,7 @@ public class MpAutoReplyServiceImpl implements MpAutoReplyService {
 
     @Override
     public void deleteAutoReply(Long id) {
-        // 校验用户存在
+        // 校验粉丝存在
         validateAutoReplyExists(id);
 
         // 删除自动回复

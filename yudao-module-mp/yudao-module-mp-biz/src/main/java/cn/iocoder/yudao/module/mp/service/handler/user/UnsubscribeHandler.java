@@ -31,7 +31,7 @@ public class UnsubscribeHandler implements WxMpMessageHandler {
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
                                     Map<String, Object> context, WxMpService wxMpService,
                                     WxSessionManager sessionManager) {
-        log.info("[handle][用户({}) 取消关注]", wxMessage.getFromUser());
+        log.info("[handle][粉丝({}) 取消关注]", wxMessage.getFromUser());
         mpUserService.updateUserUnsubscribe(MpContextHolder.getAppId(), wxMessage.getFromUser());
         return null;
     }

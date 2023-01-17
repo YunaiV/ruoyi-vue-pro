@@ -103,7 +103,6 @@ public class DefaultMpServiceFactory implements MpServiceFactory {
 
     private WxMpService buildMpService(MpAccountDO account) {
         // 第一步，创建 WxMpRedisConfigImpl 对象
-        // TODO 芋艿：需要确认下，redis key 的存储结构
         WxMpRedisConfigImpl configStorage = new WxMpRedisConfigImpl(
                 redisTemplateWxRedisOps, mpProperties.getConfigStorage().getKeyPrefix());
         configStorage.setAppId(account.getAppId());

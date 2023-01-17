@@ -6,14 +6,14 @@ import lombok.Data;
 
 import java.util.Date;
 
-@ApiModel("管理后台 - 某一天的用户增减数据 Response VO")
+@ApiModel("管理后台 - 某一天的粉丝增减数据 Response VO")
 @Data
 public class MpStatisticsUpstreamMessageRespVO {
 
     @ApiModelProperty(value = "日期", required = true)
     private Date refDate;
 
-    @ApiModelProperty(value = "上行发送了（向公众号发送了）消息的用户数", required = true, example = "10")
+    @ApiModelProperty(value = "上行发送了（向公众号发送了）消息的粉丝数", required = true, example = "10")
     private Integer messageUser;
 
     @ApiModelProperty(value = "上行发送了消息的消息总数", required = true, example = "20")

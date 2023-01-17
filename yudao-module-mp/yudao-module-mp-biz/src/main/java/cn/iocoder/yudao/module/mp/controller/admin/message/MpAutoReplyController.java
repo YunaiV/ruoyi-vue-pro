@@ -40,7 +40,7 @@ public class MpAutoReplyController {
 
     @GetMapping("/get")
     @ApiOperation("获得公众号自动回复")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('mp:auto-reply:query')")
     public CommonResult<MpAutoReplyRespVO> getAutoReply(@RequestParam("id") Long id) {
         MpAutoReplyDO autoReply = mpAutoReplyService.getAutoReply(id);

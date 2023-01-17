@@ -29,10 +29,10 @@ public class MpMessageController {
     private MpMessageService mpMessageService;
 
     @GetMapping("/page")
-    @ApiOperation("获得粉丝消息分页")
+    @ApiOperation("获得公众号消息分页")
     @PreAuthorize("@ss.hasPermission('mp:message:query')")
-    public CommonResult<PageResult<MpMessageRespVO>> getWxFansMsgPage(@Valid MpMessagePageReqVO pageVO) {
-        PageResult<MpMessageDO> pageResult = mpMessageService.getWxFansMsgPage(pageVO);
+    public CommonResult<PageResult<MpMessageRespVO>> getMessagePage(@Valid MpMessagePageReqVO pageVO) {
+        PageResult<MpMessageDO> pageResult = mpMessageService.getMessagePage(pageVO);
         return success(MpMessageConvert.INSTANCE.convertPage(pageResult));
     }
 

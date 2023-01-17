@@ -64,7 +64,7 @@ public interface MpAutoReplyService {
     WxMpXmlOutMessage replyForMessage(String appId, WxMpXmlMessage wxMessage);
 
     /**
-     * 当用户关注时，自动回复
+     * 当粉丝关注时，自动回复
      *
      * @param appId 微信公众号 appId
      * @param wxMessage 消息

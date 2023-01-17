@@ -13,7 +13,7 @@ public class MpStatisticsUserCumulateRespVO {
     @ApiModelProperty(value = "日期", required = true)
     private Date refDate;
 
-    @ApiModelProperty(value = "累计用户量", required = true, example = "10")
+    @ApiModelProperty(value = "累计粉丝量", required = true, example = "10")
     private Integer cumulateUser;
 
 }

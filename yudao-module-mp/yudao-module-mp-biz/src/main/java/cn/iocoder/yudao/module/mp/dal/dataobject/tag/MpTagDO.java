@@ -43,13 +43,13 @@ public class MpTagDO extends BaseDO {
     private Integer count;
 
     /**
-     * 微信公众号 ID
+     * 公众号账号的编号
      *
      * 关联 {@link MpAccountDO#getId()}
      */
     private Long accountId;
     /**
-     * 微信公众号 appid
+     * 公众号 appId
      *
      * 冗余 {@link MpAccountDO#getAppId()}
      */

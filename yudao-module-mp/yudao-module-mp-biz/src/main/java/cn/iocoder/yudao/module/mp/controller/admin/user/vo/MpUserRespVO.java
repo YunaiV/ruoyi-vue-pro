@@ -15,7 +15,7 @@ public class MpUserRespVO  {
     @ApiModelProperty(value = "编号", required = true, example = "1024")
     private Long id;
 
-    @ApiModelProperty(value = "公众号用户标识", required = true, example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
+    @ApiModelProperty(value = "公众号粉丝标识", required = true, example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
     private String openid;
 
     @ApiModelProperty(value = "关注状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举")
