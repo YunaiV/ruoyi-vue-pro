@@ -15,7 +15,6 @@ import org.springdoc.core.customizers.ServerBaseUrlCustomizer;
 import org.springdoc.core.providers.JavadocProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
@@ -26,14 +25,13 @@ import java.util.Optional;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
 
 /**
- * Swagger3 自动配置类
+ * springdoc 自动配置类
+ * 使用 knife4j.enable=false 禁用 Swagger
  *
  * @author 芋道源码
  */
 @AutoConfiguration
 @ConditionalOnClass({OpenAPI.class})
-// 允许使用 swagger.enable=false 禁用 Swagger
-@ConditionalOnProperty(prefix = "yudao.swagger", value = "enable", matchIfMissing = true)
 @EnableConfigurationProperties(SwaggerProperties.class)
 public class YudaoSwaggerAutoConfiguration {
 
