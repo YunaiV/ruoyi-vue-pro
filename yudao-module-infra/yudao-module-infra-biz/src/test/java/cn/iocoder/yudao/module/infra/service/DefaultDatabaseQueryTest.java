@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.infra.service;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.generator.query.DefaultQuery;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.builder.ConfigBuilder;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
-import com.baomidou.mybatisplus.generator.query.DefaultQuery;
 
 import java.util.List;
 

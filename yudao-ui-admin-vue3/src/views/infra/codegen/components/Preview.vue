@@ -13,7 +13,7 @@
           />
         </el-scrollbar>
       </el-card>
-      <el-card class="w-3/4" style="margin-left: 10px" :gutter="12" shadow="hover">
+      <el-card class="w-3/4 ml-3" :gutter="12" shadow="hover">
         <el-tabs v-model="preview.activeName">
           <el-tab-pane
             v-for="item in previewCodegen"
