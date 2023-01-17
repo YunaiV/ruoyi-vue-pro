@@ -297,7 +297,7 @@ const deleteData = async (id: string | number) => {
 }
 
 // 批量删除
-const deleteList = async () => {
+const deleteBatch = async () => {
   const g = unref(xGrid)
   if (!g) {
     return
@@ -403,7 +403,7 @@ emit('register', {
   getSearchData,
   setProps,
   deleteData,
-  deleteList,
+  deleteBatch,
   exportList,
   getCurrentColumn,
   getRadioRecord,
