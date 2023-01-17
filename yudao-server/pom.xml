@@ -59,12 +59,13 @@
             <artifactId>yudao-module-pay-biz</artifactId>
             <version>${revision}</version>
         </dependency>
-        <!-- 微信公众号 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-mp-biz</artifactId>
-            <version>${revision}</version>
-        </dependency>
+
+        <!-- 微信公众号模块。默认注释，保证编译速度 -->
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-module-mp-biz</artifactId>-->
+<!--            <version>${revision}</version>-->
+<!--        </dependency>-->
 
         <!-- 商城相关模块。默认注释，保证编译速度 -->
 <!--        <dependency>-->

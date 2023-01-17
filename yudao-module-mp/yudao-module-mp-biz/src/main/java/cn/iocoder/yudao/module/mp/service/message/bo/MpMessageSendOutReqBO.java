@@ -56,14 +56,6 @@ public class MpMessageSendOutReqBO {
      */
     @NotEmpty(message = "消息 mediaId 不能为空", groups = {ImageMessageGroup.class, VoiceMessageGroup.class, VideoMessageGroup.class})
     private String mediaId;
-//    // TODO 芋艿：考虑去掉
-//    /**
-//     * 媒体 URL
-//     *
-//     * 消息类型为 {@link WxConsts.XmlMsgType} 的 IMAGE、VOICE、VIDEO
-//     */
-//    @NotEmpty(message = "消息内容不能为空", groups = {ImageMessageGroup.class, VoiceMessageGroup.class, VideoMessageGroup.class})
-//    private String mediaUrl;
 
     /**
      * 缩略图的媒体 id

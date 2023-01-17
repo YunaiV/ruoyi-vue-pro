@@ -11,26 +11,26 @@
 </template>
 
 <script>
-  export default {
-    name: "wxLocation",
-    props: {
-      locationX: {
-        required: true,
-        type: Number
-      },
-      locationY: {
-        required: true,
-        type: Number
-      },
-      label: { // 地名
-        required: true,
-        type: String
-      },
-      qqMapKey: { // QQ 地图的密钥 https://lbs.qq.com/service/staticV2/staticGuide/staticDoc
-        required: false,
-        type: String,
-        default: 'TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E' // 需要自定义
-      }
+export default {
+  name: "wxLocation",
+  props: {
+    locationX: {
+      required: true,
+      type: Number
+    },
+    locationY: {
+      required: true,
+      type: Number
+    },
+    label: { // 地名
+      required: true,
+      type: String
+    },
+    qqMapKey: { // QQ 地图的密钥 https://lbs.qq.com/service/staticV2/staticGuide/staticDoc
+      required: false,
+      type: String,
+      default: 'TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E' // 需要自定义
     }
-  };
+  }
+};
 </script>

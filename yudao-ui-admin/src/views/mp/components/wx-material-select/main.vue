@@ -95,153 +95,153 @@
 </template>
 
 <script>
-  import WxNews from '@/views/mp/components/wx-news/main.vue';
-  import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
-  import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
-  import { getMaterialPage } from "@/api/mp/material";
-  import { getFreePublishPage } from "@/api/mp/freePublish";
-  import { getDraftPage } from "@/api/mp/draft";
+import WxNews from '@/views/mp/components/wx-news/main.vue';
+import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue';
+import WxVideoPlayer from '@/views/mp/components/wx-video-play/main.vue';
+import { getMaterialPage } from "@/api/mp/material";
+import { getFreePublishPage } from "@/api/mp/freePublish";
+import { getDraftPage } from "@/api/mp/draft";
 
-  export default {
-    name: "wxMaterialSelect",
-    components: {
-      WxNews,
-      WxVoicePlayer,
-      WxVideoPlayer
+export default {
+  name: "wxMaterialSelect",
+  components: {
+    WxNews,
+    WxVoicePlayer,
+    WxVideoPlayer
+  },
+  props: {
+    objData: {
+      type: Object, // type - 类型；accountId - 公众号账号编号
+      required: true
     },
-    props: {
-      objData: {
-        type: Object, // type - 类型；accountId - 公众号账号编号
-        required: true
+    newsType:{ // 图文类型：1、已发布图文；2、草稿箱图文
+      type: String,
+      default: "1"
+    },
+  },
+  data() {
+    return {
+      // 遮罩层
+      loading: false,
+      // 总条数
+      total: 0,
+      // 数据列表
+      list: [],
+      // 查询参数
+      queryParams: {
+        pageNo: 1,
+        pageSize: 10,
+        accountId: this.objData.accountId,
       },
-      newsType:{ // 图文类型：1、已发布图文；2、草稿箱图文
-        type: String,
-        default: "1"
-      },
+    }
+  },
+  created() {
+    this.getPage()
+  },
+  methods:{
+    selectMaterial(item) {
+      this.$emit('selectMaterial', item)
     },
-    data() {
-      return {
-        // 遮罩层
-        loading: false,
-        // 总条数
-        total: 0,
-        // 数据列表
-        list: [],
-        // 查询参数
-        queryParams: {
-          pageNo: 1,
-          pageSize: 10,
-          accountId: this.objData.accountId,
-        },
-      }
-    },
-    created() {
+    /** 搜索按钮操作 */
+    handleQuery() {
+      this.queryParams.pageNo = 1
       this.getPage()
     },
-    methods:{
-      selectMaterial(item) {
-        this.$emit('selectMaterial', item)
-      },
-      /** 搜索按钮操作 */
-      handleQuery() {
-        this.queryParams.pageNo = 1
-        this.getPage()
-      },
-      getPage() {
-        this.loading = true
-        if (this.objData.type === 'news' && this.newsType === '1') { // 【图文】+ 【已发布】
-          this.getFreePublishPage();
-        } else if (this.objData.type === 'news' && this.newsType === '2') { // 【图文】+ 【草稿】
-          this.getDraftPage();
-        } else { // 【素材】
-          this.getMaterialPage();
-        }
-      },
-      getMaterialPage() {
-        getMaterialPage({
-          ...this.queryParams,
-          type: this.objData.type
-        }).then(response => {
-          this.list = response.data.list
-          this.total = response.data.total
-        }).finally(() => {
-          this.loading = false
-        })
-      },
-      getFreePublishPage() {
-        getFreePublishPage(this.queryParams).then(response => {
-          // 将 thumbUrl 转成 picUrl，保证 wx-news 组件可以预览封面
-          response.data.list.forEach(item => {
-            const newsItem = item.content.newsItem;
-            newsItem.forEach(article => {
-              article.picUrl = article.thumbUrl;
-            })
-          })
-          this.list = response.data.list
-          this.total = response.data.total
-        }).finally(() => {
-          this.loading = false
-        })
-      },
-      getDraftPage() {
-        getDraftPage((this.queryParams)).then(response => {
-          // 将 thumbUrl 转成 picUrl，保证 wx-news 组件可以预览封面
-          response.data.list.forEach(item => {
-            const newsItem = item.content.newsItem;
-            newsItem.forEach(article => {
-              article.picUrl = article.thumbUrl;
-            })
-          })
-          this.list = response.data.list
-          this.total = response.data.total
-        }).finally(() => {
-          this.loading = false
-        })
+    getPage() {
+      this.loading = true
+      if (this.objData.type === 'news' && this.newsType === '1') { // 【图文】+ 【已发布】
+        this.getFreePublishPage();
+      } else if (this.objData.type === 'news' && this.newsType === '2') { // 【图文】+ 【草稿】
+        this.getDraftPage();
+      } else { // 【素材】
+        this.getMaterialPage();
       }
+    },
+    getMaterialPage() {
+      getMaterialPage({
+        ...this.queryParams,
+        type: this.objData.type
+      }).then(response => {
+        this.list = response.data.list
+        this.total = response.data.total
+      }).finally(() => {
+        this.loading = false
+      })
+    },
+    getFreePublishPage() {
+      getFreePublishPage(this.queryParams).then(response => {
+        // 将 thumbUrl 转成 picUrl，保证 wx-news 组件可以预览封面
+        response.data.list.forEach(item => {
+          const newsItem = item.content.newsItem;
+          newsItem.forEach(article => {
+            article.picUrl = article.thumbUrl;
+          })
+        })
+        this.list = response.data.list
+        this.total = response.data.total
+      }).finally(() => {
+        this.loading = false
+      })
+    },
+    getDraftPage() {
+      getDraftPage((this.queryParams)).then(response => {
+        // 将 thumbUrl 转成 picUrl，保证 wx-news 组件可以预览封面
+        response.data.list.forEach(item => {
+          const newsItem = item.content.newsItem;
+          newsItem.forEach(article => {
+            article.picUrl = article.thumbUrl;
+          })
+        })
+        this.list = response.data.list
+        this.total = response.data.total
+      }).finally(() => {
+        this.loading = false
+      })
     }
-  };
+  }
+};
 </script>
 
 <style lang="scss" scoped>
-  /*瀑布流样式*/
+/*瀑布流样式*/
+.waterfall {
+  width: 100%;
+  column-gap:10px;
+  column-count: 5;
+  margin: 0 auto;
+}
+.waterfall-item {
+  padding: 10px;
+  margin-bottom: 10px;
+  break-inside: avoid;
+  border: 1px solid #eaeaea;
+}
+.material-img {
+  width: 100%;
+}
+p {
+  line-height: 30px;
+}
+@media (min-width: 992px) and (max-width: 1300px) {
   .waterfall {
-    width: 100%;
-    column-gap:10px;
-    column-count: 5;
-    margin: 0 auto;
-  }
-  .waterfall-item {
-    padding: 10px;
-    margin-bottom: 10px;
-    break-inside: avoid;
-    border: 1px solid #eaeaea;
-  }
-  .material-img {
-    width: 100%;
+    column-count: 3;
   }
   p {
-    line-height: 30px;
+    color:red;
   }
-  @media (min-width: 992px) and (max-width: 1300px) {
-    .waterfall {
-      column-count: 3;
-    }
-    p {
-      color:red;
-    }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .waterfall {
+    column-count: 2;
   }
-  @media (min-width: 768px) and (max-width: 991px) {
-    .waterfall {
-      column-count: 2;
-    }
-    p {
-      color: orange;
-    }
+  p {
+    color: orange;
   }
-  @media (max-width: 767px) {
-    .waterfall {
-      column-count: 1;
-    }
+}
+@media (max-width: 767px) {
+  .waterfall {
+    column-count: 1;
   }
-  /*瀑布流样式*/
+}
+/*瀑布流样式*/
 </style>
