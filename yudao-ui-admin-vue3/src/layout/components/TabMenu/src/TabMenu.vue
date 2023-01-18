@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { usePermissionStore } from '@/store/modules/permission'
 import { useAppStore } from '@/store/modules/app'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { ElScrollbar } from 'element-plus'
 import { Icon } from '@/components/Icon'
 import { Menu } from '@/layout/components/Menu'

@@ -150,9 +150,6 @@
 <script setup lang="ts" name="Role">
 import type { ElTree } from 'element-plus'
 import type { FormExpose } from '@/components/Form'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
 import { handleTree, defaultProps } from '@/utils/tree'
 import { SystemDataScopeEnum } from '@/utils/constants'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'

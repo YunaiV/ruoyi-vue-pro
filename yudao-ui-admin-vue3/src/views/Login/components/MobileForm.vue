@@ -93,10 +93,9 @@
 </template>
 <script setup lang="ts">
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { useIcon } from '@/hooks/web/useIcon'
-import { useMessage } from '@/hooks/web/useMessage'
-import { required } from '@/utils/formRules'
+
 import { setTenantId, setToken } from '@/utils/auth'
 import { usePermissionStore } from '@/store/modules/permission'
 import { getTenantIdByNameApi, sendSmsCodeApi, smsLoginApi } from '@/api/login'

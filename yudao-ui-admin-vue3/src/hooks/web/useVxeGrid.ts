@@ -2,8 +2,7 @@ import { computed, nextTick, reactive } from 'vue'
 import { SizeType, VxeGridProps, VxeTablePropTypes } from 'vxe-table'
 import { useAppStore } from '@/store/modules/app'
 import { VxeAllSchemas } from './useVxeCrudSchemas'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import download from '@/utils/download'
 
 const { t } = useI18n()

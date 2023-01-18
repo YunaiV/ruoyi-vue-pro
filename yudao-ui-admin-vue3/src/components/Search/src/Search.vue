@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
 import { propTypes } from '@/utils/propTypes'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { useForm } from '@/hooks/web/useForm'
 import { findIndex } from '@/utils'
 import { cloneDeep } from 'lodash-es'

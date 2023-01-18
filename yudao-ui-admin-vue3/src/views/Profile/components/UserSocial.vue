@@ -22,7 +22,6 @@
   </el-table>
 </template>
 <script setup lang="ts">
-import { useMessage } from '@/hooks/web/useMessage'
 import { SystemUserSocialTypeEnum } from '@/utils/constants'
 import { getUserProfileApi, ProfileVO } from '@/api/system/user/profile'
 import { socialAuthRedirect, socialUnbind } from '@/api/system/user/socialUser'

@@ -28,9 +28,6 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Loginlog">
-// 全局相关的 import
-import { useI18n } from '@/hooks/web/useI18n'
-import { useXTable } from '@/hooks/web/useXTable'
 // 业务相关的 import
 import { allSchemas } from './loginLog.data'
 import { getLoginLogPageApi, exportLoginLogApi, LoginLogVO } from '@/api/system/loginLog'

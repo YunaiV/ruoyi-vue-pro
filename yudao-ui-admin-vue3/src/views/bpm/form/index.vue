@@ -1,14 +1,13 @@
 <script setup lang="ts" name="Form">
 import dayjs from 'dayjs'
-import { ElMessage } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'
-import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
 import type { FormExpose } from '@/components/Form'
 import type { FormVO } from '@/api/bpm/form/types'
 import { rules, allSchemas } from './form.data'
 import * as FormApi from '@/api/bpm/form'
+import { useTable } from '@/hooks/web/useTable'
 const { t } = useI18n() // 国际化
+const message = useMessage()
 
 // ========== 列表相关 ==========
 const { register, tableObject, methods } = useTable<FormVO>({
@@ -56,10 +55,10 @@ const submitForm = async () => {
         const data = unref(formRef)?.formModel as FormVO
         if (actionType.value === 'create') {
           await FormApi.createFormApi(data)
-          ElMessage.success(t('common.createSuccess'))
+          message.success(t('common.createSuccess'))
         } else {
           await FormApi.updateFormApi(data)
-          ElMessage.success(t('common.updateSuccess'))
+          message.success(t('common.updateSuccess'))
         }
         // 操作成功，重新加载列表
         dialogVisible.value = false

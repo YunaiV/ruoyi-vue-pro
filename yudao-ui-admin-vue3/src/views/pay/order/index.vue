@@ -42,8 +42,6 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Order">
-import { useI18n } from '@/hooks/web/useI18n'
-import { useXTable } from '@/hooks/web/useXTable'
 import { allSchemas } from './order.data'
 import * as OrderApi from '@/api/pay/order'
 

@@ -1,4 +1,3 @@
-import { useI18n } from '@/hooks/web/useI18n'
 import { ElDatePicker } from 'element-plus'
 import { VXETable } from 'vxe-table'
 

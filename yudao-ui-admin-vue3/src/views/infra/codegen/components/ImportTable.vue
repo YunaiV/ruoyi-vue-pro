@@ -49,8 +49,6 @@
   </XModal>
 </template>
 <script setup lang="ts">
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
 import { VxeTableInstance } from 'vxe-table'
 import type { DatabaseTableVO } from '@/api/infra/codegen/types'
 import { getSchemaTableListApi, createCodegenListApi } from '@/api/infra/codegen'

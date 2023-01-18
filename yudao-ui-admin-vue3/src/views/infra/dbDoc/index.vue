@@ -26,7 +26,7 @@
 </template>
 <script setup lang="ts" name="DbDoc">
 import download from '@/utils/download'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import * as DbDocApi from '@/api/infra/dbDoc'
 
 const { t } = useI18n() // 国际化

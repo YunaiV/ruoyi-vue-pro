@@ -2,11 +2,10 @@
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import { DICT_TYPE } from '@/utils/dict'
-import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
 import type { TaskDoneVO } from '@/api/bpm/task/types'
 import { allSchemas } from './done.data'
 import * as TaskDoneApi from '@/api/bpm/task'
+import { useTable } from '@/hooks/web/useTable'
 dayjs.extend(duration)
 const { t } = useI18n() // 国际化
 const { push } = useRouter()

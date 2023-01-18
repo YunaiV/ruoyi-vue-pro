@@ -164,7 +164,7 @@
 import { set } from 'lodash-es'
 import { EChartsOption } from 'echarts'
 import { formatTime } from '@/utils'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { useUserStore } from '@/store/modules/user'
 import { useWatermark } from '@/hooks/web/useWatermark'
 import avatarImg from '@/assets/imgs/avatar.gif'

@@ -37,7 +37,7 @@
 </template>
 <script setup lang="ts">
 import type { FormRules } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
 import LoginFormTitle from './LoginFormTitle.vue'

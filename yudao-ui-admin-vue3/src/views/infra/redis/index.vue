@@ -127,8 +127,7 @@
 <script setup lang="ts" name="Redis">
 import * as echarts from 'echarts'
 import { DICT_TYPE } from '@/utils/dict'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import * as RedisApi from '@/api/infra/redis'
 import { RedisKeyInfo, RedisMonitorInfoVO } from '@/api/infra/redis/types'
 

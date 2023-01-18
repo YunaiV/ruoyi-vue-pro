@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { propTypes } from '@/utils/propTypes'
 import { useDesign } from '@/hooks/web/useDesign'
-import { useI18n } from '@/hooks/web/useI18n'
+
 const { t } = useI18n()
 
 const { getPrefixCls } = useDesign()

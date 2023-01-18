@@ -25,10 +25,6 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Token">
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
-
 import { allSchemas } from './token.data'
 import * as TokenApi from '@/api/system/oauth2/token'
 

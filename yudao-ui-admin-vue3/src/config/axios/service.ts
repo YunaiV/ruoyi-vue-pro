@@ -10,7 +10,7 @@ import qs from 'qs'
 import { config } from '@/config/axios/config'
 import { getAccessToken, getRefreshToken, getTenantId, removeToken, setToken } from '@/utils/auth'
 import errorCode from './errorCode'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { resetRouter } from '@/router'
 import { useCache } from '@/hooks/web/useCache'
 

@@ -36,8 +36,6 @@
   </XModal>
 </template>
 <script setup lang="ts" name="ApiAccessLog">
-import { useI18n } from '@/hooks/web/useI18n'
-import { useXTable } from '@/hooks/web/useXTable'
 import { allSchemas } from './apiAccessLog.data'
 import * as ApiAccessLogApi from '@/api/infra/apiAccessLog'
 

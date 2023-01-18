@@ -66,9 +66,6 @@
 </template>
 <script setup lang="ts" name="TenantPackage">
 import { handleTree, defaultProps } from '@/utils/tree'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
 import type { FormExpose } from '@/components/Form'
 import type { ElTree } from 'element-plus'
 // 业务相关的 import

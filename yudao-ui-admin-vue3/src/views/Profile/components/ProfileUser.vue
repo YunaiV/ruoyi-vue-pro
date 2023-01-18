@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import UserAvatar from './UserAvatar.vue'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { getUserProfileApi, ProfileVO } from '@/api/system/user/profile'
 
 const { t } = useI18n()

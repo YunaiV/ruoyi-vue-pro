@@ -67,9 +67,7 @@
 </template>
 <script setup lang="ts" name="DataSourceConfig">
 // 全局相关的 import
-import { useI18n } from '@/hooks/web/useI18n'
-import { useXTable } from '@/hooks/web/useXTable'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import type { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as DataSourceConfiggApi from '@/api/infra/dataSourceConfig'

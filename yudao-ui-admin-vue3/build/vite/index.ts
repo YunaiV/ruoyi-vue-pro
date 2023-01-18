@@ -32,7 +32,24 @@ export function createVitePlugins(VITE_APP_TITLE: string) {
     PurgeIcons(),
     vueSetupExtend(),
     AutoImport({
-      imports: ['vue', 'vue-router'],
+      include: [
+        /\.[tj]sx?$/, // .ts, .tsx, .js, .jsx
+        /\.vue$/,
+        /\.vue\?vue/, // .vue
+        /\.md$/ // .md
+      ],
+      imports: [
+        'vue',
+        'vue-router',
+        {
+          '@/hooks/web/useI18n': ['useI18n'],
+          '@/hooks/web/useXTable': ['useXTable'],
+          '@/hooks/web/useMessage': ['useMessage'],
+          '@/hooks/web/useVxeCrudSchemas': ['useVxeCrudSchemas'],
+          '@/utils/formRules': ['required'],
+          '@/utils/dict': ['DICT_TYPE']
+        }
+      ],
       dts: 'src/types/auto-imports.d.ts',
       resolvers: [ElementPlusResolver()],
       eslintrc: {

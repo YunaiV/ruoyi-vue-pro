@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import type { FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { FormSchema } from '@/types/form'
 import type { FormExpose } from '@/components/Form'
 import {

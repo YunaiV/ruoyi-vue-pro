@@ -1,7 +1,4 @@
-import { useI18n } from '@/hooks/web/useI18n'
-import { required } from '@/utils/formRules'
-import { DICT_TYPE } from '@/utils/dict'
-import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
 import { getTenantPackageList, TenantPackageVO } from '@/api/system/tenantPackage'
 import { ComponentOptions } from '@/types/components'
 

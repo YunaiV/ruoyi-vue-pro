@@ -3,7 +3,7 @@ import { AxiosPromise } from 'axios'
 import { findIndex } from '@/utils'
 import { eachTree, treeMap, filter } from '@/utils/tree'
 import { getBoolDictOptions, getDictOptions, getIntDictOptions } from '@/utils/dict'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { FormSchema } from '@/types/form'
 import { TableColumn } from '@/types/table'
 import { DescriptionsSchema } from '@/types/descriptions'

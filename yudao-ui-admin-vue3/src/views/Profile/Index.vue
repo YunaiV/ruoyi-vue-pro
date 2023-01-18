@@ -31,7 +31,6 @@
   </div>
 </template>
 <script setup lang="ts" name="Profile">
-import { useI18n } from '@/hooks/web/useI18n'
 import { BasicInfo, ProfileUser, ResetPwd, UserSocial } from './components/'
 const { t } = useI18n()
 

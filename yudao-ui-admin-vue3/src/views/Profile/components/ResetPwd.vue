@@ -17,8 +17,7 @@
 </template>
 <script setup lang="ts">
 import type { FormRules, FormInstance } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import { InputPassword } from '@/components/InputPassword'
 import { updateUserPwdApi } from '@/api/system/user/profile'
 

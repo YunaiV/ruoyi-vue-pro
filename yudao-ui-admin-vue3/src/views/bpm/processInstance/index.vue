@@ -2,12 +2,12 @@
 import dayjs from 'dayjs'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
 import type { ProcessInstanceVO } from '@/api/bpm/processInstance/types'
 import { allSchemas } from './process.data'
 import * as ProcessInstanceApi from '@/api/bpm/processInstance'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 const { t } = useI18n() // 国际化
+const message = useMessage()
 
 // ========== 列表相关 ==========
 const { register, tableObject, methods } = useTable<ProcessInstanceVO>({
@@ -31,7 +31,7 @@ const handleCancel = (row: ProcessInstanceVO) => {
     inputErrorMessage: '取消原因不能为空'
   }).then(async ({ value }) => {
     await ProcessInstanceApi.cancelProcessInstanceApi(row.id, value)
-    ElMessage.success('取消成功')
+    message.success('取消成功')
     getList()
   })
 }

@@ -25,7 +25,6 @@
 - 本框架集成了国际化，不需要的话可以自己想办法移除，使用方法如下
 
 ```bash
-import { useI18n } from '@/hooks/web/useI18n'
 const { t } = useI18n()
 t('common.createTime')
 并在src/locales 增加相应的中英文

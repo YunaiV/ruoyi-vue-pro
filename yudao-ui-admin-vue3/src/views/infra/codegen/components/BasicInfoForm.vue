@@ -2,14 +2,13 @@
   <Form :rules="rules" @register="register" />
 </template>
 <script setup lang="ts">
-import { PropType } from 'vue'
-import { required } from '@/utils/formRules'
 import { useForm } from '@/hooks/web/useForm'
 import { FormSchema } from '@/types/form'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
-import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { getIntDictOptions } from '@/utils/dict'
 import { listSimpleMenusApi } from '@/api/system/menu'
 import { handleTree, defaultProps } from '@/utils/tree'
+import { PropType } from 'vue'
 
 const props = defineProps({
   basicInfo: {

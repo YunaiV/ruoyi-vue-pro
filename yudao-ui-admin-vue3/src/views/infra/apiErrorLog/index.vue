@@ -52,12 +52,9 @@
   </XModal>
 </template>
 <script setup lang="ts" name="ApiErrorLog">
-import { useI18n } from '@/hooks/web/useI18n'
-import { useXTable } from '@/hooks/web/useXTable'
 import { allSchemas } from './apiErrorLog.data'
 import * as ApiErrorLogApi from '@/api/infra/apiErrorLog'
 import { InfraApiErrorLogProcessStatusEnum } from '@/utils/constants'
-import { useMessage } from '@/hooks/web/useMessage'
 
 const { t } = useI18n() // 国际化
 const message = useMessage()

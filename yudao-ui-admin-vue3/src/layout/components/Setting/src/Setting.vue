@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
 import { useCssVar, useClipboard } from '@vueuse/core'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { useDesign } from '@/hooks/web/useDesign'
 

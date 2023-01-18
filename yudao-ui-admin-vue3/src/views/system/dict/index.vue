@@ -122,9 +122,6 @@
   </div>
 </template>
 <script setup lang="ts" name="Dict">
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
 import { VxeTableEvents } from 'vxe-table'
 import type { FormExpose } from '@/components/Form'
 import * as DictTypeSchemas from './dict.type'

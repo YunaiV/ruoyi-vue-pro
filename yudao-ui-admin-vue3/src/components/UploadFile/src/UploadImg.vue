@@ -52,8 +52,7 @@
 
 <script setup lang="ts" name="UploadImg">
 import type { UploadProps } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import { generateUUID } from '@/utils'
 import { propTypes } from '@/utils/propTypes'
 import { getAccessToken, getTenantId } from '@/utils/auth'

@@ -1,6 +1,4 @@
-import { required } from '@/utils/formRules'
-import { useI18n } from '@/hooks/web/useI18n'
-import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
 // 国际化
 const { t } = useI18n()
 // 表单校验

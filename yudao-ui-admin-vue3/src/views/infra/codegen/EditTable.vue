@@ -21,8 +21,6 @@
   </ContentWrap>
 </template>
 <script setup lang="ts">
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
 import { BasicInfoForm, CloumInfoForm } from './components'
 import { getCodegenTableApi, updateCodegenTableApi } from '@/api/infra/codegen'
 import { CodegenTableVO, CodegenColumnVO, CodegenUpdateReqVO } from '@/api/infra/codegen/types'

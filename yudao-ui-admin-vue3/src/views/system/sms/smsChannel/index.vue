@@ -68,10 +68,6 @@
   </XModal>
 </template>
 <script setup lang="ts" name="SmsChannel">
-// 全局相关的 import
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
 import type { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as SmsChannelApi from '@/api/system/sms/smsChannel'

@@ -68,9 +68,7 @@
 </template>
 <script setup lang="ts" name="ErrorCode">
 // 全局相关的 import
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
+
 import type { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import { rules, allSchemas } from './errorCode.data'

@@ -1,6 +1,4 @@
-import { useI18n } from '@/hooks/web/useI18n'
-import { DICT_TYPE } from '@/utils/dict'
-import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 // CrudSchema
 const crudSchemas = reactive<VxeCrudSchema>({

@@ -1,7 +1,4 @@
-import { useI18n } from '@/hooks/web/useI18n'
-import { DICT_TYPE } from '@/utils/dict'
-import { required } from '@/utils/formRules'
-import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 
 // 新增和修改的表单校验

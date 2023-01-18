@@ -2,14 +2,13 @@
 import dayjs from 'dayjs'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
 import type { FormExpose } from '@/components/Form'
 import type { ModelVO } from '@/api/bpm/model/types'
 import { rules, allSchemas } from './model.data'
 import * as ModelApi from '@/api/bpm/model'
-import { useMessage } from '@/hooks/web/useMessage'
-const message = useMessage()
+
 const { t } = useI18n() // 国际化
+const message = useMessage()
 
 // ========== 列表相关 ==========
 const { register, tableObject, methods } = useTable<ModelVO>({

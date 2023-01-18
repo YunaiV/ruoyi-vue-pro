@@ -76,9 +76,6 @@
 </template>
 <script setup lang="ts" name="Dept">
 import { handleTree, defaultProps } from '@/utils/tree'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
 import type { FormExpose } from '@/components/Form'
 import { allSchemas, rules } from './dept.data'
 import * as DeptApi from '@/api/system/dept'

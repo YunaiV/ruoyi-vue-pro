@@ -34,7 +34,7 @@
 </template>
 <script setup lang="ts" name="UploadFile">
 import { PropType } from 'vue'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import { propTypes } from '@/utils/propTypes'
 import { getAccessToken, getTenantId } from '@/utils/auth'
 import type { UploadInstance, UploadUserFile, UploadProps, UploadRawFile } from 'element-plus'

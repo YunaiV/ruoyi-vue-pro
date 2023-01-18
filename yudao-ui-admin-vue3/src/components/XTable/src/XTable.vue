@@ -12,9 +12,8 @@ import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
 import { XTableProps } from './type'
 import { isBoolean, isFunction } from '@/utils/is'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import download from '@/utils/download'
-import { useI18n } from '@/hooks/web/useI18n'
 
 const { t } = useI18n()
 const message = useMessage() // 消息弹窗
