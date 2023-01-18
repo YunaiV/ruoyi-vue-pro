@@ -6,6 +6,7 @@ import progress from 'vite-plugin-progress'
 import EslintPlugin from 'vite-plugin-eslint'
 import PurgeIcons from 'vite-plugin-purge-icons'
 import { ViteEjsPlugin } from 'vite-plugin-ejs'
+import ElementPlus from 'unplugin-element-plus/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
@@ -13,11 +14,6 @@ import viteCompression from 'vite-plugin-compression'
 import vueSetupExtend from 'vite-plugin-vue-setup-extend'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
-import {
-  createStyleImportPlugin,
-  ElementPlusResolve,
-  VxeTableResolve
-} from 'vite-plugin-style-import'
 export function createVitePlugins(VITE_APP_TITLE: string) {
   const root = process.cwd()
   // 路径查找
@@ -31,6 +27,7 @@ export function createVitePlugins(VITE_APP_TITLE: string) {
     progress(),
     PurgeIcons(),
     vueSetupExtend(),
+    ElementPlus(),
     AutoImport({
       include: [
         /\.[tj]sx?$/, // .ts, .tsx, .js, .jsx
@@ -71,25 +68,6 @@ export function createVitePlugins(VITE_APP_TITLE: string) {
       // 自定义组件的解析器
       resolvers: [ElementPlusResolver()],
       exclude: [/[\\/]node_modules[\\/]/]
-    }),
-    createStyleImportPlugin({
-      resolves: [ElementPlusResolve(), VxeTableResolve()],
-      libs: [
-        {
-          libraryName: 'element-plus',
-          esModule: true,
-          resolveStyle: (name) => {
-            return `element-plus/es/components/${name.substring(3)}/style/css`
-          }
-        },
-        {
-          libraryName: 'vxe-table',
-          esModule: true,
-          resolveStyle: (name) => {
-            return `vxe-table/es/${name}/style.css`
-          }
-        }
-      ]
     }),
     EslintPlugin({
       cache: false,

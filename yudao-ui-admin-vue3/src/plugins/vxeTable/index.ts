@@ -1,6 +1,7 @@
 import { App } from 'vue'
 import XEUtils from 'xe-utils'
 import './renderer'
+import 'vxe-table/lib/style.css'
 import { i18n } from '@/plugins/vueI18n'
 import zhCN from 'vxe-table/lib/locale/lang/zh-CN'
 import enUS from 'vxe-table/lib/locale/lang/en-US'
