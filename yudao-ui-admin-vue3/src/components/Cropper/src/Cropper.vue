@@ -16,6 +16,7 @@ import Cropper from 'cropperjs'
 import 'cropperjs/dist/cropper.css'
 import { useDesign } from '@/hooks/web/useDesign'
 import { propTypes } from '@/utils/propTypes'
+import { useDebounceFn } from '@vueuse/core'
 
 type Options = Cropper.Options
 

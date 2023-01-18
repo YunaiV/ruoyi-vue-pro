@@ -32,7 +32,7 @@ export function createVitePlugins(VITE_APP_TITLE: string) {
     PurgeIcons(),
     vueSetupExtend(),
     AutoImport({
-      imports: ['vue', 'vue-router', '@vueuse/core'],
+      imports: ['vue', 'vue-router'],
       dts: 'src/types/auto-imports.d.ts',
       resolvers: [ElementPlusResolver()],
       eslintrc: {

@@ -9,6 +9,7 @@ import { ContextMenu, ContextMenuExpose } from '@/layout/components/ContextMenu'
 import { useDesign } from '@/hooks/web/useDesign'
 import { ElScrollbar } from 'element-plus'
 import { useScrollTo } from '@/hooks/event/useScrollTo'
+import { useTemplateRefsList } from '@vueuse/core'
 
 const { getPrefixCls } = useDesign()
 

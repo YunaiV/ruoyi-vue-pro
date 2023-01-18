@@ -5,6 +5,7 @@ import { useAppStore } from '@/store/modules/app'
 import { setCssVar } from '@/utils'
 import { useDesign } from '@/hooks/web/useDesign'
 import { ElementPlusSize } from '@/types/elementPlus'
+import { useWindowSize } from '@vueuse/core'
 
 const { variables } = useDesign()
 

@@ -37,6 +37,7 @@ import { PropType } from 'vue'
 import { useMessage } from '@/hooks/web/useMessage'
 import { propTypes } from '@/utils/propTypes'
 import { getAccessToken, getTenantId } from '@/utils/auth'
+import type { UploadInstance, UploadUserFile, UploadProps, UploadRawFile } from 'element-plus'
 
 const message = useMessage() // 消息弹窗
 const emit = defineEmits(['update:modelValue'])

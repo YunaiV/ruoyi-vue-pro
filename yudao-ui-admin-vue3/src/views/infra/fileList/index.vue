@@ -90,6 +90,7 @@ import type { UploadInstance, UploadRawFile } from 'element-plus'
 import { allSchemas } from './fileList.data'
 import * as FileApi from '@/api/infra/fileList'
 import { getAccessToken, getTenantId } from '@/utils/auth'
+import { useClipboard } from '@vueuse/core'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗

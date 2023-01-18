@@ -1,3 +1,4 @@
+import { useCssVar } from '@vueuse/core'
 import type { NProgressOptions } from 'nprogress'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'

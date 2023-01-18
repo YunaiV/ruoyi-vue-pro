@@ -58,6 +58,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { useUserStore } from '@/store/modules/user'
+import { useWebSocket } from '@vueuse/core'
 
 const userStore = useUserStore()
 

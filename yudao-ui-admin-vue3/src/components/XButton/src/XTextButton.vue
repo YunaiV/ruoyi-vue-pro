@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { propTypes } from '@/utils/propTypes'
+import { PropType } from 'vue'
 
 const props = defineProps({
   modelValue: propTypes.bool.def(false),
