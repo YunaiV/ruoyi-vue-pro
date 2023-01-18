@@ -72,7 +72,6 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Post">
-// 全局相关的 import
 import type { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as PostApi from '@/api/system/post'

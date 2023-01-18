@@ -175,7 +175,6 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Menu">
-// 全局相关的 import
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { FormInstance } from 'element-plus'
 // 业务相关的 import
