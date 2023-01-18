@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
-import { useRouter } from 'vue-router'
 import { useDesign } from '@/hooks/web/useDesign'
 import avatarImg from '@/assets/imgs/avatar.gif'
 import { useUserStore } from '@/store/modules/user'

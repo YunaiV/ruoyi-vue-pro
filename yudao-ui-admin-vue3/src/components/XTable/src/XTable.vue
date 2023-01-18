@@ -6,7 +6,7 @@
   </VxeGrid>
 </template>
 <script lang="ts" setup name="XTable">
-import { computed, PropType, ref, unref, useAttrs, watch } from 'vue'
+import { PropType } from 'vue'
 import { SizeType, VxeGridInstance } from 'vxe-table'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'

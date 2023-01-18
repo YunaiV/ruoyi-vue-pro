@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ElDrawer, ElDivider, ElMessage } from 'element-plus'
-import { ref, unref, computed, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useCssVar, useClipboard } from '@vueuse/core'
 import { useI18n } from '@/hooks/web/useI18n'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'

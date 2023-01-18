@@ -11,9 +11,8 @@
   <XButton type="danger" :title="t('common.reset')" @click="init()" />
 </template>
 <script setup lang="ts">
-import { reactive, onMounted, unref, ref } from 'vue'
 import type { FormRules } from 'element-plus'
-import { ElMessage, ElRadioGroup, ElRadio } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { FormSchema } from '@/types/form'
 import type { FormExpose } from '@/components/Form'

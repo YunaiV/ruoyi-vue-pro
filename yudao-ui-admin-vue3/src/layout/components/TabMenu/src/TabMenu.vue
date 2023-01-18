@@ -1,12 +1,10 @@
 <script lang="tsx">
 import { usePermissionStore } from '@/store/modules/permission'
 import { useAppStore } from '@/store/modules/app'
-import { computed, unref, defineComponent, watch, ref, onMounted } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { ElScrollbar } from 'element-plus'
 import { Icon } from '@/components/Icon'
 import { Menu } from '@/layout/components/Menu'
-import { useRouter } from 'vue-router'
 import { pathResolve } from '@/utils/routerHelper'
 import { cloneDeep } from 'lodash-es'
 import { filterMenusPath, initTabMap, tabPathMap } from './helper'

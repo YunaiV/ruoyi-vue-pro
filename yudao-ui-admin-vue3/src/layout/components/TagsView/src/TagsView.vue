@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { onMounted, watch, computed, unref, ref, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
 import type { RouteLocationNormalizedLoaded, RouterLinkProps } from 'vue-router'
 import { usePermissionStore } from '@/store/modules/permission'
 import { useTagsViewStore } from '@/store/modules/tagsView'
@@ -9,7 +7,6 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { filterAffixTags } from './helper'
 import { ContextMenu, ContextMenuExpose } from '@/layout/components/ContextMenu'
 import { useDesign } from '@/hooks/web/useDesign'
-import { useTemplateRefsList } from '@vueuse/core'
 import { ElScrollbar } from 'element-plus'
 import { useScrollTo } from '@/hooks/event/useScrollTo'
 

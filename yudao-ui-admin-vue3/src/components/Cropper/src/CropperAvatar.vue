@@ -15,7 +15,6 @@
 import { useDesign } from '@/hooks/web/useDesign'
 import { useMessage } from '@/hooks/web/useMessage'
 import { propTypes } from '@/utils/propTypes'
-import { ref, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CopperModal from './CopperModal.vue'
 

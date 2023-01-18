@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, computed, watch, onMounted, unref, toRef, PropType } from 'vue'
+import { PropType } from 'vue'
 import { isNumber } from '@/utils/is'
 import { propTypes } from '@/utils/propTypes'
 import { useDesign } from '@/hooks/web/useDesign'

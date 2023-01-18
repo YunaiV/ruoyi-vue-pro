@@ -116,11 +116,7 @@
 <script setup lang="ts">
 import { useDesign } from '@/hooks/web/useDesign'
 import { dataURLtoBlob } from '@/utils/filt'
-import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElUpload, ElAvatar, ElTooltip, ElSpace } from 'element-plus'
-import { Dialog } from '@/components/Dialog'
-import { CropperImage } from '@/components/Cropper'
 import type { CropendResult, Cropper } from './types'
 import { propTypes } from '@/utils/propTypes'
 

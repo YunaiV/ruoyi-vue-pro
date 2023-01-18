@@ -1,8 +1,6 @@
-import { nextTick, unref } from 'vue'
 import type { NProgressOptions } from 'nprogress'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import { useCssVar } from '@vueuse/core'
 
 const primaryColor = useCssVar('--el-color-primary', document.documentElement)
 
