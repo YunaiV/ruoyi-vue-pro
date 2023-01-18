@@ -6,6 +6,9 @@ import progress from 'vite-plugin-progress'
 import EslintPlugin from 'vite-plugin-eslint'
 import PurgeIcons from 'vite-plugin-purge-icons'
 import { ViteEjsPlugin } from 'vite-plugin-ejs'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import viteCompression from 'vite-plugin-compression'
 import vueSetupExtend from 'vite-plugin-vue-setup-extend'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
@@ -28,6 +31,30 @@ export function createVitePlugins(VITE_APP_TITLE: string) {
     progress(),
     PurgeIcons(),
     vueSetupExtend(),
+    AutoImport({
+      imports: ['vue', 'vue-router', '@vueuse/core'],
+      dts: 'src/types/auto-imports.d.ts',
+      resolvers: [ElementPlusResolver()],
+      eslintrc: {
+        enabled: false, // Default `false`
+        filepath: './.eslintrc-auto-import.json', // Default `./.eslintrc-auto-import.json`
+        globalsPropValue: true // Default `true`, (true | false | 'readonly' | 'readable' | 'writable' | 'writeable')
+      }
+    }),
+    Components({
+      // 要搜索组件的目录的相对路径
+      dirs: ['src/components'],
+      // 组件的有效文件扩展名
+      extensions: ['vue', 'md'],
+      // 搜索子目录
+      deep: true,
+      include: [/\.vue$/, /\.vue\?vue/],
+      // 生成自定义 `auto-components.d.ts` 全局声明
+      dts: 'src/types/auto-components.d.ts',
+      // 自定义组件的解析器
+      resolvers: [ElementPlusResolver()],
+      exclude: [/[\\/]node_modules[\\/]/]
+    }),
     createStyleImportPlugin({
       resolves: [ElementPlusResolve(), VxeTableResolve()],
       libs: [

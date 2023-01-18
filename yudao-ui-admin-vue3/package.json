@@ -1,6 +1,6 @@
 {
   "name": "yudao-ui-admin-vue3",
-  "version": "1.6.6-snapshot.1922",
+  "version": "1.6.6-snapshot.1923",
   "description": "基于vue3、vite4、element-plus、typesScript",
   "author": "xingyu",
   "private": false,
@@ -94,6 +94,8 @@
     "stylelint-order": "^6.0.1",
     "terser": "^5.16.1",
     "typescript": "4.9.4",
+    "unplugin-auto-import": "^0.12.1",
+    "unplugin-vue-components": "^0.22.12",
     "vite": "4.0.4",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-ejs": "^1.6.4",
