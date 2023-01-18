@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.mp.controller.admin.news.vo.MpFreePublishPageReqV
 import cn.iocoder.yudao.module.mp.dal.dataobject.material.MpMaterialDO;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import cn.iocoder.yudao.module.mp.service.material.MpMaterialService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.freepublish.WxMpFreePublishItem;
@@ -32,7 +32,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.*;
 
-@Api(tags = "管理后台 - 公众号发布能力")
+@Tag(name = "管理后台 - 公众号发布能力")
 @RestController
 @RequestMapping("/mp/free-publish")
 @Validated
@@ -45,7 +45,7 @@ public class MpFreePublishController {
     private MpMaterialService mpMaterialService;
 
     @GetMapping("/page")
-    @ApiOperation("获得已发布的图文分页")
+    @Operation(summary = "获得已发布的图文分页")
     @PreAuthorize("@ss.hasPermission('mp:free-publish:query')")
     public CommonResult<PageResult<WxMpFreePublishItem>> getFreePublishPage(MpFreePublishPageReqVO reqVO) {
         // 从公众号查询已发布的图文列表
@@ -81,12 +81,10 @@ public class MpFreePublishController {
     }
 
     @PostMapping("/submit")
-    @ApiOperation("发布草稿")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "accountId", value = "公众号账号的编号", required = true,
-                    example = "1024", dataTypeClass = Long.class),
-            @ApiImplicitParam(name = "mediaId", value = "要发布的草稿的 media_id", required = true,
-                    example = "2048", dataTypeClass = String.class)
+    @Operation(summary = "发布草稿")
+    @Parameters({
+            @Parameter(name = "accountId", description = "公众号账号的编号", required = true, example = "1024"),
+            @Parameter(name = "mediaId", description = "要发布的草稿的 media_id", required = true, example = "2048")
     })
     @PreAuthorize("@ss.hasPermission('mp:free-publish:submit')")
     public CommonResult<String> submitFreePublish(@RequestParam("accountId") Long accountId,
@@ -101,12 +99,10 @@ public class MpFreePublishController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除草稿")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "accountId", value = "公众号账号的编号", required = true,
-                    example = "1024", dataTypeClass = Long.class),
-            @ApiImplicitParam(name = "articleId", value = "发布记录的编号", required = true,
-                    example = "2048", dataTypeClass = String.class)
+    @Operation(summary = "删除草稿")
+    @Parameters({
+            @Parameter(name = "accountId", description = "公众号账号的编号", required = true, example = "1024"),
+            @Parameter(name = "articleId", description = "发布记录的编号", required = true, example = "2048")
     })
     @PreAuthorize("@ss.hasPermission('mp:free-publish:delete')")
     public CommonResult<Boolean> deleteFreePublish(@RequestParam("accountId") Long accountId,

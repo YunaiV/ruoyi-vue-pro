@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.mp.controller.admin.account.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -14,30 +14,30 @@ import javax.validation.constraints.NotEmpty;
 @Data
 public class MpAccountBaseVO {
 
-    @ApiModelProperty(value = "公众号名称", required = true, example = "芋道源码")
+    @Schema(description = "公众号名称", required = true, example = "芋道源码")
     @NotEmpty(message = "公众号名称不能为空")
     private String name;
 
-    @ApiModelProperty(value = "公众号微信号", required = true, example = "yudaoyuanma")
+    @Schema(description = "公众号微信号", required = true, example = "yudaoyuanma")
     @NotEmpty(message = "公众号微信号不能为空")
     private String account;
 
-    @ApiModelProperty(value = "公众号 appId", required = true, example = "wx5b23ba7a5589ecbb")
+    @Schema(description = "公众号 appId", required = true, example = "wx5b23ba7a5589ecbb")
     @NotEmpty(message = "公众号 appId 不能为空")
     private String appId;
 
-    @ApiModelProperty(value = "公众号密钥", required = true, example = "3a7b3b20c537e52e74afd395eb85f61f")
+    @Schema(description = "公众号密钥", required = true, example = "3a7b3b20c537e52e74afd395eb85f61f")
     @NotEmpty(message = "公众号密钥不能为空")
     private String appSecret;
 
-    @ApiModelProperty(value = "公众号 token", required = true, example = "kangdayuzhen")
+    @Schema(description = "公众号 token", required = true, example = "kangdayuzhen")
     @NotEmpty(message = "公众号 token 不能为空")
     private String token;
 
-    @ApiModelProperty(value = "加密密钥", example = "gjN+Ksei")
+    @Schema(description = "加密密钥", example = "gjN+Ksei")
     private String aesKey;
 
-    @ApiModelProperty(value = "备注", example = "请关注芋道源码，学习技术")
+    @Schema(description = "备注", example = "请关注芋道源码，学习技术")
     private String remark;
 
 }
