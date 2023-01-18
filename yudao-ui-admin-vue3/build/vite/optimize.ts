@@ -21,6 +21,7 @@ const include = [
   'vxe-table/es/style',
   'web-storage-cache',
   'element-plus',
+  'element-plus/es',
   'element-plus/es/locale/lang/zh-cn',
   'element-plus/es/locale/lang/en',
   '@iconify/iconify',

@@ -79,17 +79,6 @@
 import { aesEncrypt } from './../utils/ase'
 import { resetSize } from './../utils/util'
 import { getCodeApi, reqCheckApi } from '@/api/login'
-import { useI18n } from '@/hooks/web/useI18n'
-import {
-  computed,
-  onMounted,
-  reactive,
-  ref,
-  watch,
-  nextTick,
-  toRefs,
-  getCurrentInstance
-} from 'vue'
 
 const props = defineProps({
   captchaType: {

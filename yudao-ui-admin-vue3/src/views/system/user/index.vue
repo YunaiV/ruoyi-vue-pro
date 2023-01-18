@@ -261,36 +261,12 @@
   </XModal>
 </template>
 <script setup lang="ts" name="User">
-import { nextTick, onMounted, reactive, ref, unref, watch } from 'vue'
-import {
-  ElTag,
-  ElInput,
-  ElCard,
-  ElTree,
-  ElTreeSelect,
-  ElSelect,
-  ElOption,
-  ElTransfer,
-  ElForm,
-  ElFormItem,
-  ElUpload,
-  ElSwitch,
-  ElCheckbox,
-  ElDropdown,
-  ElDropdownMenu,
-  ElDropdownItem,
-  UploadInstance,
-  UploadRawFile
-} from 'element-plus'
-import { useRouter } from 'vue-router'
+import type { ElTree, UploadRawFile, UploadInstance } from 'element-plus'
 import { handleTree, defaultProps } from '@/utils/tree'
 import download from '@/utils/download'
 import { CommonStatusEnum } from '@/utils/constants'
 import { getAccessToken, getTenantId } from '@/utils/auth'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 import { rules, allSchemas } from './user.data'
 import * as UserApi from '@/api/system/user'
 import { listSimpleDeptApi } from '@/api/system/dept'

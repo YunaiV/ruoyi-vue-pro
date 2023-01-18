@@ -1,4 +1,3 @@
-import { ref, unref } from 'vue'
 import { XTableProps } from '@/components/XTable/src/type'
 
 export interface tableMethod {

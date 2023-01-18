@@ -30,11 +30,7 @@
   </XModal>
 </template>
 <script setup lang="ts">
-import { reactive, ref, unref } from 'vue'
 import { useClipboard } from '@vueuse/core'
-import { ElCard, ElTree, ElTabs, ElTabPane } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
 import { handleTree2 } from '@/utils/tree'
 import { previewCodegenApi } from '@/api/infra/codegen'
 import { CodegenTableVO, CodegenPreviewVO } from '@/api/infra/codegen/types'

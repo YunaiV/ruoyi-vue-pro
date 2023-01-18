@@ -66,7 +66,6 @@ import { resetSize } from './../utils/util'
 import { aesEncrypt } from './../utils/ase'
 import { getCodeApi, reqCheckApi } from '@/api/login'
 import { onMounted, reactive, ref, nextTick, toRefs, getCurrentInstance } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
 
 const props = defineProps({
   //弹出式pop，固定fixed

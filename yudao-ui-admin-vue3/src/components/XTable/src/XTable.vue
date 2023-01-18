@@ -6,15 +6,14 @@
   </VxeGrid>
 </template>
 <script lang="ts" setup name="XTable">
-import { computed, PropType, ref, unref, useAttrs, watch } from 'vue'
+import { PropType } from 'vue'
 import { SizeType, VxeGridInstance } from 'vxe-table'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
 import { XTableProps } from './type'
 import { isBoolean, isFunction } from '@/utils/is'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import download from '@/utils/download'
-import { useI18n } from '@/hooks/web/useI18n'
 
 const { t } = useI18n()
 const message = useMessage() // 消息弹窗
@@ -260,6 +259,10 @@ const getToolBarConfig = (options: XTableProps) => {
       return
     }
   } else if (!topActionSlots) {
+    options.toolbarConfig = {
+      enabled: true
+    }
+  } else {
     options.toolbarConfig = {
       slots: { buttons: 'toolbar_buttons' }
     }

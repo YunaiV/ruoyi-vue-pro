@@ -1,5 +1,3 @@
-import { reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
 import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
 const { t } = useI18n() // 国际化
 

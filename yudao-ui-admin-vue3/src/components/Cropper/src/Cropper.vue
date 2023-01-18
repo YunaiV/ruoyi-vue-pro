@@ -11,21 +11,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import {
-  computed,
-  CSSProperties,
-  onMounted,
-  onUnmounted,
-  PropType,
-  ref,
-  unref,
-  useAttrs
-} from 'vue'
+import { CSSProperties, PropType } from 'vue'
 import Cropper from 'cropperjs'
 import 'cropperjs/dist/cropper.css'
 import { useDesign } from '@/hooks/web/useDesign'
-import { useDebounceFn } from '@vueuse/core'
 import { propTypes } from '@/utils/propTypes'
+import { useDebounceFn } from '@vueuse/core'
 
 type Options = Cropper.Options
 

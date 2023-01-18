@@ -75,13 +75,8 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Dept">
-import { nextTick, onMounted, ref, unref } from 'vue'
-import { ElSelect, ElTreeSelect, ElOption } from 'element-plus'
 import { handleTree, defaultProps } from '@/utils/tree'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 import { allSchemas, rules } from './dept.data'
 import * as DeptApi from '@/api/system/dept'
 import { getListSimpleUsersApi, UserVO } from '@/api/system/user'

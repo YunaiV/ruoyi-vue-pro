@@ -1,4 +1,3 @@
-import { reactive } from 'vue'
 import {
   FormItemRenderOptions,
   VxeColumnPropTypes,
@@ -7,7 +6,7 @@ import {
   VxeTableDefines
 } from 'vxe-table'
 import { eachTree } from 'xe-utils'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { getBoolDictOptions, getDictOptions, getIntDictOptions } from '@/utils/dict'
 import { FormSchema } from '@/types/form'
 import { VxeTableColumn } from '@/types/table'

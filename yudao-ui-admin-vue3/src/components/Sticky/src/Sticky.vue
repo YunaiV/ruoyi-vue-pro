@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { propTypes } from '@/utils/propTypes'
-import { ref, onMounted, onActivated, shallowRef } from 'vue'
-import { useEventListener, useWindowSize, isClient } from '@vueuse/core'
+import { isClient, useEventListener, useWindowSize } from '@vueuse/core'
 import type { CSSProperties } from 'vue'
 const props = defineProps({
   // 距离顶部或者底部的距离(单位px)

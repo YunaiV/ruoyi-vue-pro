@@ -66,12 +66,7 @@
   </XModal>
 </template>
 <script setup lang="ts" name="DataSourceConfig">
-// 全局相关的 import
-import { ref, unref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useXTable } from '@/hooks/web/useXTable'
-import { useMessage } from '@/hooks/web/useMessage'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as DataSourceConfiggApi from '@/api/infra/dataSourceConfig'
 import { rules, allSchemas } from './dataSourceConfig.data'

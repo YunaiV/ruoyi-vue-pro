@@ -1,5 +1,5 @@
 import { Layout } from '@/utils/routerHelper'
-import { useI18n } from '@/hooks/web/useI18n'
+
 const { t } = useI18n()
 /**
 * redirect: noredirect        当设置 noredirect 的时候该路由在面包屑导航中不可被点击
