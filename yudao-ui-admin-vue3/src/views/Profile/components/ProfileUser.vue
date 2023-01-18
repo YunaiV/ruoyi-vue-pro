@@ -40,7 +40,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
 import UserAvatar from './UserAvatar.vue'
 import { useI18n } from '@/hooks/web/useI18n'

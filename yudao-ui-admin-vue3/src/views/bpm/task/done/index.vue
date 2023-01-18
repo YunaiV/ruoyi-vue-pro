@@ -7,7 +7,6 @@ import { useI18n } from '@/hooks/web/useI18n'
 import type { TaskDoneVO } from '@/api/bpm/task/types'
 import { allSchemas } from './done.data'
 import * as TaskDoneApi from '@/api/bpm/task'
-import { useRouter } from 'vue-router'
 dayjs.extend(duration)
 const { t } = useI18n() // 国际化
 const { push } = useRouter()

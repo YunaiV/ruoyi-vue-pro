@@ -159,18 +159,7 @@
 </template>
 <script setup lang="ts" name="FileConfig">
 // 全局相关的 import
-import { ref } from 'vue'
-import {
-  ElForm,
-  ElFormItem,
-  FormInstance,
-  ElSelect,
-  ElOption,
-  ElInput,
-  ElInputNumber,
-  ElRadio,
-  ElRadioGroup
-} from 'element-plus'
+import type { FormInstance } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useXTable } from '@/hooks/web/useXTable'

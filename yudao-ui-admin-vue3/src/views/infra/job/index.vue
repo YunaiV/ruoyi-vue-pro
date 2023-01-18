@@ -129,14 +129,10 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Job">
-import { ref, unref } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useXTable } from '@/hooks/web/useXTable'
-import { FormExpose } from '@/components/Form'
-import { Crontab } from '@/components/Crontab'
+import type { FormExpose } from '@/components/Form'
 import * as JobApi from '@/api/infra/job'
 import { rules, allSchemas } from './job.data'
 import { InfraJobStatusEnum } from '@/utils/constants'

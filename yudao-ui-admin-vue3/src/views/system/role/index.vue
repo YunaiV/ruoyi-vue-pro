@@ -148,18 +148,8 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Role">
-import { onMounted, reactive, ref, unref } from 'vue'
-import {
-  ElForm,
-  ElFormItem,
-  ElSelect,
-  ElOption,
-  ElTree,
-  ElCard,
-  ElSwitch,
-  ElTag
-} from 'element-plus'
-import { FormExpose } from '@/components/Form'
+import type { ElTree } from 'element-plus'
+import type { FormExpose } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useXTable } from '@/hooks/web/useXTable'

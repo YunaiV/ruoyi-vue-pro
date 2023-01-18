@@ -16,7 +16,7 @@ import type { FormRules } from 'element-plus'
 import { ElMessage, ElRadioGroup, ElRadio } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { FormSchema } from '@/types/form'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 import {
   getUserProfileApi,
   updateUserProfileApi,

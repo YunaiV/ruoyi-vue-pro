@@ -32,7 +32,6 @@
 </template>
 <script setup lang="ts" name="SmsLog">
 // 全局相关的 import
-import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useXTable } from '@/hooks/web/useXTable'
 import { allSchemas } from './sms.log.data'

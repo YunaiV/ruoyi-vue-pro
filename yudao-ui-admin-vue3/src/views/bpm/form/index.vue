@@ -1,11 +1,10 @@
 <script setup lang="ts" name="Form">
-import { ref, unref } from 'vue'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 import type { FormVO } from '@/api/bpm/form/types'
 import { rules, allSchemas } from './form.data'
 import * as FormApi from '@/api/bpm/form'

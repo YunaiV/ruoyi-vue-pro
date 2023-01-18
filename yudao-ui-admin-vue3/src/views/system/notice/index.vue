@@ -72,15 +72,13 @@
 </template>
 <script setup lang="ts" name="Notice">
 // 全局相关的 import
-import { ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useXTable } from '@/hooks/web/useXTable'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as NoticeApi from '@/api/system/notice'
 import { rules, allSchemas } from './notice.data'
-import { Editor } from '@/components/Editor'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗

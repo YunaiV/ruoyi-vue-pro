@@ -128,27 +128,14 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { reactive, ref, unref, onMounted, computed, watch } from 'vue'
+import { ElLoading } from 'element-plus'
 import LoginFormTitle from './LoginFormTitle.vue'
-import {
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElCheckbox,
-  ElCol,
-  ElLink,
-  ElRow,
-  ElDivider,
-  ElLoading
-} from 'element-plus'
-import { useRouter } from 'vue-router'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useIcon } from '@/hooks/web/useIcon'
 import { useMessage } from '@/hooks/web/useMessage'
 import { required } from '@/utils/formRules'
 import * as authUtil from '@/utils/auth'
-import { Verify } from '@/components/Verifition'
 import { usePermissionStore } from '@/store/modules/permission'
 import * as LoginApi from '@/api/login'
 import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'

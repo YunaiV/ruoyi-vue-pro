@@ -92,9 +92,6 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { reactive, ref, unref, watch, computed } from 'vue'
-import { ElForm, ElFormItem, ElInput, ElRow, ElCol } from 'element-plus'
-import { useRouter } from 'vue-router'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useIcon } from '@/hooks/web/useIcon'

@@ -1,11 +1,10 @@
 <script setup lang="ts" name="Group">
-import { ref, unref, onMounted } from 'vue'
 import dayjs from 'dayjs'
-import { ElMessage, ElSelect, ElOption } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
 import { useI18n } from '@/hooks/web/useI18n'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 import type { UserGroupVO } from '@/api/bpm/userGroup/types'
 import { rules, allSchemas } from './group.data'
 import * as UserGroupApi from '@/api/bpm/userGroup'

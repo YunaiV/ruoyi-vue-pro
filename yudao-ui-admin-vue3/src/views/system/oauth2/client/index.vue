@@ -131,12 +131,10 @@
 </template>
 <script setup lang="ts" name="Client">
 // 全局相关的 import
-import { ref, unref } from 'vue'
-import { ElTag } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useXTable } from '@/hooks/web/useXTable'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as ClientApi from '@/api/system/oauth2/client'
 import { rules, allSchemas } from './client.data'

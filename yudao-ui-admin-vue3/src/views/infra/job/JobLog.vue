@@ -48,7 +48,6 @@
   </XModal>
 </template>
 <script setup lang="ts" name="JobLog">
-import { ref } from 'vue'
 import dayjs from 'dayjs'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useXTable } from '@/hooks/web/useXTable'

@@ -2,10 +2,9 @@
   <Form :rules="rules" @register="register" />
 </template>
 <script setup lang="ts">
-import { onMounted, PropType, reactive, ref, watch } from 'vue'
+import { PropType } from 'vue'
 import { required } from '@/utils/formRules'
 import { useForm } from '@/hooks/web/useForm'
-import { Form } from '@/components/Form'
 import { FormSchema } from '@/types/form'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'

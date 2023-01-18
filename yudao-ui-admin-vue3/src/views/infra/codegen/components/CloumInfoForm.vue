@@ -111,7 +111,7 @@
   </vxe-table>
 </template>
 <script setup lang="ts">
-import { onMounted, PropType, ref } from 'vue'
+import { PropType } from 'vue'
 import { DictTypeVO } from '@/api/system/dict/types'
 import { CodegenColumnVO } from '@/api/infra/codegen/types'
 import { listSimpleDictTypeApi } from '@/api/system/dict/dict.type'

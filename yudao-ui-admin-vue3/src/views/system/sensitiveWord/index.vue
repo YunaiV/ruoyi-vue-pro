@@ -103,12 +103,10 @@
   </XModal>
 </template>
 <script setup lang="ts" name="SensitiveWord">
-import { onMounted, ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useXTable } from '@/hooks/web/useXTable'
-import { FormExpose } from '@/components/Form'
-import { ElTag, ElSelect, ElOption } from 'element-plus'
+import type { FormExpose } from '@/components/Form'
 import * as SensitiveWordApi from '@/api/system/sensitiveWord'
 import { rules, allSchemas } from './sensitiveWord.data'
 

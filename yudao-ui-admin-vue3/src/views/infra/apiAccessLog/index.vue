@@ -36,7 +36,6 @@
   </XModal>
 </template>
 <script setup lang="ts" name="ApiAccessLog">
-import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useXTable } from '@/hooks/web/useXTable'
 import { allSchemas } from './apiAccessLog.data'

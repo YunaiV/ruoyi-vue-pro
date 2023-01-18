@@ -122,13 +122,11 @@
   </div>
 </template>
 <script setup lang="ts" name="Dict">
-import { ref, unref, reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useXTable } from '@/hooks/web/useXTable'
 import { VxeTableEvents } from 'vxe-table'
-import { FormExpose } from '@/components/Form'
-import { ElInput, ElTag, ElCard } from 'element-plus'
+import type { FormExpose } from '@/components/Form'
 import * as DictTypeSchemas from './dict.type'
 import * as DictDataSchemas from './dict.data'
 import * as DictTypeApi from '@/api/system/dict/dict.type'

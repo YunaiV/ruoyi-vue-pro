@@ -1,4 +1,3 @@
-import { reactive } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { required } from '@/utils/formRules'
 import { DICT_TYPE } from '@/utils/dict'
