@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.swagger.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -8,7 +9,6 @@ import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.*;
 import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
 import org.springdoc.core.customizers.ServerBaseUrlCustomizer;
@@ -19,7 +19,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
@@ -36,29 +38,14 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
 public class YudaoSwaggerAutoConfiguration {
 
     @Bean
-    public OpenAPI createRestApi(SwaggerProperties properties) {
-        //信息
-        Info info = new Info()
-                .title(properties.getTitle())
-                .description(properties.getDescription())
-                .version(properties.getVersion())
-                .contact(new Contact().name(properties.getAuthor()).url(properties.getUrl()).email(properties.getEmail()))
-                .license(new License().name(properties.getLicense()).url(properties.getLicenseUrl()));
-        return new OpenAPI()
-                .info(info)
-                .schemaRequirement(HttpHeaders.AUTHORIZATION, securityScheme())
+    public OpenAPI createApi(SwaggerProperties properties) {
+        Map<String, SecurityScheme> maps = securityScheme();
+        OpenAPI openAPI = new OpenAPI()
+                .info(buildInfo(properties))
+                .components(new Components().securitySchemes(maps))
                 .addSecurityItem(new SecurityRequirement().addList(HttpHeaders.AUTHORIZATION));
-    }
-
-    private SecurityScheme securityScheme() {
-        SecurityScheme securityScheme = new SecurityScheme();
-        //类型
-        securityScheme.setType(SecurityScheme.Type.APIKEY);
-        //请求头的name
-        securityScheme.setName(HttpHeaders.AUTHORIZATION);
-        //token所在未知
-        securityScheme.setIn(SecurityScheme.In.HEADER);
-        return securityScheme;
+        maps.keySet().forEach(key -> openAPI.addSecurityItem(new SecurityRequirement().addList(key)));
+        return openAPI;
     }
 
     /**
@@ -97,6 +84,38 @@ public class YudaoSwaggerAutoConfiguration {
                 .build();
     }
 
+    /**
+     * API 摘要信息
+     */
+    private Info buildInfo(SwaggerProperties properties) {
+        return new Info()
+                .title(properties.getTitle())
+                .description(properties.getDescription())
+                .version(properties.getVersion())
+                .contact(new Contact().name(properties.getAuthor()).url(properties.getUrl()).email(properties.getEmail()))
+                .license(new License().name(properties.getLicense()).url(properties.getLicenseUrl()));
+    }
+
+    /**
+     * 安全模式，这里配置通过请求头 Authorization 传递 token 参数
+     */
+    private Map<String, SecurityScheme> securityScheme() {
+        Map<String, SecurityScheme> map = new HashMap<>();
+        SecurityScheme securityScheme = new SecurityScheme()
+                //类型
+                .type(SecurityScheme.Type.APIKEY)
+                //请求头的name
+                .name(HttpHeaders.AUTHORIZATION)
+                //token所在未知
+                .in(SecurityScheme.In.HEADER);
+        map.put(HttpHeaders.AUTHORIZATION, securityScheme);
+        return map;
+    }
+
+    /**
+     * globalHeaderParameter
+     * @return 多租户参数
+     */
     private static Parameter globalHeaderParameter() {
         return new Parameter()
                 .name(HEADER_TENANT_ID)
