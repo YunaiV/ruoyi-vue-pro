@@ -260,6 +260,10 @@ const getToolBarConfig = (options: XTableProps) => {
     }
   } else if (!topActionSlots) {
     options.toolbarConfig = {
+      enabled: true
+    }
+  } else {
+    options.toolbarConfig = {
       slots: { buttons: 'toolbar_buttons' }
     }
   }
