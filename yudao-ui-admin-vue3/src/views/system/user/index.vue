@@ -8,17 +8,19 @@
         </div>
       </template>
       <el-input v-model="filterText" placeholder="搜索部门" />
-      <el-tree
-        ref="treeRef"
-        node-key="id"
-        default-expand-all
-        :data="deptOptions"
-        :props="defaultProps"
-        :highlight-current="true"
-        :filter-node-method="filterNode"
-        :expand-on-click-node="false"
-        @node-click="handleDeptNodeClick"
-      />
+      <el-scrollbar height="650">
+        <el-tree
+          ref="treeRef"
+          node-key="id"
+          default-expand-all
+          :data="deptOptions"
+          :props="defaultProps"
+          :highlight-current="true"
+          :filter-node-method="filterNode"
+          :expand-on-click-node="false"
+          @node-click="handleDeptNodeClick"
+        />
+      </el-scrollbar>
     </el-card>
     <el-card class="w-4/5 user" style="margin-left: 10px" :gutter="12" shadow="hover">
       <template #header>
@@ -534,8 +536,8 @@ onMounted(async () => {
 
 <style scoped>
 .user {
-  height: 900px;
-  max-height: 960px;
+  height: 780px;
+  max-height: 800px;
 }
 .card-header {
   display: flex;
