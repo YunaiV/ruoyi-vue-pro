@@ -91,13 +91,8 @@ const [registerTable, { deleteData }] = useXTable({
 
 // 新增操作
 const handleCreate = () => {
-  console.log('新增')
-  if (true) {
-    message.success('动态表单开发中，预计 2 月底完成')
-    return
-  }
   router.push({
-    path: '/manager/form/edit'
+    name: 'bpmFormEditor'
   })
 }
 
