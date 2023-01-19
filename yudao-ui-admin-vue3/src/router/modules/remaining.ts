@@ -177,6 +177,39 @@ const remainingRouter: AppRouteRecordRaw[] = [
       title: '500',
       noTagsView: true
     }
+  },
+  {
+    path: '/bpm',
+    component: Layout,
+    name: 'bpm',
+    meta: {
+      hidden: true
+    },
+    children: [
+      {
+        path: '/manager/definition',
+        component: () => import('@/views/bpm/definition/index.vue'),
+        name: 'BpmProcessDefinitionList',
+        meta: {
+          noCache: true,
+          hidden: true,
+          canTo: true,
+          title: '流程定义',
+          activeMenu: 'bpm/definition/index'
+        }
+      },
+      {
+        path: '/manager/task-assign-rule',
+        component: () => import('@/views/bpm/taskAssignRule/index.vue'),
+        name: 'BpmTaskAssignRuleList',
+        meta: {
+          noCache: true,
+          hidden: true,
+          canTo: true,
+          title: '任务分配规则'
+        }
+      }
+    ]
   }
 ]
 
