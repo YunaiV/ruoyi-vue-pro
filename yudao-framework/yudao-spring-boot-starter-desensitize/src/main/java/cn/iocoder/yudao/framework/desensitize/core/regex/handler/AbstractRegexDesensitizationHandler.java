@@ -9,13 +9,13 @@ import java.lang.annotation.Annotation;
  *
  * @author gaibu
  */
-public abstract class AbstractRegexDesensitizationHandler<T extends Annotation> implements DesensitizationHandler<T> {
+public abstract class AbstractRegexDesensitizationHandler<T extends Annotation>
+        implements DesensitizationHandler<T> {
 
     @Override
     public String desensitize(String origin, T annotation) {
         String regex = getRegex(annotation);
         String replacer = getReplacer(annotation);
-
         return origin.replaceAll(regex, replacer);
     }
 
@@ -34,4 +34,5 @@ public abstract class AbstractRegexDesensitizationHandler<T extends Annotation> 
      * @return 待替换的字符串
      */
     abstract String getReplacer(T annotation);
+
 }

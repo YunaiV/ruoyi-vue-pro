@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.desensitize.core.slider.annotation;
 
 import cn.iocoder.yudao.framework.desensitize.core.base.annotation.DesensitizeBy;
-import cn.iocoder.yudao.framework.desensitize.core.slider.handler.PhoneNumberDesensitization;
+import cn.iocoder.yudao.framework.desensitize.core.slider.handler.MobileDesensitization;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 
 import java.lang.annotation.Documented;
@@ -19,8 +19,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@DesensitizeBy(handler = PhoneNumberDesensitization.class)
-public @interface PhoneNumber {
+@DesensitizeBy(handler = MobileDesensitization.class)
+public @interface Mobile {
 
     /**
      * 前缀保留长度

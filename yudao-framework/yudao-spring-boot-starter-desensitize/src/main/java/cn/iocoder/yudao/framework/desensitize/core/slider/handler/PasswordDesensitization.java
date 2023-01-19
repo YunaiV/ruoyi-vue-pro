@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.Password;
 
 /**
- * 密码脱敏处理器
+ * {@link Password} 的码脱敏处理器
  *
  * @author gaibu
  */

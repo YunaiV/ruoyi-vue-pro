@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.BankCard;
 
 /**
- * 银行卡脱敏处理器
+ * {@link BankCard} 的脱敏处理器
  *
  * @author gaibu
  */

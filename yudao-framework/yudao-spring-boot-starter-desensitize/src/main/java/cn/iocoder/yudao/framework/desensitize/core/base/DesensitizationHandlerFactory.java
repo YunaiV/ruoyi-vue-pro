@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.desensitize.core.base;
 
+import cn.hutool.Hutool;
+import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler;
 
@@ -18,11 +20,13 @@ public class DesensitizationHandlerFactory {
      */
     private static final Map<Class<? extends DesensitizationHandler>, DesensitizationHandler> HANDLER_MAP = new ConcurrentHashMap<Class<? extends DesensitizationHandler>, DesensitizationHandler>();
 
+    // TODO @唐：可以考虑，使用 hutool 提供的 Singleton.get()
     public static DesensitizationHandler getDesensitizationHandler(Class<? extends DesensitizationHandler> clazz) {
         DesensitizationHandler handler = HANDLER_MAP.get(clazz);
         if (handler != null) {
             return handler;
         }
+        // 不存在，则进行创建
         synchronized (DesensitizationHandlerFactory.class) {
             handler = HANDLER_MAP.get(clazz);
             // 双重校验锁

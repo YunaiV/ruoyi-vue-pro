@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.CarLicense;
 
 /**
- * 车牌号脱敏处理器
+ * {@link CarLicense} 的脱敏处理器
  *
  * @author gaibu
  */

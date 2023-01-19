@@ -33,7 +33,9 @@ public @interface Password {
     int suffixKeep() default 0;
 
     /**
-     * 替换规则，密码;比如：123456脱敏之后为******
+     * 替换规则，密码;
+     *
+     * 比如：123456脱敏之后为******
      */
     String replacer() default "*";
 

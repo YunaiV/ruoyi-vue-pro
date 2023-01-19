@@ -1,29 +1,33 @@
-package cn.iocoder.yudao.framework.desensitize.core.slider;
+package cn.iocoder.yudao.framework.desensitize.core;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.Email;
 import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.Regex;
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.Address;
+import cn.iocoder.yudao.framework.desensitize.core.annotation.Address;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.BankCard;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.CarLicense;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.ChineseName;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.FixedPhone;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.IdCard;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.Password;
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.PhoneNumber;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.Mobile;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.Slider;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * {@link DesensitizeTest} 的单元测试
+ */
 public class DesensitizeTest extends BaseMockitoUnitTest {
 
     @Test
     public void test() {
+        // 准备参数
         DesensitizeDemo desensitizeDemo = new DesensitizeDemo();
-        desensitizeDemo.setUserName("芋道源码");
+        desensitizeDemo.setNickname("芋道源码");
         desensitizeDemo.setBankCard("9988002866797031");
         desensitizeDemo.setCarLicense("粤A66666");
         desensitizeDemo.setFixedPhone("01086551122");
@@ -33,13 +37,16 @@ public class DesensitizeTest extends BaseMockitoUnitTest {
         desensitizeDemo.setSlider1("ABCDEFG");
         desensitizeDemo.setSlider2("ABCDEFG");
         desensitizeDemo.setSlider3("ABCDEFG");
-        desensitizeDemo.setEmail("1@eamil.com");
+        desensitizeDemo.setEmail("1@email.com");
         desensitizeDemo.setRegex("你好，我是芋道源码");
         desensitizeDemo.setAddress("北京市海淀区上地十街10号");
         desensitizeDemo.setOrigin("芋道源码");
 
+        // 调用
         DesensitizeDemo d = JsonUtils.parseObject(JsonUtils.toJsonString(desensitizeDemo), DesensitizeDemo.class);
-        assertEquals("芋***", d.getUserName());
+        // 断言
+        assertNotNull(d);
+        assertEquals("芋***", d.getNickname());
         assertEquals("998800********31", d.getBankCard());
         assertEquals("粤A6***6", d.getCarLicense());
         assertEquals("0108*****22", d.getFixedPhone());
@@ -49,7 +56,7 @@ public class DesensitizeTest extends BaseMockitoUnitTest {
         assertEquals("#######", d.getSlider1());
         assertEquals("ABC*EFG", d.getSlider2());
         assertEquals("*******", d.getSlider3());
-        assertEquals("1****@eamil.com", d.getEmail());
+        assertEquals("1****@email.com", d.getEmail());
         assertEquals("你好，我是*", d.getRegex());
         assertEquals("北京市海淀区上地十街10号*", d.getAddress());
         assertEquals("芋道源码", d.getOrigin());
@@ -57,8 +64,9 @@ public class DesensitizeTest extends BaseMockitoUnitTest {
 
     @Data
     public static class DesensitizeDemo {
+
         @ChineseName
-        private String userName;
+        private String nickname;
         @BankCard
         private String bankCard;
         @CarLicense
@@ -69,20 +77,22 @@ public class DesensitizeTest extends BaseMockitoUnitTest {
         private String idCard;
         @Password
         private String password;
-        @PhoneNumber
+        @Mobile
         private String phoneNumber;
-        @Slider(prefixKeep = 6,suffixKeep = 1,replacer = "#")
+        @Slider(prefixKeep = 6, suffixKeep = 1, replacer = "#")
         private String slider1;
-        @Slider(prefixKeep = 3,suffixKeep = 3)
+        @Slider(prefixKeep = 3, suffixKeep = 3)
         private String slider2;
         @Slider(prefixKeep = 10)
         private String slider3;
         @Email
         private String email;
-        @Regex(regex = "芋道源码",replacer = "*")
+        @Regex(regex = "芋道源码", replacer = "*")
         private String regex;
         @Address
         private String address;
         private String origin;
+
     }
+
 }

@@ -3,12 +3,11 @@ package cn.iocoder.yudao.framework.desensitize.core.regex.handler;
 import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.Regex;
 
 /**
- * 默认正则脱敏处理器
+ * {@link Regex} 的正则脱敏处理器
  *
  * @author gaibu
  */
 public class DefaultRegexDesensitizationHandler extends AbstractRegexDesensitizationHandler<Regex> {
-
 
     @Override
     String getRegex(Regex annotation) {

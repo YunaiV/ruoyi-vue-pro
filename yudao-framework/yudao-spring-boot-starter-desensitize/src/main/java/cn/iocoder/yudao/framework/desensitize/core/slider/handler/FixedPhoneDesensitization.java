@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.FixedPhone;
 
 /**
- * 固定电话脱敏处理器
+ * {@link FixedPhone} 的脱敏处理器
  *
  * @author gaibu
  */

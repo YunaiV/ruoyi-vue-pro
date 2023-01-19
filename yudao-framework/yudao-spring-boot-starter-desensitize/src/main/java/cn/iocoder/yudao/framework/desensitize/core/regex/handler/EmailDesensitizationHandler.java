@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.desensitize.core.regex.handler;
 import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.Email;
 
 /**
- * 邮箱脱敏处理器
+ * {@link Email} 的脱敏处理器
  *
  * @author gaibu
  */
@@ -18,4 +18,5 @@ public class EmailDesensitizationHandler extends AbstractRegexDesensitizationHan
     String getReplacer(Email annotation) {
         return annotation.replacer();
     }
+
 }

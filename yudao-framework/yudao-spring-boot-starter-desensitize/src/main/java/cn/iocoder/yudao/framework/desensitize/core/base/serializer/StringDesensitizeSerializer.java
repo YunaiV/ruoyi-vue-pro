@@ -24,8 +24,11 @@ import java.lang.reflect.Field;
 /**
  * 脱敏序列化器
  *
+ * 实现 JSON 返回数据时，使用 {@link DesensitizationHandler} 对声明脱敏注解的字段，进行脱敏处理。
+ *
  * @author gaibu
  */
+@SuppressWarnings("rawtypes")
 public class StringDesensitizeSerializer extends StdSerializer<String> implements ContextualSerializer {
 
     @Getter
@@ -37,17 +40,19 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
     }
 
     @Override
-    public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) throws JsonMappingException {
+    public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) {
         DesensitizeBy annotation = beanProperty.getAnnotation(DesensitizeBy.class);
         if (annotation == null) {
             return this;
         }
+        // 创建一个 StringDesensitizeSerializer 对象，使用 DesensitizeBy 对应的处理器
         StringDesensitizeSerializer serializer = new StringDesensitizeSerializer();
         serializer.setDesensitizationHandler(DesensitizationHandlerFactory.getDesensitizationHandler(annotation.handler()));
         return serializer;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializerProvider) throws IOException {
         if (StrUtil.isBlank(value)) {
             gen.writeNull();
@@ -75,12 +80,12 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
     /**
      * 获取字段
      *
-     * @param gen JsonGenerator
+     * @param generator JsonGenerator
      * @return 字段
      */
-    private Field getField(JsonGenerator gen) {
-        String currentName = gen.getOutputContext().getCurrentName();
-        Object currentValue = gen.getCurrentValue();
+    private Field getField(JsonGenerator generator) {
+        String currentName = generator.getOutputContext().getCurrentName();
+        Object currentValue = generator.getCurrentValue();
         Class<?> currentValueClass = currentValue.getClass();
         return ReflectUtil.getField(currentValueClass, currentName);
     }

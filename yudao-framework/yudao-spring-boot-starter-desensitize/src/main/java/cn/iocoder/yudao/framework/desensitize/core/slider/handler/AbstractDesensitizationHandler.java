@@ -9,7 +9,8 @@ import java.lang.annotation.Annotation;
  *
  * @author gaibu
  */
-public abstract class AbstractDesensitizationHandler<T extends Annotation> implements DesensitizationHandler<T> {
+public abstract class AbstractDesensitizationHandler<T extends Annotation>
+        implements DesensitizationHandler<T> {
 
     @Override
     public String desensitize(String origin, T annotation) {
@@ -36,6 +37,21 @@ public abstract class AbstractDesensitizationHandler<T extends Annotation> imple
     }
 
     /**
+     * 根据长度循环构建替换符
+     *
+     * @param replacer 替换符
+     * @param length   长度
+     * @return 构建后的替换符
+     */
+    private String buildReplacerByLength(String replacer, int length) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            builder.append(replacer);
+        }
+        return builder.toString();
+    }
+
+    /**
      * 前缀保留长度
      *
      * @param annotation 注解信息
@@ -58,20 +74,5 @@ public abstract class AbstractDesensitizationHandler<T extends Annotation> imple
      * @return 替换符
      */
     abstract String getReplacer(T annotation);
-
-    /**
-     * 根据长度循环构建替换符
-     *
-     * @param replacer 替换符
-     * @param length   长度
-     * @return 构建后的替换符
-     */
-    private String buildReplacerByLength(String replacer, int length) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            builder.append(replacer);
-        }
-        return builder.toString();
-    }
 
 }
