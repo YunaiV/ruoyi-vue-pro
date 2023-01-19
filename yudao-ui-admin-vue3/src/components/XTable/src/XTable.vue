@@ -255,16 +255,17 @@ const getToolBarConfig = (options: XTableProps) => {
   if (toolbarConfig) return
   if (toolBar) {
     if (!isBoolean(toolBar)) {
+      console.info(2)
       options.toolbarConfig = toolBar
       return
     }
-  } else if (!topActionSlots) {
+  } else if (topActionSlots != false) {
     options.toolbarConfig = {
-      enabled: true
+      slots: { buttons: 'toolbar_buttons' }
     }
   } else {
     options.toolbarConfig = {
-      slots: { buttons: 'toolbar_buttons' }
+      enabled: true
     }
   }
 }
