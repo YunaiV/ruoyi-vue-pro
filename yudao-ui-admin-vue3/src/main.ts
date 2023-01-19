@@ -13,11 +13,14 @@ import { setupStore } from '@/store'
 // 全局组件
 import { setupGlobCom } from '@/components'
 
-// 引入element-plus
+// 引入 element-plus
 import { setupElementPlus } from '@/plugins/elementPlus'
 
-// 引入vxe-table
+// 引入 vxe-table
 import { setupVxeTable } from '@/plugins/vxeTable'
+
+// 引入 form-create
+import { setupFormCreate } from '@/plugins/formCreate'
 
 // 引入全局样式
 import '@/styles/index.scss'
@@ -39,6 +42,7 @@ import './permission'
 
 import { isDevMode } from '@/utils/env'
 
+// 本地开发模式 全局引入 element-plus 样式，加快第一次进入速度
 if (isDevMode()) {
   console.info(isDevMode())
   import('element-plus/dist/index.css')
@@ -57,6 +61,8 @@ const setupAll = async () => {
   setupElementPlus(app)
 
   setupVxeTable(app)
+
+  setupFormCreate(app)
 
   setupRouter(app)
 

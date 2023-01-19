@@ -24,6 +24,8 @@
     "lint:pretty": "pretty-quick --staged"
   },
   "dependencies": {
+    "@form-create/designer": "^3.1.0",
+    "@form-create/element-ui": "^3.1.17",
     "@iconify/iconify": "^3.0.1",
     "@vueuse/core": "^9.11.0",
     "@wangeditor/editor": "^5.1.23",
