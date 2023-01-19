@@ -1,4 +1,5 @@
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
+import { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
+
 const { t } = useI18n() // 国际化
 
 // 表单校验
@@ -7,52 +8,33 @@ export const rules = reactive({
 })
 
 // CrudSchema
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: 'seq',
+  primaryTitle: '表单编号',
+  action: true,
+  columns: [
+    {
+      title: '表单名',
+      field: 'name',
+      isSearch: true
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '表单名',
-    field: 'name',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: t('common.status'),
-    field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS,
-    dictClass: 'number'
-  },
-  {
-    label: '备注',
-    field: 'remark'
-  },
-  {
-    label: t('common.createTime'),
-    field: 'createTime',
-    form: {
-      show: false
-    }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '240px',
-    form: {
-      show: false
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      dictClass: 'number'
     },
-    detail: {
-      show: false
+    {
+      title: '备注',
+      field: 'remark'
+    },
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate',
+      isForm: false
     }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)
