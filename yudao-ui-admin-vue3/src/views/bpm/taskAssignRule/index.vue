@@ -62,14 +62,14 @@
           span="24"
           v-if="formData.type === 20 || formData.type === 21"
         >
-          <treeselect
+          <el-tree-select
+            ref="treeRef"
             v-model="formData.deptIds"
-            :options="deptTreeOptions"
-            multiple
-            flat
-            :defaultExpandLevel="3"
-            placeholder="请选择指定部门"
-            :normalizer="normalizer"
+            node-key="id"
+            show-checkbox
+            :props="defaultProps"
+            :data="deptTreeOptions"
+            empty-text="加载中，请稍后"
           />
         </el-form-item>
         <el-form-item label="指定岗位" prop="postIds" span="24" v-if="formData.type === 22">
@@ -127,18 +127,13 @@
 </template>
 <script setup lang="ts" name="TaskAssignRule">
 // 全局相关的 import
-import { onMounted, reactive, ref } from 'vue'
-import { ElInput, ElTag, ElOption, ElSelect, ElForm, ElFormItem } from 'element-plus'
 import type { FormInstance } from 'element-plus'
 
 // 业务相关的 import
-import Treeselect from 'vue3-treeselect'
-import 'vue3-treeselect/dist/vue3-treeselect.css'
-import { useXTable } from '@/hooks/web/useXTable'
 import { allSchemas } from './taskAssignRule.data'
 import * as TaskAssignRuleApi from '@/api/bpm/taskAssignRule'
 import { listSimpleRolesApi } from '@/api/system/role'
-import { handleTree } from '@/utils/tree'
+import { handleTree, defaultProps } from '@/utils/tree'
 import { listSimplePostsApi } from '@/api/system/post'
 import { getListSimpleUsersApi } from '@/api/system/user'
 import { listSimpleUserGroupsApi } from '@/api/bpm/userGroup'
@@ -168,7 +163,7 @@ const [registerTable] = useXTable({
   allSchemas: allSchemas,
   params: queryParams,
   getListApi: TaskAssignRuleApi.getTaskAssignRuleList,
-  isList: false // TODO 如果 isList 改成 true 时，进入页面不会加载数据
+  isList: true
 })
 // 修改任务责任表单
 const xForm = ref<FormInstance>()
@@ -266,14 +261,6 @@ const getAssignRuleOptionName = (type, option) => {
     }
   }
   return '未知(' + option + ')'
-}
-// 格式化部门的下拉框
-const normalizer = (node) => {
-  return {
-    id: node.id,
-    label: node.name,
-    children: node.children
-  }
 }
 
 // ========== 初始化 ==========
