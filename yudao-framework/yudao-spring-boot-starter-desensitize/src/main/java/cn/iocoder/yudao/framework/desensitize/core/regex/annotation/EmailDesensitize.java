@@ -10,7 +10,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// TODO @唐：名字还是 Email=》EmailDesensitize 合适一点，避免和 Validator 的注解有点冲突
 /**
  * 邮箱脱敏注解
  *
@@ -21,7 +20,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
 @DesensitizeBy(handler = EmailDesensitizationHandler.class)
-public @interface Email {
+public @interface EmailDesensitize {
 
     /**
      * 匹配的正则表达式

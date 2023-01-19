@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.framework.desensitize.core.base.serializer;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.desensitize.core.base.annotation.DesensitizeBy;
 import cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler;
-import cn.iocoder.yudao.framework.desensitize.core.base.DesensitizationHandlerFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
@@ -47,7 +46,7 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
         }
         // 创建一个 StringDesensitizeSerializer 对象，使用 DesensitizeBy 对应的处理器
         StringDesensitizeSerializer serializer = new StringDesensitizeSerializer();
-        serializer.setDesensitizationHandler(DesensitizationHandlerFactory.getDesensitizationHandler(annotation.handler()));
+        serializer.setDesensitizationHandler(Singleton.get(annotation.handler()));
         return serializer;
     }
 

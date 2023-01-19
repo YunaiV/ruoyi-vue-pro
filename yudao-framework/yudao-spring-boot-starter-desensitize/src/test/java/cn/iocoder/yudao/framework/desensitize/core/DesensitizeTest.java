@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.desensitize.core;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.Email;
+import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.EmailDesensitize;
 import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.Regex;
 import cn.iocoder.yudao.framework.desensitize.core.annotation.Address;
 import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.BankCard;
@@ -85,7 +85,7 @@ public class DesensitizeTest extends BaseMockitoUnitTest {
         private String slider2;
         @Slider(prefixKeep = 10)
         private String slider3;
-        @Email
+        @EmailDesensitize
         private String email;
         @Regex(regex = "芋道源码", replacer = "*")
         private String regex;
