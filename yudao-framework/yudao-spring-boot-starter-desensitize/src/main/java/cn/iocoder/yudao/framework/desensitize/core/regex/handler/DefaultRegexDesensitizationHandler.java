@@ -1,21 +1,21 @@
 package cn.iocoder.yudao.framework.desensitize.core.regex.handler;
 
-import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.Regex;
+import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.RegexDesensitize;
 
 /**
- * {@link Regex} 的正则脱敏处理器
+ * {@link RegexDesensitize} 的正则脱敏处理器
  *
  * @author gaibu
  */
-public class DefaultRegexDesensitizationHandler extends AbstractRegexDesensitizationHandler<Regex> {
+public class DefaultRegexDesensitizationHandler extends AbstractRegexDesensitizationHandler<RegexDesensitize> {
 
     @Override
-    String getRegex(Regex annotation) {
+    String getRegex(RegexDesensitize annotation) {
         return annotation.regex();
     }
 
     @Override
-    String getReplacer(Regex annotation) {
+    String getReplacer(RegexDesensitize annotation) {
         return annotation.replacer();
     }
 }

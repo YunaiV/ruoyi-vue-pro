@@ -1,26 +1,26 @@
 package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.BankCard;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.BankCardDesensitize;
 
 /**
- * {@link BankCard} 的脱敏处理器
+ * {@link BankCardDesensitize} 的脱敏处理器
  *
  * @author gaibu
  */
-public class BankCardDesensitization extends AbstractDesensitizationHandler<BankCard> {
+public class BankCardDesensitization extends AbstractDesensitizationHandler<BankCardDesensitize> {
 
     @Override
-    Integer getPrefixKeep(BankCard annotation) {
+    Integer getPrefixKeep(BankCardDesensitize annotation) {
         return annotation.prefixKeep();
     }
 
     @Override
-    Integer getSuffixKeep(BankCard annotation) {
+    Integer getSuffixKeep(BankCardDesensitize annotation) {
         return annotation.suffixKeep();
     }
 
     @Override
-    String getReplacer(BankCard annotation) {
+    String getReplacer(BankCardDesensitize annotation) {
         return annotation.replacer();
     }
 

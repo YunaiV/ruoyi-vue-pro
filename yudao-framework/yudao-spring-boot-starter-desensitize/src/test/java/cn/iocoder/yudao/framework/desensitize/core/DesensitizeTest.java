@@ -2,16 +2,16 @@ package cn.iocoder.yudao.framework.desensitize.core;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.EmailDesensitize;
-import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.Regex;
+import cn.iocoder.yudao.framework.desensitize.core.regex.annotation.RegexDesensitize;
 import cn.iocoder.yudao.framework.desensitize.core.annotation.Address;
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.BankCard;
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.CarLicense;
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.ChineseName;
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.FixedPhone;
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.IdCard;
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.Password;
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.Mobile;
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.Slider;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.BankCardDesensitize;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.CarLicenseDesensitize;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.ChineseNameDesensitize;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.FixedPhoneDesensitize;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.IdCardDesensitize;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.PasswordDesensitize;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.MobileDesensitize;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.SliderDesensitize;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
@@ -65,29 +65,29 @@ public class DesensitizeTest extends BaseMockitoUnitTest {
     @Data
     public static class DesensitizeDemo {
 
-        @ChineseName
+        @ChineseNameDesensitize
         private String nickname;
-        @BankCard
+        @BankCardDesensitize
         private String bankCard;
-        @CarLicense
+        @CarLicenseDesensitize
         private String carLicense;
-        @FixedPhone
+        @FixedPhoneDesensitize
         private String fixedPhone;
-        @IdCard
+        @IdCardDesensitize
         private String idCard;
-        @Password
+        @PasswordDesensitize
         private String password;
-        @Mobile
+        @MobileDesensitize
         private String phoneNumber;
-        @Slider(prefixKeep = 6, suffixKeep = 1, replacer = "#")
+        @SliderDesensitize(prefixKeep = 6, suffixKeep = 1, replacer = "#")
         private String slider1;
-        @Slider(prefixKeep = 3, suffixKeep = 3)
+        @SliderDesensitize(prefixKeep = 3, suffixKeep = 3)
         private String slider2;
-        @Slider(prefixKeep = 10)
+        @SliderDesensitize(prefixKeep = 10)
         private String slider3;
         @EmailDesensitize
         private String email;
-        @Regex(regex = "芋道源码", replacer = "*")
+        @RegexDesensitize(regex = "芋道源码", replacer = "*")
         private String regex;
         @Address
         private String address;

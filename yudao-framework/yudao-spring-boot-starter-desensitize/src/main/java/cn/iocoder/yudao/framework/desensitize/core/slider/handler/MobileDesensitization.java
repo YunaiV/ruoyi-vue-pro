@@ -1,26 +1,26 @@
 package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.Mobile;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.MobileDesensitize;
 
 /**
- * {@link Mobile} 的脱敏处理器
+ * {@link MobileDesensitize} 的脱敏处理器
  *
  * @author gaibu
  */
-public class MobileDesensitization extends AbstractDesensitizationHandler<Mobile> {
+public class MobileDesensitization extends AbstractDesensitizationHandler<MobileDesensitize> {
 
     @Override
-    Integer getPrefixKeep(Mobile annotation) {
+    Integer getPrefixKeep(MobileDesensitize annotation) {
         return annotation.prefixKeep();
     }
 
     @Override
-    Integer getSuffixKeep(Mobile annotation) {
+    Integer getSuffixKeep(MobileDesensitize annotation) {
         return annotation.suffixKeep();
     }
 
     @Override
-    String getReplacer(Mobile annotation) {
+    String getReplacer(MobileDesensitize annotation) {
         return annotation.replacer();
     }
 }

@@ -1,25 +1,25 @@
 package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.FixedPhone;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.FixedPhoneDesensitize;
 
 /**
- * {@link FixedPhone} 的脱敏处理器
+ * {@link FixedPhoneDesensitize} 的脱敏处理器
  *
  * @author gaibu
  */
-public class FixedPhoneDesensitization extends AbstractDesensitizationHandler<FixedPhone> {
+public class FixedPhoneDesensitization extends AbstractDesensitizationHandler<FixedPhoneDesensitize> {
     @Override
-    Integer getPrefixKeep(FixedPhone annotation) {
+    Integer getPrefixKeep(FixedPhoneDesensitize annotation) {
         return annotation.prefixKeep();
     }
 
     @Override
-    Integer getSuffixKeep(FixedPhone annotation) {
+    Integer getSuffixKeep(FixedPhoneDesensitize annotation) {
         return annotation.suffixKeep();
     }
 
     @Override
-    String getReplacer(FixedPhone annotation) {
+    String getReplacer(FixedPhoneDesensitize annotation) {
         return annotation.replacer();
     }
 }

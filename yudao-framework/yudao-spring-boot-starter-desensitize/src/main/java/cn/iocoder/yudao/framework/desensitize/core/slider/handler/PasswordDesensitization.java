@@ -1,25 +1,25 @@
 package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.Password;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.PasswordDesensitize;
 
 /**
- * {@link Password} 的码脱敏处理器
+ * {@link PasswordDesensitize} 的码脱敏处理器
  *
  * @author gaibu
  */
-public class PasswordDesensitization extends AbstractDesensitizationHandler<Password> {
+public class PasswordDesensitization extends AbstractDesensitizationHandler<PasswordDesensitize> {
     @Override
-    Integer getPrefixKeep(Password annotation) {
+    Integer getPrefixKeep(PasswordDesensitize annotation) {
         return annotation.prefixKeep();
     }
 
     @Override
-    Integer getSuffixKeep(Password annotation) {
+    Integer getSuffixKeep(PasswordDesensitize annotation) {
         return annotation.suffixKeep();
     }
 
     @Override
-    String getReplacer(Password annotation) {
+    String getReplacer(PasswordDesensitize annotation) {
         return annotation.replacer();
     }
 }

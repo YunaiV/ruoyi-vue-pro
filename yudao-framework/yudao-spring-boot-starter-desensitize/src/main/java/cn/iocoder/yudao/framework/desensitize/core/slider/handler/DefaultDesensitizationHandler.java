@@ -1,25 +1,25 @@
 package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.Slider;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.SliderDesensitize;
 
 /**
- * {@link Slider} 的脱敏处理器
+ * {@link SliderDesensitize} 的脱敏处理器
  *
  * @author gaibu
  */
-public class DefaultDesensitizationHandler extends AbstractDesensitizationHandler<Slider> {
+public class DefaultDesensitizationHandler extends AbstractDesensitizationHandler<SliderDesensitize> {
     @Override
-    Integer getPrefixKeep(Slider annotation) {
+    Integer getPrefixKeep(SliderDesensitize annotation) {
         return annotation.prefixKeep();
     }
 
     @Override
-    Integer getSuffixKeep(Slider annotation) {
+    Integer getSuffixKeep(SliderDesensitize annotation) {
         return annotation.suffixKeep();
     }
 
     @Override
-    String getReplacer(Slider annotation) {
+    String getReplacer(SliderDesensitize annotation) {
         return annotation.replacer();
     }
 }

@@ -1,25 +1,25 @@
 package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 
-import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.IdCard;
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.IdCardDesensitize;
 
 /**
- * {@link IdCard} 的脱敏处理器
+ * {@link IdCardDesensitize} 的脱敏处理器
  *
  * @author gaibu
  */
-public class IdCardDesensitization extends AbstractDesensitizationHandler<IdCard> {
+public class IdCardDesensitization extends AbstractDesensitizationHandler<IdCardDesensitize> {
     @Override
-    Integer getPrefixKeep(IdCard annotation) {
+    Integer getPrefixKeep(IdCardDesensitize annotation) {
         return annotation.prefixKeep();
     }
 
     @Override
-    Integer getSuffixKeep(IdCard annotation) {
+    Integer getSuffixKeep(IdCardDesensitize annotation) {
         return annotation.suffixKeep();
     }
 
     @Override
-    String getReplacer(IdCard annotation) {
+    String getReplacer(IdCardDesensitize annotation) {
         return annotation.replacer();
     }
 }

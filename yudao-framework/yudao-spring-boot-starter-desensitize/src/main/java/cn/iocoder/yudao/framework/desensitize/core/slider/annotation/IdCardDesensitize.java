@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.desensitize.core.slider.annotation;
 
 import cn.iocoder.yudao.framework.desensitize.core.base.annotation.DesensitizeBy;
-import cn.iocoder.yudao.framework.desensitize.core.slider.handler.BankCardDesensitization;
+import cn.iocoder.yudao.framework.desensitize.core.slider.handler.IdCardDesensitization;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 
 import java.lang.annotation.Documented;
@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 银行卡号
+ * 身份证
  *
  * @author gaibu
  */
@@ -19,8 +19,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@DesensitizeBy(handler = BankCardDesensitization.class)
-public @interface BankCard {
+@DesensitizeBy(handler = IdCardDesensitization.class)
+public @interface IdCardDesensitize {
 
     /**
      * 前缀保留长度
@@ -33,7 +33,7 @@ public @interface BankCard {
     int suffixKeep() default 2;
 
     /**
-     * 替换规则，银行卡号;比如：9988002866797031脱敏之后为998800********31
+     * 替换规则，身份证号码;比如：530321199204074611脱敏之后为530321**********11
      */
     String replacer() default "*";
 
