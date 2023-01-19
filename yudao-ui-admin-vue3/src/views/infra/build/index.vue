@@ -16,13 +16,24 @@
       </el-col>
     </el-row>
     <Dialog :title="dialogTitle" v-model="dialogVisible" maxHeight="600">
-      <div ref="editor" v-if="dialogVisible">{{ formValue }}</div>
+      <div ref="editor" v-if="dialogVisible">
+        <XTextButton style="float: right" :title="t('common.copy')" @click="copy(formValue)" />
+        <el-scrollbar height="580">
+          <pre>
+            {{ formValue }}
+          </pre>
+        </el-scrollbar>
+      </div>
       <span style="color: red" v-if="err">输入内容格式有误!</span>
     </Dialog>
   </ContentWrap>
 </template>
 <script setup lang="ts" name="Build">
 import formCreate from '@form-create/element-ui'
+import { useClipboard } from '@vueuse/core'
+
+const { t } = useI18n()
+const message = useMessage()
 
 const designer = ref()
 
@@ -38,10 +49,10 @@ const openModel = (title: string) => {
 }
 
 const setJson = () => {
-  openModel('导入JSON')
+  openModel('导入JSON--未实现')
 }
 const setOption = () => {
-  openModel('导入Options')
+  openModel('导入Options--未实现')
 }
 const showJson = () => {
   openModel('生成JSON')
@@ -61,6 +72,20 @@ const showTemplate = () => {
 const changeLocale = () => {
   console.info('changeLocale')
 }
+
+/** 复制 **/
+const copy = async (text: string) => {
+  const { copy, copied, isSupported } = useClipboard({ source: text })
+  if (!isSupported) {
+    message.error(t('common.copyError'))
+  } else {
+    await copy()
+    if (unref(copied)) {
+      message.success(t('common.copySuccess'))
+    }
+  }
+}
+
 const makeTemplate = () => {
   const rule = designer.value.getRule()
   const opt = designer.value.getOption()
@@ -75,11 +100,16 @@ const makeTemplate = () => {
 <script setup lang=ts>
   import formCreate from "@form-create/element-ui";
   const faps = ref(null)
-  const rule = formCreate.parseJson('${formCreate.toJson(rule).replaceAll('\\', '\\\\')}')
-  const option = formCreate.parseJson('${JSON.stringify(opt)}')
+  const rule = ref('')
+  const option = ref('')
+  const init = () => {
+    rule.value = formCreate.parseJson('${formCreate.toJson(rule).replaceAll('\\', '\\\\')}')
+    option.value = formCreate.parseJson('${JSON.stringify(opt)}')
+  }
   const onSubmit = (formData) => {
     //todo 提交表单
   }
+  init()
 <\/script>`
 }
 </script>
