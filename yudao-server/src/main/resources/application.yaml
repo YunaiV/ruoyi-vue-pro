@@ -37,12 +37,12 @@ spring:
 --- #################### 接口文档配置 ####################
 
 springdoc:
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui
   api-docs:
     enabled: true
     path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui
 
 knife4j:
   enable: true
