@@ -175,32 +175,14 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Menu">
-// 全局相关的 import
-import { ref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
-import { useMessage } from '@/hooks/web/useMessage'
-import {
-  ElCol,
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElInputNumber,
-  ElTreeSelect,
-  ElRadio,
-  ElRadioGroup,
-  ElRadioButton,
-  FormInstance
-} from 'element-plus'
-import { Tooltip } from '@/components/Tooltip'
-import { IconSelect } from '@/components/Icon'
+import { FormInstance } from 'element-plus'
 // 业务相关的 import
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
 import { handleTree, defaultProps } from '@/utils/tree'
 import * as MenuApi from '@/api/system/menu'
 import { allSchemas, rules } from './menu.data'
-import { useXTable } from '@/hooks/web/useXTable'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗

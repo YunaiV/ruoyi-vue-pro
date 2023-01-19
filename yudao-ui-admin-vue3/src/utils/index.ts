@@ -1,5 +1,3 @@
-// import type { Plugin } from 'vue'
-
 /**
  *
  * @param component 需要注册的组件

@@ -2,7 +2,6 @@ import { getAllParentPath } from '@/layout/components/Menu/src/helper'
 import type { RouteMeta } from 'vue-router'
 import { isUrl } from '@/utils/is'
 import { cloneDeep } from 'lodash-es'
-import { reactive } from 'vue'
 
 export type TabMapTypes = {
   [key: string]: string[]

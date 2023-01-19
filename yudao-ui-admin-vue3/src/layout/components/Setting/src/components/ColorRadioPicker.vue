@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType, watch, unref, ref } from 'vue'
+import { PropType } from 'vue'
 import { propTypes } from '@/utils/propTypes'
 import { useDesign } from '@/hooks/web/useDesign'
 

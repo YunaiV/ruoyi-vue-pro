@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.system.controller.admin.captcha;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import com.anji.captcha.model.common.ResponseModel;
-import com.anji.captcha.model.vo.CaptchaVO;
-import com.anji.captcha.service.CaptchaService;
+import com.xingyuv.captcha.model.common.ResponseModel;
+import com.xingyuv.captcha.model.vo.CaptchaVO;
+import com.xingyuv.captcha.service.CaptchaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,9 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 验证码
- *
- * 问题：为什么不直接使用 anji 提供的 CaptchaController，而要另外继承？
- * 回答：管理使用 /admin-api/* 作为前缀，所以需要继承！
  *
  * @author 芋道源码
  */
@@ -52,21 +50,12 @@ public class CaptchaController {
     }
 
     public static String getRemoteId(HttpServletRequest request) {
-        String xfwd = request.getHeader("X-Forwarded-For");
-        String ip = getRemoteIpFromXfwd(xfwd);
+        String ip = ServletUtil.getClientIP(request);
         String ua = request.getHeader("user-agent");
         if (StrUtil.isNotBlank(ip)) {
             return ip + ua;
         }
         return request.getRemoteAddr() + ua;
-    }
-
-    private static String getRemoteIpFromXfwd(String xfwd) {
-        if (StrUtil.isNotBlank(xfwd)) {
-            String[] ipList = xfwd.split(",");
-            return StrUtil.trim(ipList[0]);
-        }
-        return null;
     }
 
 }

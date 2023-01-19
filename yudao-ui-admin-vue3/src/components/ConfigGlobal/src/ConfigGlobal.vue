@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { provide, computed, watch, onMounted } from 'vue'
 import { propTypes } from '@/utils/propTypes'
-import { ElConfigProvider } from 'element-plus'
 import { useLocaleStore } from '@/store/modules/locale'
-import { useWindowSize } from '@vueuse/core'
 import { useAppStore } from '@/store/modules/app'
 import { setCssVar } from '@/utils'
 import { useDesign } from '@/hooks/web/useDesign'
 import { ElementPlusSize } from '@/types/elementPlus'
+import { useWindowSize } from '@vueuse/core'
 
 const { variables } = useDesign()
 

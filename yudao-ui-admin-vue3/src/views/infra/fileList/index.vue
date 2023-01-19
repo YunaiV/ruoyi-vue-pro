@@ -82,11 +82,7 @@
   </XModal>
 </template>
 <script setup lang="ts" name="FileList">
-import { ref, unref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
-import { ElUpload, ElImage, UploadInstance, UploadRawFile } from 'element-plus'
+import type { UploadInstance, UploadRawFile } from 'element-plus'
 // 业务相关的 import
 import { allSchemas } from './fileList.data'
 import * as FileApi from '@/api/infra/fileList'

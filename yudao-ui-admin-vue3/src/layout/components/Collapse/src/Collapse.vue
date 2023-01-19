@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, unref } from 'vue'
 import { useAppStore } from '@/store/modules/app'
 import { propTypes } from '@/utils/propTypes'
 import { useDesign } from '@/hooks/web/useDesign'

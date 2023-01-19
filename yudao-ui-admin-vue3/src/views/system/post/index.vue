@@ -9,7 +9,7 @@
           preIcon="ep:zoom-in"
           :title="t('action.add')"
           v-hasPermi="['system:post:create']"
-          @click="handleCreate()"
+          @click="openModel('create')"
         />
         <!-- 操作：导出 -->
         <XButton
@@ -24,21 +24,18 @@
         <!-- 操作：修改 -->
         <XTextButton
           preIcon="ep:edit"
-          :title="t('action.edit')"
           v-hasPermi="['system:post:update']"
-          @click="handleUpdate(row.id)"
+          @click="openModel('update', row.id)"
         />
         <!-- 操作：详情 -->
         <XTextButton
           preIcon="ep:view"
-          :title="t('action.detail')"
           v-hasPermi="['system:post:query']"
-          @click="handleDetail(row.id)"
+          @click="openModel('detail', row.id)"
         />
         <!-- 操作：删除 -->
         <XTextButton
           preIcon="ep:delete"
-          :title="t('action.del')"
           v-hasPermi="['system:post:delete']"
           @click="deleteData(row.id)"
         />
@@ -75,12 +72,7 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Post">
-// 全局相关的 import
-import { ref, unref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as PostApi from '@/api/system/post'
 import { rules, allSchemas } from './post.data'
@@ -103,34 +95,20 @@ const actionLoading = ref(false) // 按钮 Loading
 const formRef = ref<FormExpose>() // 表单 Ref
 const detailData = ref() // 详情 Ref
 
-// 设置标题
-const setDialogTile = (type: string) => {
+const openModel = async (type: string, rowId?: number) => {
   modelLoading.value = true
   modelTitle.value = t('action.' + type)
   actionType.value = type
   modelVisible.value = true
-}
-
-// 新增操作
-const handleCreate = () => {
-  setDialogTile('create')
-  modelLoading.value = false
-}
-
-// 修改操作
-const handleUpdate = async (rowId: number) => {
-  setDialogTile('update')
   // 设置数据
-  const res = await PostApi.getPostApi(rowId)
-  unref(formRef)?.setValues(res)
-  modelLoading.value = false
-}
-
-// 详情操作
-const handleDetail = async (rowId: number) => {
-  setDialogTile('detail')
-  const res = await PostApi.getPostApi(rowId)
-  detailData.value = res
+  if (rowId) {
+    const res = await PostApi.getPostApi(rowId)
+    if (type === 'update') {
+      unref(formRef)?.setValues(res)
+    } else if (type === 'detail') {
+      detailData.value = res
+    }
+  }
   modelLoading.value = false
 }
 
@@ -155,7 +133,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        await reload()
+        reload()
       }
     }
   })

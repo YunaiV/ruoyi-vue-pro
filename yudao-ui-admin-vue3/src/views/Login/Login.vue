@@ -60,7 +60,7 @@
 </template>
 <script setup lang="ts">
 import { underlineToHump } from '@/utils'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { useDesign } from '@/hooks/web/useDesign'
 import { useAppStore } from '@/store/modules/app'
 import { ThemeSwitch } from '@/layout/components/ThemeSwitch'

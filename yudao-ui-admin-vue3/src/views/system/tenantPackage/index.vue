@@ -65,13 +65,9 @@
   </XModal>
 </template>
 <script setup lang="ts" name="TenantPackage">
-import { onMounted, ref, unref } from 'vue'
 import { handleTree, defaultProps } from '@/utils/tree'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
-import { FormExpose } from '@/components/Form'
-import { ElCard, ElSwitch, ElTree } from 'element-plus'
+import type { FormExpose } from '@/components/Form'
+import type { ElTree } from 'element-plus'
 // 业务相关的 import
 import { rules, allSchemas } from './tenantPackage.data'
 import * as TenantPackageApi from '@/api/system/tenantPackage'

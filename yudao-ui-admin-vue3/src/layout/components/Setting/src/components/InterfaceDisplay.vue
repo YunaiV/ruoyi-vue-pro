@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { ElSwitch, ElInput } from 'element-plus'
 import { setCssVar } from '@/utils'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { useDesign } from '@/hooks/web/useDesign'
 import { useWatermark } from '@/hooks/web/useWatermark'
 import { useAppStore } from '@/store/modules/app'

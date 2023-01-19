@@ -1,4 +1,3 @@
-import { reactive } from 'vue'
 import {
   FormItemRenderOptions,
   VxeColumnPropTypes,
@@ -7,7 +6,7 @@ import {
   VxeTableDefines
 } from 'vxe-table'
 import { eachTree } from 'xe-utils'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { getBoolDictOptions, getDictOptions, getIntDictOptions } from '@/utils/dict'
 import { FormSchema } from '@/types/form'
 import { VxeTableColumn } from '@/types/table'
@@ -18,6 +17,7 @@ export type VxeCrudSchema = {
   primaryKey?: string // 主键ID
   primaryTitle?: string // 主键标题 默认为序号
   primaryType?: VxeColumnPropTypes.Type | 'id' // 还支持 "id" | "seq" | "radio" | "checkbox" | "expand" | "html" | null
+  firstColumn?: VxeColumnPropTypes.Type // 第一列显示类型
   action?: boolean // 是否开启表格内右侧操作栏插槽
   actionTitle?: string // 操作栏标题 默认为操作
   actionWidth?: string // 操作栏插槽宽度,一般2个字带图标 text 类型按钮 50-70
@@ -184,6 +184,14 @@ const filterSearchSchema = (crudSchema: VxeCrudSchema): VxeFormItemProps[] => {
 const filterTableSchema = (crudSchema: VxeCrudSchema): VxeGridPropTypes.Columns => {
   const { t } = useI18n()
   const tableSchema: VxeGridPropTypes.Columns = []
+  // 第一列
+  if (crudSchema.firstColumn) {
+    const tableSchemaItem = {
+      type: crudSchema.firstColumn,
+      width: '50px'
+    }
+    tableSchema.push(tableSchemaItem)
+  }
   // 主键ID
   if (crudSchema.primaryKey && crudSchema.primaryType) {
     const primaryTitle = crudSchema.primaryTitle ? crudSchema.primaryTitle : t('common.index')

@@ -1,11 +1,14 @@
-import { ref, unref } from 'vue'
 import { XTableProps } from '@/components/XTable/src/type'
 
 export interface tableMethod {
-  reload: () => void
+  reload: () => void // 刷新表格
   setProps: (props: XTableProps) => void
-  deleteData: (ids: string | number) => void
-  exportList: (fileName?: string) => void
+  deleteData: (id: string | number) => void // 删除数据
+  deleteBatch: () => void // 批量删除
+  exportList: (fileName?: string) => void // 导出列表
+  getCurrentColumn: () => void // 获取当前列
+  getRadioRecord: () => void // 获取当前选中列，redio
+  getCheckboxRecords: () => void //获取当前选中列， checkbox
 }
 
 export const useXTable = (props: XTableProps): [Function, tableMethod] => {
@@ -25,8 +28,12 @@ export const useXTable = (props: XTableProps): [Function, tableMethod] => {
   const methods: tableMethod = {
     reload: () => getInstance().reload(),
     setProps: (props) => getInstance().setProps(props),
-    deleteData: (ids: string | number) => getInstance().deleteData(ids),
-    exportList: (fileName?: string) => getInstance().exportList(fileName)
+    deleteData: (id: string | number) => getInstance().deleteData(id),
+    deleteBatch: () => getInstance().deleteBatch(),
+    exportList: (fileName?: string) => getInstance().exportList(fileName),
+    getCurrentColumn: () => getInstance().getCheckboxRecords(),
+    getRadioRecord: () => getInstance().getRadioRecord(),
+    getCheckboxRecords: () => getInstance().getCheckboxRecords()
   }
   return [register, methods]
 }

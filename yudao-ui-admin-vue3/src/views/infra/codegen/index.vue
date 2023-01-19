@@ -57,11 +57,6 @@
   <Preview ref="previewRef" />
 </template>
 <script setup lang="ts" name="Codegen">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
 import download from '@/utils/download'
 import * as CodegenApi from '@/api/infra/codegen'
 import { CodegenTableVO } from '@/api/infra/codegen/types'

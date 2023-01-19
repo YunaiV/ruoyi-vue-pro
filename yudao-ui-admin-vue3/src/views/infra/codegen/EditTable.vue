@@ -21,12 +21,6 @@
   </ContentWrap>
 </template>
 <script setup lang="ts">
-import { ref, unref, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { ElTabs, ElTabPane } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { ContentDetailWrap } from '@/components/ContentDetailWrap'
 import { BasicInfoForm, CloumInfoForm } from './components'
 import { getCodegenTableApi, updateCodegenTableApi } from '@/api/infra/codegen'
 import { CodegenTableVO, CodegenColumnVO, CodegenUpdateReqVO } from '@/api/infra/codegen/types'

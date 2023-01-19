@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { ElTabs, ElTabPane, ElPopover, ElBadge } from 'element-plus'
-
 const activeName = ref('notice')
 
 const noticeList = ref([
