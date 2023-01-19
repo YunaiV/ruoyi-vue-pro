@@ -34,8 +34,9 @@ spring:
     redis:
       time-to-live: 1h # 设置过期时间为 1 小时
 
+--- #################### 接口文档配置 ####################
+
 springdoc:
-  show-actuator: true
   swagger-ui:
     enabled: true
     path: /swagger-ui
