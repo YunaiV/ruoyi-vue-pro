@@ -50,18 +50,25 @@
       :schema="allSchemas.formSchema"
       :rules="rules"
       ref="formRef"
-    />
-    <template #memberUserIds="form">
-      <el-select v-model="form['memberUserIds']">
-        <el-option v-for="item in users" :key="item.id" :label="item.nickname" :value="item.id" />
-      </el-select>
-    </template>
+    >
+      <template #memberUserIds="form">
+        <el-select v-model="form.memberUserIds" multiple>
+          <el-option v-for="item in users" :key="item.id" :label="item.nickname" :value="item.id" />
+        </el-select>
+      </template>
+    </Form>
     <!-- 对话框(详情) -->
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
       :data="detailData"
-    />
+    >
+      <template #memberUserIds="{ row }">
+        <span v-for="userId in row.memberUserIds" :key="userId">
+          {{ getUserNickname(userId) }} &nbsp;
+        </span>
+      </template>
+    </Descriptions>
     <!-- 操作按钮 -->
     <template #footer>
       <!-- 按钮：保存 -->
