@@ -37,12 +37,9 @@
           />
         </template>
       </XTable>
-      <!-- TODO 芋艿：待完善 -->
-      <XModal v-model="detailOpen" width="400" title="表单详情">
-        <!-- <div class="test-form">
-          <parser :key="new Date().getTime()" :form-conf="detailForm" />
-        </div> -->
-        表单详情
+      <!-- 表单详情的弹窗 -->
+      <XModal v-model="detailOpen" width="800" title="表单详情">
+        <ViewForm :rule="detailPreview.rule" :option="detailPreview.option" v-if="detailOpen" />
       </XModal>
     </div>
   </ContentWrap>
@@ -50,20 +47,17 @@
 
 <script setup lang="ts" name="BpmForm">
 // 全局相关的 import
-// import { ref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
-// import { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as FormApi from '@/api/bpm/form'
 import { allSchemas } from './form.data'
-import { useRouter } from 'vue-router'
-// import { decodeFields } from '@/utils/formGenerator' // TODO 芋艿：可能要清理下
 
 const { t } = useI18n() // 国际化
-const message = useMessage() // 消息弹窗
 const router = useRouter() // 路由
+
+// 表单详情相关的变量和 import
+import viewForm from '@form-create/element-ui'
+const ViewForm = viewForm.$form()
+import { setConfAndFields2 } from '@/utils/formCreate'
 
 // 列表相关的变量
 const [registerTable, { deleteData }] = useXTable({
@@ -71,23 +65,6 @@ const [registerTable, { deleteData }] = useXTable({
   getListApi: FormApi.getFormPageApi,
   deleteApi: FormApi.deleteFormApi
 })
-
-// 弹窗相关的变量
-// const modelVisible = ref(false) // 是否显示弹出层
-// const modelTitle = ref('edit') // 弹出层标题
-// const modelLoading = ref(false) // 弹出层loading
-// const actionType = ref('') // 操作按钮的类型
-// const actionLoading = ref(false) // 按钮 Loading
-// const formRef = ref<FormExpose>() // 表单 Ref
-// const detailData = ref() // 详情 Ref
-
-// 设置标题
-// const setDialogTile = (type: string) => {
-//   modelLoading.value = true
-//   modelTitle.value = t('action.' + type)
-//   actionType.value = type
-//   modelVisible.value = true
-// }
 
 // 新增操作
 const handleCreate = () => {
@@ -98,38 +75,25 @@ const handleCreate = () => {
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
-  console.log(rowId, '修改')
-  if (true) {
-    message.success('动态表单开发中，预计 2 月底完成')
-    return
-  }
   await router.push({
-    path: '/bpm/manager/form/edit',
+    name: 'bpmFormEditor',
     query: {
-      formId: rowId
+      id: rowId
     }
   })
 }
 
-// 详情操作 // TODO 芋艿：详情的实现
-// const detailForm = ref({
-//   fields: []
-// })
-// 表单详情弹出窗显示隐藏
-// const detailOpen = ref(false)
-
+// 详情操作
+const detailOpen = ref(false)
+const detailPreview = ref({
+  rule: [],
+  option: {}
+})
 const handleDetail = async (rowId: number) => {
-  console.log(rowId, '详情')
-  message.success('动态表单开发中，预计 2 月底完成')
-  // FormApi.getFormApi(row.id).then((response) => {
-  //   // 设置值
-  //   const data = response.data
-  //   detailForm.value = {
-  //     ...JSON.parse(data.conf),
-  //     fields: decodeFields([], data.fields)
-  //   }
-  //   // 弹窗打开
-  //   detailOpen.value = true
-  // })
+  // 设置表单
+  const data = await FormApi.getFormApi(rowId)
+  setConfAndFields2(detailPreview, data.conf, data.fields)
+  // 弹窗打开
+  detailOpen.value = true
 }
 </script>

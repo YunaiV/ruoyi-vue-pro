@@ -194,7 +194,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
           noCache: true,
           hidden: true,
           canTo: true,
-          title: '流程表单',
+          title: '设计流程表单',
           activeMenu: 'bpm/manager/form/formEditor'
         }
       },
