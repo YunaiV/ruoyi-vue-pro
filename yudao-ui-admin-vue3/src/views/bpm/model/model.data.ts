@@ -54,7 +54,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '表单信息',
       field: 'formId',
       table: {
-        width: 120,
+        width: 180,
         slots: {
           default: 'formId_default'
         }

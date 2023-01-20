@@ -27,9 +27,11 @@
       <!-- 表单信息 -->
       <template #formId_default="{ row }">
         <XTextButton
+          v-if="row.formType === 10"
           :title="forms.find((form) => form.id === row.formId)?.name || row.formId"
-          @click="handleFormDetail(row.formId)"
+          @click="handleFormDetail(row)"
         />
+        <XTextButton v-else :title="row.formCustomCreatePath" @click="handleFormDetail(row)" />
       </template>
       <!-- 流程版本 -->
       <template #version_default="{ row }">
@@ -76,7 +78,7 @@
           preIcon="ep:aim"
           title="流程定义"
           v-hasPermi="['bpm:process-definition:query']"
-          @click="handleDefinitionList(row.id)"
+          @click="handleDefinitionList(row)"
         />
         <!-- 操作：删除 -->
         <XTextButton
@@ -342,7 +344,7 @@ const handleDefinitionList = (row) => {
   router.push({
     name: 'BpmProcessDefinitionList',
     query: {
-      modelId: row.id
+      key: row.key
     }
   })
 }
@@ -353,12 +355,18 @@ const formDetailPreview = ref({
   rule: [],
   option: {}
 })
-const handleFormDetail = async (rowId: number) => {
-  // 设置表单
-  const data = await FormApi.getFormApi(rowId)
-  setConfAndFields2(formDetailPreview, data.conf, data.fields)
-  // 弹窗打开
-  formDetailVisible.value = true
+const handleFormDetail = async (row) => {
+  if (row.formType == 10) {
+    // 设置表单
+    const data = await FormApi.getFormApi(row.formId)
+    setConfAndFields2(formDetailPreview, data.conf, data.fields)
+    // 弹窗打开
+    formDetailVisible.value = true
+  } else {
+    router.push({
+      path: row.formCustomCreatePath
+    })
+  }
 }
 
 // 流程图的详情按钮操作

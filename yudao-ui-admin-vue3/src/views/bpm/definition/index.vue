@@ -8,7 +8,12 @@
       </template>
       <!-- 表单信息 -->
       <template #formId_default="{ row }">
-        <XTextButton :title="row.formName" @click="handleFormDetail(row.formId)" />
+        <XTextButton
+          v-if="row.formType === 10"
+          :title="row.formName"
+          @click="handleFormDetail(row)"
+        />
+        <XTextButton v-else :title="row.formCustomCreatePath" @click="handleFormDetail(row)" />
       </template>
       <!-- 流程版本 -->
       <template #version_default="{ row }">
@@ -51,18 +56,22 @@ import * as DefinitionApi from '@/api/bpm/definition'
 // import * as ModelApi from '@/api/bpm/model'
 import { allSchemas } from './definition.data'
 
-// const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 const router = useRouter() // 路由
+const { query } = useRoute() // 查询参数
 
 import viewForm from '@form-create/element-ui'
 const ViewForm = viewForm.$form()
 import { setConfAndFields2 } from '@/utils/formCreate'
 
 // ========== 列表相关 ==========
+const queryParams = reactive({
+  key: query.key
+})
 const [registerTable] = useXTable({
   allSchemas: allSchemas,
-  getListApi: DefinitionApi.getProcessDefinitionPageApi
+  getListApi: DefinitionApi.getProcessDefinitionPageApi,
+  params: queryParams
 })
 
 // 流程表单的详情按钮操作
@@ -71,12 +80,17 @@ const formDetailPreview = ref({
   rule: [],
   option: {}
 })
-const handleFormDetail = async (rowId: number) => {
-  // 设置表单
-  const data = await FormApi.getFormApi(rowId)
-  setConfAndFields2(formDetailPreview, data.conf, data.fields)
-  // 弹窗打开
-  formDetailVisible.value = true
+const handleFormDetail = async (row) => {
+  if (row.formType == 10) {
+    // 设置表单
+    setConfAndFields2(formDetailPreview, row.formConf, row.formFields)
+    // 弹窗打开
+    formDetailVisible.value = true
+  } else {
+    router.push({
+      path: row.formCustomCreatePath
+    })
+  }
 }
 
 // 流程图的详情按钮操作
