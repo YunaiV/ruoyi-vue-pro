@@ -1,172 +1,46 @@
-<script setup lang="ts" name="Group">
-import dayjs from 'dayjs'
-import { DICT_TYPE } from '@/utils/dict'
-import { useTable } from '@/hooks/web/useTable'
-import type { FormExpose } from '@/components/Form'
-import type { UserGroupVO } from '@/api/bpm/userGroup/types'
-import { rules, allSchemas } from './group.data'
-import * as UserGroupApi from '@/api/bpm/userGroup'
-import { getListSimpleUsersApi } from '@/api/system/user'
-import { UserVO } from '@/api/system/user'
-
-const { t } = useI18n() // 国际化
-const message = useMessage()
-
-// ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<UserGroupVO>({
-  getListApi: UserGroupApi.getUserGroupPageApi,
-  delListApi: UserGroupApi.deleteUserGroupApi
-})
-const { getList, setSearchParams, delList } = methods
-
-// ========== CRUD 相关 ==========
-const actionLoading = ref(false) // 遮罩层
-const actionType = ref('') // 操作按钮的类型
-const dialogVisible = ref(false) // 是否显示弹出层
-const dialogTitle = ref('edit') // 弹出层标题
-const formRef = ref<FormExpose>() // 表单 Ref
-
-// ========== 用户选择  ==========
-const userOptions = ref<UserVO[]>([])
-const getUserOptions = async () => {
-  const res = await getListSimpleUsersApi()
-  userOptions.value.push(...res)
-}
-
-// 设置标题
-const setDialogTile = (type: string) => {
-  dialogTitle.value = t('action.' + type)
-  actionType.value = type
-  dialogVisible.value = true
-}
-
-// 新增操作
-const handleCreate = () => {
-  setDialogTile('create')
-}
-
-// 修改操作
-const handleUpdate = async (row: UserGroupVO) => {
-  setDialogTile('update')
-  // 设置数据
-  const res = await UserGroupApi.getUserGroupApi(row.id)
-  unref(formRef)?.setValues(res)
-}
-
-// 提交按钮
-const submitForm = async () => {
-  const elForm = unref(formRef)?.getElFormRef()
-  if (!elForm) return
-  elForm.validate(async (valid) => {
-    if (valid) {
-      actionLoading.value = true
-      // 提交请求
-      try {
-        const data = unref(formRef)?.formModel as UserGroupVO
-        if (actionType.value === 'create') {
-          await UserGroupApi.createUserGroupApi(data)
-          message.success(t('common.createSuccess'))
-        } else {
-          await UserGroupApi.updateUserGroupApi(data)
-          message.success(t('common.updateSuccess'))
-        }
-        // 操作成功，重新加载列表
-        dialogVisible.value = false
-        await getList()
-      } finally {
-        actionLoading.value = false
-      }
-    }
-  })
-}
-
-// 根据用户名获取用户真实名
-const getUserNickName = (userId: number) => {
-  for (const user of userOptions.value) {
-    if (user.id === userId) return user.nickname
-  }
-  return '未知(' + userId + ')'
-}
-// ========== 详情相关 ==========
-const detailData = ref() // 详情 Ref
-
-// 详情操作
-const handleDetail = async (row: UserGroupVO) => {
-  // 设置数据
-  detailData.value = row
-  setDialogTile('detail')
-}
-
-// ========== 初始化 ==========
-onMounted(async () => {
-  await getList()
-  await getUserOptions()
-})
-</script>
-
 <template>
-  <!-- 搜索工作区 -->
   <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <el-button type="primary" v-hasPermi="['bpm:user-group:create']" @click="handleCreate()">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
-    </div>
     <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
+    <XTable @register="registerTable">
+      <template #toolbar_buttons>
+        <!-- 操作：新增 -->
+        <XButton
+          type="primary"
+          preIcon="ep:zoom-in"
+          :title="t('action.add')"
+          v-hasPermi="['bpm:user-group:create']"
+          @click="handleCreate()"
+        />
       </template>
-      <template #memberUserIds="{ row }">
+      <template #memberUserIds_default="{ row }">
         <span v-for="userId in row.memberUserIds" :key="userId">
-          {{ getUserNickName(userId) + ' ' }}
+          {{ getUserNickname(userId) }} &nbsp;
         </span>
       </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
-        <el-button
-          link
-          type="primary"
+      <template #actionbtns_default="{ row }">
+        <!-- 操作：修改 -->
+        <XTextButton
+          preIcon="ep:edit"
+          :title="t('action.edit')"
           v-hasPermi="['bpm:user-group:update']"
-          @click="handleUpdate(row)"
-        >
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['bpm:user-group:update']"
-          @click="handleDetail(row)"
-        >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
+          @click="handleUpdate(row.id)"
+        />
+        <!-- 操作：详情 -->
+        <XTextButton
+          preIcon="ep:view"
+          :title="t('action.detail')"
+          v-hasPermi="['bpm:user-group:query']"
+          @click="handleDetail(row.id)"
+        />
+        <!-- 操作：删除 -->
+        <XTextButton
+          preIcon="ep:delete"
+          :title="t('action.del')"
           v-hasPermi="['bpm:user-group:delete']"
-          @click="delList(row.id, false)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
+          @click="deleteData(row.id)"
+        />
       </template>
-    </Table>
+    </XTable>
   </ContentWrap>
 
   <XModal v-model="dialogVisible" :title="dialogTitle">
@@ -176,30 +50,19 @@ onMounted(async () => {
       :schema="allSchemas.formSchema"
       :rules="rules"
       ref="formRef"
-    >
-      <template #memberUserIds="form">
-        <el-select v-model="form['memberUserIds']" multiple>
-          <el-option
-            v-for="item in userOptions"
-            :key="item.id"
-            :label="item.nickname"
-            :value="item.id"
-          />
-        </el-select>
-      </template>
-    </Form>
+    />
+    <template #memberUserIds="form">
+      <el-select v-model="form['memberUserIds']">
+        <el-option v-for="item in users" :key="item.id" :label="item.nickname" :value="item.id" />
+      </el-select>
+    </template>
     <!-- 对话框(详情) -->
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
       :data="detailData"
-    >
-      <template #memberUserIds="{ row }">
-        <span v-for="userId in row.memberUserIds" :key="userId">
-          {{ getUserNickName(userId) + ' ' }}
-        </span>
-      </template>
-    </Descriptions>
+    />
+    <!-- 操作按钮 -->
     <template #footer>
       <!-- 按钮：保存 -->
       <XButton
@@ -214,3 +77,100 @@ onMounted(async () => {
     </template>
   </XModal>
 </template>
+
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+// 业务相关的 import
+import * as UserGroupApi from '@/api/bpm/userGroup'
+import { getListSimpleUsersApi, UserVO } from '@/api/system/user'
+import { allSchemas } from './group.data'
+import { FormExpose } from '@/components/Form'
+
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
+// 列表相关的变量
+const [registerTable, { reload, deleteData }] = useXTable({
+  allSchemas: allSchemas,
+  getListApi: UserGroupApi.getUserGroupPageApi,
+  deleteApi: UserGroupApi.deleteUserGroupApi
+})
+// 用户列表
+const users = ref<UserVO[]>([])
+
+const getUserNickname = (userId) => {
+  for (const user of users.value) {
+    if (user.id === userId) {
+      return user.nickname
+    }
+  }
+  return '未知(' + userId + ')'
+}
+
+// ========== CRUD 相关 ==========
+const actionLoading = ref(false) // 遮罩层
+const actionType = ref('') // 操作按钮的类型
+const dialogVisible = ref(false) // 是否显示弹出层
+const dialogTitle = ref('edit') // 弹出层标题
+const formRef = ref<FormExpose>() // 表单 Ref
+const detailData = ref() // 详情 Ref
+
+// 设置标题
+const setDialogTile = (type: string) => {
+  dialogTitle.value = t('action.' + type)
+  actionType.value = type
+  dialogVisible.value = true
+}
+
+// 新增操作
+const handleCreate = () => {
+  setDialogTile('create')
+}
+
+// 修改操作
+const handleUpdate = async (rowId: number) => {
+  setDialogTile('update')
+  // 设置数据
+  const res = await UserGroupApi.getUserGroupApi(rowId)
+  unref(formRef)?.setValues(res)
+}
+
+// 详情操作
+const handleDetail = async (rowId: number) => {
+  setDialogTile('detail')
+  detailData.value = await UserGroupApi.getUserGroupApi(rowId)
+}
+
+// 提交按钮
+const submitForm = async () => {
+  const elForm = unref(formRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
+    if (valid) {
+      actionLoading.value = true
+      // 提交请求
+      try {
+        const data = unref(formRef)?.formModel as UserGroupApi.UserGroupVO
+        if (actionType.value === 'create') {
+          await UserGroupApi.createUserGroupApi(data)
+          message.success(t('common.createSuccess'))
+        } else {
+          await UserGroupApi.updateUserGroupApi(data)
+          message.success(t('common.updateSuccess'))
+        }
+        dialogVisible.value = false
+      } finally {
+        actionLoading.value = false
+        // 刷新列表
+        await reload()
+      }
+    }
+  })
+}
+
+// ========== 初始化 ==========
+onMounted(() => {
+  getListSimpleUsersApi().then((data) => {
+    users.value = data
+  })
+})
+</script>

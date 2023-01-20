@@ -33,7 +33,10 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: t('common.createTime'),
       field: 'createTime',
       formatter: 'formatDate',
-      isForm: false
+      isForm: false,
+      table: {
+        width: 180
+      }
     }
   ]
 })
