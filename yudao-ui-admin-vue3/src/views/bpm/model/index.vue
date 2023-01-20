@@ -28,7 +28,7 @@
       <template #formId_default="{ row }">
         <XTextButton
           :title="forms.find((form) => form.id === row.formId)?.name || row.formId"
-          @click="handleFormDetail(row.id)"
+          @click="handleFormDetail(row.formId)"
         />
       </template>
       <!-- 流程版本 -->
@@ -212,7 +212,7 @@
         <XButton
           type="primary"
           :loading="dialogLoading"
-          @click="submitForm()"
+          @click="submitForm"
           :title="t('action.save')"
         />
         <!-- 按钮：关闭 -->
@@ -287,6 +287,15 @@
         <XButton title="取 消" @click="uploadClose" />
       </template>
     </XModal>
+
+    <!-- 表单详情的弹窗 -->
+    <XModal v-model="formDetailVisible" width="800" title="表单详情" :show-footer="false">
+      <ViewForm
+        :rule="formDetailPreview.rule"
+        :option="formDetailPreview.option"
+        v-if="formDetailVisible"
+      />
+    </XModal>
   </ContentWrap>
 </template>
 
@@ -305,6 +314,10 @@ import { allSchemas, rules } from './model.data'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 const router = useRouter() // 路由
+
+import viewForm from '@form-create/element-ui'
+const ViewForm = viewForm.$form()
+import { setConfAndFields2 } from '@/utils/formCreate'
 
 // ========== 列表相关 ==========
 const [registerTable, { reload }] = useXTable({
@@ -335,10 +348,17 @@ const handleDefinitionList = (row) => {
 }
 
 // 流程表单的详情按钮操作
-const handleFormDetail = (row) => {
-  // TODO 芋艿：表单组件开发中
-  console.log(row)
-  message.success('动态表单开发中，预计 2 月底完成')
+const formDetailVisible = ref(false)
+const formDetailPreview = ref({
+  rule: [],
+  option: {}
+})
+const handleFormDetail = async (rowId: number) => {
+  // 设置表单
+  const data = await FormApi.getFormApi(rowId)
+  setConfAndFields2(formDetailPreview, data.conf, data.fields)
+  // 弹窗打开
+  formDetailVisible.value = true
 }
 
 // 流程图的详情按钮操作
