@@ -27,7 +27,7 @@ public class BpmOALeaveBaseVO {
     @ApiModelProperty(value = "请假类型", required = true, example = "1", notes = "参见 bpm_oa_type 枚举")
     private Integer type;
 
-    @ApiModelProperty(value = "原因", required = true, example = "阅读芋道源码")
+    @ApiModelProperty(value = "原因", example = "阅读芋道源码")
     private String reason;
 
 }
