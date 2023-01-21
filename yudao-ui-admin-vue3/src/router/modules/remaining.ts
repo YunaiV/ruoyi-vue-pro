@@ -220,6 +220,54 @@ const remainingRouter: AppRouteRecordRaw[] = [
           canTo: true,
           title: '任务分配规则'
         }
+      },
+      {
+        path: '/process-instance/create',
+        component: () => import('@/views/bpm/processInstance/create.vue'),
+        name: 'BpmProcessInstanceCreate',
+        meta: {
+          noCache: true,
+          hidden: true,
+          canTo: true,
+          title: '发起流程',
+          activeMenu: 'bpm/processInstance/create'
+        }
+      },
+      {
+        path: '/process-instance/detail',
+        component: () => import('@/views/bpm/processInstance/detail.vue'),
+        name: 'BpmProcessInstanceDetail',
+        meta: {
+          noCache: true,
+          hidden: true,
+          canTo: true,
+          title: '流程详情',
+          activeMenu: 'bpm/processInstance/detail'
+        }
+      },
+      {
+        path: '/oa/leave/create',
+        component: () => import('@/views/bpm/oa/leave/create.vue'),
+        name: 'OALeaveCreate',
+        meta: {
+          noCache: true,
+          hidden: true,
+          canTo: true,
+          title: '发起 OA 请假',
+          activeMenu: 'bpm/oa/leave/create'
+        }
+      },
+      {
+        path: '/oa/leave/detail',
+        component: () => import('@/views/bpm/oa/leave/detail.vue'),
+        name: 'OALeaveDetail',
+        meta: {
+          noCache: true,
+          hidden: true,
+          canTo: true,
+          title: '查看 OA 请假',
+          activeMenu: 'bpm/oa/leave/detail'
+        }
       }
     ]
   }
