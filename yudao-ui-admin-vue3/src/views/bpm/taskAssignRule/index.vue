@@ -9,29 +9,28 @@
       </template>
       <!-- 操作 -->
       <template #actionbtns_default="{ row }" v-if="modelId">
-        <vxe-button
-          type="text"
-          status="primary"
-          content="修改"
-          icon="vxe-icon-edit"
+        <!-- 操作：修改 -->
+        <XTextButton
+          preIcon="ep:edit"
+          :title="t('action.edit')"
+          v-hasPermi="['bpm:task-assign-rule:update']"
           @click="handleUpdate(row)"
         />
       </template>
     </XTable>
 
     <!-- 添加/修改弹窗 -->
-    <XModal v-model="openVisible" title="修改任务规则" width="800" height="35%" resize>
+    <XModal v-model="dialogVisible" title="修改任务规则" width="800" height="35%">
       <el-form
-        ref="xForm"
+        ref="formRef"
         :model="formData"
-        :rules="formRules"
+        :rules="rules"
         label-width="120px"
-        class="demo-ruleForm"
         size="default"
         status-icon
       >
         <el-form-item label="任务名称" prop="taskDefinitionName">
-          <el-input -model="formData.taskDefinitionName" placeholder="请输入流标标识" disabled />
+          <el-input v-model="formData.taskDefinitionName" placeholder="请输入流标标识" disabled />
         </el-form-item>
         <el-form-item label="任务标识" prop="taskDefinitionKey">
           <el-input v-model="formData.taskDefinitionKey" placeholder="请输入任务标识" disabled />
@@ -39,7 +38,7 @@
         <el-form-item label="规则类型" prop="type">
           <el-select v-model="formData.type" clearable style="width: 100%">
             <el-option
-              v-for="dict in taskAssignRuleTypeDictDatas"
+              v-for="dict in getDictOptions(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE)"
               :key="parseInt(dict.value)"
               :label="dict.label"
               :value="parseInt(dict.value)"
@@ -118,9 +117,21 @@
           </el-select>
         </el-form-item>
       </el-form>
+      <!-- 操作按钮 -->
       <template #footer>
-        <XButton type="primary" title="保存" :loading="loading" @click="submitEvent(xForm)" />
-        <XButton title="关闭" @click="resetEvent(xForm)" />
+        <!-- 按钮：保存 -->
+        <XButton
+          type="primary"
+          :title="t('action.save')"
+          :loading="actionLoading"
+          @click="submitForm"
+        />
+        <!-- 按钮：关闭 -->
+        <XButton
+          :loading="actionLoading"
+          :title="t('dialog.close')"
+          @click="dialogVisible = false"
+        />
       </template>
     </XModal>
   </ContentWrap>
@@ -128,27 +139,30 @@
 <script setup lang="ts" name="TaskAssignRule">
 // 全局相关的 import
 import type { FormInstance } from 'element-plus'
-
 // 业务相关的 import
-import { allSchemas } from './taskAssignRule.data'
 import * as TaskAssignRuleApi from '@/api/bpm/taskAssignRule'
 import { listSimpleRolesApi } from '@/api/system/role'
-import { handleTree, defaultProps } from '@/utils/tree'
 import { listSimplePostsApi } from '@/api/system/post'
 import { getListSimpleUsersApi } from '@/api/system/user'
 import { listSimpleUserGroupsApi } from '@/api/bpm/userGroup'
 import { listSimpleDeptApi } from '@/api/system/dept'
 import { DICT_TYPE, getDictOptions } from '@/utils/dict'
-// import {useI18n} from "@/hooks/web/useI18n";
-// import {useMessage} from "@/hooks/web/useMessage";
-import { useRoute } from 'vue-router'
+import { handleTree, defaultProps } from '@/utils/tree'
+import { allSchemas, rules } from './taskAssignRule.data'
 
-// const { t } = useI18n() // 国际化
-// const message = useMessage() // 消息弹窗
-// const router = useRouter() // 路由
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
 const { query } = useRoute()
 
 // ========== 列表相关 ==========
+
+const roleOptions = ref() // 角色列表
+const deptOptions = ref() // 部门列表
+const deptTreeOptions = ref()
+const postOptions = ref() // 岗位列表
+const userOptions = ref() // 用户列表
+const userGroupOptions = ref() // 用户组列表
+const taskAssignScriptDictDatas = getDictOptions(DICT_TYPE.BPM_TASK_ASSIGN_SCRIPT)
 
 // 流程模型的编号。如果 modelId 非空，则用于流程模型的查看与配置
 const modelId = query.modelId
@@ -159,68 +173,14 @@ const queryParams = reactive({
   modelId: modelId,
   processDefinitionId: processDefinitionId
 })
-const [registerTable] = useXTable({
+const [registerTable, { reload }] = useXTable({
   allSchemas: allSchemas,
   params: queryParams,
   getListApi: TaskAssignRuleApi.getTaskAssignRuleList,
   isList: true
 })
-// 修改任务责任表单
-const xForm = ref<FormInstance>()
-const formData = ref()
-const formRules = reactive({
-  type: [{ required: true, message: '规则类型不能为空', trigger: 'change' }],
-  roleIds: [{ required: true, message: '指定角色不能为空', trigger: 'change' }],
-  deptIds: [{ required: true, message: '指定部门不能为空', trigger: 'change' }],
-  postIds: [{ required: true, message: '指定岗位不能为空', trigger: 'change' }],
-  userIds: [{ required: true, message: '指定用户不能为空', trigger: 'change' }],
-  userGroupIds: [{ required: true, message: '指定用户组不能为空', trigger: 'change' }],
-  scripts: [{ required: true, message: '指定脚本不能为空', trigger: 'change' }]
-})
-const loading = ref(false)
 
-const roleOptions = ref() // 角色列表
-const deptOptions = ref() // 部门列表
-const deptTreeOptions = ref()
-const postOptions = ref() // 岗位列表
-const userOptions = ref() // 用户列表
-const userGroupOptions = ref() // 用户组列表
-const taskAssignScriptDictDatas = getDictOptions(DICT_TYPE.BPM_TASK_ASSIGN_SCRIPT)
-const taskAssignRuleTypeDictDatas = getDictOptions(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE)
-
-// 修改任务分配规则
-const openVisible = ref(false)
-
-// 添加修改弹窗提交修改
-const submitEvent = async (formEl: FormInstance | undefined) => {
-  console.log('确认')
-  if (!formEl) return
-  loading.value = true
-  await formEl.validate((valid, fields) => {
-    if (valid) {
-      console.log('submit!')
-      loading.value = false
-      openVisible.value = false
-    } else {
-      console.log('error submit!', fields)
-      loading.value = false
-    }
-  })
-}
-
-const resetEvent = (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  formEl.resetFields()
-  openVisible.value = false
-}
-
-// 修改任务分配规则
-const handleUpdate = (row) => {
-  console.log(row, '修改i数据')
-  openVisible.value = true
-  formData.value = { ...row }
-}
-// 类型字典
+// 翻译规则范围
 const getAssignRuleOptionName = (type, option) => {
   if (type === 10) {
     for (const roleOption of roleOptions.value) {
@@ -261,6 +221,103 @@ const getAssignRuleOptionName = (type, option) => {
     }
   }
   return '未知(' + option + ')'
+}
+
+// ========== 修改相关 ==========
+
+// 修改任务责任表单
+const actionLoading = ref(false) // 遮罩层
+const dialogVisible = ref(false) // 是否显示弹出层
+const formRef = ref<FormInstance>()
+const formData = ref() // 表单数据
+
+// 提交按钮
+const submitForm = async () => {
+  const elForm = unref(formRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
+    if (valid) {
+      // 构建表单
+      let form = {
+        ...formData.value,
+        taskDefinitionName: undefined
+      }
+      // 将 roleIds 等选项赋值到 options 中
+      if (form.type === 10) {
+        form.options = form.roleIds
+      } else if (form.type === 20 || form.type === 21) {
+        form.options = form.deptIds
+      } else if (form.type === 22) {
+        form.options = form.postIds
+      } else if (form.type === 30 || form.type === 31 || form.type === 32) {
+        form.options = form.userIds
+      } else if (form.type === 40) {
+        form.options = form.userGroupIds
+      } else if (form.type === 50) {
+        form.options = form.scripts
+      }
+      form.roleIds = undefined
+      form.deptIds = undefined
+      form.postIds = undefined
+      form.userIds = undefined
+      form.userGroupIds = undefined
+      form.scripts = undefined
+      // 设置提交中
+      actionLoading.value = true
+      // 提交请求
+      try {
+        const data = form as TaskAssignRuleApi.TaskAssignVO
+        // 新增
+        if (!data.id) {
+          await TaskAssignRuleApi.createTaskAssignRule(data)
+          message.success(t('common.createSuccess'))
+          // 修改
+        } else {
+          await TaskAssignRuleApi.updateTaskAssignRule(data)
+          message.success(t('common.updateSuccess'))
+        }
+        dialogVisible.value = false
+      } finally {
+        actionLoading.value = false
+        // 刷新列表
+        await reload()
+      }
+    }
+  })
+}
+
+// 修改任务分配规则
+const handleUpdate = (row) => {
+  // 1. 先重置表单
+  formData.value = {}
+  // 2. 再设置表单
+  formData.value = {
+    ...row,
+    options: [],
+    roleIds: [],
+    deptIds: [],
+    postIds: [],
+    userIds: [],
+    userGroupIds: [],
+    scripts: []
+  }
+  // 将 options 赋值到对应的 roleIds 等选项
+  if (row.type === 10) {
+    formData.value.roleIds.push(...row.options)
+  } else if (row.type === 20 || row.type === 21) {
+    formData.value.deptIds.push(...row.options)
+  } else if (row.type === 22) {
+    formData.value.postIds.push(...row.options)
+  } else if (row.type === 30 || row.type === 31 || row.type === 32) {
+    formData.value.userIds.push(...row.options)
+  } else if (row.type === 40) {
+    formData.value.userGroupIds.push(...row.options)
+  } else if (row.type === 50) {
+    formData.value.scripts.push(...row.options)
+  }
+  // 打开弹窗
+  dialogVisible.value = true
+  actionLoading.value = false
 }
 
 // ========== 初始化 ==========

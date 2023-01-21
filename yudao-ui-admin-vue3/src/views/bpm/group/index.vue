@@ -77,7 +77,7 @@
         type="primary"
         :title="t('action.save')"
         :loading="actionLoading"
-        @click="submitForm()"
+        @click="submitForm"
       />
       <!-- 按钮：关闭 -->
       <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
@@ -90,7 +90,7 @@ import { onMounted, ref } from 'vue'
 // 业务相关的 import
 import * as UserGroupApi from '@/api/bpm/userGroup'
 import { getListSimpleUsersApi, UserVO } from '@/api/system/user'
-import { allSchemas } from './group.data'
+import { allSchemas, rules } from './group.data'
 import { FormExpose } from '@/components/Form'
 
 const { t } = useI18n() // 国际化
