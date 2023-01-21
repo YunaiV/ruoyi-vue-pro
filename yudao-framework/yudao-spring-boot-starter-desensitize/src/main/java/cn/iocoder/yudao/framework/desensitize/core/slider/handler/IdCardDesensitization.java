@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.IdCardDesen
  *
  * @author gaibu
  */
-public class IdCardDesensitization extends AbstractDesensitizationHandler<IdCardDesensitize> {
+public class IdCardDesensitization extends AbstractSliderDesensitizationHandler<IdCardDesensitize> {
     @Override
     Integer getPrefixKeep(IdCardDesensitize annotation) {
         return annotation.prefixKeep();

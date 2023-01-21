@@ -30,7 +30,7 @@ public @interface EmailDesensitize {
     /**
      * 替换规则，邮箱;
      *
-     * 比如：example@gmail.com 脱敏之后 为e****@gmail.com
+     * 比如：example@gmail.com 脱敏之后为 e****@gmail.com
      */
     String replacer() default "$1****$2";
 }

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.CarLicenseD
  *
  * @author gaibu
  */
-public class CarLicenseDesensitization extends AbstractDesensitizationHandler<CarLicenseDesensitize> {
+public class CarLicenseDesensitization extends AbstractSliderDesensitizationHandler<CarLicenseDesensitize> {
     @Override
     Integer getPrefixKeep(CarLicenseDesensitize annotation) {
         return annotation.prefixKeep();

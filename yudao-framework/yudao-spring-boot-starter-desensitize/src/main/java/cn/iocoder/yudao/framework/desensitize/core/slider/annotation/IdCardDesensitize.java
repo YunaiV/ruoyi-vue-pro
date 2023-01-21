@@ -33,7 +33,7 @@ public @interface IdCardDesensitize {
     int suffixKeep() default 2;
 
     /**
-     * 替换规则，身份证号码;比如：530321199204074611脱敏之后为530321**********11
+     * 替换规则，身份证号码;比如：530321199204074611 脱敏之后为 530321**********11
      */
     String replacer() default "*";
 

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.FixedPhoneD
  *
  * @author gaibu
  */
-public class FixedPhoneDesensitization extends AbstractDesensitizationHandler<FixedPhoneDesensitize> {
+public class FixedPhoneDesensitization extends AbstractSliderDesensitizationHandler<FixedPhoneDesensitize> {
     @Override
     Integer getPrefixKeep(FixedPhoneDesensitize annotation) {
         return annotation.prefixKeep();

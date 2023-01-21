@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.MobileDesen
  *
  * @author gaibu
  */
-public class MobileDesensitization extends AbstractDesensitizationHandler<MobileDesensitize> {
+public class MobileDesensitization extends AbstractSliderDesensitizationHandler<MobileDesensitize> {
 
     @Override
     Integer getPrefixKeep(MobileDesensitize annotation) {

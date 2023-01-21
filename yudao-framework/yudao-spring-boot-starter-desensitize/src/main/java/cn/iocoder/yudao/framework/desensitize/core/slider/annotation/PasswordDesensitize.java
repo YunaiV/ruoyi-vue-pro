@@ -35,7 +35,7 @@ public @interface PasswordDesensitize {
     /**
      * 替换规则，密码;
      *
-     * 比如：123456脱敏之后为******
+     * 比如：123456 脱敏之后为 ******
      */
     String replacer() default "*";
 

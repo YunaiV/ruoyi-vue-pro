@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.BankCardDes
  *
  * @author gaibu
  */
-public class BankCardDesensitization extends AbstractDesensitizationHandler<BankCardDesensitize> {
+public class BankCardDesensitization extends AbstractSliderDesensitizationHandler<BankCardDesensitize> {
 
     @Override
     Integer getPrefixKeep(BankCardDesensitize annotation) {

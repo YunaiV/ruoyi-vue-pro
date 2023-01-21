@@ -33,7 +33,7 @@ public @interface BankCardDesensitize {
     int suffixKeep() default 2;
 
     /**
-     * 替换规则，银行卡号;比如：9988002866797031脱敏之后为998800********31
+     * 替换规则，银行卡号; 比如：9988002866797031 脱敏之后为 998800********31
      */
     String replacer() default "*";
 

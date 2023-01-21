@@ -33,7 +33,7 @@ public @interface MobileDesensitize {
     int suffixKeep() default 4;
 
     /**
-     * 替换规则，手机号;比如：13248765917脱敏之后为132****5917
+     * 替换规则，手机号;比如：13248765917 脱敏之后为 132****5917
      */
     String replacer() default "*";
 

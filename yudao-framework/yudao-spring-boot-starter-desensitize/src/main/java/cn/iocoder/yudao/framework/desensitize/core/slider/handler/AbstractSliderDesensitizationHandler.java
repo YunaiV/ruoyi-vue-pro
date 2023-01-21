@@ -9,7 +9,7 @@ import java.lang.annotation.Annotation;
  *
  * @author gaibu
  */
-public abstract class AbstractDesensitizationHandler<T extends Annotation>
+public abstract class AbstractSliderDesensitizationHandler<T extends Annotation>
         implements DesensitizationHandler<T> {
 
     @Override

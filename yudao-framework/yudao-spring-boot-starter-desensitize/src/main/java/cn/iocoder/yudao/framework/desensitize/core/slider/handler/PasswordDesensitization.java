@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.PasswordDes
  *
  * @author gaibu
  */
-public class PasswordDesensitization extends AbstractDesensitizationHandler<PasswordDesensitize> {
+public class PasswordDesensitization extends AbstractSliderDesensitizationHandler<PasswordDesensitize> {
     @Override
     Integer getPrefixKeep(PasswordDesensitize annotation) {
         return annotation.prefixKeep();
