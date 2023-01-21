@@ -1,24 +1,26 @@
 <template>
-  <XTable @register="registerTable">
-    <template #toolbar_buttons>
-      <!-- 操作：发起请假 -->
-      <XButton type="primary" preIcon="ep:plus" title="发起请假" @click="handleCreate()" />
-    </template>
-    <template #actionbtns_default="{ row }">
-      <!-- 操作: 取消请假 -->
-      <XTextButton
-        preIcon="ep:delete"
-        title="取消请假"
-        v-hasPermi="['bpm:oa-leave:create']"
-        v-if="row.result === 1"
-        @click="cancelLeave(row)"
-      />
-      <!-- 操作: 详情 -->
-      <XTextButton preIcon="ep:delete" :title="t('action.detail')" @click="handleDetail(row)" />
-      <!-- 操作: 审批进度 -->
-      <XTextButton preIcon="ep:edit-pen" title="审批进度" @click="handleProcessDetail(row)" />
-    </template>
-  </XTable>
+  <ContentWrap>
+    <XTable @register="registerTable">
+      <template #toolbar_buttons>
+        <!-- 操作：发起请假 -->
+        <XButton type="primary" preIcon="ep:plus" title="发起请假" @click="handleCreate()" />
+      </template>
+      <template #actionbtns_default="{ row }">
+        <!-- 操作: 取消请假 -->
+        <XTextButton
+          preIcon="ep:delete"
+          title="取消请假"
+          v-hasPermi="['bpm:oa-leave:create']"
+          v-if="row.result === 1"
+          @click="cancelLeave(row)"
+        />
+        <!-- 操作: 详情 -->
+        <XTextButton preIcon="ep:delete" :title="t('action.detail')" @click="handleDetail(row)" />
+        <!-- 操作: 审批进度 -->
+        <XTextButton preIcon="ep:edit-pen" title="审批进度" @click="handleProcessDetail(row)" />
+      </template>
+    </XTable>
+  </ContentWrap>
 </template>
 
 <script setup lang="ts">

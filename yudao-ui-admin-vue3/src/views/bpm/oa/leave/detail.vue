@@ -1,54 +1,37 @@
 <template>
-  <div class="app-container">
-    <!-- 对话框(添加 / 修改) -->
-    <el-form ref="form" :model="form" label-width="100px">
-      <el-form-item label="开始时间：" prop="startTime">
-        {{ formatDate(form.startTime, '{y}-{m}-{d}') }}
-      </el-form-item>
-      <el-form-item label="结束时间：" prop="endTime">
-        {{ formatDate(form.endTime, '{y}-{m}-{d}') }}
-      </el-form-item>
-      <el-form-item label="请假类型：" prop="type">
-        <dict-tag :type="DICT_TYPE.BPM_OA_LEAVE_TYPE" :value="form.type" />
-      </el-form-item>
-      <el-form-item label="原因：" prop="reason"> {{ form.reason }}</el-form-item>
-    </el-form>
-  </div>
+  <ContentWrap>
+    <!-- 详情 -->
+    <Descriptions :schema="allSchemas.detailSchema" :data="formData" />
+  </ContentWrap>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+// 业务相关的 import
+import * as LeaveApi from '@/api/bpm/leave'
+import { allSchemas } from '@/views/bpm/oa/leave/leave.data'
 
-import { getLeaveApi } from '@/api/bpm/leave'
-import { DICT_TYPE } from '@/utils/dict'
-import { formatDate } from '@/utils/formatTime'
-import { useRouter } from 'vue-router'
-const router = useRouter()
-// 请假编号
-const id = ref()
+const { query } = useRoute() // 查询参数
+const message = useMessage() // 消息弹窗
+
+const id = ref() // 请假编号
 // 表单参数
-const form = ref({
+const formData = ref({
   startTime: undefined,
   endTime: undefined,
   type: undefined,
   reason: undefined
 })
-/** 获得请假信息 */
-const getDetail = () => {
-  getLeaveApi(id.value).then((response) => {
-    form.value = response.data
-  })
-}
+
 onMounted(() => {
-  id.value = router.currentRoute.value.query.id
+  id.value = query.id
   if (!id.value) {
-    ElMessage({
-      type: 'error',
-      message: '未传递 id 参数，无法查看 OA 请假信息'
-    })
+    message.error('未传递 id 参数，无法查看 OA 请假信息')
     return
   }
-  getDetail()
+  // 获得请假信息
+  LeaveApi.getLeaveApi(id.value).then((data) => {
+    formData.value = data
+  })
 })
 </script>

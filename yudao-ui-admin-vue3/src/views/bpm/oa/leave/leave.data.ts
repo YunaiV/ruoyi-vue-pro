@@ -29,17 +29,23 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: t('common.startTimeText'),
       field: 'startTime',
-      formatter: 'formatDate',
+      formatter: 'formatDay',
       table: {
         width: 180
+      },
+      detail: {
+        dateFormat: 'YYYY-MM-DD'
       }
     },
     {
       title: t('common.endTimeText'),
       field: 'endTime',
-      formatter: 'formatDate',
+      formatter: 'formatDay',
       table: {
         width: 180
+      },
+      detail: {
+        dateFormat: 'YYYY-MM-DD'
       }
     },
     {
