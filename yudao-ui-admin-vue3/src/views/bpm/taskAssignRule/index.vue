@@ -3,9 +3,12 @@
     <!-- 列表 -->
     <XTable @register="registerTable">
       <template #options_default="{ row }">
-        <el-tag :key="option" v-for="option in row.options">
-          {{ getAssignRuleOptionName(row.type, option) }}
-        </el-tag>
+        <span :key="option" v-for="option in row.options">
+          <el-tag>
+            {{ getAssignRuleOptionName(row.type, option) }}
+          </el-tag>
+          &nbsp;
+        </span>
       </template>
       <!-- 操作 -->
       <template #actionbtns_default="{ row }" v-if="modelId">
@@ -21,14 +24,7 @@
 
     <!-- 添加/修改弹窗 -->
     <XModal v-model="dialogVisible" title="修改任务规则" width="800" height="35%">
-      <el-form
-        ref="formRef"
-        :model="formData"
-        :rules="rules"
-        label-width="120px"
-        size="default"
-        status-icon
-      >
+      <el-form ref="formRef" :model="formData" :rules="rules" label-width="80px">
         <el-form-item label="任务名称" prop="taskDefinitionName">
           <el-input v-model="formData.taskDefinitionName" placeholder="请输入流标标识" disabled />
         </el-form-item>
@@ -69,6 +65,7 @@
             :props="defaultProps"
             :data="deptTreeOptions"
             empty-text="加载中，请稍后"
+            multiple
           />
         </el-form-item>
         <el-form-item label="指定岗位" prop="postIds" span="24" v-if="formData.type === 22">
@@ -138,7 +135,7 @@
 </template>
 <script setup lang="ts" name="TaskAssignRule">
 // 全局相关的 import
-import type { FormInstance } from 'element-plus'
+import { FormInstance } from 'element-plus'
 // 业务相关的 import
 import * as TaskAssignRuleApi from '@/api/bpm/taskAssignRule'
 import { listSimpleRolesApi } from '@/api/system/role'
@@ -233,57 +230,56 @@ const formData = ref() // 表单数据
 
 // 提交按钮
 const submitForm = async () => {
-  const elForm = unref(formRef)?.getElFormRef()
+  // 参数校验
+  const elForm = unref(formRef)
   if (!elForm) return
-  elForm.validate(async (valid) => {
-    if (valid) {
-      // 构建表单
-      let form = {
-        ...formData.value,
-        taskDefinitionName: undefined
-      }
-      // 将 roleIds 等选项赋值到 options 中
-      if (form.type === 10) {
-        form.options = form.roleIds
-      } else if (form.type === 20 || form.type === 21) {
-        form.options = form.deptIds
-      } else if (form.type === 22) {
-        form.options = form.postIds
-      } else if (form.type === 30 || form.type === 31 || form.type === 32) {
-        form.options = form.userIds
-      } else if (form.type === 40) {
-        form.options = form.userGroupIds
-      } else if (form.type === 50) {
-        form.options = form.scripts
-      }
-      form.roleIds = undefined
-      form.deptIds = undefined
-      form.postIds = undefined
-      form.userIds = undefined
-      form.userGroupIds = undefined
-      form.scripts = undefined
-      // 设置提交中
-      actionLoading.value = true
-      // 提交请求
-      try {
-        const data = form as TaskAssignRuleApi.TaskAssignVO
-        // 新增
-        if (!data.id) {
-          await TaskAssignRuleApi.createTaskAssignRule(data)
-          message.success(t('common.createSuccess'))
-          // 修改
-        } else {
-          await TaskAssignRuleApi.updateTaskAssignRule(data)
-          message.success(t('common.updateSuccess'))
-        }
-        dialogVisible.value = false
-      } finally {
-        actionLoading.value = false
-        // 刷新列表
-        await reload()
-      }
+  const valid = await elForm.validate()
+  if (!valid) return
+  // 构建表单
+  let form = {
+    ...formData.value,
+    taskDefinitionName: undefined
+  }
+  // 将 roleIds 等选项赋值到 options 中
+  if (form.type === 10) {
+    form.options = form.roleIds
+  } else if (form.type === 20 || form.type === 21) {
+    form.options = form.deptIds
+  } else if (form.type === 22) {
+    form.options = form.postIds
+  } else if (form.type === 30 || form.type === 31 || form.type === 32) {
+    form.options = form.userIds
+  } else if (form.type === 40) {
+    form.options = form.userGroupIds
+  } else if (form.type === 50) {
+    form.options = form.scripts
+  }
+  form.roleIds = undefined
+  form.deptIds = undefined
+  form.postIds = undefined
+  form.userIds = undefined
+  form.userGroupIds = undefined
+  form.scripts = undefined
+  // 设置提交中
+  actionLoading.value = true
+  // 提交请求
+  try {
+    const data = form as TaskAssignRuleApi.TaskAssignVO
+    // 新增
+    if (!data.id) {
+      await TaskAssignRuleApi.createTaskAssignRule(data)
+      message.success(t('common.createSuccess'))
+      // 修改
+    } else {
+      await TaskAssignRuleApi.updateTaskAssignRule(data)
+      message.success(t('common.updateSuccess'))
     }
-  })
+    dialogVisible.value = false
+  } finally {
+    actionLoading.value = false
+    // 刷新列表
+    await reload()
+  }
 }
 
 // 修改任务分配规则
