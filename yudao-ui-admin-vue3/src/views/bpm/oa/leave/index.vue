@@ -15,7 +15,7 @@
           @click="cancelLeave(row)"
         />
         <!-- 操作: 详情 -->
-        <XTextButton preIcon="ep:delete" :title="t('action.detail')" @click="handleDetail(row)" />
+        <XTextButton preIcon="ep:view" :title="t('action.detail')" @click="handleDetail(row)" />
         <!-- 操作: 审批进度 -->
         <XTextButton preIcon="ep:edit-pen" title="审批进度" @click="handleProcessDetail(row)" />
       </template>

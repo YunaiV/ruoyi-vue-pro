@@ -45,11 +45,9 @@
     </XModal>
   </ContentWrap>
 </template>
-
 <script setup lang="ts">
 // 全局相关的 import
 import { ref } from 'vue'
-// import { DICT_TYPE, getDictOptions } from '@/utils/dict'
 
 // 业务相关的 import
 import * as DefinitionApi from '@/api/bpm/definition'
@@ -87,7 +85,7 @@ const handleFormDetail = async (row) => {
     // 弹窗打开
     formDetailVisible.value = true
   } else {
-    router.push({
+    await router.push({
       path: row.formCustomCreatePath
     })
   }

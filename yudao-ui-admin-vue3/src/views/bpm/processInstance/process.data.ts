@@ -41,7 +41,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       title: '当前审批任务',
       field: 'tasks',
       table: {
-        width: 100,
+        width: 140,
         slots: {
           default: 'tasks_default'
         }
