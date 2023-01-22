@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
@@ -75,11 +77,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
-        if (pageVO.getBeginCreateTime() != null) {
-            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getBeginCreateTime()));
+        if (ArrayUtil.get(pageVO.getCreateTime(), 0) != null) {
+            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
         }
-        if (pageVO.getEndCreateTime() != null) {
-            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getEndCreateTime()));
+        if (ArrayUtil.get(pageVO.getCreateTime(), 1) != null) {
+            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
         }
         // 执行查询
         List<Task> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
