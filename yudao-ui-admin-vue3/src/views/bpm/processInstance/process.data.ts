@@ -1,84 +1,91 @@
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
+import { reactive } from 'vue'
+import { useI18n } from '@/hooks/web/useI18n'
+import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
+import { DICT_TYPE } from '@/utils/dict'
 const { t } = useI18n() // 国际化
 
 // CrudSchema
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: null,
+  primaryTitle: '编号',
+  action: true,
+  actionWidth: '200px',
+  columns: [
+    {
+      title: '编号',
+      field: 'id',
+      table: {
+        width: 320
+      }
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '流程名',
-    field: 'name',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '流程分类',
-    field: 'category',
-    dictType: DICT_TYPE.BPM_MODEL_CATEGORY,
-    dictClass: 'number',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '当前审批任务',
-    field: 'tasks'
-  },
-  {
-    label: t('common.status'),
-    field: 'status',
-    dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS,
-    dictClass: 'number',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '结果',
-    field: 'result',
-    dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
-    dictClass: 'number',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '提交时间',
-    field: 'createTime',
-    form: {
-      show: false
+    {
+      title: '流程名',
+      field: 'name',
+      isSearch: true
     },
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '结束时间',
-    field: 'endTime',
-    form: {
-      show: false
-    }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '240px',
-    form: {
-      show: false
+    {
+      title: '所属流程',
+      field: 'processDefinitionId',
+      isSearch: true,
+      isTable: false
     },
-    detail: {
-      show: false
+    {
+      title: '流程分类',
+      field: 'category',
+      dictType: DICT_TYPE.BPM_MODEL_CATEGORY,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '当前审批任务',
+      field: 'tasks',
+      table: {
+        width: 100,
+        slots: {
+          default: 'tasks_default'
+        }
+      }
+    },
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '结果',
+      field: 'result',
+      dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '提交时间',
+      field: 'createTime',
+      formatter: 'formatDate',
+      table: {
+        width: 180
+      },
+      isForm: false,
+      isSearch: true,
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
+      }
+    },
+    {
+      title: '结束时间',
+      field: 'endTime',
+      formatter: 'formatDate',
+      table: {
+        width: 180
+      },
+      isForm: false
     }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)
