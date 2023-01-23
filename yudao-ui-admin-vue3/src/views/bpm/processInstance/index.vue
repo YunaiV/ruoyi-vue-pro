@@ -20,11 +20,17 @@
       </template>
       <!-- 操作 -->
       <template #actionbtns_default="{ row }">
-        <XButton preIcon="ep:view" :title="t('action.detail')" @click="handleDetail(row)" />
-        <XButton
+        <XTextButton
+          preIcon="ep:view"
+          :title="t('action.detail')"
+          v-hasPermi="['bpm:process-instance:cancel']"
+          @click="handleDetail(row)"
+        />
+        <XTextButton
           preIcon="ep:delete"
           title="取消"
           v-if="row.result === 1"
+          v-hasPermi="['bpm:process-instance:query']"
           @click="handleCancel(row)"
         />
       </template>

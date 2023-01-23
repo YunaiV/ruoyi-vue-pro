@@ -1,17 +1,15 @@
-import { reactive } from 'vue'
-// import { useI18n } from '@/hooks/web/useI18n'
 import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
-import { DICT_TYPE } from '@/utils/dict'
-// const { t } = useI18n() // 国际化
 
-// CrudSchema
+// crudSchemas
 const crudSchemas = reactive<VxeCrudSchema>({
   primaryKey: 'id',
-  primaryType: 'id',
-  primaryTitle: '流程名称',
+  primaryType: null,
   action: true,
-  actionWidth: '200px',
   columns: [
+    {
+      title: '流程名称',
+      field: 'name'
+    },
     {
       title: '流程分类',
       field: 'category',
@@ -20,7 +18,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
     },
     {
       title: '流程版本',
-      field: 'processDefinition.version',
+      field: 'version',
       table: {
         slots: {
           default: 'version_default'

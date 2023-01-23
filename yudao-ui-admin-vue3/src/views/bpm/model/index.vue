@@ -363,7 +363,7 @@ const handleFormDetail = async (row) => {
     // 弹窗打开
     formDetailVisible.value = true
   } else {
-    router.push({
+    await router.push({
       path: row.formCustomCreatePath
     })
   }

@@ -1,11 +1,10 @@
 import request from '@/config/axios'
-import { ProcessInstanceVO } from './types'
 
 export const getMyProcessInstancePageApi = async (params) => {
   return await request.get({ url: '/bpm/process-instance/my-page', params })
 }
 
-export const createProcessInstanceApi = async (data: ProcessInstanceVO) => {
+export const createProcessInstanceApi = async (data) => {
   return await request.post({ url: '/bpm/process-instance/create', data: data })
 }
 
