@@ -12,7 +12,7 @@
       </template>
       <el-col :span="16" :offset="6">
         <el-form
-          :ref="'form' + index"
+          :ref="auditFormRefs"
           :model="auditForms[index]"
           :rules="auditRule"
           label-width="100px"
@@ -22,7 +22,7 @@
           </el-form-item>
           <el-form-item label="流程发起人" v-if="processInstance && processInstance.startUser">
             {{ processInstance.startUser.nickname }}
-            <el-tag type="info" size="mini">{{ processInstance.startUser.deptName }}</el-tag>
+            <el-tag type="info" size="small">{{ processInstance.startUser.deptName }}</el-tag>
           </el-form-item>
           <el-form-item label="审批建议" prop="reason">
             <el-input
@@ -137,6 +137,33 @@ const auditRule = reactive({
   reason: [{ required: true, message: '审批建议不能为空', trigger: 'blur' }]
 })
 
+// 处理审批通过和不通过的操作
+const handleAudit = async (task, pass) => {
+  // 1.1 获得对应表单
+  const index = runningTasks.value.indexOf(task)
+  // const auditFormRef = ref<any>([]).value.get(index)
+  // 1.2 校验表单
+  // const elForm = unref(auditFormRef)
+  // if (!elForm) return
+  // const valid = await auditFormRef.validate()
+  // if (!valid) return
+
+  // 2.1 提交审批
+  const data = {
+    id: task.id,
+    reason: auditForms.value[index].reason
+  }
+  if (pass) {
+    await TaskApi.approveTask(data)
+    message.success('审批通过成功')
+  } else {
+    await TaskApi.rejectTask(data)
+    message.success('审批不通过成功')
+  }
+  // 2.2 加载最新数据
+  getDetail()
+}
+
 // ========== 申请信息 ==========
 import { setConfAndFields2 } from '@/utils/formCreate'
 import { ApiAttrs } from '@form-create/element-ui/types/config'
@@ -187,6 +214,10 @@ const getTimelineItemType = (item) => {
 
 // ========== 初始化 ==========
 onMounted(() => {
+  getDetail()
+})
+
+const getDetail = () => {
   // 1. 获得流程实例相关
   processInstanceLoading.value = true
   ProcessInstanceApi.getProcessInstanceApi(id)
@@ -269,7 +300,7 @@ onMounted(() => {
     .finally(() => {
       tasksLoad.value = false
     })
-})
+}
 </script>
 
 <style lang="scss">

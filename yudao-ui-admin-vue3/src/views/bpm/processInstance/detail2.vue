@@ -146,30 +146,7 @@ export default {
       })
     },
 
-    /** 处理审批通过和不通过的操作 */
-    handleAudit (task, pass) {
-      const index = this.runningTasks.indexOf(task)
-      this.$refs['form' + index][0].validate(valid => {
-        if (!valid) {
-          return
-        }
-        const data = {
-          id: task.id,
-          reason: this.auditForms[index].reason
-        }
-        if (pass) {
-          approveTask(data).then(response => {
-            this.$modal.msgSuccess("审批通过成功！")
-            this.getDetail() // 获得最新详情
-          })
-        } else {
-          rejectTask(data).then(response => {
-            this.$modal.msgSuccess("审批不通过成功！")
-            this.getDetail() // 获得最新详情
-          })
-        }
-      })
-    },
+
     /** 处理转派审批人 */
     handleUpdateAssignee (task) {
       // 设置表单
