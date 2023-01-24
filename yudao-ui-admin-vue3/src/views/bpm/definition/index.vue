@@ -37,7 +37,7 @@
 
     <!-- 表单详情的弹窗 -->
     <XModal v-model="formDetailVisible" width="800" title="表单详情" :show-footer="false">
-      <ViewForm
+      <form-create
         :rule="formDetailPreview.rule"
         :option="formDetailPreview.option"
         v-if="formDetailVisible"
@@ -58,8 +58,6 @@ const message = useMessage() // 消息弹窗
 const router = useRouter() // 路由
 const { query } = useRoute() // 查询参数
 
-import viewForm from '@form-create/element-ui'
-const ViewForm = viewForm.$form()
 import { setConfAndFields2 } from '@/utils/formCreate'
 
 // ========== 列表相关 ==========

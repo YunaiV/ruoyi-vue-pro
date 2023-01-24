@@ -39,7 +39,7 @@
       </XTable>
       <!-- 表单详情的弹窗 -->
       <XModal v-model="detailOpen" width="800" title="表单详情">
-        <ViewForm :rule="detailPreview.rule" :option="detailPreview.option" v-if="detailOpen" />
+        <form-create :rule="detailPreview.rule" :option="detailPreview.option" v-if="detailOpen" />
       </XModal>
     </div>
   </ContentWrap>
@@ -55,8 +55,6 @@ const { t } = useI18n() // 国际化
 const router = useRouter() // 路由
 
 // 表单详情相关的变量和 import
-import viewForm from '@form-create/element-ui'
-const ViewForm = viewForm.$form()
 import { setConfAndFields2 } from '@/utils/formCreate'
 
 // 列表相关的变量

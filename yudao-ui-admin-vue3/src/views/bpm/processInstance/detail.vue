@@ -51,6 +51,13 @@
             title="转办"
             @click="handleUpdateAssignee(item)"
           />
+          <XButton
+            pre-icon="ep:position"
+            type="primary"
+            title="委派"
+            @click="handleDelegate(item)"
+          />
+          <XButton pre-icon="ep:back" type="warning" title="委派" @click="handleBack(item)" />
         </div>
       </el-col>
     </el-card>
@@ -129,6 +136,21 @@
       </el-col>
     </el-card>
 
+    <!-- 高亮流程图 -->
+    <el-card class="box-card" v-loading="processInstanceLoading">
+      <template #header>
+        <span class="el-icon-picture-outline">流程图</span>
+      </template>
+      <my-process-viewer
+        key="designer"
+        v-model="bpmnXML"
+        v-bind="bpmnControlForm"
+        :activityData="activityList"
+        :processInstanceData="processInstance"
+        :taskData="tasks"
+      />
+    </el-card>
+
     <!-- 对话框(转派审批人) -->
     <XModal v-model="updateAssigneeVisible" title="转派审批人" width="500">
       <el-form
@@ -172,7 +194,9 @@ import { getCurrentInstance } from 'vue'
 import dayjs from 'dayjs'
 import * as UserApi from '@/api/system/user'
 import * as ProcessInstanceApi from '@/api/bpm/processInstance'
+import * as DefinitionApi from '@/api/bpm/definition'
 import * as TaskApi from '@/api/bpm/task'
+import * as ActivityApi from '@/api/bpm/activity'
 import { formatPast2 } from '@/utils/formatTime'
 
 const { query } = useRoute() // 查询参数
@@ -319,6 +343,34 @@ const resetUpdateAssigneeForm = () => {
   updateAssigneeFormRef.value?.resetFields()
 }
 
+/** 处理审批退回的操作 */
+const handleDelegate = async (task) => {
+  message.error('暂不支持【委派】功能，可以使用【转派】替代！')
+  console.log(task)
+}
+
+/** 处理审批退回的操作 */
+const handleBack = async (task) => {
+  message.error('暂不支持【退回】功能！')
+  // 可参考 http://blog.wya1.com/article/636697030/details/7296
+  // const data = {
+  //   id: task.id,
+  //   assigneeUserId: 1
+  // }
+  // backTask(data).then(response => {
+  //   this.$modal.msgSuccess("回退成功！");
+  //   this.getDetail(); // 获得最新详情
+  // });
+  console.log(task)
+}
+
+// ========== 高亮流程图 ==========
+const bpmnXML = ref(null)
+const bpmnControlForm = ref({
+  prefix: 'flowable'
+})
+const activityList = ref([])
+
 // ========== 初始化 ==========
 onMounted(() => {
   // 加载详情
@@ -355,9 +407,17 @@ const getDetail = () => {
         })
       }
 
-      // TODO 加载流程图
+      // 加载流程图
+      DefinitionApi.getProcessDefinitionBpmnXMLApi(processDefinition.id).then((data) => {
+        bpmnXML.value = data
+      })
 
-      // TODO 加载活动列表
+      // 加载活动列表
+      ActivityApi.getActivityList({
+        processInstanceId: data.id
+      }).then((data) => {
+        activityList.value = data
+      })
     })
     .finally(() => {
       processInstanceLoading.value = false
