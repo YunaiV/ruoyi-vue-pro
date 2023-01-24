@@ -1,78 +1,34 @@
 <template>
   <div class="app-container">
-    <!-- 审批信息 -->
-    <el-card
-      class="box-card"
-      v-loading="processInstanceLoading"
-      v-for="(item, index) in runningTasks"
-      :key="index"
+
+    <el-button
+        icon="el-icon-circle-close"
+        type="danger"
+        size="mini"
+        @click="handleAudit(item, false)"
+    >不通过</el-button
     >
-      <div slot="header" class="clearfix">
-        <span class="el-icon-picture-outline">审批任务【{{ item.name }}】</span>
-      </div>
-      <el-col :span="16" :offset="6">
-        <el-form
-          :ref="'form' + index"
-          :model="auditForms[index]"
-          :rules="auditRule"
-          label-width="100px"
-        >
-          <el-form-item label="流程名" v-if="processInstance && processInstance.name">
-            {{ processInstance.name }}
-          </el-form-item>
-          <el-form-item label="流程发起人" v-if="processInstance && processInstance.startUser">
-            {{ processInstance.startUser.nickname }}
-            <el-tag type="info" size="mini">{{ processInstance.startUser.deptName }}</el-tag>
-          </el-form-item>
-          <el-form-item label="审批建议" prop="reason">
-            <el-input
-              type="textarea"
-              v-model="auditForms[index].reason"
-              placeholder="请输入审批建议"
-            />
-          </el-form-item>
-        </el-form>
-        <div style="margin-left: 10%; margin-bottom: 20px; font-size: 14px">
-          <el-button
-            icon="el-icon-edit-outline"
-            type="success"
-            size="mini"
-            @click="handleAudit(item, true)"
-            >通过</el-button
-          >
-          <el-button
-            icon="el-icon-circle-close"
-            type="danger"
-            size="mini"
-            @click="handleAudit(item, false)"
-            >不通过</el-button
-          >
-          <el-button
-            icon="el-icon-edit-outline"
-            type="primary"
-            size="mini"
-            @click="handleUpdateAssignee(item)"
-            >转办</el-button
-          >
-          <el-button
-            icon="el-icon-edit-outline"
-            type="primary"
-            size="mini"
-            @click="handleDelegate(item)"
-            >委派</el-button
-          >
-          <el-button
-            icon="el-icon-refresh-left"
-            type="warning"
-            size="mini"
-            @click="handleBack(item)"
-            >退回</el-button
-          >
-        </div>
-      </el-col>
-    </el-card>
-
-
+    <el-button
+        icon="el-icon-edit-outline"
+        type="primary"
+        size="mini"
+        @click="handleUpdateAssignee(item)"
+    >转办</el-button
+    >
+    <el-button
+        icon="el-icon-edit-outline"
+        type="primary"
+        size="mini"
+        @click="handleDelegate(item)"
+    >委派</el-button
+    >
+    <el-button
+        icon="el-icon-refresh-left"
+        type="warning"
+        size="mini"
+        @click="handleBack(item)"
+    >退回</el-button
+    >
 
     <!-- 高亮流程图 -->
     <el-card class="box-card" v-loading="processInstanceLoading">
@@ -124,7 +80,6 @@ import { decodeFields } from "@/utils/formGenerator"
 import Parser from '@/components/parser/Parser'
 import { getProcessInstanceApi } from "@/api/bpm/processInstance"
 import { approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssignee } from "@/api/bpm/task"
-import { getDate } from "@/utils/dateUtils"
 import { getListSimpleUsersApi } from "@/api/system/user"
 import { getActivityList } from "@/api/bpm/activity"
 
@@ -189,9 +144,6 @@ export default {
           this.activityList = response.data
         })
       })
-    },
-    getDateStar (ms) {
-      return getDate(ms)
     },
 
     /** 处理审批通过和不通过的操作 */

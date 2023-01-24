@@ -1,6 +1,47 @@
 <template>
   <ContentWrap>
-    <!-- TODO 审批信息 -->
+    <!-- 审批信息 -->
+    <el-card
+      class="box-card"
+      v-loading="processInstanceLoading"
+      v-for="(item, index) in runningTasks"
+      :key="index"
+    >
+      <template #header>
+        <span class="el-icon-picture-outline">审批任务【{{ item.name }}】</span>
+      </template>
+      <el-col :span="16" :offset="6">
+        <el-form
+          :ref="'form' + index"
+          :model="auditForms[index]"
+          :rules="auditRule"
+          label-width="100px"
+        >
+          <el-form-item label="流程名" v-if="processInstance && processInstance.name">
+            {{ processInstance.name }}
+          </el-form-item>
+          <el-form-item label="流程发起人" v-if="processInstance && processInstance.startUser">
+            {{ processInstance.startUser.nickname }}
+            <el-tag type="info" size="mini">{{ processInstance.startUser.deptName }}</el-tag>
+          </el-form-item>
+          <el-form-item label="审批建议" prop="reason">
+            <el-input
+              type="textarea"
+              v-model="auditForms[index].reason"
+              placeholder="请输入审批建议"
+            />
+          </el-form-item>
+        </el-form>
+        <div style="margin-left: 10%; margin-bottom: 20px; font-size: 14px">
+          <XButton
+            pre-icon="ep:select"
+            type="success"
+            title="通过"
+            @click="handleAudit(item, true)"
+          />
+        </div>
+      </el-col>
+    </el-card>
 
     <!-- 申请信息 -->
     <el-card class="box-card" v-loading="processInstanceLoading">
@@ -92,14 +133,16 @@ const processInstanceLoading = ref(false) // 流程实例的加载中
 const processInstance = ref({}) // 流程实例
 const runningTasks = ref([]) // 运行中的任务
 const auditForms = ref([]) // 审批任务的表单
-// const auditRule = reactive({
-//   reason: [{ required: true, message: '审批建议不能为空', trigger: 'blur' }]
-// })
+const auditRule = reactive({
+  reason: [{ required: true, message: '审批建议不能为空', trigger: 'blur' }]
+})
 
 // ========== 申请信息 ==========
 import { setConfAndFields2 } from '@/utils/formCreate'
 import { ApiAttrs } from '@form-create/element-ui/types/config'
+import { useUserStore } from '@/store/modules/user'
 const fApi = ref<ApiAttrs>()
+const userId = useUserStore().getUser.id // 当前登录的编号
 // 流程表单详情
 const detailForm = ref({
   rule: [],
@@ -207,19 +250,21 @@ onMounted(() => {
       })
 
       // 需要审核的记录
-      // const userId = store.getters.userId
-      // this.tasks.forEach(task => {
-      //   if (task.result !== 1) { // 只有待处理才需要
-      //     return
-      //   }
-      //   if (!task.assigneeUser || task.assigneeUser.id !== userId) { // 自己不是处理人
-      //     return
-      //   }
-      //   this.runningTasks.push({ ...task })
-      //   this.auditForms.push({
-      //     reason: ''
-      //   })
-      // })
+      tasks.value.forEach((task) => {
+        // 1.1 只有待处理才需要
+        if (task.result !== 1) {
+          return
+        }
+        // 1.2 自己不是处理人
+        if (!task.assigneeUser || task.assigneeUser.id !== userId) {
+          return
+        }
+        // 2. 添加到处理任务
+        runningTasks.value.push({ ...task })
+        auditForms.value.push({
+          reason: ''
+        })
+      })
     })
     .finally(() => {
       tasksLoad.value = false
