@@ -12,7 +12,7 @@
       </template>
       <el-col :span="16" :offset="6">
         <el-form
-          :ref="auditFormRefs"
+          :ref="'form' + index"
           :model="auditForms[index]"
           :rules="auditRule"
           label-width="100px"
@@ -119,6 +119,7 @@
   </ContentWrap>
 </template>
 <script setup lang="ts">
+import { getCurrentInstance } from 'vue'
 import dayjs from 'dayjs'
 import * as ProcessInstanceApi from '@/api/bpm/processInstance'
 import * as TaskApi from '@/api/bpm/task'
@@ -126,6 +127,7 @@ import { formatPast2 } from '@/utils/formatTime'
 
 const { query } = useRoute() // 查询参数
 const message = useMessage() // 消息弹窗
+const { proxy } = getCurrentInstance()
 
 // ========== 审批信息 ==========
 const id = query.id as unknown as number
@@ -141,12 +143,14 @@ const auditRule = reactive({
 const handleAudit = async (task, pass) => {
   // 1.1 获得对应表单
   const index = runningTasks.value.indexOf(task)
-  // const auditFormRef = ref<any>([]).value.get(index)
+  const auditFormRef = proxy.$refs['form' + index][0]
+  // alert(auditFormRef)
+
   // 1.2 校验表单
-  // const elForm = unref(auditFormRef)
-  // if (!elForm) return
-  // const valid = await auditFormRef.validate()
-  // if (!valid) return
+  const elForm = unref(auditFormRef)
+  if (!elForm) return
+  const valid = await elForm.validate()
+  if (!valid) return
 
   // 2.1 提交审批
   const data = {
