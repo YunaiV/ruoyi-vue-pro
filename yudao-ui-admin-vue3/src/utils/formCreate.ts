@@ -37,9 +37,18 @@ export const setConfAndFields = (designerRef: object, conf: string, fields: stri
 }
 
 // 设置表单的 Conf 和 Fields
-export const setConfAndFields2 = (detailPreview: object, conf: string, fields: string) => {
+export const setConfAndFields2 = (
+  detailPreview: object,
+  conf: string,
+  fields: string,
+  value: object
+) => {
   // @ts-ignore
   detailPreview.value.option = JSON.parse(conf)
   // @ts-ignore
   detailPreview.value.rule = decodeFields(fields)
+  if (value) {
+    // @ts-ignore
+    detailPreview.value.value = value
+  }
 }

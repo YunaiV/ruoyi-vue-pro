@@ -1,5 +1,24 @@
 import request from '@/config/axios'
 
+export type Task = {
+  id: string
+  name: string
+}
+export type ProcessInstanceVO = {
+  id: number
+  name: string
+  processDefinitionId: string
+  category: string
+  result: number
+  tasks: Task[]
+  fields: string[]
+  status: number
+  remark: string
+  businessKey: string
+  createTime: string
+  endTime: string
+}
+
 export const getMyProcessInstancePageApi = async (params) => {
   return await request.get({ url: '/bpm/process-instance/my-page', params })
 }

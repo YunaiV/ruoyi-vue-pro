@@ -67,7 +67,7 @@ const handleDetail = (row) => {
   router.push({
     name: 'BpmProcessInstanceDetail',
     query: {
-      id: row.processInstanceId
+      id: row.id
     }
   })
 }

@@ -9,9 +9,12 @@
       </template>
       <!-- 情况一：流程表单 -->
       <el-col v-if="processInstance?.processDefinition?.formType === 10" :span="16" :offset="6">
-        <div>
-          <parser :key="new Date().getTime()" :form-conf="detailForm" />
-        </div>
+        <form-create
+          :rule="detailForm.rule"
+          v-model:api="fApi"
+          :option="detailForm.option"
+          v-model="detailForm.value"
+        />
       </el-col>
       <!-- 情况二：流程表单 -->
       <div v-if="processInstance?.processDefinition?.formType === 20">
@@ -40,6 +43,15 @@ const processInstanceLoading = ref(false) // 流程实例的加载中
 const processInstance = ref({}) // 流程实例
 
 // ========== 申请信息 ==========
+import { setConfAndFields2 } from '@/utils/formCreate'
+import { ApiAttrs } from '@form-create/element-ui/types/config'
+const fApi = ref<ApiAttrs>()
+// 流程表单详情
+const detailForm = ref({
+  rule: [],
+  option: {},
+  value: {}
+})
 
 // ========== 初始化 ==========
 onMounted(() => {
@@ -53,7 +65,20 @@ onMounted(() => {
       }
       processInstance.value = data
 
-      // TODO 设置表单信息
+      // 设置表单信息
+      const processDefinition = data.processDefinition
+      if (processDefinition.formType === 10) {
+        setConfAndFields2(
+          detailForm,
+          processDefinition.formConf,
+          processDefinition.formFields,
+          data.formVariables
+        )
+        nextTick().then(() => {
+          fApi.value.btn.show(false)
+          fApi.value.resetBtn.show(false)
+        })
+      }
 
       // TODO 加载流程图
 
