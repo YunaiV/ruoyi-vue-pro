@@ -163,10 +163,7 @@ export default {
         rules: {
           assigneeUserId: [{ required: true, message: "新审批人不能为空", trigger: "change" }],
         }
-      },
-
-      // 数据字典
-      categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
+      }
     };
   },
   created() {
