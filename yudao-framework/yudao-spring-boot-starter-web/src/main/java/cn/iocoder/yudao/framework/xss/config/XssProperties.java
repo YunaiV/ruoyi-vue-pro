@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.web.config;
+package cn.iocoder.yudao.framework.xss.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

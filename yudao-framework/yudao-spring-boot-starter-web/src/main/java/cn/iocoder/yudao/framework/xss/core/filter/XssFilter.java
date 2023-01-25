@@ -1,7 +1,7 @@
-package cn.iocoder.yudao.framework.web.core.filter;
+package cn.iocoder.yudao.framework.xss.core.filter;
 
-import cn.iocoder.yudao.framework.web.config.XssProperties;
-import cn.iocoder.yudao.framework.web.core.clean.XssCleaner;
+import cn.iocoder.yudao.framework.xss.config.XssProperties;
+import cn.iocoder.yudao.framework.xss.core.clean.XssCleaner;
 import lombok.AllArgsConstructor;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -14,8 +14,6 @@ import java.io.IOException;
 
 /**
  * Xss 过滤器
- * <p>
- * 对 Xss 不了解的胖友，可以看看 http://www.iocoder.cn/Fight/The-new-girl-asked-me-why-AJAX-requests-are-not-secure-I-did-not-answer/
  *
  * @author 芋道源码
  */

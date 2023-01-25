@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.framework.web.core.clean;
+package cn.iocoder.yudao.framework.xss.core.clean;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Safelist;
 
 /**
- * jsonp 过滤字符串
+ * 基于 JSONP 实现 XSS 过滤字符串
  */
 public class JsoupXssCleaner implements XssCleaner {
 
@@ -22,21 +22,6 @@ public class JsoupXssCleaner implements XssCleaner {
     public JsoupXssCleaner() {
         this.safelist = buildSafelist();
         this.baseUri = "";
-    }
-
-    public JsoupXssCleaner(Safelist safelist) {
-        this.safelist = safelist;
-        this.baseUri = "";
-    }
-
-    public JsoupXssCleaner(String baseUri) {
-        this.safelist = buildSafelist();
-        this.baseUri = baseUri;
-    }
-
-    public JsoupXssCleaner(Safelist safelist, String baseUri) {
-        this.safelist = safelist;
-        this.baseUri = baseUri;
     }
 
     /**
@@ -67,7 +52,6 @@ public class JsoupXssCleaner implements XssCleaner {
         // 虽然可以重写 WhiteList#isSafeAttribute 来处理，但是有隐患，所以暂时不支持相对路径
         // WHITELIST.removeProtocols("a", "href", "ftp", "http", "https", "mailto");
         // WHITELIST.removeProtocols("img", "src", "http", "https");
-
         return relaxedSafelist;
     }
 
