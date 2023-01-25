@@ -364,9 +364,9 @@ export default {
   created() {
     this.getList();
     this.getTreeselect();
-    this.getConfigKey("sys.user.init-password").then(response => {
-      this.initPassword = response.msg;
-    });
+    // this.getConfigKey("sys.user.init-password").then(response => {
+    //   this.initPassword = response.msg;
+    // });
   },
   methods: {
     // 更多操作
