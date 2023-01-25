@@ -53,19 +53,19 @@ public class MailTemplateServiceImpl implements MailTemplateService {
      */
     private volatile Map<Long, MailTemplateDO> mailTemplateCache;
 
-    private volatile Date maxUpdateTime;
-
     @Override
     @PostConstruct
     public void initLocalCache() {
-        List<MailTemplateDO> mailTemplateDOList = this.loadMailTemplateIfUpdate(maxUpdateTime);
+        if (true) {
+            return;
+        }
+        List<MailTemplateDO> mailTemplateDOList = this.loadMailTemplateIfUpdate(null);
         if (CollUtil.isEmpty(mailTemplateDOList)) {
             return;
         }
 
         // 写入缓存
         mailTemplateCache = CollectionUtils.convertMap(mailTemplateDOList, MailTemplateDO::getId);
-        maxUpdateTime = CollectionUtils.getMaxValue(mailTemplateDOList, MailTemplateDO::getUpdateTime);
         log.info("[initLocalCache][初始化 mailTemplate 数量为 {}]", mailTemplateDOList.size());
     }
 
@@ -156,4 +156,10 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         // 第二步，如果有更新，则从数据库加载所有邮件模板
         return mailTemplateMapper.selectList();
     }
+
+    @Override
+    public long countByAccountId(Long accountId) {
+        return mailTemplateMapper.selectCountByAccountId(accountId);
+    }
+
 }

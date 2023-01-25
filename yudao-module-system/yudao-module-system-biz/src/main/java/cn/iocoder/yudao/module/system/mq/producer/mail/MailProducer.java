@@ -55,7 +55,7 @@ public class MailProducer {
     public void sendMailSendMessage(Long sendLogId,MailAccountDO mailAccountDO, MailTemplateDO mailTemplateDO, String content,List<KeyValue<String, Object>> templateParams,String to) {
         MailSendMessage message = new MailSendMessage();
         message.setContent(content)
-        .setFromAddress(mailAccountDO.getFromAddress())
+        .setFromAddress(mailAccountDO.getMail())
         .setHost(mailAccountDO.getHost())
         .setPort(mailAccountDO.getPort())
         .setPassword(mailAccountDO.getPassword())

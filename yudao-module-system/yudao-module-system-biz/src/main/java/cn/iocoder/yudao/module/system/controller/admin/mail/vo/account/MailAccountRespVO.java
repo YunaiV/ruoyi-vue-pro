@@ -7,15 +7,19 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
-@ApiModel("管理后台 - 邮箱账号修改 Request VO")
+@ApiModel("管理后台 - 邮箱账号 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class MailAccountUpdateReqVO extends MailAccountBaseVO {
+public class MailAccountRespVO extends MailAccountBaseVO {
 
     @ApiModelProperty(value = "编号", required = true, example = "1024")
     @NotNull(message = "编号不能为空")
     private Long id;
+
+    @ApiModelProperty(value = "创建时间", required = true)
+    private LocalDateTime createTime;
 
 }

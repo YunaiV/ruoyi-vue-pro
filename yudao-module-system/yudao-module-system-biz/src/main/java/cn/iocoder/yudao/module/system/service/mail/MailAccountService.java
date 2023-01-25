@@ -28,21 +28,21 @@ public interface MailAccountService {
      * @param createReqVO 邮箱账号信息
      * @return 编号
      */
-    Long create(@Valid MailAccountCreateReqVO createReqVO);
+    Long createMailAccount(@Valid MailAccountCreateReqVO createReqVO);
 
     /**
      * 修改邮箱账号
      *
      * @param updateReqVO 邮箱账号信息
      */
-    void update(@Valid MailAccountUpdateReqVO updateReqVO);
+    void updateMailAccount(@Valid MailAccountUpdateReqVO updateReqVO);
 
     /**
      * 删除邮箱账号
      *
      * @param id 编号
      */
-    void delete(Long id);
+    void deleteMailAccount(Long id);
 
     /**
      * 获取邮箱账号信息

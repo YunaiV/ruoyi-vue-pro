@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import java.util.List;
 
 /**
- * 邮箱模版
+ * 邮箱模版 DO
  *
  * @author wangjingyi
  * @since 2022-03-21
@@ -34,9 +34,12 @@ public class MailTemplateDO extends BaseDO {
      */
     private String code;
     /**
-     * 邮箱账号主键
+     * 发送的邮箱账号编号
+     *
+     * 关联 {@link MailAccountDO#getId()}
      */
     private Long accountId;
+
     /**
      * 标题
      */

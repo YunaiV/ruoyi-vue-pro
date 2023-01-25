@@ -14,7 +14,4 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class MailAccountCreateReqVO extends MailAccountBaseVO {
 
-    @ApiModelProperty(value = "密码",required = true,example = "123456")
-    @NotNull(message = "密码必填")
-    private String password;
 }

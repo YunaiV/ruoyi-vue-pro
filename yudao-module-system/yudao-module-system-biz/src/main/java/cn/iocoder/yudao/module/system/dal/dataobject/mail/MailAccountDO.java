@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 邮箱账号
- * 配置发送邮箱的账号
+ * 邮箱账号 DO
+ *
+ * 用途：配置发送邮箱的账号
  *
  * @author wangjingyi
  * @since 2022-03-21
@@ -25,7 +25,8 @@ public class MailAccountDO extends BaseDO {
     /**
      * 邮箱
      */
-    private String fromAddress;
+    private String mail;
+
     /**
      * 用户名
      */

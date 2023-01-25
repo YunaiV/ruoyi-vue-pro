@@ -85,4 +85,12 @@ public interface MailTemplateService {
      */
     String formatMailTemplateContent(String content, Map<String, String> params);
 
+    /**
+     * 获得指定邮箱账号下的邮件模板数量
+     *
+     * @param accountId 账号编号
+     * @return 数量
+     */
+    long countByAccountId(Long accountId);
+
 }

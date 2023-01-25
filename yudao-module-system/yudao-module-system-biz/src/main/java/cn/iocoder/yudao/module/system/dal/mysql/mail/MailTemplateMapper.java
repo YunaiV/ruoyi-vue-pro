@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -36,5 +37,10 @@ public interface MailTemplateMapper extends BaseMapperX<MailTemplateDO> {
     default MailTemplateDO selectOneByAccountId(Long accountId){
         return selectOne(new QueryWrapperX<MailTemplateDO>()
                 .eqIfPresent("account_id" , accountId));
-    };
+    }
+
+    default Long selectCountByAccountId(Long accountId) {
+        return selectCount(MailTemplateDO::getAccountId, accountId);
+    }
+
 }

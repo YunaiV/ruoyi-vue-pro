@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.system.enums.mail.MailLogUserTypeEnum;
 import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * 邮箱日志
+ * 邮箱日志 DO
  * 记录每一次邮件的发送
  *
  * @author wangjingyi
@@ -29,7 +29,7 @@ import java.util.Map;
 public class MailLogDO extends BaseDO implements Serializable {
 
     /**
-     * 主键
+     * 日志编号，自增
      */
     private Long id;
 
@@ -37,62 +37,74 @@ public class MailLogDO extends BaseDO implements Serializable {
      * 用户编码
      */
     private Long userId;
-
     /**
      * 用户类型
      *
-     * 冗余 {@link MailLogUserTypeEnum#getUserType}
+     * 枚举 {@link UserTypeEnum}
      */
     private Integer userType;
+    /**
+     * 接收邮箱地址
+     */
+    private String toMail;
 
-    // TODO @wangjingyi：accountId
     /**
      * 邮箱账号编号
+     *
+     * 关联 {@link MailAccountDO#getId()}
      */
     private Long accountId;
-
-    // TODO @wangjingyi：如果是冗余字段，记得 @ 下；DONE
     /**
-     * 邮箱账号
+     * 发送邮箱地址
      *
-     * 冗余 {@link MailAccountDO}
+     * 冗余 {@link MailAccountDO#getMail()}
      */
-    private String fromAddress;
+    private String fromMail;
 
+    // ========= 模板相关字段 =========
     /**
-     * 模版主键
+     * 模版编号
+     *
+     * 关联 {@link MailTemplateDO#getId()}
      */
     private Long templateId;
-
+    /**
+     * 末班编码
+     *
+     * 冗余 {@link MailTemplateDO#getCode()}
+     */
+    private String templateCode;
     /**
      * 模版内容
+     *
+     * 基于 {@link MailTemplateDO#getContent()} 格式化后的内容
      */
     private String templateContent;
-
     /**
+     * 模版参数
+     *
      * 基于 {@link MailTemplateDO#getParams()} 输入后的参数
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String,Object> templateParams;
 
-    /**
-     * 发送时间
-     */
-    private Date sendTime;
-
-    //=========接收相关字段=========
+    // ========= 发送相关字段 =========
     /**
      * 发送状态
      *
      * 枚举 {@link MailSendStatusEnum}
      */
     private Integer sendStatus;
+    /**
+     * 发送时间
+     */
+    private Date sendTime;
 
+    // ========= 接收相关字段 =========
     /**
      * 发送结果
      */
     private String sendResult;
-
     /**
      *  消息ID
      */

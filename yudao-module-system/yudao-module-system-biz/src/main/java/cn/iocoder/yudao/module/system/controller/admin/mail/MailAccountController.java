@@ -3,11 +3,7 @@ package cn.iocoder.yudao.module.system.controller.admin.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountBaseVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountUpdateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.send.MailReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.*;
 import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.service.mail.MailAccountService;
@@ -36,14 +32,14 @@ public class MailAccountController {
     @ApiOperation("创建邮箱账号")
     @PreAuthorize("@ss.hasPermission('system:mail-account:create')")
     public CommonResult<Long> createMailAccount(@Valid @RequestBody MailAccountCreateReqVO createReqVO) {
-        return success(mailAccountService.create(createReqVO));
+        return success(mailAccountService.createMailAccount(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("修改邮箱账号")
     @PreAuthorize("@ss.hasPermission('system:mail-account:update')")
     public CommonResult<Boolean> updateMailAccount(@Valid @RequestBody MailAccountUpdateReqVO updateReqVO) {
-        mailAccountService.update(updateReqVO);
+        mailAccountService.updateMailAccount(updateReqVO);
         return success(true);
     }
 
@@ -52,18 +48,15 @@ public class MailAccountController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:mail-account:delete')")
     public CommonResult<Boolean> deleteMailAccount(@RequestParam Long id) {
-        mailAccountService.delete(id);
+        mailAccountService.deleteMailAccount(id);
         return success(true);
     }
-
-    // TODO @wangjingyi：getMailAccount 和 getMailAccountPage 这两个接口，定义一个对应的 Resp 类哈，参考别的模块。主要不要返回 password 字段。
-    // 一个可以的做法，是 MailAccountBaseVO 不返回 password，然后 MailAccountCreateReqVO、MailAccountUpdateReqVO 添加这个字段 DONE
 
     @GetMapping("/get")
     @ApiOperation("获得邮箱账号")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:mail-account:get')")
-    public CommonResult<MailAccountBaseVO> getMailAccount(@RequestParam("id") Long id) {
+    public CommonResult<MailAccountRespVO> getMailAccount(@RequestParam("id") Long id) {
         MailAccountDO mailAccountDO = mailAccountService.getMailAccount(id);
         return success(MailAccountConvert.INSTANCE.convert(mailAccountDO));
     }
@@ -76,14 +69,10 @@ public class MailAccountController {
         return success(MailAccountConvert.INSTANCE.convertPage(pageResult));
     }
 
-    // TODO @wangjingyi：getSimpleMailAccountList 单独定义一个类，只返回精简的信息，id，from 即可。像密码之类都是敏感信息，不应该返回 DONE
-
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获得邮箱账号精简列表")
-    public CommonResult<List<MailAccountBaseVO>> getSimpleMailAccountList() {
+    public CommonResult<List<MailAccountSimpleRespVO>> getSimpleMailAccountList() {
         List<MailAccountDO> list = mailAccountService.getMailAccountList();
-        // 排序后，返回给前端
-        list.sort(Comparator.comparing(MailAccountDO::getId));
         return success(MailAccountConvert.INSTANCE.convertList02(list));
     }
 

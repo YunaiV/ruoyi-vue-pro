@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailLogMapper;
 import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
 import cn.iocoder.yudao.module.system.service.mail.MailLogService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -51,7 +50,7 @@ public class MailLogServiceImpl implements MailLogService {
         logDOBuilder.sendStatus(Objects.equals(isSend, true) ? MailSendStatusEnum.INIT.getStatus()
                 : MailSendStatusEnum.IGNORE.getStatus())
                 // 设置邮箱相关字段
-                .fromAddress(mailAccountDO.getFromAddress())
+                .fromMail(mailAccountDO.getMail())
                 .accountId(mailAccountDO.getId())
                 // TODO @wangjingyi：userId、userType
                 //用户信息
@@ -60,7 +59,7 @@ public class MailLogServiceImpl implements MailLogService {
                 .templateId(template.getId()).templateParams(templateParams).templateContent(templateContent);
 
 
-        logDOBuilder.fromAddress(mailAccountDO.getFromAddress());
+        logDOBuilder.fromMail(mailAccountDO.getMail());
         logDOBuilder.accountId(mailAccountDO.getId());
         // TODO @wangjingyi：每个接收人一条日志。发送多个人，就调用多次，业务方。因为某个邮箱有问题，会导致所有都发送失败。 DONE
         // 设置模板相关字段
