@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -17,7 +17,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['pay:order:export']"
-          @click="handleExport()"
+          @click="exportList('订单数据.xls')"
         />
       </template>
       <template #actionbtns_default="{ row }">
@@ -29,7 +29,7 @@
           @click="handleDetail(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
@@ -42,17 +42,12 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Order">
-import { ref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
 import { allSchemas } from './order.data'
 import * as OrderApi from '@/api/pay/order'
 
 const { t } = useI18n() // 国际化
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, exportList } = useVxeGrid<OrderApi.OrderVO>({
+const [registerTable, { exportList }] = useXTable({
   allSchemas: allSchemas,
   getListApi: OrderApi.getOrderPageApi,
   exportListApi: OrderApi.exportOrderApi
@@ -73,10 +68,6 @@ const setDialogTile = (type: string) => {
 // 新增操作
 const handleCreate = () => {
   setDialogTile('create')
-}
-// 导出操作
-const handleExport = async () => {
-  await exportList(xGrid, '订单数据.xls')
 }
 
 // 详情操作

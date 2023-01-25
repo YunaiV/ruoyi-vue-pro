@@ -1,19 +1,6 @@
 <script setup lang="ts">
-import {
-  ElInput,
-  ElInputNumber,
-  ElDialog,
-  ElTabs,
-  ElTabPane,
-  ElSelect,
-  ElOption,
-  ElForm,
-  ElFormItem,
-  ElRadioGroup,
-  ElRadioButton,
-  ElMessage
-} from 'element-plus'
-import { ref, computed, onMounted, reactive, watch, PropType } from 'vue'
+import { ElMessage } from 'element-plus'
+import { PropType } from 'vue'
 interface shortcutsType {
   text: string
   value: string
@@ -353,7 +340,6 @@ const select = ref()
 watch(
   () => select.value,
   () => {
-    console.info(select.value)
     if (select.value == 'custom') {
       open()
     } else {

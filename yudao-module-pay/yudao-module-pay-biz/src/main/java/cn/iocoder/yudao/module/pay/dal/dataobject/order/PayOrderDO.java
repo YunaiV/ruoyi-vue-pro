@@ -93,7 +93,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 支付金额，单位：分
      */
-    private Long amount;
+    private Integer amount;
     /**
      * 渠道手续费，单位：百分比
      *

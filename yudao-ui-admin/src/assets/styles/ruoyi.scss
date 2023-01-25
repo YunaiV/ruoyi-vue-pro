@@ -60,6 +60,10 @@
   color: inherit;
 }
 
+.el-message-box__status + .el-message-box__message{
+  word-break: break-word;
+}
+
 .el-dialog:not(.is-fullscreen) {
   margin-top: 6vh !important;
 }

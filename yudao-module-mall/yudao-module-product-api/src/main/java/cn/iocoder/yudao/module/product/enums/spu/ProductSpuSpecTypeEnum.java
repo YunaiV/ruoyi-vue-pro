@@ -21,11 +21,11 @@ public enum ProductSpuSpecTypeEnum implements IntArrayValuable {
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ProductSpuSpecTypeEnum::getType).toArray();
 
     /**
-     * 规格
+     * 规格类型
      */
     private final Integer type;
     /**
-     * 规格名
+     * 规格名称
      */
     private final String name;
 

@@ -19,7 +19,7 @@ public class ProductSpuPageReqVO extends PageParam {
     @ApiModelProperty(value = "商品编码", example = "yudaoyuanma")
     private String code;
 
-    @ApiModelProperty(value = "分类id", example = "1")
+    @ApiModelProperty(value = "分类编号", example = "1")
     private Long categoryId;
 
     @ApiModelProperty(value = "商品品牌编号", example = "1")

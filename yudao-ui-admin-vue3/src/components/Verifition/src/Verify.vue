@@ -38,7 +38,6 @@
  * */
 import { VerifySlide, VerifyPoints } from './Verify'
 import { computed, ref, toRefs, watchEffect } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
 
 export default {
   name: 'Vue3Verify',

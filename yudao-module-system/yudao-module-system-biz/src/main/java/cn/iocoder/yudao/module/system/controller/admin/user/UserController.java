@@ -112,7 +112,7 @@ public class UserController {
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获取用户精简信息列表", notes = "只包含被开启的用户，主要用于前端的下拉选项")
     public CommonResult<List<UserSimpleRespVO>> getSimpleUsers() {
-        // 获用户门列表，只要开启状态的
+        // 获用户列表，只要开启状态的
         List<AdminUserDO> list = userService.getUsersByStatus(CommonStatusEnum.ENABLE.getStatus());
         // 排序后，返回给前端
         return success(UserConvert.INSTANCE.convertList04(list));

@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.system.service.dept;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
@@ -8,26 +12,22 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.enums.dept.DeptIdEnum;
 import cn.iocoder.yudao.module.system.mq.producer.dept.DeptProducer;
-import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import com.google.common.collect.Multimap;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static cn.hutool.core.bean.BeanUtil.getFieldValue;
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -47,9 +47,14 @@ public class DeptServiceTest extends BaseDbUnitTest {
     @MockBean
     private DeptProducer deptProducer;
 
+    @BeforeEach
+    public void setUp() {
+        // 清理租户上下文
+        TenantContextHolder.clear();
+    }
+
     @Test
-    @SuppressWarnings("unchecked")
-    void testInitLocalCache() {
+    public void testInitLocalCache() {
         // mock 数据
         DeptDO deptDO1 = randomDeptDO();
         deptMapper.insert(deptDO1);
@@ -59,18 +64,15 @@ public class DeptServiceTest extends BaseDbUnitTest {
         // 调用
         deptService.initLocalCache();
         // 断言 deptCache 缓存
-        Map<Long, DeptDO> deptCache = (Map<Long, DeptDO>) getFieldValue(deptService, "deptCache");
+        Map<Long, DeptDO> deptCache = deptService.getDeptCache();
         assertEquals(2, deptCache.size());
         assertPojoEquals(deptDO1, deptCache.get(deptDO1.getId()));
         assertPojoEquals(deptDO2, deptCache.get(deptDO2.getId()));
         // 断言 parentDeptCache 缓存
-        Multimap<Long, DeptDO> parentDeptCache = (Multimap<Long, DeptDO>) getFieldValue(deptService, "parentDeptCache");
+        Multimap<Long, DeptDO> parentDeptCache = deptService.getParentDeptCache();
         assertEquals(2, parentDeptCache.size());
         assertPojoEquals(deptDO1, parentDeptCache.get(deptDO1.getParentId()));
         assertPojoEquals(deptDO2, parentDeptCache.get(deptDO2.getParentId()));
-        // 断言 maxUpdateTime 缓存
-        LocalDateTime maxUpdateTime = (LocalDateTime) getFieldValue(deptService, "maxUpdateTime");
-        assertEquals(ObjectUtils.max(deptDO1.getUpdateTime(), deptDO2.getUpdateTime()), maxUpdateTime);
     }
 
     @Test

@@ -49,7 +49,7 @@
 import { PropType, ref } from 'vue'
 import { ElUpload, ElNotification, ElImageViewer } from 'element-plus'
 import type { UploadProps, UploadFile, UploadUserFile } from 'element-plus'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import { propTypes } from '@/utils/propTypes'
 import { getAccessToken, getTenantId } from '@/utils/auth'
 

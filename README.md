@@ -1,6 +1,4 @@
-**严肃声明：现在、未来都不会有商业版本，所有功能全部开源！**
-
-**拒绝虚假开源，售卖商业版，程序员不骗程序员！！**
+**严肃声明：现在、未来都不会有商业版本，所有代码全部开源！**
 
 **「我喜欢写代码，乐此不疲」**  
 **「我喜欢做开源，以此为乐」**
@@ -27,7 +25,7 @@
 
 * 管理后台的 Vue3 版本采用 [vue-element-plus-admin](https://gitee.com/kailong110120130/vue-element-plus-admin) ，Vue2 版本采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) 
 * 管理后台的移动端采用 [uni-app](https://github.com/dcloudio/uni-app) 方案，一份代码多终端适配，同时支持 APP、小程序、H5！
-* 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson
+* 后端采用 Spring Boot 多模块架构、MySQL + MyBatis Plus、Redis + Redisson
 * 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
 * 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统，支持 SSO 单点登录
 * 支持加载动态权限菜单，按钮级别权限控制，本地缓存提升性能
@@ -38,12 +36,12 @@
 * 集成阿里云、腾讯云等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务
 * 集成报表设计器，支持数据报表、图形报表、打印设计等
 
-| 项目名                | 说明                     | 传送门                                                                                                                               |
-|--------------------|------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| `ruoyi-vue-pro`    | Spring Boot 多模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro)   |
-| `yudao-cloud`  | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)       |
-| `Spring-Boot-Labs` | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/zhijiantianya/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/SpringBoot-Labs) |
- | `ruoyi-vue-pro-mini` | 精简版 移除工作流 支付等模块| **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini)**  |
+| 项目名                  | 说明                     | 传送门                                                                                                                                 |
+|----------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| `ruoyi-vue-pro`      | Spring Boot 多模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro)     |
+| `yudao-cloud`        | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)         |
+| `Spring-Boot-Labs`   | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/zhijiantianya/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/SpringBoot-Labs) |
+ | `ruoyi-vue-pro-mini` | 精简版：移除工作流、支付等模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini)**                                                                |
 
 ## 😎 开源协议
 
@@ -70,6 +68,7 @@
 * 会员中心
 * 数据报表
 * 商城系统
+* 微信公众号
 
 > 友情提示：本项目基于 RuoYi-Vue 修改，**重构优化**后端的代码，**美化**前端的界面。
 >
@@ -96,8 +95,9 @@
 | ⭐️  | 登录日志  | 系统登录日志记录查询，包含登录异常               |
 | 🚀  | 错误码管理 | 系统所有错误码的管理，可在线修改错误提示，无需重启服务     |
 |     | 通知公告  | 系统通知公告信息发布维护                    |
-| 🚀  | 敏感词  | 配置系统敏感词，支持标签分组                  |
+| 🚀  | 敏感词   | 配置系统敏感词，支持标签分组                  |
 | 🚀  | 应用管理  | 管理 SSO 单点登录的应用，支持多种 OAuth2 授权方式 |
+| 🚀  | 地区管理  | 展示省份、城市、区镇等城市信息，支持 IP 对应城市      |
 
 ### 工作流程
 
@@ -132,7 +132,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 |     | 表单构建     | 拖动表单元素生成相应的 HTML 代码，支持导出 JSON、Vue 文件         |
 | 🚀  | 配置管理     | 对系统动态配置常用参数，支持 SpringBoot 加载                 |
 | ⭐️  | 定时任务     | 在线（添加、修改、删除)任务调度包含执行结果日志                     |
-| 🚀  | 文件服务     | 支持将文件存储到 S3（MinIO、阿里云、腾讯云、七牛云）、本地、FTP、数据库等      | 
+| 🚀  | 文件服务     | 支持将文件存储到 S3（MinIO、阿里云、腾讯云、七牛云）、本地、FTP、数据库等   | 
 | 🚀  | API 日志   | 包括 RESTful API 访问日志、异常日志两部分，方便排查 API 相关的问题   |
 |     | MySQL 监控 | 监视当前系统数据库连接池状态，可进行分析SQL找出系统性能瓶颈              |
 |     | Redis 监控 | 监控 Redis 数据库的使用情况，使用的 Redis Key 管理           |
@@ -153,6 +153,21 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | 🚀  | 报表设计器     | 支持数据报表、图形报表、打印设计等       |
 | 🚀  | 大屏设计器     | 建设中... 拖拽式实现可视化数据大屏          |
 
+### 微信公众号
+
+|     | 功能     | 描述                            |
+|-----|--------|-------------------------------|
+| 🚀  | 账号管理   | 配置接入的微信公众号，可支持多个公众号           |
+| 🚀  | 数据统计   | 统计公众号的用户增减、累计用户、消息概况、接口分析等数据  |
+| 🚀  | 粉丝管理   | 查看已关注、取关的粉丝列表，可对粉丝进行同步、打标签等操作 |
+| 🚀  | 消息管理   | 查看粉丝发送的消息列表，可主动回复粉丝消息         |
+| 🚀  | 自动回复   | 自动回复粉丝发送的消息，支持关注回复、消息回复、关键字回复 |
+| 🚀  | 标签管理   | 对公众号的标签进行创建、查询、修改、删除等操作       |
+| 🚀  | 菜单管理   | 自定义公众号的菜单，也可以从公众号同步菜单         |
+| 🚀  | 素材管理   | 管理公众号的图片、语音、视频等素材，支持在线播放语音、视频 |
+| 🚀  | 图文草稿箱  | 新增常用的图文素材到草稿箱，可发布到公众号         |
+| 🚀  | 图文发表记录 | 查看已发布成功的图文素材，支持删除操作           |
+
 ### 商城系统
 
 建设中...
@@ -169,47 +184,49 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 ## 🐨 技术栈
 
-| 项目                      | 说明                 |
-|-------------------------|-----------------------|
-| `yudao-dependencies`    | Maven 依赖版本管理       |
-| `yudao-framework`       | Java 框架拓展          |
-| `yudao-server`          | 管理后台 + 用户 APP 的服务端 |
-| `yudao-ui-admin`        | 管理后台的 Vue2 前端项目     |
-| `yudao-ui-admin-vue3`   | 管理后台的 Vue3 前端项目     |
-| `yudao-ui-admin-uniapp` | 管理后台的 uni-app 多端项目  |
-| `yudao-ui-app`          | 用户 APP 的 UI 界面     |
-| `yudao-module-system`   | 系统功能的 Module 模块    |
-| `yudao-module-member`   | 会员中心的 Module 模块    |
-| `yudao-module-infra`    | 基础设施的 Module 模块    |
-| `yudao-module-tool`     | 研发工具的 Module 模块    |
-| `yudao-module-bpm`      | 工作流程的 Module 模块    |
-| `yudao-module-pay`      | 支付系统的 Module 模块    |
+| 项目                           | 说明                 |
+|------------------------------|--------------------|
+| `yudao-dependencies`         | Maven 依赖版本管理       |
+| `yudao-framework`            | Java 框架拓展          |
+| `yudao-server`               | 管理后台 + 用户 APP 的服务端 |
+| `yudao-ui-admin`             | 管理后台的 Vue2 前端项目    |
+| `yudao-ui-admin-vue3`        | 管理后台的 Vue3 前端项目    |
+| `yudao-ui-admin-uniapp`      | 管理后台的 uni-app 多端项目 |
+| `yudao-ui-app`               | 用户 APP 的 UI 界面     |
+| `yudao-module-system`        | 系统功能的 Module 模块    |
+| `yudao-module-member`        | 会员中心的 Module 模块    |
+| `yudao-module-infra`         | 基础设施的 Module 模块    |
+| `yudao-module-bpm`           | 工作流程的 Module 模块    |
+| `yudao-module-pay`           | 支付系统的 Module 模块    |
+| `yudao-module-mall`          | 商城系统的 Module 模块    |
+| `yudao-module-mp`            | 微信公众号的 Module 模块   |
+| `yudao-module-visualization` | 大屏报表 Module 模块     |
 
 ### 后端
 
-| 框架                                                                                         | 说明                   | 版本          | 学习指南                                                           |
-|---------------------------------------------------------------------------------------------|-----------------------|-------------|----------------------------------------------------------------|
-| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架             | 2.7.6       | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
-| [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器             | 5.7 / 8.0+  |                                                                |
-| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件     | 1.2.15      | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包       | 3.5.2       | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
-| [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源               | 3.6.0       | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [Redis](https://redis.io/)                                                                  | key-value 数据库        | 5.0 / 6.0   |                                                                |
-| [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端            | 3.18.0      | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
-| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架               | 5.3.24      | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
-| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架         | 5.7.5       | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
-| [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件             | 6.2.5       | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
-| [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎               | 6.7.2       | [文档](https://doc.iocoder.cn/bpm/)                                                     |
-| [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件             | 2.3.2       | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
-| [Knife4j](https://gitee.com/xiaoym/knife4j)                                                 | Swagger 增强 UI 实现    | 3.0.3       | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
-| [Resilience4j](https://github.com/resilience4j/resilience4j)                                | 服务保障组件             | 1.7.1       | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao)    |
+| 框架                                                                                          | 说明               | 版本          | 学习指南                                                           |
+|---------------------------------------------------------------------------------------------|------------------|-------------|----------------------------------------------------------------|
+| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.7       | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
+| [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器           | 5.7 / 8.0+  |                                                                |
+| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.15      | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.3.1     | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
+| [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源            | 3.6.1       | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [Redis](https://redis.io/)                                                                  | key-value 数据库    | 5.0 / 6.0   |                                                                |
+| [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端        | 3.18.0      | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
+| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架           | 5.3.24      | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
+| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架      | 5.7.6       | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
+| [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件           | 6.2.5       | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
+| [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 6.8.0       | [文档](https://doc.iocoder.cn/bpm/)                              |
+| [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.3.2       | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
+| [Knife4j](https://gitee.com/xiaoym/knife4j)                                                 | Swagger 增强 UI 实现 | 3.0.3       | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
+| [Resilience4j](https://github.com/resilience4j/resilience4j)                                | 服务保障组件           | 1.7.1       | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao)    |
 | [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.12.0      | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao)      |
-| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台    | 2.7.9       | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
-| [Jackson](https://github.com/FasterXML/jackson)                                             | JSON 工具库             | 2.13.3      |                                                                |
-| [MapStruct](https://mapstruct.org/)                                                         | Java Bean 转换         | 1.5.3.Final | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao)       |
-| [Lombok](https://projectlombok.org/)                                                        | 消除冗长的 Java 代码     | 1.18.24     | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao)          |
-| [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架        | 5.8.2       | -                                                              |
-| [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架         | 4.8.0       | -                                                              |
+| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 2.7.10      | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
+| [Jackson](https://github.com/FasterXML/jackson)                                             | JSON 工具库         | 2.13.3      |                                                                |
+| [MapStruct](https://mapstruct.org/)                                                         | Java Bean 转换     | 1.5.3.Final | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao)       |
+| [Lombok](https://projectlombok.org/)                                                        | 消除冗长的 Java 代码    | 1.18.24     | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao)          |
+| [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架      | 5.8.2       | -                                                              |
+| [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架     | 4.8.0       | -                                                              |
 
 ### [管理后台 Vue2 前端](./yudao-ui-admin)
 
@@ -220,22 +237,22 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 ### [管理后台 Vue3 前端](./yudao-ui-admin-vue3)
 
-| 框架                                                                  |     说明      |   版本   |
+| 框架                                                                   |      说明      |   版本   |
 |----------------------------------------------------------------------|:------------:|:------:|
-| [Vue](https://staging-cn.vuejs.org/)                                 |   Vue 框架    | 3.2.45 |
-| [Vite](https://cn.vitejs.dev//)                                      | 开发与构建工具  | 4.0.3  |
-| [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus | 2.2.27 |
+| [Vue](https://staging-cn.vuejs.org/)                                 |    Vue 框架    | 3.2.45 |
+| [Vite](https://cn.vitejs.dev//)                                      |   开发与构建工具    | 4.0.4  |
+| [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus | 2.2.28 |
 | [TypeScript](https://www.typescriptlang.org/docs/)                   |  TypeScript  | 4.9.4  |
 | [pinia](https://pinia.vuejs.org/)                                    |    vuex5     | 2.0.28 |
-| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) |    国际化     | 9.2.2  |
-| [vxe-table](https://vxetable.cn/)                                    |  vue最强表单  | 4.3.7  |
+| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) |     国际化      | 9.2.2  |
+| [vxe-table](https://vxetable.cn/)                                    |   vue最强表单    | 4.3.9  |
 
 ### [管理后台 uni-app 跨端](./yudao-ui-admin-uniapp)
 
-| 框架                                                                  | 说明               | 版本     |
-|----------------------------------------------------------------------|------------------|--------|
-| [uni-app](hhttps://github.com/dcloudio/uni-app)                                 | 跨平台框架           | 2.0.0 |
-| [uni-ui](https://github.com/dcloudio/uni-ui)                                      | 基于 uni-app 的 UI 框架          | 1.4.20  |
+| 框架                                              | 说明                 | 版本     |
+|-------------------------------------------------|--------------------|--------|
+| [uni-app](hhttps://github.com/dcloudio/uni-app) | 跨平台框架              | 2.0.0  |
+| [uni-ui](https://github.com/dcloudio/uni-ui)    | 基于 uni-app 的 UI 框架 | 1.4.20 |
 
 ## 🐷 演示图
 

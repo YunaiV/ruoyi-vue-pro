@@ -21,7 +21,7 @@ public interface SmsChannelService {
     /**
      * 初始化短信客户端
      */
-    void initSmsClients();
+    void initLocalCache();
 
     /**
      * 创建短信渠道

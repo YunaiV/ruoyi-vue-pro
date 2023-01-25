@@ -8,7 +8,7 @@
       </template>
       <ProfileUser />
     </el-card>
-    <el-card class="w-2/3 user" style="margin-left: 10px" shadow="hover">
+    <el-card class="w-2/3 user ml-3" shadow="hover">
       <template #header>
         <div class="card-header">
           <span>{{ t('profile.info.title') }}</span>
@@ -31,9 +31,6 @@
   </div>
 </template>
 <script setup lang="ts" name="Profile">
-import { ref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { ElCard, ElTabs, ElTabPane } from 'element-plus'
 import { BasicInfo, ProfileUser, ResetPwd, UserSocial } from './components/'
 const { t } = useI18n()
 

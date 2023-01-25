@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <XButton
           type="primary"
@@ -31,10 +31,10 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['infra:data-source-config:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
@@ -66,13 +66,7 @@
   </XModal>
 </template>
 <script setup lang="ts" name="DataSourceConfig">
-// 全局相关的 import
-import { ref, unref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as DataSourceConfiggApi from '@/api/infra/dataSourceConfig'
 import { rules, allSchemas } from './dataSourceConfig.data'
@@ -80,8 +74,7 @@ import { rules, allSchemas } from './dataSourceConfig.data'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData } = useVxeGrid<DataSourceConfiggApi.DataSourceConfigVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   isList: true,
   getListApi: DataSourceConfiggApi.getDataSourceConfigListApi,
@@ -123,11 +116,6 @@ const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
 }
 
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
-}
-
 // 提交按钮
 const submitForm = async () => {
   const elForm = unref(formRef)?.getElFormRef()
@@ -149,7 +137,7 @@ const submitForm = async () => {
       } finally {
         loading.value = false
         // 刷新列表
-        await getList(xGrid)
+        await reload()
       }
     }
   })

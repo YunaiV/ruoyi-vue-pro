@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #duration_default="{ row }">
         <span>{{ row.duration + 'ms' }}</span>
       </template>
@@ -17,7 +17,7 @@
           @click="handleDetail(row)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(详情) -->
@@ -36,17 +36,13 @@
   </XModal>
 </template>
 <script setup lang="ts" name="ApiAccessLog">
-import { ref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
 import { allSchemas } from './apiAccessLog.data'
 import * as ApiAccessLogApi from '@/api/infra/apiAccessLog'
+
 const { t } = useI18n() // 国际化
 
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions } = useVxeGrid<ApiAccessLogApi.ApiAccessLogVO>({
+const [registerTable] = useXTable({
   allSchemas: allSchemas,
   topActionSlots: false,
   getListApi: ApiAccessLogApi.getApiAccessLogPageApi

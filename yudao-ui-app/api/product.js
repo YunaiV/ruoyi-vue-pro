@@ -5,4 +5,4 @@ const { http } = uni.$u
 export const productSpuPage = params => http.get('product/spu/page', { params })
 
 // 查询商品
-export const productSpu = params => http.get('product/spu/', { params })
+export const getSpuDetail = id => http.get('product/spu/get-detail?id=' + id, { })

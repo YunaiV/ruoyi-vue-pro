@@ -1,5 +1,3 @@
-import { ref, unref } from 'vue'
-
 export interface ScrollToParams {
   el: HTMLElement
   to: number

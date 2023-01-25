@@ -201,7 +201,7 @@ export default {
       // #ifdef H5 || APP-PLUS
       node.attrs.src = node.attrs.src || node.attrs['data-src']
       // #endif
-      this.root.$emit('imgtap', node.attrs)
+      this.root.$emit('imgTap', node.attrs)
       // 自动预览图片
       if (this.root.previewImg)
         uni.previewImage({
@@ -262,7 +262,7 @@ export default {
     linkTap(e) {
       var attrs = e.currentTarget ? this.childs[e.currentTarget.dataset.i].attrs : e,
         href = attrs.href
-      this.root.$emit('linktap', attrs)
+      this.root.$emit('linkTap', attrs)
       if (href) {
         // 跳转锚点
         if (href[0] == '#')

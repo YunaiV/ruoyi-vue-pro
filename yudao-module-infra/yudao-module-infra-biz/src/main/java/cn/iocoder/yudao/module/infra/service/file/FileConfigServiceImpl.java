@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
@@ -20,8 +18,6 @@ import cn.iocoder.yudao.module.infra.dal.mysql.file.FileConfigMapper;
 import cn.iocoder.yudao.module.infra.mq.producer.file.FileConfigProducer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -31,7 +27,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -50,18 +45,6 @@ import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_CONFIG
 @Slf4j
 public class FileConfigServiceImpl implements FileConfigService {
 
-    /**
-     * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
-     * 因为已经通过 Redis Pub/Sub 机制，所以频率不需要高
-     */
-    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
-
-    /**
-     * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
-     */
-    @Getter
-    private volatile LocalDateTime maxUpdateTime;
-
     @Resource
     private FileClientFactory fileClientFactory;
     /**
@@ -79,20 +62,14 @@ public class FileConfigServiceImpl implements FileConfigService {
     @Resource
     private Validator validator;
 
-    @Resource
-    @Lazy // 注入自己，所以延迟加载
-    private FileConfigService self;
-
     @Override
     @PostConstruct
-    public void initFileClients() {
-        // 获取文件配置，如果有更新
-        List<FileConfigDO> configs = loadFileConfigIfUpdate(maxUpdateTime);
-        if (CollUtil.isEmpty(configs)) {
-            return;
-        }
+    public void initLocalCache() {
+        // 第一步：查询数据
+        List<FileConfigDO> configs = fileConfigMapper.selectList();
+        log.info("[initLocalCache][缓存文件配置，数量为:{}]", configs.size());
 
-        // 创建或更新支付 Client
+        // 第二步：构建缓存：创建或更新文件 Client
         configs.forEach(config -> {
             fileClientFactory.createOrUpdateFileClient(config.getId(), config.getStorage(), config.getConfig());
             // 如果是 master，进行设置
@@ -100,36 +77,6 @@ public class FileConfigServiceImpl implements FileConfigService {
                 masterFileClient = fileClientFactory.getFileClient(config.getId());
             }
         });
-
-        // 写入缓存
-        maxUpdateTime = CollectionUtils.getMaxValue(configs, FileConfigDO::getUpdateTime);
-        log.info("[initFileClients][初始化 FileConfig 数量为 {}]", configs.size());
-    }
-
-    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
-    public void schedulePeriodicRefresh() {
-        self.initFileClients();
-    }
-
-    /**
-     * 如果文件配置发生变化，从数据库中获取最新的全量文件配置。
-     * 如果未发生变化，则返回空
-     *
-     * @param maxUpdateTime 当前文件配置的最大更新时间
-     * @return 文件配置列表
-     */
-    private List<FileConfigDO> loadFileConfigIfUpdate(LocalDateTime maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadFileConfigIfUpdate][首次加载全量文件配置]");
-        } else { // 判断数据库中是否有更新的文件配置
-            if (fileConfigMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
-            }
-            log.info("[loadFileConfigIfUpdate][增量加载全量文件配置]");
-        }
-        // 第二步，如果有更新，则从数据库加载所有文件配置
-        return fileConfigMapper.selectList();
     }
 
     @Override

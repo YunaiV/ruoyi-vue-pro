@@ -38,6 +38,7 @@
             	    :selection-end="selectionEnd"
             	    :selection-start="selectionStart"
             	    :password="password || type === 'password' || undefined"
+                    :ignoreCompositionEvent="ignoreCompositionEvent"
             	    @input="onInput"
             	    @blur="onBlur"
             	    @focus="onFocus"
@@ -114,7 +115,7 @@ import props from "./props.js";
  * @property {Boolean}			readonly				是否只读，与disabled不同之处在于disabled会置灰组件，而readonly则不会 （ 默认 false ）
  * @property {String}			shape					输入框形状，circle-圆形，square-方形 （ 默认 'square' ）
  * @property {Object}			customStyle				定义需要用到的外部样式
- *
+ * @property {Boolean}			ignoreCompositionEvent	是否忽略组件内对文本合成系统事件的处理。
  * @example <u-input v-model="value" :password="true" suffix-icon="lock-fill" />
  */
 export default {

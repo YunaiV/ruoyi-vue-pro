@@ -139,7 +139,7 @@ public interface ErrorCodeConstants {
 
     // ========== OAuth2 授权 1002022000 =========
     ErrorCode OAUTH2_CODE_NOT_EXISTS = new ErrorCode(1002022000, "code 不存在");
-    ErrorCode OAUTH2_CODE_EXPIRE = new ErrorCode(1002022000, "code 已过期");
+    ErrorCode OAUTH2_CODE_EXPIRE = new ErrorCode(1002022001, "code 已过期");
 
     // TODO @芋艿：需要重新搞下 mail 错误码
 

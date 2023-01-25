@@ -17,6 +17,10 @@
     </description>
 
     <dependencies>
+        <dependency>
+            <groupId>com.xingyuv</groupId>
+            <artifactId>spring-boot-starter-captcha-plus</artifactId>
+        </dependency>
         <!-- Spring 核心 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -29,11 +33,6 @@
             <artifactId>yudao-spring-boot-starter-redis</artifactId>
         </dependency>
 
-        <!-- 验证码相关 -->
-        <dependency>
-            <groupId>com.anji-plus</groupId>
-            <artifactId>spring-boot-starter-captcha</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

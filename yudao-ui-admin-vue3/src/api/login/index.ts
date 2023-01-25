@@ -33,7 +33,7 @@ export const getTenantIdByNameApi = (name: string) => {
 
 // 登出
 export const loginOutApi = () => {
-  return request.delete({ url: '/system/auth/logout' })
+  return request.post({ url: '/system/auth/logout' })
 }
 
 // 获取用户权限信息

@@ -167,9 +167,8 @@ yudao:
       - ${spring.boot.admin.context-path}/** # 不处理 Spring Boot Admin 的请求
       - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求
   pay:
-    pay-notify-url: http://niubi.natapp1.cc/api/pay/order/notify
-    pay-return-url: http://niubi.natapp1.cc/api/pay/order/return
-    refund-notify-url: http://niubi.natapp1.cc/api/pay/refund/notify
+    callback-url: http://yunai.natapp1.cc/admin-api/pay/notify/callback
+    return-url: http://yunai.natapp1.cc/admin-api/pay/notify/return
   demo: true # 开启演示模式
 
 justauth:
@@ -188,3 +187,11 @@ justauth:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
+wx:
+  mp:
+    useRedis: false
+    defaultContent: \u60A8\u597D\uFF0C\u6709\u4EC0\u4E48\u95EE\u9898\uFF1F
+    redisConfig:
+      host: 127.0.0.1
+      port: 6379
+      password:

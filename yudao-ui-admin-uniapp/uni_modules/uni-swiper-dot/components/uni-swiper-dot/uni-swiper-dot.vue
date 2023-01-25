@@ -35,7 +35,7 @@
 	 * @tutorial https://ext.dcloud.net.cn/plugin?id=284
 	 * @property {Number} current 当前指示点索引，必须是通过 `swiper` 的 `change` 事件获取到的 `e.detail.current`
 	 * @property {String} mode = [default|round|nav|indexes] 指示点的类型
-	 * 	@value defualt 默认指示点
+	 * 	@value default 默认指示点
 	 * 	@value round 圆形指示点
 	 * 	@value nav 条形指示点
 	 * 	@value indexes 索引指示点

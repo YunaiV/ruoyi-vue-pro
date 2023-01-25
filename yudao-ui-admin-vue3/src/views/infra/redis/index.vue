@@ -125,21 +125,9 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Redis">
-import { onBeforeMount, ref } from 'vue'
-import {
-  ElRow,
-  ElCard,
-  ElCol,
-  ElTable,
-  ElTableColumn,
-  ElScrollbar,
-  ElDescriptions,
-  ElDescriptionsItem
-} from 'element-plus'
 import * as echarts from 'echarts'
 import { DICT_TYPE } from '@/utils/dict'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import * as RedisApi from '@/api/infra/redis'
 import { RedisKeyInfo, RedisMonitorInfoVO } from '@/api/infra/redis/types'
 

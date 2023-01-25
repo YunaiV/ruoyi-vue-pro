@@ -38,14 +38,15 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
     default PageResult<DictDataDO> selectPage(DictDataPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<DictDataDO>()
                 .likeIfPresent(DictDataDO::getLabel, reqVO.getLabel())
-                .likeIfPresent(DictDataDO::getDictType, reqVO.getDictType())
+                .eqIfPresent(DictDataDO::getDictType, reqVO.getDictType())
                 .eqIfPresent(DictDataDO::getStatus, reqVO.getStatus())
                 .orderByDesc(Arrays.asList(DictDataDO::getDictType, DictDataDO::getSort)));
     }
 
     default List<DictDataDO> selectList(DictDataExportReqVO reqVO) {
-        return selectList(new LambdaQueryWrapperX<DictDataDO>().likeIfPresent(DictDataDO::getLabel, reqVO.getLabel())
-                .likeIfPresent(DictDataDO::getDictType, reqVO.getDictType())
+        return selectList(new LambdaQueryWrapperX<DictDataDO>()
+                .likeIfPresent(DictDataDO::getLabel, reqVO.getLabel())
+                .eqIfPresent(DictDataDO::getDictType, reqVO.getDictType())
                 .eqIfPresent(DictDataDO::getStatus, reqVO.getStatus()));
     }
 

@@ -16,11 +16,11 @@
 	 * @property {String}			endText			倒计结束的提示语，见官网说明（默认 '重新获取' ）
 	 * @property {Boolean}			keepRunning		是否在H5刷新或各端返回再进入时继续倒计时（ 默认false ）
 	 * @property {String}			uniqueKey		为了区分多个页面，或者一个页面多个倒计时组件本地存储的继续倒计时变了
-	 * 
+	 *
 	 * @event {Function}	change	倒计时期间，每秒触发一次
 	 * @event {Function}	start	开始倒计时触发
 	 * @event {Function}	end		结束倒计时触发
-	 * @example <u-code ref="uCode" @change="codeChange" seconds="20"></u-code> 
+	 * @example <u-code ref="uCode" @change="codeChange" seconds="20"></u-code>
 	 */
 	export default {
 		name: "u-code",
@@ -74,7 +74,6 @@
 				this.canGetCode = false
 				// 这里放这句，是为了一开始时就提示，否则要等setInterval的1秒后才会有提示
 				this.changeEvent(this.changeText.replace(/x|X/, this.secNum))
-				this.setTimeToStorage()
 				this.timer = setInterval(() => {
 					if (--this.secNum) {
 						// 用当前倒计时的秒数替换提示字符串中的"x"字母
@@ -88,7 +87,8 @@
 						this.canGetCode = true
 					}
 				}, 1000)
-			},
+        this.setTimeToStorage()
+      },
 			// 重置，可以让用户再次获取验证码
 			reset() {
 				this.canGetCode = true

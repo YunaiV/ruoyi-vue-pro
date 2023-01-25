@@ -63,7 +63,7 @@ public class PayRefundUnifiedReqDTO {
      */
     @NotNull(message = "退款金额不能为空")
     @DecimalMin(value = "0", inclusive = false, message = "支付金额必须大于零")
-    private Long amount;
+    private Integer amount;
 
     /**
      * 退款结果 notify 回调地址， 支付宝退款不需要回调地址， 微信需要

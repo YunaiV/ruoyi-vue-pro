@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.infra.service;
 
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.generator.IDatabaseQuery.DefaultDatabaseQuery;
+import com.baomidou.mybatisplus.generator.query.DefaultQuery;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.builder.ConfigBuilder;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
@@ -19,7 +19,7 @@ public class DefaultDatabaseQueryTest {
 
         ConfigBuilder builder = new ConfigBuilder(null, dataSourceConfig, null, null, null, null);
 
-        DefaultDatabaseQuery query = new DefaultDatabaseQuery(builder);
+        DefaultQuery query = new DefaultQuery(builder);
 
         long time = System.currentTimeMillis();
         List<TableInfo> tableInfos = query.queryTables();

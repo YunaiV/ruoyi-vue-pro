@@ -16,12 +16,12 @@ export interface DictDataType {
   dictType: string
   label: string
   value: string | number | boolean
-  colorType: ElementPlusInfoType | '' | 'default' | 'primary'
+  colorType: ElementPlusInfoType | ''
   cssClass: string
 }
 
 export const getDictOptions = (dictType: string) => {
-  return dictStore.getDictMap[dictType]
+  return dictStore.getDictByType(dictType)
 }
 
 export const getIntDictOptions = (dictType: string) => {

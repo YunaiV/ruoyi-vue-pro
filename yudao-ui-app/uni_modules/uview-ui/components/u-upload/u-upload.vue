@@ -374,6 +374,7 @@
 	$u-upload-deletable-zIndex:3 !default;
 	$u-upload-success-bottom:0 !default;
 	$u-upload-success-right:0 !default;
+	$u-upload-success-border-style:solid !default;
 	$u-upload-success-border-top-color:transparent !default;
 	$u-upload-success-border-left-color:transparent !default;
 	$u-upload-success-border-bottom-color: $u-success !default;
@@ -479,6 +480,7 @@
 			// 由于weex(nvue)为阿里巴巴的KPI(部门业绩考核)的laji产物，不支持css绘制三角形
 			// 所以在nvue下使用图片，非nvue下使用css实现
 			/* #ifndef APP-NVUE */
+			border-style: $u-upload-success-border-style;
 			border-top-color: $u-upload-success-border-top-color;
 			border-left-color: $u-upload-success-border-left-color;
 			border-bottom-color: $u-upload-success-border-bottom-color;

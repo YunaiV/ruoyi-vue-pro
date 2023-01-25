@@ -1,0 +1,5 @@
+### 请求 /mp/message/page 接口 => 成功
+GET {{baseUrl}}/mp/auto-reply/page?accountId=1&pageNo=1&pageSize=10
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}

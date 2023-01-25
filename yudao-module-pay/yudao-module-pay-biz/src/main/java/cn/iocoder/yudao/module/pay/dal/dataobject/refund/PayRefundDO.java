@@ -132,11 +132,11 @@ public class PayRefundDO extends BaseDO {
     /**
      * 支付金额，单位：分
      */
-    private Long payAmount;
+    private Integer payAmount;
     /**
      * 退款金额，单位：分
      */
-    private Long refundAmount;
+    private Integer refundAmount;
 
     /**
      * 退款原因
@@ -192,8 +192,6 @@ public class PayRefundDO extends BaseDO {
      * 退款通知时间
      */
     private LocalDateTime notifyTime;
-
-
 
 
 }

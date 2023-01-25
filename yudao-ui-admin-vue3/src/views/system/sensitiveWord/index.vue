@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -17,7 +17,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['system:sensitive-word:export']"
-          @click="handleExport()"
+          @click="exportList('敏感词数据.xls')"
         />
       </template>
       <template #tags_default="{ row }">
@@ -50,10 +50,10 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:sensitive-word:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
 
   <XModal v-model="dialogVisible" :title="dialogTitle">
@@ -103,27 +103,19 @@
   </XModal>
 </template>
 <script setup lang="ts" name="SensitiveWord">
-import { onMounted, ref, unref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
-import { FormExpose } from '@/components/Form'
-import { ElTag, ElSelect, ElOption } from 'element-plus'
+import type { FormExpose } from '@/components/Form'
 import * as SensitiveWordApi from '@/api/system/sensitiveWord'
 import { rules, allSchemas } from './sensitiveWord.data'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData, exportList } =
-  useVxeGrid<SensitiveWordApi.SensitiveWordVO>({
-    allSchemas: allSchemas,
-    getListApi: SensitiveWordApi.getSensitiveWordPageApi,
-    deleteApi: SensitiveWordApi.deleteSensitiveWordApi,
-    exportListApi: SensitiveWordApi.exportSensitiveWordApi
-  })
+const [registerTable, { reload, deleteData, exportList }] = useXTable({
+  allSchemas: allSchemas,
+  getListApi: SensitiveWordApi.getSensitiveWordPageApi,
+  deleteApi: SensitiveWordApi.deleteSensitiveWordApi,
+  exportListApi: SensitiveWordApi.exportSensitiveWordApi
+})
 const actionLoading = ref(false) // 遮罩层
 const actionType = ref('') // 操作按钮的类型
 const dialogVisible = ref(false) // 是否显示弹出层
@@ -150,11 +142,6 @@ const handleCreate = () => {
   setDialogTile('create')
 }
 
-// 导出操作
-const handleExport = async () => {
-  await exportList(xGrid, '敏感词数据.xls')
-}
-
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -168,11 +155,6 @@ const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
   const res = await SensitiveWordApi.getSensitiveWordApi(rowId)
   detailData.value = res
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
 }
 
 // 提交按钮
@@ -196,7 +178,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        await getList(xGrid)
+        await reload()
       }
     }
   })

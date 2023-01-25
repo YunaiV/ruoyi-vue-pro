@@ -13,8 +13,9 @@
 	>
 		<u-line
 		    length="140rpx"
-		    color="#E6E8EB"
+		    :color="lineColor"
 		    :hairline="false"
+			:dashed="dashed"
 			v-if="line"
 		></u-line>
 		<!-- 加载中和没有更多的状态才显示两边的横线 -->
@@ -28,7 +29,7 @@
 			>
 				<u-loading-icon
 				    :color="iconColor"
-				    size="17"
+				    :size="iconSize"
 				    :mode="loadingIcon"
 				></u-loading-icon>
 			</view>
@@ -42,8 +43,9 @@
 		</view>
 		<u-line
 		    length="140rpx"
-		    color="#E6E8EB"
+		    :color="lineColor"
 			:hairline="false"
+			:dashed="dashed"
 			v-if="line"
 		></u-line>
 	</view>
@@ -60,6 +62,7 @@
 	 * @property {String}			bgColor			组件背景颜色，在页面是非白色时会用到（默认 'transparent' ）
 	 * @property {Boolean}			icon			加载中时是否显示图标（默认 true ）
 	 * @property {String | Number}	fontSize		字体大小（默认 14 ）
+	 * @property {String | Number}	iconSize		图标大小（默认 17 ）
 	 * @property {String}			color			字体颜色（默认 '#606266' ）
 	 * @property {String}			loadingIcon		加载图标（默认 'circle' ）
 	 * @property {String}			loadmoreText	加载前的提示语（默认 '加载更多' ）
@@ -67,10 +70,12 @@
 	 * @property {String}			nomoreText		没有更多的提示语（默认 '没有更多了' ）
 	 * @property {Boolean}			isDot			到上一个相邻元素的距离 （默认 false ）
 	 * @property {String}			iconColor		加载中图标的颜色 （默认 '#b7b7b7' ）
+	 * @property {String}			lineColor		线条颜色（默认 #E6E8EB ）
 	 * @property {String | Number}	marginTop		上边距 （默认 10 ）
 	 * @property {String | Number}	marginBottom	下边距 （默认 10 ）
 	 * @property {String | Number}	height			高度，单位px （默认 'auto' ）
 	 * @property {Boolean}			line			是否显示左边分割线  （默认 false ）
+	 * @property {Boolean}			dashed		// 是否虚线，true-虚线，false-实线  （默认 false ）
 	 * @event {Function} loadmore status为loadmore时，点击组件会发出此事件
 	 * @example <u-loadmore :status="status" icon-type="iconType" load-text="loadText" />
 	 */

@@ -8,10 +8,8 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleEx
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 import org.springframework.lang.Nullable;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,8 +44,5 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
     default List<RoleDO> selectListByStatus(@Nullable Collection<Integer> statuses) {
         return selectList(RoleDO::getStatus, statuses);
     }
-
-    @Select("SELECT COUNT(*) FROM system_role WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

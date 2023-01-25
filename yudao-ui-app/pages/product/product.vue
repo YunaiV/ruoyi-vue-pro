@@ -1,20 +1,22 @@
 <template>
   <view class="container">
-    <u-swiper :list="product.images" @change="e => (currentNum = e.current)" :autoplay="false" height="750rpx" radius="0" indicatorStyle="right: 20px">
+    <!-- 商品轮播图 -->
+    <u-swiper :list="spu.picUrls" @change="e => (currentNum = e.current)" :autoplay="false"
+              height="750rpx" radius="0" indicatorStyle="right: 20px">
       <view slot="indicator" class="indicator-num">
-        <text class="indicator-num__text">{{ currentNum + 1 }}/{{ product.images.length }}</text>
+        <text class="indicator-num__text">{{ currentNum + 1 }}/{{ spu.picUrls.length }}</text>
       </view>
     </u-swiper>
 
     <view class="product-box">
+      <!-- TODO @Sfmind：样式讨论，要不要改成类似 likeshop 的样子？第一栏：价格 + 分享；第二栏：商品名；第三栏：库存、销量、浏览量 -->
       <view class="prod-info">
         <view class="info-text">
-          <u--text :lines="2" size="14px" color="#333333" :text="product.title"></u--text>
-          <u-gap height="5px"></u-gap>
-          <u--text :lines="3" size="12px" color="#939393" :text="product.desc"></u--text>
+          <u--text :lines="2" size="14px" color="#333333" :text="spu.name"></u--text>
         </view>
         <view class="price-and-cart">
-          <custom-text-price color="red" size="16" intSize="26" :price="product.price"></custom-text-price>
+          <!-- TODO @Sfmind：custom-text-price 会报错 -->
+          <custom-text-price color="red" size="16" intSize="26" :price="spu.minPrice"></custom-text-price>
         </view>
       </view>
       <view class="prod-favor">
@@ -28,8 +30,8 @@
       <view class="row-right" @click="skuPopup = true">
         <view class="row-content">
           <view class="sku-box">
-            <view v-if="product.sku.length > 0" class="sku-item">
-              <view class="sku-desc">{{ product.sku[currentSkuIndex].desc }}</view>
+            <view v-if="spu.skus.length > 0" class="sku-item">
+              <view class="sku-desc">{{ spu.skus[currentSkuIndex].desc }}</view>
             </view>
           </view>
         </view>
@@ -39,19 +41,23 @@
       </view>
     </view>
 
-    <!-- 商品SKU选择弹窗 -->
+    <!-- 商品 SKU 选择弹窗 -->
     <u-popup :show="skuPopup" :round="10" :closeable="true" :closeOnClickOverlay="false" @close="skuPopup = false">
       <view class="sku-popup-slot">
         <view class="current-sku-info">
-          <u--image class="current-sku-img" :showLoading="true" :src="product.sku[currentSkuIndex].picUrl" width="120rpx" height="120rpx"></u--image>
+          <u--image class="current-sku-img" :showLoading="true" :src="spu.skus[currentSkuIndex].picUrl"
+                    width="120rpx" height="120rpx"></u--image>
           <view class="current-sku-desc">
-            <view class="name">{{ product.sku[currentSkuIndex].desc }}</view>
-            <custom-text-price color="red" size="12" intSize="18" :price="product.sku[currentSkuIndex].price"></custom-text-price>
+            <!-- TODO @Sfmind:name 这里的选择规格值的拼接 -->
+            <view class="name">{{ spu.skus[currentSkuIndex].desc }}</view>
+            <custom-text-price color="red" size="12" intSize="18" :price="spu.skus[currentSkuIndex].price"></custom-text-price>
             <view class="current-sku-stock">库存： {{ 1 }}</view>
           </view>
         </view>
         <view class="sku-selection">
-          <view class="sku-item" :class="{ active: currentSkuIndex === index }" v-for="(item, index) in product.sku" :key="item.id" @click="handleSkuItemClick(index)">{{ item.desc }}</view>
+          <!-- TODO @Sfmind:name 这里是规格的具体选项 -->
+          <view class="sku-item" :class="{ active: currentSkuIndex === index }" v-for="(item, index) in spu.skus"
+                :key="item.id" @click="handleSkuItemClick(index)">{{ item.desc }}</view>
         </view>
         <view class="sku-num-box">
           <view class="text">选择数量</view>
@@ -67,22 +73,6 @@
         </view>
       </view>
     </u-popup>
-
-    <u-gap height="8" bgColor="#f3f3f3"></u-gap>
-    <view class="row-box">
-      <view class="row-left">配送</view>
-      <view class="row-right">
-        <view class="row-content">
-          <view class="delivery-box">
-            <view class="delivery-item" v-for="(item, index) in deliveryType" :key="item.id">
-              <u-icon name="checkmark-circle" color="#2979ff" size="16"></u-icon>
-              <text class="delivery-name">{{ item.name }}</text>
-            </view>
-          </view>
-        </view>
-        <view class="row-more"></view>
-      </view>
-    </view>
 
     <u-gap height="8" bgColor="#f3f3f3"></u-gap>
     <view class="row-box">
@@ -151,6 +141,8 @@
       </view>
     </view>
 
+    <!-- TODO @Sfmind:缺个商品详情 -->
+
     <view class="fixed-btn-box">
       <view class="btn-group">
         <navigator class="btn-item" url="/pages/index/index" open-type="switchTab" hover-class="none">
@@ -161,9 +153,10 @@
           <u-icon name="server-man" :size="24"></u-icon>
           <view class="btn-text">客服</view>
         </navigator>
+        <!-- TODO @Sfmind:改成收藏 -->
         <navigator class="btn-item" url="/pages/cart/cart" open-type="switchTab" hover-class="none">
-          <u-icon name="bag" :size="24"></u-icon>
-          <view class="btn-text">购物车</view>
+          <u-icon name="star" :size="24"></u-icon>
+          <view class="btn-text">收藏</view>
         </navigator>
         <view class="btn-item-main">
           <u-button type="warning" shape="circle" size="small" text="加入购物车"></u-button>
@@ -178,7 +171,7 @@
 </template>
 
 <script>
-    import { productSpu } from '../../api/product';
+import { getSpuDetail } from '../../api/product';
 
 export default {
   data() {
@@ -187,12 +180,10 @@ export default {
       currentNum: 0,
       currentSkuIndex: 0,
       skuPopup: false,
-      product: {
+      spu: {
         id: '',
-        images: ['https://cdn.uviewui.com/uview/album/1.jpg', 'https://cdn.uviewui.com/uview/album/2.jpg', 'https://cdn.uviewui.com/uview/album/3.jpg'],
-        title: '山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨。',
-        desc: '山不在于高，有了神仙就会有名气。水不在于深，有了龙就会有灵气。这是简陋的房子，只是我品德好就感觉不到简陋了。',
-        price: '13.00',
+        picUrls: [],
+        minPrice: '13.00',
         sku: [
           {
             id: 0,
@@ -214,16 +205,6 @@ export default {
           }
         ]
       },
-      deliveryType: [
-        {
-          id: 0,
-          name: '快递配送'
-        },
-        {
-          id: 1,
-          name: '到店自提'
-        }
-      ],
       promotionPopup: false,
       promotionList: [
         {
@@ -295,25 +276,21 @@ export default {
     }
   },
   onLoad(e) {
-    if (!e.productId) {
+    if (!e.id) {
       uni.$u.toast('请求参数错误')
-    } else {
-      this.product.id = e.productId
-      this.loadProductData()
-      // TODO 请求接口获取商品详情数据
+      return;
     }
+
+    // 加载商品详情
+    this.spu.id = e.id
+    this.loadProductData()
   },
   methods: {
     loadProductData() {
-      let param = {}
-      param.spuId =  this.product.id
-      productSpu(param).then(res => {
-        this.product.images = res.data.picUrls;
-        this.product.sku = res.data.skus;
-        this.product.desc = res.data.description.replace(/<[^>]*>/g,'');
-        this.product.price = res.data.price;
-        this.product.title = res.data.name;
-        console.log(res)
+      getSpuDetail(this.spu.id).then(res => {
+        // this.spu.desc = res.data.description.replace(/<[^>]*>/g,'');
+        // console.log(res)
+        this.spu = res.data;
       })
     },
     handleSkuItemClick(index) {
@@ -383,18 +360,6 @@ export default {
 
     .row-content {
       flex: 1;
-
-      .delivery-box {
-        @include flex-left;
-        .delivery-item {
-          margin-right: 20rpx;
-          @include flex-left;
-          font-size: 22rpx;
-          .delivery-name {
-            margin-left: 5rpx;
-          }
-        }
-      }
 
       .prom-box {
         @include flex-left;

@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：导入 -->
         <XButton
@@ -32,7 +32,7 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['infra:codegen:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
         <!-- 操作：同步 -->
         <XTextButton
@@ -49,20 +49,14 @@
           @click="handleGenTable(row)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <!-- 弹窗：导入表 -->
-  <ImportTable ref="importRef" @ok="handleQuery()" />
+  <ImportTable ref="importRef" @ok="reload()" />
   <!-- 弹窗：预览代码 -->
   <Preview ref="previewRef" />
 </template>
 <script setup lang="ts" name="Codegen">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { VxeGridInstance } from 'vxe-table'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
 import download from '@/utils/download'
 import * as CodegenApi from '@/api/infra/codegen'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
@@ -73,8 +67,7 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 const { push } = useRouter() // 路由跳转
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData } = useVxeGrid<CodegenTableVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   getListApi: CodegenApi.getCodegenTablePageApi,
   deleteApi: CodegenApi.deleteCodegenTableApi
@@ -105,17 +98,10 @@ const handleSynchDb = (row: CodegenTableVO) => {
       message.success('同步成功')
     })
 }
+
 // 生成代码操作
 const handleGenTable = async (row: CodegenTableVO) => {
   const res = await CodegenApi.downloadCodegenApi(row.id)
   download.zip(res, 'codegen-' + row.className + '.zip')
-}
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
-}
-// 查询操作
-const handleQuery = async () => {
-  await getList(xGrid)
 }
 </script>

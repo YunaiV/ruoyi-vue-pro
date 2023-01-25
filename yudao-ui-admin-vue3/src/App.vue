@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { isDark } from '@/utils/is'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
-import { ConfigGlobal } from '@/components/ConfigGlobal'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 
 const { getPrefixCls } = useDesign()

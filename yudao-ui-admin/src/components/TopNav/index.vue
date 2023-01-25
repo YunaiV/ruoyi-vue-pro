@@ -1,14 +1,14 @@
 <template>
   <el-menu
-      :default-active="activeMenu"
-      mode="horizontal"
-      @select="handleSelect"
+    :default-active="activeMenu"
+    mode="horizontal"
+    @select="handleSelect"
   >
     <template v-for="(item, index) in topMenus">
-      <el-menu-item :style="{'--theme': theme}" :index="item.path" :key="index" v-if="index < visibleNumber"
-      ><svg-icon :icon-class="item.meta.icon" />
-        {{ item.meta.title }}</el-menu-item
-      >
+      <el-menu-item :style="{'--theme': theme}" :index="item.path" :key="index" v-if="index < visibleNumber">
+        <svg-icon :icon-class="item.meta.icon"/>
+        {{ item.meta.title }}
+      </el-menu-item>
     </template>
 
     <!-- 顶部菜单超出数量折叠 -->
@@ -16,12 +16,13 @@
       <template slot="title">更多菜单</template>
       <template v-for="(item, index) in topMenus">
         <el-menu-item
-            :index="item.path"
-            :key="index"
-            v-if="index >= visibleNumber"
-        ><svg-icon :icon-class="item.meta.icon" />
-          {{ item.meta.title }}</el-menu-item
+          :index="item.path"
+          :key="index"
+          v-if="index >= visibleNumber"
         >
+          <svg-icon :icon-class="item.meta.icon"/>
+          {{ item.meta.title }}
+        </el-menu-item>
       </template>
     </el-submenu>
   </el-menu>
@@ -92,7 +93,9 @@ export default {
       if (path !== undefined && path.lastIndexOf("/") > 0 && hideList.indexOf(path) === -1) {
         const tmpPath = path.substring(1, path.length);
         activePath = "/" + tmpPath.substring(0, tmpPath.indexOf("/"));
-        this.$store.dispatch('app/toggleSideBarHide', false);
+        if (!this.$route.meta.link) {
+          this.$store.dispatch('app/toggleSideBarHide', false)
+        }
       } else if(!this.$route.children) {
         activePath = path;
         this.$store.dispatch('app/toggleSideBarHide', true);
@@ -130,7 +133,9 @@ export default {
       } else {
         // 显示左侧联动菜单
         this.activeRoutes(key);
-        this.$store.dispatch('app/toggleSideBarHide', false);
+        if (!this.$route.meta.link) {
+          this.$store.dispatch('app/toggleSideBarHide', false);
+        }
       }
     },
     // 当前激活的路由
@@ -145,6 +150,8 @@ export default {
       }
       if(routes.length > 0) {
         this.$store.commit("SET_SIDEBAR_ROUTERS", routes);
+      } else {
+        this.$store.dispatch('app/toggleSideBarHide', true);
       }
     },
     ishttp(url) {

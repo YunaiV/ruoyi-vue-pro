@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel("用户 App - 规格 + 规格值 Response VO")
+@ApiModel("用户 App - 商品属性值的明细 Response VO")
 @Data
 public class AppProductPropertyValueDetailRespVO {
 

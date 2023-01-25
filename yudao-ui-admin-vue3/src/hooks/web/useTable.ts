@@ -3,7 +3,7 @@ import { Table, TableExpose } from '@/components/Table'
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
 import { computed, nextTick, reactive, ref, unref, watch } from 'vue'
 import type { TableProps } from '@/components/Table/src/types'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { TableSetPropsType } from '@/types/table'
 
 const { t } = useI18n()

@@ -18,9 +18,9 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -28,7 +28,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,17 +43,12 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 public class MenuServiceImpl implements MenuService {
 
     /**
-     * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
-     * 因为已经通过 Redis Pub/Sub 机制，所以频率不需要高
-     */
-    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
-
-    /**
      * 菜单缓存
      * key：菜单编号
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @Getter
     private volatile Map<Long, MenuDO> menuCache;
     /**
      * 权限与菜单缓存
@@ -63,11 +57,8 @@ public class MenuServiceImpl implements MenuService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @Getter
     private volatile Multimap<String, MenuDO> permissionMenuCache;
-    /**
-     * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
-     */
-    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private MenuMapper menuMapper;
@@ -86,32 +77,11 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @PostConstruct
     public synchronized void initLocalCache() {
-        initLocalCacheIfUpdate(null);
-    }
-
-    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
-    public void schedulePeriodicRefresh() {
-        initLocalCacheIfUpdate(this.maxUpdateTime);
-    }
-
-    /**
-     * 刷新本地缓存
-     *
-     * @param maxUpdateTime 最大更新时间
-     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
-     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
-     */
-    private void initLocalCacheIfUpdate(LocalDateTime maxUpdateTime) {
-        // 如果没有增量的数据变化，则不进行本地缓存的刷新
-        if (maxUpdateTime != null
-            && menuMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-            log.info("[initLocalCacheIfUpdate][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
-            return;
-        }
+        // 第一步：查询数据
         List<MenuDO> menuList = menuMapper.selectList();
-        log.info("[initLocalCacheIfUpdate][缓存菜单，数量为:{}]", menuList.size());
+        log.info("[initLocalCache][缓存菜单，数量为:{}]", menuList.size());
 
-        // 构建缓存
+        // 第二步：构建缓存
         ImmutableMap.Builder<Long, MenuDO> menuCacheBuilder = ImmutableMap.builder();
         ImmutableMultimap.Builder<String, MenuDO> permMenuCacheBuilder = ImmutableMultimap.builder();
         menuList.forEach(menuDO -> {
@@ -122,9 +92,6 @@ public class MenuServiceImpl implements MenuService {
         });
         menuCache = menuCacheBuilder.build();
         permissionMenuCache = permMenuCacheBuilder.build();
-
-        // 设置最新的 maxUpdateTime，用于下次的增量判断
-        this.maxUpdateTime = CollectionUtils.getMaxValue(menuList, MenuDO::getUpdateTime);
     }
 
     @Override

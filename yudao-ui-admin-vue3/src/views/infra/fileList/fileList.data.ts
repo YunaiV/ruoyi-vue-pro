@@ -1,6 +1,4 @@
-import { reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 
 // CrudSchema
@@ -23,7 +21,7 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'url',
       table: {
         cellRender: {
-          name: 'XImg'
+          name: 'XPreview'
         }
       }
     },

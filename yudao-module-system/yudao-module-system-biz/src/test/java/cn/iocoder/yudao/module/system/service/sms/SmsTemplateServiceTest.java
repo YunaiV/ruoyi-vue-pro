@@ -61,7 +61,6 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
     private SmsProducer smsProducer;
 
     @Test
-    @SuppressWarnings("unchecked")
     void testInitLocalCache() {
         // mock 数据
         SmsTemplateDO smsTemplate01 = randomSmsTemplateDO();
@@ -72,13 +71,10 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
         // 调用
         smsTemplateService.initLocalCache();
         // 断言 deptCache 缓存
-        Map<String, SmsTemplateDO> smsTemplateCache = (Map<String, SmsTemplateDO>) getFieldValue(smsTemplateService, "smsTemplateCache");
+        Map<String, SmsTemplateDO> smsTemplateCache = smsTemplateService.getSmsTemplateCache();
         assertEquals(2, smsTemplateCache.size());
         assertPojoEquals(smsTemplate01, smsTemplateCache.get(smsTemplate01.getCode()));
         assertPojoEquals(smsTemplate02, smsTemplateCache.get(smsTemplate02.getCode()));
-        // 断言 maxUpdateTime 缓存
-        LocalDateTime maxUpdateTime = (LocalDateTime) getFieldValue(smsTemplateService, "maxUpdateTime");
-        assertEquals(max(smsTemplate01.getUpdateTime(), smsTemplate02.getUpdateTime()), maxUpdateTime);
     }
 
     @Test

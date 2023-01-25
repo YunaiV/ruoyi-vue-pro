@@ -51,11 +51,8 @@
 </template>
 
 <script setup lang="ts" name="UploadImg">
-import { ref } from 'vue'
 import type { UploadProps } from 'element-plus'
-import { ElUpload, ElNotification, ElImageViewer } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import { generateUUID } from '@/utils'
 import { propTypes } from '@/utils/propTypes'
 import { getAccessToken, getTenantId } from '@/utils/auth'
@@ -111,17 +108,8 @@ const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
   const imgSize = rawFile.size / 1024 / 1024 < props.fileSize
   const imgType = props.fileType
   if (!imgType.includes(rawFile.type as FileTypes))
-    ElNotification({
-      title: '温馨提示',
-      message: '上传图片不符合所需的格式！',
-      type: 'warning'
-    })
-  if (!imgSize)
-    ElNotification({
-      title: '温馨提示',
-      message: `上传图片大小不能超过 ${props.fileSize}M！`,
-      type: 'warning'
-    })
+    message.notifyWarning('上传图片不符合所需的格式！')
+  if (!imgSize) message.notifyWarning(`上传图片大小不能超过 ${props.fileSize}M！`)
   return imgType.includes(rawFile.type as FileTypes) && imgSize
 }
 
@@ -133,11 +121,7 @@ const uploadSuccess: UploadProps['onSuccess'] = (res: any): void => {
 
 // 图片上传错误提示
 const uploadError = () => {
-  ElNotification({
-    title: '温馨提示',
-    message: '图片上传失败，请您重新上传！',
-    type: 'error'
-  })
+  message.notifyError('图片上传失败，请您重新上传！')
 }
 </script>
 <style scoped lang="scss">

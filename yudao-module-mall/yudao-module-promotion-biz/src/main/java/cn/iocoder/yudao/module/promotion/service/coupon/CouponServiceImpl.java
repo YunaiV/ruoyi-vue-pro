@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
-import cn.iocoder.yudao.module.member.api.user.dto.UserRespDTO;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.coupon.CouponMapper;
@@ -71,7 +71,7 @@ public class CouponServiceImpl implements CouponService {
         Set<Long> userIds = null;
         if (StrUtil.isNotEmpty(pageReqVO.getNickname())) {
             userIds = CollectionUtils.convertSet(memberUserApi.getUserListByNickname(pageReqVO.getNickname()),
-                    UserRespDTO::getId);
+                    MemberUserRespDTO::getId);
             if (CollUtil.isEmpty(userIds)) {
                 return PageResult.empty();
             }
