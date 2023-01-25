@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.service.mail.impl;
+package cn.iocoder.yudao.module.system.service.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountCreateReqVO;
@@ -8,8 +8,6 @@ import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.mq.producer.mail.MailProducer;
-import cn.iocoder.yudao.module.system.service.mail.MailAccountService;
-import cn.iocoder.yudao.module.system.service.mail.MailTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +19,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_ACCOUNT_NOT_EXISTS;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_ACCOUNT_RELATE_TEMPLATE_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 邮箱账号 Service 实现类
@@ -61,6 +58,11 @@ public class MailAccountServiceImpl implements MailAccountService {
 
         // 第二步：构建缓存
         mailAccountCache = convertMap(accounts, MailAccountDO::getId);
+    }
+
+    @Override
+    public MailAccountDO getMailAccountFromCache(Long id) {
+        return mailAccountCache.get(id);
     }
 
     @Override

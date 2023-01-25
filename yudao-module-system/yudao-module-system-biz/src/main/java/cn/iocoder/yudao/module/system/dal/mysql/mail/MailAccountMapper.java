@@ -17,9 +17,4 @@ public interface MailAccountMapper extends BaseMapperX<MailAccountDO> {
                 .likeIfPresent(MailAccountDO::getUsername , pageReqVO.getUsername()));
     }
 
-    default MailAccountDO selectOneByFrom(String from){
-        return selectOne(new QueryWrapperX<MailAccountDO>()
-                .eqIfPresent("from_address" , from));
-    }
-
 }

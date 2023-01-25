@@ -1,12 +1,9 @@
-package cn.iocoder.yudao.module.system.service.mail.impl;
+package cn.iocoder.yudao.module.system.service.mail;
 
-
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateUpdateReqVO;
@@ -14,7 +11,6 @@ import cn.iocoder.yudao.module.system.convert.mail.MailTemplateConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
 import cn.iocoder.yudao.module.system.mq.producer.mail.MailProducer;
-import cn.iocoder.yudao.module.system.service.mail.MailTemplateService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,12 +19,12 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
@@ -41,6 +37,11 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 @Validated
 @Slf4j
 public class MailTemplateServiceImpl implements MailTemplateService {
+
+    /**
+     * 正则表达式，匹配 {} 中的变量
+     */
+    private static final Pattern PATTERN_PARAMS = Pattern.compile("\\{(.*?)}");
 
     @Resource
     private MailTemplateMapper mailTemplateMapper;
@@ -73,7 +74,8 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         validateCodeUnique(null, createReqVO.getCode());
 
         // 插入
-        MailTemplateDO template = MailTemplateConvert.INSTANCE.convert(createReqVO);
+        MailTemplateDO template = MailTemplateConvert.INSTANCE.convert(createReqVO)
+                .setParams(parseTemplateContentParams(createReqVO.getContent()));
         mailTemplateMapper.insert(template);
         // 发送刷新消息
         mailProducer.sendMailTemplateRefreshMessage();
@@ -88,7 +90,8 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         validateCodeUnique(updateReqVO.getId(),updateReqVO.getCode());
 
         // 更新
-        MailTemplateDO updateObj = MailTemplateConvert.INSTANCE.convert(updateReqVO);
+        MailTemplateDO updateObj = MailTemplateConvert.INSTANCE.convert(updateReqVO)
+                .setParams(parseTemplateContentParams(updateReqVO.getContent()));
         mailTemplateMapper.updateById(updateObj);
         // 发送刷新消息
         mailProducer.sendMailTemplateRefreshMessage();
@@ -118,6 +121,12 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         mailProducer.sendMailTemplateRefreshMessage();
     }
 
+    private void validateMailTemplateExists(Long id) {
+        if (mailTemplateMapper.selectById(id) == null) {
+            throw exception(MAIL_TEMPLATE_NOT_EXISTS);
+        }
+    }
+
     @Override
     public MailTemplateDO getMailTemplate(Long id) {return mailTemplateMapper.selectById(id);}
 
@@ -135,14 +144,13 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     }
 
     @Override
-    public String formatMailTemplateContent(String content, Map<String, String> params) {
+    public String formatMailTemplateContent(String content, Map<String, Object> params) {
         return StrUtil.format(content, params);
     }
 
-    private void validateMailTemplateExists(Long id) {
-        if (mailTemplateMapper.selectById(id) == null) {
-            throw exception(MAIL_TEMPLATE_NOT_EXISTS);
-        }
+    @VisibleForTesting
+    public List<String> parseTemplateContentParams(String content) {
+        return ReUtil.findAllGroup1(PATTERN_PARAMS, content);
     }
 
     @Override

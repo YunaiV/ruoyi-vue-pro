@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.service.mail.impl;
+package cn.iocoder.yudao.module.system.service.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogExportReqVO;
@@ -28,7 +28,6 @@ import java.util.Objects;
 @Validated
 public class MailLogServiceImpl implements MailLogService {
 
-    // TODO @wangjingyi：private，然后使用 @Resource DONE
     @Resource
     private MailLogMapper mailLogMapper;
 

@@ -83,7 +83,7 @@ public interface MailTemplateService {
      * @param params 合成参数
      * @return 格式化后的内容
      */
-    String formatMailTemplateContent(String content, Map<String, String> params);
+    String formatMailTemplateContent(String content, Map<String, Object> params);
 
     /**
      * 获得指定邮件账号下的邮件模板数量

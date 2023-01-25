@@ -23,6 +23,14 @@ public interface MailAccountService {
     void initLocalCache();
 
     /**
+     * 从缓存中获取邮箱账号
+     *
+     * @param id 编号
+     * @return 邮箱账号
+     */
+    MailAccountDO getMailAccountFromCache(Long id);
+
+    /**
      * 创建邮箱账号
      *
      * @param createReqVO 邮箱账号信息
