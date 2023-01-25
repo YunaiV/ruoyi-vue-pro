@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class MailAccountSimpleRespVO {
 
-    @ApiModelProperty(value = "邮箱比那好", required = true, example = "1024")
+    @ApiModelProperty(value = "邮箱编号", required = true, example = "1024")
     private Long id;
 
     @ApiModelProperty(value = "邮箱", required = true, example = "768541388@qq.com")

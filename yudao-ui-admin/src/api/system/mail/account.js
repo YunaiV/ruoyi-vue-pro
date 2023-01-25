@@ -42,3 +42,11 @@ export function getMailAccountPage(query) {
     params: query
   })
 }
+
+// 获取邮箱账号的精简信息列表
+export function getSimpleMailAccountList() {
+  return request({
+    url: '/system/mail-account/list-all-simple',
+    method: 'get',
+  })
+}

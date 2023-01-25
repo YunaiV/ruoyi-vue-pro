@@ -29,8 +29,8 @@
       <el-table-column label="主键" align="center" prop="id" />
       <el-table-column label="邮箱" align="center" prop="mail" />
       <el-table-column label="用户名" align="center" prop="username" />
-      <el-table-column label="主机" align="center" prop="host" />
-      <el-table-column label="端口" align="center" prop="port" />
+      <el-table-column label="SMTP 服务器域名" align="center" prop="host" />
+      <el-table-column label="SMTP 服务器端口" align="center" prop="port" />
       <el-table-column label="是否开启 SSL" align="center" prop="sslEnable">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.sslEnable" />
@@ -56,7 +56,7 @@
 
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" v-dialogDrag append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="140px">
         <el-form-item label="邮箱" prop="mail">
           <el-input v-model="form.mail" placeholder="请输入邮箱" />
         </el-form-item>
@@ -66,11 +66,11 @@
         <el-form-item label="密码" prop="password">
           <el-input v-model="form.password" placeholder="请输入密码" />
         </el-form-item>
-        <el-form-item label="主机" prop="host">
-          <el-input v-model="form.host" placeholder="请输入主机" />
+        <el-form-item label="SMTP 服务器域名" prop="host">
+          <el-input v-model="form.host" placeholder="请输入 SMTP 服务器域名" />
         </el-form-item>
-        <el-form-item label="端口" prop="port">
-          <el-input v-model="form.port" placeholder="请输入端口" />
+        <el-form-item label="SMTP 服务器端口" prop="port">
+          <el-input v-model="form.port" placeholder="请输入 SMTP 服务器端口" />
         </el-form-item>
         <el-form-item label="是否开启 SSL" prop="sslEnable">
           <el-radio-group v-model="form.sslEnable">
@@ -124,10 +124,10 @@ export default {
         mail: [{ required: true, message: "邮箱不能为空", trigger: "blur" }],
         username: [{ required: true, message: "用户名不能为空", trigger: "blur" }],
         password: [{ required: true, message: "密码不能为空", trigger: "blur" }],
-        host: [{ required: true, message: "主机不能为空", trigger: "blur" }],
-        port: [{ required: true, message: "端口不能为空", trigger: "blur" }],
+        host: [{ required: true, message: "SMTP 服务器域名不能为空", trigger: "blur" }],
+        port: [{ required: true, message: "SMTP 服务器端口不能为空", trigger: "blur" }],
         sslEnable: [{ required: true, message: "是否开启 SSL不能为空", trigger: "blur" }],
-      }
+      },
     };
   },
   created() {

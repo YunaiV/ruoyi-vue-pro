@@ -145,9 +145,9 @@ public interface ErrorCodeConstants {
     ErrorCode MAIL_ACCOUNT_NOT_EXISTS = new ErrorCode(1002023000, "邮箱账号不存在");
     ErrorCode MAIL_ACCOUNT_RELATE_TEMPLATE_EXISTS = new ErrorCode(1002023001, "无法删除，该邮箱账号还有邮件模板");
 
-    // ========== 邮箱模版 1002021000 ==========
-    ErrorCode MAIL_TEMPLATE_NOT_EXISTS = new ErrorCode(1002021000, "邮箱模版不存在");
-    ErrorCode MAIL_TEMPLATE_EXISTS = new ErrorCode(1002021001, "邮箱模版存在");
-    ErrorCode MAIL_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002021003, "模板参数({})缺失");
+    // ========== 邮箱模版 1002024000 ==========
+    ErrorCode MAIL_TEMPLATE_NOT_EXISTS = new ErrorCode(1002024000, "邮件模版不存在");
+    ErrorCode MAIL_TEMPLATE_CODE_EXISTS = new ErrorCode(1002024001, "邮件模版 code({}) 已存在");
+    ErrorCode MAIL_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002021003, "模板参数({})缺失"); // TODO 优化
 
 }

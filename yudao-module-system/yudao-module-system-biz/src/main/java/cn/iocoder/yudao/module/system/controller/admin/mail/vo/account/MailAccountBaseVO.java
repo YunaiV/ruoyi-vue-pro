@@ -26,12 +26,12 @@ public class MailAccountBaseVO {
     @NotNull(message = "密码必填")
     private String password;
 
-    @ApiModelProperty(value = "网站", required = true, example = "www.iocoder.cn")
-    @NotNull(message = "网站不能为空")
+    @ApiModelProperty(value = "SMTP 服务器域名", required = true, example = "www.iocoder.cn")
+    @NotNull(message = "SMTP 服务器域名不能为空")
     private String host;
 
-    @ApiModelProperty(value = "端口", required = true, example = "80")
-    @NotNull(message = "端口不能为空")
+    @ApiModelProperty(value = "SMTP 服务器端口", required = true, example = "80")
+    @NotNull(message = "SMTP 服务器端口不能为空")
     private Integer port;
 
     @ApiModelProperty(value = "是否开启 ssl", required = true, example = "true")

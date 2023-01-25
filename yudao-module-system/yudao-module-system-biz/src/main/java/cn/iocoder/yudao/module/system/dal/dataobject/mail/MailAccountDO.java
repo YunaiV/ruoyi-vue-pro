@@ -36,11 +36,11 @@ public class MailAccountDO extends BaseDO {
      */
     private String password;
     /**
-     * 主机
+     * SMTP 服务器域名
      */
     private String host;
     /**
-     * 端口
+     * SMTP 服务器端口
      */
     private Integer port;
     /**

@@ -69,11 +69,21 @@ public class MailLogDO extends BaseDO implements Serializable {
      */
     private Long templateId;
     /**
-     * 末班编码
+     * 模版编码
      *
      * 冗余 {@link MailTemplateDO#getCode()}
      */
     private String templateCode;
+    /**
+     * 模版发送人名称
+     *
+     * 冗余 {@link MailTemplateDO#getNickname()}
+     */
+    private String templateNickname;
+    /**
+     * 模版标题
+     */
+    private String templateTitle;
     /**
      * 模版内容
      *
