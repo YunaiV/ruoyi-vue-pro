@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.framework.web.core.filter;
+package cn.iocoder.yudao.framework.xss.core.filter;
 
-import cn.iocoder.yudao.framework.web.core.clean.XssCleaner;
+import cn.iocoder.yudao.framework.xss.core.clean.XssCleaner;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -13,6 +13,7 @@ import java.util.Map;
  * @author 芋道源码
  */
 public class XssRequestWrapper extends HttpServletRequestWrapper {
+
     private final XssCleaner xssCleaner;
 
     public XssRequestWrapper(HttpServletRequest request, XssCleaner xssCleaner) {

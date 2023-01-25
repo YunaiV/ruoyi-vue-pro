@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.framework.web.core.json;
+package cn.iocoder.yudao.framework.xss.core.json;
 
-import cn.iocoder.yudao.framework.web.core.clean.XssCleaner;
+import cn.iocoder.yudao.framework.xss.core.clean.XssCleaner;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
