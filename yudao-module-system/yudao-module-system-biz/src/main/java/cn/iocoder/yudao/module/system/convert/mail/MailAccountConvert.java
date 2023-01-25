@@ -33,7 +33,7 @@ public interface MailAccountConvert {
                 .setHost(bean.getHost())
                 .setPort(bean.getPort())
                 .setAuth(true)
-                .setFrom(bean.getFromAddress())
+                .setFrom(bean.getMail())
                 .setUser(bean.getUsername())
                 .setPass(bean.getPassword())
                 .setSslEnable(bean.getSslEnable());

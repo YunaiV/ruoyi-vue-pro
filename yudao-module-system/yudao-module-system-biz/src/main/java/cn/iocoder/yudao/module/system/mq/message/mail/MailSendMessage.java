@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.system.mq.message.mail;
 
-import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessage;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 邮箱发送消息
@@ -19,61 +17,35 @@ import java.util.Map;
 public class MailSendMessage extends AbstractStreamMessage {
 
     /**
-     * 日志id
+     * 邮件日志编号
      */
-    @NotNull(message = "邮箱日志id不能为空")
+    @NotNull(message = "邮件日志编号不能为空")
     private Long logId;
     /**
-     * 邮箱地址
+     * 接收邮件地址
      */
-    @NotNull(message = "邮箱地址不能为空")
-    private String fromAddress;
+    @NotNull(message = "接收邮件地址不能为空")
+    private String mail;
     /**
-     * 用户名
+     * 邮件账号编号
      */
-    @NotNull(message = "用户名不能为空")
-    private String username;
+    @NotNull(message = "邮件账号编号不能为空")
+    private Long accountId;
+
     /**
-     * 密码
+     * 邮件发件人
      */
-    @NotNull(message = "密码不能为空")
-    private String password;
+    private String nickname;
     /**
-     * 邮箱模板编号
+     * 邮件标题
      */
-    @NotNull(message = "邮箱模板编号不能为空")
-    private String templateCode;
-    /**
-     * 收件人
-     */
-    @NotNull(message = "收件人不能为空")
-    private String to;
-    /**
-     * 标题
-     */
+    @NotEmpty(message = "邮件标题不能为空")
     private String title;
     /**
-     * 内容
+     * 邮件内容
      */
+    @NotEmpty(message = "邮件内容不能为空")
     private String content;
-    /**
-     * 主机
-     */
-    @NotNull(message = "host不能为空")
-    private String host;
-    /**
-     * 端口
-     */
-    @NotNull(message = "端口号不能为空")
-    private Integer port;
-    /**
-     * 是否开启 SSL
-     */
-    private Boolean sslEnable;
-    /**
-     * 邮箱模板参数
-     */
-    private List<KeyValue<String, Object>> templateParams;
 
     @Override
     public String getStreamKey() {

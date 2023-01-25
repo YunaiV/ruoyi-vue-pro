@@ -100,22 +100,23 @@ public class MailSendServiceImpl implements MailSendService {
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus());
         String content = mailTemplateService.formatMailTemplateContent(template.getContent(), templateParams);
         Long sendLogId = mailLogService.createMailLog(userId, userType, mail,
-                account, template, content, templateParams, isSend); // TODO 芋艿：待测试
+                account, template, content, templateParams, isSend);
         // 发送 MQ 消息，异步执行发送短信
         if (isSend) {
-            mailProducer.sendMailSendMessage(sendLogId, account, template, content, newTemplateParams, mail); // TODO 芋艿：待测试
+            mailProducer.sendMailSendMessage(sendLogId, mail, account.getId(),
+                    template.getNickname(), template.getTitle(), content);
         }
         return sendLogId;
     }
 
     @Override
     public void doSendMail(MailSendMessage message) {
-        // TODO @wangjingyi：直接使用 hutool 发送，不要封装 mail client 哈，因为短信的客户端都是比较统一的 DONE
-        //装载账号信息
-        MailAccount account  = MailAccountConvert.INSTANCE.convertAccount(message);
-        //发送邮件
+        // 装载账号信息
+        MailAccount mailAccount  = MailAccountConvert.INSTANCE.convertAccount(message);
+        // 发送邮件
         try {
-            String messageId = MailUtil.send(account,message.getTo(),message.getTitle(),message.getContent(),false,null);
+            String messageId = MailUtil.send(mailAccount, message.getMail(),
+                    message.getTitle(), message.getContent(),true);
             mailLogService.updateMailSendResult(message.getLogId() , messageId);
         } catch (Exception e){
             mailLogService.updateFailMailSendResult(message.getLogId() , e.getMessage());

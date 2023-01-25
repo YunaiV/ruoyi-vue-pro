@@ -96,7 +96,7 @@ public class MailLogDO extends BaseDO implements Serializable {
      * 基于 {@link MailTemplateDO#getParams()} 输入后的参数
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private Map<String,Object> templateParams;
+    private Map<String, Object> templateParams;
 
     // ========= 发送相关字段 =========
     /**
@@ -109,16 +109,13 @@ public class MailLogDO extends BaseDO implements Serializable {
      * 发送时间
      */
     private Date sendTime;
-
-    // ========= 接收相关字段 =========
+    /**
+     * 发送返回的消息 ID
+     */
+    private String sendMessageId;
     /**
      * 发送结果
      */
     private String sendResult;
-    /**
-     *  消息ID
-     */
-    private String messageId;
-
 
 }
