@@ -8,9 +8,7 @@ import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChann
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,9 +18,6 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
     default PayChannelDO selectByAppIdAndCode(Long appId, String code) {
         return selectOne(PayChannelDO::getAppId, appId, PayChannelDO::getCode, code);
     }
-
-    @Select("SELECT COUNT(*) FROM pay_channel WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
     default PageResult<PayChannelDO> selectPage(PayChannelPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<PayChannelDO>()
@@ -67,14 +62,14 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
      * 根据条件获取渠道
      *
      * @param merchantId 商户编号
-     * @param appid      应用编号 // TODO @aquan：appid =》appId
+     * @param appI      应用编号
      * @param code       渠道编码
      * @return 数量
      */
-    default PayChannelDO selectOne(Long merchantId, Long appid, String code) {
+    default PayChannelDO selectOne(Long merchantId, Long appI, String code) {
         return this.selectOne((new QueryWrapper<PayChannelDO>().lambda()
                 .eq(PayChannelDO::getMerchantId, merchantId)
-                .eq(PayChannelDO::getAppId, appid)
+                .eq(PayChannelDO::getAppId, appI)
                 .eq(PayChannelDO::getCode, code)
         ));
     }

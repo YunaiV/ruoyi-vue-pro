@@ -16,9 +16,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.UserRoleDO;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuMapper;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
@@ -32,7 +30,6 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -40,12 +37,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
 import static java.util.Collections.singleton;
 
 /**
@@ -56,12 +51,6 @@ import static java.util.Collections.singleton;
 @Service
 @Slf4j
 public class PermissionServiceImpl implements PermissionService {
-
-    /**
-     * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
-     * 因为已经通过 Redis Pub/Sub 机制，所以频率不需要高
-     */
-    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
 
     /**
      * 角色编号与菜单编号的缓存映射
@@ -83,11 +72,6 @@ public class PermissionServiceImpl implements PermissionService {
     @Getter
     @Setter // 单元测试需要
     private volatile Multimap<Long, Long> menuRoleCache;
-    /**
-     * 缓存 RoleMenu 的最大更新时间，用于后续的增量轮询，判断是否有更新
-     */
-    @Getter
-    private volatile LocalDateTime roleMenuMaxUpdateTime;
 
     /**
      * 用户编号与角色编号的缓存映射
@@ -99,20 +83,11 @@ public class PermissionServiceImpl implements PermissionService {
     @Getter
     @Setter // 单元测试需要
     private volatile Map<Long, Set<Long>> userRoleCache;
-    /**
-     * 缓存 UserRole 的最大更新时间，用于后续的增量轮询，判断是否有更新
-     */
-    @Getter
-    private volatile LocalDateTime userRoleMaxUpdateTime;
 
     @Resource
     private RoleMenuMapper roleMenuMapper;
     @Resource
-    private RoleMenuBatchInsertMapper roleMenuBatchInsertMapper;
-    @Resource
     private UserRoleMapper userRoleMapper;
-    @Resource
-    private UserRoleBatchInsertMapper userRoleBatchInsertMapper;
 
     @Resource
     private RoleService roleService;
@@ -129,38 +104,22 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     @PostConstruct
     public void initLocalCache() {
-        initLocalCacheIfUpdateForRoleMenu(null);
-        initLocalCacheIfUpdateForUserRole(null);
-    }
-
-    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
-    public void schedulePeriodicRefresh() {
-        initLocalCacheIfUpdateForRoleMenu(this.roleMenuMaxUpdateTime);
-        initLocalCacheIfUpdateForUserRole(this.userRoleMaxUpdateTime);
+        initLocalCacheForRoleMenu();
+        initLocalCacheForUserRole();
     }
 
     /**
      * 刷新 RoleMenu 本地缓存
-     *
-     * @param maxUpdateTime 最大更新时间
-     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
-     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
      */
     @VisibleForTesting
-    void initLocalCacheIfUpdateForRoleMenu(LocalDateTime maxUpdateTime) {
+    void initLocalCacheForRoleMenu() {
         // 注意：忽略自动多租户，因为要全局初始化缓存
         TenantUtils.executeIgnore(() -> {
-            // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
-            // 如果没有增量的数据变化，则不进行本地缓存的刷新
-            if (maxUpdateTime != null
-                    && roleMenuMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                log.info("[initLocalCacheIfUpdateForRoleMenu][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
-                return;
-            }
+            // 第一步：查询数据
             List<RoleMenuDO> roleMenus = roleMenuMapper.selectList();
-            log.info("[initLocalCacheIfUpdateForRoleMenu][缓存角色与菜单，数量为:{}]", roleMenus.size());
+            log.info("[initLocalCacheForRoleMenu][缓存角色与菜单，数量为:{}]", roleMenus.size());
 
-            // 第二步：构建缓存。
+            // 第二步：构建缓存
             ImmutableMultimap.Builder<Long, Long> roleMenuCacheBuilder = ImmutableMultimap.builder();
             ImmutableMultimap.Builder<Long, Long> menuRoleCacheBuilder = ImmutableMultimap.builder();
             roleMenus.forEach(roleMenuDO -> {
@@ -169,40 +128,24 @@ public class PermissionServiceImpl implements PermissionService {
             });
             roleMenuCache = roleMenuCacheBuilder.build();
             menuRoleCache = menuRoleCacheBuilder.build();
-
-            // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
-            this.roleMenuMaxUpdateTime = getMaxValue(roleMenus, RoleMenuDO::getUpdateTime);
         });
     }
 
     /**
      * 刷新 UserRole 本地缓存
-     *
-     * @param maxUpdateTime 最大更新时间
-     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
-     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
      */
     @VisibleForTesting
-    void initLocalCacheIfUpdateForUserRole(LocalDateTime maxUpdateTime) {
+    void initLocalCacheForUserRole() {
         // 注意：忽略自动多租户，因为要全局初始化缓存
         TenantUtils.executeIgnore(() -> {
-            // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
-            // 如果没有增量的数据变化，则不进行本地缓存的刷新
-            if (maxUpdateTime != null
-                    && userRoleMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                log.info("[initLocalCacheIfUpdateForUserRole][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
-                return;
-            }
+            // 第一步：加载数据
             List<UserRoleDO> userRoles = userRoleMapper.selectList();
-            log.info("[initLocalCacheIfUpdateForUserRole][缓存用户与角色，数量为:{}]", userRoles.size());
+            log.info("[initLocalCacheForUserRole][缓存用户与角色，数量为:{}]", userRoles.size());
 
             // 第二步：构建缓存。
             ImmutableMultimap.Builder<Long, Long> userRoleCacheBuilder = ImmutableMultimap.builder();
             userRoles.forEach(userRoleDO -> userRoleCacheBuilder.put(userRoleDO.getUserId(), userRoleDO.getRoleId()));
             userRoleCache = CollectionUtils.convertMultiMap2(userRoles, UserRoleDO::getUserId, UserRoleDO::getRoleId);
-
-            // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
-            this.userRoleMaxUpdateTime = getMaxValue(userRoles, UserRoleDO::getUpdateTime);
         });
     }
 
@@ -264,7 +207,7 @@ public class PermissionServiceImpl implements PermissionService {
         Collection<Long> deleteMenuIds = CollUtil.subtract(dbMenuIds, menuIds);
         // 执行新增和删除。对于已经授权的菜单，不用做任何处理
         if (!CollectionUtil.isEmpty(createMenuIds)) {
-            roleMenuBatchInsertMapper.saveBatch(CollectionUtils.convertList(createMenuIds, menuId -> {
+            roleMenuMapper.insertBatch(CollectionUtils.convertList(createMenuIds, menuId -> {
                 RoleMenuDO entity = new RoleMenuDO();
                 entity.setRoleId(roleId);
                 entity.setMenuId(menuId);
@@ -308,7 +251,7 @@ public class PermissionServiceImpl implements PermissionService {
         Collection<Long> deleteMenuIds = CollUtil.subtract(dbRoleIds, roleIds);
         // 执行新增和删除。对于已经授权的角色，不用做任何处理
         if (!CollectionUtil.isEmpty(createRoleIds)) {
-            userRoleBatchInsertMapper.saveBatch(CollectionUtils.convertList(createRoleIds, roleId -> {
+            userRoleMapper.insertBatch(CollectionUtils.convertList(createRoleIds, roleId -> {
                 UserRoleDO entity = new UserRoleDO();
                 entity.setUserId(userId);
                 entity.setRoleId(roleId);
