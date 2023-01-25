@@ -6,9 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuLi
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -27,8 +25,5 @@ public interface MenuMapper extends BaseMapperX<MenuDO> {
         return selectList(new LambdaQueryWrapperX<MenuDO>().likeIfPresent(MenuDO::getName, reqVO.getName())
                 .eqIfPresent(MenuDO::getStatus, reqVO.getStatus()));
     }
-
-    @Select("SELECT COUNT(*) FROM system_menu WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

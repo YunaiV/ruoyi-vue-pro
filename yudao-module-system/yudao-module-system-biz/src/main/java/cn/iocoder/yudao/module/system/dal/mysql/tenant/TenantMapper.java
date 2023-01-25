@@ -1,15 +1,13 @@
 package cn.iocoder.yudao.module.system.dal.mysql.tenant;
 
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -51,8 +49,5 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
     default List<TenantDO> selectListByPackageId(Long packageId) {
         return selectList(TenantDO::getPackageId, packageId);
     }
-
-    @Select("SELECT COUNT(*) FROM system_tenant WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

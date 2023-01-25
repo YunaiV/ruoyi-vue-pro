@@ -7,9 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.Sensitiv
 import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWordDO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -41,8 +39,5 @@ public interface SensitiveWordMapper extends BaseMapperX<SensitiveWordDO> {
     default SensitiveWordDO selectByName(String name) {
         return selectOne(SensitiveWordDO::getName, name);
     }
-
-    @Select("SELECT COUNT(*) FROM system_sensitive_word WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }
