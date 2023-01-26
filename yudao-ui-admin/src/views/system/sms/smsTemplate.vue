@@ -216,7 +216,7 @@ export default {
       },
       sendSmsRules: {
         mobile: [{ required: true, message: "手机不能为空", trigger: "blur" }],
-        templateCode: [{ required: true, message: "手机不能为空", trigger: "blur" }],
+        templateCode: [{ required: true, message: "模版编码不能为空", trigger: "blur" }],
         templateParams: { }
       }
     };

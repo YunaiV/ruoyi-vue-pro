@@ -44,6 +44,7 @@
       <el-table-column label="模板编码" align="center" prop="code" />
       <el-table-column label="模板名称" align="center" prop="name" />
       <el-table-column label="模板标题" align="center" prop="title" />
+      <el-table-column label="模板内容" align="center" prop="content" :show-overflow-tooltip="true" />
       <el-table-column label="邮箱账号" align="center" prop="accountId" width="200">
         <template v-slot="scope">
           {{ accountOptions.find(account => account.id === scope.row.accountId)?.mail }}
@@ -55,14 +56,15 @@
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
         <template v-slot="scope">
+          <el-button size="mini" type="text" icon="el-icon-share" @click="handleSend(scope.row)"
+                     v-hasPermi="['system:mail-template:send-mail']">测试</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:mail-template:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -112,11 +114,30 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 对话框(发送邮件) -->
+    <el-dialog title="测试发送邮件" :visible.sync="sendOpen" width="500px" append-to-body>
+      <el-form ref="sendForm" :model="sendForm" :rules="sendRules" label-width="140px">
+        <el-form-item label="模板内容" prop="content">
+          <el-input v-model="sendForm.content" type="textarea" placeholder="请输入模板内容" readonly />
+        </el-form-item>
+        <el-form-item label="收件邮箱" prop="mail">
+          <el-input v-model="sendForm.mail" placeholder="请输入收件邮箱" />
+        </el-form-item>
+        <el-form-item v-for="param in sendForm.params" :key="param" :label="'参数 {' + param + '}'" :prop="'templateParams.' + param">
+          <el-input v-model="sendForm.templateParams[param]" :placeholder="'请输入 ' + param + ' 参数'" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitSendForm">确 定</el-button>
+        <el-button @click="cancelSend">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { createMailTemplate, updateMailTemplate, deleteMailTemplate, getMailTemplate, getMailTemplatePage } from "@/api/system/mail/template";
+import { createMailTemplate, updateMailTemplate, deleteMailTemplate, getMailTemplate, getMailTemplatePage, sendMail } from "@/api/system/mail/template";
 import Editor from '@/components/Editor';
 import { CommonStatusEnum } from "@/utils/constants";
 import { getSimpleMailAccountList } from "@/api/system/mail/account";
@@ -130,8 +151,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -164,7 +183,18 @@ export default {
         status: [{ required: true, message: "开启状态不能为空", trigger: "blur" }],
       },
       // 邮箱账号
-      accountOptions: []
+      accountOptions: [],
+
+      // 发送邮箱
+      sendOpen: false,
+      sendForm: {
+        params: [], // 模板的参数列表
+      },
+      sendRules: {
+        mail: [{ required: true, message: "收件邮箱不能为空", trigger: "blur" }],
+        templateCode: [{ required: true, message: "模版编码不能为空", trigger: "blur" }],
+        templateParams: { }
+      }
     };
   },
   created() {
@@ -263,7 +293,56 @@ export default {
           this.getList();
           this.$modal.msgSuccess("删除成功");
         }).catch(() => {});
-    }
+    },
+    /** 发送短息按钮 */
+    handleSend(row) {
+      this.resetSend(row);
+      // 设置参数
+      this.sendForm.content = row.content;
+      this.sendForm.params = row.params;
+      this.sendForm.templateCode = row.code;
+      this.sendForm.templateParams = row.params.reduce(function(obj, item) {
+        obj[item] = undefined;
+        return obj;
+      }, {});
+      // 根据 row 重置 rules
+      this.sendRules.templateParams = row.params.reduce(function(obj, item) {
+        obj[item] = { required: true, message: '参数 ' + item + " 不能为空", trigger: "change" };
+        return obj;
+      }, {});
+      // 设置打开
+      this.sendOpen = true;
+    },
+    /** 重置发送邮箱的表单 */
+    resetSend() {
+      // 根据 row 重置表单
+      this.sendForm = {
+        content: undefined,
+        params: undefined,
+        mobile: undefined,
+        templateCode: undefined,
+        templateParams: {}
+      };
+      this.resetForm("sendForm");
+    },
+    /** 取消发送邮箱 */
+    cancelSend() {
+      this.sendOpen = false;
+      this.resetSend();
+    },
+    /** 提交按钮 */
+    submitSendForm() {
+      this.$refs["sendForm"].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        // 添加的提交
+        sendMail(this.sendForm).then(response => {
+          this.$modal.msgSuccess("提交发送成功！发送结果，见发送日志编号：" + response.data);
+          this.sendOpen = false;
+        });
+      });
+    },
   }
 };
 </script>

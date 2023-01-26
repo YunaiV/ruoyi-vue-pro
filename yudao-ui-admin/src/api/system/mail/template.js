@@ -42,3 +42,12 @@ export function getMailTemplatePage(query) {
     params: query
   })
 }
+
+// 发送测试邮件
+export function sendMail(data) {
+  return request({
+    url: '/system/mail-template/send-mail',
+    method: 'post',
+    data: data
+  })
+}
