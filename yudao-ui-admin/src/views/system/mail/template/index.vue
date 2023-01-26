@@ -44,7 +44,7 @@
       <el-table-column label="模板编码" align="center" prop="code" />
       <el-table-column label="模板名称" align="center" prop="name" />
       <el-table-column label="模板标题" align="center" prop="title" />
-      <el-table-column label="邮箱账号" align="center" prop="accountId">
+      <el-table-column label="邮箱账号" align="center" prop="accountId" width="200">
         <template v-slot="scope">
           {{ accountOptions.find(account => account.id === scope.row.accountId)?.mail }}
         </template>

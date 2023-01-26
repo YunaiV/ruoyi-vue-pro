@@ -114,8 +114,8 @@ public class MailLogDO extends BaseDO implements Serializable {
      */
     private String sendMessageId;
     /**
-     * 发送结果
+     * 发送异常
      */
-    private String sendResult;
+    private String sendException;
 
 }

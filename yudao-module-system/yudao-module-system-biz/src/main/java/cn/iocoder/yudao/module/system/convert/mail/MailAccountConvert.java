@@ -1,18 +1,16 @@
 package cn.iocoder.yudao.module.system.convert.mail;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.mail.MailAccount;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountBaseVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountSimpleRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
-import cn.iocoder.yudao.module.system.mq.message.mail.MailSendMessage;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface MailAccountConvert {
@@ -27,25 +25,11 @@ public interface MailAccountConvert {
 
     List<MailAccountSimpleRespVO> convertList02(List<MailAccountDO> list);
 
-    // TODO 芋艿：改下
-    default MailAccount convertAccount(MailSendMessage bean) {
-        return new MailAccount()
-                .setHost(bean.getHost())
-                .setPort(bean.getPort())
-                .setAuth(true)
-                .setFrom(bean.getMail())
-                .setUser(bean.getUsername())
-                .setPass(bean.getPassword())
-                .setSslEnable(bean.getSslEnable());
-    }
-
-    // TODO 芋艿：改下
-    default Map<String, String> convertToMap(MailAccountDO mailAccountDO , String content) {
-        Map<String , String> map = new HashMap<>();
-        map.put("from_address" , mailAccountDO.getMail());
-        map.put("username" , mailAccountDO.getUsername());
-        map.put("content" , content);
-        return map;
+    default MailAccount convert(MailAccountDO account, String nickname) {
+        String from = StrUtil.isNotEmpty(nickname) ? nickname + " <" + account.getMail() + ">" : account.getMail();
+        return new MailAccount().setFrom(from).setAuth(true)
+                .setUser(account.getUsername()).setPass(account.getPassword())
+                .setHost(account.getHost()).setPort(account.getPort()).setSslEnable(account.getSslEnable());
     }
 
 }

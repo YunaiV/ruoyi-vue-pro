@@ -2,41 +2,25 @@ package cn.iocoder.yudao.module.system.dal.mysql.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogExportReqVO;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailLogDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
 @Mapper
 public interface MailLogMapper extends BaseMapperX<MailLogDO> {
 
-    default PageResult<MailLogDO> selectPage(MailLogPageReqVO pageVO){
-        return selectPage(pageVO , new QueryWrapperX<MailLogDO>()
-                .eqIfPresent("from", pageVO.getFrom())
-                .eqIfPresent("templeCode", pageVO.getTemplateCode())
-                .likeIfPresent("title" , pageVO.getTitle())
-                .likeIfPresent("content" , pageVO.getContent())
-                .eqIfPresent("to", pageVO.getTo())
-                .eqIfPresent("sendTime" , pageVO.getSendTime())
-                .eqIfPresent("sendStatus" , pageVO.getSendStatus())
-                .eqIfPresent("sendResult" , pageVO.getSendResult())
-                .orderByDesc("sendTime")
-        );
-    };
+    default PageResult<MailLogDO> selectPage(MailLogPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<MailLogDO>()
+                .eqIfPresent(MailLogDO::getUserId, reqVO.getUserId())
+                .eqIfPresent(MailLogDO::getUserType, reqVO.getUserType())
+                .likeIfPresent(MailLogDO::getToMail, reqVO.getToMail())
+                .eqIfPresent(MailLogDO::getAccountId, reqVO.getAccountId())
+                .likeIfPresent(MailLogDO::getFromMail, reqVO.getFromMail())
+                .eqIfPresent(MailLogDO::getTemplateId, reqVO.getTemplateId())
+                .eqIfPresent(MailLogDO::getSendStatus, reqVO.getSendStatus())
+                .betweenIfPresent(MailLogDO::getSendTime, reqVO.getSendTime())
+                .orderByDesc(MailLogDO::getId));
+    }
 
-    default List<MailLogDO> selectList(MailLogExportReqVO exportReqVO){
-        return selectList(new QueryWrapperX<MailLogDO>()
-                .eqIfPresent("from", exportReqVO.getFrom())
-                .eqIfPresent("templeCode", exportReqVO.getTemplateCode())
-                .likeIfPresent("title" , exportReqVO.getTitle())
-                .likeIfPresent("content" , exportReqVO.getContent())
-                .eqIfPresent("to", exportReqVO.getTo())
-                .eqIfPresent("sendTime" , exportReqVO.getSendTime())
-                .eqIfPresent("sendStatus" , exportReqVO.getSendStatus())
-                .eqIfPresent("sendResult" , exportReqVO.getSendResult())
-                .orderByDesc("sendTime")
-        );
-    };
 }

@@ -9,14 +9,9 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.mq.message.mail.MailSendMessage;
 import cn.iocoder.yudao.module.system.mq.producer.mail.MailProducer;
-import cn.iocoder.yudao.module.system.service.mail.MailLogService;
-import cn.iocoder.yudao.module.system.service.mail.MailSendService;
-import cn.iocoder.yudao.module.system.service.mail.MailTemplateService;
 import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
@@ -111,15 +106,18 @@ public class MailSendServiceImpl implements MailSendService {
 
     @Override
     public void doSendMail(MailSendMessage message) {
-        // 装载账号信息
-        MailAccount mailAccount  = MailAccountConvert.INSTANCE.convertAccount(message);
-        // 发送邮件
+        // 1. 创建发送账号
+        MailAccountDO account = checkMailAccountValid(message.getAccountId());
+        MailAccount mailAccount  = MailAccountConvert.INSTANCE.convert(account, message.getNickname());
+        // 2. 发送邮件
         try {
             String messageId = MailUtil.send(mailAccount, message.getMail(),
                     message.getTitle(), message.getContent(),true);
-            mailLogService.updateMailSendResult(message.getLogId() , messageId);
-        } catch (Exception e){
-            mailLogService.updateFailMailSendResult(message.getLogId() , e.getMessage());
+            // 3. 更新结果（成功）
+            mailLogService.updateMailSendResult(message.getLogId(), messageId, null);
+        } catch (Exception e) {
+            // 3. 更新结果（异常）
+            mailLogService.updateMailSendResult(message.getLogId(), null, e);
         }
     }
 
@@ -170,4 +168,5 @@ public class MailSendServiceImpl implements MailSendService {
             return new KeyValue<>(key, value);
         }).collect(Collectors.toList());
     }
+
 }

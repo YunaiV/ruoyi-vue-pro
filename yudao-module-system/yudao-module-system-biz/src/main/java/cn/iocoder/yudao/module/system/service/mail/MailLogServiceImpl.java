@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailLogDO;
@@ -13,9 +12,10 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static cn.hutool.core.exceptions.ExceptionUtil.getRootCauseMessage;
 
 /**
  * 邮件日志 Service 实现类
@@ -33,11 +33,6 @@ public class MailLogServiceImpl implements MailLogService {
     @Override
     public PageResult<MailLogDO> getMailLogPage(MailLogPageReqVO pageVO) {
         return mailLogMapper.selectPage(pageVO);
-    }
-
-    @Override
-    public List<MailLogDO> getMailLogList(MailLogExportReqVO exportReqVO) {
-        return mailLogMapper.selectList(exportReqVO);
     }
 
     @Override
@@ -61,20 +56,18 @@ public class MailLogServiceImpl implements MailLogService {
         return logDO.getId();
     }
 
-    // TODO @wangjingyi：还是加几个字段哈，日志上。sendStatus，成功、失败；messageId 消息标号。sendException 记录发送的异常。这样界面才好筛选邮件的发送结果。DONE
     @Override
-    public void updateMailSendResult(Long logId, String result) {
-        MailLogDO.MailLogDOBuilder logDOBuilder = MailLogDO.builder();
-        logDOBuilder.id(logId).sendTime(new Date()).sendResult(result).sendMessageId(result).sendStatus(MailSendStatusEnum.SUCCESS.getStatus());
-        MailLogDO mailLogDO = logDOBuilder.build();
-        mailLogMapper.updateById(mailLogDO);
+    public void updateMailSendResult(Long logId, String messageId, Exception exception) {
+        // 1. 成功
+        if (exception == null) {
+            mailLogMapper.updateById(new MailLogDO().setId(logId).setSendTime(new Date())
+                    .setSendStatus(MailSendStatusEnum.SUCCESS.getStatus()).setSendMessageId(messageId));
+            return;
+        }
+        // 2. 失败
+        mailLogMapper.updateById(new MailLogDO().setId(logId).setSendTime(new Date())
+                .setSendStatus(MailSendStatusEnum.FAILURE.getStatus()).setSendException(getRootCauseMessage(exception)));
+
     }
 
-    @Override
-    public void updateFailMailSendResult(Long logId, String exception) {
-        MailLogDO.MailLogDOBuilder logDOBuilder = MailLogDO.builder();
-        logDOBuilder.id(logId).sendTime(new Date()).sendResult(exception).sendStatus(MailSendStatusEnum.FAILURE.getStatus());
-        MailLogDO mailLogDO = logDOBuilder.build();
-        mailLogMapper.updateById(mailLogDO);
-    }
 }
