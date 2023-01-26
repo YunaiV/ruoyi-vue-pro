@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,6 +22,7 @@ public class MailAccountDO extends BaseDO {
     /**
      * 主键
      */
+    @TableId
     private Long id;
     /**
      * 邮箱

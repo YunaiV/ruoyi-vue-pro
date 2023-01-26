@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.mq.producer.mail.MailProducer;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -47,6 +48,7 @@ public class MailAccountServiceImpl implements MailAccountService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @Getter
     private volatile Map<Long, MailAccountDO> mailAccountCache;
 
     @Override

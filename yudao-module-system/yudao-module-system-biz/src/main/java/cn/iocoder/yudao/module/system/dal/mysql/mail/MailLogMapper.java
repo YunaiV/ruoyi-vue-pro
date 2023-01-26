@@ -16,7 +16,6 @@ public interface MailLogMapper extends BaseMapperX<MailLogDO> {
                 .eqIfPresent(MailLogDO::getUserType, reqVO.getUserType())
                 .likeIfPresent(MailLogDO::getToMail, reqVO.getToMail())
                 .eqIfPresent(MailLogDO::getAccountId, reqVO.getAccountId())
-                .likeIfPresent(MailLogDO::getFromMail, reqVO.getFromMail())
                 .eqIfPresent(MailLogDO::getTemplateId, reqVO.getTemplateId())
                 .eqIfPresent(MailLogDO::getSendStatus, reqVO.getSendStatus())
                 .betweenIfPresent(MailLogDO::getSendTime, reqVO.getSendTime())

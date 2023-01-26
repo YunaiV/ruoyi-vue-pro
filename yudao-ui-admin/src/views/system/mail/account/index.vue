@@ -61,7 +61,7 @@
           <el-input v-model="form.mail" placeholder="请输入邮箱" />
         </el-form-item>
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" placeholder="请输入用户名" />
+          <el-input v-model="form.username" placeholder="请输入用户名，一般和邮箱一致" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input v-model="form.password" placeholder="请输入密码" />
@@ -98,8 +98,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
