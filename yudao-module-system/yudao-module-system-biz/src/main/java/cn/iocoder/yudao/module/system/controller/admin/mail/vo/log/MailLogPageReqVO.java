@@ -23,7 +23,7 @@ public class MailLogPageReqVO extends PageParam {
     private Long userId;
 
     @ApiModelProperty(value = "用户类型", example = "2", notes = "参见 UserTypeEnum 枚举")
-    private Byte userType;
+    private Integer userType;
 
     @ApiModelProperty(value = "接收邮箱地址", example = "76854@qq.com", notes = "模糊匹配")
     private String toMail;
