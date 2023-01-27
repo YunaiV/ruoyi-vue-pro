@@ -17,7 +17,6 @@ public class MailSendSingleToUserReqDTO {
     /**
      * 用户编号
      */
-    @NotNull(message = "用户编号不能为空")
     private Long userId;
     /**
      * 邮箱
@@ -33,7 +32,6 @@ public class MailSendSingleToUserReqDTO {
     /**
      * 邮件模板参数
      */
-    @NotNull(message = "邮件模板参数不能为空")
     private Map<String, Object> templateParams;
 
 }
