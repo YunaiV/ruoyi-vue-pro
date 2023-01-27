@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * BPM 通用的 Configuration 配置类，提供给 Activiti 和 Flowable
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class BpmCommonConfiguration {
 
     @Bean

@@ -1,8 +1,4 @@
-import { reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { required } from '@/utils/formRules'
 import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
-import { DICT_TYPE } from '@/utils/dict'
 const { t } = useI18n() // 国际化
 
 // 表单校验
@@ -41,7 +37,8 @@ const crudSchemas = reactive<CrudSchema[]>([
   {
     label: t('common.status'),
     field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS
+    dictType: DICT_TYPE.COMMON_STATUS,
+    dictClass: 'number'
   },
   {
     label: '备注',

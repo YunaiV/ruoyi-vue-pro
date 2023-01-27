@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.wx;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
@@ -23,6 +24,8 @@ import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -97,7 +100,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .outTradeNo(reqDTO.getMerchantOrderId())
                 .body(reqDTO.getBody())
                 .totalFee(reqDTO.getAmount().intValue()) // 单位分
-                .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
+                .timeExpire(DateUtil.format(Date.from(reqDTO.getExpireTime().atZone(ZoneId.systemDefault()).toInstant()), "yyyy-MM-dd'T'HH:mm:ssXXX"))
                 .spbillCreateIp(reqDTO.getUserIp())
                 .notifyUrl(reqDTO.getNotifyUrl())
                 .productId(tradeType)
@@ -150,7 +153,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .builder()
                 .orderExtensionNo(result.getOutTradeNo())
                 .channelOrderNo(result.getTradeState())
-                .successTime(DateUtil.parse(result.getSuccessTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
+                .successTime(LocalDateTimeUtil.parse(result.getSuccessTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
                 .data(data.getBody())
                 .build();
     }
@@ -164,7 +167,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .orderExtensionNo(notifyResult.getOutTradeNo())
                 .channelOrderNo(notifyResult.getTransactionId())
                 .channelUserId(notifyResult.getOpenid())
-                .successTime(DateUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"))
+                .successTime(LocalDateTimeUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"))
                 .data(data.getBody())
                 .build();
 

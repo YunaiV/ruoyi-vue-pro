@@ -2,7 +2,13 @@ package cn.iocoder.yudao.module.pay.service.notify;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyLogDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyTaskDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
@@ -13,11 +19,8 @@ import cn.iocoder.yudao.module.pay.dal.redis.notify.PayNotifyLockRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
-import cn.iocoder.yudao.module.pay.service.notify.vo.PayNotifyOrderReqVO;
-import cn.iocoder.yudao.module.pay.service.notify.vo.PayRefundOrderReqVO;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -83,7 +87,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     public void createPayNotifyTask(PayNotifyTaskCreateReqDTO reqDTO) {
         PayNotifyTaskDO task = new PayNotifyTaskDO();
         task.setType(reqDTO.getType()).setDataId(reqDTO.getDataId());
-        task.setStatus(PayNotifyStatusEnum.WAITING.getStatus()).setNextNotifyTime(new Date())
+        task.setStatus(PayNotifyStatusEnum.WAITING.getStatus()).setNextNotifyTime(LocalDateTime.now())
                 .setNotifyTimes(0).setMaxNotifyTimes(PayNotifyTaskDO.NOTIFY_FREQUENCY.length + 1);
         // 补充 merchantId + appId + notifyUrl 字段
         if (Objects.equals(task.getType(), PayNotifyTypeEnum.ORDER.getType())) {
@@ -165,8 +169,9 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             // 校验，当前任务是否已经被通知过
             // 虽然已经通过分布式加锁，但是可能同时满足通知的条件，然后都去获得锁。此时，第一个执行完后，第二个还是能拿到锁，然后会再执行一次。
             PayNotifyTaskDO dbTask = payNotifyTaskCoreMapper.selectById(task.getId());
-            if (DateUtils.afterNow(dbTask.getNextNotifyTime())) {
-                log.info("[executeNotify][dbTask({}) 任务被忽略，原因是未到达下次通知时间，可能是因为并发执行了]", JsonUtils.toJsonString(dbTask));
+            if (LocalDateTimeUtils.afterNow(dbTask.getNextNotifyTime())) {
+                log.info("[executeNotifySync][dbTask({}) 任务被忽略，原因是未到达下次通知时间，可能是因为并发执行了]",
+                        JsonUtils.toJsonString(dbTask));
                 return;
             }
 
@@ -186,11 +191,12 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             invokeException = e;
         }
 
-        // 处理
-        Integer newStatus = this.processNotifyResult(task, invokeResult, invokeException);
+        // 处理结果
+        Integer newStatus = processNotifyResult(task, invokeResult, invokeException);
 
         // 记录 PayNotifyLog 日志
-        String response = invokeException != null ? ExceptionUtil.getRootCauseMessage(invokeException) : JsonUtils.toJsonString(invokeResult);
+        String response = invokeException != null ? ExceptionUtil.getRootCauseMessage(invokeException) :
+                JsonUtils.toJsonString(invokeResult);
         payNotifyLogCoreMapper.insert(PayNotifyLogDO.builder().taskId(task.getId())
                 .notifyTimes(task.getNotifyTimes() + 1).status(newStatus).response(response).build());
     }
@@ -202,22 +208,28 @@ public class PayNotifyServiceImpl implements PayNotifyService {
      * @return HTTP 响应
      */
     private CommonResult<?> executeNotifyInvoke(PayNotifyTaskDO task) {
-        // 拼接参数
+        // 拼接 body 参数
         Object request;
         if (Objects.equals(task.getType(), PayNotifyTypeEnum.ORDER.getType())) {
-            request = PayNotifyOrderReqVO.builder().merchantOrderId(task.getMerchantOrderId())
-                            .payOrderId(task.getDataId()).build();
+            request = PayOrderNotifyReqDTO.builder().merchantOrderId(task.getMerchantOrderId())
+                    .payOrderId(task.getDataId()).build();
         } else if (Objects.equals(task.getType(), PayNotifyTypeEnum.REFUND.getType())) {
-            request = PayRefundOrderReqVO.builder().merchantOrderId(task.getMerchantOrderId())
+            request = PayRefundNotifyReqDTO.builder().merchantOrderId(task.getMerchantOrderId())
                     .payRefundId(task.getDataId()).build();
         } else {
             throw new RuntimeException("未知的通知任务类型：" + JsonUtils.toJsonString(task));
         }
-        // 请求地址
-        String response = HttpUtil.post(task.getNotifyUrl(), JsonUtils.toJsonString(request),
-                (int) NOTIFY_TIMEOUT_MILLIS);
-        // 解析结果
-        return JsonUtils.parseObject(response, CommonResult.class);
+        // 拼接 header 参数
+        Map<String, String> headers = new HashMap<>();
+        TenantUtils.addTenantHeader(headers);
+
+        // 发起请求
+        try (HttpResponse response = HttpUtil.createPost(task.getNotifyUrl())
+                .body(JsonUtils.toJsonString(request)).addHeaders(headers)
+                .timeout((int) NOTIFY_TIMEOUT_MILLIS).execute()) {
+            // 解析结果
+            return JsonUtils.parseObject(response.body(), CommonResult.class);
+        }
     }
 
     /**
@@ -232,7 +244,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         // 设置通用的更新 PayNotifyTaskDO 的字段
         PayNotifyTaskDO updateTask = new PayNotifyTaskDO()
                 .setId(task.getId())
-                .setLastExecuteTime(new Date())
+                .setLastExecuteTime(LocalDateTime.now())
                 .setNotifyTimes(task.getNotifyTimes() + 1);
 
         // 情况一：调用成功
@@ -247,7 +259,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             return updateTask.getStatus();
         }
         // 2.2 未超过最大回调次数
-        updateTask.setNextNotifyTime(DateUtils.addDate(Calendar.SECOND, PayNotifyTaskDO.NOTIFY_FREQUENCY[updateTask.getNotifyTimes()]));
+        updateTask.setNextNotifyTime(LocalDateTime.now().plusSeconds(PayNotifyTaskDO.NOTIFY_FREQUENCY[updateTask.getNotifyTimes()]));
         updateTask.setStatus(invokeException != null ? PayNotifyStatusEnum.REQUEST_FAILURE.getStatus()
                 : PayNotifyStatusEnum.REQUEST_SUCCESS.getStatus());
         return updateTask.getStatus();

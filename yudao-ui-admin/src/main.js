@@ -16,7 +16,7 @@ import './permission' // permission control
 import './tongji' // 百度统计
 import { getDicts } from "@/api/system/dict/data";
 import { getConfigKey } from "@/api/infra/config";
-import { parseTime, resetForm, handleTree} from "@/utils/ruoyi";
+import { parseTime, resetForm, handleTree, addBeginAndEndTime, divide} from "@/utils/ruoyi";
 import Pagination from "@/components/Pagination";
 // 自定义表格工具扩展
 import RightToolbar from "@/components/RightToolbar"
@@ -35,6 +35,8 @@ Vue.prototype.getDictDatas2 = getDictDatas2
 Vue.prototype.getDictDataLabel = getDictDataLabel
 Vue.prototype.DICT_TYPE = DICT_TYPE
 Vue.prototype.handleTree = handleTree
+Vue.prototype.addBeginAndEndTime = addBeginAndEndTime
+Vue.prototype.divide = divide
 
 // 全局组件挂载
 Vue.component('DictTag', DictTag)
@@ -64,11 +66,15 @@ import "bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css";
 // Form Generator 组件需要使用到 tinymce
 import Tinymce from '@/components/tinymce/index.vue'
 Vue.component('tinymce', Tinymce)
-import '@/icons'
+import '@/assets/icons'
 import request from "@/utils/request" // 实现 form generator 使用自己定义的 axios request 对象
 console.log(request)
 Vue.prototype.$axios = request
 import '@/styles/index.scss'
+
+// 默认点击背景不关闭弹窗
+import ElementUI from 'element-ui'
+ElementUI.Dialog.props.closeOnClickModal.default = false
 
 /**
  * If you don't want to use mock-server

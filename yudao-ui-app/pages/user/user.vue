@@ -1,9 +1,15 @@
 <template>
   <view class="container">
     <view class="user-header">
-      <view class="user-info" @click="loginOrJump('/pages/profile/profile')">
-        <u-avatar size="80" :src="userInfo.avatar"></u-avatar>
-        <text class="nick-name">{{ hasLogin ? userInfo.nickname || '游客' : '登录/注册' }}</text>
+      <view class="user-info" @click="pageRouter('/pages/profile/profile')">
+        <u-avatar size="60" shape="square" :src="userInfo.avatar"></u-avatar>
+        <view class="info-text">
+          <view class="user-nickname">{{ hasLogin ? userInfo.nickname || '会员用户' : '匿名用户' }}</view>
+          <view class="user-mobile">{{ hasLogin ? userInfo.mobile || ' ' : '登录/注册' }}</view>
+        </view>
+      </view>
+      <view class="user-setting">
+        <u-icon v-if="hasLogin" name="setting" color="#939393" size="22" @click="pageRouter('/pages/setting/setting')"></u-icon>
       </view>
     </view>
 
@@ -12,7 +18,7 @@
     <view>
       <view class="order-header">
         <text class="order-title">我的订单</text>
-        <view class="see-all">
+        <view class="see-all" @click="pageRouter(orderPage, -1)">
           <text>查看全部</text>
           <u-icon name="arrow-right"></u-icon>
         </view>
@@ -20,9 +26,9 @@
 
       <view class="order-status-box">
         <u-grid :border="false" :col="orderStatusList.length">
-          <u-grid-item v-for="(item, index) in orderStatusList" :key="index">
+          <u-grid-item v-for="(item, index) in orderStatusList" :key="index" @click="pageRouter(orderPage, item.status)">
             <u-icon :name="item.icon" :size="32"></u-icon>
-            <text class="grid-title">{{ item.title }}</text>
+            <text class="grid-title">{{ item.name }}</text>
           </u-grid-item>
         </u-grid>
       </view>
@@ -31,8 +37,8 @@
     <u-gap height="10" bgColor="#f3f3f3"></u-gap>
 
     <view class="stat-box">
-      <u-grid :border="false" col="3"
-        ><u-grid-item v-for="(item, index) in statList" :key="index">
+      <u-grid :border="false" col="3">
+        <u-grid-item v-for="(item, index) in statList" :key="index">
           <text class="grid-value">{{ item.value }}</text>
           <text class="grid-title">{{ item.title }}</text>
         </u-grid-item>
@@ -45,25 +51,18 @@
       <u-cell class="fun-item" :border="false" icon="gift" title="分销中心" isLink></u-cell>
       <u-cell class="fun-item" :border="false" icon="tags" title="领券中心" isLink></u-cell>
       <u-cell class="fun-item" :border="false" icon="coupon" title="我的优惠券" isLink></u-cell>
-      <u-cell class="fun-item" :border="false" icon="map" title="收货地址" @click="loginOrJump('/pages/address/list')" isLink></u-cell>
+      <u-cell class="fun-item" :border="false" icon="map" title="收货地址" @click="pageRouter('/pages/address/list')" isLink></u-cell>
     </u-cell-group>
-
-    <view v-if="hasLogin" class="logout-btn">
-      <u-button type="error" color="#ea322b" text="退出登录" @click="logout"></u-button>
-    </view>
   </view>
 </template>
 
 <script>
+import orderStatus from '@/common/orderStatus'
+
 export default {
   data() {
     return {
-      orderStatusList: [
-        { icon: 'rmb-circle', title: '待支付' },
-        { icon: 'car', title: '代发货' },
-        { icon: 'order', title: '待收货' },
-        { icon: 'integral', title: '已完成' }
-      ],
+      orderPage: '/pages/order/list',
       statList: [
         { value: '0', title: '我的收藏' },
         { value: '0', title: '我的消息' },
@@ -72,14 +71,35 @@ export default {
     }
   },
   onLoad() {
-    if (this.hasLogin){
+    if (this.hasLogin) {
       this.$store.dispatch('ObtainUserInfo')
     }
   },
+  computed: {
+    userInfo() {
+      return this.$store.getters.userInfo
+    },
+    hasLogin() {
+      return this.$store.getters.hasLogin
+    },
+    orderStatusList() {
+      let orderStatusList = []
+      for (let status in orderStatus) {
+        if (status !== '40') {
+          orderStatusList.push({ name: orderStatus[status].name, status: status, icon: orderStatus[status].icon })
+        }
+      }
+      return orderStatusList
+    }
+  },
   methods: {
-    loginOrJump(pageUrl) {
+    pageRouter(pageUrl, param) {
       if (!this.hasLogin) {
         uni.$u.route('/pages/login/social')
+      } else if (pageUrl === this.orderPage) {
+        uni.$u.route(this.orderPage, {
+          status: param
+        })
       } else {
         uni.$u.route(pageUrl)
       }
@@ -97,29 +117,41 @@ export default {
         }
       })
     }
-  },
-  computed: {
-    userInfo() {
-      return this.$store.getters.userInfo
-    },
-    hasLogin() {
-      return this.$store.getters.hasLogin
-    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .user-header {
-  @include flex-center(column);
-  height: 280rpx;
+  background-color: #fff;
+  @include flex-space-between;
+  padding: 30rpx;
+  height: 200rpx;
+
   .user-info {
-    @include flex-center(column);
-    .nick-name {
-      margin-top: 20rpx;
-      font-size: 32rpx;
-      font-weight: 700;
+    @include flex-left;
+    align-items: center;
+
+    .info-text {
+      margin-left: 20rpx;
+
+      .user-nickname {
+        font-size: 30rpx;
+        font-weight: 700;
+        line-height: 50rpx;
+      }
+
+      .user-mobile {
+        font-size: 24rpx;
+        font-weight: 700;
+        color: #939393;
+        line-height: 50rpx;
+      }
     }
+  }
+
+  .user-setting {
+    margin-right: 5rpx;
   }
 }
 
@@ -132,6 +164,7 @@ export default {
     color: #333333;
     font-size: 34rpx;
   }
+
   .see-all {
     height: 40rpx;
     @include flex-right;
@@ -166,10 +199,5 @@ export default {
     padding-bottom: 10rpx;
     border-bottom: $custom-border-style;
   }
-}
-
-.logout-btn {
-  margin: 60rpx auto 0;
-  width: 400rpx;
 }
 </style>

@@ -17,6 +17,7 @@ export default {
     cancel: 'Cancel',
     close: 'Close',
     reload: 'Reload current',
+    success: 'Success',
     closeTab: 'Close current',
     closeTheLeftTab: 'Close left',
     closeTheRightTab: 'Close right',
@@ -79,6 +80,7 @@ export default {
     screenfullIcon: 'Screenfull icon',
     sizeIcon: 'Size icon',
     localeIcon: 'Locale icon',
+    messageIcon: 'Message icon',
     tagsView: 'Tags view',
     logo: 'Logo',
     greyMode: 'Grey mode',
@@ -91,7 +93,9 @@ export default {
     copyFailed: 'Copy failed',
     footer: 'Footer',
     uniqueOpened: 'Unique opened',
-    tagsViewIcon: 'Tags view icon'
+    tagsViewIcon: 'Tags view icon',
+    reExperienced: 'Please exit the login experience again',
+    fixedMenu: 'Fixed menu'
   },
   size: {
     default: 'Default',
@@ -127,6 +131,13 @@ export default {
     qrcode: 'Scan the QR code to log in',
     btnRegister: 'Sign up',
     SmsSendMsg: 'code has been sent'
+  },
+  captcha: {
+    verification: 'Please complete security verification',
+    slide: 'Swipe right to complete verification',
+    point: 'Please click',
+    success: 'Verification succeeded',
+    fail: 'verification failed'
   },
   router: {
     login: 'Login',
@@ -179,7 +190,6 @@ export default {
     access: 'Project access',
     toDo: 'To do',
     introduction: 'A serious introduction',
-    more: 'More',
     shortcutOperation: 'Quick entry',
     operation: 'Operation',
     index: 'Index',
@@ -191,7 +201,6 @@ export default {
     yield: 'Yield',
     dynamic: 'Dynamic',
     push: 'push',
-    pushCode: 'push code to Github',
     follow: 'Follow'
   },
   form: {
@@ -275,6 +284,7 @@ export default {
     edit: 'Edit',
     update: 'Update',
     preview: 'Preview',
+    more: 'More',
     sync: 'Sync',
     save: 'Save',
     detail: 'Detail',
@@ -417,5 +427,19 @@ export default {
       cfPwdMsg: 'Please Enter Confirm Password',
       diffPwd: 'The Passwords Entered Twice No Match'
     }
+  },
+  cropper: {
+    selectImage: 'Select Image',
+    uploadSuccess: 'Uploaded success!',
+    modalTitle: 'Avatar upload',
+    okText: 'Confirm and upload',
+    btn_reset: 'Reset',
+    btn_rotate_left: 'Counterclockwise rotation',
+    btn_rotate_right: 'Clockwise rotation',
+    btn_scale_x: 'Flip horizontal',
+    btn_scale_y: 'Flip vertical',
+    btn_zoom_in: 'Zoom in',
+    btn_zoom_out: 'Zoom out',
+    preview: 'Preivew'
   }
 }

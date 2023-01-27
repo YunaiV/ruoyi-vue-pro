@@ -1,8 +1,4 @@
-import { reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { required } from '@/utils/formRules'
 import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
-import { DICT_TYPE } from '@/utils/dict'
 const { t } = useI18n() // 国际化
 
 // 表单校验
@@ -41,6 +37,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '流程分类',
     field: 'category',
     dictType: DICT_TYPE.BPM_MODEL_CATEGORY,
+    dictClass: 'number',
     search: {
       show: true
     }

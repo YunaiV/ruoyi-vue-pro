@@ -15,9 +15,9 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
@@ -60,7 +60,7 @@ public class FileServiceTest extends BaseDbUnitTest {
         FilePageReqVO reqVO = new FilePageReqVO();
         reqVO.setPath("yunai");
         reqVO.setType("jp");
-        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 10), buildTime(2021, 1, 20)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 10), buildTime(2021, 1, 20)}));
 
         // 调用
         PageResult<FileDO> pageResult = fileService.getFilePage(reqVO);
@@ -79,7 +79,7 @@ public class FileServiceTest extends BaseDbUnitTest {
         FileClient client = mock(FileClient.class);
         when(fileConfigService.getMasterFileClient()).thenReturn(client);
         String url = randomString();
-        when(client.upload(same(content), same(path))).thenReturn(url);
+        when(client.upload(same(content), same(path), eq("image/jpeg"))).thenReturn(url);
         when(client.getId()).thenReturn(10L);
         String name = "单测文件名";
         // 调用
@@ -91,7 +91,7 @@ public class FileServiceTest extends BaseDbUnitTest {
         assertEquals(10L, file.getConfigId());
         assertEquals(path, file.getPath());
         assertEquals(url, file.getUrl());
-        assertEquals("image/jpg", file.getType());
+        assertEquals("image/jpeg", file.getType());
         assertEquals(content.length, file.getSize());
     }
 

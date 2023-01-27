@@ -6,6 +6,7 @@ import { cloneDeep } from 'lodash-es'
 import { propTypes } from '@/utils/propTypes'
 import { useDesign } from '@/hooks/web/useDesign'
 import { isString } from '@/utils/is'
+import { QrcodeLogo } from '@/types/qrcode'
 
 const props = defineProps({
   // img 或者 canvas,img不支持logo嵌套
@@ -63,7 +64,7 @@ const initQrcode = async () => {
       options.errorCorrectionLevel || getErrorCorrectionLevel(unref(renderText))
     const _width: number = await getOriginWidth(unref(renderText), options)
     options.scale = props.width === 0 ? undefined : (props.width / _width) * 4
-    const canvasRef: HTMLCanvasElement = await toCanvas(
+    const canvasRef: HTMLCanvasElement | any = await toCanvas(
       unref(wrapRef) as HTMLCanvasElement,
       unref(renderText),
       options
@@ -236,10 +237,10 @@ const disabledClick = () => {
   </div>
 </template>
 
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-qrcode';
+<style lang="scss" scoped>
+$prefix-cls: #{$namespace}-qrcode;
 
-.@{prefix-cls} {
+.#{$prefix-cls} {
   &--disabled {
     background: rgba(255, 255, 255, 0.95);
 

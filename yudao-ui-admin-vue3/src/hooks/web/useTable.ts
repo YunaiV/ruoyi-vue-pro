@@ -3,7 +3,8 @@ import { Table, TableExpose } from '@/components/Table'
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
 import { computed, nextTick, reactive, ref, unref, watch } from 'vue'
 import type { TableProps } from '@/components/Table/src/types'
-import { useI18n } from '@/hooks/web/useI18n'
+
+import { TableSetPropsType } from '@/types/table'
 
 const { t } = useI18n()
 interface ResponseType<T = any> {
@@ -17,6 +18,8 @@ interface UseTableConfig<T = any> {
   exportListApi?: (option: any) => Promise<T>
   // 返回数据格式配置
   response?: ResponseType
+  // 默认传递的参数
+  defaultParams?: Recordable
   props?: TableProps
 }
 
@@ -42,7 +45,9 @@ export const useTable = <T = any>(config?: UseTableConfig<T>) => {
     // 表格数据
     tableList: [],
     // AxiosConfig 配置
-    params: {},
+    params: {
+      ...(config?.defaultParams || {})
+    },
     // 加载中
     loading: true,
     // 导出加载中
@@ -150,13 +155,17 @@ export const useTable = <T = any>(config?: UseTableConfig<T>) => {
     },
     // 与Search组件结合
     setSearchParams: (data: Recordable) => {
-      tableObject.currentPage = 1
       tableObject.params = Object.assign(tableObject.params, {
         pageSize: tableObject.pageSize,
-        pageNo: tableObject.currentPage,
+        pageNo: 1,
         ...data
       })
-      methods.getList()
+      // 页码不等于1时更新页码重新获取数据，页码等于1时重新获取数据
+      if (tableObject.currentPage !== 1) {
+        tableObject.currentPage = 1
+      } else {
+        methods.getList()
+      }
     },
     // 删除数据
     delList: async (

@@ -2,6 +2,7 @@
  * 数据字典工具类
  */
 import { useDictStoreWithOut } from '@/store/modules/dict'
+import { ElementPlusInfoType } from '@/types/elementPlus'
 
 const dictStore = useDictStoreWithOut()
 
@@ -14,39 +15,56 @@ const dictStore = useDictStoreWithOut()
 export interface DictDataType {
   dictType: string
   label: string
-  value: string | number
-  colorType: ElementPlusInfoType | '' | 'default' | 'primary'
+  value: string | number | boolean
+  colorType: ElementPlusInfoType | ''
   cssClass: string
 }
 
 export const getDictOptions = (dictType: string) => {
-  const dictOptions: DictDataType[] = []
-  dictStore.getDictMap.forEach((dict: DictDataType) => {
-    if (dict.dictType + '' === dictType) {
-      dictOptions.push(dict)
-    }
-  })
-  return dictOptions
+  return dictStore.getDictByType(dictType)
 }
 
-// TODO @芋艿：暂时提供这个方法，主要考虑 ElSelect。下拉如果可以解，就可以不用这个方法
 export const getIntDictOptions = (dictType: string) => {
-  const dictOptions: DictDataType[] = []
-  dictStore.getDictMap.forEach((dict: DictDataType) => {
-    if (dict.dictType + '' === dictType) {
-      dictOptions.push({
-        ...dict,
-        value: parseInt(dict.value + '')
-      })
-    }
-  })
-  return dictOptions
-}
-
-export const getDictObj = (dictType: string, value: string) => {
+  const dictOption: DictDataType[] = []
   const dictOptions: DictDataType[] = getDictOptions(dictType)
   dictOptions.forEach((dict: DictDataType) => {
-    if (dict.value === value) {
+    dictOption.push({
+      ...dict,
+      value: parseInt(dict.value + '')
+    })
+  })
+
+  return dictOption
+}
+
+export const getStrDictOptions = (dictType: string) => {
+  const dictOption: DictDataType[] = []
+  const dictOptions: DictDataType[] = getDictOptions(dictType)
+  dictOptions.forEach((dict: DictDataType) => {
+    dictOption.push({
+      ...dict,
+      value: dict.value + ''
+    })
+  })
+  return dictOption
+}
+
+export const getBoolDictOptions = (dictType: string) => {
+  const dictOption: DictDataType[] = []
+  const dictOptions: DictDataType[] = getDictOptions(dictType)
+  dictOptions.forEach((dict: DictDataType) => {
+    dictOption.push({
+      ...dict,
+      value: dict.value + '' === 'true' ? true : false
+    })
+  })
+  return dictOption
+}
+
+export const getDictObj = (dictType: string, value: any) => {
+  const dictOptions: DictDataType[] = getDictOptions(dictType)
+  dictOptions.forEach((dict: DictDataType) => {
+    if (dict.value === value.toString()) {
       return dict
     }
   })
@@ -72,6 +90,7 @@ export enum DICT_TYPE {
   SYSTEM_SMS_RECEIVE_STATUS = 'system_sms_receive_status',
   SYSTEM_ERROR_CODE_TYPE = 'system_error_code_type',
   SYSTEM_OAUTH2_GRANT_TYPE = 'system_oauth2_grant_type',
+  SYSTEM_MAIL_SEND_STATUS = 'system_mail_send_status',
 
   // ========== INFRA 模块 ==========
   INFRA_BOOLEAN_STRING = 'infra_boolean_string',

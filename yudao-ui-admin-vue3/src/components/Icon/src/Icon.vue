@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed, unref, ref, watch, nextTick } from 'vue'
-import { ElIcon } from 'element-plus'
 import { propTypes } from '@/utils/propTypes'
 import Iconify from '@purge-icons/generated'
 import { useDesign } from '@/hooks/web/useDesign'
@@ -15,7 +13,9 @@ const props = defineProps({
   // icon color
   color: propTypes.string,
   // icon size
-  size: propTypes.number.def(16)
+  size: propTypes.number.def(16),
+  // icon svg class
+  svgClass: propTypes.string.def('')
 })
 
 const elRef = ref<ElRef>(null)
@@ -32,6 +32,11 @@ const getIconifyStyle = computed(() => {
     fontSize: `${size}px`,
     color
   }
+})
+
+const getSvgClass = computed(() => {
+  const { svgClass } = props
+  return `iconify ${svgClass}`
 })
 
 const updateIcon = async (icon: string) => {
@@ -66,13 +71,13 @@ watch(
 </script>
 
 <template>
-  <ElIcon :class="prefixCls" :size="size" :color="color">
-    <svg v-if="isLocal" aria-hidden="true">
+  <ElIcon :class="prefixCls" :color="color" :size="size">
+    <svg v-if="isLocal" aria-hidden="true" :class="getSvgClass">
       <use :xlink:href="symbolId" />
     </svg>
 
     <span v-else ref="elRef" :class="$attrs.class" :style="getIconifyStyle">
-      <span class="iconify" :data-icon="symbolId"></span>
+      <span :class="getSvgClass" :data-icon="symbolId"></span>
     </span>
   </ElIcon>
 </template>

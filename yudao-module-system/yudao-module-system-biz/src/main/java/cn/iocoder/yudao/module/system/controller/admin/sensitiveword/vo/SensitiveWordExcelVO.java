@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -34,6 +34,6 @@ public class SensitiveWordExcelVO {
     private String description;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

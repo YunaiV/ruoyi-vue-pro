@@ -1,7 +1,5 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 import type { CodegenUpdateReqVO, CodegenCreateListReqVO } from './types'
-
-const request = useAxios()
 
 // 查询列表代码生成表定义
 export const getCodegenTablePageApi = (params) => {

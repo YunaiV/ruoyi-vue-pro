@@ -23,7 +23,7 @@ public class SmsChannelRefreshConsumer extends AbstractChannelMessageListener<Sm
     @Override
     public void onMessage(SmsChannelRefreshMessage message) {
         log.info("[onMessage][收到 SmsChannel 刷新消息]");
-        smsChannelService.initSmsClients();
+        smsChannelService.initLocalCache();
     }
 
 }

@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 用户组分页 Request VO")
 @Data
@@ -25,6 +25,6 @@ public class BpmUserGroupPageReqVO extends PageParam {
 
     @DateTimeFormat(pattern = DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "创建时间")
-    private Date[] createTime;
+    private LocalDateTime[] createTime;
 
 }

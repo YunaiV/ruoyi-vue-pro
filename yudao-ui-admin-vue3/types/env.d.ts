@@ -10,8 +10,11 @@ declare module '*.vue' {
 interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string
   readonly VITE_PORT: number
-  readonly VITE_OPEN: boolean
-  readonly VITE_APP_TENANT_ENABLE: boolean
+  readonly VITE_OPEN: string
+  readonly VITE_DEV: boolean
+  readonly VITE_ROUTE_ALWAYSSHOW_ENABLE: string
+  readonly VITE_APP_CAPTCHA_ENABLE: string
+  readonly VITE_APP_TENANT_ENABLE: string
   readonly VITE_BASE_URL: string
   readonly VITE_UPLOAD_URL: string
   readonly VITE_API_BASEPATH: string

@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ElDialog, ElScrollbar } from 'element-plus'
 import { propTypes } from '@/utils/propTypes'
-import { computed, useAttrs, ref, unref, useSlots, watch, nextTick } from 'vue'
 import { isNumber } from '@/utils/is'
 
 const slots = useSlots()
@@ -11,7 +9,7 @@ const props = defineProps({
   title: propTypes.string.def('Dialog'),
   fullscreen: propTypes.bool.def(true),
   maxHeight: propTypes.oneOfType([String, Number]).def('300px'),
-  width: propTypes.oneOfType([String, Number]).def('35%')
+  width: propTypes.oneOfType([String, Number]).def('40%')
 })
 
 const getBindValue = computed(() => {
@@ -74,7 +72,7 @@ const dialogStyle = computed(() => {
         </slot>
         <Icon
           v-if="fullscreen"
-          class="mr-22px cursor-pointer is-hover mt-2px"
+          class="mr-22px cursor-pointer is-hover mt-2px z-10"
           :icon="isFullscreen ? 'zmdi:fullscreen-exit' : 'zmdi:fullscreen'"
           color="var(--el-color-info)"
           @click="toggleFull"
@@ -92,17 +90,14 @@ const dialogStyle = computed(() => {
   </ElDialog>
 </template>
 
-<style lang="less">
-.@{elNamespace}-dialog__header {
+<style lang="scss">
+.#{$elNamespace}-dialog__header {
   margin-right: 0 !important;
   border-bottom: 1px solid var(--tags-view-border-color);
 }
 
-.@{elNamespace}-dialog__footer {
-  border-top: 0px solid var(--tags-view-border-color);
-}
-.dialog-footer button:first-child {
-  margin-right: 10px;
+.#{$elNamespace}-dialog__footer {
+  border-top: 1px solid var(--tags-view-border-color);
 }
 
 .is-hover {
@@ -112,11 +107,11 @@ const dialogStyle = computed(() => {
 }
 
 .dark {
-  .@{elNamespace}-dialog__header {
+  .#{$elNamespace}-dialog__header {
     border-bottom: 1px solid var(--el-border-color);
   }
 
-  .@{elNamespace}-dialog__footer {
+  .#{$elNamespace}-dialog__footer {
     border-top: 1px solid var(--el-border-color);
   }
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 流程模型的分页的每一项 Response VO")
 @Data
@@ -21,7 +21,7 @@ public class BpmModelPageItemRespVO extends BpmModelBaseVO {
     private String formName;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 最新部署的流程定义
@@ -39,7 +39,7 @@ public class BpmModelPageItemRespVO extends BpmModelBaseVO {
         private Integer version;
 
         @ApiModelProperty(value = "部署时间", required = true)
-        private Date deploymentTime;
+        private LocalDateTime deploymentTime;
 
         @ApiModelProperty(value = "中断状态", required = true, example = "1", notes = "参见 SuspensionState 枚举")
         private Integer suspensionState;

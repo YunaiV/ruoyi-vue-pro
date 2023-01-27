@@ -8,8 +8,8 @@ import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodePag
 import cn.iocoder.yudao.module.system.dal.dataobject.errorcode.ErrorCodeDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -43,7 +43,7 @@ public interface ErrorCodeMapper extends BaseMapperX<ErrorCodeDO> {
         return selectOne(new LambdaQueryWrapperX<ErrorCodeDO>().eq(ErrorCodeDO::getCode, code));
     }
 
-    default List<ErrorCodeDO> selectListByApplicationNameAndUpdateTimeGt(String applicationName, Date minUpdateTime) {
+    default List<ErrorCodeDO> selectListByApplicationNameAndUpdateTimeGt(String applicationName, LocalDateTime minUpdateTime) {
         return selectList(new LambdaQueryWrapperX<ErrorCodeDO>().eq(ErrorCodeDO::getApplicationName, applicationName)
                 .gtIfPresent(ErrorCodeDO::getUpdateTime, minUpdateTime));
     }

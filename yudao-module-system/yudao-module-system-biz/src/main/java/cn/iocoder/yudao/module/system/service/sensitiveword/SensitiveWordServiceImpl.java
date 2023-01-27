@@ -17,7 +17,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -40,12 +39,6 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SENSITIVE_
 public class SensitiveWordServiceImpl implements SensitiveWordService {
 
     /**
-     * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
-     * 因为已经通过 Redis Pub/Sub 机制，所以频率不需要高
-     */
-    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
-
-    /**
      * 敏感词标签缓存
      * key：敏感词编号 {@link SensitiveWordDO#getId()}
      * <p>
@@ -53,12 +46,6 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
      */
     @Getter
     private volatile Set<String> sensitiveWordTagsCache = Collections.emptySet();
-
-    /**
-     * 缓存敏感词的最大更新时间，用于后续的增量轮询，判断是否有更新
-     */
-    @Getter
-    private volatile Date maxUpdateTime;
 
     @Resource
     private SensitiveWordMapper sensitiveWordMapper;
@@ -83,21 +70,17 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
     @Override
     @PostConstruct
     public void initLocalCache() {
-        // 获取敏感词列表，如果有更新
-        List<SensitiveWordDO> sensitiveWordList = loadSensitiveWordIfUpdate(maxUpdateTime);
-        if (CollUtil.isEmpty(sensitiveWordList)) {
-            return;
-        }
+        // 第一步：查询数据
+        List<SensitiveWordDO> sensitiveWords = sensitiveWordMapper.selectList();
+        log.info("[initLocalCache][缓存敏感词，数量为:{}]", sensitiveWords.size());
 
+        // 第二步：构建缓存
         // 写入 sensitiveWordTagsCache 缓存
         Set<String> tags = new HashSet<>();
-        sensitiveWordList.forEach(word -> tags.addAll(word.getTags()));
+        sensitiveWords.forEach(word -> tags.addAll(word.getTags()));
         sensitiveWordTagsCache = tags;
         // 写入 defaultSensitiveWordTrie、tagSensitiveWordTries 缓存
-        initSensitiveWordTrie(sensitiveWordList);
-        // 写入 maxUpdateTime 最大更新时间
-        maxUpdateTime = CollectionUtils.getMaxValue(sensitiveWordList, SensitiveWordDO::getUpdateTime);
-        log.info("[initLocalCache][初始化 敏感词 数量为 {}]", sensitiveWordList.size());
+        initSensitiveWordTrie(sensitiveWords);
     }
 
     private void initSensitiveWordTrie(List<SensitiveWordDO> wordDOs) {
@@ -119,33 +102,6 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
         Map<String, SimpleTrie> tagSensitiveWordTries = new HashMap<>();
         tagWords.asMap().forEach((tag, words) -> tagSensitiveWordTries.put(tag, new SimpleTrie(words)));
         this.tagSensitiveWordTries = tagSensitiveWordTries;
-    }
-
-    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
-    public void schedulePeriodicRefresh() {
-        initLocalCache();
-    }
-
-    /**
-     * 如果敏感词发生变化，从数据库中获取最新的全量敏感词。
-     * 如果未发生变化，则返回空
-     *
-     * @param maxUpdateTime 当前敏感词的最大更新时间
-     * @return 敏感词列表
-     */
-    private List<SensitiveWordDO> loadSensitiveWordIfUpdate(Date maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        // 如果更新时间为空，说明 DB 一定有新数据
-        if (maxUpdateTime == null) {
-            log.info("[loadSensitiveWordIfUpdate][首次加载全量敏感词]");
-        } else { // 判断数据库中是否有更新的敏感词
-            if (sensitiveWordMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
-            }
-            log.info("[loadSensitiveWordIfUpdate][增量加载全量敏感词]");
-        }
-        // 第二步，如果有更新，则从数据库加载所有敏感词
-        return sensitiveWordMapper.selectList();
     }
 
     @Override

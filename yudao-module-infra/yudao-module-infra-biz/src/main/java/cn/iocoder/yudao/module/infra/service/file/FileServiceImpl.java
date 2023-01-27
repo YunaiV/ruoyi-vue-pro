@@ -52,7 +52,7 @@ public class FileServiceImpl implements FileService {
         // 上传到文件存储器
         FileClient client = fileConfigService.getMasterFileClient();
         Assert.notNull(client, "客户端(master) 不能为空");
-        String url = client.upload(content, path);
+        String url = client.upload(content, path, type);
 
         // 保存到数据库
         FileDO file = new FileDO();

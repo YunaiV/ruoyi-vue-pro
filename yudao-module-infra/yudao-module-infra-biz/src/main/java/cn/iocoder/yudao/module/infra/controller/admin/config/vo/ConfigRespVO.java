@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 参数配置信息 Response VO")
 @Data
@@ -26,6 +26,6 @@ public class ConfigRespVO extends ConfigBaseVO {
     private Integer type;
 
     @ApiModelProperty(value = "创建时间", required = true, example = "时间戳格式")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

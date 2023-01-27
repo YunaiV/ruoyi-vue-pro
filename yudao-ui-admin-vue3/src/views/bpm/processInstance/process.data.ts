@@ -1,7 +1,4 @@
-import { reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
 import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
-import { DICT_TYPE } from '@/utils/dict'
 const { t } = useI18n() // 国际化
 
 // CrudSchema
@@ -28,6 +25,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '流程分类',
     field: 'category',
     dictType: DICT_TYPE.BPM_MODEL_CATEGORY,
+    dictClass: 'number',
     search: {
       show: true
     }
@@ -40,6 +38,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: t('common.status'),
     field: 'status',
     dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS,
+    dictClass: 'number',
     search: {
       show: true
     }
@@ -48,6 +47,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     label: '结果',
     field: 'result',
     dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
+    dictClass: 'number',
     search: {
       show: true
     }

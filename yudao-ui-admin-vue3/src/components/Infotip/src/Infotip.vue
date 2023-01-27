@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
-import { Highlight } from '@//components/Highlight'
 import { useDesign } from '@/hooks/web/useDesign'
 import { propTypes } from '@/utils/propTypes'
+import { TipSchema } from '@/types/infoTip'
 
 const { getPrefixCls } = useDesign()
 

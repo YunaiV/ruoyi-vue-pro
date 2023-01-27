@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 创建商品分类
-export function createCategory(data) {
+export function createProductCategory(data) {
   return request({
     url: '/product/category/create',
     method: 'post',
@@ -10,7 +10,7 @@ export function createCategory(data) {
 }
 
 // 更新商品分类
-export function updateCategory(data) {
+export function updateProductCategory(data) {
   return request({
     url: '/product/category/update',
     method: 'put',
@@ -19,7 +19,7 @@ export function updateCategory(data) {
 }
 
 // 删除商品分类
-export function deleteCategory(id) {
+export function deleteProductCategory(id) {
   return request({
     url: '/product/category/delete?id=' + id,
     method: 'delete'
@@ -27,37 +27,18 @@ export function deleteCategory(id) {
 }
 
 // 获得商品分类
-export function getCategory(id) {
+export function getProductCategory(id) {
   return request({
     url: '/product/category/get?id=' + id,
     method: 'get'
   })
 }
 
-// 获得商品分类
-export function listCategory(query) {
+// 获得商品分类列表
+export function getProductCategoryList(query) {
   return request({
-    url: '/product/category/listByQuery',
+    url: '/product/category/list',
     method: 'get',
     params: query
-  })
-}
-
-// 获得商品分类分页
-export function getCategoryPage(query) {
-  return request({
-    url: '/product/category/page',
-    method: 'get',
-    params: query
-  })
-}
-
-// 导出商品分类 Excel
-export function exportCategoryExcel(query) {
-  return request({
-    url: '/product/category/export-excel',
-    method: 'get',
-    params: query,
-    responseType: 'blob'
   })
 }

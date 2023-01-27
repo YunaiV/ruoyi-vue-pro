@@ -17,7 +17,7 @@ public class OAuth2UserInfoRespVO {
     @ApiModelProperty(value = "用户编号", required = true, example = "1")
     private Long id;
 
-    @ApiModelProperty(value = "用户昵称", required = true, example = "芋艿")
+    @ApiModelProperty(value = "用户账号", required = true, example = "芋艿")
     private String username;
 
     @ApiModelProperty(value = "用户昵称", required = true, example = "芋道")

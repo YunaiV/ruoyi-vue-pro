@@ -1,7 +1,13 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { DataSourceConfigVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface DataSourceConfigVO {
+  id: number
+  name: string
+  url: string
+  username: string
+  password: string
+  createTime: Date
+}
 
 // 查询数据源配置列表
 export const getDataSourceConfigListApi = () => {

@@ -1,29 +1,29 @@
 package cn.iocoder.yudao.module.system.service.logger;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.module.system.dal.dataobject.logger.LoginLogDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogPageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.logger.LoginLogDO;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.LoginLogMapper;
-import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
-import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
-import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Import(LoginLogServiceImpl.class)
@@ -47,13 +47,13 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
             logDO.setUserIp("192.168.199.16");
             logDO.setUsername("wangkai");
             logDO.setCreateTime(buildTime(2021, 3, 6));
-            logDO.setResult(cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum.SUCCESS.getResult());
+            logDO.setResult(SUCCESS.getResult());
         });
         loginLogMapper.insert(loginLogDO);
 
         // 下面几个都是不匹配的数据
         // 登录失败的
-        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setResult(cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum.CAPTCHA_CODE_ERROR.getResult())));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setResult(CAPTCHA_CODE_ERROR.getResult())));
         // 不同ip段的
         loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setUserIp("192.168.128.18")));
         // 不同username
@@ -67,7 +67,8 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUsername("wangkai");
         reqVO.setUserIp("192.168.199");
         reqVO.setStatus(true);
-        reqVO.setCreateTime((new Date[]{buildTime(2021, 3, 5),buildTime(2021, 3, 5)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 3, 5),
+                buildTime(2021, 3, 7)}));
 
         // 调用service方法
         PageResult<LoginLogDO> pageResult = loginLogService.getLoginLogPage(reqVO);
@@ -91,13 +92,13 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
             logDO.setUserIp("192.168.111.16");
             logDO.setUsername("wangxiaokai");
             logDO.setCreateTime(buildTime(2021, 3, 6));
-            logDO.setResult(cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum.SUCCESS.getResult());
+            logDO.setResult(SUCCESS.getResult());
         });
         loginLogMapper.insert(loginLogDO);
 
         // 下面几个都是不匹配的数据
         // 登录失败的
-        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setResult(cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum.CAPTCHA_CODE_ERROR.getResult())));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setResult(CAPTCHA_CODE_ERROR.getResult())));
         // 不同ip段的
         loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setUserIp("192.168.128.18")));
         // 不同username
@@ -110,7 +111,8 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUsername("wangxiaokai");
         reqVO.setUserIp("192.168.111");
         reqVO.setStatus(true);
-        reqVO.setCreateTime((new Date[]{buildTime(2021, 3, 5),buildTime(2021, 3, 5)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 3, 5),
+                buildTime(2021, 3, 7)}));
 
         // 调用service方法
         List<LoginLogDO> loginLogList = loginLogService.getLoginLogList(reqVO);
@@ -126,7 +128,7 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
             // 指定随机的范围,避免超出范围入库失败
             vo.setUserType(randomEle(UserTypeEnum.values()).getValue());
             vo.setLogType(randomEle(LoginLogTypeEnum.values()).getType());
-            vo.setResult(randomEle(LoginResultEnum.values()).getResult());
+            vo.setResult(randomEle(values()).getResult());
             vo.setTraceId(TracerUtils.getTraceId());
         });
 

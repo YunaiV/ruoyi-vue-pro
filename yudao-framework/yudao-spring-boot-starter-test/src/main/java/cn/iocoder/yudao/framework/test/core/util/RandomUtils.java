@@ -1,13 +1,18 @@
 package cn.iocoder.yudao.framework.test.core.util;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
+import uk.co.jemos.podam.common.AttributeStrategy;
 
+import javax.validation.constraints.Email;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -76,6 +81,10 @@ public class RandomUtils {
         return RandomUtil.randomDay(0, RANDOM_DATE_MAX);
     }
 
+    public static LocalDateTime randomLocalDateTime() {
+        return LocalDateTimeUtil.of(randomDate());
+    }
+
     public static Short randomShort() {
         return (short) RandomUtil.randomInt(0, Short.MAX_VALUE);
     }
@@ -87,6 +96,10 @@ public class RandomUtils {
 
     public static Integer randomCommonStatus() {
         return RandomUtil.randomEle(CommonStatusEnum.values()).getStatus();
+    }
+
+    public static String randomEmail() {
+        return randomString() + "@qq.com";
     }
 
     @SafeVarargs

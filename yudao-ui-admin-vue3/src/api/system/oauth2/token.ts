@@ -1,9 +1,24 @@
-import { useAxios } from '@/hooks/web/useAxios'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface OAuth2TokenVO {
+  id: number
+  accessToken: string
+  refreshToken: string
+  userId: number
+  userType: number
+  clientId: string
+  createTime: Date
+  expiresTime: Date
+}
+
+export interface OAuth2TokenPageReqVO extends PageParam {
+  userId?: number
+  userType?: number
+  clientId?: string
+}
 
 // 查询 token列表
-export const getAccessTokenPageApi = (params) => {
+export const getAccessTokenPageApi = (params: OAuth2TokenPageReqVO) => {
   return request.get({ url: '/system/oauth2-token/page', params })
 }
 

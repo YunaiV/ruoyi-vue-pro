@@ -1,5 +1,4 @@
 import mitt from 'mitt'
-import { onBeforeUnmount } from 'vue'
 
 interface Option {
   name: string // 事件名称

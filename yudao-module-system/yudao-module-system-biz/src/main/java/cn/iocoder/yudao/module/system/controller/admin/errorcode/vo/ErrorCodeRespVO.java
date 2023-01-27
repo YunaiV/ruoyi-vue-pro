@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 错误码 Response VO")
 @Data
@@ -21,6 +21,6 @@ public class ErrorCodeRespVO extends ErrorCodeBaseVO {
     private Integer type;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

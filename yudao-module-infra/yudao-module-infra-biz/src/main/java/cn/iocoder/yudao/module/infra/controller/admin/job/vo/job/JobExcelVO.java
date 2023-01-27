@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 定时任务 Excel VO
@@ -36,21 +36,21 @@ public class JobExcelVO {
     private String cronExpression;
 
     @ExcelProperty("最后一次执行的开始时间")
-    private Date executeBeginTime;
+    private LocalDateTime executeBeginTime;
 
     @ExcelProperty("最后一次执行的结束时间")
-    private Date executeEndTime;
+    private LocalDateTime executeEndTime;
 
     @ExcelProperty("上一次触发时间")
-    private Date firePrevTime;
+    private LocalDateTime firePrevTime;
 
     @ExcelProperty("下一次触发时间")
-    private Date fireNextTime;
+    private LocalDateTime fireNextTime;
 
     @ExcelProperty("监控超时时间")
     private Integer monitorTimeout;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

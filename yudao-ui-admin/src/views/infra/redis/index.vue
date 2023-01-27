@@ -13,7 +13,7 @@
                   <td><div class="cell">Redis版本</div></td>
                   <td><div class="cell" v-if="cache.info">{{ cache.info.redis_version }}</div></td>
                   <td><div class="cell">运行模式</div></td>
-                  <td><div class="cell" v-if="cache.info">{{ cache.info.redis_mode == "standalone" ? "单机" : "集群" }}</div></td>
+                  <td><div class="cell" v-if="cache.info">{{ cache.info.redis_mode === "standalone" ? "单机" : "集群" }}</div></td>
                   <td><div class="cell">端口</div></td>
                   <td><div class="cell" v-if="cache.info">{{ cache.info.tcp_port }}</div></td>
                   <td><div class="cell">客户端数</div></td>
@@ -71,7 +71,7 @@
       <el-table-column prop="keyType" label="Key 类型" width="100" />
       <el-table-column prop="valueType" label="Value 类型" />
       <el-table-column prop="timeoutType" label="超时时间" width="200">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag
             :type="DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE"
             :value="scope.row.timeoutType"
@@ -95,10 +95,10 @@
             </div>
             <el-table :data="cacheKeys" style="width: 100%" @row-click="handleKeyValue">
               <el-table-column label="缓存键名" align="center" :show-overflow-tooltip="true">
-                <template slot-scope="scope">{{ scope.row }}</template>
+                <template v-slot="scope">{{ scope.row }}</template>
               </el-table-column>
               <el-table-column label="操作" width="60" align="center" class-name="small-padding fixed-width">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDeleteKey(scope.row)" />
                 </template>
               </el-table-column>
@@ -136,8 +136,8 @@
 
 <script>
 import {getCache, getKeyDefineList, getKeyList, getKeyValue, deleteKey, deleteKeys} from "@/api/infra/redis";
-import echarts from "echarts";
-
+import * as echarts from 'echarts'
+require('echarts/theme/macarons') // echarts theme
 export default {
   name: "Server",
   data () {

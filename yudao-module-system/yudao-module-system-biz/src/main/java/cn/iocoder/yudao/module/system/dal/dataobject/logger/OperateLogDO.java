@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -117,7 +117,7 @@ public class OperateLogDO extends BaseDO {
     /**
      * 开始时间
      */
-    private Date startTime;
+    private LocalDateTime startTime;
     /**
      * 执行时长，单位：毫秒
      */

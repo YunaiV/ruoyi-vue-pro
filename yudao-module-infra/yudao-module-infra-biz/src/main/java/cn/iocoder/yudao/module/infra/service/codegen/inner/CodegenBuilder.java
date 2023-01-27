@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 import static cn.hutool.core.text.CharSequenceUtil.*;
+import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.hutool.core.util.RandomUtil.randomInt;
 
 /**
  * 代码生成器的 Builder，负责：
@@ -31,7 +33,7 @@ public class CodegenBuilder {
      * 字段名与 {@link CodegenColumnListConditionEnum} 的默认映射
      * 注意，字段的匹配以后缀的方式
      */
-    private static final Map<String, CodegenColumnListConditionEnum> columnListOperationConditionMappings =
+    private static final Map<String, CodegenColumnListConditionEnum> COLUMN_LIST_OPERATION_CONDITION_MAPPINGS =
             MapUtil.<String, CodegenColumnListConditionEnum>builder()
                     .put("name", CodegenColumnListConditionEnum.LIKE)
                     .put("time", CodegenColumnListConditionEnum.BETWEEN)
@@ -42,7 +44,7 @@ public class CodegenBuilder {
      * 字段名与 {@link CodegenColumnHtmlTypeEnum} 的默认映射
      * 注意，字段的匹配以后缀的方式
      */
-    private static final Map<String, CodegenColumnHtmlTypeEnum> columnHtmlTypeMappings =
+    private static final Map<String, CodegenColumnHtmlTypeEnum> COLUMN_HTML_TYPE_MAPPINGS =
             MapUtil.<String, CodegenColumnHtmlTypeEnum>builder()
                     .put("status", CodegenColumnHtmlTypeEnum.RADIO)
                     .put("sex", CodegenColumnHtmlTypeEnum.RADIO)
@@ -128,6 +130,7 @@ public class CodegenBuilder {
             // 初始化 Column 列的默认字段
             processColumnOperation(column); // 处理 CRUD 相关的字段的默认值
             processColumnUI(column); // 处理 UI 相关的字段的默认值
+            processColumnExample(column); // 处理字段的 swagger example 示例
         }
         return columns;
     }
@@ -143,7 +146,7 @@ public class CodegenBuilder {
         column.setListOperation(!LIST_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField())
                 && !column.getPrimaryKey()); // 对于主键，列表过滤不需要传递
         // 处理 listOperationCondition 字段
-        columnListOperationConditionMappings.entrySet().stream()
+        COLUMN_LIST_OPERATION_CONDITION_MAPPINGS.entrySet().stream()
                 .filter(entry -> StrUtil.endWithIgnoreCase(column.getJavaField(), entry.getKey()))
                 .findFirst().ifPresent(entry -> column.setListOperationCondition(entry.getValue().getCondition()));
         if (column.getListOperationCondition() == null) {
@@ -155,7 +158,7 @@ public class CodegenBuilder {
 
     private void processColumnUI(CodegenColumnDO column) {
         // 基于后缀进行匹配
-        columnHtmlTypeMappings.entrySet().stream()
+        COLUMN_HTML_TYPE_MAPPINGS.entrySet().stream()
                 .filter(entry -> StrUtil.endWithIgnoreCase(column.getJavaField(), entry.getKey()))
                 .findFirst().ifPresent(entry -> column.setHtmlType(entry.getValue().getType()));
         // 如果是 Boolean 类型时，设置为 radio 类型.
@@ -166,6 +169,44 @@ public class CodegenBuilder {
         // 兜底，设置默认为 input 类型
         if (column.getHtmlType() == null) {
             column.setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
+        }
+    }
+
+    /**
+     * 处理字段的 swagger example 示例
+     *
+     * @param column 字段
+     */
+    private void processColumnExample(CodegenColumnDO column) {
+        // id、price、count 等可能是整数的后缀
+        if (StrUtil.endWithAnyIgnoreCase(column.getJavaField(), "id", "price", "count")) {
+            column.setExample(String.valueOf(randomInt(1, Short.MAX_VALUE)));
+            return;
+        }
+        // name
+        if (StrUtil.endWithIgnoreCase(column.getJavaField(), "name")) {
+            column.setExample(randomEle(new String[]{"张三", "李四", "王五", "赵六", "芋艿"}));
+            return;
+        }
+        // status
+        if (StrUtil.endWithAnyIgnoreCase(column.getJavaField(), "status", "type")) {
+            column.setExample(randomEle(new String[]{"1", "2"}));
+            return;
+        }
+        // url
+        if (StrUtil.endWithIgnoreCase(column.getColumnName(), "url")) {
+            column.setExample("https://www.iocoder.cn");
+            return;
+        }
+        // reason
+        if (StrUtil.endWithIgnoreCase(column.getColumnName(), "reason")) {
+            column.setExample(randomEle(new String[]{"不喜欢", "不对", "不好", "不香"}));
+            return;
+        }
+        // description、memo、remark
+        if (StrUtil.endWithAnyIgnoreCase(column.getColumnName(), "description", "memo", "remark")) {
+            column.setExample(randomEle(new String[]{"你猜", "随便", "你说的对"}));
+            return;
         }
     }
 

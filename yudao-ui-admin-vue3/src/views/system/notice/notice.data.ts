@@ -1,8 +1,4 @@
-import { reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { required } from '@/utils/formRules'
-import { DICT_TYPE } from '@/utils/dict'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 
 // 表单校验
@@ -12,74 +8,52 @@ export const rules = reactive({
 })
 
 // CrudSchema
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: 'seq',
+  action: true,
+  columns: [
+    {
+      title: '公告标题',
+      field: 'title',
+      isSearch: true
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '公告标题',
-    field: 'title',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '公告类型',
-    field: 'type',
-    dictType: DICT_TYPE.SYSTEM_NOTICE_TYPE,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: t('common.status'),
-    field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS,
-    search: {
-      show: true
+    {
+      title: '公告类型',
+      field: 'type',
+      dictType: DICT_TYPE.SYSTEM_NOTICE_TYPE,
+      dictClass: 'number'
     },
-    form: {
-      component: 'RadioButton'
-    }
-  },
-  {
-    label: '公告内容',
-    field: 'content',
-    form: {
-      component: 'Editor',
-      colProps: {
-        span: 24
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '公告内容',
+      field: 'content',
+      table: {
+        type: 'html'
       },
-      componentProps: {
-        valueHtml: ''
-      }
-    }
-  },
-  {
-    label: t('common.createTime'),
-    field: 'createTime',
-    form: {
-      show: false
-    }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '240px',
-    form: {
-      show: false
+      form: {
+        component: 'Editor',
+        colProps: {
+          span: 24
+        },
+        componentProps: {
+          valueHtml: ''
+        }
+      },
+      isTable: false
     },
-    detail: {
-      show: false
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate',
+      isForm: false
     }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

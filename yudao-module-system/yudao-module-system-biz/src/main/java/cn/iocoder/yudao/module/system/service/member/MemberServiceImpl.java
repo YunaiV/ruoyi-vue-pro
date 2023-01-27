@@ -21,14 +21,27 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public String getMemberUserMobile(Long id) {
-        if (id == null) {
-            return null;
-        }
-        Object user = ReflectUtil.invoke(getMemberUserApi(), "getUser", id);
+        Object user = getMemberUser(id);
         if (user == null) {
             return null;
         }
         return ReflectUtil.invoke(user, "getMobile");
+    }
+
+    @Override
+    public String getMemberUserEmail(Long id) {
+        Object user = getMemberUser(id);
+        if (user == null) {
+            return null;
+        }
+        return ReflectUtil.invoke(user, "getEmail");
+    }
+
+    private Object getMemberUser(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return ReflectUtil.invoke(getMemberUserApi(), "getUser", id);
     }
 
     private Object getMemberUserApi() {

@@ -1,3 +1,4 @@
+import { FormSchema } from '@/types/form'
 import { ElRadio, ElRadioButton } from 'element-plus'
 import { defineComponent } from 'vue'
 
@@ -10,7 +11,12 @@ export const useRenderRadio = () => {
       typeof defineComponent
     >
     return item?.componentProps?.options?.map((option) => {
-      return <Com label={option[labelAlias || 'value']}>{option[valueAlias || 'label']}</Com>
+      const { ...other } = option
+      return (
+        <Com {...other} label={option[valueAlias || 'value']}>
+          {option[labelAlias || 'label']}
+        </Com>
+      )
     })
   }
 

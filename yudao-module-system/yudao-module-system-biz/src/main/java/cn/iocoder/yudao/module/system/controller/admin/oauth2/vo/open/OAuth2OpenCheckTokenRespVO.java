@@ -26,6 +26,7 @@ public class OAuth2OpenCheckTokenRespVO {
     private Long tenantId;
 
     @ApiModelProperty(value = "客户端编号", required = true, example = "car")
+    @JsonProperty("client_id")
     private String clientId;
     @ApiModelProperty(value = "授权范围", required = true, example = "user_info")
     private List<String> scopes;

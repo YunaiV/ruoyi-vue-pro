@@ -16,10 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,7 +40,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         int userType = UserTypeEnum.ADMIN.getValue();
         String applicationName = "yudao-test";
         String requestUrl = "foo";
-        Date beginTime = buildTime(2021, 3, 13);
+        LocalDateTime beginTime = buildTime(2021, 3, 13);
         int duration = 1000;
         int resultCode = GlobalErrorCodeConstants.SUCCESS.getCode();
 
@@ -77,7 +77,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserType(userType);
         reqVO.setApplicationName(applicationName);
         reqVO.setRequestUrl(requestUrl);
-        reqVO.setBeginTime((new Date[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
+        reqVO.setBeginTime((new LocalDateTime[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
         reqVO.setDuration(duration);
         reqVO.setResultCode(resultCode);
 
@@ -97,7 +97,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         int userType = UserTypeEnum.ADMIN.getValue();
         String applicationName = "yudao-test";
         String requestUrl = "foo";
-        Date beginTime = buildTime(2021, 3, 13);
+        LocalDateTime beginTime = buildTime(2021, 3, 13);
         int duration = 1000;
         int resultCode = GlobalErrorCodeConstants.SUCCESS.getCode();
 
@@ -134,7 +134,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserType(userType);
         reqVO.setApplicationName(applicationName);
         reqVO.setRequestUrl(requestUrl);
-        reqVO.setBeginTime((new Date[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
+        reqVO.setBeginTime((new LocalDateTime[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
         reqVO.setDuration(duration);
         reqVO.setResultCode(resultCode);
 

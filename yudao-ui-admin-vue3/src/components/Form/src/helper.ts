@@ -1,7 +1,8 @@
-import { useI18n } from '@/hooks/web/useI18n'
 import type { Slots } from 'vue'
 import { getSlot } from '@/utils/tsxHelper'
 import { PlaceholderMoel } from './types'
+import { FormSchema } from '@/types/form'
+import { ColProps } from '@/types/components'
 
 /**
  *
@@ -12,7 +13,7 @@ import { PlaceholderMoel } from './types'
 export const setTextPlaceholder = (schema: FormSchema): PlaceholderMoel => {
   const { t } = useI18n()
   const textMap = ['Input', 'Autocomplete', 'InputNumber', 'InputPassword']
-  const selectMap = ['Select', 'TimePicker', 'DatePicker', 'TimeSelect', 'TimeSelect']
+  const selectMap = ['Select', 'SelectV2', 'TimePicker', 'DatePicker', 'TimeSelect', 'TimeSelect']
   if (textMap.includes(schema?.component as string)) {
     return {
       placeholder: t('common.inputText')

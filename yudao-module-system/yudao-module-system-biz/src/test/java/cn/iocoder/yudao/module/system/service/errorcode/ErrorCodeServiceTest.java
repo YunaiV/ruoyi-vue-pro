@@ -17,12 +17,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -96,7 +96,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
        reqVO.setApplicationName("tu");
        reqVO.setCode(1);
        reqVO.setMessage("ma");
-       reqVO.setCreateTime((new Date[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
 
        // 调用
        PageResult<ErrorCodeDO> pageResult = errorCodeService.getErrorCodePage(reqVO);
@@ -141,7 +141,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
         reqVO.setApplicationName("tu");
         reqVO.setCode(1);
         reqVO.setMessage("ma");
-        reqVO.setCreateTime((new Date[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 11, 1),buildTime(2020, 11, 30)}));
 
         // 调用
         List<ErrorCodeDO> list = errorCodeService.getErrorCodeList(reqVO);

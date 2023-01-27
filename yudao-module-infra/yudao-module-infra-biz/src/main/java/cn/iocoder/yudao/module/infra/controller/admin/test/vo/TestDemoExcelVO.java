@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.infra.controller.admin.test.vo;
 
 import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
+
+import java.time.LocalDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 
@@ -33,6 +33,6 @@ public class TestDemoExcelVO {
     private String remark;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

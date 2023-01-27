@@ -1,111 +1,106 @@
-import { reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
-import { DICT_TYPE } from '@/utils/dict'
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 // 表单校验
 export const rules = reactive({
 #foreach ($column in $columns)
 #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
 #set($comment=$column.columnComment)
-    $column.javaField: [{ required: true, message: "${comment}不能为空", trigger: #if($column.htmlType == "select")"change"#else"blur"#end }],
+  $column.javaField: [required],
 #end
 #end
 })
 // CrudSchema
-const crudSchemas = reactive<CrudSchema[]>([
-#foreach($column in $columns)
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id', // 默认的主键ID
+  primaryTitle: t('common.index'), // 默认显示的值
+  primaryType: 'seq', // 默认为seq，序号模式
+  action: true,
+  actionWidth: '200', // 3个按钮默认200，如有删减对应增减即可
+  columns: [
+  #foreach($column in $columns)
     #if ($column.listOperation || $column.listOperationResult || $column.createOperation || $column.updateOperation)
     #set ($dictType = $column.dictType)
+    #if(!$column.primaryKey)
     {
-      label: '${column.columnComment}',
+      title: '${column.columnComment}',
       field: '${column.javaField}',
+      #if (!$column.listOperationResult)
+      isTable: false,
+      #end
       #if ("" != $dictType)## 有数据字典
       dictType: DICT_TYPE.$dictType.toUpperCase(),
-      #end
-      #if($column.primaryKey)
-      type: 'index',
-      form: {
-         show: false
-      },
-      detail: {
-         show: false
-      }
+      #if (${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")
+      dictClass: 'number',
       #else
+      dictClass: 'string',
+      #end
+      #end
       #if (!$column.createOperation && !$column.updateOperation)
-      form: {
-         false
-      },
+      isForm: false,
       #elseif(!("" != $column.dictType))
+      #if (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdatetime")
       form: {
-          show: true,
-          #if ($column.htmlType == "datetime")## 时间框
-          component: 'DatePicker',
-          componentProps: {
-              type: 'datetime',
-              valueFormat: 'YYYY-MM-DD HH:mm:ss'
-          }
-          #elseif($column.htmlType == "editor")## 文本编辑器
-          component: 'Editor',
-          colProps: {
-              span: 24
-          },
-          componentProps: {
-              valueHtml: ''
-          }
-          #elseif($column.htmlType == "textarea")## 文本框
-          component: 'Input',
-          componentProps: {
-              type: 'textarea',
-              rows: 4
-          },
-          colProps: {
-              span: 24
-          }
-          #end
+        component: 'DatePicker',
+        componentProps: {
+          type: 'datetime',
+          valueFormat: 'x'
+        }
+      },
+      #elseif($column.htmlType == "editor")## 文本编辑器
+      form: {
+        component: 'Editor',
+        colProps: {
+          span: 24
+        },
+        componentProps: {
+          valueHtml: ''
+        }
+      },
+      #elseif($column.htmlType == "textarea")## 文本框
+      form: {
+        component: 'Input',
+        componentProps: {
+          type: 'textarea',
+          rows: 4
+        },
+        colProps: {
+          span: 24
+        }
+      },
+      #elseif(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")## 数字类型
+      form: {
+        component: 'InputNumber',
+        value: 0
+      },
+      #elseif($column.htmlType == "imageUpload")## 图片上传
+      form: {
+        component: 'UploadImg' // 单图上传，多图为UploadImgs
+      },
+      #elseif($column.htmlType == "fileUpload")## 图片上传
+      form: {
+        component: 'UploadFile'
       },
       #end
-      #if ($column.listOperationResult)
+      #end
+      #if ($column.listOperation)
+      #if($column.htmlType == "input")
+      isSearch: true,
+      #elseif("" != $dictType)
+      isSearch: true,
+      #elseif($column.htmlType == "datetime")
+      formatter: 'formatDate',
       search: {
-         #if($column.htmlType == "input")
-         show: true
-         #else
-         #if($column.htmlType == "datetime")
-         show: true,
-         component: 'DatePicker',
-         componentProps: {
-             type: 'datetimerange',
-             valueFormat: 'YYYY-MM-DD HH:mm:ss'
-         }
-         #elseif($column.htmlType == "select" || $column.htmlType == "radio")
-         #if ("" == $dictType)## 没有数据字典
-         show: true,
-         component: 'Select',
-         componentProps: {
-             option: [{'','请选择字典生成'}]
-         }
-         #else
-         show: true
-         #end
-         #end
-         #end
-      }
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
+      },
       #end
       #end
     },
+      #end
     #end
-#end
-    {
-        label: t('table.action'),
-        field: 'action',
-        width: '240px',
-        form: {
-            show: false
-        },
-        detail: {
-            show: false
-        }
-    }
-])
-
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  #end
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

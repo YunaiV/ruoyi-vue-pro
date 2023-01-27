@@ -15,14 +15,15 @@
     <name>${project.artifactId}</name>
 
     <description>
-        market模块，主要实现营销相关功能
-        例如：营销活动、banner广告、优惠券、优惠码等功能。
+        商城大模块，由 product 商品、promotion 营销、trade 交易等组成
     </description>
     <modules>
-        <module>yudao-module-market-api</module>
-        <module>yudao-module-market-biz</module>
+        <module>yudao-module-promotion-api</module>
+        <module>yudao-module-promotion-biz</module>
         <module>yudao-module-product-api</module>
         <module>yudao-module-product-biz</module>
+        <module>yudao-module-trade-api</module>
+        <module>yudao-module-trade-biz</module>
     </modules>
 
 </project>

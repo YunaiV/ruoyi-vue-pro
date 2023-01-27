@@ -31,7 +31,7 @@ public class PayRefundReqDTO {
      */
     @NotNull(message = "退款金额不能为空")
     @DecimalMin(value = "0", inclusive = false, message = "退款金额必须大于零")
-    private Long amount;
+    private Integer amount;
 
     /**
      * 退款原因

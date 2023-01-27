@@ -18,7 +18,7 @@ export const getParentLayout = () => {
 }
 
 // 按照路由中meta下的rank等级升序来排序路由
-export function ascending(arr: any[]) {
+export const ascending = (arr: any[]) => {
   arr.forEach((v) => {
     if (v?.meta?.rank === null) v.meta.rank = undefined
     if (v?.meta?.rank === 0) {
@@ -48,7 +48,7 @@ export const getRawRoute = (route: RouteLocationNormalized): RouteLocationNormal
 }
 
 // 后端控制路由生成
-export const generateRoutes = (routes: AppCustomRouteRecordRaw[]): AppRouteRecordRaw[] => {
+export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecordRaw[] => {
   const res: AppRouteRecordRaw[] = []
   const modulesRoutesKeys = Object.keys(modules)
   for (const route of routes) {
@@ -56,7 +56,13 @@ export const generateRoutes = (routes: AppCustomRouteRecordRaw[]): AppRouteRecor
       title: route.name,
       icon: route.icon,
       hidden: !route.visible,
-      noCache: !route.keepAlive
+      noCache: !route.keepAlive,
+      alwaysShow:
+        route.children &&
+        route.children.length === 1 &&
+        import.meta.env.VITE_ROUTE_ALWAYSSHOW_ENABLE === 'true'
+          ? true
+          : false
     }
     // 路由地址转首字母大写驼峰，作为路由名称，适配keepAlive
     let data: AppRouteRecordRaw = {
@@ -65,32 +71,52 @@ export const generateRoutes = (routes: AppCustomRouteRecordRaw[]): AppRouteRecor
       redirect: route.redirect,
       meta: meta
     }
-    // 目录
-    if (route.children) {
+    //处理顶级非目录路由
+    if (!route.children && route.parentId == 0 && route.component) {
       data.component = Layout
-      data.redirect = getRedirect(route.path, route.children)
-      // 外链
-    } else if (isUrl(route.path)) {
-      data = {
-        path: '/external-link',
-        component: Layout,
-        meta: {
-          name: route.name
-        },
-        children: [data]
-      } as AppRouteRecordRaw
-      // 菜单
-    } else {
-      // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会根path保持一致）
+      data.meta = {}
+      data.name = toCamelCase(route.path, true) + 'Parent'
+      data.redirect = ''
+      meta.alwaysShow = true
+      const childrenData: AppRouteRecordRaw = {
+        path: '',
+        name: toCamelCase(route.path, true),
+        redirect: route.redirect,
+        meta: meta
+      }
       const index = route?.component
         ? modulesRoutesKeys.findIndex((ev) => ev.includes(route.component))
         : modulesRoutesKeys.findIndex((ev) => ev.includes(route.path))
-      data.component = modules[modulesRoutesKeys[index]]
+      childrenData.component = modules[modulesRoutesKeys[index]]
+      data.children = [childrenData]
+    } else {
+      // 目录
+      if (route.children) {
+        data.component = Layout
+        data.redirect = getRedirect(route.path, route.children)
+        // 外链
+      } else if (isUrl(route.path)) {
+        data = {
+          path: '/external-link',
+          component: Layout,
+          meta: {
+            name: route.name
+          },
+          children: [data]
+        } as AppRouteRecordRaw
+        // 菜单
+      } else {
+        // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会根path保持一致）
+        const index = route?.component
+          ? modulesRoutesKeys.findIndex((ev) => ev.includes(route.component))
+          : modulesRoutesKeys.findIndex((ev) => ev.includes(route.path))
+        data.component = modules[modulesRoutesKeys[index]]
+      }
+      if (route.children) {
+        data.children = generateRoute(route.children)
+      }
     }
-    if (route.children) {
-      data.children = generateRoutes(route.children)
-    }
-    res.push(data)
+    res.push(data as AppRouteRecordRaw)
   }
   return res
 }
@@ -184,7 +210,7 @@ const addToChildren = (
     }
   }
 }
-function toCamelCase(str: string, upperCaseFirst: boolean) {
+const toCamelCase = (str: string, upperCaseFirst: boolean) => {
   str = (str || '').toLowerCase().replace(/-(.)/g, function (group1: string) {
     return group1.toUpperCase()
   })

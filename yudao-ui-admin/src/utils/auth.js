@@ -94,3 +94,6 @@ export function setTenantId(username) {
 export function removeTenantId() {
   localStorage.removeItem(TenantIdKey)
 }
+
+export class getToken {
+}

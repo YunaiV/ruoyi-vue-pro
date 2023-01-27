@@ -1,10 +1,30 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { SensitiveWordVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface SensitiveWordVO {
+  id: number
+  name: string
+  status: number
+  description: string
+  tags: string[]
+  createTime: Date
+}
+
+export interface SensitiveWordPageReqVO extends PageParam {
+  name?: string
+  tag?: string
+  status?: number
+  createTime?: Date[]
+}
+
+export interface SensitiveWordExportReqVO {
+  name?: string
+  tag?: string
+  status?: number
+  createTime?: Date[]
+}
 
 // 查询敏感词列表
-export const getSensitiveWordPageApi = (params) => {
+export const getSensitiveWordPageApi = (params: SensitiveWordPageReqVO) => {
   return request.get({ url: '/system/sensitive-word/page', params })
 }
 
@@ -29,7 +49,7 @@ export const deleteSensitiveWordApi = (id: number) => {
 }
 
 // 导出敏感词
-export const exportSensitiveWordApi = (params) => {
+export const exportSensitiveWordApi = (params: SensitiveWordExportReqVO) => {
   return request.download({ url: '/system/sensitive-word/export-excel', params })
 }
 

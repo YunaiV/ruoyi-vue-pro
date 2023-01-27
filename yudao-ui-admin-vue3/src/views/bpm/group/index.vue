@@ -1,18 +1,16 @@
-<script setup lang="ts">
-import { ref, unref, onMounted } from 'vue'
+<script setup lang="ts" name="Group">
 import dayjs from 'dayjs'
-import { ElMessage, ElSelect, ElOption } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 import type { UserGroupVO } from '@/api/bpm/userGroup/types'
 import { rules, allSchemas } from './group.data'
 import * as UserGroupApi from '@/api/bpm/userGroup'
 import { getListSimpleUsersApi } from '@/api/system/user'
-import { UserVO } from '@/api/system/user/types'
+import { UserVO } from '@/api/system/user'
 
 const { t } = useI18n() // 国际化
+const message = useMessage()
 
 // ========== 列表相关 ==========
 const { register, tableObject, methods } = useTable<UserGroupVO>({
@@ -29,7 +27,6 @@ const dialogTitle = ref('edit') // 弹出层标题
 const formRef = ref<FormExpose>() // 表单 Ref
 
 // ========== 用户选择  ==========
-const userIds = ref<number[]>([])
 const userOptions = ref<UserVO[]>([])
 const getUserOptions = async () => {
   const res = await getListSimpleUsersApi()
@@ -46,9 +43,6 @@ const setDialogTile = (type: string) => {
 // 新增操作
 const handleCreate = () => {
   setDialogTile('create')
-  userIds.value = []
-  // 重置表单
-  unref(formRef)?.getElFormRef()?.resetFields()
 }
 
 // 修改操作
@@ -56,30 +50,34 @@ const handleUpdate = async (row: UserGroupVO) => {
   setDialogTile('update')
   // 设置数据
   const res = await UserGroupApi.getUserGroupApi(row.id)
-  userIds.value = res.memberUserIds
   unref(formRef)?.setValues(res)
 }
 
 // 提交按钮
 const submitForm = async () => {
-  actionLoading.value = true
-  // 提交请求
-  try {
-    const data = unref(formRef)?.formModel as UserGroupVO
-    data.memberUserIds = userIds.value
-    if (actionType.value === 'create') {
-      await UserGroupApi.createUserGroupApi(data)
-      ElMessage.success(t('common.createSuccess'))
-    } else {
-      await UserGroupApi.updateUserGroupApi(data)
-      ElMessage.success(t('common.updateSuccess'))
+  const elForm = unref(formRef)?.getElFormRef()
+  if (!elForm) return
+  elForm.validate(async (valid) => {
+    if (valid) {
+      actionLoading.value = true
+      // 提交请求
+      try {
+        const data = unref(formRef)?.formModel as UserGroupVO
+        if (actionType.value === 'create') {
+          await UserGroupApi.createUserGroupApi(data)
+          message.success(t('common.createSuccess'))
+        } else {
+          await UserGroupApi.updateUserGroupApi(data)
+          message.success(t('common.updateSuccess'))
+        }
+        // 操作成功，重新加载列表
+        dialogVisible.value = false
+        await getList()
+      } finally {
+        actionLoading.value = false
+      }
     }
-    // 操作成功，重新加载列表
-    dialogVisible.value = false
-    await getList()
-  } finally {
-    actionLoading.value = false
-  }
+  })
 }
 
 // 根据用户名获取用户真实名
@@ -90,12 +88,12 @@ const getUserNickName = (userId: number) => {
   return '未知(' + userId + ')'
 }
 // ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 
 // 详情操作
 const handleDetail = async (row: UserGroupVO) => {
   // 设置数据
-  detailRef.value = row
+  detailData.value = row
   setDialogTile('detail')
 }
 
@@ -114,7 +112,7 @@ onMounted(async () => {
   <ContentWrap>
     <!-- 操作工具栏 -->
     <div class="mb-10px">
-      <el-button type="primary" v-hasPermi="['bpm:user-group:create']" @click="handleCreate">
+      <el-button type="primary" v-hasPermi="['bpm:user-group:create']" @click="handleCreate()">
         <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
       </el-button>
     </div>
@@ -171,7 +169,7 @@ onMounted(async () => {
     </Table>
   </ContentWrap>
 
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
+  <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
     <Form
       v-if="['create', 'update'].includes(actionType)"
@@ -179,8 +177,8 @@ onMounted(async () => {
       :rules="rules"
       ref="formRef"
     >
-      <template #memberUserIds>
-        <el-select v-model="userIds" multiple>
+      <template #memberUserIds="form">
+        <el-select v-model="form['memberUserIds']" multiple>
           <el-option
             v-for="item in userOptions"
             :key="item.id"
@@ -194,31 +192,25 @@ onMounted(async () => {
     <Descriptions
       v-if="actionType === 'detail'"
       :schema="allSchemas.detailSchema"
-      :data="detailRef"
+      :data="detailData"
     >
       <template #memberUserIds="{ row }">
         <span v-for="userId in row.memberUserIds" :key="userId">
           {{ getUserNickName(userId) + ' ' }}
         </span>
       </template>
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
     </Descriptions>
-    <!-- 操作按钮 -->
     <template #footer>
-      <el-button
+      <!-- 按钮：保存 -->
+      <XButton
         v-if="['create', 'update'].includes(actionType)"
         type="primary"
+        :title="t('action.save')"
         :loading="actionLoading"
-        @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
+        @click="submitForm()"
+      />
+      <!-- 按钮：关闭 -->
+      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
     </template>
-  </Dialog>
+  </XModal>
 </template>

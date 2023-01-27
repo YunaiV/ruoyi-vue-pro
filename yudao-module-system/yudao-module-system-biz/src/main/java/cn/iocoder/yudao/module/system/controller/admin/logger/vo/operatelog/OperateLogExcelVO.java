@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 操作日志 Excel 导出响应 VO
@@ -34,7 +34,7 @@ public class OperateLogExcelVO {
     private String successStr;
 
     @ExcelProperty("操作日志")
-    private Date startTime;
+    private LocalDateTime startTime;
 
     @ExcelProperty("执行时长")
     private Integer duration;

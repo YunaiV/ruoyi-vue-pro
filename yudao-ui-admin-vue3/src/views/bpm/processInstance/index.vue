@@ -1,14 +1,13 @@
-<script setup lang="ts">
-import { ref } from 'vue'
+<script setup lang="ts" name="ProcessInstance">
 import dayjs from 'dayjs'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
 import type { ProcessInstanceVO } from '@/api/bpm/processInstance/types'
 import { allSchemas } from './process.data'
 import * as ProcessInstanceApi from '@/api/bpm/processInstance'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 const { t } = useI18n() // 国际化
+const message = useMessage()
 
 // ========== 列表相关 ==========
 const { register, tableObject, methods } = useTable<ProcessInstanceVO>({
@@ -32,18 +31,18 @@ const handleCancel = (row: ProcessInstanceVO) => {
     inputErrorMessage: '取消原因不能为空'
   }).then(async ({ value }) => {
     await ProcessInstanceApi.cancelProcessInstanceApi(row.id, value)
-    ElMessage.success('取消成功')
+    message.success('取消成功')
     getList()
   })
 }
 
 // ========== 详情相关 ==========
-const detailRef = ref() // 详情 Ref
+const detailData = ref() // 详情 Ref
 
 // 详情操作
 const handleDetail = async (row: ProcessInstanceVO) => {
   // 设置数据
-  detailRef.value = row
+  detailData.value = row
   dialogVisible.value = true
 }
 
@@ -103,19 +102,12 @@ getList()
     </Table>
   </ContentWrap>
 
-  <Dialog v-model="dialogVisible" :title="t('action.detail')">
+  <XModal v-model="dialogVisible" :title="t('action.detail')">
     <!-- 对话框(详情) -->
-    <Descriptions :schema="allSchemas.detailSchema" :data="detailRef">
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-    </Descriptions>
+    <Descriptions :schema="allSchemas.detailSchema" :data="detailData" />
     <!-- 操作按钮 -->
     <template #footer>
       <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
     </template>
-  </Dialog>
+  </XModal>
 </template>

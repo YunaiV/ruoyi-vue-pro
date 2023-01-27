@@ -1,10 +1,37 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { FileConfigVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface FileClientConfig {
+  basePath: string
+  host?: string
+  port?: number
+  username?: string
+  password?: string
+  mode?: string
+  endpoint?: string
+  bucket?: string
+  accessKey?: string
+  accessSecret?: string
+  domain: string
+}
+export interface FileConfigVO {
+  id: number
+  name: string
+  storage: number
+  master: boolean
+  visible: boolean
+  config: FileClientConfig
+  remark: string
+  createTime: Date
+}
+
+export interface FileConfigPageReqVO extends PageParam {
+  name?: string
+  storage?: number
+  createTime?: Date[]
+}
 
 // 查询文件配置列表
-export const getFileConfigPageApi = (params) => {
+export const getFileConfigPageApi = (params: FileConfigPageReqVO) => {
   return request.get({ url: '/infra/file-config/page', params })
 }
 
@@ -15,7 +42,7 @@ export const getFileConfigApi = (id: number) => {
 
 // 更新文件配置为主配置
 export const updateFileConfigMasterApi = (id: number) => {
-  return request.get({ url: '/infra/file-config/update-master?id=' + id })
+  return request.put({ url: '/infra/file-config/update-master?id=' + id })
 }
 
 // 新增文件配置

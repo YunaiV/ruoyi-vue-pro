@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 用户 Excel 导出 VO
@@ -41,7 +41,7 @@ public class UserExcelVO {
     private String loginIp;
 
     @ExcelProperty("最后登录时间")
-    private Date loginDate;
+    private LocalDateTime loginDate;
 
     @ExcelProperty("部门名称")
     private String deptName;

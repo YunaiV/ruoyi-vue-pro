@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  *
  * @author 芋道源码
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class AdminUiConfiguration implements WebMvcConfigurer {
 
     @Override

@@ -46,28 +46,28 @@
       <el-table-column label="操作模块" align="center" prop="module" />
       <el-table-column label="操作名" align="center" prop="name" width="180" />
       <el-table-column label="操作类型" align="center" prop="type">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.SYSTEM_OPERATE_TYPE" :value="scope.row.type"/>
         </template>
       </el-table-column>
       <el-table-column label="操作人" align="center" prop="userNickname" />
       <el-table-column label="操作结果" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ scope.row.resultCode === 0 ? '成功' : '失败' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作日期" align="center" prop="startTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.startTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="执行时长" align="center" prop="startTime">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ scope.row.duration }}  ms</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row,scope.index)"
                      v-hasPermi="['system:operate-log:query']">详细</el-button>
         </template>
@@ -148,8 +148,6 @@ export default {
       open: false,
       // 类型数据字典
       typeOptions: [],
-      // 类型数据字典
-      statusOptions: [],
       // 表单参数
       form: {},
       // 查询参数

@@ -20,6 +20,7 @@ import { findIndex } from '@/utils'
 import { set } from 'lodash-es'
 import { FormProps } from './types'
 import { Icon } from '@/components/Icon'
+import { FormSchema, FormSetPropsType } from '@/types/form'
 
 const { getPrefixCls } = useDesign()
 
@@ -225,6 +226,7 @@ export default defineComponent({
                   vModel={formModel.value[item.field]}
                   {...(autoSetPlaceholder && setTextPlaceholder(item))}
                   {...setComponentProps(item)}
+                  style={item.componentProps?.style}
                   {...(notRenderOptions.includes(item?.component as string) &&
                   item?.componentProps?.options
                     ? { options: item?.componentProps?.options || [] }
@@ -243,6 +245,7 @@ export default defineComponent({
     const renderOptions = (item: FormSchema) => {
       switch (item.component) {
         case 'Select':
+        case 'SelectV2':
           const { renderSelectOptions } = useRenderSelect(slots)
           return renderSelectOptions(item)
         case 'Radio':
@@ -251,8 +254,8 @@ export default defineComponent({
           return renderRadioOptions(item)
         case 'Checkbox':
         case 'CheckboxButton':
-          const { renderChcekboxOptions } = useRenderCheckbox()
-          return renderChcekboxOptions(item)
+          const { renderCheckboxOptions } = useRenderCheckbox()
+          return renderCheckboxOptions(item)
         default:
           break
       }
@@ -291,8 +294,8 @@ export default defineComponent({
 })
 </script>
 
-<style lang="less" scoped>
-.@{elNamespace}-form.@{namespace}-form .@{elNamespace}-row {
+<style lang="scss" scoped>
+.#{$elNamespace}-form.#{$namespace}-form .#{$elNamespace}-row {
   margin-right: 0 !important;
   margin-left: 0 !important;
 }

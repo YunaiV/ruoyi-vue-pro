@@ -1,7 +1,4 @@
-import { reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
 import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
-import { DICT_TYPE } from '@/utils/dict'
 const { t } = useI18n() // 国际化
 
 // CrudSchema
@@ -29,7 +26,8 @@ const crudSchemas = reactive<CrudSchema[]>([
   {
     label: '结果',
     field: 'result',
-    dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT
+    dictType: DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
+    dictClass: 'number'
   },
   {
     label: '审批意见',

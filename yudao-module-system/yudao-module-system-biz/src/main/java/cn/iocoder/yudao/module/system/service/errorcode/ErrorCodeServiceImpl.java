@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -164,7 +164,7 @@ public class ErrorCodeServiceImpl implements ErrorCodeService {
     }
 
     @Override
-    public List<ErrorCodeRespDTO> getErrorCodeList(String applicationName, Date minUpdateTime) {
+    public List<ErrorCodeRespDTO> getErrorCodeList(String applicationName, LocalDateTime minUpdateTime) {
         List<ErrorCodeDO> errorCodeDOs = errorCodeMapper.selectListByApplicationNameAndUpdateTimeGt(
                 applicationName, minUpdateTime);
         return ErrorCodeConvert.INSTANCE.convertList03(errorCodeDOs);

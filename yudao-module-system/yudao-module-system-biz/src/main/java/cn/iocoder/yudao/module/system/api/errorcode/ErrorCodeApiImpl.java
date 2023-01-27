@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.service.errorcode.ErrorCodeService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -26,7 +26,7 @@ public class ErrorCodeApiImpl implements ErrorCodeApi {
     }
 
     @Override
-    public List<ErrorCodeRespDTO> getErrorCodeList(String applicationName, Date minUpdateTime) {
+    public List<ErrorCodeRespDTO> getErrorCodeList(String applicationName, LocalDateTime minUpdateTime) {
         return errorCodeService.getErrorCodeList(applicationName, minUpdateTime);
     }
 

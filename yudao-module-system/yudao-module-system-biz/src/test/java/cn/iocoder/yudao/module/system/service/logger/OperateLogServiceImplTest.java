@@ -23,13 +23,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -104,7 +104,8 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserNickname("wangkai");
         reqVO.setModule("order");
         reqVO.setType(OperateTypeEnum.CREATE.getType());
-        reqVO.setStartTime((new Date[]{buildTime(2021, 3, 5),buildTime(2021, 3, 7)}));
+        reqVO.setStartTime((new LocalDateTime[]{buildTime(2021, 3, 5),
+                buildTime(2021, 3, 7)}));
         reqVO.setSuccess(true);
 
         // 调用service方法
@@ -155,7 +156,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserNickname("wangkai");
         reqVO.setModule("order");
         reqVO.setType(OperateTypeEnum.CREATE.getType());
-        reqVO.setStartTime((new Date[]{buildTime(2021, 3, 5),buildTime(2021, 3, 7)}));
+        reqVO.setStartTime((new LocalDateTime[]{buildTime(2021, 3, 5),buildTime(2021, 3, 7)}));
         reqVO.setSuccess(true);
 
         // 调用 service 方法

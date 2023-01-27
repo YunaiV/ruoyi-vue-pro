@@ -1,10 +1,39 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { UserVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface UserVO {
+  id: number
+  username: string
+  nickname: string
+  deptId: number
+  postIds: string[]
+  email: string
+  mobile: string
+  sex: number
+  avatar: string
+  loginIp: string
+  status: number
+  remark: string
+  loginDate: Date
+  createTime: Date
+}
+
+export interface UserPageReqVO extends PageParam {
+  deptId?: number
+  username?: string
+  mobile?: string
+  status?: number
+  createTime?: Date[]
+}
+
+export interface UserExportReqVO {
+  code?: string
+  name?: string
+  status?: number
+  createTime?: Date[]
+}
 
 // 查询用户管理列表
-export const getUserPageApi = (params) => {
+export const getUserPageApi = (params: UserPageReqVO) => {
   return request.get({ url: '/system/user/page', params })
 }
 
@@ -29,7 +58,7 @@ export const deleteUserApi = (id: number) => {
 }
 
 // 导出用户
-export const exportUserApi = (params) => {
+export const exportUserApi = (params: UserExportReqVO) => {
   return request.download({ url: '/system/user/export', params })
 }
 

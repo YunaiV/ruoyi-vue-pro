@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, computed, PropType, unref, nextTick, ref, watch, shallowRef } from 'vue'
+import { PropType } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import { IDomEditor, IEditorConfig, i18nChangeLanguage } from '@wangeditor/editor'
 import { propTypes } from '@/utils/propTypes'
@@ -7,6 +7,8 @@ import { isNumber } from '@/utils/is'
 import { ElMessage } from 'element-plus'
 import { useLocaleStore } from '@/store/modules/locale'
 import { getAccessToken, getTenantId } from '@/utils/auth'
+
+type InsertFnType = (url: string, alt: string, href: string) => void
 
 const localeStore = useLocaleStore()
 
@@ -21,6 +23,7 @@ const props = defineProps({
     type: Object as PropType<IEditorConfig>,
     default: () => undefined
   },
+  readonly: propTypes.bool.def(false),
   modelValue: propTypes.string.def('')
 })
 
@@ -59,7 +62,7 @@ const editorConfig = computed((): IEditorConfig => {
   return Object.assign(
     {
       placeholder: '请输入内容...',
-      readOnly: false,
+      readOnly: props.readonly,
       customAlert: (s: string, t: string) => {
         switch (t) {
           case 'success':
@@ -85,29 +88,58 @@ const editorConfig = computed((): IEditorConfig => {
         ['uploadImage']: {
           server: import.meta.env.VITE_UPLOAD_URL,
           // 单个文件的最大体积限制，默认为 2M
-          maxFileSize: 2 * 1024 * 1024,
+          maxFileSize: 5 * 1024 * 1024,
           // 最多可上传几个文件，默认为 100
           maxNumberOfFiles: 10,
           // 选择文件时的类型限制，默认为 ['image/*'] 。如不想限制，则设置为 []
           allowedFileTypes: ['image/*'],
 
           // 自定义上传参数，例如传递验证的 token 等。参数会被添加到 formData 中，一起上传到服务端。
-          meta: {},
+          meta: { updateSupport: 0 },
           // 将 meta 拼接到 url 参数中，默认 false
-          metaWithUrl: false,
+          metaWithUrl: true,
 
           // 自定义增加 http  header
           headers: {
-            Accept: 'image/*',
+            Accept: '*',
             Authorization: 'Bearer ' + getAccessToken(),
             'tenant-id': getTenantId()
           },
 
           // 跨域是否传递 cookie ，默认为 false
-          withCredentials: false,
+          withCredentials: true,
 
           // 超时时间，默认为 10 秒
-          timeout: 5 * 1000 // 5 秒
+          timeout: 5 * 1000, // 5 秒
+
+          // form-data fieldName，后端接口参数名称，默认值wangeditor-uploaded-image
+          fieldName: 'file',
+
+          // 上传之前触发
+          onBeforeUpload(file: File) {
+            console.log(file)
+            return file
+          },
+          // 上传进度的回调函数
+          onProgress(progress: number) {
+            // progress 是 0-100 的数字
+            console.log('progress', progress)
+          },
+          onSuccess(file: File, res: any) {
+            console.log('onSuccess', file, res)
+          },
+          onFailed(file: File, res: any) {
+            alert(res.message)
+            console.log('onFailed', file, res)
+          },
+          onError(file: File, err: any, res: any) {
+            alert(err.message)
+            console.error('onError', file, err, res)
+          },
+          // 自定义插入图片
+          customInsert(res: any, insertFn: InsertFnType) {
+            insertFn(res.data, 'image', res.data)
+          }
         }
       },
       uploadImgShowBase64: true
@@ -146,7 +178,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="border-1 border-solid border-[var(--tags-view-border-color)]">
+  <div class="border-1 border-solid border-[var(--tags-view-border-color)] z-3000">
     <!-- 工具栏 -->
     <Toolbar
       :editor="editorRef"

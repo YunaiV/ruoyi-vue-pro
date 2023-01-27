@@ -1,17 +1,17 @@
 "use strict";
 
-var isFunction = require("min-dash").isFunction,
-  isObject = require("min-dash").isObject,
-  some = require("min-dash").some;
+const isFunction = require('min-dash').isFunction,
+  isObject = require('min-dash').isObject,
+  some = require('min-dash').some
 
-var WILDCARD = "*";
+const WILDCARD = '*'
 
 function CamundaModdleExtension(eventBus) {
-  var self = this;
+  const self = this
 
   eventBus.on("moddleCopy.canCopyProperty", function(context) {
-    var property = context.property,
-      parent = context.parent;
+    const property = context.property,
+      parent = context.parent
 
     return self.canCopyProperty(property, parent);
   });
@@ -45,14 +45,14 @@ CamundaModdleExtension.prototype.canCopyProperty = function(property, parent) {
 
 CamundaModdleExtension.prototype.canHostInputOutput = function(parent) {
   // allowed in camunda:Connector
-  var connector = getParent(parent, "camunda:Connector");
+  const connector = getParent(parent, 'camunda:Connector')
 
   if (connector) {
     return true;
   }
 
   // special rules inside bpmn:FlowNode
-  var flowNode = getParent(parent, "bpmn:FlowNode");
+  const flowNode = getParent(parent, 'bpmn:FlowNode')
 
   if (!flowNode) {
     return false;
@@ -62,15 +62,13 @@ CamundaModdleExtension.prototype.canHostInputOutput = function(parent) {
     return false;
   }
 
-  if (is(flowNode, "bpmn:SubProcess") && flowNode.get("triggeredByEvent")) {
-    return false;
-  }
+  return !(is(flowNode, "bpmn:SubProcess") && flowNode.get("triggeredByEvent"));
 
-  return true;
+
 };
 
 CamundaModdleExtension.prototype.canHostConnector = function(parent) {
-  var serviceTaskLike = getParent(parent, "camunda:ServiceTaskLike");
+  const serviceTaskLike = getParent(parent, 'camunda:ServiceTaskLike')
 
   if (is(serviceTaskLike, "bpmn:MessageEventDefinition")) {
     // only allow on throw and end events
@@ -81,13 +79,13 @@ CamundaModdleExtension.prototype.canHostConnector = function(parent) {
 };
 
 CamundaModdleExtension.prototype.canHostIn = function(parent) {
-  var callActivity = getParent(parent, "bpmn:CallActivity");
+  const callActivity = getParent(parent, 'bpmn:CallActivity')
 
   if (callActivity) {
     return true;
   }
 
-  var signalEventDefinition = getParent(parent, "bpmn:SignalEventDefinition");
+  const signalEventDefinition = getParent(parent, 'bpmn:SignalEventDefinition')
 
   if (signalEventDefinition) {
     // only allow on throw and end events
@@ -129,9 +127,9 @@ function getParent(element, type) {
 
 function isAllowedInParent(property, parent) {
   // (1) find property descriptor
-  var descriptor = property.$type && property.$model.getTypeDescriptor(property.$type);
+  const descriptor = property.$type && property.$model.getTypeDescriptor(property.$type)
 
-  var allowedIn = descriptor && descriptor.meta && descriptor.meta.allowedIn;
+  const allowedIn = descriptor && descriptor.meta && descriptor.meta.allowedIn
 
   if (!allowedIn || isWildcard(allowedIn)) {
     return true;

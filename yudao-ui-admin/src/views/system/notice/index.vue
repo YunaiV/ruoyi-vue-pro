@@ -4,12 +4,9 @@
       <el-form-item label="公告标题" prop="title">
         <el-input v-model="queryParams.title" placeholder="请输入公告标题" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="操作人员" prop="createBy">
-        <el-input v-model="queryParams.createBy" placeholder="请输入操作人员" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="公告类型" clearable>
-          <el-option v-for="dict in noticeTypeDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
+      <el-form-item label="公告状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="公告状态" clearable>
+          <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -30,23 +27,23 @@
       <el-table-column label="序号" align="center" prop="id" width="100" />
       <el-table-column label="公告标题" align="center" prop="title" :show-overflow-tooltip="true"/>
       <el-table-column label="公告类型" align="center" prop="type" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.SYSTEM_NOTICE_TYPE" :value="scope.row.type"/>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="创建者" align="center" prop="createBy" width="100" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="100">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:notice:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -136,7 +133,6 @@ export default {
         pageNo: 1,
         pageSize: 10,
         title: undefined,
-        createBy: undefined,
         status: undefined
       },
       // 表单参数

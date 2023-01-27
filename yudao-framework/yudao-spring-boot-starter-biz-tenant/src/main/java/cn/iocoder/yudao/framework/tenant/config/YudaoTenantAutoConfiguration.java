@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.tenant.core.db.TenantDatabaseInterceptor;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJobHandlerDecorator;
 import cn.iocoder.yudao.framework.tenant.core.mq.TenantRedisMessageInterceptor;
+import cn.iocoder.yudao.framework.tenant.core.redis.TenantRedisCacheManager;
 import cn.iocoder.yudao.framework.tenant.core.security.TenantSecurityWebFilter;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkServiceImpl;
@@ -20,13 +21,21 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 
-@Configuration
+import java.util.Objects;
+
+@AutoConfiguration
 @ConditionalOnProperty(prefix = "yudao.tenant", value = "enable", matchIfMissing = true) // 允许使用 yudao.tenant.enable=false 禁用多租户
 @EnableConfigurationProperties(TenantProperties.class)
 public class YudaoTenantAutoConfiguration {
@@ -108,6 +117,19 @@ public class YudaoTenantAutoConfiguration {
             }
 
         };
+    }
+
+    // ========== Redis ==========
+
+    @Bean
+    @Primary // 引入租户时，tenantRedisCacheManager 为主 Bean
+    public RedisCacheManager tenantRedisCacheManager(RedisTemplate<String, Object> redisTemplate,
+                                                     RedisCacheConfiguration redisCacheConfiguration) {
+        // 创建 RedisCacheWriter 对象
+        RedisConnectionFactory connectionFactory = Objects.requireNonNull(redisTemplate.getConnectionFactory());
+        RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory);
+        // 创建 TenantRedisCacheManager 对象
+        return new TenantRedisCacheManager(cacheWriter, redisCacheConfiguration);
     }
 
 }

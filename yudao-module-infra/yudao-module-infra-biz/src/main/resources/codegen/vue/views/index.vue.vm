@@ -65,15 +65,15 @@
     #set ($javaField = $column.javaField)
     #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
     #set ($comment=$column.columnComment)
-#if ($column.javaType == "Date")## 时间类型
+#if ($column.javaType == "LocalDateTime")## 时间类型
       <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.${javaField}) }}</span>
         </template>
       </el-table-column>
 #elseif("" != $column.dictType)## 数据字典
       <el-table-column label="${comment}" align="center" prop="${javaField}">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.${column.javaField}" />
         </template>
       </el-table-column>
@@ -83,7 +83,7 @@
 #end
 #end
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['${permissionPrefix}:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -96,7 +96,7 @@
                 @pagination="getList"/>
 
     <!-- 对话框(添加 / 修改) -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="500px" v-dialogDrag append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
 #foreach($column in $columns)
 #if ($column.createOperation || $column.updateOperation)

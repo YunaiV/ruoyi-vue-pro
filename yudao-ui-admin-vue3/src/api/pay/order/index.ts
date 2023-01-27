@@ -1,10 +1,85 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { OrderVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface OrderVO {
+  id: number
+  merchantId: number
+  appId: number
+  channelId: number
+  channelCode: string
+  merchantOrderId: string
+  subject: string
+  body: string
+  notifyUrl: string
+  notifyStatus: number
+  amount: number
+  channelFeeRate: number
+  channelFeeAmount: number
+  status: number
+  userIp: string
+  expireTime: Date
+  successTime: Date
+  notifyTime: Date
+  successExtensionId: number
+  refundStatus: number
+  refundTimes: number
+  refundAmount: number
+  channelUserId: string
+  channelOrderNo: string
+  createTime: Date
+}
+
+export interface OrderPageReqVO extends PageParam {
+  merchantId?: number
+  appId?: number
+  channelId?: number
+  channelCode?: string
+  merchantOrderId?: string
+  subject?: string
+  body?: string
+  notifyUrl?: string
+  notifyStatus?: number
+  amount?: number
+  channelFeeRate?: number
+  channelFeeAmount?: number
+  status?: number
+  expireTime?: Date[]
+  successTime?: Date[]
+  notifyTime?: Date[]
+  successExtensionId?: number
+  refundStatus?: number
+  refundTimes?: number
+  channelUserId?: string
+  channelOrderNo?: string
+  createTime?: Date[]
+}
+
+export interface OrderExportReqVO {
+  merchantId?: number
+  appId?: number
+  channelId?: number
+  channelCode?: string
+  merchantOrderId?: string
+  subject?: string
+  body?: string
+  notifyUrl?: string
+  notifyStatus?: number
+  amount?: number
+  channelFeeRate?: number
+  channelFeeAmount?: number
+  status?: number
+  expireTime?: Date[]
+  successTime?: Date[]
+  notifyTime?: Date[]
+  successExtensionId?: number
+  refundStatus?: number
+  refundTimes?: number
+  channelUserId?: string
+  channelOrderNo?: string
+  createTime?: Date[]
+}
 
 // 查询列表支付订单
-export const getOrderPageApi = async (params) => {
+export const getOrderPageApi = async (params: OrderPageReqVO) => {
   return await request.get({ url: '/pay/order/page', params })
 }
 
@@ -29,6 +104,6 @@ export const deleteOrderApi = async (id: number) => {
 }
 
 // 导出支付订单
-export const exportOrderApi = async (params) => {
+export const exportOrderApi = async (params: OrderExportReqVO) => {
   return await request.download({ url: '/pay/order/export-excel', params })
 }

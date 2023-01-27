@@ -1,14 +1,33 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { MenuVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface MenuVO {
+  id: number
+  name: string
+  permission: string
+  type: number
+  sort: number
+  parentId: number
+  path: string
+  icon: string
+  component: string
+  status: number
+  visible: boolean
+  keepAlive: boolean
+  createTime: Date
+}
 
-// 查询菜单（精简)列表
+export interface MenuPageReqVO {
+  name?: string
+  status?: number
+}
+
+// 查询菜单（精简）列表
 export const listSimpleMenusApi = () => {
   return request.get({ url: '/system/menu/list-all-simple' })
 }
+
 // 查询菜单列表
-export const getMenuListApi = (params) => {
+export const getMenuListApi = (params: MenuPageReqVO) => {
   return request.get({ url: '/system/menu/list', params })
 }
 

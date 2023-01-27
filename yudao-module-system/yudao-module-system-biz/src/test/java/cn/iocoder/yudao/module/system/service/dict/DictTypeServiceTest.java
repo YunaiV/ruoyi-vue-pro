@@ -16,7 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -24,7 +24,7 @@ import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -64,7 +64,7 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
        reqVO.setName("nai");
        reqVO.setType("艿");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 10),buildTime(2021, 1, 20)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 10),buildTime(2021, 1, 20)}));
 
        // 调用
        PageResult<DictTypeDO> pageResult = dictTypeService.getDictTypePage(reqVO);
@@ -97,7 +97,7 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
         reqVO.setName("nai");
         reqVO.setType("艿");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new Date[]{buildTime(2021, 1, 10),buildTime(2021, 1, 20)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 10),buildTime(2021, 1, 20)}));
 
         // 调用
         List<DictTypeDO> list = dictTypeService.getDictTypeList(reqVO);

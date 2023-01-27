@@ -23,7 +23,7 @@ public class FileConfigRefreshConsumer extends AbstractChannelMessageListener<Fi
     @Override
     public void onMessage(FileConfigRefreshMessage message) {
         log.info("[onMessage][收到 FileConfig 刷新消息]");
-        fileConfigService.initFileClients();
+        fileConfigService.initLocalCache();
     }
 
 }

@@ -20,12 +20,16 @@ export default {
             type: [String, Number],
             default: uni.$u.props.loadmore.fontSize
         },
+		    // 图标大小
+        iconSize: {
+            type: [String, Number],
+            default: uni.$u.props.loadmore.iconSize
+        },
         // 字体颜色
         color: {
             type: String,
             default: uni.$u.props.loadmore.color
         },
-
         // 加载中状态的图标，spinner-花朵状图标，circle-圆圈状，semicircle-半圆
         loadingIcon: {
             type: String,
@@ -75,6 +79,16 @@ export default {
         line: {
             type: Boolean,
             default: uni.$u.props.loadmore.line
+        },
+        // 线条颜色
+        lineColor: {
+            type: String,
+            default: uni.$u.props.loadmore.lineColor
+        },
+        // 是否虚线，true-虚线，false-实线
+        dashed: {
+            type: Boolean,
+            default: uni.$u.props.loadmore.dashed
         }
     }
 }

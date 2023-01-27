@@ -64,24 +64,22 @@
           <el-table-column label="部门" align="center" key="deptName" prop="dept.name" v-if="columns[3].visible" :show-overflow-tooltip="true" />
           <el-table-column label="手机号码" align="center" key="mobile" prop="mobile" v-if="columns[4].visible" width="120" />
           <el-table-column label="状态" key="status" v-if="columns[5].visible" align="center">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-switch v-model="scope.row.status" :active-value="0" :inactive-value="1" @change="handleStatusChange(scope.row)" />
             </template>
           </el-table-column>
           <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns[6].visible" width="160">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                          v-hasPermi="['system:user:update']">修改</el-button>
               <el-dropdown  @command="(command) => handleCommand(command, scope.$index, scope.row)"
                             v-hasPermi="['system:user:delete', 'system:user:update-password', 'system:permission:assign-user-role']">
-                <span class="el-dropdown-link">
-                  <i class="el-icon-d-arrow-right el-icon--right"></i>更多
-                </span>
+                <el-button size="mini" type="text" icon="el-icon-d-arrow-right">更多</el-button>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item command="handleDelete" v-if="scope.row.id !== 1" size="mini" type="text" icon="el-icon-delete"
                                     v-hasPermi="['system:user:delete']">删除</el-dropdown-item>
@@ -274,8 +272,6 @@ export default {
       deptName: undefined,
       // 默认密码
       initPassword: undefined,
-      // 状态数据字典
-      statusOptions: [],
       // 性别状态字典
       sexOptions: [],
       // 岗位选项
@@ -343,7 +339,7 @@ export default {
         ],
         mobile: [
           {
-            pattern: /^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-79])|(?:5[0-35-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[189]))\d{8}$/,
+            pattern: /^(?:(?:\+|00)86)?1(?:3[\d]|4[5-79]|5[0-35-9]|6[5-7]|7[0-8]|8[\d]|9[189])\d{8}$/,
             message: "请输入正确的手机号码",
             trigger: "blur"
           }
@@ -368,9 +364,9 @@ export default {
   created() {
     this.getList();
     this.getTreeselect();
-    this.getConfigKey("sys.user.init-password").then(response => {
-      this.initPassword = response.msg;
-    });
+    // this.getConfigKey("sys.user.init-password").then(response => {
+    //   this.initPassword = response.msg;
+    // });
   },
   methods: {
     // 更多操作

@@ -1,4 +1,4 @@
-import {login, logout, getInfo, socialLogin, socialBindLogin, smsLogin} from '@/api/login'
+import {login, logout, getInfo, socialLogin, smsLogin} from '@/api/login'
 import {setToken, removeToken} from '@/utils/auth'
 
 const user = {
@@ -36,14 +36,12 @@ const user = {
     Login({ commit }, userInfo) {
       const username = userInfo.username.trim()
       const password = userInfo.password
-      const code = userInfo.code
-      const uuid = userInfo.uuid
+      const captchaVerification = userInfo.captchaVerification
       const socialCode = userInfo.socialCode
       const socialState = userInfo.socialState
       const socialType = userInfo.socialType
       return new Promise((resolve, reject) => {
-        login(username, password, code, uuid,
-          socialType, socialCode, socialState).then(res => {
+        login(username, password, captchaVerification, socialType, socialCode, socialState).then(res => {
           res = res.data;
           // 设置 token
           setToken(res)

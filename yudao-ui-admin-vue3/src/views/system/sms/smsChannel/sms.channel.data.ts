@@ -1,8 +1,4 @@
-import { reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { required } from '@/utils/formRules'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
-import { DICT_TYPE } from '@/utils/dict'
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
 const { t } = useI18n() // 国际化
 
 // 表单校验
@@ -14,79 +10,54 @@ export const rules = reactive({
 })
 
 // CrudSchema
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: 'seq',
+  primaryTitle: '渠道编号',
+  action: true,
+  columns: [
+    {
+      title: '短信签名',
+      field: 'signature',
+      isSearch: true
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '短信签名',
-    field: 'signature',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '渠道编码',
-    field: 'code',
-    dictType: DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: t('common.status'),
-    field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '短信 API 的账号',
-    field: 'apiKey'
-  },
-  {
-    label: '短信 API 的密钥',
-    field: 'apiSecret'
-  },
-  {
-    label: '短信发送回调 URL',
-    field: 'callbackUrl'
-  },
-  {
-    label: t('common.createTime'),
-    field: 'createTime',
-    form: {
-      show: false
+    {
+      title: '渠道编码',
+      field: 'code',
+      dictType: DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE,
+      isSearch: true
     },
-    search: {
-      show: true,
-      component: 'DatePicker',
-      componentProps: {
-        type: 'daterange',
-        valueFormat: 'YYYY-MM-DD HH:mm:ss',
-        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: '短信 API 的账号',
+      field: 'apiKey'
+    },
+    {
+      title: '短信 API 的密钥',
+      field: 'apiSecret'
+    },
+    {
+      title: '短信发送回调 URL',
+      field: 'callbackUrl'
+    },
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate',
+      isForm: false,
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
       }
     }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '240px',
-    form: {
-      show: false
-    },
-    detail: {
-      show: false
-    }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

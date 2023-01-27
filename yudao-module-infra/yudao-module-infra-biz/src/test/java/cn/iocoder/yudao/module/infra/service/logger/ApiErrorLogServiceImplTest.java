@@ -17,10 +17,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.API_ERROR_LOG_NOT_FOUND;
@@ -44,7 +44,7 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
         int userType = UserTypeEnum.ADMIN.getValue();
         String applicationName = "yudao-test";
         String requestUrl = "foo";
-        Date beginTime = buildTime(2021, 3, 13);
+        LocalDateTime beginTime = buildTime(2021, 3, 13);
         int progressStatus = ApiErrorLogProcessStatusEnum.INIT.getStatus();
 
         ApiErrorLogDO infApiErrorLogDO = RandomUtils.randomPojo(ApiErrorLogDO.class, logDO -> {
@@ -77,7 +77,7 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserType(userType);
         reqVO.setApplicationName(applicationName);
         reqVO.setRequestUrl(requestUrl);
-        reqVO.setExceptionTime((new Date[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
+        reqVO.setExceptionTime((new LocalDateTime[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
         reqVO.setProcessStatus(progressStatus);
 
         // 调用service方法
@@ -96,7 +96,7 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
         int userType = UserTypeEnum.ADMIN.getValue();
         String applicationName = "yudao-test";
         String requestUrl = "foo";
-        Date beginTime = buildTime(2021, 3, 13);
+        LocalDateTime beginTime = buildTime(2021, 3, 13);
         int progressStatus = ApiErrorLogProcessStatusEnum.INIT.getStatus();
 
         ApiErrorLogDO infApiErrorLogDO = RandomUtils.randomPojo(ApiErrorLogDO.class, logDO -> {
@@ -129,7 +129,7 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserType(userType);
         reqVO.setApplicationName(applicationName);
         reqVO.setRequestUrl(requestUrl);
-        reqVO.setExceptionTime((new Date[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
+        reqVO.setExceptionTime((new LocalDateTime[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
         reqVO.setProcessStatus(progressStatus);
 
         // 调用service方法

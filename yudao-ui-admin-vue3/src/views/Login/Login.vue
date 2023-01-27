@@ -1,25 +1,7 @@
-<script setup lang="ts">
-import { LoginForm, MobileForm, RegisterForm, QrCodeForm } from './components'
-import { ThemeSwitch } from '@/components/ThemeSwitch'
-import { LocaleDropdown } from '@/components/LocaleDropdown'
-import { useI18n } from '@/hooks/web/useI18n'
-import { underlineToHump } from '@/utils'
-import { useAppStore } from '@/store/modules/app'
-import { useDesign } from '@/hooks/web/useDesign'
-
-const { t } = useI18n()
-
-const { getPrefixCls } = useDesign()
-
-const prefixCls = getPrefixCls('login')
-
-const appStore = useAppStore()
-</script>
-
 <template>
   <div
     :class="prefixCls"
-    class="h-[100%] relative overflow-hidden <xl:bg-v-dark <sm:px-10px <xl:px-10px <md:px-10px"
+    class="h-[100%] relative <xl:bg-v-dark <sm:px-10px <xl:px-10px <md:px-10px"
   >
     <div class="relative h-full flex mx-auto">
       <div
@@ -76,11 +58,25 @@ const appStore = useAppStore()
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { underlineToHump } from '@/utils'
 
-<style lang="less" scoped>
-@prefix-cls: ~'@{namespace}-login';
+import { useDesign } from '@/hooks/web/useDesign'
+import { useAppStore } from '@/store/modules/app'
+import { ThemeSwitch } from '@/layout/components/ThemeSwitch'
+import { LocaleDropdown } from '@/layout/components/LocaleDropdown'
+import { LoginForm, MobileForm, RegisterForm, QrCodeForm } from './components'
 
-.@{prefix-cls} {
+const { t } = useI18n()
+const appStore = useAppStore()
+const { getPrefixCls } = useDesign()
+const prefixCls = getPrefixCls('login')
+</script>
+
+<style lang="scss" scoped>
+$prefix-cls: #{$namespace}-login;
+
+.#{$prefix-cls} {
   &__left {
     &::before {
       position: absolute;

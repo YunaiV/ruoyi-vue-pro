@@ -12,8 +12,7 @@ public interface ErrorCodeConstants {
     // ========== AUTH 模块 1002000000 ==========
     ErrorCode AUTH_LOGIN_BAD_CREDENTIALS = new ErrorCode(1002000000, "登录失败，账号密码不正确");
     ErrorCode AUTH_LOGIN_USER_DISABLED = new ErrorCode(1002000001, "登录失败，账号被禁用");
-    ErrorCode AUTH_LOGIN_CAPTCHA_NOT_FOUND = new ErrorCode(1002000003, "验证码不存在");
-    ErrorCode AUTH_LOGIN_CAPTCHA_CODE_ERROR = new ErrorCode(1002000004, "验证码不正确");
+    ErrorCode AUTH_LOGIN_CAPTCHA_CODE_ERROR = new ErrorCode(1002000004, "验证码不正确，原因：{}");
     ErrorCode AUTH_THIRD_LOGIN_NOT_BIND = new ErrorCode(1002000005, "未绑定账号，需要进行绑定");
     ErrorCode AUTH_TOKEN_EXPIRED = new ErrorCode(1002000006, "Token 已经过期");
     ErrorCode AUTH_MOBILE_NOT_EXISTS = new ErrorCode(1002000007, "手机号不存在");
@@ -140,7 +139,19 @@ public interface ErrorCodeConstants {
 
     // ========== OAuth2 授权 1002022000 =========
     ErrorCode OAUTH2_CODE_NOT_EXISTS = new ErrorCode(1002022000, "code 不存在");
-    ErrorCode OAUTH2_CODE_EXPIRE = new ErrorCode(1002022000, "code 已过期");
+    ErrorCode OAUTH2_CODE_EXPIRE = new ErrorCode(1002022001, "code 已过期");
+
+    // ========== 邮箱账号 1002023000 ==========
+    ErrorCode MAIL_ACCOUNT_NOT_EXISTS = new ErrorCode(1002023000, "邮箱账号不存在");
+    ErrorCode MAIL_ACCOUNT_RELATE_TEMPLATE_EXISTS = new ErrorCode(1002023001, "无法删除，该邮箱账号还有邮件模板");
+
+    // ========== 邮件模版 1002024000 ==========
+    ErrorCode MAIL_TEMPLATE_NOT_EXISTS = new ErrorCode(1002024000, "邮件模版不存在");
+    ErrorCode MAIL_TEMPLATE_CODE_EXISTS = new ErrorCode(1002024001, "邮件模版 code({}) 已存在");
+
+    // ========== 邮件发送 1002025000 ==========
+    ErrorCode MAIL_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002025000, "模板参数({})缺失");
+    ErrorCode MAIL_SEND_MAIL_NOT_EXISTS = new ErrorCode(1002025000, "邮箱不存在");
 
     // ========== 站内信模版 1002023000 ==========
     ErrorCode NOTIFY_TEMPLATE_NOT_EXISTS = new ErrorCode(1002023000, "站内信模版不存在");

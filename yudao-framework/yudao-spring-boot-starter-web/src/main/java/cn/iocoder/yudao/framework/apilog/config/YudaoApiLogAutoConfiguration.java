@@ -11,16 +11,14 @@ import cn.iocoder.yudao.framework.web.config.YudaoWebAutoConfiguration;
 import cn.iocoder.yudao.module.infra.api.logger.ApiAccessLogApi;
 import cn.iocoder.yudao.module.infra.api.logger.ApiErrorLogApi;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.Filter;
 
-@Configuration
-@AutoConfigureAfter(YudaoWebAutoConfiguration.class)
+@AutoConfiguration(after = YudaoWebAutoConfiguration.class)
 public class YudaoApiLogAutoConfiguration {
 
     @Bean

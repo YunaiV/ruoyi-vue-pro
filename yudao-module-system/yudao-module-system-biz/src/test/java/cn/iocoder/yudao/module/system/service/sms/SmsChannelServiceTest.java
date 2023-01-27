@@ -1,33 +1,31 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsChannelMapper;
-import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
+import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsChannelMapper;
+import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -57,10 +55,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         smsChannelMapper.insert(smsChannelDO02);
 
         // 调用
-        smsChannelService.initSmsClients();
-        // 校验 maxUpdateTime 属性
-        Date maxUpdateTime = (Date) BeanUtil.getFieldValue(smsChannelService, "maxUpdateTime");
-        assertEquals(max(smsChannelDO01.getUpdateTime(), smsChannelDO02.getUpdateTime()), maxUpdateTime);
+        smsChannelService.initLocalCache();
         // 校验调用
         verify(smsClientFactory, times(1)).createOrUpdateSmsClient(
                 argThat(properties -> isPojoEquals(smsChannelDO01, properties)));
@@ -172,7 +167,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
        SmsChannelPageReqVO reqVO = new SmsChannelPageReqVO();
        reqVO.setSignature("芋道");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setCreateTime((new Date[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)}));
 
        // 调用
        PageResult<SmsChannelDO> pageResult = smsChannelService.getSmsChannelPage(reqVO);

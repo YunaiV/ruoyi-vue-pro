@@ -1,10 +1,32 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { JobVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface JobVO {
+  id: number
+  name: string
+  status: number
+  handlerName: string
+  handlerParam: string
+  cronExpression: string
+  retryCount: number
+  retryInterval: number
+  monitorTimeout: number
+  createTime: Date
+}
+
+export interface JobPageReqVO extends PageParam {
+  name?: string
+  status?: number
+  handlerName?: string
+}
+
+export interface JobExportReqVO {
+  name?: string
+  status?: number
+  handlerName?: string
+}
 
 // 任务列表
-export const getJobPageApi = (params) => {
+export const getJobPageApi = (params: JobPageReqVO) => {
   return request.get({ url: '/infra/job/page', params })
 }
 
@@ -29,7 +51,7 @@ export const deleteJobApi = (id: number) => {
 }
 
 // 导出定时任务调度
-export const exportJobApi = (params) => {
+export const exportJobApi = (params: JobExportReqVO) => {
   return request.download({ url: '/infra/job/export-excel', params })
 }
 

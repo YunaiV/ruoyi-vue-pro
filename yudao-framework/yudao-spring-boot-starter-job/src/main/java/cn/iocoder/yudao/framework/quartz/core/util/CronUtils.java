@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.framework.quartz.core.util;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import org.quartz.CronExpression;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +33,7 @@ public class CronUtils {
      * @param n 数量
      * @return 满足条件的执行时间
      */
-    public static List<Date> getNextTimes(String cronExpression, int n) {
+    public static List<LocalDateTime> getNextTimes(String cronExpression, int n) {
         // 获得 CronExpression 对象
         CronExpression cron;
         try {
@@ -41,10 +43,10 @@ public class CronUtils {
         }
         // 从当前开始计算，n 个满足条件的
         Date now = new Date();
-        List<Date> nextTimes = new ArrayList<>(n);
+        List<LocalDateTime> nextTimes = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             Date nextTime = cron.getNextValidTimeAfter(now);
-            nextTimes.add(nextTime);
+            nextTimes.add(LocalDateTimeUtil.of(nextTime));
             // 切换现在，为下一个触发时间；
             now = nextTime;
         }

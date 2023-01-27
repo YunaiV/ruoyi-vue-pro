@@ -6,6 +6,7 @@ import { setIndex } from './helper'
 import { getSlot } from '@/utils/tsxHelper'
 import type { TableProps } from './types'
 import { set } from 'lodash-es'
+import { Pagination, TableColumn, TableSetPropsType, TableSlotDefault } from '@/types/table'
 
 export default defineComponent({
   name: 'Table',
@@ -294,7 +295,7 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 :deep(.el-button.is-text) {
   margin-left: 0;
   padding: 8px 4px;

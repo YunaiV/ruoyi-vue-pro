@@ -24,16 +24,20 @@
       "@/*": ["src/*"]
     },
     "types": [
-      "@intlify/vite-plugin-vue-i18n/client",
+      "@intlify/unplugin-vue-i18n/types",
       "vite/client",
       "element-plus/global",
       "@types/intro.js",
       "@types/qrcode",
-      "vite-plugin-svg-icons/client",
-      "unplugin-vue-define-options"
+      "vite-plugin-svg-icons/client"
     ],
     "typeRoots": ["./node_modules/@types/", "./types"]
   },
-  "include": ["src/**/*", "types/**/*.d.ts"],
+  "include": [
+    "src/**/*",
+    "types/**/*.d.ts",
+    "src/types/auto-imports.d.ts",
+    "src/types/auto-components.d.ts"
+  ],
   "exclude": ["dist", "node_modules"]
 }

@@ -1,7 +1,26 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { PostVO, PostPageReqVO, PostExportReqVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface PostVO {
+  id?: number
+  name: string
+  code: string
+  sort: number
+  status: number
+  remark: string
+  createTime?: Date
+}
+
+export interface PostPageReqVO extends PageParam {
+  code?: string
+  name?: string
+  status?: number
+}
+
+export interface PostExportReqVO {
+  code?: string
+  name?: string
+  status?: number
+}
 
 // 查询岗位列表
 export const getPostPageApi = async (params: PostPageReqVO) => {
@@ -12,6 +31,7 @@ export const getPostPageApi = async (params: PostPageReqVO) => {
 export const listSimplePostsApi = async () => {
   return await request.get({ url: '/system/post/list-all-simple' })
 }
+
 // 查询岗位详情
 export const getPostApi = async (id: number) => {
   return await request.get({ url: '/system/post/get?id=' + id })

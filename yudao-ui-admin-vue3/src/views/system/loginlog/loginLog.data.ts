@@ -1,80 +1,53 @@
-import { reactive } from 'vue'
-import { DICT_TYPE } from '@/utils/dict'
-import { useI18n } from '@/hooks/web/useI18n'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
-const { t } = useI18n() // 国际化
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
+
+// CrudSchema
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: 'seq',
+  primaryTitle: '日志编号',
+  action: true,
+  actionWidth: '100px',
+  columns: [
+    {
+      title: '日志类型',
+      field: 'logType',
+      dictType: DICT_TYPE.SYSTEM_LOGIN_TYPE,
+      dictClass: 'number'
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '日志类型',
-    field: 'logType',
-    dictType: DICT_TYPE.SYSTEM_LOGIN_TYPE,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '用户名称',
-    field: 'username',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '登录地址',
-    field: 'userIp',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: 'userAgent',
-    field: 'userAgent'
-  },
-  {
-    label: '登陆结果',
-    field: 'result',
-    dictType: DICT_TYPE.SYSTEM_LOGIN_RESULT,
-    search: {
-      show: true
-    }
-  },
-  {
-    label: t('common.createTime'),
-    field: 'createTime',
-    form: {
-      show: false
+    {
+      title: '用户名称',
+      field: 'username',
+      isSearch: true
     },
-    search: {
-      show: true,
-      component: 'DatePicker',
-      componentProps: {
-        type: 'daterange',
-        valueFormat: 'YYYY-MM-DD HH:mm:ss',
-        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]
+    {
+      title: '登录地址',
+      field: 'userIp',
+      isSearch: true
+    },
+    {
+      title: '浏览器',
+      field: 'userAgent'
+    },
+    {
+      title: '登陆结果',
+      field: 'result',
+      dictType: DICT_TYPE.SYSTEM_LOGIN_RESULT,
+      dictClass: 'number'
+    },
+    {
+      title: '登录日期',
+      field: 'createTime',
+      formatter: 'formatDate',
+      table: {
+        width: 150
+      },
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
       }
     }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '120px',
-    form: {
-      show: false
-    },
-    detail: {
-      show: false
-    }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

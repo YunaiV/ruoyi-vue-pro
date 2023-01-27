@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { ElCard } from 'element-plus'
 import { propTypes } from '@/utils/propTypes'
 import { useDesign } from '@/hooks/web/useDesign'
-import { ref, onMounted, defineEmits } from 'vue'
-import { Sticky } from '@/components/Sticky'
-import { useI18n } from '@/hooks/web/useI18n'
+
 const { t } = useI18n()
 
 const { getPrefixCls } = useDesign()
@@ -24,12 +21,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div :class="[`${prefixCls}-container`, 'relative bg-[#fff]']" ref="contentDetailWrap">
+  <div :class="[`${prefixCls}-container`]" ref="contentDetailWrap">
     <Sticky :offset="offset">
       <div
         :class="[
           `${prefixCls}-header`,
-          'flex border-bottom-1 h-50px items-center text-center bg-white pr-10px'
+          'flex border-bottom-1 h-50px items-center text-center pr-10px'
         ]"
       >
         <div :class="[`${prefixCls}-header__back`, 'flex pl-10px pr-10px ']">
@@ -50,9 +47,7 @@ onMounted(() => {
     </Sticky>
     <div style="padding: var(--app-content-padding)">
       <ElCard :class="[`${prefixCls}-body`, 'mb-20px']" shadow="never">
-        <div>
-          <slot></slot>
-        </div>
+        <div> <slot></slot> </div>
       </ElCard>
     </div>
   </div>

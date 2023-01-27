@@ -1,176 +1,205 @@
 <template>
   <view class="container">
+    <!-- 搜索框 -->
     <view class="search-wrap">
-      <u-search placeholder="搜索" disabled height="32" :show-action="false" @click="handleSearchClick"></u-search>
+      <u-search placeholder="搜索" disabled height="32" bgColor="#f2f2f2" margin="0 20rpx" :show-action="false"
+        @click="handleSearchClick"></u-search>
     </view>
+
+    <!-- 分类内容 -->
     <view class="category-box">
-      <view class="box-left">
-        <view>
-          <view class="category-item" v-for="(item, index) in categoryList" :key="item.id">
-            <view class="item-title" :class="{ active: currentIndex === index }" @click="handleCategoryClick(index)">
-              <text>{{ item.name }}</text>
-            </view>
+      <!-- 左侧导航栏 -->
+      <scroll-view scroll-y="true" class='box-left'>
+        <view class="category-item" v-for="(item, index) in categoryList" :key="item.id">
+          <view class="item-title" :class="{ active: currentIndex === index }" @click="handleCategoryClick(index)">
+            <text>{{ item.name }}</text>
           </view>
         </view>
-      </view>
-      <view class="box-right">
-        <image class="category-image" :showLoading="true" :src="categoryList[currentIndex].image" width="530rpx" height="160rpx" @click="click"></image>
+      </scroll-view>
+
+      <!-- 右侧分类内容 -->
+      <scroll-view scroll-y="true" class="box-right">
+        <view class="category-image">
+          <image :showLoading="true" :src="categoryList[currentIndex].picUrl" mode='widthFix' @click="click"></image>
+        </view>
+
         <view class="sub-category-box" v-for="(item, index) in categoryList[currentIndex].children" :key="item.id">
           <view class="sub-category-header">
-            <view class="title">{{ item.title }}</view>
-            <view class="more">查看更多</view>
+            <view class="title">{{ item.name }}</view>
+            <view class="more" @click="handleCategory(item, 0)">查看更多</view>
           </view>
-          <u-grid class="sub-category-grid" col="3">
-            <u-grid-item v-for="(subItem, subIndex) in item.category" :key="subItem.id">
-              <view class="sub-category-item">
-                <u-icon name="photo" :size="80"></u-icon>
-                <text class="sub-category-title">{{ subItem.title }}</text>
-              </view>
-            </u-grid-item>
-          </u-grid>
+
+          <view class="sub-category-grid">
+            <u-grid col="3">
+              <u-grid-item v-for="(subItem, subIndex) in item.children" :key="subItem.id">
+                <view class="sub-category-item" @click="handleCategory(item, subIndex)">
+                  <u-icon name="photo" :size="80" v-if="subItem.picUrl === null"></u-icon>
+                  <image :src="subItem.picUrl" v-if="subItem.picUrl != null" mode='widthFix' />
+                  <text class="sub-category-title">{{ subItem.name }}</text>
+                </view>
+              </u-grid-item>
+            </u-grid>
+          </view>
         </view>
-      </view>
+      </scroll-view>
     </view>
   </view>
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      currentIndex: 0,
-      categoryList: []
-    }
-  },
-  onLoad() {
-    for (let i = 0; i < 10; i++) {
-      this.categoryList.push({
-        id: i,
-        image: 'https://cdn.uviewui.com/uview/swiper/swiper1.png',
-        name: '商品分类' + i,
-        children: [
-          {
-            id: 0,
-            title: '分类' + i + '-1',
-            category: [
-              {
-                id: 0,
-                image: '',
-                title: '分类' + i + '-1-1'
-              },
-              {
-                id: 2,
-                image: '',
-                title: '分类' + i + '-1-2'
-              },
-              {
-                id: 3,
-                image: '',
-                title: '分类' + i + '-1-3'
-              }
-            ]
-          },
-          {
-            id: 1,
-            title: '分类' + i + '-2',
-            category: [
-              {
-                id: 0,
-                image: '',
-                title: '分类' + i + '-2-1'
-              },
-              {
-                id: 2,
-                image: '',
-                title: '分类' + i + '-2-2'
-              },
-              {
-                id: 3,
-                image: '',
-                title: '分类' + i + '-2-3'
-              }
-            ]
-          }
-        ]
-      })
-    }
-  },
-  methods: {
-    handleSearchClick(e) {
-      uni.$u.route('/pages/search/search')
+  import { categoryListData } from '../../api/category';
+  import { handleTree, convertTree } from '../../utils/tree.js';
+
+  export default {
+    data() {
+      return {
+        currentIndex: 0,
+        categoryList: []
+      }
     },
-    handleCategoryClick(index) {
-      if (this.currentIndex !== index) {
-        this.currentIndex = index
+    onLoad() {
+      this.handleCategoryList();
+    },
+    methods: {
+      // 点击搜索框
+      handleSearchClick(e) {
+        uni.$u.route('/pages/search/search')
+      },
+      // 点击左侧导航栏
+      handleCategoryClick(index) {
+        if (this.currentIndex !== index) {
+          this.currentIndex = index
+        }
+      },
+      // 获取分类列表并构建树形结构
+      handleCategoryList() {
+        categoryListData().then(res => {
+          this.categoryList = handleTree(res.data, "id", "parentId");
+        })
+      },
+      handleCategory(item, index){
+        // console.log(item)
+        // console.log(index)
+        uni.navigateTo({
+          url:"./product-list?item="+encodeURIComponent(JSON.stringify(item))+"&index="+index
+        })
       }
     }
   }
-}
 </script>
 
 <style lang="scss" scoped>
-
-.search-wrap {
-  background: $custom-bg-color;
-  padding: 20rpx;
-}
-
-.category-box {
-  display: flex;
-  .box-left {
-    width: 200rpx;
-    padding-top: 20rpx;
-    border-right: $custom-border-style;
-    .category-item {
-      border-bottom: $custom-border-style;
-      padding: 20rpx 0;
-      .item-title {
-        padding-left: 30rpx;
-        font-size: 28rpx;
-        &.active {
-          border-left: 6rpx solid $u-primary;
-          font-weight: 700;
-        }
-      }
-    }
+  .search-wrap {
+    background: #ffffff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.07);
+    padding: 20rpx 0;
+    width: 100%;
+    z-index: 3;
   }
-  .box-right {
-    flex: 1;
-    .category-image {
-      width: 510rpx;
-      height: 160rpx;
-      padding: 20rpx;
+
+  .category-box {
+    position: fixed;
+    display: flex;
+    overflow: hidden;
+    margin-top: 100rpx;
+    height: calc(100% - 100rpx);
+
+    .box-left {
+      width: 200rpx;
+      padding-top: 5rpx;
+      overflow: scroll;
+      z-index: 2;
+      background-color: #f2f2f2;
+
+      .category-item {
+        line-height: 80rpx;
+        height: 80rpx;
+        text-align: center;
+        color: #777;
+
+        .item-title {
+          font-size: 28rpx;
+
+          &.active {
+            font-size: 28rpx;
+            font-weight: bold;
+            position: relative;
+            background: #fff;
+            color: $u-primary;
+          }
+
+          &.active::before {
+            position: absolute;
+            left: 0;
+            content: "";
+            width: 8rpx;
+            height: 32rpx;
+            top: 25rpx;
+            background: $u-primary;
+          }
+        }
+      }
     }
 
-    .sub-category-box {
-      .sub-category-header {
-        @include flex-space-between;
-        padding: 30rpx 20rpx;
+    .box-right {
+      width: 550rpx;
+      height: 100%;
+      box-sizing: border-box;
+      z-index: 1;
 
-        .title {
-          font-size: 28rpx;
-          font-weight: 700;
-        }
-        .more {
-          font-size: 22rpx;
-          color: #939393;
+      .category-image {
+        width: 510rpx;
+        box-sizing: border-box;
+        overflow: hidden;
+        position: relative;
+        margin: 30rpx 20rpx 0;
+
+        image {
+          width: 100%;
         }
       }
 
-      .sub-category-grid {
-        padding: 0 15rpx;
+      .sub-category-box {
+        .sub-category-header {
+          @include flex-space-between;
+          padding: 20rpx 20rpx;
 
-        .sub-category-item {
-          @include flex-center(column);
-          background: #fff;
+          .title {
+            font-size: 28rpx;
+            font-weight: bolder;
+          }
 
-          .sub-category-title {
-            margin: 15rpx 0;
-            font-size: 24rpx;
+          .more {
+            font-size: 22rpx;
+            color: #939393;
+          }
+        }
+
+        .sub-category-grid {
+          padding: 0 15rpx;
+
+          .sub-category-item {
+            @include flex-center(column);
+            background: #fff;
+
+            image {
+              text-align: center;
+              width: 150rpx;
+              height: 150rpx;
+              line-height: 150rpx;
+              font-size: 0;
+            }
+
+            .sub-category-title {
+              margin: 15rpx 0;
+              font-size: 22rpx;
+            }
           }
         }
       }
     }
   }
-}
 </style>

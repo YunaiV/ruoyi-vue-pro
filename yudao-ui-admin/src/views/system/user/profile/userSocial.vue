@@ -1,12 +1,12 @@
 <template>
   <el-table :data="socialUsers" :show-header="false">
     <el-table-column label="社交平台" align="left" width="120">
-      <template slot-scope="scope">
+      <template v-slot="scope">
         <img style="height:20px;vertical-align: middle;" :src="scope.row.img" /> {{ scope.row.title }}
       </template>
     </el-table-column>
     <el-table-column label="操作" align="left" >
-      <template slot-scope="scope">
+      <template v-slot="scope">
         <div v-if="scope.row.openid">
           已绑定
           <el-button size="large" type="text" @click="unbind(scope.row)">(解绑)</el-button>

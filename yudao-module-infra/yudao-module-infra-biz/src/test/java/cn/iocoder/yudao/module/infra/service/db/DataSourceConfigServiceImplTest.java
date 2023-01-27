@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.db;
 
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.crypto.symmetric.AES;
 import cn.iocoder.yudao.framework.mybatis.core.type.EncryptTypeHandler;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
@@ -9,7 +10,6 @@ import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigUpda
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.db.DataSourceConfigMapper;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
-import org.jasypt.encryption.StringEncryptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -24,7 +24,8 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.DATA_SOURCE_CONFIG_NOT_EXISTS;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
@@ -45,7 +46,7 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
     private DataSourceConfigMapper dataSourceConfigMapper;
 
     @MockBean
-    private StringEncryptor stringEncryptor;
+    private AES aes;
 
     @MockBean
     private DynamicDataSourceProperties dynamicDataSourceProperties;
@@ -53,9 +54,9 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
     @BeforeEach
     public void setUp() {
         // mock 一个空实现的 StringEncryptor，避免 EncryptTypeHandler 报错
-        ReflectUtil.setFieldValue(EncryptTypeHandler.class, "encryptor", stringEncryptor);
-        when(stringEncryptor.encrypt(anyString())).then((Answer<String>) invocation -> invocation.getArgument(0));
-        when(stringEncryptor.decrypt(anyString())).then((Answer<String>) invocation -> invocation.getArgument(0));
+        ReflectUtil.setFieldValue(EncryptTypeHandler.class, "aes", aes);
+        when(aes.encryptBase64(anyString())).then((Answer<String>) invocation -> invocation.getArgument(0));
+        when(aes.decryptStr(anyString())).then((Answer<String>) invocation -> invocation.getArgument(0));
     }
 
     @Test

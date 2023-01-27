@@ -1,10 +1,26 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { TenantPackageVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface TenantPackageVO {
+  id: number
+  name: string
+  status: number
+  remark: string
+  creator: string
+  updater: string
+  updateTime: string
+  menuIds: number[]
+  createTime: Date
+}
+
+export interface TenantPackagePageReqVO extends PageParam {
+  name?: string
+  status?: number
+  remark?: string
+  createTime?: Date[]
+}
 
 // 查询租户套餐列表
-export const getTenantPackageTypePageApi = (params) => {
+export const getTenantPackageTypePageApi = (params: TenantPackagePageReqVO) => {
   return request.get({ url: '/system/tenant-package/page', params })
 }
 
@@ -27,7 +43,7 @@ export const updateTenantPackageTypeApi = (data: TenantPackageVO) => {
 export const deleteTenantPackageTypeApi = (id: number) => {
   return request.delete({ url: '/system/tenant-package/delete?id=' + id })
 }
-// // 获取租户套餐精简信息列表
+// 获取租户套餐精简信息列表
 export const getTenantPackageList = () => {
   return request.get({ url: '/system/tenant-package/get-simple-list' })
 }

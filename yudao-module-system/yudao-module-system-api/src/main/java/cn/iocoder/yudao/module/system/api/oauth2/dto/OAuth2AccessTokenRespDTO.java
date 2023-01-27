@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * OAuth2.0 访问令牌的信息 Response DTO
@@ -34,6 +34,6 @@ public class OAuth2AccessTokenRespDTO implements Serializable {
     /**
      * 过期时间
      */
-    private Date expiresTime;
+    private LocalDateTime expiresTime;
 
 }

@@ -1,10 +1,41 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { ChannelVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface ChannelVO {
+  id: number
+  code: string
+  config: string
+  status: number
+  remark: string
+  feeRate: number
+  merchantId: number
+  appId: number
+  createTime: Date
+}
+
+export interface ChannelPageReqVO extends PageParam {
+  code?: string
+  status?: number
+  remark?: string
+  feeRate?: number
+  merchantId?: number
+  appId?: number
+  config?: string
+  createTime?: Date[]
+}
+
+export interface ChannelExportReqVO {
+  code?: string
+  status?: number
+  remark?: string
+  feeRate?: number
+  merchantId?: number
+  appId?: number
+  config?: string
+  createTime?: Date[]
+}
 
 // 查询列表支付渠道
-export const getChannelPageApi = (params) => {
+export const getChannelPageApi = (params: ChannelPageReqVO) => {
   return request.get({ url: '/pay/channel/page', params })
 }
 
@@ -34,6 +65,6 @@ export const deleteChannelApi = (id: number) => {
 }
 
 // 导出支付渠道
-export const exportChannelApi = (params) => {
+export const exportChannelApi = (params: ChannelExportReqVO) => {
   return request.download({ url: '/pay/channel/export-excel', params })
 }

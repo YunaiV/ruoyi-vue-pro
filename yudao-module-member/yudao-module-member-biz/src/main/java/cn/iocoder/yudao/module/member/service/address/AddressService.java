@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.member.service.address;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.member.controller.app.address.vo.*;
+import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreateReqVO;
+import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.address.AddressDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 用户收件地址 Service 接口
@@ -55,5 +56,12 @@ public interface AddressService {
      */
     List<AddressDO> getAddressList(Long userId);
 
+    /**
+     * 获得用户默认的收件地址
+     *
+     * @param userId 用户编号
+     * @return 用户收件地址
+     */
     AddressDO getDefaultUserAddress(Long userId);
+
 }

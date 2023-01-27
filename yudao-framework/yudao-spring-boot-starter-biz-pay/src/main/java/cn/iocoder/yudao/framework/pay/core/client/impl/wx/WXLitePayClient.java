@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.wx;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
@@ -25,6 +26,8 @@ import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -49,7 +52,7 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
     @Override
     protected void doInit() {
         WxPayConfig payConfig = new WxPayConfig();
-        BeanUtil.copyProperties(config, payConfig, "keyContent");
+        BeanUtil.copyProperties(config, payConfig, "privateKeyContent","privateCertContent");
         payConfig.setTradeType(WxPayConstants.TradeType.JSAPI); // 设置使用 JS API 支付方式
 //        if (StrUtil.isNotEmpty(config.getKeyContent())) {
 //            payConfig.setKeyContent(config.getKeyContent().getBytes(StandardCharsets.UTF_8));
@@ -118,7 +121,7 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .setTotal(reqDTO
                         .getAmount()
                         .intValue())); // 单位分
-        request.setTimeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ssXXX")); // v3的时间格式
+        request.setTimeExpire(DateUtil.format(Date.from(reqDTO.getExpireTime().atZone(ZoneId.systemDefault()).toInstant()), "yyyy-MM-dd'T'HH:mm:ssXXX")); // v3的时间格式
         request.setPayer(new WxPayUnifiedOrderV3Request.Payer().setOpenid(getOpenid(reqDTO)));
         request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
         request.setNotifyUrl(reqDTO.getNotifyUrl());
@@ -166,8 +169,9 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
         return PayOrderNotifyRespDTO
                 .builder()
                 .orderExtensionNo(result.getOutTradeNo())
-                .channelOrderNo(result.getTradeState())
-                .successTime(DateUtil.parse(result.getSuccessTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
+                .channelOrderNo(result.getTransactionId())
+                .channelUserId(result.getPayer().getOpenid())
+                .successTime(LocalDateTimeUtil.parse(result.getSuccessTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
                 .data(data.getBody())
                 .build();
     }
@@ -181,7 +185,7 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .orderExtensionNo(notifyResult.getOutTradeNo())
                 .channelOrderNo(notifyResult.getTransactionId())
                 .channelUserId(notifyResult.getOpenid())
-                .successTime(DateUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"))
+                .successTime(LocalDateTimeUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"))
                 .data(data.getBody())
                 .build();
 

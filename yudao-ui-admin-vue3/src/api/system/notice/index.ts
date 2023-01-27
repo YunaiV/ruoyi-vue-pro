@@ -1,10 +1,23 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { NoticeVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface NoticeVO {
+  id: number
+  title: string
+  type: number
+  content: string
+  status: number
+  remark: string
+  creator: string
+  createTime: Date
+}
+
+export interface NoticePageReqVO extends PageParam {
+  title?: string
+  status?: number
+}
 
 // 查询公告列表
-export const getNoticePageApi = (params) => {
+export const getNoticePageApi = (params: NoticePageReqVO) => {
   return request.get({ url: '/system/notice/page', params })
 }
 

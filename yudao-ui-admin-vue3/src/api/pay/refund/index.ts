@@ -1,10 +1,92 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { RefundVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface RefundVO {
+  id: number
+  merchantId: number
+  appId: number
+  channelId: number
+  channelCode: string
+  orderId: string
+  tradeNo: string
+  merchantOrderId: string
+  merchantRefundNo: string
+  notifyUrl: string
+  notifyStatus: number
+  status: number
+  type: number
+  payAmount: number
+  refundAmount: number
+  reason: string
+  userIp: string
+  channelOrderNo: string
+  channelRefundNo: string
+  channelErrorCode: string
+  channelErrorMsg: string
+  channelExtras: string
+  expireTime: Date
+  successTime: Date
+  notifyTime: Date
+  createTime: Date
+}
+
+export interface RefundPageReqVO extends PageParam {
+  merchantId?: number
+  appId?: number
+  channelId?: number
+  channelCode?: string
+  orderId?: string
+  tradeNo?: string
+  merchantOrderId?: string
+  merchantRefundNo?: string
+  notifyUrl?: string
+  notifyStatus?: number
+  status?: number
+  type?: number
+  payAmount?: number
+  refundAmount?: number
+  reason?: string
+  userIp?: string
+  channelOrderNo?: string
+  channelRefundNo?: string
+  channelErrorCode?: string
+  channelErrorMsg?: string
+  channelExtras?: string
+  expireTime?: Date[]
+  successTime?: Date[]
+  notifyTime?: Date[]
+  createTime?: Date[]
+}
+
+export interface PayRefundExportReqVO {
+  merchantId?: number
+  appId?: number
+  channelId?: number
+  channelCode?: string
+  orderId?: string
+  tradeNo?: string
+  merchantOrderId?: string
+  merchantRefundNo?: string
+  notifyUrl?: string
+  notifyStatus?: number
+  status?: number
+  type?: number
+  payAmount?: number
+  refundAmount?: number
+  reason?: string
+  userIp?: string
+  channelOrderNo?: string
+  channelRefundNo?: string
+  channelErrorCode?: string
+  channelErrorMsg?: string
+  channelExtras?: string
+  expireTime?: Date[]
+  successTime?: Date[]
+  notifyTime?: Date[]
+  createTime?: Date[]
+}
 
 // 查询列表退款订单
-export const getRefundPageApi = (params) => {
+export const getRefundPageApi = (params: RefundPageReqVO) => {
   return request.get({ url: '/pay/refund/page', params })
 }
 
@@ -29,6 +111,6 @@ export const deleteRefundApi = (id: number) => {
 }
 
 // 导出退款订单
-export const exportRefundApi = (params) => {
+export const exportRefundApi = (params: PayRefundExportReqVO) => {
   return request.download({ url: '/pay/refund/export-excel', params })
 }

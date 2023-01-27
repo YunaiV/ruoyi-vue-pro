@@ -651,10 +651,10 @@
 <script>
 import { isArray } from 'util'
 import TreeNodeDialog from './TreeNodeDialog'
-import { isNumberStr } from '@/utils/index'
+import { isNumberStr } from '@/utils'
 import IconsDialog from './IconsDialog'
 import {
-  inputComponents, selectComponents, layoutComponents
+  inputComponents, selectComponents
 } from '@/components/generator/config'
 import { saveFormConf } from '@/utils/db'
 
@@ -1021,7 +1021,7 @@ export default {
   .el-date-editor {
     width: 227px;
   }
-  ::v-deep .el-icon-time {
+  :deep(.el-icon-time) {
     display: none;
   }
 }

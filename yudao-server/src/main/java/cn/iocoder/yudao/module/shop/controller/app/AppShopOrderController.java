@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.shop.controller.app;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
-import cn.iocoder.yudao.module.pay.service.notify.vo.PayNotifyOrderReqVO;
-import cn.iocoder.yudao.module.pay.service.notify.vo.PayRefundOrderReqVO;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
-import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.util.PaySeqUtils;
 import cn.iocoder.yudao.module.shop.controller.app.vo.AppShopOrderCreateRespVO;
 import io.swagger.annotations.Api;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
@@ -49,7 +48,7 @@ public class AppShopOrderController {
         reqDTO.setSubject("标题：" + shopOrderId);
         reqDTO.setBody("内容：" + shopOrderId);
         reqDTO.setAmount(200); // 单位：分
-        reqDTO.setExpireTime(DateUtils.addTime(Duration.ofDays(1)));
+        reqDTO.setExpireTime(LocalDateTime.now().plusDays(1));
         Long payOrderId = payOrderService.createPayOrder(reqDTO);
 
         // 拼接返回
@@ -59,14 +58,14 @@ public class AppShopOrderController {
 
     @PostMapping("/pay-notify")
     @ApiOperation("支付回调")
-    public CommonResult<Boolean> payNotify(@RequestBody @Valid PayNotifyOrderReqVO reqVO) {
+    public CommonResult<Boolean> payNotify(@RequestBody @Valid PayOrderNotifyReqDTO reqVO) {
         log.info("[payNotify][回调成功]");
         return success(true);
     }
 
     @PostMapping("/refund-notify")
     @ApiOperation("退款回调")
-    public CommonResult<Boolean> refundNotify(@RequestBody @Valid PayRefundOrderReqVO reqVO) {
+    public CommonResult<Boolean> refundNotify(@RequestBody @Valid PayRefundNotifyReqDTO reqVO) {
         log.info("[refundNotify][回调成功]");
         return success(true);
     }

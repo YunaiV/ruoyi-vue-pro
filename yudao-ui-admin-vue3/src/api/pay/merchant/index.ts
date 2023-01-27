@@ -1,10 +1,35 @@
-import { useAxios } from '@/hooks/web/useAxios'
-import type { MerchantVO } from './types'
+import request from '@/config/axios'
 
-const request = useAxios()
+export interface MerchantVO {
+  id: number
+  no: string
+  name: string
+  shortName: string
+  status: number
+  remark: string
+  createTime: Date
+}
+
+export interface MerchantPageReqVO extends PageParam {
+  no?: string
+  name?: string
+  shortName?: string
+  status?: number
+  remark?: string
+  createTime?: Date[]
+}
+
+export interface MerchantExportReqVO {
+  no?: string
+  name?: string
+  shortName?: string
+  status?: number
+  remark?: string
+  createTime?: Date[]
+}
 
 // 查询列表支付商户
-export const getMerchantPageApi = (params) => {
+export const getMerchantPageApi = (params: MerchantPageReqVO) => {
   return request.get({ url: '/pay/merchant/page', params })
 }
 
@@ -39,7 +64,7 @@ export const deleteMerchantApi = (id: number) => {
 }
 
 // 导出支付商户
-export const exportMerchantApi = (params) => {
+export const exportMerchantApi = (params: MerchantExportReqVO) => {
   return request.download({ url: '/pay/merchant/export-excel', params })
 }
 // 支付商户状态修改

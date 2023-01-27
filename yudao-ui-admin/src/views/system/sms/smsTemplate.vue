@@ -57,30 +57,30 @@
       <el-table-column label="模板名称" align="center" prop="name" />
       <el-table-column label="模板内容" align="center" prop="content" width="300" />
       <el-table-column label="短信类型" align="center" prop="type">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE" :value="scope.row.type"/>
         </template>
       </el-table-column>
       <el-table-column label="开启状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="短信 API 的模板编号" align="center" prop="apiTemplateId" width="180" />
       <el-table-column label="短信渠道" align="center" width="120">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <div>{{ formatChannelSignature(scope.row.channelId) }}</div>
           <dict-tag :type="DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE" :value="scope.row.channelCode"/>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-share" @click="handleSendSms(scope.row)"
                      v-hasPermi="['system:sms-template:send-sms']">测试</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -216,7 +216,7 @@ export default {
       },
       sendSmsRules: {
         mobile: [{ required: true, message: "手机不能为空", trigger: "blur" }],
-        templateCode: [{ required: true, message: "手机不能为空", trigger: "blur" }],
+        templateCode: [{ required: true, message: "模版编码不能为空", trigger: "blur" }],
         templateParams: { }
       }
     };

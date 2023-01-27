@@ -106,7 +106,7 @@ public class OAuth2OpenController {
                                                                      @RequestParam(value = "scope", required = false) String scope, // 密码模式
                                                                      @RequestParam(value = "refresh_token", required = false) String refreshToken) { // 刷新模式
         List<String> scopes = OAuth2Utils.buildScopes(scope);
-        // 授权类型
+        // 1.1 校验授权类型
         OAuth2GrantTypeEnum grantTypeEnum = OAuth2GrantTypeEnum.getByGranType(grantType);
         if (grantTypeEnum == null) {
             throw exception0(BAD_REQUEST.getCode(), StrUtil.format("未知授权类型({})", grantType));
@@ -115,12 +115,12 @@ public class OAuth2OpenController {
             throw exception0(BAD_REQUEST.getCode(), "Token 接口不支持 implicit 授权模式");
         }
 
-        // 校验客户端
+        // 1.2 校验客户端
         String[] clientIdAndSecret = obtainBasicAuthorization(request);
         OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientIdAndSecret[0], clientIdAndSecret[1],
                 grantType, scopes, redirectUri);
 
-        // 根据授权模式，获取访问令牌
+        // 2. 根据授权模式，获取访问令牌
         OAuth2AccessTokenDO accessTokenDO;
         switch (grantTypeEnum) {
             case AUTHORIZATION_CODE:

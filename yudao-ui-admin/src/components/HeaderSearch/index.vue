@@ -88,7 +88,6 @@ export default {
         threshold: 0.4,
         location: 0,
         distance: 100,
-        maxPatternLength: 32,
         minMatchCharLength: 1,
         keys: [{
           name: 'title',
@@ -167,7 +166,7 @@ export default {
     display: inline-block;
     vertical-align: middle;
 
-    ::v-deep .el-input__inner {
+    :deep(.el-input__inner) {
       border-radius: 0;
       border: 0;
       padding-left: 0;

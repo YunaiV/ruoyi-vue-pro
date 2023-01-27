@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -114,7 +114,7 @@ public class SmsLogDO extends BaseDO {
     /**
      * 发送时间
      */
-    private Date sendTime;
+    private LocalDateTime sendTime;
     /**
      * 发送结果的编码
      *
@@ -162,7 +162,7 @@ public class SmsLogDO extends BaseDO {
     /**
      * 接收时间
      */
-    private Date receiveTime;
+    private LocalDateTime receiveTime;
     /**
      * 短信 API 接收结果的编码
      */

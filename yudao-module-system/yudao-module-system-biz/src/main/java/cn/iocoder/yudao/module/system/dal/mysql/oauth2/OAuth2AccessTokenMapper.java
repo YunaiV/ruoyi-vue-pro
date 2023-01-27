@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2Acc
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -26,7 +26,7 @@ public interface OAuth2AccessTokenMapper extends BaseMapperX<OAuth2AccessTokenDO
                 .eqIfPresent(OAuth2AccessTokenDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(OAuth2AccessTokenDO::getUserType, reqVO.getUserType())
                 .likeIfPresent(OAuth2AccessTokenDO::getClientId, reqVO.getClientId())
-                .gt(OAuth2AccessTokenDO::getExpiresTime, new Date())
+                .gt(OAuth2AccessTokenDO::getExpiresTime, LocalDateTime.now())
                 .orderByDesc(OAuth2AccessTokenDO::getId));
     }
 

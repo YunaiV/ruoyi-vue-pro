@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @ApiModel("管理后台 - 代码生成表定义 Response VO")
 @Data
@@ -21,9 +21,9 @@ public class CodegenTableRespVO extends CodegenTableBaseVO {
     private Integer dataSourceConfigId;
 
     @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ApiModelProperty(value = "更新时间", required = true)
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
 }

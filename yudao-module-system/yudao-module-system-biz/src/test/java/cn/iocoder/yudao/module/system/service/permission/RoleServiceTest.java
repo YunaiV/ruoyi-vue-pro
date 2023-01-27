@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.system.service.permission;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
@@ -19,12 +18,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -60,8 +58,6 @@ public class RoleServiceTest extends BaseDbUnitTest {
         Map<Long, RoleDO> roleCache = roleService.getRoleCache();
         assertPojoEquals(roleDO1, roleCache.get(roleDO1.getId()));
         assertPojoEquals(roleDO2, roleCache.get(roleDO2.getId()));
-        // 断言 maxUpdateTime 缓存
-        assertEquals(max(roleDO1.getUpdateTime(), roleDO2.getUpdateTime()), roleService.getMaxUpdateTime());
     }
 
     @Test
@@ -128,7 +124,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
         Long roleId = roleDO.getId();
 
         //调用
-        Set<Long> deptIdSet = Arrays.asList(1L, 2L, 3L, 4L, 5L).stream().collect(Collectors.toSet());
+        Set<Long> deptIdSet = new HashSet<>(Arrays.asList(1L, 2L, 3L, 4L, 5L));
         roleService.updateRoleDataScope(roleId, DataScopeEnum.DEPT_CUSTOM.getScope(), deptIdSet);
 
         //断言
@@ -136,7 +132,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
         assertEquals(DataScopeEnum.DEPT_CUSTOM.getScope(), newRoleDO.getDataScope());
 
         Set<Long> newDeptIdSet = newRoleDO.getDataScopeDeptIds();
-        assertTrue(deptIdSet.size() == newDeptIdSet.size());
+        assertEquals(deptIdSet.size(), newDeptIdSet.size());
         deptIdSet.stream().forEach(d -> assertTrue(newDeptIdSet.contains(d)));
 
         verify(roleProducer).sendRoleRefreshMessage();
@@ -165,7 +161,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
             o.setName("土豆");
             o.setCode("tudou");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setCreateTime(DateUtils.buildTime(2022, 2, 8));
+            o.setCreateTime(buildTime(2022, 2, 8));
         });
         roleMapper.insert(dbRole);
         // 测试 name 不匹配
@@ -173,13 +169,13 @@ public class RoleServiceTest extends BaseDbUnitTest {
         // 测试 code 不匹配
         roleMapper.insert(cloneIgnoreId(dbRole, o -> o.setCode("hong")));
         // 测试 createTime 不匹配
-        roleMapper.insert(cloneIgnoreId(dbRole, o -> o.setCreateTime(DateUtils.buildTime(2022, 2, 16))));
+        roleMapper.insert(cloneIgnoreId(dbRole, o -> o.setCreateTime(buildTime(2022, 2, 16))));
         // 准备参数
         RoleExportReqVO reqVO = new RoleExportReqVO();
         reqVO.setName("土豆");
         reqVO.setCode("tu");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new Date[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
 
         // 调用
         List<RoleDO> list = roleService.getRoleList(reqVO);
@@ -195,7 +191,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
             o.setName("土豆");
             o.setCode("tudou");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setCreateTime(DateUtils.buildTime(2022, 2, 8));
+            o.setCreateTime(buildTime(2022, 2, 8));
         });
         roleMapper.insert(dbRole);
         // 测试 name 不匹配
@@ -203,13 +199,13 @@ public class RoleServiceTest extends BaseDbUnitTest {
         // 测试 code 不匹配
         roleMapper.insert(cloneIgnoreId(dbRole, o -> o.setCode("hong")));
         // 测试 createTime 不匹配
-        roleMapper.insert(cloneIgnoreId(dbRole, o -> o.setCreateTime(DateUtils.buildTime(2022, 2, 16))));
+        roleMapper.insert(cloneIgnoreId(dbRole, o -> o.setCreateTime(buildTime(2022, 2, 16))));
         // 准备参数
         RolePageReqVO reqVO = new RolePageReqVO();
         reqVO.setName("土豆");
         reqVO.setCode("tu");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new Date[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
 
         // 调用
         PageResult<RoleDO> pageResult = roleService.getRolePage(reqVO);

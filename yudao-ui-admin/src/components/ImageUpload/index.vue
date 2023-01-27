@@ -85,8 +85,8 @@ export default {
     value: {
       handler(val) {
         if (val) {
-          // 首先将值转为数组
-          const list = Array.isArray(val) ? val : this.value.split(',');
+          // 首先将值转为数组, 当只穿了一个图片时，会报map方法错误
+          const list = Array.isArray(val) ? val :  Array.isArray(this.value.split(',')) ? this.value.split(','): Array.of(this.value);
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
             if (typeof item === "string") {
@@ -141,8 +141,7 @@ export default {
         }
         isImg = this.fileType.some(type => {
           if (file.type.indexOf(type) > -1) return true;
-          if (fileExtension && fileExtension.indexOf(type) > -1) return true;
-          return false;
+          return !!(fileExtension && fileExtension.indexOf(type) > -1);
         });
       } else {
         isImg = file.type.indexOf("image") > -1;
@@ -190,16 +189,15 @@ export default {
 </script>
 <style scoped lang="scss">
 // .el-upload--picture-card 控制加号部分
-::v-deep.hide .el-upload--picture-card {
+:deep(.hide .el-upload--picture-card) {
   display: none;
 }
 // 去掉动画效果
-::v-deep .el-list-enter-active,
-::v-deep .el-list-leave-active {
+:deep(.el-list-enter-active, .el-list-leave-active) {
   transition: all 0s;
 }
 
-::v-deep .el-list-enter, .el-list-leave-active {
+:deep(.el-list-enter, .el-list-leave-active) {
   opacity: 0;
   transform: translateY(0);
 }

@@ -1,20 +1,24 @@
 package cn.iocoder.yudao.module.product.convert.sku;
 
-import java.util.*;
-
-import cn.hutool.json.JSONUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.*;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuOptionRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuDetailRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
-import org.springframework.util.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
- * 商品sku Convert
+ * 商品 SKU Convert
  *
  * @author 芋道源码
  */
@@ -23,38 +27,67 @@ public interface ProductSkuConvert {
 
     ProductSkuConvert INSTANCE = Mappers.getMapper(ProductSkuConvert.class);
 
-    @Mapping(source = "properties", target = "properties", qualifiedByName = "translateStringFromList")
-    ProductSkuDO convert(ProductSkuCreateReqVO bean);
+    ProductSkuDO convert(ProductSkuCreateOrUpdateReqVO bean);
 
-    @Mapping(source = "properties", target = "properties", qualifiedByName = "translateStringFromList")
-    ProductSkuDO convert(ProductSkuUpdateReqVO bean);
-
-    @Mapping(source = "properties", target = "properties", qualifiedByName = "tokenizeToBeanArray")
     ProductSkuRespVO convert(ProductSkuDO bean);
-
-    @Mapping(source = "properties", target = "properties", qualifiedByName = "tokenizeToExcelBeanArray")
-    ProductSkuExcelVO convertToExcelVO(ProductSkuDO bean);
 
     List<ProductSkuRespVO> convertList(List<ProductSkuDO> list);
 
-    List<ProductSkuDO> convertSkuDOList(List<ProductSkuCreateReqVO> list);
+    List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list);
 
-    PageResult<ProductSkuRespVO> convertPage(PageResult<ProductSkuDO> page);
-
-    List<ProductSkuExcelVO> convertList02(List<ProductSkuDO> list);
-
-    @Named("tokenizeToBeanArray")
-    default List<ProductSkuBaseVO.Property> translatePropertyArrayFromString(String properties) {
-        return JSONUtil.toList(properties, ProductSkuBaseVO.Property.class);
+    default List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list, Long spuId, String spuName) {
+        List<ProductSkuDO> result = convertList06(list);
+        result.forEach(item -> item.setSpuId(spuId).setSpuName(spuName));
+        return result;
     }
 
-    @Named("tokenizeToExcelBeanArray")
-    default List<ProductSkuExcelVO.Property> translateExcelPropertyArrayFromString(String properties) {
-        return JSONUtil.toList(properties, ProductSkuExcelVO.Property.class);
+    ProductSkuRespDTO convert02(ProductSkuDO bean);
+
+    List<ProductSpuDetailRespVO.Sku> convertList03(List<ProductSkuDO> list);
+
+    List<ProductSkuRespDTO> convertList04(List<ProductSkuDO> list);
+
+    List<ProductSkuOptionRespVO> convertList05(List<ProductSkuDO> skus);
+
+    /**
+     * 获得 SPU 的库存变化 Map
+     *
+     * @param items SKU 库存变化
+     * @param skus SKU 列表
+     * @return SPU 的库存变化 Map
+     */
+    default Map<Long, Integer> convertSpuStockMap(List<ProductSkuUpdateStockReqDTO.Item> items,
+                                                  List<ProductSkuDO> skus) {
+        Map<Long, Long> skuIdAndSpuIdMap = convertMap(skus, ProductSkuDO::getId, ProductSkuDO::getSpuId); // SKU 与 SKU 编号的 Map 关系
+        Map<Long, Integer> spuIdAndStockMap = new HashMap<>(); // SPU 的库存变化 Map 关系
+        items.forEach(item -> {
+            Long spuId = skuIdAndSpuIdMap.get(item.getId());
+            if (spuId == null) {
+                return;
+            }
+            Integer stock = spuIdAndStockMap.getOrDefault(spuId, 0) + item.getIncrCount();
+            spuIdAndStockMap.put(spuId, stock);
+        });
+        return spuIdAndStockMap;
     }
 
-    @Named("translateStringFromList")
-    default String translatePropertyStringFromList(List<ProductSkuBaseVO.Property> properties) {
-        return JSONUtil.toJsonStr(properties);
+    default Collection<Long> convertPropertyValueIds(List<ProductSkuDO> list) {
+        if (CollUtil.isEmpty(list)) {
+            return new HashSet<>();
+        }
+        return list.stream().filter(item -> item.getProperties() != null)
+                .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
+                .map(ProductSkuDO.Property::getValueId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
+                .collect(Collectors.toSet());
     }
+
+    default String buildPropertyKey(ProductSkuDO bean) {
+        if (CollUtil.isEmpty(bean.getProperties())) {
+            return StrUtil.EMPTY;
+        }
+        List<ProductSkuDO.Property> properties = new ArrayList<>(bean.getProperties());
+        properties.sort(Comparator.comparing(ProductSkuDO.Property::getValueId));
+        return properties.stream().map(m -> String.valueOf(m.getValueId())).collect(Collectors.joining());
+    }
+
 }

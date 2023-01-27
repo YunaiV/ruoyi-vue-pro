@@ -1,6 +1,6 @@
 import type { App } from 'vue'
-import { useCache } from '@/hooks/web/useCache'
-import { useI18n } from '@/hooks/web/useI18n'
+import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
+
 const { t } = useI18n() // 国际化
 
 export function hasPermi(app: App<Element>) {
@@ -8,7 +8,7 @@ export function hasPermi(app: App<Element>) {
     const { wsCache } = useCache()
     const { value } = binding
     const all_permission = '*:*:*'
-    const permissions = wsCache.get('user').permissions
+    const permissions = wsCache.get(CACHE_KEY.USER).permissions
 
     if (value && value instanceof Array && value.length > 0) {
       const permissionFlag = value

@@ -16,7 +16,6 @@ public interface SmsFrameworkErrorCodeConstants {
     // ========== 权限 / 限流等相关 2001000100 ==========
 
     ErrorCode SMS_PERMISSION_DENY = new ErrorCode(2001000100, "没有发送短信的权限");
-    // 云片：可以配置 IP 白名单，只有在白名单中才可以发送短信
     ErrorCode SMS_IP_DENY = new ErrorCode(2001000100, "IP 不允许发送短信");
 
     // 阿里云：将短信发送频率限制在正常的业务限流范围内。默认短信验证码：使用同一签名，对同一个手机号验证码，支持 1 条 / 分钟，5 条 / 小时，累计 10 条 / 天。

@@ -1,96 +1,65 @@
-import { reactive } from 'vue'
-import { DICT_TYPE } from '@/utils/dict'
-import { required } from '@/utils/formRules'
-import { useI18n } from '@/hooks/web/useI18n'
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
-// 国际化
-const { t } = useI18n()
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
+const { t } = useI18n() // 国际化
+
 // 表单校验
 export const dictTypeRules = reactive({
   name: [required],
   type: [required]
 })
 // 新增 + 修改
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: null,
+  action: true,
+  actionWidth: '140px',
+  searchSpan: 12,
+  columns: [
+    {
+      title: '字典名称',
+      field: 'name',
+      isSearch: true
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '字典名称',
-    field: 'name',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '字典类型',
-    field: 'type',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: t('common.status'),
-    field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS
-  },
-  {
-    label: t('common.createTime'),
-    field: 'createTime',
-    table: {
-      show: false
+    {
+      title: '字典类型',
+      field: 'type',
+      isSearch: true
     },
-    form: {
-      show: false
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      dictClass: 'number',
+      table: {
+        width: 70
+      }
     },
-    detail: {
-      show: false
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate',
+      isForm: false,
+      isTable: false,
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
+      }
     },
-    search: {
-      show: true,
-      component: 'DatePicker',
-      componentProps: {
-        type: 'datetimerange',
-        valueFormat: 'YYYY-MM-DD HH:mm:ss',
-        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]
+    {
+      title: t('form.remark'),
+      field: 'remark',
+      isTable: false,
+      form: {
+        componentProps: {
+          type: 'textarea',
+          rows: 4
+        },
+        colProps: {
+          span: 24
+        }
       }
     }
-  },
-  {
-    label: t('form.remark'),
-    field: 'remark',
-    table: {
-      show: false
-    },
-    form: {
-      componentProps: {
-        type: 'textarea',
-        rows: 4
-      },
-      colProps: {
-        span: 24
-      }
-    }
-  },
-  {
-    field: 'action',
-    width: '180px',
-    label: t('table.action'),
-    form: {
-      show: false
-    },
-    detail: {
-      show: false
-    }
-  }
-])
-
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

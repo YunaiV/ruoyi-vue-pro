@@ -21,6 +21,12 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Web 相关 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -35,7 +41,7 @@
 
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <artifactId>knife4j-openapi2-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
             <groupId>io.swagger</groupId>
@@ -65,6 +71,12 @@
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-ratelimiter</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，主要是 GlobalExceptionHandler 使用 -->
+        </dependency>
+
+        <!-- xss -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
         </dependency>
 
     </dependencies>

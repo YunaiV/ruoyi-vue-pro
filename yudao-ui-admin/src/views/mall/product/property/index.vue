@@ -3,14 +3,8 @@
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="规格名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入规格名称" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="开启状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择开启状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                     :key="dict.value" :label="dict.label" :value="dict.value"/>
-        </el-select>
+      <el-form-item label="名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="创建时间" prop="createTime">
         <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
@@ -33,17 +27,15 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="规格名称" align="center" prop="name" />
-       <el-table-column label="规格名称" align="center" prop="propertyValueList">
+      <el-table-column label="编号" align="center" prop="id" />
+      <el-table-column label="名称" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <span>{{formatList(scope.row.propertyValueList)}}</span>
-        </template>
-       </el-table-column>
-      <el-table-column label="开启状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+          <router-link :to="'/property/value/' + scope.row.id" class="link-type">
+            <span>{{ scope.row.name }}</span>
+          </router-link>
         </template>
       </el-table-column>
+      <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -65,36 +57,12 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="规格名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入规格名称" />
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入名称" />
         </el-form-item>
-        <el-form-item label="开启状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                      :key="dict.value" :label="parseInt(dict.value)">{{ dict.label }}
-            </el-radio>
-          </el-radio-group>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" placeholder="备注" />
         </el-form-item>
-        <el-form-item label="属性值">
-          <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="addPropertyValue()">添加</el-button>
-        </el-form-item>
-        <el-form-item
-            v-for="(domain, index) in form.propertyValueList"
-            :key="domain.key"
-            :prop="'propertyValueList.' + index + '.name'"
-            :rules="{
-              required: true, message: '属性值不能为空', trigger: 'blur'
-            }"
-          >
-            <el-row>
-              <el-col :span="18">
-                <el-input v-model="domain.name" size="mini"></el-input>
-              </el-col>
-              <el-col :span="6">
-                <el-button style="margin-left: 20px;" size="mini" @click.prevent="removePropertyValue(domain)">删除</el-button>
-              </el-col>
-            </el-row>
-          </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -105,7 +73,7 @@
 </template>
 
 <script>
-import { createProperty, updateProperty, deleteProperty, getProperty, getPropertyPage, exportPropertyExcel } from "@/api/mall/product/property";
+import { createProperty, updateProperty, deleteProperty, getProperty, getPropertyPage } from "@/api/mall/product/property";
 
 export default {
   name: "Property",
@@ -115,13 +83,11 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
       total: 0,
-      // 规格名称列表
+      // 属性项列表
       list: [],
       // 弹出层标题
       title: "",
@@ -132,19 +98,19 @@ export default {
         pageNo: 1,
         pageSize: 10,
         name: null,
-        status: null,
         createTime: []
       },
       // 表单参数
       form: {
         name:'',
-        status:'',
-        propertyValueList: [{
-          name: ''
-        }],
+        remark:"",
+        id: null,
       },
       // 表单校验
       rules: {
+        name: [
+          { required: true, message: "名称不能为空", trigger: "blur" }
+        ]
       }
     };
   },
@@ -170,12 +136,9 @@ export default {
     /** 表单重置 */
     reset() {
       this.form = {
-        id: undefined,
-        name: undefined,
-        status: undefined,
-        propertyValueList: [{
-          name: ''
-        }]
+        name:'',
+        remark:"",
+        id: null,
       };
       this.resetForm("form");
     },
@@ -193,7 +156,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加规格";
+      this.title = "添加属性项";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -202,7 +165,7 @@ export default {
       getProperty(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改规格";
+        this.title = "修改属性项";
       });
     },
     /** 提交按钮 */
@@ -231,49 +194,13 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$modal.confirm('是否确认删除规格名称为"' + row.name + '"的数据项?').then(function() {
+      this.$modal.confirm('是否确认删除名称为"' + row.name + '"的数据项?').then(function() {
           return deleteProperty(id);
         }).then(() => {
           this.getList();
           this.$modal.msgSuccess("删除成功");
         }).catch(() => {});
     },
-    /** 导出按钮操作 */
-    handleExport() {
-      // 处理查询参数
-      let params = {...this.queryParams};
-      params.pageNo = undefined;
-      params.pageSize = undefined;
-      // 执行导出
-      this.$modal.confirm('是否确认导出所有规格名称数据项?').then(() => {
-          this.exportLoading = true;
-          return exportPropertyExcel(params);
-        }).then(response => {
-          this.$download.excel(response, '规格名称.xls');
-          this.exportLoading = false;
-        }).catch(() => {});
-    },
-    removePropertyValue(item) {
-      var index = this.form.propertyValueList.indexOf(item)
-      if (index !== -1) {
-        this.form.propertyValueList.splice(index, 1)
-      }
-    },
-    addPropertyValue() {
-      this.form.propertyValueList.push({
-        name: ''
-      });
-    },
-    formatList(list) {
-      let str = ''
-      for (var i = 0; i < list.length; i++) {
-        str += list[i].name;
-        if(i != list.length-1){
-          str+="/";
-        }
-      }
-      return str
-    }
   }
 };
 </script>

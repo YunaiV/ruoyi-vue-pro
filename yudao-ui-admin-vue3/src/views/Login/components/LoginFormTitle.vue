@@ -1,6 +1,9 @@
-<script lang="ts" setup>
-import { computed, unref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
+<template>
+  <h2 class="mb-3 text-2xl font-bold text-center xl:text-3xl enter-x xl:text-center">
+    {{ getFormTitle }}
+  </h2>
+</template>
+<script setup lang="ts">
 import { LoginStateEnum, useLoginState } from './useLogin'
 
 const { t } = useI18n()
@@ -18,8 +21,3 @@ const getFormTitle = computed(() => {
   return titleObj[unref(getLoginState)]
 })
 </script>
-<template>
-  <h2 class="mb-3 text-2xl font-bold text-center xl:text-3xl enter-x xl:text-center">
-    {{ getFormTitle }}
-  </h2>
-</template>

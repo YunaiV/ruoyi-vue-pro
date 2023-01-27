@@ -1,0 +1,23 @@
+@import './var.css';
+@import './vxe.css';
+@import 'element-plus/theme-chalk/dark/css-vars.css';
+
+.reset-margin [class*='el-icon'] + span {
+  margin-left: 2px !important;
+}
+
+/* nprogress 适配 element-plus 的主题色 */
+#nprogress {
+  & .bar {
+    background-color: var(--el-color-primary) !important;
+  }
+
+  & .peg {
+    box-shadow: 0 0 10px var(--el-color-primary), 0 0 5px var(--el-color-primary) !important;
+  }
+
+  & .spinner-icon {
+    border-top-color: var(--el-color-primary);
+    border-left-color: var(--el-color-primary);
+  }
+}

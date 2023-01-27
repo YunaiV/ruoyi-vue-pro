@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -44,7 +45,7 @@ public class OAuth2ApproveServiceImpl implements OAuth2ApproveService {
         Assert.notNull(clientDO, "客户端不能为空"); // 防御性编程
         if (CollUtil.containsAll(clientDO.getAutoApproveScopes(), requestedScopes)) {
             // gh-877 - if all scopes are auto approved, approvals still need to be added to the approval store.
-            Date expireTime = DateUtils.addDate(Calendar.SECOND, TIMEOUT);
+            LocalDateTime expireTime = LocalDateTime.now().plusSeconds(TIMEOUT);
             for (String scope : requestedScopes) {
                 saveApprove(userId, userType, clientId, scope, true, expireTime);
             }
@@ -68,8 +69,8 @@ public class OAuth2ApproveServiceImpl implements OAuth2ApproveService {
 
         // 更新批准的信息
         boolean success = false; // 需要至少有一个同意
-        Date expireTime = DateUtils.addDate(Calendar.SECOND, TIMEOUT);
-        for (Map.Entry<String, Boolean> entry :requestedScopes.entrySet()) {
+        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(TIMEOUT);
+        for (Map.Entry<String, Boolean> entry : requestedScopes.entrySet()) {
             if (entry.getValue()) {
                 success = true;
             }
@@ -88,7 +89,7 @@ public class OAuth2ApproveServiceImpl implements OAuth2ApproveService {
 
     @VisibleForTesting
     void saveApprove(Long userId, Integer userType, String clientId,
-                     String scope, Boolean approved, Date expireTime) {
+                     String scope, Boolean approved, LocalDateTime expireTime) {
         // 先更新
         OAuth2ApproveDO approveDO = new OAuth2ApproveDO().setUserId(userId).setUserType(userType)
                 .setClientId(clientId).setScope(scope).setApproved(approved).setExpiresTime(expireTime);

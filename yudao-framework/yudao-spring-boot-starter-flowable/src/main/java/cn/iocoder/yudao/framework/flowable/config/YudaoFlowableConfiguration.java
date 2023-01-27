@@ -2,13 +2,13 @@ package cn.iocoder.yudao.framework.flowable.config;
 
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.flowable.core.web.FlowableWebFilter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-@Configuration
+@AutoConfiguration
 public class YudaoFlowableConfiguration {
 
     /**
