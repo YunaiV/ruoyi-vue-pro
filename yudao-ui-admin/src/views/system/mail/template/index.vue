@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <doc-alert title="邮件配置" url="https://doc.iocoder.cn/mail" />
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
@@ -119,7 +120,7 @@
     <el-dialog title="测试发送邮件" :visible.sync="sendOpen" width="500px" append-to-body>
       <el-form ref="sendForm" :model="sendForm" :rules="sendRules" label-width="140px">
         <el-form-item label="模板内容" prop="content">
-          <el-input v-model="sendForm.content" type="textarea" placeholder="请输入模板内容" readonly />
+          <editor v-model="sendForm.content" :min-height="192" readonly />
         </el-form-item>
         <el-form-item label="收件邮箱" prop="mail">
           <el-input v-model="sendForm.mail" placeholder="请输入收件邮箱" />
