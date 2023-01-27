@@ -27,7 +27,7 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="主键" align="center" prop="id" />
+      <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="邮箱" align="center" prop="mail" />
       <el-table-column label="用户名" align="center" prop="username" />
       <el-table-column label="SMTP 服务器域名" align="center" prop="host" />
