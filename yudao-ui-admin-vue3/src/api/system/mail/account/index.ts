@@ -39,3 +39,8 @@ export const updateMailAccountApi = async (data: MailAccountVO) => {
 export const deleteMailAccountApi = async (id: number) => {
   return await request.delete({ url: '/system/mail-account/delete?id=' + id })
 }
+
+// 获得邮箱账号精简列表
+export const getSimpleMailAccounts = async () => {
+  return request.get({ url: '/system/mail-account/list-all-simple' })
+}

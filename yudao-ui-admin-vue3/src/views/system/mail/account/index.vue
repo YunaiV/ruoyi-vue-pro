@@ -69,7 +69,7 @@
 <script setup lang="ts" name="MailAccount">
 import { FormExpose } from '@/components/Form'
 // 业务相关的 import
-import { rules, allSchemas } from './account.template.data'
+import { rules, allSchemas } from './account.data'
 import * as MailAccountApi from '@/api/system/mail/account'
 
 const { t } = useI18n() // 国际化
