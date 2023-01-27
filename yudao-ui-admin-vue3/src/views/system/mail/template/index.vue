@@ -2,6 +2,17 @@
   <ContentWrap>
     <!-- 列表 -->
     <XTable @register="registerTable">
+      <template #accountId_search>
+        <el-select v-model="queryParams.accountId">
+          <el-option :key="undefined" label="全部" :value="undefined" />
+          <el-option
+            v-for="item in accountOptions"
+            :key="item.id"
+            :label="item.mail"
+            :value="item.id"
+          />
+        </el-select>
+      </template>
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -132,8 +143,12 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
 // 列表相关的变量
+const queryParams = reactive({
+  accountId: null
+})
 const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
+  params: queryParams,
   getListApi: MailTemplateApi.getMailTemplatePageApi,
   deleteApi: MailTemplateApi.deleteMailTemplateApi
 })

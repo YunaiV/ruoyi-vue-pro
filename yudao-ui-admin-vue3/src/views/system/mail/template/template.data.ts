@@ -55,6 +55,11 @@ const crudSchemas = reactive<VxeCrudSchema>({
         slots: {
           default: 'accountId_default'
         }
+      },
+      search: {
+        slots: {
+          default: 'accountId_search'
+        }
       }
     },
     {

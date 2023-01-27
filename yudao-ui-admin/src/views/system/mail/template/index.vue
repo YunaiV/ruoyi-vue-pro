@@ -320,7 +320,7 @@ export default {
       this.sendForm = {
         content: undefined,
         params: undefined,
-        mobile: undefined,
+        mail: undefined,
         templateCode: undefined,
         templateParams: {}
       };
