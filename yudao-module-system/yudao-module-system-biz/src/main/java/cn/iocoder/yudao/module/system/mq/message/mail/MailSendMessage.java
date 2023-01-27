@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessage;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Map;
 
 /**
  * 邮箱发送消息
@@ -17,28 +17,35 @@ import java.util.Map;
 public class MailSendMessage extends AbstractStreamMessage {
 
     /**
-     * 邮箱地址
+     * 邮件日志编号
      */
-    @NotNull(message = "邮箱地址不能为空")
-    private String address;
+    @NotNull(message = "邮件日志编号不能为空")
+    private Long logId;
     /**
-     * 短信模板编号
+     * 接收邮件地址
      */
-    @NotNull(message = "短信模板编号不能为空")
-    private String templateCode;
+    @NotNull(message = "接收邮件地址不能为空")
+    private String mail;
     /**
-     * 短信模板参数
+     * 邮件账号编号
      */
-    private Map<String, Object> templateParams;
+    @NotNull(message = "邮件账号编号不能为空")
+    private Long accountId;
 
     /**
-     * 用户编号，允许空
+     * 邮件发件人
      */
-    private Integer userId;
+    private String nickname;
     /**
-     * 用户类型，允许空
+     * 邮件标题
      */
-    private Integer userType;
+    @NotEmpty(message = "邮件标题不能为空")
+    private String title;
+    /**
+     * 邮件内容
+     */
+    @NotEmpty(message = "邮件内容不能为空")
+    private String content;
 
     @Override
     public String getStreamKey() {
