@@ -31,7 +31,7 @@ public class MailProducer {
     }
 
     /**
-     * 发送 {@link MailTemplateRefreshMessage} 消息
+     * 发送 {@link MailAccountRefreshMessage} 消息
      */
     public void sendMailAccountRefreshMessage() {
         MailAccountRefreshMessage message = new MailAccountRefreshMessage();

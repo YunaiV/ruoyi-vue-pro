@@ -20,13 +20,13 @@ public class MailSendApiImpl implements MailSendApi {
     private MailSendService mailSendService;
 
     @Override
-    public Long sendSingleSmsToAdmin(MailSendSingleToUserReqDTO reqDTO) {
+    public Long sendSingleMailToAdmin(MailSendSingleToUserReqDTO reqDTO) {
         return mailSendService.sendSingleMailToAdmin(reqDTO.getMail(), reqDTO.getUserId(),
                 reqDTO.getTemplateCode(), reqDTO.getTemplateParams());
     }
 
     @Override
-    public Long sendSingleSmsToMember(MailSendSingleToUserReqDTO reqDTO) {
+    public Long sendSingleMailToMember(MailSendSingleToUserReqDTO reqDTO) {
         return mailSendService.sendSingleMailToMember(reqDTO.getMail(), reqDTO.getUserId(),
                 reqDTO.getTemplateCode(), reqDTO.getTemplateParams());
     }

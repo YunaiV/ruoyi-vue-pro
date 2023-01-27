@@ -19,7 +19,7 @@ public interface MailSendApi {
      * @param reqDTO 发送请求
      * @return 发送日志编号
      */
-    Long sendSingleSmsToAdmin(@Valid MailSendSingleToUserReqDTO reqDTO);
+    Long sendSingleMailToAdmin(@Valid MailSendSingleToUserReqDTO reqDTO);
 
     /**
      * 发送单条邮箱给 Member 用户
@@ -29,6 +29,6 @@ public interface MailSendApi {
      * @param reqDTO 发送请求
      * @return 发送日志编号
      */
-    Long sendSingleSmsToMember(@Valid MailSendSingleToUserReqDTO reqDTO);
+    Long sendSingleMailToMember(@Valid MailSendSingleToUserReqDTO reqDTO);
 
 }

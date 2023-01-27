@@ -22,7 +22,8 @@ public class MailTemplateRefreshConsumer extends AbstractChannelMessageListener<
 
     @Override
     public void onMessage(MailTemplateRefreshMessage message) {
-        log.info("[onMessage][收到 MailTemplate 刷新信息]");
+        log.info("[onMessage][收到 Mail Template 刷新信息]");
         mailTemplateService.initLocalCache();
     }
+
 }
