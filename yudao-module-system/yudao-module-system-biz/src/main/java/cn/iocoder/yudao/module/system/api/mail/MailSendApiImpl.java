@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.system.api.mail;
 
 import cn.iocoder.yudao.module.system.api.mail.dto.MailSendSingleToUserReqDTO;
+import cn.iocoder.yudao.module.system.service.mail.MailSendService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
+
 /**
- * 邮件发送 API 接口
+ * 邮件发送 API 实现类
  *
  * @author wangjingyi
  */
@@ -13,14 +16,19 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class MailSendApiImpl implements MailSendApi {
 
+    @Resource
+    private MailSendService mailSendService;
+
     @Override
     public Long sendSingleSmsToAdmin(MailSendSingleToUserReqDTO reqDTO) {
-        return null;
+        return mailSendService.sendSingleMailToAdmin(reqDTO.getMail(), reqDTO.getUserId(),
+                reqDTO.getTemplateCode(), reqDTO.getTemplateParams());
     }
 
     @Override
     public Long sendSingleSmsToMember(MailSendSingleToUserReqDTO reqDTO) {
-        return null;
+        return mailSendService.sendSingleMailToMember(reqDTO.getMail(), reqDTO.getUserId(),
+                reqDTO.getTemplateCode(), reqDTO.getTemplateParams());
     }
 
 }

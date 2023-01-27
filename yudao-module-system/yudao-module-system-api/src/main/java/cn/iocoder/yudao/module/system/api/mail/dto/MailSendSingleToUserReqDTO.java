@@ -18,7 +18,7 @@ public class MailSendSingleToUserReqDTO {
      * 用户编号
      */
     @NotNull(message = "用户编号不能为空")
-    private String userId;
+    private Long userId;
     /**
      * 邮箱
      */
