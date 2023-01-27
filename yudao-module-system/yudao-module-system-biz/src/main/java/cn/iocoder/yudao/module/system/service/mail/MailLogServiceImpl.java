@@ -36,6 +36,11 @@ public class MailLogServiceImpl implements MailLogService {
     }
 
     @Override
+    public MailLogDO getMailLog(Long id) {
+        return mailLogMapper.selectById(id);
+    }
+
+    @Override
     public Long createMailLog(Long userId, Integer userType, String toMail,
                               MailAccountDO account, MailTemplateDO template,
                               String templateContent, Map<String, Object> templateParams, Boolean isSend) {

@@ -25,6 +25,14 @@ public interface MailLogService {
     PageResult<MailLogDO> getMailLogPage(MailLogPageReqVO pageVO);
 
     /**
+     * 获得指定编号的邮件日志
+     *
+     * @param id 日志编号
+     * @return 邮件日志
+     */
+    MailLogDO getMailLog(Long id);
+
+    /**
      * 创建邮件日志
      *
      * @param userId 用户编码

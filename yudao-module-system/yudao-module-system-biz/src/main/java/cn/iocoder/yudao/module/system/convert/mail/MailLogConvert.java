@@ -13,4 +13,6 @@ public interface MailLogConvert {
 
     PageResult<MailLogRespVO> convertPage(PageResult<MailLogDO> pageResult);
 
+    MailLogRespVO convert(MailLogDO bean);
+
 }
