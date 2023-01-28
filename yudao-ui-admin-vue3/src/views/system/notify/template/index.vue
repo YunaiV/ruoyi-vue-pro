@@ -2,83 +2,58 @@
   <ContentWrap>
     <!-- 列表 -->
     <XTable @register="registerTable">
-      <template #accountId_search>
-        <el-select v-model="queryParams.accountId">
-          <el-option :key="undefined" label="全部" :value="undefined" />
-          <el-option
-            v-for="item in accountOptions"
-            :key="item.id"
-            :label="item.mail"
-            :value="item.id"
-          />
-        </el-select>
-      </template>
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
           type="primary"
           preIcon="ep:zoom-in"
           :title="t('action.add')"
-          v-hasPermi="['system:mail-template:create']"
+          v-hasPermi="['system:notify-template:create']"
           @click="handleCreate()"
         />
       </template>
-      <template #accountId_default="{ row }">
-        <span>{{ accountOptions.find((account) => account.id === row.accountId)?.mail }}</span>
-      </template>
       <template #actionbtns_default="{ row }">
-        <!-- 操作：测试短信 -->
+        <!-- 操作：测试站内信 -->
         <XTextButton
           preIcon="ep:cpu"
           :title="t('action.test')"
-          v-hasPermi="['system:mail-template:send-mail']"
-          @click="handleSendMail(row)"
+          v-hasPermi="['system:notify-template:send-notify']"
+          @click="handleSendNotify(row)"
         />
         <!-- 操作：修改 -->
         <XTextButton
           preIcon="ep:edit"
           :title="t('action.edit')"
-          v-hasPermi="['system:mail-template:update']"
+          v-hasPermi="['system:notify-template:update']"
           @click="handleUpdate(row.id)"
         />
         <!-- 操作：详情 -->
         <XTextButton
           preIcon="ep:view"
           :title="t('action.detail')"
-          v-hasPermi="['system:mail-template:query']"
+          v-hasPermi="['system:notify-template:query']"
           @click="handleDetail(row.id)"
         />
         <!-- 操作：删除 -->
         <XTextButton
           preIcon="ep:delete"
           :title="t('action.del')"
-          v-hasPermi="['system:mail-template:delete']"
+          v-hasPermi="['system:notify-template:delete']"
           @click="deleteData(row.id)"
         />
       </template>
     </XTable>
   </ContentWrap>
 
-  <!-- 添加/修改/详情的弹窗 -->
-  <XModal id="mailTemplateModel" :loading="modelLoading" v-model="modelVisible" :title="modelTitle">
+  <!-- 添加/修改的弹窗 -->
+  <XModal id="templateModel" :loading="modelLoading" v-model="modelVisible" :title="modelTitle">
     <!-- 表单：添加/修改 -->
     <Form
       ref="formRef"
       v-if="['create', 'update'].includes(actionType)"
       :schema="allSchemas.formSchema"
       :rules="rules"
-    >
-      <template #accountId="form">
-        <el-select v-model="form.accountId">
-          <el-option
-            v-for="item in accountOptions"
-            :key="item.id"
-            :label="item.mail"
-            :value="item.id"
-          />
-        </el-select>
-      </template>
-    </Form>
+    />
     <!-- 表单：详情 -->
     <Descriptions
       v-if="actionType === 'detail'"
@@ -99,14 +74,21 @@
     </template>
   </XModal>
 
-  <!-- 测试邮件的弹窗 -->
+  <!-- 测试站内信的弹窗 -->
   <XModal id="sendTest" v-model="sendVisible" title="测试">
     <el-form :model="sendForm" :rules="sendRules" label-width="200px" label-position="top">
       <el-form-item label="模板内容" prop="content">
-        <Editor :model-value="sendForm.content" readonly height="150px" />
+        <el-input type="textarea" v-model="sendForm.content" readonly />
       </el-form-item>
-      <el-form-item label="收件邮箱" prop="mail">
-        <el-input v-model="sendForm.mail" placeholder="请输入收件邮箱" />
+      <el-form-item label="接收人" prop="userId">
+        <el-select v-model="sendForm.userId" placeholder="请选择接收人">
+          <el-option
+            v-for="item in userOption"
+            :key="item.id"
+            :label="item.nickname"
+            :value="item.id"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item
         v-for="param in sendForm.params"
@@ -132,27 +114,22 @@
     </template>
   </XModal>
 </template>
-<script setup lang="ts" name="MailTemplate">
+<script setup lang="ts" name="NotifyTemplate">
 import { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import { rules, allSchemas } from './template.data'
-import * as MailTemplateApi from '@/api/system/mail/template'
-import * as MailAccountApi from '@/api/system/mail/account'
+import * as NotifyTemplateApi from '@/api/system/notify/template'
+import { getListSimpleUsersApi, UserVO } from '@/api/system/user'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
 // 列表相关的变量
-const queryParams = reactive({
-  accountId: null
-})
 const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
-  params: queryParams,
-  getListApi: MailTemplateApi.getMailTemplatePageApi,
-  deleteApi: MailTemplateApi.deleteMailTemplateApi
+  getListApi: NotifyTemplateApi.getNotifyTemplatePageApi,
+  deleteApi: NotifyTemplateApi.deleteNotifyTemplateApi
 })
-const accountOptions = ref([]) // 账号下拉选项
 
 // 弹窗相关的变量
 const modelVisible = ref(false) // 是否显示弹出层
@@ -181,7 +158,7 @@ const handleCreate = () => {
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
   // 设置数据
-  const res = await MailTemplateApi.getMailTemplateApi(rowId)
+  const res = await NotifyTemplateApi.getNotifyTemplateApi(rowId)
   unref(formRef)?.setValues(res)
   modelLoading.value = false
 }
@@ -189,7 +166,7 @@ const handleUpdate = async (rowId: number) => {
 // 详情操作
 const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
-  const res = await MailTemplateApi.getMailTemplateApi(rowId)
+  const res = await NotifyTemplateApi.getNotifyTemplateApi(rowId)
   detailData.value = res
   modelLoading.value = false
 }
@@ -203,12 +180,12 @@ const submitForm = async () => {
       actionLoading.value = true
       // 提交请求
       try {
-        const data = unref(formRef)?.formModel as MailTemplateApi.MailTemplateVO
+        const data = unref(formRef)?.formModel as NotifyTemplateApi.NotifyTemplateVO
         if (actionType.value === 'create') {
-          await MailTemplateApi.createMailTemplateApi(data)
+          await NotifyTemplateApi.createNotifyTemplateApi(data)
           message.success(t('common.createSuccess'))
         } else {
-          await MailTemplateApi.updateMailTemplateApi(data)
+          await NotifyTemplateApi.updateNotifyTemplateApi(data)
           message.success(t('common.updateSuccess'))
         }
         modelVisible.value = false
@@ -225,18 +202,19 @@ const submitForm = async () => {
 const sendForm = ref({
   content: '',
   params: {},
-  mail: '',
+  userId: undefined,
   templateCode: '',
   templateParams: {}
 })
 const sendRules = ref({
-  mail: [{ required: true, message: '邮箱不能为空', trigger: 'blur' }],
+  userId: [{ required: true, message: '用户编号不能为空', trigger: 'blur' }],
   templateCode: [{ required: true, message: '模版编号不能为空', trigger: 'blur' }],
   templateParams: {}
 })
 const sendVisible = ref(false)
+const userOption = ref<UserVO[]>([])
 
-const handleSendMail = (row: any) => {
+const handleSendNotify = (row: any) => {
   sendForm.value.content = row.content
   sendForm.value.params = row.params
   sendForm.value.templateCode = row.code
@@ -252,12 +230,12 @@ const handleSendMail = (row: any) => {
 }
 
 const sendTest = async () => {
-  const data: MailTemplateApi.MailSendReqVO = {
-    mail: sendForm.value.mail,
+  const data: NotifyTemplateApi.NotifySendReqVO = {
+    userId: sendForm.value.userId,
     templateCode: sendForm.value.templateCode,
     templateParams: sendForm.value.templateParams as unknown as Map<string, Object>
   }
-  const res = await MailTemplateApi.sendMailApi(data)
+  const res = await NotifyTemplateApi.sendNotifyApi(data)
   if (res) {
     message.success('提交发送成功！发送结果，见发送日志编号：' + res)
   }
@@ -266,8 +244,8 @@ const sendTest = async () => {
 
 // ========== 初始化 ==========
 onMounted(() => {
-  MailAccountApi.getSimpleMailAccounts().then((data) => {
-    accountOptions.value = data
+  getListSimpleUsersApi().then((data) => {
+    userOption.value = data
   })
 })
 </script>
