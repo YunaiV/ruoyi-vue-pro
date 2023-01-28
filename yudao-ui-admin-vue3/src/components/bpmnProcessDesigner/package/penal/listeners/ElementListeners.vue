@@ -11,15 +11,15 @@
       />
       <el-table-column label="操作" width="90px">
         <template #default="scope">
-          <el-button size="mini" type="text" @click="openListenerForm(scope, scope.$index)"
+          <el-button size="small" type="text" @click="openListenerForm(scope.row, scope.$index)"
             >编辑</el-button
           >
           <el-divider direction="vertical" />
           <el-button
-            size="mini"
+            size="small"
             type="text"
             style="color: #ff4d4f"
-            @click="removeListener(scope, scope.$index)"
+            @click="removeListener(scope.row, scope.$index)"
             >移除</el-button
           >
         </template>
@@ -138,7 +138,7 @@
       <el-divider />
       <p class="listener-filed__title">
         <span><Icon icon="ep:menu" />注入字段：</span>
-        <el-button type="primary" @click="openListenerFieldForm(null)">添加字段</el-button>
+        <XButton type="primary" size="mini" @click="openListenerFieldForm(null)" title="添加字段" />
       </p>
       <el-table
         :data="fieldsListOfListener"
@@ -164,15 +164,18 @@
         />
         <el-table-column label="操作" width="100px">
           <template #default="scope">
-            <el-button size="mini" type="text" @click="openListenerFieldForm(scope, scope.$index)"
+            <el-button
+              size="small"
+              type="text"
+              @click="openListenerFieldForm(scope.row, scope.$index)"
               >编辑</el-button
             >
             <el-divider direction="vertical" />
             <el-button
-              size="mini"
+              size="small"
               type="text"
               style="color: #ff4d4f"
-              @click="removeListenerField(scope, scope.$index)"
+              @click="removeListenerField(scope.row, scope.$index)"
               >移除</el-button
             >
           </template>
@@ -180,8 +183,8 @@
       </el-table>
 
       <div class="element-drawer__button">
-        <el-button size="mini" @click="listenerFormModelVisible = false">取 消</el-button>
-        <el-button size="mini" type="primary" @click="saveListenerConfig">保 存</el-button>
+        <el-button @click="listenerFormModelVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveListenerConfig">保 存</el-button>
       </div>
     </el-drawer>
 
@@ -240,8 +243,8 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button size="mini" @click="listenerFieldFormModelVisible = false">取 消</el-button>
-        <el-button size="mini" type="primary" @click="saveListenerFiled">确 定</el-button>
+        <el-button size="small" @click="listenerFieldFormModelVisible = false">取 消</el-button>
+        <el-button size="small" type="primary" @click="saveListenerFiled">确 定</el-button>
       </template>
     </el-dialog>
   </div>
@@ -392,10 +395,10 @@ const saveListenerConfig = async () => {
     bpmnElement.value.businessObject?.extensionElements?.values?.filter(
       (ex) => ex.$type !== `${prefix}:ExecutionListener`
     ) ?? []
-  updateElementExtensions(
-    bpmnElement.value,
-    otherExtensionList.value.concat(bpmnElementListeners.value)
-  )
+  // updateElementExtensions(
+  //   bpmnElement.value,
+  //   otherExtensionList.value.concat(bpmnElementListeners.value)
+  // )
   // 4. 隐藏侧边栏
   listenerFormModelVisible.value = false
   listenerForm.value = {}

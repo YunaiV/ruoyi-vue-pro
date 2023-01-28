@@ -1,7 +1,7 @@
 <template>
   <div class="panel-tab__content">
     <el-form label-width="90px" :model="needProps" :rules="rules">
-      <div v-if="elementBaseInfo == 'bpmn:Process'">
+      <div v-if="needProps.type == 'bpmn:Process'">
         <!-- 如果是 Process 信息的时候，使用自定义表单 -->
         <el-link
           href="https://doc.iocoder.cn/bpm/#_3-%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%A4%BA%E4%BE%8B"
@@ -9,9 +9,9 @@
           target="_blank"
           >如何实现实现会签、或签？</el-link
         >
-        <el-form-item label="流程标识" prop="key">
+        <el-form-item label="流程标识" prop="id">
           <el-input
-            v-model="needProps.key"
+            v-model="needProps.id"
             placeholder="请输入流标标识"
             :disabled="needProps.id !== undefined && needProps.id.length > 0"
             @change="handleKeyUpdate"
@@ -38,20 +38,20 @@
   </div>
 </template>
 <script setup lang="ts" name="ElementBaseInfo">
-import { ref, reactive, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { ref, reactive, watch, onMounted, onBeforeUnmount, toRaw } from 'vue'
 import { ElLink, ElForm, ElFormItem, ElInput } from 'element-plus'
 const props = defineProps({
   businessObject: Object,
   model: Object // 流程模型的数据
 })
-const needProps = ref()
+const needProps = ref({})
 const bpmnElement = ref()
 const elementBaseInfo = ref({})
 // 流程表单的下拉框的数据
 // const forms = ref([])
 // 流程模型的校验
 const rules = reactive({
-  key: [{ required: true, message: '流程标识不能为空', trigger: 'blur' }],
+  id: [{ required: true, message: '流程标识不能为空', trigger: 'blur' }],
   name: [{ required: true, message: '流程名称不能为空', trigger: 'blur' }]
 })
 
@@ -60,10 +60,13 @@ const resetBaseInfo = () => {
   console.log(bpmnElement, 'bpmnElement')
 
   bpmnElement.value = window?.bpmnInstances?.bpmnElement
-  console.log(bpmnElement.value, 'resetBaseInfo')
+  console.log(bpmnElement.value, 'resetBaseInfo11111111111')
   elementBaseInfo.value = bpmnElement.value.businessObject
+  needProps.value['type'] = bpmnElement.value.businessObject.$type
+  // elementBaseInfo.value['typess'] = bpmnElement.value.businessObject.$type
+
   // elementBaseInfo.value = JSON.parse(JSON.stringify(bpmnElement.value.businessObject))
-  console.log(elementBaseInfo.value, 'elementBaseInfo')
+  console.log(elementBaseInfo.value, 'elementBaseInfo22222222222')
 }
 const handleKeyUpdate = (value) => {
   // 校验 value 的值，只有 XML NCName 通过的情况下，才进行赋值。否则，会导致流程图报错，无法绘制的问题
@@ -104,10 +107,15 @@ const updateBaseInfo = (key) => {
   //   id: elementBaseInfo.value[key]
   //   // di: { id: `${elementBaseInfo.value[key]}_di` }
   // }
+  console.log(elementBaseInfo, 'elementBaseInfo11111111111')
+  needProps.value = { ...elementBaseInfo.value, ...needProps.value }
 
   if (key === 'id') {
     console.log('jinru')
-    window.bpmnInstances.modeling.updateProperties(bpmnElement.value, {
+    console.log(window, 'window')
+    console.log(bpmnElement.value, 'bpmnElement')
+    console.log(toRaw(bpmnElement.value), 'bpmnElement')
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
       id: elementBaseInfo.value[key],
       di: { id: `${elementBaseInfo.value[key]}_di` }
     })
@@ -131,9 +139,9 @@ watch(
   (val) => {
     console.log(val, 'val11111111111111111111')
     if (val) {
-      nextTick(() => {
-        resetBaseInfo()
-      })
+      // nextTick(() => {
+      resetBaseInfo()
+      // })
     }
   }
 )

@@ -1,6 +1,6 @@
 <template>
   <div class="panel-tab__content">
-    <el-table :data="elementListenersList" size="mini" border>
+    <el-table :data="elementListenersList" size="small" border>
       <el-table-column label="序号" width="50px" type="index" />
       <el-table-column
         label="事件类型"
@@ -17,15 +17,15 @@
       />
       <el-table-column label="操作" width="90px">
         <template #default="scope">
-          <el-button size="mini" type="text" @click="openListenerForm(scope, scope.$index)"
+          <el-button size="small" type="text" @click="openListenerForm(scope.row, scope.$index)"
             >编辑</el-button
           >
           <el-divider direction="vertical" />
           <el-button
-            size="mini"
+            size="small"
             type="text"
             style="color: #ff4d4f"
-            @click="removeListener(scope, scope.$index)"
+            @click="removeListener(scope.row, scope.$index)"
             >移除</el-button
           >
         </template>
@@ -33,7 +33,7 @@
     </el-table>
     <div class="element-drawer__button">
       <XButton
-        size="mini"
+        size="small"
         type="primary"
         preIcon="ep:plus"
         title="添加监听器"
@@ -49,7 +49,7 @@
       append-to-body
       destroy-on-close
     >
-      <el-form size="mini" :model="listenerForm" label-width="96px" ref="listenerFormRef">
+      <el-form size="small" :model="listenerForm" label-width="96px" ref="listenerFormRef">
         <el-form-item
           label="事件类型"
           prop="event"
@@ -176,13 +176,13 @@
       <el-divider />
       <p class="listener-filed__title">
         <span><Icon icon="ep:menu" />注入字段：</span>
-        <el-button size="mini" type="primary" @click="openListenerFieldForm(null)"
+        <el-button size="small" type="primary" @click="openListenerFieldForm(null)"
           >添加字段</el-button
         >
       </p>
       <el-table
         :data="fieldsListOfListener"
-        size="mini"
+        size="small"
         max-height="240"
         border
         fit
@@ -204,15 +204,18 @@
         />
         <el-table-column label="操作" width="100px">
           <template #default="scope">
-            <el-button size="mini" type="text" @click="openListenerFieldForm(scope, scope.$index)"
+            <el-button
+              size="small"
+              type="text"
+              @click="openListenerFieldForm(scope.row, scope.$index)"
               >编辑</el-button
             >
             <el-divider direction="vertical" />
             <el-button
-              size="mini"
+              size="small"
               type="text"
               style="color: #ff4d4f"
-              @click="removeListenerField(scope, scope.$index)"
+              @click="removeListenerField(scope.row, scope.$index)"
               >移除</el-button
             >
           </template>
@@ -220,8 +223,8 @@
       </el-table>
 
       <div class="element-drawer__button">
-        <el-button size="mini" @click="listenerFormModelVisible = false">取 消</el-button>
-        <el-button size="mini" type="primary" @click="saveListenerConfig">保 存</el-button>
+        <el-button size="small" @click="listenerFormModelVisible = false">取 消</el-button>
+        <el-button size="small" type="primary" @click="saveListenerConfig">保 存</el-button>
       </div>
     </el-drawer>
 
@@ -235,7 +238,7 @@
     >
       <el-form
         :model="listenerFieldForm"
-        size="mini"
+        size="small"
         label-width="96px"
         ref="listenerFieldFormRef"
         style="height: 136px"
@@ -281,8 +284,8 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button size="mini" @click="listenerFieldFormModelVisible = false">取 消</el-button>
-        <el-button size="mini" type="primary" @click="saveListenerFiled">确 定</el-button>
+        <el-button size="small" @click="listenerFieldFormModelVisible = false">取 消</el-button>
+        <el-button size="small" type="primary" @click="saveListenerFiled">确 定</el-button>
       </template>
     </el-dialog>
   </div>
