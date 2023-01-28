@@ -82,10 +82,12 @@ const bpmnElementPropertyList = ref()
 const attributeFormRef = ref()
 
 const resetAttributesList = () => {
+  console.log(window, 'windowwindowwindowwindowwindowwindowwindow')
   bpmnElement.value = window.bpmnInstances.bpmnElement
   otherExtensionList.value = [] // 其他扩展配置
   bpmnElementProperties.value =
-    bpmnElement.value.businessObject?.extensionElements?.values?.filter((ex) => {
+    // bpmnElement.value.businessObject?.extensionElements?.filter((ex) => {
+    bpmnElement.value.businessObject?.extensionElements?.filter((ex) => {
       if (ex.$type !== `${prefix}:Properties`) {
         otherExtensionList.value.push(ex)
       }

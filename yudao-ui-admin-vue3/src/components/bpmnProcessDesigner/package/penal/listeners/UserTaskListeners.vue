@@ -338,7 +338,8 @@ const resetListenersList = () => {
   bpmnElement.value = window.bpmnInstances.bpmnElement
   otherExtensionList.value = []
   bpmnElementListeners.value =
-    bpmnElement.value.businessObject?.extensionElements?.values?.filter(
+    // bpmnElement.value.businessObject?.extensionElements?.filter(
+    bpmnElement.value.businessObject?.extensionElements?.filter(
       (ex) => ex.$type === `${prefix}:TaskListener`
     ) ?? []
   elementListenersList.value = bpmnElementListeners.value.map((listener) =>

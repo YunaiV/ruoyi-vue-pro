@@ -293,7 +293,9 @@ const resetListenersList = () => {
   otherExtensionList.value = []
   console.log(bpmnElement.value, 'bpmnElement.value')
   bpmnElementListeners.value =
-    bpmnElement.value.businessObject?.extensionElements?.values?.filter(
+    // bpmnElement.value.businessObject?.extensionElements?.filter(
+    bpmnElement.value.businessObject?.extensionElements?.filter(
+      // bpmnElement.value.businessObject?.extensionElements?.values?.filter(
       (ex) => ex.$type === `${prefix}:ExecutionListener`
     ) ?? []
   elementListenersList.value = bpmnElementListeners.value.map((listener) =>
