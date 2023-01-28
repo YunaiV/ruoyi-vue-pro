@@ -12,7 +12,6 @@
   </ContentWrap>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
 import { FormExpose } from '@/components/Form'
 import XEUtils from 'xe-utils'
 

@@ -41,7 +41,7 @@ export const setConfAndFields2 = (
   detailPreview: object,
   conf: string,
   fields: string,
-  value: object
+  value?: object
 ) => {
   // @ts-ignore
   detailPreview.value.option = JSON.parse(conf)

@@ -43,7 +43,6 @@
   </ContentWrap>
 </template>
 <script setup lang="ts" name="BpmFormEditor">
-import { reactive } from 'vue'
 import { FormInstance } from 'element-plus'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { CommonStatusEnum } from '@/utils/constants'

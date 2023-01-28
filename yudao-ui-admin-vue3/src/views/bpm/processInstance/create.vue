@@ -48,6 +48,8 @@
 import { allSchemas } from './process.create'
 import * as DefinitionApi from '@/api/bpm/definition'
 import * as ProcessInstanceApi from '@/api/bpm/processInstance'
+import { setConfAndFields2 } from '@/utils/formCreate'
+import { ApiAttrs } from '@form-create/element-ui/types/config'
 
 const router = useRouter() // 路由
 const message = useMessage() // 消息
@@ -65,8 +67,6 @@ const [registerTable] = useXTable({
 
 // ========== 表单相关 ==========
 
-import { setConfAndFields2 } from '@/utils/formCreate'
-import { ApiAttrs } from '@form-create/element-ui/types/config'
 const fApi = ref<ApiAttrs>()
 
 // 流程表单详情
@@ -76,7 +76,7 @@ const detailForm = ref({
 })
 
 // 流程表单
-const selectProcessInstance = ref(undefined) // 选择的流程实例
+const selectProcessInstance = ref() // 选择的流程实例
 /** 处理选择流程的按钮操作 **/
 const handleSelect = async (row) => {
   // 设置选择的流程

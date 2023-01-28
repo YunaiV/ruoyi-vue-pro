@@ -50,12 +50,11 @@
 // 业务相关的 import
 import * as FormApi from '@/api/bpm/form'
 import { allSchemas } from './form.data'
+// 表单详情相关的变量和 import
+import { setConfAndFields2 } from '@/utils/formCreate'
 
 const { t } = useI18n() // 国际化
 const router = useRouter() // 路由
-
-// 表单详情相关的变量和 import
-import { setConfAndFields2 } from '@/utils/formCreate'
 
 // 列表相关的变量
 const [registerTable, { deleteData }] = useXTable({

@@ -190,7 +190,6 @@
   </ContentWrap>
 </template>
 <script setup lang="ts">
-import { getCurrentInstance } from 'vue'
 import dayjs from 'dayjs'
 import * as UserApi from '@/api/system/user'
 import * as ProcessInstanceApi from '@/api/bpm/processInstance'
@@ -198,6 +197,9 @@ import * as DefinitionApi from '@/api/bpm/definition'
 import * as TaskApi from '@/api/bpm/task'
 import * as ActivityApi from '@/api/bpm/activity'
 import { formatPast2 } from '@/utils/formatTime'
+import { setConfAndFields2 } from '@/utils/formCreate'
+import { ApiAttrs } from '@form-create/element-ui/types/config'
+import { useUserStore } from '@/store/modules/user'
 
 const { query } = useRoute() // 查询参数
 const message = useMessage() // 消息弹窗
@@ -207,9 +209,9 @@ const { proxy } = getCurrentInstance()
 // ========== 审批信息 ==========
 const id = query.id as unknown as number
 const processInstanceLoading = ref(false) // 流程实例的加载中
-const processInstance = ref({}) // 流程实例
-const runningTasks = ref([]) // 运行中的任务
-const auditForms = ref([]) // 审批任务的表单
+const processInstance = ref() // 流程实例
+const runningTasks = ref() // 运行中的任务
+const auditForms = ref() // 审批任务的表单
 const auditRule = reactive({
   reason: [{ required: true, message: '审批建议不能为空', trigger: 'blur' }]
 })
@@ -244,9 +246,6 @@ const handleAudit = async (task, pass) => {
 }
 
 // ========== 申请信息 ==========
-import { setConfAndFields2 } from '@/utils/formCreate'
-import { ApiAttrs } from '@form-create/element-ui/types/config'
-import { useUserStore } from '@/store/modules/user'
 const fApi = ref<ApiAttrs>()
 const userId = useUserStore().getUser.id // 当前登录的编号
 // 流程表单详情
@@ -258,7 +257,7 @@ const detailForm = ref({
 
 // ========== 审批记录 ==========
 const tasksLoad = ref(true)
-const tasks = ref([])
+const tasks = ref()
 
 const getTimelineItemIcon = (item) => {
   if (item.result === 1) {
@@ -302,7 +301,7 @@ const updateAssigneeRules = ref({
   assigneeUserId: [{ required: true, message: '新审批人不能为空', trigger: 'change' }]
 })
 const updateAssigneeFormRef = ref()
-const userOptions = ref([])
+const userOptions = ref()
 
 // 处理转派审批人
 const handleUpdateAssignee = (task) => {
@@ -402,8 +401,8 @@ const getDetail = () => {
           data.formVariables
         )
         nextTick().then(() => {
-          fApi.value.btn.show(false)
-          fApi.value.resetBtn.show(false)
+          fApi.value?.btn.show(false)
+          fApi.value?.resetBtn.show(false)
         })
       }
 

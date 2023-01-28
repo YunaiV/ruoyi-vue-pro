@@ -303,7 +303,6 @@
 
 <script setup lang="ts">
 // 全局相关的 import
-import { onMounted, ref, unref } from 'vue'
 import { DICT_TYPE, getDictOptions } from '@/utils/dict'
 import { FormInstance, UploadInstance } from 'element-plus'
 
@@ -312,12 +311,11 @@ import { getAccessToken, getTenantId } from '@/utils/auth'
 import * as FormApi from '@/api/bpm/form'
 import * as ModelApi from '@/api/bpm/model'
 import { allSchemas, rules } from './model.data'
+import { setConfAndFields2 } from '@/utils/formCreate'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 const router = useRouter() // 路由
-
-import { setConfAndFields2 } from '@/utils/formCreate'
 
 // ========== 列表相关 ==========
 const [registerTable, { reload }] = useXTable({
@@ -388,7 +386,7 @@ const handleAssignRule = (row) => {
 const dialogVisible = ref(false)
 const dialogTitle = ref('新建模型')
 const dialogLoading = ref(false)
-const saveForm = ref({})
+const saveForm = ref()
 const saveFormRef = ref<FormInstance>()
 
 // 设置标题
