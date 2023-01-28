@@ -45,7 +45,7 @@ const props = defineProps({
   model: Object // 流程模型的数据
 })
 const needProps = ref({})
-const bpmnElement = ref()
+let bpmnElement
 const elementBaseInfo = ref({})
 // 流程表单的下拉框的数据
 // const forms = ref([])
@@ -59,10 +59,10 @@ const resetBaseInfo = () => {
   console.log(window, 'window')
   console.log(bpmnElement, 'bpmnElement')
 
-  bpmnElement.value = window?.bpmnInstances?.bpmnElement
-  console.log(bpmnElement.value, 'resetBaseInfo11111111111')
-  elementBaseInfo.value = bpmnElement.value.businessObject
-  needProps.value['type'] = bpmnElement.value.businessObject.$type
+  bpmnElement = window?.bpmnInstances?.bpmnElement
+  console.log(bpmnElement, 'resetBaseInfo11111111111')
+  elementBaseInfo.value = bpmnElement.businessObject
+  needProps.value['type'] = bpmnElement.businessObject.$type
   // elementBaseInfo.value['typess'] = bpmnElement.value.businessObject.$type
 
   // elementBaseInfo.value = JSON.parse(JSON.stringify(bpmnElement.value.businessObject))
@@ -113,15 +113,15 @@ const updateBaseInfo = (key) => {
   if (key === 'id') {
     console.log('jinru')
     console.log(window, 'window')
-    console.log(bpmnElement.value, 'bpmnElement')
-    console.log(toRaw(bpmnElement.value), 'bpmnElement')
-    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
+    console.log(bpmnElement, 'bpmnElement')
+    console.log(toRaw(bpmnElement), 'bpmnElement')
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement), {
       id: elementBaseInfo.value[key],
       di: { id: `${elementBaseInfo.value[key]}_di` }
     })
   } else {
     console.log(attrObj, 'attrObj')
-    window.bpmnInstances.modeling.updateProperties(bpmnElement.value, attrObj)
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement), attrObj)
   }
 }
 onMounted(() => {
@@ -165,6 +165,6 @@ watch(
 //   }
 // }
 onBeforeUnmount(() => {
-  bpmnElement.value = null
+  bpmnElement = null
 })
 </script>

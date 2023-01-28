@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeMount } from 'vue'
 // import { translations } from '@/components/bpmnProcessDesigner/src/translations'
 // 自定义元素选中时的弹出菜单（修改 默认任务 为 用户任务）
 import CustomContentPadProvider from '@/components/bpmnProcessDesigner/package/designer/plugins/content-pad'
@@ -39,7 +39,7 @@ import CustomPaletteProvider from '@/components/bpmnProcessDesigner/package/desi
 import { createModelApi, getModelApi, updateModelApi } from '@/api/bpm/model'
 
 import { useRouter } from 'vue-router'
-import { onBeforeMount } from 'vue'
+import { ElMessage } from 'element-plus'
 const router = useRouter()
 
 // 自定义侧边栏
@@ -115,12 +115,15 @@ const save = (bpmnXml) => {
     ...model.value,
     bpmnXml: bpmnXml // this.bpmnXml 只是初始化流程图，后续修改无法通过它获得
   }
+  console.log(data, 'data')
 
   // 修改的提交
   if (data.id) {
     updateModelApi(data).then((response) => {
       console.log(response, 'response')
       // this.$modal.msgSuccess("修改成功")
+      ElMessage.success('修改成功')
+
       // 跳转回去
       close()
     })
@@ -130,6 +133,7 @@ const save = (bpmnXml) => {
   createModelApi(data).then((response) => {
     console.log(response, 'response1')
     // this.$modal.msgSuccess("保存成功")
+    ElMessage.success('保存成功')
     // 跳转回去
     close()
   })

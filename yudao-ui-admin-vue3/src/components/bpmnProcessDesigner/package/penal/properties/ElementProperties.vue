@@ -6,12 +6,14 @@
       <el-table-column label="属性值" prop="value" min-width="100px" show-overflow-tooltip />
       <el-table-column label="操作" width="90px">
         <template #default="scope">
-          <el-button type="text" @click="openAttributesForm(scope, scope.$index)">编辑</el-button>
+          <el-button type="text" @click="openAttributesForm(scope.row, scope.$index)"
+            >编辑</el-button
+          >
           <el-divider direction="vertical" />
           <el-button
             type="text"
             style="color: #ff4d4f"
-            @click="removeAttributes(scope, scope.$index)"
+            @click="removeAttributes(scope.roww, scope.$index)"
             >移除</el-button
           >
         </template>
@@ -84,10 +86,10 @@ const resetAttributesList = () => {
   otherExtensionList.value = [] // 其他扩展配置
   bpmnElementProperties.value =
     bpmnElement.value.businessObject?.extensionElements?.values?.filter((ex) => {
-      if (ex.$type !== `${prefix.value}:Properties`) {
+      if (ex.$type !== `${prefix}:Properties`) {
         otherExtensionList.value.push(ex)
       }
-      return ex.$type === `${prefix.value}:Properties`
+      return ex.$type === `${prefix}:Properties`
     }) ?? []
 
   // 保存所有的 扩展属性字段
@@ -116,7 +118,7 @@ const removeAttributes = (attr, index) => {
       elementPropertyList.value.splice(index, 1)
       bpmnElementPropertyList.value.splice(index, 1)
       // 新建一个属性字段的保存列表
-      const propertiesObject = window.bpmnInstances.moddle.create(`${prefix.value}:Properties`, {
+      const propertiesObject = window.bpmnInstances.moddle.create(`${prefix}:Properties`, {
         values: bpmnElementPropertyList.value
       })
       updateElementExtensions(propertiesObject)
@@ -125,8 +127,8 @@ const removeAttributes = (attr, index) => {
     .catch(() => console.info('操作取消'))
 }
 const saveAttribute = () => {
+  console.log(propertyForm.value, 'propertyForm.value')
   const { name, value } = propertyForm.value
-  console.log(bpmnElementPropertyList.value)
   if (editingPropertyIndex.value !== -1) {
     window.bpmnInstances.modeling.updateModdleProperties(
       bpmnElement.value,
@@ -138,12 +140,12 @@ const saveAttribute = () => {
     )
   } else {
     // 新建属性字段
-    const newPropertyObject = window.bpmnInstances.moddle.create(`${prefix.value}:Property`, {
+    const newPropertyObject = window.bpmnInstances.moddle.create(`${prefix}:Property`, {
       name,
       value
     })
     // 新建一个属性字段的保存列表
-    const propertiesObject = window.bpmnInstances.moddle.create(`${prefix.value}:Properties`, {
+    const propertiesObject = window.bpmnInstances.moddle.create(`${prefix}:Properties`, {
       values: bpmnElementPropertyList.value.concat([newPropertyObject])
     })
     updateElementExtensions(propertiesObject)

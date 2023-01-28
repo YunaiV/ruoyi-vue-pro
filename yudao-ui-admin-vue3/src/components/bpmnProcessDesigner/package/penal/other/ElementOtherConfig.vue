@@ -25,13 +25,16 @@ const props = defineProps({
 const documentation = ref('')
 const bpmnElement = ref()
 const updateDocumentation = () => {
-  ;(bpmnElement.value && bpmnElement.value.id === props.id) ||
-    (bpmnElement.value = window.bpmnInstances.elementRegistry.get(props.id))
-  const documentation = window.bpmnInstances.bpmnFactory.create('bpmn:Documentation', {
+  if (bpmnElement.value && bpmnElement.value.id === props.id) {
+    bpmnElement.value = window.bpmnInstances.elementRegistry.get(props.id)
+  }
+  // (bpmnElement.value && bpmnElement.value.id === props.id) ||
+  //   (bpmnElement.value = window.bpmnInstances.elementRegistry.get(props.id))
+  const documentations = window.bpmnInstances.bpmnFactory.create('bpmn:Documentation', {
     text: documentation.value
   })
   window.bpmnInstances.modeling.updateProperties(bpmnElement.value, {
-    documentation: [documentation]
+    documentation: [documentations]
   })
 }
 onBeforeUnmount(() => {

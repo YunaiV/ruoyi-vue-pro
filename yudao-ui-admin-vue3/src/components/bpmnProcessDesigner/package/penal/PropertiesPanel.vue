@@ -89,7 +89,7 @@ const props = defineProps({
   },
   width: {
     type: Number,
-    default: 500
+    default: 480
   },
   idEditDisabled: {
     type: Boolean,

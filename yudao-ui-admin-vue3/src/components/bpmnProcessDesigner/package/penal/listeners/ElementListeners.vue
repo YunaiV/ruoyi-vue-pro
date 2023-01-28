@@ -11,13 +11,12 @@
       />
       <el-table-column label="操作" width="90px">
         <template #default="scope">
-          <el-button size="small" type="text" @click="openListenerForm(scope.row, scope.$index)"
+          <el-button size="small" @click="openListenerForm(scope.row, scope.$index)"
             >编辑</el-button
           >
           <el-divider direction="vertical" />
           <el-button
             size="small"
-            type="text"
             style="color: #ff4d4f"
             @click="removeListener(scope.row, scope.$index)"
             >移除</el-button
@@ -395,10 +394,15 @@ const saveListenerConfig = async () => {
     bpmnElement.value.businessObject?.extensionElements?.values?.filter(
       (ex) => ex.$type !== `${prefix}:ExecutionListener`
     ) ?? []
-  // updateElementExtensions(
-  //   bpmnElement.value,
-  //   otherExtensionList.value.concat(bpmnElementListeners.value)
-  // )
+  console.log(bpmnElement.value.height, 'bpmnElement.value')
+  console.log(
+    otherExtensionList.value.concat(bpmnElementListeners.value),
+    'otherExtensionList.value.concat(bpmnElementListeners.value).value'
+  )
+  updateElementExtensions(
+    bpmnElement.value,
+    otherExtensionList.value.concat(bpmnElementListeners.value)
+  )
   // 4. 隐藏侧边栏
   listenerFormModelVisible.value = false
   listenerForm.value = {}
@@ -407,6 +411,7 @@ const saveListenerConfig = async () => {
 watch(
   () => props.id,
   (val) => {
+    console.log(val, 'propsId变化')
     val &&
       val.length &&
       nextTick(() => {

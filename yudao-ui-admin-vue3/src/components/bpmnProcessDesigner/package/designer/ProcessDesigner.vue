@@ -7,22 +7,24 @@
           <XButton preIcon="ep:folder-opened" title="打开文件" @click="refFile.click()" />
           <el-tooltip effect="light" placement="bottom">
             <template #content>
-              <XButton type="text" title="下载为XML文件" @click="downloadProcessAsXml()" />
-              <br />
+              <div style="color: #409eff">
+                <el-button link @click="downloadProcessAsXml()">下载为XML文件</el-button>
+                <br />
 
-              <XButton type="text" title="下载为SVG文件" @click="downloadProcessAsSvg()" />
-              <br />
+                <el-button link @click="downloadProcessAsSvg()">下载为SVG文件</el-button>
+                <br />
 
-              <XButton type="text" title="下载为BPMN文件" @click="downloadProcessAsBpmn()" />
+                <el-button link @click="downloadProcessAsBpmn()">下载为BPMN文件</el-button>
+              </div>
             </template>
             <XButton title="下载文件" preIcon="ep:download" />
           </el-tooltip>
           <el-tooltip effect="light">
             <XButton preIcon="ep:view" title="浏览" />
             <template #content>
-              <el-button type="text" @click="previewProcessXML">预览XML</el-button>
+              <el-button link @click="previewProcessXML">预览XML</el-button>
               <br />
-              <el-button type="text" @click="previewProcessJson">预览JSON</el-button>
+              <el-button link @click="previewProcessJson">预览JSON</el-button>
             </template>
           </el-tooltip>
           <el-tooltip
@@ -594,10 +596,9 @@ const elementsAlign = (align) => {
   const Align = bpmnModeler.get('alignElements')
   const Selection = bpmnModeler.get('selection')
   const SelectedElements = Selection.get()
-  console.log(SelectedElements, 'SelectedElements')
   if (!SelectedElements || SelectedElements.length <= 1) {
     ElMessage.warning('请按住 Shift 键选择多个元素对齐')
-    // alert('请按住 Ctrl 键选择多个元素对齐')
+    // alert('请按住 Ctrl 键选择多个元素对齐
     return
   }
   ElMessageBox.confirm('自动对齐可能造成图形变形，是否继续？', '警告', {
@@ -636,7 +637,10 @@ const previewProcessJson = () => {
 }
 /* ------------------------------------------------ 芋道源码 methods ------------------------------------------------------ */
 const processSave = async () => {
+  console.log(bpmnModeler, 'bpmnModelerbpmnModelerbpmnModelerbpmnModeler')
   const { err, xml } = await bpmnModeler.saveXML()
+  console.log(err, 'errerrerrerrerr')
+  console.log(xml, 'xmlxmlxmlxmlxml')
   // 读取异常时抛出异常
   if (err) {
     // this.$modal.msgError('保存模型失败，请重试！')
