@@ -153,13 +153,13 @@ public interface ErrorCodeConstants {
     ErrorCode MAIL_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002025000, "模板参数({})缺失");
     ErrorCode MAIL_SEND_MAIL_NOT_EXISTS = new ErrorCode(1002025000, "邮箱不存在");
 
-    // ========== 站内信模版 1002023000 ==========
-    ErrorCode NOTIFY_TEMPLATE_NOT_EXISTS = new ErrorCode(1002023000, "站内信模版不存在");
-    ErrorCode NOTIFY_TEMPLATE_CODE_DUPLICATE = new ErrorCode(1002023001, "已经存在编码为【{}】的站内信模板");
-    ErrorCode NOTIFY_TEMPLATE_PARAM_MISS = new ErrorCode(1002023002, "模板参数({})缺失");
+    // ========== 站内信模版 1002026000 ==========
+    ErrorCode NOTIFY_TEMPLATE_NOT_EXISTS = new ErrorCode(1002026000, "站内信模版不存在");
+    ErrorCode NOTIFY_TEMPLATE_CODE_DUPLICATE = new ErrorCode(1002026001, "已经存在编码为【{}】的站内信模板");
 
-    // ========== 站内信 1002024000 ==========
-    ErrorCode NOTIFY_MESSAGE_NOT_EXISTS = new ErrorCode(1002024000, "站内信不存在");
-    ErrorCode NOTIFY_MESSAGE_ID_PARAM_ERROR = new ErrorCode(1002024001, "站内信ID错误");
+    // ========== 站内信模版 1002027000 ==========
+
+    // ========== 站内信发送 1002028000 ==========
+    ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002025000, "模板参数({})缺失");
 
 }

@@ -5,7 +5,6 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateExcelVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateUpdateReqVO;
 import org.mapstruct.Mapper;
@@ -31,7 +30,5 @@ public interface NotifyTemplateConvert {
     List<NotifyTemplateRespVO> convertList(List<NotifyTemplateDO> list);
 
     PageResult<NotifyTemplateRespVO> convertPage(PageResult<NotifyTemplateDO> page);
-
-    List<NotifyTemplateExcelVO> convertList02(List<NotifyTemplateDO> list);
 
 }

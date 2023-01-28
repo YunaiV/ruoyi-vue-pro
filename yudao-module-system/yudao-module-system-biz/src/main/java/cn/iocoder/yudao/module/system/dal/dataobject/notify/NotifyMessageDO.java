@@ -2,19 +2,24 @@ package cn.iocoder.yudao.module.system.dal.dataobject.notify;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 站内信 DO
  *
  * @author xrcoder
  */
-@TableName("system_notify_message")
+@TableName(value = "system_notify_message", autoResultMap = true)
 @KeySequence("system_notify_message_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -25,22 +30,10 @@ import java.util.Date;
 public class NotifyMessageDO extends BaseDO {
 
     /**
-     * ID
+     * 站内信编号，自增
      */
     @TableId
     private Long id;
-    /**
-     * 站内信模版编号
-     *
-     * 关联 {@link NotifyTemplateDO#getId()}
-     */
-    private Long templateId;
-    /**
-     * 站内信模版编码
-     *
-     * 关联 {@link NotifyTemplateDO#getCode()}
-     */
-    private String templateCode;
     /**
      * 用户编号
      *
@@ -53,28 +46,49 @@ public class NotifyMessageDO extends BaseDO {
      * 枚举 {@link UserTypeEnum}
      */
     private Integer userType;
+
+    // ========= 模板相关字段 =========
+
     /**
-     * 标题
+     * 模版编号
+     *
+     * 关联 {@link NotifyTemplateDO#getId()}
      */
-    private String title;
+    private Long templateId;
     /**
-     * 内容
+     * 模版编码
+     *
+     * 关联 {@link NotifyTemplateDO#getCode()}
      */
-    private String content;
-    // TODO @luowenfeng：是不是创建时间，直接作为发送时间；
+    private String templateCode;
     /**
-     * 发送时间
+     * 模版类型
+     *
+     * 冗余 {@link NotifyTemplateDO#getType()}
      */
-    private Date sendTime;
-    // TODO @luowenfeng：是不是不用发送 id 和名字😑？
+    private Integer templateType;
     /**
-     * 发送用户id
+     * 模版发送人名称
+     *
+     * 冗余 {@link NotifyTemplateDO#getNickname()}
      */
-    private Long sendUserId;
+    private String templateNickname;
     /**
-     * 发送用户名
+     * 模版内容
+     *
+     * 基于 {@link NotifyTemplateDO#getContent()} 格式化后的内容
      */
-    private String sendUserName;
+    private String templateContent;
+    /**
+     * 模版参数
+     *
+     * 基于 {@link NotifyTemplateDO#getParams()} 输入后的参数
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, Object> templateParams;
+
+    // ========= 读取相关字段 =========
+
     /**
      * 是否已读
      */
@@ -82,6 +96,6 @@ public class NotifyMessageDO extends BaseDO {
     /**
      * 阅读时间
      */
-    private Date readTime;
+    private LocalDateTime readTime;
 
 }

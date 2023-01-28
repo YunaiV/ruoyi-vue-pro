@@ -10,7 +10,7 @@ import io.swagger.annotations.*;
 @ToString(callSuper = true)
 public class NotifyTemplateRespVO extends NotifyTemplateBaseVO {
 
-    @ApiModelProperty(value = "ID", required = true)
+    @ApiModelProperty(value = "ID", required = true, example = "1024")
     private Long id;
 
     @ApiModelProperty(value = "参数数组", example = "name,code")

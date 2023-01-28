@@ -8,5 +8,4 @@ import io.swagger.annotations.*;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class NotifyTemplateCreateReqVO extends NotifyTemplateBaseVO {
-
 }

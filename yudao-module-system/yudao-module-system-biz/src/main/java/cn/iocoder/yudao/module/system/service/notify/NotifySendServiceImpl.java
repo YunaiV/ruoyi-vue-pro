@@ -1,25 +1,20 @@
 package cn.iocoder.yudao.module.system.service.notify;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.module.system.dal.mysql.notify.NotifyMessageMapper;
-import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.NOTICE_NOT_FOUND;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
-// TODO @luowenfeng：可以直接合并到 NotifyMessageService 中；之前 sms 台复杂，所以没合并。
 /**
  * 站内信发送 Service 实现类
  *
@@ -34,10 +29,7 @@ public class NotifySendServiceImpl implements NotifySendService {
     private NotifyTemplateService notifyTemplateService;
 
     @Resource
-    private NotifyMessageMapper notifyMessageMapper;
-
-    @Resource
-    private AdminUserService userService;
+    private NotifyMessageService notifyMessageService;
 
     @Override
     public Long sendSingleNotifyToAdmin(Long userId, String templateCode, Map<String, Object> templateParams) {
@@ -51,38 +43,44 @@ public class NotifySendServiceImpl implements NotifySendService {
 
     @Override
     public Long sendSingleNotify(Long userId, Integer userType, String templateCode, Map<String, Object> templateParams) {
-        // 校验短信模板是否合法
-        NotifyTemplateDO template = this.checkNotifyTemplateValid(templateCode);
-        String content = notifyTemplateService.formatNotifyTemplateContent(template.getContent(), templateParams);
-        // 获得用户
-        AdminUserDO sendUser = userService.getUser(getLoginUserId());
+        // 校验模版
+        NotifyTemplateDO template = checkNotifyTemplateValid(templateCode);
+        if (Objects.equals(template.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
+            log.info("[sendSingleNotify][模版({})已经关闭，无法给用户({}/{})发送]", templateCode, userId, userType);
+            return null;
+        }
+        // 校验参数
+        checkTemplateParams(template, templateParams);
 
-        // todo 模板状态未开启时的业务；如果未开启，就直接 return 好了；
-        NotifyMessageDO notifyMessageDO = new NotifyMessageDO();
-        notifyMessageDO.setContent(content);
-        notifyMessageDO.setTitle(template.getTitle());
-        notifyMessageDO.setReadStatus(false);
-        notifyMessageDO.setTemplateId(template.getId());
-        notifyMessageDO.setTemplateCode(templateCode);
-        notifyMessageDO.setUserId(userId);
-        notifyMessageDO.setUserType(userType);
-        notifyMessageDO.setSendTime(new Date());
-        notifyMessageDO.setSendUserId(sendUser.getId());
-        notifyMessageDO.setSendUserName(sendUser.getUsername());
-        notifyMessageMapper.insert(notifyMessageDO);
-        return notifyMessageDO.getId();
+        // 发送站内信
+        String content = notifyTemplateService.formatNotifyTemplateContent(template.getContent(), templateParams);
+        return notifyMessageService.createNotifyMessage(userId, userType, template, content, templateParams);
     }
 
-    // 此注解的含义
     @VisibleForTesting
     public NotifyTemplateDO checkNotifyTemplateValid(String templateCode) {
-        // 获得短信模板。考虑到效率，从缓存中获取
+        // 获得站内信模板。考虑到效率，从缓存中获取
         NotifyTemplateDO template = notifyTemplateService.getNotifyTemplateByCodeFromCache(templateCode);
-        // 短信模板不存在
+        // 站内信模板不存在
         if (template == null) {
             throw exception(NOTICE_NOT_FOUND);
         }
         return template;
     }
 
+    /**
+     * 校验站内信模版参数是否确实
+     *
+     * @param template 邮箱模板
+     * @param templateParams 参数列表
+     */
+    @VisibleForTesting
+    public void checkTemplateParams(NotifyTemplateDO template, Map<String, Object> templateParams) {
+        template.getParams().forEach(key -> {
+            Object value = templateParams.get(key);
+            if (value == null) {
+                throw exception(NOTIFY_SEND_TEMPLATE_PARAM_MISS, key);
+            }
+        });
+    }
 }

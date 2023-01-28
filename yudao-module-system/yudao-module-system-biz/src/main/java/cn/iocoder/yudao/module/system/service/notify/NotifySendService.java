@@ -3,8 +3,12 @@ package cn.iocoder.yudao.module.system.service.notify;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 站内信发送 Service 接口
+ *
+ * @author xrcoder
+ */
 public interface NotifySendService {
-
 
     /**
      * 发送单条站内信给管理后台的用户

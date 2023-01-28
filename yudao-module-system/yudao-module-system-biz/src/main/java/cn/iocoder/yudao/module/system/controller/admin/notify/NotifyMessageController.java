@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.system.controller.admin.notify;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageMyPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessagePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageRespVO;
 import cn.iocoder.yudao.module.system.convert.notify.NotifyMessageConvert;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -32,6 +31,8 @@ public class NotifyMessageController {
 
     @Resource
     private NotifyMessageService notifyMessageService;
+
+    // ========== 管理所有的站内信 ==========
 
     @GetMapping("/get")
     @ApiOperation("获得站内信")
@@ -50,38 +51,45 @@ public class NotifyMessageController {
         return success(NotifyMessageConvert.INSTANCE.convertPage(pageResult));
     }
 
-    @GetMapping("/get-recent-list")
-    @ApiOperation("获取当前用户最新站内信，默认10条")
-    @ApiImplicitParam(name = "size", value = "10", defaultValue = "10", dataTypeClass = Integer.class)
-    public CommonResult<List<NotifyMessageRespVO>> getRecentList(@RequestParam(name = "size", defaultValue = "10") Integer size) {
-        NotifyMessagePageReqVO reqVO = new NotifyMessagePageReqVO();
-        List<NotifyMessageDO> pageResult = notifyMessageService.getNotifyMessageList(reqVO, size);
-        if (CollUtil.isNotEmpty(pageResult)) {
-            return success(NotifyMessageConvert.INSTANCE.convertList(pageResult));
-        }
-        return success(Collections.emptyList());
+    // ========== 查看自己的站内信 ==========
+
+    @GetMapping("/my-page")
+    @ApiOperation("获得我的站内信分页")
+    public CommonResult<PageResult<NotifyMessageRespVO>> getMyMyNotifyMessagePage(@Valid NotifyMessageMyPageReqVO pageVO) {
+        PageResult<NotifyMessageDO> pageResult = notifyMessageService.getMyMyNotifyMessagePage(pageVO,
+                getLoginUserId(), UserTypeEnum.ADMIN.getValue());
+        return success(NotifyMessageConvert.INSTANCE.convertPage(pageResult));
     }
 
-    @GetMapping("/get-unread-count")
-    @ApiOperation("获得未读站内信数量")
-    public CommonResult<Long> getUnreadCount() {
-        return success(notifyMessageService.getUnreadNotifyMessageCount(getLoginUserId(), UserTypeEnum.ADMIN.getValue()));
-    }
-
-    @PutMapping("/update-list-read")
-    @ApiOperation("批量标记已读")
+    @PutMapping("/update-read")
+    @ApiOperation("标记站内信为已读")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    public CommonResult<Boolean> batchUpdateNotifyMessageReadStatus(@RequestBody List<Long> ids) {
-        notifyMessageService.batchUpdateNotifyMessageReadStatus(ids, getLoginUserId());
+    public CommonResult<Boolean> updateNotifyMessageRead(@RequestParam("ids") List<Long> ids) {
+        notifyMessageService.updateNotifyMessageRead(ids, getLoginUserId(), UserTypeEnum.ADMIN.getValue());
         return success(Boolean.TRUE);
     }
 
     @PutMapping("/update-all-read")
-    @ApiOperation("所有未读消息标记已读")
-    public CommonResult<Boolean> batchUpdateAllNotifyMessageReadStatus() {
-        notifyMessageService.batchUpdateAllNotifyMessageReadStatus(getLoginUserId(), UserTypeEnum.ADMIN.getValue());
+    @ApiOperation("标记所有站内信为已读")
+    public CommonResult<Boolean> updateAllNotifyMessageRead() {
+        notifyMessageService.updateAllNotifyMessageRead(getLoginUserId(), UserTypeEnum.ADMIN.getValue());
         return success(Boolean.TRUE);
     }
 
+    @GetMapping("/get-unread-list")
+    @ApiOperation("获取当前用户的最新站内信列表，默认 10 条")
+    @ApiImplicitParam(name = "size", value = "10", defaultValue = "10", dataTypeClass = Integer.class)
+    public CommonResult<List<NotifyMessageRespVO>> getUnreadNotifyMessageList(
+            @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        List<NotifyMessageDO> list = notifyMessageService.getUnreadNotifyMessageList(
+                getLoginUserId(), UserTypeEnum.ADMIN.getValue(), size);
+        return success(NotifyMessageConvert.INSTANCE.convertList(list));
+    }
+
+    @GetMapping("/get-unread-count")
+    @ApiOperation("获得当前用户的未读站内信数量")
+    public CommonResult<Long> getUnreadNotifyMessageCount() {
+        return success(notifyMessageService.getUnreadNotifyMessageCount(getLoginUserId(), UserTypeEnum.ADMIN.getValue()));
+    }
 
 }

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -14,24 +15,32 @@ import javax.validation.constraints.NotNull;
 @Data
 public class NotifyTemplateBaseVO {
 
-    @ApiModelProperty(value = "模版编码", required = true)
+    @ApiModelProperty(value = "模版名称", required = true, example = "测试模版")
+    @NotEmpty(message = "模版名称不能为空")
+    private String name;
+
+    @ApiModelProperty(value = "模版编码", required = true, example = "SEND_TEST")
     @NotNull(message = "模版编码不能为空")
     private String code;
 
-    @ApiModelProperty(value = "模版标题", required = true)
-    @NotNull(message = "模版标题不能为空")
-    private String title;
+    @ApiModelProperty(value = "模版类型", required = true, example = "1", notes = "对应 system_notify_template_type 字典")
+    @NotNull(message = "模版类型不能为空")
+    private Integer type;
 
-    @ApiModelProperty(value = "模版内容", required = true)
-    @NotNull(message = "模版内容不能为空")
+    @ApiModelProperty(value = "发送人名称", required = true, example = "土豆")
+    @NotEmpty(message = "发送人名称不能为空")
+    private String nickname;
+
+    @ApiModelProperty(value = "模版内容", required = true, example = "我是模版内容")
+    @NotEmpty(message = "模版内容不能为空")
     private String content;
 
-    @ApiModelProperty(value = "状态：1-启用 0-禁用", required = true)
-    @NotNull(message = "状态：1-启用 0-禁用不能为空")
+    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举")
+    @NotNull(message = "状态不能为空")
     @InEnum(value = CommonStatusEnum.class, message = "状态必须是 {value}")
     private Integer status;
 
-    @ApiModelProperty(value = "备注")
-    private String remarks;
+    @ApiModelProperty(value = "备注", example = "我是备注")
+    private String remark;
 
 }

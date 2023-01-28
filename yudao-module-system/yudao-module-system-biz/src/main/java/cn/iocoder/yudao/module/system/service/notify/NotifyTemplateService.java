@@ -2,14 +2,11 @@ package cn.iocoder.yudao.module.system.service.notify;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,7 +14,6 @@ import java.util.Map;
  *
  * @author xrcoder
  */
-// TODO 芋艿：缺少单测，可以参考 SmsTemplateServiceTest 写下
 public interface NotifyTemplateService {
 
     /**
@@ -32,16 +28,6 @@ public interface NotifyTemplateService {
      * @return 站内信模板
      */
     NotifyTemplateDO getNotifyTemplateByCodeFromCache(String code);
-
-
-    /**
-     * 格式化站内信内容
-     *
-     * @param content 站内信模板的内容
-     * @param params 站内信内容的参数
-     * @return 格式化后的内容
-     */
-    String formatNotifyTemplateContent(String content, Map<String, Object> params);
 
     /**
      * 创建站内信模版
@@ -74,14 +60,6 @@ public interface NotifyTemplateService {
     NotifyTemplateDO getNotifyTemplate(Long id);
 
     /**
-     * 获得站内信模版列表
-     *
-     * @param ids 编号
-     * @return 站内信模版列表
-     */
-    List<NotifyTemplateDO> getNotifyTemplateList(Collection<Long> ids);
-
-    /**
      * 获得站内信模版分页
      *
      * @param pageReqVO 分页查询
@@ -90,11 +68,12 @@ public interface NotifyTemplateService {
     PageResult<NotifyTemplateDO> getNotifyTemplatePage(NotifyTemplatePageReqVO pageReqVO);
 
     /**
-     * 获得站内信模版列表, 用于 Excel 导出
+     * 格式化站内信内容
      *
-     * @param exportReqVO 查询条件
-     * @return 站内信模版列表
+     * @param content 站内信模板的内容
+     * @param params 站内信内容的参数
+     * @return 格式化后的内容
      */
-    List<NotifyTemplateDO> getNotifyTemplateList(NotifyTemplateExportReqVO exportReqVO);
+    String formatNotifyTemplateContent(String content, Map<String, Object> params);
 
 }

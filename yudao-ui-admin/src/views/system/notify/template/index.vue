@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="150px">
-      <el-form-item label="模板编码" prop="code">
-        <el-input v-model="queryParams.code" placeholder="请输入模板编码" clearable @keyup.enter.native="handleQuery"/>
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="模板名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入模板名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="模板标题" prop="title">
-        <el-input v-model="queryParams.title" placeholder="请输入模板标题" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="模版编码" prop="code">
+        <el-input v-model="queryParams.code" placeholder="请输入模版编码" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="开启状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择开启状态" clearable>
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
@@ -30,17 +30,19 @@
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
                    v-hasPermi="['system:notify-template:create']">新增</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
-                   v-hasPermi="['system:notify-template:export']">导出</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="模板编码" align="center" prop="code" />
-      <el-table-column label="模板标题" align="center" prop="title" />
+      <el-table-column label="模板名称" align="center" prop="name" />
+      <el-table-column label="类型" align="center" prop="type">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.SYSTEM_NOTIFY_TEMPLATE_TYPE" :value="scope.row.type" />
+        </template>
+      </el-table-column>
+      <el-table-column label="发送人名称" align="center" prop="nickname" />
       <el-table-column label="模板内容" align="center" prop="content" width="300" />
       <el-table-column label="开启状态" align="center" prop="status">
         <template slot-scope="scope">
@@ -74,11 +76,20 @@
         <el-form-item label="模板编号" prop="code">
           <el-input v-model="form.code" placeholder="请输入模板编号" />
         </el-form-item>
-        <el-form-item label="模板标题" prop="title">
-          <el-input v-model="form.title" placeholder="请输入标题名称" />
+        <el-form-item label="模板名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入模版名称" />
+        </el-form-item>
+        <el-form-item label="发件人名称" prop="nickname">
+          <el-input v-model="form.nickname" placeholder="请输入发件人名称" />
         </el-form-item>
         <el-form-item label="模板内容" prop="content">
           <el-input type="textarea" v-model="form.content" placeholder="请输入模板内容" />
+        </el-form-item>
+        <el-form-item label="类型" prop="type">
+          <el-select v-model="form.type" placeholder="请选择类型">
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_NOTIFY_TEMPLATE_TYPE)"
+                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
+          </el-select>
         </el-form-item>
         <el-form-item label="开启状态" prop="status">
           <el-radio-group v-model="form.status">
@@ -122,8 +133,9 @@
 
 <script>
 import { createNotifyTemplate, updateNotifyTemplate, deleteNotifyTemplate, getNotifyTemplate, getNotifyTemplatePage,
-  exportNotifyTemplateExcel, sendNotify } from "@/api/system/notify/notifyTemplate";
+  sendNotify } from "@/api/system/notify/template";
 import {listSimpleUsers} from "@/api/system/user";
+import {CommonStatusEnum} from "@/utils/constants";
 
 export default {
   name: "NotifyTemplate",
@@ -131,8 +143,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -156,11 +166,12 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        status: [{ required: true, message: "开启状态不能为空", trigger: "blur" }],
-        code: [{ required: true, message: "模板编码不能为空", trigger: "blur" }],
-        title: [{ required: true, message: "模板标题不能为空", trigger: "blur" }],
-        content: [{ required: true, message: "模板内容不能为空", trigger: "blur" }],
-        userId: [{ required: true, message: "接收人不能为空", trigger: "blur" }]
+        name: [{ required: true, message: "模板名称不能为空", trigger: "blur" }],
+        code: [{ required: true, message: "模版编码不能为空", trigger: "blur" }],
+        nickname: [{ required: true, message: "发件人名称不能为空", trigger: "blur" }],
+        content: [{ required: true, message: "模版内容不能为空", trigger: "blur" }],
+        type: [{ required: true, message: "类型不能为空", trigger: "change" }],
+        status: [{ required: true, message: "状态不能为空", trigger: "blur" }],
       },
       // 用户列表
       users: [],
@@ -170,8 +181,8 @@ export default {
         params: [], // 模板的参数列表
       },
       sendNotifyRules: {
-        mobile: [{ required: true, message: "手机不能为空", trigger: "blur" }],
-        templateCode: [{ required: true, message: "手机不能为空", trigger: "blur" }],
+        userId: [{ required: true, message: "接收人不能为空", trigger: "blur" }],
+        templateCode: [{ required: true, message: "模版编号不能为空", trigger: "blur" }],
         templateParams: { }
       }
     };
@@ -203,10 +214,13 @@ export default {
     reset() {
       this.form = {
         id: undefined,
-        status: undefined,
+        name: undefined,
         code: undefined,
-        title: undefined,
+        nickname: undefined,
         content: undefined,
+        type: undefined,
+        params: undefined,
+        status: CommonStatusEnum.ENABLE,
         remark: undefined,
       };
       this.resetForm("form");
@@ -268,21 +282,6 @@ export default {
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
-      }).catch(() => {});
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      // 处理查询参数
-      let params = {...this.queryParams};
-      params.pageNo = undefined;
-      params.pageSize = undefined;
-      // 执行导出
-      this.$modal.confirm('是否确认导出所有站内信模板数据项?', "警告").then(() => {
-        this.exportLoading = true;
-        return exportNotifyTemplateExcel(params);
-      }).then(response => {
-        this.$download.excel(response, '短信模板.xls');
-        this.exportLoading = false;
       }).catch(() => {});
     },
     /** 发送站内信按钮 */

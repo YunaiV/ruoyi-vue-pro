@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -18,14 +19,20 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class NotifyMessagePageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "标题")
-    private String title;
+    @ApiModelProperty(value = "用户编号", example = "25025")
+    private Long userId;
 
-    @ApiModelProperty(value = "是否已读 0-未读  1-已读")
-    private Boolean readStatus;
+    @ApiModelProperty(value = "用户类型", example = "1")
+    private Integer userType;
+
+    @ApiModelProperty(value = "模板编码", example = "test_01")
+    private String templateCode;
+
+    @ApiModelProperty(value = "模版类型", example = "2")
+    private Integer templateType;
 
     @ApiModelProperty(value = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date[] createTime;
+    private LocalDateTime[] createTime;
 
 }

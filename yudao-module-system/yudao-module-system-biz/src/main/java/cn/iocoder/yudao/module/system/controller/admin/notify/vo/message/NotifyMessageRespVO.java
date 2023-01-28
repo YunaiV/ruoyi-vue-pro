@@ -10,7 +10,10 @@ import io.swagger.annotations.*;
 @ToString(callSuper = true)
 public class NotifyMessageRespVO extends NotifyMessageBaseVO {
 
-    @ApiModelProperty(value = "ID", required = true)
+    @ApiModelProperty(value = "ID", required = true, example = "1024")
     private Long id;
+
+    @ApiModelProperty(value = "创建时间", required = true)
+    private Date createTime;
 
 }

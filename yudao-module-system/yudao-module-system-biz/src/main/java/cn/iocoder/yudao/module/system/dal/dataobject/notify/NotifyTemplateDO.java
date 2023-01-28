@@ -32,13 +32,23 @@ public class NotifyTemplateDO extends BaseDO {
     @TableId
     private Long id;
     /**
+     * 模版名称
+     */
+    private String name;
+    /**
      * 模版编码
      */
     private String code;
     /**
-     * 模版标题
+     * 模版类型
+     *
+     * 对应 system_notify_template_type 字典
      */
-    private String title;
+    private Integer type;
+    /**
+     * 发送人名称
+     */
+    private String nickname;
     /**
      * 模版内容
      */

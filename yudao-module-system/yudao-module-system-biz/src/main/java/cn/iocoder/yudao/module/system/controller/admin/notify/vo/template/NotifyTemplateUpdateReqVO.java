@@ -10,8 +10,8 @@ import javax.validation.constraints.*;
 @ToString(callSuper = true)
 public class NotifyTemplateUpdateReqVO extends NotifyTemplateBaseVO {
 
-    @ApiModelProperty(value = "ID", required = true)
-    @NotNull(message = "ID不能为空")
+    @ApiModelProperty(value = "ID", required = true, example = "1024")
+    @NotNull(message = "ID 不能为空")
     private Long id;
 
 }

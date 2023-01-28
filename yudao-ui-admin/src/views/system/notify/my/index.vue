@@ -1,17 +1,14 @@
 <template>
   <div class="app-container">
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="150px">
-      <el-form-item label="模板标题" prop="title">
-        <el-input v-model="queryParams.title" placeholder="请输入模板标题" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="读取状态" prop="readStatus">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="是否已读" prop="readStatus">
         <el-select v-model="queryParams.readStatus" placeholder="请选择状态" clearable>
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_NOTIFY_READ_STATUS)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间" prop="createTime">
+      <el-form-item label="发送时间" prop="createTime">
         <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
@@ -35,17 +32,21 @@
     <!-- 列表 -->
     <el-table v-loading="loading" ref="tables" :data="list">
       <el-table-column type="selection" width="55" />
-      <el-table-column label="模板标题" align="center" prop="title" />
-      <el-table-column label="模板内容" align="center" prop="content" width="300" />
-      <el-table-column label="发送人" align="center" prop="sendUserName" />
-      <el-table-column label="发送时间" align="center" prop="sendTime" width="180">
+      <el-table-column label="发送人" align="center" prop="templateNickname" width="120" />
+      <el-table-column label="发送时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.sendTime) }}</span>
+          <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="读取状态" align="center" prop="readStatus">
+      <el-table-column label="类型" align="center" prop="templateType" width="80">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.SYSTEM_NOTIFY_TEMPLATE_TYPE" :value="scope.row.templateType" />
+        </template>
+      </el-table-column>
+      <el-table-column label="内容" align="center" prop="templateContent" />
+      <el-table-column label="是否已读" align="center" prop="readStatus" width="80">
         <template slot-scope="scope">
-          <dict-tag :type="DICT_TYPE.SYSTEM_NOTIFY_READ_STATUS" :value="scope.row.readStatus"/>
+          <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.readStatus"/>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
@@ -62,7 +63,7 @@
 </template>
 
 <script>
-import { getNotifyMessagePage, updateNotifyMessageListRead, updateNotifyMessageAllRead} from "@/api/system/notify/myNotify";
+import {getMyNotifyMessagePage, updateAllNotifyMessageRead, updateNotifyMessageRead} from "@/api/system/notify/message";
 
 export default {
   name: "myNotify",
@@ -70,25 +71,17 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
       total: 0,
       // 我的站内信列表
       list: [],
-      // 弹出层标题
-      title: "",
-      // 是否显示弹出层
-      open: false,
       // 查询参数
       queryParams: {
         pageNo: 1,
         pageSize: 10,
         readStatus: null,
-        code: null,
-        title: null,
         createTime: []
       },
     };
@@ -101,7 +94,7 @@ export default {
     getList() {
       this.loading = true;
       // 执行查询
-      getNotifyMessagePage(this.queryParams).then(response => {
+      getMyNotifyMessagePage(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -117,25 +110,26 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    handleUpdateList(){
+    handleUpdateList() {
       let list = this.$refs["tables"].selection;
-      if(list.length != 0){
-        this.handleUpdate(list.map(v=>v.id))
+      if (list.length === 0) {
+        return;
       }
+      this.handleUpdate(list.map(v => v.id))
     },
-    handleUpdateSingle(row){
+    handleUpdateSingle(row) {
       this.handleUpdate([row.id])
     },
-    handleUpdate(ids){
-      updateNotifyMessageListRead(ids).then(response => {
-        this.$modal.msgSuccess("修改成功");
-            this.getList();
+    handleUpdate(ids) {
+      updateNotifyMessageRead(ids).then(response => {
+        this.$modal.msgSuccess("标记已读成功！");
+        this.getList();
       });
     },
     handleUpdateAll(){
-      updateNotifyMessageAllRead().then(response => {
-        this.$modal.msgSuccess("修改成功");
-            this.getList();
+      updateAllNotifyMessageRead().then(response => {
+        this.$modal.msgSuccess("全部已读成功！");
+        this.getList();
       });
     }
   }

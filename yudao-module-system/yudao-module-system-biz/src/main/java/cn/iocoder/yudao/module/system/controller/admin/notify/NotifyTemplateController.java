@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.system.controller.admin.notify;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.*;
 import cn.iocoder.yudao.module.system.convert.notify.NotifyTemplateConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
@@ -17,13 +15,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "管理后台 - 站内信模版")
 @RestController
@@ -36,7 +30,6 @@ public class NotifyTemplateController {
 
     @Resource
     private NotifySendService notifySendService;
-
 
     @PostMapping("/create")
     @ApiOperation("创建站内信模版")
@@ -79,22 +72,12 @@ public class NotifyTemplateController {
         return success(NotifyTemplateConvert.INSTANCE.convertPage(pageResult));
     }
 
-    @GetMapping("/export-excel")
-    @ApiOperation("导出站内信模版 Excel")
-    @PreAuthorize("@ss.hasPermission('system:notify-template:export')")
-    @OperateLog(type = EXPORT)
-    public void exportNotifyTemplateExcel(@Valid NotifyTemplateExportReqVO exportReqVO,
-                                          HttpServletResponse response) throws IOException {
-        List<NotifyTemplateDO> list = notifyTemplateService.getNotifyTemplateList(exportReqVO);
-        // 导出 Excel
-        List<NotifyTemplateExcelVO> datas = NotifyTemplateConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "站内信模版.xls", "数据", NotifyTemplateExcelVO.class, datas);
-    }
-
     @PostMapping("/send-notify")
     @ApiOperation("发送站内信")
+    @PreAuthorize("@ss.hasPermission('system:notify-template:send-notify')")
     public CommonResult<Long> sendNotify(@Valid @RequestBody NotifyTemplateSendReqVO sendReqVO) {
         return success(notifySendService.sendSingleNotifyToAdmin(sendReqVO.getUserId(),
                 sendReqVO.getTemplateCode(), sendReqVO.getTemplateParams()));
     }
+
 }

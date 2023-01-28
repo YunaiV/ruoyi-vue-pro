@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ public class NotifyTemplateSendReqVO {
     private Long userId;
 
     @ApiModelProperty(value = "模板编码", required = true, example = "01")
-    @NotNull(message = "模板编码不能为空")
+    @NotEmpty(message = "模板编码不能为空")
     private String templateCode;
 
     @ApiModelProperty(value = "模板参数")
