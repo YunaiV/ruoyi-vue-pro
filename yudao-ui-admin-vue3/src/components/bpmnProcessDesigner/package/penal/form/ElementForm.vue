@@ -205,7 +205,7 @@
 </template>
 
 <script setup lang="ts" name="ElementForm">
-import { ref, inject, watch, nextTick } from 'vue'
+import { ref, inject, watch, nextTick, toRaw } from 'vue'
 import {
   ElDialog,
   ElForm,
@@ -280,10 +280,12 @@ const resetFormList = () => {
   updateElementExtensions()
 }
 const updateElementFormKey = () => {
-  window.bpmnInstances.modeling.updateProperties(bpmnELement.value, { formKey: formKey.value })
+  window.bpmnInstances.modeling.updateProperties(toRaw(bpmnELement.value), {
+    formKey: formKey.value
+  })
 }
 const updateElementBusinessKey = () => {
-  window.bpmnInstances.modeling.updateModdleProperties(bpmnELement.value, formData.value, {
+  window.bpmnInstances.modeling.updateModdleProperties(toRaw(bpmnELement.value), formData.value, {
     businessKey: businessKey.value
   })
 }
@@ -437,7 +439,7 @@ const updateElementExtensions = () => {
     values: otherExtensions.value.concat(formData.value)
   })
   // 更新到元素上
-  window.bpmnInstances.modeling.updateProperties(bpmnELement.value, {
+  window.bpmnInstances.modeling.updateProperties(toRaw(bpmnELement.value), {
     extensionElements: newElExtensionElements
   })
 }

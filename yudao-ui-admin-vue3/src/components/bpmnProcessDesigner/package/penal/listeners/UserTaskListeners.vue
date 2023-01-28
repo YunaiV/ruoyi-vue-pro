@@ -331,6 +331,10 @@ const listenerFormRef = ref()
 const listenerFieldFormRef = ref()
 
 const resetListenersList = () => {
+  console.log(
+    window.bpmnInstances.bpmnElement,
+    'window.bpmnInstances.bpmnElementwindow.bpmnInstances.bpmnElementwindow.bpmnInstances.bpmnElementwindow.bpmnInstances.bpmnElementwindow.bpmnInstances.bpmnElementwindow.bpmnInstances.bpmnElement'
+  )
   bpmnElement.value = window.bpmnInstances.bpmnElement
   otherExtensionList.value = []
   bpmnElementListeners.value =

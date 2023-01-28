@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts" name="ElementMultiInstance">
-import { inject, ref, onBeforeUnmount, watch } from 'vue'
+import { inject, ref, onBeforeUnmount, watch, toRaw } from 'vue'
 import { ElForm, ElFormItem, ElSelect, ElOption, ElCheckbox, ElInput } from 'element-plus'
 const props = defineProps({
   businessObject: Object,
@@ -129,7 +129,9 @@ const changeLoopCharacteristicsType = (type) => {
   // this.loopInstanceForm = { ...this.defaultLoopInstanceForm }; // 切换类型取消原表单配置
   // 取消多实例配置
   if (type === 'Null') {
-    window.bpmnInstances.modeling.updateProperties(bpmnElement.value, { loopCharacteristics: null })
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
+      loopCharacteristics: null
+    })
     return
   }
   // 配置循环
@@ -137,7 +139,7 @@ const changeLoopCharacteristicsType = (type) => {
     const loopCharacteristicsObject = window.bpmnInstances.moddle.create(
       'bpmn:StandardLoopCharacteristics'
     )
-    window.bpmnInstances.modeling.updateProperties(bpmnElement.value, {
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
       loopCharacteristics: loopCharacteristicsObject
     })
     multiLoopInstance.value = null
@@ -155,7 +157,7 @@ const changeLoopCharacteristicsType = (type) => {
       { collection: '${coll_userList}' }
     )
   }
-  window.bpmnInstances.modeling.updateProperties(bpmnElement.value, {
+  window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
     loopCharacteristics: multiLoopInstance.value
   })
 }
@@ -167,9 +169,13 @@ const updateLoopCardinality = (cardinality) => {
       body: cardinality
     })
   }
-  window.bpmnInstances.modeling.updateModdleProperties(bpmnElement.value, multiLoopInstance.value, {
-    loopCardinality
-  })
+  window.bpmnInstances.modeling.updateModdleProperties(
+    toRaw(bpmnElement.value),
+    multiLoopInstance.value,
+    {
+      loopCardinality
+    }
+  )
 }
 // 完成条件
 const updateLoopCondition = (condition) => {
@@ -179,9 +185,13 @@ const updateLoopCondition = (condition) => {
       body: condition
     })
   }
-  window.bpmnInstances.modeling.updateModdleProperties(bpmnElement.value, multiLoopInstance.value, {
-    completionCondition
-  })
+  window.bpmnInstances.modeling.updateModdleProperties(
+    toRaw(bpmnElement.value),
+    multiLoopInstance.value,
+    {
+      completionCondition
+    }
+  )
 }
 // 重试周期
 const updateLoopTimeCycle = (timeCycle) => {
@@ -192,16 +202,24 @@ const updateLoopTimeCycle = (timeCycle) => {
       })
     ]
   })
-  window.bpmnInstances.modeling.updateModdleProperties(bpmnElement.value, multiLoopInstance.value, {
-    extensionElements
-  })
+  window.bpmnInstances.modeling.updateModdleProperties(
+    toRaw(bpmnElement.value),
+    multiLoopInstance.value,
+    {
+      extensionElements
+    }
+  )
 }
 // 直接更新的基础信息
 const updateLoopBase = () => {
-  window.bpmnInstances.modeling.updateModdleProperties(bpmnElement.value, multiLoopInstance.value, {
-    collection: loopInstanceForm.value.collection || null,
-    elementVariable: loopInstanceForm.value.elementVariable || null
-  })
+  window.bpmnInstances.modeling.updateModdleProperties(
+    toRaw(bpmnElement.value),
+    multiLoopInstance.value,
+    {
+      collection: loopInstanceForm.value.collection || null,
+      elementVariable: loopInstanceForm.value.elementVariable || null
+    }
+  )
 }
 // 各异步状态
 const updateLoopAsync = (key) => {
@@ -215,7 +233,7 @@ const updateLoopAsync = (key) => {
     asyncAttr[key] = loopInstanceForm.value[key]
   }
   window.bpmnInstances.modeling.updateModdleProperties(
-    bpmnElement.value,
+    toRaw(bpmnElement.value),
     multiLoopInstance.value,
     asyncAttr
   )

@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeMount } from 'vue'
+import { ref, onMounted } from 'vue'
 // import { translations } from '@/components/bpmnProcessDesigner/src/translations'
 // 自定义元素选中时的弹出菜单（修改 默认任务 为 用户任务）
 import CustomContentPadProvider from '@/components/bpmnProcessDesigner/package/designer/plugins/content-pad'
@@ -64,9 +64,6 @@ const controlForm = ref({
 // })
 // 流程模型的信息
 const model = ref({})
-onBeforeMount(() => {
-  // window.bpmnInstances = {}
-})
 onMounted(() => {
   // 如果 modelId 非空，说明是修改流程模型
   const modelId = router.currentRoute.value.query && router.currentRoute.value.query.modelId

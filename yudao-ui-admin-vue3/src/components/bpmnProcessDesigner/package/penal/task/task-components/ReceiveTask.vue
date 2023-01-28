@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts" name="ReceiveTask">
-import { ref, watch, onBeforeUnmount, onMounted, nextTick } from 'vue'
+import { ref, watch, onBeforeUnmount, onMounted, nextTick, toRaw } from 'vue'
 import { ElMessage, ElFormItem, ElDialog, ElForm, ElSelect, ElOption } from 'element-plus'
 const props = defineProps({
   id: String,
@@ -85,11 +85,11 @@ const createNewMessage = () => {
 }
 const updateTaskMessage = (messageId) => {
   if (messageId === '-1') {
-    window.bpmnInstances.modeling.updateProperties(bpmnElement.value, {
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
       messageRef: null
     })
   } else {
-    window.bpmnInstances.modeling.updateProperties(bpmnElement.value, {
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
       messageRef: bpmnMessageRefsMap.value[messageId]
     })
   }

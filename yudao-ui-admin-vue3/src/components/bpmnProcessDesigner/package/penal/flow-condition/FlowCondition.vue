@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts" name="FlowCondition">
-import { ref, nextTick, watch, onBeforeUnmount } from 'vue'
+import { ref, nextTick, watch, onBeforeUnmount, toRaw } from 'vue'
 import { ElSelect, ElForm, ElFormItem, ElInput, ElOption } from 'element-plus'
 
 const props = defineProps({
@@ -117,17 +117,17 @@ const updateFlowType = (flowType) => {
   // 正常条件类
   if (flowType === 'condition') {
     flowConditionRef.value = window.bpmnInstances.moddle.create('bpmn:FormalExpression')
-    window.bpmnInstances.modeling.updateProperties(bpmnElement.value, {
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
       conditionExpression: flowConditionRef.value
     })
     return
   }
   // 默认路径
   if (flowType === 'default') {
-    window.bpmnInstances.modeling.updateProperties(bpmnElement.value, {
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
       conditionExpression: null
     })
-    window.bpmnInstances.modeling.updateProperties(bpmnElementSource.value, {
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElementSource.value), {
       default: bpmnElement.value
     })
     return
@@ -137,11 +137,11 @@ const updateFlowType = (flowType) => {
     bpmnElementSourceRef.value.default &&
     bpmnElementSourceRef.value.default.id === bpmnElement.value.id
   ) {
-    window.bpmnInstances.modeling.updateProperties(bpmnElementSource.value, {
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElementSource.value), {
       default: null
     })
   }
-  window.bpmnInstances.modeling.updateProperties(bpmnElement.value, {
+  window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
     conditionExpression: null
   })
 }
@@ -164,7 +164,7 @@ const updateFlowCondition = () => {
       })
     }
   }
-  window.bpmnInstances.modeling.updateProperties(bpmnElement.value, {
+  window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
     conditionExpression: condition
   })
 }

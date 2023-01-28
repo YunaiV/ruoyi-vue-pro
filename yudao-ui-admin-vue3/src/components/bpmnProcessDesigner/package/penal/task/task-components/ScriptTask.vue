@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts" name="ScriptTask">
-import { ref, watch, nextTick, onBeforeUnmount } from 'vue'
+import { ref, watch, nextTick, onBeforeUnmount, toRaw } from 'vue'
 import { ElInput, ElFormItem } from 'element-plus'
 const props = defineProps({
   id: String,
@@ -78,7 +78,7 @@ const updateElementTask = () => {
     taskAttr.resource = scriptTaskForm.value.resource || null
     taskAttr.script = null
   }
-  window.bpmnInstances.modeling.updateProperties(bpmnElement.value, taskAttr)
+  window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), taskAttr)
 }
 
 onBeforeUnmount(() => {

@@ -45,7 +45,7 @@ const props = defineProps({
   model: Object // 流程模型的数据
 })
 const needProps = ref({})
-let bpmnElement
+const bpmnElement = ref()
 const elementBaseInfo = ref({})
 // 流程表单的下拉框的数据
 // const forms = ref([])
@@ -57,12 +57,12 @@ const rules = reactive({
 
 const resetBaseInfo = () => {
   console.log(window, 'window')
-  console.log(bpmnElement, 'bpmnElement')
+  console.log(bpmnElement.value, 'bpmnElement')
 
-  bpmnElement = window?.bpmnInstances?.bpmnElement
-  console.log(bpmnElement, 'resetBaseInfo11111111111')
-  elementBaseInfo.value = bpmnElement.businessObject
-  needProps.value['type'] = bpmnElement.businessObject.$type
+  bpmnElement.value = window?.bpmnInstances?.bpmnElement
+  console.log(bpmnElement.value, 'resetBaseInfo11111111111')
+  elementBaseInfo.value = bpmnElement.value.businessObject
+  needProps.value['type'] = bpmnElement.value.businessObject.$type
   // elementBaseInfo.value['typess'] = bpmnElement.value.businessObject.$type
 
   // elementBaseInfo.value = JSON.parse(JSON.stringify(bpmnElement.value.businessObject))
@@ -81,7 +81,10 @@ const handleKeyUpdate = (value) => {
 
   // 在 BPMN 的 XML 中，流程标识 key，其实对应的是 id 节点
   elementBaseInfo.value['id'] = value
-  updateBaseInfo('id')
+
+  setTimeout(() => {
+    updateBaseInfo('id')
+  }, 100)
 }
 const handleNameUpdate = (value) => {
   console.log(elementBaseInfo, 'elementBaseInfo')
@@ -89,7 +92,10 @@ const handleNameUpdate = (value) => {
     return
   }
   elementBaseInfo.value['name'] = value
-  updateBaseInfo('name')
+
+  setTimeout(() => {
+    updateBaseInfo('name')
+  }, 100)
 }
 // const handleDescriptionUpdate=(value)=> {
 // TODO 芋艿：documentation 暂时无法修改，后续在看看
@@ -113,15 +119,15 @@ const updateBaseInfo = (key) => {
   if (key === 'id') {
     console.log('jinru')
     console.log(window, 'window')
-    console.log(bpmnElement, 'bpmnElement')
-    console.log(toRaw(bpmnElement), 'bpmnElement')
-    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement), {
+    console.log(bpmnElement.value, 'bpmnElement')
+    console.log(toRaw(bpmnElement.value), 'bpmnElement')
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
       id: elementBaseInfo.value[key],
       di: { id: `${elementBaseInfo.value[key]}_di` }
     })
   } else {
     console.log(attrObj, 'attrObj')
-    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement), attrObj)
+    window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), attrObj)
   }
 }
 onMounted(() => {
@@ -165,6 +171,6 @@ watch(
 //   }
 // }
 onBeforeUnmount(() => {
-  bpmnElement = null
+  bpmnElement.value = null
 })
 </script>

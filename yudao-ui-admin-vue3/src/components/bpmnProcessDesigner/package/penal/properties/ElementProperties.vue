@@ -13,7 +13,7 @@
           <el-button
             type="text"
             style="color: #ff4d4f"
-            @click="removeAttributes(scope.roww, scope.$index)"
+            @click="removeAttributes(scope.row, scope.$index)"
             >移除</el-button
           >
         </template>
@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts" name="ElementProperties">
-import { ref, inject, nextTick, watch } from 'vue'
+import { ref, inject, nextTick, watch, toRaw } from 'vue'
 import {
   ElMessageBox,
   ElDialog,
@@ -131,8 +131,8 @@ const saveAttribute = () => {
   const { name, value } = propertyForm.value
   if (editingPropertyIndex.value !== -1) {
     window.bpmnInstances.modeling.updateModdleProperties(
-      bpmnElement.value,
-      bpmnElementPropertyList.value[editingPropertyIndex.value],
+      toRaw(bpmnElement.value),
+      toRaw(bpmnElementPropertyList.value)[toRaw(editingPropertyIndex.value)],
       {
         name,
         value
@@ -157,7 +157,7 @@ const updateElementExtensions = (properties) => {
   const extensions = window.bpmnInstances.moddle.create('bpmn:ExtensionElements', {
     values: otherExtensionList.value.concat([properties])
   })
-  window.bpmnInstances.modeling.updateProperties(bpmnElement.value, {
+  window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
     extensionElements: extensions
   })
 }

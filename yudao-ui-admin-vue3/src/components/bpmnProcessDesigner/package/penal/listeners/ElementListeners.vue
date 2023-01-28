@@ -249,7 +249,7 @@
   </div>
 </template>
 <script setup lang="ts" name="ElementListeners">
-import { ref, inject, watch, nextTick } from 'vue'
+import { ref, inject, watch, nextTick, toRaw } from 'vue'
 import {
   ElMessageBox,
   ElTable,
@@ -288,8 +288,10 @@ const listenerFormRef = ref()
 const listenerFieldFormRef = ref()
 
 const resetListenersList = () => {
+  console.log(window, 'window')
   bpmnElement.value = window.bpmnInstances.bpmnElement
   otherExtensionList.value = []
+  console.log(bpmnElement.value, 'bpmnElement.value')
   bpmnElementListeners.value =
     bpmnElement.value.businessObject?.extensionElements?.values?.filter(
       (ex) => ex.$type === `${prefix}:ExecutionListener`
@@ -394,14 +396,15 @@ const saveListenerConfig = async () => {
     bpmnElement.value.businessObject?.extensionElements?.values?.filter(
       (ex) => ex.$type !== `${prefix}:ExecutionListener`
     ) ?? []
-  console.log(bpmnElement.value.height, 'bpmnElement.value')
+  console.log(bpmnElement.value, 'bpmnElement.value')
+  console.log(toRaw(bpmnElement.value), 'toRawtoRawtoRawtoRawtoRaw')
   console.log(
     otherExtensionList.value.concat(bpmnElementListeners.value),
     'otherExtensionList.value.concat(bpmnElementListeners.value).value'
   )
   updateElementExtensions(
-    bpmnElement.value,
-    otherExtensionList.value.concat(bpmnElementListeners.value)
+    toRaw(bpmnElement.value),
+    toRaw(otherExtensionList.value.concat(bpmnElementListeners.value))
   )
   // 4. 隐藏侧边栏
   listenerFormModelVisible.value = false

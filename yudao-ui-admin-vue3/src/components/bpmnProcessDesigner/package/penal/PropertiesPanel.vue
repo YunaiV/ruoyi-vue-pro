@@ -1,5 +1,5 @@
 <template>
-  <div class="process-panel__container" :style="{ width: `${width}px;` }">
+  <div class="process-panel__container" :style="{ width: `${width}px` }">
     <el-collapse v-model="activeTab">
       <el-collapse-item name="base">
         <!-- class="panel-tab__title" -->

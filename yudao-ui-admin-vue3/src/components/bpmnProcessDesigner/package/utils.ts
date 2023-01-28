@@ -1,3 +1,4 @@
+import { toRaw } from 'vue'
 // 创建监听器实例
 export function createListenerObject(options, isTask, prefix) {
   const listenerObj = Object.create(null)
@@ -59,12 +60,9 @@ export function updateElementExtensions(element, extensionList) {
   const extensions = window.bpmnInstances.moddle.create('bpmn:ExtensionElements', {
     values: extensionList
   })
-  console.log(element, 'elementelementelementelement')
-  console.log(extensions.values, 'extensionsextensionsextensions')
-  window.bpmnInstances.modeling.updateProperties(element, {
+  window.bpmnInstances.modeling.updateProperties(toRaw(element), {
     extensionElements: extensions.values
   })
-  console.log('ssss')
 }
 
 // 创建一个id

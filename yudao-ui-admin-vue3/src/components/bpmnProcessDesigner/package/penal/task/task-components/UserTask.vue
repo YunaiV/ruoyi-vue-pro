@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts" name="UserTask">
-import { ref, watch, nextTick, onBeforeUnmount } from 'vue'
+import { ref, watch, nextTick, onBeforeUnmount, toRaw } from 'vue'
 import { ElLink, ElFormItem, ElInput } from 'element-plus'
 const props = defineProps({
   id: String,
@@ -78,7 +78,7 @@ const updateElementTask = (key) => {
   } else {
     taskAttr[key] = userTaskForm.value[key] || null
   }
-  window.bpmnInstances.modeling.updateProperties(bpmnElement.value, taskAttr)
+  window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), taskAttr)
 }
 
 watch(
