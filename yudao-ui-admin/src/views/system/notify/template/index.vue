@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="站内信配置" url="https://doc.iocoder.cn/notify/" />
+
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="模板名称" prop="name">
@@ -58,7 +60,7 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-share" @click="handleSendNotify(scope.row)"
-                     v-hasPermi="['system:notify-template:send-notify']">发送</el-button>
+                     v-hasPermi="['system:notify-template:send-notify']">测试</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:notify-template:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -73,8 +75,8 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="140px">
-        <el-form-item label="模板编号" prop="code">
-          <el-input v-model="form.code" placeholder="请输入模板编号" />
+        <el-form-item label="模版编码" prop="code">
+          <el-input v-model="form.code" placeholder="请输入模版编码" />
         </el-form-item>
         <el-form-item label="模板名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入模版名称" />
@@ -182,7 +184,7 @@ export default {
       },
       sendNotifyRules: {
         userId: [{ required: true, message: "接收人不能为空", trigger: "blur" }],
-        templateCode: [{ required: true, message: "模版编号不能为空", trigger: "blur" }],
+        templateCode: [{ required: true, message: "模版编码不能为空", trigger: "blur" }],
         templateParams: { }
       }
     };

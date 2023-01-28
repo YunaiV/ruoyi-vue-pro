@@ -28,7 +28,7 @@ public interface NotifyMessageMapper extends BaseMapperX<NotifyMessageDO> {
 
     default PageResult<NotifyMessageDO> selectPage(NotifyMessageMyPageReqVO reqVO, Long userId, Integer userType) {
         return selectPage(reqVO, new LambdaQueryWrapperX<NotifyMessageDO>()
-                .eq(NotifyMessageDO::getReadStatus, reqVO.getReadStatus())
+                .eqIfPresent(NotifyMessageDO::getReadStatus, reqVO.getReadStatus())
                 .betweenIfPresent(NotifyMessageDO::getCreateTime, reqVO.getCreateTime())
                 .eq(NotifyMessageDO::getUserId, userId)
                 .eq(NotifyMessageDO::getUserType, userType)

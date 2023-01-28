@@ -8,7 +8,7 @@
 
       <!-- 弹出列表 -->
       <el-table v-loading="loading" :data="list">
-        <el-table-column width="120" property="templateNickname" label="日期" />
+        <el-table-column width="120" property="templateNickname" label="发送人" />
         <el-table-column width="180" property="title" label="发送时间">
           <template slot-scope="scope">
             <span>{{ parseTime(scope.row.createTime) }}</span>
