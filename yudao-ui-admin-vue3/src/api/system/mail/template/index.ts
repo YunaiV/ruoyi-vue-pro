@@ -21,7 +21,7 @@ export interface MailTemplatePageReqVO extends PageParam {
   createTime?: Date[]
 }
 
-export interface MailSmsReqVO {
+export interface MailSendReqVO {
   mail: string
   templateCode: string
   templateParams: Map<String, Object>
@@ -53,6 +53,6 @@ export const deleteMailTemplateApi = async (id: number) => {
 }
 
 // 发送邮件
-export const sendMailApi = (data: MailSmsReqVO) => {
+export const sendMailApi = (data: MailSendReqVO) => {
   return request.post({ url: '/system/mail-template/send-mail', data })
 }

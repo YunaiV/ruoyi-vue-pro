@@ -252,7 +252,7 @@ const handleSendMail = (row: any) => {
 }
 
 const sendTest = async () => {
-  const data: MailTemplateApi.MailSmsReqVO = {
+  const data: MailTemplateApi.MailSendReqVO = {
     mail: sendForm.value.mail,
     templateCode: sendForm.value.templateCode,
     templateParams: sendForm.value.templateParams as unknown as Map<string, Object>

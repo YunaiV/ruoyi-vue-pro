@@ -1,77 +1,74 @@
 <script setup lang="ts">
-const activeName = ref('notice')
+import dayjs from 'dayjs'
+import * as NotifyMessageApi from '@/api/system/notify/message'
 
-const noticeList = ref([
-  { id: 1, title: '版本升级1', date: '2022-12-12 10:00:00' },
-  { id: 2, title: '版本升级2', date: '2022-12-12 10:00:00' },
-  { id: 3, title: '版本升级3', date: '2022-12-12 10:00:00' },
-  { id: 4, title: '版本升级4', date: '2022-12-12 10:00:00' },
-  { id: 5, title: '版本升级5', date: '2022-12-12 10:00:00' }
-])
-const messageList = ref([
-  { id: 1, title: '加班1', date: '2022-12-12 10:00:00' },
-  { id: 2, title: '加班2', date: '2022-12-12 10:00:00' },
-  { id: 3, title: '加班3', date: '2022-12-12 10:00:00' },
-  { id: 4, title: '加班4', date: '2022-12-12 10:00:00' },
-  { id: 5, title: '加班5', date: '2022-12-12 10:00:00' }
-])
-const needList = ref([
-  { id: 1, title: '审批1', date: '2022-12-12 10:00:00' },
-  { id: 2, title: '审批2', date: '2022-12-12 10:00:00' },
-  { id: 3, title: '审批3', date: '2022-12-12 10:00:00' },
-  { id: 4, title: '审批4', date: '2022-12-12 10:00:00' },
-  { id: 5, title: '审批5', date: '2022-12-12 10:00:00' }
-])
+const { push } = useRouter()
+const activeName = ref('notice')
+const unreadCount = ref(0) // 未读消息数量
+const list = ref([]) // 消息列表
+
+// 获得消息列表
+const getList = async () => {
+  list.value = await NotifyMessageApi.getUnreadNotifyMessageListApi()
+  // 强制设置 unreadCount 为 0，避免小红点因为轮询太慢，不消除
+  unreadCount.value = 0
+}
+
+// 获得未读消息数
+const getUnreadCount = async () => {
+  NotifyMessageApi.getUnreadNotifyMessageCountApi().then((data) => {
+    unreadCount.value = data
+  })
+}
+
+// 跳转我的站内信
+const goMyList = () => {
+  push({
+    name: 'MyNotifyMessage'
+  })
+}
+
+// ========== 初始化 =========
+onMounted(() => {
+  // 首次加载小红点
+  getUnreadCount()
+  // 轮询刷新小红点
+  setInterval(() => {
+    getUnreadCount()
+  }, 1000 * 60 * 2)
+})
 </script>
 <template>
   <div class="message">
-    <ElPopover placement="bottom" :width="310" trigger="click">
+    <ElPopover placement="bottom" :width="400" trigger="click">
       <template #reference>
-        <ElBadge :value="noticeList.length" class="item">
-          <Icon icon="ep:bell" :size="18" class="cursor-pointer" />
+        <ElBadge :is-dot="unreadCount > 0" class="item">
+          <Icon icon="ep:bell" :size="18" class="cursor-pointer" @click="getList" />
         </ElBadge>
       </template>
       <ElTabs v-model="activeName">
-        <ElTabPane label="通知(5)" name="notice">
+        <ElTabPane label="我的站内信" name="notice">
           <div class="message-list">
-            <template v-for="item in noticeList" :key="item.id">
+            <template v-for="item in list" :key="item.id">
               <div class="message-item">
                 <img src="@/assets/imgs/avatar.gif" alt="" class="message-icon" />
                 <div class="message-content">
-                  <span class="message-title">{{ item.title }}</span>
-                  <span class="message-date">{{ item.date }}</span>
-                </div>
-              </div>
-            </template>
-          </div>
-        </ElTabPane>
-        <ElTabPane label="消息(0)" name="message">
-          <div class="message-list">
-            <template v-for="item in messageList" :key="item.id">
-              <div class="message-item">
-                <img src="@/assets/imgs/avatar.gif" alt="" class="message-icon" />
-                <div class="message-content">
-                  <span class="message-title">{{ item.title }}</span>
-                  <span class="message-date">{{ item.date }}</span>
-                </div>
-              </div>
-            </template>
-          </div>
-        </ElTabPane>
-        <ElTabPane label="代办(0)" name="need">
-          <div class="message-list">
-            <template v-for="item in needList" :key="item.id">
-              <div class="message-item">
-                <img src="@/assets/imgs/avatar.gif" alt="" class="message-icon" />
-                <div class="message-content">
-                  <span class="message-title">{{ item.title }}</span>
-                  <span class="message-date">{{ item.date }}</span>
+                  <span class="message-title">
+                    {{ item.templateNickname }}：{{ item.templateContent }}
+                  </span>
+                  <span class="message-date">
+                    {{ dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+                  </span>
                 </div>
               </div>
             </template>
           </div>
         </ElTabPane>
       </ElTabs>
+      <!-- 更多 -->
+      <div style="text-align: right; margin-top: 10px">
+        <XButton type="primary" preIcon="ep:view" title="查看全部" @click="goMyList" />
+      </div>
     </ElPopover>
   </div>
 </template>
