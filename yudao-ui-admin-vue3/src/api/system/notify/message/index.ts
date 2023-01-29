@@ -1,4 +1,5 @@
 import request from '@/config/axios'
+import qs from 'qs'
 
 export interface NotifyMessageVO {
   id: number
@@ -22,6 +23,11 @@ export interface NotifyMessagePageReqVO extends PageParam {
   createTime?: Date[]
 }
 
+export interface NotifyMessageMyPageReqVO extends PageParam {
+  readStatus?: boolean
+  createTime?: Date[]
+}
+
 // 查询站内信消息列表
 export const getNotifyMessagePageApi = async (params: NotifyMessagePageReqVO) => {
   return await request.get({ url: '/system/notify-message/page', params })
@@ -33,29 +39,21 @@ export const getNotifyMessageApi = async (id: number) => {
 }
 
 // 获得我的站内信分页
-// export function getMyNotifyMessagePage(query) {
-//   return request({
-//     url: '/system/notify-message/my-page',
-//     method: 'get',
-//     params: query
-//   })
-// }
+export const getMyNotifyMessagePage = async (params: NotifyMessageMyPageReqVO) => {
+  return await request.get({ url: '/system/notify-message/my-page', params })
+}
 
 // 批量标记已读
-// export function updateNotifyMessageRead(ids) {
-//   return request({
-//     url: '/system/notify-message/update-read?' + qs.stringify({ids: ids}, { indices: false }),
-//     method: 'put'
-//   })
-// }
+export const updateNotifyMessageRead = async (ids) => {
+  return await request.put({
+    url: '/system/notify-message/update-read?' + qs.stringify({ ids: ids }, { indices: false })
+  })
+}
 
 // 标记所有站内信为已读
-// export function updateAllNotifyMessageRead() {
-//   return request({
-//     url: '/system/notify-message/update-all-read',
-//     method: 'put'
-//   })
-// }
+export const updateAllNotifyMessageRead = async () => {
+  return await request.put({ url: '/system/notify-message/update-all-read' })
+}
 
 // 获取当前用户的最新站内信列表
 export const getUnreadNotifyMessageListApi = async () => {

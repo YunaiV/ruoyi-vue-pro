@@ -41,7 +41,7 @@ const loginOut = () => {
     .catch(() => {})
 }
 const toProfile = async () => {
-  push('/userinfo/profile')
+  push('/user/profile')
 }
 const toDocument = () => {
   window.open('https://doc.iocoder.cn/')

@@ -4,18 +4,20 @@ import * as NotifyMessageApi from '@/api/system/notify/message'
 
 const { push } = useRouter()
 const activeName = ref('notice')
-const count = ref(0) // 未读消息数量
+const unreadCount = ref(0) // 未读消息数量
 const list = ref([]) // 消息列表
 
 // 获得消息列表
 const getList = async () => {
   list.value = await NotifyMessageApi.getUnreadNotifyMessageListApi()
+  // 强制设置 unreadCount 为 0，避免小红点因为轮询太慢，不消除
+  unreadCount.value = 0
 }
 
 // 获得未读消息数
 const getUnreadCount = async () => {
   NotifyMessageApi.getUnreadNotifyMessageCountApi().then((data) => {
-    count.value = data
+    unreadCount.value = data
   })
 }
 
@@ -40,7 +42,7 @@ onMounted(() => {
   <div class="message">
     <ElPopover placement="bottom" :width="400" trigger="click">
       <template #reference>
-        <ElBadge :is-dot="count > 0" class="item">
+        <ElBadge :is-dot="unreadCount > 0" class="item">
           <Icon icon="ep:bell" :size="18" class="cursor-pointer" @click="getList" />
         </ElBadge>
       </template>
