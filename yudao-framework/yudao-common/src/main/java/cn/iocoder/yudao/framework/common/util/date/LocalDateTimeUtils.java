@@ -41,6 +41,11 @@ public class LocalDateTimeUtils {
         return LocalDateTime.of(year, mouth, day, 0, 0, 0);
     }
 
+    public static LocalDateTime[] buildBetweenTime(int year1, int mouth1, int day1,
+                                                   int year2, int mouth2, int day2) {
+        return new LocalDateTime[]{buildTime(year1, mouth1, day1), buildTime(year2, mouth2, day2)};
+    }
+
     /**
      * 判断当前时间是否在该时间范围内
      *

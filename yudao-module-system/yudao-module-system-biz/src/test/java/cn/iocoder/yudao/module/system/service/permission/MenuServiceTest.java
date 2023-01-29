@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.system.service.permission;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringAopUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuCreateReqVO;
@@ -20,7 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
@@ -51,32 +49,24 @@ public class MenuServiceTest extends BaseDbUnitTest {
     private TenantService tenantService;
 
     @Test
-    public void testInitLocalCache_success() throws Exception {
-        MenuDO menuDO1 = createMenuDO(MenuTypeEnum.MENU, "xxxx", 0L);
+    public void testInitLocalCache_success() {
+        MenuDO menuDO1 = randomPojo(MenuDO.class);
         menuMapper.insert(menuDO1);
-        MenuDO menuDO2 = createMenuDO(MenuTypeEnum.MENU, "xxxx", 0L);
+        MenuDO menuDO2 = randomPojo(MenuDO.class);
         menuMapper.insert(menuDO2);
 
         // 调用
         menuService.initLocalCache();
-
-        // 获取代理对象
-        MenuServiceImpl target = (MenuServiceImpl) SpringAopUtils.getTarget(menuService);
-
-        Map<Long, MenuDO> menuCache =
-                (Map<Long, MenuDO>) BeanUtil.getFieldValue(target, "menuCache");
+        // 校验 menuCache 缓存
+        Map<Long, MenuDO> menuCache = menuService.getMenuCache();
         Assert.isTrue(menuCache.size() == 2);
         assertPojoEquals(menuDO1, menuCache.get(menuDO1.getId()));
         assertPojoEquals(menuDO2, menuCache.get(menuDO2.getId()));
-
-        Multimap<String, MenuDO> permissionMenuCache =
-                (Multimap<String, MenuDO>) BeanUtil.getFieldValue(target, "permissionMenuCache");
+        // 校验 permissionMenuCache 缓存
+        Multimap<String, MenuDO> permissionMenuCache = menuService.getPermissionMenuCache();
         Assert.isTrue(permissionMenuCache.size() == 2);
         assertPojoEquals(menuDO1, permissionMenuCache.get(menuDO1.getPermission()));
         assertPojoEquals(menuDO2, permissionMenuCache.get(menuDO2.getPermission()));
-
-        LocalDateTime maxUpdateTime = (LocalDateTime) BeanUtil.getFieldValue(target, "maxUpdateTime");
-        assertEquals(ObjectUtils.max(menuDO1.getUpdateTime(), menuDO2.getUpdateTime()), maxUpdateTime);
     }
 
     @Test

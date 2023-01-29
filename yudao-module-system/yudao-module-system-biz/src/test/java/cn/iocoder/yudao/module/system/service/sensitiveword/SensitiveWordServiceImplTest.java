@@ -60,8 +60,6 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         sensitiveWordService.initLocalCache();
-        // 断言 maxUpdateTime 缓存
-        assertEquals(max(wordDO1.getUpdateTime(), wordDO2.getUpdateTime()), sensitiveWordService.getMaxUpdateTime());
         // 断言 sensitiveWordTagsCache 缓存
         assertEquals(SetUtils.asSet("论坛", "蔬菜"), sensitiveWordService.getSensitiveWordTags());
         // 断言 tagSensitiveWordTries 缓存

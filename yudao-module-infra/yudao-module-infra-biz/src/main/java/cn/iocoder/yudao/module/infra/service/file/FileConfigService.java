@@ -21,7 +21,7 @@ public interface FileConfigService {
     /**
      * 初始化文件客户端
      */
-    void initFileClients();
+    void initLocalCache();
 
     /**
      * 创建文件配置

@@ -49,7 +49,7 @@
     "core-js": "^3.26.0",
     "crypto-js": "^4.0.0",
     "echarts": "5.4.0",
-    "element-ui": "2.15.10",
+    "element-ui": "2.15.12",
     "file-saver": "2.0.5",
     "fuse.js": "6.6.2",
     "highlight.js": "9.18.5",

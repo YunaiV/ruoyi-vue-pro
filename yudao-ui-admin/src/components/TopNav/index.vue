@@ -133,7 +133,9 @@ export default {
       } else {
         // 显示左侧联动菜单
         this.activeRoutes(key);
-        this.$store.dispatch('app/toggleSideBarHide', false);
+        if (!this.$route.meta.link) {
+          this.$store.dispatch('app/toggleSideBarHide', false);
+        }
       }
     },
     // 当前激活的路由
@@ -149,7 +151,7 @@ export default {
       if(routes.length > 0) {
         this.$store.commit("SET_SIDEBAR_ROUTERS", routes);
       } else {
-        this.$store.dispatch("app/toggleSideBarHide", true);
+        this.$store.dispatch('app/toggleSideBarHide', true);
       }
     },
     ishttp(url) {

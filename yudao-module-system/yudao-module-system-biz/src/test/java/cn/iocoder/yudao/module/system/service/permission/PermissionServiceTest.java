@@ -3,18 +3,15 @@ package cn.iocoder.yudao.module.system.service.permission;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.UserRoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuMapper;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
@@ -27,8 +24,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -42,8 +41,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@Import({PermissionServiceImpl.class,
-        RoleMenuBatchInsertMapper.class, UserRoleBatchInsertMapper.class})
+@Import({PermissionServiceImpl.class})
 public class PermissionServiceTest extends BaseDbUnitTest {
 
     @Resource
@@ -52,11 +50,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     @Resource
     private RoleMenuMapper roleMenuMapper;
     @Resource
-    private RoleMenuBatchInsertMapper roleMenuBatchInsertMapper;
-    @Resource
     private UserRoleMapper userRoleMapper;
-    @Resource
-    private UserRoleBatchInsertMapper userRoleBatchInsertMapper;
 
     @MockBean
     private RoleService roleService;
@@ -71,7 +65,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     private PermissionProducer permissionProducer;
 
     @Test
-    public void testInitLocalCacheIfUpdateForRoleMenu() {
+    public void testInitLocalCacheForRoleMenu() {
         // mock 数据
         RoleMenuDO roleMenuDO01 = randomPojo(RoleMenuDO.class, o -> o.setRoleId(1L).setMenuId(10L));
         roleMenuMapper.insert(roleMenuDO01);
@@ -79,7 +73,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         roleMenuMapper.insert(roleMenuDO02);
 
         // 调用
-        permissionService.initLocalCacheIfUpdateForRoleMenu(null);
+        permissionService.initLocalCacheForRoleMenu();
         // 断言 roleMenuCache 缓存
         assertEquals(1, permissionService.getRoleMenuCache().keySet().size());
         assertEquals(asList(10L, 20L), permissionService.getRoleMenuCache().get(1L));
@@ -87,13 +81,10 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         assertEquals(2, permissionService.getMenuRoleCache().size());
         assertEquals(singletonList(1L), permissionService.getMenuRoleCache().get(10L));
         assertEquals(singletonList(1L), permissionService.getMenuRoleCache().get(20L));
-        // 断言 maxUpdateTime 缓存
-        LocalDateTime maxUpdateTime = permissionService.getRoleMenuMaxUpdateTime();
-        assertEquals(ObjectUtils.max(roleMenuDO01.getUpdateTime(), roleMenuDO02.getUpdateTime()), maxUpdateTime);
     }
 
     @Test
-    public void testInitLocalCacheIfUpdateForUserRole() {
+    public void testInitLocalCacheForUserRole() {
         // mock 数据
         UserRoleDO userRoleDO01 = randomPojo(UserRoleDO.class, o -> o.setUserId(1L).setRoleId(10L));
         userRoleMapper.insert(userRoleDO01);
@@ -101,13 +92,10 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         userRoleMapper.insert(roleMenuDO02);
 
         // 调用
-        permissionService.initLocalCacheIfUpdateForUserRole(null);
+        permissionService.initLocalCacheForUserRole();
         // 断言 roleMenuCache 缓存
         assertEquals(1, permissionService.getUserRoleCache().size());
         assertEquals(asSet(10L, 20L), permissionService.getUserRoleCache().get(1L));
-        // 断言 maxUpdateTime 缓存
-        LocalDateTime maxUpdateTime = permissionService.getUserRoleMaxUpdateTime();
-        assertEquals(ObjectUtils.max(userRoleDO01.getUpdateTime(), roleMenuDO02.getUpdateTime()), maxUpdateTime);
     }
 
     @Test

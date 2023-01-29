@@ -197,7 +197,7 @@ const sendSmsForm = ref({
 })
 const sendSmsRules = ref({
   mobile: [{ required: true, message: '手机不能为空', trigger: 'blur' }],
-  templateCode: [{ required: true, message: '手机不能为空', trigger: 'blur' }],
+  templateCode: [{ required: true, message: '模版编号不能为空', trigger: 'blur' }],
   templateParams: {}
 })
 const sendVisible = ref(false)
@@ -225,7 +225,7 @@ const sendSmsTest = async () => {
   }
   const res = await SmsTemplateApi.sendSmsApi(data)
   if (res) {
-    message.success('发送成功')
+    message.success('提交发送成功！发送结果，见发送日志编号：' + res)
   }
   sendVisible.value = false
 }
