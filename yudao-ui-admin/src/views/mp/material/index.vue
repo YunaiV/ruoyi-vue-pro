@@ -27,6 +27,8 @@ SOFTWARE.
 -->
 <template>
   <div class="app-container">
+    <doc-alert title="公众号素材" url="https://doc.iocoder.cn/mp/material/" />
+
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="公众号" prop="accountId">

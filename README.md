@@ -41,7 +41,20 @@
 | `ruoyi-vue-pro`      | Spring Boot 多模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro)     |
 | `yudao-cloud`        | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)         |
 | `Spring-Boot-Labs`   | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/zhijiantianya/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/SpringBoot-Labs) |
- | `ruoyi-vue-pro-mini` | 精简版：移除工作流、支付等模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini)**                                                                |
+
+## 🐰 分支说明
+
+|       | JDK 8 完整版                                                 | JDK 8 精简版                                                          | JDK 17 完整版                                                                  |
+|-------|-----------------------------------------------------------|--------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| 分支    | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`mini`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini/) | [`boot-dev`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/boot3-dev/) |
+| 说明    | 包括所有功能                                                    | 只保留核心功能                                                            | 适配 Spring Boot 3.X                                                          |
+| 系统功能  | √                                                         | √                                                                  | √                                                                           |
+| 基础设施  | √                                                         | √                                                                  | √                                                                           |
+| 会员中心  | √                                                         | √                                                                  | √                                                                           |
+| 工作流程  | √                                                         | x                                                                  | 适配中                                                                         |
+| 数据报表  | √                                                         | x                                                                  | 适配中                                                                         |
+| 商城系统  | √                                                         | x                                                                  | √                                                                           |
+| 微信公众号 | √                                                         | x                                                                  | √                                                                           |
 
 ## 😎 开源协议
 
@@ -54,6 +67,14 @@
 ![开源项目对比](https://static.iocoder.cn/project-vs.png?imageView2/2/format/webp/w/1280)
 
 ③ 代码整洁、架构整洁，遵循《阿里巴巴 Java 开发手册》规范，代码注释详细，57000 行 Java 代码，22000 行代码注释。
+
+## 💰 项目外包
+
+我们也是接外包滴，如果你有项目想要外包，可以微信联系【**coeus2016**】。
+
+团队包含专业的项目经理、架构师、前端工程师、后端工程师、测试工程师、运维工程师，可以提供全流程的外包服务。
+
+项目可以是商城、SCRM 系统、OA 系统、物流系统、ERP 系统、CMS 系统、HIS 系统、支付系统、IM 聊天、微信公众号、微信小程序等等。
 
 ## 🐼 内置功能
 
