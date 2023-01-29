@@ -9,14 +9,15 @@
         show-overflow-tooltip
         :formatter="(row) => listenerTypeObject[row.listenerType]"
       />
-      <el-table-column label="操作" width="130px">
+      <el-table-column label="操作" width="100px">
         <template #default="scope">
-          <el-button size="small" @click="openListenerForm(scope.row, scope.$index)"
+          <el-button size="small" link @click="openListenerForm(scope.row, scope.$index)"
             >编辑</el-button
           >
           <el-divider direction="vertical" />
           <el-button
             size="small"
+            link
             style="color: #ff4d4f"
             @click="removeListener(scope.row, scope.$index)"
             >移除</el-button
@@ -26,7 +27,6 @@
     </el-table>
     <div class="element-drawer__button">
       <XButton
-        size="mini"
         type="primary"
         preIcon="ep:plus"
         title="添加监听器"
@@ -137,7 +137,7 @@
       <el-divider />
       <p class="listener-filed__title">
         <span><Icon icon="ep:menu" />注入字段：</span>
-        <XButton type="primary" size="mini" @click="openListenerFieldForm(null)" title="添加字段" />
+        <XButton type="primary" @click="openListenerFieldForm(null)" title="添加字段" />
       </p>
       <el-table
         :data="fieldsListOfListener"
@@ -163,16 +163,13 @@
         />
         <el-table-column label="操作" width="130px">
           <template #default="scope">
-            <el-button
-              size="small"
-              type="text"
-              @click="openListenerFieldForm(scope.row, scope.$index)"
+            <el-button size="small" link @click="openListenerFieldForm(scope.row, scope.$index)"
               >编辑</el-button
             >
             <el-divider direction="vertical" />
             <el-button
               size="small"
-              type="text"
+              link
               style="color: #ff4d4f"
               @click="removeListenerField(scope.row, scope.$index)"
               >移除</el-button
@@ -293,9 +290,7 @@ const resetListenersList = () => {
   otherExtensionList.value = []
   console.log(bpmnElement.value, 'bpmnElement.value')
   bpmnElementListeners.value =
-    // bpmnElement.value.businessObject?.extensionElements?.filter(
-    bpmnElement.value.businessObject?.extensionElements?.filter(
-      // bpmnElement.value.businessObject?.extensionElements?.values?.filter(
+    bpmnElement.value.businessObject?.extensionElements?.values?.filter(
       (ex) => ex.$type === `${prefix}:ExecutionListener`
     ) ?? []
   elementListenersList.value = bpmnElementListeners.value.map((listener) =>
@@ -396,8 +391,8 @@ const saveListenerConfig = async () => {
   // 保存其他配置
   console.log(bpmnElement.value, 'bpmnElement.value')
   otherExtensionList.value =
-    bpmnElement.value.businessObject?.extensionElements?.filter(
-      // bpmnElement.value.businessObject?.extensionElements?.values?.filter(
+    // bpmnElement.value.businessObject?.extensionElements?.filter(
+    bpmnElement.value.businessObject?.extensionElements?.values?.filter(
       (ex) => ex.$type !== `${prefix}:ExecutionListener`
     ) ?? []
   console.log(bpmnElement.value, 'bpmnElement.value')
@@ -406,20 +401,10 @@ const saveListenerConfig = async () => {
     otherExtensionList.value.concat(bpmnElementListeners.value),
     'otherExtensionList.value.concat(bpmnElementListeners.value).value'
   )
-  // updateElementExtensions(
-  //   bpmnElement.value,
-  //   // toRaw(bpmnElement.value),
-  //   otherExtensionList.value.concat(bpmnElementListeners.value)
-  //   // toRaw(otherExtensionList.value.concat(bpmnElementListeners.value))
-  // )
-  const extensions = window.bpmnInstances.moddle.create('bpmn:ExtensionElements', {
-    values: otherExtensionList.value.concat(bpmnElementListeners.value)
-  })
-  console.log(extensions, 'extensionsextensionsextensions')
-  console.log(extensions.values, 'extensionsextensionsextensions')
-  window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
-    extensionElements: extensions.values
-  })
+  updateElementExtensions(
+    bpmnElement.value,
+    otherExtensionList.value.concat(bpmnElementListeners.value)
+  )
   // 4. 隐藏侧边栏
   listenerFormModelVisible.value = false
   listenerForm.value = {}

@@ -61,7 +61,7 @@ export function updateElementExtensions(element, extensionList) {
     values: extensionList
   })
   window.bpmnInstances.modeling.updateProperties(toRaw(element), {
-    extensionElements: extensions.values
+    extensionElements: extensions
   })
 }
 

@@ -17,13 +17,13 @@
       />
       <el-table-column label="操作" width="90px">
         <template #default="scope">
-          <el-button size="small" type="text" @click="openListenerForm(scope.row, scope.$index)"
+          <el-button size="small" link @click="openListenerForm(scope.row, scope.$index)"
             >编辑</el-button
           >
           <el-divider direction="vertical" />
           <el-button
             size="small"
-            type="text"
+            link
             style="color: #ff4d4f"
             @click="removeListener(scope.row, scope.$index)"
             >移除</el-button
@@ -204,16 +204,13 @@
         />
         <el-table-column label="操作" width="100px">
           <template #default="scope">
-            <el-button
-              size="small"
-              type="text"
-              @click="openListenerFieldForm(scope.row, scope.$index)"
+            <el-button size="small" link @click="openListenerFieldForm(scope.row, scope.$index)"
               >编辑</el-button
             >
             <el-divider direction="vertical" />
             <el-button
               size="small"
-              type="text"
+              link
               style="color: #ff4d4f"
               @click="removeListenerField(scope.row, scope.$index)"
               >移除</el-button
@@ -338,8 +335,7 @@ const resetListenersList = () => {
   bpmnElement.value = window.bpmnInstances.bpmnElement
   otherExtensionList.value = []
   bpmnElementListeners.value =
-    bpmnElement.value.businessObject?.extensionElements?.filter(
-      // bpmnElement.value.businessObject?.extensionElements?.values.filter(
+    bpmnElement.value.businessObject?.extensionElements?.values.filter(
       (ex) => ex.$type === `${prefix}:TaskListener`
     ) ?? []
   elementListenersList.value = bpmnElementListeners.value.map((listener) =>

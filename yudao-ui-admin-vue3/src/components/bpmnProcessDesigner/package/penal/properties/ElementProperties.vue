@@ -4,14 +4,15 @@
       <el-table-column label="序号" width="50px" type="index" />
       <el-table-column label="属性名" prop="name" min-width="100px" show-overflow-tooltip />
       <el-table-column label="属性值" prop="value" min-width="100px" show-overflow-tooltip />
-      <el-table-column label="操作" width="90px">
+      <el-table-column label="操作" width="110px">
         <template #default="scope">
-          <el-button type="text" @click="openAttributesForm(scope.row, scope.$index)"
+          <el-button link @click="openAttributesForm(scope.row, scope.$index)" size="small"
             >编辑</el-button
           >
           <el-divider direction="vertical" />
           <el-button
-            type="text"
+            link
+            size="small"
             style="color: #ff4d4f"
             @click="removeAttributes(scope.row, scope.$index)"
             >移除</el-button
@@ -86,8 +87,8 @@ const resetAttributesList = () => {
   bpmnElement.value = window.bpmnInstances.bpmnElement
   otherExtensionList.value = [] // 其他扩展配置
   bpmnElementProperties.value =
-    bpmnElement.value.businessObject?.extensionElements?.filter((ex) => {
-      // bpmnElement.value.businessObject?.extensionElements?.values.filter((ex) => {
+    // bpmnElement.value.businessObject?.extensionElements?.filter((ex) => {
+    bpmnElement.value.businessObject?.extensionElements?.values.filter((ex) => {
       if (ex.$type !== `${prefix}:Properties`) {
         otherExtensionList.value.push(ex)
       }

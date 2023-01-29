@@ -18,7 +18,6 @@
           />
         </el-select>
         <XButton
-          size="mini"
           type="primary"
           preIcon="ep:plus"
           style="margin-left: 8px"
