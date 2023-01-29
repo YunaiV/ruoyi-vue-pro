@@ -9,7 +9,7 @@
       <!-- 弹出列表 -->
       <el-table v-loading="loading" :data="list">
         <el-table-column width="120" property="templateNickname" label="发送人" />
-        <el-table-column width="180" property="title" label="发送时间">
+        <el-table-column width="180" property="createTime" label="发送时间">
           <template slot-scope="scope">
             <span>{{ parseTime(scope.row.createTime) }}</span>
           </template>
@@ -49,7 +49,7 @@ export default {
     // 首次加载小红点
     this.getUnreadCount()
     // 轮询刷新小红点
-    window.timer = setInterval(()=>{
+    setInterval(() => {
       this.getUnreadCount()
     },1000 * 60 * 2)
   },
