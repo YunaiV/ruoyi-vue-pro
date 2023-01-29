@@ -183,18 +183,26 @@
       <!-- <div id="js-properties-panel" class="panel"></div> -->
       <!-- <div class="my-process-designer__canvas" ref="bpmn-canvas"></div> -->
     </div>
-    <el-dialog
+    <XModal
       title="预览"
       width="80%"
+      height="90%"
       v-model="previewModelVisible"
       append-to-body
       destroy-on-close
     >
-      <pre>
-        <!-- <code class="hljs" v-html="highlightedCode(previewType, previewResult)"></code> -->
-        {{ previewResult }}
-      </pre>
-    </el-dialog>
+      <div v-highlight>
+        <pre>
+            <code>
+            <!-- 高亮代码块 -->
+            {{ previewResult }}
+            </code>
+        </pre>
+      </div>
+      <!-- <pre>
+        <code class="hljs" v-html="highlightedCode(previewType, previewResult)"></code>
+      </pre> -->
+    </XModal>
   </div>
 </template>
 
@@ -204,7 +212,7 @@
 // import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css'
 // import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
 // import 'bpmn-js-properties-panel/dist/assets/bpmn-js-properties-panel.css' // 右侧框样式
-import { ElTooltip, ElButtonGroup, ElDialog, ElButton, ElMessage, ElMessageBox } from 'element-plus'
+import { ElTooltip, ElButtonGroup, ElButton, ElMessage, ElMessageBox } from 'element-plus'
 import { computed, onBeforeMount, onBeforeUnmount, onMounted, provide, ref } from 'vue'
 import BpmnModeler from 'bpmn-js/lib/Modeler'
 import DefaultEmptyXML from './plugins/defaultEmpty'

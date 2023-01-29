@@ -246,7 +246,7 @@
   </div>
 </template>
 <script setup lang="ts" name="ElementListeners">
-import { ref, inject, watch, nextTick, toRaw } from 'vue'
+import { ref, inject, watch, nextTick } from 'vue'
 import {
   ElMessageBox,
   ElTable,
@@ -285,10 +285,8 @@ const listenerFormRef = ref()
 const listenerFieldFormRef = ref()
 
 const resetListenersList = () => {
-  console.log(window, 'window')
   bpmnElement.value = window.bpmnInstances.bpmnElement
   otherExtensionList.value = []
-  console.log(bpmnElement.value, 'bpmnElement.value')
   bpmnElementListeners.value =
     bpmnElement.value.businessObject?.extensionElements?.values?.filter(
       (ex) => ex.$type === `${prefix}:ExecutionListener`
@@ -348,7 +346,6 @@ const saveListenerFiled = async () => {
 }
 // 移除监听器字段
 const removeListenerField = (field, index) => {
-  console.log(field, 'field')
   ElMessageBox.confirm('确认移除该字段吗？', '提示', {
     confirmButtonText: '确 认',
     cancelButtonText: '取 消'
@@ -361,7 +358,6 @@ const removeListenerField = (field, index) => {
 }
 // 移除监听器
 const removeListener = (listener, index) => {
-  console.log(listener, 'listener')
   ElMessageBox.confirm('确认移除该监听器吗？', '提示', {
     confirmButtonText: '确 认',
     cancelButtonText: '取 消'
@@ -389,18 +385,10 @@ const saveListenerConfig = async () => {
     elementListenersList.value.splice(editingListenerIndex.value, 1, listenerForm.value)
   }
   // 保存其他配置
-  console.log(bpmnElement.value, 'bpmnElement.value')
   otherExtensionList.value =
-    // bpmnElement.value.businessObject?.extensionElements?.filter(
     bpmnElement.value.businessObject?.extensionElements?.values?.filter(
       (ex) => ex.$type !== `${prefix}:ExecutionListener`
     ) ?? []
-  console.log(bpmnElement.value, 'bpmnElement.value')
-  console.log(toRaw(bpmnElement.value), 'toRawtoRawtoRawtoRawtoRaw')
-  console.log(
-    otherExtensionList.value.concat(bpmnElementListeners.value),
-    'otherExtensionList.value.concat(bpmnElementListeners.value).value'
-  )
   updateElementExtensions(
     bpmnElement.value,
     otherExtensionList.value.concat(bpmnElementListeners.value)
@@ -413,7 +401,6 @@ const saveListenerConfig = async () => {
 watch(
   () => props.id,
   (val) => {
-    console.log(val, 'propsId变化')
     val &&
       val.length &&
       nextTick(() => {
