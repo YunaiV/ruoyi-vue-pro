@@ -25,22 +25,8 @@ const props = defineProps({
 const documentation = ref('')
 const bpmnElement = ref()
 const updateDocumentation = () => {
-  console.log(props, 'props')
-  console.log(window, 'window')
-  console.log(
-    window.bpmnInstances.elementRegistry.get(props.id),
-    'window.bpmnInstances.elementRegistry.get(props.id)'
-  )
-  console.log(bpmnElement.value, 'bpmnElement.value ')
-  if (bpmnElement.value && bpmnElement.value.id === props.id) {
-    bpmnElement.value = window?.bpmnInstances.elementRegistry.get(props.id)
-  }
-  console.log(
-    bpmnElement.value,
-    'bpmnElement.value bpmnElement.value bpmnElement.value bpmnElement.value bpmnElement.value bpmnElement.value '
-  )
-  // (bpmnElement.value && bpmnElement.value.id === props.id) ||
-  //   (bpmnElement.value = window.bpmnInstances.elementRegistry.get(props.id))
+  ;(bpmnElement.value && bpmnElement.value.id === props.id) ||
+    (bpmnElement.value = (window as any).bpmnInstances.elementRegistry.get(props.id))
   const documentations = window.bpmnInstances.bpmnFactory.create('bpmn:Documentation', {
     text: documentation.value
   })

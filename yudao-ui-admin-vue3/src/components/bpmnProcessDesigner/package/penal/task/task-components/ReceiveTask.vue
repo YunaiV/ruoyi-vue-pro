@@ -34,7 +34,7 @@
       append-to-body
       destroy-on-close
     >
-      <el-form :model="newMessageForm" size="mini" label-width="90px">
+      <el-form :model="newMessageForm" size="small" label-width="90px">
         <el-form-item label="消息ID">
           <el-input v-model="newMessageForm.id" clearable />
         </el-form-item>
@@ -43,7 +43,7 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button size="mini" type="primary" @click="createNewMessage">确 认</el-button>
+        <el-button size="small" type="primary" @click="createNewMessage">确 认</el-button>
       </template>
     </el-dialog>
   </div>
