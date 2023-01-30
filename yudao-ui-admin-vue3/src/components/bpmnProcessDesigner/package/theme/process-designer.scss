@@ -1,0 +1,161 @@
+@import 'bpmn-js-token-simulation/assets/css/bpmn-js-token-simulation.css';
+@import 'bpmn-js-token-simulation/assets/css/font-awesome.min.css';
+@import 'bpmn-js-token-simulation/assets/css/normalize.css';
+
+// 边框被 token-simulation 样式覆盖了
+.djs-palette {
+  background: var(--palette-background-color);
+  border: solid 1px var(--palette-border-color) !important;
+  border-radius: 2px;
+}
+
+.my-process-designer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  .my-process-designer__header {
+    width: 100%;
+    min-height: 36px;
+    .el-button {
+      text-align: center;
+    }
+    .el-button-group {
+      margin: 4px;
+    }
+    .el-tooltip__popper {
+      .el-button {
+        width: 100%;
+        text-align: left;
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+      .el-button:hover {
+        background: rgba(64, 158, 255, 0.8);
+        color: #ffffff;
+      }
+    }
+    .align {
+      position: relative;
+      i {
+        &:after {
+          content: '|';
+          position: absolute;
+          // transform: rotate(90deg) translate(200%, 60%);
+          transform: rotate(180deg) translate(271%, -10%);
+        }
+      }
+    }
+    .align.align-left i {
+      transform: rotate(90deg);
+    }
+    .align.align-right i {
+      transform: rotate(-90deg);
+    }
+    .align.align-top i {
+      transform: rotate(180deg);
+    }
+    .align.align-bottom i {
+      transform: rotate(0deg);
+    }
+    .align.align-center i {
+      transform: rotate(0deg);
+      &:after {
+        // transform: rotate(90deg) translate(0, 60%);
+        transform: rotate(0deg) translate(-0%, -5%);
+      }
+    }
+    .align.align-middle i {
+      transform: rotate(-90deg);
+      &:after {
+        // transform: rotate(90deg) translate(0, 60%);
+        transform: rotate(0deg) translate(0, -10%);
+      }
+    }
+  }
+  .my-process-designer__container {
+    display: inline-flex;
+    width: 100%;
+    flex: 1;
+    .my-process-designer__canvas {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+')
+        repeat !important;
+      div.toggle-mode {
+        display: none;
+      }
+    }
+    .my-process-designer__property-panel {
+      height: 100%;
+      overflow: scroll;
+      overflow-y: auto;
+      z-index: 10;
+      * {
+        box-sizing: border-box;
+      }
+    }
+    svg {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      overflow: hidden;
+    }
+  }
+}
+
+//侧边栏配置
+// .djs-palette .two-column .open {
+.open {
+  // .djs-palette.open {
+  .djs-palette-entries {
+    div[class^='bpmn-icon-']:before,
+    div[class*='bpmn-icon-']:before {
+      line-height: unset;
+    }
+    div.entry {
+      position: relative;
+    }
+    div.entry:hover {
+      &::after {
+        width: max-content;
+        content: attr(title);
+        vertical-align: text-bottom;
+        position: absolute;
+        right: -10px;
+        top: 0;
+        bottom: 0;
+        overflow: hidden;
+        transform: translateX(100%);
+        font-size: 0.5em;
+        display: inline-block;
+        text-decoration: inherit;
+        font-variant: normal;
+        text-transform: none;
+        background: #fafafa;
+        box-shadow: 0 0 6px #eeeeee;
+        border: 1px solid #cccccc;
+        box-sizing: border-box;
+        padding: 0 16px;
+        border-radius: 4px;
+        z-index: 100;
+      }
+    }
+  }
+}
+pre {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  max-height: calc(80vh - 32px);
+  overflow-y: auto;
+}
+.hljs {
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+.hljs * {
+  font-family: Consolas, Monaco, monospace;
+}

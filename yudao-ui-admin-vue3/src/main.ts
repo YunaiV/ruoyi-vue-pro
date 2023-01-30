@@ -42,6 +42,16 @@ import './permission'
 
 import { isDevMode } from '@/utils/env'
 
+import { MyPD } from '@/components/bpmnProcessDesigner/package/index.js'
+import '@/components/bpmnProcessDesigner/package/theme/index.scss'
+import 'bpmn-js/dist/assets/diagram-js.css'
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css'
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
+
+import hljs from 'highlight.js' //导入代码高亮文件
+import 'highlight.js/styles/github-gist.css' //导入代码高亮样式
+
 // 本地开发模式 全局引入 element-plus 样式，加快第一次进入速度
 if (isDevMode()) {
   console.info(isDevMode())
@@ -52,7 +62,17 @@ if (isDevMode()) {
 const setupAll = async () => {
   const app = createApp(App)
 
+  //自定义一个代码高亮指令
+  app.directive('highlight', function (el) {
+    const blocks = el.querySelectorAll('code')
+    blocks.forEach((block: any) => {
+      hljs.highlightBlock(block)
+    })
+  })
+
   await setupI18n(app)
+
+  MyPD(app)
 
   setupStore(app)
 

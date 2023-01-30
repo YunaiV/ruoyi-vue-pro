@@ -54,7 +54,15 @@
     "vue-types": "^5.0.2",
     "vxe-table": "^4.3.9",
     "web-storage-cache": "^1.1.1",
-    "xe-utils": "^3.5.7"
+    "xe-utils": "^3.5.7",
+    "bpmn-js-token-simulation": "^0.10.0",
+    "camunda-bpmn-moddle": "^7.0.1",
+    "fast-xml-parser": "^4.0.13",
+    "highlight.js": "^9.18.5",
+    "min-dash": "^4.0.0",
+    "vue3-treeselect": "^0.1.10",
+    "vuedraggable": "^4.1.0",
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.2",
@@ -76,6 +84,8 @@
     "autoprefixer": "^10.4.13",
     "consola": "^2.15.3",
     "eslint": "^8.32.0",
+    "bpmn-js": "^8.9.0",
+    "bpmn-js-properties-panel": "^0.46.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-define-config": "^1.14.0",
     "eslint-plugin-prettier": "^4.2.1",

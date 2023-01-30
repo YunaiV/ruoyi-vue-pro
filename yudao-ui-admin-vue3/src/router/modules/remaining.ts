@@ -211,6 +211,18 @@ const remainingRouter: AppRouteRecordRaw[] = [
         }
       },
       {
+        path: '/manager/model/edit',
+        component: () => import('@/views/bpm/model/modelEditor.vue'),
+        name: 'modelEditor',
+        meta: {
+          noCache: true,
+          hidden: true,
+          canTo: true,
+          title: '设计流程',
+          activeMenu: 'bpm/manager/model/design'
+        }
+      },
+      {
         path: '/manager/definition',
         component: () => import('@/views/bpm/definition/index.vue'),
         name: 'BpmProcessDefinitionList',
