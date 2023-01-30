@@ -8,13 +8,16 @@
           <el-tooltip effect="light" placement="bottom">
             <template #content>
               <div style="color: #409eff">
-                <el-button link @click="downloadProcessAsXml()">下载为XML文件</el-button>
+                <!-- <el-button link @click="downloadProcessAsXml()">下载为XML文件</el-button> -->
+                <XTextButton title="下载为XML文件" @click="downloadProcessAsXml()" />
                 <br />
 
-                <el-button link @click="downloadProcessAsSvg()">下载为SVG文件</el-button>
+                <!-- <el-button link @click="downloadProcessAsSvg()">下载为SVG文件</el-button> -->
+                <XTextButton title="下载为SVG文件" @click="downloadProcessAsSvg()" />
                 <br />
 
-                <el-button link @click="downloadProcessAsBpmn()">下载为BPMN文件</el-button>
+                <!-- <el-button link @click="downloadProcessAsBpmn()">下载为BPMN文件</el-button> -->
+                <XTextButton title="下载为BPMN文件" @click="downloadProcessAsBpmn()" />
               </div>
             </template>
             <XButton title="下载文件" preIcon="ep:download" />
@@ -22,9 +25,11 @@
           <el-tooltip effect="light">
             <XButton preIcon="ep:view" title="浏览" />
             <template #content>
-              <el-button link @click="previewProcessXML">预览XML</el-button>
+              <!-- <el-button link @click="previewProcessXML">预览XML</el-button> -->
+              <XTextButton title="预览XML" @click="previewProcessXML" />
               <br />
-              <el-button link @click="previewProcessJson">预览JSON</el-button>
+              <!-- <el-button link @click="previewProcessJson">预览JSON</el-button> -->
+              <XTextButton title="预览JSON" @click="previewProcessJson" />
             </template>
           </el-tooltip>
           <el-tooltip
@@ -236,7 +241,7 @@ import flowableModdleExtension from './plugins/extension-moddle/flowable'
 // 引入json转换与高亮
 // import xml2js from 'xml-js'
 import xml2js from 'fast-xml-parser'
-
+import { XmlNode, XmlNodeType, parseXmlString } from 'steady-xml'
 // 代码高亮插件
 // import hljs from 'highlight.js/lib/highlight'
 // import 'highlight.js/styles/github-gist.css'
@@ -630,6 +635,13 @@ const previewProcessXML = () => {
 const previewProcessJson = () => {
   bpmnModeler.saveXML({ format: true }).then(({ xml }) => {
     console.log(xml, 'xml')
+
+    const rootNode = parseXmlString(xml)
+    console.log(rootNode, 'rootNoderootNode')
+    const rootNodes = new XmlNode(XmlNodeType.Root)
+    rootNodes.toJsObject()
+    console.log(JSON.stringify(rootNodes), ';;;;;;;;;;;;;;;')
+
     const parser = new xml2js.XMLParser()
     let jObj = parser.parse(xml)
     // console.log(jObj, 'jObjjObjjObjjObjjObj')

@@ -39,6 +39,10 @@ const props = defineProps({
 
 provide('configGlobal', props)
 
+const emit = defineEmits(['destroy'])
+
+let bpmnModeler
+
 const xml = ref('')
 const activityList = ref([])
 const processInstance = ref(undefined)
