@@ -241,7 +241,7 @@ import flowableModdleExtension from './plugins/extension-moddle/flowable'
 // 引入json转换与高亮
 // import xml2js from 'xml-js'
 import xml2js from 'fast-xml-parser'
-import { XmlNode, XmlNodeType, parseXmlString } from 'steady-xml'
+// import { XmlNode, XmlNodeType, parseXmlString } from 'steady-xml'
 // 代码高亮插件
 // import hljs from 'highlight.js/lib/highlight'
 // import 'highlight.js/styles/github-gist.css'
@@ -636,11 +636,11 @@ const previewProcessJson = () => {
   bpmnModeler.saveXML({ format: true }).then(({ xml }) => {
     console.log(xml, 'xml')
 
-    const rootNode = parseXmlString(xml)
-    console.log(rootNode, 'rootNoderootNode')
-    const rootNodes = new XmlNode(XmlNodeType.Root)
-    rootNodes.toJsObject()
-    console.log(JSON.stringify(rootNodes), ';;;;;;;;;;;;;;;')
+    // const rootNode = parseXmlString(xml)
+    // console.log(rootNode, 'rootNoderootNode')
+    // const rootNodes = new XmlNode(XmlNodeType.Root)
+    // rootNodes.toJsObject()
+    // console.log(JSON.stringify(rootNodes), ';;;;;;;;;;;;;;;')
 
     const parser = new xml2js.XMLParser()
     let jObj = parser.parse(xml)
