@@ -7,9 +7,9 @@ import cn.iocoder.yudao.module.system.convert.notify.NotifyTemplateConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 import cn.iocoder.yudao.module.system.service.notify.NotifySendService;
 import cn.iocoder.yudao.module.system.service.notify.NotifyTemplateService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - 站内信模版")
+@Tag(name = "管理后台 - 站内信模版")
 @RestController
 @RequestMapping("/system/notify-template")
 @Validated
@@ -32,14 +32,14 @@ public class NotifyTemplateController {
     private NotifySendService notifySendService;
 
     @PostMapping("/create")
-    @ApiOperation("创建站内信模版")
+    @Operation(summary = "创建站内信模版")
     @PreAuthorize("@ss.hasPermission('system:notify-template:create')")
     public CommonResult<Long> createNotifyTemplate(@Valid @RequestBody NotifyTemplateCreateReqVO createReqVO) {
         return success(notifyTemplateService.createNotifyTemplate(createReqVO));
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新站内信模版")
+    @Operation(summary = "更新站内信模版")
     @PreAuthorize("@ss.hasPermission('system:notify-template:update')")
     public CommonResult<Boolean> updateNotifyTemplate(@Valid @RequestBody NotifyTemplateUpdateReqVO updateReqVO) {
         notifyTemplateService.updateNotifyTemplate(updateReqVO);
@@ -47,8 +47,8 @@ public class NotifyTemplateController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除站内信模版")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @Operation(summary = "删除站内信模版")
+    @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('system:notify-template:delete')")
     public CommonResult<Boolean> deleteNotifyTemplate(@RequestParam("id") Long id) {
         notifyTemplateService.deleteNotifyTemplate(id);
@@ -56,8 +56,8 @@ public class NotifyTemplateController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得站内信模版")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得站内信模版")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:notify-template:query')")
     public CommonResult<NotifyTemplateRespVO> getNotifyTemplate(@RequestParam("id") Long id) {
         NotifyTemplateDO notifyTemplate = notifyTemplateService.getNotifyTemplate(id);
@@ -65,7 +65,7 @@ public class NotifyTemplateController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得站内信模版分页")
+    @Operation(summary = "获得站内信模版分页")
     @PreAuthorize("@ss.hasPermission('system:notify-template:query')")
     public CommonResult<PageResult<NotifyTemplateRespVO>> getNotifyTemplatePage(@Valid NotifyTemplatePageReqVO pageVO) {
         PageResult<NotifyTemplateDO> pageResult = notifyTemplateService.getNotifyTemplatePage(pageVO);
@@ -73,7 +73,7 @@ public class NotifyTemplateController {
     }
 
     @PostMapping("/send-notify")
-    @ApiOperation("发送站内信")
+    @Operation(summary = "发送站内信")
     @PreAuthorize("@ss.hasPermission('system:notify-template:send-notify')")
     public CommonResult<Long> sendNotify(@Valid @RequestBody NotifyTemplateSendReqVO sendReqVO) {
         return success(notifySendService.sendSingleNotifyToAdmin(sendReqVO.getUserId(),
