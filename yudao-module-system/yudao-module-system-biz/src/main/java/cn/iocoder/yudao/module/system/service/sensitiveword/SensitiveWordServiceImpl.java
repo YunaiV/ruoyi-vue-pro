@@ -17,13 +17,11 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -41,12 +39,6 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SENSITIVE_
 public class SensitiveWordServiceImpl implements SensitiveWordService {
 
     /**
-     * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
-     * 因为已经通过 Redis Pub/Sub 机制，所以频率不需要高
-     */
-    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
-
-    /**
      * 敏感词标签缓存
      * key：敏感词编号 {@link SensitiveWordDO#getId()}
      * <p>
@@ -54,12 +46,6 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
      */
     @Getter
     private volatile Set<String> sensitiveWordTagsCache = Collections.emptySet();
-
-    /**
-     * 缓存敏感词的最大更新时间，用于后续的增量轮询，判断是否有更新
-     */
-    @Getter
-    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private SensitiveWordMapper sensitiveWordMapper;
@@ -84,42 +70,17 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
     @Override
     @PostConstruct
     public void initLocalCache() {
-        initLocalCacheIfUpdate(null);
-    }
-
-    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
-    public void schedulePeriodicRefresh() {
-        initLocalCacheIfUpdate(this.maxUpdateTime);
-    }
-
-    /**
-     * 刷新本地缓存
-     *
-     * @param maxUpdateTime 最大更新时间
-     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
-     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
-     */
-    private void initLocalCacheIfUpdate(LocalDateTime maxUpdateTime) {
-        // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
-        // 如果没有增量的数据变化，则不进行本地缓存的刷新
-        if (maxUpdateTime != null
-                && sensitiveWordMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-            log.info("[initLocalCacheIfUpdate][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
-            return;
-        }
+        // 第一步：查询数据
         List<SensitiveWordDO> sensitiveWords = sensitiveWordMapper.selectList();
-        log.info("[initLocalCacheIfUpdate][缓存敏感词，数量为:{}]", sensitiveWords.size());
+        log.info("[initLocalCache][缓存敏感词，数量为:{}]", sensitiveWords.size());
 
-        // 第二步：构建缓存。
+        // 第二步：构建缓存
         // 写入 sensitiveWordTagsCache 缓存
         Set<String> tags = new HashSet<>();
         sensitiveWords.forEach(word -> tags.addAll(word.getTags()));
         sensitiveWordTagsCache = tags;
         // 写入 defaultSensitiveWordTrie、tagSensitiveWordTries 缓存
         initSensitiveWordTrie(sensitiveWords);
-
-        // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
-        this.maxUpdateTime = CollectionUtils.getMaxValue(sensitiveWords, SensitiveWordDO::getUpdateTime);
     }
 
     private void initSensitiveWordTrie(List<SensitiveWordDO> wordDOs) {

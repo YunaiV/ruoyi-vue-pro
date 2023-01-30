@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.6.6-snapshot</revision>
+        <revision>1.7.0-snapshot</revision>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.7.8</spring.boot.version>
         <!-- Web 相关 -->
@@ -141,6 +141,11 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-captcha</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-desensitize</artifactId>
                 <version>${revision}</version>
             </dependency>
 

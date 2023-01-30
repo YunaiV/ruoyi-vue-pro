@@ -235,7 +235,6 @@ public class SmsLogServiceTest extends BaseDbUnitTest {
         return randomPojo(SmsLogDO.class, ArrayUtils.append(consumer, consumers));
     }
 
-
     private static Map<String, Object> randomTemplateParams() {
         return MapUtil.<String, Object>builder().put(randomString(), randomString())
                 .put(randomString(), randomString()).build();

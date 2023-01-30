@@ -25,6 +25,8 @@ export const DICT_TYPE = {
   SYSTEM_SMS_RECEIVE_STATUS: 'system_sms_receive_status',
   SYSTEM_ERROR_CODE_TYPE: 'system_error_code_type',
   SYSTEM_OAUTH2_GRANT_TYPE: 'system_oauth2_grant_type',
+  SYSTEM_MAIL_SEND_STATUS: 'system_mail_send_status',
+  SYSTEM_NOTIFY_TEMPLATE_TYPE: 'system_notify_template_type',
 
   // ========== INFRA 模块 ==========
   INFRA_BOOLEAN_STRING: 'infra_boolean_string',

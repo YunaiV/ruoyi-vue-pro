@@ -6,9 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqV
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -29,8 +27,5 @@ public interface DeptMapper extends BaseMapperX<DeptDO> {
     default Long selectCountByParentId(Long parentId) {
         return selectCount(DeptDO::getParentId, parentId);
     }
-
-    @Select("SELECT COUNT(*) FROM system_dept WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

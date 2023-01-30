@@ -1,0 +1,14 @@
+### 请求 /system/mail-template/send-mail 接口 => 成功
+POST {{baseUrl}}/system/mail-template/send-mail
+Authorization: Bearer {{token}}
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+
+{
+  "templateCode": "test_01",
+  "mail": "7685413@qq.com",
+  "templateParams": {
+    "key01": "value01",
+    "key02": "value02"
+  }
+}

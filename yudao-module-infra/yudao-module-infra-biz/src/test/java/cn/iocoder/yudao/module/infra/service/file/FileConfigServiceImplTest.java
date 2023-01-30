@@ -30,7 +30,6 @@ import java.util.Map;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -74,16 +73,13 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         when(fileClientFactory.getFileClient(eq(1L))).thenReturn(masterFileClient);
 
         // 调用
-        fileConfigService.initFileClients();
+        fileConfigService.initLocalCache();
         // 断言 fileClientFactory 调用
         verify(fileClientFactory).createOrUpdateFileClient(eq(1L),
                 eq(configDO1.getStorage()), eq(configDO1.getConfig()));
         verify(fileClientFactory).createOrUpdateFileClient(eq(2L),
                 eq(configDO2.getStorage()), eq(configDO2.getConfig()));
         assertSame(masterFileClient, fileConfigService.getMasterFileClient());
-        // 断言 maxUpdateTime 缓存
-        assertEquals(max(configDO1.getUpdateTime(), configDO2.getUpdateTime()),
-                fileConfigService.getMaxUpdateTime());
     }
 
     @Test
