@@ -289,6 +289,7 @@ const handleUpdate = (row) => {
   // 2. 再设置表单
   formData.value = {
     ...row,
+    modelId: modelId,
     options: [],
     roleIds: [],
     deptIds: [],

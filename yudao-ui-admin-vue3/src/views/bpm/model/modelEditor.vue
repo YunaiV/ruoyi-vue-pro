@@ -4,7 +4,7 @@
     <!-- <myProcessDesigner -->
     <my-process-designer
       :key="`designer-${reloadIndex}`"
-      v-if="xmlString != undefined"
+      v-if="xmlString !== undefined"
       v-model="xmlString"
       :value="xmlString"
       v-bind="controlForm"
@@ -70,14 +70,14 @@ onMounted(() => {
   console.log(modelId, 'modelId')
   if (modelId) {
     // let data = '4b4909d8-97e7-11ec-8e20-862bc1a4a054'
-    getModelApi(modelId).then((response) => {
-      console.log(response, 'response')
-      xmlString.value = response.data.bpmnXml
+    getModelApi(modelId).then((data) => {
+      console.log(data, 'response')
+      xmlString.value = data.bpmnXml
       model.value = {
-        ...response.data,
+        ...data,
         bpmnXml: undefined // 清空 bpmnXml 属性
       }
-      // this.controlForm.processId = response.data.key
+      // this.controlForm.processId = data.key
 
       // xmlString.value =
       //   '<?xml version="1.0" encoding="UTF-8"?>\n<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="diagram_Process_1645980650311" targetNamespace="http://activiti.org/bpmn"><bpmn2:process id="flowable_01" name="flowable测试" isExecutable="true"><bpmn2:startEvent id="Event_1iruxim"><bpmn2:outgoing>Flow_0804gmo</bpmn2:outgoing></bpmn2:startEvent><bpmn2:userTask id="task01" name="task01"><bpmn2:incoming>Flow_0804gmo</bpmn2:incoming><bpmn2:outgoing>Flow_0cx479x</bpmn2:outgoing></bpmn2:userTask><bpmn2:sequenceFlow id="Flow_0804gmo" sourceRef="Event_1iruxim" targetRef="task01" /><bpmn2:endEvent id="Event_1mdsccz"><bpmn2:incoming>Flow_0cx479x</bpmn2:incoming></bpmn2:endEvent><bpmn2:sequenceFlow id="Flow_0cx479x" sourceRef="task01" targetRef="Event_1mdsccz" /></bpmn2:process><bpmndi:BPMNDiagram id="BPMNDiagram_1"><bpmndi:BPMNPlane id="flowable_01_di" bpmnElement="flowable_01"><bpmndi:BPMNEdge id="Flow_0cx479x_di" bpmnElement="Flow_0cx479x"><di:waypoint x="440" y="350" /><di:waypoint x="492" y="350" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="Flow_0804gmo_di" bpmnElement="Flow_0804gmo"><di:waypoint x="288" y="350" /><di:waypoint x="340" y="350" /></bpmndi:BPMNEdge><bpmndi:BPMNShape id="Event_1iruxim_di" bpmnElement="Event_1iruxim"><dc:Bounds x="252" y="332" width="36" height="36" /></bpmndi:BPMNShape><bpmndi:BPMNShape id="task01_di" bpmnElement="task01"><dc:Bounds x="340" y="310" width="100" height="80" /></bpmndi:BPMNShape><bpmndi:BPMNShape id="Event_1mdsccz_di" bpmnElement="Event_1mdsccz"><dc:Bounds x="492" y="332" width="36" height="36" /></bpmndi:BPMNShape></bpmndi:BPMNPlane></bpmndi:BPMNDiagram></bpmn2:definitions>'
