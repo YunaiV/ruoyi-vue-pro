@@ -140,7 +140,7 @@ export default {
       // 邮件日志列表
       list: [],
       // 弹出层标题
-      title: "",
+      title: "邮件发送日志详细",
       // 是否显示弹出层
       open: false,
       // 查询参数

@@ -9,6 +9,9 @@
       <template v-if="device!=='mobile'">
         <search id="header-search" class="right-menu-item" />
 
+        <!-- 站内信 -->
+        <notify-message class="right-menu-item hover-effect" />
+
         <el-tooltip content="源码地址" effect="dark" placement="bottom">
           <ruo-yi-git id="ruoyi-git" class="right-menu-item hover-effect" />
         </el-tooltip>
@@ -57,6 +60,7 @@ import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
 import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
+import NotifyMessage from '@/layout/components/Message'
 import {getPath} from "@/utils/ruoyi";
 
 export default {
@@ -68,7 +72,8 @@ export default {
     SizeSelect,
     Search,
     RuoYiGit,
-    RuoYiDoc
+    RuoYiDoc,
+    NotifyMessage
   },
   computed: {
     ...mapGetters([

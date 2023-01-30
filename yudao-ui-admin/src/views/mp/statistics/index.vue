@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="公众号统计" url="https://doc.iocoder.cn/mp/statistics/" />
+
     <!-- 搜索工作栏 -->
     <el-form ref="queryForm" size="small" :inline="true" label-width="68px">
       <el-form-item label="公众号" prop="accountId">

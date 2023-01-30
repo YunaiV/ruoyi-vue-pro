@@ -45,7 +45,7 @@ public interface MailLogService {
      * @param isSend        是否发送成功
      * @return 日志编号
      */
-    Long createMailLog(Long userId,Integer userType, String toMail,
+    Long createMailLog(Long userId, Integer userType, String toMail,
                        MailAccountDO account, MailTemplateDO template ,
                        String templateContent, Map<String, Object> templateParams, Boolean isSend);
 

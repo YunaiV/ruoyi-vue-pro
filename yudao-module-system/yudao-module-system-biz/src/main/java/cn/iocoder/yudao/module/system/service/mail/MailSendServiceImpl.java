@@ -88,8 +88,7 @@ public class MailSendServiceImpl implements MailSendService {
 
         // 校验邮箱是否存在
         mail = checkMail(mail);
-        // 构建有序的模板参数。为什么放在这个位置，是提前保证模板参数的正确性，而不是到了插入发送日志
-        List<KeyValue<String, Object>> newTemplateParams = buildTemplateParams(template, templateParams);
+        checkTemplateParams(template, templateParams);
 
         // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus());
@@ -152,21 +151,19 @@ public class MailSendServiceImpl implements MailSendService {
     }
 
     /**
-     * 将参数模板，处理成有序的 KeyValue 数组
+     * 校验邮件参数是否确实
      *
      * @param template 邮箱模板
-     * @param templateParams 原始参数
-     * @return 处理后的参数
+     * @param templateParams 参数列表
      */
     @VisibleForTesting
-    public List<KeyValue<String, Object>> buildTemplateParams(MailTemplateDO template, Map<String, Object> templateParams) {
-        return template.getParams().stream().map(key -> {
+    public void checkTemplateParams(MailTemplateDO template, Map<String, Object> templateParams) {
+        template.getParams().forEach(key -> {
             Object value = templateParams.get(key);
             if (value == null) {
                 throw exception(MAIL_SEND_TEMPLATE_PARAM_MISS, key);
             }
-            return new KeyValue<>(key, value);
-        }).collect(Collectors.toList());
+        });
     }
 
 }

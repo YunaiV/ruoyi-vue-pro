@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <doc-alert title="公众号粉丝" url="https://doc.iocoder.cn/mp/user/" />
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
