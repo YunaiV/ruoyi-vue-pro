@@ -110,7 +110,7 @@ import { getMessagePage, sendMessage } from '@/api/mp/message'
   import WxNews from '@/views/mp/components/wx-news/main.vue';
   import WxLocation from '@/views/mp/components/wx-location/main.vue';
   import WxMusic from '@/views/mp/components/wx-music/main.vue';
-import { getUser } from "@/api/mp/user";
+import { getUser } from "@/api/mp/mpuser";
 
 export default {
   name: "wxMsg",
