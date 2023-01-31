@@ -36,7 +36,7 @@
       <el-table-column type="selection" width="55" />
       <el-table-column label="发送人" align="center" prop="templateNickname" width="120" />
       <el-table-column label="发送时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
@@ -47,12 +47,12 @@
       </el-table-column>
       <el-table-column label="内容" align="center" prop="templateContent" />
       <el-table-column label="是否已读" align="center" prop="readStatus" width="80">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.readStatus"/>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button v-show="!scope.row.readStatus" size="mini" type="text" icon="el-icon-check" @click="handleUpdateSingle(scope.row)">已读</el-button>
         </template>
       </el-table-column>
