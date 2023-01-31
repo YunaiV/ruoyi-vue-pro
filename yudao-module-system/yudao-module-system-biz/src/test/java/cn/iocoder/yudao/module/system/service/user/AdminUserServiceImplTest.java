@@ -299,7 +299,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
         List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));
-        when(deptService.getDeptsByParentIdFromCache(eq(reqVO.getDeptId()), eq(true))).thenReturn(deptList);
+        when(deptService.getDeptListByParentIdFromCache(eq(reqVO.getDeptId()), eq(true))).thenReturn(deptList);
 
         // 调用
         PageResult<AdminUserDO> pageResult = userService.getUserPage(reqVO);
@@ -322,7 +322,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
         List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));
-        when(deptService.getDeptsByParentIdFromCache(eq(reqVO.getDeptId()), eq(true))).thenReturn(deptList);
+        when(deptService.getDeptListByParentIdFromCache(eq(reqVO.getDeptId()), eq(true))).thenReturn(deptList);
 
         // 调用
         List<AdminUserDO> list = userService.getUsers(reqVO);
@@ -366,7 +366,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         UserImportExcelVO importUser = randomPojo(UserImportExcelVO.class, o -> {
         });
         // mock 方法，模拟失败
-        doThrow(new ServiceException(DEPT_NOT_FOUND)).when(deptService).validDepts(any());
+        doThrow(new ServiceException(DEPT_NOT_FOUND)).when(deptService).validateDeptList(any());
 
         // 调用
         UserImportRespVO respVO = userService.importUsers(newArrayList(importUser), true);

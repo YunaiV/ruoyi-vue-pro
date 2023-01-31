@@ -299,7 +299,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (deptId == null) {
             return Collections.emptySet();
         }
-        Set<Long> deptIds = convertSet(deptService.getDeptsByParentIdFromCache(
+        Set<Long> deptIds = convertSet(deptService.getDeptListByParentIdFromCache(
                 deptId, true), DeptDO::getId);
         deptIds.add(deptId); // 包括自身
         return deptIds;
@@ -317,7 +317,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 校验邮箱唯一
         checkEmailUnique(id, email);
         // 校验部门处于开启状态
-        deptService.validDepts(CollectionUtils.singleton(deptId));
+        deptService.validateDeptList(CollectionUtils.singleton(deptId));
         // 校验岗位处于开启状态
         postService.validPosts(postIds);
     }

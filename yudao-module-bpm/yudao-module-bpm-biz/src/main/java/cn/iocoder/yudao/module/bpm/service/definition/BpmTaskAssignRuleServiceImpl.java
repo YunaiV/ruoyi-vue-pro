@@ -216,7 +216,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
             roleApi.validRoles(options);
         } else if (ObjectUtils.equalsAny(type, BpmTaskAssignRuleTypeEnum.DEPT_MEMBER.getType(),
             BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType())) {
-            deptApi.validDepts(options);
+            deptApi.validateDeptList(options);
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.POST.getType())) {
             postApi.validPosts(options);
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER.getType())) {
@@ -293,7 +293,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     }
 
     private Set<Long> calculateTaskCandidateUsersByDeptLeader(BpmTaskAssignRuleDO rule) {
-        List<DeptRespDTO> depts = deptApi.getDepts(rule.getOptions());
+        List<DeptRespDTO> depts = deptApi.getDeptList(rule.getOptions());
         return convertSet(depts, DeptRespDTO::getLeaderUserId);
     }
 

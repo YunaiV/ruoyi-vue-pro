@@ -509,7 +509,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO().setDeptId(3L), null, null); // 最后返回 null 的目的，看看会不会重复调用
         // mock 方法（部门）
         DeptDO deptDO = randomPojo(DeptDO.class);
-        when(deptService.getDeptsByParentIdFromCache(eq(3L), eq(true)))
+        when(deptService.getDeptListByParentIdFromCache(eq(3L), eq(true)))
                 .thenReturn(singletonList(deptDO));
 
         // 调用

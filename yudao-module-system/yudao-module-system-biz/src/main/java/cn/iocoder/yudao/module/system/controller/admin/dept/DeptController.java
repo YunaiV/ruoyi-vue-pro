@@ -58,7 +58,7 @@ public class DeptController {
     @ApiOperation("获取部门列表")
     @PreAuthorize("@ss.hasPermission('system:dept:query')")
     public CommonResult<List<DeptRespVO>> listDepts(DeptListReqVO reqVO) {
-        List<DeptDO> list = deptService.getSimpleDepts(reqVO);
+        List<DeptDO> list = deptService.getDeptList(reqVO);
         list.sort(Comparator.comparing(DeptDO::getSort));
         return success(DeptConvert.INSTANCE.convertList(list));
     }
@@ -69,7 +69,7 @@ public class DeptController {
         // 获得部门列表，只要开启状态的
         DeptListReqVO reqVO = new DeptListReqVO();
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        List<DeptDO> list = deptService.getSimpleDepts(reqVO);
+        List<DeptDO> list = deptService.getDeptList(reqVO);
         // 排序后，返回给前端
         list.sort(Comparator.comparing(DeptDO::getSort));
         return success(DeptConvert.INSTANCE.convertList02(list));
