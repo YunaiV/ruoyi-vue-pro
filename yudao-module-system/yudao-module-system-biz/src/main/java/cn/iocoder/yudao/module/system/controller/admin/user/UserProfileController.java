@@ -72,7 +72,7 @@ public class UserProfileController {
         }
         // 获得岗位信息
         if (CollUtil.isNotEmpty(user.getPostIds())) {
-            List<PostDO> posts = postService.getPosts(user.getPostIds());
+            List<PostDO> posts = postService.getPostList(user.getPostIds());
             resp.setPosts(UserConvert.INSTANCE.convertList02(posts));
         }
         // 获得社交用户信息

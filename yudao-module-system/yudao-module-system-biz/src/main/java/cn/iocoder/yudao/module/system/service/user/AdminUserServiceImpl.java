@@ -319,7 +319,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 校验部门处于开启状态
         deptService.validateDeptList(CollectionUtils.singleton(deptId));
         // 校验岗位处于开启状态
-        postService.validPosts(postIds);
+        postService.validatePostList(postIds);
     }
 
     @VisibleForTesting

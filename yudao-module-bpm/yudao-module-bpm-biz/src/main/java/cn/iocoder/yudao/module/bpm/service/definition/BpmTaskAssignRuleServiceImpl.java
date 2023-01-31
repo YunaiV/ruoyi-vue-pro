@@ -218,7 +218,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
             BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType())) {
             deptApi.validateDeptList(options);
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.POST.getType())) {
-            postApi.validPosts(options);
+            postApi.validPostList(options);
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER.getType())) {
             adminUserApi.validUsers(options);
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER_GROUP.getType())) {

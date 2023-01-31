@@ -337,7 +337,7 @@ public class DeptServiceImplTest extends BaseDbUnitTest {
         List<Long> ids = singletonList(deptDO.getId());
 
         // 调用, 并断言异常
-        assertServiceException(() -> deptService.validateDeptList(ids), DEPT_NOT_ENABLE);
+        assertServiceException(() -> deptService.validateDeptList(ids), DEPT_NOT_ENABLE, deptDO.getName());
     }
 
     @SafeVarargs
