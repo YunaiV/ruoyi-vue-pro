@@ -25,7 +25,7 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="info" plain icon="el-icon-refresh" size="mini" @click="handleSync"
-                   v-hasPermi="['mp:user:sync']">同步
+                   v-hasPermi="['mp:fans:sync']">同步
         </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -58,7 +58,7 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                     v-hasPermi="['mp:user:update']">修改</el-button>
+                     v-hasPermi="['mp:fans:update']">修改</el-button>
         </template>
       </el-table-column>
     </el-table>
