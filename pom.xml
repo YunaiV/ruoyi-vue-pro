@@ -39,7 +39,7 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <!-- 看看咋放到 bom 里 -->
         <lombok.version>1.18.24</lombok.version>
-        <spring.boot.version>2.7.7</spring.boot.version>
+        <spring.boot.version>2.7.8</spring.boot.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
