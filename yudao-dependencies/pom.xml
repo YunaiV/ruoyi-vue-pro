@@ -16,7 +16,7 @@
     <properties>
         <revision>1.7.0-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.7.7</spring.boot.version>
+        <spring.boot.version>2.7.8</spring.boot.version>
         <!-- Web 相关 -->
         <knife4j.version>4.0.0</knife4j.version>
         <swagger-annotations.version>1.6.8</swagger-annotations.version>
@@ -41,12 +41,12 @@
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.8.0</flowable.version>
         <!-- 工具类相关 -->
-        <captcha-plus.version>1.0.1</captcha-plus.version>
+        <captcha-plus.version>1.0.2</captcha-plus.version>
         <jsoup.version>1.15.3</jsoup.version>
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <hutool.version>5.8.11</hutool.version>
-        <easyexcel.verion>3.1.5</easyexcel.verion>
+        <easyexcel.verion>3.2.0</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>

@@ -37,20 +37,20 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="发送时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="消息类型" align="center" prop="type" width="80"/>
       <el-table-column label="发送方" align="center" prop="sendFrom" width="80">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-tag v-if="scope.row.sendFrom === 1" type="success">粉丝</el-tag>
           <el-tag v-else type="info">公众号</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="用户标识" align="center" prop="openid" width="300" />
       <el-table-column label="内容" prop="content">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <!-- 【事件】区域 -->
           <div v-if="scope.row.type === 'event' && scope.row.event === 'subscribe'">
             <el-tag type="success" size="mini">关注</el-tag>
@@ -118,7 +118,7 @@
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleSend(scope.row)"
                      v-hasPermi="['mp:message:send']">消息
           </el-button>

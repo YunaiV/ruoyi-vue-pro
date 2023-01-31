@@ -14,23 +14,23 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="秒杀时段名称" align="center" prop="name" />
       <el-table-column label="开始时间点" align="center" prop="startTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ scope.row.startTime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="结束时间点" align="center" prop="endTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ scope.row.endTime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="秒杀活动数量" align="center" prop="seckillActivityCount" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-view" @click="handleOpenSeckillActivity(scope.row)">
             查看秒杀活动</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"

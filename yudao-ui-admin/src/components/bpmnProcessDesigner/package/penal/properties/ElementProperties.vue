@@ -5,7 +5,7 @@
       <el-table-column label="属性名" prop="name" min-width="100px" show-overflow-tooltip />
       <el-table-column label="属性值" prop="value" min-width="100px" show-overflow-tooltip />
       <el-table-column label="操作" width="90px">
-        <template slot-scope="{ row, $index }">
+        <template v-slot="{ row, $index }">
           <el-button size="mini" type="text" @click="openAttributesForm(row, $index)">编辑</el-button>
           <el-divider direction="vertical" />
           <el-button size="mini" type="text" style="color: #ff4d4f" @click="removeAttributes(row, $index)">移除</el-button>

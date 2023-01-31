@@ -94,7 +94,7 @@ SOFTWARE.
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-button type="text" icon="el-icon-download" size="small" plain @click="handleDownload(scope.row)">下载</el-button>
               <el-button type="text" icon="el-icon-delete" size="small" plain @click="handleDelete(scope.row)"
                          v-hasPermi="['mp:material:delete']">删除</el-button>
