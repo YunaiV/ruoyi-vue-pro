@@ -10,6 +10,7 @@
 import BpmnViewer from 'bpmn-js/lib/Viewer'
 import DefaultEmptyXML from './plugins/defaultEmpty'
 import { onMounted, onBeforeUnmount, provide, ref, watch } from 'vue'
+import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 const props = defineProps({
   value: {
     // BPMN XML 字符串
@@ -265,15 +266,31 @@ const elementHover = (element) => {
   !elementOverlayIds.value && (elementOverlayIds.value = {})
   !overlays.value && (overlays.value = bpmnModeler.get('overlays'))
   // 展示信息
+  console.log(activityLists.value, 'activityLists.value')
+  console.log(element.value, 'element.value')
   const activity = activityLists.value.find((m) => m.key === element.value.id)
+  console.log(activity, 'activityactivityactivityactivity')
   if (!activity) {
     return
   }
+  console.log(elementOverlayIds.value, 'elementOverlayIds.value')
+  console.log(element.value.id, 'element.value.id')
+  console.log(
+    elementOverlayIds.value[element.value.id],
+    'elementOverlayIds.value[element.value.id]'
+  )
+  console.log(
+    !elementOverlayIds.value[element.value.id],
+    '!elementOverlayIds.value[element.value.id]'
+  )
+  console.log(element.value.type, 'element.value.type')
   if (!elementOverlayIds.value[element.value.id] && element.value.type !== 'bpmn:Process') {
+    console.log('进入')
     let html = `<div class="element-overlays">
             <p>Elemet id: ${element.value.id}</p>
             <p>Elemet type: ${element.value.type}</p>
           </div>` // 默认值
+    console.log(processInstance.value, 'processInstance')
     if (element.value.type === 'bpmn:StartEvent' && processInstance.value) {
       html = `<p>发起人：${processInstance.value.startUser.nickname}</p>
                   <p>部门：${processInstance.value.startUser.deptName}</p>
@@ -286,7 +303,7 @@ const elementHover = (element) => {
       }
       html = `<p>审批人：${task.assigneeUser.nickname}</p>
                   <p>部门：${task.assigneeUser.deptName}</p>
-                  <p>结果：${getDictDataLabel(
+                  <p>结果：${getIntDictOptions(
                     DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
                     task.result
                   )}</p>
@@ -306,7 +323,7 @@ const elementHover = (element) => {
       }
       console.log(html)
     } else if (element.value.type === 'bpmn:EndEvent' && processInstance.value) {
-      html = `<p>结果：${getDictDataLabel(
+      html = `<p>结果：${getIntDictOptions(
         DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
         processInstance.value.result
       )}</p>`
@@ -314,16 +331,69 @@ const elementHover = (element) => {
         html += `<p>结束时间：${parseTime(processInstance.value.endTime)}</p>`
       }
     }
+    console.log(html, 'html111111111111111')
+    console.log(
+      elementOverlayIds.value[element.value.id],
+      'elementOverlayIds.value[element.value.id]'
+    )
     elementOverlayIds.value[element.value.id] = overlays.value.add(element.value, {
       position: { left: 0, bottom: 0 },
       html: `<div class="element-overlays">${html}</div>`
     })
+    console.log(
+      elementOverlayIds.value[element.value.id],
+      'elementOverlayIds.value[element.value.id]'
+    )
   }
 }
 // 流程图的元素被 out
 const elementOut = (element) => {
   overlays.value.remove({ element })
   elementOverlayIds.value[element.id] = null
+}
+const parseTime = (time) => {
+  if (!time) {
+    return null
+  }
+  const format = '{y}-{m}-{d} {h}:{i}:{s}'
+  let date
+  if (typeof time === 'object') {
+    date = time
+  } else {
+    if (typeof time === 'string' && /^[0-9]+$/.test(time)) {
+      time = parseInt(time)
+    } else if (typeof time === 'string') {
+      time = time
+        .replace(new RegExp(/-/gm), '/')
+        .replace('T', ' ')
+        .replace(new RegExp(/\.[\d]{3}/gm), '')
+    }
+    if (typeof time === 'number' && time.toString().length === 10) {
+      time = time * 1000
+    }
+    date = new Date(time)
+  }
+  const formatObj = {
+    y: date.getFullYear(),
+    m: date.getMonth() + 1,
+    d: date.getDate(),
+    h: date.getHours(),
+    i: date.getMinutes(),
+    s: date.getSeconds(),
+    a: date.getDay()
+  }
+  const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+    let value = formatObj[key]
+    // Note: getDay() returns 0 on Sunday
+    if (key === 'a') {
+      return ['日', '一', '二', '三', '四', '五', '六'][value]
+    }
+    if (result.length > 0 && value < 10) {
+      value = '0' + value
+    }
+    return value || 0
+  })
+  return time_str
 }
 
 onMounted(() => {

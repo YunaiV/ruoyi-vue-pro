@@ -38,7 +38,13 @@
           <span class="el-icon-picture-outline">流程图</span>
         </div>
         <!-- TODO 芋艿：待完成？？？ -->
-        <!-- <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" /> -->
+        <my-process-viewer
+          key="designer"
+          v-model="bpmnXML"
+          :value="bpmnXML"
+          v-bind="bpmnControlForm"
+          :prefix="bpmnControlForm.prefix"
+        />
       </el-card>
     </div>
   </ContentWrap>
@@ -89,7 +95,7 @@ const handleSelect = async (row) => {
 
     // 加载流程图
     DefinitionApi.getProcessDefinitionBpmnXMLApi(row.id).then((response) => {
-      bpmnXML.value = response.data
+      bpmnXML.value = response
     })
     // 情况二：业务表单
   } else if (row.formCustomCreatePath) {
@@ -126,9 +132,9 @@ const submitForm = async (formData) => {
 
 // // BPMN 数据
 const bpmnXML = ref(null)
-// const bpmnControlForm=ref( {
-//   prefix: "flowable"
-// })
+const bpmnControlForm = ref({
+  prefix: 'flowable'
+})
 </script>
 
 <style lang="scss">

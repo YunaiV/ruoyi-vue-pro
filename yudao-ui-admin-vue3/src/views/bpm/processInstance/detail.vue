@@ -144,7 +144,9 @@
       <my-process-viewer
         key="designer"
         v-model="bpmnXML"
+        :value="bpmnXML"
         v-bind="bpmnControlForm"
+        :prefix="bpmnControlForm.prefix"
         :activityData="activityList"
         :processInstanceData="processInstance"
         :taskData="tasks"
