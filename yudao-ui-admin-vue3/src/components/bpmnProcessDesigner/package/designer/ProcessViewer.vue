@@ -1,7 +1,7 @@
 <template>
   <div class="my-process-designer">
     <div class="my-process-designer__container">
-      <div class="my-process-designer__canvas" ref="bpmn-canvas"></div>
+      <div class="my-process-designer__canvas" style="height: 760px" ref="bpmnCanvas"></div>
     </div>
   </div>
 </template>
@@ -9,8 +9,7 @@
 <script setup lang="ts" name="MyProcessViewer">
 import BpmnViewer from 'bpmn-js/lib/Viewer'
 import DefaultEmptyXML from './plugins/defaultEmpty'
-import { onMounted } from 'vue'
-import { onBeforeUnmount, provide, ref, watch } from 'vue'
+import { onMounted, onBeforeUnmount, provide, ref, watch } from 'vue'
 const props = defineProps({
   value: {
     // BPMN XML 字符串
@@ -44,7 +43,7 @@ const emit = defineEmits(['destroy'])
 let bpmnModeler
 
 const xml = ref('')
-const activityList = ref([])
+const activityLists = ref([])
 const processInstance = ref(undefined)
 const taskList = ref([])
 const bpmnCanvas = ref()
@@ -84,7 +83,7 @@ const createNewDiagram = async (xml) => {
 /* 高亮流程图 */
 // TODO 芋艿：如果多个 endActivity 的话，目前的逻辑可能有一定的问题。https://www.jdon.com/workflow/multi-events.html
 const highlightDiagram = async () => {
-  const activityList = activityList.value
+  const activityList = activityLists.value
   if (activityList.length === 0) {
     return
   }
@@ -266,7 +265,7 @@ const elementHover = (element) => {
   !elementOverlayIds.value && (elementOverlayIds.value = {})
   !overlays.value && (overlays.value = bpmnModeler.get('overlays'))
   // 展示信息
-  const activity = activityList.value.find((m) => m.key === element.value.id)
+  const activity = activityLists.value.find((m) => m.key === element.value.id)
   if (!activity) {
     return
   }
@@ -329,7 +328,7 @@ const elementOut = (element) => {
 
 onMounted(() => {
   xml.value = props.value
-  activityList.value = props.activityData
+  activityLists.value = props.activityData
   // 初始化
   initBpmnModeler()
   createNewDiagram(xml.value)
@@ -355,7 +354,7 @@ watch(
 watch(
   () => props.activityData,
   (newActivityData) => {
-    activityList.value = newActivityData
+    activityLists.value = newActivityData
     createNewDiagram(xml.value)
   }
 )

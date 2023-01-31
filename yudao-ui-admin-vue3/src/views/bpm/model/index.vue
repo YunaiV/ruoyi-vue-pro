@@ -298,6 +298,17 @@
         v-if="formDetailVisible"
       />
     </XModal>
+
+    <!-- 流程模型图的预览 -->
+    <XModal title="流程图" v-model="showBpmnOpen" width="80%" height="90%">
+      <my-process-viewer
+        key="designer"
+        v-model="bpmnXML"
+        :value="bpmnXML"
+        v-bind="bpmnControlForm"
+        :prefix="bpmnControlForm.prefix"
+      />
+    </XModal>
   </ContentWrap>
 </template>
 
@@ -317,6 +328,11 @@ const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 const router = useRouter() // 路由
 
+const showBpmnOpen = ref(false)
+const bpmnXML = ref(null)
+const bpmnControlForm = ref({
+  prefix: 'flowable'
+})
 // ========== 列表相关 ==========
 const [registerTable, { reload }] = useXTable({
   allSchemas: allSchemas,
@@ -369,7 +385,13 @@ const handleFormDetail = async (row) => {
 const handleBpmnDetail = (row) => {
   // TODO 芋艿：流程组件开发中
   console.log(row)
-  message.success('流程组件开发中，预计 2 月底完成')
+  ModelApi.getModelApi(row).then((response) => {
+    console.log(response, 'response')
+    bpmnXML.value = response.bpmnXml
+    // 弹窗打开
+    showBpmnOpen.value = true
+  })
+  // message.success('流程组件开发中，预计 2 月底完成')
 }
 
 // 点击任务分配按钮
