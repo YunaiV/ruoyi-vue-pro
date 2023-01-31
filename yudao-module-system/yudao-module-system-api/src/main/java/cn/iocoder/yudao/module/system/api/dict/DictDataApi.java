@@ -19,7 +19,7 @@ public interface DictDataApi {
      * @param dictType 字典类型
      * @param values 字典数据值的数组
      */
-    void validDictDatas(String dictType, Collection<String> values);
+    void validateDictDataList(String dictType, Collection<String> values);
 
     /**
      * 获得指定的字典数据，从缓存中

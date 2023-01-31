@@ -48,7 +48,7 @@ public class DictDataServiceImpl implements DictDataService {
     private DictDataMapper dictDataMapper;
 
     @Override
-    public List<DictDataDO> getDictDatas() {
+    public List<DictDataDO> getDictDataList() {
         List<DictDataDO> list = dictDataMapper.selectList();
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
@@ -60,7 +60,7 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @Override
-    public List<DictDataDO> getDictDatas(DictDataExportReqVO reqVO) {
+    public List<DictDataDO> getDictDataList(DictDataExportReqVO reqVO) {
         List<DictDataDO> list = dictDataMapper.selectList(reqVO);
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
@@ -74,7 +74,7 @@ public class DictDataServiceImpl implements DictDataService {
     @Override
     public Long createDictData(DictDataCreateReqVO reqVO) {
         // 校验正确性
-        checkCreateOrUpdate(null, reqVO.getValue(), reqVO.getDictType());
+        validateDictDataForCreateOrUpdate(null, reqVO.getValue(), reqVO.getDictType());
 
         // 插入字典类型
         DictDataDO dictData = DictDataConvert.INSTANCE.convert(reqVO);
@@ -85,7 +85,7 @@ public class DictDataServiceImpl implements DictDataService {
     @Override
     public void updateDictData(DictDataUpdateReqVO reqVO) {
         // 校验正确性
-        checkCreateOrUpdate(reqVO.getId(), reqVO.getValue(), reqVO.getDictType());
+        validateDictDataForCreateOrUpdate(reqVO.getId(), reqVO.getValue(), reqVO.getDictType());
 
         // 更新字典类型
         DictDataDO updateObj = DictDataConvert.INSTANCE.convert(reqVO);
@@ -95,7 +95,7 @@ public class DictDataServiceImpl implements DictDataService {
     @Override
     public void deleteDictData(Long id) {
         // 校验是否存在
-        checkDictDataExists(id);
+        validateDictDataExists(id);
 
         // 删除字典数据
         dictDataMapper.deleteById(id);
@@ -106,18 +106,17 @@ public class DictDataServiceImpl implements DictDataService {
         return dictDataMapper.selectCountByDictType(dictType);
     }
 
-
-    private void checkCreateOrUpdate(Long id, String value, String dictType) {
+    private void validateDictDataForCreateOrUpdate(Long id, String value, String dictType) {
         // 校验自己存在
-        checkDictDataExists(id);
+        validateDictDataExists(id);
         // 校验字典类型有效
-        checkDictTypeValid(dictType);
+        validateDictTypeExists(dictType);
         // 校验字典数据的值的唯一性
-        checkDictDataValueUnique(id, dictType, value);
+        validateDictDataValueUnique(id, dictType, value);
     }
 
     @VisibleForTesting
-    public void checkDictDataValueUnique(Long id, String dictType, String value) {
+    public void validateDictDataValueUnique(Long id, String dictType, String value) {
         DictDataDO dictData = dictDataMapper.selectByDictTypeAndValue(dictType, value);
         if (dictData == null) {
             return;
@@ -132,7 +131,7 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @VisibleForTesting
-    public void checkDictDataExists(Long id) {
+    public void validateDictDataExists(Long id) {
         if (id == null) {
             return;
         }
@@ -143,7 +142,7 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @VisibleForTesting
-    public void checkDictTypeValid(String type) {
+    public void validateDictTypeExists(String type) {
         DictTypeDO dictType = dictTypeService.getDictType(type);
         if (dictType == null) {
             throw exception(DICT_TYPE_NOT_EXISTS);
@@ -154,7 +153,7 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @Override
-    public void validDictDatas(String dictType, Collection<String> values) {
+    public void validateDictDataList(String dictType, Collection<String> values) {
         if (CollUtil.isEmpty(values)) {
             return;
         }

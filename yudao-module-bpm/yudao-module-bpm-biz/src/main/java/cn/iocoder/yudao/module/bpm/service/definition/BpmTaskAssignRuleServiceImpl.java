@@ -224,7 +224,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER_GROUP.getType())) {
             userGroupService.validUserGroups(options);
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.SCRIPT.getType())) {
-            dictDataApi.validDictDatas(DictTypeConstants.TASK_ASSIGN_SCRIPT,
+            dictDataApi.validateDictDataList(DictTypeConstants.TASK_ASSIGN_SCRIPT,
                 CollectionUtils.convertSet(options, String::valueOf));
         } else {
             throw new IllegalArgumentException(format("未知的规则类型({})", type));
