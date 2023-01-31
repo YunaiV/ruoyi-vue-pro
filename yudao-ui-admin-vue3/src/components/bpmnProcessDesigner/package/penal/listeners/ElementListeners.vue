@@ -316,7 +316,9 @@ const openListenerForm = (listener, index) => {
   // 打开侧边栏并清楚验证状态
   listenerFormModelVisible.value = true
   nextTick(() => {
-    if (listenerFormRef.value) listenerFormRef.value.clearValidate()
+    if (listenerFormRef.value) {
+      listenerFormRef.value.clearValidate()
+    }
   })
 }
 // 打开监听器字段编辑弹窗
@@ -325,7 +327,9 @@ const openListenerFieldForm = (field, index) => {
   editingListenerFieldIndex.value = field ? index : -1
   listenerFieldFormModelVisible.value = true
   nextTick(() => {
-    if (listenerFieldFormRef.value) listenerFieldFormRef.value.clearValidate()
+    if (listenerFieldFormRef.value) {
+      listenerFieldFormRef.value.clearValidate()
+    }
   })
 }
 // 保存监听器注入字段
@@ -345,7 +349,7 @@ const saveListenerFiled = async () => {
   })
 }
 // 移除监听器字段
-const removeListenerField = (field, index) => {
+const removeListenerField = (index) => {
   ElMessageBox.confirm('确认移除该字段吗？', '提示', {
     confirmButtonText: '确 认',
     cancelButtonText: '取 消'
@@ -357,7 +361,7 @@ const removeListenerField = (field, index) => {
     .catch(() => console.info('操作取消'))
 }
 // 移除监听器
-const removeListener = (listener, index) => {
+const removeListener = (index) => {
   ElMessageBox.confirm('确认移除该监听器吗？', '提示', {
     confirmButtonText: '确 认',
     cancelButtonText: '取 消'

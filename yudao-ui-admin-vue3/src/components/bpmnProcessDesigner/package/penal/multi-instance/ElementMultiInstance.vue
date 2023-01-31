@@ -87,8 +87,8 @@ const defaultLoopInstanceForm = ref({
   exclusive: false
 })
 const loopInstanceForm = ref({})
-const bpmnElement = ref()
-const multiLoopInstance = ref()
+const bpmnElement = ref(null)
+const multiLoopInstance = ref(null)
 
 const getElementLoop = (businessObject) => {
   if (!businessObject.loopCharacteristics) {
@@ -158,7 +158,7 @@ const changeLoopCharacteristicsType = (type) => {
     )
   }
   window.bpmnInstances.modeling.updateProperties(toRaw(bpmnElement.value), {
-    loopCharacteristics: multiLoopInstance.value
+    loopCharacteristics: toRaw(multiLoopInstance.value)
   })
 }
 // 循环基数
@@ -245,7 +245,7 @@ onBeforeUnmount(() => {
 })
 
 watch(
-  () => props.type,
+  () => props.businessObject,
   (val) => {
     bpmnElement.value = window.bpmnInstances.bpmnElement
     getElementLoop(val)

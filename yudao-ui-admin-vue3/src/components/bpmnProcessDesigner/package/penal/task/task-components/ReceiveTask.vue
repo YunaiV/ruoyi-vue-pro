@@ -112,7 +112,7 @@ onBeforeUnmount(() => {
 watch(
   () => props.id,
   () => {
-    bpmnElement.value = window.bpmnInstances.bpmnElement
+    // bpmnElement.value = window.bpmnInstances.bpmnElement
     nextTick(() => {
       getBindMessage()
     })

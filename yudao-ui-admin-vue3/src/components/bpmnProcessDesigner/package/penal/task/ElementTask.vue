@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts" name="ElementTaskConfig">
-import { ref, watch, shallowRef } from 'vue'
+import { ref, watch } from 'vue'
 import { ElForm, ElFormItem, ElCheckbox } from 'element-plus'
 import UserTask from './task-components/UserTask.vue'
 import ScriptTask from './task-components/ScriptTask.vue'
@@ -36,7 +36,7 @@ const taskConfigForm = ref({
   asyncBefore: false,
   exclusive: false
 })
-const witchTaskComponent = shallowRef()
+const witchTaskComponent = ref()
 const installedComponent = ref({
   // 手工任务与普通任务一致，不需要其他配置
   // 接收消息任务，需要在全局下插入新的消息实例，并在该节点下的 messageRef 属性绑定该实例
