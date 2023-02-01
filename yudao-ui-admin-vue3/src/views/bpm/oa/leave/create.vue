@@ -13,7 +13,7 @@
 </template>
 <script setup lang="ts">
 import { FormExpose } from '@/components/Form'
-import XEUtils from 'xe-utils'
+// import XEUtils from 'xe-utils'
 
 // 业务相关的 import
 import * as LeaveApi from '@/api/bpm/leave'
@@ -39,8 +39,10 @@ const submitForm = async () => {
       // 设置提交中
       actionLoading.value = true
       const data = unref(formRef)?.formModel as LeaveApi.LeaveVO
-      data.startTime = XEUtils.toDateString(data.startTime, 'yyyy-MM-dd HH:mm:ss')
-      data.endTime = XEUtils.toDateString(data.endTime, 'yyyy-MM-dd HH:mm:ss')
+      // data.startTime = XEUtils.toDateString(data.startTime, 'yyyy-MM-dd HH:mm:ss')
+      // data.endTime = XEUtils.toDateString(data.endTime, 'yyyy-MM-dd HH:mm:ss')
+      data.startTime = Date.parse(new Date(data.startTime).toString())
+      data.endTime = Date.parse(new Date(data.endTime).toString())
       // 添加的提交
       await LeaveApi.createLeaveApi(data)
       message.success(t('common.createSuccess'))
