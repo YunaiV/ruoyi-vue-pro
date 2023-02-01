@@ -270,7 +270,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
         }
       },
       {
-        path: '/oa/leave/create',
+        path: '/bpm/oa/leave/create',
         component: () => import('@/views/bpm/oa/leave/create.vue'),
         name: 'OALeaveCreate',
         meta: {
@@ -282,7 +282,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
         }
       },
       {
-        path: '/oa/leave/detail',
+        path: '/bpm/oa/leave/detail',
         component: () => import('@/views/bpm/oa/leave/detail.vue'),
         name: 'OALeaveDetail',
         meta: {
