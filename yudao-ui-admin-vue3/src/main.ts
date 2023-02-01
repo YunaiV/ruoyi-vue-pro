@@ -39,8 +39,9 @@ import './permission'
 
 import { isDevMode } from '@/utils/env'
 
-if (isDevMode()) {
-  console.info(isDevMode())
+import Logger from '@/utils/logger'
+
+if (isDevMode() == true) {
   import('element-plus/dist/index.css')
 }
 
@@ -68,3 +69,5 @@ const setupAll = async () => {
 }
 
 setupAll()
+
+Logger.prettyPrimary(`欢迎使用`, import.meta.env.VITE_APP_TITLE)
