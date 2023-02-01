@@ -9,7 +9,7 @@
 <script setup lang="ts" name="MyProcessViewer">
 import BpmnViewer from 'bpmn-js/lib/Viewer'
 import DefaultEmptyXML from './plugins/defaultEmpty'
-import { onMounted, onBeforeUnmount, provide, ref, watch } from 'vue'
+import { onMounted, onBeforeUnmount, provide, ref, watch, toRaw } from 'vue'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 const props = defineProps({
   value: {
@@ -49,8 +49,8 @@ const processInstance = ref(undefined)
 const taskList = ref([])
 const bpmnCanvas = ref()
 // const element = ref()
-const elementOverlayIds = ref()
-const overlays = ref()
+const elementOverlayIds = ref(null)
+const overlays = ref(null)
 
 const initBpmnModeler = () => {
   if (bpmnModeler) return
@@ -67,7 +67,6 @@ const createNewDiagram = async (xml) => {
   let newName = `业务流程_${new Date().getTime()}`
   let xmlString = xml || DefaultEmptyXML(newId, newName, props.prefix)
   try {
-    // console.log(this.bpmnModeler.importXML);
     let { warnings } = await bpmnModeler.importXML(xmlString)
     if (warnings && warnings.length) {
       warnings.forEach((warn) => console.warn(warn))
@@ -94,7 +93,6 @@ const highlightDiagram = async () => {
   let todoActivity = activityList.find((m) => !m.endTime) // 找到待办的任务
   let endActivity = activityList[activityList.length - 1] // 获得最后一个任务
   // debugger
-  // console.log(this.bpmnModeler.getDefinitions().rootElements[0].flowElements);
   bpmnModeler.getDefinitions().rootElements[0].flowElements?.forEach((n) => {
     let activity = activityList.find((m) => m.key === n.id) // 找到对应的活动
     if (!activity) {
@@ -270,27 +268,14 @@ const elementHover = (element) => {
   console.log(element.value, 'element.value')
   const activity = activityLists.value.find((m) => m.key === element.value.id)
   console.log(activity, 'activityactivityactivityactivity')
-  if (!activity) {
-    return
-  }
-  console.log(elementOverlayIds.value, 'elementOverlayIds.value')
-  console.log(element.value.id, 'element.value.id')
-  console.log(
-    elementOverlayIds.value[element.value.id],
-    'elementOverlayIds.value[element.value.id]'
-  )
-  console.log(
-    !elementOverlayIds.value[element.value.id],
-    '!elementOverlayIds.value[element.value.id]'
-  )
-  console.log(element.value.type, 'element.value.type')
+  // if (!activity) {
+  //   return
+  // }
   if (!elementOverlayIds.value[element.value.id] && element.value.type !== 'bpmn:Process') {
-    console.log('进入')
     let html = `<div class="element-overlays">
             <p>Elemet id: ${element.value.id}</p>
             <p>Elemet type: ${element.value.type}</p>
           </div>` // 默认值
-    console.log(processInstance.value, 'processInstance')
     if (element.value.type === 'bpmn:StartEvent' && processInstance.value) {
       html = `<p>发起人：${processInstance.value.startUser.nickname}</p>
                   <p>部门：${processInstance.value.startUser.deptName}</p>
@@ -301,13 +286,24 @@ const elementHover = (element) => {
       if (!task) {
         return
       }
+      let optionData = getIntDictOptions(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT)
+      let dataResult = ''
+      optionData.forEach((element) => {
+        if (element.value == task.result) {
+          dataResult = element.label
+        }
+      })
       html = `<p>审批人：${task.assigneeUser.nickname}</p>
                   <p>部门：${task.assigneeUser.deptName}</p>
-                  <p>结果：${getIntDictOptions(
-                    DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
-                    task.result
-                  )}</p>
+                  <p>结果：${dataResult}</p>
                   <p>创建时间：${parseTime(task.createTime)}</p>`
+      // html = `<p>审批人：${task.assigneeUser.nickname}</p>
+      //             <p>部门：${task.assigneeUser.deptName}</p>
+      //             <p>结果：${getIntDictOptions(
+      //               DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
+      //               task.result
+      //             )}</p>
+      //             <p>创建时间：${parseTime(task.createTime)}</p>`
       if (task.endTime) {
         html += `<p>结束时间：${parseTime(task.endTime)}</p>`
       }
@@ -323,32 +319,32 @@ const elementHover = (element) => {
       }
       console.log(html)
     } else if (element.value.type === 'bpmn:EndEvent' && processInstance.value) {
-      html = `<p>结果：${getIntDictOptions(
-        DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
-        processInstance.value.result
-      )}</p>`
+      let optionData = getIntDictOptions(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT)
+      let dataResult = ''
+      optionData.forEach((element) => {
+        if (element.value == processInstance.value.result) {
+          dataResult = element.label
+        }
+      })
+      html = `<p>结果：${dataResult}</p>`
+      // html = `<p>结果：${getIntDictOptions(
+      //   DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT,
+      //   processInstance.value.result
+      // )}</p>`
       if (processInstance.value.endTime) {
         html += `<p>结束时间：${parseTime(processInstance.value.endTime)}</p>`
       }
     }
     console.log(html, 'html111111111111111')
-    console.log(
-      elementOverlayIds.value[element.value.id],
-      'elementOverlayIds.value[element.value.id]'
-    )
-    elementOverlayIds.value[element.value.id] = overlays.value.add(element.value, {
+    elementOverlayIds.value[element.value.id] = toRaw(overlays.value).add(element.value, {
       position: { left: 0, bottom: 0 },
       html: `<div class="element-overlays">${html}</div>`
     })
-    console.log(
-      elementOverlayIds.value[element.value.id],
-      'elementOverlayIds.value[element.value.id]'
-    )
   }
 }
 // 流程图的元素被 out
 const elementOut = (element) => {
-  overlays.value.remove({ element })
+  toRaw(overlays.value).remove({ element })
   elementOverlayIds.value[element.id] = null
 }
 const parseTime = (time) => {
@@ -416,7 +412,6 @@ onBeforeUnmount(() => {
 watch(
   () => props.value,
   (newValue) => {
-    console.log(newValue, 'oldVal')
     xml.value = newValue
     createNewDiagram(xml.value)
   }
