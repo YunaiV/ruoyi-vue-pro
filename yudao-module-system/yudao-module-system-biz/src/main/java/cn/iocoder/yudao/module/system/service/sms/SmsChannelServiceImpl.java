@@ -81,7 +81,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     public void deleteSmsChannel(Long id) {
         // 校验存在
         this.validateSmsChannelExists(id);
-        // 校验是否有字典数据
+        // 校验是否有在使用该账号的模版
         if (smsTemplateService.countByChannelId(id) > 0) {
             throw exception(SMS_CHANNEL_HAS_CHILDREN);
         }

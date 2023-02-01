@@ -27,6 +27,8 @@ SOFTWARE.
 -->
 <template>
   <div class="app-container">
+    <doc-alert title="公众号素材" url="https://doc.iocoder.cn/mp/material/" />
+
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="公众号" prop="accountId">
@@ -92,7 +94,7 @@ SOFTWARE.
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-button type="text" icon="el-icon-download" size="small" plain @click="handleDownload(scope.row)">下载</el-button>
               <el-button type="text" icon="el-icon-delete" size="small" plain @click="handleDelete(scope.row)"
                          v-hasPermi="['mp:material:delete']">删除</el-button>

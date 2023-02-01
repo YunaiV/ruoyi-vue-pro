@@ -26,6 +26,8 @@ SOFTWARE.
 -->
 <template>
   <div class="app-container">
+    <doc-alert title="自动回复" url="https://doc.iocoder.cn/mp/auto-reply/" />
+
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="公众号" prop="accountId">
@@ -77,7 +79,7 @@ SOFTWARE.
         </template>
       </el-table-column>
       <el-table-column label="回复内容" align="center">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <div v-if="scope.row.responseMessageType === 'text'">{{ scope.row.responseContent }}</div>
           <div v-else-if="scope.row.responseMessageType === 'voice'">
             <wx-voice-player :url="scope.row.responseMediaUrl" />
@@ -101,12 +103,12 @@ SOFTWARE.
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['mp:auto-reply:update']">修改
           </el-button>

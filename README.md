@@ -41,7 +41,20 @@
 | `ruoyi-vue-pro`      | Spring Boot 多模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro)     |
 | `yudao-cloud`        | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)         |
 | `Spring-Boot-Labs`   | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/zhijiantianya/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/SpringBoot-Labs) |
- | `ruoyi-vue-pro-mini` | 精简版：移除工作流、支付等模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini)**                                                                |
+
+## 🐰 分支说明
+
+|       | JDK 8 完整版                                                 | JDK 8 精简版                                                          | JDK 17 完整版                                                                  |
+|-------|-----------------------------------------------------------|--------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| 分支    | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`mini`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini/) | [`boot-dev`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/boot3-dev/) |
+| 说明    | 包括所有功能                                                    | 只保留核心功能                                                            | 适配 Spring Boot 3.X                                                          |
+| 系统功能  | √                                                         | √                                                                  | √                                                                           |
+| 基础设施  | √                                                         | √                                                                  | √                                                                           |
+| 会员中心  | √                                                         | √                                                                  | √                                                                           |
+| 工作流程  | √                                                         | x                                                                  | 适配中                                                                         |
+| 数据报表  | √                                                         | x                                                                  | 适配中                                                                         |
+| 商城系统  | √                                                         | x                                                                  | √                                                                           |
+| 微信公众号 | √                                                         | x                                                                  | √                                                                           |
 
 ## 😎 开源协议
 
@@ -54,6 +67,14 @@
 ![开源项目对比](https://static.iocoder.cn/project-vs.png?imageView2/2/format/webp/w/1280)
 
 ③ 代码整洁、架构整洁，遵循《阿里巴巴 Java 开发手册》规范，代码注释详细，57000 行 Java 代码，22000 行代码注释。
+
+## 🤝 项目外包
+
+我们也是接外包滴，如果你有项目想要外包，可以微信联系【**Aix9975**】。
+
+团队包含专业的项目经理、架构师、前端工程师、后端工程师、测试工程师、运维工程师，可以提供全流程的外包服务。
+
+项目可以是商城、SCRM 系统、OA 系统、物流系统、ERP 系统、CMS 系统、HIS 系统、支付系统、IM 聊天、微信公众号、微信小程序等等。
 
 ## 🐼 内置功能
 
@@ -91,6 +112,8 @@
 | 🚀  | 租户套餐  | 配置租户套餐，自定每个租户的菜单、操作、按钮的权限       |
 |     | 字典管理  | 对系统中经常使用的一些较为固定的数据进行维护          |
 | 🚀  | 短信管理  | 短信渠道、短息模板、短信日志，对接阿里云、腾讯云等主流短信平台 |
+| 🚀  | 邮件管理  | 邮箱账号、邮件模版、邮件发送日志，支持所有邮件平台       |
+| 🚀  | 站内信   | 系统内的消息通知，提供站内信模版、站内信消息          |
 | 🚀  | 操作日志  | 系统正常操作日志记录和查询，集成 Swagger 生成日志内容 |
 | ⭐️  | 登录日志  | 系统登录日志记录查询，包含登录异常               |
 | 🚀  | 错误码管理 | 系统所有错误码的管理，可在线修改错误提示，无需重启服务     |
