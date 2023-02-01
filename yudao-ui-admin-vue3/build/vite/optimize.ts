@@ -14,6 +14,7 @@ const include = [
   'vue-i18n',
   'xe-utils',
   'crypto-js',
+  'cropperjs',
   'lodash-es',
   'vxe-table',
   'nprogress',
