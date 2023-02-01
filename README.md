@@ -265,8 +265,8 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [Vue](https://staging-cn.vuejs.org/)                                 |    Vue 框架    | 3.2.45 |
 | [Vite](https://cn.vitejs.dev//)                                      |   开发与构建工具    | 4.0.4  |
 | [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus | 2.2.28 |
-| [TypeScript](https://www.typescriptlang.org/docs/)                   |  TypeScript  | 4.9.4  |
-| [pinia](https://pinia.vuejs.org/)                                    |    vuex5     | 2.0.28 |
+| [TypeScript](https://www.typescriptlang.org/docs/)                   |  TypeScript  | 4.9.5  |
+| [pinia](https://pinia.vuejs.org/)                                    |    vuex5     | 2.0.29 |
 | [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) |     国际化      | 9.2.2  |
 | [vxe-table](https://vxetable.cn/)                                    |   vue最强表单    | 4.3.9  |
 
