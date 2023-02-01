@@ -163,7 +163,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 方法
         when(roleService.hasAnySuperAdmin(eq(singleton(100L)))).thenReturn(true);
         List<MenuDO> menuList = singletonList(randomPojo(MenuDO.class).setId(1L));
-        when(menuService.getMenus()).thenReturn(menuList);
+        when(menuService.getMenuList()).thenReturn(menuList);
 
         // 调用
         Set<Long> menuIds = permissionService.getRoleMenuIds(roleId);

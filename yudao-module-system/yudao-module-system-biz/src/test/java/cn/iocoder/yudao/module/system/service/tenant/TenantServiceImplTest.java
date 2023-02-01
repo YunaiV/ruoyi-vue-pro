@@ -453,7 +453,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         tenantMapper.insert(dbTenant);// @Sql: 先插入出一条存在的数据
         TenantContextHolder.setTenantId(dbTenant.getId());
         // mock 菜单
-        when(menuService.getMenus()).thenReturn(Arrays.asList(randomPojo(MenuDO.class, o -> o.setId(100L)),
+        when(menuService.getMenuList()).thenReturn(Arrays.asList(randomPojo(MenuDO.class, o -> o.setId(100L)),
                         randomPojo(MenuDO.class, o -> o.setId(101L))));
 
         // 调用
