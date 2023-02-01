@@ -45,8 +45,8 @@ const submitForm = async () => {
       await LeaveApi.createLeaveApi(data)
       message.success(t('common.createSuccess'))
       // 关闭窗口
-      await router.push({
-        path: '/oa/leave/create'
+      router.push({
+        path: '/bpm/oa/leave'
       })
     } finally {
       actionLoading.value = false

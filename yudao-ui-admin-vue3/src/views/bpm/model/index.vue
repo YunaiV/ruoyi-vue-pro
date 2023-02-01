@@ -426,7 +426,7 @@ const handleCreate = async () => {
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   resetForm()
-  await setDialogTile('create')
+  await setDialogTile('edit')
   // 设置数据
   saveForm.value = await ModelApi.getModelApi(rowId)
 }

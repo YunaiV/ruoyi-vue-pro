@@ -71,7 +71,7 @@
       <el-col v-if="processInstance?.processDefinition?.formType === 10" :span="16" :offset="6">
         <form-create
           :rule="detailForm.rule"
-          v-model:api="fApi"
+          :api="fApi"
           :option="detailForm.option"
           v-model="detailForm.value"
         />
@@ -108,7 +108,7 @@
               <el-card :body-style="{ padding: '10px' }">
                 <label v-if="item.assigneeUser" style="font-weight: normal; margin-right: 30px">
                   审批人：{{ item.assigneeUser.nickname }}
-                  <el-tag type="info" size="mini">{{ item.assigneeUser.deptName }}</el-tag>
+                  <el-tag type="info" size="small">{{ item.assigneeUser.deptName }}</el-tag>
                 </label>
                 <label style="font-weight: normal" v-if="item.createTime">创建时间：</label>
                 <label style="color: #8a909c; font-weight: normal">
@@ -220,6 +220,9 @@ const auditRule = reactive({
 
 // 处理审批通过和不通过的操作
 const handleAudit = async (task, pass) => {
+  console.log(task, 'task')
+  console.log(pass, 'pass')
+  console.log(runningTasks.value, 'runningTasks.value')
   // 1.1 获得对应表单
   const index = runningTasks.value.indexOf(task)
   const auditFormRef = proxy.$refs['form' + index][0]
@@ -236,6 +239,9 @@ const handleAudit = async (task, pass) => {
     id: task.id,
     reason: auditForms.value[index].reason
   }
+  console.log(data, '是否通过')
+  console.log(pass, 'pass是否通过')
+  console.log(task, 'task')
   if (pass) {
     await TaskApi.approveTask(data)
     message.success('审批通过成功')
