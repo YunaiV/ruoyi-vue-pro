@@ -16,7 +16,7 @@
       <template #toMail_default="{ row }">
         <div>{{ row.toMail }}</div>
         <div v-if="row.userType && row.userId">
-          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="row.userType" />{{ '(' + row.userId + ')' }}
+          <DictTag :type="DICT_TYPE.USER_TYPE" :value="row.userType" />{{ '(' + row.userId + ')' }}
         </div>
       </template>
       <template #actionbtns_default="{ row }">
@@ -46,6 +46,7 @@
 </template>
 <script setup lang="ts" name="MailLog">
 // 业务相关的 import
+import { DICT_TYPE } from '@/utils/dict'
 import { allSchemas } from './log.data'
 import * as MailLogApi from '@/api/system/mail/log'
 import * as MailAccountApi from '@/api/system/mail/account'
@@ -61,7 +62,7 @@ const [registerTable] = useXTable({
   params: queryParams,
   getListApi: MailLogApi.getMailLogPageApi
 })
-const accountOptions = ref([]) // 账号下拉选项
+const accountOptions = ref<any[]>([]) // 账号下拉选项
 
 // 弹窗相关的变量
 const modelVisible = ref(false) // 是否显示弹出层

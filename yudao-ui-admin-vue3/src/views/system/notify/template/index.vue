@@ -202,7 +202,7 @@ const submitForm = async () => {
 const sendForm = ref({
   content: '',
   params: {},
-  userId: undefined,
+  userId: 0,
   templateCode: '',
   templateParams: {}
 })

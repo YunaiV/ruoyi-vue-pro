@@ -152,7 +152,7 @@ const [registerTable, { reload, deleteData }] = useXTable({
   getListApi: MailTemplateApi.getMailTemplatePageApi,
   deleteApi: MailTemplateApi.deleteMailTemplateApi
 })
-const accountOptions = ref([]) // 账号下拉选项
+const accountOptions = ref<any[]>([]) // 账号下拉选项
 
 // 弹窗相关的变量
 const modelVisible = ref(false) // 是否显示弹出层
