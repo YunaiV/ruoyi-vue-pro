@@ -28,7 +28,7 @@ public interface UserPostMapper extends BaseMapperX<UserPostDO> {
                 .in(UserPostDO::getPostId, postIds));
     }
 
-    default void deleteByUserId(Long userId){
+    default void deleteByUserId(Long userId) {
         delete(Wrappers.lambdaUpdate(UserPostDO.class).eq(UserPostDO::getUserId, userId));
     }
 }
