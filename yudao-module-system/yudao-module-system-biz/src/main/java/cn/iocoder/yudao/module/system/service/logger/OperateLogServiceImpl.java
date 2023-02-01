@@ -59,7 +59,7 @@ public class OperateLogServiceImpl implements OperateLogService {
     }
 
     @Override
-    public List<OperateLogDO> getOperateLogs(OperateLogExportReqVO reqVO) {
+    public List<OperateLogDO> getOperateLogList(OperateLogExportReqVO reqVO) {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
