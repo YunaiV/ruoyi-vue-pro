@@ -13,7 +13,7 @@
           />
         </el-scrollbar>
       </el-card>
-      <el-card class="w-3/4" style="margin-left: 10px" :gutter="12" shadow="hover">
+      <el-card class="w-3/4 ml-3" :gutter="12" shadow="hover">
         <el-tabs v-model="preview.activeName">
           <el-tab-pane
             v-for="item in previewCodegen"
@@ -30,11 +30,7 @@
   </XModal>
 </template>
 <script setup lang="ts">
-import { reactive, ref, unref } from 'vue'
 import { useClipboard } from '@vueuse/core'
-import { ElCard, ElTree, ElTabs, ElTabPane } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
 import { handleTree2 } from '@/utils/tree'
 import { previewCodegenApi } from '@/api/infra/codegen'
 import { CodegenTableVO, CodegenPreviewVO } from '@/api/infra/codegen/types'

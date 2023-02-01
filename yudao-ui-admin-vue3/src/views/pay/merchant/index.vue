@@ -75,11 +75,7 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Merchant">
-import { ref, unref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 import { rules, allSchemas } from './merchant.data'
 import * as MerchantApi from '@/api/pay/merchant'
 

@@ -1,5 +1,5 @@
 import { Layout } from '@/utils/routerHelper'
-import { useI18n } from '@/hooks/web/useI18n'
+
 const { t } = useI18n()
 /**
 * redirect: noredirect        当设置 noredirect 的时候该路由在面包屑导航中不可被点击
@@ -71,7 +71,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
     ]
   },
   {
-    path: '/userinfo',
+    path: '/user',
     component: Layout,
     name: 'UserInfo',
     meta: {
@@ -88,6 +88,18 @@ const remainingRouter: AppRouteRecordRaw[] = [
           noTagsView: false,
           icon: 'ep:user',
           title: t('common.profile')
+        }
+      },
+      {
+        path: 'notify-message',
+        component: () => import('@/views/system/notify/my/index.vue'),
+        name: 'MyNotifyMessage',
+        meta: {
+          canTo: true,
+          hidden: true,
+          noTagsView: false,
+          icon: 'ep:message',
+          title: '我的站内信'
         }
       }
     ]

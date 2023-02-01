@@ -34,9 +34,6 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Refund">
-import { ref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useXTable } from '@/hooks/web/useXTable'
 import { allSchemas } from './refund.data'
 import * as RefundApi from '@/api/pay/refund'
 

@@ -38,7 +38,7 @@
       <!-- @星语：分页和列表重叠在一起了 -->
     </el-card>
     <!-- ====== 字典数据 ====== -->
-    <el-card class="w-1/2 dict" style="margin-left: 10px" :gutter="12" shadow="hover">
+    <el-card class="w-1/2 dict ml-3" :gutter="12" shadow="hover">
       <template #header>
         <div class="card-header">
           <span>字典数据</span>
@@ -122,13 +122,8 @@
   </div>
 </template>
 <script setup lang="ts" name="Dict">
-import { ref, unref, reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
 import { VxeTableEvents } from 'vxe-table'
-import { FormExpose } from '@/components/Form'
-import { ElInput, ElTag, ElCard } from 'element-plus'
+import type { FormExpose } from '@/components/Form'
 import * as DictTypeSchemas from './dict.type'
 import * as DictDataSchemas from './dict.data'
 import * as DictTypeApi from '@/api/system/dict/dict.type'

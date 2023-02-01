@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
+import { ElMessageBox } from 'element-plus'
+
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
-import { useRouter } from 'vue-router'
 import { useDesign } from '@/hooks/web/useDesign'
 import avatarImg from '@/assets/imgs/avatar.gif'
 import { useUserStore } from '@/store/modules/user'
@@ -35,14 +34,14 @@ const loginOut = () => {
     type: 'warning'
   })
     .then(async () => {
-      userStore.loginOut()
+      await userStore.loginOut()
       tagsViewStore.delAllViews()
       replace('/login?redirect=/index')
     })
     .catch(() => {})
 }
 const toProfile = async () => {
-  push('/userinfo/profile')
+  push('/user/profile')
 }
 const toDocument = () => {
   window.open('https://doc.iocoder.cn/')

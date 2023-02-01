@@ -23,7 +23,6 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -59,8 +58,6 @@ public class RoleServiceTest extends BaseDbUnitTest {
         Map<Long, RoleDO> roleCache = roleService.getRoleCache();
         assertPojoEquals(roleDO1, roleCache.get(roleDO1.getId()));
         assertPojoEquals(roleDO2, roleCache.get(roleDO2.getId()));
-        // 断言 maxUpdateTime 缓存
-        assertEquals(max(roleDO1.getUpdateTime(), roleDO2.getUpdateTime()), roleService.getMaxUpdateTime());
     }
 
     @Test

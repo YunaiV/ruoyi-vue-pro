@@ -1,0 +1,18 @@
+### 请求 /mp/user/sync 接口 => 成功
+POST {{baseUrl}}/mp/user/sync?accountId=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 请求 /mp/user/update 接口 => 成功
+PUT {{baseUrl}}/mp/user/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "id": "3",
+  "nickname": "test",
+  "remark": "测试备注",
+  "tagIds": [103, 104]
+}

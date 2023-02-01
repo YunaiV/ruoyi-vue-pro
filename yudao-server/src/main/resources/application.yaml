@@ -92,6 +92,7 @@ yudao:
   security:
     permit-all_urls:
       - /admin-ui/** # /resources/admin-ui 目录下的静态资源
+      - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，不需要登录
   websocket:
     enable: true # websocket的开关
     path: /websocket/message # 路径
@@ -114,6 +115,7 @@ yudao:
       - cn.iocoder.yudao.module.member.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.system.enums.ErrorCodeConstants
+      - cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants
   tenant: # 多租户相关配置项
     enable: true
     ignore-urls:
@@ -124,6 +126,7 @@ yudao:
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
       - /admin-api/pay/notify/callback/* # 支付回调通知，不携带租户编号
       - /jmreport/* # 积木报表，无法携带租户编号
+      - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
     ignore-tables:
       - system_tenant
       - system_tenant_package
@@ -136,6 +139,10 @@ yudao:
       - system_sms_log
       - system_sensitive_word
       - system_oauth2_client
+      - system_mail_account
+      - system_mail_template
+      - system_mail_log
+      - system_notify_template
       - infra_codegen_column
       - infra_codegen_table
       - infra_test_demo

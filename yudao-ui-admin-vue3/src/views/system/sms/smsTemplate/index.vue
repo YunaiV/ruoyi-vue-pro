@@ -109,13 +109,7 @@
   </XModal>
 </template>
 <script setup lang="ts" name="SmsTemplate">
-// 全局相关的 import
-import { ref, unref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
-import { FormExpose } from '@/components/Form'
-import { ElForm, ElFormItem, ElInput } from 'element-plus'
+import type { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as SmsTemplateApi from '@/api/system/sms/smsTemplate'
 import { rules, allSchemas } from './sms.template.data'
@@ -203,7 +197,7 @@ const sendSmsForm = ref({
 })
 const sendSmsRules = ref({
   mobile: [{ required: true, message: '手机不能为空', trigger: 'blur' }],
-  templateCode: [{ required: true, message: '手机不能为空', trigger: 'blur' }],
+  templateCode: [{ required: true, message: '模版编号不能为空', trigger: 'blur' }],
   templateParams: {}
 })
 const sendVisible = ref(false)
@@ -231,7 +225,7 @@ const sendSmsTest = async () => {
   }
   const res = await SmsTemplateApi.sendSmsApi(data)
   if (res) {
-    message.success('发送成功')
+    message.success('提交发送成功！发送结果，见发送日志编号：' + res)
   }
   sendVisible.value = false
 }

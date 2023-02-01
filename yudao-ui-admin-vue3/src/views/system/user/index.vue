@@ -8,17 +8,19 @@
         </div>
       </template>
       <el-input v-model="filterText" placeholder="搜索部门" />
-      <el-tree
-        ref="treeRef"
-        node-key="id"
-        default-expand-all
-        :data="deptOptions"
-        :props="defaultProps"
-        :highlight-current="true"
-        :filter-node-method="filterNode"
-        :expand-on-click-node="false"
-        @node-click="handleDeptNodeClick"
-      />
+      <el-scrollbar height="650">
+        <el-tree
+          ref="treeRef"
+          node-key="id"
+          default-expand-all
+          :data="deptOptions"
+          :props="defaultProps"
+          :highlight-current="true"
+          :filter-node-method="filterNode"
+          :expand-on-click-node="false"
+          @node-click="handleDeptNodeClick"
+        />
+      </el-scrollbar>
     </el-card>
     <el-card class="w-4/5 user" style="margin-left: 10px" :gutter="12" shadow="hover">
       <template #header>
@@ -261,36 +263,12 @@
   </XModal>
 </template>
 <script setup lang="ts" name="User">
-import { nextTick, onMounted, reactive, ref, unref, watch } from 'vue'
-import {
-  ElTag,
-  ElInput,
-  ElCard,
-  ElTree,
-  ElTreeSelect,
-  ElSelect,
-  ElOption,
-  ElTransfer,
-  ElForm,
-  ElFormItem,
-  ElUpload,
-  ElSwitch,
-  ElCheckbox,
-  ElDropdown,
-  ElDropdownMenu,
-  ElDropdownItem,
-  UploadInstance,
-  UploadRawFile
-} from 'element-plus'
-import { useRouter } from 'vue-router'
+import type { ElTree, UploadRawFile, UploadInstance } from 'element-plus'
 import { handleTree, defaultProps } from '@/utils/tree'
 import download from '@/utils/download'
 import { CommonStatusEnum } from '@/utils/constants'
 import { getAccessToken, getTenantId } from '@/utils/auth'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useXTable } from '@/hooks/web/useXTable'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 import { rules, allSchemas } from './user.data'
 import * as UserApi from '@/api/system/user'
 import { listSimpleDeptApi } from '@/api/system/dept'
@@ -558,8 +536,8 @@ onMounted(async () => {
 
 <style scoped>
 .user {
-  height: 900px;
-  max-height: 960px;
+  height: 780px;
+  max-height: 800px;
 }
 .card-header {
   display: flex;

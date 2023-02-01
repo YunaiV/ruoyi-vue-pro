@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.framework.captcha.core.service;
 
-import com.anji.captcha.service.CaptchaCacheService;
+import com.xingyuv.captcha.service.CaptchaCacheService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import javax.annotation.Resource;

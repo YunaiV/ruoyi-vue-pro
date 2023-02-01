@@ -6,15 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
-import java.time.LocalDateTime;
-
-/**
- * 文件配置 Mapper
- *
- * @author 芋道源码
- */
 @Mapper
 public interface FileConfigMapper extends BaseMapperX<FileConfigDO> {
 
@@ -25,8 +17,5 @@ public interface FileConfigMapper extends BaseMapperX<FileConfigDO> {
                 .betweenIfPresent(FileConfigDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(FileConfigDO::getId));
     }
-
-    @Select("SELECT COUNT(*) FROM infra_file_config WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

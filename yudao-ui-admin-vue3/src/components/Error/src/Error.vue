@@ -3,7 +3,6 @@ import pageError from '@/assets/svgs/404.svg'
 import networkError from '@/assets/svgs/500.svg'
 import noPermission from '@/assets/svgs/403.svg'
 import { propTypes } from '@/utils/propTypes'
-import { useI18n } from '@/hooks/web/useI18n'
 
 interface ErrorMap {
   url: string

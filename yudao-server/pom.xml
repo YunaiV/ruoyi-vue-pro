@@ -60,6 +60,13 @@
             <version>${revision}</version>
         </dependency>
 
+        <!-- 微信公众号模块。默认注释，保证编译速度 -->
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-module-mp-biz</artifactId>-->
+<!--            <version>${revision}</version>-->
+<!--        </dependency>-->
+
         <!-- 商城相关模块。默认注释，保证编译速度 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
@@ -76,6 +83,7 @@
 <!--            <artifactId>yudao-module-trade-biz</artifactId>-->
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
+
 
         <!-- spring boot 配置所需依赖 -->
         <dependency>
@@ -104,7 +112,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.7.7</version> <!-- 如果 spring.boot.version 版本修改，则这里也要跟着修改 -->
+                <version>2.7.8</version> <!-- 如果 spring.boot.version 版本修改，则这里也要跟着修改 -->
                 <configuration>
                     <fork>true</fork>
                 </configuration>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
-import { PropType, ref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
+import { PropType } from 'vue'
+
 import { useDesign } from '@/hooks/web/useDesign'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { contextMenuSchema } from '@/types/contextMenu'
+import type { ElDropdown } from 'element-plus'
 
 const { getPrefixCls } = useDesign()
 

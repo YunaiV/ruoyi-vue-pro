@@ -237,10 +237,6 @@ public class CodegenServiceImpl implements CodegenService {
     @Override
     public List<DatabaseTableRespVO> getDatabaseTableList(Long dataSourceConfigId, String name, String comment) {
         List<TableInfo> tables = databaseTableService.getTableList(dataSourceConfigId, name, comment);
-        // 移除置顶前缀的表名 // TODO 未来做成可配置
-        tables.removeIf(table -> table.getName().toUpperCase().startsWith("QRTZ_"));
-        tables.removeIf(table -> table.getName().toUpperCase().startsWith("ACT_"));
-        tables.removeIf(table -> table.getName().toUpperCase().startsWith("FLW_"));
         // 移除已经生成的表
         // 移除在 Codegen 中，已经存在的
         Set<String> existsTables = CollectionUtils.convertSet(

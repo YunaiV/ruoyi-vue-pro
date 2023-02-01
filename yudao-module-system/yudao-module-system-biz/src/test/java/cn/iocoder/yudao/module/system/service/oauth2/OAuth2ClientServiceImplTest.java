@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
@@ -59,8 +58,6 @@ public class OAuth2ClientServiceImplTest extends BaseDbUnitTest {
         assertEquals(2, clientCache.size());
         assertPojoEquals(clientDO1, clientCache.get(clientDO1.getClientId()));
         assertPojoEquals(clientDO2, clientCache.get(clientDO2.getClientId()));
-        // 断言 maxUpdateTime 缓存
-        assertEquals(max(clientDO1.getUpdateTime(), clientDO2.getUpdateTime()), oauth2ClientService.getMaxUpdateTime());
     }
 
     @Test

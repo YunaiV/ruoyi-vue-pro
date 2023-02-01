@@ -6,15 +6,14 @@
   </VxeGrid>
 </template>
 <script lang="ts" setup name="XTable">
-import { computed, PropType, ref, unref, useAttrs, watch } from 'vue'
+import { PropType } from 'vue'
 import { SizeType, VxeGridInstance } from 'vxe-table'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
 import { XTableProps } from './type'
 import { isBoolean, isFunction } from '@/utils/is'
-import { useMessage } from '@/hooks/web/useMessage'
+
 import download from '@/utils/download'
-import { useI18n } from '@/hooks/web/useI18n'
 
 const { t } = useI18n()
 const message = useMessage() // 消息弹窗
@@ -120,7 +119,7 @@ const getColumnsConfig = (options: XTableProps) => {
 const getProxyConfig = (options: XTableProps) => {
   const { getListApi, proxyConfig, data, isList } = options
   if (proxyConfig || data) return
-  if (getListApi && isFunction(getListApi) && !isList) {
+  if (getListApi && isFunction(getListApi)) {
     if (!isList) {
       options.proxyConfig = {
         seq: true, // 启用动态序号代理（分页之后索引自动计算为当前页的起始序号）
@@ -194,7 +193,8 @@ const getProxyConfig = (options: XTableProps) => {
 
 // 分页
 const getPageConfig = (options: XTableProps) => {
-  const { pagination, pagerConfig, treeConfig } = options
+  const { pagination, pagerConfig, treeConfig, isList } = options
+  if (isList) return
   if (treeConfig) {
     options.treeConfig = options.treeConfig
     return
@@ -204,7 +204,7 @@ const getPageConfig = (options: XTableProps) => {
     if (isBoolean(pagination)) {
       options.pagerConfig = {
         border: false, // 带边框
-        background: true, // 带背景颜色
+        background: false, // 带背景颜色
         perfect: false, // 配套的样式
         pageSize: 10, // 每页大小
         pagerCount: 7, // 显示页码按钮的数量
@@ -228,19 +228,19 @@ const getPageConfig = (options: XTableProps) => {
     if (pagination != false) {
       options.pagerConfig = {
         border: false, // 带边框
-        background: true, // 带背景颜色
+        background: false, // 带背景颜色
         perfect: false, // 配套的样式
         pageSize: 10, // 每页大小
         pagerCount: 7, // 显示页码按钮的数量
         autoHidden: false, // 当只有一页时自动隐藏
         pageSizes: [5, 10, 20, 30, 50, 100], // 每页大小选项列表
         layouts: [
+          'Sizes',
           'PrevJump',
           'PrevPage',
-          'JumpNumber',
+          'Number',
           'NextPage',
           'NextJump',
-          'Sizes',
           'FullJump',
           'Total'
         ]
@@ -255,12 +255,17 @@ const getToolBarConfig = (options: XTableProps) => {
   if (toolbarConfig) return
   if (toolBar) {
     if (!isBoolean(toolBar)) {
+      console.info(2)
       options.toolbarConfig = toolBar
       return
     }
-  } else if (!topActionSlots) {
+  } else if (topActionSlots != false) {
     options.toolbarConfig = {
       slots: { buttons: 'toolbar_buttons' }
+    }
+  } else {
+    options.toolbarConfig = {
+      enabled: true
     }
   }
 }
@@ -275,7 +280,7 @@ const reload = () => {
 }
 
 // 删除
-const deleteData = async (ids: string | number) => {
+const deleteData = async (id: string | number) => {
   const g = unref(xGrid)
   if (!g) {
     return
@@ -287,12 +292,55 @@ const deleteData = async (ids: string | number) => {
   }
   return new Promise(async () => {
     message.delConfirm().then(async () => {
-      await (options?.deleteApi && options?.deleteApi(ids))
+      await (options?.deleteApi && options?.deleteApi(id))
       message.success(t('common.delSuccess'))
       // 刷新列表
       reload()
     })
   })
+}
+
+// 批量删除
+const deleteBatch = async () => {
+  const g = unref(xGrid)
+  if (!g) {
+    return
+  }
+  const rows = g.getCheckboxRecords() || g.getRadioRecord()
+  let ids: any[] = []
+  if (rows.length == 0) {
+    message.error('请选择数据')
+    return
+  } else {
+    rows.forEach((row) => {
+      ids.push(row.id)
+    })
+  }
+  const options = innerProps.value || props.options
+  if (options.deleteListApi) {
+    return new Promise(async () => {
+      message.delConfirm().then(async () => {
+        await (options?.deleteListApi && options?.deleteListApi(ids))
+        message.success(t('common.delSuccess'))
+        // 刷新列表
+        reload()
+      })
+    })
+  } else if (options.deleteApi) {
+    return new Promise(async () => {
+      message.delConfirm().then(async () => {
+        ids.forEach(async (id) => {
+          await (options?.deleteApi && options?.deleteApi(id))
+        })
+        message.success(t('common.delSuccess'))
+        // 刷新列表
+        reload()
+      })
+    })
+  } else {
+    console.error('未传入delListApi')
+    return
+  }
 }
 
 // 导出
@@ -323,12 +371,48 @@ const getSearchData = () => {
   return queryParams
 }
 
+// 获取当前列
+const getCurrentColumn = () => {
+  const g = unref(xGrid)
+  if (!g) {
+    return
+  }
+  return g.getCurrentColumn()
+}
+
+// 获取当前选中列，redio
+const getRadioRecord = () => {
+  const g = unref(xGrid)
+  if (!g) {
+    return
+  }
+  return g.getRadioRecord(false)
+}
+
+// 获取当前选中列，checkbox
+const getCheckboxRecords = () => {
+  const g = unref(xGrid)
+  if (!g) {
+    return
+  }
+  return g.getCheckboxRecords(false)
+}
 const setProps = (prop: Partial<XTableProps>) => {
   innerProps.value = { ...unref(innerProps), ...prop }
 }
 
 defineExpose({ reload, Ref: xGrid, getSearchData, deleteData, exportList })
-emit('register', { reload, getSearchData, setProps, deleteData, exportList })
+emit('register', {
+  reload,
+  getSearchData,
+  setProps,
+  deleteData,
+  deleteBatch,
+  exportList,
+  getCurrentColumn,
+  getRadioRecord,
+  getCheckboxRecords
+})
 </script>
 <style lang="scss">
 @import './style/index.scss';

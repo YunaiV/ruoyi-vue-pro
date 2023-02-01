@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping;
-import springfox.documentation.spring.web.plugins.WebFluxRequestHandlerProvider;
 import springfox.documentation.spring.web.plugins.WebMvcRequestHandlerProvider;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public class SpringFoxHandlerProviderBeanPostProcessor implements BeanPostProces
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        if (bean instanceof WebMvcRequestHandlerProvider || bean instanceof WebFluxRequestHandlerProvider) {
+        if (bean instanceof WebMvcRequestHandlerProvider) {
             customizeSpringfoxHandlerMappings(getHandlerMappings(bean));
         }
         return bean;

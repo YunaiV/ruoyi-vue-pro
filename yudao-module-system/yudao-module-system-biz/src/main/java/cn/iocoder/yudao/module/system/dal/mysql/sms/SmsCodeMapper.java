@@ -22,7 +22,7 @@ public interface SmsCodeMapper extends BaseMapperX<SmsCodeDO> {
                 .eqIfPresent("scene", scene)
                 .eqIfPresent("code", code)
                 .orderByDesc("id")
-                .limit1());
+                .limitN(1));
     }
 
 }

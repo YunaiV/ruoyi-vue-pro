@@ -42,10 +42,6 @@
   </XModal>
 </template>
 <script setup lang="ts" name="OperateLog">
-// 全局相关的 import
-import { ref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useXTable } from '@/hooks/web/useXTable'
 // 业务相关的 import
 import * as OperateLogApi from '@/api/system/operatelog'
 import { allSchemas } from './operatelog.data'
