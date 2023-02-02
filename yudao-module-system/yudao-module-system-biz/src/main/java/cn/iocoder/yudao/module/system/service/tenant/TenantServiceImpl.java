@@ -138,7 +138,7 @@ public class TenantServiceImpl implements TenantService {
     @Transactional(rollbackFor = Exception.class)
     public void updateTenant(TenantUpdateReqVO updateReqVO) {
         // 校验存在
-        TenantDO tenant = checkUpdateTenant(updateReqVO.getId());
+        TenantDO tenant = validateUpdateTenant(updateReqVO.getId());
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(updateReqVO.getPackageId());
 
@@ -179,12 +179,12 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public void deleteTenant(Long id) {
         // 校验存在
-        checkUpdateTenant(id);
+        validateUpdateTenant(id);
         // 删除
         tenantMapper.deleteById(id);
     }
 
-    private TenantDO checkUpdateTenant(Long id) {
+    private TenantDO validateUpdateTenant(Long id) {
         TenantDO tenant = tenantMapper.selectById(id);
         if (tenant == null) {
             throw exception(TENANT_NOT_EXISTS);
