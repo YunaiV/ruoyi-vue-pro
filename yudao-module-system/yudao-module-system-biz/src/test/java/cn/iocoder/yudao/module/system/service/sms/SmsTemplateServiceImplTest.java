@@ -30,9 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static cn.hutool.core.bean.BeanUtil.getFieldValue;
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -43,7 +41,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @Import(SmsTemplateServiceImpl.class)
-public class SmsTemplateServiceTest extends BaseDbUnitTest {
+public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private SmsTemplateServiceImpl smsTemplateService;

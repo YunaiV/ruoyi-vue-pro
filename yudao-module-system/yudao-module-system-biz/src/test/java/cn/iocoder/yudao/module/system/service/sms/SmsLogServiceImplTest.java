@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Import(SmsLogServiceImpl.class)
-public class SmsLogServiceTest extends BaseDbUnitTest {
+public class SmsLogServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private SmsLogServiceImpl smsLogService;
