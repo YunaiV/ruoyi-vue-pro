@@ -188,22 +188,14 @@
       <!-- <div id="js-properties-panel" class="panel"></div> -->
       <!-- <div class="my-process-designer__canvas" ref="bpmn-canvas"></div> -->
     </div>
-    <XModal
-      title="预览"
-      width="80%"
-      height="90%"
-      v-model="previewModelVisible"
-      append-to-body
-      destroy-on-close
-    >
-      <div v-highlight>
-        <pre>
-            <code>
+    <XModal title="预览" width="80%" height="90%" v-model="previewModelVisible" destroy-on-close>
+      <!-- append-to-body -->
+      <pre v-highlight>
+            <code class="hljs">
             <!-- 高亮代码块 -->
             {{ previewResult }}
             </code>
         </pre>
-      </div>
       <!-- <pre>
         <code class="hljs" v-html="highlightedCode(previewType, previewResult)"></code>
       </pre> -->
@@ -241,7 +233,7 @@ import flowableModdleExtension from './plugins/extension-moddle/flowable'
 // 引入json转换与高亮
 // import xml2js from 'xml-js'
 import xml2js from 'fast-xml-parser'
-// import { XmlNode, XmlNodeType, parseXmlString } from 'steady-xml'
+import { XmlNode, XmlNodeType, parseXmlString } from 'steady-xml'
 // 代码高亮插件
 // import hljs from 'highlight.js/lib/highlight'
 // import 'highlight.js/styles/github-gist.css'
@@ -638,18 +630,21 @@ const previewProcessJson = () => {
 
     // const rootNode = parseXmlString(xml)
     // console.log(rootNode, 'rootNoderootNode')
-    // const rootNodes = new XmlNode(XmlNodeType.Root)
-    // rootNodes.toJsObject()
-    // console.log(JSON.stringify(rootNodes), ';;;;;;;;;;;;;;;')
+    const rootNodes = new XmlNode(XmlNodeType.Root, parseXmlString(xml))
+    // console.log(rootNodes, 'rootNodesrootNodesrootNodes')
+    // console.log(rootNodes.parent.toJsObject(), 'rootNodes.toJSON()')
+    // console.log(JSON.stringify(rootNodes.parent.toJsObject()), 'rootNodes.toJSON()')
+    // console.log(JSON.stringify(rootNodes.parent.toJSON()), 'rootNodes.toJSON()')
 
     const parser = new xml2js.XMLParser()
     let jObj = parser.parse(xml)
-    // console.log(jObj, 'jObjjObjjObjjObjjObj')
+    console.log(jObj, 'jObjjObjjObjjObjjObj')
     // const builder = new xml2js.XMLBuilder(xml)
     // const xmlContent = builder
     // console.log(xmlContent, 'xmlContent')
     // console.log(xml2js, 'convertconvertconvert')
-    previewResult.value = jObj
+    previewResult.value = rootNodes.parent.toJSON()
+    // previewResult.value = jObj
     // previewResult.value = convert.xml2json(xml,  {explicitArray : false},{ spaces: 2 })
     previewType.value = 'json'
     previewModelVisible.value = true

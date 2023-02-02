@@ -50,7 +50,7 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
 
 import hljs from 'highlight.js' //导入代码高亮文件
-import 'highlight.js/styles/github-gist.css' //导入代码高亮样式
+import 'highlight.js/styles/github.css' //导入代码高亮样式  新版
 
 // 本地开发模式 全局引入 element-plus 样式，加快第一次进入速度
 if (isDevMode()) {
@@ -66,7 +66,7 @@ const setupAll = async () => {
   app.directive('highlight', function (el) {
     const blocks = el.querySelectorAll('code')
     blocks.forEach((block: any) => {
-      hljs.highlightBlock(block)
+      hljs.highlightElement(block)
     })
   })
 
