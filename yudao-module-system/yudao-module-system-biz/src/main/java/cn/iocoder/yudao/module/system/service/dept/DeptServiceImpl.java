@@ -140,9 +140,9 @@ public class DeptServiceImpl implements DeptService {
         }
         List<DeptDO> result = new ArrayList<>();
         // 递归，简单粗暴
-        this.getDeptsByParentIdFromCache(result, parentId,
-                recursive ? Integer.MAX_VALUE : 1, // 如果递归获取，则无限；否则，只递归 1 次
-                parentDeptCache);
+       getDeptsByParentIdFromCache(result, parentId,
+               recursive ? Integer.MAX_VALUE : 1, // 如果递归获取，则无限；否则，只递归 1 次
+               parentDeptCache);
         return result;
     }
 
@@ -205,7 +205,7 @@ public class DeptServiceImpl implements DeptService {
             throw exception(DEPT_NOT_ENABLE);
         }
         // 父部门不能是原来的子部门
-        List<DeptDO> children = this.getDeptListByParentIdFromCache(id, true);
+        List<DeptDO> children = getDeptListByParentIdFromCache(id, true);
         if (children.stream().anyMatch(dept1 -> dept1.getId().equals(parentId))) {
             throw exception(DEPT_PARENT_IS_CHILD);
         }

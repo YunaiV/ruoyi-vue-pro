@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @Import(SocialUserServiceImpl.class)
-public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
+public class SocialUserServiceImplTest extends BaseDbAndRedisUnitTest {
 
     @Resource
     private SocialUserServiceImpl socialUserService;

@@ -125,7 +125,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @Override
     public void updateSmsTemplate(SmsTemplateUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validateSmsTemplateExists(updateReqVO.getId());
+        validateSmsTemplateExists(updateReqVO.getId());
         // 校验短信渠道
         SmsChannelDO channelDO = checkSmsChannel(updateReqVO.getChannelId());
         // 校验短信编码是否重复
@@ -145,7 +145,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @Override
     public void deleteSmsTemplate(Long id) {
         // 校验存在
-        this.validateSmsTemplateExists(id);
+        validateSmsTemplateExists(id);
         // 更新
         smsTemplateMapper.deleteById(id);
         // 发送刷新消息

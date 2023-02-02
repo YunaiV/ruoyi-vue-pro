@@ -68,7 +68,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     @Override
     public void updateSmsChannel(SmsChannelUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validateSmsChannelExists(updateReqVO.getId());
+        validateSmsChannelExists(updateReqVO.getId());
         // 更新
         SmsChannelDO updateObj = SmsChannelConvert.INSTANCE.convert(updateReqVO);
         smsChannelMapper.updateById(updateObj);
@@ -79,7 +79,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     @Override
     public void deleteSmsChannel(Long id) {
         // 校验存在
-        this.validateSmsChannelExists(id);
+        validateSmsChannelExists(id);
         // 校验是否有在使用该账号的模版
         if (smsTemplateService.countByChannelId(id) > 0) {
             throw exception(SMS_CHANNEL_HAS_CHILDREN);
