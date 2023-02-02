@@ -66,7 +66,7 @@ public class SmsSendServiceImpl implements SmsSendService {
             }
         }
         // 执行发送
-        return this.sendSingleSms(mobile, userId, UserTypeEnum.ADMIN.getValue(), templateCode, templateParams);
+        return sendSingleSms(mobile, userId, UserTypeEnum.ADMIN.getValue(), templateCode, templateParams);
     }
 
     @Override
@@ -76,19 +76,19 @@ public class SmsSendServiceImpl implements SmsSendService {
             mobile = memberService.getMemberUserMobile(userId);
         }
         // 执行发送
-        return this.sendSingleSms(mobile, userId, UserTypeEnum.MEMBER.getValue(), templateCode, templateParams);
+        return sendSingleSms(mobile, userId, UserTypeEnum.MEMBER.getValue(), templateCode, templateParams);
     }
 
     @Override
     public Long sendSingleSms(String mobile, Long userId, Integer userType,
                               String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否合法
-        SmsTemplateDO template = this.checkSmsTemplateValid(templateCode);
+        SmsTemplateDO template = validateSmsTemplate(templateCode);
         // 校验短信渠道是否合法
-        SmsChannelDO smsChannel = this.checkSmsChannelValid(template.getChannelId());
+        SmsChannelDO smsChannel = validateSmsChannel(template.getChannelId());
 
         // 校验手机号码是否存在
-        mobile = this.checkMobile(mobile);
+        mobile = validateMobile(mobile);
         // 构建有序的模板参数。为什么放在这个位置，是提前保证模板参数的正确性，而不是到了插入发送日志
         List<KeyValue<String, Object>> newTemplateParams = this.buildTemplateParams(template, templateParams);
 
@@ -108,7 +108,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     }
 
     @VisibleForTesting
-    public SmsChannelDO checkSmsChannelValid(Long channelId) {
+    SmsChannelDO validateSmsChannel(Long channelId) {
         // 获得短信模板。考虑到效率，从缓存中获取
         SmsChannelDO channelDO = smsChannelService.getSmsChannel(channelId);
         // 短信模板不存在
@@ -119,7 +119,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     }
 
     @VisibleForTesting
-    public SmsTemplateDO checkSmsTemplateValid(String templateCode) {
+    SmsTemplateDO validateSmsTemplate(String templateCode) {
         // 获得短信模板。考虑到效率，从缓存中获取
         SmsTemplateDO template = smsTemplateService.getSmsTemplateByCodeFromCache(templateCode);
         // 短信模板不存在
@@ -139,7 +139,7 @@ public class SmsSendServiceImpl implements SmsSendService {
      * @return 处理后的参数
      */
     @VisibleForTesting
-    public List<KeyValue<String, Object>> buildTemplateParams(SmsTemplateDO template, Map<String, Object> templateParams) {
+    List<KeyValue<String, Object>> buildTemplateParams(SmsTemplateDO template, Map<String, Object> templateParams) {
         return template.getParams().stream().map(key -> {
             Object value = templateParams.get(key);
             if (value == null) {
@@ -150,7 +150,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     }
 
     @VisibleForTesting
-    public String checkMobile(String mobile) {
+    public String validateMobile(String mobile) {
         if (StrUtil.isEmpty(mobile)) {
             throw exception(SMS_SEND_MOBILE_NOT_EXISTS);
         }
