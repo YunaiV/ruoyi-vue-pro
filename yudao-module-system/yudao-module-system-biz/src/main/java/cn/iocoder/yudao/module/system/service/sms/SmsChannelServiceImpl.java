@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -100,11 +99,6 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     @Override
     public SmsChannelDO getSmsChannel(Long id) {
         return smsChannelMapper.selectById(id);
-    }
-
-    @Override
-    public List<SmsChannelDO> getSmsChannelList(Collection<Long> ids) {
-        return smsChannelMapper.selectBatchIds(ids);
     }
 
     @Override
