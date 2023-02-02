@@ -25,6 +25,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SENSITIVE_WORD_EXISTS;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SENSITIVE_WORD_NOT_EXISTS;
 
@@ -85,7 +86,7 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
 
     private void initSensitiveWordTrie(List<SensitiveWordDO> wordDOs) {
         // 过滤禁用的敏感词
-        wordDOs = CollectionUtils.filterList(wordDOs, word -> word.getStatus().equals(CommonStatusEnum.ENABLE.getStatus()));
+        wordDOs = filterList(wordDOs, word -> word.getStatus().equals(CommonStatusEnum.ENABLE.getStatus()));
 
         // 初始化默认的 defaultSensitiveWordTrie
         this.defaultSensitiveWordTrie = new SimpleTrie(CollectionUtils.convertList(wordDOs, SensitiveWordDO::getName));
@@ -107,7 +108,8 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
     @Override
     public Long createSensitiveWord(SensitiveWordCreateReqVO createReqVO) {
         // 校验唯一性
-        checkSensitiveWordNameUnique(null, createReqVO.getName());
+        validateSensitiveWordNameUnique(null, createReqVO.getName());
+
         // 插入
         SensitiveWordDO sensitiveWord = SensitiveWordConvert.INSTANCE.convert(createReqVO);
         sensitiveWordMapper.insert(sensitiveWord);
@@ -119,8 +121,9 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
     @Override
     public void updateSensitiveWord(SensitiveWordUpdateReqVO updateReqVO) {
         // 校验唯一性
-        checkSensitiveWordExists(updateReqVO.getId());
-        checkSensitiveWordNameUnique(updateReqVO.getId(), updateReqVO.getName());
+        validateSensitiveWordExists(updateReqVO.getId());
+        validateSensitiveWordNameUnique(updateReqVO.getId(), updateReqVO.getName());
+
         // 更新
         SensitiveWordDO updateObj = SensitiveWordConvert.INSTANCE.convert(updateReqVO);
         sensitiveWordMapper.updateById(updateObj);
@@ -131,14 +134,14 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
     @Override
     public void deleteSensitiveWord(Long id) {
         // 校验存在
-        checkSensitiveWordExists(id);
+        validateSensitiveWordExists(id);
         // 删除
         sensitiveWordMapper.deleteById(id);
         // 发送消息，刷新缓存
         sensitiveWordProducer.sendSensitiveWordRefreshMessage();
     }
 
-    private void checkSensitiveWordNameUnique(Long id, String name) {
+    private void validateSensitiveWordNameUnique(Long id, String name) {
         SensitiveWordDO word = sensitiveWordMapper.selectByName(name);
         if (word == null) {
             return;
@@ -152,7 +155,7 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
         }
     }
 
-    private void checkSensitiveWordExists(Long id) {
+    private void validateSensitiveWordExists(Long id) {
         if (sensitiveWordMapper.selectById(id) == null) {
             throw exception(SENSITIVE_WORD_NOT_EXISTS);
         }
