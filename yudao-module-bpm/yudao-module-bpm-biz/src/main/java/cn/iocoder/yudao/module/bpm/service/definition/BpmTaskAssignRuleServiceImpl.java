@@ -213,7 +213,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
 
     private void validTaskAssignRuleOptions(Integer type, Set<Long> options) {
         if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.ROLE.getType())) {
-            roleApi.validRoles(options);
+            roleApi.validRoleList(options);
         } else if (ObjectUtils.equalsAny(type, BpmTaskAssignRuleTypeEnum.DEPT_MEMBER.getType(),
             BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType())) {
             deptApi.validateDeptList(options);

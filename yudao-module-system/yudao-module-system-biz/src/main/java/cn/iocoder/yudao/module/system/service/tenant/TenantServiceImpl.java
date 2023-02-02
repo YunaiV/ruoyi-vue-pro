@@ -156,7 +156,7 @@ public class TenantServiceImpl implements TenantService {
     public void updateTenantRoleMenu(Long tenantId, Set<Long> menuIds) {
         TenantUtils.execute(tenantId, () -> {
             // 获得所有角色
-            List<RoleDO> roles = roleService.getRoles(null);
+            List<RoleDO> roles = roleService.getRoleListByStatus(null);
             roles.forEach(role -> Assert.isTrue(tenantId.equals(role.getTenantId()), "角色({}/{}) 租户不匹配",
                     role.getId(), role.getTenantId(), tenantId)); // 兜底校验
             // 重新分配每个角色的权限

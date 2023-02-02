@@ -63,7 +63,7 @@ public class UserProfileController {
         AdminUserDO user = userService.getUser(getLoginUserId());
         UserProfileRespVO resp = UserConvert.INSTANCE.convert03(user);
         // 获得用户角色
-        List<RoleDO> userRoles = roleService.getRolesFromCache(permissionService.getUserRoleIdListByUserId(user.getId()));
+        List<RoleDO> userRoles = roleService.getRoleListFromCache(permissionService.getUserRoleIdListByUserId(user.getId()));
         resp.setRoles(UserConvert.INSTANCE.convertList(userRoles));
         // 获得部门信息
         if (user.getDeptId() != null) {

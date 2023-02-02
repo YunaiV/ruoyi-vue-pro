@@ -158,7 +158,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // 判断角色是否包含超级管理员。如果是超级管理员，获取到全部
-        List<RoleDO> roleList = roleService.getRolesFromCache(roleIds);
+        List<RoleDO> roleList = roleService.getRoleListFromCache(roleIds);
         if (roleService.hasAnySuperAdmin(roleList)) {
             return menuService.getMenuListFromCache(menuTypes, menusStatuses);
         }
@@ -371,7 +371,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (roleService.hasAnySuperAdmin(roleIds)) {
             return true;
         }
-        Set<String> userRoles = convertSet(roleService.getRolesFromCache(roleIds),
+        Set<String> userRoles = convertSet(roleService.getRoleListFromCache(roleIds),
                 RoleDO::getCode);
         return CollUtil.containsAny(userRoles, Sets.newHashSet(roles));
     }
@@ -388,7 +388,7 @@ public class PermissionServiceImpl implements PermissionService {
             result.setSelf(true);
             return result;
         }
-        List<RoleDO> roles = roleService.getRolesFromCache(roleIds);
+        List<RoleDO> roles = roleService.getRoleListFromCache(roleIds);
 
         // 获得用户的部门编号的缓存，通过 Guava 的 Suppliers 惰性求值，即有且仅有第一次发起 DB 的查询
         Supplier<Long> userDeptIdCache = Suppliers.memoize(() -> userService.getUser(userId).getDeptId());

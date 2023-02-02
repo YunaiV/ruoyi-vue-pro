@@ -106,7 +106,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         Collection<Integer> menusStatuses = asList(0, 1);
         // mock 方法
         List<RoleDO> roleList = singletonList(randomPojo(RoleDO.class, o -> o.setId(100L)));
-        when(roleService.getRolesFromCache(eq(roleIds))).thenReturn(roleList);
+        when(roleService.getRoleListFromCache(eq(roleIds))).thenReturn(roleList);
         when(roleService.hasAnySuperAdmin(same(roleList))).thenReturn(true);
         List<MenuDO> menuList = randomPojoList(MenuDO.class);
         when(menuService.getMenuListFromCache(eq(menuTypes), eq(menusStatuses))).thenReturn(menuList);
@@ -419,7 +419,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         when(roleService.getRoleFromCache(eq(100L))).thenReturn(role);
         // mock 其它方法
-        when(roleService.getRolesFromCache(eq(asSet(100L)))).thenReturn(singletonList(role));
+        when(roleService.getRoleListFromCache(eq(asSet(100L)))).thenReturn(singletonList(role));
 
         // 调用
         boolean has = permissionService.hasAnyRoles(userId, roles);
@@ -436,7 +436,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 获得用户的角色
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.ALL.getScope())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
         when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
 
         // 调用
@@ -456,7 +456,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 获得用户的角色
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_CUSTOM.getScope())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
         when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
         // mock 部门的返回
         when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO().setDeptId(3L), null, null); // 最后返回 null 的目的，看看会不会重复调用
@@ -480,7 +480,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 获得用户的角色
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_ONLY.getScope())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
         when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
         // mock 部门的返回
         when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO().setDeptId(3L), null, null); // 最后返回 null 的目的，看看会不会重复调用
@@ -503,7 +503,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 获得用户的角色
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_AND_CHILD.getScope())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
         when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
         // mock 部门的返回
         when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO().setDeptId(3L), null, null); // 最后返回 null 的目的，看看会不会重复调用
@@ -531,7 +531,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 获得用户的角色
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.SELF.getScope())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
         when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
 
         // 调用
