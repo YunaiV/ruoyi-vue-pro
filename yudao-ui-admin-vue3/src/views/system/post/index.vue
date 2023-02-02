@@ -42,13 +42,13 @@
       </template>
     </XTable>
   </ContentWrap>
-  <PostModal ref="modalRef" @success="success" />
+  <PostForm ref="modalRef" @success="reload()" />
 </template>
 <script setup lang="ts" name="Post">
 // 业务相关的 import
 import * as PostApi from '@/api/system/post'
 import { allSchemas } from './post.data'
-import PostModal from './PostModal.vue'
+import PostForm from './PostForm.vue'
 
 const { t } = useI18n() // 国际化
 const modalRef = ref()
@@ -62,9 +62,5 @@ const [registerTable, { reload, deleteData, exportList }] = useXTable({
 
 const openModal = (type: string, rowId?: number) => {
   modalRef.value.openModal(type, rowId)
-}
-
-const success = () => {
-  reload()
 }
 </script>

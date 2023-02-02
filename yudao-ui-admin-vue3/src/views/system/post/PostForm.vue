@@ -1,6 +1,6 @@
 <template>
   <!-- 弹窗 -->
-  <XModal id="postModel" :loading="modelLoading" v-model="modelVisible" :title="modelTitle">
+  <XModal id="PostForm" :loading="modelLoading" v-model="modelVisible" :title="modelTitle">
     <!-- 表单：添加/修改 -->
     <Form
       ref="formRef"
@@ -35,7 +35,7 @@ import { rules, allSchemas } from './post.data'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
-const emit = defineEmits(['success', 'openModal'])
+const emit = defineEmits(['success'])
 
 // 弹窗相关的变量
 const modelVisible = ref(false) // 是否显示弹出层
@@ -81,9 +81,9 @@ const submitForm = async () => {
           message.success(t('common.updateSuccess'))
         }
         modelVisible.value = false
+        emit('success')
       } finally {
         actionLoading.value = false
-        emit('success')
       }
     }
   })
