@@ -70,8 +70,8 @@
       <!-- 情况一：流程表单 -->
       <el-col v-if="processInstance?.processDefinition?.formType === 10" :span="16" :offset="6">
         <form-create
+          ref="fApi"
           :rule="detailForm.rule"
-          :api="fApi"
           :option="detailForm.option"
           v-model="detailForm.value"
         />
@@ -200,6 +200,7 @@ import * as TaskApi from '@/api/bpm/task'
 import * as ActivityApi from '@/api/bpm/activity'
 import { formatPast2 } from '@/utils/formatTime'
 import { setConfAndFields2 } from '@/utils/formCreate'
+// import { OptionAttrs } from '@form-create/element-ui/types/config'
 import { ApiAttrs } from '@form-create/element-ui/types/config'
 import { useUserStore } from '@/store/modules/user'
 
@@ -220,9 +221,6 @@ const auditRule = reactive({
 
 // 处理审批通过和不通过的操作
 const handleAudit = async (task, pass) => {
-  console.log(task, 'task')
-  console.log(pass, 'pass')
-  console.log(runningTasks.value, 'runningTasks.value')
   // 1.1 获得对应表单
   const index = runningTasks.value.indexOf(task)
   const auditFormRef = proxy.$refs['form' + index][0]
@@ -239,9 +237,6 @@ const handleAudit = async (task, pass) => {
     id: task.id,
     reason: auditForms.value[index].reason
   }
-  console.log(data, '是否通过')
-  console.log(pass, 'pass是否通过')
-  console.log(task, 'task')
   if (pass) {
     await TaskApi.approveTask(data)
     message.success('审批通过成功')
@@ -409,8 +404,9 @@ const getDetail = () => {
           data.formVariables
         )
         nextTick().then(() => {
-          fApi.value?.btn.show(false)
-          fApi.value?.resetBtn.show(false)
+          fApi.value?.fapi.btn.show(false)
+          fApi.value?.fapi.resetBtn.show(false)
+          fApi.value?.fapi.disabled(true)
         })
       }
 

@@ -14,7 +14,7 @@
       </template>
       <!-- 当前审批任务 -->
       <template #tasks_default="{ row }">
-        <el-button v-for="task in row.tasks" :key="task.id" type="text">
+        <el-button v-for="task in row.tasks" :key="task.id" link>
           <span>{{ task.name }}</span>
         </el-button>
       </template>
