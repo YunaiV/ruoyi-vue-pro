@@ -29,7 +29,7 @@ import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Import(ConfigServiceImpl.class)
-public class ConfigServiceTest extends BaseDbUnitTest {
+public class ConfigServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private ConfigServiceImpl configService;

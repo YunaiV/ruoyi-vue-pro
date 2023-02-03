@@ -27,7 +27,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -95,7 +94,7 @@ public class FileConfigServiceImpl implements FileConfigService {
     @Override
     public void updateFileConfig(FileConfigUpdateReqVO updateReqVO) {
         // 校验存在
-        FileConfigDO config = this.validateFileConfigExists(updateReqVO.getId());
+        FileConfigDO config = validateFileConfigExists(updateReqVO.getId());
         // 更新
         FileConfigDO updateObj = FileConfigConvert.INSTANCE.convert(updateReqVO)
                 .setConfig(parseClientConfig(config.getStorage(), updateReqVO.getConfig()));
@@ -108,7 +107,7 @@ public class FileConfigServiceImpl implements FileConfigService {
     @Transactional(rollbackFor = Exception.class)
     public void updateFileConfigMaster(Long id) {
         // 校验存在
-        this.validateFileConfigExists(id);
+        validateFileConfigExists(id);
         // 更新其它为非 master
         fileConfigMapper.updateBatch(new FileConfigDO().setMaster(false));
         // 更新
@@ -138,7 +137,7 @@ public class FileConfigServiceImpl implements FileConfigService {
     @Override
     public void deleteFileConfig(Long id) {
         // 校验存在
-        FileConfigDO config = this.validateFileConfigExists(id);
+        FileConfigDO config = validateFileConfigExists(id);
         if (Boolean.TRUE.equals(config.getMaster())) {
              throw exception(FILE_CONFIG_DELETE_FAIL_MASTER);
         }
@@ -162,11 +161,6 @@ public class FileConfigServiceImpl implements FileConfigService {
     }
 
     @Override
-    public List<FileConfigDO> getFileConfigList(Collection<Long> ids) {
-        return fileConfigMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public PageResult<FileConfigDO> getFileConfigPage(FileConfigPageReqVO pageReqVO) {
         return fileConfigMapper.selectPage(pageReqVO);
     }
@@ -174,7 +168,7 @@ public class FileConfigServiceImpl implements FileConfigService {
     @Override
     public String testFileConfig(Long id) throws Exception {
         // 校验存在
-        this.validateFileConfigExists(id);
+        validateFileConfigExists(id);
         // 上传文件
         byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
         return fileClientFactory.getFileClient(id).upload(content, IdUtil.fastSimpleUUID() + ".jpg", "image/jpeg");
