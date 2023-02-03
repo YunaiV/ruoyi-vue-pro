@@ -89,7 +89,6 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
                 o.setId(dbDataSourceConfig.getId()); // 设置更新的 ID
             });
             // mock 方法
-//            when(stringEncryptor.encrypt(eq(reqVO.getPassword()))).thenReturn("123456");
             databaseUtilsMock.when(() -> JdbcUtils.isConnectionOK(eq(reqVO.getUrl()),
                     eq(reqVO.getUsername()), eq(reqVO.getPassword()))).thenReturn(true);
 
