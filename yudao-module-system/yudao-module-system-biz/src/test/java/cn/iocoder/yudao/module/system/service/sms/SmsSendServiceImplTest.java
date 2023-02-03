@@ -101,7 +101,7 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
         String templateCode = randomString();
         Map<String, Object> templateParams = MapUtil.<String, Object>builder().put("code", "1234")
                 .put("op", "login").build();
-        // mock adminUserService 的方法
+        // mock memberService 的方法
         String mobile = "15601691300";
         when(memberService.getMemberUserMobile(eq(userId))).thenReturn(mobile);
 
