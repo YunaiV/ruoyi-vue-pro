@@ -181,7 +181,7 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetTemplate() {
+    public void testGetMailTemplate() {
         // mock 数据
         MailTemplateDO dbMailTemplate = randomPojo(MailTemplateDO.class);
         mailTemplateMapper.insert(dbMailTemplate);
