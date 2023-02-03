@@ -81,13 +81,13 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetTenantIds() {
+    public void testGetTenantIdList() {
         // mock 数据
         TenantDO tenant = randomPojo(TenantDO.class, o -> o.setId(1L));
         tenantMapper.insert(tenant);
 
         // 调用，并断言业务异常
-        List<Long> result = tenantService.getTenantIds();
+        List<Long> result = tenantService.getTenantIdList();
         assertEquals(Collections.singletonList(1L), result);
     }
 
@@ -196,7 +196,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         role100.setTenantId(dbTenant.getId());
         RoleDO role101 = randomPojo(RoleDO.class, o -> o.setId(101L));
         role101.setTenantId(dbTenant.getId());
-        when(roleService.getRoles(isNull())).thenReturn(asList(role100, role101));
+        when(roleService.getRoleListByStatus(isNull())).thenReturn(asList(role100, role101));
         // mock 每个角色的权限
         when(permissionService.getRoleMenuIds(eq(101L))).thenReturn(asSet(201L, 202L));
 
@@ -453,7 +453,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         tenantMapper.insert(dbTenant);// @Sql: 先插入出一条存在的数据
         TenantContextHolder.setTenantId(dbTenant.getId());
         // mock 菜单
-        when(menuService.getMenus()).thenReturn(Arrays.asList(randomPojo(MenuDO.class, o -> o.setId(100L)),
+        when(menuService.getMenuList()).thenReturn(Arrays.asList(randomPojo(MenuDO.class, o -> o.setId(100L)),
                         randomPojo(MenuDO.class, o -> o.setId(101L))));
 
         // 调用

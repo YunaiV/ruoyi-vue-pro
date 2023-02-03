@@ -58,7 +58,7 @@ public class ErrorCodeServiceImpl implements ErrorCodeService {
     @Override
     public void updateErrorCode(ErrorCodeUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validateErrorCodeExists(updateReqVO.getId());
+        validateErrorCodeExists(updateReqVO.getId());
         // 校验 code 重复
         validateCodeDuplicate(updateReqVO.getCode(), updateReqVO.getId());
 
@@ -71,7 +71,7 @@ public class ErrorCodeServiceImpl implements ErrorCodeService {
     @Override
     public void deleteErrorCode(Long id) {
         // 校验存在
-        this.validateErrorCodeExists(id);
+        validateErrorCodeExists(id);
         // 删除
         errorCodeMapper.deleteById(id);
     }
@@ -100,7 +100,7 @@ public class ErrorCodeServiceImpl implements ErrorCodeService {
     }
 
     @VisibleForTesting
-    public void validateErrorCodeExists(Long id) {
+    void validateErrorCodeExists(Long id) {
         if (errorCodeMapper.selectById(id) == null) {
             throw exception(ERROR_CODE_NOT_EXISTS);
         }

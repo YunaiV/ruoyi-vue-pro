@@ -76,7 +76,7 @@ public class DictTypeController {
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获得全部字典类型列表", notes = "包括开启 + 禁用的字典类型，主要用于前端的下拉选项")
     // 无需添加权限认证，因为前端全局都需要
-    public CommonResult<List<DictTypeSimpleRespVO>> listSimpleDictTypes() {
+    public CommonResult<List<DictTypeSimpleRespVO>> getSimpleDictTypeList() {
         List<DictTypeDO> list = dictTypeService.getDictTypeList();
         return success(DictTypeConvert.INSTANCE.convertList(list));
     }

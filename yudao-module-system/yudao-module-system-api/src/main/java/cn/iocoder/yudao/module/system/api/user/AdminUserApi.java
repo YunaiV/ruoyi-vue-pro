@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Admin 用户 API 接口
@@ -29,7 +28,7 @@ public interface AdminUserApi {
      * @param ids 用户 ID 们
      * @return 用户对象信息
      */
-    List<AdminUserRespDTO> getUsers(Collection<Long> ids);
+    List<AdminUserRespDTO> getUserList(Collection<Long> ids);
 
     /**
      * 获得指定部门的用户数组
@@ -37,7 +36,7 @@ public interface AdminUserApi {
      * @param deptIds 部门数组
      * @return 用户数组
      */
-    List<AdminUserRespDTO> getUsersByDeptIds(Collection<Long> deptIds);
+    List<AdminUserRespDTO> getUserListByDeptIds(Collection<Long> deptIds);
 
     /**
      * 获得指定岗位的用户数组
@@ -54,7 +53,7 @@ public interface AdminUserApi {
      * @return 用户 Map
      */
     default Map<Long, AdminUserRespDTO> getUserMap(Collection<Long> ids) {
-        List<AdminUserRespDTO> users = getUsers(ids);
+        List<AdminUserRespDTO> users = getUserList(ids);
         return CollectionUtils.convertMap(users, AdminUserRespDTO::getId);
     }
 
@@ -65,6 +64,6 @@ public interface AdminUserApi {
      *
      * @param ids 用户编号数组
      */
-    void validUsers(Set<Long> ids);
+    void validateUserList(Collection<Long> ids);
 
 }

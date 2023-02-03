@@ -71,7 +71,7 @@ public class OperateLogController {
     @PreAuthorize("@ss.hasPermission('system:operate-log:export')")
     @OperateLog(type = EXPORT)
     public void exportOperateLog(HttpServletResponse response, @Valid OperateLogExportReqVO reqVO) throws IOException {
-        List<OperateLogDO> list = operateLogService.getOperateLogs(reqVO);
+        List<OperateLogDO> list = operateLogService.getOperateLogList(reqVO);
 
         // 获得拼接需要的数据
         Collection<Long> userIds = CollectionUtils.convertList(list, OperateLogDO::getUserId);

@@ -2,36 +2,36 @@ package cn.iocoder.yudao.module.system.service.dict;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypePageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dict.DictTypeMapper;
-import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @Import(DictTypeServiceImpl.class)
-public class DictTypeServiceTest extends BaseDbUnitTest {
+public class DictTypeServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private DictTypeServiceImpl dictTypeService;
@@ -52,19 +52,19 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
        });
        dictTypeMapper.insert(dbDictType);
        // 测试 name 不匹配
-       dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setName("tudou")));
+       dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setName("tudou")));
        // 测试 type 不匹配
-       dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setType("土豆")));
+       dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setType("土豆")));
        // 测试 status 不匹配
-       dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+       dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
        // 测试 createTime 不匹配
-       dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setCreateTime(buildTime(2021, 1, 1))));
+       dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setCreateTime(buildTime(2021, 1, 1))));
        // 准备参数
        DictTypePageReqVO reqVO = new DictTypePageReqVO();
        reqVO.setName("nai");
        reqVO.setType("艿");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 10),buildTime(2021, 1, 20)}));
+       reqVO.setCreateTime(buildBetweenTime(2021, 1, 10, 2021, 1, 20));
 
        // 调用
        PageResult<DictTypeDO> pageResult = dictTypeService.getDictTypePage(reqVO);
@@ -75,7 +75,7 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetDictTypeList() {
+    public void testGetDictTypeList_export() {
         // mock 数据
         DictTypeDO dbDictType = randomPojo(DictTypeDO.class, o -> { // 等会查询到
             o.setName("yunai");
@@ -85,19 +85,19 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
         });
         dictTypeMapper.insert(dbDictType);
         // 测试 name 不匹配
-        dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setName("tudou")));
+        dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setName("tudou")));
         // 测试 type 不匹配
-        dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setType("土豆")));
+        dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setType("土豆")));
         // 测试 status 不匹配
-        dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 测试 createTime 不匹配
-        dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setCreateTime(buildTime(2021, 1, 1))));
+        dictTypeMapper.insert(cloneIgnoreId(dbDictType, o -> o.setCreateTime(buildTime(2021, 1, 1))));
         // 准备参数
         DictTypeExportReqVO reqVO = new DictTypeExportReqVO();
         reqVO.setName("nai");
         reqVO.setType("艿");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 10),buildTime(2021, 1, 20)}));
+        reqVO.setCreateTime(buildBetweenTime(2021, 1, 10, 2021, 1, 20));
 
         // 调用
         List<DictTypeDO> list = dictTypeService.getDictTypeList(reqVO);
@@ -107,7 +107,22 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetDictType() {
+    public void testGetDictType_id() {
+        // mock 数据
+        DictTypeDO dbDictType = randomDictTypeDO();
+        dictTypeMapper.insert(dbDictType);
+        // 准备参数
+        Long id = dbDictType.getId();
+
+        // 调用
+        DictTypeDO dictType = dictTypeService.getDictType(id);
+        // 断言
+        assertNotNull(dictType);
+        assertPojoEquals(dbDictType, dictType);
+    }
+
+    @Test
+    public void testGetDictType_type() {
         // mock 数据
         DictTypeDO dbDictType = randomDictTypeDO();
         dictTypeMapper.insert(dbDictType);
@@ -183,40 +198,57 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testCheckDictDataExists_success() {
+    public void testGetDictTypeList() {
+        // 准备参数
+        DictTypeDO dictTypeDO01 = randomDictTypeDO();
+        dictTypeMapper.insert(dictTypeDO01);
+        DictTypeDO dictTypeDO02 = randomDictTypeDO();
+        dictTypeMapper.insert(dictTypeDO02);
+        // mock 方法
+
+        // 调用
+        List<DictTypeDO> dictTypeDOList = dictTypeService.getDictTypeList();
+        // 断言
+        assertEquals(2, dictTypeDOList.size());
+        assertPojoEquals(dictTypeDO01, dictTypeDOList.get(0));
+        assertPojoEquals(dictTypeDO02, dictTypeDOList.get(1));
+    }
+
+    @Test
+    public void testValidateDictDataExists_success() {
         // mock 数据
         DictTypeDO dbDictType = randomDictTypeDO();
         dictTypeMapper.insert(dbDictType);// @Sql: 先插入出一条存在的数据
 
         // 调用成功
-        dictTypeService.checkDictTypeExists(dbDictType.getId());
+        dictTypeService.validateDictTypeExists(dbDictType.getId());
     }
 
     @Test
-    public void testCheckDictDataExists_notExists() {
-        assertServiceException(() -> dictTypeService.checkDictTypeExists(randomLongId()), DICT_TYPE_NOT_EXISTS);
+    public void testValidateDictDataExists_notExists() {
+        assertServiceException(() -> dictTypeService.validateDictTypeExists(randomLongId()), DICT_TYPE_NOT_EXISTS);
     }
 
     @Test
-    public void testCheckDictTypeUnique_success() {
+    public void testValidateDictTypeUnique_success() {
         // 调用，成功
-        dictTypeService.checkDictTypeUnique(randomLongId(), randomString());
+        dictTypeService.validateDictTypeUnique(randomLongId(), randomString());
     }
 
     @Test
-    public void testCheckDictTypeUnique_valueDuplicateForCreate() {
+    public void testValidateDictTypeUnique_valueDuplicateForCreate() {
         // 准备参数
         String type = randomString();
         // mock 数据
         dictTypeMapper.insert(randomDictTypeDO(o -> o.setType(type)));
 
         // 调用，校验异常
-        assertServiceException(() -> dictTypeService.checkDictTypeUnique(null, type),
+        assertServiceException(() -> dictTypeService.validateDictTypeUnique(null, type),
                 DICT_TYPE_TYPE_DUPLICATE);
     }
 
     @Test
-    public void testCheckDictTypeUnique_valueDuplicateForUpdate() {
+    public void testValidateDictTypeUnique_valueDuplicateForUpdate() {
         // 准备参数
         Long id = randomLongId();
         String type = randomString();
@@ -224,30 +256,30 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
         dictTypeMapper.insert(randomDictTypeDO(o -> o.setType(type)));
 
         // 调用，校验异常
-        assertServiceException(() -> dictTypeService.checkDictTypeUnique(id, type),
+        assertServiceException(() -> dictTypeService.validateDictTypeUnique(id, type),
                 DICT_TYPE_TYPE_DUPLICATE);
     }
 
     @Test
-    public void testCheckDictTypNameUnique_success() {
+    public void testValidateDictTypNameUnique_success() {
         // 调用，成功
-        dictTypeService.checkDictTypeNameUnique(randomLongId(), randomString());
+        dictTypeService.validateDictTypeNameUnique(randomLongId(), randomString());
     }
 
     @Test
-    public void testCheckDictTypeNameUnique_nameDuplicateForCreate() {
+    public void testValidateDictTypeNameUnique_nameDuplicateForCreate() {
         // 准备参数
         String name = randomString();
         // mock 数据
         dictTypeMapper.insert(randomDictTypeDO(o -> o.setName(name)));
 
         // 调用，校验异常
-        assertServiceException(() -> dictTypeService.checkDictTypeNameUnique(null, name),
+        assertServiceException(() -> dictTypeService.validateDictTypeNameUnique(null, name),
                 DICT_TYPE_NAME_DUPLICATE);
     }
 
     @Test
-    public void testCheckDictTypeNameUnique_nameDuplicateForUpdate() {
+    public void testValidateDictTypeNameUnique_nameDuplicateForUpdate() {
         // 准备参数
         Long id = randomLongId();
         String name = randomString();
@@ -255,7 +287,7 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
         dictTypeMapper.insert(randomDictTypeDO(o -> o.setName(name)));
 
         // 调用，校验异常
-        assertServiceException(() -> dictTypeService.checkDictTypeNameUnique(id, name),
+        assertServiceException(() -> dictTypeService.validateDictTypeNameUnique(id, name),
                 DICT_TYPE_NAME_DUPLICATE);
     }
 

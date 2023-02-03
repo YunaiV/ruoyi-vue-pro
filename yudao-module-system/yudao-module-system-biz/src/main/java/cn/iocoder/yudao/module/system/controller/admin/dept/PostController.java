@@ -70,9 +70,9 @@ public class PostController {
 
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获取岗位精简信息列表", notes = "只包含被开启的岗位，主要用于前端的下拉选项")
-    public CommonResult<List<PostSimpleRespVO>> getSimplePosts() {
+    public CommonResult<List<PostSimpleRespVO>> getSimplePostList() {
         // 获得岗位列表，只要开启状态的
-        List<PostDO> list = postService.getPosts(null, Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
+        List<PostDO> list = postService.getPostList(null, Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 排序后，返回给前端
         list.sort(Comparator.comparing(PostDO::getSort));
         return success(PostConvert.INSTANCE.convertList02(list));
@@ -90,7 +90,7 @@ public class PostController {
     @PreAuthorize("@ss.hasPermission('system:post:export')")
     @OperateLog(type = EXPORT)
     public void export(HttpServletResponse response, @Validated PostExportReqVO reqVO) throws IOException {
-        List<PostDO> posts = postService.getPosts(reqVO);
+        List<PostDO> posts = postService.getPostList(reqVO);
         List<PostExcelVO> data = PostConvert.INSTANCE.convertList03(posts);
         // 输出
         ExcelUtils.write(response, "岗位数据.xls", "岗位列表", PostExcelVO.class, data);

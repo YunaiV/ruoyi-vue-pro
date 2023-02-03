@@ -57,7 +57,8 @@ public class DictTypeServiceImpl implements DictTypeService {
     @Override
     public Long createDictType(DictTypeCreateReqVO reqVO) {
         // 校验正确性
-        checkCreateOrUpdate(null, reqVO.getName(), reqVO.getType());
+        validateDictTypeForCreateOrUpdate(null, reqVO.getName(), reqVO.getType());
+
         // 插入字典类型
         DictTypeDO dictType = DictTypeConvert.INSTANCE.convert(reqVO)
                 .setDeletedTime(LocalDateTimeUtils.EMPTY); // 唯一索引，避免 null 值
@@ -68,7 +69,8 @@ public class DictTypeServiceImpl implements DictTypeService {
     @Override
     public void updateDictType(DictTypeUpdateReqVO reqVO) {
         // 校验正确性
-        checkCreateOrUpdate(reqVO.getId(), reqVO.getName(), null);
+        validateDictTypeForCreateOrUpdate(reqVO.getId(), reqVO.getName(), null);
+
         // 更新字典类型
         DictTypeDO updateObj = DictTypeConvert.INSTANCE.convert(reqVO);
         dictTypeMapper.updateById(updateObj);
@@ -77,7 +79,7 @@ public class DictTypeServiceImpl implements DictTypeService {
     @Override
     public void deleteDictType(Long id) {
         // 校验是否存在
-        DictTypeDO dictType = checkDictTypeExists(id);
+        DictTypeDO dictType = validateDictTypeExists(id);
         // 校验是否有字典数据
         if (dictDataService.countByDictType(dictType.getType()) > 0) {
             throw exception(DICT_TYPE_HAS_CHILDREN);
@@ -91,17 +93,17 @@ public class DictTypeServiceImpl implements DictTypeService {
         return dictTypeMapper.selectList();
     }
 
-    private void checkCreateOrUpdate(Long id, String name, String type) {
+    private void validateDictTypeForCreateOrUpdate(Long id, String name, String type) {
         // 校验自己存在
-        checkDictTypeExists(id);
+        validateDictTypeExists(id);
         // 校验字典类型的名字的唯一性
-        checkDictTypeNameUnique(id, name);
+        validateDictTypeNameUnique(id, name);
         // 校验字典类型的类型的唯一性
-        checkDictTypeUnique(id, type);
+        validateDictTypeUnique(id, type);
     }
 
     @VisibleForTesting
-    public void checkDictTypeNameUnique(Long id, String name) {
+    void validateDictTypeNameUnique(Long id, String name) {
         DictTypeDO dictType = dictTypeMapper.selectByName(name);
         if (dictType == null) {
             return;
@@ -116,7 +118,7 @@ public class DictTypeServiceImpl implements DictTypeService {
     }
 
     @VisibleForTesting
-    public void checkDictTypeUnique(Long id, String type) {
+    void validateDictTypeUnique(Long id, String type) {
         if (StrUtil.isEmpty(type)) {
             return;
         }
@@ -134,7 +136,7 @@ public class DictTypeServiceImpl implements DictTypeService {
     }
 
     @VisibleForTesting
-    public DictTypeDO checkDictTypeExists(Long id) {
+    DictTypeDO validateDictTypeExists(Long id) {
         if (id == null) {
             return null;
         }

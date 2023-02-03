@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Admin 用户 API 实现类
@@ -29,26 +28,26 @@ public class AdminUserApiImpl implements AdminUserApi {
     }
 
     @Override
-    public List<AdminUserRespDTO> getUsers(Collection<Long> ids) {
-        List<AdminUserDO> users = userService.getUsers(ids);
+    public List<AdminUserRespDTO> getUserList(Collection<Long> ids) {
+        List<AdminUserDO> users = userService.getUserList(ids);
         return UserConvert.INSTANCE.convertList4(users);
     }
 
     @Override
-    public List<AdminUserRespDTO> getUsersByDeptIds(Collection<Long> deptIds) {
-        List<AdminUserDO> users = userService.getUsersByDeptIds(deptIds);
+    public List<AdminUserRespDTO> getUserListByDeptIds(Collection<Long> deptIds) {
+        List<AdminUserDO> users = userService.getUserListByDeptIds(deptIds);
         return UserConvert.INSTANCE.convertList4(users);
     }
 
     @Override
     public List<AdminUserRespDTO> getUsersByPostIds(Collection<Long> postIds) {
-        List<AdminUserDO> users = userService.getUsersByPostIds(postIds);
+        List<AdminUserDO> users = userService.getUserListByPostIds(postIds);
         return UserConvert.INSTANCE.convertList4(users);
     }
 
     @Override
-    public void validUsers(Set<Long> ids) {
-        userService.validUsers(ids);
+    public void validateUserList(Collection<Long> ids) {
+        userService.validateUserList(ids);
     }
 
 }

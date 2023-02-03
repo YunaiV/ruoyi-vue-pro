@@ -63,7 +63,7 @@ public class UserProfileController {
         AdminUserDO user = userService.getUser(getLoginUserId());
         UserProfileRespVO resp = UserConvert.INSTANCE.convert03(user);
         // 获得用户角色
-        List<RoleDO> userRoles = roleService.getRolesFromCache(permissionService.getUserRoleIdListByUserId(user.getId()));
+        List<RoleDO> userRoles = roleService.getRoleListFromCache(permissionService.getUserRoleIdListByUserId(user.getId()));
         resp.setRoles(UserConvert.INSTANCE.convertList(userRoles));
         // 获得部门信息
         if (user.getDeptId() != null) {
@@ -72,7 +72,7 @@ public class UserProfileController {
         }
         // 获得岗位信息
         if (CollUtil.isNotEmpty(user.getPostIds())) {
-            List<PostDO> posts = postService.getPosts(user.getPostIds());
+            List<PostDO> posts = postService.getPostList(user.getPostIds());
             resp.setPosts(UserConvert.INSTANCE.convertList02(posts));
         }
         // 获得社交用户信息

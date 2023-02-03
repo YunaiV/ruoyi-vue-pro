@@ -28,14 +28,14 @@ public class DeptApiImpl implements DeptApi {
     }
 
     @Override
-    public List<DeptRespDTO> getDepts(Collection<Long> ids) {
-        List<DeptDO> depts = deptService.getDepts(ids);
+    public List<DeptRespDTO> getDeptList(Collection<Long> ids) {
+        List<DeptDO> depts = deptService.getDeptList(ids);
         return DeptConvert.INSTANCE.convertList03(depts);
     }
 
     @Override
-    public void validDepts(Collection<Long> ids) {
-        deptService.validDepts(ids);
+    public void validateDeptList(Collection<Long> ids) {
+        deptService.validateDeptList(ids);
     }
 
 }

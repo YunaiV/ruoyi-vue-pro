@@ -20,12 +20,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static java.util.Collections.singleton;
 
 @Api(tags = "管理后台 - 角色")
 @RestController
@@ -85,9 +85,9 @@ public class RoleController {
 
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获取角色精简信息列表", notes = "只包含被开启的角色，主要用于前端的下拉选项")
-    public CommonResult<List<RoleSimpleRespVO>> getSimpleRoles() {
+    public CommonResult<List<RoleSimpleRespVO>> getSimpleRoleList() {
         // 获得角色列表，只要开启状态的
-        List<RoleDO> list = roleService.getRoles(Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
+        List<RoleDO> list = roleService.getRoleListByStatus(singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 排序后，返回给前端
         list.sort(Comparator.comparing(RoleDO::getSort));
         return success(RoleConvert.INSTANCE.convertList02(list));

@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
  * @author 芋道源码
  */
 @Data
-public class SmsCodeCheckReqDTO {
+public class SmsCodeValidateReqDTO {
 
     /**
      * 手机号
