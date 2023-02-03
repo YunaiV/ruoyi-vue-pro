@@ -279,7 +279,7 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testCheckSmsChannel_success() {
+    public void testValidateSmsChannel_success() {
         // 准备参数
         Long channelId = randomLongId();
         // mock 方法
@@ -290,23 +290,23 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         when(smsChannelService.getSmsChannel(eq(channelId))).thenReturn(channelDO);
 
         // 调用
-        SmsChannelDO returnChannelDO = smsTemplateService.checkSmsChannel(channelId);
+        SmsChannelDO returnChannelDO = smsTemplateService.validateSmsChannel(channelId);
         // 断言
         assertPojoEquals(returnChannelDO, channelDO);
     }
 
     @Test
-    public void testCheckSmsChannel_notExists() {
+    public void testValidateSmsChannel_notExists() {
         // 准备参数
         Long channelId = randomLongId();
 
         // 调用，校验异常
-        assertServiceException(() -> smsTemplateService.checkSmsChannel(channelId),
+        assertServiceException(() -> smsTemplateService.validateSmsChannel(channelId),
                 SMS_CHANNEL_NOT_EXISTS);
     }
 
     @Test
-    public void testCheckSmsChannel_disable() {
+    public void testValidateSmsChannel_disable() {
         // 准备参数
         Long channelId = randomLongId();
         // mock 方法
@@ -317,30 +317,30 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         when(smsChannelService.getSmsChannel(eq(channelId))).thenReturn(channelDO);
 
         // 调用，校验异常
-        assertServiceException(() -> smsTemplateService.checkSmsChannel(channelId),
+        assertServiceException(() -> smsTemplateService.validateSmsChannel(channelId),
                 SMS_CHANNEL_DISABLE);
     }
 
     @Test
-    public void testCheckDictDataValueUnique_success() {
+    public void testValidateDictDataValueUnique_success() {
         // 调用，成功
-        smsTemplateService.checkSmsTemplateCodeDuplicate(randomLongId(), randomString());
+        smsTemplateService.validateSmsTemplateCodeDuplicate(randomLongId(), randomString());
     }
 
     @Test
-    public void testCheckSmsTemplateCodeDuplicate_valueDuplicateForCreate() {
+    public void testValidateSmsTemplateCodeDuplicate_valueDuplicateForCreate() {
         // 准备参数
         String code = randomString();
         // mock 数据
         smsTemplateMapper.insert(randomSmsTemplateDO(o -> o.setCode(code)));
 
         // 调用，校验异常
-        assertServiceException(() -> smsTemplateService.checkSmsTemplateCodeDuplicate(null, code),
+        assertServiceException(() -> smsTemplateService.validateSmsTemplateCodeDuplicate(null, code),
                 SMS_TEMPLATE_CODE_DUPLICATE, code);
     }
 
     @Test
-    public void testCheckDictDataValueUnique_valueDuplicateForUpdate() {
+    public void testValidateDictDataValueUnique_valueDuplicateForUpdate() {
         // 准备参数
         Long id = randomLongId();
         String code = randomString();
@@ -348,7 +348,7 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         smsTemplateMapper.insert(randomSmsTemplateDO(o -> o.setCode(code)));
 
         // 调用，校验异常
-        assertServiceException(() -> smsTemplateService.checkSmsTemplateCodeDuplicate(id, code),
+        assertServiceException(() -> smsTemplateService.validateSmsTemplateCodeDuplicate(id, code),
                 SMS_TEMPLATE_CODE_DUPLICATE, code);
     }
 
