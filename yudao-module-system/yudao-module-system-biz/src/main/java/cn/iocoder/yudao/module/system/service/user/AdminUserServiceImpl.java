@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
+import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
@@ -74,10 +74,6 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Resource
     private FileApi fileApi;
 
-    @Resource
-    @Lazy // 循环依赖（自己依赖自己），避免报错
-    private AdminUserServiceImpl self;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createUser(UserCreateReqVO reqVO) {
@@ -89,7 +85,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             }
         });
         // 校验正确性
-        self.checkCreateOrUpdate(null, reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
+        validateUserForCreateOrUpdate(null, reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
                 reqVO.getDeptId(), reqVO.getPostIds());
         // 插入用户
         AdminUserDO user = UserConvert.INSTANCE.convert(reqVO);
@@ -108,7 +104,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Transactional(rollbackFor = Exception.class)
     public void updateUser(UserUpdateReqVO reqVO) {
         // 校验正确性
-        self.checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
+        validateUserForCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
                 reqVO.getDeptId(), reqVO.getPostIds());
         // 更新用户
         AdminUserDO updateObj = UserConvert.INSTANCE.convert(reqVO);
@@ -142,9 +138,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public void updateUserProfile(Long id, UserProfileUpdateReqVO reqVO) {
         // 校验正确性
-        checkUserExists(id);
-        checkEmailUnique(id, reqVO.getEmail());
-        checkMobileUnique(id, reqVO.getMobile());
+        validateUserExists(id);
+        validateEmailUnique(id, reqVO.getEmail());
+        validateMobileUnique(id, reqVO.getMobile());
         // 执行更新
         userMapper.updateById(UserConvert.INSTANCE.convert(reqVO).setId(id));
     }
@@ -152,7 +148,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public void updateUserPassword(Long id, UserProfileUpdatePasswordReqVO reqVO) {
         // 校验旧密码密码
-        checkOldPassword(id, reqVO.getOldPassword());
+        validateOldPassword(id, reqVO.getOldPassword());
         // 执行更新
         AdminUserDO updateObj = new AdminUserDO().setId(id);
         updateObj.setPassword(encodePassword(reqVO.getNewPassword())); // 加密密码
@@ -161,7 +157,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public String updateUserAvatar(Long id, InputStream avatarFile) throws Exception {
-        checkUserExists(id);
+        validateUserExists(id);
         // 存储文件
         String avatar = fileApi.createFile(IoUtil.readBytes(avatarFile));
         // 更新路径
@@ -175,7 +171,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public void updateUserPassword(Long id, String password) {
         // 校验用户存在
-        checkUserExists(id);
+        validateUserExists(id);
         // 更新密码
         AdminUserDO updateObj = new AdminUserDO();
         updateObj.setId(id);
@@ -186,7 +182,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public void updateUserStatus(Long id, Integer status) {
         // 校验用户存在
-        checkUserExists(id);
+        validateUserExists(id);
         // 更新状态
         AdminUserDO updateObj = new AdminUserDO();
         updateObj.setId(id);
@@ -198,7 +194,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Long id) {
         // 校验用户存在
-        checkUserExists(id);
+        validateUserExists(id);
         // 删除用户
         userMapper.deleteById(id);
         // 删除用户关联数据
@@ -228,7 +224,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public List<AdminUserDO> getUsersByDeptIds(Collection<Long> deptIds) {
+    public List<AdminUserDO> getUserListByDeptIds(Collection<Long> deptIds) {
         if (CollUtil.isEmpty(deptIds)) {
             return Collections.emptyList();
         }
@@ -236,7 +232,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public List<AdminUserDO> getUsersByPostIds(Collection<Long> postIds) {
+    public List<AdminUserDO> getUserListByPostIds(Collection<Long> postIds) {
         if (CollUtil.isEmpty(postIds)) {
             return Collections.emptyList();
         }
@@ -248,7 +244,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public List<AdminUserDO> getUsers(Collection<Long> ids) {
+    public List<AdminUserDO> getUserList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
@@ -256,7 +252,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public void validUsers(Set<Long> ids) {
+    public void validateUserList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return;
         }
@@ -276,18 +272,13 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public List<AdminUserDO> getUsers(UserExportReqVO reqVO) {
+    public List<AdminUserDO> getUserList(UserExportReqVO reqVO) {
         return userMapper.selectList(reqVO, getDeptCondition(reqVO.getDeptId()));
     }
 
     @Override
-    public List<AdminUserDO> getUsersByNickname(String nickname) {
+    public List<AdminUserDO> getUserListByNickname(String nickname) {
         return userMapper.selectListByNickname(nickname);
-    }
-
-    @Override
-    public List<AdminUserDO> getUsersByUsername(String username) {
-        return userMapper.selectListByUsername(username);
     }
 
     /**
@@ -305,25 +296,27 @@ public class AdminUserServiceImpl implements AdminUserService {
         return deptIds;
     }
 
-    @DataPermission(enable = false) // 关闭数据权限，避免因为没有数据权限，查询不到数据，进而导致唯一校验不正确
-    public void checkCreateOrUpdate(Long id, String username, String mobile, String email,
-                                     Long deptId, Set<Long> postIds) {
-        // 校验用户存在
-        checkUserExists(id);
-        // 校验用户名唯一
-        checkUsernameUnique(id, username);
-        // 校验手机号唯一
-        checkMobileUnique(id, mobile);
-        // 校验邮箱唯一
-        checkEmailUnique(id, email);
-        // 校验部门处于开启状态
-        deptService.validateDeptList(CollectionUtils.singleton(deptId));
-        // 校验岗位处于开启状态
-        postService.validatePostList(postIds);
+    private void validateUserForCreateOrUpdate(Long id, String username, String mobile, String email,
+                                              Long deptId, Set<Long> postIds) {
+        // 关闭数据权限，避免因为没有数据权限，查询不到数据，进而导致唯一校验不正确
+        DataPermissionUtils.executeIgnore(() -> {
+            // 校验用户存在
+            validateUserExists(id);
+            // 校验用户名唯一
+            validateUsernameUnique(id, username);
+            // 校验手机号唯一
+            validateMobileUnique(id, mobile);
+            // 校验邮箱唯一
+            validateEmailUnique(id, email);
+            // 校验部门处于开启状态
+            deptService.validateDeptList(CollectionUtils.singleton(deptId));
+            // 校验岗位处于开启状态
+            postService.validatePostList(postIds);
+        });
     }
 
     @VisibleForTesting
-    public void checkUserExists(Long id) {
+    void validateUserExists(Long id) {
         if (id == null) {
             return;
         }
@@ -334,7 +327,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @VisibleForTesting
-    public void checkUsernameUnique(Long id, String username) {
+    void validateUsernameUnique(Long id, String username) {
         if (StrUtil.isBlank(username)) {
             return;
         }
@@ -352,7 +345,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @VisibleForTesting
-    public void checkEmailUnique(Long id, String email) {
+    void validateEmailUnique(Long id, String email) {
         if (StrUtil.isBlank(email)) {
             return;
         }
@@ -370,7 +363,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @VisibleForTesting
-    public void checkMobileUnique(Long id, String mobile) {
+    void validateMobileUnique(Long id, String mobile) {
         if (StrUtil.isBlank(mobile)) {
             return;
         }
@@ -393,7 +386,7 @@ public class AdminUserServiceImpl implements AdminUserService {
      * @param oldPassword 旧密码
      */
     @VisibleForTesting
-    public void checkOldPassword(Long id, String oldPassword) {
+    void validateOldPassword(Long id, String oldPassword) {
         AdminUserDO user = userMapper.selectById(id);
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
@@ -405,7 +398,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class) // 添加事务，异常则回滚所有导入
-    public UserImportRespVO importUsers(List<UserImportExcelVO> importUsers, boolean isUpdateSupport) {
+    public UserImportRespVO importUserList(List<UserImportExcelVO> importUsers, boolean isUpdateSupport) {
         if (CollUtil.isEmpty(importUsers)) {
             throw exception(USER_IMPORT_LIST_IS_EMPTY);
         }
@@ -414,7 +407,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         importUsers.forEach(importUser -> {
             // 校验，判断是否有不符合的原因
             try {
-                checkCreateOrUpdate(null, null, importUser.getMobile(), importUser.getEmail(),
+                validateUserForCreateOrUpdate(null, null, importUser.getMobile(), importUser.getEmail(),
                         importUser.getDeptId(), null);
             } catch (ServiceException ex) {
                 respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
@@ -442,7 +435,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public List<AdminUserDO> getUsersByStatus(Integer status) {
+    public List<AdminUserDO> getUserListByStatus(Integer status) {
         return userMapper.selectListByStatus(status);
     }
 

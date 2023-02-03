@@ -64,7 +64,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
             o.setNickname("wang");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
-        when(userService.getUsersByNickname("wang")).thenReturn(Collections.singletonList(user));
+        when(userService.getUserListByNickname("wang")).thenReturn(Collections.singletonList(user));
         Long userId = user.getId();
 
         // 构造操作日志
@@ -112,7 +112,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
             o.setNickname("wang");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
-        when(userService.getUsersByNickname("wang")).thenReturn(Collections.singletonList(user));
+        when(userService.getUserListByNickname("wang")).thenReturn(Collections.singletonList(user));
         Long userId = user.getId();
 
         // 构造操作日志
