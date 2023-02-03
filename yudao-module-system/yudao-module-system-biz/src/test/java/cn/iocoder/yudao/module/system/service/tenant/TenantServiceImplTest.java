@@ -81,13 +81,13 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetTenantIds() {
+    public void testGetTenantIdList() {
         // mock 数据
         TenantDO tenant = randomPojo(TenantDO.class, o -> o.setId(1L));
         tenantMapper.insert(tenant);
 
         // 调用，并断言业务异常
-        List<Long> result = tenantService.getTenantIds();
+        List<Long> result = tenantService.getTenantIdList();
         assertEquals(Collections.singletonList(1L), result);
     }
 

@@ -60,7 +60,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         // 调用
         sensitiveWordService.initLocalCache();
         // 断言 sensitiveWordTagsCache 缓存
-        assertEquals(SetUtils.asSet("论坛", "蔬菜"), sensitiveWordService.getSensitiveWordTags());
+        assertEquals(SetUtils.asSet("论坛", "蔬菜"), sensitiveWordService.getSensitiveWordTagSet());
         // 断言 tagSensitiveWordTries 缓存
         assertNotNull(sensitiveWordService.getDefaultSensitiveWordTrie());
         assertEquals(2, sensitiveWordService.getTagSensitiveWordTries().size());

@@ -108,7 +108,7 @@ public class AuthController {
 
     @GetMapping("/list-menus")
     @ApiOperation("获得登录用户的菜单列表")
-    public CommonResult<List<AuthMenuRespVO>> getMenus() {
+    public CommonResult<List<AuthMenuRespVO>> getMenuList() {
         // 获得角色列表
         Set<Long> roleIds = permissionService.getUserRoleIdsFromCache(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 获得用户拥有的菜单列表

@@ -75,7 +75,7 @@ public class TenantServiceImpl implements TenantService {
     private PermissionService permissionService;
 
     @Override
-    public List<Long> getTenantIds() {
+    public List<Long> getTenantIdList() {
         List<TenantDO> tenants = tenantMapper.selectList();
         return CollectionUtils.convertList(tenants, TenantDO::getId);
     }

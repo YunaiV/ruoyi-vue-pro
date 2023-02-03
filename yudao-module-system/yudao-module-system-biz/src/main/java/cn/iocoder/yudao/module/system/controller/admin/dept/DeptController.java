@@ -57,7 +57,7 @@ public class DeptController {
     @GetMapping("/list")
     @ApiOperation("获取部门列表")
     @PreAuthorize("@ss.hasPermission('system:dept:query')")
-    public CommonResult<List<DeptRespVO>> listDepts(DeptListReqVO reqVO) {
+    public CommonResult<List<DeptRespVO>> getDeptList(DeptListReqVO reqVO) {
         List<DeptDO> list = deptService.getDeptList(reqVO);
         list.sort(Comparator.comparing(DeptDO::getSort));
         return success(DeptConvert.INSTANCE.convertList(list));
@@ -65,7 +65,7 @@ public class DeptController {
 
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获取部门精简信息列表", notes = "只包含被开启的部门，主要用于前端的下拉选项")
-    public CommonResult<List<DeptSimpleRespVO>> getSimpleDepts() {
+    public CommonResult<List<DeptSimpleRespVO>> getSimpleDeptList() {
         // 获得部门列表，只要开启状态的
         DeptListReqVO reqVO = new DeptListReqVO();
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());

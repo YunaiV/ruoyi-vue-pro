@@ -182,7 +182,7 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
     }
 
     @Override
-    public Set<String> getSensitiveWordTags() {
+    public Set<String> getSensitiveWordTagSet() {
         return sensitiveWordTagsCache;
     }
 

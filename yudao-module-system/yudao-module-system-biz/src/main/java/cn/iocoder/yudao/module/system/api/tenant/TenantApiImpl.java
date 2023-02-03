@@ -19,7 +19,7 @@ public class TenantApiImpl implements TenantApi {
 
     @Override
     public List<Long> getTenantIdList() {
-        return tenantService.getTenantIds();
+        return tenantService.getTenantIdList();
     }
 
     @Override
