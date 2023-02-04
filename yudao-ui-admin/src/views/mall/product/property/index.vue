@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <doc-alert title="功能开启" url="https://doc.iocoder.cn/mall/build/" />
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
@@ -29,7 +30,7 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="名称" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <router-link :to="'/property/value/' + scope.row.id" class="link-type">
             <span>{{ scope.row.name }}</span>
           </router-link>
@@ -37,12 +38,12 @@
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['product:property:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.mp.controller.admin.tag.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -14,7 +14,7 @@ import javax.validation.constraints.NotEmpty;
 @Data
 public class MpTagBaseVO {
 
-    @ApiModelProperty(value = "标签名", required = true, example = "土豆")
+    @Schema(description = "标签名", required = true, example = "土豆")
     @NotEmpty(message = "标签名不能为空")
     private String name;
 

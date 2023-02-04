@@ -44,13 +44,13 @@ public class NotifySendServiceImpl implements NotifySendService {
     @Override
     public Long sendSingleNotify(Long userId, Integer userType, String templateCode, Map<String, Object> templateParams) {
         // 校验模版
-        NotifyTemplateDO template = checkNotifyTemplateValid(templateCode);
+        NotifyTemplateDO template = validateNotifyTemplate(templateCode);
         if (Objects.equals(template.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
             log.info("[sendSingleNotify][模版({})已经关闭，无法给用户({}/{})发送]", templateCode, userId, userType);
             return null;
         }
         // 校验参数
-        checkTemplateParams(template, templateParams);
+        validateTemplateParams(template, templateParams);
 
         // 发送站内信
         String content = notifyTemplateService.formatNotifyTemplateContent(template.getContent(), templateParams);
@@ -58,7 +58,7 @@ public class NotifySendServiceImpl implements NotifySendService {
     }
 
     @VisibleForTesting
-    public NotifyTemplateDO checkNotifyTemplateValid(String templateCode) {
+    public NotifyTemplateDO validateNotifyTemplate(String templateCode) {
         // 获得站内信模板。考虑到效率，从缓存中获取
         NotifyTemplateDO template = notifyTemplateService.getNotifyTemplateByCodeFromCache(templateCode);
         // 站内信模板不存在
@@ -75,7 +75,7 @@ public class NotifySendServiceImpl implements NotifySendService {
      * @param templateParams 参数列表
      */
     @VisibleForTesting
-    public void checkTemplateParams(NotifyTemplateDO template, Map<String, Object> templateParams) {
+    public void validateTemplateParams(NotifyTemplateDO template, Map<String, Object> templateParams) {
         template.getParams().forEach(key -> {
             Object value = templateParams.get(key);
             if (value == null) {

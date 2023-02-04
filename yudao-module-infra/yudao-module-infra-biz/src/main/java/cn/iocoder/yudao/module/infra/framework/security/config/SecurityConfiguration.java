@@ -23,7 +23,9 @@ public class SecurityConfiguration {
             @Override
             public void customize(ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry) {
                 // Swagger 接口文档
-                registry.antMatchers("/swagger-ui.html").anonymous()
+                registry.antMatchers("/v3/api-docs/**").permitAll()
+                        .antMatchers("/swagger-ui.html").permitAll()
+                        .antMatchers("/swagger-ui/**").permitAll()
                         .antMatchers("/swagger-resources/**").anonymous()
                         .antMatchers("/webjars/**").anonymous()
                         .antMatchers("/*/api-docs").anonymous();

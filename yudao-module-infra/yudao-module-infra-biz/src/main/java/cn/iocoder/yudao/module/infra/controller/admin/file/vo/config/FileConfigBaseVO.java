@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.infra.controller.admin.file.vo.config;
-
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -12,11 +11,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class FileConfigBaseVO {
 
-    @ApiModelProperty(value = "配置名", required = true, example = "S3 - 阿里云")
+    @Schema(description = "配置名", required = true, example = "S3 - 阿里云")
     @NotNull(message = "配置名不能为空")
     private String name;
 
-    @ApiModelProperty(value = "备注", example = "我是备注")
+    @Schema(description = "备注", example = "我是备注")
     private String remark;
 
 }

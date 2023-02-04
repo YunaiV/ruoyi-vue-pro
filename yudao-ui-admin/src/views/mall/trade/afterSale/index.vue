@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <doc-alert title="功能开启" url="https://doc.iocoder.cn/mall/build/" />
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
@@ -57,7 +58,7 @@
       <el-table-column label="订单编号" align="center" prop="orderNo" /> <!-- TODO 芋艿：未来要加个订单链接 -->
       <el-table-column label="商品信息" align="center" prop="spuName" width="auto" min-width="300">
         <!-- TODO @小红：样式不太对，辛苦改改 -->
-<!--        <div slot-scope="{ row }" class="goods-info">-->
+<!--        <div v-slot="{ row }" class="goods-info">-->
 <!--          <img :src="row.picUrl"/>-->
 <!--          <span class="ellipsis-2" :title="row.name">{{row.name}}</span>-->
 <!--        </div>-->

@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <doc-alert title="功能开启" url="https://doc.iocoder.cn/mall/build/" />
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="82px">
@@ -44,7 +45,7 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="优惠券名称" align="center" prop="name" />
       <el-table-column label="优惠券类型" align="center" prop="discountType">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.PROMOTION_DISCOUNT_TYPE" :value="scope.row.discountType" />
         </template>
       </el-table-column>
@@ -54,17 +55,17 @@
       <el-table-column label="领取上限" align="center" prop="takeLimitCount" :formatter="takeLimitCountFormat" />
       <el-table-column label="有效期限" align="center" prop="validityType" width="180" :formatter="validityTypeFormat" />
       <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-switch v-model="scope.row.status" :active-value="0" :inactive-value="1" @change="handleStatusChange(scope.row)"/>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['promotion:coupon-template:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"

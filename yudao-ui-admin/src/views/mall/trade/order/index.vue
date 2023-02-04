@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="功能开启" url="https://doc.iocoder.cn/mall/build/" />
+
     <!-- 搜索工作栏 -->
     <!-- TODO: inline 看看是不是需要; v-show= 那块逻辑还是要的 -->
     <el-row :gutter="20">
@@ -71,7 +73,7 @@
         <!-- 列表 -->
         <el-table v-loading="loading" :data="list" :show-header="false" class="order-table">
           <el-table-column>
-            <template slot-scope="{ row }">
+            <template v-slot="{ row }">
               <el-row type="flex" align="middle">
                 <el-col :span="5">
                   订单号：{{row.no}}
@@ -94,7 +96,7 @@
               <!-- 订单下的商品 -->
               <el-table :data="row.items" border :show-header="true">
                 <el-table-column label="商品" prop="goods" header-align="center" width="auto" min-width="300">
-                  <template slot-scope="{ row, $index }">
+                  <template v-slot="{ row, $index }">
                     <div class="goods-info">
                       <img :src="row.picUrl"/>
                       <span class="ellipsis-2" :title="row.spuName">{{row.spuName}}</span>
@@ -105,7 +107,7 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="单价(元)/数量" prop="fee" align="center" width="115">
-                  <template slot-scope="{ row }">
+                  <template v-slot="{ row }">
                     <div>￥{{ (row.originalUnitPrice / 100.0).toFixed(2) }}</div>
                     <div>{{row.count}} 件</div>
                   </template>
@@ -114,7 +116,7 @@
                 <el-table-column label="实付金额(元)" prop="amount" align="center" width="100"/>
                 <!-- TODO @小程：这里应该是一个订单下，多个商品，只展示订单上的收件信息；使用 order.receiverXXX 开头的字段 -->
                 <el-table-column label="买家/收货人" prop="buyer" header-align="center" width="auto" min-width="300">
-                  <template slot-scope="{ row }">
+                  <template v-slot="{ row }">
                     <!-- TODO @芋艿：以后增加一个会员详情界面 -->
                     <div>{{row.buyer}}</div>
                     <div>{{row.receiver}}{{row.tel}}</div>

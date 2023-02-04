@@ -5,7 +5,7 @@
       <el-table-column label="事件类型" min-width="100px" prop="event" />
       <el-table-column label="监听器类型" min-width="100px" show-overflow-tooltip :formatter="row => listenerTypeObject[row.listenerType]" />
       <el-table-column label="操作" width="90px">
-        <template slot-scope="{ row, $index }">
+        <template v-slot="{ row, $index }">
           <el-button size="mini" type="text" @click="openListenerForm(row, $index)">编辑</el-button>
           <el-divider direction="vertical" />
           <el-button size="mini" type="text" style="color: #ff4d4f" @click="removeListener(row, $index)">移除</el-button>
@@ -108,7 +108,7 @@
         <el-table-column label="字段类型" min-width="80px" show-overflow-tooltip :formatter="row => fieldTypeObject[row.fieldType]" />
         <el-table-column label="字段值/表达式" min-width="100px" show-overflow-tooltip :formatter="row => row.string || row.expression" />
         <el-table-column label="操作" width="100px">
-          <template slot-scope="{ row, $index }">
+          <template v-slot="{ row, $index }">
             <el-button size="mini" type="text" @click="openListenerFieldForm(row, $index)">编辑</el-button>
             <el-divider direction="vertical" />
             <el-button size="mini" type="text" style="color: #ff4d4f" @click="removeListenerField(row, $index)">移除</el-button>

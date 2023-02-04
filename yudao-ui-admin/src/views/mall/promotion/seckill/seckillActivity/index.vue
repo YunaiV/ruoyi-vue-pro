@@ -1,5 +1,6 @@
 <template>
     <div class="app-container">
+      <doc-alert title="功能开启" url="https://doc.iocoder.cn/mall/build/" />
 
         <!-- 搜索工作栏 -->
         <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch"
@@ -47,12 +48,12 @@
         <el-table v-loading="loading" :data="list">
             <el-table-column label="活动名称" align="center" prop="name" />
             <el-table-column label="活动状态" align="center" prop="status">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                     <dict-tag :type="DICT_TYPE.PROMOTION_ACTIVITY_STATUS" :value="scope.row.status" />
                 </template>
             </el-table-column>
             <el-table-column label="参与场次" prop="timeIds" width="250">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                     <span v-for="item in seckillTimeList" :key="item.id"
                         v-if="scope.row.timeIds.includes(item.id)">
                         <el-tag style="margin:4px;" size="small">{{ item.name }}</el-tag>
@@ -60,7 +61,7 @@
                 </template>
             </el-table-column>
             <el-table-column label="活动开始时间" align="center" prop="startTime" width="190">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                     <span>{{ "开始: " + parseTime(scope.row.startTime) }}</span>
                     <span>{{ "结束: " + parseTime(scope.row.endTime) }}</span>
                 </template>
@@ -69,12 +70,12 @@
             <el-table-column label="付款订单数" align="center" prop="orderCount" />
             <el-table-column label="付款人数" align="center" prop="userCount" />
             <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                     <span>{{ parseTime(scope.row.createTime) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                         v-hasPermi="['promotion:seckill-activity:update']">修改</el-button>
                     <el-button size="mini" type="text" icon="el-icon-close" @click="handleClose(scope.row)"
@@ -137,37 +138,37 @@
                         <el-table-column type="selection" width="55">
                         </el-table-column>
                         <el-table-column label="商品名称" align="center" width="200">
-                            <template slot-scope="scope">
+                            <template v-slot="scope">
                                 {{ scope.row.spuName }} &nbsp; {{ scope.row.name }}
                             </template>
                         </el-table-column>
                         <el-table-column label="商品价格" align="center" prop="price">
-                            <template slot-scope="scope">
+                            <template v-slot="scope">
                                 ￥{{ (scope.row.price / 100.0).toFixed(2) }}
                             </template>
                         </el-table-column>
                         <el-table-column label="库存" align="center" prop="productStock" />
                         <el-table-column label="限购(0为不限购)" align="center" width="150">
-                            <template slot-scope="scope">
+                            <template v-slot="scope">
                                 <el-input-number v-model="scope.row.limitBuyCount" size="mini" :min="0" :max="10000">
                                 </el-input-number>
                             </template>
                         </el-table-column>
                         <el-table-column label="秒杀价(元)" align="center" width="150">
-                            <template slot-scope="scope">
+                            <template v-slot="scope">
                                 <el-input-number v-model="scope.row.seckillPrice" size="mini" :precision="2" :min="0"
                                     :max="10000">
                                 </el-input-number>
                             </template>
                         </el-table-column>
                         <el-table-column label="秒杀库存" align="center" width="150" prop="seckillStock">
-                            <template slot-scope="scope">
+                            <template v-slot="scope">
                                 <el-input-number v-model="scope.row.seckillStock" size="mini" :min="0" :max="10000">
                                 </el-input-number>
                             </template>
                         </el-table-column>
                         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-                            <template slot-scope="scope">
+                            <template v-slot="scope">
                                 <el-button size="mini" type="text" icon="el-icon-delete"
                                     @click="removeFormSku(scope.row.skuId)">删除
                                 </el-button>

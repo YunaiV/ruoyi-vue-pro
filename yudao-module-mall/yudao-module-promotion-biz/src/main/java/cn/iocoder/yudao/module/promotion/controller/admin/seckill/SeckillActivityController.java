@@ -7,9 +7,9 @@ import cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity.Seckill
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity.SeckillActivityService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - 秒杀活动")
+@Tag(name = "管理后台 - 秒杀活动")
 @RestController
 @RequestMapping("/promotion/seckill-activity")
 @Validated
@@ -31,14 +31,14 @@ public class SeckillActivityController {
     private SeckillActivityService seckillActivityService;
 
     @PostMapping("/create")
-    @ApiOperation("创建秒杀活动")
+    @Operation(summary = "创建秒杀活动")
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:create')")
     public CommonResult<Long> createSeckillActivity(@Valid @RequestBody SeckillActivityCreateReqVO createReqVO) {
         return success(seckillActivityService.createSeckillActivity(createReqVO));
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新秒杀活动")
+    @Operation(summary = "更新秒杀活动")
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:update')")
     public CommonResult<Boolean> updateSeckillActivity(@Valid @RequestBody SeckillActivityUpdateReqVO updateReqVO) {
         seckillActivityService.updateSeckillActivity(updateReqVO);
@@ -46,8 +46,8 @@ public class SeckillActivityController {
     }
 
     @PutMapping("/close")
-    @ApiOperation("关闭秒杀活动")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @Operation(summary = "关闭秒杀活动")
+    @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:close')")
     public CommonResult<Boolean> closeSeckillActivity(@RequestParam("id") Long id) {
         seckillActivityService.closeSeckillActivity(id);
@@ -55,8 +55,8 @@ public class SeckillActivityController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除秒杀活动")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @Operation(summary = "删除秒杀活动")
+    @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:delete')")
     public CommonResult<Boolean> deleteSeckillActivity(@RequestParam("id") Long id) {
         seckillActivityService.deleteSeckillActivity(id);
@@ -64,8 +64,8 @@ public class SeckillActivityController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得秒杀活动")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得秒杀活动")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
     public CommonResult<SeckillActivityDetailRespVO> getSeckillActivity(@RequestParam("id") Long id) {
         SeckillActivityDO seckillActivity = seckillActivityService.getSeckillActivity(id);
@@ -77,8 +77,8 @@ public class SeckillActivityController {
     }
 
     @GetMapping("/list")
-    @ApiOperation("获得秒杀活动列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
+    @Operation(summary = "获得秒杀活动列表")
+    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
     public CommonResult<List<SeckillActivityRespVO>> getSeckillActivityList(@RequestParam("ids") Collection<Long> ids) {
         List<SeckillActivityDO> list = seckillActivityService.getSeckillActivityList(ids);
@@ -86,7 +86,7 @@ public class SeckillActivityController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得秒杀活动分页")
+    @Operation(summary = "获得秒杀活动分页")
     @PreAuthorize("@ss.hasPermission('promotion:seckill-activity:query')")
     public CommonResult<PageResult<SeckillActivityRespVO>> getSeckillActivityPage(@Valid SeckillActivityPageReqVO pageVO) {
         PageResult<SeckillActivityDO> pageResult = seckillActivityService.getSeckillActivityPage(pageVO);

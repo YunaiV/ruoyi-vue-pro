@@ -127,7 +127,7 @@ public interface AdminUserService {
      * @param deptIds 部门数组
      * @return 用户数组
      */
-    List<AdminUserDO> getUsersByDeptIds(Collection<Long> deptIds);
+    List<AdminUserDO> getUserListByDeptIds(Collection<Long> deptIds);
 
     /**
      * 获得指定岗位的用户数组
@@ -135,7 +135,7 @@ public interface AdminUserService {
      * @param postIds 岗位数组
      * @return 用户数组
      */
-    List<AdminUserDO> getUsersByPostIds(Collection<Long> postIds);
+    List<AdminUserDO> getUserListByPostIds(Collection<Long> postIds);
 
     /**
      * 获得用户列表
@@ -143,7 +143,7 @@ public interface AdminUserService {
      * @param ids 用户编号数组
      * @return 用户列表
      */
-    List<AdminUserDO> getUsers(Collection<Long> ids);
+    List<AdminUserDO> getUserList(Collection<Long> ids);
 
     /**
      * 校验用户们是否有效。如下情况，视为无效：
@@ -152,7 +152,7 @@ public interface AdminUserService {
      *
      * @param ids 用户编号数组
      */
-    void validUsers(Set<Long> ids);
+    void validateUserList(Collection<Long> ids);
 
     /**
      * 获得用户 Map
@@ -164,7 +164,7 @@ public interface AdminUserService {
         if (CollUtil.isEmpty(ids)) {
             return new HashMap<>();
         }
-        return CollectionUtils.convertMap(getUsers(ids), AdminUserDO::getId);
+        return CollectionUtils.convertMap(getUserList(ids), AdminUserDO::getId);
     }
 
     /**
@@ -173,7 +173,7 @@ public interface AdminUserService {
      * @param reqVO 列表请求
      * @return 用户列表
      */
-    List<AdminUserDO> getUsers(UserExportReqVO reqVO);
+    List<AdminUserDO> getUserList(UserExportReqVO reqVO);
 
     /**
      * 获得用户列表，基于昵称模糊匹配
@@ -181,15 +181,7 @@ public interface AdminUserService {
      * @param nickname 昵称
      * @return 用户列表
      */
-    List<AdminUserDO> getUsersByNickname(String nickname);
-
-    /**
-     * 获得用户列表，基于用户账号模糊匹配
-     *
-     * @param username 用户账号
-     * @return 用户列表
-     */
-    List<AdminUserDO> getUsersByUsername(String username);
+    List<AdminUserDO> getUserListByNickname(String nickname);
 
     /**
      * 批量导入用户
@@ -198,7 +190,7 @@ public interface AdminUserService {
      * @param isUpdateSupport 是否支持更新
      * @return 导入结果
      */
-    UserImportRespVO importUsers(List<UserImportExcelVO> importUsers, boolean isUpdateSupport);
+    UserImportRespVO importUserList(List<UserImportExcelVO> importUsers, boolean isUpdateSupport);
 
     /**
      * 获得指定状态的用户们
@@ -206,7 +198,7 @@ public interface AdminUserService {
      * @param status 状态
      * @return 用户们
      */
-    List<AdminUserDO> getUsersByStatus(Integer status);
+    List<AdminUserDO> getUserListByStatus(Integer status);
 
     /**
      * 判断密码是否匹配

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.infra.controller.admin.file.vo.config;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -9,17 +8,17 @@ import lombok.ToString;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 
-@ApiModel("管理后台 - 文件配置创建 Request VO")
+@Schema(description = "管理后台 - 文件配置创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class FileConfigCreateReqVO extends FileConfigBaseVO {
 
-    @ApiModelProperty(value = "存储器", required = true, example = "1", notes = "参见 FileStorageEnum 枚举类")
+    @Schema(description = "存储器,参见 FileStorageEnum 枚举类参见 FileStorageEnum 枚举类", required = true, example = "1")
     @NotNull(message = "存储器不能为空")
     private Integer storage;
 
-    @ApiModelProperty(value = "存储配置", required = true, notes = "配置是动态参数，所以使用 Map 接收")
+    @Schema(description = "存储配置,配置是动态参数，所以使用 Map 接收", required = true)
     @NotNull(message = "存储配置不能为空")
     private Map<String, Object> config;
 

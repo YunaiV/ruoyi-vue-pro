@@ -1,5 +1,5 @@
 ## 提供给 baseVO、createVO、updateVO 生成字段
-    @ApiModelProperty(value = "${column.columnComment}"#if (!${column.nullable}), required = true#end#if ("$!column.example" != ""), example = "${column.example}"#end)
+    @Schema(description = "${column.columnComment}"#if (!${column.nullable}), required = true#end#if ("$!column.example" != ""), example = "${column.example}"#end)
 #if (!${column.nullable})## 判断 @NotEmpty 和 @NotNull 注解
 #if (${field.fieldType} == 'String')
     @NotEmpty(message = "${column.columnComment}不能为空")

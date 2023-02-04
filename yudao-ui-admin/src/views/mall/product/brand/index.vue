@@ -1,7 +1,8 @@
 <template>
   <div class="app-container">
+    <doc-alert title="功能开启" url="https://doc.iocoder.cn/mall/build/" />
 
-«    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="品牌名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入品牌名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>

@@ -18,9 +18,9 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +39,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "管理后台 - 支付订单")
+@Tag(name = "管理后台 - 支付订单")
 @RestController
 @RequestMapping("/pay/order")
 @Validated
@@ -55,8 +55,8 @@ public class PayOrderController {
     private PayAppService appService;
 
     @GetMapping("/get")
-    @ApiOperation("获得支付订单")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得支付订单")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('pay:order:query')")
     public CommonResult<PayOrderDetailsRespVO> getOrder(@RequestParam("id") Long id) {
         PayOrderDO order = orderService.getOrder(id);
@@ -83,7 +83,7 @@ public class PayOrderController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得支付订单分页")
+    @Operation(summary = "获得支付订单分页")
     @PreAuthorize("@ss.hasPermission('pay:order:query')")
     public CommonResult<PageResult<PayOrderPageItemRespVO>> getOrderPage(@Valid PayOrderPageReqVO pageVO) {
         PageResult<PayOrderDO> pageResult = orderService.getOrderPage(pageVO);
@@ -114,7 +114,7 @@ public class PayOrderController {
     }
 
     @GetMapping("/export-excel")
-    @ApiOperation("导出支付订单Excel")
+    @Operation(summary = "导出支付订单Excel")
     @PreAuthorize("@ss.hasPermission('pay:order:export')")
     @OperateLog(type = EXPORT)
     public void exportOrderExcel(@Valid PayOrderExportReqVO exportReqVO,

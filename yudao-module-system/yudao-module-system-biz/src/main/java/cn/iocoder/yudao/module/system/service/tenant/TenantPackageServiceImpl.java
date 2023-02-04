@@ -64,9 +64,9 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     @Override
     public void deleteTenantPackage(Long id) {
         // 校验存在
-        this.validateTenantPackageExists(id);
+        validateTenantPackageExists(id);
         // 校验正在使用
-        this.validateTenantUsed(id);
+        validateTenantUsed(id);
         // 删除
         tenantPackageMapper.deleteById(id);
     }

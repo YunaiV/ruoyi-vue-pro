@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.system.service.mail;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
-import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
@@ -20,15 +19,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
- * 邮箱模版 服务实现类
+ * 邮箱发送 Service 实现类
  *
  * @author wangjingyi
  * @since 2022-03-21
@@ -82,13 +79,13 @@ public class MailSendServiceImpl implements MailSendService {
     public Long sendSingleMail(String mail, Long userId, Integer userType,
                                String templateCode, Map<String, Object> templateParams) {
         // 校验邮箱模版是否合法
-        MailTemplateDO template = checkMailTemplateValid(templateCode);
+        MailTemplateDO template = validateMailTemplate(templateCode);
         // 校验邮箱账号是否合法
-        MailAccountDO account = checkMailAccountValid(template.getAccountId());
+        MailAccountDO account = validateMailAccount(template.getAccountId());
 
         // 校验邮箱是否存在
-        mail = checkMail(mail);
-        checkTemplateParams(template, templateParams);
+        mail = validateMail(mail);
+        validateTemplateParams(template, templateParams);
 
         // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus());
@@ -106,7 +103,7 @@ public class MailSendServiceImpl implements MailSendService {
     @Override
     public void doSendMail(MailSendMessage message) {
         // 1. 创建发送账号
-        MailAccountDO account = checkMailAccountValid(message.getAccountId());
+        MailAccountDO account = validateMailAccount(message.getAccountId());
         MailAccount mailAccount  = MailAccountConvert.INSTANCE.convert(account, message.getNickname());
         // 2. 发送邮件
         try {
@@ -121,7 +118,7 @@ public class MailSendServiceImpl implements MailSendService {
     }
 
     @VisibleForTesting
-    public MailTemplateDO checkMailTemplateValid(String templateCode) {
+    MailTemplateDO validateMailTemplate(String templateCode) {
         // 获得邮件模板。考虑到效率，从缓存中获取
         MailTemplateDO template = mailTemplateService.getMailTemplateByCodeFromCache(templateCode);
         // 邮件模板不存在
@@ -132,7 +129,7 @@ public class MailSendServiceImpl implements MailSendService {
     }
 
     @VisibleForTesting
-    public MailAccountDO checkMailAccountValid(Long accountId) {
+    MailAccountDO validateMailAccount(Long accountId) {
         // 获得邮箱账号。考虑到效率，从缓存中获取
         MailAccountDO account = mailAccountService.getMailAccountFromCache(accountId);
         // 邮箱账号不存在
@@ -143,7 +140,7 @@ public class MailSendServiceImpl implements MailSendService {
     }
 
     @VisibleForTesting
-    public String checkMail(String mail) {
+    String validateMail(String mail) {
         if (StrUtil.isEmpty(mail)) {
             throw exception(MAIL_SEND_MAIL_NOT_EXISTS);
         }
@@ -157,7 +154,7 @@ public class MailSendServiceImpl implements MailSendService {
      * @param templateParams 参数列表
      */
     @VisibleForTesting
-    public void checkTemplateParams(MailTemplateDO template, Map<String, Object> templateParams) {
+    void validateTemplateParams(MailTemplateDO template, Map<String, Object> templateParams) {
         template.getParams().forEach(key -> {
             Object value = templateParams.get(key);
             if (value == null) {

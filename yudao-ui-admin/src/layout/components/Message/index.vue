@@ -10,7 +10,7 @@
       <el-table v-loading="loading" :data="list">
         <el-table-column width="120" property="templateNickname" label="发送人" />
         <el-table-column width="180" property="createTime" label="发送时间">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <span>{{ parseTime(scope.row.createTime) }}</span>
           </template>
         </el-table-column>

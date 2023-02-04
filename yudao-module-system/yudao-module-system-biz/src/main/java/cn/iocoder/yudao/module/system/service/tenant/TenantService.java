@@ -120,7 +120,7 @@ public interface TenantService {
      *
      * @return 租户编号数组
      */
-    List<Long> getTenantIds();
+    List<Long> getTenantIdList();
 
     /**
      * 校验租户是否合法

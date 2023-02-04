@@ -109,6 +109,20 @@ public class NotifyMessageServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetNotifyMessage() {
+        // mock 数据
+        NotifyMessageDO dbNotifyMessage = randomPojo(NotifyMessageDO.class,
+                o -> o.setTemplateParams(randomTemplateParams()));
+        notifyMessageMapper.insert(dbNotifyMessage);
+        // 准备参数
+        Long id = dbNotifyMessage.getId();
+
+        // 调用
+        NotifyMessageDO notifyMessage = notifyMessageService.getNotifyMessage(id);
+        assertPojoEquals(dbNotifyMessage, notifyMessage);
+    }
+
+    @Test
     public void testGetMyNotifyMessagePage() {
         // mock 数据
         NotifyMessageDO dbNotifyMessage = randomPojo(NotifyMessageDO.class, o -> { // 等会查询到

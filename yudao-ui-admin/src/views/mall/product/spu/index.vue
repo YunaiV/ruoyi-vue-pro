@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="功能开启" url="https://doc.iocoder.cn/mall/build/" />
+
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="商品名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入商品名称" clearable @keyup.enter.native="handleQuery"/>
@@ -67,7 +69,7 @@
         <!-- 列表 -->
         <el-table v-loading="loading" :data="list">
           <el-table-column label="商品信息" align="center" width="260">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <div class="product-info">
                 <img v-if="scope.row.picUrls" :src="scope.row.picUrls[0]" alt="分类图片" class="img-height" />
                 <div class="message">{{ scope.row.name }}</div>
@@ -80,17 +82,17 @@
           <el-table-column label="销量" align="center" prop="salesCount"/>
           <el-table-column label="排序" align="center" prop="sort"/>
           <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
           </el-table-column>
           <el-table-column label="状态" align="center" prop="status">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <dict-tag :type="DICT_TYPE.PRODUCT_SPU_STATUS" :value="scope.row.status"/>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                          v-hasPermi="['product:spu:update']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -105,7 +107,7 @@
         <!-- 列表 -->
         <el-table v-loading="loading" :data="list">
           <el-table-column label="商品信息" align="center" width="260">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <div class="product-info">
                 <img v-if="scope.row.picUrls" :src="scope.row.picUrls[0]" alt="分类图片" class="img-height"/>
                 <div class="message">{{ scope.row.name }}</div>
@@ -117,17 +119,17 @@
           <el-table-column label="销量" align="center" prop="salesCount"/>
           <el-table-column label="排序" align="center" prop="sort"/>
           <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
           </el-table-column>
           <el-table-column label="状态" align="center" prop="status">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <dict-tag :type="DICT_TYPE.PRODUCT_SPU_STATUS" :value="scope.row.status"/>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                          v-hasPermi="['product:spu:update']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -142,7 +144,7 @@
         <!-- 列表 -->
         <el-table v-loading="loading" :data="list">
           <el-table-column label="商品信息" align="center" width="260">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <div class="product-info">
                 <img v-if="scope.row.picUrls" :src="scope.row.picUrls[0]" alt="分类图片" class="img-height"/>
                 <div class="message">{{ scope.row.name }}</div>
@@ -154,17 +156,17 @@
           <el-table-column label="销量" align="center" prop="salesCount"/>
           <el-table-column label="排序" align="center" prop="sort"/>
           <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
           </el-table-column>
           <el-table-column label="状态" align="center" prop="status">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <dict-tag :type="DICT_TYPE.PRODUCT_SPU_STATUS" :value="scope.row.status"/>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                          v-hasPermi="['product:spu:update']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -179,7 +181,7 @@
         <!-- 列表 -->
         <el-table v-loading="loading" :data="list">
           <el-table-column label="商品信息" align="center" width="260">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <div class="product-info">
                 <img v-if="scope.row.picUrls" :src="scope.row.picUrls[0]" alt="分类图片" class="img-height"/>
                 <div class="message">{{ scope.row.name }}</div>
@@ -191,17 +193,17 @@
           <el-table-column label="销量" align="center" prop="salesCount"/>
           <el-table-column label="排序" align="center" prop="sort"/>
           <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
           </el-table-column>
           <el-table-column label="状态" align="center" prop="status">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <dict-tag :type="DICT_TYPE.PRODUCT_SPU_STATUS" :value="scope.row.status"/>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                          v-hasPermi="['product:spu:update']">修改</el-button>
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
