@@ -41,7 +41,7 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
         return CollUtil.getFirst(getTableList0(dataSourceConfigId, name));
     }
 
-    public List<TableInfo> getTableList0(Long dataSourceConfigId, String name) {
+    private List<TableInfo> getTableList0(Long dataSourceConfigId, String name) {
         // 获得数据源配置
         DataSourceConfigDO config = dataSourceConfigService.getDataSourceConfig(dataSourceConfigId);
         Assert.notNull(config, "数据源({}) 不存在！", dataSourceConfigId);
