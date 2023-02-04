@@ -45,7 +45,7 @@ public class TestDemoServiceImpl implements TestDemoService {
     @CacheEvict(value = "test", key = "#updateReqVO.id")
     public void updateTestDemo(TestDemoUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validateTestDemoExists(updateReqVO.getId());
+        validateTestDemoExists(updateReqVO.getId());
         // 更新
         TestDemoDO updateObj = TestDemoConvert.INSTANCE.convert(updateReqVO);
         testDemoMapper.updateById(updateObj);
@@ -55,7 +55,7 @@ public class TestDemoServiceImpl implements TestDemoService {
     @CacheEvict(value = "test", key = "#id")
     public void deleteTestDemo(Long id) {
         // 校验存在
-        this.validateTestDemoExists(id);
+        validateTestDemoExists(id);
         // 删除
         testDemoMapper.deleteById(id);
     }
