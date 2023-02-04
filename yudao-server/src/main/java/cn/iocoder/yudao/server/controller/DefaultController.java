@@ -27,4 +27,12 @@ public class DefaultController {
                 "[微信公众号 yudao-module-mp - 已禁用][参考 https://doc.iocoder.cn/mp/build/ 开启]");
     }
 
+    @RequestMapping(value = {"/admin-api/product/**", // 商品中心
+            "/admin-api/trade/**", // 交易中心
+            "/admin-api/promotion/**"})  // 营销中心
+    public CommonResult<Boolean> mall404() {
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(),
+                "[商城 yudao-module-mp - 已禁用][参考 https://doc.iocoder.cn/mall/build/ 开启]");
+    }
+
 }

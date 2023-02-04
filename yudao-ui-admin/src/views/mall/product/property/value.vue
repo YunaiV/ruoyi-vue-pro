@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="功能开启" url="https://doc.iocoder.cn/mall/build/" />
+
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="属性项" prop="propertyId">
         <el-select v-model="queryParams.propertyId">
