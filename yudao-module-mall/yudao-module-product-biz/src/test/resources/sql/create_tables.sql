@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS `product_sku` (
     PRIMARY KEY (`id`)
 ) COMMENT '商品sku';
 
-
 CREATE TABLE IF NOT EXISTS `product_spu` (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
     `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
