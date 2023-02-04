@@ -76,7 +76,7 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
     @Override
     public Long createNotifyTemplate(NotifyTemplateCreateReqVO createReqVO) {
         // 校验站内信编码是否重复
-        checkNotifyTemplateCodeDuplicate(null, createReqVO.getCode());
+        validateNotifyTemplateCodeDuplicate(null, createReqVO.getCode());
 
         // 插入
         NotifyTemplateDO notifyTemplate = NotifyTemplateConvert.INSTANCE.convert(createReqVO);
@@ -93,7 +93,7 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
         // 校验存在
         validateNotifyTemplateExists(updateReqVO.getId());
         // 校验站内信编码是否重复
-        checkNotifyTemplateCodeDuplicate(updateReqVO.getId(), updateReqVO.getCode());
+        validateNotifyTemplateCodeDuplicate(updateReqVO.getId(), updateReqVO.getCode());
 
         // 更新
         NotifyTemplateDO updateObj = NotifyTemplateConvert.INSTANCE.convert(updateReqVO);
@@ -136,7 +136,7 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
     }
 
     @VisibleForTesting
-    public void checkNotifyTemplateCodeDuplicate(Long id, String code) {
+    public void validateNotifyTemplateCodeDuplicate(Long id, String code) {
         NotifyTemplateDO template = notifyTemplateMapper.selectByCode(code);
         if (template == null) {
             return;

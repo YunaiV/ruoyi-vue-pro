@@ -38,25 +38,25 @@
       <el-table-column label="昵称" align="center" prop="nickname" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="标签" align="center" prop="tagIds" width="200">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span v-for="(tagId, index) in scope.row.tagIds" :key="index">
             <el-tag>{{ tags.find(tag => tag.tagId === tagId)?.name }} </el-tag>&nbsp;
           </span>
         </template>
       </el-table-column>
       <el-table-column label="订阅状态" align="center" prop="subscribeStatus">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-tag v-if="scope.row.subscribeStatus === 0" type="success">已订阅</el-tag>
           <el-tag v-else type="danger">未订阅</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="订阅时间" align="center" prop="subscribeTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.subscribeTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['mp:user:update']">修改</el-button>
         </template>
@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import { updateUser, getUser, getUserPage, syncUser } from "@/api/mp/user";
+import { updateUser, getUser, getUserPage, syncUser } from "@/api/mp/mpuser";
 import { getSimpleAccounts } from "@/api/mp/account";
 import { getSimpleTags } from "@/api/mp/tag";
 

@@ -111,9 +111,9 @@ public class UserController {
 
     @GetMapping("/list-all-simple")
     @Operation(summary = "获取用户精简信息列表", description = "只包含被开启的用户，主要用于前端的下拉选项")
-    public CommonResult<List<UserSimpleRespVO>> getSimpleUsers() {
+    public CommonResult<List<UserSimpleRespVO>> getSimpleUserList() {
         // 获用户列表，只要开启状态的
-        List<AdminUserDO> list = userService.getUsersByStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<AdminUserDO> list = userService.getUserListByStatus(CommonStatusEnum.ENABLE.getStatus());
         // 排序后，返回给前端
         return success(UserConvert.INSTANCE.convertList04(list));
     }
@@ -122,7 +122,7 @@ public class UserController {
     @Operation(summary = "获得用户详情")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:user:query')")
-    public CommonResult<UserRespVO> getInfo(@RequestParam("id") Long id) {
+    public CommonResult<UserRespVO> getUser(@RequestParam("id") Long id) {
         return success(UserConvert.INSTANCE.convert(userService.getUser(id)));
     }
 
@@ -130,10 +130,10 @@ public class UserController {
     @Operation(summary = "导出用户")
     @PreAuthorize("@ss.hasPermission('system:user:export')")
     @OperateLog(type = EXPORT)
-    public void exportUsers(@Validated UserExportReqVO reqVO,
-                            HttpServletResponse response) throws IOException {
+    public void exportUserList(@Validated UserExportReqVO reqVO,
+                               HttpServletResponse response) throws IOException {
         // 获得用户列表
-        List<AdminUserDO> users = userService.getUsers(reqVO);
+        List<AdminUserDO> users = userService.getUserList(reqVO);
 
         // 获得拼接需要的数据
         Collection<Long> deptIds = convertList(users, AdminUserDO::getDeptId);
@@ -183,7 +183,7 @@ public class UserController {
     public CommonResult<UserImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
                                                       @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {
         List<UserImportExcelVO> list = ExcelUtils.read(file, UserImportExcelVO.class);
-        return success(userService.importUsers(list, updateSupport));
+        return success(userService.importUserList(list, updateSupport));
     }
 
 }

@@ -39,27 +39,38 @@ public class CodegenColumnDO extends BaseDO {
 
     /**
      * 字段名
+     *
+     * 关联 {@link TableField#getName()}
      */
     private String columnName;
     /**
      * 数据库字段类型
+     *
      * 关联 {@link TableField.MetaInfo#getJdbcType()}
      */
     private String dataType;
     /**
      * 字段描述
+     *
+     * 关联 {@link TableField#getComment()}
      */
     private String columnComment;
     /**
      * 是否允许为空
+     *
+     * 关联 {@link TableField.MetaInfo#isNullable()}
      */
     private Boolean nullable;
     /**
      * 是否主键
+     *
+     * 关联 {@link TableField#isKeyFlag()}
      */
     private Boolean primaryKey;
     /**
      * 是否自增
+     *
+     * 关联 {@link TableField#isKeyIdentityFlag()}
      */
     private Boolean autoIncrement;
     /**
@@ -71,12 +82,16 @@ public class CodegenColumnDO extends BaseDO {
 
     /**
      * Java 属性类型
-     * <p>
+     *
      * 例如说 String、Boolean 等等
+     *
+     * 关联 {@link TableField#getColumnType()}
      */
     private String javaType;
     /**
      * Java 属性名
+     *
+     * 关联 {@link TableField#getPropertyName()}
      */
     private String javaField;
     /**

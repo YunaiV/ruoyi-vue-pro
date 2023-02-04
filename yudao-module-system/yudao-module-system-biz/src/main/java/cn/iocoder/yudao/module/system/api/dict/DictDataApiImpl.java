@@ -21,8 +21,8 @@ public class DictDataApiImpl implements DictDataApi {
     private DictDataService dictDataService;
 
     @Override
-    public void validDictDatas(String dictType, Collection<String> values) {
-        dictDataService.validDictDatas(dictType, values);
+    public void validateDictDataList(String dictType, Collection<String> values) {
+        dictDataService.validateDictDataList(dictType, values);
     }
 
     @Override

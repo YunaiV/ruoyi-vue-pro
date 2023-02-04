@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.system.service.dept;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
@@ -19,13 +17,11 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -95,7 +91,7 @@ public class DeptServiceImpl implements DeptService {
         if (reqVO.getParentId() == null) {
             reqVO.setParentId(DeptIdEnum.ROOT.getId());
         }
-        checkCreateOrUpdate(null, reqVO.getParentId(), reqVO.getName());
+        validateForCreateOrUpdate(null, reqVO.getParentId(), reqVO.getName());
         // 插入部门
         DeptDO dept = DeptConvert.INSTANCE.convert(reqVO);
         deptMapper.insert(dept);
@@ -110,7 +106,7 @@ public class DeptServiceImpl implements DeptService {
         if (reqVO.getParentId() == null) {
             reqVO.setParentId(DeptIdEnum.ROOT.getId());
         }
-        checkCreateOrUpdate(reqVO.getId(), reqVO.getParentId(), reqVO.getName());
+        validateForCreateOrUpdate(reqVO.getId(), reqVO.getParentId(), reqVO.getName());
         // 更新部门
         DeptDO updateObj = DeptConvert.INSTANCE.convert(reqVO);
         deptMapper.updateById(updateObj);
@@ -121,10 +117,10 @@ public class DeptServiceImpl implements DeptService {
     @Override
     public void deleteDept(Long id) {
         // 校验是否存在
-        checkDeptExists(id);
+        validateDeptExists(id);
         // 校验是否有子部门
         if (deptMapper.selectCountByParentId(id) > 0) {
-            throw ServiceExceptionUtil.exception(DEPT_EXITS_CHILDREN);
+            throw exception(DEPT_EXITS_CHILDREN);
         }
         // 删除部门
         deptMapper.deleteById(id);
@@ -133,20 +129,20 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    public List<DeptDO> getSimpleDepts(DeptListReqVO reqVO) {
+    public List<DeptDO> getDeptList(DeptListReqVO reqVO) {
         return deptMapper.selectList(reqVO);
     }
 
     @Override
-    public List<DeptDO> getDeptsByParentIdFromCache(Long parentId, boolean recursive) {
+    public List<DeptDO> getDeptListByParentIdFromCache(Long parentId, boolean recursive) {
         if (parentId == null) {
             return Collections.emptyList();
         }
-        List<DeptDO> result = new ArrayList<>(); // TODO 芋艿：待优化，新增缓存，避免每次遍历的计算
+        List<DeptDO> result = new ArrayList<>();
         // 递归，简单粗暴
-        this.getDeptsByParentIdFromCache(result, parentId,
-                recursive ? Integer.MAX_VALUE : 1, // 如果递归获取，则无限；否则，只递归 1 次
-                parentDeptCache);
+       getDeptsByParentIdFromCache(result, parentId,
+               recursive ? Integer.MAX_VALUE : 1, // 如果递归获取，则无限；否则，只递归 1 次
+               parentDeptCache);
         return result;
     }
 
@@ -182,65 +178,65 @@ public class DeptServiceImpl implements DeptService {
                 recursiveCount - 1, parentDeptMap));
     }
 
-    private void checkCreateOrUpdate(Long id, Long parentId, String name) {
+    private void validateForCreateOrUpdate(Long id, Long parentId, String name) {
         // 校验自己存在
-        checkDeptExists(id);
+        validateDeptExists(id);
         // 校验父部门的有效性
-        checkParentDeptEnable(id, parentId);
+        validateParentDeptEnable(id, parentId);
         // 校验部门名的唯一性
-        checkDeptNameUnique(id, parentId, name);
+        validateDeptNameUnique(id, parentId, name);
     }
 
-    private void checkParentDeptEnable(Long id, Long parentId) {
+    private void validateParentDeptEnable(Long id, Long parentId) {
         if (parentId == null || DeptIdEnum.ROOT.getId().equals(parentId)) {
             return;
         }
         // 不能设置自己为父部门
         if (parentId.equals(id)) {
-            throw ServiceExceptionUtil.exception(DEPT_PARENT_ERROR);
+            throw exception(DEPT_PARENT_ERROR);
         }
         // 父岗位不存在
         DeptDO dept = deptMapper.selectById(parentId);
         if (dept == null) {
-            throw ServiceExceptionUtil.exception(DEPT_PARENT_NOT_EXITS);
+            throw exception(DEPT_PARENT_NOT_EXITS);
         }
         // 父部门被禁用
         if (!CommonStatusEnum.ENABLE.getStatus().equals(dept.getStatus())) {
-            throw ServiceExceptionUtil.exception(DEPT_NOT_ENABLE);
+            throw exception(DEPT_NOT_ENABLE);
         }
         // 父部门不能是原来的子部门
-        List<DeptDO> children = this.getDeptsByParentIdFromCache(id, true);
+        List<DeptDO> children = getDeptListByParentIdFromCache(id, true);
         if (children.stream().anyMatch(dept1 -> dept1.getId().equals(parentId))) {
-            throw ServiceExceptionUtil.exception(DEPT_PARENT_IS_CHILD);
+            throw exception(DEPT_PARENT_IS_CHILD);
         }
     }
 
-    private void checkDeptExists(Long id) {
+    private void validateDeptExists(Long id) {
         if (id == null) {
             return;
         }
         DeptDO dept = deptMapper.selectById(id);
         if (dept == null) {
-            throw ServiceExceptionUtil.exception(DEPT_NOT_FOUND);
+            throw exception(DEPT_NOT_FOUND);
         }
     }
 
-    private void checkDeptNameUnique(Long id, Long parentId, String name) {
+    private void validateDeptNameUnique(Long id, Long parentId, String name) {
         DeptDO menu = deptMapper.selectByParentIdAndName(parentId, name);
         if (menu == null) {
             return;
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的岗位
         if (id == null) {
-            throw ServiceExceptionUtil.exception(DEPT_NAME_DUPLICATE);
+            throw exception(DEPT_NAME_DUPLICATE);
         }
         if (!menu.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(DEPT_NAME_DUPLICATE);
+            throw exception(DEPT_NAME_DUPLICATE);
         }
     }
 
     @Override
-    public List<DeptDO> getDepts(Collection<Long> ids) {
+    public List<DeptDO> getDeptList(Collection<Long> ids) {
         return deptMapper.selectBatchIds(ids);
     }
 
@@ -250,13 +246,12 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    public void validDepts(Collection<Long> ids) {
+    public void validateDeptList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return;
         }
         // 获得科室信息
-        List<DeptDO> depts = deptMapper.selectBatchIds(ids);
-        Map<Long, DeptDO> deptMap = CollectionUtils.convertMap(depts, DeptDO::getId);
+        Map<Long, DeptDO> deptMap = getDeptMap(ids);
         // 校验
         ids.forEach(id -> {
             DeptDO dept = deptMap.get(id);
@@ -267,11 +262,6 @@ public class DeptServiceImpl implements DeptService {
                 throw exception(DEPT_NOT_ENABLE, dept.getName());
             }
         });
-    }
-
-    @Override
-    public List<DeptDO> getSimpleDepts(Collection<Long> ids) {
-        return deptMapper.selectBatchIds(ids);
     }
 
 }

@@ -57,8 +57,8 @@ public class NoticeController {
     @GetMapping("/page")
     @Operation(summary = "获取通知公告列表")
     @PreAuthorize("@ss.hasPermission('system:notice:query')")
-    public CommonResult<PageResult<NoticeRespVO>> pageNotices(@Validated NoticePageReqVO reqVO) {
-        return success(NoticeConvert.INSTANCE.convertPage(noticeService.pageNotices(reqVO)));
+    public CommonResult<PageResult<NoticeRespVO>> getNoticePage(@Validated NoticePageReqVO reqVO) {
+        return success(NoticeConvert.INSTANCE.convertPage(noticeService.getNoticePage(reqVO)));
     }
 
     @GetMapping("/get")

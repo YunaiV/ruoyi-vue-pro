@@ -37,7 +37,7 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
     @Override
     public Long createDataSourceConfig(DataSourceConfigCreateReqVO createReqVO) {
         DataSourceConfigDO dataSourceConfig = DataSourceConfigConvert.INSTANCE.convert(createReqVO);
-        checkConnectionOK(dataSourceConfig);
+        validateConnectionOK(dataSourceConfig);
 
         // 插入
         dataSourceConfigMapper.insert(dataSourceConfig);
@@ -50,7 +50,7 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
         // 校验存在
         validateDataSourceConfigExists(updateReqVO.getId());
         DataSourceConfigDO updateObj = DataSourceConfigConvert.INSTANCE.convert(updateReqVO);
-        checkConnectionOK(updateObj);
+        validateConnectionOK(updateObj);
 
         // 更新
         dataSourceConfigMapper.updateById(updateObj);
@@ -88,7 +88,7 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
         return result;
     }
 
-    private void checkConnectionOK(DataSourceConfigDO config) {
+    private void validateConnectionOK(DataSourceConfigDO config) {
         boolean success = JdbcUtils.isConnectionOK(config.getUrl(), config.getUsername(), config.getPassword());
         if (!success) {
             throw exception(DATA_SOURCE_CONFIG_NOT_OK);

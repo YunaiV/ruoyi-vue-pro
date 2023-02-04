@@ -73,6 +73,8 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
       } else {
         route.component = ParentView
       }
+      // 解决只有一个菜单时无法显示目录
+      route.alwaysShow = true
     } else { // 根节点
       route.component = loadView(route.component)
     }

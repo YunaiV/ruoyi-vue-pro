@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.infra.controller.admin.config;
 
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -8,7 +7,6 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.*;
 import cn.iocoder.yudao.module.infra.convert.config.ConfigConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
-import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,6 +21,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
@@ -76,7 +75,7 @@ public class ConfigController {
             return null;
         }
         if (!config.getVisible()) {
-            throw ServiceExceptionUtil.exception(ErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_VISIBLE);
+            throw exception(ErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_VISIBLE);
         }
         return success(config.getValue());
     }
@@ -93,8 +92,8 @@ public class ConfigController {
     @Operation(summary = "导出参数配置")
     @PreAuthorize("@ss.hasPermission('infra:config:export')")
     @OperateLog(type = EXPORT)
-    public void exportSysConfig(@Valid ConfigExportReqVO reqVO,
-                                HttpServletResponse response) throws IOException {
+    public void exportConfig(@Valid ConfigExportReqVO reqVO,
+                             HttpServletResponse response) throws IOException {
         List<ConfigDO> list = configService.getConfigList(reqVO);
         // 拼接数据
         List<ConfigExcelVO> datas = ConfigConvert.INSTANCE.convertList(list);

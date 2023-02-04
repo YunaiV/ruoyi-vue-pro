@@ -70,7 +70,7 @@ public class SmsChannelController {
 
     @GetMapping("/list-all-simple")
     @Operation(summary = "获得短信渠道精简列表", description = "包含被禁用的短信渠道")
-    public CommonResult<List<SmsChannelSimpleRespVO>> getSimpleSmsChannels() {
+    public CommonResult<List<SmsChannelSimpleRespVO>> getSimpleSmsChannelList() {
         List<SmsChannelDO> list = smsChannelService.getSmsChannelList();
         // 排序后，返回给前端
         list.sort(Comparator.comparing(SmsChannelDO::getId));

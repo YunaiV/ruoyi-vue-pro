@@ -61,7 +61,7 @@ public class OAuth2UserController {
         }
         // 获得岗位信息
         if (CollUtil.isNotEmpty(user.getPostIds())) {
-            List<PostDO> posts = postService.getPosts(user.getPostIds());
+            List<PostDO> posts = postService.getPostList(user.getPostIds());
             resp.setPosts(OAuth2UserConvert.INSTANCE.convertList(posts));
         }
         return success(resp);

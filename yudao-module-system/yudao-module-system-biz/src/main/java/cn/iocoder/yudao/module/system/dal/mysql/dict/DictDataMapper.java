@@ -17,13 +17,11 @@ import java.util.List;
 public interface DictDataMapper extends BaseMapperX<DictDataDO> {
 
     default DictDataDO selectByDictTypeAndValue(String dictType, String value) {
-        return selectOne(new LambdaQueryWrapper<DictDataDO>().eq(DictDataDO::getDictType, dictType)
-                .eq(DictDataDO::getValue, value));
+        return selectOne(DictDataDO::getDictType, dictType, DictDataDO::getValue, value);
     }
 
     default DictDataDO selectByDictTypeAndLabel(String dictType, String label) {
-        return selectOne(new LambdaQueryWrapper<DictDataDO>().eq(DictDataDO::getDictType, dictType)
-                .eq(DictDataDO::getLabel, label));
+        return selectOne(DictDataDO::getDictType, dictType, DictDataDO::getLabel, label);
     }
 
     default List<DictDataDO> selectByDictTypeAndValues(String dictType, Collection<String> values) {

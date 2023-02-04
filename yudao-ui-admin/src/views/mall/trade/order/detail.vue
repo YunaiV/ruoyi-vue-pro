@@ -56,25 +56,25 @@
       <el-descriptions-item labelClassName="no-colon">
         <el-table :data="order.items" border>
           <el-table-column prop="spuName" label="商品" width="700">
-            <template slot-scope="{ row }">
+            <template v-slot="{ row }">
               {{row.spuName}}
               <el-tag size="medium" v-for="property in row.properties" :key="property.propertyId">
                 {{property.propertyName}}：{{property.valueName}}</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="originalUnitPrice" label="单价(元)" width="180">
-            <template slot-scope="{ row }">
+            <template v-slot="{ row }">
               ￥{{ (row.originalUnitPrice / 100.0).toFixed(2) }}
             </template>
           </el-table-column>
           <el-table-column prop="count" label="数量" width="180"/>
           <el-table-column prop="originalPrice" label="小计（元）" width="180">
-            <template slot-scope="{ row }">
+            <template v-slot="{ row }">
               ￥{{ (row.originalPrice / 100.0).toFixed(2) }}
             </template>
           </el-table-column>
           <el-table-column prop="afterSaleStatus" label="退款状态">
-            <template slot-scope="{ row }">
+            <template v-slot="{ row }">
               <dict-tag :type="DICT_TYPE.TRADE_ORDER_ITEM_AFTER_SALE_STATUS" :value="row.afterSaleStatus" />
             </template>
           </el-table-column>

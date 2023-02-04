@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.infra.dal.mysql.job;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobLogDO;
@@ -19,24 +19,24 @@ import java.util.List;
 public interface JobLogMapper extends BaseMapperX<JobLogDO> {
 
     default PageResult<JobLogDO> selectPage(JobLogPageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<JobLogDO>()
-                .eqIfPresent("job_id", reqVO.getJobId())
-                .likeIfPresent("handler_name", reqVO.getHandlerName())
-                .geIfPresent("begin_time", reqVO.getBeginTime())
-                .leIfPresent("end_time", reqVO.getEndTime())
-                .eqIfPresent("status", reqVO.getStatus())
-                .orderByDesc("id") // ID 倒序
+        return selectPage(reqVO, new LambdaQueryWrapperX<JobLogDO>()
+                .eqIfPresent(JobLogDO::getJobId, reqVO.getJobId())
+                .likeIfPresent(JobLogDO::getHandlerName, reqVO.getHandlerName())
+                .geIfPresent(JobLogDO::getBeginTime, reqVO.getBeginTime())
+                .leIfPresent(JobLogDO::getEndTime, reqVO.getEndTime())
+                .eqIfPresent(JobLogDO::getStatus, reqVO.getStatus())
+                .orderByDesc(JobLogDO::getId) // ID 倒序
         );
     }
 
     default List<JobLogDO> selectList(JobLogExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<JobLogDO>()
-                .eqIfPresent("job_id", reqVO.getJobId())
-                .likeIfPresent("handler_name", reqVO.getHandlerName())
-                .geIfPresent("begin_time", reqVO.getBeginTime())
-                .leIfPresent("end_time", reqVO.getEndTime())
-                .eqIfPresent("status", reqVO.getStatus())
-                .orderByDesc("id") // ID 倒序
+        return selectList(new LambdaQueryWrapperX<JobLogDO>()
+                .eqIfPresent(JobLogDO::getJobId, reqVO.getJobId())
+                .likeIfPresent(JobLogDO::getHandlerName, reqVO.getHandlerName())
+                .geIfPresent(JobLogDO::getBeginTime, reqVO.getBeginTime())
+                .leIfPresent(JobLogDO::getEndTime, reqVO.getEndTime())
+                .eqIfPresent(JobLogDO::getStatus, reqVO.getStatus())
+                .orderByDesc(JobLogDO::getId) // ID 倒序
         );
     }
 

@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.*;
 
 @Import({FileServiceImpl.class})
-public class FileServiceTest extends BaseDbUnitTest {
+public class FileServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private FileService fileService;

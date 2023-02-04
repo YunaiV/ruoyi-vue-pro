@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.controller.admin.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileRespVO;
@@ -31,6 +30,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_IS_EMPTY;
@@ -63,7 +63,7 @@ public class UserProfileController {
         AdminUserDO user = userService.getUser(getLoginUserId());
         UserProfileRespVO resp = UserConvert.INSTANCE.convert03(user);
         // 获得用户角色
-        List<RoleDO> userRoles = roleService.getRolesFromCache(permissionService.getUserRoleIdListByUserId(user.getId()));
+        List<RoleDO> userRoles = roleService.getRoleListFromCache(permissionService.getUserRoleIdListByUserId(user.getId()));
         resp.setRoles(UserConvert.INSTANCE.convertList(userRoles));
         // 获得部门信息
         if (user.getDeptId() != null) {
@@ -72,7 +72,7 @@ public class UserProfileController {
         }
         // 获得岗位信息
         if (CollUtil.isNotEmpty(user.getPostIds())) {
-            List<PostDO> posts = postService.getPosts(user.getPostIds());
+            List<PostDO> posts = postService.getPostList(user.getPostIds());
             resp.setPosts(UserConvert.INSTANCE.convertList02(posts));
         }
         // 获得社交用户信息
@@ -99,7 +99,7 @@ public class UserProfileController {
     @Operation(summary = "上传用户个人头像")
     public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
-            throw ServiceExceptionUtil.exception(FILE_IS_EMPTY);
+            throw exception(FILE_IS_EMPTY);
         }
         String avatar = userService.updateUserAvatar(getLoginUserId(), file.getInputStream());
         return success(avatar);

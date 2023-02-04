@@ -41,19 +41,19 @@
             <artifactId>yudao-spring-boot-starter-biz-error-code</artifactId>
         </dependency>
 
-        <!-- 数据报表。默认注释，保证编译速度 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-visualization-biz</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <!-- 工作流。默认注释，保证编译速度 -->
+        <!-- 数据报表 -->
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-module-visualization-biz</artifactId>-->
+<!--            <version>${revision}</version>-->
+<!--        </dependency>-->
+        <!-- 工作流 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
 <!--            <artifactId>yudao-module-bpm-biz</artifactId>-->
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
-        <!-- 支付服务。默认注释，保证编译速度 -->
+        <!-- 支付服务 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-pay-biz</artifactId>
@@ -112,7 +112,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.7.7</version> <!-- 如果 spring.boot.version 版本修改，则这里也要跟着修改 -->
+                <version>2.7.8</version> <!-- 如果 spring.boot.version 版本修改，则这里也要跟着修改 -->
                 <configuration>
                     <fork>true</fork>
                 </configuration>

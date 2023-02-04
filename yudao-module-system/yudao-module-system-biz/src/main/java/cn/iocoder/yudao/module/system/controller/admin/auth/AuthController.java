@@ -97,7 +97,7 @@ public class AuthController {
         }
         // 获得角色列表
         Set<Long> roleIds = permissionService.getUserRoleIdsFromCache(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
-        List<RoleDO> roleList = roleService.getRolesFromCache(roleIds);
+        List<RoleDO> roleList = roleService.getRoleListFromCache(roleIds);
         // 获得菜单列表
         List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(roleIds,
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType(), MenuTypeEnum.BUTTON.getType()),
@@ -108,7 +108,7 @@ public class AuthController {
 
     @GetMapping("/list-menus")
     @Operation(summary = "获得登录用户的菜单列表")
-    public CommonResult<List<AuthMenuRespVO>> getMenus() {
+    public CommonResult<List<AuthMenuRespVO>> getMenuList() {
         // 获得角色列表
         Set<Long> roleIds = permissionService.getUserRoleIdsFromCache(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 获得用户拥有的菜单列表

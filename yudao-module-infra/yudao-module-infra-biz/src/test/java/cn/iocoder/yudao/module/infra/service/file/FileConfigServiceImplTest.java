@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
 import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
 import cn.iocoder.yudao.framework.file.core.client.FileClientFactory;
+import cn.iocoder.yudao.framework.file.core.client.local.LocalFileClient;
 import cn.iocoder.yudao.framework.file.core.client.local.LocalFileClientConfig;
 import cn.iocoder.yudao.framework.file.core.enums.FileStorageEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
@@ -240,6 +241,30 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
 
         // 调用，并断言
         assertEquals("https://www.iocoder.cn", fileConfigService.testFileConfig(id));
+    }
+
+    @Test
+    public void testGetFileConfig() {
+        // mock 数据
+        FileConfigDO dbFileConfig = randomFileConfigDO().setMaster(false);
+        fileConfigMapper.insert(dbFileConfig);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbFileConfig.getId();
+
+        // 调用，并断言
+        assertPojoEquals(dbFileConfig, fileConfigService.getFileConfig(id));
+    }
+
+    @Test
+    public void testGetFileClient() {
+        // 准备参数
+        Long id = randomLongId();
+        // mock 获得 Client
+        FileClient fileClient = new LocalFileClient(id, new LocalFileClientConfig());
+        when(fileClientFactory.getFileClient(eq(id))).thenReturn(fileClient);
+
+        // 调用，并断言
+        assertSame(fileClient, fileConfigService.getFileClient(id));
     }
 
     private FileConfigDO randomFileConfigDO() {

@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsLogDO;
@@ -10,11 +14,6 @@ import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsLogMapper;
 import cn.iocoder.yudao.module.system.enums.sms.SmsReceiveStatusEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSendStatusEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SmsTemplateTypeEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -26,14 +25,16 @@ import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomBoolean;
 import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Import(SmsLogServiceImpl.class)
-public class SmsLogServiceTest extends BaseDbUnitTest {
+public class SmsLogServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private SmsLogServiceImpl smsLogService;
@@ -55,30 +56,28 @@ public class SmsLogServiceTest extends BaseDbUnitTest {
        });
        smsLogMapper.insert(dbSmsLog);
        // 测试 channelId 不匹配
-       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setChannelId(2L)));
+       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setChannelId(2L)));
        // 测试 templateId 不匹配
-       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setTemplateId(20L)));
+       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setTemplateId(20L)));
        // 测试 mobile 不匹配
-       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setMobile("18818260999")));
+       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setMobile("18818260999")));
        // 测试 sendStatus 不匹配
-       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setSendStatus(SmsSendStatusEnum.IGNORE.getStatus())));
+       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setSendStatus(SmsSendStatusEnum.IGNORE.getStatus())));
        // 测试 sendTime 不匹配
-       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setSendTime(buildTime(2020, 12, 12))));
+       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setSendTime(buildTime(2020, 12, 12))));
        // 测试 receiveStatus 不匹配
-       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setReceiveStatus(SmsReceiveStatusEnum.SUCCESS.getStatus())));
+       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setReceiveStatus(SmsReceiveStatusEnum.SUCCESS.getStatus())));
        // 测试 receiveTime 不匹配
-       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setReceiveTime(buildTime(2021, 12, 12))));
+       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setReceiveTime(buildTime(2021, 12, 12))));
        // 准备参数
        SmsLogPageReqVO reqVO = new SmsLogPageReqVO();
        reqVO.setChannelId(1L);
        reqVO.setTemplateId(10L);
        reqVO.setMobile("156");
        reqVO.setSendStatus(SmsSendStatusEnum.INIT.getStatus());
-       reqVO.setSendTime((new LocalDateTime[]{buildTime(2020, 11, 1),
-               buildTime(2020, 11, 30)}));
+       reqVO.setSendTime(buildBetweenTime(2020, 11, 1, 2020, 11, 30));
        reqVO.setReceiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
-       reqVO.setReceiveTime((new LocalDateTime[]{buildTime(2021, 11, 1),
-               buildTime(2021, 11, 30)}));
+       reqVO.setReceiveTime(buildBetweenTime(2021, 11, 1, 2021, 11, 30));
 
        // 调用
        PageResult<SmsLogDO> pageResult = smsLogService.getSmsLogPage(reqVO);
@@ -102,30 +101,28 @@ public class SmsLogServiceTest extends BaseDbUnitTest {
         });
         smsLogMapper.insert(dbSmsLog);
         // 测试 channelId 不匹配
-        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setChannelId(2L)));
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setChannelId(2L)));
         // 测试 templateId 不匹配
-        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setTemplateId(20L)));
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setTemplateId(20L)));
         // 测试 mobile 不匹配
-        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setMobile("18818260999")));
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setMobile("18818260999")));
         // 测试 sendStatus 不匹配
-        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setSendStatus(SmsSendStatusEnum.IGNORE.getStatus())));
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setSendStatus(SmsSendStatusEnum.IGNORE.getStatus())));
         // 测试 sendTime 不匹配
-        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setSendTime(buildTime(2020, 12, 12))));
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setSendTime(buildTime(2020, 12, 12))));
         // 测试 receiveStatus 不匹配
-        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setReceiveStatus(SmsReceiveStatusEnum.SUCCESS.getStatus())));
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setReceiveStatus(SmsReceiveStatusEnum.SUCCESS.getStatus())));
         // 测试 receiveTime 不匹配
-        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setReceiveTime(buildTime(2021, 12, 12))));
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setReceiveTime(buildTime(2021, 12, 12))));
         // 准备参数
         SmsLogExportReqVO reqVO = new SmsLogExportReqVO();
         reqVO.setChannelId(1L);
         reqVO.setTemplateId(10L);
         reqVO.setMobile("156");
         reqVO.setSendStatus(SmsSendStatusEnum.INIT.getStatus());
-        reqVO.setSendTime((new LocalDateTime[]{buildTime(2020, 11, 1),
-                buildTime(2020, 11, 30)}));
+        reqVO.setSendTime(buildBetweenTime(2020, 11, 1, 2020, 11, 30));
         reqVO.setReceiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
-        reqVO.setReceiveTime((new LocalDateTime[]{buildTime(2021, 11, 1),
-                buildTime(2021, 11, 30)}));
+        reqVO.setReceiveTime(buildBetweenTime(2021, 11, 1, 2021, 11, 30));
 
        // 调用
        List<SmsLogDO> list = smsLogService.getSmsLogList(reqVO);

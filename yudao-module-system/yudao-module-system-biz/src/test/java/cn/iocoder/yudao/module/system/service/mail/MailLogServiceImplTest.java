@@ -117,6 +117,20 @@ public class MailLogServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetMailLog() {
+        // mock 数据
+        MailLogDO dbMailLog = randomPojo(MailLogDO.class, o -> o.setTemplateParams(randomTemplateParams()));
+        mailLogMapper.insert(dbMailLog);
+        // 准备参数
+        Long id = dbMailLog.getId();
+
+        // 调用
+        MailLogDO mailLog = mailLogService.getMailLog(id);
+        // 断言
+        assertPojoEquals(dbMailLog, mailLog);
+    }
+
+    @Test
     public void testGetMailLogPage() {
        // mock 数据
        MailLogDO dbMailLog = randomPojo(MailLogDO.class, o -> { // 等会查询到
