@@ -2,80 +2,77 @@ package cn.iocoder.yudao.module.mp.controller.admin.message.vo.message;
 
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import com.baomidou.mybatisplus.annotation.TableField;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import me.chanjar.weixin.common.api.WxConsts;
 
 import java.util.Date;
 import java.util.List;
 
-@ApiModel("管理后台 - 公众号消息 Response VO")
+@Schema(description = "管理后台 - 公众号消息 Response VO")
 @Data
 public class MpMessageRespVO {
 
-    @ApiModelProperty(value = "主键", required = true, example = "1024")
+    @Schema(description = "主键", required = true, example = "1024")
     private Integer id;
 
-    @ApiModelProperty(value = "微信公众号消息 id", required = true, example = "23953173569869169")
+    @Schema(description = "微信公众号消息 id", required = true, example = "23953173569869169")
     private Long msgId;
 
-    @ApiModelProperty(value = "公众号账号的编号", required = true, example = "1")
+    @Schema(description = "公众号账号的编号", required = true, example = "1")
     private Long accountId;
-    @ApiModelProperty(value = "公众号账号的 appid", required = true, example = "wx1234567890")
+    @Schema(description = "公众号账号的 appid", required = true, example = "wx1234567890")
     private String appId;
 
-    @ApiModelProperty(value = "公众号粉丝编号", required = true, example = "2048")
+    @Schema(description = "公众号粉丝编号", required = true, example = "2048")
     private Long userId;
-    @ApiModelProperty(value = "公众号粉丝标志", required = true, example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
+    @Schema(description = "公众号粉丝标志", required = true, example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
     private String openid;
 
-    @ApiModelProperty(value = "消息类型", required = true, example = "text", notes = "参见 WxConsts.XmlMsgType 枚举")
+    @Schema(description = "消息类型 参见 WxConsts.XmlMsgType 枚举", required = true, example = "text")
     private String type;
-    @ApiModelProperty(value = "消息来源", required = true, example = "1", notes = "参见 MpMessageSendFromEnum 枚举")
+    @Schema(description = "消息来源 参见 MpMessageSendFromEnum 枚举", required = true, example = "1")
     private Integer sendFrom;
 
     // ========= 普通消息内容 https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_standard_messages.html
 
-    @ApiModelProperty(value = "消息内容", example = "你好呀", notes = "消息类型为 text 时，才有值")
+    @Schema(description = "消息内容 消息类型为 text 时，才有值", example = "你好呀")
     private String content;
 
-    @ApiModelProperty(value = "媒体素材的编号", example = "1234567890", notes = "消息类型为 image、voice、video 时，才有值")
+    @Schema(description = "媒体素材的编号 消息类型为 image、voice、video 时，才有值", example = "1234567890")
     private String mediaId;
-    @ApiModelProperty(value = "媒体文件的 URL", example = "https://www.iocoder.cn/xxx.png",
-            notes = "消息类型为 image、voice、video 时，才有值")
+    @Schema(description = "媒体文件的 URL 消息类型为 image、voice、video 时，才有值", example = "https://www.iocoder.cn/xxx.png")
     private String mediaUrl;
 
-    @ApiModelProperty(value = "语音识别后文本", example = "语音识别后文本", notes = "消息类型为 voice 时，才有值")
+    @Schema(description = "语音识别后文本 消息类型为 voice 时，才有值", example = "语音识别后文本")
     private String recognition;
-    @ApiModelProperty(value = "语音格式", example = "amr", notes = "消息类型为 voice 时，才有值")
+    @Schema(description = "语音格式 消息类型为 voice 时，才有值", example = "amr")
     private String format;
 
-    @ApiModelProperty(value = "标题", example = "我是标题", notes = "消息类型为 video、music、link 时，才有值")
+    @Schema(description = "标题 消息类型为 video、music、link 时，才有值", example = "我是标题")
     private String title;
 
-    @ApiModelProperty(value = "描述", example = "我是描述", notes = "消息类型为 video、music 时，才有值")
+    @Schema(description = "描述 消息类型为 video、music 时，才有值", example = "我是描述")
     private String description;
 
-    @ApiModelProperty(value = "缩略图的媒体 id", example = "1234567890", notes = "消息类型为 video、music 时，才有值")
+    @Schema(description = "缩略图的媒体 id 消息类型为 video、music 时，才有值", example = "1234567890")
     private String thumbMediaId;
-    @ApiModelProperty(value = "缩略图的媒体 URL", example = "https://www.iocoder.cn/xxx.png",
-            notes = "消息类型为 video、music 时，才有值")
+    @Schema(description = "缩略图的媒体 URL 消息类型为 video、music 时，才有值", example = "https://www.iocoder.cn/xxx.png")
     private String thumbMediaUrl;
 
-    @ApiModelProperty(value = "点击图文消息跳转链接", example = "https://www.iocoder.cn", notes = "消息类型为 link 时，才有值")
+    @Schema(description = "点击图文消息跳转链接 消息类型为 link 时，才有值", example = "https://www.iocoder.cn")
     private String url;
 
-    @ApiModelProperty(value = "地理位置维度", example = "23.137466", notes = "消息类型为 location 时，才有值")
+    @Schema(description = "地理位置维度 消息类型为 location 时，才有值", example = "23.137466")
     private Double locationX;
 
-    @ApiModelProperty(value = "地理位置经度", example = "113.352425", notes = "消息类型为 location 时，才有值")
+    @Schema(description = "地理位置经度 消息类型为 location 时，才有值", example = "113.352425")
     private Double locationY;
 
-    @ApiModelProperty(value = "地图缩放大小", example = "13", notes = "消息类型为 location 时，才有值")
+    @Schema(description = "地图缩放大小 消息类型为 location 时，才有值", example = "13")
     private Double scale;
 
-    @ApiModelProperty(value = "详细地址", example = "杨浦区黄兴路 221-4 号临", notes = "消息类型为 location 时，才有值")
+    @Schema(description = "详细地址 消息类型为 location 时，才有值", example = "杨浦区黄兴路 221-4 号临")
     private String label;
 
     /**
@@ -86,19 +83,19 @@ public class MpMessageRespVO {
     @TableField(typeHandler = MpMessageDO.ArticleTypeHandler.class)
     private List<MpMessageDO.Article> articles;
 
-    @ApiModelProperty(value = "音乐链接", example = "https://www.iocoder.cn/xxx.mp3", notes = "消息类型为 music 时，才有值")
+    @Schema(description = "音乐链接 消息类型为 music 时，才有值", example = "https://www.iocoder.cn/xxx.mp3")
     private String musicUrl;
-    @ApiModelProperty(value = "高质量音乐链接", example = "https://www.iocoder.cn/xxx.mp3", notes = "消息类型为 music 时，才有值")
+    @Schema(description = "高质量音乐链接 消息类型为 music 时，才有值", example = "https://www.iocoder.cn/xxx.mp3")
     private String hqMusicUrl;
 
     // ========= 事件推送 https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_event_pushes.html
 
-    @ApiModelProperty(value = "事件类型", example = "subscribe", notes = "参见 WxConsts.EventType 枚举")
+    @Schema(description = "事件类型 参见 WxConsts.EventType 枚举", example = "subscribe")
     private String event;
-    @ApiModelProperty(value = "事件 Key", example = "qrscene_123456", notes = "参见 WxConsts.EventType 枚举")
+    @Schema(description = "事件 Key 参见 WxConsts.EventType 枚举", example = "qrscene_123456")
     private String eventKey;
 
-    @ApiModelProperty(value = "创建时间", required = true)
+    @Schema(description = "创建时间", required = true)
     private Date createTime;
 
 }

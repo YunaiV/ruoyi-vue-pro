@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -11,20 +10,20 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@ApiModel("管理后台 - 秒杀活动创建 Request VO")
+@Schema(description = "管理后台 - 秒杀活动创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class SeckillActivityCreateReqVO extends SeckillActivityBaseVO {
 
-    @ApiModelProperty(value = "备注", example = "限时秒杀活动")
+    @Schema(description = "备注", example = "限时秒杀活动")
     private String remark;
 
-    @ApiModelProperty(value = "排序", required = true, example = "1")
+    @Schema(description = "排序", required = true, example = "1")
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
-    @ApiModelProperty(value = "秒杀时段id", required = true, example = "1,3")
+    @Schema(description = "秒杀时段id", required = true, example = "1,3")
     @NotEmpty(message = "参与场次不能为空")
     private List<Long> timeIds;
 

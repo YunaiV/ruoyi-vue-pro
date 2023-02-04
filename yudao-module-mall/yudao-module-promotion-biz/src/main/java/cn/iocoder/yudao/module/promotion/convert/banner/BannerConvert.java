@@ -10,16 +10,10 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-/**
- * Banner Convert
- *
- * @author xia
- */
 @Mapper
 public interface BannerConvert {
 
     BannerConvert INSTANCE = Mappers.getMapper(BannerConvert.class);
-
 
     List<BannerRespVO> convertList(List<BannerDO> list);
 

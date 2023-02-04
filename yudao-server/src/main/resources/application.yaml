@@ -34,6 +34,21 @@ spring:
     redis:
       time-to-live: 1h # 设置过期时间为 1 小时
 
+--- #################### 接口文档配置 ####################
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
 # 工作流 Flowable 配置
 flowable:
   # 1. false: 默认值，Flowable 启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
@@ -99,10 +114,13 @@ yudao:
     maxOnlineCount: 0 # 最大连接人数
     sessionMap: true # 保存sessionMap
   swagger:
-    title: 管理后台
-    description: 提供管理员管理的所有功能
+    title: 芋道快速开发平台
+    description: 提供管理后台、用户 App 的所有功能
     version: ${yudao.info.version}
-    base-package: ${yudao.info.base-package}
+    url: ${yudao.web.admin-ui.url}
+    email: xingyu4j@vip.qq.com
+    license: MIT
+    license-url: https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE
   captcha:
     enable: true # 验证码的开关，默认为 true
   codegen:

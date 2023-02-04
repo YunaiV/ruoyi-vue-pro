@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import io.swagger.annotations.*;
 import javax.validation.constraints.*;
 
 /**
@@ -11,26 +10,26 @@ import javax.validation.constraints.*;
 @Data
 public class PayChannelBaseVO {
 
-    @ApiModelProperty(value = "渠道编码", required = true)
+    @Schema(description = "渠道编码", required = true)
     @NotNull(message = "渠道编码不能为空")
     private String code;
 
-    @ApiModelProperty(value = "开启状态", required = true)
+    @Schema(description = "开启状态", required = true)
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "备注")
+    @Schema(description = "备注")
     private String remark;
 
-    @ApiModelProperty(value = "渠道费率，单位：百分比", required = true)
+    @Schema(description = "渠道费率，单位：百分比", required = true)
     @NotNull(message = "渠道费率，单位：百分比不能为空")
     private Double feeRate;
 
-    @ApiModelProperty(value = "商户编号", required = true)
+    @Schema(description = "商户编号", required = true)
     @NotNull(message = "商户编号不能为空")
     private Long merchantId;
 
-    @ApiModelProperty(value = "应用编号", required = true)
+    @Schema(description = "应用编号", required = true)
     @NotNull(message = "应用编号不能为空")
     private Long appId;
 

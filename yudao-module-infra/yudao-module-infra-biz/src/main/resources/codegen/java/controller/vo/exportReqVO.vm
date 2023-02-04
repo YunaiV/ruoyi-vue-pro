@@ -2,7 +2,7 @@ package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePac
 
 import lombok.*;
 import java.util.*;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import ${PageParamClassName};
 ## 处理 Date 字段的引入
 #foreach ($column in $columns)
@@ -16,18 +16,18 @@ import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 #end
 ## 字段模板
 #macro(columnTpl $prefix $prefixStr)
-    @ApiModelProperty(value = "${prefixStr}${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
+    @Schema(description = "${prefixStr}${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
     private ${column.javaType}#if ("$!prefix" != "") ${prefix}${JavaField}#else ${column.javaField}#end;
 #end
 
-@ApiModel(value = "${sceneEnum.name} - ${table.classComment} Excel 导出 Request VO", description = "参数和 ${table.className}PageReqVO 是一致的")
+@Schema(description = "${sceneEnum.name} - ${table.classComment} Excel 导出 Request VO，参数和 ${table.className}PageReqVO 是一致的")
 @Data
 public class ${sceneEnum.prefixClass}${table.className}ExportReqVO {
 
 #foreach ($column in $columns)
 #if (${column.listOperation})##查询操作
 #if (${column.listOperationCondition} == "BETWEEN")## 情况一，Between 的时候
-    @ApiModelProperty(value = "${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
+    @Schema(description = "${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private ${column.javaType}[] ${column.javaField};
 #else##情况二，非 Between 的时间

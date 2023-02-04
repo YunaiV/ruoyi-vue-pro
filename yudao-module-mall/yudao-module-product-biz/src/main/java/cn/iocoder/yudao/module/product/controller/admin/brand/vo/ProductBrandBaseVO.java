@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.brand.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -12,22 +12,22 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProductBrandBaseVO {
 
-    @ApiModelProperty(value = "品牌名称", required = true, example = "芋道")
+    @Schema(description = "品牌名称", required = true, example = "芋道")
     @NotNull(message = "品牌名称不能为空")
     private String name;
 
-    @ApiModelProperty(value = "品牌图片", required = true)
+    @Schema(description = "品牌图片", required = true)
     @NotNull(message = "品牌图片不能为空")
     private String picUrl;
 
-    @ApiModelProperty(value = "品牌排序", required = true, example = "1")
+    @Schema(description = "品牌排序", required = true, example = "1")
     @NotNull(message = "品牌排序不能为空")
     private Integer sort;
 
-    @ApiModelProperty(value = "品牌描述", example = "描述")
+    @Schema(description = "品牌描述", example = "描述")
     private String description;
 
-    @ApiModelProperty(value = "状态", required = true, example = "0")
+    @Schema(description = "状态", required = true, example = "0")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

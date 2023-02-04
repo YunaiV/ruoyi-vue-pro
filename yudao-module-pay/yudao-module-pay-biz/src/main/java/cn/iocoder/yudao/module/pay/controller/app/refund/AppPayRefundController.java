@@ -8,8 +8,8 @@ import cn.iocoder.yudao.module.pay.convert.refund.PayRefundConvert;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayRefundReqDTO;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import cn.iocoder.yudao.module.pay.util.PaySeqUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 
-@Api(tags = "用户 APP - 退款订单")
+@Tag(name = "用户 APP - 退款订单")
 @RestController
 @RequestMapping("/pay/refund")
 @Validated
@@ -33,7 +33,7 @@ public class AppPayRefundController {
     private PayRefundService refundService;
 
     @PostMapping("/refund")
-    @ApiOperation("提交退款订单")
+    @Operation(summary = "提交退款订单")
     public CommonResult<AppPayRefundRespVO> submitRefundOrder(@RequestBody AppPayRefundReqVO reqVO){
         PayRefundReqDTO req = PayRefundConvert.INSTANCE.convert(reqVO);
         req.setUserIp(getClientIP());

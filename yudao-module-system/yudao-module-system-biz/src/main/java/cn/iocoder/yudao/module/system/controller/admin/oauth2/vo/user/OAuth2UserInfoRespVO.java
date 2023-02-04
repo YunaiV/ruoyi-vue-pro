@@ -1,37 +1,36 @@
 package cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.user;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@ApiModel("管理后台 - OAuth2 获得用户基本信息 Response VO")
+@Schema(description = "管理后台 - OAuth2 获得用户基本信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OAuth2UserInfoRespVO {
 
-    @ApiModelProperty(value = "用户编号", required = true, example = "1")
+    @Schema(description = "用户编号", required = true, example = "1")
     private Long id;
 
-    @ApiModelProperty(value = "用户账号", required = true, example = "芋艿")
+    @Schema(description = "用户账号", required = true, example = "芋艿")
     private String username;
 
-    @ApiModelProperty(value = "用户昵称", required = true, example = "芋道")
+    @Schema(description = "用户昵称", required = true, example = "芋道")
     private String nickname;
 
-    @ApiModelProperty(value = "用户邮箱", example = "yudao@iocoder.cn")
+    @Schema(description = "用户邮箱", example = "yudao@iocoder.cn")
     private String email;
-    @ApiModelProperty(value = "手机号码", example = "15601691300")
+    @Schema(description = "手机号码", example = "15601691300")
     private String mobile;
 
-    @ApiModelProperty(value = "用户性别", example = "1", notes = "参见 SexEnum 枚举类")
+    @Schema(description = "用户性别,参见 SexEnum 枚举类", example = "1")
     private Integer sex;
 
-    @ApiModelProperty(value = "用户头像", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
     private String avatar;
 
     /**
@@ -44,26 +43,26 @@ public class OAuth2UserInfoRespVO {
      */
     private List<Post> posts;
 
-    @ApiModel("部门")
+    @Schema(description = "部门")
     @Data
     public static class Dept {
 
-        @ApiModelProperty(value = "部门编号", required = true, example = "1")
+        @Schema(description = "部门编号", required = true, example = "1")
         private Long id;
 
-        @ApiModelProperty(value = "部门名称", required = true, example = "研发部")
+        @Schema(description = "部门名称", required = true, example = "研发部")
         private String name;
 
     }
 
-    @ApiModel("岗位")
+    @Schema(description = "岗位")
     @Data
     public static class Post {
 
-        @ApiModelProperty(value = "岗位编号", required = true, example = "1")
+        @Schema(description = "岗位编号", required = true, example = "1")
         private Long id;
 
-        @ApiModelProperty(value = "岗位名称", required = true, example = "开发")
+        @Schema(description = "岗位名称", required = true, example = "开发")
         private String name;
 
     }

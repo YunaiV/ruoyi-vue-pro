@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.controller.app.base.spu;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
@@ -13,13 +13,13 @@ import java.util.List;
 @Data
 public class AppProductSpuBaseRespVO {
 
-    @ApiModelProperty(value = "主键", required = true, example = "1024")
+    @Schema(description = "主键", required = true, example = "1024")
     private Long id;
 
-    @ApiModelProperty(value = "商品 SPU 名字", required = true, example = "芋道")
+    @Schema(description = "商品 SPU 名字", required = true, example = "芋道")
     private String name;
 
-    @ApiModelProperty(value = "商品主图地址", example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "商品主图地址", example = "https://www.iocoder.cn/xx.png")
     private List<String> picUrls;
 
 }

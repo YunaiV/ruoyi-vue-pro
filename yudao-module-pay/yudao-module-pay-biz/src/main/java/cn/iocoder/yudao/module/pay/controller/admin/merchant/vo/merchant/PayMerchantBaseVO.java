@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant;
-
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -12,19 +11,19 @@ import javax.validation.constraints.NotNull;
 @Data
 public class PayMerchantBaseVO {
 
-    @ApiModelProperty(value = "商户全称", required = true)
+    @Schema(description = "商户全称", required = true)
     @NotNull(message = "商户全称不能为空")
     private String name;
 
-    @ApiModelProperty(value = "商户简称", required = true)
+    @Schema(description = "商户简称", required = true)
     @NotNull(message = "商户简称不能为空")
     private String shortName;
 
-    @ApiModelProperty(value = "开启状态", required = true)
+    @Schema(description = "开启状态", required = true)
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "备注")
+    @Schema(description = "备注")
     private String remark;
 
 }

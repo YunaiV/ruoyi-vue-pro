@@ -11,9 +11,9 @@ import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.Coupo
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +26,7 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
-@Api(tags = "管理后台 - 优惠劵")
+@Tag(name = "管理后台 - 优惠劵")
 @RestController
 @RequestMapping("/promotion/coupon")
 @Validated
@@ -38,8 +38,8 @@ public class CouponController {
     private MemberUserApi memberUserApi;
 
 //    @GetMapping("/get")
-//    @ApiOperation("获得优惠劵")
-//    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+//    @Operation(summary = "获得优惠劵")
+//    @Parameter(name = "id", description = "编号", required = true, example = "1024")
 //    @PreAuthorize("@ss.hasPermission('promotion:coupon:query')")
 //    public CommonResult<CouponRespVO> getCoupon(@RequestParam("id") Long id) {
 //        CouponDO coupon = couponService.getCoupon(id);
@@ -47,8 +47,8 @@ public class CouponController {
 //    }
 
     @DeleteMapping("/delete")
-    @ApiOperation("回收优惠劵")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @Operation(summary = "回收优惠劵")
+    @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('promotion:coupon:delete')")
     public CommonResult<Boolean> deleteCoupon(@RequestParam("id") Long id) {
         couponService.deleteCoupon(id);
@@ -56,7 +56,7 @@ public class CouponController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得优惠劵分页")
+    @Operation(summary = "获得优惠劵分页")
     @PreAuthorize("@ss.hasPermission('promotion:coupon:query')")
     public CommonResult<PageResult<CouponPageItemRespVO>> getCouponPage(@Valid CouponPageReqVO pageVO) {
         PageResult<CouponDO> pageResult = couponService.getCouponPage(pageVO);

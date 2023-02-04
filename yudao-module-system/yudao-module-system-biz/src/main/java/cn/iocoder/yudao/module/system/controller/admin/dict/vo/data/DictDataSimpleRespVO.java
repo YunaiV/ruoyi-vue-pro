@@ -1,25 +1,24 @@
 package cn.iocoder.yudao.module.system.controller.admin.dict.vo.data;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@ApiModel("管理后台 - 数据字典精简 Response VO")
+@Schema(description = "管理后台 - 数据字典精简 Response VO")
 @Data
 public class DictDataSimpleRespVO {
 
-    @ApiModelProperty(value = "字典类型", required = true, example = "gender")
+    @Schema(description = "字典类型", required = true, example = "gender")
     private String dictType;
 
-    @ApiModelProperty(value = "字典键值", required = true, example = "1")
+    @Schema(description = "字典键值", required = true, example = "1")
     private String value;
 
-    @ApiModelProperty(value = "字典标签", required = true, example = "男")
+    @Schema(description = "字典标签", required = true, example = "男")
     private String label;
 
-    @ApiModelProperty(value = "颜色类型", example = "default", notes = "default、primary、success、info、warning、danger")
+    @Schema(description = "颜色类型,default、primary、success、info、warning、danger", example = "default")
     private String colorType;
-    @ApiModelProperty(value = "css 样式", example = "btn-visible")
+    @Schema(description = "css 样式", example = "btn-visible")
     private String cssClass;
 
 }

@@ -5,7 +5,9 @@ import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 #if ($sceneEnum.scene == 1)import org.springframework.security.access.prepost.PreAuthorize;#end
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 
 import javax.validation.constraints.*;
 import javax.validation.*;
@@ -27,7 +29,7 @@ import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.business
 import ${basePackage}.module.${table.moduleName}.convert.${table.businessName}.${table.className}Convert;
 import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.${table.className}Service;
 
-@Api(tags = "${sceneEnum.name} - ${table.classComment}")
+@Tag(name = "${sceneEnum.name} - ${table.classComment}")
 @RestController
 ##二级的 businessName 暂时不算在 HTTP 路径上，可以根据需要写
 @RequestMapping("/${table.moduleName}/${simpleClassName_strikeCase}")
@@ -38,7 +40,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     private ${table.className}Service ${classNameVar}Service;
 
     @PostMapping("/create")
-    @ApiOperation("创建${table.classComment}")
+    @Operation(summary = "创建${table.classComment}")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:create')")#end
 
     public CommonResult<${primaryColumn.javaType}> create${simpleClassName}(@Valid @RequestBody ${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
@@ -46,7 +48,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新${table.classComment}")
+    @Operation(summary = "更新${table.classComment}")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:update')")#end
 
     public CommonResult<Boolean> update${simpleClassName}(@Valid @RequestBody ${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO) {
@@ -55,8 +57,8 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除${table.classComment}")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = ${primaryColumn.javaType}.class)
+    @Operation(summary = "删除${table.classComment}")
+    @Parameter(name = "id", description = "编号", required = true)
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")#end
 
     public CommonResult<Boolean> delete${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
@@ -65,8 +67,8 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得${table.classComment}")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = ${primaryColumn.javaType}.class)
+    @Operation(summary = "获得${table.classComment}")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
 
     public CommonResult<${sceneEnum.prefixClass}${table.className}RespVO> get${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
@@ -75,8 +77,8 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     }
 
     @GetMapping("/list")
-    @ApiOperation("获得${table.classComment}列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
+    @Operation(summary = "获得${table.classComment}列表")
+    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
 
     public CommonResult<List<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}List(@RequestParam("ids") Collection<${primaryColumn.javaType}> ids) {
@@ -85,7 +87,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得${table.classComment}分页")
+    @Operation(summary = "获得${table.classComment}分页")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
 
     public CommonResult<PageResult<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}Page(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageVO) {
@@ -94,7 +96,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     }
 
     @GetMapping("/export-excel")
-    @ApiOperation("导出${table.classComment} Excel")
+    @Operation(summary = "导出${table.classComment} Excel")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:export')")#end
 
     @OperateLog(type = EXPORT)
