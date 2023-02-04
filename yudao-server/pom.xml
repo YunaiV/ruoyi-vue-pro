@@ -84,7 +84,6 @@
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
 
-
         <!-- spring boot 配置所需依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

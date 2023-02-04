@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `product_sku` (
     PRIMARY KEY (`id`)
 ) COMMENT '商品sku';
 
+
 CREATE TABLE IF NOT EXISTS `product_spu` (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
     `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
@@ -66,3 +67,18 @@ CREATE TABLE IF NOT EXISTS `product_category` (
     `deleted` bit(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
     PRIMARY KEY (`id`)
 ) COMMENT '商品分类';
+
+CREATE TABLE IF NOT EXISTS `product_brand` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '品牌编号',
+    `name` varchar(128) NOT NULL COMMENT '品牌名称',
+    `pic_url` varchar DEFAULT NULL COMMENT '品牌图片',
+    `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段',
+    `description` varchar(256) NOT NULL DEFAULT '0' COMMENT '品牌描述',
+    `status` bit(1) DEFAULT NULL COMMENT '状态',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `creator` varchar DEFAULT NULL COMMENT '创建人',
+    `updater` varchar DEFAULT NULL COMMENT '更新人',
+    `deleted` bit(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
+    PRIMARY KEY (`id`)
+) COMMENT '商品品牌';
