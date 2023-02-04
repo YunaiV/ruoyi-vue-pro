@@ -69,7 +69,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public void deleteFile(Long id) throws Exception {
         // 校验存在
-        FileDO file = this.validateFileExists(id);
+        FileDO file = validateFileExists(id);
 
         // 从文件存储器中删除
         FileClient client = fileConfigService.getFileClient(file.getConfigId());

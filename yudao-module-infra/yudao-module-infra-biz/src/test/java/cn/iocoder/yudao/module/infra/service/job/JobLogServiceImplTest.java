@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.job;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogPageReqVO;
@@ -12,18 +11,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static java.util.Collections.singleton;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Import(JobLogServiceImpl.class)
-public class JobLogServiceTest extends BaseDbUnitTest {
+public class JobLogServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private JobLogServiceImpl jobLogService;
@@ -31,66 +32,103 @@ public class JobLogServiceTest extends BaseDbUnitTest {
     private JobLogMapper jobLogMapper;
 
     @Test
-    public void testCreateJobLog_success() {
+    public void testCreateJobLog() {
         // 准备参数
-        JobLogDO reqVO = randomPojo(JobLogDO.class, o -> {
-            o.setExecuteIndex(1);
-        });
+        JobLogDO reqVO = randomPojo(JobLogDO.class, o -> o.setExecuteIndex(1));
+
         // 调用
-        Long jobLogId = jobLogService.createJobLog(reqVO.getJobId(), reqVO.getBeginTime(), reqVO.getHandlerName(), reqVO.getHandlerParam(), reqVO.getExecuteIndex());
+        Long id = jobLogService.createJobLog(reqVO.getJobId(), reqVO.getBeginTime(),
+                reqVO.getHandlerName(), reqVO.getHandlerParam(), reqVO.getExecuteIndex());
         // 断言
-        assertNotNull(jobLogId);
+        assertNotNull(id);
         // 校验记录的属性是否正确
-        JobLogDO job = jobLogMapper.selectById(jobLogId);
+        JobLogDO job = jobLogMapper.selectById(id);
         assertEquals(JobLogStatusEnum.RUNNING.getStatus(), job.getStatus());
     }
 
     @Test
     public void testUpdateJobLogResultAsync_success() {
-        // 准备参数
-        JobLogDO reqVO = randomPojo(JobLogDO.class, o -> {
+        // mock 数据
+        JobLogDO log = randomPojo(JobLogDO.class, o -> {
             o.setExecuteIndex(1);
+            o.setStatus(JobLogStatusEnum.RUNNING.getStatus());
         });
-        JobLogDO log = JobLogDO.builder().jobId(reqVO.getJobId()).handlerName(reqVO.getHandlerName()).handlerParam(reqVO.getHandlerParam()).executeIndex(reqVO.getExecuteIndex())
-                .beginTime(reqVO.getBeginTime()).status(JobLogStatusEnum.RUNNING.getStatus()).build();
         jobLogMapper.insert(log);
-        // 调用
-        jobLogService.updateJobLogResultAsync(log.getId(), reqVO.getBeginTime(), reqVO.getDuration(), true,reqVO.getResult());
-        // 校验记录的属性是否正确
-        JobLogDO job = jobLogMapper.selectById(log.getId());
-        assertEquals(JobLogStatusEnum.SUCCESS.getStatus(), job.getStatus());
+        // 准备参数
+        Long logId = log.getId();
+        LocalDateTime endTime = randomLocalDateTime();
+        Integer duration = randomInteger();
+        boolean success = true;
+        String result = randomString();
 
         // 调用
-        jobLogService.updateJobLogResultAsync(log.getId(), reqVO.getBeginTime(), reqVO.getDuration(), false,reqVO.getResult());
+        jobLogService.updateJobLogResultAsync(logId, endTime, duration, success, result);
         // 校验记录的属性是否正确
-        JobLogDO job2 = jobLogMapper.selectById(log.getId());
-        assertEquals(JobLogStatusEnum.FAILURE.getStatus(), job2.getStatus());
+        JobLogDO dbLog = jobLogMapper.selectById(log.getId());
+        assertEquals(endTime, dbLog.getEndTime());
+        assertEquals(duration, dbLog.getDuration());
+        assertEquals(JobLogStatusEnum.SUCCESS.getStatus(), dbLog.getStatus());
+        assertEquals(result, dbLog.getResult());
     }
 
     @Test
-    public void testGetJobLogListByIds_success() {
+    public void testUpdateJobLogResultAsync_failure() {
         // mock 数据
-        JobLogDO dbJobLog = randomPojo(JobLogDO.class, o -> {
+        JobLogDO log = randomPojo(JobLogDO.class, o -> {
             o.setExecuteIndex(1);
-            o.setStatus(randomEle(JobLogStatusEnum.values()).getStatus()); // 保证 status 的范围
+            o.setStatus(JobLogStatusEnum.RUNNING.getStatus());
         });
-        JobLogDO cloneJobLog = ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setHandlerName(randomString()));
+        jobLogMapper.insert(log);
+        // 准备参数
+        Long logId = log.getId();
+        LocalDateTime endTime = randomLocalDateTime();
+        Integer duration = randomInteger();
+        boolean success = false;
+        String result = randomString();
+
+        // 调用
+        jobLogService.updateJobLogResultAsync(logId, endTime, duration, success, result);
+        // 校验记录的属性是否正确
+        JobLogDO dbLog = jobLogMapper.selectById(log.getId());
+        assertEquals(endTime, dbLog.getEndTime());
+        assertEquals(duration, dbLog.getDuration());
+        assertEquals(JobLogStatusEnum.FAILURE.getStatus(), dbLog.getStatus());
+        assertEquals(result, dbLog.getResult());
+    }
+
+    @Test
+    public void testGetJobLog() {
+        // mock 数据
+        JobLogDO dbJobLog = randomPojo(JobLogDO.class, o -> o.setExecuteIndex(1));
+        jobLogMapper.insert(dbJobLog);
+        // 准备参数
+        Long id = dbJobLog.getId();
+
+        // 调用
+        JobLogDO jobLog = jobLogService.getJobLog(id);
+        // 断言
+        assertPojoEquals(dbJobLog, jobLog);
+    }
+
+    @Test
+    public void testGetJobLogList() {
+        // mock 数据
+        JobLogDO dbJobLog = randomPojo(JobLogDO.class, o -> o.setExecuteIndex(1));
         jobLogMapper.insert(dbJobLog);
         // 测试 handlerName 不匹配
-        jobLogMapper.insert(cloneJobLog);
+        jobLogMapper.insert(cloneIgnoreId(dbJobLog, o -> {}));
         // 准备参数
-        ArrayList ids = new ArrayList<>();
-        ids.add(dbJobLog.getId());
-        ids.add(cloneJobLog.getId());
+        Collection<Long> ids = singleton(dbJobLog.getId());
+
         // 调用
         List<JobLogDO> list = jobLogService.getJobLogList(ids);
         // 断言
-        assertEquals(2, list.size());
+        assertEquals(1, list.size());
         assertPojoEquals(dbJobLog, list.get(0));
     }
 
     @Test
-    public void testGetJobPage_success() {
+    public void testGetJobPage() {
         // mock 数据
         JobLogDO dbJobLog = randomPojo(JobLogDO.class, o -> {
             o.setExecuteIndex(1);
@@ -101,15 +139,15 @@ public class JobLogServiceTest extends BaseDbUnitTest {
         });
         jobLogMapper.insert(dbJobLog);
         // 测试 jobId 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setJobId(randomLongId())));
+        jobLogMapper.insert(cloneIgnoreId(dbJobLog, o -> o.setJobId(randomLongId())));
         // 测试 handlerName 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setHandlerName(randomString())));
+        jobLogMapper.insert(cloneIgnoreId(dbJobLog, o -> o.setHandlerName(randomString())));
         // 测试 beginTime 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setBeginTime(buildTime(2021, 1, 7))));
+        jobLogMapper.insert(cloneIgnoreId(dbJobLog, o -> o.setBeginTime(buildTime(2021, 1, 7))));
         // 测试 endTime 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setEndTime(buildTime(2021, 1, 9))));
+        jobLogMapper.insert(cloneIgnoreId(dbJobLog, o -> o.setEndTime(buildTime(2021, 1, 9))));
         // 测试 status 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setStatus(JobLogStatusEnum.FAILURE.getStatus())));
+        jobLogMapper.insert(cloneIgnoreId(dbJobLog, o -> o.setStatus(JobLogStatusEnum.FAILURE.getStatus())));
         // 准备参数
         JobLogPageReqVO reqVo = new JobLogPageReqVO();
         reqVo.setJobId(dbJobLog.getJobId());
@@ -117,6 +155,7 @@ public class JobLogServiceTest extends BaseDbUnitTest {
         reqVo.setBeginTime(dbJobLog.getBeginTime());
         reqVo.setEndTime(dbJobLog.getEndTime());
         reqVo.setStatus(JobLogStatusEnum.SUCCESS.getStatus());
+
         // 调用
         PageResult<JobLogDO> pageResult = jobLogService.getJobLogPage(reqVo);
         // 断言
@@ -126,7 +165,7 @@ public class JobLogServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetJobListForExport_success() {
+    public void testGetJobList_export() {
         // mock 数据
         JobLogDO dbJobLog = randomPojo(JobLogDO.class, o -> {
             o.setExecuteIndex(1);
@@ -137,15 +176,15 @@ public class JobLogServiceTest extends BaseDbUnitTest {
         });
         jobLogMapper.insert(dbJobLog);
         // 测试 jobId 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setJobId(randomLongId())));
+        jobLogMapper.insert(cloneIgnoreId(dbJobLog, o -> o.setJobId(randomLongId())));
         // 测试 handlerName 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setHandlerName(randomString())));
+        jobLogMapper.insert(cloneIgnoreId(dbJobLog, o -> o.setHandlerName(randomString())));
         // 测试 beginTime 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setBeginTime(buildTime(2021, 1, 7))));
+        jobLogMapper.insert(cloneIgnoreId(dbJobLog, o -> o.setBeginTime(buildTime(2021, 1, 7))));
         // 测试 endTime 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setEndTime(buildTime(2021, 1, 9))));
+        jobLogMapper.insert(cloneIgnoreId(dbJobLog, o -> o.setEndTime(buildTime(2021, 1, 9))));
         // 测试 status 不匹配
-        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setStatus(JobLogStatusEnum.FAILURE.getStatus())));
+        jobLogMapper.insert(cloneIgnoreId(dbJobLog, o -> o.setStatus(JobLogStatusEnum.FAILURE.getStatus())));
         // 准备参数
         JobLogExportReqVO reqVo = new JobLogExportReqVO();
         reqVo.setJobId(dbJobLog.getJobId());
@@ -153,6 +192,7 @@ public class JobLogServiceTest extends BaseDbUnitTest {
         reqVo.setBeginTime(dbJobLog.getBeginTime());
         reqVo.setEndTime(dbJobLog.getEndTime());
         reqVo.setStatus(JobLogStatusEnum.SUCCESS.getStatus());
+
         // 调用
         List<JobLogDO> list = jobLogService.getJobLogList(reqVo);
         // 断言
