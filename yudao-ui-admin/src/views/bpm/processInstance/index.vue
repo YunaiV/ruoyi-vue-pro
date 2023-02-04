@@ -58,7 +58,7 @@
       </el-table-column>
       <el-table-column label="当前审批任务" align="center" prop="tasks">
         <template v-slot="scope">
-          <el-button v-for="task in scope.row.tasks" :key="task.id" type="text" @click="handleFormDetail(task.id)">
+          <el-button v-for="task in scope.row.tasks" :key="task.id" type="text"">
             <span>{{ task.name }}</span>
           </el-button>
         </template>

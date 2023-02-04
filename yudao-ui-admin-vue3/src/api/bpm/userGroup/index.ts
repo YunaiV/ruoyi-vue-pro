@@ -1,5 +1,14 @@
 import request from '@/config/axios'
-import { UserGroupVO } from './types'
+
+export type UserGroupVO = {
+  id: number
+  name: string
+  description: string
+  memberUserIds: number[]
+  status: number
+  remark: string
+  createTime: string
+}
 
 // 创建用户组
 export const createUserGroupApi = async (data: UserGroupVO) => {
