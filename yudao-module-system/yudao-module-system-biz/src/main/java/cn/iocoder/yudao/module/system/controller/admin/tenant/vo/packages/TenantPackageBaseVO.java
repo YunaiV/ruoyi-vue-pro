@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -13,18 +13,18 @@ import java.util.Set;
 @Data
 public class TenantPackageBaseVO {
 
-    @ApiModelProperty(value = "套餐名", required = true, example = "VIP")
+    @Schema(description = "套餐名", required = true, example = "VIP")
     @NotNull(message = "套餐名不能为空")
     private String name;
 
-    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举")
+    @Schema(description = "状态,参见 CommonStatusEnum 枚举", required = true, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "备注", example = "好")
+    @Schema(description = "备注", example = "好")
     private String remark;
 
-    @ApiModelProperty(value = "关联的菜单编号", required = true)
+    @Schema(description = "关联的菜单编号", required = true)
     @NotNull(message = "关联的菜单编号不能为空")
     private Set<Long> menuIds;
 

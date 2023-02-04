@@ -9,9 +9,9 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.*;
 import cn.iocoder.yudao.module.system.convert.permission.RoleConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.service.permission.RoleService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +20,14 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static java.util.Collections.singleton;
 
-@Api(tags = "管理后台 - 角色")
+@Tag(name = "管理后台 - 角色")
 @RestController
 @RequestMapping("/system/role")
 @Validated
@@ -37,14 +37,14 @@ public class RoleController {
     private RoleService roleService;
 
     @PostMapping("/create")
-    @ApiOperation("创建角色")
+    @Operation(summary = "创建角色")
     @PreAuthorize("@ss.hasPermission('system:role:create')")
     public CommonResult<Long> createRole(@Valid @RequestBody RoleCreateReqVO reqVO) {
         return success(roleService.createRole(reqVO, null));
     }
 
     @PutMapping("/update")
-    @ApiOperation("修改角色")
+    @Operation(summary = "修改角色")
     @PreAuthorize("@ss.hasPermission('system:role:update')")
     public CommonResult<Boolean> updateRole(@Valid @RequestBody RoleUpdateReqVO reqVO) {
         roleService.updateRole(reqVO);
@@ -52,7 +52,7 @@ public class RoleController {
     }
 
     @PutMapping("/update-status")
-    @ApiOperation("修改角色状态")
+    @Operation(summary = "修改角色状态")
     @PreAuthorize("@ss.hasPermission('system:role:update')")
     public CommonResult<Boolean> updateRoleStatus(@Valid @RequestBody RoleUpdateStatusReqVO reqVO) {
         roleService.updateRoleStatus(reqVO.getId(), reqVO.getStatus());
@@ -60,8 +60,8 @@ public class RoleController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除角色")
-    @ApiImplicitParam(name = "id", value = "角色编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "删除角色")
+    @Parameter(name = "id", description = "角色编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
     public CommonResult<Boolean> deleteRole(@RequestParam("id") Long id) {
         roleService.deleteRole(id);
@@ -69,7 +69,7 @@ public class RoleController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得角色信息")
+    @Operation(summary = "获得角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:query')")
     public CommonResult<RoleRespVO> getRole(@RequestParam("id") Long id) {
         RoleDO role = roleService.getRole(id);
@@ -77,17 +77,17 @@ public class RoleController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得角色分页")
+    @Operation(summary = "获得角色分页")
     @PreAuthorize("@ss.hasPermission('system:role:query')")
     public CommonResult<PageResult<RoleDO>> getRolePage(RolePageReqVO reqVO) {
         return success(roleService.getRolePage(reqVO));
     }
 
     @GetMapping("/list-all-simple")
-    @ApiOperation(value = "获取角色精简信息列表", notes = "只包含被开启的角色，主要用于前端的下拉选项")
-    public CommonResult<List<RoleSimpleRespVO>> getSimpleRoles() {
+    @Operation(summary = "获取角色精简信息列表", description = "只包含被开启的角色，主要用于前端的下拉选项")
+    public CommonResult<List<RoleSimpleRespVO>> getSimpleRoleList() {
         // 获得角色列表，只要开启状态的
-        List<RoleDO> list = roleService.getRoles(Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
+        List<RoleDO> list = roleService.getRoleListByStatus(singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 排序后，返回给前端
         list.sort(Comparator.comparing(RoleDO::getSort));
         return success(RoleConvert.INSTANCE.convertList02(list));

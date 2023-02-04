@@ -44,7 +44,7 @@ public interface DictDataService {
      *
      * @return 字典数据全列表
      */
-    List<DictDataDO> getDictDatas();
+    List<DictDataDO> getDictDataList();
 
     /**
      * 获得字典数据分页列表
@@ -60,7 +60,7 @@ public interface DictDataService {
      * @param reqVO 列表请求
      * @return 字典数据列表
      */
-    List<DictDataDO> getDictDatas(DictDataExportReqVO reqVO);
+    List<DictDataDO> getDictDataList(DictDataExportReqVO reqVO);
 
     /**
      * 获得字典数据详情
@@ -86,7 +86,7 @@ public interface DictDataService {
      * @param dictType 字典类型
      * @param values 字典数据值的数组
      */
-    void validDictDatas(String dictType, Collection<String> values);
+    void validateDictDataList(String dictType, Collection<String> values);
 
     /**
      * 获得指定的字典数据

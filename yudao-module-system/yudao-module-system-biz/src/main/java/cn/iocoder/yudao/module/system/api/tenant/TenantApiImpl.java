@@ -18,12 +18,12 @@ public class TenantApiImpl implements TenantApi {
     private TenantService tenantService;
 
     @Override
-    public List<Long> getTenantIds() {
-        return tenantService.getTenantIds();
+    public List<Long> getTenantIdList() {
+        return tenantService.getTenantIdList();
     }
 
     @Override
-    public void validTenant(Long id) {
+    public void validateTenant(Long id) {
         tenantService.validTenant(id);
     }
 

@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@ApiModel("管理后台 - 授权页的信息 Response VO")
+@Schema(description = "管理后台 - 授权页的信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,7 +19,7 @@ public class OAuth2OpenAuthorizeInfoRespVO {
      */
     private Client client;
 
-    @ApiModelProperty(value = "scope 的选中信息", required = true, notes = "使用 List 保证有序性，Key 是 scope，Value 为是否选中")
+    @Schema(description = "scope 的选中信息,使用 List 保证有序性，Key 是 scope，Value 为是否选中", required = true)
     private List<KeyValue<String, Boolean>> scopes;
 
     @Data
@@ -28,10 +27,10 @@ public class OAuth2OpenAuthorizeInfoRespVO {
     @AllArgsConstructor
     public static class Client {
 
-        @ApiModelProperty(value = "应用名", required = true, example = "土豆")
+        @Schema(description = "应用名", required = true, example = "土豆")
         private String name;
 
-        @ApiModelProperty(value = "应用图标", required = true, example = "https://www.iocoder.cn/xx.png")
+        @Schema(description = "应用图标", required = true, example = "https://www.iocoder.cn/xx.png")
         private String logo;
 
     }

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model;
-
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -12,30 +11,30 @@ import javax.validation.constraints.NotEmpty;
 @Data
 public class BpmModelBaseVO {
 
-    @ApiModelProperty(value = "流程标识", required = true, example = "process_yudao")
+    @Schema(description = "流程标识", required = true, example = "process_yudao")
     @NotEmpty(message = "流程标识不能为空")
     private String key;
 
-    @ApiModelProperty(value = "流程名称", required = true, example = "芋道")
+    @Schema(description = "流程名称", required = true, example = "芋道")
     @NotEmpty(message = "流程名称不能为空")
     private String name;
 
-    @ApiModelProperty(value = "流程描述", example = "我是描述")
+    @Schema(description = "流程描述", example = "我是描述")
     private String description;
 
-    @ApiModelProperty(value = "流程分类", notes = "参见 bpm_model_category 数据字典", example = "1")
+    @Schema(description = "流程分类-参见 bpm_model_category 数据字典", example = "1")
     @NotEmpty(message = "流程分类不能为空")
     private String category;
 
-    @ApiModelProperty(value = "表单类型", notes = "参见 bpm_model_form_type 数据字典", example = "1")
+    @Schema(description = "表单类型-参见 bpm_model_form_type 数据字典", example = "1")
     private Integer formType;
-    @ApiModelProperty(value = "表单编号", example = "1024", notes = "在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空")
+    @Schema(description = "表单编号-在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空", example = "1024")
     private Long formId;
-    @ApiModelProperty(value = "自定义表单的提交路径，使用 Vue 的路由地址", example = "/bpm/oa/leave/create",
-            notes = "在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空")
+    @Schema(description = "自定义表单的提交路径，使用 Vue 的路由地址-在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空",
+            example = "/bpm/oa/leave/create")
     private String formCustomCreatePath;
-    @ApiModelProperty(value = "自定义表单的查看路径，使用 Vue 的路由地址", example = "/bpm/oa/leave/view",
-            notes = "在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空")
+    @Schema(description = "自定义表单的查看路径，使用 Vue 的路由地址-在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空",
+            example = "/bpm/oa/leave/view")
     private String formCustomViewPath;
 
 }

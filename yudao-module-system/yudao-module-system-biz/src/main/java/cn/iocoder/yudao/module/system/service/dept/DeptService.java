@@ -52,7 +52,7 @@ public interface DeptService {
      * @param reqVO 筛选条件请求 VO
      * @return 部门列表
      */
-    List<DeptDO> getSimpleDepts(DeptListReqVO reqVO);
+    List<DeptDO> getDeptList(DeptListReqVO reqVO);
 
     /**
      * 获得所有子部门，从缓存中
@@ -61,7 +61,7 @@ public interface DeptService {
      * @param recursive 是否递归获取所有
      * @return 子部门列表
      */
-    List<DeptDO> getDeptsByParentIdFromCache(Long parentId, boolean recursive);
+    List<DeptDO> getDeptListByParentIdFromCache(Long parentId, boolean recursive);
 
     /**
      * 获得部门信息数组
@@ -69,7 +69,21 @@ public interface DeptService {
      * @param ids 部门编号数组
      * @return 部门信息数组
      */
-    List<DeptDO> getDepts(Collection<Long> ids);
+    List<DeptDO> getDeptList(Collection<Long> ids);
+
+    /**
+     * 获得指定编号的部门 Map
+     *
+     * @param ids 部门编号数组
+     * @return 部门 Map
+     */
+    default Map<Long, DeptDO> getDeptMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        List<DeptDO> list = getDeptList(ids);
+        return CollectionUtils.convertMap(list, DeptDO::getId);
+    }
 
     /**
      * 获得部门信息
@@ -86,27 +100,6 @@ public interface DeptService {
      *
      * @param ids 角色编号数组
      */
-    void validDepts(Collection<Long> ids);
+    void validateDeptList(Collection<Long> ids);
 
-    /**
-     * 获得指定编号的部门列表
-     *
-     * @param ids 部门编号数组
-     * @return 部门列表
-     */
-    List<DeptDO> getSimpleDepts(Collection<Long> ids);
-
-    /**
-     * 获得指定编号的部门 Map
-     *
-     * @param ids 部门编号数组
-     * @return 部门 Map
-     */
-    default Map<Long, DeptDO> getDeptMap(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return Collections.emptyMap();
-        }
-        List<DeptDO> list = getSimpleDepts(ids);
-        return CollectionUtils.convertMap(list, DeptDO::getId);
-    }
 }

@@ -14,6 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
@@ -143,4 +145,44 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
        assertPojoEquals(dbNotifyTemplate, pageResult.getList().get(0));
     }
 
+    @Test
+    public void testGetNotifyTemplate() {
+        // mock 数据
+        NotifyTemplateDO dbNotifyTemplate = randomPojo(NotifyTemplateDO.class);
+        notifyTemplateMapper.insert(dbNotifyTemplate);
+        // 准备参数
+        Long id = dbNotifyTemplate.getId();
+
+        // 调用
+        NotifyTemplateDO notifyTemplate = notifyTemplateService.getNotifyTemplate(id);
+        // 断言
+        assertPojoEquals(dbNotifyTemplate, notifyTemplate);
+    }
+
+    @Test
+    public void testGetNotifyTemplateByCodeFromCache() {
+        // mock 数据
+        NotifyTemplateDO dbNotifyTemplate = randomPojo(NotifyTemplateDO.class);
+        notifyTemplateMapper.insert(dbNotifyTemplate);
+        notifyTemplateService.initLocalCache();
+        // 准备参数
+        String code = dbNotifyTemplate.getCode();
+
+        // 调用
+        NotifyTemplateDO notifyTemplate = notifyTemplateService.getNotifyTemplateByCodeFromCache(code);
+        // 断言
+        assertPojoEquals(dbNotifyTemplate, notifyTemplate);
+    }
+    
+    @Test
+    public void testFormatNotifyTemplateContent() {
+        // 准备参数
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "小红");
+        params.put("what", "饭");
+
+        // 调用，并断言
+        assertEquals("小红，你好，饭吃了吗？",
+                notifyTemplateService.formatNotifyTemplateContent("{name}，你好，{what}吃了吗？", params));
+    }
 }

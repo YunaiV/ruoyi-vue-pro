@@ -13,9 +13,9 @@ import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourcePrope
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-@Api(tags = "管理后台 - 数据库文档")
+@Tag(name = "管理后台 - 数据库文档")
 @RestController
 @RequestMapping("/infra/db-doc")
 public class DatabaseDocController {
@@ -42,27 +42,24 @@ public class DatabaseDocController {
     private static final String DOC_DESCRIPTION = "文档描述";
 
     @GetMapping("/export-html")
-    @ApiOperation("导出 html 格式的数据文档")
-    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true",
-            dataTypeClass = Boolean.class)
+    @Operation(summary = "导出 html 格式的数据文档")
+    @Parameter(name = "deleteFile", description = "是否删除在服务器本地生成的数据库文档", example = "true")
     public void exportHtml(@RequestParam(defaultValue = "true") Boolean deleteFile,
                            HttpServletResponse response) throws IOException {
         doExportFile(EngineFileType.HTML, deleteFile, response);
     }
 
     @GetMapping("/export-word")
-    @ApiOperation("导出 word 格式的数据文档")
-    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true",
-            dataTypeClass = Boolean.class)
+    @Operation(summary = "导出 word 格式的数据文档")
+    @Parameter(name = "deleteFile", description = "是否删除在服务器本地生成的数据库文档", example = "true")
     public void exportWord(@RequestParam(defaultValue = "true") Boolean deleteFile,
                            HttpServletResponse response) throws IOException {
         doExportFile(EngineFileType.WORD, deleteFile, response);
     }
 
     @GetMapping("/export-markdown")
-    @ApiOperation("导出 markdown 格式的数据文档")
-    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true",
-            dataTypeClass = Boolean.class)
+    @Operation(summary = "导出 markdown 格式的数据文档")
+    @Parameter(name = "deleteFile", description = "是否删除在服务器本地生成的数据库文档", example = "true")
     public void exportMarkdown(@RequestParam(defaultValue = "true") Boolean deleteFile,
                                HttpServletResponse response) throws IOException {
         doExportFile(EngineFileType.MD, deleteFile, response);

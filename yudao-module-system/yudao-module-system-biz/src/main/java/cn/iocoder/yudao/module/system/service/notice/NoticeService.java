@@ -39,7 +39,7 @@ public interface NoticeService {
      * @param reqVO 分页条件
      * @return 部门分页列表
      */
-    PageResult<NoticeDO> pageNotices(NoticePageReqVO reqVO);
+    PageResult<NoticeDO> getNoticePage(NoticePageReqVO reqVO);
 
     /**
      * 获得岗位公告公告信息

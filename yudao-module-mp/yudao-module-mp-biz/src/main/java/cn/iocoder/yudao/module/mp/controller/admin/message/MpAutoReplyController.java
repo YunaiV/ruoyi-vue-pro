@@ -9,9 +9,9 @@ import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessageP
 import cn.iocoder.yudao.module.mp.convert.message.MpAutoReplyConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpAutoReplyDO;
 import cn.iocoder.yudao.module.mp.service.message.MpAutoReplyService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - 公众号自动回复")
+@Tag(name = "管理后台 - 公众号自动回复")
 @RestController
 @RequestMapping("/mp/auto-reply")
 @Validated
@@ -31,7 +31,7 @@ public class MpAutoReplyController {
     private MpAutoReplyService mpAutoReplyService;
 
     @GetMapping("/page")
-    @ApiOperation("获得公众号自动回复分页")
+    @Operation(summary = "获得公众号自动回复分页")
     @PreAuthorize("@ss.hasPermission('mp:auto-reply:query')")
     public CommonResult<PageResult<MpAutoReplyRespVO>> getAutoReplyPage(@Valid MpMessagePageReqVO pageVO) {
         PageResult<MpAutoReplyDO> pageResult = mpAutoReplyService.getAutoReplyPage(pageVO);
@@ -39,8 +39,8 @@ public class MpAutoReplyController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得公众号自动回复")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得公众号自动回复")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('mp:auto-reply:query')")
     public CommonResult<MpAutoReplyRespVO> getAutoReply(@RequestParam("id") Long id) {
         MpAutoReplyDO autoReply = mpAutoReplyService.getAutoReply(id);
@@ -48,14 +48,14 @@ public class MpAutoReplyController {
     }
 
     @PostMapping("/create")
-    @ApiOperation("创建公众号自动回复")
+    @Operation(summary = "创建公众号自动回复")
     @PreAuthorize("@ss.hasPermission('mp:auto-reply:create')")
     public CommonResult<Long> createAutoReply(@Valid @RequestBody MpAutoReplyCreateReqVO createReqVO) {
         return success(mpAutoReplyService.createAutoReply(createReqVO));
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新公众号自动回复")
+    @Operation(summary = "更新公众号自动回复")
     @PreAuthorize("@ss.hasPermission('mp:auto-reply:update')")
     public CommonResult<Boolean> updateAutoReply(@Valid @RequestBody MpAutoReplyUpdateReqVO updateReqVO) {
         mpAutoReplyService.updateAutoReply(updateReqVO);
@@ -63,8 +63,8 @@ public class MpAutoReplyController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除公众号自动回复")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @Operation(summary = "删除公众号自动回复")
+    @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('mp:auto-reply:delete')")
     public CommonResult<Boolean> deleteAutoReply(@RequestParam("id") Long id) {
         mpAutoReplyService.deleteAutoReply(id);

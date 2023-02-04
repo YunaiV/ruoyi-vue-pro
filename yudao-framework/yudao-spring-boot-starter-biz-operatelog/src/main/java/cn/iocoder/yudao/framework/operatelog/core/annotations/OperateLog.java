@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.framework.operatelog.core.annotations;
 
 import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

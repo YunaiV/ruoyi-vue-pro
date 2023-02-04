@@ -8,9 +8,9 @@ import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.*;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +24,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "管理后台 - 租户")
+@Tag(name = "管理后台 - 租户")
 @RestController
 @RequestMapping("/system/tenant")
 public class TenantController {
@@ -34,22 +34,22 @@ public class TenantController {
 
     @GetMapping("/get-id-by-name")
     @PermitAll
-    @ApiOperation(value = "使用租户名，获得租户编号", notes = "登录界面，根据用户的租户名，获得租户编号")
-    @ApiImplicitParam(name = "name", value = "租户名", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "使用租户名，获得租户编号", description = "登录界面，根据用户的租户名，获得租户编号")
+    @Parameter(name = "name", description = "租户名", required = true, example = "1024")
     public CommonResult<Long> getTenantIdByName(@RequestParam("name") String name) {
         TenantDO tenantDO = tenantService.getTenantByName(name);
         return success(tenantDO != null ? tenantDO.getId() : null);
     }
 
     @PostMapping("/create")
-    @ApiOperation("创建租户")
+    @Operation(summary = "创建租户")
     @PreAuthorize("@ss.hasPermission('system:tenant:create')")
     public CommonResult<Long> createTenant(@Valid @RequestBody TenantCreateReqVO createReqVO) {
         return success(tenantService.createTenant(createReqVO));
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新租户")
+    @Operation(summary = "更新租户")
     @PreAuthorize("@ss.hasPermission('system:tenant:update')")
     public CommonResult<Boolean> updateTenant(@Valid @RequestBody TenantUpdateReqVO updateReqVO) {
         tenantService.updateTenant(updateReqVO);
@@ -57,8 +57,8 @@ public class TenantController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除租户")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "删除租户")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:tenant:delete')")
     public CommonResult<Boolean> deleteTenant(@RequestParam("id") Long id) {
         tenantService.deleteTenant(id);
@@ -66,8 +66,8 @@ public class TenantController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得租户")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得租户")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:tenant:query')")
     public CommonResult<TenantRespVO> getTenant(@RequestParam("id") Long id) {
         TenantDO tenant = tenantService.getTenant(id);
@@ -75,7 +75,7 @@ public class TenantController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得租户分页")
+    @Operation(summary = "获得租户分页")
     @PreAuthorize("@ss.hasPermission('system:tenant:query')")
     public CommonResult<PageResult<TenantRespVO>> getTenantPage(@Valid TenantPageReqVO pageVO) {
         PageResult<TenantDO> pageResult = tenantService.getTenantPage(pageVO);
@@ -83,7 +83,7 @@ public class TenantController {
     }
 
     @GetMapping("/export-excel")
-    @ApiOperation("导出租户 Excel")
+    @Operation(summary = "导出租户 Excel")
     @PreAuthorize("@ss.hasPermission('system:tenant:export')")
     @OperateLog(type = EXPORT)
     public void exportTenantExcel(@Valid TenantExportReqVO exportReqVO,

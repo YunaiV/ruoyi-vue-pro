@@ -9,9 +9,9 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import cn.iocoder.yudao.module.promotion.convert.reward.RewardActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.service.reward.RewardActivityService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - 满减送活动")
+@Tag(name = "管理后台 - 满减送活动")
 @RestController
 @RequestMapping("/promotion/reward-activity")
 @Validated
@@ -31,14 +31,14 @@ public class RewardActivityController {
     private RewardActivityService rewardActivityService;
 
     @PostMapping("/create")
-    @ApiOperation("创建满减送活动")
+    @Operation(summary = "创建满减送活动")
     @PreAuthorize("@ss.hasPermission('promotion:reward-activity:create')")
     public CommonResult<Long> createRewardActivity(@Valid @RequestBody RewardActivityCreateReqVO createReqVO) {
         return success(rewardActivityService.createRewardActivity(createReqVO));
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新满减送活动")
+    @Operation(summary = "更新满减送活动")
     @PreAuthorize("@ss.hasPermission('promotion:reward-activity:update')")
     public CommonResult<Boolean> updateRewardActivity(@Valid @RequestBody RewardActivityUpdateReqVO updateReqVO) {
         rewardActivityService.updateRewardActivity(updateReqVO);
@@ -46,8 +46,8 @@ public class RewardActivityController {
     }
 
     @PutMapping("/close")
-    @ApiOperation("关闭满减送活动")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @Operation(summary = "关闭满减送活动")
+    @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('promotion:reward-activity:close')")
     public CommonResult<Boolean> closeRewardActivity(@RequestParam("id") Long id) {
         rewardActivityService.closeRewardActivity(id);
@@ -55,8 +55,8 @@ public class RewardActivityController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除满减送活动")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @Operation(summary = "删除满减送活动")
+    @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('promotion:reward-activity:delete')")
     public CommonResult<Boolean> deleteRewardActivity(@RequestParam("id") Long id) {
         rewardActivityService.deleteRewardActivity(id);
@@ -64,8 +64,8 @@ public class RewardActivityController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得满减送活动")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得满减送活动")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('promotion:reward-activity:query')")
     public CommonResult<RewardActivityRespVO> getRewardActivity(@RequestParam("id") Long id) {
         RewardActivityDO rewardActivity = rewardActivityService.getRewardActivity(id);
@@ -73,7 +73,7 @@ public class RewardActivityController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得满减送活动分页")
+    @Operation(summary = "获得满减送活动分页")
     @PreAuthorize("@ss.hasPermission('promotion:reward-activity:query')")
     public CommonResult<PageResult<RewardActivityRespVO>> getRewardActivityPage(@Valid RewardActivityPageReqVO pageVO) {
         PageResult<RewardActivityDO> pageResult = rewardActivityService.getRewardActivityPage(pageVO);

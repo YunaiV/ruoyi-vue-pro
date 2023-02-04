@@ -52,7 +52,7 @@ import static org.mockito.Mockito.*;
        #if (${column.listOperation})
        #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
        #if (${column.listOperationCondition} == "BETWEEN")## BETWEEN 的情况
-       reqVO.set${JavaField}((new LocalDateTime[]{}));
+       reqVO.set${JavaField}(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        #else
        reqVO.set$JavaField(null);
        #end

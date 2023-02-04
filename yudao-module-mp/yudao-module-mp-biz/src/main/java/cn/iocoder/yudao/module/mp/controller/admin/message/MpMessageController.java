@@ -8,8 +8,8 @@ import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessageS
 import cn.iocoder.yudao.module.mp.convert.message.MpMessageConvert;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import cn.iocoder.yudao.module.mp.service.message.MpMessageService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - 公众号消息")
+@Tag(name = "管理后台 - 公众号消息")
 @RestController
 @RequestMapping("/mp/message")
 @Validated
@@ -29,7 +29,7 @@ public class MpMessageController {
     private MpMessageService mpMessageService;
 
     @GetMapping("/page")
-    @ApiOperation("获得公众号消息分页")
+    @Operation(summary = "获得公众号消息分页")
     @PreAuthorize("@ss.hasPermission('mp:message:query')")
     public CommonResult<PageResult<MpMessageRespVO>> getMessagePage(@Valid MpMessagePageReqVO pageVO) {
         PageResult<MpMessageDO> pageResult = mpMessageService.getMessagePage(pageVO);
@@ -37,7 +37,7 @@ public class MpMessageController {
     }
 
     @PostMapping("/send")
-    @ApiOperation("给粉丝发送消息")
+    @Operation(summary = "给粉丝发送消息")
     @PreAuthorize("@ss.hasPermission('mp:message:send')")
     public CommonResult<MpMessageRespVO> sendMessage(@Valid @RequestBody MpMessageSendReqVO reqVO) {
         MpMessageDO message = mpMessageService.sendKefuMessage(reqVO);

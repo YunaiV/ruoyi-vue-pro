@@ -15,8 +15,8 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +35,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "管理后台 - 操作日志")
+@Tag(name = "管理后台 - 操作日志")
 @RestController
 @RequestMapping("/system/operate-log")
 @Validated
@@ -47,7 +47,7 @@ public class OperateLogController {
     private AdminUserService userService;
 
     @GetMapping("/page")
-    @ApiOperation("查看操作日志分页列表")
+    @Operation(summary = "查看操作日志分页列表")
     @PreAuthorize("@ss.hasPermission('system:operate-log:query')")
     public CommonResult<PageResult<OperateLogRespVO>> pageOperateLog(@Valid OperateLogPageReqVO reqVO) {
         PageResult<OperateLogDO> pageResult = operateLogService.getOperateLogPage(reqVO);
@@ -66,12 +66,12 @@ public class OperateLogController {
         return success(new PageResult<>(list, pageResult.getTotal()));
     }
 
-    @ApiOperation("导出操作日志")
+    @Operation(summary = "导出操作日志")
     @GetMapping("/export")
     @PreAuthorize("@ss.hasPermission('system:operate-log:export')")
     @OperateLog(type = EXPORT)
     public void exportOperateLog(HttpServletResponse response, @Valid OperateLogExportReqVO reqVO) throws IOException {
-        List<OperateLogDO> list = operateLogService.getOperateLogs(reqVO);
+        List<OperateLogDO> list = operateLogService.getOperateLogList(reqVO);
 
         // 获得拼接需要的数据
         Collection<Long> userIds = CollectionUtils.convertList(list, OperateLogDO::getUserId);

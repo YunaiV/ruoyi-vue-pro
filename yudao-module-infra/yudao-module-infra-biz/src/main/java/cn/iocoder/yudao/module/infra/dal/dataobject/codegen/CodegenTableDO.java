@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -44,10 +45,14 @@ public class CodegenTableDO extends BaseDO {
 
     /**
      * 表名称
+     *
+     * 关联 {@link TableInfo#getName()}
      */
     private String tableName;
     /**
      * 表描述
+     *
+     * 关联 {@link TableInfo#getComment()}
      */
     private String tableComment;
     /**

@@ -4,8 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,19 +15,19 @@ import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
-@ApiModel(value = "用户 APP - 手机 + 验证码登录 Request VO", description = "如果登录并绑定社交用户，需要传递 social 开头的参数")
+@Schema(description = "用户 APP - 手机 + 验证码登录 Request VO,如果登录并绑定社交用户，需要传递 social 开头的参数")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class AppAuthSmsLoginReqVO {
 
-    @ApiModelProperty(value = "手机号", required = true, example = "15601691300")
+    @Schema(description = "手机号", required = true, example = "15601691300")
     @NotEmpty(message = "手机号不能为空")
     @Mobile
     private String mobile;
 
-    @ApiModelProperty(value = "手机验证码", required = true, example = "1024")
+    @Schema(description = "手机验证码", required = true, example = "1024")
     @NotEmpty(message = "手机验证码不能为空")
     @Length(min = 4, max = 6, message = "手机验证码长度为 4-6 位")
     @Pattern(regexp = "^[0-9]+$", message = "手机验证码必须都是数字")
@@ -36,14 +35,14 @@ public class AppAuthSmsLoginReqVO {
 
     // ========== 绑定社交登录时，需要传递如下参数 ==========
 
-    @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 SysUserSocialTypeEnum 枚举值")
+    @Schema(description = "社交平台的类型,参见 SysUserSocialTypeEnum 枚举值", required = true, example = "10")
     @InEnum(SocialTypeEnum.class)
     private Integer socialType;
 
-    @ApiModelProperty(value = "授权码", required = true, example = "1024")
+    @Schema(description = "授权码", required = true, example = "1024")
     private String socialCode;
 
-    @ApiModelProperty(value = "state", required = true, example = "9b2ffbc1-7425-4155-9894-9d5c08541d62")
+    @Schema(description = "state", required = true, example = "9b2ffbc1-7425-4155-9894-9d5c08541d62")
     private String socialState;
 
     @AssertTrue(message = "授权码不能为空")

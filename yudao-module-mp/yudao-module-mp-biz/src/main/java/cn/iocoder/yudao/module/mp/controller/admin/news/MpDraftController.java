@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.mp.controller.admin.news.vo.MpDraftPageReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.material.MpMaterialDO;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import cn.iocoder.yudao.module.mp.service.material.MpMaterialService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.draft.*;
@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.*;
 
-@Api(tags = "管理后台 - 公众号草稿")
+@Tag(name = "管理后台 - 公众号草稿")
 @RestController
 @RequestMapping("/mp/draft")
 @Validated
@@ -44,7 +44,7 @@ public class MpDraftController {
     private MpMaterialService mpMaterialService;
 
     @GetMapping("/page")
-    @ApiOperation("获得草稿分页")
+    @Operation(summary = "获得草稿分页")
     @PreAuthorize("@ss.hasPermission('mp:draft:query')")
     public CommonResult<PageResult<WxMpDraftItem>> getDraftPage(MpDraftPageReqVO reqVO) {
         // 从公众号查询草稿箱
@@ -79,9 +79,8 @@ public class MpDraftController {
     }
 
     @PostMapping("/create")
-    @ApiOperation("创建草稿")
-    @ApiImplicitParam(name = "accountId", value = "公众号账号的编号", required = true,
-            example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "创建草稿")
+    @Parameter(name = "accountId", description = "公众号账号的编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('mp:draft:create')")
     public CommonResult<String> deleteDraft(@RequestParam("accountId") Long accountId,
                                             @RequestBody WxMpAddDraft draft) {
@@ -95,12 +94,10 @@ public class MpDraftController {
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新草稿")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "accountId", value = "公众号账号的编号", required = true,
-                    example = "1024", dataTypeClass = Long.class),
-            @ApiImplicitParam(name = "mediaId", value = "草稿素材的编号", required = true,
-                    example = "xxx", dataTypeClass = String.class),
+    @Operation(summary = "更新草稿")
+    @Parameters({
+            @Parameter(name = "accountId", description = "公众号账号的编号", required = true, example = "1024"),
+            @Parameter(name = "mediaId", description = "草稿素材的编号", required = true, example = "xxx")
     })
     @PreAuthorize("@ss.hasPermission('mp:draft:update')")
     public CommonResult<Boolean> deleteDraft(@RequestParam("accountId") Long accountId,
@@ -119,12 +116,10 @@ public class MpDraftController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除草稿")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "accountId", value = "公众号账号的编号", required = true,
-                    example = "1024", dataTypeClass = Long.class),
-            @ApiImplicitParam(name = "mediaId", value = "草稿素材的编号", required = true,
-                    example = "xxx", dataTypeClass = String.class),
+    @Operation(summary = "删除草稿")
+    @Parameters({
+            @Parameter(name = "accountId", description = "公众号账号的编号", required = true, example = "1024"),
+            @Parameter(name = "mediaId", description = "草稿素材的编号", required = true, example = "xxx")
     })
     @PreAuthorize("@ss.hasPermission('mp:draft:delete')")
     public CommonResult<Boolean> deleteDraft(@RequestParam("accountId") Long accountId,

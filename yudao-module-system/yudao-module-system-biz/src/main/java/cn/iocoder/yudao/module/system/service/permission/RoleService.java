@@ -79,7 +79,7 @@ public interface RoleService {
      * @param statuses 筛选的状态。允许空，空时不筛选
      * @return 角色列表
      */
-    List<RoleDO> getRoles(@Nullable Collection<Integer> statuses);
+    List<RoleDO> getRoleListByStatus(@Nullable Collection<Integer> statuses);
 
     /**
      * 获得角色数组，从缓存中
@@ -87,7 +87,7 @@ public interface RoleService {
      * @param ids 角色编号数组
      * @return 角色数组
      */
-    List<RoleDO> getRolesFromCache(Collection<Long> ids);
+    List<RoleDO> getRoleListFromCache(Collection<Long> ids);
 
     /**
      * 判断角色数组中，是否有超级管理员
@@ -104,7 +104,7 @@ public interface RoleService {
      * @return 是否有管理员
      */
     default boolean hasAnySuperAdmin(Set<Long> ids) {
-        return hasAnySuperAdmin(getRolesFromCache(ids));
+        return hasAnySuperAdmin(getRoleListFromCache(ids));
     }
 
     /**
@@ -138,6 +138,6 @@ public interface RoleService {
      *
      * @param ids 角色编号数组
      */
-    void validRoles(Collection<Long> ids);
+    void validateRoleList(Collection<Long> ids);
 
 }

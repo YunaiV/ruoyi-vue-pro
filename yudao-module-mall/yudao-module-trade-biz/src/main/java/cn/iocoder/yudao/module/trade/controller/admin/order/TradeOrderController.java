@@ -15,9 +15,9 @@ import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -30,7 +30,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Api(tags = "管理后台 - 交易订单")
+@Tag(name = "管理后台 - 交易订单")
 @RestController
 @RequestMapping("/trade/order")
 @Validated
@@ -46,7 +46,7 @@ public class TradeOrderController {
     private MemberUserApi memberUserApi;
 
     @GetMapping("/page")
-    @ApiOperation("获得交易订单分页")
+    @Operation(summary = "获得交易订单分页")
     @PreAuthorize("@ss.hasPermission('trade:order:query')")
     public CommonResult<PageResult<TradeOrderPageItemRespVO>> getOrderPage(TradeOrderPageReqVO reqVO) {
         // 查询订单
@@ -65,8 +65,8 @@ public class TradeOrderController {
     }
 
     @GetMapping("/get-detail")
-    @ApiOperation("获得交易订单详情")
-    @ApiImplicitParam(name = "id", value = "订单编号", required = true, example = "1")
+    @Operation(summary = "获得交易订单详情")
+    @Parameter(name = "id", description = "订单编号", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('trade:order:query')")
     public CommonResult<TradeOrderDetailRespVO> getOrderDetail(@RequestParam("id") Long id) {
         // 查询订单
@@ -83,7 +83,7 @@ public class TradeOrderController {
     }
 
     @PostMapping("/delivery")
-    @ApiOperation("发货订单")
+    @Operation(summary = "发货订单")
     @PreAuthorize("@ss.hasPermission('trade:order:delivery')")
     public CommonResult<Boolean> deliveryOrder(@RequestBody TradeOrderDeliveryReqVO deliveryReqVO) {
         tradeOrderService.deliveryOrder(getLoginUserId(), deliveryReqVO);
