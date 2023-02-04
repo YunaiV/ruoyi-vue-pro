@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.common.util.validation;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolation;

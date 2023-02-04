@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
@@ -10,7 +9,6 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuUp
 import cn.iocoder.yudao.module.system.convert.permission.MenuConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.MenuMapper;
-import cn.iocoder.yudao.module.system.enums.permission.MenuIdEnum;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.MenuProducer;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
@@ -18,9 +16,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -28,10 +27,11 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO.ID_ROOT;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
@@ -44,17 +44,13 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 public class MenuServiceImpl implements MenuService {
 
     /**
-     * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
-     * 因为已经通过 Redis Pub/Sub 机制，所以频率不需要高
-     */
-    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
-
-    /**
      * 菜单缓存
      * key：菜单编号
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @Getter
+    @Setter
     private volatile Map<Long, MenuDO> menuCache;
     /**
      * 权限与菜单缓存
@@ -63,11 +59,9 @@ public class MenuServiceImpl implements MenuService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @Getter
+    @Setter
     private volatile Multimap<String, MenuDO> permissionMenuCache;
-    /**
-     * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
-     */
-    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private MenuMapper menuMapper;
@@ -86,33 +80,11 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @PostConstruct
     public synchronized void initLocalCache() {
-        initLocalCacheIfUpdate(null);
-    }
-
-    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
-    public void schedulePeriodicRefresh() {
-        initLocalCacheIfUpdate(this.maxUpdateTime);
-    }
-
-    /**
-     * 刷新本地缓存
-     *
-     * @param maxUpdateTime 最大更新时间
-     *                      1. 如果 maxUpdateTime 为 null，则“强制”刷新缓存
-     *                      2. 如果 maxUpdateTime 不为 null，判断自 maxUpdateTime 是否有数据发生变化，有的情况下才刷新缓存
-     */
-    private void initLocalCacheIfUpdate(LocalDateTime maxUpdateTime) {
-        // 第一步：基于 maxUpdateTime 判断缓存是否刷新。
-        // 如果没有增量的数据变化，则不进行本地缓存的刷新
-        if (maxUpdateTime != null
-            && menuMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-            log.info("[initLocalCacheIfUpdate][数据未发生变化({})，本地缓存不刷新]", maxUpdateTime);
-            return;
-        }
+        // 第一步：查询数据
         List<MenuDO> menuList = menuMapper.selectList();
-        log.info("[initLocalCacheIfUpdate][缓存菜单，数量为:{}]", menuList.size());
+        log.info("[initLocalCache][缓存菜单，数量为:{}]", menuList.size());
 
-        // 第二步：构建缓存。
+        // 第二步：构建缓存
         ImmutableMap.Builder<Long, MenuDO> menuCacheBuilder = ImmutableMap.builder();
         ImmutableMultimap.Builder<String, MenuDO> permMenuCacheBuilder = ImmutableMultimap.builder();
         menuList.forEach(menuDO -> {
@@ -123,17 +95,15 @@ public class MenuServiceImpl implements MenuService {
         });
         menuCache = menuCacheBuilder.build();
         permissionMenuCache = permMenuCacheBuilder.build();
-
-        // 第三步：设置最新的 maxUpdateTime，用于下次的增量判断。
-        this.maxUpdateTime = CollectionUtils.getMaxValue(menuList, MenuDO::getUpdateTime);
     }
 
     @Override
     public Long createMenu(MenuCreateReqVO reqVO) {
         // 校验父菜单存在
-        checkParentResource(reqVO.getParentId(), null);
+        validateParentMenu(reqVO.getParentId(), null);
         // 校验菜单（自己）
-        checkResource(reqVO.getParentId(), reqVO.getName(), null);
+        validateMenu(reqVO.getParentId(), reqVO.getName(), null);
+
         // 插入数据库
         MenuDO menu = MenuConvert.INSTANCE.convert(reqVO);
         initMenuProperty(menu);
@@ -148,12 +118,13 @@ public class MenuServiceImpl implements MenuService {
     public void updateMenu(MenuUpdateReqVO reqVO) {
         // 校验更新的菜单是否存在
         if (menuMapper.selectById(reqVO.getId()) == null) {
-            throw ServiceExceptionUtil.exception(MENU_NOT_EXISTS);
+            throw exception(MENU_NOT_EXISTS);
         }
         // 校验父菜单存在
-        checkParentResource(reqVO.getParentId(), reqVO.getId());
+        validateParentMenu(reqVO.getParentId(), reqVO.getId());
         // 校验菜单（自己）
-        checkResource(reqVO.getParentId(), reqVO.getName(), reqVO.getId());
+        validateMenu(reqVO.getParentId(), reqVO.getName(), reqVO.getId());
+
         // 更新到数据库
         MenuDO updateObject = MenuConvert.INSTANCE.convert(reqVO);
         initMenuProperty(updateObject);
@@ -162,21 +133,16 @@ public class MenuServiceImpl implements MenuService {
         menuProducer.sendMenuRefreshMessage();
     }
 
-    /**
-     * 删除菜单
-     *
-     * @param menuId 菜单编号
-     */
-    @Transactional(rollbackFor = Exception.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteMenu(Long menuId) {
         // 校验是否还有子菜单
         if (menuMapper.selectCountByParentId(menuId) > 0) {
-            throw ServiceExceptionUtil.exception(MENU_EXISTS_CHILDREN);
+            throw exception(MENU_EXISTS_CHILDREN);
         }
         // 校验删除的菜单是否存在
         if (menuMapper.selectById(menuId) == null) {
-            throw ServiceExceptionUtil.exception(MENU_NOT_EXISTS);
+            throw exception(MENU_NOT_EXISTS);
         }
         // 标记删除
         menuMapper.deleteById(menuId);
@@ -194,20 +160,20 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<MenuDO> getMenus() {
+    public List<MenuDO> getMenuList() {
         return menuMapper.selectList();
     }
 
     @Override
-    public List<MenuDO> getTenantMenus(MenuListReqVO reqVO) {
-        List<MenuDO> menus = getMenus(reqVO);
+    public List<MenuDO> getMenuListByTenant(MenuListReqVO reqVO) {
+        List<MenuDO> menus = getMenuList(reqVO);
         // 开启多租户的情况下，需要过滤掉未开通的菜单
         tenantService.handleTenantMenu(menuIds -> menus.removeIf(menu -> !CollUtil.contains(menuIds, menu.getId())));
         return menus;
     }
 
     @Override
-    public List<MenuDO> getMenus(MenuListReqVO reqVO) {
+    public List<MenuDO> getMenuList(MenuListReqVO reqVO) {
         return menuMapper.selectList(reqVO);
     }
 
@@ -257,23 +223,23 @@ public class MenuServiceImpl implements MenuService {
      * @param childId 当前菜单编号
      */
     @VisibleForTesting
-    public void checkParentResource(Long parentId, Long childId) {
-        if (parentId == null || MenuIdEnum.ROOT.getId().equals(parentId)) {
+    void validateParentMenu(Long parentId, Long childId) {
+        if (parentId == null || ID_ROOT.equals(parentId)) {
             return;
         }
         // 不能设置自己为父菜单
         if (parentId.equals(childId)) {
-            throw ServiceExceptionUtil.exception(MENU_PARENT_ERROR);
+            throw exception(MENU_PARENT_ERROR);
         }
         MenuDO menu = menuMapper.selectById(parentId);
         // 父菜单不存在
         if (menu == null) {
-            throw ServiceExceptionUtil.exception(MENU_PARENT_NOT_EXISTS);
+            throw exception(MENU_PARENT_NOT_EXISTS);
         }
         // 父菜单必须是目录或者菜单类型
         if (!MenuTypeEnum.DIR.getType().equals(menu.getType())
             && !MenuTypeEnum.MENU.getType().equals(menu.getType())) {
-            throw ServiceExceptionUtil.exception(MENU_PARENT_NOT_DIR_OR_MENU);
+            throw exception(MENU_PARENT_NOT_DIR_OR_MENU);
         }
     }
 
@@ -287,17 +253,17 @@ public class MenuServiceImpl implements MenuService {
      * @param id 菜单编号
      */
     @VisibleForTesting
-    public void checkResource(Long parentId, String name, Long id) {
+    void validateMenu(Long parentId, String name, Long id) {
         MenuDO menu = menuMapper.selectByParentIdAndName(parentId, name);
         if (menu == null) {
             return;
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的菜单
         if (id == null) {
-            throw ServiceExceptionUtil.exception(MENU_NAME_DUPLICATE);
+            throw exception(MENU_NAME_DUPLICATE);
         }
         if (!menu.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(MENU_NAME_DUPLICATE);
+            throw exception(MENU_NAME_DUPLICATE);
         }
     }
 

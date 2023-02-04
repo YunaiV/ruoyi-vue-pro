@@ -40,6 +40,10 @@ public class BannerApplicationRunner implements ApplicationRunner {
             if (isNotPresent("cn.iocoder.yudao.framework.flowable.config.YudaoFlowableConfiguration")) {
                 System.out.println("[工作流模块 yudao-module-bpm - 已禁用][参考 https://doc.iocoder.cn/bpm/ 开启]");
             }
+            // 微信公众号
+            if (isNotPresent("cn.iocoder.yudao.module.mp.framework.mp.config.MpConfiguration")) {
+                System.out.println("[微信公众号 yudao-module-mp - 已禁用][参考 https://doc.iocoder.cn/mp/build/ 开启]");
+            }
         });
     }
 

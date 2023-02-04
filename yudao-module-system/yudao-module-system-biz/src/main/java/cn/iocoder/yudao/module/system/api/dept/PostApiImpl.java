@@ -18,7 +18,8 @@ public class PostApiImpl implements PostApi {
     private PostService postService;
 
     @Override
-    public void validPosts(Collection<Long> ids) {
-        postService.validPosts(ids);
+    public void validPostList(Collection<Long> ids) {
+        postService.validatePostList(ids);
     }
+
 }

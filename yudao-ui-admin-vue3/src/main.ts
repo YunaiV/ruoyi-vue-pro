@@ -26,14 +26,23 @@ import '@/styles/index.scss'
 import '@/plugins/animate.css'
 
 // 路由
-import { setupRouter } from './router'
+import router, { setupRouter } from '@/router'
 
 // 权限
-import { setupAuth } from './directives'
+import { setupAuth } from '@/directives'
 
 import { createApp } from 'vue'
 
 import App from './App.vue'
+
+import './permission'
+
+import { isDevMode } from '@/utils/env'
+
+if (isDevMode()) {
+  console.info(isDevMode())
+  import('element-plus/dist/index.css')
+}
 
 // 创建实例
 const setupAll = async () => {
@@ -52,6 +61,8 @@ const setupAll = async () => {
   setupRouter(app)
 
   setupAuth(app)
+
+  await router.isReady()
 
   app.mount('#app')
 }

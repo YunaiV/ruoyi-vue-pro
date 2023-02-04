@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -20,15 +19,17 @@ import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsTemplateMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
 import com.google.common.annotations.VisibleForTesting;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -38,17 +39,11 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
  * 短信模板 Service 实现类
  *
  * @author zzf
- * @date 2021/1/25 9:25
+ * @since 2021/1/25 9:25
  */
 @Service
 @Slf4j
 public class SmsTemplateServiceImpl implements SmsTemplateService {
-
-    /**
-     * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
-     * 因为已经通过 Redis Pub/Sub 机制，所以频率不需要高
-     */
-    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
 
     /**
      * 正则表达式，匹配 {} 中的变量
@@ -73,51 +68,18 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @Getter // 为了方便测试，这里提供 getter 方法
     private volatile Map<String, SmsTemplateDO> smsTemplateCache;
-    /**
-     * 缓存短信模板的最大更新时间，用于后续的增量轮询，判断是否有更新
-     */
-    private volatile LocalDateTime maxUpdateTime;
 
     @Override
     @PostConstruct
     public void initLocalCache() {
-        // 获取短信模板列表，如果有更新
-        List<SmsTemplateDO> smsTemplateList = this.loadSmsTemplateIfUpdate(maxUpdateTime);
-        if (CollUtil.isEmpty(smsTemplateList)) {
-            return;
-        }
+        // 第一步：查询数据
+        List<SmsTemplateDO> smsTemplateList = smsTemplateMapper.selectList();
+        log.info("[initLocalCache][缓存短信模版，数量为:{}]", smsTemplateList.size());
 
-        // 写入缓存
+        // 第二步：构建缓存
         smsTemplateCache = CollectionUtils.convertMap(smsTemplateList, SmsTemplateDO::getCode);
-        maxUpdateTime = CollectionUtils.getMaxValue(smsTemplateList, SmsTemplateDO::getUpdateTime);
-        log.info("[initLocalCache][初始化 SmsTemplate 数量为 {}]", smsTemplateList.size());
-    }
-
-    /**
-     * 如果短信模板发生变化，从数据库中获取最新的全量短信模板。
-     * 如果未发生变化，则返回空
-     *
-     * @param maxUpdateTime 当前短信模板的最大更新时间
-     * @return 短信模板列表
-     */
-    private List<SmsTemplateDO> loadSmsTemplateIfUpdate(LocalDateTime maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadSmsTemplateIfUpdate][首次加载全量短信模板]");
-        } else { // 判断数据库中是否有更新的短信模板
-            if (smsTemplateMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
-            }
-            log.info("[loadSmsTemplateIfUpdate][增量加载全量短信模板]");
-        }
-        // 第二步，如果有更新，则从数据库加载所有短信模板
-        return smsTemplateMapper.selectList();
-    }
-
-    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
-    public void schedulePeriodicRefresh() {
-        initLocalCache();
     }
 
     @Override
@@ -143,11 +105,11 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @Override
     public Long createSmsTemplate(SmsTemplateCreateReqVO createReqVO) {
         // 校验短信渠道
-        SmsChannelDO channelDO = checkSmsChannel(createReqVO.getChannelId());
+        SmsChannelDO channelDO = validateSmsChannel(createReqVO.getChannelId());
         // 校验短信编码是否重复
-        checkSmsTemplateCodeDuplicate(null, createReqVO.getCode());
+        validateSmsTemplateCodeDuplicate(null, createReqVO.getCode());
         // 校验短信模板
-        checkApiTemplate(createReqVO.getChannelId(), createReqVO.getApiTemplateId());
+        validateApiTemplate(createReqVO.getChannelId(), createReqVO.getApiTemplateId());
 
         // 插入
         SmsTemplateDO template = SmsTemplateConvert.INSTANCE.convert(createReqVO);
@@ -163,13 +125,13 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @Override
     public void updateSmsTemplate(SmsTemplateUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validateSmsTemplateExists(updateReqVO.getId());
+        validateSmsTemplateExists(updateReqVO.getId());
         // 校验短信渠道
-        SmsChannelDO channelDO = checkSmsChannel(updateReqVO.getChannelId());
+        SmsChannelDO channelDO = validateSmsChannel(updateReqVO.getChannelId());
         // 校验短信编码是否重复
-        checkSmsTemplateCodeDuplicate(updateReqVO.getId(), updateReqVO.getCode());
+        validateSmsTemplateCodeDuplicate(updateReqVO.getId(), updateReqVO.getCode());
         // 校验短信模板
-        checkApiTemplate(updateReqVO.getChannelId(), updateReqVO.getApiTemplateId());
+        validateApiTemplate(updateReqVO.getChannelId(), updateReqVO.getApiTemplateId());
 
         // 更新
         SmsTemplateDO updateObj = SmsTemplateConvert.INSTANCE.convert(updateReqVO);
@@ -183,7 +145,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @Override
     public void deleteSmsTemplate(Long id) {
         // 校验存在
-        this.validateSmsTemplateExists(id);
+        validateSmsTemplateExists(id);
         // 更新
         smsTemplateMapper.deleteById(id);
         // 发送刷新消息
@@ -222,7 +184,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     @VisibleForTesting
-    public SmsChannelDO checkSmsChannel(Long channelId) {
+    public SmsChannelDO validateSmsChannel(Long channelId) {
         SmsChannelDO channelDO = smsChannelService.getSmsChannel(channelId);
         if (channelDO == null) {
             throw exception(SMS_CHANNEL_NOT_EXISTS);
@@ -234,7 +196,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     @VisibleForTesting
-    public void checkSmsTemplateCodeDuplicate(Long id, String code) {
+    public void validateSmsTemplateCodeDuplicate(Long id, String code) {
         SmsTemplateDO template = smsTemplateMapper.selectByCode(code);
         if (template == null) {
             return;
@@ -255,7 +217,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
      * @param apiTemplateId API 模板编号
      */
     @VisibleForTesting
-    public void checkApiTemplate(Long channelId, String apiTemplateId) {
+    public void validateApiTemplate(Long channelId, String apiTemplateId) {
         // 获得短信模板
         SmsClient smsClient = smsClientFactory.getSmsClient(channelId);
         Assert.notNull(smsClient, String.format("短信客户端(%d) 不存在", channelId));

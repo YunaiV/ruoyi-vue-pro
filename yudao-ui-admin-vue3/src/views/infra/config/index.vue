@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -17,7 +17,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['infra:config:export']"
-          @click="handleExport()"
+          @click="exportList('配置.xls')"
         />
       </template>
       <template #visible_default="{ row }">
@@ -43,10 +43,10 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['infra:config:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
 
   <XModal v-model="dialogVisible" :title="dialogTitle">
@@ -83,13 +83,7 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Config">
-// 全局相关的 import
-import { ref, unref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 // 业务相关的 import
 import * as ConfigApi from '@/api/infra/config'
 import { rules, allSchemas } from './config.data'
@@ -97,8 +91,7 @@ import { rules, allSchemas } from './config.data'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData, exportList } = useVxeGrid<ConfigApi.ConfigVO>({
+const [registerTable, { reload, deleteData, exportList }] = useXTable({
   allSchemas: allSchemas,
   getListApi: ConfigApi.getConfigPageApi,
   deleteApi: ConfigApi.deleteConfigApi,
@@ -125,11 +118,6 @@ const handleCreate = () => {
   setDialogTile('create')
 }
 
-// 导出操作
-const handleExport = async () => {
-  await exportList(xGrid, '配置.xls')
-}
-
 // 修改操作
 const handleUpdate = async (rowId: number) => {
   setDialogTile('update')
@@ -143,11 +131,6 @@ const handleDetail = async (rowId: number) => {
   setDialogTile('detail')
   const res = await ConfigApi.getConfigApi(rowId)
   detailData.value = res
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
 }
 
 // 提交按钮
@@ -171,7 +154,7 @@ const submitForm = async () => {
       } finally {
         actionLoading.value = false
         // 刷新列表
-        await getList(xGrid)
+        await reload()
       }
     }
   })

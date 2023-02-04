@@ -47,7 +47,7 @@ public interface MenuService {
      *
      * @return 菜单列表
      */
-    List<MenuDO> getMenus();
+    List<MenuDO> getMenuList();
 
     /**
      * 基于租户，筛选菜单列表
@@ -56,7 +56,7 @@ public interface MenuService {
      * @param reqVO 筛选条件请求 VO
      * @return 菜单列表
      */
-    List<MenuDO> getTenantMenus(MenuListReqVO reqVO);
+    List<MenuDO> getMenuListByTenant(MenuListReqVO reqVO);
 
     /**
      * 筛选菜单列表
@@ -64,7 +64,7 @@ public interface MenuService {
      * @param reqVO 筛选条件请求 VO
      * @return 菜单列表
      */
-    List<MenuDO> getMenus(MenuListReqVO reqVO);
+    List<MenuDO> getMenuList(MenuListReqVO reqVO);
 
     /**
      * 获得所有菜单，从缓存中

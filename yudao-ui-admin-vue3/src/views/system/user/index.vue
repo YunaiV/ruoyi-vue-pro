@@ -8,17 +8,19 @@
         </div>
       </template>
       <el-input v-model="filterText" placeholder="搜索部门" />
-      <el-tree
-        ref="treeRef"
-        node-key="id"
-        default-expand-all
-        :data="deptOptions"
-        :props="defaultProps"
-        :highlight-current="true"
-        :filter-node-method="filterNode"
-        :expand-on-click-node="false"
-        @node-click="handleDeptNodeClick"
-      />
+      <el-scrollbar height="650">
+        <el-tree
+          ref="treeRef"
+          node-key="id"
+          default-expand-all
+          :data="deptOptions"
+          :props="defaultProps"
+          :highlight-current="true"
+          :filter-node-method="filterNode"
+          :expand-on-click-node="false"
+          @node-click="handleDeptNodeClick"
+        />
+      </el-scrollbar>
     </el-card>
     <el-card class="w-4/5 user" style="margin-left: 10px" :gutter="12" shadow="hover">
       <template #header>
@@ -27,7 +29,7 @@
         </div>
       </template>
       <!-- 列表 -->
-      <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+      <XTable @register="registerTable">
         <template #toolbar_buttons>
           <!-- 操作：新增 -->
           <XButton
@@ -112,14 +114,14 @@
                     preIcon="ep:delete"
                     :title="t('action.del')"
                     v-hasPermi="['system:user:delete']"
-                    @click="handleDelete(row.id)"
+                    @click="deleteData(row.id)"
                   />
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </template>
-      </vxe-grid>
+      </XTable>
     </el-card>
   </div>
   <XModal v-model="dialogVisible" :title="dialogTitle">
@@ -261,37 +263,12 @@
   </XModal>
 </template>
 <script setup lang="ts" name="User">
-import { nextTick, onMounted, reactive, ref, unref, watch } from 'vue'
-import {
-  ElTag,
-  ElInput,
-  ElCard,
-  ElTree,
-  ElTreeSelect,
-  ElSelect,
-  ElOption,
-  ElTransfer,
-  ElForm,
-  ElFormItem,
-  ElUpload,
-  ElSwitch,
-  ElCheckbox,
-  ElDropdown,
-  ElDropdownMenu,
-  ElDropdownItem,
-  UploadInstance,
-  UploadRawFile
-} from 'element-plus'
-import { useRouter } from 'vue-router'
-import { VxeGridInstance } from 'vxe-table'
+import type { ElTree, UploadRawFile, UploadInstance } from 'element-plus'
 import { handleTree, defaultProps } from '@/utils/tree'
 import download from '@/utils/download'
 import { CommonStatusEnum } from '@/utils/constants'
 import { getAccessToken, getTenantId } from '@/utils/auth'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 import { rules, allSchemas } from './user.data'
 import * as UserApi from '@/api/system/user'
 import { listSimpleDeptApi } from '@/api/system/dept'
@@ -312,10 +289,9 @@ const queryParams = reactive({
 // ========== 列表相关 ==========
 const tableTitle = ref('用户列表')
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, getList, deleteData, exportList } = useVxeGrid<UserApi.UserVO>({
+const [registerTable, { reload, deleteData, exportList }] = useXTable({
   allSchemas: allSchemas,
-  queryParams: queryParams,
+  params: queryParams,
   getListApi: UserApi.getUserPageApi,
   deleteApi: UserApi.deleteUserApi,
   exportListApi: UserApi.exportUserApi
@@ -334,7 +310,7 @@ const filterNode = (value: string, data: Tree) => {
 }
 const handleDeptNodeClick = async (row: { [key: string]: any }) => {
   queryParams.deptId = row.id
-  await getList(xGrid)
+  await reload()
 }
 const { push } = useRouter()
 const handleDeptEdit = () => {
@@ -407,10 +383,7 @@ const handleDetail = async (rowId: number) => {
   detailData.value = res
   await setDialogTile('detail')
 }
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
-}
+
 // 提交按钮
 const submitForm = async () => {
   loading.value = true
@@ -428,7 +401,7 @@ const submitForm = async () => {
   } finally {
     // unref(formRef)?.setSchema(allSchemas.formSchema)
     // 刷新列表
-    await getList(xGrid)
+    await reload()
     loading.value = false
   }
 }
@@ -443,7 +416,7 @@ const handleStatusChange = async (row: UserApi.UserVO) => {
       await UserApi.updateUserStatusApi(row.id, row.status)
       message.success(text + '成功')
       // 刷新列表
-      await getList(xGrid)
+      await reload()
     })
     .catch(() => {
       row.status =
@@ -544,7 +517,7 @@ const handleFileSuccess = async (response: any): Promise<void> => {
     text += '< ' + username + ': ' + data.failureUsernames[username] + ' >'
   }
   message.alert(text)
-  await getList(xGrid)
+  await reload()
 }
 // 文件数超出提示
 const handleExceed = (): void => {
@@ -563,8 +536,8 @@ onMounted(async () => {
 
 <style scoped>
 .user {
-  height: 900px;
-  max-height: 960px;
+  height: 780px;
+  max-height: 800px;
 }
 .card-header {
   display: flex;

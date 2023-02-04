@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { propTypes } from '@/utils/propTypes'
-import { computed, useAttrs, useSlots } from 'vue'
 import { ElScrollbar } from 'element-plus'
 const slots = useSlots()
 

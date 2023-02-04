@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.captcha.config;
 import cn.hutool.core.util.ClassUtil;
 import cn.iocoder.yudao.framework.captcha.core.enums.CaptchaRedisKeyConstants;
 import cn.iocoder.yudao.framework.captcha.core.service.RedisCaptchaServiceImpl;
-import com.anji.captcha.service.CaptchaCacheService;
+import com.xingyuv.captcha.service.CaptchaCacheService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;

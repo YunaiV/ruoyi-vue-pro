@@ -33,11 +33,11 @@
   </div>
 </template>
 <script setup lang="ts" name="UploadFile">
-import { PropType, ref } from 'vue'
-import { useMessage } from '@/hooks/web/useMessage'
+import { PropType } from 'vue'
+
 import { propTypes } from '@/utils/propTypes'
 import { getAccessToken, getTenantId } from '@/utils/auth'
-import { ElUpload, UploadInstance, UploadProps, UploadRawFile, UploadUserFile } from 'element-plus'
+import type { UploadInstance, UploadUserFile, UploadProps, UploadRawFile } from 'element-plus'
 
 const message = useMessage() // 消息弹窗
 const emit = defineEmits(['update:modelValue'])
@@ -99,6 +99,9 @@ const beforeUpload: UploadProps['beforeUpload'] = (file: UploadRawFile) => {
 // 文件上传成功
 const handleFileSuccess: UploadProps['onSuccess'] = (res: any): void => {
   message.success('上传成功')
+  const fileListNew = fileList.value
+  fileListNew.pop()
+  fileList.value = fileListNew
   uploadList.value.push({ name: res.data, url: res.data })
   if (uploadList.value.length == uploadNumber.value) {
     fileList.value = fileList.value.concat(uploadList.value)

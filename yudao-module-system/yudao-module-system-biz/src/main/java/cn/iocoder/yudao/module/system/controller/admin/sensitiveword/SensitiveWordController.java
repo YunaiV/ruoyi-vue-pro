@@ -90,8 +90,8 @@ public class SensitiveWordController {
     @GetMapping("/get-tags")
     @ApiOperation("获取所有敏感词的标签数组")
     @PreAuthorize("@ss.hasPermission('system:sensitive-word:query')")
-    public CommonResult<Set<String>> getSensitiveWordTags() throws IOException {
-        return success(sensitiveWordService.getSensitiveWordTags());
+    public CommonResult<Set<String>> getSensitiveWordTagSet() {
+        return success(sensitiveWordService.getSensitiveWordTagSet());
     }
 
     @GetMapping("/validate-text")

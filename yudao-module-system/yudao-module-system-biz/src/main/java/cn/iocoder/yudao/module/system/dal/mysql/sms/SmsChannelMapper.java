@@ -6,9 +6,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-
-import java.time.LocalDateTime;
 
 @Mapper
 public interface SmsChannelMapper extends BaseMapperX<SmsChannelDO> {
@@ -20,8 +17,5 @@ public interface SmsChannelMapper extends BaseMapperX<SmsChannelDO> {
                 .betweenIfPresent(SmsChannelDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SmsChannelDO::getId));
     }
-
-    @Select("SELECT COUNT(*) FROM system_sms_channel WHERE update_time > #{maxUpdateTime}")
-    Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
 
 }

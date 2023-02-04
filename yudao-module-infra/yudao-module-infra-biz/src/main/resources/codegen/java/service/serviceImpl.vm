@@ -39,7 +39,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     @Override
     public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO) {
         // 校验存在
-        this.validate${simpleClassName}Exists(updateReqVO.getId());
+        validate${simpleClassName}Exists(updateReqVO.getId());
         // 更新
         ${table.className}DO updateObj = ${table.className}Convert.INSTANCE.convert(updateReqVO);
         ${classNameVar}Mapper.updateById(updateObj);
@@ -48,7 +48,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     @Override
     public void delete${simpleClassName}(${primaryColumn.javaType} id) {
         // 校验存在
-        this.validate${simpleClassName}Exists(id);
+        validate${simpleClassName}Exists(id);
         // 删除
         ${classNameVar}Mapper.deleteById(id);
     }

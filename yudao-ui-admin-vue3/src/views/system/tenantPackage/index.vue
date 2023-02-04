@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <XButton
           type="primary"
@@ -12,9 +12,9 @@
       </template>
       <template #actionbtns_default="{ row }">
         <XTextButton preIcon="ep:edit" :title="t('action.edit')" @click="handleUpdate(row.id)" />
-        <XTextButton preIcon="ep:delete" :title="t('action.del')" @click="handleDelete(row.id)" />
+        <XTextButton preIcon="ep:delete" :title="t('action.del')" @click="deleteData(row.id)" />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <XModal v-model="dialogVisible" :title="dialogTitle">
     <!-- 对话框(添加 / 修改) -->
@@ -65,14 +65,9 @@
   </XModal>
 </template>
 <script setup lang="ts" name="TenantPackage">
-import { onMounted, ref, unref } from 'vue'
 import { handleTree, defaultProps } from '@/utils/tree'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
-import { FormExpose } from '@/components/Form'
-import { ElCard, ElSwitch, ElTree } from 'element-plus'
+import type { FormExpose } from '@/components/Form'
+import type { ElTree } from 'element-plus'
 // 业务相关的 import
 import { rules, allSchemas } from './tenantPackage.data'
 import * as TenantPackageApi from '@/api/system/tenantPackage'
@@ -86,7 +81,6 @@ const menuExpand = ref(false)
 const menuNodeAll = ref(false)
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const treeNodeAll = ref(false)
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
 const formRef = ref<FormExpose>() // 表单 Ref
 const loading = ref(false) // 遮罩层
 const actionType = ref('') // 操作按钮的类型
@@ -102,7 +96,7 @@ const getTree = async () => {
   menuOptions.value = handleTree(res)
 }
 
-const { gridOptions, getList, deleteData } = useVxeGrid<TenantPackageApi.TenantPackageVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   getListApi: TenantPackageApi.getTenantPackageTypePageApi,
   deleteApi: TenantPackageApi.deleteTenantPackageTypeApi
@@ -134,11 +128,6 @@ const handleUpdate = async (rowId: number) => {
   unref(treeRef)?.setCheckedKeys(res.menuIds)
 }
 
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
-}
-
 // 提交按钮
 const submitForm = async () => {
   const elForm = unref(formRef)?.getElFormRef()
@@ -149,7 +138,10 @@ const submitForm = async () => {
       // 提交请求
       try {
         const data = unref(formRef)?.formModel as TenantPackageApi.TenantPackageVO
-        data.menuIds = treeRef.value!.getCheckedKeys(false) as number[]
+        data.menuIds = [
+          ...(treeRef.value!.getCheckedKeys(false) as unknown as Array<number>),
+          ...(treeRef.value!.getHalfCheckedKeys() as unknown as Array<number>)
+        ]
         if (actionType.value === 'create') {
           await TenantPackageApi.createTenantPackageTypeApi(data)
           message.success(t('common.createSuccess'))
@@ -162,7 +154,7 @@ const submitForm = async () => {
       } finally {
         loading.value = false
         // 刷新列表
-        await getList(xGrid)
+        await reload()
       }
     }
   })

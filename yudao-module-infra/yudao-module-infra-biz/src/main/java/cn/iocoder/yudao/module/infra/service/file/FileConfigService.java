@@ -8,8 +8,6 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigU
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 文件配置 Service 接口
@@ -21,7 +19,7 @@ public interface FileConfigService {
     /**
      * 初始化文件客户端
      */
-    void initFileClients();
+    void initLocalCache();
 
     /**
      * 创建文件配置
@@ -59,14 +57,6 @@ public interface FileConfigService {
      * @return 文件配置
      */
     FileConfigDO getFileConfig(Long id);
-
-    /**
-     * 获得文件配置列表
-     *
-     * @param ids 编号
-     * @return 文件配置列表
-     */
-    List<FileConfigDO> getFileConfigList(Collection<Long> ids);
 
     /**
      * 获得文件配置分页

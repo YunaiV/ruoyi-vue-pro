@@ -1,11 +1,8 @@
 <script setup lang="ts" name="Group">
-import { ref, unref, onMounted } from 'vue'
 import dayjs from 'dayjs'
-import { ElMessage, ElSelect, ElOption } from 'element-plus'
 import { DICT_TYPE } from '@/utils/dict'
 import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 import type { UserGroupVO } from '@/api/bpm/userGroup/types'
 import { rules, allSchemas } from './group.data'
 import * as UserGroupApi from '@/api/bpm/userGroup'
@@ -13,6 +10,7 @@ import { getListSimpleUsersApi } from '@/api/system/user'
 import { UserVO } from '@/api/system/user'
 
 const { t } = useI18n() // 国际化
+const message = useMessage()
 
 // ========== 列表相关 ==========
 const { register, tableObject, methods } = useTable<UserGroupVO>({
@@ -67,10 +65,10 @@ const submitForm = async () => {
         const data = unref(formRef)?.formModel as UserGroupVO
         if (actionType.value === 'create') {
           await UserGroupApi.createUserGroupApi(data)
-          ElMessage.success(t('common.createSuccess'))
+          message.success(t('common.createSuccess'))
         } else {
           await UserGroupApi.updateUserGroupApi(data)
-          ElMessage.success(t('common.updateSuccess'))
+          message.success(t('common.updateSuccess'))
         }
         // 操作成功，重新加载列表
         dialogVisible.value = false

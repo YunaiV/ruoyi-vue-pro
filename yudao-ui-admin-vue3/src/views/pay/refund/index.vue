@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" class="xtable-scrollbar">
+    <XTable @register="registerTable">
       <template #toolbar_buttons>
         <!-- 操作：导出 -->
         <XButton
@@ -9,7 +9,7 @@
           preIcon="ep:download"
           :title="t('action.export')"
           v-hasPermi="['pay:refund:export']"
-          @click="handleExport()"
+          @click="exportList('退款订单.xls')"
         />
       </template>
       <template #actionbtns_default="{ row }">
@@ -21,7 +21,7 @@
           @click="handleDetail(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
 
   <XModal v-model="dialogVisible" :title="t('action.detail')">
@@ -34,27 +34,17 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Refund">
-import { ref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance } from 'vxe-table'
 import { allSchemas } from './refund.data'
 import * as RefundApi from '@/api/pay/refund'
 
 const { t } = useI18n() // 国际化
 
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const { gridOptions, exportList } = useVxeGrid<RefundApi.RefundVO>({
+const [registerTable, { exportList }] = useXTable({
   allSchemas: allSchemas,
   getListApi: RefundApi.getRefundPageApi,
   exportListApi: RefundApi.exportRefundApi
 })
-
-// 导出操作
-const handleExport = async () => {
-  await exportList(xGrid, '退款订单.xls')
-}
 
 // ========== CRUD 相关 ==========
 const dialogVisible = ref(false) // 是否显示弹出层

@@ -7,12 +7,7 @@
           <span>字典分类</span>
         </div>
       </template>
-      <vxe-grid
-        ref="xTypeGrid"
-        v-bind="typeGridOptions"
-        @cell-click="cellClickEvent"
-        class="xtable-scrollbar"
-      >
+      <XTable @register="registerType" @cell-click="cellClickEvent">
         <!-- 操作：新增类型 -->
         <template #toolbar_buttons>
           <XButton
@@ -36,14 +31,14 @@
             preIcon="ep:delete"
             :title="t('action.del')"
             v-hasPermi="['system:dict:delete']"
-            @click="handleTypeDelete(row.id)"
+            @click="typeDeleteData(row.id)"
           />
         </template>
-      </vxe-grid>
+      </XTable>
       <!-- @星语：分页和列表重叠在一起了 -->
     </el-card>
     <!-- ====== 字典数据 ====== -->
-    <el-card class="w-1/2 dict" style="margin-left: 10px" :gutter="12" shadow="hover">
+    <el-card class="w-1/2 dict ml-3" :gutter="12" shadow="hover">
       <template #header>
         <div class="card-header">
           <span>字典数据</span>
@@ -55,7 +50,7 @@
       </div>
       <div v-if="tableTypeSelect">
         <!-- 列表 -->
-        <vxe-grid ref="xDataGrid" v-bind="dataGridOptions" class="xtable-scrollbar">
+        <XTable @register="registerData">
           <!-- 操作：新增数据 -->
           <template #toolbar_buttons>
             <XButton
@@ -79,10 +74,10 @@
               v-hasPermi="['system:dict:delete']"
               preIcon="ep:delete"
               :title="t('action.del')"
-              @click="handleDataDelete(row.id)"
+              @click="dataDeleteData(row.id)"
             />
           </template>
-        </vxe-grid>
+        </XTable>
       </div>
     </el-card>
     <XModal id="dictModel" v-model="dialogVisible" :title="dialogTitle">
@@ -127,13 +122,8 @@
   </div>
 </template>
 <script setup lang="ts" name="Dict">
-import { ref, unref, reactive } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { VxeGridInstance, VxeTableEvents } from 'vxe-table'
-import { FormExpose } from '@/components/Form'
-import { ElInput, ElTag, ElCard } from 'element-plus'
+import { VxeTableEvents } from 'vxe-table'
+import type { FormExpose } from '@/components/Form'
 import * as DictTypeSchemas from './dict.type'
 import * as DictDataSchemas from './dict.data'
 import * as DictTypeApi from '@/api/system/dict/dict.type'
@@ -143,28 +133,18 @@ import { DictDataVO, DictTypeVO } from '@/api/system/dict/types'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
-const xTypeGrid = ref<VxeGridInstance>() // 列表 Grid Ref
-const {
-  gridOptions: typeGridOptions,
-  getList: typeGetList,
-  deleteData: typeDeleteData
-} = useVxeGrid<DictTypeVO>({
+const [registerType, { reload: typeGetList, deleteData: typeDeleteData }] = useXTable({
   allSchemas: DictTypeSchemas.allSchemas,
   getListApi: DictTypeApi.getDictTypePageApi,
   deleteApi: DictTypeApi.deleteDictTypeApi
 })
 
-const xDataGrid = ref<VxeGridInstance>() // 列表 Grid Ref
 const queryParams = reactive({
   dictType: null
 })
-const {
-  gridOptions: dataGridOptions,
-  getList: dataGetList,
-  deleteData: dataDeleteData
-} = useVxeGrid<DictDataVO>({
+const [registerData, { reload: dataGetList, deleteData: dataDeleteData }] = useXTable({
   allSchemas: DictDataSchemas.allSchemas,
-  queryParams: queryParams,
+  params: queryParams,
   getListApi: DictDataApi.getDictDataPageApi,
   deleteApi: DictDataApi.deleteDictDataApi
 })
@@ -199,7 +179,7 @@ const tableTypeSelect = ref(false)
 const cellClickEvent: VxeTableEvents.CellClick = async ({ row }) => {
   tableTypeSelect.value = true
   queryParams.dictType = row['type']
-  await dataGetList(xDataGrid)
+  await dataGetList()
   parentType.value = row['type']
 }
 // 弹出框
@@ -215,15 +195,6 @@ const setDialogTile = (type: string) => {
   dialogTitle.value = t('action.' + type)
   actionType.value = type
   dialogVisible.value = true
-}
-
-// 删除操作
-const handleTypeDelete = async (rowId: number) => {
-  await typeDeleteData(xTypeGrid, rowId)
-}
-
-const handleDataDelete = async (rowId: number) => {
-  await dataDeleteData(xDataGrid, rowId)
 }
 
 // 提交按钮
@@ -247,7 +218,7 @@ const submitTypeForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
-        typeGetList(xTypeGrid)
+        typeGetList()
       }
     }
   })
@@ -272,7 +243,7 @@ const submitDataForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
-        dataGetList(xDataGrid)
+        dataGetList()
       }
     }
   })

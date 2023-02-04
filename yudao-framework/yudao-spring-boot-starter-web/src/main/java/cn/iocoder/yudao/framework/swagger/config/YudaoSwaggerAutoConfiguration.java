@@ -9,15 +9,16 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.ExampleBuilder;
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestParameterBuilder;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +31,7 @@ import static springfox.documentation.builders.RequestHandlerSelectors.basePacka
  * @author 芋道源码
  */
 @AutoConfiguration
-@EnableSwagger2
+@EnableSwagger2WebMvc
 @EnableKnife4j
 @ConditionalOnClass({Docket.class, ApiInfoBuilder.class})
 // 允许使用 swagger.enable=false 禁用 Swagger
@@ -59,7 +60,7 @@ public class YudaoSwaggerAutoConfiguration {
                 .securitySchemes(securitySchemes())
                 .securityContexts(securityContexts())
                 // ④ 全局参数（多租户 header）
-                .globalRequestParameters(globalRequestParameters());
+                .globalOperationParameters(globalRequestParameters());
     }
 
     // ========== apiInfo ==========
@@ -95,7 +96,7 @@ public class YudaoSwaggerAutoConfiguration {
         return Collections.singletonList(SecurityContext.builder()
                 .securityReferences(securityReferences())
                 // 通过 PathSelectors.regex("^(?!auth).*$")，排除包含 "auth" 的接口不需要使用securitySchemes
-                .operationSelector(o -> o.requestMappingPattern().matches("^(?!auth).*$"))
+                .forPaths(PathSelectors.regex("^(?!auth).*$"))
                 .build());
     }
 
@@ -109,11 +110,17 @@ public class YudaoSwaggerAutoConfiguration {
 
     // ========== globalRequestParameters ==========
 
-    private static List<RequestParameter> globalRequestParameters() {
-        RequestParameterBuilder tenantParameter = new RequestParameterBuilder()
-                .name(HEADER_TENANT_ID).description("租户编号")
-                .in(ParameterType.HEADER).example(new ExampleBuilder().value(1L).build());
-        return Collections.singletonList(tenantParameter.build());
+    private static List<Parameter> globalRequestParameters() {
+        List<Parameter> tenantParameter = new ArrayList<>();
+        tenantParameter.add(new ParameterBuilder()
+                .name(HEADER_TENANT_ID)
+                .description("租户编号")
+                .modelRef(new ModelRef("long"))
+                .defaultValue("1")
+                .parameterType("header")
+                .required(true)
+                .build());
+        return tenantParameter;
     }
 
 }

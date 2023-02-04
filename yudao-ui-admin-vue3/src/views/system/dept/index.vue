@@ -1,7 +1,7 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <vxe-grid ref="xGrid" v-bind="gridOptions" show-overflow class="xtable-scrollbar">
+    <XTable ref="xGrid" @register="registerTable" show-overflow>
       <template #toolbar_buttons>
         <!-- 操作：新增 -->
         <XButton
@@ -11,8 +11,8 @@
           v-hasPermi="['system:dept:create']"
           @click="handleCreate()"
         />
-        <XButton title="展开所有" @click="xGrid?.setAllTreeExpand(true)" />
-        <XButton title="关闭所有" @click="xGrid?.clearTreeExpand()" />
+        <XButton title="展开所有" @click="xGrid?.Ref.setAllTreeExpand(true)" />
+        <XButton title="关闭所有" @click="xGrid?.Ref.clearTreeExpand()" />
       </template>
       <template #leaderUserId_default="{ row }">
         <span>{{ userNicknameFormat(row) }}</span>
@@ -30,10 +30,10 @@
           preIcon="ep:delete"
           :title="t('action.del')"
           v-hasPermi="['system:dept:delete']"
-          @click="handleDelete(row.id)"
+          @click="deleteData(row.id)"
         />
       </template>
-    </vxe-grid>
+    </XTable>
   </ContentWrap>
   <!-- 添加或修改菜单对话框 -->
   <XModal id="deptModel" v-model="dialogVisible" :title="dialogTitle">
@@ -75,14 +75,8 @@
   </XModal>
 </template>
 <script setup lang="ts" name="Dept">
-import { nextTick, onMounted, ref, unref } from 'vue'
-import { ElSelect, ElTreeSelect, ElOption } from 'element-plus'
-import { VxeGridInstance } from 'vxe-table'
 import { handleTree, defaultProps } from '@/utils/tree'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useVxeGrid } from '@/hooks/web/useVxeGrid'
-import { FormExpose } from '@/components/Form'
+import type { FormExpose } from '@/components/Form'
 import { allSchemas, rules } from './dept.data'
 import * as DeptApi from '@/api/system/dept'
 import { getListSimpleUsersApi, UserVO } from '@/api/system/user'
@@ -90,7 +84,7 @@ import { getListSimpleUsersApi, UserVO } from '@/api/system/user'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 // 列表相关的变量
-const xGrid = ref<VxeGridInstance>() // 列表 Grid Ref
+const xGrid = ref<any>() // 列表 Grid Ref
 const treeConfig = {
   transform: true,
   rowField: 'id',
@@ -119,7 +113,7 @@ const getTree = async () => {
   dept.children = handleTree(res)
   deptOptions.value.push(dept)
 }
-const { gridOptions, getList, deleteData } = useVxeGrid<DeptApi.DeptVO>({
+const [registerTable, { reload, deleteData }] = useXTable({
   allSchemas: allSchemas,
   treeConfig: treeConfig,
   getListApi: DeptApi.getDeptPageApi,
@@ -168,15 +162,11 @@ const submitForm = async () => {
         dialogVisible.value = false
       } finally {
         actionLoading.value = false
-        await getList(xGrid)
+        await getTree()
+        await reload()
       }
     }
   })
-}
-
-// 删除操作
-const handleDelete = async (rowId: number) => {
-  await deleteData(xGrid, rowId)
 }
 
 const userNicknameFormat = (row) => {

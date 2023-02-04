@@ -6,7 +6,7 @@ import { usePermissionStore } from '@/store/modules/permission'
 import { filterBreadcrumb } from './helper'
 import { filter, treeToList } from '@/utils/tree'
 import type { RouteLocationNormalizedLoaded, RouteMeta } from 'vue-router'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { Icon } from '@/components/Icon'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'

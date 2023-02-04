@@ -36,11 +36,11 @@ public interface ErrorCodeMapper extends BaseMapperX<ErrorCodeDO> {
     }
 
     default List<ErrorCodeDO> selectListByCodes(Collection<Integer> codes) {
-        return selectList(new LambdaQueryWrapperX<ErrorCodeDO>().in(ErrorCodeDO::getCode, codes));
+        return selectList(ErrorCodeDO::getCode, codes);
     }
 
     default ErrorCodeDO selectByCode(Integer code) {
-        return selectOne(new LambdaQueryWrapperX<ErrorCodeDO>().eq(ErrorCodeDO::getCode, code));
+        return selectOne(ErrorCodeDO::getCode, code);
     }
 
     default List<ErrorCodeDO> selectListByApplicationNameAndUpdateTimeGt(String applicationName, LocalDateTime minUpdateTime) {

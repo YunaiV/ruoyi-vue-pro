@@ -128,28 +128,13 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { reactive, ref, unref, onMounted, computed, watch } from 'vue'
+import { ElLoading } from 'element-plus'
 import LoginFormTitle from './LoginFormTitle.vue'
-import {
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElCheckbox,
-  ElCol,
-  ElLink,
-  ElRow,
-  ElDivider,
-  ElLoading
-} from 'element-plus'
-import { useRouter } from 'vue-router'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
-import { useI18n } from '@/hooks/web/useI18n'
+
 import { useIcon } from '@/hooks/web/useIcon'
-import { useMessage } from '@/hooks/web/useMessage'
-import { required } from '@/utils/formRules'
+
 import * as authUtil from '@/utils/auth'
-import { decrypt } from '@/utils/jsencrypt'
-import { Verify } from '@/components/Verifition'
 import { usePermissionStore } from '@/store/modules/permission'
 import * as LoginApi from '@/api/login'
 import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'
@@ -180,10 +165,6 @@ const loginData = reactive({
   isShowPassword: false,
   captchaEnable: import.meta.env.VITE_APP_CAPTCHA_ENABLE,
   tenantEnable: import.meta.env.VITE_APP_TENANT_ENABLE,
-  token: '',
-  loading: {
-    signIn: false
-  },
   loginForm: {
     tenantName: '芋道源码',
     username: 'admin',
@@ -194,22 +175,10 @@ const loginData = reactive({
 })
 
 const socialList = [
-  {
-    icon: 'ant-design:github-filled',
-    type: 0
-  },
-  {
-    icon: 'ant-design:wechat-filled',
-    type: 30
-  },
-  {
-    icon: 'ant-design:alipay-circle-filled',
-    type: 0
-  },
-  {
-    icon: 'ant-design:dingtalk-circle-filled',
-    type: 20
-  }
+  { icon: 'ant-design:github-filled', type: 0 },
+  { icon: 'ant-design:wechat-filled', type: 30 },
+  { icon: 'ant-design:alipay-circle-filled', type: 0 },
+  { icon: 'ant-design:dingtalk-circle-filled', type: 20 }
 ]
 
 // 获取验证码
@@ -232,18 +201,15 @@ const getTenantId = async () => {
 }
 // 记住我
 const getCookie = () => {
-  const username = authUtil.getUsername()
-  const password = authUtil.getPassword()
-    ? decrypt(authUtil.getPassword() as unknown as string)
-    : undefined
-  const rememberMe = authUtil.getRememberMe()
-  const tenantName = authUtil.getTenantName()
-  loginData.loginForm = {
-    ...loginData.loginForm,
-    username: username ? username : loginData.loginForm.username,
-    password: password ? password : loginData.loginForm.password,
-    rememberMe: rememberMe ? true : false,
-    tenantName: tenantName ? tenantName : loginData.loginForm.tenantName
+  const loginForm = authUtil.getLoginForm()
+  if (loginForm) {
+    loginData.loginForm = {
+      ...loginData.loginForm,
+      username: loginForm.username ? loginForm.username : loginData.loginForm.username,
+      password: loginForm.password ? loginForm.password : loginData.loginForm.password,
+      rememberMe: loginForm.rememberMe ? true : false,
+      tenantName: loginForm.tenantName ? loginForm.tenantName : loginData.loginForm.tenantName
+    }
   }
 }
 // 登录
@@ -266,15 +232,9 @@ const handleLogin = async (params) => {
       background: 'rgba(0, 0, 0, 0.7)'
     })
     if (loginData.loginForm.rememberMe) {
-      authUtil.setUsername(loginData.loginForm.username)
-      authUtil.setPassword(loginData.loginForm.password)
-      authUtil.setRememberMe(loginData.loginForm.rememberMe)
-      authUtil.setTenantName(loginData.loginForm.tenantName)
+      authUtil.setLoginForm(loginData.loginForm)
     } else {
-      authUtil.removeUsername()
-      authUtil.removePassword()
-      authUtil.removeRememberMe()
-      authUtil.removeTenantName()
+      authUtil.removeLoginForm()
     }
     authUtil.setToken(res)
     if (!redirect.value) {

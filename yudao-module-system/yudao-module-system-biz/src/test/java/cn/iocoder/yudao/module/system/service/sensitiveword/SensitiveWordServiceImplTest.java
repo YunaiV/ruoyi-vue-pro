@@ -16,13 +16,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -60,10 +59,8 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         sensitiveWordService.initLocalCache();
-        // 断言 maxUpdateTime 缓存
-        assertEquals(max(wordDO1.getUpdateTime(), wordDO2.getUpdateTime()), sensitiveWordService.getMaxUpdateTime());
         // 断言 sensitiveWordTagsCache 缓存
-        assertEquals(SetUtils.asSet("论坛", "蔬菜"), sensitiveWordService.getSensitiveWordTags());
+        assertEquals(SetUtils.asSet("论坛", "蔬菜"), sensitiveWordService.getSensitiveWordTagSet());
         // 断言 tagSensitiveWordTries 缓存
         assertNotNull(sensitiveWordService.getDefaultSensitiveWordTrie());
         assertEquals(2, sensitiveWordService.getTagSensitiveWordTries().size());
@@ -138,6 +135,36 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetSensitiveWord() {
+        // mock 数据
+        SensitiveWordDO sensitiveWord = randomPojo(SensitiveWordDO.class);
+        sensitiveWordMapper.insert(sensitiveWord);
+        // 准备参数
+        Long id = sensitiveWord.getId();
+
+        // 调用
+        SensitiveWordDO dbSensitiveWord = sensitiveWordService.getSensitiveWord(id);
+        // 断言
+        assertPojoEquals(sensitiveWord, dbSensitiveWord);
+    }
+
+    @Test
+    public void testGetSensitiveWordList() {
+        // mock 数据
+        SensitiveWordDO sensitiveWord01 = randomPojo(SensitiveWordDO.class);
+        sensitiveWordMapper.insert(sensitiveWord01);
+        SensitiveWordDO sensitiveWord02 = randomPojo(SensitiveWordDO.class);
+        sensitiveWordMapper.insert(sensitiveWord02);
+
+        // 调用
+        List<SensitiveWordDO> list = sensitiveWordService.getSensitiveWordList();
+        // 断言
+        assertEquals(2, list.size());
+        assertEquals(sensitiveWord01, list.get(0));
+        assertEquals(sensitiveWord02, list.get(1));
+    }
+
+    @Test
     public void testGetSensitiveWordPage() {
         // mock 数据
         SensitiveWordDO dbSensitiveWord = randomPojo(SensitiveWordDO.class, o -> { // 等会查询到
@@ -158,7 +185,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         reqVO.setName("笨");
         reqVO.setTag("论坛");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
+        reqVO.setCreateTime(buildBetweenTime(2022, 2, 1, 2022, 2, 12));
 
         // 调用
         PageResult<SensitiveWordDO> pageResult = sensitiveWordService.getSensitiveWordPage(reqVO);
@@ -169,7 +196,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetSensitiveWordList() {
+    public void testGetSensitiveWordList_export() {
         // mock 数据
         SensitiveWordDO dbSensitiveWord = randomPojo(SensitiveWordDO.class, o -> { // 等会查询到
             o.setName("笨蛋");
@@ -189,7 +216,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         reqVO.setName("笨");
         reqVO.setTag("论坛");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
+        reqVO.setCreateTime(buildBetweenTime(2022, 2, 1, 2022, 2, 12));
 
         // 调用
         List<SensitiveWordDO> list = sensitiveWordService.getSensitiveWordList(reqVO);

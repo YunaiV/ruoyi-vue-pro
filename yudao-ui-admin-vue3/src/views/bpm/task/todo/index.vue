@@ -5,7 +5,6 @@ import { useTable } from '@/hooks/web/useTable'
 import type { TaskTodoVO } from '@/api/bpm/task/types'
 import { allSchemas } from './done.data'
 import * as TaskTodoApi from '@/api/bpm/task'
-import { useRouter } from 'vue-router'
 const { push } = useRouter()
 // ========== 列表相关 ==========
 const { register, tableObject, methods } = useTable<TaskTodoVO>({
