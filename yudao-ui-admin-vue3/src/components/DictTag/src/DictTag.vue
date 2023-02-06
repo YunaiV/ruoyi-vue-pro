@@ -33,6 +33,9 @@ export default defineComponent({
       if (!props.type) {
         return null
       }
+      if (!props.value) {
+        return null
+      }
       getDictObj(props.type, props.value.toString())
       return (
         <ElTag

@@ -1,69 +1,63 @@
-import { CrudSchema, useCrudSchemas } from '@/hooks/web/useCrudSchemas'
+import { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
+
 const { t } = useI18n() // 国际化
 
 // 表单校验
 export const rules = reactive({
-  name: [required]
+  name: [required],
+  description: [required],
+  memberUserIds: [required],
+  status: [required]
 })
 
 // CrudSchema
-const crudSchemas = reactive<CrudSchema[]>([
-  {
-    label: t('common.index'),
-    field: 'id',
-    type: 'index',
-    form: {
-      show: false
+const crudSchemas = reactive<VxeCrudSchema>({
+  primaryKey: 'id',
+  primaryType: 'id',
+  primaryTitle: '编号',
+  action: true,
+  columns: [
+    {
+      title: '组名',
+      field: 'name',
+      isSearch: true
     },
-    detail: {
-      show: false
-    }
-  },
-  {
-    label: '组名',
-    field: 'name',
-    search: {
-      show: true
-    }
-  },
-  {
-    label: '成员',
-    field: 'memberUserIds'
-  },
-  {
-    label: '描述',
-    field: 'description'
-  },
-  {
-    label: t('common.status'),
-    field: 'status',
-    dictType: DICT_TYPE.COMMON_STATUS,
-    dictClass: 'number'
-  },
-  {
-    label: '备注',
-    field: 'remark',
-    table: {
-      show: false
-    }
-  },
-  {
-    label: t('common.createTime'),
-    field: 'createTime',
-    form: {
-      show: false
-    }
-  },
-  {
-    label: t('table.action'),
-    field: 'action',
-    width: '240px',
-    form: {
-      show: false
+    {
+      title: '成员',
+      field: 'memberUserIds',
+      table: {
+        slots: {
+          default: 'memberUserIds_default'
+        }
+      }
     },
-    detail: {
-      show: false
+    {
+      title: '描述',
+      field: 'description'
+    },
+    {
+      title: t('common.status'),
+      field: 'status',
+      dictType: DICT_TYPE.COMMON_STATUS,
+      dictClass: 'number',
+      isSearch: true
+    },
+    {
+      title: t('common.createTime'),
+      field: 'createTime',
+      formatter: 'formatDate',
+      isForm: false,
+      isSearch: true,
+      search: {
+        show: true,
+        itemRender: {
+          name: 'XDataTimePicker'
+        }
+      },
+      table: {
+        width: 180
+      }
     }
-  }
-])
-export const { allSchemas } = useCrudSchemas(crudSchemas)
+  ]
+})
+export const { allSchemas } = useVxeCrudSchemas(crudSchemas)

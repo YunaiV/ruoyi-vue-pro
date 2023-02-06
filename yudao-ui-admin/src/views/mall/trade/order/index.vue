@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="功能开启" url="https://doc.iocoder.cn/mall/build/" />
+
     <!-- 搜索工作栏 -->
     <!-- TODO: inline 看看是不是需要; v-show= 那块逻辑还是要的 -->
     <el-row :gutter="20">

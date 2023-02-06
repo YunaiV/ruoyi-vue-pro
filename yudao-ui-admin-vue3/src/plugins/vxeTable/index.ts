@@ -135,7 +135,15 @@ VXETable.setup({
 })
 // 自定义全局的格式化处理函数
 VXETable.formats.mixin({
-  // 格式日期，默认 yyyy-MM-dd HH:mm:ss
+  // 格式精简日期，默认 yyyy-MM-dd HH:mm:ss
+  formatDay({ cellValue }, format) {
+    if (cellValue != null) {
+      return XEUtils.toDateString(cellValue, format || 'yyyy-MM-dd')
+    } else {
+      return ''
+    }
+  },
+  // 格式完整日期，默认 yyyy-MM-dd HH:mm:ss
   formatDate({ cellValue }, format) {
     if (cellValue != null) {
       return XEUtils.toDateString(cellValue, format || 'yyyy-MM-dd HH:mm:ss')

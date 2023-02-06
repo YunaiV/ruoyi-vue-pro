@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,12 +21,8 @@ public class BpmTaskTodoPageReqVO extends PageParam {
     @Schema(description = "流程任务名", example = "芋道")
     private String name;
 
-    @Schema(description = "开始的创建收间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime beginCreateTime;
-
-    @Schema(description = "结束的创建时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime endCreateTime;
+    @Schema(description = "创建时间")
+    @DateTimeFormat(pattern = DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] createTime;
 
 }

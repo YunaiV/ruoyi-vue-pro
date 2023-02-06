@@ -119,6 +119,13 @@ service.interceptors.response.use(async res => {
       type: 'error'
     })
     return Promise.reject(new Error(msg))
+  } else if (code === 501) {
+    Message({
+      type: 'error',
+      duration: 0,
+      message: msg
+    })
+    return Promise.reject(new Error(msg))
   } else if (code === 901) {
     Message({
       type: 'error',

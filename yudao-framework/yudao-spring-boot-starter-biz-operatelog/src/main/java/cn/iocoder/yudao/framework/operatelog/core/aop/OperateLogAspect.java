@@ -196,7 +196,7 @@ public class OperateLogAspect {
             operateLogObj.setName(operateLog.name());
         }
         if (StrUtil.isEmpty(operateLogObj.getName()) && operation != null) {
-            operateLogObj.setName(operation.description());
+            operateLogObj.setName(operation.summary());
         }
         // type 属性
         if (operateLog != null && ArrayUtil.isNotEmpty(operateLog.type())) {

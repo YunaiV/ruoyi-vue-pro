@@ -1,165 +1,96 @@
-<script setup lang="ts" name="Form">
-import dayjs from 'dayjs'
-import { DICT_TYPE } from '@/utils/dict'
-import type { FormExpose } from '@/components/Form'
-import type { FormVO } from '@/api/bpm/form/types'
-import { rules, allSchemas } from './form.data'
+<template>
+  <ContentWrap>
+    <!-- 列表 -->
+    <div>
+      <XTable @register="registerTable">
+        <!-- 操作：新增 -->
+        <template #toolbar_buttons>
+          <XButton
+            type="primary"
+            preIcon="ep:zoom-in"
+            :title="t('action.add')"
+            v-hasPermi="['system:post:create']"
+            @click="handleCreate()"
+          />
+        </template>
+        <template #actionbtns_default="{ row }">
+          <!-- 操作：修改 -->
+          <XTextButton
+            preIcon="ep:edit"
+            :title="t('action.edit')"
+            v-hasPermi="['bpm:form:update']"
+            @click="handleUpdate(row.id)"
+          />
+          <!-- 操作：详情 -->
+          <XTextButton
+            preIcon="ep:view"
+            :title="t('action.detail')"
+            v-hasPermi="['bpm:form:query']"
+            @click="handleDetail(row.id)"
+          />
+          <!-- 操作：删除 -->
+          <XTextButton
+            preIcon="ep:delete"
+            :title="t('action.del')"
+            v-hasPermi="['bpm:form:delete']"
+            @click="deleteData(row.id)"
+          />
+        </template>
+      </XTable>
+      <!-- 表单详情的弹窗 -->
+      <XModal v-model="detailOpen" width="800" title="表单详情">
+        <form-create :rule="detailPreview.rule" :option="detailPreview.option" v-if="detailOpen" />
+      </XModal>
+    </div>
+  </ContentWrap>
+</template>
+
+<script setup lang="ts" name="BpmForm">
+// 全局相关的 import
+// 业务相关的 import
 import * as FormApi from '@/api/bpm/form'
-import { useTable } from '@/hooks/web/useTable'
+import { allSchemas } from './form.data'
+// 表单详情相关的变量和 import
+import { setConfAndFields2 } from '@/utils/formCreate'
+
 const { t } = useI18n() // 国际化
-const message = useMessage()
+const router = useRouter() // 路由
 
-// ========== 列表相关 ==========
-const { register, tableObject, methods } = useTable<FormVO>({
+// 列表相关的变量
+const [registerTable, { deleteData }] = useXTable({
+  allSchemas: allSchemas,
   getListApi: FormApi.getFormPageApi,
-  delListApi: FormApi.deleteFormApi
+  deleteApi: FormApi.deleteFormApi
 })
-const { getList, setSearchParams, delList } = methods
-
-// ========== CRUD 相关 ==========
-const actionLoading = ref(false) // 遮罩层
-const actionType = ref('') // 操作按钮的类型
-const dialogVisible = ref(false) // 是否显示弹出层
-const dialogTitle = ref('edit') // 弹出层标题
-const formRef = ref<FormExpose>() // 表单 Ref
-
-// 设置标题
-const setDialogTile = (type: string) => {
-  dialogTitle.value = t('action.' + type)
-  actionType.value = type
-  dialogVisible.value = true
-}
 
 // 新增操作
 const handleCreate = () => {
-  setDialogTile('create')
+  router.push({
+    name: 'bpmFormEditor'
+  })
 }
 
 // 修改操作
-const handleUpdate = async (row: FormVO) => {
-  setDialogTile('update')
-  // 设置数据
-  const res = await FormApi.getFormApi(row.id)
-  unref(formRef)?.setValues(res)
-}
-
-// 提交按钮
-const submitForm = async () => {
-  const elForm = unref(formRef)?.getElFormRef()
-  if (!elForm) return
-  elForm.validate(async (valid) => {
-    if (valid) {
-      actionLoading.value = true
-      // 提交请求
-      try {
-        const data = unref(formRef)?.formModel as FormVO
-        if (actionType.value === 'create') {
-          await FormApi.createFormApi(data)
-          message.success(t('common.createSuccess'))
-        } else {
-          await FormApi.updateFormApi(data)
-          message.success(t('common.updateSuccess'))
-        }
-        // 操作成功，重新加载列表
-        dialogVisible.value = false
-        await getList()
-      } finally {
-        actionLoading.value = false
-      }
+const handleUpdate = async (rowId: number) => {
+  await router.push({
+    name: 'bpmFormEditor',
+    query: {
+      id: rowId
     }
   })
 }
 
-// ========== 详情相关 ==========
-const detailData = ref() // 详情 Ref
-
 // 详情操作
-const handleDetail = async (row: FormVO) => {
-  // 设置数据
-  detailData.value = row
-  setDialogTile('detail')
+const detailOpen = ref(false)
+const detailPreview = ref({
+  rule: [],
+  option: {}
+})
+const handleDetail = async (rowId: number) => {
+  // 设置表单
+  const data = await FormApi.getFormApi(rowId)
+  setConfAndFields2(detailPreview, data.conf, data.fields)
+  // 弹窗打开
+  detailOpen.value = true
 }
-
-// ========== 初始化 ==========
-getList()
 </script>
-
-<template>
-  <!-- 搜索工作区 -->
-  <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <el-button type="primary" v-hasPermi="['bpm:form:create']" @click="handleCreate()">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
-    </div>
-    <!-- 列表 -->
-    <Table
-      :columns="allSchemas.tableColumns"
-      :selection="false"
-      :data="tableObject.tableList"
-      :loading="tableObject.loading"
-      :pagination="{
-        total: tableObject.total
-      }"
-      v-model:pageSize="tableObject.pageSize"
-      v-model:currentPage="tableObject.currentPage"
-      @register="register"
-    >
-      <template #status="{ row }">
-        <DictTag :type="DICT_TYPE.COMMON_STATUS" :value="row.status" />
-      </template>
-      <template #createTime="{ row }">
-        <span>{{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-      <template #action="{ row }">
-        <el-button link type="primary" v-hasPermi="['bpm:form:update']" @click="handleUpdate(row)">
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
-        </el-button>
-        <el-button link type="primary" v-hasPermi="['bpm:form:update']" @click="handleDetail(row)">
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
-        </el-button>
-        <el-button
-          link
-          type="primary"
-          v-hasPermi="['bpm:form:delete']"
-          @click="delList(row.id, false)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
-      </template>
-    </Table>
-  </ContentWrap>
-
-  <XModal v-model="dialogVisible" :title="dialogTitle">
-    <!-- 对话框(添加 / 修改) -->
-    <Form
-      v-if="['create', 'update'].includes(actionType)"
-      :schema="allSchemas.formSchema"
-      :rules="rules"
-      ref="formRef"
-    />
-    <!-- 对话框(详情) -->
-    <Descriptions
-      v-if="actionType === 'detail'"
-      :schema="allSchemas.detailSchema"
-      :data="detailData"
-    />
-    <!-- 操作按钮 -->
-    <template #footer>
-      <!-- 按钮：保存 -->
-      <XButton
-        v-if="['create', 'update'].includes(actionType)"
-        type="primary"
-        :title="t('action.save')"
-        :loading="actionLoading"
-        @click="submitForm()"
-      />
-      <!-- 按钮：关闭 -->
-      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="dialogVisible = false" />
-    </template>
-  </XModal>
-</template>

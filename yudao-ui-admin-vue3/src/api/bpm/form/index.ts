@@ -1,5 +1,14 @@
 import request from '@/config/axios'
-import { FormVO } from './types'
+
+export type FormVO = {
+  id: number
+  name: string
+  conf: string
+  fields: string[]
+  status: number
+  remark: string
+  createTime: string
+}
 
 // 创建工作流的表单定义
 export const createFormApi = async (data: FormVO) => {
