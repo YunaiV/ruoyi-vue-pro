@@ -5,7 +5,7 @@ $--color-danger: #ff4d4f;
 /* 改变 icon 字体路径变量，必需 */
 $--font-path: '~element-ui/lib/theme-chalk/fonts';
 
-@import "~element-ui/packages/theme-chalk/src/index";
+@import '~element-ui/packages/theme-chalk/src/index';
 
 .el-table td,
 .el-table th {
@@ -20,7 +20,7 @@ $--font-path: '~element-ui/lib/theme-chalk/fonts';
   box-sizing: border-box;
   border-bottom: 1px solid #e8e8e8;
 }
-div[class^="el-drawer"]:focus,
+div[class^='el-drawer']:focus,
 span:focus {
   outline: none;
 }
@@ -63,7 +63,7 @@ span:focus {
   width: 100%;
 }
 .el-divider:not(.el-divider--horizontal) {
-  margin: 0 8px ;
+  margin: 0 8px;
 }
 .el-divider.el-divider--horizontal {
   margin: 16px 0;

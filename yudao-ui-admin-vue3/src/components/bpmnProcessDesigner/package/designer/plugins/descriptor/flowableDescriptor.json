@@ -875,10 +875,7 @@
       "name": "FailedJobRetryTimeCycle",
       "superClass": ["Element"],
       "meta": {
-        "allowedIn": [
-          "flowable:AsyncCapable",
-          "bpmn:MultiInstanceLoopCharacteristics"
-        ]
+        "allowedIn": ["flowable:AsyncCapable", "bpmn:MultiInstanceLoopCharacteristics"]
       },
       "properties": [
         {

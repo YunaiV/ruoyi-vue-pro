@@ -212,9 +212,9 @@ const { proxy } = getCurrentInstance()
 // ========== 审批信息 ==========
 const id = query.id as unknown as number
 const processInstanceLoading = ref(false) // 流程实例的加载中
-const processInstance = ref({}) // 流程实例
-const runningTasks = ref([]) // 运行中的任务
-const auditForms = ref([]) // 审批任务的表单
+const processInstance = ref<any>({}) // 流程实例
+const runningTasks = ref<any[]>([]) // 运行中的任务
+const auditForms = ref<any[]>([]) // 审批任务的表单
 const auditRule = reactive({
   reason: [{ required: true, message: '审批建议不能为空', trigger: 'blur' }]
 })
@@ -260,7 +260,7 @@ const detailForm = ref({
 
 // ========== 审批记录 ==========
 const tasksLoad = ref(true)
-const tasks = ref([])
+const tasks = ref<any[]>([])
 
 const getTimelineItemIcon = (item) => {
   if (item.result === 1) {
@@ -304,7 +304,7 @@ const updateAssigneeRules = ref({
   assigneeUserId: [{ required: true, message: '新审批人不能为空', trigger: 'change' }]
 })
 const updateAssigneeFormRef = ref()
-const userOptions = ref([])
+const userOptions = ref<any[]>([])
 
 // 处理转派审批人
 const handleUpdateAssignee = (task) => {

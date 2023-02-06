@@ -38,8 +38,6 @@
 </template>
 
 <script setup lang="ts" name="UserTask">
-import { ref, watch, nextTick, onBeforeUnmount, toRaw } from 'vue'
-import { ElLink, ElFormItem, ElInput } from 'element-plus'
 const props = defineProps({
   id: String,
   type: String
@@ -52,7 +50,7 @@ const defaultTaskForm = ref({
   followUpDate: '',
   priority: ''
 })
-const userTaskForm = ref({})
+const userTaskForm = ref<any>({})
 // const mockData=ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 const bpmnElement = ref()
 const resetTaskForm = () => {

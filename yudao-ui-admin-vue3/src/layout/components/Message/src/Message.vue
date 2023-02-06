@@ -5,7 +5,7 @@ import * as NotifyMessageApi from '@/api/system/notify/message'
 const { push } = useRouter()
 const activeName = ref('notice')
 const unreadCount = ref(0) // 未读消息数量
-const list = ref([]) // 消息列表
+const list = ref<any[]>([]) // 消息列表
 
 // 获得消息列表
 const getList = async () => {

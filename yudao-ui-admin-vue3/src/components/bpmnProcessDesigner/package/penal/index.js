@@ -1,7 +1,7 @@
-import MyPropertiesPanel from "./PropertiesPanel.vue";
+import MyPropertiesPanel from './PropertiesPanel.vue'
 
-MyPropertiesPanel.install = function(Vue) {
-  Vue.component(MyPropertiesPanel.name, MyPropertiesPanel);
-};
+MyPropertiesPanel.install = function (Vue) {
+  Vue.component(MyPropertiesPanel.name, MyPropertiesPanel)
+}
 
-export default MyPropertiesPanel;
+export default MyPropertiesPanel

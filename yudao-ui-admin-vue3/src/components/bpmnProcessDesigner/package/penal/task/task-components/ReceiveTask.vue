@@ -49,19 +49,20 @@
 </template>
 
 <script setup lang="ts" name="ReceiveTask">
-import { ref, watch, onBeforeUnmount, onMounted, nextTick, toRaw } from 'vue'
-import { ElMessage, ElFormItem, ElDialog, ElForm, ElSelect, ElOption } from 'element-plus'
 const props = defineProps({
   id: String,
   type: String
 })
+
+const message = useMessage()
+
 const bindMessageId = ref('')
-const newMessageForm = ref({})
-const messageMap = ref({})
+const newMessageForm = ref<any>({})
+const messageMap = ref<any>({})
 const messageModelVisible = ref(false)
-const bpmnElement = ref()
-const bpmnMessageRefsMap = ref()
-const bpmnRootElements = ref()
+const bpmnElement = ref<any>()
+const bpmnMessageRefsMap = ref<any>()
+const bpmnRootElements = ref<any>()
 
 const getBindMessage = () => {
   bpmnElement.value = window.bpmnInstances.bpmnElement
@@ -73,7 +74,7 @@ const openMessageModel = () => {
 }
 const createNewMessage = () => {
   if (messageMap.value[newMessageForm.value.id]) {
-    ElMessage.error('该消息已存在，请修改id后重新保存')
+    message.error('该消息已存在，请修改id后重新保存')
     return
   }
   const newMessage = window.bpmnInstances.moddle.create('bpmn:Message', newMessageForm.value)

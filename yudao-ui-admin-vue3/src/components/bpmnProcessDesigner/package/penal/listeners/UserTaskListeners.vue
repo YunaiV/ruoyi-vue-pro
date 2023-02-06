@@ -288,20 +288,7 @@
   </div>
 </template>
 <script lang="ts" setup name="UserTaskListeners">
-import { ref, inject, watch, nextTick } from 'vue'
-import {
-  ElDialog,
-  ElForm,
-  ElFormItem,
-  ElSelect,
-  ElOption,
-  ElDivider,
-  ElTable,
-  ElTableColumn,
-  ElMessageBox,
-  ElButton,
-  ElDrawer
-} from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { createListenerObject, updateElementExtensions } from '../../utils'
 import { initListenerForm, initListenerType, eventType, listenerType, fieldType } from './utilSelf'
 const props = defineProps({
@@ -310,17 +297,17 @@ const props = defineProps({
 })
 const prefix = inject('prefix')
 const width = inject('width')
-const elementListenersList = ref([])
+const elementListenersList = ref<any[]>([])
 const listenerEventTypeObject = ref(eventType)
 const listenerTypeObject = ref(listenerType)
 const listenerFormModelVisible = ref(false)
-const listenerForm = ref({})
+const listenerForm = ref<any>({})
 const fieldTypeObject = ref(fieldType)
-const fieldsListOfListener = ref([])
+const fieldsListOfListener = ref<any[]>([])
 const listenerFieldFormModelVisible = ref(false) // 监听器 注入字段表单弹窗 显示状态
 const editingListenerIndex = ref(-1) // 监听器所在下标，-1 为新增
 const editingListenerFieldIndex = ref(-1) // 字段所在下标，-1 为新增
-const listenerFieldForm = ref({}) // 监听器 注入字段 详情表单
+const listenerFieldForm = ref<any>({}) // 监听器 注入字段 详情表单
 const bpmnElement = ref()
 const bpmnElementListeners = ref()
 const otherExtensionList = ref()
@@ -342,7 +329,7 @@ const resetListenersList = () => {
     initListenerType(listener)
   )
 }
-const openListenerForm = (listener, index) => {
+const openListenerForm = (listener, index?) => {
   if (listener) {
     listenerForm.value = initListenerForm(listener)
     editingListenerIndex.value = index
@@ -366,7 +353,7 @@ const openListenerForm = (listener, index) => {
   })
 }
 // 移除监听器
-const removeListener = (listener, index) => {
+const removeListener = (listener, index?) => {
   console.log(listener, 'listener')
   ElMessageBox.confirm('确认移除该监听器吗？', '提示', {
     confirmButtonText: '确 认',
@@ -408,7 +395,7 @@ const saveListenerConfig = async () => {
   listenerForm.value = {}
 }
 // 打开监听器字段编辑弹窗
-const openListenerFieldForm = (field, index) => {
+const openListenerFieldForm = (field, index?) => {
   listenerFieldForm.value = field ? JSON.parse(JSON.stringify(field)) : {}
   editingListenerFieldIndex.value = field ? index : -1
   listenerFieldFormModelVisible.value = true

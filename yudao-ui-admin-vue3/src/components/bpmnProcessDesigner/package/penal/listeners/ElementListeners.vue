@@ -15,11 +15,7 @@
             >编辑</el-button
           >
           <el-divider direction="vertical" />
-          <el-button
-            size="small"
-            link
-            style="color: #ff4d4f"
-            @click="removeListener(scope.row, scope.$index)"
+          <el-button size="small" link style="color: #ff4d4f" @click="removeListener(scope.$index)"
             >移除</el-button
           >
         </template>
@@ -171,7 +167,7 @@
               size="small"
               link
               style="color: #ff4d4f"
-              @click="removeListenerField(scope.row, scope.$index)"
+              @click="removeListenerField(scope.$index)"
               >移除</el-button
             >
           </template>
@@ -268,11 +264,11 @@ const props = defineProps({
 })
 const prefix = inject('prefix')
 const width = inject('width')
-const elementListenersList = ref([]) // 监听器列表
-const listenerForm = ref({}) // 监听器详情表单
+const elementListenersList = ref<any[]>([]) // 监听器列表
+const listenerForm = ref<any>({}) // 监听器详情表单
 const listenerFormModelVisible = ref(false) // 监听器 编辑 侧边栏显示状态
-const fieldsListOfListener = ref([])
-const listenerFieldForm = ref({}) // 监听器 注入字段 详情表单
+const fieldsListOfListener = ref<any[]>([])
+const listenerFieldForm = ref<any>({}) // 监听器 注入字段 详情表单
 const listenerFieldFormModelVisible = ref(false) // 监听器 注入字段表单弹窗 显示状态
 const editingListenerIndex = ref(-1) // 监听器所在下标，-1 为新增
 const editingListenerFieldIndex = ref(-1) // 字段所在下标，-1 为新增
@@ -296,7 +292,7 @@ const resetListenersList = () => {
   )
 }
 // 打开 监听器详情 侧边栏
-const openListenerForm = (listener, index) => {
+const openListenerForm = (listener, index?) => {
   if (listener) {
     listenerForm.value = initListenerForm(listener)
     editingListenerIndex.value = index
@@ -322,7 +318,7 @@ const openListenerForm = (listener, index) => {
   })
 }
 // 打开监听器字段编辑弹窗
-const openListenerFieldForm = (field, index) => {
+const openListenerFieldForm = (field, index?) => {
   listenerFieldForm.value = field ? JSON.parse(JSON.stringify(field)) : {}
   editingListenerFieldIndex.value = field ? index : -1
   listenerFieldFormModelVisible.value = true
