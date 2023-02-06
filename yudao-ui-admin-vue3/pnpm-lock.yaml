@@ -90,7 +90,6 @@ specifiers:
   vue-router: ^4.1.6
   vue-tsc: ^1.0.24
   vue-types: ^5.0.2
-  vue3-treeselect: ^0.1.10
   vuedraggable: ^4.1.0
   vxe-table: ^4.3.9
   web-storage-cache: ^1.1.1
@@ -134,7 +133,6 @@ dependencies:
   vue-i18n: 9.2.2_vue@3.2.47
   vue-router: 4.1.6_vue@3.2.47
   vue-types: 5.0.2_vue@3.2.47
-  vue3-treeselect: 0.1.10_vue@3.2.47
   vuedraggable: 4.1.0_vue@3.2.47
   vxe-table: 4.3.9_vue@3.2.47+xe-utils@3.5.7
   web-storage-cache: 1.1.1
@@ -8382,14 +8380,6 @@ packages:
       '@vue/runtime-dom': 3.2.47
       '@vue/server-renderer': 3.2.47_vue@3.2.47
       '@vue/shared': 3.2.47
-
-  /vue3-treeselect/0.1.10_vue@3.2.47:
-    resolution: {integrity: sha512-QawdAbzmlZ7T3uBdSU4FRnrnmcV0Q9Jrph5hUBQJcXmM9OZ8lULQo7O7YbKxkOyuDX9Yx2rGjs6L5FKcL1FeXA==}
-    peerDependencies:
-      vue: ^3.0.0
-    dependencies:
-      vue: 3.2.47
-    dev: false
 
   /vuedraggable/4.1.0_vue@3.2.47:
     resolution: {integrity: sha512-FU5HCWBmsf20GpP3eudURW3WdWTKIbEIQxh9/8GE806hydR9qZqRRxRE3RjqX7PkuLuMQG/A7n3cfj9rCEchww==}
