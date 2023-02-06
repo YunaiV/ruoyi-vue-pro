@@ -49,8 +49,8 @@ public interface PostService {
      * @param ids 岗位编号数组。如果为空，不进行筛选
      * @return 部门列表
      */
-    default List<PostDO> getPosts(@Nullable Collection<Long> ids) {
-        return getPosts(ids, asSet(CommonStatusEnum.ENABLE.getStatus(), CommonStatusEnum.DISABLE.getStatus()));
+    default List<PostDO> getPostList(@Nullable Collection<Long> ids) {
+        return getPostList(ids, asSet(CommonStatusEnum.ENABLE.getStatus(), CommonStatusEnum.DISABLE.getStatus()));
     }
 
     /**
@@ -60,7 +60,7 @@ public interface PostService {
      * @param statuses 状态数组。如果为空，不进行筛选
      * @return 部门列表
      */
-    List<PostDO> getPosts(@Nullable Collection<Long> ids, @Nullable Collection<Integer> statuses);
+    List<PostDO> getPostList(@Nullable Collection<Long> ids, @Nullable Collection<Integer> statuses);
 
     /**
      * 获得岗位分页列表
@@ -76,7 +76,7 @@ public interface PostService {
      * @param reqVO 查询条件
      * @return 部门列表
      */
-    List<PostDO> getPosts(PostExportReqVO reqVO);
+    List<PostDO> getPostList(PostExportReqVO reqVO);
 
     /**
      * 获得岗位信息
@@ -93,6 +93,6 @@ public interface PostService {
      *
      * @param ids 岗位编号数组
      */
-    void validPosts(Collection<Long> ids);
+    void validatePostList(Collection<Long> ids);
 
 }

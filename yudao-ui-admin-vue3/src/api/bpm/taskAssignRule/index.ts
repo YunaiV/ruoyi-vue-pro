@@ -1,5 +1,14 @@
 import request from '@/config/axios'
-import { TaskAssignVO } from './types'
+
+export type TaskAssignVO = {
+  id: number
+  modelId: string
+  processDefinitionId: string
+  taskDefinitionKey: string
+  taskDefinitionName: string
+  options: string[]
+  type: number
+}
 
 export const getTaskAssignRuleList = async (params) => {
   return await request.get({ url: '/bpm/task-assign-rule/list', params })

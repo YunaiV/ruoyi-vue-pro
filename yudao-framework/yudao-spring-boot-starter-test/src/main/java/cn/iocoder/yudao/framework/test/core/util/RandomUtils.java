@@ -50,7 +50,7 @@ public class RandomUtils {
             }
             // 如果是 type、status 结尾的字段，返回 tinyint 范围
             if (StrUtil.endWithAnyIgnoreCase(attributeMetadata.getAttributeName(),
-                    "type", "status", "category", "scope")) {
+                    "type", "status", "category", "scope", "result")) {
                 return RandomUtil.randomInt(0, TINYINT_MAX + 1);
             }
             return RandomUtil.randomInt();

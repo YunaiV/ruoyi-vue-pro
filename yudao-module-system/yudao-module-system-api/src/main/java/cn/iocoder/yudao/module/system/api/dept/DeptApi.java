@@ -29,7 +29,7 @@ public interface DeptApi {
      * @param ids 部门编号数组
      * @return 部门信息数组
      */
-    List<DeptRespDTO> getDepts(Collection<Long> ids);
+    List<DeptRespDTO> getDeptList(Collection<Long> ids);
 
     /**
      * 校验部门们是否有效。如下情况，视为无效：
@@ -38,7 +38,7 @@ public interface DeptApi {
      *
      * @param ids 角色编号数组
      */
-    void validDepts(Collection<Long> ids);
+    void validateDeptList(Collection<Long> ids);
 
     /**
      * 获得指定编号的部门 Map
@@ -47,7 +47,7 @@ public interface DeptApi {
      * @return 部门 Map
      */
     default Map<Long, DeptRespDTO> getDeptMap(Set<Long> ids) {
-        List<DeptRespDTO> list = getDepts(ids);
+        List<DeptRespDTO> list = getDeptList(ids);
         return CollectionUtils.convertMap(list, DeptRespDTO::getId);
     }
 

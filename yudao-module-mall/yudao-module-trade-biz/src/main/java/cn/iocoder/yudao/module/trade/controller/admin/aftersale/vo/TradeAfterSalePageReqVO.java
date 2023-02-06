@@ -5,8 +5,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -16,34 +15,34 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel("管理后台 - 交易售后分页 Request VO")
+@Schema(description = "管理后台 - 交易售后分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class TradeAfterSalePageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "售后流水号", example = "202211190847450020500077", notes = "模糊匹配")
+    @Schema(description = "售后流水号", example = "202211190847450020500077")
     private String no;
 
-    @ApiModelProperty(value = "售后状态", example = "10", notes = "参见 TradeAfterSaleStatusEnum 枚举")
+    @Schema(description = "售后状态", example = "10")
     @InEnum(value = TradeAfterSaleStatusEnum.class, message = "售后状态必须是 {value}")
     private Integer status;
 
-    @ApiModelProperty(value = "售后类型", example = "20", notes = "参见 TradeAfterSaleTypeEnum 枚举")
+    @Schema(description = "售后类型", example = "20")
     @InEnum(value = TradeAfterSaleTypeEnum.class, message = "售后类型必须是 {value}")
     private Integer type;
 
-    @ApiModelProperty(value = "售后方式", example = "10", notes = "参见 TradeAfterSaleWayEnum 枚举")
+    @Schema(description = "售后方式", example = "10")
     @InEnum(value = TradeAfterSaleWayEnum.class, message = "售后方式必须是 {value}")
     private Integer way;
 
-    @ApiModelProperty(value = "订单编号", example = "18078", notes = "模糊匹配")
+    @Schema(description = "订单编号", example = "18078")
     private String orderNo;
 
-    @ApiModelProperty(value = "商品 SPU 名称", example = "李四", notes = "模糊匹配")
+    @Schema(description = "商品 SPU 名称", example = "李四")
     private String spuName;
 
-    @ApiModelProperty(value = "创建时间")
+    @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 

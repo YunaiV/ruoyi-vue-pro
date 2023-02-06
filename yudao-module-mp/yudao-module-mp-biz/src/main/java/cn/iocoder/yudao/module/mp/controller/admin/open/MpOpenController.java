@@ -10,8 +10,8 @@ import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import cn.iocoder.yudao.module.mp.framework.mp.core.context.MpContextHolder;
 import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.Objects;
 
-@Api(tags = "管理后台 - 公众号回调")
+@Tag(name = "管理后台 - 公众号回调")
 @RestController
 @RequestMapping("/mp/open")
 @Validated
@@ -41,7 +41,7 @@ public class MpOpenController {
      *
      * 对应 <a href="https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html">文档</a>
      */
-    @ApiOperation("校验签名") // 参见
+    @Operation(summary = "校验签名") // 参见
     @GetMapping(value = "/{appId}", produces = "text/plain;charset=utf-8")
     public String checkSignature(@PathVariable("appId") String appId,
                                  MpOpenCheckSignatureReqVO reqVO) {
@@ -61,7 +61,7 @@ public class MpOpenController {
      *
      * <a href="https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_standard_messages.html">文档</a>
      */
-    @ApiOperation("处理消息")
+    @Operation(summary = "处理消息")
     @PostMapping(value = "/{appId}", produces = "application/xml; charset=UTF-8")
     @OperateLog(enable = false) // 回调地址，无需记录操作日志
     public String handleMessage(@PathVariable("appId") String appId,

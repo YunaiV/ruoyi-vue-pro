@@ -28,5 +28,6 @@ export default {
 <style scoped>
 .el-alert--success.is-light {
   margin-bottom: 10px;
+  cursor: pointer;
 }
 </style>

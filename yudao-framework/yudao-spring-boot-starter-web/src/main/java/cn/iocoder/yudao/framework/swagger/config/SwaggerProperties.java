@@ -35,9 +35,26 @@ public class SwaggerProperties {
     @NotEmpty(message = "版本不能为空")
     private String version;
     /**
-     * 扫描的包
+     * url
      */
     @NotEmpty(message = "扫描的 package 不能为空")
-    private String basePackage;
+    private String url;
+    /**
+     * email
+     */
+    @NotEmpty(message = "扫描的 email 不能为空")
+    private String email;
+
+    /**
+     * license
+     */
+    @NotEmpty(message = "扫描的 license 不能为空")
+    private String license;
+
+    /**
+     * license-url
+     */
+    @NotEmpty(message = "扫描的 license-url 不能为空")
+    private String licenseUrl;
 
 }

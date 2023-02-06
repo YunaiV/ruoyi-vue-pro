@@ -154,6 +154,19 @@ public class OAuth2ClientServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetOAuth2Client() {
+        // mock 数据
+        OAuth2ClientDO clientDO = randomPojo(OAuth2ClientDO.class);
+        oauth2ClientMapper.insert(clientDO);
+        // 准备参数
+        Long id = clientDO.getId();
+
+        // 调用，并断言
+        OAuth2ClientDO dbClientDO = oauth2ClientService.getOAuth2Client(id);
+        assertPojoEquals(clientDO, dbClientDO);
+    }
+
+    @Test
     public void testGetOAuth2ClientPage() {
        // mock 数据
        OAuth2ClientDO dbOAuth2Client = randomPojo(OAuth2ClientDO.class, o -> { // 等会查询到
@@ -203,9 +216,12 @@ public class OAuth2ClientServiceImplTest extends BaseDbUnitTest {
                 null, null, Collections.singleton(randomString()), null), OAUTH2_CLIENT_SCOPE_OVER);
         assertServiceException(() -> oauth2ClientService.validOAuthClientFromCache("default",
                 null, null, null, "test"), OAUTH2_CLIENT_REDIRECT_URI_NOT_MATCH, "test");
-        // 成功调用
+        // 成功调用（1：参数完整）
         OAuth2ClientDO result = oauth2ClientService.validOAuthClientFromCache(client.getClientId(), client.getSecret(),
                 client.getAuthorizedGrantTypes().get(0), client.getScopes(), client.getRedirectUris().get(0));
+        assertPojoEquals(client, result);
+        // 成功调用（2：只有 clientId 参数）
+        result = oauth2ClientService.validOAuthClientFromCache(client.getClientId());
         assertPojoEquals(client, result);
     }
 

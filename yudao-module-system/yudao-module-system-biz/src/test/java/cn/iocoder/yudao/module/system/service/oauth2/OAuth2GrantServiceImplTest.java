@@ -16,6 +16,7 @@ import java.util.List;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -132,6 +133,13 @@ public class OAuth2GrantServiceImplTest extends BaseMockitoUnitTest {
         // 调用，并断言
         assertPojoEquals(accessTokenDO, oauth2GrantService.grantRefreshToken(
                 refreshToken, clientId));
+    }
+
+    @Test
+    public void testGrantClientCredentials() {
+        assertThrows(UnsupportedOperationException.class,
+                () -> oauth2GrantService.grantClientCredentials(randomString(), emptyList()),
+                "暂时不支持 client_credentials 授权模式");
     }
 
     @Test

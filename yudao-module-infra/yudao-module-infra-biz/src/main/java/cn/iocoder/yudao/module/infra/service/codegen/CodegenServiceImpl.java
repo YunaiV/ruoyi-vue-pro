@@ -76,7 +76,7 @@ public class CodegenServiceImpl implements CodegenService {
 
     private Long createCodegen0(Long userId, Long dataSourceConfigId, TableInfo tableInfo) {
         // 校验导入的表和字段非空
-        checkTableInfo(tableInfo);
+        validateTableInfo(tableInfo);
         // 校验是否已经存在
         if (codegenTableMapper.selectByTableNameAndDataSourceConfigId(tableInfo.getName(),
                 dataSourceConfigId) != null) {
@@ -100,7 +100,7 @@ public class CodegenServiceImpl implements CodegenService {
         return table.getId();
     }
 
-    private void checkTableInfo(TableInfo tableInfo) {
+    private void validateTableInfo(TableInfo tableInfo) {
         if (tableInfo == null) {
             throw exception(CODEGEN_IMPORT_TABLE_NULL);
         }
@@ -149,7 +149,7 @@ public class CodegenServiceImpl implements CodegenService {
 
     private void syncCodegen0(Long tableId, TableInfo tableInfo) {
         // 校验导入的表和字段非空
-        checkTableInfo(tableInfo);
+        validateTableInfo(tableInfo);
         List<TableField> tableFields = tableInfo.getFields();
 
         // 构建 CodegenColumnDO 数组，只同步新增的字段

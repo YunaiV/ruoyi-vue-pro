@@ -81,7 +81,7 @@ public interface SensitiveWordService {
      *
      * @return 标签数组
      */
-    Set<String> getSensitiveWordTags();
+    Set<String> getSensitiveWordTagSet();
 
     /**
      * 获得文本所包含的不合法的敏感词数组

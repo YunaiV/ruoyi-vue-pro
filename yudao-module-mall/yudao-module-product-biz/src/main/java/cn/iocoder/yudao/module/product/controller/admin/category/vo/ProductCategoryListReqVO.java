@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.module.product.controller.admin.category.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@ApiModel(value = "管理后台 - 商品分类列表查询 Request VO")
+@Schema(description = "管理后台 - 商品分类列表查询 Request VO")
 @Data
 public class ProductCategoryListReqVO {
 
-    @ApiModelProperty(value = "分类名称", example = "办公文具")
+    @Schema(description = "分类名称", example = "办公文具")
     private String name;
 
 }

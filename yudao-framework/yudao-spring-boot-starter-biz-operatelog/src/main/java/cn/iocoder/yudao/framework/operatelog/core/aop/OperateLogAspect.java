@@ -15,8 +15,8 @@ import cn.iocoder.yudao.framework.operatelog.core.service.OperateLog;
 import cn.iocoder.yudao.framework.operatelog.core.service.OperateLogFrameworkService;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import com.google.common.collect.Maps;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -71,15 +71,15 @@ public class OperateLogAspect {
     @Resource
     private OperateLogFrameworkService operateLogFrameworkService;
 
-    @Around("@annotation(apiOperation)")
-    public Object around(ProceedingJoinPoint joinPoint, ApiOperation apiOperation) throws Throwable {
+    @Around("@annotation(operation)")
+    public Object around(ProceedingJoinPoint joinPoint, Operation operation) throws Throwable {
         // 可能也添加了 @ApiOperation 注解
         cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog = getMethodAnnotation(joinPoint,
                 cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog.class);
-        return around0(joinPoint, operateLog, apiOperation);
+        return around0(joinPoint, operateLog, operation);
     }
 
-    @Around("!@annotation(io.swagger.annotations.ApiOperation) && @annotation(operateLog)")
+    @Around("!@annotation(io.swagger.v3.oas.annotations.Operation) && @annotation(operateLog)")
     // 兼容处理，只添加 @OperateLog 注解的情况
     public Object around(ProceedingJoinPoint joinPoint,
                          cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog) throws Throwable {
@@ -88,7 +88,7 @@ public class OperateLogAspect {
 
     private Object around0(ProceedingJoinPoint joinPoint,
                            cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
-                           ApiOperation apiOperation) throws Throwable {
+                           Operation operation) throws Throwable {
         // 目前，只有管理员，才记录操作日志！所以非管理员，直接调用，不进行记录
         Integer userType = WebFrameworkUtils.getLoginUserType();
         if (!Objects.equals(userType, UserTypeEnum.ADMIN.getValue())) {
@@ -101,10 +101,10 @@ public class OperateLogAspect {
             // 执行原有方法
             Object result = joinPoint.proceed();
             // 记录正常执行时的操作日志
-            this.log(joinPoint, operateLog, apiOperation, startTime, result, null);
+            this.log(joinPoint, operateLog, operation, startTime, result, null);
             return result;
         } catch (Throwable exception) {
-            this.log(joinPoint, operateLog, apiOperation, startTime, null, exception);
+            this.log(joinPoint, operateLog, operation, startTime, null, exception);
             throw exception;
         } finally {
             clearThreadLocal();
@@ -129,7 +129,7 @@ public class OperateLogAspect {
 
     private void log(ProceedingJoinPoint joinPoint,
                      cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
-                     ApiOperation apiOperation,
+                     Operation operation,
                      LocalDateTime startTime, Object result, Throwable exception) {
         try {
             // 判断不记录的情况
@@ -137,16 +137,16 @@ public class OperateLogAspect {
                 return;
             }
             // 真正记录操作日志
-            this.log0(joinPoint, operateLog, apiOperation, startTime, result, exception);
+            this.log0(joinPoint, operateLog, operation, startTime, result, exception);
         } catch (Throwable ex) {
             log.error("[log][记录操作日志时，发生异常，其中参数是 joinPoint({}) operateLog({}) apiOperation({}) result({}) exception({}) ]",
-                    joinPoint, operateLog, apiOperation, result, exception, ex);
+                    joinPoint, operateLog, operation, result, exception, ex);
         }
     }
 
     private void log0(ProceedingJoinPoint joinPoint,
                       cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
-                      ApiOperation apiOperation,
+                      Operation operation,
                       LocalDateTime startTime, Object result, Throwable exception) {
         OperateLog operateLogObj = new OperateLog();
         // 补全通用字段
@@ -155,7 +155,7 @@ public class OperateLogAspect {
         // 补充用户信息
         fillUserFields(operateLogObj);
         // 补全模块信息
-        fillModuleFields(operateLogObj, joinPoint, operateLog, apiOperation);
+        fillModuleFields(operateLogObj, joinPoint, operateLog, operation);
         // 补全请求信息
         fillRequestFields(operateLogObj);
         // 补全方法信息
@@ -173,21 +173,21 @@ public class OperateLogAspect {
     private static void fillModuleFields(OperateLog operateLogObj,
                                          ProceedingJoinPoint joinPoint,
                                          cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog,
-                                         ApiOperation apiOperation) {
+                                         Operation operation) {
         // module 属性
         if (operateLog != null) {
             operateLogObj.setModule(operateLog.module());
         }
         if (StrUtil.isEmpty(operateLogObj.getModule())) {
-            Api api = getClassAnnotation(joinPoint, Api.class);
-            if (api != null) {
-                // 优先读取 @API 的 name 属性
-                if (StrUtil.isNotEmpty(api.value())) {
-                    operateLogObj.setModule(api.value());
+            Tag tag = getClassAnnotation(joinPoint, Tag.class);
+            if (tag != null) {
+                // 优先读取 @Tag 的 name 属性
+                if (StrUtil.isNotEmpty(tag.name())) {
+                    operateLogObj.setModule(tag.name());
                 }
-                // 没有的话，读取 @API 的 tags 属性
-                if (StrUtil.isEmpty(operateLogObj.getModule()) && ArrayUtil.isNotEmpty(api.tags())) {
-                    operateLogObj.setModule(api.tags()[0]);
+                // 没有的话，读取 @API 的 description 属性
+                if (StrUtil.isEmpty(operateLogObj.getModule()) && ArrayUtil.isNotEmpty(tag.description())) {
+                    operateLogObj.setModule(tag.description());
                 }
             }
         }
@@ -195,8 +195,8 @@ public class OperateLogAspect {
         if (operateLog != null) {
             operateLogObj.setName(operateLog.name());
         }
-        if (StrUtil.isEmpty(operateLogObj.getName()) && apiOperation != null) {
-            operateLogObj.setName(apiOperation.value());
+        if (StrUtil.isEmpty(operateLogObj.getName()) && operation != null) {
+            operateLogObj.setName(operation.summary());
         }
         // type 属性
         if (operateLog != null && ArrayUtil.isNotEmpty(operateLog.type())) {

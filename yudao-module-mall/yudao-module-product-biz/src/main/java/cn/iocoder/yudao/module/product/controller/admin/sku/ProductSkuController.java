@@ -9,8 +9,8 @@ import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +24,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
-@Api(tags = "管理后台 - 商品 sku")
+@Tag(name = "管理后台 - 商品 sku")
 @RestController
 @RequestMapping("/product/sku")
 @Validated
@@ -36,7 +36,7 @@ public class ProductSkuController {
     private ProductSpuService productSpuService;
 
     @GetMapping("/get-option-list")
-    @ApiOperation("获得商品 SKU 选项的列表")
+    @Operation(summary = "获得商品 SKU 选项的列表")
 //    @PreAuthorize("@ss.hasPermission('product:sku:query')")
     public CommonResult<List<ProductSkuOptionRespVO>> getSkuOptionList() {
         // 获得 SKU 列表

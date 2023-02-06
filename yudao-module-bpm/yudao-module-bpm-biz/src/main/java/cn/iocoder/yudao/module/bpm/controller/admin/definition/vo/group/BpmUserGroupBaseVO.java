@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
-import io.swagger.annotations.*;
 import javax.validation.constraints.*;
 
 /**
@@ -12,19 +11,19 @@ import javax.validation.constraints.*;
 @Data
 public class BpmUserGroupBaseVO {
 
-    @ApiModelProperty(value = "组名", required = true, example = "芋道")
+    @Schema(description = "组名", required = true, example = "芋道")
     @NotNull(message = "组名不能为空")
     private String name;
 
-    @ApiModelProperty(value = "描述", required = true, example = "芋道源码")
+    @Schema(description = "描述", required = true, example = "芋道源码")
     @NotNull(message = "描述不能为空")
     private String description;
 
-    @ApiModelProperty(value = "成员编号数组", required = true, example = "1,2,3")
+    @Schema(description = "成员编号数组", required = true, example = "1,2,3")
     @NotNull(message = "成员编号数组不能为空")
     private Set<Long> memberUserIds;
 
-    @ApiModelProperty(value = "状态", required = true, example = "1")
+    @Schema(description = "状态", required = true, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
 
-@ApiModel(value = "用户 App - 订单获得创建信息 Response VO")
+@Schema(description = "用户 App - 订单获得创建信息 Response VO")
 @Data
 public class AppTradeOrderGetCreateInfoRespVO {
 
@@ -25,7 +24,7 @@ public class AppTradeOrderGetCreateInfoRespVO {
 //     */
 //    private List<CouponCardAvailableRespDTO> coupons;
 
-    @ApiModel(value = "商品分组", description = "多个商品，参加同一个活动，从而形成分组")
+    @Schema(description = "商品分组") // 多个商品，参加同一个活动，从而形成分组
     @Data
     public static class ItemGroup {
 
@@ -40,12 +39,12 @@ public class AppTradeOrderGetCreateInfoRespVO {
 
     }
 
-    @ApiModel("商品 SKU")
+    @Schema(description = "商品 SKU")
     @Data
     public static class Sku {
 
         // SKU 自带信息
-        @ApiModelProperty(value = "SKU 编号", required = true, example = "1024")
+        @Schema(description = "SKU 编号", required = true, example = "1024")
         private Integer id;
         /**
          * SPU 信息
@@ -140,12 +139,12 @@ public class AppTradeOrderGetCreateInfoRespVO {
 
     }
 
-    @ApiModel("费用（合计）")
+    @Schema(description = "费用（合计）")
     @Data
     @AllArgsConstructor
     public static class Fee {
 
-        @ApiModelProperty(value = "购买总价", required = true, example = "1024")
+        @Schema(description = "购买总价", required = true, example = "1024")
         private Integer buyPrice;
         /**
          * 优惠总价

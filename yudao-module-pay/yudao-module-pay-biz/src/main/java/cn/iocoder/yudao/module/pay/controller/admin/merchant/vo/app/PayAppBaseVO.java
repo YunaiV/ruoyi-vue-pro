@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import io.swagger.annotations.*;
 import javax.validation.constraints.*;
 
 /**
@@ -11,26 +10,26 @@ import javax.validation.constraints.*;
 @Data
 public class PayAppBaseVO {
 
-    @ApiModelProperty(value = "应用名", required = true)
+    @Schema(description = "应用名", required = true)
     @NotNull(message = "应用名不能为空")
     private String name;
 
-    @ApiModelProperty(value = "开启状态", required = true)
+    @Schema(description = "开启状态", required = true)
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "备注")
+    @Schema(description = "备注")
     private String remark;
 
-    @ApiModelProperty(value = "支付结果的回调地址", required = true)
+    @Schema(description = "支付结果的回调地址", required = true)
     @NotNull(message = "支付结果的回调地址不能为空")
     private String payNotifyUrl;
 
-    @ApiModelProperty(value = "退款结果的回调地址", required = true)
+    @Schema(description = "退款结果的回调地址", required = true)
     @NotNull(message = "退款结果的回调地址不能为空")
     private String refundNotifyUrl;
 
-    @ApiModelProperty(value = "商户编号", required = true)
+    @Schema(description = "商户编号", required = true)
     @NotNull(message = "商户编号不能为空")
     private Long merchantId;
 

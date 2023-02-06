@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.oa.vo;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.time.LocalDateTime;
-import io.swagger.annotations.*;
 import javax.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -15,19 +14,19 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class BpmOALeaveBaseVO {
 
-    @ApiModelProperty(value = "请假的开始时间", required = true)
+    @Schema(description = "请假的开始时间", required = true)
     @NotNull(message = "开始时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime startTime;
-    @ApiModelProperty(value = "请假的结束时间", required = true)
+    @Schema(description = "请假的结束时间", required = true)
     @NotNull(message = "结束时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime endTime;
 
-    @ApiModelProperty(value = "请假类型", required = true, example = "1", notes = "参见 bpm_oa_type 枚举")
+    @Schema(description = "请假类型-参见 bpm_oa_type 枚举", required = true, example = "1")
     private Integer type;
 
-    @ApiModelProperty(value = "原因", required = true, example = "阅读芋道源码")
+    @Schema(description = "原因", required = true, example = "阅读芋道源码")
     private String reason;
 
 }

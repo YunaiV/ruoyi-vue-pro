@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel;
-
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -13,25 +12,25 @@ import javax.validation.constraints.NotNull;
 @Data
 public class SmsChannelBaseVO {
 
-    @ApiModelProperty(value = "短信签名", required = true, example = "芋道源码")
+    @Schema(description = "短信签名", required = true, example = "芋道源码")
     @NotNull(message = "短信签名不能为空")
     private String signature;
 
-    @ApiModelProperty(value = "启用状态", required = true, example = "1")
+    @Schema(description = "启用状态", required = true, example = "1")
     @NotNull(message = "启用状态不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "备注", example = "好吃！")
+    @Schema(description = "备注", example = "好吃！")
     private String remark;
 
-    @ApiModelProperty(value = "短信 API 的账号", required = true, example = "yudao")
+    @Schema(description = "短信 API 的账号", required = true, example = "yudao")
     @NotNull(message = "短信 API 的账号不能为空")
     private String apiKey;
 
-    @ApiModelProperty(value = "短信 API 的密钥", example = "yuanma")
+    @Schema(description = "短信 API 的密钥", example = "yuanma")
     private String apiSecret;
 
-    @ApiModelProperty(value = "短信发送回调 URL", example = "http://www.iocoder.cn")
+    @Schema(description = "短信发送回调 URL", example = "http://www.iocoder.cn")
     @URL(message = "回调 URL 格式不正确")
     private String callbackUrl;
 

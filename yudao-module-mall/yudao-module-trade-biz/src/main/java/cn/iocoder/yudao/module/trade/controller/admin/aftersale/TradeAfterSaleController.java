@@ -14,9 +14,9 @@ import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSal
 import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +32,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Api(tags = "管理后台 - 交易售后")
+@Tag(name = "管理后台 - 交易售后")
 @RestController
 @RequestMapping("/trade/after-sale")
 @Validated
@@ -48,7 +48,7 @@ public class TradeAfterSaleController {
     private ProductPropertyValueApi productPropertyValueApi;
 
     @GetMapping("/page")
-    @ApiOperation("获得交易售后分页")
+    @Operation(summary = "获得交易售后分页")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:query')")
     public CommonResult<PageResult<TradeAfterSaleRespPageItemVO>> getAfterSalePage(@Valid TradeAfterSalePageReqVO pageVO) {
         // 查询售后
@@ -67,8 +67,8 @@ public class TradeAfterSaleController {
     }
 
     @PutMapping("/agree")
-    @ApiOperation("同意售后")
-    @ApiImplicitParam(name = "id", value = "售后编号", required = true, example = "1")
+    @Operation(summary = "同意售后")
+    @Parameter(name = "id", description = "售后编号", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:agree')")
     public CommonResult<Boolean> agreeAfterSale(@RequestParam("id") Long id) {
         afterSaleService.agreeAfterSale(getLoginUserId(), id);
@@ -76,7 +76,7 @@ public class TradeAfterSaleController {
     }
 
     @PutMapping("/disagree")
-    @ApiOperation("拒绝售后")
+    @Operation(summary = "拒绝售后")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:disagree')")
     public CommonResult<Boolean> disagreeAfterSale(@RequestBody TradeAfterSaleDisagreeReqVO confirmReqVO) {
         afterSaleService.disagreeAfterSale(getLoginUserId(), confirmReqVO);
@@ -84,8 +84,8 @@ public class TradeAfterSaleController {
     }
 
     @PutMapping("/receive")
-    @ApiOperation("确认收货")
-    @ApiImplicitParam(name = "id", value = "售后编号", required = true, example = "1")
+    @Operation(summary = "确认收货")
+    @Parameter(name = "id", description = "售后编号", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:receive')")
     public CommonResult<Boolean> receiveAfterSale(@RequestParam("id") Long id) {
         afterSaleService.receiveAfterSale(getLoginUserId(), id);
@@ -93,8 +93,8 @@ public class TradeAfterSaleController {
     }
 
     @PutMapping("/refuse")
-    @ApiOperation("确认收货")
-    @ApiImplicitParam(name = "id", value = "售后编号", required = true, example = "1")
+    @Operation(summary = "确认收货")
+    @Parameter(name = "id", description = "售后编号", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:receive')")
     public CommonResult<Boolean> refuseAfterSale(TradeAfterSaleRefuseReqVO refuseReqVO) {
         afterSaleService.refuseAfterSale(getLoginUserId(), refuseReqVO);
@@ -102,8 +102,8 @@ public class TradeAfterSaleController {
     }
 
     @PostMapping("/refund")
-    @ApiOperation(value = "确认退款")
-    @ApiImplicitParam(name = "id", value = "售后编号", required = true, example = "1")
+    @Operation(summary = "确认退款")
+    @Parameter(name = "id", description = "售后编号", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('trade:after-sale:refund')")
     public CommonResult<Boolean> refundAfterSale(@RequestParam("id") Long id) {
         afterSaleService.refundAfterSale(getLoginUserId(), getClientIP(), id);

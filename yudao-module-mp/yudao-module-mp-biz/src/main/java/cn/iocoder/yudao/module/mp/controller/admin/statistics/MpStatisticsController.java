@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.mp.controller.admin.statistics.vo.*;
 import cn.iocoder.yudao.module.mp.convert.statistics.MpStatisticsConvert;
 import cn.iocoder.yudao.module.mp.service.statistics.MpStatisticsService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeInterfaceResult;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeMsgResult;
 import me.chanjar.weixin.mp.bean.datacube.WxDataCubeUserCumulate;
@@ -21,7 +21,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - 公众号统计")
+@Tag(name = "管理后台 - 公众号统计")
 @RestController
 @RequestMapping("/mp/statistics")
 @Validated
@@ -31,7 +31,7 @@ public class MpStatisticsController {
     private MpStatisticsService mpStatisticsService;
 
     @GetMapping("/user-summary")
-    @ApiOperation("获得粉丝增减数据")
+    @Operation(summary = "获得粉丝增减数据")
     @PreAuthorize("@ss.hasPermission('mp:statistics:query')")
     public CommonResult<List<MpStatisticsUserSummaryRespVO>> getUserSummary(MpStatisticsGetReqVO getReqVO) {
         List<WxDataCubeUserSummary> list = mpStatisticsService.getUserSummary(
@@ -40,7 +40,7 @@ public class MpStatisticsController {
     }
 
     @GetMapping("/user-cumulate")
-    @ApiOperation("获得粉丝累计数据")
+    @Operation(summary = "获得粉丝累计数据")
     @PreAuthorize("@ss.hasPermission('mp:statistics:query')")
     public CommonResult<List<MpStatisticsUserCumulateRespVO>> getUserCumulate(MpStatisticsGetReqVO getReqVO) {
         List<WxDataCubeUserCumulate> list = mpStatisticsService.getUserCumulate(
@@ -49,7 +49,7 @@ public class MpStatisticsController {
     }
 
     @GetMapping("/upstream-message")
-    @ApiOperation("获取消息发送概况数据")
+    @Operation(summary = "获取消息发送概况数据")
     @PreAuthorize("@ss.hasPermission('mp:statistics:query')")
     public CommonResult<List<MpStatisticsUpstreamMessageRespVO>> getUpstreamMessage(MpStatisticsGetReqVO getReqVO) {
         List<WxDataCubeMsgResult> list = mpStatisticsService.getUpstreamMessage(
@@ -58,7 +58,7 @@ public class MpStatisticsController {
     }
 
     @GetMapping("/interface-summary")
-    @ApiOperation("获取消息发送概况数据")
+    @Operation(summary = "获取消息发送概况数据")
     @PreAuthorize("@ss.hasPermission('mp:statistics:query')")
     public CommonResult<List<MpStatisticsInterfaceSummaryRespVO>> getInterfaceSummary(MpStatisticsGetReqVO getReqVO) {
         List<WxDataCubeInterfaceResult> list = mpStatisticsService.getInterfaceSummary(
