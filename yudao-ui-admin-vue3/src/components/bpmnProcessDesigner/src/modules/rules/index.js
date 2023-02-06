@@ -1,6 +1,6 @@
-import CustomRules from "./CustomRules";
+import CustomRules from './CustomRules'
 
 export default {
-  __init__: ["customRules"],
-  customRules: ["type", CustomRules]
-};
+  __init__: ['customRules'],
+  customRules: ['type', CustomRules]
+}

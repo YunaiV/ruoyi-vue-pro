@@ -29,7 +29,8 @@
       "element-plus/global",
       "@types/intro.js",
       "@types/qrcode",
-      "vite-plugin-svg-icons/client"
+      "vite-plugin-svg-icons/client",
+      "@form-create/element-ui/types"
     ],
     "typeRoots": ["./node_modules/@types/", "./types"]
   },

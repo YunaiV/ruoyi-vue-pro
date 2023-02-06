@@ -21,8 +21,6 @@
 </template>
 
 <script setup lang="ts" name="ElementTaskConfig">
-import { ref, watch } from 'vue'
-import { ElForm, ElFormItem, ElCheckbox } from 'element-plus'
 import UserTask from './task-components/UserTask.vue'
 import ScriptTask from './task-components/ScriptTask.vue'
 import ReceiveTask from './task-components/ReceiveTask.vue'
