@@ -1,11 +1,6 @@
-"use strict"
+'use strict'
 
-
-import {
-  isFunction,
-  isObject,
-  some
-} from 'min-dash'
+import { isFunction, isObject, some } from 'min-dash'
 
 // const isFunction = isFunction,
 //   isObject = isObject,
@@ -16,10 +11,11 @@ import {
 
 const WILDCARD = '*'
 
-function CamundaModdleExtension (eventBus) {
+function CamundaModdleExtension(eventBus) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const self = this
 
-  eventBus.on("moddleCopy.canCopyProperty", function (context) {
+  eventBus.on('moddleCopy.canCopyProperty', function (context) {
     const property = context.property,
       parent = context.parent
 
@@ -27,7 +23,7 @@ function CamundaModdleExtension (eventBus) {
   })
 }
 
-CamundaModdleExtension.$inject = ["eventBus"]
+CamundaModdleExtension.$inject = ['eventBus']
 
 /**
  * Check wether to disallow copying property.
@@ -40,15 +36,15 @@ CamundaModdleExtension.prototype.canCopyProperty = function (property, parent) {
 
   // (2) check more complex scenarios
 
-  if (is(property, "camunda:InputOutput") && !this.canHostInputOutput(parent)) {
+  if (is(property, 'camunda:InputOutput') && !this.canHostInputOutput(parent)) {
     return false
   }
 
-  if (isAny(property, ["camunda:Connector", "camunda:Field"]) && !this.canHostConnector(parent)) {
+  if (isAny(property, ['camunda:Connector', 'camunda:Field']) && !this.canHostConnector(parent)) {
     return false
   }
 
-  if (is(property, "camunda:In") && !this.canHostIn(parent)) {
+  if (is(property, 'camunda:In') && !this.canHostIn(parent)) {
     return false
   }
 }
@@ -68,21 +64,19 @@ CamundaModdleExtension.prototype.canHostInputOutput = function (parent) {
     return false
   }
 
-  if (isAny(flowNode, ["bpmn:StartEvent", "bpmn:Gateway", "bpmn:BoundaryEvent"])) {
+  if (isAny(flowNode, ['bpmn:StartEvent', 'bpmn:Gateway', 'bpmn:BoundaryEvent'])) {
     return false
   }
 
-  return !(is(flowNode, "bpmn:SubProcess") && flowNode.get("triggeredByEvent"))
-
-
+  return !(is(flowNode, 'bpmn:SubProcess') && flowNode.get('triggeredByEvent'))
 }
 
 CamundaModdleExtension.prototype.canHostConnector = function (parent) {
   const serviceTaskLike = getParent(parent, 'camunda:ServiceTaskLike')
 
-  if (is(serviceTaskLike, "bpmn:MessageEventDefinition")) {
+  if (is(serviceTaskLike, 'bpmn:MessageEventDefinition')) {
     // only allow on throw and end events
-    return getParent(parent, "bpmn:IntermediateThrowEvent") || getParent(parent, "bpmn:EndEvent")
+    return getParent(parent, 'bpmn:IntermediateThrowEvent') || getParent(parent, 'bpmn:EndEvent')
   }
 
   return true
@@ -99,7 +93,7 @@ CamundaModdleExtension.prototype.canHostIn = function (parent) {
 
   if (signalEventDefinition) {
     // only allow on throw and end events
-    return getParent(parent, "bpmn:IntermediateThrowEvent") || getParent(parent, "bpmn:EndEvent")
+    return getParent(parent, 'bpmn:IntermediateThrowEvent') || getParent(parent, 'bpmn:EndEvent')
   }
 
   return true
@@ -110,17 +104,17 @@ export default CamundaModdleExtension
 
 // helpers //////////
 
-function is (element, type) {
+function is(element, type) {
   return element && isFunction(element.$instanceOf) && element.$instanceOf(type)
 }
 
-function isAny (element, types) {
+function isAny(element, types) {
   return some(types, function (t) {
     return is(element, t)
   })
 }
 
-function getParent (element, type) {
+function getParent(element, type) {
   if (!type) {
     return element.$parent
   }
@@ -136,7 +130,7 @@ function getParent (element, type) {
   return getParent(element.$parent, type)
 }
 
-function isAllowedInParent (property, parent) {
+function isAllowedInParent(property, parent) {
   // (1) find property descriptor
   const descriptor = property.$type && property.$model.getTypeDescriptor(property.$type)
 
@@ -152,6 +146,6 @@ function isAllowedInParent (property, parent) {
   })
 }
 
-function isWildcard (allowedIn) {
+function isWildcard(allowedIn) {
   return allowedIn.indexOf(WILDCARD) !== -1
 }

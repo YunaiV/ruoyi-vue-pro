@@ -57,7 +57,7 @@ const defaultTaskForm = ref({
   resource: '',
   resultVariable: ''
 })
-const scriptTaskForm = ref({})
+const scriptTaskForm = ref<any>({})
 const bpmnElement = ref()
 
 const resetTaskForm = () => {

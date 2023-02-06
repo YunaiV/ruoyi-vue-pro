@@ -17,8 +17,6 @@
 </template>
 
 <script setup lang="ts" name="ElementOtherConfig">
-import { ref, watch, nextTick, onBeforeUnmount, toRaw } from 'vue'
-import { ElInput } from 'element-plus'
 const props = defineProps({
   id: String
 })

@@ -53,18 +53,7 @@
 </template>
 
 <script setup lang="ts" name="ElementProperties">
-import { ref, inject, nextTick, watch, toRaw } from 'vue'
-import {
-  ElMessageBox,
-  ElDialog,
-  ElButton,
-  ElForm,
-  ElFormItem,
-  ElTable,
-  ElTableColumn,
-  ElDivider,
-  ElInput
-} from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 const props = defineProps({
   id: String,
   type: String
@@ -72,8 +61,8 @@ const props = defineProps({
 const prefix = inject('prefix')
 // const width = inject('width')
 
-const elementPropertyList = ref([])
-const propertyForm = ref({})
+const elementPropertyList = ref<any[]>([])
+const propertyForm = ref<any>({})
 const editingPropertyIndex = ref(-1)
 const propertyFormModelVisible = ref(false)
 const bpmnElement = ref()
