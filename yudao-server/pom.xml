@@ -44,7 +44,7 @@
         <!-- 数据报表 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
-<!--            <artifactId>yudao-module-visualization-biz</artifactId>-->
+<!--            <artifactId>yudao-module-report-biz</artifactId>-->
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
         <!-- 工作流 -->

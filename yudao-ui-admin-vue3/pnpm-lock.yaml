@@ -45,7 +45,7 @@ specifiers:
   eslint-plugin-prettier: ^4.2.1
   eslint-plugin-vue: ^9.9.0
   fast-xml-parser: ^4.0.13
-  highlight.js: ^9.18.5
+  highlight.js: ^11.7.0
   intro.js: ^6.0.0
   jsencrypt: ^3.3.1
   lint-staged: ^13.1.0
@@ -63,6 +63,7 @@ specifiers:
   rimraf: ^4.1.2
   rollup: ^3.11.0
   sass: ^1.57.1
+  steady-xml: ^0.1.0
   stylelint: ^14.16.1
   stylelint-config-html: ^1.1.0
   stylelint-config-prettier: ^9.0.4
@@ -117,7 +118,7 @@ dependencies:
   echarts-wordcloud: 2.1.0_echarts@5.4.1
   element-plus: 2.2.28_vue@3.2.45
   fast-xml-parser: 4.0.15
-  highlight.js: 9.18.5
+  highlight.js: 11.7.0
   intro.js: 6.0.0
   jsencrypt: 3.3.1
   lodash-es: 4.17.21
@@ -127,6 +128,7 @@ dependencies:
   pinia: 2.0.29_typescript@4.9.4+vue@3.2.45
   qrcode: 1.5.1
   qs: 6.11.0
+  steady-xml: 0.1.0
   url: 0.11.0
   vue: 3.2.45
   vue-i18n: 9.2.2_vue@3.2.45
@@ -3944,10 +3946,9 @@ packages:
     hasBin: true
     dev: true
 
-  /highlight.js/9.18.5:
-    resolution: {integrity: sha512-a5bFyofd/BHCX52/8i8uJkjr9DYwXIPnM/plwI6W7ezItLGqzt7X2G2nXuYSfsIJdkwwj/g9DG1LkcGJI/dDoA==}
-    deprecated: Support has ended for 9.x series. Upgrade to @latest
-    requiresBuild: true
+  /highlight.js/11.7.0:
+    resolution: {integrity: sha512-1rRqesRFhMO/PRF+G86evnyJkCgaZFOI+Z6kdj15TA18funfoqJXvgPCLSf0SWq3SRfg1j3HlDs8o4s3EGq1oQ==}
+    engines: {node: '>=12.0.0'}
     dev: false
 
   /hosted-git-info/2.8.9:
@@ -5907,6 +5908,11 @@ packages:
       define-property: 0.2.5
       object-copy: 0.1.0
     dev: true
+
+  /steady-xml/0.1.0:
+    resolution: {integrity: sha512-5sk17qO2wWRtonTNoBhoKAB35OSsGJOa3+NEa6D+1GS+de+ujDWxnflMkXBrviOfkNrPTUqduAdXhrMJs89nAw==}
+    engines: {node: '>=12.0.0'}
+    dev: false
 
   /strict-uri-encode/1.1.0:
     resolution: {integrity: sha512-R3f198pcvnB+5IpnBlRkphuE9n46WyVl8I39W/ZUTZLz4nqSP/oLYUrcnJrw462Ds8he4YKMov2efsTIw1BDGQ==}
