@@ -1,10 +1,10 @@
 export default (key, name, type) => {
-  if (!type) type = "camunda";
+  if (!type) type = 'camunda'
   const TYPE_TARGET = {
-    activiti: "http://activiti.org/bpmn",
-    camunda: "http://bpmn.io/schema/bpmn",
-    flowable: "http://flowable.org/bpmn"
-  };
+    activiti: 'http://activiti.org/bpmn',
+    camunda: 'http://bpmn.io/schema/bpmn',
+    flowable: 'http://flowable.org/bpmn'
+  }
   return `<?xml version="1.0" encoding="UTF-8"?>
 <bpmn2:definitions 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -20,5 +20,5 @@ export default (key, name, type) => {
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="${key}">
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</bpmn2:definitions>`;
-};
+</bpmn2:definitions>`
+}

@@ -209,8 +209,7 @@
 // import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css'
 // import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
 // import 'bpmn-js-properties-panel/dist/assets/bpmn-js-properties-panel.css' // 右侧框样式
-import { ElTooltip, ElButtonGroup, ElButton, ElMessage, ElMessageBox } from 'element-plus'
-import { computed, onBeforeMount, onBeforeUnmount, onMounted, provide, ref } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import BpmnModeler from 'bpmn-js/lib/Modeler'
 import DefaultEmptyXML from './plugins/defaultEmpty'
 // 翻译方法
@@ -262,9 +261,17 @@ const props = defineProps({
   processId: String, // 流程 key 标识
   processName: String, // 流程 name 名字
   formId: Number, // 流程 form 表单编号
-  translations: Object, // 自定义的翻译文件
+  translations: {
+    // 自定义的翻译文件
+    type: Object,
+    default: () => {}
+  },
   additionalModel: [Object, Array], // 自定义model
-  moddleExtension: Object, // 自定义moddle
+  moddleExtension: {
+    // 自定义moddle
+    type: Object,
+    default: () => {}
+  },
   onlyCustomizeAddi: {
     type: Boolean,
     default: false
@@ -292,18 +299,18 @@ const props = defineProps({
   headerButtonSize: {
     type: String,
     default: 'small',
-    validator: (value) => ['default', 'medium', 'small', 'mini'].indexOf(value) !== -1
+    validator: (value: string) => ['default', 'medium', 'small', 'mini'].indexOf(value) !== -1
   },
   headerButtonType: {
     type: String,
     default: 'primary',
-    validator: (value) =>
+    validator: (value: string) =>
       ['default', 'primary', 'success', 'warning', 'danger', 'info'].indexOf(value) !== -1
   }
 })
 
 provide('configGlobal', props)
-let bpmnModeler = null
+let bpmnModeler: any = null
 const defaultZoom = ref(1)
 const previewModelVisible = ref(false)
 const simulationStatus = ref(false)
@@ -313,7 +320,7 @@ const recoverable = ref(false)
 const revocable = ref(false)
 const additionalModules = computed(() => {
   console.log(props.additionalModel, 'additionalModel')
-  const Modules = []
+  const Modules: any[] = []
   // 仅保留用户自定义扩展模块
   if (props.onlyCustomizeAddi) {
     if (Object.prototype.toString.call(props.additionalModel) == '[object Array]') {
@@ -361,7 +368,7 @@ const moddleExtensions = computed(() => {
   console.log(props.onlyCustomizeModdle, 'props.onlyCustomizeModdle')
   console.log(props.moddleExtension, 'props.moddleExtension')
   console.log(props.prefix, 'props.prefix')
-  const Extensions = {}
+  const Extensions: any = {}
   // 仅使用用户自定义模块
   if (props.onlyCustomizeModdle) {
     return props.moddleExtension || null
@@ -432,7 +439,7 @@ const initModelListeners = () => {
   const EventBus = bpmnModeler.get('eventBus')
   console.log(EventBus, 'EventBus')
   // 注册需要的监听事件, 将. 替换为 - , 避免解析异常
-  props.events.forEach((event) => {
+  props.events.forEach((event: any) => {
     EventBus.on(event, function (eventObj) {
       let eventName = event.replace(/\./g, '-')
       // eventName.name = eventName
@@ -452,7 +459,7 @@ const initModelListeners = () => {
       emit('commandStack-changed', event)
       emit('input', xml)
       emit('change', xml)
-    } catch (e) {
+    } catch (e: any) {
       console.error(`[Process Designer Warn]: ${e.message || e}`)
     }
   })
@@ -478,13 +485,13 @@ const createNewDiagram = async (xml) => {
     if (warnings && warnings.length) {
       warnings.forEach((warn) => console.warn(warn))
     }
-  } catch (e) {
-    console.error(`[Process Designer Warn]: ${e?.message || e}`)
+  } catch (e: any) {
+    console.error(`[Process Designer Warn]: ${e.message || e}`)
   }
 }
 
 // 下载流程图到本地
-const downloadProcess = async (type, name) => {
+const downloadProcess = async (type) => {
   try {
     // 按需要类型创建文件并下载
     if (type === 'xml' || type === 'bpmn') {
@@ -493,7 +500,7 @@ const downloadProcess = async (type, name) => {
       if (err) {
         console.error(`[Process Designer Warn ]: ${err.message || err}`)
       }
-      let { href, filename } = setEncoded(type.toUpperCase(), name, xml)
+      let { href, filename } = setEncoded(type.toUpperCase(), xml)
       downloadFunc(href, filename)
     } else {
       const { err, svg } = await bpmnModeler.saveSVG()
@@ -501,10 +508,10 @@ const downloadProcess = async (type, name) => {
       if (err) {
         return console.error(err)
       }
-      let { href, filename } = setEncoded('SVG', name, svg)
+      let { href, filename } = setEncoded('SVG', svg)
       downloadFunc(href, filename)
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error(`[Process Designer Warn ]: ${e.message || e}`)
   }
   // 文件下载方法
@@ -520,7 +527,8 @@ const downloadProcess = async (type, name) => {
 }
 
 // 根据所需类型进行转码并返回下载地址
-const setEncoded = (type, filename = 'diagram', data) => {
+const setEncoded = (type, data) => {
+  const filename = 'diagram'
   const encodedData = encodeURIComponent(data)
   return {
     filename: `${filename}.${type}`,
@@ -643,7 +651,7 @@ const previewProcessJson = () => {
     // const xmlContent = builder
     // console.log(xmlContent, 'xmlContent')
     // console.log(xml2js, 'convertconvertconvert')
-    previewResult.value = rootNodes.parent.toJSON()
+    previewResult.value = rootNodes.parent?.toJSON() as unknown as string
     // previewResult.value = jObj
     // previewResult.value = convert.xml2json(xml,  {explicitArray : false},{ spaces: 2 })
     previewType.value = 'json'

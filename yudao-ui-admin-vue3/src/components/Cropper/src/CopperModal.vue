@@ -119,6 +119,7 @@ import { dataURLtoBlob } from '@/utils/filt'
 import { useI18n } from 'vue-i18n'
 import type { CropendResult, Cropper } from './types'
 import { propTypes } from '@/utils/propTypes'
+import { CropperImage } from '@/components/Cropper'
 
 const props = defineProps({
   srcValue: propTypes.string.def(''),

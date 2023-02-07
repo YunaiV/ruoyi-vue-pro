@@ -73,8 +73,6 @@ import ElementListeners from './listeners/ElementListeners.vue'
 import ElementProperties from './properties/ElementProperties.vue'
 // import ElementForm from './form/ElementForm.vue'
 import UserTaskListeners from './listeners/UserTaskListeners.vue'
-import { provide, ref, watch, onBeforeUnmount, onMounted } from 'vue'
-import { ElCollapse, ElCollapseItem, ElLink } from 'element-plus'
 /**
  * 侧边栏
  * @Author MiyueFE
@@ -82,7 +80,10 @@ import { ElCollapse, ElCollapseItem, ElLink } from 'element-plus'
  * @Date 2021年3月31日18:57:51
  */
 const props = defineProps({
-  bpmnModeler: Object,
+  bpmnModeler: {
+    type: Object,
+    default: () => {}
+  },
   prefix: {
     type: String,
     default: 'camunda'
@@ -101,7 +102,7 @@ const props = defineProps({
 const activeTab = ref('base')
 const elementId = ref('')
 const elementType = ref('')
-const elementBusinessObject = ref({}) // 元素 businessObject 镜像，提供给需要做判断的组件使用
+const elementBusinessObject = ref<any>({}) // 元素 businessObject 镜像，提供给需要做判断的组件使用
 const conditionFormVisible = ref(false) // 流转条件设置
 const formVisible = ref(false) // 表单配置
 const bpmnElement = ref()

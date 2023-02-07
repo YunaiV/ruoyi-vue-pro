@@ -69,8 +69,6 @@
 </template>
 
 <script setup lang="ts" name="ElementMultiInstance">
-import { inject, ref, onBeforeUnmount, watch, toRaw } from 'vue'
-import { ElForm, ElFormItem, ElSelect, ElOption, ElCheckbox, ElInput } from 'element-plus'
 const props = defineProps({
   businessObject: Object,
   type: String
@@ -86,7 +84,7 @@ const defaultLoopInstanceForm = ref({
   asyncBefore: false,
   exclusive: false
 })
-const loopInstanceForm = ref({})
+const loopInstanceForm = ref<any>({})
 const bpmnElement = ref(null)
 const multiLoopInstance = ref(null)
 

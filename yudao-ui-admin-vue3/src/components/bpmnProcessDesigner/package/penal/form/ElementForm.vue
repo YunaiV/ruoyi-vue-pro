@@ -205,20 +205,6 @@
 </template>
 
 <script setup lang="ts" name="ElementForm">
-import { ref, inject, watch, nextTick, toRaw } from 'vue'
-import {
-  ElDialog,
-  ElForm,
-  ElFormItem,
-  ElSelect,
-  ElOption,
-  ElDivider,
-  ElTable,
-  ElTableColumn,
-  ElButton,
-  ElDrawer,
-  ElInput
-} from 'element-plus'
 const props = defineProps({
   id: String,
   type: String
@@ -229,8 +215,8 @@ const width = inject('width')
 const formKey = ref('')
 const businessKey = ref('')
 const optionModelTitle = ref('')
-const fieldList = ref([])
-const formFieldForm = ref({})
+const fieldList = ref<any[]>([])
+const formFieldForm = ref<any>({})
 const fieldType = ref({
   long: '长整型',
   string: '字符串',
@@ -243,11 +229,11 @@ const formFieldIndex = ref(-1) // 编辑中的字段， -1 为新增
 const formFieldOptionIndex = ref(-1) // 编辑中的字段配置项， -1 为新增
 const fieldModelVisible = ref(false)
 const fieldOptionModelVisible = ref(false)
-const fieldOptionForm = ref({}) // 当前激活的字段配置项数据
+const fieldOptionForm = ref<any>({}) // 当前激活的字段配置项数据
 const fieldOptionType = ref('') // 当前激活的字段配置项弹窗 类型
-const fieldEnumList = ref([]) // 枚举值列表
-const fieldConstraintsList = ref([]) // 约束条件列表
-const fieldPropertiesList = ref([]) // 绑定属性列表
+const fieldEnumList = ref<any[]>([]) // 枚举值列表
+const fieldConstraintsList = ref<any[]>([]) // 约束条件列表
+const fieldPropertiesList = ref<any[]>([]) // 绑定属性列表
 const bpmnELement = ref()
 const elExtensionElements = ref()
 const formData = ref()

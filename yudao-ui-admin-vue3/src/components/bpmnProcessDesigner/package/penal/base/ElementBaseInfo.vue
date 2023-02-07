@@ -38,15 +38,19 @@
   </div>
 </template>
 <script setup lang="ts" name="ElementBaseInfo">
-import { ref, reactive, watch, onMounted, onBeforeUnmount, toRaw } from 'vue'
-import { ElLink, ElForm, ElFormItem, ElInput } from 'element-plus'
 const props = defineProps({
-  businessObject: Object,
-  model: Object // 流程模型的数据
+  businessObject: {
+    type: Object,
+    default: () => {}
+  },
+  model: {
+    type: Object,
+    default: () => {}
+  }
 })
-const needProps = ref({})
+const needProps = ref<any>({})
 const bpmnElement = ref()
-const elementBaseInfo = ref({})
+const elementBaseInfo = ref<any>({})
 // 流程表单的下拉框的数据
 // const forms = ref([])
 // 流程模型的校验

@@ -57,11 +57,11 @@ import {
   ElInput
 } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
-const signalList = ref([])
-const messageList = ref([])
+const signalList = ref<any[]>([])
+const messageList = ref<any[]>([])
 const modelVisible = ref(false)
 const modelType = ref('')
-const modelObjectForm = ref({})
+const modelObjectForm = ref<any>({})
 const rootElements = ref()
 const messageIdMap = ref()
 const signalIdMap = ref()

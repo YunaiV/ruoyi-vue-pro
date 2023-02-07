@@ -1,4 +1,4 @@
-export const template = isTaskListener => {
+export const template = (isTaskListener) => {
   return `
   <div class="panel-tab__content">
     <el-table :data="elementListenersList" size="small" border>
@@ -97,20 +97,21 @@ export const template = isTaskListener => {
             <el-input v-model="listenerForm.resource" clearable />
           </el-form-item>
         </template>
-        ${isTaskListener
-      ? "<el-form-item label='定时器类型' prop='eventDefinitionType' key='eventDefinitionType'>" +
-      "<el-select v-model='listenerForm.eventDefinitionType'>" +
-      "<el-option label='日期' value='date' />" +
-      "<el-option label='持续时长' value='duration' />" +
-      "<el-option label='循环' value='cycle' />" +
-      "<el-option label='无' value='' />" +
-      "</el-select>" +
-      "</el-form-item>" +
-      "<el-form-item v-if='!!listenerForm.eventDefinitionType' label='定时器' prop='eventDefinitions' key='eventDefinitions'>" +
-      "<el-input v-model='listenerForm.eventDefinitions' clearable />" +
-      "</el-form-item>"
-      : ""
-    }
+        ${
+          isTaskListener
+            ? "<el-form-item label='定时器类型' prop='eventDefinitionType' key='eventDefinitionType'>" +
+              "<el-select v-model='listenerForm.eventDefinitionType'>" +
+              "<el-option label='日期' value='date' />" +
+              "<el-option label='持续时长' value='duration' />" +
+              "<el-option label='循环' value='cycle' />" +
+              "<el-option label='无' value='' />" +
+              '</el-select>' +
+              '</el-form-item>' +
+              "<el-form-item v-if='!!listenerForm.eventDefinitionType' label='定时器' prop='eventDefinitions' key='eventDefinitions'>" +
+              "<el-input v-model='listenerForm.eventDefinitions' clearable />" +
+              '</el-form-item>'
+            : ''
+        }
       </el-form>
       <el-divider />
       <p class="listener-filed__title">

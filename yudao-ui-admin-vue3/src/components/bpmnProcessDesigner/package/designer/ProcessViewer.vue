@@ -9,12 +9,12 @@
 <script setup lang="ts" name="MyProcessViewer">
 import BpmnViewer from 'bpmn-js/lib/Viewer'
 import DefaultEmptyXML from './plugins/defaultEmpty'
-import { onMounted, onBeforeUnmount, provide, ref, watch, toRaw } from 'vue'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 const props = defineProps({
   value: {
     // BPMN XML 字符串
-    type: String
+    type: String,
+    default: ''
   },
   prefix: {
     // 使用哪个引擎
@@ -28,7 +28,8 @@ const props = defineProps({
   },
   processInstanceData: {
     // 流程实例的数据。传递时，可展示流程发起人等信息
-    type: Object
+    type: Object,
+    default: () => {}
   },
   taskData: {
     // 任务实例的数据。传递时，可展示 UserTask 审核相关的信息
@@ -44,13 +45,13 @@ const emit = defineEmits(['destroy'])
 let bpmnModeler
 
 const xml = ref('')
-const activityLists = ref([])
-const processInstance = ref(undefined)
-const taskList = ref([])
+const activityLists = ref<any[]>([])
+const processInstance = ref<any>(undefined)
+const taskList = ref<any[]>([])
 const bpmnCanvas = ref()
 // const element = ref()
-const elementOverlayIds = ref(null)
-const overlays = ref(null)
+const elementOverlayIds = ref<any>(null)
+const overlays = ref<any>(null)
 
 const initBpmnModeler = () => {
   if (bpmnModeler) return
@@ -90,18 +91,18 @@ const highlightDiagram = async () => {
   // 参考自 https://gitee.com/tony2y/RuoYi-flowable/blob/master/ruoyi-ui/src/components/Process/index.vue#L222 实现
   // 再次基础上，增加不同审批结果的颜色等等
   let canvas = bpmnModeler.get('canvas')
-  let todoActivity = activityList.find((m) => !m.endTime) // 找到待办的任务
-  let endActivity = activityList[activityList.length - 1] // 获得最后一个任务
+  let todoActivity: any = activityList.find((m: any) => !m.endTime) // 找到待办的任务
+  let endActivity: any = activityList[activityList.length - 1] // 获得最后一个任务
   // debugger
-  bpmnModeler.getDefinitions().rootElements[0].flowElements?.forEach((n) => {
-    let activity = activityList.find((m) => m.key === n.id) // 找到对应的活动
+  bpmnModeler.getDefinitions().rootElements[0].flowElements?.forEach((n: any) => {
+    let activity: any = activityList.find((m: any) => m.key === n.id) // 找到对应的活动
     if (!activity) {
       return
     }
     if (n.$type === 'bpmn:UserTask') {
       // 用户任务
       // 处理用户任务的高亮
-      const task = taskList.value.find((m) => m.id === activity.taskId) // 找到活动对应的 taskId
+      const task: any = taskList.value.find((m: any) => m.id === activity.taskId) // 找到活动对应的 taskId
       if (!task) {
         return
       }
@@ -114,9 +115,9 @@ const highlightDiagram = async () => {
       }
       // 处理 outgoing 出线
       const outgoing = getActivityOutgoing(activity)
-      outgoing?.forEach((nn) => {
+      outgoing?.forEach((nn: any) => {
         // debugger
-        let targetActivity = activityList.find((m) => m.key === nn.targetRef.id)
+        let targetActivity: any = activityList.find((m: any) => m.key === nn.targetRef.id)
         // 如果目标活动存在，则根据该活动是否结束，进行【bpmn:SequenceFlow】连线的高亮设置
         if (targetActivity) {
           canvas.addMarker(nn.id, targetActivity.endTime ? 'highlight' : 'highlight-todo')
@@ -141,10 +142,10 @@ const highlightDiagram = async () => {
       // 设置【bpmn:ExclusiveGateway】排它网关的高亮
       canvas.addMarker(n.id, getActivityHighlightCss(activity))
       // 查找需要高亮的连线
-      let matchNN = undefined
-      let matchActivity = undefined
-      n.outgoing?.forEach((nn) => {
-        let targetActivity = activityList.find((m) => m.key === nn.targetRef.id)
+      let matchNN: any = undefined
+      let matchActivity: any = undefined
+      n.outgoing?.forEach((nn: any) => {
+        let targetActivity = activityList.find((m: any) => m.key === nn.targetRef.id)
         if (!targetActivity) {
           return
         }
@@ -165,9 +166,9 @@ const highlightDiagram = async () => {
       // 并行网关
       // 设置【bpmn:ParallelGateway】并行网关的高亮
       canvas.addMarker(n.id, getActivityHighlightCss(activity))
-      n.outgoing?.forEach((nn) => {
+      n.outgoing?.forEach((nn: any) => {
         // 获得连线是否有指向目标。如果有，则进行高亮
-        const targetActivity = activityList.find((m) => m.key === nn.targetRef.id)
+        const targetActivity = activityList.find((m: any) => m.key === nn.targetRef.id)
         if (targetActivity) {
           canvas.addMarker(nn.id, getActivityHighlightCss(targetActivity)) // 高亮【bpmn:SequenceFlow】连线
           // 高亮【...】目标。其中 ... 可以是 bpm:UserTask、也可以是其它的。当然，如果是 bpm:UserTask 的话，其实不做高亮也没问题，因为上面有逻辑做了这块。
@@ -179,7 +180,7 @@ const highlightDiagram = async () => {
       n.outgoing?.forEach((nn) => {
         // outgoing 例如说【bpmn:SequenceFlow】连线
         // 获得连线是否有指向目标。如果有，则进行高亮
-        let targetActivity = activityList.find((m) => m.key === nn.targetRef.id)
+        let targetActivity = activityList.find((m: any) => m.key === nn.targetRef.id)
         if (targetActivity) {
           canvas.addMarker(nn.id, 'highlight') // 高亮【bpmn:SequenceFlow】连线
           canvas.addMarker(n.id, 'highlight') // 高亮【bpmn:StartEvent】开始节点（自己）
@@ -235,8 +236,8 @@ const getActivityOutgoing = (activity) => {
   }
   // 如果没有，则遍历获得起点为它的【bpmn:SequenceFlow】节点们。原因是：bpmn-js 的 UserTask 拿不到 outgoing
   const flowElements = bpmnModeler.getDefinitions().rootElements[0].flowElements
-  const outgoing = []
-  flowElements.forEach((item) => {
+  const outgoing: any[] = []
+  flowElements.forEach((item: any) => {
     if (item.$type !== 'bpmn:SequenceFlow') {
       return
     }
