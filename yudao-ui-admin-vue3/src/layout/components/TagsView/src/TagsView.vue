@@ -262,7 +262,7 @@ watch(
   >
     <span
       :class="`${prefixCls}__tool`"
-      class="w-[var(--tags-view-height)] h-[var(--tags-view-height)] text-center leading-[var(--tags-view-height)] cursor-pointer"
+      class="w-[var(--tags-view-height)] h-[var(--tags-view-height)] cursor-pointer"
       @click="move(-200)"
     >
       <Icon
@@ -470,6 +470,9 @@ $prefix-cls: #{$namespace}-tags-view;
 
   &__tool {
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover {
       :deep(span) {
