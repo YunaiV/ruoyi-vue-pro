@@ -103,7 +103,7 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
         // mock 方法
         DeptRespDTO dept1 = randomPojo(DeptRespDTO.class, o -> o.setLeaderUserId(11L));
         DeptRespDTO dept2 = randomPojo(DeptRespDTO.class, o -> o.setLeaderUserId(22L));
-        when(deptApi.getDepts(eq(rule.getOptions()))).thenReturn(Arrays.asList(dept1, dept2));
+        when(deptApi.getDeptList(eq(rule.getOptions()))).thenReturn(Arrays.asList(dept1, dept2));
         mockGetUserMap(asSet(11L, 22L));
 
         // 调用

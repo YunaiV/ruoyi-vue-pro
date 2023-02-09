@@ -32,7 +32,13 @@ public class DefaultController {
             "/admin-api/promotion/**"})  // 营销中心
     public CommonResult<Boolean> mall404() {
         return CommonResult.error(NOT_IMPLEMENTED.getCode(),
-                "[商城 yudao-module-mp - 已禁用][参考 https://doc.iocoder.cn/mall/build/ 开启]");
+                "[商城系统 yudao-module-mall - 已禁用][参考 https://doc.iocoder.cn/mall/build/ 开启]");
+    }
+
+    @RequestMapping(value = {"/admin-api/report/**"})
+    public CommonResult<Boolean> report404() {
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(),
+                "[报表模块 yudao-module-report - 已禁用][参考 https://doc.iocoder.cn/report/ 开启]");
     }
 
 }

@@ -33,8 +33,8 @@ public class BannerApplicationRunner implements ApplicationRunner {
                     "https://t.zsxq.com/02B6ujIee");
 
             // 数据报表
-            if (isNotPresent("cn.iocoder.yudao.module.visualization.framework.security.config.SecurityConfiguration")) {
-                System.out.println("[报表模块 yudao-module-visualization - 已禁用][参考 https://doc.iocoder.cn/report/ 开启]");
+            if (isNotPresent("cn.iocoder.yudao.module.report.framework.security.config.SecurityConfiguration")) {
+                System.out.println("[报表模块 yudao-module-report - 已禁用][参考 https://doc.iocoder.cn/report/ 开启]");
             }
             // 工作流
             if (isNotPresent("cn.iocoder.yudao.framework.flowable.config.YudaoFlowableConfiguration")) {
@@ -44,9 +44,9 @@ public class BannerApplicationRunner implements ApplicationRunner {
             if (isNotPresent("cn.iocoder.yudao.module.mp.framework.mp.config.MpConfiguration")) {
                 System.out.println("[微信公众号 yudao-module-mp - 已禁用][参考 https://doc.iocoder.cn/mp/build/ 开启]");
             }
-            // 微信公众号
+            // 商城
             if (isNotPresent("cn.iocoder.yudao.module.trade.framework.web.config.TradeWebConfiguration")) {
-                System.out.println("[商城 yudao-module-mall - 已禁用][参考 https://doc.iocoder.cn/mall/build/ 开启]");
+                System.out.println("[商城系统 yudao-module-mall - 已禁用][参考 https://doc.iocoder.cn/mall/build/ 开启]");
             }
         });
     }
