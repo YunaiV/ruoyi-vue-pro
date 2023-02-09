@@ -5,7 +5,7 @@
   </ContentWrap>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 // 业务相关的 import
 import * as LeaveApi from '@/api/bpm/leave'
 import { allSchemas } from '@/views/bpm/oa/leave/leave.data'

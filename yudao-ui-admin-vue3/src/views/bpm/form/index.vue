@@ -1,52 +1,49 @@
 <template>
   <ContentWrap>
     <!-- 列表 -->
-    <div>
-      <XTable @register="registerTable">
-        <!-- 操作：新增 -->
-        <template #toolbar_buttons>
-          <XButton
-            type="primary"
-            preIcon="ep:zoom-in"
-            :title="t('action.add')"
-            v-hasPermi="['system:post:create']"
-            @click="handleCreate()"
-          />
-        </template>
-        <template #actionbtns_default="{ row }">
-          <!-- 操作：修改 -->
-          <XTextButton
-            preIcon="ep:edit"
-            :title="t('action.edit')"
-            v-hasPermi="['bpm:form:update']"
-            @click="handleUpdate(row.id)"
-          />
-          <!-- 操作：详情 -->
-          <XTextButton
-            preIcon="ep:view"
-            :title="t('action.detail')"
-            v-hasPermi="['bpm:form:query']"
-            @click="handleDetail(row.id)"
-          />
-          <!-- 操作：删除 -->
-          <XTextButton
-            preIcon="ep:delete"
-            :title="t('action.del')"
-            v-hasPermi="['bpm:form:delete']"
-            @click="deleteData(row.id)"
-          />
-        </template>
-      </XTable>
-      <!-- 表单详情的弹窗 -->
-      <XModal v-model="detailOpen" width="800" title="表单详情">
-        <form-create :rule="detailPreview.rule" :option="detailPreview.option" v-if="detailOpen" />
-      </XModal>
-    </div>
+    <XTable @register="registerTable">
+      <!-- 操作：新增 -->
+      <template #toolbar_buttons>
+        <XButton
+          type="primary"
+          preIcon="ep:zoom-in"
+          :title="t('action.add')"
+          v-hasPermi="['system:post:create']"
+          @click="handleCreate()"
+        />
+      </template>
+      <template #actionbtns_default="{ row }">
+        <!-- 操作：修改 -->
+        <XTextButton
+          preIcon="ep:edit"
+          :title="t('action.edit')"
+          v-hasPermi="['bpm:form:update']"
+          @click="handleUpdate(row.id)"
+        />
+        <!-- 操作：详情 -->
+        <XTextButton
+          preIcon="ep:view"
+          :title="t('action.detail')"
+          v-hasPermi="['bpm:form:query']"
+          @click="handleDetail(row.id)"
+        />
+        <!-- 操作：删除 -->
+        <XTextButton
+          preIcon="ep:delete"
+          :title="t('action.del')"
+          v-hasPermi="['bpm:form:delete']"
+          @click="deleteData(row.id)"
+        />
+      </template>
+    </XTable>
+    <!-- 表单详情的弹窗 -->
+    <XModal v-model="detailOpen" width="800" title="表单详情">
+      <form-create :rule="detailPreview.rule" :option="detailPreview.option" v-if="detailOpen" />
+    </XModal>
   </ContentWrap>
 </template>
 
 <script setup lang="ts" name="BpmForm">
-// 全局相关的 import
 // 业务相关的 import
 import * as FormApi from '@/api/bpm/form'
 import { allSchemas } from './form.data'
@@ -54,7 +51,7 @@ import { allSchemas } from './form.data'
 import { setConfAndFields2 } from '@/utils/formCreate'
 
 const { t } = useI18n() // 国际化
-const router = useRouter() // 路由
+const { push } = useRouter() // 路由
 
 // 列表相关的变量
 const [registerTable, { deleteData }] = useXTable({
@@ -65,14 +62,14 @@ const [registerTable, { deleteData }] = useXTable({
 
 // 新增操作
 const handleCreate = () => {
-  router.push({
+  push({
     name: 'bpmFormEditor'
   })
 }
 
 // 修改操作
 const handleUpdate = async (rowId: number) => {
-  await router.push({
+  await push({
     name: 'bpmFormEditor',
     query: {
       id: rowId

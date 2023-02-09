@@ -1,4 +1,4 @@
-import { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
 
 // 表单校验
 export const rules = reactive({
