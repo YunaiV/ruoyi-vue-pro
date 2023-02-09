@@ -1,7 +1,7 @@
 import request from '@/config/axios'
 
 // 获取消息发送概况数据
-export function getUpstreamMessage(query) {
+export const getUpstreamMessage = (query) => {
   return request.get({
     url: '/mp/statistics/upstream-message',
     params: query
@@ -9,7 +9,7 @@ export function getUpstreamMessage(query) {
 }
 
 // 用户增减数据
-export function getUserSummary(query) {
+export const getUserSummary = (query) => {
   return request.get({
     url: '/mp/statistics/user-summary',
     params: query
@@ -17,7 +17,7 @@ export function getUserSummary(query) {
 }
 
 // 获得用户累计数据
-export function getUserCumulate(query) {
+export const getUserCumulate = (query) => {
   return request.get({
     url: '/mp/statistics/user-cumulate',
     params: query
@@ -25,7 +25,7 @@ export function getUserCumulate(query) {
 }
 
 // 获得接口分析数据
-export function getInterfaceSummary(query) {
+export const getInterfaceSummary = (query) => {
   return request.get({
     url: '/mp/statistics/interface-summary',
     params: query

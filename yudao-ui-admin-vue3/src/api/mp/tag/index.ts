@@ -1,7 +1,7 @@
 import request from '@/config/axios'
 
 // 创建公众号标签
-export function createTag(data) {
+export const createTag = (data) => {
   return request.post({
     url: '/mp/tag/create',
     data: data
@@ -9,7 +9,7 @@ export function createTag(data) {
 }
 
 // 更新公众号标签
-export function updateTag(data) {
+export const updateTag = (data) => {
   return request.put({
     url: '/mp/tag/update',
     data: data
@@ -17,21 +17,21 @@ export function updateTag(data) {
 }
 
 // 删除公众号标签
-export function deleteTag(id) {
+export const deleteTag = (id) => {
   return request.delete({
     url: '/mp/tag/delete?id=' + id
   })
 }
 
 // 获得公众号标签
-export function getTag(id) {
+export const getTag = (id) => {
   return request.get({
     url: '/mp/tag/get?id=' + id
   })
 }
 
 // 获得公众号标签分页
-export function getTagPage(query) {
+export const getTagPage = (query) => {
   return request.get({
     url: '/mp/tag/page',
     params: query
@@ -39,14 +39,14 @@ export function getTagPage(query) {
 }
 
 // 获取公众号标签精简信息列表
-export function getSimpleTags() {
+export const getSimpleTags = () => {
   return request.get({
     url: '/mp/tag/list-all-simple'
   })
 }
 
 // 同步公众号标签
-export function syncTag(accountId) {
+export const syncTag = (accountId) => {
   return request.post({
     url: '/mp/tag/sync?accountId=' + accountId
   })
