@@ -1,4 +1,11 @@
-import axios, { AxiosInstance, AxiosRequestHeaders, AxiosResponse, AxiosError } from 'axios'
+import axios, {
+  AxiosInstance,
+  AxiosRequestHeaders,
+  AxiosResponse,
+  AxiosError,
+  InternalAxiosRequestConfig
+} from 'axios'
+
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import qs from 'qs'
 import { config } from '@/config/axios/config'
@@ -35,7 +42,7 @@ const service: AxiosInstance = axios.create({
 
 // request拦截器
 service.interceptors.request.use(
-  (config) => {
+  (config: InternalAxiosRequestConfig) => {
     // 是否需要设置 token
     let isToken = (config!.headers || {}).isToken === false
     whiteList.some((v) => {
