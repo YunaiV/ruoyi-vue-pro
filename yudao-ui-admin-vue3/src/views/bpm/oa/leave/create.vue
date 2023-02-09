@@ -21,7 +21,7 @@ import { rules, allSchemas } from './leave.data'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
-const router = useRouter() // 路由
+const { push } = useRouter() // 路由
 
 // 表单参数
 const actionLoading = ref(false) // 按钮 Loading
@@ -41,15 +41,13 @@ const submitForm = async () => {
       const data = unref(formRef)?.formModel as LeaveApi.LeaveVO
       // data.startTime = XEUtils.toDateString(data.startTime, 'yyyy-MM-dd HH:mm:ss')
       // data.endTime = XEUtils.toDateString(data.endTime, 'yyyy-MM-dd HH:mm:ss')
-      data.startTime = Date.parse(new Date(data.startTime).toString())
-      data.endTime = Date.parse(new Date(data.endTime).toString())
+      data.startTime = Date.parse(new Date(data.startTime).toString()).toString()
+      data.endTime = Date.parse(new Date(data.endTime).toString()).toString()
       // 添加的提交
       await LeaveApi.createLeaveApi(data)
       message.success(t('common.createSuccess'))
       // 关闭窗口
-      router.push({
-        path: '/bpm/oa/leave'
-      })
+      push('/bpm/oa/leave')
     } finally {
       actionLoading.value = false
     }

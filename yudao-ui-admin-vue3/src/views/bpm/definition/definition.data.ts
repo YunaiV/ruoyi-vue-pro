@@ -1,7 +1,4 @@
-import { reactive } from 'vue'
-import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
-
-import { DICT_TYPE } from '@/utils/dict'
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
 
 // CrudSchema
 const crudSchemas = reactive<VxeCrudSchema>({

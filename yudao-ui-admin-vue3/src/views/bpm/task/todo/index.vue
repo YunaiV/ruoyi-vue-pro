@@ -18,7 +18,7 @@
 import { allSchemas } from './todo.data'
 import * as TaskApi from '@/api/bpm/task'
 
-const router = useRouter() // 路由
+const { push } = useRouter() // 路由
 
 const [registerTable] = useXTable({
   allSchemas: allSchemas,
@@ -27,7 +27,7 @@ const [registerTable] = useXTable({
 
 // 处理审批按钮
 const handleAudit = (row) => {
-  router.push({
+  push({
     name: 'BpmProcessInstanceDetail',
     query: {
       id: row.processInstance.id

@@ -22,6 +22,7 @@ export type ModelVO = {
   status: number
   remark: string
   createTime: string
+  bpmnXml: string
 }
 
 export const getModelPageApi = async (params) => {

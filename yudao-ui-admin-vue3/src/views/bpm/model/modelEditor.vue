@@ -27,7 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
 // import { translations } from '@/components/bpmnProcessDesigner/src/translations'
 // 自定义元素选中时的弹出菜单（修改 默认任务 为 用户任务）
 import CustomContentPadProvider from '@/components/bpmnProcessDesigner/package/designer/plugins/content-pad'
@@ -36,11 +35,10 @@ import CustomPaletteProvider from '@/components/bpmnProcessDesigner/package/desi
 // import xmlObj2json from "./utils/xml2json";
 // import myProcessDesigner from '@/components/bpmnProcessDesigner/package/designer/ProcessDesigner.vue'
 // import MyProcessPalette from '@/components/bpmnProcessDesigner/package/palette/ProcessPalette.vue'
-import { createModelApi, getModelApi, updateModelApi } from '@/api/bpm/model'
+import { createModelApi, getModelApi, updateModelApi, ModelVO } from '@/api/bpm/model'
 
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 const router = useRouter()
+const message = useMessage()
 
 // 自定义侧边栏
 // import MyProcessPanel from "../package/process-panel/ProcessPanel";
@@ -63,14 +61,14 @@ const controlForm = ref({
 //   CustomPaletteProvider
 // })
 // 流程模型的信息
-const model = ref({})
+const model = ref<ModelVO>()
 onMounted(() => {
   // 如果 modelId 非空，说明是修改流程模型
   const modelId = router.currentRoute.value.query && router.currentRoute.value.query.modelId
   console.log(modelId, 'modelId')
   if (modelId) {
     // let data = '4b4909d8-97e7-11ec-8e20-862bc1a4a054'
-    getModelApi(modelId).then((data) => {
+    getModelApi(modelId as unknown as number).then((data) => {
       console.log(data, 'response')
       xmlString.value = data.bpmnXml
       model.value = {
@@ -109,9 +107,9 @@ const initModeler = (item) => {
 }
 
 const save = (bpmnXml) => {
-  const data = {
+  const data: ModelVO = {
     ...model.value,
-    bpmnXml: bpmnXml // this.bpmnXml 只是初始化流程图，后续修改无法通过它获得
+    bpmnXml: bpmnXml // bpmnXml 只是初始化流程图，后续修改无法通过它获得
   }
   console.log(data, 'data')
 
@@ -119,9 +117,7 @@ const save = (bpmnXml) => {
   if (data.id) {
     updateModelApi(data).then((response) => {
       console.log(response, 'response')
-      // this.$modal.msgSuccess("修改成功")
-      ElMessage.success('修改成功')
-
+      message.success('修改成功')
       // 跳转回去
       close()
     })
@@ -130,15 +126,13 @@ const save = (bpmnXml) => {
   // 添加的提交
   createModelApi(data).then((response) => {
     console.log(response, 'response1')
-    // this.$modal.msgSuccess("保存成功")
-    ElMessage.success('保存成功')
+    message.success('保存成功')
     // 跳转回去
     close()
   })
 }
 /** 关闭按钮 */
 const close = () => {
-  // this.$tab.closeOpenPage({ path: "/bpm/manager/model" })
   router.push({ path: '/bpm/manager/model' })
 }
 </script>

@@ -51,7 +51,7 @@ import { allSchemas } from './post.data'
 import PostForm from './PostForm.vue'
 
 const { t } = useI18n() // 国际化
-const modalRef = ref()
+
 // 列表相关的变量
 const [registerTable, { reload, deleteData, exportList }] = useXTable({
   allSchemas: allSchemas,
@@ -59,7 +59,8 @@ const [registerTable, { reload, deleteData, exportList }] = useXTable({
   deleteApi: PostApi.deletePostApi,
   exportListApi: PostApi.exportPostApi
 })
-
+// 表单相关的变量
+const modalRef = ref()
 const openModal = (type: string, rowId?: number) => {
   modalRef.value.openModal(type, rowId)
 }

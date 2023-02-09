@@ -46,8 +46,8 @@
   </div>
 </template>
 <script setup lang="ts" name="UploadImgs">
-import { PropType, ref } from 'vue'
-import { ElUpload, ElNotification, ElImageViewer } from 'element-plus'
+import { PropType } from 'vue'
+import { ElNotification } from 'element-plus'
 import type { UploadProps, UploadFile, UploadUserFile } from 'element-plus'
 
 import { propTypes } from '@/utils/propTypes'

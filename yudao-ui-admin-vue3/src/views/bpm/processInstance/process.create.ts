@@ -1,4 +1,4 @@
-import { VxeCrudSchema, useVxeCrudSchemas } from '@/hooks/web/useVxeCrudSchemas'
+import type { VxeCrudSchema } from '@/hooks/web/useVxeCrudSchemas'
 
 // crudSchemas
 const crudSchemas = reactive<VxeCrudSchema>({

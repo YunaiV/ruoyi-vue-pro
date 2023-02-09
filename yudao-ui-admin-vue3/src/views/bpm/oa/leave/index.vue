@@ -33,7 +33,7 @@ import * as ProcessInstanceApi from '@/api/bpm/processInstance'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
-const router = useRouter() // 路由
+const { push } = useRouter() // 路由
 
 const [registerTable, { reload }] = useXTable({
   allSchemas: allSchemas,
@@ -42,7 +42,7 @@ const [registerTable, { reload }] = useXTable({
 
 // 发起请假
 const handleCreate = () => {
-  router.push({
+  push({
     name: 'OALeaveCreate'
   })
 }
@@ -63,7 +63,7 @@ const cancelLeave = (row) => {
 
 // 详情
 const handleDetail = (row) => {
-  router.push({
+  push({
     name: 'OALeaveDetail',
     query: {
       id: row.id
@@ -73,7 +73,7 @@ const handleDetail = (row) => {
 
 // 审批进度
 const handleProcessDetail = (row) => {
-  router.push({
+  push({
     name: 'BpmProcessInstanceDetail',
     query: {
       id: row.processInstanceId

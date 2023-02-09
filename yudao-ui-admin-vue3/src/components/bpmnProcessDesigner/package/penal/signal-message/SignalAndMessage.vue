@@ -46,17 +46,7 @@
   </div>
 </template>
 <script setup lang="ts" name="SignalAndMassage">
-import {
-  ElMessage,
-  ElDialog,
-  ElForm,
-  ElFormItem,
-  ElTable,
-  ElTableColumn,
-  ElButton,
-  ElInput
-} from 'element-plus'
-import { ref, computed, onMounted } from 'vue'
+const message = useMessage()
 const signalList = ref<any[]>([])
 const messageList = ref<any[]>([])
 const modelVisible = ref(false)
@@ -99,13 +89,13 @@ const openModel = (type) => {
 const addNewObject = () => {
   if (modelType.value === 'message') {
     if (messageIdMap.value[modelObjectForm.value.id]) {
-      ElMessage.error('该消息已存在，请修改id后重新保存')
+      message.error('该消息已存在，请修改id后重新保存')
     }
     const messageRef = window.bpmnInstances.moddle.create('bpmn:Message', modelObjectForm.value)
     rootElements.value.push(messageRef)
   } else {
     if (signalIdMap.value[modelObjectForm.value.id]) {
-      ElMessage.error('该信号已存在，请修改id后重新保存')
+      message.error('该信号已存在，请修改id后重新保存')
     }
     const signalRef = window.bpmnInstances.moddle.create('bpmn:Signal', modelObjectForm.value)
     rootElements.value.push(signalRef)

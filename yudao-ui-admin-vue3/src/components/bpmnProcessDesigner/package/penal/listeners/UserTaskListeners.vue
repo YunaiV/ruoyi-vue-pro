@@ -287,7 +287,7 @@
     </el-dialog>
   </div>
 </template>
-<script lang="ts" setup name="UserTaskListeners">
+<script setup lang="ts" name="UserTaskListeners">
 import { ElMessageBox } from 'element-plus'
 import { createListenerObject, updateElementExtensions } from '../../utils'
 import { initListenerForm, initListenerType, eventType, listenerType, fieldType } from './utilSelf'

@@ -46,19 +46,15 @@
   </ContentWrap>
 </template>
 <script setup lang="ts">
-// 全局相关的 import
-import { ref } from 'vue'
-
 // 业务相关的 import
 import * as DefinitionApi from '@/api/bpm/definition'
 // import * as ModelApi from '@/api/bpm/model'
 import { allSchemas } from './definition.data'
+import { setConfAndFields2 } from '@/utils/formCreate'
 
 const message = useMessage() // 消息弹窗
 const router = useRouter() // 路由
 const { query } = useRoute() // 查询参数
-
-import { setConfAndFields2 } from '@/utils/formCreate'
 
 // ========== 列表相关 ==========
 const queryParams = reactive({
