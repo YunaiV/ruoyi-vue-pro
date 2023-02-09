@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { propTypes } from '@/utils/propTypes'
-import { ElScrollbar } from 'element-plus'
 const slots = useSlots()
 
 const props = defineProps({

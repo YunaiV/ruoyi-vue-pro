@@ -242,20 +242,7 @@
   </div>
 </template>
 <script setup lang="ts" name="ElementListeners">
-import { ref, inject, watch, nextTick } from 'vue'
-import {
-  ElMessageBox,
-  ElTable,
-  ElTableColumn,
-  ElDivider,
-  ElOption,
-  ElSelect,
-  ElInput,
-  ElDrawer,
-  ElDialog,
-  ElForm,
-  ElFormItem
-} from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { createListenerObject, updateElementExtensions } from '../../utils'
 import { initListenerType, initListenerForm, listenerType, fieldType } from './utilSelf'
 const props = defineProps({
