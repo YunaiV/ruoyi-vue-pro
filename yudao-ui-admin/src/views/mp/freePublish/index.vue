@@ -64,7 +64,7 @@ import { getSimpleAccounts } from "@/api/mp/account";
 import WxNews from '@/views/mp/components/wx-news/main.vue';
 
 export default {
-  name: 'mpDraft',
+  name: 'MpFreePublish',
   components: {
     WxNews
   },

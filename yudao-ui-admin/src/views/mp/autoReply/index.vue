@@ -162,7 +162,7 @@ import { getSimpleAccounts } from "@/api/mp/account";
 import { createAutoReply, deleteAutoReply, getAutoReply, getAutoReplyPage, updateAutoReply } from "@/api/mp/autoReply";
 
 export default {
-  name: 'mpAutoReply',
+  name: 'MpAutoReply',
   components: {
     WxVideoPlayer,
     WxVoicePlayer,

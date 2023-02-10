@@ -60,14 +60,15 @@ export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecord
       alwaysShow:
         route.children &&
         route.children.length === 1 &&
-        import.meta.env.VITE_ROUTE_ALWAYSSHOW_ENABLE === 'true'
-          ? true
-          : false
+        (route.alwaysShow !== undefined ? route.alwaysShow : true)
     }
     // 路由地址转首字母大写驼峰，作为路由名称，适配keepAlive
     let data: AppRouteRecordRaw = {
       path: route.path,
-      name: toCamelCase(route.path, true),
+      name:
+        route.componentName && route.componentName.length > 0
+          ? route.componentName
+          : toCamelCase(route.path, true),
       redirect: route.redirect,
       meta: meta
     }

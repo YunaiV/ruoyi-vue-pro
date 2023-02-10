@@ -82,7 +82,7 @@ import {addTime, beginOfDay, betweenDay, endOfDay, formatDate} from "@/utils/dat
 import { getSimpleAccounts } from "@/api/mp/account";
 
 export default {
-  name: 'mpStatistics',
+  name: 'MpStatistics',
   data() {
     return {
       date : [beginOfDay(new Date(new Date().getTime() - 3600 * 1000 * 24 * 7)), // -7 天

@@ -91,7 +91,16 @@
       <template v-if="menuForm.type === 2">
         <el-col :span="16">
           <el-form-item label="组件地址" prop="component">
-            <el-input v-model="menuForm.component" placeholder="请输入组件地址" clearable />
+            <el-input
+              v-model="menuForm.component"
+              placeholder="例如说：system/user/index"
+              clearable
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="16">
+          <el-form-item label="组件名字" prop="componentName">
+            <el-input v-model="menuForm.componentName" placeholder="例如说：SystemUser" clearable />
           </el-form-item>
         </el-col>
       </template>
@@ -129,7 +138,7 @@
       </el-col>
       <template v-if="menuForm.type !== 3">
         <el-col :span="16">
-          <el-form-item label="显示状态" prop="status">
+          <el-form-item label="显示状态" prop="visible">
             <template #label>
               <Tooltip
                 titel="显示状态"
@@ -143,13 +152,29 @@
           </el-form-item>
         </el-col>
       </template>
+      <template v-if="menuForm.type !== 3">
+        <el-col :span="16">
+          <el-form-item label="总是显示" prop="alwaysShow">
+            <template #label>
+              <Tooltip
+                titel="总是显示"
+                message="选择不是时，当该菜单只有一个子菜单时，不展示自己，直接展示子菜单"
+              />
+            </template>
+            <el-radio-group v-model="menuForm.alwaysShow">
+              <el-radio border key="true" :label="true">总是</el-radio>
+              <el-radio border key="false" :label="false">不是</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+      </template>
       <template v-if="menuForm.type === 2">
         <el-col :span="16">
           <el-form-item label="缓存状态" prop="keepAlive">
             <template #label>
               <Tooltip
                 titel="缓存状态"
-                message="选择缓存时，则会被 `keep-alive` 缓存，需要匹配组件的 `name` 和路由地址保持一致"
+                message="选择缓存时，则会被 `keep-alive` 缓存，必须填写「组件名称」字段"
               />
             </template>
             <el-radio-group v-model="menuForm.keepAlive">
@@ -220,9 +245,11 @@ const menuForm = ref<MenuApi.MenuVO>({
   path: '',
   icon: '',
   component: '',
+  componentName: '',
   status: CommonStatusEnum.ENABLE,
   visible: true,
   keepAlive: true,
+  alwaysShow: true,
   createTime: new Date()
 })
 
@@ -262,9 +289,11 @@ const handleCreate = () => {
     path: '',
     icon: '',
     component: '',
+    componentName: '',
     status: CommonStatusEnum.ENABLE,
     visible: true,
     keepAlive: true,
+    alwaysShow: true,
     createTime: new Date()
   }
 }
@@ -275,6 +304,9 @@ const handleUpdate = async (rowId: number) => {
   // 设置数据
   const res = await MenuApi.getMenuApi(rowId)
   menuForm.value = res
+  // TODO 芋艿：这块要优化下，部分字段未重置，无法修改
+  menuForm.value.componentName = res.componentName || ''
+  menuForm.value.alwaysShow = res.alwaysShow !== undefined ? res.alwaysShow : true
 }
 
 // 提交新增/修改的表单

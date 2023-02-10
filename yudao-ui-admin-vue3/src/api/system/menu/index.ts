@@ -10,9 +10,11 @@ export interface MenuVO {
   path: string
   icon: string
   component: string
+  componentName?: string
   status: number
   visible: boolean
   keepAlive: boolean
+  alwaysShow?: boolean
   createTime: Date
 }
 

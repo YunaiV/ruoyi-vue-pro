@@ -157,7 +157,7 @@ import { deleteMenu, getMenuList, saveMenu } from "@/api/mp/menu";
 import { getSimpleAccounts } from "@/api/mp/account";
 
 export default {
-  name: 'mpMenu',
+  name: 'MpMenu',
   components: {
       WxReplySelect,
       WxNews,

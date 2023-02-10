@@ -30,6 +30,9 @@ public class AuthMenuRespVO {
     @Schema(description = "组件路径,仅菜单类型为菜单时，才需要传", example = "system/post/index")
     private String component;
 
+    @Schema(description = "组件名", example = "SystemUser")
+    private String componentName;
+
     @Schema(description = "菜单图标,仅菜单类型为菜单或者目录时，才需要传", example = "/menu/list")
     private String icon;
 
@@ -38,6 +41,9 @@ public class AuthMenuRespVO {
 
     @Schema(description = "是否缓存", required = true, example = "false")
     private Boolean keepAlive;
+
+    @Schema(description = "是否总是显示", example = "false")
+    private Boolean alwaysShow;
 
     /**
      * 子路由
