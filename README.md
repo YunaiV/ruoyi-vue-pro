@@ -207,23 +207,27 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 ## 🐨 技术栈
 
-| 项目                      | 说明                 |
-|-------------------------|--------------------|
-| `yudao-dependencies`    | Maven 依赖版本管理       |
-| `yudao-framework`       | Java 框架拓展          |
-| `yudao-server`          | 管理后台 + 用户 APP 的服务端 |
-| `yudao-ui-admin`        | 管理后台的 Vue2 前端项目    |
-| `yudao-ui-admin-vue3`   | 管理后台的 Vue3 前端项目    |
-| `yudao-ui-admin-uniapp` | 管理后台的 uni-app 多端项目 |
-| `yudao-ui-app`          | 用户 APP 的 UI 界面     |
-| `yudao-module-system`   | 系统功能的 Module 模块    |
-| `yudao-module-member`   | 会员中心的 Module 模块    |
-| `yudao-module-infra`    | 基础设施的 Module 模块    |
-| `yudao-module-bpm`      | 工作流程的 Module 模块    |
-| `yudao-module-pay`      | 支付系统的 Module 模块    |
-| `yudao-module-mall`     | 商城系统的 Module 模块    |
-| `yudao-module-mp`       | 微信公众号的 Module 模块   |
-| `yudao-module-report`   | 大屏报表 Module 模块     |
+| 项目                                                                       | 说明                 |
+|--------------------------------------------------------------------------|--------------------|
+| `yudao-dependencies`                                                     | Maven 依赖版本管理       |
+| `yudao-framework`                                                        | Java 框架拓展          |
+| `yudao-server`                                                           | 管理后台 + 用户 APP 的服务端 |
+| `yudao-module-system`                                                    | 系统功能的 Module 模块    |
+| `yudao-module-member`                                                    | 会员中心的 Module 模块    |
+| `yudao-module-infra`                                                     | 基础设施的 Module 模块    |
+| `yudao-module-bpm`                                                       | 工作流程的 Module 模块    |
+| `yudao-module-pay`                                                       | 支付系统的 Module 模块    |
+| `yudao-module-mall`                                                      | 商城系统的 Module 模块    |
+| `yudao-module-mp`                                                        | 微信公众号的 Module 模块   |
+| `yudao-module-report`                                                    | 大屏报表 Module 模块     |
+
+> 前端项目的地址：
+> 
+> * [`yudao-ui-admin-vue3`](https://gitee.com/yudaocode/yudao-ui-admin-vue3)：基于 Vue3 + element-plus 实现的管理后台
+> * `yudao-ui-admin`：基于 Vue2 + element-ui 实现的管理后台
+> * [`yudao-ui-go-view`](https://gitee.com/yudaocode/yudao-ui-go-view)：基于 Vue3 + naive-ui 实现的大屏报表
+> * `yudao-ui-admin-uniapp`：基于 uni-app + uni-ui 实现的管理后台的小程序 
+> * `yudao-ui-app`：基于 uni-app + uview 实现的用户 App
 
 ### 后端
 
@@ -257,18 +261,6 @@ ps：核心功能已经实现，正在对接微信小程序中...
 |------------------------------------------------------------------------------|---------------|--------|
 | [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.7.14 |
 | [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -      |
-
-### [管理后台 Vue3 前端](./yudao-ui-admin-vue3)
-
-| 框架                                                                   |      说明      |   版本   |
-|----------------------------------------------------------------------|:------------:|:------:|
-| [Vue](https://staging-cn.vuejs.org/)                                 |    Vue 框架    | 3.2.47 |
-| [Vite](https://cn.vitejs.dev//)                                      |   开发与构建工具    | 4.1.1  |
-| [Element Plus](https://element-plus.org/zh-CN/)                      | Element Plus | 2.2.29 |
-| [TypeScript](https://www.typescriptlang.org/docs/)                   |  TypeScript  | 4.9.5  |
-| [pinia](https://pinia.vuejs.org/)                                    |    vuex5     | 2.0.30 |
-| [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) |     国际化      | 9.2.2  |
-| [vxe-table](https://vxetable.cn/)                                    |   vue最强表单    | 4.3.9  |
 
 ### [管理后台 uni-app 跨端](./yudao-ui-admin-uniapp)
 
