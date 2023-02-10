@@ -132,7 +132,7 @@ import {
 } from '@/api/mp/account'
 
 export default {
-  name: 'mpAccount',
+  name: 'MpAccount',
   components: {},
   data() {
     return {

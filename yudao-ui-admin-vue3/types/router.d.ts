@@ -69,11 +69,13 @@ declare global {
     name: string
     meta: RouteMeta
     component: string
+    componentName?: string
     path: string
     redirect: string
     children?: AppCustomRouteRecordRaw[]
     keepAlive?: boolean
     visible?: boolean
     parentId?: number
+    alwaysShow?: boolean
   }
 }

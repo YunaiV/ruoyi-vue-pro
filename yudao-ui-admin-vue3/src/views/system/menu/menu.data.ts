@@ -47,6 +47,10 @@ const crudSchemas = reactive<VxeCrudSchema>({
       field: 'component'
     },
     {
+      title: '组件名字',
+      field: 'componentName'
+    },
+    {
       title: '权限标识',
       field: 'permission'
     },
@@ -64,7 +68,8 @@ const crudSchemas = reactive<VxeCrudSchema>({
     {
       title: t('common.createTime'),
       field: 'createTime',
-      formatter: 'formatDate'
+      formatter: 'formatDate',
+      isTable: false
     }
   ]
 })

@@ -95,7 +95,7 @@ import { getSimpleAccounts } from "@/api/mp/account";
 import { getSimpleTags } from "@/api/mp/tag";
 
 export default {
-  name: "WxAccountFans",
+  name: "MpUser",
   components: {
   },
   data() {

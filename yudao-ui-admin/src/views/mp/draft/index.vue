@@ -167,7 +167,7 @@ import { getSimpleAccounts } from "@/api/mp/account";
 import {deleteFreePublish, submitFreePublish} from "@/api/mp/freePublish";
 
 export default {
-  name: 'mpDraft',
+  name: 'MpDraft',
   components: {
     WxEditor,
     WxNews,
