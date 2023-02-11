@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 @Data
 public class PayDemoOrderRespVO {
 
+    @Schema(description = "订单编号", required = true, example = "1024")
+    private Long id;
+
     @Schema(description = "用户编号", required = true, example = "23199")
     private Long userId;
 
@@ -38,5 +41,8 @@ public class PayDemoOrderRespVO {
 
     @Schema(description = "退款时间")
     private LocalDateTime refundTime;
+
+    @Schema(description = "创建时间", required = true)
+    private LocalDateTime createTime;
 
 }
