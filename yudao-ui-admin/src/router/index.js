@@ -221,6 +221,18 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/mall/trade/order/detail'], resolve)
       }
     ]
+  },
+  {
+    path: '/pay',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: 'order/submit',
+      name: '收银台',
+      hidden: true,
+      meta: { title: '收银台' },
+      component: (resolve) => require(['@/views/pay/order/submit'], resolve)
+    }]
   }
 ]
 
