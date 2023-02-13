@@ -172,7 +172,7 @@ export const PayOrderStatusEnum = {
   },
   CLOSED: {
     status: 20,
-    name: '未支付'
+    name: '支付关闭'
   }
 }
 

@@ -47,7 +47,7 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handlePay(scope.row)"
-                     v-if="!scope.row.payed">支付</el-button>
+                     v-if="!scope.row.payed">前往支付</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -187,15 +187,14 @@ export default {
         });
       });
     },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      const id = row.id;
-      this.$modal.confirm('是否确认删除示例订单编号为"' + id + '"的数据项?').then(function() {
-        return deleteDemoOrder(id);
-      }).then(() => {
-        this.getList();
-        this.$modal.msgSuccess("删除成功");
-      }).catch(() => {});
+    /** 支付按钮操作 */
+    handlePay(row) {
+      this.$router.push({
+          name: 'PayOrderSubmit',
+          query:{
+            id: row.payOrderId
+          }
+      })
     }
   }
 };

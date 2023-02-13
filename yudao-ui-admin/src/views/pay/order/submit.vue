@@ -3,12 +3,12 @@
     <!-- 支付信息 -->
     <el-card v-loading="loading">
       <el-descriptions title="支付信息" :column="3" border>
-        <el-descriptions-item label="支付单号">kooriookami</el-descriptions-item>
-        <el-descriptions-item label="商品标题">苏州市</el-descriptions-item>
-        <el-descriptions-item label="商品内容">苏州市</el-descriptions-item>
-        <el-descriptions-item label="支付金额">18100000000</el-descriptions-item>
-        <el-descriptions-item label="创建时间">苏州市</el-descriptions-item>
-        <el-descriptions-item label="过期时间">苏州市</el-descriptions-item>
+        <el-descriptions-item label="支付单号">{{ payOrder.id }}</el-descriptions-item>
+        <el-descriptions-item label="商品标题">{{ payOrder.subject }}</el-descriptions-item>
+        <el-descriptions-item label="商品内容">{{ payOrder.body }}</el-descriptions-item>
+        <el-descriptions-item label="支付金额">￥{{ (payOrder.amount / 100.0).toFixed(2) }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ parseTime(payOrder.createTime) }}</el-descriptions-item>
+        <el-descriptions-item label="过期时间">{{ parseTime(payOrder.expireTime) }}</el-descriptions-item>
       </el-descriptions>
     </el-card>
 
@@ -43,7 +43,9 @@
   </div>
 </template>
 <script>
-import {DICT_TYPE, getDictDatas} from "@/utils/dict";
+import { DICT_TYPE, getDictDatas } from "@/utils/dict";
+import { getOrder } from '@/api/pay/order';
+import { PayOrderStatusEnum } from "@/utils/constants";
 
 export default {
   name: "PayOrderSubmit",
@@ -71,11 +73,7 @@ export default {
   },
   created() {
     this.id = this.$route.query.id;
-    // if (!this.id) {
-    //   this.$message.error('未传递 id 参数，无法查看 OA 请假信息');
-    //   return;
-    // }
-    // this.getDetail();
+    this.getDetail();
     this.initPayChannels();
   },
   methods: {
@@ -98,8 +96,28 @@ export default {
     },
     /** 获得请假信息 */
     getDetail() {
-      getLeave(this.id).then(response => {
-        this.form = response.data;
+      // 1.1 未传递订单编号
+      if (!this.id) {
+        this.$message.error('未传递支付单号，无法查看对应的支付信息');
+        this.$router.go(-1);
+        return;
+      }
+      getOrder(this.id).then(response => {
+        // 1.2 无法查询到支付信息
+        if (!response.data) {
+          this.$message.error('支付订单不存在，请检查！');
+          this.$router.go(-1);
+          return;
+        }
+        // 1.3 订单已支付
+        if (response.data.status !== PayOrderStatusEnum.WAITING.status) {
+          this.$message.error('支付订单不处于待支付状态，请检查！');
+          this.$router.go(-1);
+          return;
+        }
+
+        // 2. 可以展示
+        this.payOrder = response.data;
       });
     },
   }

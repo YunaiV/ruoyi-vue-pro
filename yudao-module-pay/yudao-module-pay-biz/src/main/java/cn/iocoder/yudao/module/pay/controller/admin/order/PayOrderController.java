@@ -46,7 +46,7 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
 public class PayOrderController {
 
     @Resource
-    private PayOrderService orderService;
+    private PayOrderService payOrderService;
     @Resource
     private PayOrderExtensionService orderExtensionService;
     @Resource
@@ -58,8 +58,17 @@ public class PayOrderController {
     @Operation(summary = "获得支付订单")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('pay:order:query')")
-    public CommonResult<PayOrderDetailsRespVO> getOrder(@RequestParam("id") Long id) {
-        PayOrderDO order = orderService.getOrder(id);
+    public CommonResult<PayOrderRespVO> getOrder(@RequestParam("id") Long id) {
+        return success(PayOrderConvert.INSTANCE.convert(payOrderService.getOrder(id)));
+    }
+
+    // TODO 芋艿：看看怎么优化下；
+    @GetMapping("/get-detail")
+    @Operation(summary = "获得支付订单详情")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('pay:order:query')")
+    public CommonResult<PayOrderDetailsRespVO> getOrderDetail(@RequestParam("id") Long id) {
+        PayOrderDO order = payOrderService.getOrder(id);
         if (ObjectUtil.isNull(order)) {
             return success(new PayOrderDetailsRespVO());
         }
@@ -86,7 +95,7 @@ public class PayOrderController {
     @Operation(summary = "获得支付订单分页")
     @PreAuthorize("@ss.hasPermission('pay:order:query')")
     public CommonResult<PageResult<PayOrderPageItemRespVO>> getOrderPage(@Valid PayOrderPageReqVO pageVO) {
-        PageResult<PayOrderDO> pageResult = orderService.getOrderPage(pageVO);
+        PageResult<PayOrderDO> pageResult = payOrderService.getOrderPage(pageVO);
         if (CollectionUtil.isEmpty(pageResult.getList())) {
             return success(new PageResult<>(pageResult.getTotal()));
         }
@@ -120,7 +129,7 @@ public class PayOrderController {
     public void exportOrderExcel(@Valid PayOrderExportReqVO exportReqVO,
             HttpServletResponse response) throws IOException {
 
-        List<PayOrderDO> list = orderService.getOrderList(exportReqVO);
+        List<PayOrderDO> list = payOrderService.getOrderList(exportReqVO);
         if (CollectionUtil.isEmpty(list)) {
             ExcelUtils.write(response, "支付订单.xls", "数据",
                     PayOrderExcelVO.class, new ArrayList<>());

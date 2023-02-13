@@ -228,9 +228,12 @@ export const constantRoutes = [
     hidden: true,
     children: [{
       path: 'order/submit',
-      name: '收银台',
+      name: 'PayOrderSubmit',
       hidden: true,
-      meta: { title: '收银台' },
+      meta: {
+        title: '收银台',
+        noCache: true
+      },
       component: (resolve) => require(['@/views/pay/order/submit'], resolve)
     }]
   }

@@ -34,6 +34,14 @@ export function getOrder(id) {
   })
 }
 
+// 获得支付订单的明细
+export function getOrderDetail(id) {
+  return request({
+    url: '/pay/order/get-detail?id=' + id,
+    method: 'get'
+  })
+}
+
 // 获得支付订单分页
 export function getOrderPage(query) {
   return request({
