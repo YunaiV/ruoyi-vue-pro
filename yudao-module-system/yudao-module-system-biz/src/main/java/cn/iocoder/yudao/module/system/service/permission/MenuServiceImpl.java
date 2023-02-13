@@ -278,6 +278,7 @@ public class MenuServiceImpl implements MenuService {
         // 菜单为按钮类型时，无需 component、icon、path 属性，进行置空
         if (MenuTypeEnum.BUTTON.getType().equals(menu.getType())) {
             menu.setComponent("");
+            menu.setComponentName("");
             menu.setIcon("");
             menu.setPath("");
         }

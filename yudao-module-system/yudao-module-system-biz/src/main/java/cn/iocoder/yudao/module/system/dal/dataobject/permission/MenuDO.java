@@ -61,6 +61,8 @@ public class MenuDO extends BaseDO {
     private Long parentId;
     /**
      * 路由地址
+     *
+     * 如果 path 为 http(s) 时，则它是外链
      */
     private String path;
     /**
@@ -71,6 +73,10 @@ public class MenuDO extends BaseDO {
      * 组件路径
      */
     private String component;
+    /**
+     * 组件名
+     */
+    private String componentName;
     /**
      * 状态
      *
@@ -87,9 +93,15 @@ public class MenuDO extends BaseDO {
     /**
      * 是否缓存
      *
-     * 只有菜单、目录使用
-     * 是否使用 Vue 路由的 keep-alive 特性
+     * 只有菜单、目录使用，否使用 Vue 路由的 keep-alive 特性
+     * 注意：如果开启缓存，则必须填写 {@link #componentName} 属性，否则无法缓存
      */
     private Boolean keepAlive;
+    /**
+     * 是否总是显示
+     *
+     * 如果为 false 时，当该菜单只有一个子菜单时，不展示自己，直接展示子菜单
+     */
+    private Boolean alwaysShow;
 
 }

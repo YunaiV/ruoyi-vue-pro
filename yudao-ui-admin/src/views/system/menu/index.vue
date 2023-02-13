@@ -38,16 +38,12 @@
         </template>
       </el-table-column>
       <el-table-column prop="sort" label="排序" width="60"></el-table-column>
-      <el-table-column prop="permission" label="权限标识" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="component" label="组件路径" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column prop="permission" label="权限标识" :show-overflow-tooltip="true" />
+      <el-table-column prop="component" label="组件路径" :show-overflow-tooltip="true" />
+      <el-table-column prop="componentName" label="组件名称" :show-overflow-tooltip="true" />
       <el-table-column prop="status" label="状态" width="80">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
-        </template>
-      </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime">
-        <template v-slot="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -63,7 +59,7 @@
     </el-table>
 
     <!-- 添加或修改菜单对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="680px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
           <el-col :span="24">
@@ -113,22 +109,27 @@
               <el-input v-model="form.path" placeholder="请输入路由地址" />
             </el-form-item>
           </el-col>
-          <el-col :span="12" v-if="form.type === 2">
-            <el-form-item label="组件路径" prop="component">
-              <el-input v-model="form.component" placeholder="请输入组件路径" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item v-if="form.type !== 1" label="权限标识">
+					<el-col :span="12">
+						<el-form-item v-if="form.type !== 1" label="权限标识">
               <span slot="label">
                 <el-tooltip content="Controller 方法上的权限字符，如：@PreAuthorize(`@ss.hasPermission('system:user:list')`)" placement="top">
                   <i class="el-icon-question" />
                 </el-tooltip>
                 权限字符
               </span>
-              <el-input v-model="form.permission" placeholder="请权限标识" maxlength="50" />
+							<el-input v-model="form.permission" placeholder="请权限标识" maxlength="50" />
+						</el-form-item>
+					</el-col>
+          <el-col :span="12" v-if="form.type === 2">
+            <el-form-item label="组件路径" prop="component">
+              <el-input v-model="form.component" placeholder="例如说：system/user/index" />
             </el-form-item>
           </el-col>
+					<el-col :span="12" v-if="form.type === 2">
+						<el-form-item label="组件名称" prop="componentName">
+							<el-input v-model="form.componentName" placeholder="例如说：SystemUser" />
+						</el-form-item>
+					</el-col>
           <el-col :span="12">
             <el-form-item label="菜单状态" prop="status">
               <span slot="label">
@@ -158,19 +159,33 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.type === 2" label="显示状态">
+            <el-form-item v-if="form.type !== 3" label="总是显示">
               <span slot="label">
-                <el-tooltip content="选择缓存时，则会被 `keep-alive` 缓存，需要匹配组件的 `name` 和路由地址保持一致" placement="top">
+                <el-tooltip content="选择不是时，当该菜单只有一个子菜单时，不展示自己，直接展示子菜单" placement="top">
+                  <i class="el-icon-question" />
+                </el-tooltip>
+                 总是显示
+              </span>
+              <el-radio-group v-model="form.alwaysShow">
+                <el-radio :key="true" :label="true">总是</el-radio>
+                <el-radio :key="false" :label="false">不是</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+					<el-col :span="12">
+						<el-form-item v-if="form.type === 2" label="是否缓存">
+              <span slot="label">
+                <el-tooltip content="选择缓存时，则会被 `keep-alive` 缓存，必须填写「组件名称」字段" placement="top">
                   <i class="el-icon-question" />
                 </el-tooltip>
                  是否缓存
               </span>
-              <el-radio-group v-model="form.keepAlive">
-                <el-radio :key="true" :label="true">缓存</el-radio>
-                <el-radio :key="false" :label="false">不缓存</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
+							<el-radio-group v-model="form.keepAlive">
+								<el-radio :key="true" :label="true">缓存</el-radio>
+								<el-radio :key="false" :label="false">不缓存</el-radio>
+							</el-radio-group>
+						</el-form-item>
+					</el-col>
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -296,6 +311,7 @@ export default {
         status: CommonStatusEnum.ENABLE,
         visible: true,
         keepAlive: true,
+        alwaysShow: true,
       };
       this.resetForm("form");
     },

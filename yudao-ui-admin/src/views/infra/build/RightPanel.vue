@@ -554,7 +554,7 @@
               default-expand-all
               draggable
             >
-              <span>
+              <span slot-scope="{ node, data }">
                 <span class="node-label">
                   <svg-icon class="node-icon" :icon-class="data.__config__?data.__config__.tagIcon:data.tagIcon" />
                   {{ node.label }}

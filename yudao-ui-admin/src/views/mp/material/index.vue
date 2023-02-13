@@ -178,7 +178,7 @@ import { getMaterialPage, deletePermanentMaterial } from "@/api/mp/material";
 import { getAccessToken } from '@/utils/auth'
 
 export default {
-  name: 'mpMaterial',
+  name: 'MpMaterial',
   components: {
     WxVoicePlayer,
     WxVideoPlayer

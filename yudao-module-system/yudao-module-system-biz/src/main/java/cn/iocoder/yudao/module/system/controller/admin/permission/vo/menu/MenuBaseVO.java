@@ -46,6 +46,9 @@ public class MenuBaseVO {
     @Size(max = 200, message = "组件路径不能超过255个字符")
     private String component;
 
+    @Schema(description = "组件名", example = "SystemUser")
+    private String componentName;
+
     @Schema(description = "状态,见 CommonStatusEnum 枚举", required = true, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
@@ -55,5 +58,8 @@ public class MenuBaseVO {
 
     @Schema(description = "是否缓存", example = "false")
     private Boolean keepAlive;
+
+    @Schema(description = "是否总是显示", example = "false")
+    private Boolean alwaysShow;
 
 }

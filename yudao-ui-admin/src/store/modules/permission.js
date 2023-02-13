@@ -58,14 +58,19 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
       icon: route.icon,
       noCache: !route.keepAlive,
     }
-    // 路由地址转首字母大写驼峰，作为路由名称，适配 keepAlive
-    route.name = toCamelCase(route.path, true)
-    // 处理三级及以上菜单路由缓存问题，将path名字赋值给name
-    if (route.path.indexOf("/") !== -1) {
-      const pathArr = route.path.split("/");
-      route.name = toCamelCase(pathArr[pathArr.length - 1], true)
-    }
     route.hidden = !route.visible
+    // 处理 name 属性
+    if (route.componentName && route.componentName.length > 0) {
+      route.name = route.componentName
+    } else {
+      // 路由地址转首字母大写驼峰，作为路由名称，适配 keepAlive
+      route.name = toCamelCase(route.path, true)
+      // 处理三级及以上菜单路由缓存问题，将 path 名字赋值给 name
+      if (route.path.indexOf("/") !== -1) {
+        const pathArr = route.path.split("/");
+        route.name = toCamelCase(pathArr[pathArr.length - 1], true)
+      }
+    }
     // 处理 component 属性
     if (route.children) { // 父节点
       if (route.parentId === 0) {
@@ -73,8 +78,6 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
       } else {
         route.component = ParentView
       }
-      // 解决只有一个菜单时无法显示目录
-      route.alwaysShow = true
     } else { // 根节点
       route.component = loadView(route.component)
     }
@@ -85,8 +88,10 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
     }
     if (route.children != null && route.children && route.children.length) {
       route.children = filterAsyncRouter(route.children, route, type)
+      route.alwaysShow = route.alwaysShow !== undefined ? route.alwaysShow  : true
     } else {
       delete route['children']
+      delete route['alwaysShow'] // 如果没有子菜单，就不需要考虑 alwaysShow 字段
     }
     return true
   })
