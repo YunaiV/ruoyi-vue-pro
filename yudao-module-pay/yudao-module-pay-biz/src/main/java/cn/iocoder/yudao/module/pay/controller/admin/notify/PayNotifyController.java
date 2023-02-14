@@ -64,8 +64,8 @@ public class PayNotifyController {
     @PermitAll
     @OperateLog(enable = false) // 回调地址，无需记录操作日志
     public String notifyCallback(@PathVariable("channelId") Long channelId,
-                                 @RequestParam Map<String, String> params,
-                                 @RequestBody String body) throws Exception {
+                                 @RequestParam(required = false) Map<String, String> params,
+                                 @RequestBody(required = false) String body) throws Exception {
         // 校验支付渠道是否存在
         PayClient payClient = payClientFactory.getPayClient(channelId);
         if (payClient == null) {
@@ -86,6 +86,5 @@ public class PayNotifyController {
         orderService.notifyPayOrder(channelId, PayNotifyDataDTO.builder().params(params).body(body).build());
         return "success";
     }
-
 
 }

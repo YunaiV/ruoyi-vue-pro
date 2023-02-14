@@ -31,8 +31,8 @@ import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
 import cn.iocoder.yudao.module.pay.service.merchant.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
-import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitReqDTO;
-import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitRespDTO;
+import cn.iocoder.yudao.module.pay.service.order.bo.PayOrderSubmitReqBO;
+import cn.iocoder.yudao.module.pay.service.order.bo.PayOrderSubmitRespBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -127,51 +127,62 @@ public class PayOrderServiceImpl implements PayOrderService {
     }
 
     @Override
-    public PayOrderSubmitRespDTO submitPayOrder(PayOrderSubmitReqDTO reqDTO) {
-        // 校验 App
-        appService.validPayApp(reqDTO.getAppId());
-        // 校验支付渠道是否有效
-        PayChannelDO channel = channelService.validPayChannel(reqDTO.getAppId(), reqDTO.getChannelCode());
-        // 校验支付客户端是否正确初始化
+    public PayOrderSubmitRespBO submitPayOrder(PayOrderSubmitReqBO reqBO) {
+        // 1. 获得 PayOrderDO ，并校验其是否存在
+        PayOrderDO order = validatePayOrderCanSubmit(reqBO.getId());
+        // 1.2 校验支付渠道是否有效
+        PayChannelDO channel = validatePayChannelCanSubmit(order.getAppId(), reqBO.getChannelCode());
         PayClient client = payClientFactory.getPayClient(channel.getId());
-        if (client == null) {
-            log.error("[submitPayOrder][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
-            throw exception(ErrorCodeConstants.PAY_CHANNEL_CLIENT_NOT_FOUND);
-        }
 
-        // 获得 PayOrderDO ，并校验其是否存在
-        PayOrderDO order = orderMapper.selectById(reqDTO.getId());
-        if (order == null || !Objects.equals(order.getAppId(), reqDTO.getAppId())) { // 是否存在
-            throw exception(ErrorCodeConstants.PAY_ORDER_NOT_FOUND);
-        }
-        if (!PayOrderStatusEnum.WAITING.getStatus().equals(order.getStatus())) { // 校验状态，必须是待支付
-            throw exception(ErrorCodeConstants.PAY_ORDER_STATUS_IS_NOT_WAITING);
-        }
-
-        // 插入 PayOrderExtensionDO
-        PayOrderExtensionDO orderExtension = PayOrderConvert.INSTANCE.convert(reqDTO)
+        // 2. 插入 PayOrderExtensionDO
+        PayOrderExtensionDO orderExtension = PayOrderConvert.INSTANCE.convert(reqBO)
                 .setOrderId(order.getId()).setNo(generateOrderExtensionNo())
                 .setChannelId(channel.getId()).setChannelCode(channel.getCode())
                 .setStatus(PayOrderStatusEnum.WAITING.getStatus());
         orderExtensionMapper.insert(orderExtension);
 
-        // 调用三方接口
-        PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderConvert.INSTANCE.convert2(reqDTO);
-        // 商户相关字段
-        //TODO jason @芋艿 是否加一个属性  如tradeNo 支付订单号， 用这个merchantOrderId让人迷糊
-        unifiedOrderReqDTO.setMerchantOrderId(orderExtension.getNo()) // 注意，此处使用的是 PayOrderExtensionDO.no 属性！
+        // 3. 调用三方接口
+        PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderConvert.INSTANCE.convert2(reqBO)
+                // 商户相关的字段
+                .setMerchantOrderId(orderExtension.getNo()) // 注意，此处使用的是 PayOrderExtensionDO.no 属性！
                 .setSubject(order.getSubject()).setBody(order.getBody())
                 .setNotifyUrl(genChannelPayNotifyUrl(channel))
-                .setReturnUrl(genChannelReturnUrl(channel));
-        // 订单相关字段
-        unifiedOrderReqDTO.setAmount(order.getAmount()).setExpireTime(order.getExpireTime());
+                .setReturnUrl(genChannelReturnUrl(channel))
+                // 订单相关字段
+                .setAmount(order.getAmount()).setExpireTime(order.getExpireTime());
         CommonResult<?> unifiedOrderResult = client.unifiedOrder(unifiedOrderReqDTO);
         unifiedOrderResult.checkError();
 
         // TODO 轮询三方接口，是否已经支付的任务
         // 返回成功
-        return new PayOrderSubmitRespDTO().setExtensionId(orderExtension.getId())
+        return new PayOrderSubmitRespBO().setExtensionId(orderExtension.getId())
                 .setInvokeResponse(unifiedOrderResult.getData());
+    }
+
+    private PayOrderDO validatePayOrderCanSubmit(Long id) {
+        PayOrderDO order = orderMapper.selectById(id);
+        if (order == null) { // 是否存在
+            throw exception(ErrorCodeConstants.PAY_ORDER_NOT_FOUND);
+        }
+        if (!PayOrderStatusEnum.WAITING.getStatus().equals(order.getStatus())) { // 校验状态，必须是待支付
+            throw exception(ErrorCodeConstants.PAY_ORDER_STATUS_IS_NOT_WAITING);
+        }
+        return order;
+    }
+
+    private PayChannelDO validatePayChannelCanSubmit(Long appId, String channelCode) {
+        // 校验 App
+        appService.validPayApp(appId);
+
+        // 校验支付渠道是否有效
+        PayChannelDO channel = channelService.validPayChannel(appId, channelCode);
+        // 校验支付客户端是否正确初始化
+        PayClient client = payClientFactory.getPayClient(channel.getId());
+        if (client == null) {
+            log.error("[validatePayChannelCanSubmit][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
+            throw exception(ErrorCodeConstants.PAY_CHANNEL_CLIENT_NOT_FOUND);
+        }
+        return channel;
     }
 
     /**

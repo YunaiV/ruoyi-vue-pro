@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.service.order.dto;
+package cn.iocoder.yudao.module.pay.service.order.bo;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -9,17 +9,11 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * 支付单提交 Request DTO
+ * 支付单提交 Request BO
  */
 @Data
 @Accessors(chain = true)
-public class PayOrderSubmitReqDTO implements Serializable {
-
-    /**
-     * 应用编号
-     */
-    @NotNull(message = "应用编号不能为空")
-    private Long appId;
+public class PayOrderSubmitReqBO implements Serializable {
 
     /**
      * 支付单编号

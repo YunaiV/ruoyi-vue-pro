@@ -7,8 +7,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
-import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitReqDTO;
-import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitRespDTO;
+import cn.iocoder.yudao.module.pay.service.order.bo.PayOrderSubmitReqBO;
+import cn.iocoder.yudao.module.pay.service.order.bo.PayOrderSubmitRespBO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -84,7 +84,7 @@ public interface PayOrderService {
      * @param reqDTO 提交请求
      * @return 提交结果
      */
-    PayOrderSubmitRespDTO submitPayOrder(@Valid PayOrderSubmitReqDTO reqDTO);
+    PayOrderSubmitRespBO submitPayOrder(@Valid PayOrderSubmitReqBO reqDTO);
 
     /**
      * 通知支付单成功

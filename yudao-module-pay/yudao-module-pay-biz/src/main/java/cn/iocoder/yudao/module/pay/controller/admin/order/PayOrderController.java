@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.pay.controller.admin.order;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
+import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
+import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
@@ -18,15 +20,13 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.service.order.bo.PayOrderSubmitRespBO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 支付订单")
@@ -89,6 +90,14 @@ public class PayOrderController {
         }
 
         return success(respVO);
+    }
+
+    @PostMapping("/submit")
+    @Operation(summary = "提交支付订单")
+    public CommonResult<AppPayOrderSubmitRespVO> submitPayOrder(@RequestBody PayOrderSubmitReqVO reqVO) {
+        PayOrderSubmitRespBO respDTO = payOrderService.submitPayOrder(
+                PayOrderConvert.INSTANCE.convert(reqVO, getClientIP()));
+        return success(new AppPayOrderSubmitRespVO(respDTO.getInvokeResponse()));
     }
 
     @GetMapping("/page")

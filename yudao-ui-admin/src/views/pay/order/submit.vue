@@ -12,13 +12,13 @@
       </el-descriptions>
     </el-card>
 
-    <!-- 微信支付 -->
+    <!-- 支付选择框 -->
     <el-card style="margin-top: 10px">
       <!-- 支付宝 -->
       <el-descriptions title="选择支付宝支付">
       </el-descriptions>
       <div class="pay-channel-container">
-        <div class="box" v-for="channel in aliPayChannels" :key="channel.code">
+        <div class="box" v-for="channel in aliPayChannels" :key="channel.code" @click="submit(channel.code)">
           <img :src="icons[channel.code]">
           <div class="title">{{ channel.name }}</div>
         </div>
@@ -40,16 +40,24 @@
         </div>
       </div>
     </el-card>
+
+    <!-- 支付二维码 -->
+    <el-dialog :title="qrCode.title" :visible.sync="qrCode.visible" width="350px" append-to-body
+               :close-on-press-escape="false">
+      <qrcode-vue :value="qrCode.url" size="310" level="H" />
+    </el-dialog>
   </div>
 </template>
 <script>
+import QrcodeVue from 'qrcode.vue'
 import { DICT_TYPE, getDictDatas } from "@/utils/dict";
-import { getOrder } from '@/api/pay/order';
-import { PayOrderStatusEnum } from "@/utils/constants";
+import { getOrder, submitOrder } from '@/api/pay/order';
+import { PayChannelEnum, PayOrderStatusEnum } from "@/utils/constants";
 
 export default {
   name: "PayOrderSubmit",
   components: {
+    QrcodeVue,
   },
   data() {
     return {
@@ -69,6 +77,12 @@ export default {
         wx_pub: require("@/assets/images/pay/icon/wx_pub.svg"),
         mock: require("@/assets/images/pay/icon/mock.svg"),
       },
+      qrCode: { // 支付二维码
+        url: '',
+        title: '',
+        visible: false,
+      },
+      interval: undefined, // 定时任务，轮询是否完成支付
     };
   },
   created() {
@@ -94,25 +108,25 @@ export default {
         }
       }
     },
-    /** 获得请假信息 */
+    /** 获得支付信息 */
     getDetail() {
       // 1.1 未传递订单编号
       if (!this.id) {
         this.$message.error('未传递支付单号，无法查看对应的支付信息');
-        this.$router.go(-1);
+        this.goBackToList();
         return;
       }
       getOrder(this.id).then(response => {
         // 1.2 无法查询到支付信息
         if (!response.data) {
           this.$message.error('支付订单不存在，请检查！');
-          this.$router.go(-1);
+          this.goBackToList();
           return;
         }
         // 1.3 订单已支付
         if (response.data.status !== PayOrderStatusEnum.WAITING.status) {
           this.$message.error('支付订单不处于待支付状态，请检查！');
-          this.$router.go(-1);
+          this.goBackToList();
           return;
         }
 
@@ -120,6 +134,64 @@ export default {
         this.payOrder = response.data;
       });
     },
+    /** 提交支付 */
+    submit(channelCode) {
+      submitOrder({
+        id: this.id,
+        channelCode: channelCode
+      }).then(response => {
+        // 不同的支付，调用不同的策略
+        if (channelCode === PayChannelEnum.ALIPAY_QR.code) {
+          this.submitAfterAlipayQr(response.data.invokeResponse)
+        }
+        // 打开轮询任务
+        this.createQueryInterval()
+      })
+    },
+    /** 提交支付后（支付宝扫码支付） */
+    submitAfterAlipayQr(invokeResponse) {
+      this.qrCode = {
+        title: '请使用支付宝“扫一扫”扫码支付',
+        url: invokeResponse.qrCode,
+        visible: true
+      }
+    },
+    /** 轮询查询任务 */
+    createQueryInterval() {
+      this.interval = setInterval(() => {
+        getOrder(this.id).then(response => {
+          // 已支付
+          if (response.data.status === PayOrderStatusEnum.SUCCESS.status) {
+            this.clearQueryInterval();
+            this.$message.success('支付成功！');
+            this.goBackToList();
+          }
+          // 已取消
+          if (response.data.status === PayOrderStatusEnum.CLOSED.status) {
+            this.clearQueryInterval();
+            this.$message.error('支付已关闭！');
+            this.goBackToList();
+          }
+        })
+      }, 1000 * 2)
+    },
+    /** 清空查询任务 */
+    clearQueryInterval() {
+      // 清空各种弹窗
+      this.qrCode = {
+        title: '',
+        url: '',
+        visible: false
+      }
+      // 清空任务
+      clearInterval(this.interval)
+      this.interval = undefined
+    },
+    /** 回到列表 **/
+    goBackToList() {
+      this.$tab.closePage();
+      this.$router.go(-1);
+    }
   }
 };
 </script>

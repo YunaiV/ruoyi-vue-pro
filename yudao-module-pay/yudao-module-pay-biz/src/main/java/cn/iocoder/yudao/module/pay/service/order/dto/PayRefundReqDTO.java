@@ -10,6 +10,8 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+// TODO 芋艿：可能需要改造
+
 /**
  * 退款申请单 Request DTO
  */
