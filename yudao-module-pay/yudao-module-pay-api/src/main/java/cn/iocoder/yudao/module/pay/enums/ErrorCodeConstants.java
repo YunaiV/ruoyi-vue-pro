@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pay.enums;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
@@ -60,8 +61,11 @@ public interface ErrorCodeConstants {
 
     // ========== 示例订单 1-007-900-000 ==========
     ErrorCode PAY_DEMO_ORDER_NOT_FOUND = new ErrorCode(100790000, "示例订单不存在");
-    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1011000013, "示例订单更新支付状态失败，订单不是【未支付】状态");
-    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR = new ErrorCode(1011000014, "示例订单更新支付状态失败，支付单编号不匹配");
-    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS = new ErrorCode(1011000015, "示例订单更新支付状态失败，支付单状态不是【支付成功】状态");
-    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH = new ErrorCode(1011000016, "示例订单更新支付状态失败，支付单金额不匹配");
+    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(100790001, "示例订单更新支付状态失败，订单不是【未支付】状态");
+    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR = new ErrorCode(100790002, "示例订单更新支付状态失败，支付单编号不匹配");
+    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS = new ErrorCode(100790003, "示例订单更新支付状态失败，支付单状态不是【支付成功】状态");
+    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH = new ErrorCode(100790004, "示例订单更新支付状态失败，支付单金额不匹配");
+    ErrorCode PAY_DEMO_ORDER_REFUND_FAIL_NOT_PAID = new ErrorCode(100790005, "发起退款失败，原因：示例订单未支付");
+    ErrorCode PAY_DEMO_ORDER_REFUND_FAIL_REFUNDED = new ErrorCode(100790005, "发起退款失败，原因：示例订单已退款");
+
 }

@@ -11,6 +11,8 @@ import cn.iocoder.yudao.module.pay.convert.demo.PayDemoOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoOrderDO;
 import cn.iocoder.yudao.module.pay.service.demo.PayDemoOrderService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 示例订单")
@@ -51,6 +54,14 @@ public class PayDemoOrderController {
     public CommonResult<Boolean> updateDemoOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
         payDemoOrderService.updateDemoOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
                 notifyReqDTO.getPayOrderId());
+        return success(true);
+    }
+
+    @PutMapping("/refund")
+    @Operation(description = "退款示例订单")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    public CommonResult<Boolean> refundDemoOrder(@RequestParam("id") Long id) {
+        payDemoOrderService.refundDemoOrder(id, getClientIP());
         return success(true);
     }
 

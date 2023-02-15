@@ -25,3 +25,11 @@ export function getDemoOrderPage(query) {
     params: query
   })
 }
+
+// 退款示例订单
+export function refundDemoOrder(id) {
+  return request({
+    url: '/pay/demo-order/refund?id=' + id,
+    method: 'put'
+  })
+}

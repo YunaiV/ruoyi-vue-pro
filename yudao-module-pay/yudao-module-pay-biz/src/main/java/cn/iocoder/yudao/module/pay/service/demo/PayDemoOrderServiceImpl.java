@@ -2,16 +2,16 @@ package cn.iocoder.yudao.module.pay.service.demo;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.PayDemoOrderCreateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoOrderDO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.demo.PayDemoOrderMapper;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +56,8 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
 
     @Resource
     private PayOrderApi payOrderApi;
+    @Resource
+    private PayRefundApi payRefundApi;
 
     @Resource
     private PayDemoOrderMapper payDemoOrderMapper;
@@ -178,6 +180,38 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
             throw exception(PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
         }
         return payOrder;
+    }
+
+    @Override
+    public void refundDemoOrder(Long id, String userIp) {
+        // 1. 校验订单是否可以退款
+        PayDemoOrderDO order = validateDemoOrderCanRefund(id);
+
+        // 2.1 创建退款单
+        Long payRefundId = payRefundApi.createPayRefund(new PayRefundCreateReqDTO()
+                .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
+                .setMerchantOrderId(order.getId().toString()) // 业务的订单编号
+                .setReason("想退钱").setAmount(order.getPrice())); // 价格信息
+        // 2.2 更新支付单到 demo 订单
+        payDemoOrderMapper.updateById(new PayDemoOrderDO().setId(id)
+                .setPayRefundId(payRefundId).setRefundPrice(order.getPrice()));
+    }
+
+    private PayDemoOrderDO validateDemoOrderCanRefund(Long id) {
+        // 校验订单是否存在
+        PayDemoOrderDO order = payDemoOrderMapper.selectById(id);
+        if (order == null) {
+            throw exception(PAY_DEMO_ORDER_NOT_FOUND);
+        }
+        // 校验订单是否支付
+        if (!order.getPayed()) {
+            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_NOT_PAID);
+        }
+        // 校验是否已经发起退款
+        if (order.getPayRefundId() != null) {
+            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUNDED);
+        }
+        return order;
     }
 
 }

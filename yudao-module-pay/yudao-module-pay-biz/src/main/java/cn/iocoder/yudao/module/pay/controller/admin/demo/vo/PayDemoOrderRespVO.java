@@ -36,6 +36,12 @@ public class PayDemoOrderRespVO {
     @Schema(description = "订单支付时间")
     private LocalDateTime payTime;
 
+    @Schema(description = "支付渠道", example = "alipay_qr")
+    private String payChannelCode;
+
+    @Schema(description = "支付退款编号", example = "23366")
+    private Long payRefundId;
+
     @Schema(description = "退款金额，单位：分", required = true, example = "14039")
     private Integer refundPrice;
 

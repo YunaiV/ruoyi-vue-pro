@@ -48,6 +48,8 @@
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handlePay(scope.row)"
                      v-if="!scope.row.payed">前往支付</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleRefund(scope.row)"
+                     v-if="scope.row.payed && !scope.row.payRefundId">发起退款</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -76,7 +78,8 @@
 </template>
 
 <script>
-import { createDemoOrder, getDemoOrderPage } from "@/api/pay/demo";
+import {createDemoOrder, getDemoOrderPage, refundDemoOrder} from "@/api/pay/demo";
+import {deleteMerchant} from "@/api/pay/merchant";
 
 export default {
   name: "PayDemoOrder",
@@ -195,6 +198,16 @@ export default {
             id: row.payOrderId
           }
       })
+    },
+    /** 退款按钮操作 */
+    handleRefund(row) {
+      const id = row.id;
+      this.$modal.confirm('是否确认退款编号为"' + id + '"的示例订单?').then(function() {
+        return refundDemoOrder(id);
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("退款成功");
+      }).catch(() => {});
     }
   }
 };
