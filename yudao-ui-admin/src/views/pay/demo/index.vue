@@ -206,7 +206,7 @@ export default {
         return refundDemoOrder(id);
       }).then(() => {
         this.getList();
-        this.$modal.msgSuccess("退款成功");
+        this.$modal.msgSuccess("发起退款成功！");
       }).catch(() => {});
     }
   }

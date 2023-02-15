@@ -48,11 +48,19 @@ public interface PayDemoOrderService {
     void updateDemoOrderPaid(Long id, Long payOrderId);
 
     /**
-     * 退款示例订单
+     * 发起示例订单的退款
      *
      * @param id 编号
      * @param userIp 用户编号
      */
     void refundDemoOrder(Long id, String userIp);
+
+    /**
+     * 更新示例订单为已退款
+     *
+     * @param id 编号
+     * @param payRefundId 退款订单号
+     */
+    void updateDemoOrderRefunded(Long id, Long payRefundId);
 
 }

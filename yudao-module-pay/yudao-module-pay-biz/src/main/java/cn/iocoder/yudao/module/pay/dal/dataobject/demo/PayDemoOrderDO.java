@@ -83,6 +83,6 @@ public class PayDemoOrderDO extends BaseDO {
     /**
      * 退款完成时间
      */
-    private Date refundTime;
+    private LocalDateTime refundTime;
 
 }

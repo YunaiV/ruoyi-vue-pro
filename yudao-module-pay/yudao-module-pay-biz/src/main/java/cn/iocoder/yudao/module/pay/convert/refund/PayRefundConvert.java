@@ -2,12 +2,8 @@ package cn.iocoder.yudao.module.pay.convert.refund;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.*;
-import cn.iocoder.yudao.module.pay.controller.app.refund.vo.AppPayRefundReqVO;
-import cn.iocoder.yudao.module.pay.controller.app.refund.vo.AppPayRefundRespVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
-import cn.iocoder.yudao.module.pay.service.order.dto.PayRefundReqDTO;
-import cn.iocoder.yudao.module.pay.service.order.dto.PayRefundRespDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -17,11 +13,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-/**
- * 退款订单 Convert
- *
- * @author aquan
- */
 @Mapper
 public interface PayRefundConvert {
 
@@ -101,9 +92,5 @@ public interface PayRefundConvert {
             @Mapping(target = "status",ignore = true)
     })
     PayRefundDO convert(PayOrderDO orderDO);
-
-    PayRefundReqDTO convert(AppPayRefundReqVO bean);
-
-    AppPayRefundRespVO convert(PayRefundRespDTO bean);
 
 }

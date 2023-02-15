@@ -29,12 +29,6 @@ public class PayRefundCreateReqDTO {
     // ========== 商户相关字段 ==========
 
     /**
-     * 商户订单编号
-     */
-    @NotEmpty(message = "商户订单编号不能为空")
-    private String merchantOrderId;
-
-    /**
      * 退款描述
      */
     @NotEmpty(message = "退款描述不能为空")
@@ -42,6 +36,12 @@ public class PayRefundCreateReqDTO {
     private String reason;
 
     // ========== 订单相关字段 ==========
+
+    /**
+     * 支付单号
+     */
+    @NotNull(message = "支付单号不能为空")
+    private Long payOrderId;
 
     /**
      * 退款金额，单位：分

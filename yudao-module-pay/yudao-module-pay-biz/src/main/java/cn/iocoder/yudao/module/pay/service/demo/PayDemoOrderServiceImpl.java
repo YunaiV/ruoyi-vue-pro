@@ -10,10 +10,12 @@ import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.PayDemoOrderCreateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoOrderDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.demo.PayDemoOrderMapper;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -23,9 +25,12 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+import static cn.hutool.core.util.ObjectUtil.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
+import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 
@@ -137,46 +142,46 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
      * @return 交易订单
      */
     private PayOrderRespDTO validateDemoOrderCanPaid(Long id, Long payOrderId) {
-        // 校验订单是否存在
+        // 1.1 校验订单是否存在
         PayDemoOrderDO order = payDemoOrderMapper.selectById(id);
         if (order == null) {
             throw exception(PAY_DEMO_ORDER_NOT_FOUND);
         }
-        // 校验订单未支付
+        // 1.2 校验订单未支付
         if (order.getPayed()) {
             log.error("[validateDemoOrderCanPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
-                    id, JsonUtils.toJsonString(order));
+                    id, toJsonString(order));
             throw exception(PAY_DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
-        // 校验支付订单匹配
-        if (ObjectUtil.notEqual(order.getPayOrderId(), payOrderId)) { // 支付单号
+        // 1.3 校验支付订单匹配
+        if (notEqual(order.getPayOrderId(), payOrderId)) { // 支付单号
             log.error("[validateDemoOrderCanPaid][order({}) 支付单不匹配({})，请进行处理！order 数据是：{}]",
-                    id, payOrderId, JsonUtils.toJsonString(order));
+                    id, payOrderId, toJsonString(order));
             throw exception(PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
         }
 
-        // 校验支付单是否存在
+        // 2.1 校验支付单是否存在
         PayOrderRespDTO payOrder = payOrderApi.getOrder(payOrderId);
         if (payOrder == null) {
             log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 不存在，请进行处理！]", id, payOrderId);
             throw exception(PAY_ORDER_NOT_FOUND);
         }
-        // 校验支付单已支付
+        // 2.2 校验支付单已支付
         if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
             log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 未支付，请进行处理！payOrder 数据是：{}]",
-                    id, payOrderId, JsonUtils.toJsonString(payOrder));
+                    id, payOrderId, toJsonString(payOrder));
             throw exception(PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
         }
-        // 校验支付金额一致
-        if (ObjectUtil.notEqual(payOrder.getAmount(), order.getPrice())) {
+        // 2.3 校验支付金额一致
+        if (notEqual(payOrder.getAmount(), order.getPrice())) {
             log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
-                    id, payOrderId, JsonUtils.toJsonString(order), JsonUtils.toJsonString(payOrder));
+                    id, payOrderId, toJsonString(order), toJsonString(payOrder));
             throw exception(PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);
         }
-        // 校验支付订单匹配（二次）
-        if (ObjectUtil.notEqual(payOrder.getMerchantOrderId(), id.toString())) {
+        // 2.4 校验支付订单匹配（二次）
+        if (notEqual(payOrder.getMerchantOrderId(), id.toString())) {
             log.error("[validateDemoOrderCanPaid][order({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
-                    id, payOrderId, JsonUtils.toJsonString(payOrder));
+                    id, payOrderId, toJsonString(payOrder));
             throw exception(PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
         }
         return payOrder;
@@ -190,9 +195,9 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         // 2.1 创建退款单
         Long payRefundId = payRefundApi.createPayRefund(new PayRefundCreateReqDTO()
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
-                .setMerchantOrderId(order.getId().toString()) // 业务的订单编号
-                .setReason("想退钱").setAmount(order.getPrice())); // 价格信息
-        // 2.2 更新支付单到 demo 订单
+                .setPayOrderId(order.getPayOrderId()) // 支付单号
+                .setReason("想退钱").setAmount(order.getPrice()));// 价格信息
+        // 2.2 更新退款单到 demo 订单
         payDemoOrderMapper.updateById(new PayDemoOrderDO().setId(id)
                 .setPayRefundId(payRefundId).setRefundPrice(order.getPrice()));
     }
@@ -207,11 +212,57 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         if (!order.getPayed()) {
             throw exception(PAY_DEMO_ORDER_REFUND_FAIL_NOT_PAID);
         }
-        // 校验是否已经发起退款
+        // 校验订单是否已退款
         if (order.getPayRefundId() != null) {
             throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUNDED);
         }
         return order;
+    }
+
+    @Override
+    public void updateDemoOrderRefunded(Long id, Long payRefundId) {
+        // 1. 校验并获得退款订单（可退款）
+        PayRefundRespDTO payRefund = validateDemoOrderCanRefunded(id, payRefundId);
+        // 2.2 更新退款单到 demo 订单
+        payDemoOrderMapper.updateById(new PayDemoOrderDO().setId(id)
+                .setRefundTime(payRefund.getSuccessTime()));
+    }
+
+    private PayRefundRespDTO validateDemoOrderCanRefunded(Long id, Long payRefundId) {
+        // 1.1 校验示例订单
+        PayDemoOrderDO order = payDemoOrderMapper.selectById(id);
+        if (order == null) {
+            throw exception(PAY_DEMO_ORDER_NOT_FOUND);
+        }
+        // 1.2 校验退款订单匹配
+        if (Objects.equals(order.getPayOrderId(), payRefundId)) {
+            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
+                    id, payRefundId, toJsonString(order));
+            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+        }
+
+        // 2.1 校验退款订单
+        PayRefundRespDTO payRefund = payRefundApi.getPayRefund(payRefundId);
+        if (payRefund == null) {
+            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUND_NOT_FOUND);
+        }
+        // 2.2
+        if (!PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
+            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
+        }
+        // 2.3 校验退款金额一致
+        if (notEqual(payRefund.getRefundAmount(), order.getPrice())) {
+            log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
+                    id, payRefundId, toJsonString(order), toJsonString(payRefund));
+            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
+        }
+        // 2.4 校验退款订单匹配（二次）
+        if (notEqual(payRefund.getMerchantOrderId(), id.toString())) {
+            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
+                    id, payRefundId, toJsonString(payRefund));
+            throw exception(PAY_DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+        }
+        return payRefund;
     }
 
 }

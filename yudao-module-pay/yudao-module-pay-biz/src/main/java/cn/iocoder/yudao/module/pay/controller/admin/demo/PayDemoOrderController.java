@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.PayDemoOrderCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.PayDemoOrderRespVO;
 import cn.iocoder.yudao.module.pay.convert.demo.PayDemoOrderConvert;
@@ -12,7 +13,6 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoOrderDO;
 import cn.iocoder.yudao.module.pay.service.demo.PayDemoOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -58,10 +58,20 @@ public class PayDemoOrderController {
     }
 
     @PutMapping("/refund")
-    @Operation(description = "退款示例订单")
+    @Operation(description = "发起示例订单的退款")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     public CommonResult<Boolean> refundDemoOrder(@RequestParam("id") Long id) {
         payDemoOrderService.refundDemoOrder(id, getClientIP());
+        return success(true);
+    }
+
+    @PostMapping("/update-refunded")
+    @Operation(description = "更新示例订单为已退款") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    public CommonResult<Boolean> updateDemoOrderRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
+        payDemoOrderService.updateDemoOrderRefunded(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+                notifyReqDTO.getPayRefundId());
         return success(true);
     }
 
