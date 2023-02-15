@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.pay.controller.admin.demo;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.PayDemoOrderCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.PayDemoOrderRespVO;
 import cn.iocoder.yudao.module.pay.convert.demo.PayDemoOrderConvert;
@@ -14,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -39,6 +42,16 @@ public class PayDemoOrderController {
     public CommonResult<PageResult<PayDemoOrderRespVO>> getDemoOrderPage(@Valid PageParam pageVO) {
         PageResult<PayDemoOrderDO> pageResult = payDemoOrderService.getDemoOrderPage(pageVO);
         return success(PayDemoOrderConvert.INSTANCE.convertPage(pageResult));
+    }
+
+    @PostMapping("/update-paid")
+    @Operation(description = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    public CommonResult<Boolean> updateDemoOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
+        payDemoOrderService.updateDemoOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+                notifyReqDTO.getPayOrderId());
+        return success(true);
     }
 
 }

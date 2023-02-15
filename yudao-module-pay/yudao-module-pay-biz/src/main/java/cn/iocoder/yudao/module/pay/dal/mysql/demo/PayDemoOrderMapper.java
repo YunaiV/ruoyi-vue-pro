@@ -20,4 +20,9 @@ public interface PayDemoOrderMapper extends BaseMapperX<PayDemoOrderDO> {
                 .orderByDesc(PayDemoOrderDO::getId));
     }
 
+    default int updateByIdAndPayed(Long id, boolean wherePayed, PayDemoOrderDO updateObj) {
+        return update(updateObj, new LambdaQueryWrapperX<PayDemoOrderDO>()
+                .eq(PayDemoOrderDO::getId, id).eq(PayDemoOrderDO::getPayed, wherePayed));
+    }
+
 }

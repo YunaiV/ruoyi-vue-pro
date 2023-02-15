@@ -39,4 +39,12 @@ public interface PayDemoOrderService {
      */
     PageResult<PayDemoOrderDO> getDemoOrderPage(PageParam pageReqVO);
 
+    /**
+     * 更新示例订单为已支付
+     *
+     * @param id 编号
+     * @param payOrderId 支付订单号
+     */
+    void updateDemoOrderPaid(Long id, Long payOrderId);
+
 }

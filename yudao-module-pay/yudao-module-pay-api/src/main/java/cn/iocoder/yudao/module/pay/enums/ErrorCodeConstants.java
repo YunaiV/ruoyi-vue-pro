@@ -57,4 +57,11 @@ public interface ErrorCodeConstants {
     ErrorCode PAY_MERCHANT_NOT_EXISTS = new ErrorCode(1007004000, "支付商户信息不存在");
     ErrorCode PAY_MERCHANT_EXIST_APP_CANT_DELETE = new ErrorCode(1007004001, "支付商户存在支付应用,无法删除");
 
+
+    // ========== 示例订单 1-007-900-000 ==========
+    ErrorCode PAY_DEMO_ORDER_NOT_FOUND = new ErrorCode(100790000, "示例订单不存在");
+    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1011000013, "示例订单更新支付状态失败，订单不是【未支付】状态");
+    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR = new ErrorCode(1011000014, "示例订单更新支付状态失败，支付单编号不匹配");
+    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS = new ErrorCode(1011000015, "示例订单更新支付状态失败，支付单状态不是【支付成功】状态");
+    ErrorCode PAY_DEMO_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH = new ErrorCode(1011000016, "示例订单更新支付状态失败，支付单金额不匹配");
 }
