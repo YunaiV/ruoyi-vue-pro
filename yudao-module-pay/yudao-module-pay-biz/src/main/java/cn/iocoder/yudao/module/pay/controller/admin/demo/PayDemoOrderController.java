@@ -48,7 +48,7 @@ public class PayDemoOrderController {
     }
 
     @PostMapping("/update-paid")
-    @Operation(description = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     public CommonResult<Boolean> updateDemoOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
@@ -58,7 +58,7 @@ public class PayDemoOrderController {
     }
 
     @PutMapping("/refund")
-    @Operation(description = "发起示例订单的退款")
+    @Operation(summary = "发起示例订单的退款")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     public CommonResult<Boolean> refundDemoOrder(@RequestParam("id") Long id) {
         payDemoOrderService.refundDemoOrder(id, getClientIP());
@@ -66,7 +66,7 @@ public class PayDemoOrderController {
     }
 
     @PostMapping("/update-refunded")
-    @Operation(description = "更新示例订单为已退款") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @Operation(summary = "更新示例订单为已退款") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     public CommonResult<Boolean> updateDemoOrderRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {

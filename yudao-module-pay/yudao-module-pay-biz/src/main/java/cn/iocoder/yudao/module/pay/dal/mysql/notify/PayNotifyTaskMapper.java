@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
-public interface PayNotifyTaskCoreMapper extends BaseMapperX<PayNotifyTaskDO> {
+public interface PayNotifyTaskMapper extends BaseMapperX<PayNotifyTaskDO> {
 
     /**
      * 获得需要通知的 PayNotifyTaskDO 记录。需要满足如下条件：
