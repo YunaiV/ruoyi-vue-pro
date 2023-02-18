@@ -17,6 +17,7 @@ public enum PayDisplayModeEnum {
     FORM("form"), // HTML 表单提交
     QR_CODE("qr_code"), // 二维码的文字内容
     QR_CODE_URL("qr_code_url"), // 二维码的图片链接
+    BAR_CODE("bar_code"), // 条形码
     ;
 
     /**

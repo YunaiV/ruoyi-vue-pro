@@ -148,6 +148,10 @@ export const PayChannelEnum = {
     "code": "alipay_qr",
     "name": "支付宝扫码支付"
   },
+  ALIPAY_BAR: {
+    "code": "alipay_bar",
+    "name": "支付宝条码支付"
+  },
 }
 
 /**

@@ -82,6 +82,7 @@ export default {
         alipay_app: require("@/assets/images/pay/icon/alipay_app.svg"),
         alipay_wap: require("@/assets/images/pay/icon/alipay_wap.svg"),
         alipay_pc: require("@/assets/images/pay/icon/alipay_pc.svg"),
+        alipay_bar: require("@/assets/images/pay/icon/alipay_bar.svg"),
         wx_app: require("@/assets/images/pay/icon/wx_app.svg"),
         wx_lite: require("@/assets/images/pay/icon/wx_lite.svg"),
         wx_pub: require("@/assets/images/pay/icon/wx_pub.svg"),
@@ -101,6 +102,11 @@ export default {
       },
       form: { // 展示形式：form
         html: '',
+      },
+      barCode: { // 展示形式：条形码
+        value: '',
+        title: '',
+        visible: false,
       },
     };
   },
@@ -155,6 +161,16 @@ export default {
     },
     /** 提交支付 */
     submit(channelCode) {
+      // 条形码支付，需要特殊处理
+      if (channelCode === PayChannelEnum.ALIPAY_BAR.code) {
+
+        return;
+      }
+
+      // 默认的提交处理
+      this.submit0(channelCode)
+    },
+    submit0(channelCode) {
       this.submitLoading = true
       submitOrder({
         id: this.id,
