@@ -116,6 +116,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
 
     protected abstract PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
 
+    // ========== 各种工具方法 ==========
 
     protected String formatAmount(Integer amount) {
         return String.valueOf(amount / 100.0);

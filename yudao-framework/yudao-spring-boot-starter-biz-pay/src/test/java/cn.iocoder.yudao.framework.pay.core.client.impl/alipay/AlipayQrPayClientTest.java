@@ -3,6 +3,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.DefaultAlipayClient;
@@ -87,7 +88,7 @@ public class AlipayQrPayClientTest extends BaseMockitoUnitTest {
         }))).thenReturn(response);
 
 
-        PayCommonResult<AlipayTradePrecreateResponse> result = client.doUnifiedOrder(reqDTO);
+        PayCommonResult<PayOrderUnifiedRespDTO> result = client.doUnifiedOrder(reqDTO);
         // 断言
         assertEquals(response.getCode(), result.getApiCode());
         assertEquals(response.getMsg(), result.getApiMsg());

@@ -53,7 +53,7 @@ public class AlipayWapPayClient extends AbstractAlipayClient {
         request.setReturnUrl(reqDTO.getReturnUrl()); // TODO 芋艿，待搞
         model.setQuitUrl(reqDTO.getReturnUrl()); // TODO 芋艿，待搞
 
-        // 执行请求
+        // 2.1 执行请求
         AlipayTradeWapPayResponse response;
         try {
             response = client.pageExecute(request, Method.GET.name());
