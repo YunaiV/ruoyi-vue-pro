@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
-import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.Method;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.PayDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradeWapPayModel;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
@@ -14,7 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Objects;
 
 /**
- * 支付宝【手机网站】的 PayClient 实现类
+ * 支付宝【手机 网站】的 PayClient 实现类
+ *
  * 文档：https://opendocs.alipay.com/apis/api_1/alipay.trade.wap.pay
  *
  * @author 芋道源码
@@ -22,31 +26,32 @@ import java.util.Objects;
 @Slf4j
 public class AlipayWapPayClient extends AbstractAlipayClient {
 
-
     public AlipayWapPayClient(Long channelId, AlipayPayClientConfig config) {
-        super(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), config, new AlipayPayCodeMapping());
+        super(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), config,
+                new AlipayPayCodeMapping());
     }
 
     @Override
-    public PayCommonResult<AlipayTradeWapPayResponse> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
-        // 构建 AlipayTradeWapPayModel 请求
+    public PayCommonResult<PayOrderUnifiedRespDTO> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
+        // 1.1 构建 AlipayTradeWapPayModel 请求
         AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
+        // ① 通用的参数
         model.setOutTradeNo(reqDTO.getMerchantOrderId());
         model.setSubject(reqDTO.getSubject());
         model.setBody(reqDTO.getBody());
-        model.setTotalAmount(calculateAmount(reqDTO.getAmount()).toString());
-        model.setProductCode("QUICK_WAP_PAY"); // TODO 芋艿：这里咋整
-        //TODO 芋艿：这里咋整  jason @芋艿 可以去掉吧,
-        // TODO 芋艿 似乎这里不用传sellerId
-        // https://opendocs.alipay.com/apis/api_1/alipay.trade.wap.pay
-        //model.setSellerId("2088102147948060");
-        model.setTimeExpire(DateUtil.format(reqDTO.getExpireTime(),"yyyy-MM-dd HH:mm:ss"));
-        // TODO 芋艿：userIp
-        // 构建 AlipayTradeWapPayRequest
+        model.setTotalAmount(formatAmount(reqDTO.getAmount()));
+        model.setProductCode("QUICK_WAP_PAY"); // 销售产品码. 目前 Wap 支付场景下仅支持 QUICK_WAP_PAY
+        // ② 个性化的参数【无】
+        // ③ 支付宝 Wap 支付只有一种展示，考虑到前端可能希望二维码扫描后，手机打开
+        String displayMode = ObjectUtil.defaultIfNull(reqDTO.getDisplayMode(),
+                PayDisplayModeEnum.URL.getMode());
+
+        // 1.2 构建 AlipayTradeWapPayRequest 请求
         AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
         request.setBizModel(model);
         request.setNotifyUrl(reqDTO.getNotifyUrl());
-        request.setReturnUrl(reqDTO.getReturnUrl());
+        request.setReturnUrl(reqDTO.getReturnUrl()); // TODO 芋艿，待搞
+        model.setQuitUrl(reqDTO.getReturnUrl()); // TODO 芋艿，待搞
 
         // 执行请求
         AlipayTradeWapPayResponse response;
@@ -57,21 +62,11 @@ public class AlipayWapPayClient extends AbstractAlipayClient {
         }
         System.out.println(response.getBody());
 
-        // TODO 芋艿：sub Code
-        if(response.isSuccess() && Objects.isNull(response.getCode()) && Objects.nonNull(response.getBody())){
-            //成功alipay wap 成功 code 为 null , body 为form 表单
-            return PayCommonResult.build("-9999", "Success", response, codeMapping);
-        }else {
-            return PayCommonResult.build(response.getCode(), response.getMsg(), response, codeMapping);
-        }
+        // 2.2 处理结果
+        PayOrderUnifiedRespDTO respDTO = new PayOrderUnifiedRespDTO()
+                .setDisplayMode(displayMode).setDisplayContent(response.getBody());
+        return PayCommonResult.build(StrUtil.blankToDefault(response.getCode(),"10000"),
+                response.getMsg(), respDTO, codeMapping);
     }
-
-
-
-
-
-
-
-
 
 }

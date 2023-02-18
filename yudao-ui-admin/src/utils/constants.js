@@ -162,6 +162,9 @@ export const PayDisplayModeEnum = {
   },
   FORM: {
     "mode": "form"
+  },
+  QR_CODE: {
+    "mode": "qr_code"
   }
 }
 

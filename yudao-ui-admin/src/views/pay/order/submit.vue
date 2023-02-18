@@ -44,7 +44,7 @@
     <!-- 展示形式：二维码 URL -->
     <el-dialog :title="qrCode.title" :visible.sync="qrCode.visible" width="350px" append-to-body
                :close-on-press-escape="false">
-      <qrcode-vue :value="qrCode.url" size="310" level="H" />
+      <qrcode-vue :value="qrCode.url" size="310" level="L" />
     </el-dialog>
 
     <!-- 展示形式：IFrame -->
@@ -53,7 +53,7 @@
       <iframe :src="iframe.url" width="100%" />
     </el-dialog>
 
-    <!-- 展示形式： -->
+    <!-- 展示形式：Form -->
     <div ref="formRef" v-html="form.value" />
 
   </div>
@@ -162,20 +162,15 @@ export default {
         ...this.buildSubmitParam(channelCode)
       }).then(response => {
         const data = response.data
-        if (data.displayMode === 'iframe') {
+        if (data.displayMode === PayDisplayModeEnum.IFRAME.mode) {
           this.displayIFrame(channelCode, data)
-        } else if (data.displayMode === 'url') {
+        } else if (data.displayMode === PayDisplayModeEnum.URL.mode) {
           this.displayUrl(channelCode, data)
-        } else if (data.displayMode === 'form') {
+        } else if (data.displayMode === PayDisplayModeEnum.FORM.mode) {
           this.displayForm(channelCode, data)
+        } else if (data.displayMode === PayDisplayModeEnum.QR_CODE.mode) {
+          this.displayQrCode(channelCode, data)
         }
-        // 不同的支付，调用不同的策略
-        // if (channelCode === PayChannelEnum.ALIPAY_QR.code) {
-        //   this.submitAfterAlipayQr(invokeResponse)
-        // } else if (channelCode === PayChannelEnum.ALIPAY_PC.code
-        //   || channelCode === PayChannelEnum.ALIPAY_WAP.code) {
-        //   this.submitAfterAlipayPc(invokeResponse)
-        // }
 
         // 打开轮询任务
         this.createQueryInterval()
@@ -183,7 +178,7 @@ export default {
     },
     /** 构建提交支付的额外参数 */
     buildSubmitParam(channelCode) {
-      // 支付宝网页支付时，有多种展示形态
+      // ① 支付宝 PC 支付时，有多种展示形态
       if (channelCode === PayChannelEnum.ALIPAY_PC.code) {
         // 情况【前置模式】：将二维码前置到商户的订单确认页的模式。需要商户在自己的页面中以 iframe 方式请求支付宝页面。具体支持的枚举值有以下几种：
         // 0：订单码-简约前置模式，对应 iframe 宽度不能小于 600px，高度不能小于 300px
@@ -221,16 +216,13 @@ export default {
         //   displayMode: PayDisplayModeEnum.FORM.mode
         // }
       }
-      return {}
-    },
-    /** 提交支付后（支付宝扫码支付） */
-    submitAfterAlipayQr(invokeResponse) {
-      this.qrCode = {
-        title: '请使用支付宝“扫一扫”扫码支付',
-        url: invokeResponse.qrCode,
-        visible: true
+      // ② 支付宝 Wap 支付时，引导手机扫码支付
+      if (channelCode === PayChannelEnum.ALIPAY_WAP.code) {
+        return {
+          displayMode: PayDisplayModeEnum.QR_CODE.mode
+        }
       }
-      this.submitLoading = false
+      return {}
     },
     /** 提交支付后，IFrame 内置 URL 的展示形式 */
     displayIFrame(channelCode, data) {
@@ -262,9 +254,26 @@ export default {
         }, 1000);
       });
     },
+    /** 提交支付后（支付宝扫码支付） */
+    displayQrCode(channelCode, data) {
+      let title = '请使用手机浏览器“扫一扫”';
+      if (channelCode === PayChannelEnum.ALIPAY_WAP.code) {
+        // 考虑到 WAP 测试，所以引导手机浏览器搞
+      } else if (channelCode.indexOf('alipay_') === 0) {
+        title = '请使用支付宝“扫一扫”扫码支付';
+      } else if (channelCode.indexOf('wx_') === 0) {
+        title = '请使用微信“扫一扫”扫码支付';
+      }
+      this.qrCode = {
+        title: title,
+        url: data.displayContent,
+        visible: true
+      }
+      this.submitLoading = false
+    },
     /** 轮询查询任务 */
     createQueryInterval() {
-      if (!this.interval) {
+      if (this.interval) {
         return
       }
       this.interval = setInterval(() => {

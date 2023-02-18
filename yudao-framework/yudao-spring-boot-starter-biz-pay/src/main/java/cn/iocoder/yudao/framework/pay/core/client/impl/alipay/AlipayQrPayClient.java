@@ -31,7 +31,7 @@ public class AlipayQrPayClient extends AbstractAlipayClient {
         model.setOutTradeNo(reqDTO.getMerchantOrderId());
         model.setSubject(reqDTO.getSubject());
         model.setBody(reqDTO.getBody());
-        model.setTotalAmount(calculateAmount(reqDTO.getAmount()).toString()); // 单位：元
+        model.setTotalAmount(formatAmount(reqDTO.getAmount()).toString()); // 单位：元
         // TODO 芋艿：userIp + expireTime
         // 构建 AlipayTradePrecreateRequest
         AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();

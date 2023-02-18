@@ -112,7 +112,7 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
         model.setOutTradeNo(reqDTO.getPayTradeNo());
 
         model.setOutRequestNo(reqDTO.getMerchantRefundId());
-        model.setRefundAmount(calculateAmount(reqDTO.getAmount() / 2).toString());
+        model.setRefundAmount(formatAmount(reqDTO.getAmount() / 2).toString());
         model.setRefundReason(reqDTO.getReason());
 
         AlipayTradeRefundRequest refundRequest = new AlipayTradeRefundRequest();

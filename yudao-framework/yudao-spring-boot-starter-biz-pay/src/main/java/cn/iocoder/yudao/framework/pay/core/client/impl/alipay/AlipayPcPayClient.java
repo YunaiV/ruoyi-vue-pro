@@ -1,11 +1,8 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
-import cn.hutool.core.lang.Pair;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.Method;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
@@ -18,12 +15,11 @@ import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.response.AlipayTradePagePayResponse;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
 import java.util.Objects;
 
-
 /**
- * 支付宝【PC网站支付】的 PayClient 实现类
+ * 支付宝【PC 网站支付】的 PayClient 实现类
+ *
  * 文档：https://opendocs.alipay.com/open/270/105898
  *
  * @author XGD
@@ -32,7 +28,8 @@ import java.util.Objects;
 public class AlipayPcPayClient extends AbstractAlipayClient {
 
     public AlipayPcPayClient(Long channelId, AlipayPayClientConfig config) {
-        super(channelId, PayChannelEnum.ALIPAY_PC.getCode(), config, new AlipayPayCodeMapping());
+        super(channelId, PayChannelEnum.ALIPAY_PC.getCode(), config,
+                new AlipayPayCodeMapping());
     }
 
     @Override
@@ -42,8 +39,10 @@ public class AlipayPcPayClient extends AbstractAlipayClient {
         // ① 通用的参数
         model.setOutTradeNo(reqDTO.getMerchantOrderId());
         model.setSubject(reqDTO.getSubject());
-        model.setTotalAmount(String.valueOf(calculateAmount(reqDTO.getAmount())));
-        model.setProductCode("FAST_INSTANT_TRADE_PAY"); // 销售产品码. 目前电脑支付场景下仅支持 FAST_INSTANT_TRADE_PAY
+        model.setBody(reqDTO.getBody());
+        model.setTotalAmount(formatAmount(reqDTO.getAmount()));
+        model.setTimeExpire(formatTime(reqDTO.getExpireTime()));
+        model.setProductCode("FAST_INSTANT_TRADE_PAY"); // 销售产品码. 目前 PC 支付场景下仅支持 FAST_INSTANT_TRADE_PAY
         // ② 个性化的参数
         // 参考 https://www.pingxx.com/api/支付渠道 extra 参数说明.html 的 alipay_pc_direct 部分
         model.setQrPayMode(MapUtil.getStr(reqDTO.getChannelExtras(), "qr_pay_mode"));
@@ -71,10 +70,8 @@ public class AlipayPcPayClient extends AbstractAlipayClient {
         }
 
         // 2.2 处理结果
-        System.out.println(response.getBody());
         PayOrderUnifiedRespDTO respDTO = new PayOrderUnifiedRespDTO()
                 .setDisplayMode(displayMode).setDisplayContent(response.getBody());
-        // 响应为表单格式，前端可嵌入响应的页面或关闭当前支付窗口
         return PayCommonResult.build(StrUtil.blankToDefault(response.getCode(),"10000"),
                 response.getMsg(), respDTO, codeMapping);
     }

@@ -1,5 +1,10 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
@@ -11,6 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Validation;
 
+import java.time.LocalDateTime;
+
+import static cn.hutool.core.date.DatePattern.NORM_DATETIME_MS_FORMATTER;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
@@ -69,11 +77,6 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         this.init();
     }
 
-    // TODO 芋艿：后续抽取到工具类里
-    protected Double calculateAmount(Integer amount) {
-        return amount / 100.0;
-    }
-
     @Override
     public Long getId() {
         return channelId;
@@ -112,5 +115,15 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     }
 
     protected abstract PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
+
+
+    protected String formatAmount(Integer amount) {
+        return String.valueOf(amount / 100.0);
+    }
+
+    protected String formatTime(LocalDateTime time) {
+        // "yyyy-MM-dd HH:mm:ss"
+        return LocalDateTimeUtil.format(time, NORM_DATETIME_MS_FORMATTER);
+    }
 
 }
