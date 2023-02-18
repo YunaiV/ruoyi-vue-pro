@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.Method;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
@@ -36,24 +37,25 @@ public class AlipayPcPayClient extends AbstractAlipayClient {
         JSONObject bizContent = new JSONObject();
         // 参数说明可查看: https://opendocs.alipay.com/open/028r8t?scene=22
         bizContent.put("out_trade_no", reqDTO.getMerchantOrderId());
-        bizContent.put("total_amount", calculateAmount(reqDTO.getAmount()));
         bizContent.put("subject", reqDTO.getSubject());
-        bizContent.put("product_code", "FAST_INSTANT_TRADE_PAY");
+        bizContent.put("total_amount", calculateAmount(reqDTO.getAmount()));
+        bizContent.put("product_code", "FAST_INSTANT_TRADE_PAY"); // 销售产品码. 目前电脑支付场景下仅支持 FAST_INSTANT_TRADE_PAY
         // PC扫码支付的方式：支持前置模式和跳转模式。4: 订单码-可定义宽度的嵌入式二维码
-        bizContent.put("qr_pay_mode", "4");
+//        bizContent.put("qr_pay_mode", "4");
         // 自定义二维码宽度
-        bizContent.put("qrcode_width", "150");
+//        bizContent.put("qrcode_width", "150");
         request.setBizContent(bizContent.toJSONString());
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         request.setReturnUrl("");
         // 执行请求
         AlipayTradePagePayResponse response;
         try {
-            response = client.pageExecute(request);
+            response = client.pageExecute(request, Method.GET.name());
         } catch (AlipayApiException e) {
             log.error("[unifiedOrder][request({}) 发起支付失败]", JsonUtils.toJsonString(reqDTO), e);
             return PayCommonResult.build(e.getErrCode(), e.getErrMsg(), null, codeMapping);
         }
+        System.out.println(response.getBody());
         // 响应为表单格式，前端可嵌入响应的页面或关闭当前支付窗口
         return PayCommonResult.build(StrUtil.blankToDefault(response.getCode(),"10000") ,response.getMsg(), response, codeMapping);
     }

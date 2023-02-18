@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.http.Method;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradeWapPayModel;
@@ -50,10 +51,11 @@ public class AlipayWapPayClient extends AbstractAlipayClient {
         // 执行请求
         AlipayTradeWapPayResponse response;
         try {
-            response = client.pageExecute(request);
+            response = client.pageExecute(request, Method.GET.name());
         } catch (AlipayApiException e) {
             return PayCommonResult.build(e.getErrCode(), e.getErrMsg(), null, codeMapping);
         }
+        System.out.println(response.getBody());
 
         // TODO 芋艿：sub Code
         if(response.isSuccess() && Objects.isNull(response.getCode()) && Objects.nonNull(response.getBody())){

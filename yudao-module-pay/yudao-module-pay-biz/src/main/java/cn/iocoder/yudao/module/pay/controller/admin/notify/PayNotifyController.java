@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pay.controller.admin.notify;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import io.swagger.v3.oas.annotations.Operation;

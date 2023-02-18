@@ -4,7 +4,11 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.*;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayNotifyRefundStatusEnum;
 import com.alipay.api.AlipayApiException;
@@ -106,11 +110,15 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
         AlipayTradeRefundModel model=new AlipayTradeRefundModel();
         model.setTradeNo(reqDTO.getChannelOrderNo());
         model.setOutTradeNo(reqDTO.getPayTradeNo());
+
         model.setOutRequestNo(reqDTO.getMerchantRefundId());
-        model.setRefundAmount(calculateAmount(reqDTO.getAmount()).toString());
+        model.setRefundAmount(calculateAmount(reqDTO.getAmount() / 2).toString());
         model.setRefundReason(reqDTO.getReason());
+
         AlipayTradeRefundRequest refundRequest = new AlipayTradeRefundRequest();
         refundRequest.setBizModel(model);
+        refundRequest.setNotifyUrl(reqDTO.getNotifyUrl());
+        refundRequest.setReturnUrl(reqDTO.getNotifyUrl());
         try {
             AlipayTradeRefundResponse response =  client.execute(refundRequest);
             log.info("[doUnifiedRefund][response({}) 发起退款 渠道返回", toJsonString(response));

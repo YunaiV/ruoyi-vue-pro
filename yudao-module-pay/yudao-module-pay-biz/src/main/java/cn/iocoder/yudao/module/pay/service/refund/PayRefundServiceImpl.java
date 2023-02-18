@@ -3,13 +3,14 @@ package cn.iocoder.yudao.module.pay.service.refund;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayRefundNotifyDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayRefundUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayRefundUnifiedRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayNotifyRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
@@ -53,6 +54,9 @@ import java.util.Objects;
 @Slf4j
 @Validated
 public class PayRefundServiceImpl implements PayRefundService {
+
+    @Resource
+    private PayProperties payProperties;
 
     @Resource
     private PayClientFactory payClientFactory;
@@ -162,6 +166,7 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setChannelOrderNo(order.getChannelOrderNo())
                 .setPayTradeNo(orderExtensionDO.getNo())
                 .setMerchantRefundId(merchantRefundId)  // TODO 芋艿：需要优化
+                .setNotifyUrl(genChannelPayNotifyUrl(channel)) // TODO 芋艿：优化下 notifyUrl
                 .setReason(reqDTO.getReason());
         // 向渠道发起退款申请
         PayCommonResult<PayRefundUnifiedRespDTO> refundUnifiedResult = client.unifiedRefund(unifiedReqDTO);
@@ -171,6 +176,16 @@ public class PayRefundServiceImpl implements PayRefundService {
         refundUnifiedResult.checkError();
         // 成功在 退款回调中处理
         return payRefundDO.getId();
+    }
+
+    /**
+     * 根据支付渠道的编码，生成支付渠道的回调地址
+     *
+     * @param channel 支付渠道
+     * @return 支付渠道的回调地址  配置地址 + "/" + channel id
+     */
+    private String genChannelPayNotifyUrl(PayChannelDO channel) {
+        return payProperties.getCallbackUrl() + "/" + channel.getId();
     }
 
     @Override

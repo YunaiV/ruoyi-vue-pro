@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.refund;
 
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageReqVO;

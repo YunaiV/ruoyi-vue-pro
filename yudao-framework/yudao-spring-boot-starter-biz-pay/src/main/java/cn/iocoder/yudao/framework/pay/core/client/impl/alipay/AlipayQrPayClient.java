@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradePrecreateModel;

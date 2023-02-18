@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.pay.core.client.dto;
+package cn.iocoder.yudao.framework.pay.core.client.dto.refund;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

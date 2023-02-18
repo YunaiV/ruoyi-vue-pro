@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.pay.core.client.dto;
+package cn.iocoder.yudao.framework.pay.core.client.dto.notify;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

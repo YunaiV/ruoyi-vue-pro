@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.order;
 
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;

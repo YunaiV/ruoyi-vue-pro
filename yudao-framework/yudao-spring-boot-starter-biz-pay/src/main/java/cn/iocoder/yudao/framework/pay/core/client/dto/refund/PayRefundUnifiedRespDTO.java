@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.pay.core.client.dto;
+package cn.iocoder.yudao.framework.pay.core.client.dto.refund;
 
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRefundRespEnum;
 import lombok.AllArgsConstructor;

@@ -12,8 +12,9 @@
       </el-descriptions>
     </el-card>
 
+
     <!-- 支付选择框 -->
-    <el-card style="margin-top: 10px">
+    <el-card style="margin-top: 10px" v-loading="submitLoading"  element-loading-text="提交支付中...">
       <!-- 支付宝 -->
       <el-descriptions title="选择支付宝支付">
       </el-descriptions>
@@ -46,6 +47,10 @@
                :close-on-press-escape="false">
       <qrcode-vue :value="qrCode.url" size="310" level="H" />
     </el-dialog>
+
+    <!-- 阿里支付 -->
+    <div ref="alipayWap" v-html="alipayHtml.value" />
+
   </div>
 </template>
 <script>
@@ -77,12 +82,14 @@ export default {
         wx_pub: require("@/assets/images/pay/icon/wx_pub.svg"),
         mock: require("@/assets/images/pay/icon/mock.svg"),
       },
+      submitLoading: false, // 提交支付的 loading
       qrCode: { // 支付二维码
         url: '',
         title: '',
         visible: false,
       },
       interval: undefined, // 定时任务，轮询是否完成支付
+      alipayHtml: '' // 阿里支付的 HTML
     };
   },
   created() {
@@ -136,14 +143,20 @@ export default {
     },
     /** 提交支付 */
     submit(channelCode) {
+      this.submitLoading = true
       submitOrder({
         id: this.id,
         channelCode: channelCode
       }).then(response => {
+        const invokeResponse = response.data.invokeResponse
         // 不同的支付，调用不同的策略
         if (channelCode === PayChannelEnum.ALIPAY_QR.code) {
-          this.submitAfterAlipayQr(response.data.invokeResponse)
+          this.submitAfterAlipayQr(invokeResponse)
+        } else if (channelCode === PayChannelEnum.ALIPAY_PC.code
+          || channelCode === PayChannelEnum.ALIPAY_WAP.code) {
+          this.submitAfterAlipayPc(invokeResponse)
         }
+
         // 打开轮询任务
         this.createQueryInterval()
       })
@@ -155,6 +168,23 @@ export default {
         url: invokeResponse.qrCode,
         visible: true
       }
+      this.submitLoading = false
+    },
+    /** 提交支付后（支付宝 PC 网站支付） */
+    submitAfterAlipayPc(invokeResponse) {
+      // 渲染支付页面
+      this.alipayHtml = {
+        value: invokeResponse.body,
+        visible: true
+      }
+      // 防抖避免重复支付
+      this.$nextTick(() => {
+        // 提交支付表单
+        // this.$refs.alipayWap.children[0].submit();
+        // setTimeout(() => {
+        //   this.submitLoading = false
+        // }, 1000);
+      });
     },
     /** 轮询查询任务 */
     createQueryInterval() {

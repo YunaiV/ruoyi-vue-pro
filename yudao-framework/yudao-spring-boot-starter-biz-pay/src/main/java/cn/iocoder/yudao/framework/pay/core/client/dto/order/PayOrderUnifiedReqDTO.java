@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.pay.core.client.dto;
+package cn.iocoder.yudao.framework.pay.core.client.dto.order;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
