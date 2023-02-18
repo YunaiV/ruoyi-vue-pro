@@ -69,6 +69,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         this.init();
     }
 
+    // TODO 芋艿：后续抽取到工具类里
     protected Double calculateAmount(Integer amount) {
         return amount / 100.0;
     }

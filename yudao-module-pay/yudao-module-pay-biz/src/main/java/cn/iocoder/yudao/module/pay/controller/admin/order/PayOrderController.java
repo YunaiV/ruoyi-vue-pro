@@ -2,9 +2,13 @@ package cn.iocoder.yudao.module.pay.controller.admin.order;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
-import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
-import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
@@ -14,16 +18,9 @@ import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
 import cn.iocoder.yudao.module.pay.service.merchant.PayMerchantService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderExtensionService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import cn.iocoder.yudao.module.pay.service.order.bo.PayOrderSubmitRespBO;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -94,10 +91,9 @@ public class PayOrderController {
 
     @PostMapping("/submit")
     @Operation(summary = "提交支付订单")
-    public CommonResult<AppPayOrderSubmitRespVO> submitPayOrder(@RequestBody PayOrderSubmitReqVO reqVO) {
-        PayOrderSubmitRespBO respDTO = payOrderService.submitPayOrder(
-                PayOrderConvert.INSTANCE.convert(reqVO, getClientIP()));
-        return success(new AppPayOrderSubmitRespVO(respDTO.getInvokeResponse()));
+    public CommonResult<PayOrderSubmitRespVO> submitPayOrder(@RequestBody PayOrderSubmitReqVO reqVO) {
+        PayOrderSubmitRespVO respVO = payOrderService.submitPayOrder(reqVO, getClientIP());
+        return success(respVO);
     }
 
     @GetMapping("/page")

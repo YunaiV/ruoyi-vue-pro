@@ -151,6 +151,18 @@ export const PayChannelEnum = {
 }
 
 /**
+ * 支付的展示模式每局
+ */
+export const PayDisplayModeEnum = {
+  URL: {
+    "mode": "url",
+  },
+  IFRAME: {
+    "mode": "iframe",
+  },
+}
+
+/**
  * 支付类型枚举
  */
 export const PayType = {

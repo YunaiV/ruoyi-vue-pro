@@ -6,11 +6,11 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.awt.*;
 import java.util.Map;
 
 @Schema(description = "管理后台 - 支付订单提交 Request VO")
 @Data
-@Accessors(chain = true)
 public class PayOrderSubmitReqVO {
 
     @Schema(description = "支付单编号", required = true, example = "1024")
@@ -24,4 +24,6 @@ public class PayOrderSubmitReqVO {
     @Schema(description = "支付渠道的额外参数，例如说，微信公众号需要传递 openid 参数")
     private Map<String, String> channelExtras;
 
+    @Schema(description = "展示模式", example = "url") // 参见 {@link PayDisplayModeEnum} 枚举。如果不传递，则每个支付渠道使用默认的方式
+    private String displayMode;
 }

@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.pay.controller.app.order;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
-import cn.iocoder.yudao.module.pay.service.order.bo.PayOrderSubmitRespBO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +33,8 @@ public class AppPayOrderController {
     @PostMapping("/submit")
     @Operation(summary = "提交支付订单")
     public CommonResult<AppPayOrderSubmitRespVO> submitPayOrder(@RequestBody AppPayOrderSubmitReqVO reqVO) {
-        PayOrderSubmitRespBO respDTO = orderService.submitPayOrder(
-                PayOrderConvert.INSTANCE.convert(reqVO, getClientIP()));
-        return success(new AppPayOrderSubmitRespVO(respDTO.getInvokeResponse()));
+        PayOrderSubmitRespVO respVO = orderService.submitPayOrder(reqVO, getClientIP());
+        return success(PayOrderConvert.INSTANCE.convert3(respVO));
     }
 
 }

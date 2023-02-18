@@ -9,15 +9,12 @@ import lombok.experimental.Accessors;
 
 @Schema(description = "管理后台 - 支付订单提交 Response VO")
 @Data
-@Accessors(chain = true)
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class PayOrderSubmitRespVO {
 
-    /**
-     * 调用支付渠道的响应结果
-     */
-    private Object invokeResponse;
+    @Schema(description = "展示模式", required = true, example = "url") // 参见 PayDisplayModeEnum 枚举
+    private String displayMode;
+
+    @Schema(description = "展示内容", required = true)
+    private String displayContent;
 
 }

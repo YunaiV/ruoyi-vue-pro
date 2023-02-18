@@ -1,16 +1,17 @@
 package cn.iocoder.yudao.module.pay.service.order;
 
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
-import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
-import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
-import cn.iocoder.yudao.module.pay.service.order.bo.PayOrderSubmitReqBO;
-import cn.iocoder.yudao.module.pay.service.order.bo.PayOrderSubmitRespBO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -81,10 +82,12 @@ public interface PayOrderService {
      * 提交支付
      * 此时，会发起支付渠道的调用
      *
-     * @param reqDTO 提交请求
+     * @param reqVO 提交请求
+     * @param userIp 提交 IP
      * @return 提交结果
      */
-    PayOrderSubmitRespBO submitPayOrder(@Valid PayOrderSubmitReqBO reqDTO);
+    PayOrderSubmitRespVO submitPayOrder(@Valid PayOrderSubmitReqVO reqVO,
+                                        @NotEmpty(message = "提交 IP 不能为空") String userIp);
 
     /**
      * 通知支付单成功

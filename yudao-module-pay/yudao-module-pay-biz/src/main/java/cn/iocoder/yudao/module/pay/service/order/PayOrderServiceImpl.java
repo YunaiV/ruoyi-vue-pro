@@ -12,10 +12,13 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
@@ -31,8 +34,6 @@ import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
 import cn.iocoder.yudao.module.pay.service.merchant.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
-import cn.iocoder.yudao.module.pay.service.order.bo.PayOrderSubmitReqBO;
-import cn.iocoder.yudao.module.pay.service.order.bo.PayOrderSubmitRespBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,22 +127,22 @@ public class PayOrderServiceImpl implements PayOrderService {
     }
 
     @Override
-    public PayOrderSubmitRespBO submitPayOrder(PayOrderSubmitReqBO reqBO) {
+    public PayOrderSubmitRespVO submitPayOrder(PayOrderSubmitReqVO reqVO, String userIp) {
         // 1. 获得 PayOrderDO ，并校验其是否存在
-        PayOrderDO order = validatePayOrderCanSubmit(reqBO.getId());
+        PayOrderDO order = validatePayOrderCanSubmit(reqVO.getId());
         // 1.2 校验支付渠道是否有效
-        PayChannelDO channel = validatePayChannelCanSubmit(order.getAppId(), reqBO.getChannelCode());
+        PayChannelDO channel = validatePayChannelCanSubmit(order.getAppId(), reqVO.getChannelCode());
         PayClient client = payClientFactory.getPayClient(channel.getId());
 
         // 2. 插入 PayOrderExtensionDO
-        PayOrderExtensionDO orderExtension = PayOrderConvert.INSTANCE.convert(reqBO)
+        PayOrderExtensionDO orderExtension = PayOrderConvert.INSTANCE.convert(reqVO, userIp)
                 .setOrderId(order.getId()).setNo(generateOrderExtensionNo())
                 .setChannelId(channel.getId()).setChannelCode(channel.getCode())
                 .setStatus(PayOrderStatusEnum.WAITING.getStatus());
         orderExtensionMapper.insert(orderExtension);
 
         // 3. 调用三方接口
-        PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderConvert.INSTANCE.convert2(reqBO)
+        PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderConvert.INSTANCE.convert2(reqVO)
                 // 商户相关的字段
                 .setMerchantOrderId(orderExtension.getNo()) // 注意，此处使用的是 PayOrderExtensionDO.no 属性！
                 .setSubject(order.getSubject()).setBody(order.getBody())
@@ -152,10 +153,11 @@ public class PayOrderServiceImpl implements PayOrderService {
         CommonResult<?> unifiedOrderResult = client.unifiedOrder(unifiedOrderReqDTO);
         unifiedOrderResult.checkError();
 
+        PayOrderUnifiedRespDTO xx = (PayOrderUnifiedRespDTO) unifiedOrderResult.getData();
+
         // TODO 轮询三方接口，是否已经支付的任务
         // 返回成功
-        return new PayOrderSubmitRespBO().setExtensionId(orderExtension.getId())
-                .setInvokeResponse(unifiedOrderResult.getData());
+        return PayOrderConvert.INSTANCE.convert(xx);
     }
 
     private PayOrderDO validatePayOrderCanSubmit(Long id) {

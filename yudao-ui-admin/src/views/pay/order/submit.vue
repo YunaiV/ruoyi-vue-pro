@@ -12,7 +12,6 @@
       </el-descriptions>
     </el-card>
 
-
     <!-- 支付选择框 -->
     <el-card style="margin-top: 10px" v-loading="submitLoading"  element-loading-text="提交支付中...">
       <!-- 支付宝 -->
@@ -42,10 +41,16 @@
       </div>
     </el-card>
 
-    <!-- 支付二维码 -->
+    <!-- 展示形式：二维码 -->
     <el-dialog :title="qrCode.title" :visible.sync="qrCode.visible" width="350px" append-to-body
                :close-on-press-escape="false">
       <qrcode-vue :value="qrCode.url" size="310" level="H" />
+    </el-dialog>
+
+    <!-- 展示形式：iframe -->
+    <el-dialog :title="iframe.title" :visible.sync="iframe.visible" width="800px" height="800px" append-to-body
+               :close-on-press-escape="false">
+      <iframe :src="iframe.url" width="100%" />
     </el-dialog>
 
     <!-- 阿里支付 -->
@@ -57,7 +62,7 @@
 import QrcodeVue from 'qrcode.vue'
 import { DICT_TYPE, getDictDatas } from "@/utils/dict";
 import { getOrder, submitOrder } from '@/api/pay/order';
-import { PayChannelEnum, PayOrderStatusEnum } from "@/utils/constants";
+import {PayChannelEnum, PayDisplayModeEnum, PayOrderStatusEnum} from "@/utils/constants";
 
 export default {
   name: "PayOrderSubmit",
@@ -83,10 +88,15 @@ export default {
         mock: require("@/assets/images/pay/icon/mock.svg"),
       },
       submitLoading: false, // 提交支付的 loading
-      qrCode: { // 支付二维码
+      qrCode: { // 展示形式：二维码
         url: '',
         title: '',
         visible: false,
+      },
+      iframe: { // 展示形式：iframe
+        url: '',
+        title: '',
+        visible: false
       },
       interval: undefined, // 定时任务，轮询是否完成支付
       alipayHtml: '' // 阿里支付的 HTML
@@ -146,20 +156,64 @@ export default {
       this.submitLoading = true
       submitOrder({
         id: this.id,
-        channelCode: channelCode
+        channelCode: channelCode,
+        ...this.buildSubmitParam(channelCode)
       }).then(response => {
-        const invokeResponse = response.data.invokeResponse
-        // 不同的支付，调用不同的策略
-        if (channelCode === PayChannelEnum.ALIPAY_QR.code) {
-          this.submitAfterAlipayQr(invokeResponse)
-        } else if (channelCode === PayChannelEnum.ALIPAY_PC.code
-          || channelCode === PayChannelEnum.ALIPAY_WAP.code) {
-          this.submitAfterAlipayPc(invokeResponse)
+        const data = response.data
+        if (data.displayMode === 'iframe') {
+          this.displayIFrame(channelCode, data)
+        } else if (data.displayMode === 'url') {
+          this.displayUrl(channelCode, data)
         }
+        // 不同的支付，调用不同的策略
+        // if (channelCode === PayChannelEnum.ALIPAY_QR.code) {
+        //   this.submitAfterAlipayQr(invokeResponse)
+        // } else if (channelCode === PayChannelEnum.ALIPAY_PC.code
+        //   || channelCode === PayChannelEnum.ALIPAY_WAP.code) {
+        //   this.submitAfterAlipayPc(invokeResponse)
+        // }
 
         // 打开轮询任务
         this.createQueryInterval()
       })
+    },
+    /** 构建提交支付的额外参数 */
+    buildSubmitParam(channelCode) {
+      // 支付宝网页支付时，有多种展示形态
+      if (channelCode === PayChannelEnum.ALIPAY_PC.code) {
+        // 情况【前置模式】：将二维码前置到商户的订单确认页的模式。需要商户在自己的页面中以 iframe 方式请求支付宝页面。具体支持的枚举值有以下几种：
+        // 0：订单码-简约前置模式，对应 iframe 宽度不能小于 600px，高度不能小于 300px
+        // return {
+        //   "channelExtras": {
+        //     "qr_pay_mode": "0"
+        //   }
+        // }
+        // 1：订单码-前置模式，对应iframe 宽度不能小于 300px，高度不能小于 600px
+        // return {
+        //   "channelExtras": {
+        //     "qr_pay_mode": "1"
+        //   }
+        // }
+        // 3：订单码-迷你前置模式，对应 iframe 宽度不能小于 75px，高度不能小于 75px
+        // return {
+        //   "channelExtras": {
+        //     "qr_pay_mode": "3"
+        //   }
+        // }
+        // 4：订单码-可定义宽度的嵌入式二维码，商户可根据需要设定二维码的大小
+        // return {
+        //   "channelExtras": {
+        //     "qr_pay_mode": "2"
+        //   }
+        // }
+        // 情况【跳转模式】：跳转模式下，用户的扫码界面是由支付宝生成的，不在商户的域名下。支持传入的枚举值有
+        return {
+          "channelExtras": {
+            "qr_pay_mode": "2"
+          }
+        }
+      }
+      return {}
     },
     /** 提交支付后（支付宝扫码支付） */
     submitAfterAlipayQr(invokeResponse) {
@@ -168,6 +222,19 @@ export default {
         url: invokeResponse.qrCode,
         visible: true
       }
+      this.submitLoading = false
+    },
+    displayIFrame(channelCode, data) {
+      // this.iframe = {
+      //   title: '支付窗口',
+      //   url: data.displayContent,
+      //   visible: true
+      // }
+      window.open(data.displayContent)
+    },
+    /** 提交支付后，URL 的展示形式 */
+    displayUrl(channelCode, data) {
+      window.open(data.displayContent)
       this.submitLoading = false
     },
     /** 提交支付后（支付宝 PC 网站支付） */
@@ -188,6 +255,9 @@ export default {
     },
     /** 轮询查询任务 */
     createQueryInterval() {
+      if (!this.interval) {
+        return
+      }
       this.interval = setInterval(() => {
         getOrder(this.id).then(response => {
           // 已支付
