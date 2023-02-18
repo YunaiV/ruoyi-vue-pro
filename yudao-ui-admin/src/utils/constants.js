@@ -160,6 +160,9 @@ export const PayDisplayModeEnum = {
   IFRAME: {
     "mode": "iframe",
   },
+  FORM: {
+    "mode": "form"
+  }
 }
 
 /**

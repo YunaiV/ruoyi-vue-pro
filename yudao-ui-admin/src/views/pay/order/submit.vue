@@ -41,20 +41,20 @@
       </div>
     </el-card>
 
-    <!-- 展示形式：二维码 -->
+    <!-- 展示形式：二维码 URL -->
     <el-dialog :title="qrCode.title" :visible.sync="qrCode.visible" width="350px" append-to-body
                :close-on-press-escape="false">
       <qrcode-vue :value="qrCode.url" size="310" level="H" />
     </el-dialog>
 
-    <!-- 展示形式：iframe -->
+    <!-- 展示形式：IFrame -->
     <el-dialog :title="iframe.title" :visible.sync="iframe.visible" width="800px" height="800px" append-to-body
                :close-on-press-escape="false">
       <iframe :src="iframe.url" width="100%" />
     </el-dialog>
 
-    <!-- 阿里支付 -->
-    <div ref="alipayWap" v-html="alipayHtml.value" />
+    <!-- 展示形式： -->
+    <div ref="formRef" v-html="form.value" />
 
   </div>
 </template>
@@ -88,6 +88,7 @@ export default {
         mock: require("@/assets/images/pay/icon/mock.svg"),
       },
       submitLoading: false, // 提交支付的 loading
+      interval: undefined, // 定时任务，轮询是否完成支付
       qrCode: { // 展示形式：二维码
         url: '',
         title: '',
@@ -98,8 +99,9 @@ export default {
         title: '',
         visible: false
       },
-      interval: undefined, // 定时任务，轮询是否完成支付
-      alipayHtml: '' // 阿里支付的 HTML
+      form: { // 展示形式：form
+        html: '',
+      },
     };
   },
   created() {
@@ -164,6 +166,8 @@ export default {
           this.displayIFrame(channelCode, data)
         } else if (data.displayMode === 'url') {
           this.displayUrl(channelCode, data)
+        } else if (data.displayMode === 'form') {
+          this.displayForm(channelCode, data)
         }
         // 不同的支付，调用不同的策略
         // if (channelCode === PayChannelEnum.ALIPAY_QR.code) {
@@ -203,7 +207,7 @@ export default {
         // 4：订单码-可定义宽度的嵌入式二维码，商户可根据需要设定二维码的大小
         // return {
         //   "channelExtras": {
-        //     "qr_pay_mode": "2"
+        //     "qr_pay_mode": "4"
         //   }
         // }
         // 情况【跳转模式】：跳转模式下，用户的扫码界面是由支付宝生成的，不在商户的域名下。支持传入的枚举值有
@@ -212,6 +216,10 @@ export default {
             "qr_pay_mode": "2"
           }
         }
+        // 情况【表单模式】：直接提交当前页面到支付宝
+        // return {
+        //   displayMode: PayDisplayModeEnum.FORM.mode
+        // }
       }
       return {}
     },
@@ -224,33 +232,34 @@ export default {
       }
       this.submitLoading = false
     },
+    /** 提交支付后，IFrame 内置 URL 的展示形式 */
     displayIFrame(channelCode, data) {
-      // this.iframe = {
-      //   title: '支付窗口',
-      //   url: data.displayContent,
-      //   visible: true
-      // }
-      window.open(data.displayContent)
+      // TODO 芋艿：目前有点奇怪，支付宝总是会显示“支付环境存在风险”
+      this.iframe = {
+        title: '支付窗口',
+        url: data.displayContent,
+        visible: true
+      }
+      this.submitLoading = false
     },
     /** 提交支付后，URL 的展示形式 */
     displayUrl(channelCode, data) {
       window.open(data.displayContent)
       this.submitLoading = false
     },
-    /** 提交支付后（支付宝 PC 网站支付） */
-    submitAfterAlipayPc(invokeResponse) {
+    /** 提交支付后，Form 的展示形式 */
+    displayForm(channelCode, data) {
       // 渲染支付页面
-      this.alipayHtml = {
-        value: invokeResponse.body,
-        visible: true
+      this.form = {
+        value: data.displayContent
       }
       // 防抖避免重复支付
       this.$nextTick(() => {
         // 提交支付表单
-        // this.$refs.alipayWap.children[0].submit();
-        // setTimeout(() => {
-        //   this.submitLoading = false
-        // }, 1000);
+        this.$refs.formRef.children[0].submit();
+        setTimeout(() => {
+          this.submitLoading = false
+        }, 1000);
       });
     },
     /** 轮询查询任务 */
