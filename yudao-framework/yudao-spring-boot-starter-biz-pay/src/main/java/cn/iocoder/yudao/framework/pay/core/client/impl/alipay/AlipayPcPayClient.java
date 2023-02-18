@@ -69,10 +69,6 @@ public class AlipayPcPayClient extends AbstractAlipayClient {
             log.error("[unifiedOrder][request({}) 发起支付失败]", JsonUtils.toJsonString(reqDTO), e);
             return PayCommonResult.build(e.getErrCode(), e.getErrMsg(), null, codeMapping);
         }
-        // 1. form
-        // 2. url
-        // 3. code
-        // 4. code url
 
         // 2.2 处理结果
         System.out.println(response.getBody());

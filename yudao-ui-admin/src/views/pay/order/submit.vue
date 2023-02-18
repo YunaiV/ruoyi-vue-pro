@@ -203,7 +203,7 @@ export default {
         // 4：订单码-可定义宽度的嵌入式二维码，商户可根据需要设定二维码的大小
         // return {
         //   "channelExtras": {
-        //     "qr_pay_mode": "2"
+        //     "qr_pay_mode": "4"
         //   }
         // }
         // 情况【跳转模式】：跳转模式下，用户的扫码界面是由支付宝生成的，不在商户的域名下。支持传入的枚举值有
@@ -224,13 +224,15 @@ export default {
       }
       this.submitLoading = false
     },
+    /** 提交支付后，IFrame 内置 URL 的展示形式 */
     displayIFrame(channelCode, data) {
-      // this.iframe = {
-      //   title: '支付窗口',
-      //   url: data.displayContent,
-      //   visible: true
-      // }
-      window.open(data.displayContent)
+      // TODO 芋艿：目前有点奇怪，支付宝总是会显示“支付环境存在风险”
+      this.iframe = {
+        title: '支付窗口',
+        url: data.displayContent,
+        visible: true
+      }
+      this.submitLoading = false
     },
     /** 提交支付后，URL 的展示形式 */
     displayUrl(channelCode, data) {
