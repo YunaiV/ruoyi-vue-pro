@@ -2493,7 +2493,7 @@ CREATE TABLE "system_login_log" (
   "id" int8 NOT NULL,
   "log_type" int8 NOT NULL,
   "trace_id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
-  "user_id" int8 NOT NULL,
+  "user_id" int8 NOT NULL DEFAULT 0,
   "user_type" int2 NOT NULL,
   "username" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "result" int2 NOT NULL,
@@ -2866,7 +2866,7 @@ CREATE TABLE "system_oauth2_access_token" (
   "updater" varchar(64) COLLATE "pg_catalog"."default",
   "update_time" timestamp(6) NOT NULL,
   "deleted" int2 NOT NULL DEFAULT 0,
-  "tenant_id" int8 NOT NULL,
+  "tenant_id" int8 NOT NULL DEFAULT 0,
   "scopes" varchar(255) COLLATE "pg_catalog"."default" DEFAULT ''::character varying
 )
 ;
@@ -2909,7 +2909,7 @@ CREATE TABLE "system_oauth2_approve" (
   "updater" varchar(64) COLLATE "pg_catalog"."default",
   "update_time" timestamp(6) NOT NULL,
   "deleted" int2 NOT NULL DEFAULT 0,
-  "tenant_id" int8 NOT NULL
+  "tenant_id" int8 NOT NULL DEFAULT 0
 )
 ;
 COMMENT ON COLUMN "system_oauth2_approve"."id" IS '编号';
@@ -3011,7 +3011,7 @@ CREATE TABLE "system_oauth2_code" (
   "updater" varchar(64) COLLATE "pg_catalog"."default",
   "update_time" timestamp(6) NOT NULL,
   "deleted" int2 NOT NULL DEFAULT 0,
-  "tenant_id" int8 NOT NULL
+  "tenant_id" int8 NOT NULL DEFAULT 0
 )
 ;
 COMMENT ON COLUMN "system_oauth2_code"."id" IS '编号';
@@ -3053,7 +3053,7 @@ CREATE TABLE "system_oauth2_refresh_token" (
   "updater" varchar(64) COLLATE "pg_catalog"."default",
   "update_time" timestamp(6) NOT NULL,
   "deleted" int2 NOT NULL DEFAULT 0,
-  "tenant_id" int8 NOT NULL,
+  "tenant_id" int8 NOT NULL DEFAULT 0,
   "scopes" varchar(255) COLLATE "pg_catalog"."default" DEFAULT ''::character varying
 )
 ;
