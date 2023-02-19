@@ -126,11 +126,11 @@ export default {
       }, {
         id: 4,
         name: '华硕笔记本',
-        price: 200,
+        price: 1000,
       }, {
         id: 5,
         name: '蔚来汽车',
-        price: 300,
+        price: 200000,
       }]
     };
   },

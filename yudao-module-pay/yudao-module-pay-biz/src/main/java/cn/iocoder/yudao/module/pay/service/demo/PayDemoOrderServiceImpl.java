@@ -71,8 +71,8 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         spuNames.put(1L, new Object[]{"华为手机", 1});
         spuNames.put(2L, new Object[]{"小米电视", 10});
         spuNames.put(3L, new Object[]{"苹果手表", 100});
-        spuNames.put(4L, new Object[]{"华硕笔记本", 200});
-        spuNames.put(5L, new Object[]{"蔚来汽车", 300});
+        spuNames.put(4L, new Object[]{"华硕笔记本", 1000});
+        spuNames.put(5L, new Object[]{"蔚来汽车", 200000});
     }
 
     @Override
