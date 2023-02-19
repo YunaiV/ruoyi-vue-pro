@@ -150,14 +150,11 @@ public class PayOrderServiceImpl implements PayOrderService {
                 .setReturnUrl(genChannelReturnUrl(channel))
                 // 订单相关字段
                 .setAmount(order.getAmount()).setExpireTime(order.getExpireTime());
-        CommonResult<?> unifiedOrderResult = client.unifiedOrder(unifiedOrderReqDTO);
-        unifiedOrderResult.checkError();
-
-        PayOrderUnifiedRespDTO xx = (PayOrderUnifiedRespDTO) unifiedOrderResult.getData();
+        PayOrderUnifiedRespDTO unifiedOrderRespDTO = client.unifiedOrder(unifiedOrderReqDTO);
 
         // TODO 轮询三方接口，是否已经支付的任务
         // 返回成功
-        return PayOrderConvert.INSTANCE.convert(xx);
+        return PayOrderConvert.INSTANCE.convert(unifiedOrderRespDTO);
     }
 
     private PayOrderDO validatePayOrderCanSubmit(Long id) {

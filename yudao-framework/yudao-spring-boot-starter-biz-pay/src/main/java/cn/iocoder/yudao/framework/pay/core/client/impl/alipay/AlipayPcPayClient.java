@@ -3,8 +3,6 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.Method;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
@@ -18,9 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Objects;
 
 /**
- * 支付宝【PC 网站支付】的 PayClient 实现类
+ * 支付宝【PC 网站】的 PayClient 实现类
  *
- * 文档：https://opendocs.alipay.com/open/270/105898
+ * 文档：<a href="https://opendocs.alipay.com/open/270/105898">电脑网站支付</a>
  *
  * @author XGD
  */
@@ -28,12 +26,11 @@ import java.util.Objects;
 public class AlipayPcPayClient extends AbstractAlipayClient {
 
     public AlipayPcPayClient(Long channelId, AlipayPayClientConfig config) {
-        super(channelId, PayChannelEnum.ALIPAY_PC.getCode(), config,
-                new AlipayPayCodeMapping());
+        super(channelId, PayChannelEnum.ALIPAY_PC.getCode(), config);
     }
 
     @Override
-    public PayCommonResult<PayOrderUnifiedRespDTO> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
+    public PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
         // 1.1 构建 AlipayTradePagePayModel 请求
         AlipayTradePagePayModel model = new AlipayTradePagePayModel();
         // ① 通用的参数
@@ -54,26 +51,20 @@ public class AlipayPcPayClient extends AbstractAlipayClient {
         AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
         request.setBizModel(model);
         request.setNotifyUrl(reqDTO.getNotifyUrl());
-        request.setReturnUrl(""); // TODO 芋艿，待搞
+        request.setReturnUrl(reqDTO.getReturnUrl());
 
         // 2.1 执行请求
         AlipayTradePagePayResponse response;
-        try {
-            if (Objects.equals(displayMode, PayDisplayModeEnum.FORM.getMode())) {
-                response = client.pageExecute(request, Method.POST.name()); // 需要特殊使用 POST 请求
-            } else {
-                response = client.pageExecute(request, Method.GET.name());
-            }
-        } catch (AlipayApiException e) {
-            log.error("[unifiedOrder][request({}) 发起支付失败]", JsonUtils.toJsonString(reqDTO), e);
-            return PayCommonResult.build(e.getErrCode(), e.getErrMsg(), null, codeMapping);
+        if (Objects.equals(displayMode, PayDisplayModeEnum.FORM.getMode())) {
+            response = client.pageExecute(request, Method.POST.name()); // 需要特殊使用 POST 请求
+        } else {
+            response = client.pageExecute(request, Method.GET.name());
         }
 
         // 2.2 处理结果
-        PayOrderUnifiedRespDTO respDTO = new PayOrderUnifiedRespDTO()
-                .setDisplayMode(displayMode).setDisplayContent(response.getBody());
-        return PayCommonResult.build(StrUtil.blankToDefault(response.getCode(),"10000"),
-                response.getMsg(), respDTO, codeMapping);
+        validateSuccess(response);
+        return new PayOrderUnifiedRespDTO().setDisplayMode(displayMode)
+                .setDisplayContent(response.getBody());
     }
 
     /**

@@ -7,12 +7,11 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
@@ -35,10 +34,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Objects;
 
-import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
-import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.CODE_SUCCESS;
-import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.MESSAGE_SUCCESS;
-
 /**
  * 微信支付（公众号）的 PayClient 实现类
  *
@@ -50,7 +45,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
     private WxPayService client;
 
     public WXPubPayClient(Long channelId, WXPayClientConfig config) {
-        super(channelId, PayChannelEnum.WX_PUB.getCode(), config, new WXCodeMapping());
+        super(channelId, PayChannelEnum.WX_PUB.getCode(), config);
     }
 
     @Override
@@ -75,28 +70,30 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
     }
 
     @Override
-    public PayCommonResult<WxPayMpOrderResult> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
-        WxPayMpOrderResult response;
-        try {
-            switch (config.getApiVersion()) {
-                case WXPayClientConfig.API_VERSION_V2:
-                    response = this.unifiedOrderV2(reqDTO);
-                    break;
-                case WXPayClientConfig.API_VERSION_V3:
-                    WxPayUnifiedOrderV3Result.JsapiResult responseV3 = this.unifiedOrderV3(reqDTO);
-                    // 将 V3 的结果，统一转换成 V2。返回的字段是一致的
-                    response = new WxPayMpOrderResult();
-                    BeanUtil.copyProperties(responseV3, response, true);
-                    break;
-                default:
-                    throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
-            }
-        } catch (WxPayException e) {
-            log.error("[unifiedOrder][request({}) 发起支付失败，原因({})]", toJsonString(reqDTO), e);
-            return PayCommonResult.build(ObjectUtils.defaultIfNull(e.getErrCode(), e.getReturnCode(), "CustomErrorCode"),
-                    ObjectUtils.defaultIfNull(e.getErrCodeDes(), e.getCustomErrorMsg()),null, codeMapping);
-        }
-        return PayCommonResult.build(CODE_SUCCESS, MESSAGE_SUCCESS, response, codeMapping);
+    public PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
+        throw new UnsupportedOperationException();
+//
+//        WxPayMpOrderResult response;
+//        try {
+//            switch (config.getApiVersion()) {
+//                case WXPayClientConfig.API_VERSION_V2:
+//                    response = this.unifiedOrderV2(reqDTO);
+//                    break;
+//                case WXPayClientConfig.API_VERSION_V3:
+//                    WxPayUnifiedOrderV3Result.JsapiResult responseV3 = this.unifiedOrderV3(reqDTO);
+//                    // 将 V3 的结果，统一转换成 V2。返回的字段是一致的
+//                    response = new WxPayMpOrderResult();
+//                    BeanUtil.copyProperties(responseV3, response, true);
+//                    break;
+//                default:
+//                    throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+//            }
+//        } catch (WxPayException e) {
+//            log.error("[unifiedOrder][request({}) 发起支付失败，原因({})]", toJsonString(reqDTO), e);
+//            return PayCommonResult.build(ObjectUtils.defaultIfNull(e.getErrCode(), e.getReturnCode(), "CustomErrorCode"),
+//                    ObjectUtils.defaultIfNull(e.getErrCodeDes(), e.getCustomErrorMsg()),null, codeMapping);
+//        }
+//        return PayCommonResult.build(CODE_SUCCESS, MESSAGE_SUCCESS, response, codeMapping);
     }
 
 
@@ -196,7 +193,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
     }
 
     @Override
-    protected PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
+    protected PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
         // TODO 需要实现
         throw new UnsupportedOperationException();
     }

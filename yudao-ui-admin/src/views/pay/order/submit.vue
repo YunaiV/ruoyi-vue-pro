@@ -56,6 +56,32 @@
     <!-- 展示形式：Form -->
     <div ref="formRef" v-html="form.value" />
 
+    <!-- 展示形式：BarCode 条形码 -->
+    <el-dialog :title="barCode.title" :visible.sync="barCode.visible" width="500px" append-to-body
+               :close-on-press-escape="false">
+      <el-form ref="form" label-width="80px">
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="条形码" prop="name">
+              <el-input v-model="barCode.value" placeholder="请输入条形码" required />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <div style="text-align: right">
+              或使用
+              <el-link type="danger" target="_blank"
+                       href="https://baike.baidu.com/item/条码支付/10711903">(扫码枪/扫码盒)</el-link>
+              扫码
+            </div>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submit0(barCode.channelCode)"
+                   :disabled="barCode.value.length === 0">确认支付</el-button>
+        <el-button @click="barCode.visible = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -104,6 +130,7 @@ export default {
         html: '',
       },
       barCode: { // 展示形式：条形码
+        channelCode: '',
         value: '',
         title: '',
         visible: false,
@@ -163,7 +190,12 @@ export default {
     submit(channelCode) {
       // 条形码支付，需要特殊处理
       if (channelCode === PayChannelEnum.ALIPAY_BAR.code) {
-
+        this.barCode = {
+          channelCode: channelCode,
+          value: '',
+          title: '“支付宝”条码支付',
+          visible: true
+        }
         return;
       }
 
@@ -190,7 +222,9 @@ export default {
 
         // 打开轮询任务
         this.createQueryInterval()
-      })
+      }).catch(() => {
+        this.submitLoading = false
+      });
     },
     /** 构建提交支付的额外参数 */
     buildSubmitParam(channelCode) {
@@ -232,10 +266,20 @@ export default {
         //   displayMode: PayDisplayModeEnum.FORM.mode
         // }
       }
+
       // ② 支付宝 Wap 支付时，引导手机扫码支付
       if (channelCode === PayChannelEnum.ALIPAY_WAP.code) {
         return {
           displayMode: PayDisplayModeEnum.QR_CODE.mode
+        }
+      }
+
+      // ③ 支付宝 BarCode 支付时，需要传递 authCode 条形码
+      if (channelCode === PayChannelEnum.ALIPAY_BAR.code) {
+        return {
+          "channelExtras": {
+            "auth_code": this.barCode.value
+          }
         }
       }
       return {}

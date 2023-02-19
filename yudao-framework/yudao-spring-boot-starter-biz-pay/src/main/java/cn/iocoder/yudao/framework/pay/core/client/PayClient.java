@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
 
 /**
@@ -28,7 +28,7 @@ public interface PayClient {
      * @param reqDTO 下单信息
      * @return 各支付渠道的返回结果
      */
-    PayCommonResult<?> unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
+    PayOrderUnifiedRespDTO unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
 
     /**
      * 解析支付单的通知结果
@@ -44,7 +44,7 @@ public interface PayClient {
      * @param reqDTO  统一退款请求信息
      * @return 各支付渠道的统一返回结果
      */
-    PayCommonResult<PayRefundUnifiedRespDTO> unifiedRefund(PayRefundUnifiedReqDTO reqDTO);
+    PayRefundUnifiedRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO);
 
     /**
      * 解析支付退款通知数据

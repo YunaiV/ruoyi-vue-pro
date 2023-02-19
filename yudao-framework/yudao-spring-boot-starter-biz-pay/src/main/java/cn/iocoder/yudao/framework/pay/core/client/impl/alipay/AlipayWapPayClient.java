@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.Method;
-import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
@@ -14,12 +12,10 @@ import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Objects;
-
 /**
- * 支付宝【手机 网站】的 PayClient 实现类
+ * 支付宝【Wap 网站】的 PayClient 实现类
  *
- * 文档：https://opendocs.alipay.com/apis/api_1/alipay.trade.wap.pay
+ * 文档：<a href="https://opendocs.alipay.com/apis/api_1/alipay.trade.wap.pay">手机网站支付接口</a>
  *
  * @author 芋道源码
  */
@@ -27,12 +23,11 @@ import java.util.Objects;
 public class AlipayWapPayClient extends AbstractAlipayClient {
 
     public AlipayWapPayClient(Long channelId, AlipayPayClientConfig config) {
-        super(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), config,
-                new AlipayPayCodeMapping());
+        super(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), config);
     }
 
     @Override
-    public PayCommonResult<PayOrderUnifiedRespDTO> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
+    public PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
         // 1.1 构建 AlipayTradeWapPayModel 请求
         AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
         // ① 通用的参数
@@ -50,23 +45,16 @@ public class AlipayWapPayClient extends AbstractAlipayClient {
         AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
         request.setBizModel(model);
         request.setNotifyUrl(reqDTO.getNotifyUrl());
-        request.setReturnUrl(reqDTO.getReturnUrl()); // TODO 芋艿，待搞
-        model.setQuitUrl(reqDTO.getReturnUrl()); // TODO 芋艿，待搞
+        request.setReturnUrl(reqDTO.getReturnUrl());
+        model.setQuitUrl(reqDTO.getReturnUrl());
 
         // 2.1 执行请求
-        AlipayTradeWapPayResponse response;
-        try {
-            response = client.pageExecute(request, Method.GET.name());
-        } catch (AlipayApiException e) {
-            return PayCommonResult.build(e.getErrCode(), e.getErrMsg(), null, codeMapping);
-        }
-        System.out.println(response.getBody());
+        AlipayTradeWapPayResponse response = client.pageExecute(request, Method.GET.name());
 
         // 2.2 处理结果
-        PayOrderUnifiedRespDTO respDTO = new PayOrderUnifiedRespDTO()
+        validateSuccess(response);
+        return new PayOrderUnifiedRespDTO()
                 .setDisplayMode(displayMode).setDisplayContent(response.getBody());
-        return PayCommonResult.build(StrUtil.blankToDefault(response.getCode(),"10000"),
-                response.getMsg(), respDTO, codeMapping);
     }
 
 }

@@ -3,14 +3,13 @@ package cn.iocoder.yudao.module.pay.service.refund;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
-import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayNotifyRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
@@ -22,7 +21,6 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.refund.PayRefundMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
@@ -169,11 +167,10 @@ public class PayRefundServiceImpl implements PayRefundService {
                 .setNotifyUrl(genChannelPayNotifyUrl(channel)) // TODO 芋艿：优化下 notifyUrl
                 .setReason(reqDTO.getReason());
         // 向渠道发起退款申请
-        PayCommonResult<PayRefundUnifiedRespDTO> refundUnifiedResult = client.unifiedRefund(unifiedReqDTO);
+        client.unifiedRefund(unifiedReqDTO);
         // 检查是否失败，失败抛出业务异常。
         // TODO 渠道的异常记录。
         // TODO @jason：可以先打个 warn log 哈；
-        refundUnifiedResult.checkError();
         // 成功在 退款回调中处理
         return payRefundDO.getId();
     }
