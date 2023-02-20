@@ -7,9 +7,9 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
@@ -145,8 +145,8 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
      * @return 支付回调对象
      * @throws WxPayException 微信异常类
      */
-    @Override
-    public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws WxPayException {
+//    @Override
+    public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyReqDTO data) throws WxPayException {
         log.info("[parseOrderNotify][微信支付回调data数据:{}]", data.getBody());
         // 微信支付 v2 回调结果处理
         switch (config.getApiVersion()) {
@@ -159,7 +159,7 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
         }
     }
 
-    private PayOrderNotifyRespDTO parseOrderNotifyV3(PayNotifyDataDTO data) throws WxPayException {
+    private PayOrderNotifyRespDTO parseOrderNotifyV3(PayNotifyReqDTO data) throws WxPayException {
         WxPayOrderNotifyV3Result wxPayOrderNotifyV3Result = client.parseOrderNotifyV3Result(data.getBody(), null);
         WxPayOrderNotifyV3Result.DecryptNotifyResult result = wxPayOrderNotifyV3Result.getResult();
         // 转换结果
@@ -172,11 +172,10 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .channelOrderNo(result.getTransactionId())
                 .channelUserId(result.getPayer().getOpenid())
                 .successTime(LocalDateTimeUtil.parse(result.getSuccessTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
-                .data(data.getBody())
                 .build();
     }
 
-    private PayOrderNotifyRespDTO parseOrderNotifyV2(PayNotifyDataDTO data) throws WxPayException {
+    private PayOrderNotifyRespDTO parseOrderNotifyV2(PayNotifyReqDTO data) throws WxPayException {
         WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(data.getBody());
         Assert.isTrue(Objects.equals(notifyResult.getResultCode(), "SUCCESS"), "支付结果非 SUCCESS");
         // 转换结果
@@ -186,17 +185,9 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .channelOrderNo(notifyResult.getTransactionId())
                 .channelUserId(notifyResult.getOpenid())
                 .successTime(LocalDateTimeUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"))
-                .data(data.getBody())
                 .build();
 
     }
-
-    @Override
-    public PayRefundNotifyDTO parseRefundNotify(PayNotifyDataDTO notifyData) {
-        //TODO 需要实现
-        throw new UnsupportedOperationException("需要实现");
-    }
-
 
     @Override
     protected PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO)  {

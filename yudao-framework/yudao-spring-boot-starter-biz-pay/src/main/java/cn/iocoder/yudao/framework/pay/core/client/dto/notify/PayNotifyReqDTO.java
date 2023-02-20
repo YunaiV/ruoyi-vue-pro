@@ -13,11 +13,11 @@ import java.util.Map;
 @Data
 @ToString
 @Builder
-public class PayNotifyDataDTO {
+public class PayNotifyReqDTO {
 
 
     /**
-     *  HTTP 回调接口的 request body
+     * HTTP 回调接口的 request body
      */
     private String body;
 

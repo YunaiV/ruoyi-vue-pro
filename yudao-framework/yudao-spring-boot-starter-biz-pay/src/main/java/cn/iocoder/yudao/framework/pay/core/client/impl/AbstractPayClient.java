@@ -12,6 +12,7 @@ import com.alipay.api.AlipayResponse;import lombok.extern.slf4j.Slf4j;
 import javax.validation.Validation;
 import java.time.LocalDateTime;
 
+import static cn.hutool.core.date.DatePattern.NORM_DATETIME_FORMATTER;
 import static cn.hutool.core.date.DatePattern.NORM_DATETIME_MS_FORMATTER;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
@@ -129,7 +130,12 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
 
     protected String formatTime(LocalDateTime time) {
         // "yyyy-MM-dd HH:mm:ss"
-        return LocalDateTimeUtil.format(time, NORM_DATETIME_MS_FORMATTER);
+        return LocalDateTimeUtil.format(time, NORM_DATETIME_FORMATTER);
+    }
+
+    protected LocalDateTime parseTime(String str) {
+        // "yyyy-MM-dd HH:mm:ss"
+        return LocalDateTimeUtil.parse(str, NORM_DATETIME_FORMATTER);
     }
 
 }

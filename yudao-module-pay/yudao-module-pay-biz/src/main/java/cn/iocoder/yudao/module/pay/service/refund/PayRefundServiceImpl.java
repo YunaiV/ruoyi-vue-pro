@@ -7,8 +7,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayNotifyRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
@@ -187,29 +187,22 @@ public class PayRefundServiceImpl implements PayRefundService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void notifyPayRefund(Long channelId, PayNotifyDataDTO notifyData) {
-        log.info("[notifyPayRefund][channelId({}) 回调数据({})]", channelId, notifyData.getBody());
+    public void notifyPayRefund(Long channelId, PayRefundNotifyRespDTO notify, PayNotifyReqDTO rawNotify) {
         // 校验支付渠道是否有效
+        // TODO 芋艿：需要重构下这块的逻辑
         PayChannelDO channel = channelService.validPayChannel(channelId);
-        // 校验支付客户端是否正确初始化
-        PayClient client = payClientFactory.getPayClient(channel.getId());
-        if (client == null) {
-            log.error("[notifyPayOrder][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
-            throw ServiceExceptionUtil.exception(ErrorCodeConstants.PAY_CHANNEL_CLIENT_NOT_FOUND);
-        }
-        // 解析渠道退款通知数据， 统一处理
-        PayRefundNotifyDTO refundNotify = client.parseRefundNotify(notifyData);
-        if (Objects.equals(PayNotifyRefundStatusEnum.SUCCESS,refundNotify.getStatus())){
-            payRefundSuccess(refundNotify);
+        if (Objects.equals(PayNotifyRefundStatusEnum.SUCCESS, notify.getStatus())){
+            payRefundSuccess(notify);
         } else {
             //TODO 支付异常， 支付宝似乎没有支付异常的通知。
             // TODO @jason：那这里可以考虑打个 error logger @芋艿 微信是否存在支付异常通知
         }
     }
 
-    private void payRefundSuccess(PayRefundNotifyDTO refundNotify) {
+    private void payRefundSuccess(PayRefundNotifyRespDTO refundNotify) {
         // 校验退款单存在
-        PayRefundDO refundDO = refundMapper.selectByTradeNoAndMerchantRefundNo(refundNotify.getTradeNo(), refundNotify.getReqNo());
+        PayRefundDO refundDO = refundMapper.selectByTradeNoAndMerchantRefundNo(refundNotify.getTradeNo(),
+                refundNotify.getReqNo());
         if (refundDO == null) {
             log.error("[payRefundSuccess][不存在 seqNo 为{} 的支付退款单]", refundNotify.getReqNo());
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.PAY_REFUND_NOT_FOUND);

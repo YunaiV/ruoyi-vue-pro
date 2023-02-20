@@ -36,14 +36,8 @@ public class PayOrderNotifyRespDTO {
     private LocalDateTime successTime;
 
     /**
-     * 通知的原始数据
-     *
-     * 主要用于持久化，方便后续修复数据，或者排错
-     */
-    private String data;
-
-    /**
      * TODO @jason 结合其他的渠道定义成枚举,
+     *
      * alipay
      * TRADE_CLOSED,未付款交易超时关闭，或支付完成后全额退款。
      * TRADE_SUCCESS, 交易支付成功

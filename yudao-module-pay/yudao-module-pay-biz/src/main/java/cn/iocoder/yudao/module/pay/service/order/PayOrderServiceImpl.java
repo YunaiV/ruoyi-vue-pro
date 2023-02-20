@@ -3,13 +3,12 @@ package cn.iocoder.yudao.module.pay.service.order;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyDataDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
@@ -45,6 +44,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.*;
 
 /**
  * 支付订单 Service 实现类
@@ -105,7 +105,7 @@ public class PayOrderServiceImpl implements PayOrderService {
                 reqDTO.getAppId(), reqDTO.getMerchantOrderId());
         if (order != null) {
             log.warn("[createPayOrder][appId({}) merchantOrderId({}) 已经存在对应的支付单({})]", order.getAppId(),
-                    order.getMerchantOrderId(), JsonUtils.toJsonString(order)); // 理论来说，不会出现这个情况
+                    order.getMerchantOrderId(), toJsonString(order)); // 理论来说，不会出现这个情况
             return order.getId();
         }
 
@@ -222,49 +222,30 @@ public class PayOrderServiceImpl implements PayOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void notifyPayOrder(Long channelId, PayNotifyDataDTO notifyData) {
-        // TODO 芋艿，记录回调日志
-        log.info("[notifyPayOrder][channelId({}) 回调数据({})]", channelId, notifyData.getBody());
-
+    public void notifyPayOrder(Long channelId, PayOrderNotifyRespDTO notify, PayNotifyReqDTO rawNotify) {
         // 校验支付渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(channelId);
         TenantUtils.execute(channel.getTenantId(), () -> {
-            try {
-                notifyPayOrder(channel, notifyData);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            // 1. 更新 PayOrderExtensionDO 支付成功
+            PayOrderExtensionDO orderExtension = updatePayOrderExtensionSuccess(notify.getOrderExtensionNo(),
+                    rawNotify);
+            // 2. 更新 PayOrderDO 支付成功
+            PayOrderDO order = updatePayOrderSuccess(channel, orderExtension, notify);
+
+            // 3. 插入支付通知记录
+            notifyService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
+                    .type(PayNotifyTypeEnum.ORDER.getType()).dataId(order.getId()).build());
         });
-    }
-
-    private void notifyPayOrder(PayChannelDO channel, PayNotifyDataDTO notifyData) throws Exception {
-        // 校验支付客户端是否正确初始化
-        PayClient client = payClientFactory.getPayClient(channel.getId());
-        if (client == null) {
-            log.error("[notifyPayOrder][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
-            throw exception(ErrorCodeConstants.PAY_CHANNEL_CLIENT_NOT_FOUND);
-        }
-
-        // 0. 解析支付结果
-        PayOrderNotifyRespDTO notifyRespDTO = client.parseOrderNotify(notifyData);
-        // 1. 更新 PayOrderExtensionDO 支付成功
-        PayOrderExtensionDO orderExtension = updatePayOrderExtensionSuccess(notifyRespDTO.getOrderExtensionNo(), notifyData.getBody());
-        // 2. 更新 PayOrderDO 支付成功
-        PayOrderDO order = updatePayOrderSuccess(channel, orderExtension, notifyRespDTO);
-
-        // 3. 插入支付通知记录
-        notifyService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
-                .type(PayNotifyTypeEnum.ORDER.getType()).dataId(order.getId()).build());
     }
 
     /**
      * 更新 PayOrderExtensionDO 支付成功
      *
      * @param no 支付订单号（支付模块）
-     * @param body 回调内容
+     * @param rawNotify 通知数据
      * @return PayOrderExtensionDO 对象
      */
-    private PayOrderExtensionDO updatePayOrderExtensionSuccess(String no, String body) {
+    private PayOrderExtensionDO updatePayOrderExtensionSuccess(String no, PayNotifyReqDTO rawNotify) {
         // 1.1 查询 PayOrderExtensionDO
         PayOrderExtensionDO orderExtension = orderExtensionMapper.selectByNo(no);
         if (orderExtension == null) {
@@ -276,7 +257,8 @@ public class PayOrderServiceImpl implements PayOrderService {
         // 1.2 更新 PayOrderExtensionDO
         int updateCounts = orderExtensionMapper.updateByIdAndStatus(orderExtension.getId(),
                 PayOrderStatusEnum.WAITING.getStatus(), PayOrderExtensionDO.builder().id(orderExtension.getId())
-                        .status(PayOrderStatusEnum.SUCCESS.getStatus()).channelNotifyData(body).build());
+                        .status(PayOrderStatusEnum.SUCCESS.getStatus())
+                        .channelNotifyData(toJsonString(rawNotify)).build());
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw exception(ErrorCodeConstants.PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
         }
@@ -289,11 +271,11 @@ public class PayOrderServiceImpl implements PayOrderService {
      *
      * @param channel 支付渠道
      * @param orderExtension 支付拓展单
-     * @param notifyRespDTO 通知回调
+     * @param notify 通知回调
      * @return PayOrderDO 对象
      */
     private PayOrderDO updatePayOrderSuccess(PayChannelDO channel, PayOrderExtensionDO orderExtension,
-                                             PayOrderNotifyRespDTO notifyRespDTO) {
+                                             PayOrderNotifyRespDTO notify) {
         // 2.1 判断 PayOrderDO 是否处于待支付
         PayOrderDO order = orderMapper.selectById(orderExtension.getOrderId());
         if (order == null) {
@@ -306,8 +288,8 @@ public class PayOrderServiceImpl implements PayOrderService {
         int updateCounts = orderMapper.updateByIdAndStatus(order.getId(), PayOrderStatusEnum.WAITING.getStatus(),
                 PayOrderDO.builder().status(PayOrderStatusEnum.SUCCESS.getStatus())
                         .channelId(channel.getId()).channelCode(channel.getCode())
-                        .successTime(notifyRespDTO.getSuccessTime()).successExtensionId(orderExtension.getId())
-                        .channelOrderNo(notifyRespDTO.getChannelOrderNo()).channelUserId(notifyRespDTO.getChannelUserId())
+                        .successTime(notify.getSuccessTime()).successExtensionId(orderExtension.getId())
+                        .channelOrderNo(notify.getChannelOrderNo()).channelUserId(notify.getChannelUserId())
                         .notifyTime(LocalDateTime.now()).build());
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw exception(ErrorCodeConstants.PAY_ORDER_STATUS_IS_NOT_WAITING);
