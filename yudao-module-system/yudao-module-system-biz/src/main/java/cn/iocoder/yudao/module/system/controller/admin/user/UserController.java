@@ -123,7 +123,10 @@ public class UserController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:user:query')")
     public CommonResult<UserRespVO> getUser(@RequestParam("id") Long id) {
-        return success(UserConvert.INSTANCE.convert(userService.getUser(id)));
+        AdminUserDO user = userService.getUser(id);
+        // 获得部门数据
+        DeptDO dept = deptService.getDept(user.getDeptId());
+        return success(UserConvert.INSTANCE.convert(user).setDept(UserConvert.INSTANCE.convert(dept)));
     }
 
     @GetMapping("/export")
