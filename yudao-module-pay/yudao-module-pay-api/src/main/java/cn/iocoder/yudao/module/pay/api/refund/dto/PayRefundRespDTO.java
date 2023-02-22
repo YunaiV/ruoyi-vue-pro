@@ -27,8 +27,16 @@ public class PayRefundRespDTO {
      * 枚举 {@link PayRefundStatusEnum}
      */
     private Integer status;
+    /**
+     * 退款金额，单位：分
+     */
+    private Integer refundAmount;
 
-    // ========== 渠道相关字段 ==========
+    // ========== 商户相关字段 ==========
+    /**
+     * 商户订单编号
+     */
+    private String merchantOrderId;
     /**
      * 退款成功时间
      */

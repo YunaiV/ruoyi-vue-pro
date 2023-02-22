@@ -18,6 +18,7 @@ public class PaySeqUtils {
 
     private static final AtomicLong MER_ORDER_NO_SEQ = new AtomicLong(0L);
 
+    // TODO 芋艿：需要看看
     /**
      * 生成商户退款单号，用于测试，应该由商户系统生成
      * @return 商户退款单
@@ -27,6 +28,8 @@ public class PaySeqUtils {
                 DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATETIME_MS_PATTERN),
                 (int) MER_REFUND_NO_SEQ.getAndIncrement() % 10000);
     }
+
+    // TODO 芋艿：需要看看
 
     /**
      * 生成退款请求号

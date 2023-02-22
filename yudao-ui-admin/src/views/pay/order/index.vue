@@ -215,7 +215,7 @@
 </template>
 
 <script>
-import {getOrder, getOrderPage, exportOrderExcel} from "@/api/pay/order";
+import { getOrderDetail, getOrderPage, exportOrderExcel} from "@/api/pay/order";
 import {getMerchantListByName} from "@/api/pay/merchant";
 import {getAppListByMerchantId} from "@/api/pay/app";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
@@ -250,7 +250,7 @@ const defaultOrderDetail = {
 };
 
 export default {
-  name: "Order",
+  name: "PayOrder",
   components: {},
   data() {
     return {
@@ -364,7 +364,7 @@ export default {
      */
     handleQueryDetails(row) {
       this.orderDetail = JSON.parse(JSON.stringify(defaultOrderDetail));
-      getOrder(row.id).then(response => {
+      getOrderDetail(row.id).then(response => {
         this.orderDetail = response.data;
         if (response.data.payOrderExtension === null) {
           this.orderDetail.payOrderExtension = Object.assign(defaultOrderDetail.payOrderExtension, {});

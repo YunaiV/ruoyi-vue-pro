@@ -13,8 +13,8 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyLogDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyTaskDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
-import cn.iocoder.yudao.module.pay.dal.mysql.notify.PayNotifyLogCoreMapper;
-import cn.iocoder.yudao.module.pay.dal.mysql.notify.PayNotifyTaskCoreMapper;
+import cn.iocoder.yudao.module.pay.dal.mysql.notify.PayNotifyLogMapper;
+import cn.iocoder.yudao.module.pay.dal.mysql.notify.PayNotifyTaskMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.notify.PayNotifyLockRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
 import static cn.iocoder.yudao.module.pay.framework.job.config.PayJobConfiguration.NOTIFY_THREAD_POOL_TASK_EXECUTOR;
 
 /**
@@ -69,9 +71,9 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     private PayRefundService refundService;
 
     @Resource
-    private PayNotifyTaskCoreMapper payNotifyTaskCoreMapper;
+    private PayNotifyTaskMapper payNotifyTaskMapper;
     @Resource
-    private PayNotifyLogCoreMapper payNotifyLogCoreMapper;
+    private PayNotifyLogMapper payNotifyLogMapper;
 
     @Resource(name = NOTIFY_THREAD_POOL_TASK_EXECUTOR)
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
@@ -101,7 +103,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         }
 
         // 执行插入
-        payNotifyTaskCoreMapper.insert(task);
+        payNotifyTaskMapper.insert(task);
 
         // 异步直接发起任务。虽然会有定时任务扫描，但是会导致延迟
         self.executeNotifyAsync(task);
@@ -110,7 +112,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     @Override
     public int executeNotify() throws InterruptedException {
         // 获得需要通知的任务
-        List<PayNotifyTaskDO> tasks = payNotifyTaskCoreMapper.selectListByNotify();
+        List<PayNotifyTaskDO> tasks = payNotifyTaskMapper.selectListByNotify();
         if (CollUtil.isEmpty(tasks)) {
             return 0;
         }
@@ -168,8 +170,8 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         payNotifyLockCoreRedisDAO.lock(task.getId(), NOTIFY_TIMEOUT_MILLIS, () -> {
             // 校验，当前任务是否已经被通知过
             // 虽然已经通过分布式加锁，但是可能同时满足通知的条件，然后都去获得锁。此时，第一个执行完后，第二个还是能拿到锁，然后会再执行一次。
-            PayNotifyTaskDO dbTask = payNotifyTaskCoreMapper.selectById(task.getId());
-            if (LocalDateTimeUtils.afterNow(dbTask.getNextNotifyTime())) {
+            PayNotifyTaskDO dbTask = payNotifyTaskMapper.selectById(task.getId());
+            if (afterNow(dbTask.getNextNotifyTime())) {
                 log.info("[executeNotifySync][dbTask({}) 任务被忽略，原因是未到达下次通知时间，可能是因为并发执行了]",
                         JsonUtils.toJsonString(dbTask));
                 return;
@@ -197,7 +199,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         // 记录 PayNotifyLog 日志
         String response = invokeException != null ? ExceptionUtil.getRootCauseMessage(invokeException) :
                 JsonUtils.toJsonString(invokeResult);
-        payNotifyLogCoreMapper.insert(PayNotifyLogDO.builder().taskId(task.getId())
+        payNotifyLogMapper.insert(PayNotifyLogDO.builder().taskId(task.getId())
                 .notifyTimes(task.getNotifyTimes() + 1).status(newStatus).response(response).build());
     }
 
@@ -250,23 +252,22 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         // 情况一：调用成功
         if (invokeResult != null && invokeResult.isSuccess()) {
             updateTask.setStatus(PayNotifyStatusEnum.SUCCESS.getStatus());
+            payNotifyTaskMapper.updateById(updateTask);
             return updateTask.getStatus();
         }
         // 情况二：调用失败、调用异常
         // 2.1 超过最大回调次数
         if (updateTask.getNotifyTimes() >= PayNotifyTaskDO.NOTIFY_FREQUENCY.length) {
             updateTask.setStatus(PayNotifyStatusEnum.FAILURE.getStatus());
+            payNotifyTaskMapper.updateById(updateTask);
             return updateTask.getStatus();
         }
         // 2.2 未超过最大回调次数
-        updateTask.setNextNotifyTime(LocalDateTime.now().plusSeconds(PayNotifyTaskDO.NOTIFY_FREQUENCY[updateTask.getNotifyTimes()]));
+        updateTask.setNextNotifyTime(addTime(Duration.ofSeconds(PayNotifyTaskDO.NOTIFY_FREQUENCY[updateTask.getNotifyTimes()])));
         updateTask.setStatus(invokeException != null ? PayNotifyStatusEnum.REQUEST_FAILURE.getStatus()
                 : PayNotifyStatusEnum.REQUEST_SUCCESS.getStatus());
+        payNotifyTaskMapper.updateById(updateTask);
         return updateTask.getStatus();
-    }
-
-    private void processNotifySuccess(PayNotifyTaskDO task, PayNotifyTaskDO updateTask) {
-        payNotifyTaskCoreMapper.updateById(updateTask);
     }
 
 }

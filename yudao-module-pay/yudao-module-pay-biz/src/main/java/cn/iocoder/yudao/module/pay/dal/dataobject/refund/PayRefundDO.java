@@ -80,7 +80,6 @@ public class PayRefundDO extends BaseDO {
      */
     private String tradeNo;
 
-
     // ========== 商户相关字段 ==========
     /**
      * 商户订单编号
@@ -171,13 +170,11 @@ public class PayRefundDO extends BaseDO {
      */
     private String channelErrorMsg;
 
-
     /**
      * 支付渠道的额外参数
      * 参见 https://www.pingxx.com/api/Refunds%20退款概述.html
      */
     private String channelExtras;
-
 
     /**
      * TODO
@@ -192,6 +189,5 @@ public class PayRefundDO extends BaseDO {
      * 退款通知时间
      */
     private LocalDateTime notifyTime;
-
 
 }

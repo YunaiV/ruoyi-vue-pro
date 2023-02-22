@@ -148,6 +148,28 @@ export const PayChannelEnum = {
     "code": "alipay_qr",
     "name": "支付宝扫码支付"
   },
+  ALIPAY_BAR: {
+    "code": "alipay_bar",
+    "name": "支付宝条码支付"
+  },
+}
+
+/**
+ * 支付的展示模式每局
+ */
+export const PayDisplayModeEnum = {
+  URL: {
+    "mode": "url",
+  },
+  IFRAME: {
+    "mode": "iframe",
+  },
+  FORM: {
+    "mode": "form"
+  },
+  QR_CODE: {
+    "mode": "qr_code"
+  }
 }
 
 /**
@@ -172,7 +194,7 @@ export const PayOrderStatusEnum = {
   },
   CLOSED: {
     status: 20,
-    name: '未支付'
+    name: '支付关闭'
   }
 }
 

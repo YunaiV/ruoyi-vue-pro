@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 @Data
 public class PayDemoOrderRespVO {
 
+    @Schema(description = "订单编号", required = true, example = "1024")
+    private Long id;
+
     @Schema(description = "用户编号", required = true, example = "23199")
     private Long userId;
 
@@ -33,10 +36,19 @@ public class PayDemoOrderRespVO {
     @Schema(description = "订单支付时间")
     private LocalDateTime payTime;
 
+    @Schema(description = "支付渠道", example = "alipay_qr")
+    private String payChannelCode;
+
+    @Schema(description = "支付退款编号", example = "23366")
+    private Long payRefundId;
+
     @Schema(description = "退款金额，单位：分", required = true, example = "14039")
     private Integer refundPrice;
 
     @Schema(description = "退款时间")
     private LocalDateTime refundTime;
+
+    @Schema(description = "创建时间", required = true)
+    private LocalDateTime createTime;
 
 }

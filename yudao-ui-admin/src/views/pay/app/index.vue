@@ -53,11 +53,6 @@
         </template>
       </el-table-column>
       <el-table-column label="商户名称" align="center" prop="payMerchant.name"/>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template v-slot="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="支付宝配置" align="center">
         <el-table-column :label="payChannelEnum.ALIPAY_APP.name" align="center">
           <template v-slot="scope">
@@ -104,6 +99,18 @@
             <el-button v-else
                        type="danger" icon="el-icon-close" circle
                        @click="handleCreateChannel(scope.row,payChannelEnum.ALIPAY_QR.code,payType.ALIPAY)">
+            </el-button>
+          </template>
+        </el-table-column>
+        <el-table-column :label="payChannelEnum.ALIPAY_BAR.name" align="center">
+          <template v-slot="scope">
+            <el-button type="success" icon="el-icon-check" circle
+                       v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.ALIPAY_BAR.code)"
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_BAR.code,payType.ALIPAY)">
+            </el-button>
+            <el-button v-else
+                       type="danger" icon="el-icon-close" circle
+                       @click="handleCreateChannel(scope.row,payChannelEnum.ALIPAY_BAR.code,payType.ALIPAY)">
             </el-button>
           </template>
         </el-table-column>
