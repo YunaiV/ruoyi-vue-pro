@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.framework.operatelog.core.annotations;
 
 import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,13 +23,13 @@ public @interface OperateLog {
     /**
      * 操作模块
      *
-     * 为空时，会尝试读取 {@link Api#value()} 属性
+     * 为空时，会尝试读取 {@link Tag#name()} 属性
      */
     String module() default "";
     /**
      * 操作名
      *
-     * 为空时，会尝试读取 {@link ApiOperation#value()} 属性
+     * 为空时，会尝试读取 {@link Operation#summary()} 属性
      */
     String name() default "";
     /**
