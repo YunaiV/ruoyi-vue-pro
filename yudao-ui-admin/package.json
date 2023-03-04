@@ -10,7 +10,7 @@
     "build:prod": "vue-cli-service build --mode prod",
     "build:stage": "vue-cli-service build --mode stage",
     "build:dev": "vue-cli-service build --mode dev",
-    "build:demo1024": "vue-cli-service build --mode demo1024",
+    "build:static": "vue-cli-service build --mode static",
     "preview": "node build/index.js --preview",
     "lint": "eslint --ext .js,.vue src",
     "clean": "rimraf node_modules"

@@ -106,7 +106,6 @@ yudao:
       url: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
   security:
     permit-all_urls:
-      - /admin-ui/** # /resources/admin-ui 目录下的静态资源
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，不需要登录
   websocket:
     enable: true # websocket的开关
