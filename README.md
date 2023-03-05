@@ -42,6 +42,27 @@
 | `yudao-cloud`      | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)        |
 | `Spring-Boot-Labs` | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/yudaocode/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/yudaocode/SpringBoot-Labs) |
 
+##  🐳 项目关系
+
+### 后端项目
+
+
+| 项目                                                              | Star                                                                                                                                                                                                                                                                                             | 简介                          |
+|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|
+| [ruoyi-vue-pro](https://gitee.com/zhijiantianya/ruoyi-vue-pro)  | [![Gitee star](https://gitee.com/zhijiantianya/ruoyi-vue-pro/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/ruoyi-vue-pro) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/ruoyi-vue-pro.svg?style=social&label=Stars)](https://github.com/YunaiV/ruoyi-vue-pro)       | 基于 Spring Boot 多模块架构        |
+| [yudao-cloud](https://gitee.com/zhijiantianya/yudao-cloud)      | [![Gitee star](https://gitee.com/zhijiantianya/yudao-cloud/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/yudao-cloud) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/yudao-cloud.svg?style=social&label=Stars)](https://github.com/YunaiV/yudao-cloud)               | 基于 Spring Cloud 微服务架构       |
+| [Spring-Boot-Labs](https://gitee.com/yudaocode/SpringBoot-Labs) | [![Gitee star](https://gitee.com/yudaocode/SpringBoot-Labs/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/yudao-cloud) [![GitHub stars](https://img.shields.io/github/stars/yudaocode/SpringBoot-Labs.svg?style=social&label=Stars)](https://github.com/yudaocode/SpringBoot-Labs) | 系统学习 Spring Boot & Cloud 专栏 |
+
+### 前端项目
+
+| 项目                                                                                                       | Star                                                                                                                                                                                                                                                                                                                                                           | 简介                              |
+|----------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|
+| [yudao-ui-admin-vue3](https://gitee.com/yudaocode/yudao-ui-admin-vue3)                                   | [![Gitee star](https://gitee.com/yudaocode/yudao-ui-admin-vue3/badge/star.svg?theme=white)](https://gitee.com/yudaocode/yudao-ui-admin-vue3) [![GitHub stars](https://img.shields.io/github/stars/yudaocode/yudao-ui-admin-vue3.svg?style=social&label=Stars)](https://github.com/yudaocode/yudao-ui-admin-vue3)                                               | 基于 Vue3 + element-plus 实现的管理后台  |
+| [yudao-ui-admin](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-admin)               | [![Gitee star](https://gitee.com/zhijiantianya/ruoyi-vue-pro/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-admin) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/ruoyi-vue-pro.svg?style=social&label=Stars)](https://github.com/YunaiV/ruoyi-vue-pro/tree/master/yudao-ui-admin)               | 基于 Vue2 + element-ui 实现的管理后台    |
+| [yudao-ui-admin-uniapp](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-admin-uniapp) | [![Gitee star](https://gitee.com/zhijiantianya/ruoyi-vue-pro/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-admin-uniapp) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/ruoyi-vue-pro.svg?style=social&label=Stars)](https://github.com/YunaiV/ruoyi-vue-pro/tree/master/yudao-ui-admin-uniapp) | 基于 uni-app + uni-ui 实现的管理后台的小程序 |
+| [yudao-ui-go-view](https://gitee.com/yudaocode/yudao-ui-go-view)                                         | [![Gitee star](https://gitee.com/yudaocode/yudao-ui-go-view/badge/star.svg?theme=white)](https://gitee.com/yudaocode/yudao-ui-go-view) [![GitHub stars](https://img.shields.io/github/stars/yudaocode/yudao-ui-go-view.svg?style=social&label=Stars)](https://github.com/yudaocode/yudao-ui-go-view)                                                           | 基于 Vue3 + naive-ui 实现的大屏报表      |
+| [yudao-ui-app](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-app)                   | [![Gitee star](https://gitee.com/zhijiantianya/ruoyi-vue-pro/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/yudao-ui-app) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/ruoyi-vue-pro.svg?style=social&label=Stars)](https://github.com/YunaiV/ruoyi-vue-pro/tree/master/yudao-ui-app)                   | 基于 uni-app + uview 实现的用户 App    |
+
 ## 🐰 分支说明
 
 |       | JDK 8 完整版                                                 | JDK 8 精简版                                                          | JDK 17 完整版                                                                  |
@@ -207,6 +228,8 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 ## 🐨 技术栈
 
+### 模块
+
 | 项目                                                                       | 说明                 |
 |--------------------------------------------------------------------------|--------------------|
 | `yudao-dependencies`                                                     | Maven 依赖版本管理       |
@@ -221,15 +244,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | `yudao-module-mp`                                                        | 微信公众号的 Module 模块   |
 | `yudao-module-report`                                                    | 大屏报表 Module 模块     |
 
-> 前端项目的地址：
-> 
-> * [`yudao-ui-admin-vue3`](https://gitee.com/yudaocode/yudao-ui-admin-vue3)：基于 Vue3 + element-plus 实现的管理后台
-> * `yudao-ui-admin`：基于 Vue2 + element-ui 实现的管理后台
-> * [`yudao-ui-go-view`](https://gitee.com/yudaocode/yudao-ui-go-view)：基于 Vue3 + naive-ui 实现的大屏报表
-> * `yudao-ui-admin-uniapp`：基于 uni-app + uni-ui 实现的管理后台的小程序 
-> * `yudao-ui-app`：基于 uni-app + uview 实现的用户 App
-
-### 后端
+### 框架
 
 | 框架                                                                                          | 说明               | 版本          | 学习指南                                                           |
 |---------------------------------------------------------------------------------------------|------------------|-------------|----------------------------------------------------------------|
@@ -254,20 +269,6 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [Lombok](https://projectlombok.org/)                                                        | 消除冗长的 Java 代码    | 1.18.24     | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao)          |
 | [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架      | 5.8.2       | -                                                              |
 | [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架     | 4.8.0       | -                                                              |
-
-### [管理后台 Vue2 前端](./yudao-ui-admin)
-
-| 框架                                                                           | 说明            | 版本     |
-|------------------------------------------------------------------------------|---------------|--------|
-| [Vue](https://cn.vuejs.org/index.html)                                       | JavaScript 框架 | 2.7.14 |
-| [Vue Element Admin](https://panjiachen.github.io/vue-element-admin-site/zh/) | 后台前端解决方案      | -      |
-
-### [管理后台 uni-app 跨端](./yudao-ui-admin-uniapp)
-
-| 框架                                              | 说明                 | 版本     |
-|-------------------------------------------------|--------------------|--------|
-| [uni-app](hhttps://github.com/dcloudio/uni-app) | 跨平台框架              | 2.0.0  |
-| [uni-ui](https://github.com/dcloudio/uni-ui)    | 基于 uni-app 的 UI 框架 | 1.4.20 |
 
 ## 🐷 演示图
 
