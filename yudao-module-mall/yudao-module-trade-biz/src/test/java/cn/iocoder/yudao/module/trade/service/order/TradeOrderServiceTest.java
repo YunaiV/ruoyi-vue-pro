@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
@@ -63,6 +64,8 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
     @Resource
     private TradeOrderItemMapper tradeOrderItemMapper;
 
+    @MockBean
+    private MemberUserApi memberUserApi;
     @MockBean
     private ProductSpuApi productSpuApi;
     @MockBean
