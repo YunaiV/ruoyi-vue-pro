@@ -158,7 +158,7 @@ public class CodegenServiceImpl implements CodegenService {
 
         //计算需要修改的字段，插入时重新插入，删除时将原来的删除
         BiPredicate<TableField, CodegenColumnDO> pr =
-                (tableField, codegenColumn) -> tableField.getType().equals(codegenColumn.getDataType())
+                (tableField, codegenColumn) -> tableField.getMetaInfo().getJdbcType().name().equals(codegenColumn.getDataType())
                         && tableField.getMetaInfo().isNullable() == codegenColumn.getNullable()
                         && tableField.isKeyFlag() == codegenColumn.getPrimaryKey()
                         && tableField.getComment().equals(codegenColumn.getColumnComment());

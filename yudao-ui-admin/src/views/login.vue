@@ -263,8 +263,8 @@ export default {
         await this.$prompt('请输入租户名称', "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消"
-        }).then(({value}) => {
-          getTenantIdByName(value).then(res => {
+        }).then(async ({value}) => {
+          await getTenantIdByName(value).then(res => {
             const tenantId = res.data;
             tenant = true
             if (tenantId && tenantId >= 0) {
@@ -272,6 +272,9 @@ export default {
             }
           });
         }).catch(() => {
+          // 取消登录按钮 loading状态
+          this.loading = false;
+
           return false
         });
       } else {

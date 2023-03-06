@@ -76,9 +76,9 @@ public class DeptServiceImpl implements DeptService {
             // 第二步：构建缓存
             ImmutableMap.Builder<Long, DeptDO> builder = ImmutableMap.builder();
             ImmutableMultimap.Builder<Long, DeptDO> parentBuilder = ImmutableMultimap.builder();
-            depts.forEach(sysRoleDO -> {
-                builder.put(sysRoleDO.getId(), sysRoleDO);
-                parentBuilder.put(sysRoleDO.getParentId(), sysRoleDO);
+            depts.forEach(deptDO -> {
+                builder.put(deptDO.getId(), deptDO);
+                parentBuilder.put(deptDO.getParentId(), deptDO);
             });
             deptCache = builder.build();
             parentDeptCache = parentBuilder.build();

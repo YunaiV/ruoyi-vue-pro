@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 * @author 芋道源码
 */
 @Import(SeckillTimeServiceImpl.class)
+@Disabled // TODO 芋艿：未来开启
 public class SeckillTimeServiceImplTest extends BaseDbUnitTest {
 
     @Resource

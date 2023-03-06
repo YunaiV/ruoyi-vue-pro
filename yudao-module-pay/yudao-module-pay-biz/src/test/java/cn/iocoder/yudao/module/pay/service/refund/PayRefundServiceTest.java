@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.pay.service.refund;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
@@ -38,6 +39,8 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
     @Resource
     private PayRefundMapper refundMapper;
 
+    @MockBean
+    private PayProperties payProperties;
     @MockBean
     private PayClientFactory payClientFactory;
     @MockBean

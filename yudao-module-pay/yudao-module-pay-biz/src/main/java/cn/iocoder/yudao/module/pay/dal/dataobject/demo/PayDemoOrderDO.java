@@ -73,14 +73,16 @@ public class PayDemoOrderDO extends BaseDO {
 
     // ========== 退款相关字段 ==========
     /**
-     * 退款金额
+     * 支付退款单号
+     */
+    private Long payRefundId;
+    /**
+     * 退款金额，单位：分
      */
     private Integer refundPrice;
     /**
-     * 退款时间
-     *
-     * 由于可以多次退款，记录最后一次退款的时间
+     * 退款完成时间
      */
-    private Date refundTime;
+    private LocalDateTime refundTime;
 
 }

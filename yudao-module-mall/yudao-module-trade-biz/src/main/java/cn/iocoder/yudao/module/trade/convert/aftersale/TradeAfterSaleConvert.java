@@ -37,7 +37,6 @@ public interface TradeAfterSaleConvert {
     TradeAfterSaleDO convert(AppTradeAfterSaleCreateReqVO createReqVO, TradeOrderItemDO tradeOrderItem);
 
     @Mappings({
-            @Mapping(source = "afterSale.orderId", target = "merchantOrderId"),
             @Mapping(source = "afterSale.applyReason", target = "reason"),
             @Mapping(source = "afterSale.refundPrice", target = "amount")
     })
