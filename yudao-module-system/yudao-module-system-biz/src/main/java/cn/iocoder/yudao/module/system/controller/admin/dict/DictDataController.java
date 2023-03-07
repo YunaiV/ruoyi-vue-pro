@@ -41,7 +41,7 @@ public class DictDataController {
         return success(dictDataId);
     }
 
-    @PutMapping("update")
+    @PutMapping("/update")
     @Operation(summary = "修改字典数据")
     @PreAuthorize("@ss.hasPermission('system:dict:update')")
     public CommonResult<Boolean> updateDictData(@Valid @RequestBody DictDataUpdateReqVO reqVO) {
