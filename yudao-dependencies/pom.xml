@@ -329,7 +329,7 @@
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-test</artifactId>
                 <version>${revision}</version>
-                <scope>test</scope>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
