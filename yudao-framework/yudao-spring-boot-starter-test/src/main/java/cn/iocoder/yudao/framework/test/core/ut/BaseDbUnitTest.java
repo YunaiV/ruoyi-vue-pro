@@ -38,6 +38,7 @@ public class BaseDbUnitTest {
             YudaoMybatisAutoConfiguration.class, // 自己的 MyBatis 配置类
             MybatisPlusAutoConfiguration.class, // MyBatis 的自动配置类
             MybatisPlusJoinConfiguration.class, // MyBatis 的自动配置类
+            // TODO @升平：看看有没可能去掉下面两个类
             JoinInterceptor.class, // MyBatis 的Join配置类
             JoinInterceptorConfig.class, // MyBatis 的Join配置类
     })

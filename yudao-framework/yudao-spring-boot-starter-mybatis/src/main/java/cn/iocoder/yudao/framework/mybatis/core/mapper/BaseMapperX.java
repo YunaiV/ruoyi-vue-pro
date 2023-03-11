@@ -17,6 +17,8 @@ import java.util.List;
 
 /**
  * 在 MyBatis Plus 的 BaseMapper 的基础上拓展，提供更多的能力
+ *
+ * 为什么继承 JoinBaseMapper 接口？支持 MyBatis Plus 多表 Join 的能力。
  */
 public interface BaseMapperX<T> extends JoinBaseMapper<T> {
 

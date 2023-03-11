@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+// TODO @升平：是不是作为 YudaoMybatisAutoConfiguration 的 bean 即可呀？然后 getMethodList 不用重写
 @Configuration
 public class MybatisPlusJoinConfiguration extends JoinDefaultSqlInjector {
 
