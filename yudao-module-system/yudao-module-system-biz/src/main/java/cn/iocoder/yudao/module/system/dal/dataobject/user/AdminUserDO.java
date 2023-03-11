@@ -3,11 +3,15 @@ package cn.iocoder.yudao.module.system.dal.dataobject.user;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
+import icu.mhb.mybatisplus.plugln.annotations.JoinField;
+import icu.mhb.mybatisplus.plugln.constant.RelevancyType;
 import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -92,5 +96,14 @@ public class AdminUserDO extends TenantBaseDO {
      * 最后登录时间
      */
     private LocalDateTime loginDate;
+
+    /**
+     * 用户所属部门
+     */
+    @JoinField(masterModelClass = AdminUserDO.class, masterModelField = "deptId",
+            sunModelClass = DeptDO.class, sunModelField = "id",
+            relevancyType = RelevancyType.ONT_TO_ONE, sunAlias = "d")
+    @TableField(exist = false, typeHandler = FastjsonTypeHandler.class)
+    private DeptDO dept;
 
 }

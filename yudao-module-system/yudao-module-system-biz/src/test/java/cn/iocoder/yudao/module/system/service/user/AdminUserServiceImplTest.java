@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.UserPostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.UserPostMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.enums.common.SexEnum;
@@ -23,6 +24,7 @@ import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
+import icu.mhb.mybatisplus.plugln.extend.Joins;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -63,6 +65,8 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     private AdminUserMapper userMapper;
     @Resource
     private UserPostMapper userPostMapper;
+    @Resource
+    private DeptMapper deptMapper;
 
     @MockBean
     private DeptService deptService;
@@ -769,6 +773,37 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> userService.validateUserList(ids), USER_IS_DISABLE,
                 userDO.getNickname());
     }
+
+    @Test
+    public void testSelectUserIncludeDept_success() {
+        // 需设置 application-unit-test.yaml 文件中 spring.main.lazy-initialization: true
+
+        // 准备部门数据
+        DeptDO dept = new DeptDO();
+        dept.setName("测试");
+        dept.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        deptMapper.insert(dept);
+
+        // 准备用户参数
+        UserCreateReqVO reqVO = randomPojo(UserCreateReqVO.class, o -> {
+            o.setSex(RandomUtil.randomEle(SexEnum.values()).getSex());
+            o.setMobile(randomString());
+            o.setPostIds(asSet(1L, 2L));
+            o.setDeptId(dept.getId());
+        });
+
+        // 调用
+        Long userId = userService.createUser(reqVO);
+
+        // 断言
+        AdminUserDO user = Joins.of(AdminUserDO.class)
+                .leftJoin(DeptDO.class, DeptDO::getId, AdminUserDO::getDeptId)
+                .end()
+                .eq(AdminUserDO::getId, userId)
+                .joinGetOne(AdminUserDO.class);
+        System.out.println("=========>" + user);
+    }
+
 
     // ========== 随机对象 ==========
 

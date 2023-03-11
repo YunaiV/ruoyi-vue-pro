@@ -59,6 +59,11 @@
             <artifactId>dynamic-datasource-spring-boot-starter</artifactId> <!-- 多数据源 -->
         </dependency>
 
+        <dependency>
+            <groupId>icu.mhb</groupId>
+            <artifactId>mybatis-plus-join</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
