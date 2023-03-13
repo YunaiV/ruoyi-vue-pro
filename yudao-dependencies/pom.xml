@@ -26,7 +26,7 @@
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.3.1</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.6.1</dynamic-datasource.version>
-        <mybatis-plus-join.version>1.3.4</mybatis-plus-join.version>
+        <mybatis-plus-join-boot-starter.version>1.4.3.1</mybatis-plus-join-boot-starter.version>
         <redisson.version>3.18.0</redisson.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.3</lock4j.version>
@@ -211,9 +211,9 @@
             </dependency>
 
             <dependency>
-                <groupId>icu.mhb</groupId>
-                <artifactId>mybatis-plus-join</artifactId>
-                <version>${mybatis-plus-join.version}</version>
+                <groupId>com.github.yulichang</groupId>
+                <artifactId>mybatis-plus-join-boot-starter</artifactId>
+                <version>${mybatis-plus-join-boot-starter.version}</version>
             </dependency>
 
             <dependency>

@@ -24,7 +24,7 @@ import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
-import icu.mhb.mybatisplus.plugln.extend.Joins;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -776,7 +776,6 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testSelectUserIncludeDept_success() {
-        // 需设置 application-unit-test.yaml 文件中 spring.main.lazy-initialization: false
 
         // 准备部门数据
         DeptDO dept = new DeptDO();
@@ -795,13 +794,13 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         // 调用
         Long userId = userService.createUser(reqVO);
 
-        // 断言
-        AdminUserDO user = Joins.of(AdminUserDO.class)
+        MPJLambdaWrapper<AdminUserDO> wrapper = new MPJLambdaWrapper<>(AdminUserDO.class)
+                .selectAll(AdminUserDO.class)
+                .selectAssociation(DeptDO.class, AdminUserDO::getDept)
                 .leftJoin(DeptDO.class, DeptDO::getId, AdminUserDO::getDeptId)
-                .oneToOneSelect(AdminUserDO::getDept, DeptDO.class)
-                .end()
-                .eq(AdminUserDO::getId, userId)
-                .joinGetOne(AdminUserDO.class);
+                .eq(AdminUserDO::getId, userId);
+        AdminUserDO user = userMapper.selectJoinOne(AdminUserDO.class, wrapper);
+
         System.out.println("=========>" + user);
     }
 

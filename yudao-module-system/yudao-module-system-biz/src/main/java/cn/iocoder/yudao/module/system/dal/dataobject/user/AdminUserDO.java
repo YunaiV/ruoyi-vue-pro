@@ -10,8 +10,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
-import icu.mhb.mybatisplus.plugln.annotations.JoinField;
-import icu.mhb.mybatisplus.plugln.constant.RelevancyType;
 import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -100,9 +98,6 @@ public class AdminUserDO extends TenantBaseDO {
     /**
      * 用户所属部门
      */
-    @JoinField(masterModelClass = AdminUserDO.class, masterModelField = "deptId",
-            sunModelClass = DeptDO.class, sunModelField = "id",
-            relevancyType = RelevancyType.ONT_TO_ONE, sunAlias = "d")
     @TableField(exist = false, typeHandler = FastjsonTypeHandler.class)
     private DeptDO dept;
 
