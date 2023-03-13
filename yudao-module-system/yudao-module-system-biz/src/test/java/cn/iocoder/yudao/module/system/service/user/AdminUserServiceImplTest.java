@@ -776,7 +776,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testSelectUserIncludeDept_success() {
-        // 需设置 application-unit-test.yaml 文件中 spring.main.lazy-initialization: true
+        // 需设置 application-unit-test.yaml 文件中 spring.main.lazy-initialization: false
 
         // 准备部门数据
         DeptDO dept = new DeptDO();
@@ -798,6 +798,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         // 断言
         AdminUserDO user = Joins.of(AdminUserDO.class)
                 .leftJoin(DeptDO.class, DeptDO::getId, AdminUserDO::getDeptId)
+                .oneToOneSelect(AdminUserDO::getDept, DeptDO.class)
                 .end()
                 .eq(AdminUserDO::getId, userId)
                 .joinGetOne(AdminUserDO.class);

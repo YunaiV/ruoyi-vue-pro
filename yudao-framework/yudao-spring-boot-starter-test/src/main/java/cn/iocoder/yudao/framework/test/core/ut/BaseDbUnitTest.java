@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.test.core.ut;
 
 import cn.iocoder.yudao.framework.datasource.config.YudaoDataSourceAutoConfiguration;
-import cn.iocoder.yudao.framework.mybatis.config.MybatisPlusJoinConfiguration;
 import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;
 import cn.iocoder.yudao.framework.test.config.SqlInitializationTestConfiguration;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
@@ -37,7 +36,6 @@ public class BaseDbUnitTest {
             // MyBatis 配置类
             YudaoMybatisAutoConfiguration.class, // 自己的 MyBatis 配置类
             MybatisPlusAutoConfiguration.class, // MyBatis 的自动配置类
-            MybatisPlusJoinConfiguration.class, // MyBatis 的自动配置类
             // TODO @升平：看看有没可能去掉下面两个类
             JoinInterceptor.class, // MyBatis 的Join配置类
             JoinInterceptorConfig.class, // MyBatis 的Join配置类
