@@ -774,37 +774,6 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
                 userDO.getNickname());
     }
 
-    @Test
-    public void testSelectUserIncludeDept_success() {
-
-        // 准备部门数据
-        DeptDO dept = new DeptDO();
-        dept.setName("测试");
-        dept.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        deptMapper.insert(dept);
-
-        // 准备用户参数
-        UserCreateReqVO reqVO = randomPojo(UserCreateReqVO.class, o -> {
-            o.setSex(RandomUtil.randomEle(SexEnum.values()).getSex());
-            o.setMobile(randomString());
-            o.setPostIds(asSet(1L, 2L));
-            o.setDeptId(dept.getId());
-        });
-
-        // 调用
-        Long userId = userService.createUser(reqVO);
-
-        MPJLambdaWrapper<AdminUserDO> wrapper = new MPJLambdaWrapper<>(AdminUserDO.class)
-                .selectAll(AdminUserDO.class)
-                .selectAssociation(DeptDO.class, AdminUserDO::getDept)
-                .leftJoin(DeptDO.class, DeptDO::getId, AdminUserDO::getDeptId)
-                .eq(AdminUserDO::getId, userId);
-        AdminUserDO user = userMapper.selectJoinOne(AdminUserDO.class, wrapper);
-
-        System.out.println("=========>" + user);
-    }
-
-
     // ========== 随机对象 ==========
 
     @SafeVarargs
