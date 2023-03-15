@@ -77,7 +77,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             throw exception(CATEGORY_PARENT_NOT_EXISTS);
         }
         // 父分类不能是二级分类
-        if (Objects.equals(id, ProductCategoryDO.PARENT_ID_NULL)) {
+        if (!Objects.equals(category.getParentId(), ProductCategoryDO.PARENT_ID_NULL)) {
             throw exception(CATEGORY_PARENT_NOT_FIRST_LEVEL);
         }
     }
