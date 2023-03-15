@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.service.category;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
@@ -127,18 +128,28 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         ProductCategoryDO dbCategory = randomPojo(ProductCategoryDO.class, o -> { // 等会查询到
             o.setName("奥特曼");
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            o.setParentId(ProductCategoryDO.PARENT_ID_NULL);
         });
         productCategoryMapper.insert(dbCategory);
         // 测试 name 不匹配
         productCategoryMapper.insert(cloneIgnoreId(dbCategory, o -> o.setName("奥特块")));
+        // 测试 status 不匹配
+        productCategoryMapper.insert(cloneIgnoreId(dbCategory, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        // 测试 parentId 不匹配
+        productCategoryMapper.insert(cloneIgnoreId(dbCategory, o -> o.setParentId(3333L)));
         // 准备参数
         ProductCategoryListReqVO reqVO = new ProductCategoryListReqVO();
         reqVO.setName("特曼");
+        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        reqVO.setParentId(ProductCategoryDO.PARENT_ID_NULL);
 
         // 调用
         List<ProductCategoryDO> list = productCategoryService.getEnableCategoryList(reqVO);
+        List<ProductCategoryDO> all = productCategoryService.getEnableCategoryList(new ProductCategoryListReqVO());
         // 断言
         assertEquals(1, list.size());
+        assertEquals(4, all.size());
         assertPojoEquals(dbCategory, list.get(0));
     }
 

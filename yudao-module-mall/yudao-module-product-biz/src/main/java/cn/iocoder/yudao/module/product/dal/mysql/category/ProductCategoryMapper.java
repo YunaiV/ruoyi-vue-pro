@@ -19,6 +19,8 @@ public interface ProductCategoryMapper extends BaseMapperX<ProductCategoryDO> {
     default List<ProductCategoryDO> selectList(ProductCategoryListReqVO listReqVO) {
         return selectList(new LambdaQueryWrapperX<ProductCategoryDO>()
                 .likeIfPresent(ProductCategoryDO::getName, listReqVO.getName())
+                .eqIfPresent(ProductCategoryDO::getParentId, listReqVO.getParentId())
+                .eqIfPresent(ProductCategoryDO::getStatus, listReqVO.getStatus())
                 .orderByDesc(ProductCategoryDO::getId));
     }
 
