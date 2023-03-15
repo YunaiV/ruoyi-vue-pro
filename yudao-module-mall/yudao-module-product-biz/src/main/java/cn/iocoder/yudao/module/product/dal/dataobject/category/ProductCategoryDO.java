@@ -54,14 +54,14 @@ public class ProductCategoryDO extends BaseDO {
      */
     private Integer sort;
     /**
-     * 分类描述
-     */
-    private String description;
-    /**
      * 开启状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+    /**
+     * PC端分类图
+     */
+    private String bigPicUrl;
 
 }

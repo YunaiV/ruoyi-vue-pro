@@ -28,11 +28,11 @@ public class ProductCategoryBaseVO {
     @Schema(description = "分类排序", required = true, example = "1")
     private Integer sort;
 
-    @Schema(description = "分类描述", required = true, example = "描述")
-    private String description;
-
     @Schema(description = "开启状态", required = true, example = "0")
     @NotNull(message = "开启状态不能为空")
     private Integer status;
+
+    @Schema(description = "PC端分类图")
+    private String bigPicUrl;
 
 }
