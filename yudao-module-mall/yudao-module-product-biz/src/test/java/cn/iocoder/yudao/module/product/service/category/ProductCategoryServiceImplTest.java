@@ -18,6 +18,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO.PARENT_ID_NULL;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.CATEGORY_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,9 +39,16 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateCategory_success() {
         // 准备参数
-        ProductCategoryCreateReqVO reqVO = randomPojo(ProductCategoryCreateReqVO.class);
+        ProductCategoryCreateReqVO reqVO = randomPojo(ProductCategoryCreateReqVO.class,o -> {
+            // 设置PC端图片可为空
+            o.setBigPicUrl(null);
+        });
+
         // mock 父类
-        ProductCategoryDO parentProductCategory = randomPojo(ProductCategoryDO.class, o -> o.setId(reqVO.getParentId()));
+        ProductCategoryDO parentProductCategory = randomPojo(ProductCategoryDO.class, o -> {
+            reqVO.setParentId(o.getId());
+            o.setParentId(PARENT_ID_NULL);
+        });
         productCategoryMapper.insert(parentProductCategory);
 
         // 调用
@@ -108,7 +116,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
     public void testGetCategoryLevel() {
         // mock 数据
         ProductCategoryDO category1 = randomPojo(ProductCategoryDO.class,
-                o -> o.setParentId(ProductCategoryDO.PARENT_ID_NULL));
+                o -> o.setParentId(PARENT_ID_NULL));
         productCategoryMapper.insert(category1);
         ProductCategoryDO category2 = randomPojo(ProductCategoryDO.class,
                 o -> o.setParentId(category1.getId()));
@@ -129,7 +137,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
         ProductCategoryDO dbCategory = randomPojo(ProductCategoryDO.class, o -> { // 等会查询到
             o.setName("奥特曼");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setParentId(ProductCategoryDO.PARENT_ID_NULL);
+            o.setParentId(PARENT_ID_NULL);
         });
         productCategoryMapper.insert(dbCategory);
         // 测试 name 不匹配
@@ -142,7 +150,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
         ProductCategoryListReqVO reqVO = new ProductCategoryListReqVO();
         reqVO.setName("特曼");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setParentId(ProductCategoryDO.PARENT_ID_NULL);
+        reqVO.setParentId(PARENT_ID_NULL);
 
         // 调用
         List<ProductCategoryDO> list = productCategoryService.getEnableCategoryList(reqVO);
