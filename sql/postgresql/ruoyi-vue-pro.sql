@@ -4042,6 +4042,260 @@ INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", 
 INSERT INTO "system_users" ("id", "username", "password", "nickname", "remark", "dept_id", "post_ids", "email", "mobile", "sex", "avatar", "status", "login_ip", "login_date", "creator", "create_time", "updater", "update_time", "deleted", "tenant_id") VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://test.yudao.iocoder.cn/48934f2f-92d4-4250-b917-d10d2b262c6a', 0, '127.0.0.1', '2022-05-25 23:44:33.003', 'admin', '2021-01-05 17:03:47', NULL, '2022-05-25 23:44:33.003', 0, 1);
 COMMIT;
 
+
+
+-- ----------------------------
+-- Table structure for system_mail_account
+-- ----------------------------
+DROP TABLE IF EXISTS "system_mail_account";
+CREATE TABLE "system_mail_account" (
+  "id" int8 NOT NULL,
+  "mail" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "username" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "password" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "host" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "port" int4 NOT NULL,
+  "ssl_enable" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
+  "creator" varchar(64) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL,
+  "updater" varchar(64) COLLATE "pg_catalog"."default",
+  "update_time" timestamp(6) NOT NULL,
+  "deleted" int2 NOT NULL
+)
+;
+COMMENT ON COLUMN "system_mail_account"."id" IS '主键';
+COMMENT ON COLUMN "system_mail_account"."mail" IS '邮箱';
+COMMENT ON COLUMN "system_mail_account"."username" IS '用户名';
+COMMENT ON COLUMN "system_mail_account"."password" IS '密码';
+COMMENT ON COLUMN "system_mail_account"."host" IS 'SMTP 服务器域名';
+COMMENT ON COLUMN "system_mail_account"."port" IS 'SMTP 服务器端口';
+COMMENT ON COLUMN "system_mail_account"."ssl_enable" IS '是否开启 SSL';
+COMMENT ON COLUMN "system_mail_account"."creator" IS '创建者';
+COMMENT ON COLUMN "system_mail_account"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_mail_account"."updater" IS '更新者';
+COMMENT ON COLUMN "system_mail_account"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_mail_account"."deleted" IS '是否删除';
+COMMENT ON TABLE "system_mail_account" IS '邮箱账号表';
+
+
+-- ----------------------------
+-- Table structure for system_mail_log
+-- ----------------------------
+DROP TABLE IF EXISTS "system_mail_log";
+CREATE TABLE "system_mail_log" (
+  "id" int8 NOT NULL,
+  "user_id" int8,
+  "user_type" int2,
+  "to_mail" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "account_id" int8 NOT NULL,
+  "from_mail" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "template_id" int8 NOT NULL,
+  "template_code" varchar(63) COLLATE "pg_catalog"."default" NOT NULL,
+  "template_nickname" varchar(255) COLLATE "pg_catalog"."default",
+  "template_title" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "template_content" varchar(10240) COLLATE "pg_catalog"."default" NOT NULL,
+  "template_params" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "send_status" int2 NOT NULL,
+  "send_time" timestamp(6),
+  "send_message_id" varchar(255) COLLATE "pg_catalog"."default",
+  "send_exception" varchar(4096) COLLATE "pg_catalog"."default",
+  "creator" varchar(64) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL,
+  "updater" varchar(64) COLLATE "pg_catalog"."default",
+  "update_time" timestamp(6) NOT NULL,
+  "deleted" int2 NOT NULL DEFAULT 0
+)
+;
+COMMENT ON COLUMN "system_mail_log"."id" IS '编号';
+COMMENT ON COLUMN "system_mail_log"."user_id" IS '用户编号';
+COMMENT ON COLUMN "system_mail_log"."user_type" IS '用户类型';
+COMMENT ON COLUMN "system_mail_log"."to_mail" IS '接收邮箱地址';
+COMMENT ON COLUMN "system_mail_log"."account_id" IS '邮箱账号编号';
+COMMENT ON COLUMN "system_mail_log"."from_mail" IS '发送邮箱地址';
+COMMENT ON COLUMN "system_mail_log"."template_id" IS '模板编号';
+COMMENT ON COLUMN "system_mail_log"."template_code" IS '模板编码';
+COMMENT ON COLUMN "system_mail_log"."template_nickname" IS '模版发送人名称';
+COMMENT ON COLUMN "system_mail_log"."template_title" IS '邮件标题';
+COMMENT ON COLUMN "system_mail_log"."template_content" IS '邮件内容';
+COMMENT ON COLUMN "system_mail_log"."template_params" IS '邮件参数';
+COMMENT ON COLUMN "system_mail_log"."send_status" IS '发送状态';
+COMMENT ON COLUMN "system_mail_log"."send_time" IS '发送时间';
+COMMENT ON COLUMN "system_mail_log"."send_message_id" IS '发送返回的消息 ID';
+COMMENT ON COLUMN "system_mail_log"."send_exception" IS '发送异常';
+COMMENT ON COLUMN "system_mail_log"."creator" IS '创建者';
+COMMENT ON COLUMN "system_mail_log"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_mail_log"."updater" IS '更新者';
+COMMENT ON COLUMN "system_mail_log"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_mail_log"."deleted" IS '是否删除';
+COMMENT ON TABLE "system_mail_log" IS '邮件日志表';
+
+
+-- ----------------------------
+-- Table structure for system_mail_template
+-- ----------------------------
+DROP TABLE IF EXISTS "system_mail_template";
+CREATE TABLE "system_mail_template" (
+  "id" int8 NOT NULL,
+  "name" varchar(63) COLLATE "pg_catalog"."default" NOT NULL,
+  "code" varchar(63) COLLATE "pg_catalog"."default" NOT NULL,
+  "account_id" int8 NOT NULL,
+  "nickname" varchar(255) COLLATE "pg_catalog"."default",
+  "title" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "content" varchar(10240) COLLATE "pg_catalog"."default" NOT NULL,
+  "params" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "status" int2 NOT NULL,
+  "remark" varchar(255) COLLATE "pg_catalog"."default",
+  "creator" varchar(64) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL,
+  "updater" varchar(64) COLLATE "pg_catalog"."default",
+  "update_time" timestamp(6) NOT NULL,
+  "deleted" int2 NOT NULL DEFAULT 0
+)
+;
+COMMENT ON COLUMN "system_mail_template"."id" IS '编号';
+COMMENT ON COLUMN "system_mail_template"."name" IS '模板名称';
+COMMENT ON COLUMN "system_mail_template"."code" IS '模板编码';
+COMMENT ON COLUMN "system_mail_template"."account_id" IS '发送的邮箱账号编号';
+COMMENT ON COLUMN "system_mail_template"."nickname" IS '发送人名称';
+COMMENT ON COLUMN "system_mail_template"."title" IS '模板标题';
+COMMENT ON COLUMN "system_mail_template"."content" IS '模板内容';
+COMMENT ON COLUMN "system_mail_template"."params" IS '参数数组';
+COMMENT ON COLUMN "system_mail_template"."status" IS '开启状态';
+COMMENT ON COLUMN "system_mail_template"."remark" IS '备注';
+COMMENT ON COLUMN "system_mail_template"."creator" IS '创建者';
+COMMENT ON COLUMN "system_mail_template"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_mail_template"."updater" IS '更新者';
+COMMENT ON COLUMN "system_mail_template"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_mail_template"."deleted" IS '是否删除';
+COMMENT ON TABLE "system_mail_template" IS '邮件模版表';
+
+
+
+-- ----------------------------
+-- Table structure for system_notify_message
+-- ----------------------------
+DROP TABLE IF EXISTS "system_notify_message";
+CREATE TABLE "system_notify_message" (
+  "id" int8 NOT NULL,
+  "user_id" int8 NOT NULL,
+  "user_type" int2 NOT NULL,
+  "template_id" int8 NOT NULL,
+  "template_code" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+  "template_nickname" varchar(63) COLLATE "pg_catalog"."default" NOT NULL,
+  "template_content" varchar(1024) COLLATE "pg_catalog"."default" NOT NULL,
+  "template_type" int4 NOT NULL,
+  "template_params" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "read_status" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
+  "read_time" timestamp(6),
+  "creator" varchar(64) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL,
+  "updater" varchar(64) COLLATE "pg_catalog"."default",
+  "update_time" timestamp(6) NOT NULL,
+  "deleted" int2 NOT NULL DEFAULT 0,
+  "tenant_id" int8 NOT NULL
+)
+;
+COMMENT ON COLUMN "system_notify_message"."id" IS '用户ID';
+COMMENT ON COLUMN "system_notify_message"."user_id" IS '用户id';
+COMMENT ON COLUMN "system_notify_message"."user_type" IS '用户类型';
+COMMENT ON COLUMN "system_notify_message"."template_id" IS '模版编号';
+COMMENT ON COLUMN "system_notify_message"."template_code" IS '模板编码';
+COMMENT ON COLUMN "system_notify_message"."template_nickname" IS '模版发送人名称';
+COMMENT ON COLUMN "system_notify_message"."template_content" IS '模版内容';
+COMMENT ON COLUMN "system_notify_message"."template_type" IS '模版类型';
+COMMENT ON COLUMN "system_notify_message"."template_params" IS '模版参数';
+COMMENT ON COLUMN "system_notify_message"."read_status" IS '是否已读';
+COMMENT ON COLUMN "system_notify_message"."read_time" IS '阅读时间';
+COMMENT ON COLUMN "system_notify_message"."creator" IS '创建者';
+COMMENT ON COLUMN "system_notify_message"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_notify_message"."updater" IS '更新者';
+COMMENT ON COLUMN "system_notify_message"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_notify_message"."deleted" IS '是否删除';
+COMMENT ON COLUMN "system_notify_message"."tenant_id" IS '租户编号';
+COMMENT ON TABLE "system_notify_message" IS '站内信消息表';
+
+
+
+-- ----------------------------
+-- Table structure for system_notify_template
+-- ----------------------------
+DROP TABLE IF EXISTS "system_notify_template";
+CREATE TABLE "system_notify_template" (
+  "id" int8 NOT NULL,
+  "name" varchar(63) COLLATE "pg_catalog"."default" NOT NULL,
+  "code" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+  "nickname" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "content" varchar(1024) COLLATE "pg_catalog"."default" NOT NULL,
+  "type" int2 NOT NULL,
+  "params" varchar(255) COLLATE "pg_catalog"."default",
+  "status" int2 NOT NULL,
+  "remark" varchar(255) COLLATE "pg_catalog"."default",
+  "creator" varchar(64) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL,
+  "updater" varchar(64) COLLATE "pg_catalog"."default",
+  "update_time" timestamp(6) NOT NULL,
+  "deleted" int2 NOT NULL DEFAULT 0
+)
+;
+COMMENT ON COLUMN "system_notify_template"."id" IS '主键';
+COMMENT ON COLUMN "system_notify_template"."name" IS '模板名称';
+COMMENT ON COLUMN "system_notify_template"."code" IS '模版编码';
+COMMENT ON COLUMN "system_notify_template"."nickname" IS '发送人名称';
+COMMENT ON COLUMN "system_notify_template"."content" IS '模版内容';
+COMMENT ON COLUMN "system_notify_template"."type" IS '类型';
+COMMENT ON COLUMN "system_notify_template"."params" IS '参数数组';
+COMMENT ON COLUMN "system_notify_template"."status" IS '状态';
+COMMENT ON COLUMN "system_notify_template"."remark" IS '备注';
+COMMENT ON COLUMN "system_notify_template"."creator" IS '创建者';
+COMMENT ON COLUMN "system_notify_template"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_notify_template"."updater" IS '更新者';
+COMMENT ON COLUMN "system_notify_template"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_notify_template"."deleted" IS '是否删除';
+COMMENT ON TABLE "system_notify_template" IS '站内信模板表';
+
+
+
+-- ----------------------------
+-- Table structure for system_user_session
+-- ----------------------------
+DROP TABLE IF EXISTS "system_user_session";
+CREATE TABLE "system_user_session" (
+  "id" int8 NOT NULL,
+  "token" varchar(32) COLLATE "pg_catalog"."default" NOT NULL,
+  "user_id" int8 NOT NULL,
+  "user_type" int2 NOT NULL,
+  "session_timeout" timestamp(6) NOT NULL,
+  "username" varchar(30) COLLATE "pg_catalog"."default" NOT NULL,
+  "user_ip" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+  "user_agent" varchar(512) COLLATE "pg_catalog"."default" NOT NULL,
+  "creator" varchar(64) COLLATE "pg_catalog"."default",
+  "create_time" timestamp(6) NOT NULL,
+  "updater" varchar(64) COLLATE "pg_catalog"."default",
+  "update_time" timestamp(6) NOT NULL,
+  "deleted" int2 NOT NULL DEFAULT 0,
+  "tenant_id" int8 NOT NULL
+)
+;
+COMMENT ON COLUMN "system_user_session"."id" IS '编号';
+COMMENT ON COLUMN "system_user_session"."token" IS '会话编号';
+COMMENT ON COLUMN "system_user_session"."user_id" IS '用户编号';
+COMMENT ON COLUMN "system_user_session"."user_type" IS '用户类型';
+COMMENT ON COLUMN "system_user_session"."session_timeout" IS '会话超时时间';
+COMMENT ON COLUMN "system_user_session"."username" IS '用户账号';
+COMMENT ON COLUMN "system_user_session"."user_ip" IS '用户 IP';
+COMMENT ON COLUMN "system_user_session"."user_agent" IS '浏览器 UA';
+COMMENT ON COLUMN "system_user_session"."creator" IS '创建者';
+COMMENT ON COLUMN "system_user_session"."create_time" IS '创建时间';
+COMMENT ON COLUMN "system_user_session"."updater" IS '更新者';
+COMMENT ON COLUMN "system_user_session"."update_time" IS '更新时间';
+COMMENT ON COLUMN "system_user_session"."deleted" IS '是否删除';
+COMMENT ON COLUMN "system_user_session"."tenant_id" IS '租户编号';
+COMMENT ON TABLE "system_user_session" IS '用户在线 Session';
+
+
+
+
+
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
