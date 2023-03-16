@@ -52,11 +52,12 @@
                 </el-form-item>
                 <el-form-item prop="mobileCode">
                   <el-input v-model="loginForm.mobileCode" type="text" auto-complete="off" placeholder="短信验证码"
+                            class="sms-login-mobile-code-prefix"
                             @keyup.enter.native="handleLogin">
-                    <template v-slot="icon">
+                    <template>
                       <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
                     </template>
-                    <template v-slot="append">
+                    <template slot="append">
                       <span v-if="mobileCodeTimer <= 0" class="getMobileCode" @click="getSmsCode" style="cursor: pointer;">获取验证码</span>
                       <span v-if="mobileCodeTimer > 0" class="getMobileCode">{{ mobileCodeTimer }}秒后可重新获取</span>
                     </template>
@@ -334,5 +335,10 @@ export default {
 .oauth-login-item span:hover {
   text-decoration: underline red;
   color: red;
+}
+.sms-login-mobile-code-prefix {
+  :deep(.el-input__prefix) {
+    top: 22%;
+  }
 }
 </style>
