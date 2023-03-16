@@ -531,6 +531,60 @@ MAXVALUE 9223372036854775807
 CACHE 1;
 
 -- ----------------------------
+-- Sequence structure for system_mail_account_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "system_mail_account_seq";
+CREATE SEQUENCE "system_mail_account_seq"
+INCREMENT 1
+MAXVALUE 9223372036854775807
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for system_mail_log_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "system_mail_log_seq";
+CREATE SEQUENCE "system_mail_log_seq"
+INCREMENT 1
+MAXVALUE 9223372036854775807
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for system_mail_template_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "system_mail_template_seq";
+CREATE SEQUENCE "system_mail_template_seq"
+INCREMENT 1
+MAXVALUE 9223372036854775807
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for system_notify_message_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "system_notify_message_seq";
+CREATE SEQUENCE "system_notify_message_seq"
+INCREMENT 1
+MAXVALUE 9223372036854775807
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for system_notify_template_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "system_notify_template_seq";
+CREATE SEQUENCE "system_notify_template_seq"
+INCREMENT 1
+MAXVALUE 9223372036854775807
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for system_user_session_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "system_user_session_seq";
+CREATE SEQUENCE "system_user_session_seq"
+INCREMENT 1
+MAXVALUE 9223372036854775807
+CACHE 1;
+
+-- ----------------------------
 -- Table structure for bpm_form
 -- ----------------------------
 DROP TABLE IF EXISTS "bpm_form";
