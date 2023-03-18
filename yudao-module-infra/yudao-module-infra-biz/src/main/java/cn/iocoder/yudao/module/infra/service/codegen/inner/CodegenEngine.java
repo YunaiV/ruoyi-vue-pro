@@ -23,9 +23,12 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
+import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -50,11 +53,12 @@ import static cn.hutool.core.text.CharSequenceUtil.*;
 public class CodegenEngine {
 
     /**
-     * 模板配置
+     * 后端的模板配置
+     *
      * key：模板在 resources 的地址
      * value：生成的路径
      */
-    private static final Map<String, String> TEMPLATES = MapUtil.<String, String>builder(new LinkedHashMap<>()) // 有序
+    private static final Map<String, String> SERVER_TEMPLATES = MapUtil.<String, String>builder(new LinkedHashMap<>()) // 有序
             // Java module-biz Main
             .put(javaTemplatePath("controller/vo/baseVO"), javaModuleImplVOFilePath("BaseVO"))
             .put(javaTemplatePath("controller/vo/createReqVO"), javaModuleImplVOFilePath("CreateReqVO"))
@@ -80,21 +84,31 @@ public class CodegenEngine {
                     javaModuleImplTestFilePath("service/${table.businessName}/${table.className}ServiceImplTest"))
             // Java module-api Main
             .put(javaTemplatePath("enums/errorcode"), javaModuleApiMainFilePath("enums/ErrorCodeConstants_手动操作"))
-            // Vue2
-            .put(vueTemplatePath("views/index.vue"),
-                    vueFilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
-            .put(vueTemplatePath("api/api.js"),
-                    vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
-            // Vue3
-            .put(vue3TemplatePath("views/index.vue"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
-            .put(vue3TemplatePath("views/data.ts"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
-            .put(vue3TemplatePath("api/api.ts"),
-                    vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
             // SQL
             .put("codegen/sql/sql.vm", "sql/sql.sql")
             .put("codegen/sql/h2.vm", "sql/h2.sql")
+            .build();
+
+    /**
+     * 后端的配置模版
+     *
+     * key1：UI 模版的类型 {@link CodegenFrontTypeEnum#getType()}
+     * key2：模板在 resources 的地址
+     * value：生成的路径
+     */
+    private static final Table<Integer, String, String> FRONT_TEMPLATES = ImmutableTable.<Integer, String, String>builder()
+            // Vue2
+            .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/index.vue"),
+                    vueFilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
+            .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("api/api.js"),
+                    vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
+            // Vue3
+            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/index.vue"),
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
+            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/data.ts"),
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
+            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("api/api.ts"),
+                    vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
             .build();
 
     @Resource
@@ -165,13 +179,21 @@ public class CodegenEngine {
         bindingMap.put("permissionPrefix", table.getModuleName() + ":" + simpleClassNameStrikeCase);
 
         // 执行生成
-        final Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(TEMPLATES.size()); // 有序
-        TEMPLATES.forEach((vmPath, filePath) -> {
+        Map<String, String> templates = getTemplates();
+        Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(templates.size()); // 有序
+        templates.forEach((vmPath, filePath) -> {
             filePath = formatFilePath(filePath, bindingMap);
             String content = templateEngine.getTemplate(vmPath).render(bindingMap);
             result.put(filePath, content);
         });
         return result;
+    }
+
+    private Map<String, String> getTemplates() {
+        Map<String, String> templates = new LinkedHashMap<>();
+        templates.putAll(SERVER_TEMPLATES);
+        templates.putAll(FRONT_TEMPLATES.row(codegenProperties.getFrontType()));
+        return templates;
     }
 
     private String formatFilePath(String filePath, Map<String, Object> bindingMap) {
