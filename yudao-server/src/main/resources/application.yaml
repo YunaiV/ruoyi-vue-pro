@@ -125,6 +125,7 @@ yudao:
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
+    front-type: 20
   error-code: # 错误码相关配置项
     constants-class-list:
       - cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants
