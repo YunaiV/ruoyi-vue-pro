@@ -1,0 +1,165 @@
+<!-- 对话框(添加 / 修改) -->
+<el-dialog :title="title" :visible.sync="open" width="500px" v-dialogDrag append-to-body>
+  <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      #foreach($column in $columns)
+          #if ($column.createOperation || $column.updateOperation)
+              #set ($dictType = $column.dictType)
+              #set ($javaField = $column.javaField)
+              #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+              #set ($comment = $column.columnComment)
+              #if ($column.htmlType == "input")
+                  #if (!$column.primaryKey)## 忽略主键，不用在表单里
+                    <el-form-item label="${comment}" prop="${javaField}">
+                      <el-input v-model="form.${javaField}" placeholder="请输入${comment}" />
+                    </el-form-item>
+                  #end
+              #elseif($column.htmlType == "imageUpload")## 图片上传
+                  #set ($hasImageUploadColumn = true)
+                <el-form-item label="${comment}">
+                  <imageUpload v-model="form.${javaField}"/>
+                </el-form-item>
+              #elseif($column.htmlType == "fileUpload")## 文件上传
+                  #set ($hasFileUploadColumn = true)
+                <el-form-item label="${comment}">
+                  <fileUpload v-model="form.${javaField}"/>
+                </el-form-item>
+              #elseif($column.htmlType == "editor")## 文本编辑器
+                  #set ($hasEditorColumn = true)
+                <el-form-item label="${comment}">
+                  <editor v-model="form.${javaField}" :min-height="192"/>
+                </el-form-item>
+              #elseif($column.htmlType == "select")## 下拉框
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <el-select v-model="form.${javaField}" placeholder="请选择${comment}">
+                      #if ("" != $dictType)## 有数据字典
+                        <el-option v-for="dict in this.getDictDatas(DICT_TYPE.$dictType.toUpperCase())"
+                                   :key="dict.value" :label="dict.label" #if ($column.javaType == "Integer" || $column.javaType == "Long"):value="parseInt(dict.value)"#else:value="dict.value"#end />
+                      #else##没数据字典
+                        <el-option label="请选择字典生成" value="" />
+                      #end
+                  </el-select>
+                </el-form-item>
+              #elseif($column.htmlType == "checkbox")## 多选框
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <el-checkbox-group v-model="form.${javaField}">
+                      #if ("" != $dictType)## 有数据字典
+                        <el-checkbox v-for="dict in this.getDictDatas(DICT_TYPE.$dictType.toUpperCase())"
+                                     :key="dict.value" #if($column.javaType == "Integer" || $column.javaType == "Long"):label="parseInt(dict.value)"#else:label="dict.value"#end>{{dict.label}}</el-checkbox>
+                      #else##没数据字典
+                        <el-checkbox>请选择字典生成</el-checkbox>
+                      #end
+                  </el-checkbox-group>
+                </el-form-item>
+              #elseif($column.htmlType == "radio")## 单选框
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <el-radio-group v-model="form.${javaField}">
+                      #if ("" != $dictType)## 有数据字典
+                        <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.$dictType.toUpperCase())"
+                                  :key="dict.value" #if($column.javaType == "Integer" || $column.javaType == "Long"):label="parseInt(dict.value)"#else:label="dict.value"#end>{{dict.label}}</el-radio>
+                      #else##没数据字典
+                        <el-radio label="1">请选择字典生成</el-radio>
+                      #end
+                  </el-radio-group>
+                </el-form-item>
+              #elseif($column.htmlType == "datetime")## 时间框
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <el-date-picker clearable v-model="form.${javaField}" type="date" value-format="timestamp" placeholder="选择${comment}" />
+                </el-form-item>
+              #elseif($column.htmlType == "textarea")## 文本框
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <el-input v-model="form.${javaField}" type="textarea" placeholder="请输入内容" />
+                </el-form-item>
+              #end
+          #end
+      #end
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button type="primary" @click="submitForm">确 定</el-button>
+    <el-button @click="cancel">取 消</el-button>
+  </div>
+</el-dialog>
+
+
+// 弹出层标题
+title: "",
+// 是否显示弹出层
+open: false,
+
+// 表单参数
+form: {},
+// 表单校验
+rules: {
+#foreach ($column in $columns)
+    #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+        #set($comment=$column.columnComment)
+        $column.javaField: [{ required: true, message: "${comment}不能为空", trigger: #if($column.htmlType == "select")"change"#else"blur"#end }],
+    #end
+#end
+}
+
+
+/** 表单重置 */
+reset() {
+this.form = {
+#foreach ($column in $columns)
+    #if ($column.createOperation || $column.updateOperation)
+        #if ($column.htmlType == "checkbox")
+            $column.javaField: [],
+        #else
+            $column.javaField: undefined,
+        #end
+    #end
+#end
+};
+this.resetForm("form");
+},
+
+/** 新增按钮操作 */
+handleAdd() {
+this.reset();
+this.open = true;
+this.title = "添加${table.classComment}";
+},
+/** 修改按钮操作 */
+handleUpdate(row) {
+this.reset();
+const ${primaryColumn.javaField} = row.${primaryColumn.javaField};
+get${simpleClassName}(${primaryColumn.javaField}).then(response => {
+this.form = response.data;
+#foreach ($column in $columns)
+    #if($column.htmlType == "checkbox")## checkbox 特殊处理
+    this.form.$column.javaField = this.form.${column.javaField}.split(",");
+    #end
+#end
+this.open = true;
+this.title = "修改${table.classComment}";
+});
+},
+/** 提交按钮 */
+submitForm() {
+this.#[[$]]#refs["form"].validate(valid => {
+if (!valid) {
+return;
+}
+#foreach ($column in $columns)
+#if($column.htmlType == "checkbox")
+this.form.$column.javaField = this.form.${column.javaField}.join(",");
+#end
+#end
+// 修改的提交
+if (this.form.${primaryColumn.javaField} != null) {
+update${simpleClassName}(this.form).then(response => {
+this.#[[$modal]]#.msgSuccess("修改成功");
+this.open = false;
+this.getList();
+});
+return;
+}
+// 添加的提交
+create${simpleClassName}(this.form).then(response => {
+this.#[[$modal]]#.msgSuccess("新增成功");
+this.open = false;
+this.getList();
+});
+});
+},

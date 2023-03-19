@@ -105,8 +105,8 @@ public class CodegenEngine {
             // Vue3
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/index.vue"),
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
-            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/data.ts"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
+//            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/data.ts"),
+//                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
             .build();
