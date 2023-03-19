@@ -44,7 +44,7 @@ public class ProductCommentDO extends BaseDO {
     /**
      * 评价人名称
      */
-    private Long userNickname;
+    private String userNickname;
 
     /**
      * 评价人头像
@@ -76,6 +76,11 @@ public class ProductCommentDO extends BaseDO {
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
+
+    /**
+     * 商品 SPU 名称
+     */
+    private String spuName;
 
     /**
      * 商品 SKU 编号

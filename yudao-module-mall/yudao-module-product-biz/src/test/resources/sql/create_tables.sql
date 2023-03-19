@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS `product_comment` (
     `order_id` bigint NOT NULL COMMENT '交易订单编号',
     `order_item_id` bigint NOT NULL COMMENT '交易订单项编号',
     `spu_id` bigint NOT NULL COMMENT '商品SPU编号',
+    `spu_name` varchar NOT NULL COMMENT '商品SPU名称',
     `sku_id` bigint NOT NULL COMMENT '商品SKU编号',
     `visible` bit(1) NOT NULL DEFAULT 1 COMMENT '是否可见 1:显示 0:隐藏',
     `scores` int NOT NULL COMMENT '评分星级 1-5分',
