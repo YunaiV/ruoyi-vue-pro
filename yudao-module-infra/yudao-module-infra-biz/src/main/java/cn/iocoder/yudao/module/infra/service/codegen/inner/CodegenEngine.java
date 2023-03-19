@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
@@ -136,6 +137,7 @@ public class CodegenEngine {
         globalBindingMap.put("ServiceExceptionUtilClassName", ServiceExceptionUtil.class.getName());
         globalBindingMap.put("DateUtilsClassName", DateUtils.class.getName());
         globalBindingMap.put("ExcelUtilsClassName", ExcelUtils.class.getName());
+        globalBindingMap.put("LocalDateTimeUtilsClassName", LocalDateTimeUtils.class.getName());
         globalBindingMap.put("ObjectUtilsClassName", ObjectUtils.class.getName());
         globalBindingMap.put("DictConvertClassName", DictConvert.class.getName());
         globalBindingMap.put("OperateLogClassName", OperateLog.class.getName());
