@@ -82,3 +82,35 @@ CREATE TABLE IF NOT EXISTS `product_brand` (
     `deleted` bit(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
     PRIMARY KEY (`id`)
 ) COMMENT '商品品牌';
+
+CREATE TABLE IF NOT EXISTS `product_comment` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '评价编号',
+    `user_id` bigint NOT NULL COMMENT ' 评价ID 用户编号',
+    `user_nickname` varchar(128) NOT NULL COMMENT '评价人名称',
+    `user_avatar` varchar(255) NOT NULL COMMENT '评价人头像',
+    `anonymous` bit(1) NOT NULL DEFAULT 0 COMMENT '是否匿名 0:不匿名 1:匿名',
+    `order_id` bigint NOT NULL COMMENT '交易订单编号',
+    `order_item_id` bigint NOT NULL COMMENT '交易订单项编号',
+    `spu_id` bigint NOT NULL COMMENT '商品SPU编号',
+    `sku_id` bigint NOT NULL COMMENT '商品SKU编号',
+    `visible` bit(1) NOT NULL DEFAULT 1 COMMENT '是否可见 1:显示 0:隐藏',
+    `scores` int NOT NULL COMMENT '评分星级 1-5分',
+    `description_scores` int NOT NULL COMMENT '描述星级 1-5分',
+    `benefit_scores` int NOT NULL COMMENT '服务星级 1-5分',
+    `delivery_scores` int NOT NULL COMMENT '配送星级 1-5分',
+    `content` varchar(2000) NOT NULL COMMENT '评论内容',
+    `pic_urls` varchar(1024) DEFAULT '' COMMENT '评论图片地址数组，以逗号分隔最多上传9张',
+    `replied` bit(1) NOT NULL DEFAULT 0 COMMENT '商家是否回复 1:回复 0:未回复',
+    `reply_user_id` bigint COMMENT '回复管理员编号',
+    `reply_content` varchar(2000) COMMENT '商家回复内容',
+    `reply_time` datetime COMMENT '商家回复时间',
+    `additional_content` varchar(2000) COMMENT '追加评价内容',
+    `additional_pic_urls` varchar(1024) COMMENT '追评评价图片地址数组，以逗号分隔最多上传9张',
+    `additional_create_time` datetime COMMENT '追加评价时间',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `creator` varchar DEFAULT NULL COMMENT '创建人',
+    `updater` varchar DEFAULT NULL COMMENT '更新人',
+    `deleted` bit(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
+    PRIMARY KEY (`id`)
+) COMMENT '商品评价';
