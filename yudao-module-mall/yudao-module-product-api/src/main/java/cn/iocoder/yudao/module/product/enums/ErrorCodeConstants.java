@@ -42,4 +42,7 @@ public interface ErrorCodeConstants {
     ErrorCode SPU_SKU_NOT_DUPLICATE = new ErrorCode(1008006003, "一个 SPU 下的每个 SKU，必须不重复");
     ErrorCode SKU_STOCK_NOT_ENOUGH = new ErrorCode(1008006004, "商品 SKU 库存不足");
 
+    // ========== 商品 评价 1008007000 ==========
+    ErrorCode COMMENT_NOT_EXISTS = new ErrorCode(1008007000, "商品 评价 不存在");
+
 }

@@ -5,7 +5,9 @@ import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
@@ -19,7 +21,7 @@ import java.util.Date;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * {@link ProductCommentServiceImpl} 的单元测试类
@@ -62,6 +64,7 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
             o.setUserNickname("王二狗");
             o.setSpuName("感冒药");
             o.setScores(ProductCommentScoresEnum.FOUR.getScores());
+            o.setReplied(Boolean.TRUE);
         });
         productCommentMapper.insert(productComment);
 
@@ -78,6 +81,8 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setSpuName("感康")));
         // 测试 scores 不匹配
         productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setScores(ProductCommentScoresEnum.ONE.getScores())));
+        // 测试 replied 不匹配
+        productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setReplied(Boolean.FALSE)));
 
         // 调用
         ProductCommentPageReqVO productCommentPageReqVO = new ProductCommentPageReqVO();
@@ -86,13 +91,50 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         productCommentPageReqVO.setSpuId(spuId);
         productCommentPageReqVO.setSpuName("感冒药");
         productCommentPageReqVO.setScores(ProductCommentScoresEnum.FOUR.getScores());
+        productCommentPageReqVO.setReplied(Boolean.TRUE);
 
         PageResult<ProductCommentDO> commentPage = productCommentService.getCommentPage(productCommentPageReqVO);
         PageResult<ProductCommentRespVO> result = ProductCommentConvert.INSTANCE.convertPage(productCommentMapper.selectPage(productCommentPageReqVO));
         assertEquals(result.getTotal(), commentPage.getTotal());
 
         PageResult<ProductCommentDO> all = productCommentService.getCommentPage(new ProductCommentPageReqVO());
-        assertEquals(6, all.getTotal());
+        assertEquals(7, all.getTotal());
     }
 
+    @Test
+    public void testUpdateCommentVisible_success() {
+        // mock 测试
+        ProductCommentDO productComment = randomPojo(ProductCommentDO.class, o -> {
+            o.setVisible(Boolean.TRUE);
+        });
+        productCommentMapper.insert(productComment);
+
+        Long productCommentId = productComment.getId();
+
+        ProductCommentUpdateVisibleReqVO updateReqVO = new ProductCommentUpdateVisibleReqVO();
+        updateReqVO.setId(productCommentId);
+        updateReqVO.setVisible(Boolean.FALSE);
+        productCommentService.updateCommentVisible(updateReqVO);
+
+        ProductCommentDO productCommentDO = productCommentMapper.selectById(productCommentId);
+        assertFalse(productCommentDO.getVisible());
+    }
+
+
+    @Test
+    public void testCommentReply_success() {
+        // mock 测试
+        ProductCommentDO productComment = randomPojo(ProductCommentDO.class);
+        productCommentMapper.insert(productComment);
+
+        Long productCommentId = productComment.getId();
+
+        ProductCommentReplyVO replyVO = new ProductCommentReplyVO();
+        replyVO.setId(productCommentId);
+        replyVO.setReplyContent("测试");
+        productCommentService.commentReply(replyVO, 1L);
+
+        ProductCommentDO productCommentDO = productCommentMapper.selectById(productCommentId);
+        assertEquals("测试", productCommentDO.getReplyContent());
+    }
 }
