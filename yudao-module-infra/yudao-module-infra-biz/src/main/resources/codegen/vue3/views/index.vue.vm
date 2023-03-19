@@ -1,160 +1,230 @@
 <template>
-  <ContentWrap>
-    <!-- 列表 -->
-    <XTable @register="registerTable">
-      <template #toolbar_buttons>
-        <!-- 操作：新增 -->
-        <XButton
-          type="primary"
-          preIcon="ep:zoom-in"
-          :title="t('action.add')"
-          v-hasPermi="['${permissionPrefix}:create']"
-          @click="handleCreate()"
+  <content-wrap>
+    <!-- 搜索工作栏 -->
+    <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true">
+    #foreach($column in $columns)
+      #if ($column.listOperation)
+        #set ($dictType = $column.dictType)
+        #set ($javaField = $column.javaField)
+        #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+        #set ($comment = $column.columnComment)
+        #if ($column.htmlType == "input")
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-input
+          v-model="queryParams.${javaField}"
+          placeholder="请输入${comment}"
+          clearable
+          @keyup.enter="handleQuery"
         />
-        <!-- 操作：导出 -->
-        <XButton
-          type="warning"
-          preIcon="ep:download"
-          :title="t('action.export')"
+      </el-form-item>
+    #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-select v-model="queryParams.${javaField}" placeholder="请选择${comment}" clearable>
+          #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+          <!-- TODO 芋艿：需要考虑不同类型的处理 -->
+          <el-option
+            v-for="dict in getDictDatas(DICT_TYPE.$dictType.toUpperCase())"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+          #else## 未设置 dictType 数据字典的情况
+          <el-option label="请选择字典生成" value="" />
+          #end
+        </el-select>
+      </el-form-item>
+    #elseif($column.htmlType == "datetime")
+      #if ($column.listOperationCondition != "BETWEEN")## 非范围
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker
+          v-model="queryParams.${javaField}"
+          value-format="yyyy-MM-dd"
+          type="date"
+          placeholder="选择${comment}"
+          clearable
+        />
+      </el-form-item>
+      #else## 范围
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker
+          v-model="queryParams.${javaField}"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          type="daterange"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :default-time="[new Date('1 00:00:00'), new Date('1 23:59:59')]"
+        />
+      </el-form-item>
+      #end
+    #end
+    #end
+    #end
+      <el-form-item>
+        <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button>
+        <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
+        <el-button type="primary" @click="openModal('create')" v-hasPermi="['${permissionPrefix}:create']">
+          <Icon icon="ep:plus" class="mr-5px" /> 新增
+        </el-button>
+        <el-button
+          type="success"
+          plain
+          @click="handleExport"
+          :loading="exportLoading"
           v-hasPermi="['${permissionPrefix}:export']"
-          @click="exportList('${table.classComment}.xls')"
-        />
-      </template>
-      <template #actionbtns_default="{ row }">
-        <!-- 操作：修改 -->
-        <XTextButton
-          preIcon="ep:edit"
-          :title="t('action.edit')"
-          v-hasPermi="['${permissionPrefix}:update']"
-          @click="handleUpdate(row.id)"
-        />
-        <!-- 操作：详情 -->
-        <XTextButton
-          preIcon="ep:view"
-          :title="t('action.detail')"
-          v-hasPermi="['${permissionPrefix}:query']"
-          @click="handleDetail(row.id)"
-        />
-        <!-- 操作：删除 -->
-        <XTextButton
-          preIcon="ep:delete"
-          :title="t('action.del')"
-          v-hasPermi="['${permissionPrefix}:delete']"
-          @click="deleteData(row.id)"
-        />
-      </template>
-    </XTable>
-  </ContentWrap>
-  <!-- 弹窗 -->
-  <XModal id="${classNameVar}Model" :loading="modelLoading" v-model="modelVisible" :title="modelTitle">
-    <!-- 表单：添加/修改 -->
-    <Form
-      ref="formRef"
-      v-if="['create', 'update'].includes(actionType)"
-      :schema="allSchemas.formSchema"
-      :rules="rules"
-    />
-    <!-- 表单：详情 -->
-    <Descriptions
-      v-if="actionType === 'detail'"
-      :schema="allSchemas.detailSchema"
-      :data="detailData"
-    />
-    <template #footer>
-      <!-- 按钮：保存 -->
-      <XButton
-        v-if="['create', 'update'].includes(actionType)"
-        type="primary"
-        :title="t('action.save')"
-        :loading="actionLoading"
-        @click="submitForm()"
+        >
+          <Icon icon="ep:download" class="mr-5px" /> 导出
+        </el-button>
+      </el-form-item>
+    </el-form>
+  </content-wrap>
+
+  <!-- 列表 -->
+  <content-wrap>
+    <el-table v-loading="loading" :data="list">
+    #foreach($column in $columns)
+      #if ($column.listOperationResult)
+        #set ($dictType=$column.dictType)
+        #set ($javaField = $column.javaField)
+        #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+        #set ($comment=$column.columnComment)
+        #if ($column.javaType == "LocalDateTime")## 时间类型
+      <el-table-column
+        label="${comment}"
+        align="center"
+        prop="${javaField}"
+        :formatter="dateFormatter"
       />
-      <!-- 按钮：关闭 -->
-      <XButton :loading="actionLoading" :title="t('dialog.close')" @click="modelVisible = false" />
-    </template>
-  </XModal>
+        #elseif("" != $column.dictType)## 数据字典
+      <el-table-column label="${comment}" align="center" prop="${javaField}">
+        <template #default="scope">
+          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.${column.javaField}" />
+        </template>
+      </el-table-column>
+        #else
+      <el-table-column label="${comment}" align="center" prop="${javaField}" />
+        #end
+      #end
+    #end
+      <el-table-column label="操作" align="center">
+        <template #default="scope">
+          <el-button
+            link
+            type="primary"
+            @click="openModal('update', scope.row.id)"
+            v-hasPermi="['${permissionPrefix}:update']"
+          >
+            编辑
+          </el-button>
+          <el-button
+            link
+            type="danger"
+            @click="handleDelete(scope.row.id)"
+            v-hasPermi="['${permissionPrefix}:delete']"
+          >
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 分页 -->
+    <Pagination
+      :total="total"
+      v-model:page="queryParams.pageNo"
+      v-model:limit="queryParams.pageSize"
+      @pagination="getList"
+    />
+  </content-wrap>
 </template>
+
 <script setup lang="ts" name="${simpleClassName}">
-import { FormExpose } from '@/components/Form'
-// 业务相关的 import
-import { rules, allSchemas } from './${classNameVar}.data'
+import { DICT_TYPE, getDictOptions } from '@/utils/dict'
+import { dateFormatter } from '@/utils/formatTime'
+import download from '@/utils/download'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
-
-const { t } = useI18n() // 国际化
+// import ConfigForm from './form.vue'
 const message = useMessage() // 消息弹窗
+const { t } = useI18n() // 国际化
 
-// 列表相关的变量
-const [registerTable, { reload, deleteData, exportList }] = useXTable({
-  allSchemas: allSchemas,
-  getListApi: ${simpleClassName}Api.get${simpleClassName}PageApi,
-  deleteApi: ${simpleClassName}Api.delete${simpleClassName}Api,
-  exportListApi: ${simpleClassName}Api.export${simpleClassName}Api
+const loading = ref(true) // 列表的加载中
+const total = ref(0) // 列表的总页数
+const list = ref([]) // 列表的数据
+const queryParams = reactive({
+  pageNo: 1,
+  pageSize: 10,
+  #foreach ($column in $columns)
+    #if ($column.listOperation)
+      #if ($column.listOperationCondition != 'BETWEEN')
+  $column.javaField: null,
+  #end
+      #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+  $column.javaField: [],
+      #end
+    #end
+  #end
 })
+const queryFormRef = ref() // 搜索的表单
+const exportLoading = ref(false) // 导出的加载中
 
-// 弹窗相关的变量
-const modelVisible = ref(false) // 是否显示弹出层
-const modelTitle = ref('edit') // 弹出层标题
-const modelLoading = ref(false) // 弹出层loading
-const actionType = ref('') // 操作按钮的类型
-const actionLoading = ref(false) // 按钮 Loading
-const formRef = ref<FormExpose>() // 表单 Ref
-const detailData = ref() // 详情 Ref
-
-// 设置标题
-const setDialogTile = (type: string) => {
-  modelLoading.value = true
-  modelTitle.value = t('action.' + type)
-  actionType.value = type
-  modelVisible.value = true
+/** 查询参数列表 */
+const getList = async () => {
+  loading.value = true
+  try {
+    const data = await ${simpleClassName}Api.get${simpleClassName}Page(queryParams)
+    list.value = data.list
+    total.value = data.total
+  } finally {
+    loading.value = false
+  }
 }
 
-// 新增操作
-const handleCreate = () => {
-  setDialogTile('create')
-  modelLoading.value = false
+/** 搜索按钮操作 */
+const handleQuery = () => {
+  queryParams.pageNo = 1
+  getList()
 }
 
-// 修改操作
-const handleUpdate = async (rowId: number) => {
-  setDialogTile('update')
-  // 设置数据
-  const res = await ${simpleClassName}Api.get${simpleClassName}Api(rowId)
-  unref(formRef)?.setValues(res)
-  modelLoading.value = false
+/** 重置按钮操作 */
+const resetQuery = () => {
+  queryFormRef.value.resetFields()
+  handleQuery()
 }
 
-// 详情操作
-const handleDetail = async (rowId: number) => {
-  setDialogTile('detail')
-  const res = await ${simpleClassName}Api.get${simpleClassName}Api(rowId)
-  detailData.value = res
-  modelLoading.value = false
+/** 添加/修改操作 */
+// const modalRef = ref()
+// const openModal = (type: string, id?: number) => {
+//   modalRef.value.openModal(type, id)
+// }
+
+/** 删除按钮操作 */
+const handleDelete = async (id: number) => {
+  try {
+    // 删除的二次确认
+    await message.delConfirm()
+    // 发起删除
+    await ${simpleClassName}Api.delete${simpleClassName}(id)
+    message.success(t('common.delSuccess'))
+    // 刷新列表
+    await getList()
+  } catch {}
 }
 
-// 提交按钮
-const submitForm = async () => {
-  const elForm = unref(formRef)?.getElFormRef()
-  if (!elForm) return
-  elForm.validate(async (valid) => {
-    if (valid) {
-      actionLoading.value = true
-      // 提交请求
-      try {
-        const data = unref(formRef)?.formModel as ${simpleClassName}Api.${simpleClassName}VO
-        if (actionType.value === 'create') {
-          await ${simpleClassName}Api.create${simpleClassName}Api(data)
-          message.success(t('common.createSuccess'))
-        } else {
-          await ${simpleClassName}Api.update${simpleClassName}Api(data)
-          message.success(t('common.updateSuccess'))
-        }
-        modelVisible.value = false
-      } finally {
-        actionLoading.value = false
-        // 刷新列表
-        await reload()
-      }
-    }
-  })
+/** 导出按钮操作 */
+const handleExport = async () => {
+  try {
+    // 导出的二次确认
+    await message.exportConfirm()
+    // 发起导出
+    exportLoading.value = true
+    const data = await ${simpleClassName}Api.export${simpleClassName}Api(queryParams)
+    download.excel(data, '${table.classComment}.xls')
+  } catch {
+  } finally {
+    exportLoading.value = false
+  }
 }
+
+/** 初始化 **/
+onMounted(() => {
+  getList()
+})
 </script>
