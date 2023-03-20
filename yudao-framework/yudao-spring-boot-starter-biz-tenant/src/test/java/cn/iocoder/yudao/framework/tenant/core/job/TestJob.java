@@ -11,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 @TenantJob // 标记多租户
 public class TestJob implements JobHandler {
+
     private final List<Long> tenantIds = new CopyOnWriteArrayList<>();
 
     @Override

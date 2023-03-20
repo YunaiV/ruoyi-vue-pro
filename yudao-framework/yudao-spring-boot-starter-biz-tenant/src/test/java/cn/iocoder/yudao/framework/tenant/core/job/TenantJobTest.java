@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 
 import java.util.List;
 
@@ -18,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author gaibu
  */
 public class TenantJobTest extends BaseMockitoUnitTest {
-    @Spy
+
+    @Mock
     TenantFrameworkService tenantFrameworkService;
 
     @Test
@@ -31,8 +32,10 @@ public class TenantJobTest extends BaseMockitoUnitTest {
         TestJob testJob = new TestJob();
         // 创建任务装饰器
         TenantJobHandlerDecorator tenantJobHandlerDecorator = new TenantJobHandlerDecorator(tenantFrameworkService, testJob);
+
         // 执行任务
         tenantJobHandlerDecorator.execute(null);
+
         // 断言返回值
         assertEquals(testJob.getTenantIds(), tenantIds);
     }
