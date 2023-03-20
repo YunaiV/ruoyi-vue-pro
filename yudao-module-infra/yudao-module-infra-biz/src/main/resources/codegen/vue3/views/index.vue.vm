@@ -1,11 +1,19 @@
 <template>
   <content-wrap>
     <!-- 搜索工作栏 -->
-    <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true">
+    <el-form
+      class="-mb-15px"
+      :model="queryParams"
+      ref="queryFormRef"
+      :inline="true"
+      label-width="68px"
+    >
+    #set ($dictMethods = []) ## 使用到的 dict 字典方法
     #foreach($column in $columns)
       #if ($column.listOperation)
         #set ($dictType = $column.dictType)
         #set ($javaField = $column.javaField)
+        #set ($javaType = $column.javaType)
         #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
         #set ($comment = $column.columnComment)
         #if ($column.htmlType == "input")
@@ -15,15 +23,31 @@
           placeholder="请输入${comment}"
           clearable
           @keyup.enter="handleQuery"
+          class="!w-240px"
         />
       </el-form-item>
     #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
       <el-form-item label="${comment}" prop="${javaField}">
-        <el-select v-model="queryParams.${javaField}" placeholder="请选择${comment}" clearable>
+        <el-select
+          v-model="queryParams.${javaField}"
+          placeholder="请选择${comment}"
+          clearable
+          class="!w-240px"
+        >
           #if ("" != $dictType)## 设置了 dictType 数据字典的情况
-          <!-- TODO 芋艿：需要考虑不同类型的处理 -->
+              #set ($dictMethod = "getDictOptions") ## 计算使用哪个 dict 字典方法
+              #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                #set ($dictMethod = "getIntDictOptions")
+              #elseif ($javaType == "String")
+                #set ($dictMethod = "getStrDictOptions")
+              #elseif ($javaType == "Boolean")
+                #set ($dictMethod = "getBoolDictOptions")
+              #end
+              #if (!$dictMethods.contains($dictMethod)) ## 如果不存在，则添加到 dictMethods 数组中，后续好 import
+                  #( $dictMethods.add($dictMethod) )
+              #end
           <el-option
-            v-for="dict in getDictDatas(DICT_TYPE.$dictType.toUpperCase())"
+            v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
             :key="dict.value"
             :label="dict.label"
             :value="dict.value"
@@ -42,6 +66,7 @@
           type="date"
           placeholder="选择${comment}"
           clearable
+          class="!w-240px"
         />
       </el-form-item>
       #else## 范围
@@ -53,6 +78,7 @@
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           :default-time="[new Date('1 00:00:00'), new Date('1 23:59:59')]"
+          class="!w-240px"
         />
       </el-form-item>
       #end
@@ -137,7 +163,9 @@
 </template>
 
 <script setup lang="ts" name="${simpleClassName}">
-import { DICT_TYPE, getDictOptions } from '@/utils/dict'
+#if ($dictMethods.size() > 0)
+import { DICT_TYPE#foreach ($dictMethod in $dictMethods), ${dictMethod}#end } from '@/utils/dict'
+#end
 import { dateFormatter } from '@/utils/formatTime'
 import download from '@/utils/download'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
@@ -151,13 +179,19 @@ const list = ref([]) // 列表的数据
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
+  #set ($listOperationLastIndex = -1) ## 求最后一个需要 , 的地方
+  #foreach ($column in $columns)
+    #if ($column.listOperation)
+      #set ($listOperationLastIndex = $foreach.index)
+    #end
+  #end
   #foreach ($column in $columns)
     #if ($column.listOperation)
       #if ($column.listOperationCondition != 'BETWEEN')
-  $column.javaField: null,
+  $column.javaField: null#if($foreach.index < $listOperationLastIndex),#end
   #end
       #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
-  $column.javaField: [],
+  $column.javaField: []#if($foreach.index < $listOperationLastIndex),#end
       #end
     #end
   #end
