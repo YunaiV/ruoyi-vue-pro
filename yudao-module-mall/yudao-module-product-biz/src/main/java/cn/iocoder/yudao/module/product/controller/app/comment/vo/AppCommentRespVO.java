@@ -1,18 +1,28 @@
-package cn.iocoder.yudao.module.product.controller.admin.comment.vo;
+package cn.iocoder.yudao.module.product.controller.app.comment.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "管理后台 - 商品评价 Response VO")
+@Schema(description = "用户APP - 商品评价 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ProductCommentRespVO extends ProductCommentBaseVO {
+public class AppCommentRespVO extends AppCommentBaseVO {
+
+    @Schema(description = "评价人 用户编号", required = true, example = "15721")
+    private Long userId;
+
+    @Schema(description = "评价人名称", required = true, example = "张三")
+    private String userNickname;
+
+    @Schema(description = "评价人头像", required = true)
+    private String userAvatar;
 
     @Schema(description = "订单项编号", required = true, example = "24965")
     private Long id;
@@ -25,9 +35,6 @@ public class ProductCommentRespVO extends ProductCommentBaseVO {
 
     @Schema(description = "交易订单项编号", required = true, example = "8233")
     private Long orderItemId;
-
-    @Schema(description = "是否可见：[true:显示 false:隐藏]", required = true)
-    private Boolean visible;
 
     @Schema(description = "商家是否回复：[1:回复 0:未回复]", required = true)
     private Boolean replied;

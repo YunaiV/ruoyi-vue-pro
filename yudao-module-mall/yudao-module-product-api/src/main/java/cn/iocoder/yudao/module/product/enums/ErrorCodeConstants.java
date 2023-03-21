@@ -44,5 +44,8 @@ public interface ErrorCodeConstants {
 
     // ========== 商品 评价 1008007000 ==========
     ErrorCode COMMENT_NOT_EXISTS = new ErrorCode(1008007000, "商品 评价 不存在");
+    ErrorCode ORDER_SPU_COMMENT_EXISTS = new ErrorCode(1008007001, "订单 商品评价 已存在");
+    ErrorCode COMMENT_ERROR_OPT = new ErrorCode(1008007002, "商品评价非法操作");
+    ErrorCode COMMENT_ADDITIONAL_EXISTS  = new ErrorCode(1008007003, "商品追加评价已存在");
 
 }

@@ -36,7 +36,6 @@ public class ProductCommentDO extends BaseDO {
 
     /**
      * 评价人 用户编号
-     * <p>
      * 关联 MemberUserDO 的 id 编号
      */
     private Long userId;
@@ -49,7 +48,7 @@ public class ProductCommentDO extends BaseDO {
     /**
      * 评价人头像
      */
-    private Long userAvatar;
+    private String userAvatar;
 
     /**
      * 是否匿名
@@ -58,21 +57,18 @@ public class ProductCommentDO extends BaseDO {
 
     /**
      * 交易订单编号
-     * <p>
      * 关联 TradeOrderDO 的 id 编号
      */
     private Long orderId;
 
     /**
      * 交易订单项编号
-     * <p>
      * 关联 TradeOrderItemDO 的 id 编号
      */
     private Long orderItemId;
 
     /**
      * 商品 SPU 编号
-     * <p>
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
@@ -84,42 +80,36 @@ public class ProductCommentDO extends BaseDO {
 
     /**
      * 商品 SKU 编号
-     * <p>
      * 关联 {@link ProductSkuDO#getId()}
      */
     private Long skuId;
 
     /**
      * 是否可见
-     * <p>
-     * 1:显示 0:隐藏
+     * true:显示 false:隐藏
      */
     private Boolean visible;
 
     /**
      * 评分星级
-     * <p>
      * 1-5分
      */
     private Integer scores;
 
     /**
      * 描述星级
-     * <p>
      * 1-5 星
      */
     private Integer descriptionScores;
 
     /**
      * 服务星级
-     * <p>
      * 1-5 星
      */
     private Integer benefitScores;
 
     /**
      * 配送星级
-     * <p>
      * 1-5 星
      */
     private Integer deliveryScores;
@@ -142,7 +132,6 @@ public class ProductCommentDO extends BaseDO {
 
     /**
      * 回复管理员编号
-     * <p>
      * 关联 AdminUserDO 的 id 编号
      */
     private Long replyUserId;
@@ -171,6 +160,6 @@ public class ProductCommentDO extends BaseDO {
     /**
      * 追加评价时间
      */
-    private LocalDateTime additionalCreateTime;
+    private LocalDateTime additionalTime;
 
 }

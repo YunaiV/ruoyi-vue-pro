@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.product.controller.admin.comment;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyVO;
-import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.comment.vo.*;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.service.comment.ProductCommentService;
@@ -51,6 +48,14 @@ public class ProductCommentController {
     @PreAuthorize("@ss.hasPermission('product:comment:update')")
     public CommonResult<Boolean> commentReply(@Valid @RequestBody ProductCommentReplyVO replyVO) {
         productCommentService.commentReply(replyVO, getLoginUserId());
+        return success(true);
+    }
+
+    @PutMapping("/create")
+    @Operation(summary = "添加自评")
+    @PreAuthorize("@ss.hasPermission('product:comment:update')")
+    public CommonResult<Boolean> createComment(@Valid @RequestBody ProductCommentCreateReqVO createReqVO) {
+        productCommentService.createComment(ProductCommentConvert.INSTANCE.convert(createReqVO), Boolean.TRUE);
         return success(true);
     }
 

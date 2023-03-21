@@ -4,10 +4,13 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
+import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentAdditionalReqVO;
+import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
@@ -21,7 +24,8 @@ import java.util.Date;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * {@link ProductCommentServiceImpl} 的单元测试类
@@ -65,6 +69,7 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
             o.setSpuName("感冒药");
             o.setScores(ProductCommentScoresEnum.FOUR.getScores());
             o.setReplied(Boolean.TRUE);
+            o.setVisible(Boolean.TRUE);
         });
         productCommentMapper.insert(productComment);
 
@@ -83,6 +88,8 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setScores(ProductCommentScoresEnum.ONE.getScores())));
         // 测试 replied 不匹配
         productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setReplied(Boolean.FALSE)));
+        // 测试 visible 不匹配
+        productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setVisible(Boolean.FALSE)));
 
         // 调用
         ProductCommentPageReqVO productCommentPageReqVO = new ProductCommentPageReqVO();
@@ -98,7 +105,10 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         assertEquals(result.getTotal(), commentPage.getTotal());
 
         PageResult<ProductCommentDO> all = productCommentService.getCommentPage(new ProductCommentPageReqVO());
-        assertEquals(7, all.getTotal());
+        assertEquals(8, all.getTotal());
+
+        PageResult<ProductCommentDO> visible = productCommentService.getCommentPage(new AppCommentPageReqVO(), Boolean.TRUE);
+        assertEquals(7, visible.getTotal());
     }
 
     @Test
@@ -137,4 +147,28 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         ProductCommentDO productCommentDO = productCommentMapper.selectById(productCommentId);
         assertEquals("测试", productCommentDO.getReplyContent());
     }
+
+    @Test
+    public void testCreateComment_success() {
+        // mock 测试
+        ProductCommentDO productComment = randomPojo(ProductCommentDO.class, o -> {
+            o.setAdditionalContent("");
+        });
+
+        productCommentService.createComment(productComment, Boolean.TRUE);
+
+        MemberUserRespDTO user = new MemberUserRespDTO();
+        user.setId(productComment.getUserId());
+
+        AppCommentAdditionalReqVO createReqVO = new AppCommentAdditionalReqVO();
+        createReqVO.setId(productComment.getId());
+        createReqVO.setAdditionalContent("追加");
+        createReqVO.setAdditionalPicUrls(productComment.getAdditionalPicUrls());
+
+        productCommentService.additionalComment(user, createReqVO);
+        ProductCommentDO exist = productCommentMapper.selectById(productComment.getId());
+
+        assertEquals("追加", exist.getAdditionalContent());
+    }
+
 }
