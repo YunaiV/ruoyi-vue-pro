@@ -92,7 +92,7 @@
       <el-form-item>
         <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button>
         <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
-        #if ($permissionPrefix <= 14)
+        #if ($permissionPrefix.length() < 15)
         <el-button type="primary" @click="openModal('create')" v-hasPermi="['${permissionPrefix}:create']">
         #else
         <el-button
