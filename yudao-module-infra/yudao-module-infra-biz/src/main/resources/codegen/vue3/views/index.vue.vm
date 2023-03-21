@@ -8,15 +8,23 @@
       :inline="true"
       label-width="68px"
     >
-    #set ($dictMethods = []) ## 使用到的 dict 字典方法
+    #set ($dictMethods = [])## 使用到的 dict 字典方法
     #foreach($column in $columns)
-      #if ($column.listOperation)
-        #set ($dictType = $column.dictType)
-        #set ($javaField = $column.javaField)
-        #set ($javaType = $column.javaType)
-        #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-        #set ($comment = $column.columnComment)
-        #if ($column.htmlType == "input")
+        #if ($column.listOperation)
+            #set ($dictType = $column.dictType)
+            #set ($javaField = $column.javaField)
+            #set ($javaType = $column.javaType)
+            #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+            #set ($comment = $column.columnComment)
+            #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
+            #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                #set ($dictMethod = "getIntDictOptions")
+            #elseif ($javaType == "String")
+                #set ($dictMethod = "getStrDictOptions")
+            #elseif ($javaType == "Boolean")
+                #set ($dictMethod = "getBoolDictOptions")
+            #end
+            #if ($column.htmlType == "input")
       <el-form-item label="${comment}" prop="${javaField}">
         <el-input
           v-model="queryParams.${javaField}"
@@ -26,35 +34,31 @@
           class="!w-240px"
         />
       </el-form-item>
-    #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
+            #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
       <el-form-item label="${comment}" prop="${javaField}">
+                #if ($javaField.length() + $comment.length() > 8)
         <el-select
           v-model="queryParams.${javaField}"
           placeholder="请选择${comment}"
           clearable
           class="!w-240px"
         >
-          #if ("" != $dictType)## 设置了 dictType 数据字典的情况
-              #set ($dictMethod = "getDictOptions") ## 计算使用哪个 dict 字典方法
-              #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
-                #set ($dictMethod = "getIntDictOptions")
-              #elseif ($javaType == "String")
-                #set ($dictMethod = "getStrDictOptions")
-              #elseif ($javaType == "Boolean")
-                #set ($dictMethod = "getBoolDictOptions")
-              #end
-              #if (!$dictMethods.contains($dictMethod)) ## 如果不存在，则添加到 dictMethods 数组中，后续好 import
-                  #( $dictMethods.add($dictMethod) )
-              #end
+                #else
+        <el-select v-model="queryParams.${javaField}" placeholder="请选择${comment}" clearable class="!w-240px">
+                #end
+                #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+                    #if (!$dictMethods.contains($dictMethod))## 如果不存在，则添加到 dictMethods 数组中，后续好 import
+                        #set($ignore = $dictMethods.add($dictMethod) )
+                    #end
           <el-option
             v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
             :key="dict.value"
             :label="dict.label"
             :value="dict.value"
           />
-          #else## 未设置 dictType 数据字典的情况
+                #else## 未设置 dictType 数据字典的情况
           <el-option label="请选择字典生成" value="" />
-          #end
+                #end
         </el-select>
       </el-form-item>
     #elseif($column.htmlType == "datetime")
@@ -88,7 +92,15 @@
       <el-form-item>
         <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button>
         <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
+        #if ($permissionPrefix <= 14)
         <el-button type="primary" @click="openModal('create')" v-hasPermi="['${permissionPrefix}:create']">
+        #else
+        <el-button
+          type="primary"
+          @click="openModal('create')"
+          v-hasPermi="['${permissionPrefix}:create']"
+        >
+        #end
           <Icon icon="ep:plus" class="mr-5px" /> 新增
         </el-button>
         <el-button
@@ -179,7 +191,7 @@ const list = ref([]) // 列表的数据
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
-  #set ($listOperationLastIndex = -1) ## 求最后一个需要 , 的地方
+  #set ($listOperationLastIndex = -1)## 求最后一个需要 , 的地方
   #foreach ($column in $columns)
     #if ($column.listOperation)
       #set ($listOperationLastIndex = $foreach.index)
@@ -249,7 +261,7 @@ const handleExport = async () => {
     await message.exportConfirm()
     // 发起导出
     exportLoading.value = true
-    const data = await ${simpleClassName}Api.export${simpleClassName}Api(queryParams)
+    const data = await ${simpleClassName}Api.export${simpleClassName}(queryParams)
     download.excel(data, '${table.classComment}.xls')
   } catch {
   } finally {
