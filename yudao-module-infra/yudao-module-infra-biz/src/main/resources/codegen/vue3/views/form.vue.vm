@@ -27,17 +27,17 @@
       <el-form-item label="${comment}" prop="${javaField}">
         <el-input v-model="formData.${javaField}" placeholder="请输入${comment}" />
       </el-form-item>
-        #elseif($column.htmlType == "imageUpload")## 图片上传 TODO 芋艿：待测试
+        #elseif($column.htmlType == "imageUpload")## 图片上传
             #set ($hasImageUploadColumn = true)
-          <el-form-item label="${comment}">
-            <imageUpload v-model="formData.${javaField}"/>
-          </el-form-item>
-        #elseif($column.htmlType == "fileUpload")## 文件上传 TODO 芋艿：待测试
+      <el-form-item label="${comment}">
+        <UploadImg v-model="formData.${javaField}" />
+      </el-form-item>
+        #elseif($column.htmlType == "fileUpload")## 文件上传
             #set ($hasFileUploadColumn = true)
-          <el-form-item label="${comment}">
-            <fileUpload v-model="formData.${javaField}"/>
-          </el-form-item>
-        #elseif($column.htmlType == "editor")## 文本编辑器 TODO 芋艿：待测试
+      <el-form-item label="${comment}">
+        <UploadFile v-model="formData.${javaField}" />
+      </el-form-item>
+        #elseif($column.htmlType == "editor")## 文本编辑器
       <el-form-item label="${comment}">
         <Editor :model-value="formData.${javaField}" height="150px" />
       </el-form-item>
@@ -59,19 +59,20 @@
                 #end
         </el-select>
       </el-form-item>
-        #elseif($column.htmlType == "checkbox")## 多选框 TODO 芋艿：待测试
+        #elseif($column.htmlType == "checkbox")## 多选框
       <el-form-item label="${comment}" prop="${javaField}">
         <el-checkbox-group v-model="formData.${javaField}">
                 #if ("" != $dictType)## 有数据字典
                     #if (!$dictMethods.contains($dictMethod))## 如果不存在，则添加到 dictMethods 数组中，后续好 import
                       #set($ignore = $dictMethods.add($dictMethod) )
                     #end
-              <el-checkbox
-                v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
-                key="dict.value"
-                :label="dict.value">
-                {{dict.label}}
-              </el-checkbox>
+          <el-checkbox
+            v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+            :key="dict.value"
+            :label="dict.value"
+          >
+            {{ dict.label }}
+          </el-checkbox>
                 #else##没数据字典
           <el-checkbox>请选择字典生成</el-checkbox>
                 #end
@@ -96,14 +97,19 @@
                 #end
         </el-radio-group>
       </el-form-item>
-        #elseif($column.htmlType == "datetime")## 时间框 TODO 芋艿：待测试
-          <el-form-item label="${comment}" prop="${javaField}">
-            <el-date-picker clearable v-model="formData.${javaField}" type="date" value-format="timestamp" placeholder="选择${comment}" />
-          </el-form-item>
-        #elseif($column.htmlType == "textarea")## 文本框 TODO 芋艿：待测试
-          <el-form-item label="${comment}" prop="${javaField}">
-            <el-input v-model="formData.${javaField}" type="textarea" placeholder="请输入${comment}" />
-          </el-form-item>
+        #elseif($column.htmlType == "datetime")## 时间框
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker
+          v-model="formData.${javaField}"
+          type="date"
+          value-format="timestamp"
+          placeholder="选择${comment}"
+        />
+      </el-form-item>
+        #elseif($column.htmlType == "textarea")## 文本框
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-input v-model="formData.${javaField}" type="textarea" placeholder="请输入${comment}" />
+      </el-form-item>
         #end
     #end
 #end
@@ -163,7 +169,7 @@ const formRules = reactive({
 const formRef = ref() // 表单 Ref
 
 /** 打开弹窗 */
-const openModal = async (type: string, id?: number) => {
+const open = async (type: string, id?: number) => {
   modelVisible.value = true
   modelTitle.value = t('action.' + type)
   formType.value = type
@@ -178,7 +184,7 @@ const openModal = async (type: string, id?: number) => {
     }
   }
 }
-defineExpose({ openModal }) // 提供 openModal 方法，用于打开弹窗
+defineExpose({ open }) // 提供 open 方法，用于打开弹窗
 
 /** 提交表单 */
 const emit = defineEmits(['success']) // 定义 success 事件，用于操作成功后的回调
