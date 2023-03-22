@@ -92,12 +92,12 @@
       <el-form-item>
         <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button>
         <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
-        #if ($permissionPrefix.length() < 15)
-        <el-button type="primary" @click="openModal('create')" v-hasPermi="['${permissionPrefix}:create']">
+        #if ($permissionPrefix.length() <= 12)
+        <el-button type="primary" @click="openForm('create')" v-hasPermi="['${permissionPrefix}:create']">
         #else
         <el-button
           type="primary"
-          @click="openModal('create')"
+          @click="openForm('create')"
           v-hasPermi="['${permissionPrefix}:create']"
         >
         #end
@@ -148,7 +148,7 @@
           <el-button
             link
             type="primary"
-            @click="openModal('update', scope.row.id)"
+            @click="openForm('update', scope.row.id)"
             v-hasPermi="['${permissionPrefix}:update']"
           >
             编辑
@@ -172,6 +172,9 @@
       @pagination="getList"
     />
   </content-wrap>
+
+  <!-- 表单弹窗：添加/修改 -->
+  <${simpleClassName}Form ref="formRef" @success="getList" />
 </template>
 
 <script setup lang="ts" name="${simpleClassName}">
@@ -181,7 +184,7 @@ import { DICT_TYPE#foreach ($dictMethod in $dictMethods), ${dictMethod}#end } fr
 import { dateFormatter } from '@/utils/formatTime'
 import download from '@/utils/download'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
-// import ConfigForm from './form.vue'
+import ${simpleClassName}Form from './${simpleClassName}Form.vue'
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 
@@ -236,10 +239,10 @@ const resetQuery = () => {
 }
 
 /** 添加/修改操作 */
-// const modalRef = ref()
-// const openModal = (type: string, id?: number) => {
-//   modalRef.value.openModal(type, id)
-// }
+const formRef = ref()
+const openForm = (type: string, id?: number) => {
+  formRef.value.open(type, id)
+}
 
 /** 删除按钮操作 */
 const handleDelete = async (id: number) => {

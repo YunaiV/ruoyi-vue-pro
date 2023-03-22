@@ -97,20 +97,21 @@ public class CodegenEngine {
      * value：生成的路径
      */
     private static final Table<Integer, String, String> FRONT_TEMPLATES = ImmutableTable.<Integer, String, String>builder()
-            // Vue2
+            // Vue2 标准模版
             .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("views/index.vue"),
                     vueFilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE2.getType(), vueTemplatePath("api/api.js"),
                     vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
-            // Vue3
+            // Vue3 标准模版
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/index.vue"),
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/form.vue"))
-//            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/data.ts"),
-//                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${simpleClassName}Form.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
+            // Vue3 Schema 模版
+//            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/data.ts"),
+//                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
             .build();
 
     @Resource
@@ -203,6 +204,8 @@ public class CodegenEngine {
                 getStr(bindingMap, "basePackage").replaceAll("\\.", "/"));
         filePath = StrUtil.replace(filePath, "${classNameVar}",
                 getStr(bindingMap, "classNameVar"));
+        filePath = StrUtil.replace(filePath, "${simpleClassName}",
+                getStr(bindingMap, "simpleClassName"));
         // sceneEnum 包含的字段
         CodegenSceneEnum sceneEnum = (CodegenSceneEnum) bindingMap.get("sceneEnum");
         filePath = StrUtil.replace(filePath, "${sceneEnum.prefixClass}", sceneEnum.getPrefixClass());
