@@ -25,7 +25,10 @@ public class MemberUserRespDTO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
-
+    /**
+     * 用户头像
+     */
+    private String avatar;
     /**
      * 手机
      */

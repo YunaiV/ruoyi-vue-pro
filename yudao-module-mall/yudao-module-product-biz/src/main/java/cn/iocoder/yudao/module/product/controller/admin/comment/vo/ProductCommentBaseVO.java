@@ -4,14 +4,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Data
 public class ProductCommentBaseVO {
-
-    @Schema(description = "评价人 用户编号", required = true, example = "15721")
-    @NotNull(message = "评价人 用户编号不能为空")
-    private Long userId;
 
     @Schema(description = "评价人名称", required = true, example = "张三")
     @NotNull(message = "评价人名称不能为空")
@@ -54,7 +51,7 @@ public class ProductCommentBaseVO {
     private String content;
 
     @Schema(description = "评论图片地址数组，以逗号分隔最多上传9张", required = true)
-    @NotNull(message = "评论图片地址数组，以逗号分隔最多上传9张不能为空")
+    @Size(max = 9, message = "评论图片地址数组长度不能超过9张")
     private List<String> picUrls;
 
 }

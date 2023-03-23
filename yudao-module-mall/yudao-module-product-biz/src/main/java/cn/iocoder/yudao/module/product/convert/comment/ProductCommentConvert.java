@@ -34,7 +34,7 @@ public interface ProductCommentConvert {
         ProductCommentDO productComment = new ProductCommentDO();
         productComment.setUserId(user.getId());
         productComment.setUserNickname(user.getNickname());
-//        productComment.setUserAvatar();
+        productComment.setUserAvatar(user.getAvatar());
         productComment.setAnonymous(createReqVO.getAnonymous());
         productComment.setOrderId(createReqVO.getOrderId());
         productComment.setOrderItemId(createReqVO.getOrderItemId());
@@ -52,11 +52,10 @@ public interface ProductCommentConvert {
 
     default ProductCommentDO convert(ProductCommentCreateReqVO createReq) {
         ProductCommentDO productComment = new ProductCommentDO();
-        productComment.setUserId(createReq.getUserId());
+        productComment.setUserId(0L);
         productComment.setUserNickname(createReq.getUserNickname());
         productComment.setUserAvatar(createReq.getUserAvatar());
         productComment.setAnonymous(Boolean.FALSE);
-        // TODO: 2023/3/21 自评订单ID来源
         productComment.setOrderId(0L);
         productComment.setOrderItemId(0L);
         productComment.setSpuId(createReq.getSpuId());

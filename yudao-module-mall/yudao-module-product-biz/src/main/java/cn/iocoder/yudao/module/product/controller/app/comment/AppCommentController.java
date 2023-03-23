@@ -44,7 +44,6 @@ public class AppCommentController {
     @PostMapping(value = "/create")
     @Operation(summary = "创建商品评价")
     public CommonResult<Boolean> createComment(@RequestBody AppCommentCreateReqVO createReqVO) {
-        // 查询会员 todo@艿艿 获取用户头像
         // TODO: 2023/3/20 要不要判断订单、商品是否存在
         MemberUserRespDTO user = memberUserApi.getUser(getLoginUserId());
         productCommentService.createComment(ProductCommentConvert.INSTANCE.convert(user, createReqVO), Boolean.FALSE);
