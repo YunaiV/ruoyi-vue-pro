@@ -19,7 +19,6 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dept.UserPostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.UserPostMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
-import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
@@ -90,7 +89,6 @@ public class AdminUserServiceImpl implements AdminUserService {
                 reqVO.getDeptId(), reqVO.getPostIds());
         // 插入用户
         AdminUserDO user = UserConvert.INSTANCE.convert(reqVO);
-        user.setSex(SexEnum.MALE.getSex());
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(encodePassword(reqVO.getPassword())); // 加密密码
         userMapper.insert(user);
