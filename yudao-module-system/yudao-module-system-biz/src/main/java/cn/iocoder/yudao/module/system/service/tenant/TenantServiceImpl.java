@@ -29,6 +29,7 @@ import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -97,6 +98,9 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createTenant(TenantCreateReqVO createReqVO) {
+        // 校验租户名称是否重复
+        validTenantName(createReqVO.getName(), null);
+
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(createReqVO.getPackageId());
 
@@ -139,6 +143,10 @@ public class TenantServiceImpl implements TenantService {
     public void updateTenant(TenantUpdateReqVO updateReqVO) {
         // 校验存在
         TenantDO tenant = validateUpdateTenant(updateReqVO.getId());
+
+        // 校验租户名称是否重复
+        validTenantName(updateReqVO.getName(), updateReqVO.getId());
+
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(updateReqVO.getPackageId());
 
@@ -148,6 +156,17 @@ public class TenantServiceImpl implements TenantService {
         // 如果套餐发生变化，则修改其角色的权限
         if (ObjectUtil.notEqual(tenant.getPackageId(), updateReqVO.getPackageId())) {
             updateTenantRoleMenu(tenant.getId(), tenantPackage.getMenuIds());
+        }
+    }
+
+    protected void validTenantName(String tenantName, Long id) {
+        LambdaQueryWrapper<TenantDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(TenantDO::getName, tenantName);
+        if (id != null) {
+            wrapper.ne(TenantDO::getId, id);
+        }
+        if (tenantMapper.selectCount(wrapper) > 0) {
+            throw exception(TENANT_NAME_DUPLICATE);
         }
     }
 
