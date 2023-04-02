@@ -1,5 +1,5 @@
 <template>
-  <content-wrap>
+  <ContentWrap>
     <!-- 搜索工作栏 -->
     <el-form
       class="-mb-15px"
@@ -114,10 +114,10 @@
         </el-button>
       </el-form-item>
     </el-form>
-  </content-wrap>
+  </ContentWrap>
 
   <!-- 列表 -->
-  <content-wrap>
+  <ContentWrap>
     <el-table v-loading="loading" :data="list">
     #foreach($column in $columns)
       #if ($column.listOperationResult)
@@ -171,7 +171,7 @@
       v-model:limit="queryParams.pageSize"
       @pagination="getList"
     />
-  </content-wrap>
+  </ContentWrap>
 
   <!-- 表单弹窗：添加/修改 -->
   <${simpleClassName}Form ref="formRef" @success="getList" />
