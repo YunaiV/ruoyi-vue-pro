@@ -22,7 +22,7 @@ public class TradeOrderBaseVO {
     private String no;
 
     @Schema(description = "下单时间", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @Schema(description = "订单类型", required = true, example = "1")
     private Integer type;

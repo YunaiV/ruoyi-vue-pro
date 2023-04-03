@@ -37,4 +37,8 @@ public class SecurityProperties {
      */
     private List<String> permitAllUrls = Collections.emptyList();
 
+    /**
+     * PasswordEncoder 加密复杂度，越高开销越大
+     */
+    private Integer passwordEncoderLength = 4;
 }
