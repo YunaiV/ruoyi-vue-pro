@@ -79,10 +79,6 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
             if (tenantId == null) {
                 log.error("[doFilterInternal][URL({}/{}) 未传递租户编号]", request.getRequestURI(), request.getMethod());
                 String msg = "请求的租户标识未传递，请进行排查";
-                if ("/admin-api/system/auth/login".equals(request.getRequestURI()))
-                {
-                    msg = "登录失败，租户名称不正确";
-                }
                 ServletUtils.writeJSON(response, CommonResult.error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(), msg));
                 return;
             }
