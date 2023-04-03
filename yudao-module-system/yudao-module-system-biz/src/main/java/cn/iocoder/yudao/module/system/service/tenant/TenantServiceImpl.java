@@ -160,12 +160,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     protected void validTenantName(String tenantName, Long id) {
-        LambdaQueryWrapper<TenantDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(TenantDO::getName, tenantName);
-        if (id != null) {
-            wrapper.ne(TenantDO::getId, id);
-        }
-        if (tenantMapper.selectCount(wrapper) > 0) {
+        if (tenantMapper.selectCountByName(tenantName, id) > 0) {
             throw exception(TENANT_NAME_DUPLICATE);
         }
     }
