@@ -73,7 +73,7 @@ public class ConfigController {
     public CommonResult<String> getConfigKey(@RequestParam("key") String key) {
         ConfigDO config = configService.getConfigByKey(key);
         if (config == null) {
-            return null;
+            return success(null);
         }
         if (!config.getVisible()) {
             throw exception(ErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_VISIBLE);
