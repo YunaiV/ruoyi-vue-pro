@@ -143,7 +143,7 @@ import { datePickerOptions } from "@/utils/constants";
 import { DICT_TYPE, getDictDatas } from "@/utils/dict";
 
 export default {
-  name: "index",
+  name: "TradeOrder",
   data () {
     return {
       // 遮罩层
@@ -232,7 +232,7 @@ export default {
       this.getList();
     },
     goToDetail (row) {
-      this.$router.push({ path: '/trade/order/detail', query: { id: row.id }})
+      this.$router.push({ name: 'TradeOrderDetail', query: { id: row.id }})
     }
   }
 }

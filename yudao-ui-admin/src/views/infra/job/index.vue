@@ -155,7 +155,7 @@ import Crontab from '@/components/Crontab'
 
 export default {
   components: { Crontab },
-  name: "Job",
+  name: "InfraJob",
   data() {
     return {
       // 遮罩层

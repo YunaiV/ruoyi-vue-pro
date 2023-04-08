@@ -166,7 +166,7 @@ import { createSmsTemplate, updateSmsTemplate, deleteSmsTemplate, getSmsTemplate
 import {  getSimpleSmsChannels } from "@/api/system/sms/smsChannel";
 
 export default {
-  name: "SmsTemplate",
+  name: "SystemSmsTemplate",
   data() {
     return {
       // 遮罩层

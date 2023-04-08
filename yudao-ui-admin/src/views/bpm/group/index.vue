@@ -102,7 +102,7 @@ import {CommonStatusEnum} from "@/utils/constants";
 import {listSimpleUsers} from "@/api/system/user";
 
 export default {
-  name: "UserGroup",
+  name: "BpmUserGroup",
   components: {
   },
   data() {

@@ -233,7 +233,7 @@ import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
-  name: "model",
+  name: "BpmModel",
   components: {
     Parser,
     Treeselect,
@@ -380,7 +380,7 @@ export default {
     /** 设计按钮操作 */
     handleDesign(row) {
       this.$router.push({
-        path:"/bpm/manager/model/design",
+        name: "BpmModelEditor",
         query:{
           modelId: row.id
         }
@@ -473,7 +473,7 @@ export default {
     /** 跳转流程定义的列表 */
     handleDefinitionList(row) {
       this.$router.push({
-        path:"/bpm/manager/definition",
+        name: "BpmProcessDefinition",
         query:{
           key: row.key
         }

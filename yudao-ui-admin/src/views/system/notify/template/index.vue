@@ -140,7 +140,7 @@ import {listSimpleUsers} from "@/api/system/user";
 import {CommonStatusEnum} from "@/utils/constants";
 
 export default {
-  name: "NotifyTemplate",
+  name: "SystemNotifyTemplate",
   data() {
     return {
       // 遮罩层

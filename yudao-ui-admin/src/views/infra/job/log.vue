@@ -96,7 +96,7 @@
 import { getJobLogPage, exportJobLogExcel } from "@/api/infra/jobLog";
 
 export default {
-  name: "JobLog",
+  name: "InfraJobLog",
   data() {
     return {
       // 遮罩层

@@ -117,7 +117,7 @@ import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {CommonStatusEnum} from "@/utils/constants";
 
 export default {
-  name: "Merchant",
+  name: "PayMerchant",
   components: {
   },
   data() {

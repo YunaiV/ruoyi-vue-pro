@@ -74,7 +74,7 @@ import { deleteCoupon, getCouponPage } from "@/api/mall/promotion/coupon";
 import { DICT_TYPE, getDictDatas} from "@/utils/dict";
 
 export default {
-  name: "Coupon",
+  name: "PromotionCoupon",
   components: {
   },
   data() {

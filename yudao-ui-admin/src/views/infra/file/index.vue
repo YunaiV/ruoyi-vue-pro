@@ -92,7 +92,7 @@ import {getAccessToken} from "@/utils/auth";
 import ImagePreview from "@/components/ImagePreview";
 
 export default {
-  name: "File",
+  name: "InfraFile",
   components: {
     ImagePreview
   },

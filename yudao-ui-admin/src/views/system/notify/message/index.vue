@@ -116,7 +116,7 @@
 import { getNotifyMessagePage } from "@/api/system/notify/message";
 
 export default {
-  name: "NotifyMessage",
+  name: "SystemNotifyMessage",
   data() {
     return {
       // 遮罩层

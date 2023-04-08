@@ -8,7 +8,7 @@
 import iFrame from "@/components/iFrame/index";
 import { getConfigKey } from "@/api/infra/config";
 export default {
-  name: "Druid",
+  name: "InfraAdminServer",
   components: { iFrame },
   data() {
     return {

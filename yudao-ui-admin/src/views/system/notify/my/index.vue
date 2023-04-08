@@ -68,7 +68,7 @@
 import {getMyNotifyMessagePage, updateAllNotifyMessageRead, updateNotifyMessageRead} from "@/api/system/notify/message";
 
 export default {
-  name: "myNotify",
+  name: "SystemMyNotify",
   data() {
     return {
       // 遮罩层

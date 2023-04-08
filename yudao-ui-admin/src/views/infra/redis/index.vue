@@ -73,7 +73,7 @@ import { getCache } from "@/api/infra/redis";
 import * as echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 export default {
-  name: "Server",
+  name: "InfraRedis",
   data () {
     return {
       // 统计命令信息

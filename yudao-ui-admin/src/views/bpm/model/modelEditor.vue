@@ -26,7 +26,7 @@ import {createModel, getModel, updateModel} from "@/api/bpm/model";
 // import MyProcessPanel from "../package/process-panel/ProcessPanel";
 
 export default {
-  name: "App",
+  name: "BpmModelEditor",
   components: { MyProcessPalette },
   data() {
     return {
