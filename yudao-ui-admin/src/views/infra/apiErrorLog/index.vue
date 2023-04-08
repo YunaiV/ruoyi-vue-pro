@@ -123,7 +123,7 @@ import { updateApiErrorLogProcess, getApiErrorLogPage, exportApiErrorLogExcel } 
 import { InfraApiErrorLogProcessStatusEnum } from '@/utils/constants'
 
 export default {
-  name: "ApiErrorLog",
+  name: "InfraApiErrorLog",
   components: {
   },
   data() {

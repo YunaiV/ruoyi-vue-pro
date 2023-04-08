@@ -81,7 +81,7 @@ import Parser from '@/components/parser/Parser'
 import taskAssignRuleDialog from "../taskAssignRule/taskAssignRuleDialog";
 
 export default {
-  name: "processDefinition",
+  name: "BpmProcessDefinition",
   components: {
     Parser,
     taskAssignRuleDialog

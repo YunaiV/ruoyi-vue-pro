@@ -144,7 +144,7 @@ import { CommonStatusEnum } from "@/utils/constants";
 import { getSimpleMailAccountList } from "@/api/system/mail/account";
 
 export default {
-  name: "MailTemplate",
+  name: "SystemMailTemplate",
   components: {
     Editor,
   },

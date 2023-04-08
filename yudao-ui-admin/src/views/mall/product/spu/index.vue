@@ -227,7 +227,7 @@ import {getBrandList} from "@/api/mall/product/brand";
 import {ProductSpuStatusEnum} from "@/utils/constants";
 
 export default {
-  name: "Spu",
+  name: "ProductSpu",
   data() {
     return {
       activeTabs: "all",
@@ -318,11 +318,11 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.$router.push({ name: 'SpuAdd'})
+      this.$router.push({ name: 'ProductSpuCreate'})
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.$router.push({ name: 'SpuEdit', params: { spuId: row.id }})
+      this.$router.push({ name: 'ProductSpuUpdate', params: { spuId: row.id }})
     },
     /** 删除按钮操作 */
     handleDelete(row) {

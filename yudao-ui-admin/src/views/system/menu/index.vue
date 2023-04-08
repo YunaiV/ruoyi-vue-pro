@@ -207,7 +207,7 @@ import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 import {isExternal} from "@/utils/validate";
 
 export default {
-  name: "Menu",
+  name: "SystemMenu",
   components: { Treeselect, IconSelect },
   data() {
     return {

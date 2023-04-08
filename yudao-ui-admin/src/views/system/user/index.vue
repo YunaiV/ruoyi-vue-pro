@@ -248,7 +248,7 @@ import {listSimpleRoles} from "@/api/system/role";
 import {getBaseHeader} from "@/utils/request";
 
 export default {
-  name: "User",
+  name: "SystemUser",
   components: { Treeselect },
   data() {
     return {

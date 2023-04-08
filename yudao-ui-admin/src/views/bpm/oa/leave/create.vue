@@ -30,7 +30,7 @@ import { createLeave}  from "@/api/bpm/leave"
 import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
-  name: "LeaveCreate",
+  name: "BpmOALeaveCreate",
   components: {
   },
   data() {

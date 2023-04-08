@@ -100,7 +100,7 @@ hljs.registerLanguage("javascript", require("highlight.js/lib/languages/javascri
 hljs.registerLanguage("sql", require("highlight.js/lib/languages/sql"));
 hljs.registerLanguage("typescript", require("highlight.js/lib/languages/typescript"));
 export default {
-  name: "Codegen",
+  name: "InfraCodegen",
   components: { importTable },
   data() {
     return {

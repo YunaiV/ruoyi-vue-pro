@@ -83,7 +83,7 @@ import {
 } from '@/api/mall/product/property'
 
 export default {
-  name: "PropertyValue",
+  name: "ProductPropertyValue",
   data() {
     return {
       // 遮罩层

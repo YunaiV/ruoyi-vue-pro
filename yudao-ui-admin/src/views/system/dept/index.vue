@@ -117,7 +117,7 @@ import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 import {listSimpleUsers} from "@/api/system/user";
 
 export default {
-  name: "Dept",
+  name: "SystemDept",
   components: { Treeselect },
   data() {
     return {

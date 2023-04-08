@@ -77,7 +77,7 @@
 import { createProperty, updateProperty, deleteProperty, getProperty, getPropertyPage } from "@/api/mall/product/property";
 
 export default {
-  name: "Property",
+  name: "ProductProperty",
   components: {
   },
   data() {

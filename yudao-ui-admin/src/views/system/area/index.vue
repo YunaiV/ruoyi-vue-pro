@@ -39,7 +39,7 @@
 import {getAreaByIp, getAreaTree} from "@/api/system/area";
 
 export default {
-  name: "Area",
+  name: "SystemArea",
   components: {
   },
   data() {

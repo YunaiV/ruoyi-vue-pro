@@ -89,7 +89,7 @@ import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 import {cancelProcessInstance} from "@/api/bpm/processInstance";
 
 export default {
-  name: "Leave",
+  name: "BpmOALeave",
   components: {
   },
   data() {
@@ -142,15 +142,15 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.$router.push({ path: "/bpm/oa/leave/create"});
+      this.$router.push({ name: "BpmOALeaveCreate"});
     },
     /** 详情按钮操作 */
     handleDetail(row) {
-      this.$router.push({ path: "/bpm/oa/leave/detail", query: { id: row.id}});
+      this.$router.push({ name: "BpmOALeaveDetail", query: { id: row.id}});
     },
     /** 查看审批进度的操作 */
     handleProcessDetail(row) {
-      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.processInstanceId}});
+      this.$router.push({ name: "BpmProcessInstanceDetail", query: { id: row.processInstanceId}});
     },
     /** 取消请假 */
     handleCancel(row) {

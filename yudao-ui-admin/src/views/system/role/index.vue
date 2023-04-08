@@ -180,7 +180,7 @@ import {CommonStatusEnum, SystemDataScopeEnum} from "@/utils/constants";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 
 export default {
-  name: "Role",
+  name: "SystemRole",
   data() {
     return {
       // 遮罩层

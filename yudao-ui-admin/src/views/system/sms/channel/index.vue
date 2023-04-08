@@ -110,7 +110,7 @@
 import { createSmsChannel, updateSmsChannel, deleteSmsChannel, getSmsChannel, getSmsChannelPage } from "@/api/system/sms/smsChannel";
 
 export default {
-  name: "SmsChannel",
+  name: "SystemSmsChannel",
   components: {
   },
   data() {

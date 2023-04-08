@@ -229,7 +229,7 @@ import wechatChannelForm from "@/views/pay/app/components/wechatChannelForm";
 import aliPayChannelForm from "@/views/pay/app/components/aliPayChannelForm";
 
 export default {
-  name: "App",
+  name: "PayApp",
   components: {
     "wechatChannelForm": wechatChannelForm,
     "aliPayChannelForm": aliPayChannelForm

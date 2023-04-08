@@ -192,7 +192,7 @@ import { getSeckillTimeList } from "@/api/mall/promotion/seckillTime";
 import { deepClone } from "@/utils";
 
 export default {
-    name: "SeckillActivity",
+    name: "PromotionSeckillActivity",
     components: {
     },
     data() {

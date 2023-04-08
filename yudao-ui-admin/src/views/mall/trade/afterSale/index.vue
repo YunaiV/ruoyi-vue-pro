@@ -104,7 +104,7 @@ import { datePickerOptions } from "@/utils/constants";
 import { DICT_TYPE, getDictDatas } from "@/utils/dict";
 
 export default {
-  name: "AfterSale",
+  name: "TradeAfterSale",
   components: {
   },
   data() {

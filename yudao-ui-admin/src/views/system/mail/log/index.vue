@@ -123,7 +123,7 @@ import Editor from '@/components/Editor';
 import { getSimpleMailAccountList } from "@/api/system/mail/account";
 
 export default {
-  name: "MailLog",
+  name: "SystemMailLog",
   components: {
     Editor,
   },

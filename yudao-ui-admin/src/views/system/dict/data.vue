@@ -111,7 +111,7 @@ import { CommonStatusEnum } from '@/utils/constants'
 import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
-  name: "Data",
+  name: "SystemDictData",
   data() {
     return {
       // 遮罩层
