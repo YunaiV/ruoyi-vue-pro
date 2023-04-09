@@ -178,7 +178,7 @@
   <${simpleClassName}Form ref="formRef" @success="getList" />
 </template>
 
-<script setup lang="ts" name="${simpleClassName}">
+<script setup lang="ts" name="${table.className}">
 #if ($dictMethods.size() > 0)
 import { DICT_TYPE#foreach ($dictMethod in $dictMethods), ${dictMethod}#end } from '@/utils/dict'
 #end
