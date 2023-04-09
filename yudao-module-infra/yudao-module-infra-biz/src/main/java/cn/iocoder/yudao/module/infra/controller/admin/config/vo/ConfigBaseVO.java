@@ -29,8 +29,8 @@ public class ConfigBaseVO {
     @Size(max = 500, message = "参数键值长度不能超过500个字符")
     private String value;
 
-    @Schema(description = "是否敏感", required = true, example = "true")
-    @NotNull(message = "是否敏感不能为空")
+    @Schema(description = "是否可见", required = true, example = "true")
+    @NotNull(message = "是否可见不能为空")
     private Boolean visible;
 
     @Schema(description = "备注", example = "备注一下很帅气！")

@@ -38,6 +38,12 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
                 .orderByDesc(TenantDO::getId));
     }
 
+    default Long selectCountByName(String name, Long id) {
+        return selectCount(new LambdaQueryWrapperX<TenantDO>()
+                .eqIfPresent(TenantDO::getName, name)
+                .neIfPresent(TenantDO::getId, id));
+    }
+
     default TenantDO selectByName(String name) {
         return selectOne(TenantDO::getName, name);
     }
