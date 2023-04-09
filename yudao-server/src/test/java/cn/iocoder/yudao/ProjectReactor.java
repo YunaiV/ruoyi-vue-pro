@@ -5,7 +5,6 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -87,7 +86,7 @@ public class ProjectReactor {
     }
 
     private static Collection<File> listFiles(String projectBaseDir) {
-        Collection<File> files = FileUtils.listFiles(new File(projectBaseDir), null, true);
+        Collection<File> files = FileUtil.loopFiles(projectBaseDir);
         // 移除 IDEA、Git 自身的文件、Node 编译出来的文件
         files = files.stream()
                 .filter(file -> !file.getPath().contains(separator + "target" + separator)

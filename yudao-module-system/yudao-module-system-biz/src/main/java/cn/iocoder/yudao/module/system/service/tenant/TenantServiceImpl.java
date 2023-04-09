@@ -29,7 +29,6 @@ import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -99,8 +98,7 @@ public class TenantServiceImpl implements TenantService {
     @Transactional(rollbackFor = Exception.class)
     public Long createTenant(TenantCreateReqVO createReqVO) {
         // 校验租户名称是否重复
-        validTenantName(createReqVO.getName(), null);
-
+        validTenantNameDuplicate(createReqVO.getName(), null);
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(createReqVO.getPackageId());
 
@@ -143,10 +141,8 @@ public class TenantServiceImpl implements TenantService {
     public void updateTenant(TenantUpdateReqVO updateReqVO) {
         // 校验存在
         TenantDO tenant = validateUpdateTenant(updateReqVO.getId());
-
         // 校验租户名称是否重复
-        validTenantName(updateReqVO.getName(), updateReqVO.getId());
-
+        validTenantNameDuplicate(updateReqVO.getName(), updateReqVO.getId());
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(updateReqVO.getPackageId());
 
@@ -159,9 +155,17 @@ public class TenantServiceImpl implements TenantService {
         }
     }
 
-    protected void validTenantName(String tenantName, Long id) {
-        if (tenantMapper.selectCountByName(tenantName, id) > 0) {
-            throw exception(TENANT_NAME_DUPLICATE);
+    private void validTenantNameDuplicate(String name, Long id) {
+        TenantDO tenant = tenantMapper.selectByName(name);
+        if (tenant == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同名字的租户
+        if (id == null) {
+            throw exception(TENANT_NAME_DUPLICATE, name);
+        }
+        if (!tenant.getId().equals(id)) {
+            throw exception(TENANT_NAME_DUPLICATE, name);
         }
     }
 
