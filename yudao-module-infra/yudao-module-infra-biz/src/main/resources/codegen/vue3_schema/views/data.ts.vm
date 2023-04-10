@@ -1,0 +1,115 @@
+import type { CrudSchema } from '@/hooks/web/useCrudSchemas'
+const { t } = useI18n() // 国际化
+
+// 表单校验
+export const rules = reactive({
+#foreach ($column in $columns)
+#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+#set($comment=$column.columnComment)
+  $column.javaField: [required],
+#end
+#end
+})
+
+// CrudSchema
+const crudSchemas = reactive<CrudSchema[]>([
+#foreach($column in $columns)
+#if ($column.listOperation || $column.listOperationResult || $column.createOperation || $column.updateOperation)
+#set ($dictType = $column.dictType)
+#set ($javaField = $column.javaField)
+#set ($javaType = $column.javaType)
+  {
+    title: '${column.columnComment}',
+    field: '${column.javaField}',
+    #if (!$column.listOperationResult)
+    isTable: false,
+    #end
+    #if ("" != $dictType)## 有数据字典
+    dictType: DICT_TYPE.$dictType.toUpperCase(),
+        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+    dictClass: 'number',
+        #elseif ($javaType == "String")
+    dictClass: 'string',
+        #elseif ($javaType == "Boolean")
+    dictClass: 'boolean',
+        #end
+    #end
+    #if ((!$column.createOperation && !$column.updateOperation) || $column.primaryKey)
+    isForm: false,
+    #else
+        #if($column.htmlType == "imageUpload")## 图片上传
+    form: {
+      component: 'UploadImg'
+    },
+        #elseif($column.htmlType == "fileUpload")## 文件上传
+    form: {
+      component: 'UploadFile'
+    },
+        #elseif($column.htmlType == "editor")## 文本编辑器
+    form: {
+      component: 'Editor',
+      componentProps: {
+        valueHtml: '',
+        height: 200
+      }
+    },
+        #elseif($column.htmlType == "select")## 下拉框
+    form: {
+      component: 'SelectV2'
+    },
+        #elseif($column.htmlType == "checkbox")## 多选框
+    form: {
+      component: 'Checkbox'
+    },
+        #elseif($column.htmlType == "checkbox")## 单选框
+    form: {
+      component: 'Radio'
+    },
+        #end
+    #end
+  #elseif(!("" != $column.dictType))
+  #if (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdatetime")
+  form: {
+    component: 'DatePicker',
+    componentProps: {
+      type: 'datetime',
+      valueFormat: 'x'
+    }
+  },
+  #elseif($column.htmlType == "textarea")## 文本框
+  form: {
+    component: 'Input',
+    componentProps: {
+      type: 'textarea',
+      rows: 4
+    },
+    colProps: {
+      span: 24
+    }
+  },
+  #elseif(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")## 数字类型
+  form: {
+    component: 'InputNumber',
+    value: 0
+  },
+  #end
+  #end
+  #if ($column.listOperation)
+  #if($column.htmlType == "input")
+  isSearch: true,
+  #elseif("" != $dictType)
+  isSearch: true,
+  #elseif($column.htmlType == "datetime")
+  formatter: 'formatDate',
+  search: {
+    show: true,
+    itemRender: {
+      name: 'XDataTimePicker'
+    }
+  },
+  #end
+  #end
+  },
+#end
+])
+export const { allSchemas } = useCrudSchemas(crudSchemas)

@@ -110,8 +110,8 @@ public class CodegenEngine {
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
             // Vue3 Schema 模版
-//            .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/data.ts"),
-//                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
+            .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("views/data.ts"),
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
             .build();
 
     @Resource
@@ -264,6 +264,7 @@ public class CodegenEngine {
         return "yudao-ui-${sceneEnum.basePackage}/" + // 顶级目录
                 "src/" + path;
     }
+
     private static String vue3TemplatePath(String path) {
         return "codegen/vue3/" + path + ".vm";
     }
@@ -271,5 +272,9 @@ public class CodegenEngine {
     private static String vue3FilePath(String path) {
         return "yudao-ui-${sceneEnum.basePackage}-vue3/" + // 顶级目录
                 "src/" + path;
+    }
+
+    private static String vue3SchemaTemplatePath(String path) {
+        return "codegen/vue3_schema/" + path + ".vm";
     }
 }
