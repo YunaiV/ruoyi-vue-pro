@@ -185,7 +185,7 @@ export default {
 		averageTotal: function () {
 			this.average01 = this.checkNum(this.average01, 1, 4)
 			this.average02 = this.checkNum(this.average02, 1, 7)
-			return this.average02 + '#' + this.average01;
+			return this.average01 + '#' + this.average02;
 		},
 		// 最近的工作日（格式）
 		weekdayCheck: function () {
