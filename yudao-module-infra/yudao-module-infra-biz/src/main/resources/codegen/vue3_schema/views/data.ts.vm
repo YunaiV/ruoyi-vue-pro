@@ -1,4 +1,5 @@
 import type { CrudSchema } from '@/hooks/web/useCrudSchemas'
+import { dateFormatter } from '@/utils/formatTime'
 const { t } = useI18n() // 国际化
 
 // 表单校验
@@ -21,9 +22,7 @@ const crudSchemas = reactive<CrudSchema[]>([
   {
     title: '${column.columnComment}',
     field: '${column.javaField}',
-    #if (!$column.listOperationResult)
-    isTable: false,
-    #end
+## ========= 字典部分 =========
     #if ("" != $dictType)## 有数据字典
     dictType: DICT_TYPE.$dictType.toUpperCase(),
         #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
@@ -34,6 +33,28 @@ const crudSchemas = reactive<CrudSchema[]>([
     dictClass: 'boolean',
         #end
     #end
+## ========= Table 表格部分 =========
+    #if (!$column.listOperationResult)
+    isTable: false,
+      #if ($column.htmlType == "datetime")
+    formatter: dateFormatter,
+      #end
+    #end
+## ========= Search 表格部分 =========
+    #if ($column.listOperation)
+    isSearch: true,
+        #if ($column.htmlType == "datetime")
+    search: {
+      component: 'DatePicker',
+      componentProps: {
+        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        type: 'daterange',
+        defaultTime: [new Date('1 00:00:00'), new Date('1 23:59:59')]
+      }
+    }
+        #end
+    #end
+## ========= Form 表单部分 =========
     #if ((!$column.createOperation && !$column.updateOperation) || $column.primaryKey)
     isForm: false,
     #else
@@ -65,51 +86,39 @@ const crudSchemas = reactive<CrudSchema[]>([
     form: {
       component: 'Radio'
     },
+        #elseif($column.htmlType == "datetime")## 时间框
+    form: {
+      component: 'DatePicker',
+      componentProps: {
+        type: 'datetime',
+        valueFormat: 'x'
+      }
+    },
+        #elseif($column.htmlType == "textarea")## 文本框
+    form: {
+      component: 'Input',
+      componentProps: {
+        type: 'textarea',
+        rows: 4
+      },
+      colProps: {
+        span: 24
+      }
+    },
+        #elseif(${javaType.toLowerCase()} == "long" || ${javaType.toLowerCase()} == "integer")## 文本框
+    form: {
+      component: 'InputNumber',
+      value: 0
+    },
         #end
     #end
-  #elseif(!("" != $column.dictType))
-  #if (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdatetime")
-  form: {
-    component: 'DatePicker',
-    componentProps: {
-      type: 'datetime',
-      valueFormat: 'x'
-    }
-  },
-  #elseif($column.htmlType == "textarea")## 文本框
-  form: {
-    component: 'Input',
-    componentProps: {
-      type: 'textarea',
-      rows: 4
-    },
-    colProps: {
-      span: 24
-    }
-  },
-  #elseif(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer")## 数字类型
-  form: {
-    component: 'InputNumber',
-    value: 0
-  },
-  #end
-  #end
-  #if ($column.listOperation)
-  #if($column.htmlType == "input")
-  isSearch: true,
-  #elseif("" != $dictType)
-  isSearch: true,
-  #elseif($column.htmlType == "datetime")
-  formatter: 'formatDate',
-  search: {
-    show: true,
-    itemRender: {
-      name: 'XDataTimePicker'
-    }
-  },
-  #end
-  #end
   },
 #end
+#end
+  {
+    label: '操作',
+    field: 'action',
+    isForm: false
+  }
 ])
 export const { allSchemas } = useCrudSchemas(crudSchemas)
