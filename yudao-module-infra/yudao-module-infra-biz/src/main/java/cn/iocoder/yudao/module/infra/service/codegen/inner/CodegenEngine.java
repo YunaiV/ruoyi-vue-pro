@@ -112,6 +112,10 @@ public class CodegenEngine {
             // Vue3 Schema 模版
             .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("views/data.ts"),
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
+            .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("views/index.vue"),
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("views/form.vue"),
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${simpleClassName}Form.vue"))
             .build();
 
     @Resource
