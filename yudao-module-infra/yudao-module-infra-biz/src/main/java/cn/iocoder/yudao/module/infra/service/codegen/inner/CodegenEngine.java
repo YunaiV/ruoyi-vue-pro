@@ -186,7 +186,7 @@ public class CodegenEngine {
         bindingMap.put("permissionPrefix", table.getModuleName() + ":" + simpleClassNameStrikeCase);
 
         // 执行生成
-        Map<String, String> templates = getTemplates();
+        Map<String, String> templates = getTemplates(table.getFrontType());
         Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(templates.size()); // 有序
         templates.forEach((vmPath, filePath) -> {
             filePath = formatFilePath(filePath, bindingMap);
@@ -198,10 +198,10 @@ public class CodegenEngine {
         return result;
     }
 
-    private Map<String, String> getTemplates() {
+    private Map<String, String> getTemplates(Integer frontType) {
         Map<String, String> templates = new LinkedHashMap<>();
         templates.putAll(SERVER_TEMPLATES);
-        templates.putAll(FRONT_TEMPLATES.row(codegenProperties.getFrontType()));
+        templates.putAll(FRONT_TEMPLATES.row(frontType));
         return templates;
     }
 

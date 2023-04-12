@@ -27,7 +27,7 @@ public class CodegenProperties {
     private Collection<String> dbSchemas;
 
     /**
-     * 代码生成的前端类型
+     * 代码生成的前端类型（默认）
      *
      * 枚举 {@link CodegenFrontTypeEnum#getType()}
      */
