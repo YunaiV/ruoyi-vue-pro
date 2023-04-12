@@ -182,7 +182,12 @@
 #if ($dictMethods.size() > 0)
 import { DICT_TYPE#foreach ($dictMethod in $dictMethods), ${dictMethod}#end } from '@/utils/dict'
 #end
+#foreach ($column in $columns)
+    #if ($column.listOperationResult && $column.htmlType == "datetime")
 import { dateFormatter } from '@/utils/formatTime'
+    #break
+    #end
+#end
 import download from '@/utils/download'
 import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
 import ${simpleClassName}Form from './${simpleClassName}Form.vue'

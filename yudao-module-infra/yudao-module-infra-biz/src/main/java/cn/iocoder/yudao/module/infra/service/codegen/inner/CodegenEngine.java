@@ -187,6 +187,8 @@ public class CodegenEngine {
         templates.forEach((vmPath, filePath) -> {
             filePath = formatFilePath(filePath, bindingMap);
             String content = templateEngine.getTemplate(vmPath).render(bindingMap);
+            // 去除字段后面多余的 , 逗号
+            content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
             result.put(filePath, content);
         });
         return result;

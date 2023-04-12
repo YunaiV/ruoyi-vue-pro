@@ -1,6 +1,10 @@
 import type { CrudSchema } from '@/hooks/web/useCrudSchemas'
+#foreach ($column in $columns)
+    #if ($column.listOperationResult && $column.htmlType == "datetime")
 import { dateFormatter } from '@/utils/formatTime'
-const { t } = useI18n() // 国际化
+    #break
+    #end
+#end
 
 // 表单校验
 export const rules = reactive({
@@ -12,7 +16,7 @@ export const rules = reactive({
 #end
 })
 
-// CrudSchema
+// CrudSchema https://kailong110120130.gitee.io/vue-element-plus-admin-doc/hooks/useCrudSchemas.html
 const crudSchemas = reactive<CrudSchema[]>([
 #foreach($column in $columns)
 #if ($column.listOperation || $column.listOperationResult || $column.createOperation || $column.updateOperation)
@@ -20,7 +24,7 @@ const crudSchemas = reactive<CrudSchema[]>([
 #set ($javaField = $column.javaField)
 #set ($javaType = $column.javaType)
   {
-    title: '${column.columnComment}',
+    label: '${column.columnComment}',
     field: '${column.javaField}',
 ## ========= 字典部分 =========
     #if ("" != $dictType)## 有数据字典
@@ -36,6 +40,7 @@ const crudSchemas = reactive<CrudSchema[]>([
 ## ========= Table 表格部分 =========
     #if (!$column.listOperationResult)
     isTable: false,
+    #else
       #if ($column.htmlType == "datetime")
     formatter: dateFormatter,
       #end
@@ -51,7 +56,7 @@ const crudSchemas = reactive<CrudSchema[]>([
         type: 'daterange',
         defaultTime: [new Date('1 00:00:00'), new Date('1 23:59:59')]
       }
-    }
+    },
         #end
     #end
 ## ========= Form 表单部分 =========
@@ -82,7 +87,7 @@ const crudSchemas = reactive<CrudSchema[]>([
     form: {
       component: 'Checkbox'
     },
-        #elseif($column.htmlType == "checkbox")## 单选框
+        #elseif($column.htmlType == "radio")## 单选框
     form: {
       component: 'Radio'
     },
