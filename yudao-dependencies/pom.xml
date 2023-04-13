@@ -57,7 +57,7 @@
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.7.0</tika-core.version>
-        <netty-all.version>4.1.86.Final</netty-all.version>
+        <netty-all.version>4.1.90.Final</netty-all.version>
         <ip2region.version>2.7.0</ip2region.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.0.0</okio.version>
