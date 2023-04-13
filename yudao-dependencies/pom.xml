@@ -16,17 +16,17 @@
     <properties>
         <revision>1.7.1-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.7.8</spring.boot.version>
+        <spring.boot.version>2.7.10</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>1.6.14</springdoc.version>
-        <knife4j.version>4.0.0</knife4j.version>
+        <springdoc.version>1.6.15</springdoc.version>
+        <knife4j.version>4.1.0</knife4j.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
-        <druid.version>1.2.15</druid.version>
+        <druid.version>1.2.16</druid.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.3.1</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.6.1</dynamic-datasource.version>
-        <mybatis-plus-join-boot-starter.version>1.4.3.1</mybatis-plus-join-boot-starter.version>
+        <mybatis-plus-join-boot-starter.version>1.4.3.2</mybatis-plus-join-boot-starter.version>
         <redisson.version>3.18.0</redisson.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.3</lock4j.version>
@@ -37,17 +37,17 @@
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>7.2.11.RELEASE</podam.version>
-        <jedis-mock.version>1.0.6</jedis-mock.version>
+        <jedis-mock.version>1.0.7</jedis-mock.version>
         <mockito-inline.version>4.11.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.8.0</flowable.version>
         <!-- 工具类相关 -->
         <captcha-plus.version>1.0.2</captcha-plus.version>
-        <jsoup.version>1.15.3</jsoup.version>
-        <lombok.version>1.18.24</lombok.version>
+        <jsoup.version>1.15.4</jsoup.version>
+        <lombok.version>1.18.26</lombok.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
-        <hutool.version>5.8.11</hutool.version>
-        <easyexcel.verion>3.2.0</easyexcel.verion>
+        <hutool.version>5.8.15</hutool.version>
+        <easyexcel.verion>3.2.1</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
@@ -56,16 +56,16 @@
         <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
-        <tika-core.version>2.6.0</tika-core.version>
-        <netty-all.version>4.1.86.Final</netty-all.version>
-        <ip2region.version>2.6.6</ip2region.version>
+        <tika-core.version>2.7.0</tika-core.version>
+        <netty-all.version>4.1.90.Final</netty-all.version>
+        <ip2region.version>2.7.0</ip2region.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.0.0</okio.version>
         <okhttp3.version>4.10.0</okhttp3.version>
-        <minio.version>8.5.1</minio.version>
+        <minio.version>8.5.2</minio.version>
         <aliyun-java-sdk-core.version>4.6.3</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
-        <tencentcloud-sdk-java.version>3.1.676</tencentcloud-sdk-java.version>
+        <tencentcloud-sdk-java.version>3.1.715</tencentcloud-sdk-java.version>
         <justauth.version>1.4.0</justauth.version>
         <jimureport.version>1.5.6</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
