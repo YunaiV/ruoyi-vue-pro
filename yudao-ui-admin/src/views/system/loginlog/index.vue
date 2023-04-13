@@ -66,7 +66,7 @@
 import { list, exportLoginLog } from "@/api/system/loginlog";
 
 export default {
-  name: "Logininfor",
+  name: "SystemLoginLog",
   data() {
     return {
       // 遮罩层

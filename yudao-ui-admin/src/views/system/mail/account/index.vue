@@ -92,7 +92,7 @@
 import { createMailAccount, updateMailAccount, deleteMailAccount, getMailAccount, getMailAccountPage } from "@/api/system/mail/account";
 
 export default {
-  name: "MailAccount",
+  name: "SystemMailAccount",
   components: {
   },
   data() {

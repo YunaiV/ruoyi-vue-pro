@@ -52,7 +52,7 @@
 import {getTodoTaskPage} from '@/api/bpm/task'
 
 export default {
-  name: "Todo",
+  name: "BpmTodoTask",
   components: {
   },
   data() {
@@ -100,7 +100,7 @@ export default {
     },
     /** 处理审批按钮 */
     handleAudit(row) {
-      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.processInstance.id}});
+      this.$router.push({ name: "BpmProcessInstanceDetail", query: { id: row.processInstance.id}});
     },
   }
 };

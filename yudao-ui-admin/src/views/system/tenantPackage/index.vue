@@ -95,7 +95,7 @@ import {CommonStatusEnum} from "@/utils/constants";
 import {listSimpleMenus} from "@/api/system/menu";
 
 export default {
-  name: "TenantPackage",
+  name: "SystemTenantPackage",
   components: {
   },
   data() {

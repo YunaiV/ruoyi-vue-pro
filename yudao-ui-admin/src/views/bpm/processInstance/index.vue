@@ -103,7 +103,7 @@
 import { getMyProcessInstancePage, cancelProcessInstance } from "@/api/bpm/processInstance";
 
 export default {
-  name: "ProcessInstance",
+  name: "BpmProcessInstance",
   components: {
   },
   data() {
@@ -155,7 +155,7 @@ export default {
     },
     /** 新增按钮操作 **/
     handleAdd() {
-      this.$router.push({ path: "/bpm/process-instance/create"})
+      this.$router.push({ name: "BpmProcessInstanceCreate"})
     },
     /** 取消按钮操作 */
     handleCancel(row) {
@@ -175,7 +175,7 @@ export default {
     },
     /** 处理详情按钮 */
     handleDetail(row) {
-      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.id}});
+      this.$router.push({ name: "BpmProcessInstanceDetail", query: { id: row.id}});
     },
   }
 };

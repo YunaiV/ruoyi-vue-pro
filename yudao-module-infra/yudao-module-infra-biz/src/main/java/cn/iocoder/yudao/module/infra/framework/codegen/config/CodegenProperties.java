@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.framework.codegen.config;
 
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -24,5 +25,13 @@ public class CodegenProperties {
      */
     @NotEmpty(message = "数据库不能为空")
     private Collection<String> dbSchemas;
+
+    /**
+     * 代码生成的前端类型（默认）
+     *
+     * 枚举 {@link CodegenFrontTypeEnum#getType()}
+     */
+    @NotNull(message = "代码生成的前端类型不能为空")
+    private Integer frontType;
 
 }

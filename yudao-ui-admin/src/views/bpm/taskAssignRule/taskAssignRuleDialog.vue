@@ -91,7 +91,7 @@ import {listSimpleUsers} from "@/api/system/user";
 import {listSimpleUserGroups} from "@/api/bpm/userGroup";
 
 export default {
-  name: "taskAssignRuleDialog",
+  name: "BpmTaskAssignRule",
   components: {
     Treeselect
   },

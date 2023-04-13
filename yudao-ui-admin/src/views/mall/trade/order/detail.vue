@@ -165,7 +165,7 @@
 import { getOrderDetail } from "@/api/mall/trade/order";
 
 export default {
-  name: "detail",
+  name: "TradeOrderDetail",
   data () {
     return {
       detailGroups: [

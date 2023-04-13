@@ -133,7 +133,7 @@ import { createSensitiveWord, updateSensitiveWord, deleteSensitiveWord, getSensi
 import {CommonStatusEnum} from "@/utils/constants";
 
 export default {
-  name: "SensitiveWord",
+  name: "SystemSensitiveWord",
   data() {
     return {
       // 遮罩层

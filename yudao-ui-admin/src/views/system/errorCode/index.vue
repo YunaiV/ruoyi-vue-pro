@@ -99,7 +99,7 @@
 import { createErrorCode, updateErrorCode, deleteErrorCode, getErrorCode, getErrorCodePage, exportErrorCodeExcel } from "@/api/system/errorCode";
 
 export default {
-  name: "ErrorCode",
+  name: "SystemErrorCode",
   components: {
   },
   data() {

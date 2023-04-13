@@ -36,6 +36,7 @@ export const DICT_TYPE = {
   INFRA_API_ERROR_LOG_PROCESS_STATUS: 'infra_api_error_log_process_status',
   INFRA_CONFIG_TYPE: 'infra_config_type',
   INFRA_CODEGEN_TEMPLATE_TYPE: 'infra_codegen_template_type',
+  INFRA_CODEGEN_FRONT_TYPE: 'infra_codegen_front_type',
   INFRA_CODEGEN_SCENE: 'infra_codegen_scene',
   INFRA_FILE_STORAGE: 'infra_file_storage',
 

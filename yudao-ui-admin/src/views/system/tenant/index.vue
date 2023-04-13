@@ -141,7 +141,7 @@ import { CommonStatusEnum } from '@/utils/constants'
 import {getTenantPackageList} from "@/api/system/tenantPackage";
 
 export default {
-  name: "Tenant",
+  name: "SystemTenant",
   components: {
   },
   data() {

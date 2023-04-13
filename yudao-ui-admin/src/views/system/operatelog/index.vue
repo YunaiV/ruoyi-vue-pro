@@ -131,7 +131,7 @@
 import { listOperateLog, exportOperateLog } from "@/api/system/operatelog";
 
 export default {
-  name: "Operlog",
+  name: "SystemOperateLog",
   data() {
     return {
       // 遮罩层

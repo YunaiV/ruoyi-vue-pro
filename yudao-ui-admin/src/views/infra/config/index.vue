@@ -110,7 +110,7 @@
 import { listConfig, getConfig, delConfig, addConfig, updateConfig, exportConfig } from "@/api/infra/config";
 
 export default {
-  name: "Config",
+  name: "InfraConfig",
   data() {
     return {
       // 遮罩层

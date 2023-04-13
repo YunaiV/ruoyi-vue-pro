@@ -50,6 +50,10 @@ public class CodegenTableBaseVO {
     @NotNull(message = "模板类型不能为空")
     private Integer templateType;
 
+    @Schema(description = "前端类型，参见 CodegenFrontTypeEnum 枚举", required = true, example = "20")
+    @NotNull(message = "前端类型不能为空")
+    private Integer frontType;
+
     @Schema(description = "父菜单编号", example = "1024")
     private Long parentMenuId;
 

@@ -187,7 +187,6 @@
 </template>
 
 <script>
-
 import {getBrandList} from "@/api/mall/product/brand";
 import {getProductCategoryList} from "@/api/mall/product/category";
 import {createSpu, getSpuDetail, updateSpu} from "@/api/mall/product/spu";
@@ -197,6 +196,7 @@ import ImageUpload from "@/components/ImageUpload";
 import VideoUpload from "@/components/VideoUpload";
 
 export default {
+  name: "ProductSave",
   components: {
     Editor,
     ImageUpload,

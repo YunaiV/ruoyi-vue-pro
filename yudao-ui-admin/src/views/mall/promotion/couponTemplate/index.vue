@@ -179,7 +179,7 @@ import { parseTime } from "@/utils/ruoyi";
 import {changeRoleStatus} from "@/api/system/role";
 
 export default {
-  name: "CouponTemplate",
+  name: "PromotionCouponTemplate",
   components: {
   },
   data() {

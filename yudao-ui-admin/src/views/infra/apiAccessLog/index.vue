@@ -116,7 +116,7 @@
 import { getApiAccessLogPage, exportApiAccessLogExcel } from "@/api/infra/apiAccessLog";
 
 export default {
-  name: "ApiAccessLog",
+  name: "InfraApiAccessLog",
   components: {
   },
   data() {
