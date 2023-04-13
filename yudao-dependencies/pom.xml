@@ -47,7 +47,7 @@
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <hutool.version>5.8.15</hutool.version>
-        <easyexcel.verion>3.2.0</easyexcel.verion>
+        <easyexcel.verion>3.2.1</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
