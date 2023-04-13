@@ -116,6 +116,17 @@ public class CodegenEngine {
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("views/form.vue"),
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/${simpleClassName}Form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("api/api.ts"),
+                    vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
+            // Vue3 vben 模版
+            .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("views/data.ts"),
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${classNameVar}.data.ts"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("views/index.vue"),
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("views/form.vue"),
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${simpleClassName}Modal.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("api/api.ts"),
+                    vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
             .build();
 
     @Resource
@@ -282,5 +293,9 @@ public class CodegenEngine {
 
     private static String vue3SchemaTemplatePath(String path) {
         return "codegen/vue3_schema/" + path + ".vm";
+    }
+
+    private static String vue3VbenTemplatePath(String path) {
+        return "codegen/vue3_vben/" + path + ".vm";
     }
 }
