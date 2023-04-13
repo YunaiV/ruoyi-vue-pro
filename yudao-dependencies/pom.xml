@@ -16,7 +16,7 @@
     <properties>
         <revision>1.7.1-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.7.8</spring.boot.version>
+        <spring.boot.version>2.7.10</spring.boot.version>
         <!-- Web 相关 -->
         <springdoc.version>1.6.14</springdoc.version>
         <knife4j.version>4.0.0</knife4j.version>
