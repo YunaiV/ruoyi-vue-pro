@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.web.core.util;
 
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -40,7 +41,7 @@ public class WebFrameworkUtils {
      */
     public static Long getTenantId(HttpServletRequest request) {
         String tenantId = request.getHeader(HEADER_TENANT_ID);
-        return StrUtil.isNotEmpty(tenantId) ? Long.valueOf(tenantId) : null;
+        return NumberUtil.isNumber(tenantId) ? Long.valueOf(tenantId) : null;
     }
 
     public static void setLoginUserId(ServletRequest request, Long userId) {
