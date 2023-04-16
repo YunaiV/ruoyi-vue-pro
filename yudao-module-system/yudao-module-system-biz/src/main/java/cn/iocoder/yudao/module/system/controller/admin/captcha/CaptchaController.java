@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.controller.admin.captcha;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import com.xingyuv.captcha.model.common.ResponseModel;
 import com.xingyuv.captcha.model.vo.CaptchaVO;
@@ -50,7 +50,7 @@ public class CaptchaController {
     }
 
     public static String getRemoteId(HttpServletRequest request) {
-        String ip = ServletUtil.getClientIP(request);
+        String ip = ServletUtils.getClientIP(request);
         String ua = request.getHeader("user-agent");
         if (StrUtil.isNotBlank(ip)) {
             return ip + ua;
