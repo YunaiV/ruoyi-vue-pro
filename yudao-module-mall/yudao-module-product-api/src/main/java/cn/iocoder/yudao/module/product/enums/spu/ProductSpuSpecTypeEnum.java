@@ -13,6 +13,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
+@Deprecated
 public enum ProductSpuSpecTypeEnum implements IntArrayValuable {
 
     RECYCLE(1, "统一规格"),

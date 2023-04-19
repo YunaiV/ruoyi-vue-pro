@@ -203,7 +203,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setClickCount(100);
             o.setCode(code);
             o.setDescription("测试商品");
-            o.setPicUrls(new ArrayList<>());
+            o.setSliderPicUrls(new ArrayList<>());
             o.setName("测试");
             o.setSalesCount(100);
             o.setSellPoint("超级加倍");
@@ -251,7 +251,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             o.setClickCount(1);
             o.setCode(generateNo());
             o.setDescription("测试商品");
-            o.setPicUrls(new ArrayList<>());
+            o.setSliderPicUrls(new ArrayList<>());
             o.setName("测试");
             o.setSalesCount(1);
             o.setSellPoint("卖点");
