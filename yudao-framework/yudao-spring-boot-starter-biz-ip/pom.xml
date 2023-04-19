@@ -20,10 +20,6 @@
     </description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
-    <properties>
-        <ip2region.version>2.6.6</ip2region.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

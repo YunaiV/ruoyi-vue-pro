@@ -21,6 +21,7 @@ public interface CodegenTableMapper extends BaseMapperX<CodegenTableDO> {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<CodegenTableDO>()
                 .likeIfPresent(CodegenTableDO::getTableName, pageReqVO.getTableName())
                 .likeIfPresent(CodegenTableDO::getTableComment, pageReqVO.getTableComment())
+                .likeIfPresent(CodegenTableDO::getClassName, pageReqVO.getClassName())
                 .betweenIfPresent(CodegenTableDO::getCreateTime, pageReqVO.getCreateTime()));
     }
 

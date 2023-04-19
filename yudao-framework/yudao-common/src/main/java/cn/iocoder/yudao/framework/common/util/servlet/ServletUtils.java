@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.Map;
 
 /**
  * 客户端工具类
@@ -40,7 +41,6 @@ public class ServletUtils {
      * @param response 响应
      * @param filename 文件名
      * @param content 附件内容
-     * @throws IOException
      */
     public static void writeAttachment(HttpServletResponse response, String filename, byte[] content) throws IOException {
         // 设置 header 和 contentType
@@ -92,4 +92,19 @@ public class ServletUtils {
         return StrUtil.startWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE);
     }
 
+    public static String getBody(HttpServletRequest request) {
+        return ServletUtil.getBody(request);
+    }
+
+    public static byte[] getBodyBytes(HttpServletRequest request) {
+        return ServletUtil.getBodyBytes(request);
+    }
+
+    public static String getClientIP(HttpServletRequest request) {
+        return ServletUtil.getClientIP(request);
+    }
+
+    public static Map<String, String> getParamMap(HttpServletRequest request) {
+        return ServletUtil.getParamMap(request);
+    }
 }

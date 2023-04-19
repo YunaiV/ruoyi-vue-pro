@@ -63,7 +63,7 @@ import {getDoneTaskPage} from '@/api/bpm/task'
 import {getDate} from "@/utils/dateUtils";
 
 export default {
-  name: "Done",
+  name: "BpmDoneTask",
   components: {
   },
   data() {
@@ -113,7 +113,7 @@ export default {
     },
     /** 处理审批按钮 */
     handleAudit(row) {
-      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.processInstance.id}});
+      this.$router.push({ name: "BpmProcessInstanceDetail", query: { id: row.processInstance.id}});
     },
   }
 };

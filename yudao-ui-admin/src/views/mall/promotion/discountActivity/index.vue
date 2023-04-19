@@ -156,7 +156,7 @@ import { getSkuOptionList } from "@/api/mall/product/sku";
 import { deepClone } from "@/utils";
 
 export default {
-  name: "DiscountActivity",
+  name: "PromotionDiscountActivity",
   components: {
   },
   data() {

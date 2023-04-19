@@ -51,7 +51,7 @@ public class IPUtils {
      */
     @SneakyThrows
     public static Integer getAreaId(String ip) {
-        return Integer.parseInt(SEARCHER.search(ip));
+        return Integer.parseInt(SEARCHER.search(ip.trim()));
     }
 
     /**

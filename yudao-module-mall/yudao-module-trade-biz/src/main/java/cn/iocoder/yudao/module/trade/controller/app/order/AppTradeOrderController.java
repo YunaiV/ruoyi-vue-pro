@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.trade.controller.app.order;
 
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
@@ -55,7 +54,7 @@ public class AppTradeOrderController {
                                           HttpServletRequest servletRequest) {
         // 获取登录用户、用户 IP 地址
         Long loginUserId = getLoginUserId();
-        String clientIp = ServletUtil.getClientIP(servletRequest);
+        String clientIp = ServletUtils.getClientIP(servletRequest);
         // 创建交易订单，预支付记录
         Long orderId = tradeOrderService.createOrder(loginUserId, clientIp, createReqVO);
         return success(orderId);

@@ -158,6 +158,7 @@ const formConfInDB = getFormConf()
 const idGlobal = getIdGlobal()
 
 export default {
+  name: "InfraBuild",
   components: {
     draggable,
     render,

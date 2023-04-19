@@ -264,7 +264,7 @@ const defaultRefundDetail = {
 }
 
 export default {
-  name: "Refund",
+  name: "PayRefund",
   components: {},
   data() {
     return {

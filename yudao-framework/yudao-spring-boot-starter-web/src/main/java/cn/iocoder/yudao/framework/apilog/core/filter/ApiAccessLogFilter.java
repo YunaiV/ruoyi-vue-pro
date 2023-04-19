@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.apilog.core.filter;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiAccessLog;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiAccessLogFrameworkService;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
@@ -50,8 +49,8 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
         // 获得开始时间
         LocalDateTime beginTime = LocalDateTime.now();
         // 提前获得参数，避免 XssFilter 过滤处理
-        Map<String, String> queryString = ServletUtil.getParamMap(request);
-        String requestBody = ServletUtils.isJsonRequest(request) ? ServletUtil.getBody(request) : null;
+        Map<String, String> queryString = ServletUtils.getParamMap(request);
+        String requestBody = ServletUtils.isJsonRequest(request) ? ServletUtils.getBody(request) : null;
 
         try {
             // 继续过滤器
@@ -101,7 +100,7 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
         accessLog.setRequestParams(toJsonString(requestParams));
         accessLog.setRequestMethod(request.getMethod());
         accessLog.setUserAgent(ServletUtils.getUserAgent(request));
-        accessLog.setUserIp(ServletUtil.getClientIP(request));
+        accessLog.setUserIp(ServletUtils.getClientIP(request));
         // 持续时间
         accessLog.setBeginTime(beginTime);
         accessLog.setEndTime(LocalDateTime.now());

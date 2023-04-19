@@ -68,7 +68,7 @@ import router from "@/router";
 import { deepClone } from "@/utils";
 
 export default {
-  name: "SeckillTime",
+  name: "PromotionSeckillTime",
   components: {
   },
   data() {

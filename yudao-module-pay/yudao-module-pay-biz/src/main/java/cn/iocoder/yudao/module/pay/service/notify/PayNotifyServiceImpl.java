@@ -6,9 +6,10 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
-import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyLogDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyTaskDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
@@ -19,8 +20,6 @@ import cn.iocoder.yudao.module.pay.dal.redis.notify.PayNotifyLockRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
-import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
-import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +40,8 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.afterNow;
 import static cn.iocoder.yudao.module.pay.framework.job.config.PayJobConfiguration.NOTIFY_THREAD_POOL_TASK_EXECUTOR;
 
 /**
@@ -178,7 +178,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             }
 
             // 执行通知
-            executeNotify(dbTask);
+            self.executeNotify(dbTask);
         });
     }
 

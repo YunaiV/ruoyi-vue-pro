@@ -155,7 +155,7 @@ import {CommonStatusEnum} from "@/utils/constants";
 import FileUpload from "@/components/FileUpload";
 
 export default {
-  name: "OAuth2Client",
+  name: "SystemOAuth2Client",
   components: {
     FileUpload,
     ImageUpload,

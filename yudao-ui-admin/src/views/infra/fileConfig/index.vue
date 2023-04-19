@@ -145,7 +145,7 @@ import {
 } from "@/api/infra/fileConfig";
 
 export default {
-  name: "FileConfig",
+  name: "InfraFileConfig",
   components: {
   },
   data() {

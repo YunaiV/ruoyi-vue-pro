@@ -110,7 +110,7 @@ import {CommonStatusEnum} from '@/utils/constants'
 import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
-  name: "Notice",
+  name: "SystemNotice",
   components: {
     Editor
   },

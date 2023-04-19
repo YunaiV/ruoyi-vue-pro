@@ -11,12 +11,34 @@
         </el-form-item>
       </el-col>
       <el-col :span="12">
+        <el-form-item prop="templateType">
+          <span slot="label">前端类型</span>
+          <el-select v-model="info.frontType">
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_CODEGEN_FRONT_TYPE)"
+                       :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
+          </el-select>
+        </el-form-item>
+      </el-col>
+
+      <el-col :span="12">
         <el-form-item prop="scene">
           <span slot="label">生成场景</span>
           <el-select v-model="info.scene">
             <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_CODEGEN_SCENE)"
                        :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
           </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item>
+          <span slot="label">
+            上级菜单
+            <el-tooltip content="分配到指定菜单下，例如 系统管理" placement="top">
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </span>
+          <treeselect :append-to-body="true" v-model="info.parentMenuId" :options="menus"
+                      :normalizer="normalizer" :show-count="true" placeholder="请选择系统菜单" />
         </el-form-item>
       </el-col>
 
@@ -89,19 +111,6 @@
             </el-tooltip>
           </span>
           <el-input v-model="info.classComment" />
-        </el-form-item>
-      </el-col>
-
-      <el-col :span="12">
-        <el-form-item>
-          <span slot="label">
-            上级菜单
-            <el-tooltip content="分配到指定菜单下，例如 系统管理" placement="top">
-              <i class="el-icon-question"></i>
-            </el-tooltip>
-          </span>
-          <treeselect :append-to-body="true" v-model="info.parentMenuId" :options="menus"
-            :normalizer="normalizer" :show-count="true" placeholder="请选择系统菜单" />
         </el-form-item>
       </el-col>
 
@@ -256,6 +265,9 @@ export default {
         ],
         scene: [
           { required: true, message: "请选择生成场景", trigger: "blur" }
+        ],
+        frontType: [
+          { required: true, message: "请选择前端类型", trigger: "blur" }
         ],
         // packageName: [
         //   { required: true, message: "请输入生成包路径", trigger: "blur" }

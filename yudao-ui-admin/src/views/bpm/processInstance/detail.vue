@@ -39,10 +39,7 @@
         </div>
       </el-col>
       <div v-if="this.processInstance.processDefinition && this.processInstance.processDefinition.formType === 20">
-        <router-link :to="this.processInstance.processDefinition.formCustomViewPath + '?id='
-                          + this.processInstance.businessKey">
-          <el-button type="primary">点击查看</el-button>
-        </router-link>
+        <async-biz-form-component :id="this.processInstance.businessKey"></async-biz-form-component>
       </div>
     </el-card>
 
@@ -115,6 +112,7 @@ import {approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssig
 import {getDate} from "@/utils/dateUtils";
 import {listSimpleUsers} from "@/api/system/user";
 import {getActivityList} from "@/api/bpm/activity";
+import Vue from "vue";
 
 // 流程实例的详情页，可用于审批
 export default {
@@ -192,6 +190,12 @@ export default {
         }
         // 设置流程信息
         this.processInstance = response.data;
+
+        //将业务表单，注册为动态组件
+        const path = this.processInstance.processDefinition.formCustomViewPath;
+        Vue.component("async-biz-form-component", function(resolve) {
+          require([`@/views${path}`], resolve);
+        });
 
         // 设置表单信息
         if (this.processInstance.processDefinition.formType === 10) {

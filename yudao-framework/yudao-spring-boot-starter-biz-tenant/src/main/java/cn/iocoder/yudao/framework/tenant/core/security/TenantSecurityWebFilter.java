@@ -79,7 +79,7 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
             if (tenantId == null) {
                 log.error("[doFilterInternal][URL({}/{}) 未传递租户编号]", request.getRequestURI(), request.getMethod());
                 ServletUtils.writeJSON(response, CommonResult.error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(),
-                        "租户的请求未传递，请进行排查"));
+                        "请求的租户标识未传递，请进行排查"));
                 return;
             }
             // 3. 校验租户是合法，例如说被禁用、到期

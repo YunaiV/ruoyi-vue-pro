@@ -59,7 +59,7 @@
 import { getAccessTokenPage, deleteAccessToken } from "@/api/system/oauth2/oauth2Token";
 
 export default {
-  name: "OAuth2Token",
+  name: "SystemTokenClient",
   data() {
     return {
       // 遮罩层

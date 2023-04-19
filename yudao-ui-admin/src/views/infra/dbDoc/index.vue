@@ -21,7 +21,7 @@ import { exportHtml, exportWord, exportMarkdown} from "@/api/infra/dbDoc";
 import iFrame from "@/components/iFrame/index";
 
 export default {
-  name: "DBDoc",
+  name: "InfraDBDoc",
   components: { iFrame },
   data() {
     return {

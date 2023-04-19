@@ -189,7 +189,7 @@ import { getSmsLogPage, exportSmsLogExcel } from "@/api/system/sms/smsLog";
 import {  getSimpleSmsChannels } from "@/api/system/sms/smsChannel";
 
 export default {
-  name: "SmsLog",
+  name: "SystemSmsLog",
   components: {
   },
   data() {

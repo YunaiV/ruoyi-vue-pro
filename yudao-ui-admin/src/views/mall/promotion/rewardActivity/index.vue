@@ -129,7 +129,7 @@ import {
 import {getSpuSimpleList} from "@/api/mall/product/spu";
 
 export default {
-  name: "RewardActivity",
+  name: "PromotionRewardActivity",
   components: {
   },
   data() {

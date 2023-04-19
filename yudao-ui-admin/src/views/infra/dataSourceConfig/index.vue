@@ -57,7 +57,7 @@
 import { createDataSourceConfig, updateDataSourceConfig, deleteDataSourceConfig, getDataSourceConfig, getDataSourceConfigList } from "@/api/infra/dataSourceConfig";
 
 export default {
-  name: "DataSourceConfig",
+  name: "InfraDataSourceConfig",
   components: {
   },
   data() {

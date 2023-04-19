@@ -141,7 +141,7 @@ import { CommonStatusEnum } from '@/utils/constants'
 import {getTenantPackageList} from "@/api/system/tenantPackage";
 
 export default {
-  name: "Tenant",
+  name: "SystemTenant",
   components: {
   },
   data() {
@@ -183,6 +183,8 @@ export default {
         accountCount: [{ required: true, message: "账号额度不能为空", trigger: "blur" }],
         expireTime: [{ required: true, message: "过期时间不能为空", trigger: "blur" }],
         domain: [{ required: true, message: "绑定域名不能为空", trigger: "blur" }],
+        username: [{ required: true, message: "用户名称不能为空", trigger: "blur" }],
+        password: [{ required: true, message: "用户密码不能为空", trigger: "blur" }],
       }
     };
   },

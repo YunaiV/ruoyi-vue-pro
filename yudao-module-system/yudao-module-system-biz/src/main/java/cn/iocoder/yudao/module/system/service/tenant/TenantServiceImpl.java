@@ -97,6 +97,8 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createTenant(TenantCreateReqVO createReqVO) {
+        // 校验租户名称是否重复
+        validTenantNameDuplicate(createReqVO.getName(), null);
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(createReqVO.getPackageId());
 
@@ -139,6 +141,8 @@ public class TenantServiceImpl implements TenantService {
     public void updateTenant(TenantUpdateReqVO updateReqVO) {
         // 校验存在
         TenantDO tenant = validateUpdateTenant(updateReqVO.getId());
+        // 校验租户名称是否重复
+        validTenantNameDuplicate(updateReqVO.getName(), updateReqVO.getId());
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(updateReqVO.getPackageId());
 
@@ -148,6 +152,20 @@ public class TenantServiceImpl implements TenantService {
         // 如果套餐发生变化，则修改其角色的权限
         if (ObjectUtil.notEqual(tenant.getPackageId(), updateReqVO.getPackageId())) {
             updateTenantRoleMenu(tenant.getId(), tenantPackage.getMenuIds());
+        }
+    }
+
+    private void validTenantNameDuplicate(String name, Long id) {
+        TenantDO tenant = tenantMapper.selectByName(name);
+        if (tenant == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同名字的租户
+        if (id == null) {
+            throw exception(TENANT_NAME_DUPLICATE, name);
+        }
+        if (!tenant.getId().equals(id)) {
+            throw exception(TENANT_NAME_DUPLICATE, name);
         }
     }
 

@@ -256,6 +256,7 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
         when(smsClientFactory.getSmsClient(eq(message.getChannelId()))).thenReturn(smsClient);
         // mock SmsClient 的方法
         SmsCommonResult<SmsSendRespDTO> sendResult = randomPojo(SmsCommonResult.class, SmsSendRespDTO.class);
+        sendResult.setData(randomPojo(SmsSendRespDTO.class));
         when(smsClient.sendSms(eq(message.getLogId()), eq(message.getMobile()), eq(message.getApiTemplateId()),
                 eq(message.getTemplateParams()))).thenReturn(sendResult);
 

@@ -67,7 +67,7 @@ import Parser from '@/components/parser/Parser'
 import {decodeFields} from "@/utils/formGenerator";
 
 export default {
-  name: "Form",
+  name: "BpmForm",
   components: {
     Parser
   },
@@ -134,13 +134,13 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.$router.push({
-        path:"/bpm/manager/form/edit"
+        name: "BpmFormEditor"
       });
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.$router.push({
-        path:"/bpm/manager/form/edit",
+        name: "BpmFormEditor",
         query:{
           formId: row.id
         }

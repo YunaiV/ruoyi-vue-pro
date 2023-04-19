@@ -18,10 +18,10 @@ public class ConfigExcelVO {
     private Long id;
 
     @ExcelProperty("参数键名")
-    private String key;
+    private String configKey;
 
-    @ExcelProperty("参数分组")
-    private String group;
+    @ExcelProperty("参数分类")
+    private String category;
 
     @ExcelProperty("参数名称")
     private String name;
@@ -33,9 +33,9 @@ public class ConfigExcelVO {
     @DictFormat(DictTypeConstants.CONFIG_TYPE)
     private Integer type;
 
-    @ExcelProperty(value = "是否敏感", converter = DictConvert.class)
+    @ExcelProperty(value = "是否可见", converter = DictConvert.class)
     @DictFormat(DictTypeConstants.BOOLEAN_STRING)
-    private Boolean sensitive;
+    private Boolean visible;
 
     @ExcelProperty("备注")
     private String remark;
