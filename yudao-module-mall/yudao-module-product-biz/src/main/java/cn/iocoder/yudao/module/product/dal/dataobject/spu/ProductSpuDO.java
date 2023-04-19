@@ -170,6 +170,13 @@ public class ProductSpuDO extends BaseDO {
      * 赠送积分
      */
     private Integer giveIntegral;
+    /**
+     * 赠送的优惠劵编号的数组
+     *
+     * 对应 CouponTemplateDO 的 id 属性
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<Long> giveCouponTemplateIds;
 
     /**
      * 分销类型
@@ -201,5 +208,4 @@ public class ProductSpuDO extends BaseDO {
      * 浏览量
      */
     private Integer browseCount;
-
 }

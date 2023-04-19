@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.sku;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
@@ -37,23 +36,17 @@ public class ProductSkuDO extends BaseDO {
     private Long id;
     /**
      * SPU 编号
-     * <p>
+     *
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
-    /**
-     * SPU 名字
-     *
-     * 冗余 {@link ProductSkuDO#getSpuName()}
-     */
-    private String spuName;
     /**
      * 属性数组，JSON 格式
      */
     @TableField(typeHandler = PropertyTypeHandler.class)
     private List<Property> properties;
     /**
-     * 销售价格，单位：分
+     * 商品价格，单位：分
      */
     private Integer price;
     /**
@@ -65,7 +58,7 @@ public class ProductSkuDO extends BaseDO {
      */
     private Integer costPrice;
     /**
-     * SKU 的条形码
+     * 商品条码
      */
     private String barCode;
     /**
@@ -73,19 +66,9 @@ public class ProductSkuDO extends BaseDO {
      */
     private String picUrl;
     /**
-     * SKU 状态
-     * <p>
-     * 枚举 {@link CommonStatusEnum}
-     */
-    private Integer status;
-    /**
      * 库存
      */
     private Integer stock;
-    /**
-     * 预警预存
-     */
-    private Integer warnStock;
     /**
      * 商品重量，单位：kg 千克
      */
@@ -94,6 +77,23 @@ public class ProductSkuDO extends BaseDO {
      * 商品体积，单位：m^3 平米
      */
     private Double volume;
+
+    /**
+     * 一级分销的佣金，单位：分
+     */
+    private Integer subCommissionFirstPrice;
+    /**
+     * 二级分销的佣金，单位：分
+     */
+    private Integer subCommissionSecondPrice;
+
+    // ========== 营销相关字段 =========
+
+    // ========== 统计相关字段 =========
+    /**
+     * 商品销量
+     */
+    private Integer salesCount;
 
     /**
      * 商品属性
@@ -105,13 +105,13 @@ public class ProductSkuDO extends BaseDO {
 
         /**
          * 属性编号
-         * <p>
+         *
          * 关联 {@link ProductPropertyDO#getId()}
          */
         private Long propertyId;
         /**
          * 属性值编号
-         * <p>
+         *
          * 关联 {@link ProductPropertyValueDO#getId()}
          */
         private Long valueId;
@@ -132,6 +132,16 @@ public class ProductSkuDO extends BaseDO {
         }
 
     }
+
+    // TODO 芋艿：integral from y
+    // TODO 芋艿：pinkPrice from y
+    // TODO 芋艿：seckillPrice from y
+    // TODO 芋艿：pinkStock from y
+    // TODO 芋艿：seckillStock from y
+
+    // TODO 芋艿：quota from c
+    // TODO 芋艿：quotaShow from c
+    // TODO 芋艿：attrValue from c
 
 }
 
