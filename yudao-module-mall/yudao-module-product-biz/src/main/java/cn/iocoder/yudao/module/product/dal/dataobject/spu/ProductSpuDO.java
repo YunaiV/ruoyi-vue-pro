@@ -55,6 +55,7 @@ public class ProductSpuDO extends BaseDO {
      * 商品详情
      */
     private String description;
+    // TODO @芋艿：是不是要删除
     /**
      * 商品条码（一维码）
      */
@@ -87,9 +88,11 @@ public class ProductSpuDO extends BaseDO {
     private String videoUrl;
 
     /**
-     * 单位名
+     * 单位
+     *
+     * 对应 product_unit 数据字典
      */
-    private String unitName;
+    private Integer unit;
     /**
      * 排序字段
      */
