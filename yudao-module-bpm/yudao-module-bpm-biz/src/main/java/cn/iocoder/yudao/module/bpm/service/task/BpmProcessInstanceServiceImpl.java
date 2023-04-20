@@ -295,8 +295,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 .name(definition.getName().trim())
                 .variables(variables)
                 .start();
-        // 设置流程名字
-        runtimeService.setProcessInstanceName(instance.getId(), definition.getName());
 
         // 补全流程实例的拓展表
         processInstanceExtMapper.updateByProcessInstanceId(new BpmProcessInstanceExtDO().setProcessInstanceId(instance.getId())
