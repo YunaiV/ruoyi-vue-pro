@@ -3,7 +3,7 @@ import request from '@/config/axios'
 export interface ${simpleClassName}VO {
 #foreach ($column in $columns)
 #if ($column.createOperation || $column.updateOperation)
-#if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
+#if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
   ${column.javaField}: number
 #elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdatetime")
   ${column.javaField}: Date
@@ -14,32 +14,34 @@ export interface ${simpleClassName}VO {
 #end
 }
 
+const baseURL = '/${table.moduleName}/${simpleClassName_strikeCase}'
+
 // 查询${table.classComment}列表
 export const get${simpleClassName}Page = async (params: ${simpleClassName}PageReqVO) => {
-  return await request.get({ url: '${baseURL}/page', params })
+  return await request.get({ url: `${baseURL}/page`, params })
 }
 
 // 查询${table.classComment}详情
 export const get${simpleClassName} = async (id: number) => {
-  return await request.get({ url: '${baseURL}/get?id=' + id })
+  return await request.get({ url: `${baseURL}/get?id=` + id })
 }
 
 // 新增${table.classComment}
 export const create${simpleClassName} = async (data: ${simpleClassName}VO) => {
-  return await request.post({ url: '${baseURL}/create', data })
+  return await request.post({ url: `${baseURL}/create`, data })
 }
 
 // 修改${table.classComment}
 export const update${simpleClassName} = async (data: ${simpleClassName}VO) => {
-  return await request.put({ url: '${baseURL}/update', data })
+  return await request.put({ url: `${baseURL}/update`, data })
 }
 
 // 删除${table.classComment}
 export const delete${simpleClassName} = async (id: number) => {
-  return await request.delete({ url: '${baseURL}/delete?id=' + id })
+  return await request.delete({ url: `${baseURL}/delete?id=` + id })
 }
 
 // 导出${table.classComment} Excel
-export const export${simpleClassName}Api = async (params) => {
-  return await request.download({ url: '${baseURL}/export-excel', params })
+export const export${simpleClassName} = async (params) => {
+  return await request.download({ url: `${baseURL}/export-excel`, params })
 }
