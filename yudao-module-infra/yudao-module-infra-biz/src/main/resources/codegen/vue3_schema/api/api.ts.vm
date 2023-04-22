@@ -1,4 +1,5 @@
 import request from '@/config/axios'
+#set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
 
 export interface ${simpleClassName}VO {
     #foreach ($column in $columns)

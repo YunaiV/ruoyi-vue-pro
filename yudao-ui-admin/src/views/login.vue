@@ -83,6 +83,14 @@
                     </div>
                 </div>
               </el-form-item>
+
+              <!-- 教程说明 -->
+              <el-form-item style="width:100%; margin-top:-25px">
+                <router-link to="https://doc.iocoder.cn/">📚开发指南</router-link>
+                <router-link to="https://doc.iocoder.cn/video/" style="padding-left: 10px">🔥视频教程</router-link>
+                <router-link to="https://www.iocoder.cn/Interview/good-collection/" style="padding-left: 10px">⚡面试手册</router-link>
+                <router-link to="http://static.yudao.iocoder.cn/mp/Aix9975.jpeg" style="padding-left: 10px">🤝外包咨询</router-link>
+              </el-form-item>
             </el-form>
           </div>
         </div>
