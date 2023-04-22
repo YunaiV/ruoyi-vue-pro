@@ -102,7 +102,7 @@
         <el-date-picker
           v-model="formData.${javaField}"
           type="date"
-          value-format="timestamp"
+          value-format="x"
           placeholder="选择${comment}"
         />
       </el-form-item>
