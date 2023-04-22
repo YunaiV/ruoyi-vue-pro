@@ -4,3 +4,4 @@
  * 2. 基于 weixin-java-miniapp 库，对接微信小程序。目前主要解决微信小程序的一键登录场景。
  */
 package cn.iocoder.yudao.framework.weixin;
+
