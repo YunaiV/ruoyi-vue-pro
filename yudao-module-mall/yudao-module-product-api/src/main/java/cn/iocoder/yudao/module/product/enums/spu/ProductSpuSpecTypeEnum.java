@@ -16,15 +16,15 @@ import java.util.Arrays;
 @Deprecated
 public enum ProductSpuSpecTypeEnum implements IntArrayValuable {
 
-    RECYCLE(1, "统一规格"),
-    DISABLE(2, "多规格");
+    RECYCLE(false, "统一规格"),
+    DISABLE(true, "多规格");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ProductSpuSpecTypeEnum::getType).toArray();
-
+    //public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ProductSpuSpecTypeEnum::getType).toArray();// TODO 暂时先这样跑起来
+    public static final int[] ARRAYS = {};
     /**
      * 规格类型
      */
-    private final Integer type;
+    private final Boolean type;
     /**
      * 规格名称
      */

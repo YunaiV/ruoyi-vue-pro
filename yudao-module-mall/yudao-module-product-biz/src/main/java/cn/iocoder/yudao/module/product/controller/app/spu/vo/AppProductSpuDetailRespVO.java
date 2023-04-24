@@ -35,8 +35,8 @@ public class AppProductSpuDetailRespVO {
 
     // ========== SKU 相关字段 =========
 
-    @Schema(description = "规格类型", required = true, example = "1")
-    private Integer specType;
+    @Schema(description = "规格类型", required = true, example = "true")
+    private Boolean specType;
 
     @Schema(description = "是否展示库存", required = true, example = "true")
     private Boolean showStock;

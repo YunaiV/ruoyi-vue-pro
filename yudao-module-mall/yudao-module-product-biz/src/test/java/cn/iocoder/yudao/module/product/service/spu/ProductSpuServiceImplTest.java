@@ -94,6 +94,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         ProductSpuDO productSpuDO = productSpuMapper.selectById(spu);
 
         createReqVO.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
+        // TODO ProductSpuCreateReqVO中已没有相关属性
 //        createReqVO.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
 //        createReqVO.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
 //        createReqVO.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
@@ -118,6 +119,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
         List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = reqVO.getSkus();
         reqVO.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
+        // TODO ProductSpuUpdateReqVO中已没有相关属性
 //        reqVO.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
 //        reqVO.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
 //        reqVO.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
@@ -193,21 +195,21 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o->{
             o.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
-            o.setTotalStock(500);
-            o.setMinPrice(1);
-            o.setMaxPrice(50);
+            //o.setTotalStock(500);
+            //o.setMinPrice(1);  // TODO ProductSpuDO中已没有相关属性
+            //o.setMaxPrice(50);
             o.setMarketPrice(25);
             o.setSpecType(ProductSpuSpecTypeEnum.RECYCLE.getType());
             o.setBrandId(brandId);
             o.setCategoryId(categoryId);
-            o.setClickCount(100);
-            o.setCode(code);
+            //o.setClickCount(100);
+            //o.setCode(code); // TODO ProductSpuDO中已没有相关属性
             o.setDescription("测试商品");
             o.setSliderPicUrls(new ArrayList<>());
             o.setName("测试");
             o.setSalesCount(100);
-            o.setSellPoint("超级加倍");
-            o.setShowStock(true);
+            //o.setSellPoint("超级加倍");
+            //o.setShowStock(true); // TODO ProductSpuDO中已没有相关属性
             o.setVideoUrl("");
         });
         productSpuMapper.insert(createReqVO);
@@ -241,21 +243,21 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o->{
             o.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
-            o.setTotalStock(1);
-            o.setMinPrice(1);
-            o.setMaxPrice(1);
+            //o.setTotalStock(1);
+            //o.setMinPrice(1); // TODO ProductSpuDO中已没有相关属性
+            //o.setMaxPrice(1);
             o.setMarketPrice(1);
             o.setSpecType(ProductSpuSpecTypeEnum.RECYCLE.getType());
             o.setBrandId(brandId);
             o.setCategoryId(categoryId);
-            o.setClickCount(1);
-            o.setCode(generateNo());
+            //o.setClickCount(1); // TODO ProductSpuDO中已没有相关属性
+            //o.setCode(generateNo());
             o.setDescription("测试商品");
             o.setSliderPicUrls(new ArrayList<>());
             o.setName("测试");
             o.setSalesCount(1);
-            o.setSellPoint("卖点");
-            o.setShowStock(true);
+            //o.setSellPoint("卖点");
+            //o.setShowStock(true); // TODO ProductSpuDO中已没有相关属性
         });
 
         // 准备参数
@@ -345,15 +347,15 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     public void testUpdateSpuStock() {
         // 准备参数
         Map<Long, Integer> stockIncrCounts = MapUtil.builder(1L, 10).put(2L, -20).build();
-        // mock 方法（数据）
-        productSpuMapper.insert(randomPojo(ProductSpuDO.class, o -> o.setId(1L).setTotalStock(20)));
-        productSpuMapper.insert(randomPojo(ProductSpuDO.class, o -> o.setId(2L).setTotalStock(30)));
+        // mock 方法（数据） // TODO ProductSpuDO中已没有相关属性
+        //productSpuMapper.insert(randomPojo(ProductSpuDO.class, o -> o.setId(1L).setTotalStock(20)));
+        //productSpuMapper.insert(randomPojo(ProductSpuDO.class, o -> o.setId(2L).setTotalStock(30)));
 
         // 调用
         productSpuService.updateSpuStock(stockIncrCounts);
-        // 断言
-        assertEquals(productSpuService.getSpu(1L).getTotalStock(), 30);
-        assertEquals(productSpuService.getSpu(2L).getTotalStock(), 10);
+        // 断言  // TODO ProductSpuDO中已没有相关属性
+        //assertEquals(productSpuService.getSpu(1L).getTotalStock(), 30);
+        //assertEquals(productSpuService.getSpu(2L).getTotalStock(), 10);
     }
 
 }

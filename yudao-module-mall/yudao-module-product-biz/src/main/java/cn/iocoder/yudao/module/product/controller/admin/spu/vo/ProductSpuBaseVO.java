@@ -57,8 +57,7 @@ public class ProductSpuBaseVO {
 
     @Schema(description = "规格类型", required = true, example = "1")
     @NotNull(message = "规格类型不能为空")
-    @InEnum(ProductSpuSpecTypeEnum.class)
-    private Integer specType;
+    private Boolean specType;
 
     @Schema(description = "是否展示库存", required = true, example = "true")
     @NotNull(message = "是否展示库存不能为空")

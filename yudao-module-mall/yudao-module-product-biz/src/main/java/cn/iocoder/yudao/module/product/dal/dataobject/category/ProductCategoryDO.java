@@ -60,8 +60,13 @@ public class ProductCategoryDO extends BaseDO {
      */
     private Integer status;
     /**
-     * PC端分类图
+     * 描述
      */
-    private String bigPicUrl;
+    private String description;
+
+    /**
+     * PC端分类图 TODO 数据库没有这个字段
+     */
+    //private String bigPicUrl;
 
 }

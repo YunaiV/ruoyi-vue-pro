@@ -79,7 +79,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public void validateSkuList(List<ProductSkuCreateOrUpdateReqVO> skus, Integer specType) {
+    public void validateSkuList(List<ProductSkuCreateOrUpdateReqVO> skus, Boolean specType) {
         // 非多规格，不需要校验
         if (ObjectUtil.notEqual(specType, ProductSpuSpecTypeEnum.DISABLE.getType())) {
             return;

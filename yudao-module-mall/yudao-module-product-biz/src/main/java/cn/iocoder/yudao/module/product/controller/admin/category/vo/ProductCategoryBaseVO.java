@@ -32,7 +32,7 @@ public class ProductCategoryBaseVO {
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
-    @Schema(description = "PC端分类图")
-    private String bigPicUrl;
+    //@Schema(description = "PC端分类图") TODO 数据库没有这个字段
+    //private String bigPicUrl;
 
 }
