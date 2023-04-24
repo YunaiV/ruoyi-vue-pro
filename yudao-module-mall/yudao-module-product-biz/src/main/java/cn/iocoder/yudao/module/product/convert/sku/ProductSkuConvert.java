@@ -37,7 +37,8 @@ public interface ProductSkuConvert {
 
     default List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list, Long spuId, String spuName) {
         List<ProductSkuDO> result = convertList06(list);
-        result.forEach(item -> item.setSpuId(spuId).setSpuName(spuName));
+        // result.forEach(item -> item.setSpuId(spuId).setSpuName(spuName)); TODO ProductSkuDO中已经没有name相关属性
+        result.forEach(item -> item.setSpuId(spuId));
         return result;
     }
 

@@ -50,7 +50,7 @@ public interface ProductSkuService {
      *
      * @param list sku组合的集合
      */
-    void validateSkuList(List<ProductSkuCreateOrUpdateReqVO> list, Integer specType);
+    void validateSkuList(List<ProductSkuCreateOrUpdateReqVO> list, Boolean specType);
 
     /**
      * 批量创建 SKU

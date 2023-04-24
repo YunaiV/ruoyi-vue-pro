@@ -79,7 +79,7 @@ public class ProductSpuRespDTO {
      * <p>
      * 枚举 {@link ProductSpuSpecTypeEnum}
      */
-    private Integer specType;
+    private Boolean specType;
     /**
      * 最小价格，单位使用：分
      * <p>

@@ -102,9 +102,10 @@ public class ProductSpuServiceImpl implements ProductSpuService {
      */
     private void initSpuFromSkus(ProductSpuDO spu, List<ProductSkuCreateOrUpdateReqVO> skus) {
         spu.setMarketPrice(getMaxValue(skus, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
-        spu.setMaxPrice(getMaxValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
-        spu.setMinPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
-        spu.setTotalStock(getSumValue(skus, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
+        // TODO ProductSpuDO中已没有相关属性
+        //spu.setMaxPrice(getMaxValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
+        //spu.setMinPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
+        //spu.setTotalStock(getSumValue(skus, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
     }
 
     /**

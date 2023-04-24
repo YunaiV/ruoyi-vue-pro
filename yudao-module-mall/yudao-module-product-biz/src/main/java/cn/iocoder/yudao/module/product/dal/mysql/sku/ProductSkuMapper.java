@@ -26,8 +26,8 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
     default List<ProductSkuDO> selectListBySpuIdAndStatus(Long spuId,
                                                           Integer status) {
         return selectList(new LambdaQueryWrapperX<ProductSkuDO>()
-                .eq(ProductSkuDO::getSpuId, spuId)
-                .eqIfPresent(ProductSkuDO::getStatus, status));
+                .eq(ProductSkuDO::getSpuId, spuId)// eqIfPresent(ProductSkuDO::getStatus, status) TODO ProductSkuDO已经没有status属性
+                );
     }
 
     default List<ProductSkuDO> selectListBySpuId(Collection<Long> spuIds) {
