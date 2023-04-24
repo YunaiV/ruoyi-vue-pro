@@ -5,10 +5,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.constraints.NotBlank;
+
 @Schema(description = "管理后台 - 商品分类创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductCategoryCreateReqVO extends ProductCategoryBaseVO {
-
+    @Schema(description = "分类描述")
+    private String description;
 }

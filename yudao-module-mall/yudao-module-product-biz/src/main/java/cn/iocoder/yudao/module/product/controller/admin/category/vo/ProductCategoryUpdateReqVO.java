@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 商品分类更新 Request VO")
@@ -16,5 +17,7 @@ public class ProductCategoryUpdateReqVO extends ProductCategoryBaseVO {
     @Schema(description = "分类编号", required = true, example = "2")
     @NotNull(message = "分类编号不能为空")
     private Long id;
+    @Schema(description = "分类描述")
+    private String description;
 
 }
