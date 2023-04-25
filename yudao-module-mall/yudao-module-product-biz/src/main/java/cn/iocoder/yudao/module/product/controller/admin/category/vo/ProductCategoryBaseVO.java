@@ -21,9 +21,12 @@ public class ProductCategoryBaseVO {
     @NotBlank(message = "分类名称不能为空")
     private String name;
 
-    @Schema(description = "分类图片", required = true)
-    @NotBlank(message = "分类图片不能为空")
+    @Schema(description = "移动端分类图", required = true)
+    @NotBlank(message = "移动端分类图不能为空")
     private String picUrl;
+
+    @Schema(description = "PC 端分类图")
+    private String bigPicUrl;
 
     @Schema(description = "分类排序", required = true, example = "1")
     private Integer sort;
@@ -31,8 +34,5 @@ public class ProductCategoryBaseVO {
     @Schema(description = "开启状态", required = true, example = "0")
     @NotNull(message = "开启状态不能为空")
     private Integer status;
-
-    //@Schema(description = "PC端分类图") TODO 数据库没有这个字段
-    //private String bigPicUrl;
 
 }
