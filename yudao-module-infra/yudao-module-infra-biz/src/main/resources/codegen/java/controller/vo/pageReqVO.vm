@@ -26,6 +26,8 @@ import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 @ToString(callSuper = true)
 public class ${sceneEnum.prefixClass}${table.className}PageReqVO extends PageParam {
 
+    private static final long serialVersionUID = 1L;
+
 #foreach ($column in $columns)
 #if (${column.listOperation})##查询操作
 #if (${column.listOperationCondition} == "BETWEEN")## 情况一，Between 的时候
