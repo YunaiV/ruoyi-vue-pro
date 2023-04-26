@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
@@ -75,8 +76,6 @@ public interface ProductSpuConvert {
     List<AppProductSpuDetailRespVO.Sku> convertList03(List<ProductSkuDO> skus);
     AppProductPropertyValueDetailRespVO convert03(ProductPropertyValueDetailRespBO propertyValue);
 
-    PageResult<AppProductSpuPageItemRespVO> convertPage02(PageResult<ProductSpuDO> page);
-
     default ProductSpuDetailRespVO convert03(ProductSpuDO spu, List<ProductSkuDO> skus,
                                              List<ProductPropertyValueDetailRespBO> propertyValues) {
         ProductSpuDetailRespVO spuVO = convert03(spu);
@@ -104,5 +103,15 @@ public interface ProductSpuConvert {
     ProductSpuDetailRespVO convert03(ProductSpuDO spu);
     List<ProductSpuDetailRespVO.Sku> convertList04(List<ProductSkuDO> skus);
     ProductPropertyValueDetailRespVO convert04(ProductPropertyValueDetailRespBO propertyValue);
+
+    // ========== 用户 App 相关 ==========
+
+    default PageResult<AppProductSpuPageItemRespVO> convertPageForGetSpuPage(PageResult<ProductSpuDO> page) {
+        // 累加虚拟销量
+        page.getList().forEach(spu -> spu.setSalesCount(spu.getSalesCount() + spu.getVirtualSalesCount()));
+        // 然后进行转换
+        return convertPageForGetSpuPage0(page);
+    }
+    PageResult<AppProductSpuPageItemRespVO> convertPageForGetSpuPage0(PageResult<ProductSpuDO> page);
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.app.spu.vo;
 
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -15,21 +16,24 @@ public class AppProductSpuPageItemRespVO {
     private Long id;
 
     @Schema(description = "商品名称", required = true, example = "芋道")
-    @NotEmpty(message = "商品名称不能为空")
     private String name;
 
     @Schema(description = "分类编号", required = true)
-    @NotNull(message = "分类编号不能为空")
     private Long categoryId;
 
-    @Schema(description = "商品图片的数组", required = true)
-    private List<String> picUrls;
+    @Schema(description = "商品封面图", required = true)
+    private String picUrl;
 
-    @Schema(description = " 最小价格，单位使用：分", required = true, example = "1024")
-    private Integer minPrice;
+    @Schema(description = "商品轮播图", required = true)
+    private List<String> sliderPicUrls;
 
-    @Schema(description = "最大价格，单位使用：分", required = true, example = "1024")
-    private Integer maxPrice;
+    @Schema(description = "商品价格，单位使用：分", required = true, example = "1024")
+    private Integer price;
+
+    // ========== SKU 相关字段 =========
+
+    @Schema(description = "库存", required = true, example = "666")
+    private Integer stock;
 
     // ========== 统计相关字段 =========
 

@@ -19,17 +19,22 @@ public class AppProductSpuPageReqVO extends PageParam {
     public static final String SORT_FIELD_PRICE = "price";
     public static final String SORT_FIELD_SALES_COUNT = "salesCount";
 
+    public static final String RECOMMEND_TYPE_HOT = "hot";
+
     @Schema(description = "分类编号", example = "1")
     private Long categoryId;
 
     @Schema(description = "关键字", example = "好看")
     private String keyword;
 
-    @Schema(description = "排序字段", example = "price") // 参见 AppSpuPageReqVO.SORT_FIELD_XXX 常量
+    @Schema(description = "排序字段", example = "price") // 参见 AppProductSpuPageReqVO.SORT_FIELD_XXX 常量
     private String sortField;
 
     @Schema(description = "排序方式", example = "true")
     private Boolean sortAsc;
+
+    @Schema(description = "推荐类型", example = "hot") // 参见 AppProductSpuPageReqVO.RECOMMEND_TYPE_XXX 常亮
+    private String recommendType;
 
     @AssertTrue(message = "排序字段不合法")
     @JsonIgnore
