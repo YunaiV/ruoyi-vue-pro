@@ -53,7 +53,14 @@ export const searchFormSchema: FormSchema[] = [
     component: 'Select',
     componentProps: {
       #if ("" != $dictType)## 设置了 dictType 数据字典的情况
-        options: getIntDictOptions(DICT_TYPE.$dictType.toUpperCase())
+        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+          #set ($dictMethod = "getIntDictOptions")
+        #elseif ($javaType == "String")
+          #set ($dictMethod = "getStrDictOptions")
+        #elseif ($javaType == "Boolean")
+          #set ($dictMethod = "getBoolDictOptions")
+        #end
+        options: $dictMethod(DICT_TYPE.$dictType.toUpperCase())
       #else## 未设置 dictType 数据字典的情况
         options: []
       #end
@@ -99,7 +106,14 @@ export const formSchema: FormSchema[] = [
     component: 'Select',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getIntDictOptions(DICT_TYPE.COMMON_STATUS)
+        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+          #set ($dictMethod = "getIntDictOptions")
+        #elseif ($javaType == "String")
+          #set ($dictMethod = "getStrDictOptions")
+        #elseif ($javaType == "Boolean")
+          #set ($dictMethod = "getBoolDictOptions")
+        #end
+        options: $dictMethod(DICT_TYPE.$dictType.toUpperCase())
       #else##没数据字典
         options:[]
       #end
