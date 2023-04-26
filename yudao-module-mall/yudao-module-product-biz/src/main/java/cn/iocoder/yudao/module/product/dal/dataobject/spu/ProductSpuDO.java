@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.delivery.DeliveryTemplateDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;

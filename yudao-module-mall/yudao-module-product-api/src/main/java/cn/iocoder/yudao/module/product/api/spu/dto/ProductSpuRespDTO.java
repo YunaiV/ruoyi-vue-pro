@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.product.api.spu.dto;
 
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import lombok.Data;
 
@@ -76,8 +75,6 @@ public class ProductSpuRespDTO {
 
     /**
      * 规格类型
-     * <p>
-     * 枚举 {@link ProductSpuSpecTypeEnum}
      */
     private Boolean specType;
     /**

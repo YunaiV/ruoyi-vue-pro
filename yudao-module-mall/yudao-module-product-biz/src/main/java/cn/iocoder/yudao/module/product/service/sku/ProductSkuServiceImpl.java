@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyVa
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
@@ -81,7 +80,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     @Override
     public void validateSkuList(List<ProductSkuCreateOrUpdateReqVO> skus, Boolean specType) {
         // 非多规格，不需要校验
-        if (ObjectUtil.notEqual(specType, ProductSpuSpecTypeEnum.DISABLE.getType())) {
+        if (ObjectUtil.notEqual(specType, true)) {
             return;
         }
 
