@@ -74,7 +74,7 @@ export const searchFormSchema: FormSchema[] = [
 #end
 ]
 
-export const formSchema: FormSchema[] = [
+export const createFormSchema: FormSchema[] = [
   {
     label: '编号',
     field: 'id',
@@ -82,7 +82,7 @@ export const formSchema: FormSchema[] = [
     component: 'Input'
   },
 #foreach($column in $columns)
-#if ($column.createOperation || $column.updateOperation)
+#if ($column.createOperation)
   #set ($dictType = $column.dictType)
   #set ($javaField = $column.javaField)
   #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
@@ -145,4 +145,77 @@ export const formSchema: FormSchema[] = [
 #end
 #end
 #end
+]
+
+export const updateFormSchema: FormSchema[] = [
+  {
+    label: '编号',
+    field: 'id',
+    show: false,
+    component: 'Input'
+  },
+  #foreach($column in $columns)
+    #if ($column.updateOperation)
+      #set ($dictType = $column.dictType)
+      #set ($javaField = $column.javaField)
+      #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+      #set ($comment = $column.columnComment)
+      #if (!$column.primaryKey)## 忽略主键，不用在表单里
+        {
+          label: '${comment}',
+          field: '${javaField}',
+          #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+            required: true,
+          #end
+          #if ($column.htmlType == "input")
+            component: 'Input'
+          #elseif($column.htmlType == "imageUpload")## 图片上传
+            component: 'Upload'
+          #elseif($column.htmlType == "fileUpload")## 文件上传
+            component: 'Upload'
+          #elseif($column.htmlType == "editor")## 文本编辑器
+            component: 'InputTextArea'
+          #elseif($column.htmlType == "select")## 下拉框
+            component: 'Select',
+            componentProps: {
+              #if ("" != $dictType)## 有数据字典
+                #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                  #set ($dictMethod = "getIntDictOptions")
+                #elseif ($javaType == "String")
+                  #set ($dictMethod = "getStrDictOptions")
+                #elseif ($javaType == "Boolean")
+                  #set ($dictMethod = "getBoolDictOptions")
+                #end
+                options: $dictMethod(DICT_TYPE.$dictType.toUpperCase())
+              #else##没数据字典
+                options:[]
+              #end
+            }
+          #elseif($column.htmlType == "checkbox")## 多选框
+            component: 'Checkbox',
+            componentProps: {
+              #if ("" != $dictType)## 有数据字典
+                options: getIntDictOptions(DICT_TYPE.COMMON_STATUS)
+              #else##没数据字典
+                options:[]
+              #end
+            }
+          #elseif($column.htmlType == "radio")## 单选框
+            component: 'Radio',
+            componentProps: {
+              #if ("" != $dictType)## 有数据字典
+                options: getIntDictOptions(DICT_TYPE.COMMON_STATUS)
+              #else##没数据字典
+                options:[]
+              #end
+            }
+          #elseif($column.htmlType == "datetime")## 时间框
+            component: 'DatePicker'
+          #elseif($column.htmlType == "textarea")## 文本域
+            component: 'InputTextArea'
+          #end
+        },
+      #end
+    #end
+  #end
 ]

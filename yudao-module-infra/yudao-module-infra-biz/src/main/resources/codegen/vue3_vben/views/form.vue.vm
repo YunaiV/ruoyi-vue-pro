@@ -9,7 +9,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { BasicForm, useForm } from '@/components/Form'
 import { BasicModal, useModalInner } from '@/components/Modal'
-import { formSchema } from './${classNameVar}.data'
+import { createFormSchema, updateFormSchema } from './${classNameVar}.data'
 import { create${simpleClassName}, get${simpleClassName}, update${simpleClassName} } from '@/api/${table.moduleName}/${classNameVar}'
 
 const { t } = useI18n()
@@ -20,7 +20,7 @@ const isUpdate = ref(true)
 const [registerForm, { setFieldsValue, resetFields, validate }] = useForm({
   labelWidth: 120,
   baseColProps: { span: 24 },
-  schemas: formSchema,
+  schemas: isUpdate? updateFormSchema : createFormSchema,
   showActionButtonGroup: false,
   actionColOptions: { span: 23 }
 })
