@@ -18,17 +18,17 @@ public class AppProductSpuDetailRespVO {
     @Schema(description = "商品名称", required = true, example = "芋道")
     private String name;
 
-    @Schema(description = "促销语", example = "好吃！")
-    private String sellPoint;
-
     @Schema(description = "商品详情", required = true, example = "我是商品描述")
     private String description;
 
     @Schema(description = "商品分类编号", required = true, example = "1")
     private Long categoryId;
 
-    @Schema(description = "商品图片的数组", required = true)
-    private List<String> picUrls;
+    @Schema(description = "商品封面图", required = true)
+    private String picUrl;
+
+    @Schema(description = "商品轮播图", required = true)
+    private List<String> sliderPicUrls;
 
     @Schema(description = "商品视频", required = true)
     private String videoUrl;
@@ -38,14 +38,14 @@ public class AppProductSpuDetailRespVO {
     @Schema(description = "规格类型", required = true, example = "true")
     private Boolean specType;
 
-    @Schema(description = "是否展示库存", required = true, example = "true")
-    private Boolean showStock;
+    @Schema(description = "商品价格，单位使用：分", required = true, example = "1024")
+    private Integer price;
 
-    @Schema(description = " 最小价格，单位使用：分", required = true, example = "1024")
-    private Integer minPrice;
+    @Schema(description = "市场价，单位使用：分", required = true, example = "1024")
+    private Integer marketPrice;
 
-    @Schema(description = "最大价格，单位使用：分", required = true, example = "1024")
-    private Integer maxPrice;
+    @Schema(description = "库存", required = true, example = "666")
+    private Integer stock;
 
     /**
      * SKU 数组
@@ -72,7 +72,7 @@ public class AppProductSpuDetailRespVO {
         @Schema(description = "销售价格，单位：分", required = true, example = "1024")
         private Integer price;
 
-        @Schema(description = "市场价", example = "1024")
+        @Schema(description = "市场价，单位使用：分", required = true, example = "1024")
         private Integer marketPrice;
 
         @Schema(description = "图片地址", required = true, example = "https://www.iocoder.cn/xx.png")

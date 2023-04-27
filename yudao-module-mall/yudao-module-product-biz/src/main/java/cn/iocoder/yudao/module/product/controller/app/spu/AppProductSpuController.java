@@ -73,7 +73,7 @@ public class AppProductSpuController {
         List<ProductPropertyValueDetailRespBO> propertyValues = productPropertyValueService
                 .getPropertyValueDetailList(ProductSkuConvert.INSTANCE.convertPropertyValueIds(skus));
         // 拼接
-        return success(ProductSpuConvert.INSTANCE.convert(spu, skus, propertyValues));
+        return success(ProductSpuConvert.INSTANCE.convertForGetSpuDetail(spu, skus, propertyValues));
     }
 
 }

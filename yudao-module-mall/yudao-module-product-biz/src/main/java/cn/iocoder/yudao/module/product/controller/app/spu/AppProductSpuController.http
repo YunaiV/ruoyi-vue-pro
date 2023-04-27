@@ -14,5 +14,5 @@ Authorization: Bearer {{appToken}}
 tenant-id: {{appTenentId}}
 
 ### 获得商品 SPU 明细
-GET {{appApi}}/product/spu/get-detail?id=4
+GET {{appApi}}/product/spu/get-detail?id=102
 tenant-id: {{appTenentId}}

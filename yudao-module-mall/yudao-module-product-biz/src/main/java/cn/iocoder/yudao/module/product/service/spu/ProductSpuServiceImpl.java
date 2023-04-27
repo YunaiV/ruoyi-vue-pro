@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
@@ -66,7 +63,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         productSkuService.validateSkuList(skuSaveReqList, createReqVO.getSpecType());
 
         // 插入 SPU
-        ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
+        ProductSpuDO spu = ProductSpuConvert.INSTANCE.convertForGetSpuDetail(createReqVO);
         initSpuFromSkus(spu, skuSaveReqList);
         productSpuMapper.insert(spu);
         // 插入 SKU
@@ -89,7 +86,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         productSkuService.validateSkuList(skuSaveReqList, updateReqVO.getSpecType());
 
         // 更新 SPU
-        ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
+        ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convertForGetSpuDetail(updateReqVO);
         initSpuFromSkus(updateObj, skuSaveReqList);
         productSpuMapper.updateById(updateObj);
         // 批量更新 SKU
