@@ -174,7 +174,7 @@ export const updateFormSchema: FormSchema[] = [
     #elseif($column.htmlType == "fileUpload")## 文件上传
     component: 'Upload'
     #elseif($column.htmlType == "editor")## 文本编辑器
-    component: 'InputTextArea'
+    component: 'Editor'
     #elseif($column.htmlType == "select")## 下拉框
     component: 'Select',
     componentProps: {
