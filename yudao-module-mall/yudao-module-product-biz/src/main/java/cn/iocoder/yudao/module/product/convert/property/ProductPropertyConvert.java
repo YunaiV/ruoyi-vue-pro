@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.convert.property;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyAndValueRespVO;
@@ -11,8 +12,11 @@ import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyVa
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 /**
  * 属性项 Convert
@@ -38,7 +42,12 @@ public interface ProductPropertyConvert {
         Map<Long, List<ProductPropertyValueDO>> valueMap = CollectionUtils.convertMultiMap(values, ProductPropertyValueDO::getPropertyId);
         return CollectionUtils.convertList(keys, key -> {
             ProductPropertyAndValueRespVO respVO = convert02(key);
-            respVO.setValues(convertList02(valueMap.get(key.getId())));
+            // 如果属性值为空value不为null,返回空列表
+            if (CollUtil.isEmpty(values)) {
+                respVO.setValues(Collections.emptyList());
+            }else {
+                respVO.setValues(convertList02(valueMap.get(key.getId())));
+            }
             return respVO;
         });
     }
