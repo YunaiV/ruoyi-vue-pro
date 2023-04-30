@@ -87,7 +87,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         // 1、校验属性项存在
         Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null)
                 .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
-                .map(ProductSkuBaseVO.Property::getPropertyId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
+                .map(ProductSkuCreateOrUpdateReqVO.Property::getPropertyId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
                 .collect(Collectors.toSet());
         List<ProductPropertyDO> propertyList = productPropertyService.getPropertyList(propertyIds);
         if (propertyList.size() != propertyIds.size()) {
@@ -114,7 +114,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         // 4. 最后校验，每个 Sku 之间不是重复的
         Set<Set<Long>> skuAttrValues = new HashSet<>(); // 每个元素，都是一个 Sku 的 attrValueId 集合。这样，通过最外层的 Set ，判断是否有重复的.
         for (ProductSkuCreateOrUpdateReqVO sku : skus) {
-            if (!skuAttrValues.add(convertSet(sku.getProperties(), ProductSkuBaseVO.Property::getValueId))) { // 添加失败，说明重复
+            if (!skuAttrValues.add(convertSet(sku.getProperties(), ProductSkuCreateOrUpdateReqVO.Property::getValueId))) { // 添加失败，说明重复
                 throw exception(ErrorCodeConstants.SPU_SKU_NOT_DUPLICATE);
             }
         }

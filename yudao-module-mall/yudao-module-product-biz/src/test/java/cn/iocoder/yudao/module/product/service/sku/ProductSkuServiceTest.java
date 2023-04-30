@@ -68,11 +68,9 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
         List<ProductSkuCreateOrUpdateReqVO> skus = Arrays.asList(
                 randomPojo(ProductSkuCreateOrUpdateReqVO.class, o -> { // 测试更新
                     o.setProperties(singletonList(new ProductSkuCreateOrUpdateReqVO.Property(10L, 20L)));
-                    o.setStatus(CommonStatusEnum.ENABLE.getStatus());
                 }),
                 randomPojo(ProductSkuCreateOrUpdateReqVO.class, o -> { // 测试新增
                     o.setProperties(singletonList(new ProductSkuCreateOrUpdateReqVO.Property(10L, 40L)));
-                    o.setStatus(CommonStatusEnum.ENABLE.getStatus());
                 })
         );
 

@@ -38,11 +38,6 @@ public class ProductSkuBaseVO {
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
 
-    @Schema(description = "SKU 状态", required = true, example = "1")
-    @NotNull(message = "SKU 状态不能为空")
-    @InEnum(CommonStatusEnum.class)
-    private Integer status;
-
     @Schema(description = "库存", required = true, example = "1")
     @NotNull(message = "库存不能为空")
     private Integer stock;
@@ -55,21 +50,4 @@ public class ProductSkuBaseVO {
 
     @Schema(description = "商品体积", example = "1024") // 单位：m^3 平米
     private Double volume;
-
-    @Schema(description = "商品属性")
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Property {
-
-        @Schema(description = "属性编号", required = true, example = "1")
-        @NotNull(message = "属性编号不能为空")
-        private Long propertyId;
-
-        @Schema(description = "属性值编号", required = true, example = "1024")
-        @NotNull(message = "属性值编号不能为空")
-        private Long valueId;
-
-    }
-
 }
