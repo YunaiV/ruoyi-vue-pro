@@ -67,6 +67,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         // 更新
         ProductPropertyDO updateObj = ProductPropertyConvert.INSTANCE.convert(updateReqVO);
         productPropertyMapper.updateById(updateObj);
+        // TODO 芋艿：更新时，需要看看 sku 表
     }
 
     @Override

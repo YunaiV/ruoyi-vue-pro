@@ -26,6 +26,9 @@ public class AppProductSpuPageItemRespVO {
 
     // ========== SKU 相关字段 =========
 
+    @Schema(description = "规格类型", required = true, example = "true")
+    private Boolean specType;
+
     @Schema(description = "商品价格，单位使用：分", required = true, example = "1024")
     private Integer price;
 

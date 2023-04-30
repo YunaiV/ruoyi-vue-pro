@@ -54,12 +54,14 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
         // mock 数据
         ProductSkuDO sku01 = randomPojo(ProductSkuDO.class, o -> { // 测试更新
             o.setSpuId(1L);
-            o.setProperties(singletonList(new ProductSkuDO.Property(10L, 20L)));
+            o.setProperties(singletonList(new ProductSkuDO.Property(
+                    10L, "颜色", 20L, "红色")));
         });
         productSkuMapper.insert(sku01);
         ProductSkuDO sku02 = randomPojo(ProductSkuDO.class, o -> { // 测试删除
             o.setSpuId(1L);
-            o.setProperties(singletonList(new ProductSkuDO.Property(10L, 30L)));
+            o.setProperties(singletonList(new ProductSkuDO.Property(
+                    10L, "颜色", 30L, "蓝色")));
         });
         productSkuMapper.insert(sku02);
         // 准备参数

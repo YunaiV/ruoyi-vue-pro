@@ -15,7 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * TODO LeeYan9: 类注释;
+ * 商品 SKU API 实现类
+ *
  * @author LeeYan9
  * @since 2022-09-06
  */
@@ -28,8 +29,8 @@ public class ProductSkuApiImpl implements ProductSkuApi {
 
     @Override
     public ProductSkuRespDTO getSku(Long id) {
-        // TODO TODO LeeYan9: 需要实现
-        return null;
+        ProductSkuDO sku = productSkuService.getSku(id);
+        return ProductSkuConvert.INSTANCE.convert02(sku);
     }
 
     @Override

@@ -110,11 +110,28 @@ public class ProductSkuDO extends BaseDO {
          */
         private Long propertyId;
         /**
+         * 属性名字
+         *
+         * 冗余 {@link ProductPropertyDO#getName()}
+         *
+         * 注意：每次属性名字发生变化时，需要更新该冗余
+         */
+        private String propertyName;
+
+        /**
          * 属性值编号
          *
          * 关联 {@link ProductPropertyValueDO#getId()}
          */
         private Long valueId;
+        /**
+         * 属性值名字
+         *
+         * 冗余 {@link ProductPropertyValueDO#getName()}
+         *
+         * 注意：每次属性值名字发生变化时，需要更新该冗余
+         */
+        private String valueName;
 
     }
 
@@ -138,10 +155,6 @@ public class ProductSkuDO extends BaseDO {
     // TODO 芋艿：seckillPrice from y
     // TODO 芋艿：pinkStock from y
     // TODO 芋艿：seckillStock from y
-
-    // TODO 芋艿：quota from c
-    // TODO 芋艿：quotaShow from c
-    // TODO 芋艿：attrValue from c
 
 }
 

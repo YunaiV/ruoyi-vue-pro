@@ -6,15 +6,15 @@ import lombok.Data;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-@Schema(description = "用户 App - 购物车添加购物项 Request VO")
+@Schema(description = "用户 App - 购物车更新 Request VO")
 @Data
-public class AppTradeCartItemAddCountReqVO {
+public class AppTradeCartUpdateReqVO {
 
-    @Schema(description = "商品 SKU 编号", required = true,example = "1024")
-    @NotNull(message = "商品 SKU 编号不能为空")
-    private Long skuId;
+    @Schema(description = "编号", required = true, example = "1024")
+    @NotNull(message = "编号不能为空")
+    private Long id;
 
-    @Schema(description = "新增商品数量", required = true, example = "1")
+    @Schema(description = "商品数量", required = true, example = "1")
     @NotNull(message = "数量不能为空")
     @Min(message = "数量必须大于 0", value = 1L)
     private Integer count;

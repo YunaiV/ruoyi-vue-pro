@@ -28,7 +28,7 @@ public class ProductSkuRespDTO {
     private String spuName;
 
     /**
-     * 属性数组，JSON 格式
+     * 属性数组
      */
     private List<Property> properties;
     /**
@@ -85,11 +85,19 @@ public class ProductSkuRespDTO {
          */
         private Long propertyId;
         /**
+         * 属性名字
+         */
+        private String propertyName;
+
+        /**
          * 属性值编号
          */
         private Long valueId;
+        /**
+         * 属性值名字
+         */
+        private String valueName;
 
     }
-
 
 }
