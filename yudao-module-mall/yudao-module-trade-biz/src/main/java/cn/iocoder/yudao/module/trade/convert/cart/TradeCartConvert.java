@@ -34,17 +34,17 @@ public interface TradeCartConvert {
             ProductSpuRespDTO spu = spuMap.get(cart.getSpuId());
             ProductSkuRespDTO sku = skuMap.get(cart.getSkuId());
             cartVO.setSpu(convert(spu)).setSku(convert(sku));
-            // 如果 spu 或 sku 不存在，或者 spu 被禁用，说明是非法的，或者 sku 库存不足
+            // 如果 SPU 不存在，或者下架，或者库存不足，说明是无效的
             if (spu == null
-                || sku == null
                 || !ProductSpuStatusEnum.isEnable(spu.getStatus())
-                || sku.getStock() <= 0) {
+                || spu.getStock() <= 0) {
                 invalidList.add(cartVO);
             } else {
+                // 虽然 SKU 可能也会不存在，但是可以通过购物车重新选择
                 validList.add(cartVO);
             }
         });
-        return new AppTradeCartListRespVO().setValidList(validList).setValidList(invalidList);
+        return new AppTradeCartListRespVO().setValidList(validList).setInvalidList(invalidList);
     }
     AppProductSpuBaseRespVO convert(ProductSpuRespDTO spu);
     AppProductSkuBaseRespVO convert(ProductSkuRespDTO sku);

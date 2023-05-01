@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.api.sku.dto;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import lombok.Data;
 
 import java.util.List;
@@ -22,10 +21,6 @@ public class ProductSkuRespDTO {
      * SPU 编号
      */
     private Long spuId;
-    /**
-     * SPU 名字
-     */
-    private String spuName;
 
     /**
      * 属性数组
@@ -51,12 +46,6 @@ public class ProductSkuRespDTO {
      * 图片地址
      */
     private String picUrl;
-    /**
-     * SKU 状态
-     * <p>
-     * 枚举 {@link CommonStatusEnum}
-     */
-    private Integer status;
     /**
      * 库存
      */

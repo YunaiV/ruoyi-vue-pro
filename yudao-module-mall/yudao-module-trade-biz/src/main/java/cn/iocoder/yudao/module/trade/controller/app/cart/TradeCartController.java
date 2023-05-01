@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartListRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartAddReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartResetReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartUpdateReqVO;
 import cn.iocoder.yudao.module.trade.service.cart.TradeCartService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,8 +43,16 @@ public class TradeCartController {
     @PutMapping("/update")
     @Operation(summary = "更新购物车商品")
     @PreAuthenticated
-    public CommonResult<Boolean> updateCartItemQuantity(@Valid @RequestBody AppTradeCartUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateCart(@Valid @RequestBody AppTradeCartUpdateReqVO updateReqVO) {
         cartService.updateCart(getLoginUserId(), updateReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/reset")
+    @Operation(summary = "重置购物车商品")
+    @PreAuthenticated
+    public CommonResult<Boolean> resetCart(@Valid @RequestBody AppTradeCartResetReqVO updateReqVO) {
+        cartService.resetCart(getLoginUserId(), updateReqVO);
         return success(true);
     }
 

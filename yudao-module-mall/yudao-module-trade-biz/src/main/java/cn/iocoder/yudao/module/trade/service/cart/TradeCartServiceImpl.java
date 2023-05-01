@@ -1,18 +1,19 @@
 package cn.iocoder.yudao.module.trade.service.cart;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartAddReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartListRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartResetReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartUpdateReqVO;
 import cn.iocoder.yudao.module.trade.convert.cart.TradeCartConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.cart.TradeCartMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -86,6 +87,28 @@ public class TradeCartServiceImpl implements TradeCartService {
                 .setCount(updateReqVO.getCount()));
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void resetCart(Long userId, AppTradeCartResetReqVO resetReqVO) {
+        // 第一步：删除原本的购物项
+        TradeCartDO oldCart = cartMapper.selectById(resetReqVO.getId(), userId);
+        if (oldCart == null) {
+            throw exception(CARD_ITEM_NOT_FOUND);
+        }
+        cartMapper.deleteById(oldCart.getId());
+
+        // 第二步：添加新的购物项
+        TradeCartDO newCart = cartMapper.selectByUserIdAndSkuId(userId, resetReqVO.getSkuId(),
+                true, false);
+        if (newCart != null) {
+            updateCart(userId, new AppTradeCartUpdateReqVO()
+                    .setId(newCart.getId()).setCount(resetReqVO.getCount()));
+        } else {
+            addCart(userId, new AppTradeCartAddReqVO().setAddStatus(true)
+                    .setSkuId(resetReqVO.getSkuId()).setCount(resetReqVO.getCount()));
+        }
+    }
+
     /**
      * 购物车删除商品
      *
@@ -111,8 +134,8 @@ public class TradeCartServiceImpl implements TradeCartService {
 
     @Override
     public AppTradeCartListRespVO getCartList(Long userId) {
-        // 获得购物车的商品
-        List<TradeCartDO> carts = cartMapper.selectListByUserId(userId);
+        // 获得购物车的商品，只查询未下单的
+        List<TradeCartDO> carts = cartMapper.selectListByUserId(userId, true, false);
         carts.sort(Comparator.comparing(TradeCartDO::getId).reversed());
         // 如果未空，则返回空结果
         if (CollUtil.isEmpty(carts)) {
@@ -122,10 +145,24 @@ public class TradeCartServiceImpl implements TradeCartService {
 
         // 查询 SPU、SKU 列表
         List<ProductSpuRespDTO> spus = productSpuApi.getSpuList(convertSet(carts, TradeCartDO::getSpuId));
-        List<ProductSkuRespDTO> skus = productSkuApi.getSkuList(convertSet(carts, TradeCartDO::getSpuId));
+        List<ProductSkuRespDTO> skus = productSkuApi.getSkuList(convertSet(carts, TradeCartDO::getSkuId));
+
+        // 如果 SPU 被删除，则删除购物车对应的商品。延迟删除
+        deleteCartIfSpuDeleted(carts, spus);
 
         // 拼接数据
         return TradeCartConvert.INSTANCE.convertList(carts, spus, skus);
+    }
+
+    private void deleteCartIfSpuDeleted(List<TradeCartDO> carts, List<ProductSpuRespDTO> spus) {
+        // 如果 SPU 被删除，则删除购物车对应的商品。延迟删除
+        carts.removeIf(cart -> {
+            if (spus.stream().noneMatch(spu -> spu.getId().equals(cart.getSpuId()))) {
+                cartMapper.deleteById(cart.getId());
+                return true;
+            }
+            return false;
+        });
     }
 
     /**
@@ -140,7 +177,7 @@ public class TradeCartServiceImpl implements TradeCartService {
      */
     private ProductSkuRespDTO checkProductSku(Long skuId, Integer count) {
         ProductSkuRespDTO sku = productSkuApi.getSku(skuId);
-        if (sku == null || CommonStatusEnum.DISABLE.getStatus().equals(sku.getStatus())) {
+        if (sku == null) {
             throw exception(SKU_NOT_EXISTS);
         }
         if (count > sku.getStock()) {

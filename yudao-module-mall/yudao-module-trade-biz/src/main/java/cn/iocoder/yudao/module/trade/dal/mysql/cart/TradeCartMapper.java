@@ -45,8 +45,11 @@ public interface TradeCartMapper extends BaseMapperX<TradeCartDO> {
                 .eq(TradeCartDO::getUserId, userId));
     }
 
-    default List<TradeCartDO> selectListByUserId(Long userId) {
-        return selectList(TradeCartDO::getUserId, userId);
+    default List<TradeCartDO> selectListByUserId(Long userId, Boolean addStatus, Boolean orderStatus) {
+        return selectList(new LambdaQueryWrapper<TradeCartDO>()
+                .eq(TradeCartDO::getUserId, userId)
+                .eq(TradeCartDO::getAddStatus, addStatus)
+                .eq(TradeCartDO::getOrderStatus, orderStatus));
     }
 
     default void updateByIds(Collection<Long> ids, TradeCartDO updateObject) {

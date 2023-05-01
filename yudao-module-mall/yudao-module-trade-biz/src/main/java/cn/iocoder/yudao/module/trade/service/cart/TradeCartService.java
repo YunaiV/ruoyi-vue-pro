@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.trade.service.cart;
 
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartListRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartAddReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartListRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartResetReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartUpdateReqVO;
 
 import javax.validation.Valid;
@@ -30,6 +31,16 @@ public interface TradeCartService {
      * @param updateCountReqVO 更新信息
      */
     void updateCart(Long userId, AppTradeCartUpdateReqVO updateCountReqVO);
+
+    /**
+     * 重置购物车商品
+     *
+     * 使用场景：在一个购物车项对应的商品失效（例如说 SPU 被下架），可以重新选择对应的 SKU
+     *
+     * @param userId 用户编号
+     * @param updateReqVO 重置信息
+     */
+    void resetCart(Long userId, AppTradeCartResetReqVO updateReqVO);
 
     /**
      * 删除购物车商品

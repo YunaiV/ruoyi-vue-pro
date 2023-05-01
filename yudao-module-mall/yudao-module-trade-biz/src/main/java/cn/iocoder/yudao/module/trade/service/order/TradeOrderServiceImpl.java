@@ -5,7 +5,6 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -125,15 +124,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if (items.size() != skus.size()) {
             throw exception(ORDER_CREATE_SKU_NOT_FOUND);
         }
-        // 校验是否禁用 or 库存不足
+        // 校验库存不足
         Map<Long, ProductSkuRespDTO> skuMap = convertMap(skus, ProductSkuRespDTO::getId);
         items.forEach(item -> {
             ProductSkuRespDTO sku = skuMap.get(item.getSkuId());
-            // SKU 禁用
-            if (ObjectUtil.notEqual(CommonStatusEnum.ENABLE.getStatus(), sku.getStatus())) {
-                throw exception(ORDER_CREATE_SKU_NOT_SALE);
-            }
-            // SKU 库存不足
             if (item.getCount() > sku.getStock()) {
                 throw exception(ErrorCodeConstants.ORDER_CREATE_SKU_STOCK_NOT_ENOUGH);
             }
