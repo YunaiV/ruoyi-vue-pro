@@ -84,10 +84,17 @@ public class ProductSkuServiceImpl implements ProductSkuService {
             return;
         }
 
+        // 0、校验skus是否为空
+        if (CollUtil.isEmpty(skus)){
+            throw exception(SKU_NOT_EXISTS);
+        }
+
         // 1、校验属性项存在
         Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null)
-                .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
-                .map(ProductSkuCreateOrUpdateReqVO.Property::getPropertyId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
+                // 遍历多个 Property 属性
+                .flatMap(p -> p.getProperties().stream())
+                // 将每个 Property 转换成对应的 propertyId，最后形成集合
+                .map(ProductSkuCreateOrUpdateReqVO.Property::getPropertyId)
                 .collect(Collectors.toSet());
         List<ProductPropertyDO> propertyList = productPropertyService.getPropertyList(propertyIds);
         if (propertyList.size() != propertyIds.size()) {
@@ -107,22 +114,24 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         int attrValueIdsSize = skus.get(0).getProperties().size();
         for (int i = 1; i < skus.size(); i++) {
             if (attrValueIdsSize != skus.get(i).getProperties().size()) {
-                throw exception(ErrorCodeConstants.SPU_ATTR_NUMBERS_MUST_BE_EQUALS);
+                throw exception(SPU_ATTR_NUMBERS_MUST_BE_EQUALS);
             }
         }
 
         // 4. 最后校验，每个 Sku 之间不是重复的
-        Set<Set<Long>> skuAttrValues = new HashSet<>(); // 每个元素，都是一个 Sku 的 attrValueId 集合。这样，通过最外层的 Set ，判断是否有重复的.
+        // 每个元素，都是一个 Sku 的 attrValueId 集合。这样，通过最外层的 Set ，判断是否有重复的.
+        Set<Set<Long>> skuAttrValues = new HashSet<>();
         for (ProductSkuCreateOrUpdateReqVO sku : skus) {
-            if (!skuAttrValues.add(convertSet(sku.getProperties(), ProductSkuCreateOrUpdateReqVO.Property::getValueId))) { // 添加失败，说明重复
-                throw exception(ErrorCodeConstants.SPU_SKU_NOT_DUPLICATE);
+            // 添加失败，说明重复
+            if (!skuAttrValues.add(convertSet(sku.getProperties(), ProductSkuCreateOrUpdateReqVO.Property::getValueId))) {
+                throw exception(SPU_SKU_NOT_DUPLICATE);
             }
         }
     }
 
     @Override
-    public void createSkuList(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList) {
-        productSkuMapper.insertBatch(ProductSkuConvert.INSTANCE.convertList06(skuCreateReqList, spuId, spuName));
+    public void createSkuList(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList) {
+        productSkuMapper.insertBatch(ProductSkuConvert.INSTANCE.convertList06(skuCreateReqList, spuId));
     }
 
     @Override
@@ -152,7 +161,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateSkuList(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skus) {
+    public void updateSkuList(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // 构建属性与 SKU 的映射关系;
         Map<String, Long> existsSkuMap = convertMap(productSkuMapper.selectListBySpuId(spuId),
                 ProductSkuConvert.INSTANCE::buildPropertyKey, ProductSkuDO::getId);
@@ -160,13 +169,14 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         // 拆分三个集合，新插入的、需要更新的、需要删除的
         List<ProductSkuDO> insertSkus = new ArrayList<>();
         List<ProductSkuDO> updateSkus = new ArrayList<>();
-        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertList06(skus, null, spuName);
+        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertList06(skus, null);
         allUpdateSkus.forEach(sku -> {
             String propertiesKey = ProductSkuConvert.INSTANCE.buildPropertyKey(sku);
             // 1、找得到的，进行更新
             Long existsSkuId = existsSkuMap.remove(propertiesKey);
             if (existsSkuId != null) {
                 sku.setId(existsSkuId);
+                // TODO 那spuId岂不是为null了
                 updateSkus.add(sku);
                 return;
             }

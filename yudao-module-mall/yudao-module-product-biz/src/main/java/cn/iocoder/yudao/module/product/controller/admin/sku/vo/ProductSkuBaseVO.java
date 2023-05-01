@@ -50,4 +50,14 @@ public class ProductSkuBaseVO {
 
     @Schema(description = "商品体积", example = "1024") // 单位：m^3 平米
     private Double volume;
+    /**
+     * 一级分销的佣金，单位：分
+     */
+    @Schema(description = "一级分销的佣金", example = "1024")
+    private Integer subCommissionFirstPrice;
+    /**
+     * 二级分销的佣金，单位：分
+     */
+    @Schema(description = "二级分销的佣金", example = "1024")
+    private Integer subCommissionSecondPrice;
 }

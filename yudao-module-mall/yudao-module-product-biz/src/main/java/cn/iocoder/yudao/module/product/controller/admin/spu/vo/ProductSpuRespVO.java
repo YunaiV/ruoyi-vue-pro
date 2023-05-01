@@ -19,22 +19,4 @@ public class ProductSpuRespVO extends ProductSpuBaseVO {
     @Schema(description = "创建时间")
     private LocalDateTime createTime;
 
-    // ========== SKU 相关字段 =========
-
-    @Schema(description = "库存", required = true, example = "true")
-    private Integer totalStock;
-
-    @Schema(description = " 最小价格，单位使用：分", required = true, example = "1024")
-    private Integer minPrice;
-
-    @Schema(description = "最大价格，单位使用：分", required = true, example = "1024")
-    private Integer maxPrice;
-
-    @Schema(description = "商品销量", example = "1024")
-    private Integer salesCount;
-
-    // ========== 统计相关字段 =========
-
-    @Schema(description = "点击量", example = "1024")
-    private Integer clickCount;
 }

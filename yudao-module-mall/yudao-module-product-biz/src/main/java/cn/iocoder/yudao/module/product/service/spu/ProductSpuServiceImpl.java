@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
@@ -21,10 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -54,20 +52,21 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createSpu(ProductSpuCreateReqVO createReqVO) {
-        // 校验分类
-        validateCategory(createReqVO.getCategoryId());
-        // 校验品牌
-        brandService.validateProductBrand(createReqVO.getBrandId());
-        // 校验SKU
-        List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = createReqVO.getSkus();
-        productSkuService.validateSkuList(skuSaveReqList, createReqVO.getSpecType());
+        // 校验分类 TODO 暂不清楚为什么只能选择第三层的结点
+        //validateCategory(createReqVO.getCategoryId());
+        // 校验品牌 TODO 暂不校验
+        //brandService.validateProductBrand(createReqVO.getBrandId());
 
-        // 插入 SPU
+        List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = createReqVO.getSkus();
+        // 校验SKU
+        productSkuService.validateSkuList(skuSaveReqList, createReqVO.getSpecType());
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
+        // 初始化SPU中SKU相关属性
         initSpuFromSkus(spu, skuSaveReqList);
+        // 插入 SPU
         productSpuMapper.insert(spu);
         // 插入 SKU
-        productSkuService.createSkuList(spu.getId(), spu.getName(), skuSaveReqList);
+        productSkuService.createSkuList(spu.getId(), skuSaveReqList);
         // 返回
         return spu.getId();
     }
@@ -90,7 +89,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         initSpuFromSkus(updateObj, skuSaveReqList);
         productSpuMapper.updateById(updateObj);
         // 批量更新 SKU
-        productSkuService.updateSkuList(updateObj.getId(), updateObj.getName(), updateReqVO.getSkus());
+        productSkuService.updateSkuList(updateObj.getId(), updateReqVO.getSkus());
     }
 
     /**
@@ -101,11 +100,25 @@ public class ProductSpuServiceImpl implements ProductSpuService {
      * @param skus 商品 SKU 数组
      */
     private void initSpuFromSkus(ProductSpuDO spu, List<ProductSkuCreateOrUpdateReqVO> skus) {
-        spu.setMarketPrice(getMaxValue(skus, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
-        // TODO ProductSpuDO中已没有相关属性
-        //spu.setMaxPrice(getMaxValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
-        //spu.setMinPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
-        //spu.setTotalStock(getSumValue(skus, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
+        // 断言，避免告警
+        assert skus.size() > 0;
+        // 获取sku单价最低的商品
+        ProductSkuCreateOrUpdateReqVO vo = skus.stream().min(Comparator.comparing(ProductSkuCreateOrUpdateReqVO::getPrice)).get();
+        // sku单价最低的商品的价格
+        spu.setPrice(vo.getPrice());
+        // sku单价最低的商品的市场价格
+        spu.setMarketPrice(vo.getMarketPrice());
+        // sku单价最低的商品的成本价格
+        spu.setCostPrice(vo.getCostPrice());
+        // sku单价最低的商品的条形码
+        spu.setBarCode(vo.getBarCode());
+        // 默认状态为上架
+        spu.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
+        // TODO 默认商品销量和浏览量为零
+        spu.setSalesCount(0);
+        spu.setBrowseCount(0);
+        // skus库存总数
+        spu.setStock(getSumValue(skus, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
     }
 
     /**
@@ -155,14 +168,14 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public PageResult<ProductSpuDO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
-        // 库存告警的 SPU 编号的集合
+        // 库存告警的 SPU 编号的集合 TODO 一个接口一个接口来
         Set<Long> alarmStockSpuIds = null;
-        if (Boolean.TRUE.equals(pageReqVO.getAlarmStock())) {
-            alarmStockSpuIds = CollectionUtils.convertSet(productSkuService.getSkuListByAlarmStock(), ProductSkuDO::getSpuId);
-            if (CollUtil.isEmpty(alarmStockSpuIds)) {
-                return PageResult.empty();
-            }
-        }
+        //if (Boolean.TRUE.equals(pageReqVO.getAlarmStock())) {
+        //    alarmStockSpuIds = CollectionUtils.convertSet(productSkuService.getSkuListByAlarmStock(), ProductSkuDO::getSpuId);
+        //    if (CollUtil.isEmpty(alarmStockSpuIds)) {
+        //        return PageResult.empty();
+        //    }
+        //}
         // 分页查询
         return productSpuMapper.selectPage(pageReqVO, alarmStockSpuIds);
     }

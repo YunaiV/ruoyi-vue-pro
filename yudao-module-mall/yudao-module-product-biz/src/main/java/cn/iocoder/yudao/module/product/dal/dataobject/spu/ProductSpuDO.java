@@ -116,19 +116,19 @@ public class ProductSpuDO extends TenantBaseDO {
     /**
      * 商品价格，单位使用：分
      *
-     * 基于其对应的 {@link ProductSkuDO#getPrice()} 最小值
+     * 基于其对应的 {@link ProductSkuDO#getPrice()} sku单价最低的商品的
      */
     private Integer price;
     /**
      * 市场价，单位使用：分
      *
-     * 基于其对应的 {@link ProductSkuDO#getMarketPrice()} 最大值 TODO 芋艿：待确定最大还是最小
+     * 基于其对应的 {@link ProductSkuDO#getMarketPrice()} sku单价最低的商品的
      */
     private Integer marketPrice;
     /**
      * 成本价，单位使用：分
      *
-     * 基于其对应的 {@link ProductSkuDO#getCostPrice()} 最大值 TODO 芋艿：待确定最大还是最小
+     * 基于其对应的 {@link ProductSkuDO#getCostPrice()} sku单价最低的商品的
      */
     private Integer costPrice;
     /**

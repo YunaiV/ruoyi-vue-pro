@@ -38,7 +38,7 @@ public interface ProductSpuConvert {
 
     List<ProductSpuDO> convertList(List<ProductSpuDO> list);
 
-    PageResult<ProductSpuRespVO> convertPage(PageResult<ProductSpuDO> page);
+    PageResult<ProductSpuPageRespVO> convertPage(PageResult<ProductSpuDO> page);
 
     ProductSpuPageReqVO convert(AppProductSpuPageReqVO bean);
 

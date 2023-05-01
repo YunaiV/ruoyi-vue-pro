@@ -24,11 +24,6 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<ProductSpuDO>()
                 .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
                 .eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId())
-                .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
-                .leIfPresent(ProductSpuDO::getSalesCount, reqVO.getSalesCountMax())
-                .geIfPresent(ProductSpuDO::getSalesCount, reqVO.getSalesCountMin())
-                .leIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMax())
-                .geIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMin())
                 .orderByDesc(ProductSpuDO::getSort));
     }
 
@@ -36,13 +31,7 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<ProductSpuDO>()
                 .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
                 .eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId())
-                .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
-                .leIfPresent(ProductSpuDO::getSalesCount, reqVO.getSalesCountMax())
-                .geIfPresent(ProductSpuDO::getSalesCount, reqVO.getSalesCountMin())
-                .leIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMax())
-                .geIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMin())
                 .inIfPresent(ProductSpuDO::getId, alarmStockSpuIds) // 库存告警
-                .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
                 .orderByDesc(ProductSpuDO::getSort));
     }
 
@@ -52,8 +41,6 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .eqIfPresent(ProductSpuDO::getStatus, status);
         // 排序逻辑
         if (Objects.equals(pageReqVO.getSortField(), AppProductSpuPageReqVO.SORT_FIELD_PRICE)) {
-            // TODO ProductSpuDO 已经没有maxPrice 属性
-            //query.orderBy(true, pageReqVO.getSortAsc(), ProductSpuDO::getMaxPrice);
         } else if (Objects.equals(pageReqVO.getSortField(), AppProductSpuPageReqVO.SORT_FIELD_SALES_COUNT)) {
             query.orderBy(true, pageReqVO.getSortAsc(), ProductSpuDO::getSalesCount);
         }

@@ -75,7 +75,7 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
         );
 
         // 调用
-        productSkuService.updateSkuList(spuId, spuName, skus);
+        productSkuService.updateSkuList(spuId, skus);
         // 断言
         List<ProductSkuDO> dbSkus = productSkuMapper.selectListBySpuId(spuId);
         assertEquals(dbSkus.size(), 2);

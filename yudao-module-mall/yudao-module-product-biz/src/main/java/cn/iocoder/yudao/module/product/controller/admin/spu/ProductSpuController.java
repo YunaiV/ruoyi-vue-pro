@@ -94,7 +94,7 @@ public class ProductSpuController {
     @GetMapping("/page")
     @Operation(summary = "获得商品 SPU 分页")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<PageResult<ProductSpuRespVO>> getSpuPage(@Valid ProductSpuPageReqVO pageVO) {
+    public CommonResult<PageResult<ProductSpuPageRespVO>> getSpuPage(@Valid ProductSpuPageReqVO pageVO) {
         return success(ProductSpuConvert.INSTANCE.convertPage(productSpuService.getSpuPage(pageVO)));
     }
 
