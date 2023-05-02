@@ -19,6 +19,7 @@ services:
   redis:
     container_name: yudao-redis
     image: redis:6-alpine
+    restart: unless-stopped
     ports:
       - 6379:6379
     networks:
@@ -29,6 +30,7 @@ services:
     build:
       context: ./yudao-server/
     image: yudao-server
+    restart: unless-stopped
     ports:
       - 48080:48080
     environment:
@@ -70,6 +72,7 @@ services:
           VUE_APP_DOC_ENABLE=${VUE_APP_DOC_ENABLE:-true}
           VUE_APP_BAIDU_CODE=${VUE_APP_BAIDU_CODE:-fadc1bd5db1a1d6f581df60a1807f8ab}
     image: yudao-admin
+    restart: unless-stopped
     ports:
       - 8080:80
     networks:
