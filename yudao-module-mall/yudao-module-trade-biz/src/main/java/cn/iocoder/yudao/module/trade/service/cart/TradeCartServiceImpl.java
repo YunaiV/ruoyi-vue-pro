@@ -58,9 +58,15 @@ public class TradeCartServiceImpl implements TradeCartService {
                 cart.getCount() + addReqVO.getCount() : addReqVO.getCount();
         ProductSkuRespDTO sku = checkProductSku(addReqVO.getSkuId(), count);
 
+        // 情况零：特殊，count 小于等于 0，说明前端项目删除
         // 情况一：存在，则进行数量更新
         if (cart != null) {
-            cartMapper.updateById(new TradeCartDO().setId(cart.getId()).setCount(count));
+            // 特殊情况，如果 count 小于等于 0，说明前端想要删除
+            if (count <= 0) {
+                cartMapper.deleteById(cart.getId());
+            } else {
+                cartMapper.updateById(new TradeCartDO().setId(cart.getId()).setCount(count));
+            }
             return cart.getId();
         // 情况二：不存在，则进行插入
         } else {

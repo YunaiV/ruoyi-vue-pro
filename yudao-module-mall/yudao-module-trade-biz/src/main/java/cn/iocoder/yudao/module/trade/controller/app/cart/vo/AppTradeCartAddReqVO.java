@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.trade.controller.app.cart.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Schema(description = "用户 App - 购物车添加购物项 Request VO")
@@ -16,7 +15,6 @@ public class AppTradeCartAddReqVO {
 
     @Schema(description = "新增商品数量", required = true, example = "1")
     @NotNull(message = "数量不能为空")
-    @Min(message = "数量必须大于 0", value = 1L)
     private Integer count;
 
     @Schema(description = "是否添加到购物车", required = true, example = "true")
