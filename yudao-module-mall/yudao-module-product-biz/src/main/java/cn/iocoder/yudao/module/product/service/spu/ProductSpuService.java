@@ -98,4 +98,11 @@ public interface ProductSpuService {
      */
     void updateSpuStock(Map<Long, Integer> stockIncrCounts);
 
+    /**
+     * 得到spu详细
+     *
+     * @param id id
+     * @return {@link ProductSpuDetailRespVO}
+     */
+    ProductSpuDetailRespVO getSpuDetail(Long id);
 }

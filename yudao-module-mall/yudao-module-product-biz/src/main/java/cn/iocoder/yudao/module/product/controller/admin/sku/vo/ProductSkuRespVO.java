@@ -7,6 +7,9 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * @author HUIHUI
+ */
 @Schema(description = "管理后台 - 商品 SKU Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -15,9 +18,6 @@ public class ProductSkuRespVO extends ProductSkuBaseVO {
 
     @Schema(description = "主键", required = true, example = "1024")
     private Long id;
-
-    @Schema(description = "创建时间")
-    private LocalDateTime createTime;
 
     @Schema(description = "商品属性")
     @Data
@@ -34,11 +34,11 @@ public class ProductSkuRespVO extends ProductSkuBaseVO {
         private Long valueId;
 
         @Schema(description = "属性值", example = "1024")
-        private String value;
+        private String valueName;
     }
     /**
      * 属性数组
      */
-    private List<ProductSkuCreateOrUpdateReqVO.Property> properties;
+    private List<Property> properties;
 
 }

@@ -43,7 +43,7 @@ public interface ProductSkuConvert {
 
     ProductSkuRespDTO convert02(ProductSkuDO bean);
 
-    List<ProductSpuDetailRespVO.Sku> convertList03(List<ProductSkuDO> list);
+    List<ProductSkuRespVO> convertList03(List<ProductSkuDO> list);
 
     List<ProductSkuRespDTO> convertList04(List<ProductSkuDO> list);
 

@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueServ
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -81,10 +82,10 @@ public class ProductPropertyController {
         return success(ProductPropertyConvert.INSTANCE.convertPage(productPropertyService.getPropertyPage(pageVO)));
     }
 
-    @GetMapping("/get-value-list")
+    @PostMapping("/get-value-list")
     @Operation(summary = "获得属性项列表")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
-    public CommonResult<List<ProductPropertyAndValueRespVO>> getPropertyAndValueList(@Valid ProductPropertyListReqVO listReqVO) {
+    public CommonResult<List<ProductPropertyAndValueRespVO>> getPropertyAndValueList(@Valid @RequestBody ProductPropertyListReqVO listReqVO) {
         // 查询属性项
         List<ProductPropertyDO> keys = productPropertyService.getPropertyList(listReqVO);
         if (CollUtil.isEmpty(keys)) {

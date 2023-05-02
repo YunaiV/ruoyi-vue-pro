@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueDetailRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
@@ -88,7 +89,7 @@ public interface ProductSpuConvert {
             if (CollUtil.isEmpty(properties)) {
                 continue;
             }
-            ProductSpuDetailRespVO.Sku sku = spuVO.getSkus().get(i);
+            ProductSkuRespVO sku = spuVO.getSkus().get(i);
             sku.setProperties(new ArrayList<>(properties.size()));
             // 遍历每个 properties，设置到 AppSpuDetailRespVO.Sku 中
             properties.forEach(property -> {
@@ -96,13 +97,13 @@ public interface ProductSpuConvert {
                 if (propertyValue == null) {
                     return;
                 }
-                sku.getProperties().add(convert04(propertyValue));
+                //sku.getProperties().add(convert04(propertyValue)); TODO 需要重写
             });
         }
         return spuVO;
     }
     ProductSpuDetailRespVO convert03(ProductSpuDO spu);
-    List<ProductSpuDetailRespVO.Sku> convertList04(List<ProductSkuDO> skus);
+    List<ProductSkuRespVO> convertList04(List<ProductSkuDO> skus);
     ProductPropertyValueDetailRespVO convert04(ProductPropertyValueDetailRespBO propertyValue);
 
 }

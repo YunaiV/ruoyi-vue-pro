@@ -4,10 +4,13 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuDetailRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -15,6 +18,8 @@ import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
+import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
+import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -23,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -48,6 +54,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private ProductBrandService brandService;
     @Resource
     private ProductCategoryService categoryService;
+    @Resource
+    private ProductPropertyValueService productPropertyValueService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -189,6 +197,29 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Transactional(rollbackFor = Exception.class)
     public void updateSpuStock(Map<Long, Integer> stockIncrCounts) {
         stockIncrCounts.forEach((id, incCount) -> productSpuMapper.updateStock(id, incCount));
+    }
+
+    @Override
+    public ProductSpuDetailRespVO getSpuDetail(Long id) {
+        // 获得商品 SPU
+        ProductSpuDO spu = getSpu(id);
+        if (spu == null) {
+            throw exception(SPU_NOT_EXISTS);
+        }
+        ProductSpuDetailRespVO productSpuDetailRespVO = ProductSpuConvert.INSTANCE.convert03(spu);
+        // 查询商品 SKU
+        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
+        if (CollUtil.isNotEmpty(skus)){
+            List<ProductSkuRespVO> skuRespVoS = ProductSkuConvert.INSTANCE.convertList(skus);
+            // 获取所有的属性值id
+            Set<Long> valueIds = skus.stream().flatMap(p -> p.getProperties().stream()).map(ProductSkuDO.Property::getValueId).collect(Collectors.toSet());
+            List<ProductPropertyValueDetailRespBO> valueDetailList = productPropertyValueService.getPropertyValueDetailList(valueIds);
+            Map<Long, String> stringMap = valueDetailList.stream().collect(Collectors.toMap(ProductPropertyValueDetailRespBO::getValueId, ProductPropertyValueDetailRespBO::getValueName));
+            // 设置属性值名称
+            skuRespVoS.stream().flatMap(p -> p.getProperties().stream()).forEach(item ->item.setValueName(stringMap.get(item.getValueId())));
+            productSpuDetailRespVO.setSkus(skuRespVoS);
+        }
+        return productSpuDetailRespVO;
     }
 
 }
