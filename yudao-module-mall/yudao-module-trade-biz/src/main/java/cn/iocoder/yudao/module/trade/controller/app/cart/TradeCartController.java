@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.trade.controller.app.cart;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartListRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartAddReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartListRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartResetReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartUpdateReqVO;
 import cn.iocoder.yudao.module.trade.service.cart.TradeCartService;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -70,6 +71,13 @@ public class TradeCartController {
     @PreAuthenticated
     public CommonResult<Integer> getCartCount() {
         return success(cartService.getCartCount(getLoginUserId()));
+    }
+
+    @GetMapping("get-count-map")
+    @Operation(summary = "查询用户在购物车中的商品 SPU 数量 Map")
+    @PreAuthenticated
+    public CommonResult<Map<Long, Integer>> getCartCountMap() {
+        return success(cartService.getCartCountMap(getLoginUserId()));
     }
 
     @GetMapping("/list")

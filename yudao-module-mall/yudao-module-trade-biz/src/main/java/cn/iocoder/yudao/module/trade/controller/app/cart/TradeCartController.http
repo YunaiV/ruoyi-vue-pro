@@ -31,6 +31,11 @@ GET {{appApi}}/trade/cart/get-count
 tenant-id: {{appTenentId}}
 Authorization: Bearer {{appToken}}
 
+### 请求 /trade/cart/get-count-map 接口 => 成功
+GET {{appApi}}/trade/cart/get-count-map
+tenant-id: {{appTenentId}}
+Authorization: Bearer {{appToken}}
+
 ### 请求 /trade/cart/list 接口 => 成功
 GET {{appApi}}/trade/cart/list
 tenant-id: {{appTenentId}}

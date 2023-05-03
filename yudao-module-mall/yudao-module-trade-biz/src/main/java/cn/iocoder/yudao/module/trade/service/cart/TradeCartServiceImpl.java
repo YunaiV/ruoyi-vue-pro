@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -136,6 +137,11 @@ public class TradeCartServiceImpl implements TradeCartService {
     @Override
     public Integer getCartCount(Long userId) {
         return cartMapper.selectSumByUserId(userId);
+    }
+
+    @Override
+    public Map<Long, Integer> getCartCountMap(Long userId) {
+        return cartMapper.selectSumMapByUserId(userId);
     }
 
     @Override

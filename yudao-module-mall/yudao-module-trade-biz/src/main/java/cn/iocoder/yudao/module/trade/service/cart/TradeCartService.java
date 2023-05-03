@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartUpdateRe
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * 购物车 Service 接口
@@ -65,5 +66,13 @@ public interface TradeCartService {
      * @return 购物车列表
      */
     AppTradeCartListRespVO getCartList(Long userId);
+
+    /**
+     * 获得用户的购物车商品 SPU 数量的 Map
+     *
+     * @param userId 用户编号
+     * @return 购物车商品 SPU 数量的 Map
+     */
+    Map<Long, Integer> getCartCountMap(Long userId);
 
 }
