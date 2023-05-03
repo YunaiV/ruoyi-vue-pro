@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.trade.service.cart;
 
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartDetailRespVO;
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartItemAddCountReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartItemUpdateCountReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartItemUpdateSelectedReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartAddReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartListRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartResetReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartUpdateReqVO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -19,9 +19,10 @@ public interface TradeCartService {
      * 添加商品到购物车
      *
      * @param userId 用户编号
-     * @param addCountReqVO 添加信息
+     * @param addReqVO 添加信息
+     * @return 购物项的编号
      */
-    void addCartItemCount(Long userId, @Valid AppTradeCartItemAddCountReqVO addCountReqVO);
+    Long addCart(Long userId, @Valid AppTradeCartAddReqVO addReqVO);
 
     /**
      * 更新购物车商品数量
@@ -29,23 +30,25 @@ public interface TradeCartService {
      * @param userId 用户编号
      * @param updateCountReqVO 更新信息
      */
-    void updateCartItemCount(Long userId, AppTradeCartItemUpdateCountReqVO updateCountReqVO);
+    void updateCart(Long userId, AppTradeCartUpdateReqVO updateCountReqVO);
 
     /**
-     * 更新购物车商品是否选中
+     * 重置购物车商品
+     *
+     * 使用场景：在一个购物车项对应的商品失效（例如说 SPU 被下架），可以重新选择对应的 SKU
      *
      * @param userId 用户编号
-     * @param updateSelectedReqVO 更新信息
+     * @param updateReqVO 重置信息
      */
-    void updateCartItemSelected(Long userId, AppTradeCartItemUpdateSelectedReqVO updateSelectedReqVO);
+    void resetCart(Long userId, AppTradeCartResetReqVO updateReqVO);
 
     /**
      * 删除购物车商品
      *
      * @param userId 用户编号
-     * @param skuIds SKU 编号的数组
+     * @param ids 购物项的编号
      */
-    void deleteCartItems(Long userId, Collection<Long> skuIds);
+    void deleteCart(Long userId, Collection<Long> ids);
 
     /**
      * 查询用户在购物车中的商品数量
@@ -56,11 +59,11 @@ public interface TradeCartService {
     Integer getCartCount(Long userId);
 
     /**
-     * 查询用户的购物车详情
+     * 查询用户的购物车列表
      *
      * @param userId 用户编号
-     * @return 购物车详情
+     * @return 购物车列表
      */
-    AppTradeCartDetailRespVO getCartDetail(Long userId);
+    AppTradeCartListRespVO getCartList(Long userId);
 
 }

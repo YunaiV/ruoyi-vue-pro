@@ -169,7 +169,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         // 拆分三个集合，新插入的、需要更新的、需要删除的
         List<ProductSkuDO> insertSkus = new ArrayList<>();
         List<ProductSkuDO> updateSkus = new ArrayList<>();
-        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertList06(skus, null);
+        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertList06(skus, spuId);
         allUpdateSkus.forEach(sku -> {
             String propertiesKey = ProductSkuConvert.INSTANCE.buildPropertyKey(sku);
             // 1、找得到的，进行更新

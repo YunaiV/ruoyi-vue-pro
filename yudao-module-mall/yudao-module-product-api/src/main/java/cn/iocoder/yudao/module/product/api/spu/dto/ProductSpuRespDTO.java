@@ -28,17 +28,23 @@ public class ProductSpuRespDTO {
      */
     private String name;
     /**
-     * 商品编码
+     * 关键字
      */
-    private String code;
+    private String keyword;
     /**
-     * 促销语
+     * 商品简介
      */
-    private String sellPoint;
+    private String introduction;
     /**
      * 商品详情
      */
     private String description;
+    // TODO @芋艿：是不是要删除
+    /**
+     * 商品条码（一维码）
+     */
+    private String barCode;
+
     /**
      * 商品分类编号
      */
@@ -48,13 +54,13 @@ public class ProductSpuRespDTO {
      */
     private Long brandId;
     /**
-     * 商品图片的数组
-     * <p>
-     * 1. 第一张图片将作为商品主图，支持同时上传多张图；
-     * 2. 建议使用尺寸 800x800 像素以上、大小不超过 1M 的正方形图片；
-     * 3. 至少 1 张，最多上传 10 张
+     * 商品封面图
      */
-    private List<String> picUrls;
+    private String picUrl;
+    /**
+     * 商品轮播图
+     */
+    private List<String> sliderPicUrls;
     /**
      * 商品视频
      */
@@ -75,36 +81,27 @@ public class ProductSpuRespDTO {
 
     /**
      * 规格类型
+     *
+     * false - 单规格
+     * true - 多规格
      */
     private Boolean specType;
     /**
-     * 最小价格，单位使用：分
-     * <p>
-     * 基于其对应的 {@link ProductSkuRespDTO#getPrice()} 最小值
+     * 商品价格，单位使用：分
      */
-    private Integer minPrice;
-    /**
-     * 最大价格，单位使用：分
-     * <p>
-     * 基于其对应的 {@link ProductSkuRespDTO#getPrice()} 最大值
-     */
-    private Integer maxPrice;
+    private Integer price;
     /**
      * 市场价，单位使用：分
-     * <p>
-     * 基于其对应的 {@link ProductSkuRespDTO#getMarketPrice()} 最大值
      */
     private Integer marketPrice;
     /**
-     * 总库存
-     * <p>
-     * 基于其对应的 {@link ProductSkuRespDTO#getStock()} 求和
+     * 成本价，单位使用：分
      */
-    private Integer totalStock;
+    private Integer costPrice;
     /**
-     * 是否展示库存
+     * 库存
      */
-    private Boolean showStock;
+    private Integer stock;
 
     // ========== 统计相关字段 =========
 

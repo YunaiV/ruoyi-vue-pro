@@ -49,8 +49,8 @@ public class AppProductSpuController {
     @GetMapping("/page")
     @Operation(summary = "获得商品 SPU 分页")
     public CommonResult<PageResult<AppProductSpuPageItemRespVO>> getSpuPage(@Valid AppProductSpuPageReqVO pageVO) {
-        PageResult<ProductSpuDO> pageResult = productSpuService.getSpuPage(pageVO, ProductSpuStatusEnum.ENABLE.getStatus());
-        return success(ProductSpuConvert.INSTANCE.convertPage02(pageResult));
+        PageResult<ProductSpuDO> pageResult = productSpuService.getSpuPage(pageVO);
+        return success(ProductSpuConvert.INSTANCE.convertPageForGetSpuPage(pageResult));
     }
 
     @GetMapping("/get-detail")
@@ -73,7 +73,7 @@ public class AppProductSpuController {
         List<ProductPropertyValueDetailRespBO> propertyValues = productPropertyValueService
                 .getPropertyValueDetailList(ProductSkuConvert.INSTANCE.convertPropertyValueIds(skus));
         // 拼接
-        return success(ProductSpuConvert.INSTANCE.convert(spu, skus, propertyValues));
+        return success(ProductSpuConvert.INSTANCE.convertForGetSpuDetail(spu, skus, propertyValues));
     }
 
 }
