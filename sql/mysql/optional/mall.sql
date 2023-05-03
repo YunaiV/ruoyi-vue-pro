@@ -163,19 +163,20 @@ COMMIT;
 -- Table structure for product_property
 -- ----------------------------
 DROP TABLE IF EXISTS `product_property`;
-CREATE TABLE `product_property`  (
-                                     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-                                     `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '规格名称',
-                                     `status` tinyint NULL DEFAULT NULL COMMENT '状态： 0 开启 ，1 禁用',
-                                     `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                     `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                     `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
-                                     `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
-                                     `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-                                     `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                     PRIMARY KEY (`id`) USING BTREE,
-                                     INDEX `idx_name`(`name`(32) ASC) USING BTREE COMMENT '规格名称索引'
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '规格名称';
+CREATE TABLE `product_property` (
+                                    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+                                    `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '规格名称',
+                                    `status` tinyint DEFAULT NULL COMMENT '状态： 0 开启 ，1 禁用',
+                                    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '创建人',
+                                    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '更新人',
+                                    `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+                                    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+                                    `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+                                    PRIMARY KEY (`id`) USING BTREE,
+                                    KEY `idx_name` (`name`(32)) USING BTREE COMMENT '规格名称索引'
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='规格名称';
 
 -- ----------------------------
 -- Records of product_property
@@ -187,19 +188,20 @@ COMMIT;
 -- Table structure for product_property_value
 -- ----------------------------
 DROP TABLE IF EXISTS `product_property_value`;
-CREATE TABLE `product_property_value`  (
-                                           `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-                                           `property_id` bigint NULL DEFAULT NULL COMMENT '规格键id',
-                                           `name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '规格值名字',
-                                           `status` tinyint NULL DEFAULT NULL COMMENT '状态： 1 开启 ，2 禁用',
-                                           `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                           `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                           `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
-                                           `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
-                                           `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-                                           `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                           PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '规格值';
+CREATE TABLE `product_property_value` (
+                                          `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+                                          `property_id` bigint DEFAULT NULL COMMENT '规格键id',
+                                          `name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '规格值名字',
+                                          `status` tinyint DEFAULT NULL COMMENT '状态： 1 开启 ，2 禁用',
+                                          `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                          `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                          `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '创建人',
+                                          `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '更新人',
+                                          `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+                                          `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+                                          `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+                                          PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='规格值';
 
 -- ----------------------------
 -- Records of product_property_value
@@ -325,3 +327,36 @@ INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2028, 'Banner更新', 'market:banner:update', 3, 3, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2029, 'Banner删除', 'market:banner:delete', 3, 4, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
 
+INSERT INTO `system_dict_data`(`sort`,`label`,`value`,`dict_type`,`status`,`color_type`,`css_class`,`remark`,`creator`,`create_time`,`updater`,`update_time`,`deleted`) VALUES
+                                                                                                                                                                            (1,'打',2,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'盒',3,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'袋',4,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'箱',5,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'套',6,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'包',7,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'双',8,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'卷',9,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'张',10,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'克',11,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'千克',12,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'毫克',13,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'微克',14,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'吨',15,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'升',16,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1,'毫升',17,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
+                                                                                                                                                                            (1, '平方米', 18, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '平方千米', 19, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '平方英里', 20, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '平方码', 21, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '平方英尺', 22, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '立方米', 23, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '立方厘米', 24, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '立方英寸', 25, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '米', 26, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '千米', 27, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '厘米', 28, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '毫米', 29, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '英寸', 30, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '英尺', 31, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1, '码', 32, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), 0),
+                                                                                                                                                                            (1,'个',1,'product_unit',0,'','','',1, NOW(),1, NOW(),0);

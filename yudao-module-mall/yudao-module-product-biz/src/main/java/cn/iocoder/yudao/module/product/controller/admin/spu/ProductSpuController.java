@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -54,6 +55,14 @@ public class ProductSpuController {
         return success(true);
     }
 
+    @PutMapping("/updateStatus")
+    @Operation(summary = "更新商品 SPU Status")
+    @PreAuthorize("@ss.hasPermission('product:spu:update')")
+    public CommonResult<Boolean> updateStatus(@Valid @RequestBody ProductSpuUpdateStatusReqVO updateReqVO) {
+        productSpuService.updateStatus(updateReqVO);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除商品 SPU")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
@@ -84,6 +93,12 @@ public class ProductSpuController {
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<PageResult<ProductSpuPageRespVO>> getSpuPage(@Valid ProductSpuPageReqVO pageVO) {
         return success(ProductSpuConvert.INSTANCE.convertPage(productSpuService.getSpuPage(pageVO)));
+    }
+    @GetMapping("/tabsCount")
+    @Operation(summary = "获得商品 SPU tabsCount")
+    @PreAuthorize("@ss.hasPermission('product:spu:query')")
+    public CommonResult<Map<Integer, Long>> getTabsCount() {
+        return success(productSpuService.getTabsCount());
     }
 
 }

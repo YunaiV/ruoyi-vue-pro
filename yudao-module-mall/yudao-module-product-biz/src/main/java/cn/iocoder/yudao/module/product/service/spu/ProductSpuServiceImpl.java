@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuDetailRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
@@ -16,11 +17,13 @@ import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuTabTypeEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +65,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public Long createSpu(ProductSpuCreateReqVO createReqVO) {
         // 校验分类 TODO 暂不清楚为什么只能选择第三层的结点
         //validateCategory(createReqVO.getCategoryId());
-        // 校验品牌 TODO 暂不校验
+        // 校验品牌 TODO 暂不校验，前端没有做品牌选择
         //brandService.validateProductBrand(createReqVO.getBrandId());
 
         List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = createReqVO.getSkus();
@@ -84,14 +87,13 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public void updateSpu(ProductSpuUpdateReqVO updateReqVO) {
         // 校验 SPU 是否存在
         validateSpuExists(updateReqVO.getId());
-        // 校验分类
-        validateCategory(updateReqVO.getCategoryId());
-        // 校验品牌
-        brandService.validateProductBrand(updateReqVO.getBrandId());
+        // 校验分类 TODO 暂不清楚为什么只能选择第三层的结点
+        //validateCategory(updateReqVO.getCategoryId());
+        // 校验品牌 TODO 暂不校验，前端没有做品牌选择
+        //brandService.validateProductBrand(updateReqVO.getBrandId());
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = updateReqVO.getSkus();
         productSkuService.validateSkuList(skuSaveReqList, updateReqVO.getSpecType());
-
         // 更新 SPU
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
         initSpuFromSkus(updateObj, skuSaveReqList);
@@ -176,21 +178,13 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public PageResult<ProductSpuDO> getSpuPage(ProductSpuPageReqVO pageReqVO) {
-        // 库存告警的 SPU 编号的集合 TODO 一个接口一个接口来
-        Set<Long> alarmStockSpuIds = null;
-        //if (Boolean.TRUE.equals(pageReqVO.getAlarmStock())) {
-        //    alarmStockSpuIds = CollectionUtils.convertSet(productSkuService.getSkuListByAlarmStock(), ProductSkuDO::getSpuId);
-        //    if (CollUtil.isEmpty(alarmStockSpuIds)) {
-        //        return PageResult.empty();
-        //    }
-        //}
-        // 分页查询
-        return productSpuMapper.selectPage(pageReqVO, alarmStockSpuIds);
+        return productSpuMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public PageResult<ProductSpuDO> getSpuPage(AppProductSpuPageReqVO pageReqVO, Integer status) {
-        return productSpuMapper.selectPage(pageReqVO, status);
+    public PageResult<ProductSpuDO> getSpuPage(AppProductSpuPageReqVO pageReqVO) {
+        //return productSpuMapper.selectPage(pageReqVO); TODO 有差异接口接受参数类型不对
+        return null;
     }
 
     @Override
@@ -211,15 +205,45 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
         if (CollUtil.isNotEmpty(skus)){
             List<ProductSkuRespVO> skuRespVoS = ProductSkuConvert.INSTANCE.convertList(skus);
-            // 获取所有的属性值id
-            Set<Long> valueIds = skus.stream().flatMap(p -> p.getProperties().stream()).map(ProductSkuDO.Property::getValueId).collect(Collectors.toSet());
-            List<ProductPropertyValueDetailRespBO> valueDetailList = productPropertyValueService.getPropertyValueDetailList(valueIds);
-            Map<Long, String> stringMap = valueDetailList.stream().collect(Collectors.toMap(ProductPropertyValueDetailRespBO::getValueId, ProductPropertyValueDetailRespBO::getValueName));
-            // 设置属性值名称
-            skuRespVoS.stream().flatMap(p -> p.getProperties().stream()).forEach(item ->item.setValueName(stringMap.get(item.getValueId())));
+            // 非多规格，不需要处理
+            if (ObjectUtil.equal(productSpuDetailRespVO.getSpecType(), true)) {
+                // 获取所有的属性值id
+                Set<Long> valueIds = skus.stream().flatMap(p -> p.getProperties().stream()).map(ProductSkuDO.Property::getValueId).collect(Collectors.toSet());
+                List<ProductPropertyValueDetailRespBO> valueDetailList = productPropertyValueService.getPropertyValueDetailList(valueIds);
+                Map<Long, String> stringMap = valueDetailList.stream().collect(Collectors.toMap(ProductPropertyValueDetailRespBO::getValueId, ProductPropertyValueDetailRespBO::getValueName));
+                // 设置属性值名称
+                skuRespVoS.stream().flatMap(p -> p.getProperties().stream()).forEach(item ->item.setValueName(stringMap.get(item.getValueId())));
+            }
             productSpuDetailRespVO.setSkus(skuRespVoS);
         }
         return productSpuDetailRespVO;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateStatus(ProductSpuUpdateStatusReqVO updateReqVO) {
+        // 校验存在
+        validateSpuExists(updateReqVO.getId());
+        // 更新状态
+        ProductSpuDO productSpuDO = productSpuMapper.selectById(updateReqVO.getId()).setStatus(updateReqVO.getStatus());
+        productSpuMapper.updateById(productSpuDO);
+
+    }
+
+    @Override
+    public Map<Integer, Long> getTabsCount() {
+        Map<Integer, Long> map = new HashMap<>();
+        // 查询销售中的商品数量
+        map.put(ProductSpuTabTypeEnum.FOR_SALE.getType(), productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus()));
+        // 查询仓库中的商品数量
+        map.put(ProductSpuTabTypeEnum.IN_WAREHOUSE.getType(),productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus()));
+        // 查询售空的商品数量
+        map.put(ProductSpuTabTypeEnum.SOLD_OUT.getType(),productSpuMapper.selectCount(ProductSpuDO::getStock, 0));
+        // 查询触发警戒库存的商品数量 TODO 警戒库存暂时为 10，后期需要使用常量或者数据库配置替换
+        map.put(ProductSpuTabTypeEnum.ALERT_STOCK.getType(),productSpuMapper.selectCount(new LambdaQueryWrapperX<ProductSpuDO>().le(ProductSpuDO::getStock, 10)));
+        // 查询回收站中的商品数量
+        map.put(ProductSpuTabTypeEnum.RECYCLE_BIN.getType(),productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
+        return map;
     }
 
 }

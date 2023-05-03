@@ -189,7 +189,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         });
         productSpuMapper.insert(createReqVO);
 
-        Set<Long> alarmStockSpuIds = SetUtils.asSet(createReqVO.getId());
+        //Set<Long> alarmStockSpuIds = SetUtils.asSet(createReqVO.getId()); TODO 查询接口已改变没有使用到这个变量
 
         List<ProductSkuDO> productSpuDOS = Arrays.asList(randomPojo(ProductSkuDO.class, o -> {
             o.setSpuId(createReqVO.getId());
@@ -204,7 +204,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         //productSpuPageReqVO.setAlarmStock(true);
         PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
-        PageResult<ProductSpuPageRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, alarmStockSpuIds));
+        PageResult<ProductSpuPageRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO));
         Assertions.assertIterableEquals(result.getList(), spuPage.getList());
         assertEquals(spuPage.getTotal(), result.getTotal());
     }
@@ -249,14 +249,15 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
+        // TODO 已暂时没有相关属性，等用到时再添加
         //productSpuPageReqVO.setAlarmStock(false);
         //productSpuPageReqVO.setBrandId(brandId);
         //productSpuPageReqVO.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
-        productSpuPageReqVO.setCategoryId(categoryId);
+        //productSpuPageReqVO.setCategoryId(categoryId);
 
         PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
-        PageResult<ProductSpuPageRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, (Set<Long>) null));
+        PageResult<ProductSpuPageRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO));
         assertEquals(result, spuPage);
     }
 
