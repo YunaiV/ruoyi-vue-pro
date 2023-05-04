@@ -290,6 +290,25 @@ CREATE TABLE `product_spu` (
 ) ENGINE=InnoDB COMMENT='商品spu';
 
 -- ----------------------------
+-- Table structure for product_favorite
+-- ----------------------------
+DROP TABLE IF EXISTS `product_favorite`;
+CREATE TABLE `product_favorite` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+   `spu_id` bigint NOT NULL COMMENT '商品 SPU 编号',
+   `user_id` bigint NOT NULL COMMENT '用户id',
+   `type` int(10) NOT NULL DEFAULT 1 COMMENT '类型1:收藏 2:点赞',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='喜欢的商品表';
+
+
+-- ----------------------------
 -- Records of product_spu
 -- ----------------------------
 BEGIN;

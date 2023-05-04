@@ -48,4 +48,8 @@ public interface ErrorCodeConstants {
     ErrorCode COMMENT_ERROR_OPT = new ErrorCode(1008007002, "商品评价非法操作");
     ErrorCode COMMENT_ADDITIONAL_EXISTS  = new ErrorCode(1008007003, "商品追加评价已存在");
 
+    // ========== 喜爱商品 1008008000 ==========
+    ErrorCode COLLECTION_EXISTS = new ErrorCode(1008008000, "该商品已经被收藏");
+    ErrorCode COLLECTION_NOT_EXISTS = new ErrorCode(1008008001, "商品收藏不存在");
+
 }
