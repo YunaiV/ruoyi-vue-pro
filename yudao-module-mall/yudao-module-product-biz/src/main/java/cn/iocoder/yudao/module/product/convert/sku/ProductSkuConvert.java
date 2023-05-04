@@ -35,16 +35,15 @@ public interface ProductSkuConvert {
 
     List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list);
 
-    default List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list, Long spuId, String spuName) {
+    default List<ProductSkuDO> convertList06(List<ProductSkuCreateOrUpdateReqVO> list, Long spuId) {
         List<ProductSkuDO> result = convertList06(list);
-        // result.forEach(item -> item.setSpuId(spuId).setSpuName(spuName)); TODO ProductSkuDO中已经没有name相关属性
         result.forEach(item -> item.setSpuId(spuId));
         return result;
     }
 
     ProductSkuRespDTO convert02(ProductSkuDO bean);
 
-    List<ProductSpuDetailRespVO.Sku> convertList03(List<ProductSkuDO> list);
+    List<ProductSkuRespVO> convertList03(List<ProductSkuDO> list);
 
     List<ProductSkuRespDTO> convertList04(List<ProductSkuDO> list);
 

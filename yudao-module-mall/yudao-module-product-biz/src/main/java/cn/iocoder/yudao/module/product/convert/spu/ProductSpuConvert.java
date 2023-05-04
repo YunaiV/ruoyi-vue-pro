@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueDetailRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
@@ -32,13 +33,15 @@ public interface ProductSpuConvert {
 
     ProductSpuConvert INSTANCE = Mappers.getMapper(ProductSpuConvert.class);
 
-    ProductSpuDO convertForGetSpuDetail(ProductSpuCreateReqVO bean);
-
-    ProductSpuDO convertForGetSpuDetail(ProductSpuUpdateReqVO bean);
+    ProductSpuDO convert(ProductSpuCreateReqVO bean);
+    // TODO 还是使用convert，重命名改动太多
+    ProductSpuDO convert(ProductSpuUpdateReqVO bean);
 
     List<ProductSpuDO> convertList(List<ProductSpuDO> list);
 
-    PageResult<ProductSpuRespVO> convertPage(PageResult<ProductSpuDO> page);
+    PageResult<ProductSpuPageRespVO> convertPage(PageResult<ProductSpuDO> page);
+
+    ProductSpuPageReqVO convert(AppProductSpuPageReqVO bean);
 
     List<ProductSpuRespDTO> convertList2(List<ProductSpuDO> list);
 
@@ -56,7 +59,7 @@ public interface ProductSpuConvert {
             if (CollUtil.isEmpty(properties)) {
                 continue;
             }
-            ProductSpuDetailRespVO.Sku sku = spuVO.getSkus().get(i);
+            ProductSkuRespVO sku = spuVO.getSkus().get(i);
             sku.setProperties(new ArrayList<>(properties.size()));
             // 遍历每个 properties，设置到 AppSpuDetailRespVO.Sku 中
             properties.forEach(property -> {
@@ -64,13 +67,13 @@ public interface ProductSpuConvert {
                 if (propertyValue == null) {
                     return;
                 }
-                sku.getProperties().add(convert04(propertyValue));
+                //sku.getProperties().add(convert04(propertyValue)); TODO 需要重写
             });
         }
         return spuVO;
     }
     ProductSpuDetailRespVO convert03(ProductSpuDO spu);
-    List<ProductSpuDetailRespVO.Sku> convertList04(List<ProductSkuDO> skus);
+    List<ProductSkuRespVO> convertList04(List<ProductSkuDO> skus);
     ProductPropertyValueDetailRespVO convert04(ProductPropertyValueDetailRespBO propertyValue);
 
     // ========== 用户 App 相关 ==========

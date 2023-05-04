@@ -9,16 +9,12 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandServiceImpl;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryServiceImpl;
@@ -38,6 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -83,22 +80,10 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     public void testCreateSpu_success() {
         // 准备参数
         ProductSpuCreateReqVO createReqVO = randomPojo(ProductSpuCreateReqVO.class, o -> {
-            o.setSpecType(ProductSpuSpecTypeEnum.DISABLE.getType());
-            o.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
+            o.setSpecType(true);
         });
-
-        // 校验SKU
-        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = createReqVO.getSkus();
-
         Long spu = productSpuService.createSpu(createReqVO);
         ProductSpuDO productSpuDO = productSpuMapper.selectById(spu);
-
-        createReqVO.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
-        // TODO ProductSpuCreateReqVO中已没有相关属性
-//        createReqVO.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-//        createReqVO.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-//        createReqVO.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
-
         assertPojoEquals(createReqVO, productSpuDO);
 
     }
@@ -111,19 +96,10 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         ProductSpuUpdateReqVO reqVO = randomPojo(ProductSpuUpdateReqVO.class, o -> {
             o.setId(createReqVO.getId()); // 设置更新的 ID
-            o.setSpecType(ProductSpuSpecTypeEnum.DISABLE.getType());
-            o.setStatus(ProductSpuStatusEnum.DISABLE.getStatus());
+            o.setSpecType(true);
         });
         // 调用
         productSpuService.updateSpu(reqVO);
-
-        List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList = reqVO.getSkus();
-        reqVO.setMarketPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
-        // TODO ProductSpuUpdateReqVO中已没有相关属性
-//        reqVO.setMaxPrice(CollectionUtils.getMaxValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-//        reqVO.setMinPrice(CollectionUtils.getMinValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getPrice));
-//        reqVO.setTotalStock(CollectionUtils.getSumValue(skuCreateReqList, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
-
         // 校验是否更新正确
         ProductSpuDO spu = productSpuMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, spu);
@@ -132,8 +108,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testValidateSpuExists_exception() {
         ProductSpuUpdateReqVO reqVO = randomPojo(ProductSpuUpdateReqVO.class, o -> {
-            o.setSpecType(ProductSpuSpecTypeEnum.DISABLE.getType());
-            o.setStatus(ProductSpuStatusEnum.DISABLE.getStatus());
+            o.setSpecType(true);
         });
         // 调用
         Assertions.assertThrows(ServiceException.class, () -> productSpuService.updateSpu(reqVO));
@@ -176,7 +151,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     void getSpuPage_alarmStock_empty() {
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
-        productSpuPageReqVO.setAlarmStock(true);
+        //productSpuPageReqVO.setAlarmStock(true);
 
         PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
@@ -199,7 +174,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             //o.setMinPrice(1);  // TODO ProductSpuDO中已没有相关属性
             //o.setMaxPrice(50);
             o.setMarketPrice(25);
-            o.setSpecType(ProductSpuSpecTypeEnum.RECYCLE.getType());
+            o.setSpecType(false);
             o.setBrandId(brandId);
             o.setCategoryId(categoryId);
             //o.setClickCount(100);
@@ -214,7 +189,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         });
         productSpuMapper.insert(createReqVO);
 
-        Set<Long> alarmStockSpuIds = SetUtils.asSet(createReqVO.getId());
+        //Set<Long> alarmStockSpuIds = SetUtils.asSet(createReqVO.getId()); TODO 查询接口已改变没有使用到这个变量
 
         List<ProductSkuDO> productSpuDOS = Arrays.asList(randomPojo(ProductSkuDO.class, o -> {
             o.setSpuId(createReqVO.getId());
@@ -226,10 +201,10 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
-        productSpuPageReqVO.setAlarmStock(true);
+        //productSpuPageReqVO.setAlarmStock(true);
         PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
-        PageResult<ProductSpuRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, alarmStockSpuIds));
+        PageResult<ProductSpuPageRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO));
         Assertions.assertIterableEquals(result.getList(), spuPage.getList());
         assertEquals(spuPage.getTotal(), result.getTotal());
     }
@@ -247,7 +222,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             //o.setMinPrice(1); // TODO ProductSpuDO中已没有相关属性
             //o.setMaxPrice(1);
             o.setMarketPrice(1);
-            o.setSpecType(ProductSpuSpecTypeEnum.RECYCLE.getType());
+            o.setSpecType(false);
             o.setBrandId(brandId);
             o.setCategoryId(categoryId);
             //o.setClickCount(1); // TODO ProductSpuDO中已没有相关属性
@@ -266,7 +241,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setStatus(ProductSpuStatusEnum.DISABLE.getStatus())));
         productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setStatus(ProductSpuStatusEnum.RECYCLE.getStatus())));
         // 测试 SpecType 不匹配
-        productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setSpecType(ProductSpuSpecTypeEnum.DISABLE.getType())));
+        productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setSpecType(true)));
         // 测试 BrandId 不匹配
         productSpuMapper.insert(cloneIgnoreId(createReqVO, o -> o.setBrandId(generateId())));
         // 测试 CategoryId 不匹配
@@ -274,14 +249,15 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
-        productSpuPageReqVO.setAlarmStock(false);
-        productSpuPageReqVO.setBrandId(brandId);
-        productSpuPageReqVO.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
-        productSpuPageReqVO.setCategoryId(categoryId);
+        // TODO 已暂时没有相关属性，等用到时再添加
+        //productSpuPageReqVO.setAlarmStock(false);
+        //productSpuPageReqVO.setBrandId(brandId);
+        //productSpuPageReqVO.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
+        //productSpuPageReqVO.setCategoryId(categoryId);
 
         PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
-        PageResult<ProductSpuRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO, (Set<Long>) null));
+        PageResult<ProductSpuPageRespVO> result = ProductSpuConvert.INSTANCE.convertPage(productSpuMapper.selectPage(productSpuPageReqVO));
         assertEquals(result, spuPage);
     }
 

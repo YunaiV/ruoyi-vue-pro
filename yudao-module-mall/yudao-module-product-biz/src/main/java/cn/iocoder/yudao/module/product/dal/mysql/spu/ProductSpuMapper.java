@@ -10,9 +10,11 @@ import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReq
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuTabTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -24,29 +26,26 @@ import java.util.Set;
 @Mapper
 public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
 
+    //default PageResult<ProductSpuDO> selectPage(ProductSpuPageReqVO reqVO) {
+    //    return selectPage(reqVO, new LambdaQueryWrapperX<ProductSpuDO>()
+    //            .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
+    //            .orderByDesc(ProductSpuDO::getSort));
+    //}
     default PageResult<ProductSpuDO> selectPage(ProductSpuPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ProductSpuDO>()
+                // 商品名称
                 .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
-                .eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId())
-                .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
-                .leIfPresent(ProductSpuDO::getSalesCount, reqVO.getSalesCountMax())
-                .geIfPresent(ProductSpuDO::getSalesCount, reqVO.getSalesCountMin())
-                .leIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMax())
-                .geIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMin())
-                .orderByDesc(ProductSpuDO::getSort));
-    }
-
-    default PageResult<ProductSpuDO> selectPage(ProductSpuPageReqVO reqVO, Set<Long> alarmStockSpuIds) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<ProductSpuDO>()
-                .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
-                .eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId())
-                .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
-                .leIfPresent(ProductSpuDO::getSalesCount, reqVO.getSalesCountMax())
-                .geIfPresent(ProductSpuDO::getSalesCount, reqVO.getSalesCountMin())
-                .leIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMax())
-                .geIfPresent(ProductSpuDO::getMarketPrice, reqVO.getMarketPriceMin())
-                .inIfPresent(ProductSpuDO::getId, alarmStockSpuIds) // 库存告警
-                .eqIfPresent(ProductSpuDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime())
+                // 出售中商品
+                .eq(ProductSpuTabTypeEnum.FOR_SALE.getType().equals(reqVO.getTabType()),ProductSpuDO::getStatus,ProductSpuStatusEnum.ENABLE.getStatus())
+                // 仓储中商品
+                .eq(ProductSpuTabTypeEnum.IN_WAREHOUSE.getType().equals(reqVO.getTabType()),ProductSpuDO::getStatus,ProductSpuStatusEnum.DISABLE.getStatus())
+                // 已售空商品
+                .eq(ProductSpuTabTypeEnum.SOLD_OUT.getType().equals(reqVO.getTabType()),ProductSpuDO::getStock,0)
+                // TODO 警戒库存暂时为 10，后期需要使用常量或者数据库配置替换
+                .le(ProductSpuTabTypeEnum.ALERT_STOCK.getType().equals(reqVO.getTabType()),ProductSpuDO::getStock,10)
+                // 回收站
+                .eq(ProductSpuTabTypeEnum.RECYCLE_BIN.getType().equals(reqVO.getTabType()),ProductSpuDO::getStatus,ProductSpuStatusEnum.RECYCLE.getStatus())
                 .orderByDesc(ProductSpuDO::getSort));
     }
 

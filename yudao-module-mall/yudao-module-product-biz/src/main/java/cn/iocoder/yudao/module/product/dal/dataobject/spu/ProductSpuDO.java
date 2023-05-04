@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.spu;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.delivery.DeliveryTemplateDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -29,7 +29,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductSpuDO extends BaseDO {
+public class ProductSpuDO extends TenantBaseDO {
 
     /**
      * 商品 SPU 编号，自增
@@ -116,19 +116,19 @@ public class ProductSpuDO extends BaseDO {
     /**
      * 商品价格，单位使用：分
      *
-     * 基于其对应的 {@link ProductSkuDO#getPrice()} 最小值
+     * 基于其对应的 {@link ProductSkuDO#getPrice()} sku单价最低的商品的
      */
     private Integer price;
     /**
      * 市场价，单位使用：分
      *
-     * 基于其对应的 {@link ProductSkuDO#getMarketPrice()} 最大值 TODO 芋艿：待确定最大还是最小
+     * 基于其对应的 {@link ProductSkuDO#getMarketPrice()} sku单价最低的商品的
      */
     private Integer marketPrice;
     /**
      * 成本价，单位使用：分
      *
-     * 基于其对应的 {@link ProductSkuDO#getCostPrice()} 最大值 TODO 芋艿：待确定最大还是最小
+     * 基于其对应的 {@link ProductSkuDO#getCostPrice()} sku单价最低的商品的
      */
     private Integer costPrice;
     /**

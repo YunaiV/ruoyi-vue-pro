@@ -54,14 +54,18 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
         // mock 数据
         ProductSkuDO sku01 = randomPojo(ProductSkuDO.class, o -> { // 测试更新
             o.setSpuId(1L);
+            //o.setProperties(singletonList(new ProductSkuDO.Property(
+            //        10L, "颜色", 20L, "红色"))); TODO 新增字段已注释
             o.setProperties(singletonList(new ProductSkuDO.Property(
-                    10L, "颜色", 20L, "红色")));
+                    10L, 20L)));
         });
         productSkuMapper.insert(sku01);
         ProductSkuDO sku02 = randomPojo(ProductSkuDO.class, o -> { // 测试删除
             o.setSpuId(1L);
+            //o.setProperties(singletonList(new ProductSkuDO.Property(
+            //        10L, "颜色", 30L, "蓝色"))); TODO 新增字段已注释
             o.setProperties(singletonList(new ProductSkuDO.Property(
-                    10L, "颜色", 30L, "蓝色")));
+                    10L, 30L)));
         });
         productSkuMapper.insert(sku02);
         // 准备参数
@@ -70,16 +74,14 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
         List<ProductSkuCreateOrUpdateReqVO> skus = Arrays.asList(
                 randomPojo(ProductSkuCreateOrUpdateReqVO.class, o -> { // 测试更新
                     o.setProperties(singletonList(new ProductSkuCreateOrUpdateReqVO.Property(10L, 20L)));
-                    o.setStatus(CommonStatusEnum.ENABLE.getStatus());
                 }),
                 randomPojo(ProductSkuCreateOrUpdateReqVO.class, o -> { // 测试新增
                     o.setProperties(singletonList(new ProductSkuCreateOrUpdateReqVO.Property(10L, 40L)));
-                    o.setStatus(CommonStatusEnum.ENABLE.getStatus());
                 })
         );
 
         // 调用
-        productSkuService.updateSkuList(spuId, spuName, skus);
+        productSkuService.updateSkuList(spuId, skus);
         // 断言
         List<ProductSkuDO> dbSkus = productSkuMapper.selectListBySpuId(spuId);
         assertEquals(dbSkus.size(), 2);

@@ -100,7 +100,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         if (category == null) {
             throw exception(CATEGORY_NOT_EXISTS);
         }
-        if (Objects.equals(category.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (Objects.equals(category.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
             throw exception(CATEGORY_DISABLED, category.getName());
         }
     }

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -54,6 +55,14 @@ public class ProductSpuController {
         return success(true);
     }
 
+    @PutMapping("/updateStatus")
+    @Operation(summary = "更新商品 SPU Status")
+    @PreAuthorize("@ss.hasPermission('product:spu:update')")
+    public CommonResult<Boolean> updateStatus(@Valid @RequestBody ProductSpuUpdateStatusReqVO updateReqVO) {
+        productSpuService.updateStatus(updateReqVO);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除商品 SPU")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
@@ -68,19 +77,7 @@ public class ProductSpuController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<ProductSpuDetailRespVO> getSpuDetail(@RequestParam("id") Long id) {
-        // 获得商品 SPU
-        ProductSpuDO spu = productSpuService.getSpu(id);
-        if (spu == null) {
-            throw exception(SPU_NOT_EXISTS);
-        }
-
-        // 查询商品 SKU
-        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuIdAndStatus(spu.getId(), null);
-        // 查询商品属性
-        List<ProductPropertyValueDetailRespBO> propertyValues = productPropertyValueService
-                .getPropertyValueDetailList(ProductSkuConvert.INSTANCE.convertPropertyValueIds(skus));
-        // 拼接
-        return success(ProductSpuConvert.INSTANCE.convert03(spu, skus, propertyValues));
+        return success(productSpuService.getSpuDetail(id));
     }
 
     @GetMapping("/get-simple-list")
@@ -94,8 +91,14 @@ public class ProductSpuController {
     @GetMapping("/page")
     @Operation(summary = "获得商品 SPU 分页")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<PageResult<ProductSpuRespVO>> getSpuPage(@Valid ProductSpuPageReqVO pageVO) {
+    public CommonResult<PageResult<ProductSpuPageRespVO>> getSpuPage(@Valid ProductSpuPageReqVO pageVO) {
         return success(ProductSpuConvert.INSTANCE.convertPage(productSpuService.getSpuPage(pageVO)));
+    }
+    @GetMapping("/tabsCount")
+    @Operation(summary = "获得商品 SPU tabsCount")
+    @PreAuthorize("@ss.hasPermission('product:spu:query')")
+    public CommonResult<Map<Integer, Long>> getTabsCount() {
+        return success(productSpuService.getTabsCount());
     }
 
 }

@@ -97,4 +97,25 @@ public interface ProductSpuService {
      */
     void updateSpuStock(Map<Long, Integer> stockIncrCounts);
 
+    /**
+     * 得到spu详细
+     *
+     * @param id id
+     * @return {@link ProductSpuDetailRespVO}
+     */
+    ProductSpuDetailRespVO getSpuDetail(Long id);
+
+    /**
+     * 更新状态
+     *
+     * @param updateReqVO 更新请求签证官
+     */
+    void updateStatus(ProductSpuUpdateStatusReqVO updateReqVO);
+
+    /**
+     * 获取spu列表标签对应的Count数量
+     *
+     * @return {@link Map}<{@link Integer}, {@link Integer}>
+     */
+    Map<Integer, Long> getTabsCount();
 }

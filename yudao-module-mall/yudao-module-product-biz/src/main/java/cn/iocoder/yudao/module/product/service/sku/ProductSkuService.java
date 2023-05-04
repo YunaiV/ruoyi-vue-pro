@@ -56,19 +56,17 @@ public interface ProductSkuService {
      * 批量创建 SKU
      *
      * @param spuId 商品 SPU 编号
-     * @param spuName 商品 SPU 名称
      * @param list SKU 对象集合
      */
-    void createSkuList(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> list);
+    void createSkuList(Long spuId, List<ProductSkuCreateOrUpdateReqVO> list);
 
     /**
      * 根据 SPU 编号，批量更新它的 SKU 信息
      *
      * @param spuId SPU 编码
-     * @param spuName 商品 SPU 名称
      * @param skus SKU 的集合
      */
-    void updateSkuList(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skus);
+    void updateSkuList(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus);
 
     /**
      * 更新 SKU 库存（增量）
@@ -89,7 +87,7 @@ public interface ProductSkuService {
 
     /**
      * 基于 SPU 编号和状态，获得商品 SKU 集合
-     *
+     * TODO SKU中已经不存在status属性
      * @param spuId SPU 编号
      * @param status 状态
      * @return 商品 SKU 集合
