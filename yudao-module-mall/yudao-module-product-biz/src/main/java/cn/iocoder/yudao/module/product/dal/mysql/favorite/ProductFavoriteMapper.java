@@ -12,15 +12,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-/**
- * 喜爱商品 Mapper
- *
- * @author jason
- */
 @Mapper
 public interface ProductFavoriteMapper extends BaseMapperX<ProductFavoriteDO> {
 
-    default  ProductFavoriteDO selectByUserAndSpuAndType(Long userId, Long spuId, Integer type){
+    default  ProductFavoriteDO selectByUserAndSpuAndType(Long userId, Long spuId, Integer type) {
         Assert.notNull(userId, "the userId argument  must not be null");
         Assert.notNull(spuId, "the spuId argument must not be null");
         Assert.notNull(type, "the type argument must not be null");
@@ -36,6 +31,7 @@ public interface ProductFavoriteMapper extends BaseMapperX<ProductFavoriteDO> {
         return new PageResult<>(page.getRecords(), page.getTotal());
     }
 
+    // TODO @jason：内存中拼接哈。这样好兼容更多的 db 类型；
     Page<AppFavoriteRespVO> selectFavoriteProductList(Page<AppFavoriteRespVO> page,
                                                       @Param("userId") Long userId,
                                                       @Param("type") Integer type);

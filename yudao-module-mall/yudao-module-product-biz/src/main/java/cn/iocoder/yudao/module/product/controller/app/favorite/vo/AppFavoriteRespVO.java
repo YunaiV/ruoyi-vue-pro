@@ -1,23 +1,27 @@
 package cn.iocoder.yudao.module.product.controller.app.favorite.vo;
 
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-/**
- * @author jason
- */
-@Schema(description = "用户APP - 喜爱商品 Response VO")
+@Schema(description = "用户APP - 商品收藏 Response VO")
 @Data
 public class AppFavoriteRespVO {
 
+    // TODO @jason：required true 哈
     @Schema(description = "编号", example = "1")
     private Long id;
 
-    @Schema(description = "商品SPU编号", example = "29502")
+    // TODO @jason：required true 哈
+    @Schema(description = "商品 SPU 编号", example = "29502")
     private Long spuId;
 
-    @Schema(description = "商品SPU名称", example = "赵六")
+    // TODO @jason：required true 哈
+    @Schema(description = "类型", example = "1")
+    private Integer type;
+
+    // ========== 商品相关字段 ==========
+
+    @Schema(description = "商品 SPU 名称", example = "赵六")
     private String spuName;
 
     @Schema(description = "商品封面图", example = "https://domain/pic.png")
@@ -26,6 +30,4 @@ public class AppFavoriteRespVO {
     @Schema(description = "商品单价", example = "100")
     private Integer price;
 
-    @Schema(description = "类型 1:收藏 2：点赞", example = "1")
-    private Integer type;
 }

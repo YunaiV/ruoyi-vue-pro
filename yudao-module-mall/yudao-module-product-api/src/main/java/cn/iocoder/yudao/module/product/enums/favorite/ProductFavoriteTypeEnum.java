@@ -7,17 +7,19 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * 喜爱商品类型 枚举
+ * 商品收藏的类型枚举
  *
  * @author jason
  */
 @Getter
 @AllArgsConstructor
 public enum ProductFavoriteTypeEnum implements IntArrayValuable {
+
     COLLECT(1,"收藏"),
     THUMBS_UP(2, "点赞");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ProductFavoriteTypeEnum::getType).toArray();
+
     /**
      * 类型
      */

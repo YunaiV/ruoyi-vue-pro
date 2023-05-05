@@ -20,7 +20,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductFavoriteDO extends TenantBaseDO {
+public class ProductFavoriteDO extends TenantBaseDO { // TODO @jason：如无必要，使用 BaseDO 哈。例如说 tenant_id 在业务里，是否需要使用到
 
     /**
      * 编号，主键自增
@@ -40,7 +40,7 @@ public class ProductFavoriteDO extends TenantBaseDO {
      */
     private Long spuId;
     /**
-     * 类型  1 收藏；2 点赞
+     * 类型  1 收藏；2 点赞 // TODO @jason：不要注释 1 收藏 2 点赞；而是注释好，它对应的枚举类
      */
     private Integer type;
 

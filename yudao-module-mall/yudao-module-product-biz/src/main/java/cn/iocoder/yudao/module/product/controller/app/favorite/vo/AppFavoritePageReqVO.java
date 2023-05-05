@@ -10,15 +10,13 @@ import javax.validation.constraints.NotNull;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
-/**
- * @author jason
- */
-@Schema(description = "用户APP - 喜爱商品分页查询 Request VO")
+@Schema(description = "用户APP - 商品收藏分页查询 Request VO")
 @Data
 public class AppFavoritePageReqVO extends PageParam {
 
-    @Schema(description = "类型 1:收藏 2：点赞", requiredMode = REQUIRED, example = "1")
+    @Schema(description = "类型", requiredMode = REQUIRED, example = "1")
     @NotNull(message = "类型不能为空")
     @InEnum(ProductFavoriteTypeEnum.class)
     private Integer type;
+
 }

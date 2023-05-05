@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.COLLECTIO
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.COLLECTION_NOT_EXISTS;
 
 /**
- * 喜爱商品 Service 实现类
+ * 商品收藏 Service 实现类
  *
  * @author jason
  */
@@ -33,11 +33,15 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
 
     @Override
     public Boolean collect(@Valid AppFavoriteReqVO reqVO) {
+        // TODO @jason：userId 要从 Controller 传递过来，Service 不能有转台
         Long userId = getLoginUserId();
+       // TODO @jason：代码缩进不对；
         ProductFavoriteDO favoriteDO = mapper.selectByUserAndSpuAndType(userId, reqVO.getSpuId(), reqVO.getType());
         if (Objects.nonNull(favoriteDO)) {
             throw exception(COLLECTION_EXISTS);
         }
+
+        // TODO @jason：插入只有成功，不用判断 1
         ProductFavoriteDO entity = ProductFavoriteConvert.INSTANCE.convert(userId, reqVO);
         int count = mapper.insert(entity);
         return count == 1;
@@ -45,11 +49,13 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
 
     @Override
     public Boolean cancelCollect(@Valid AppFavoriteReqVO reqVO) {
+        // TODO @jason：代码缩进不对；
         Long loginUserId = getLoginUserId();
         ProductFavoriteDO favoriteDO = mapper.selectByUserAndSpuAndType(loginUserId, reqVO.getSpuId(), reqVO.getType());
         if (Objects.isNull(favoriteDO)) {
             throw exception(COLLECTION_NOT_EXISTS);
         }
+        // TODO @jason：插入只有成功，不用判断 1
         int count = mapper.deleteById(favoriteDO.getId());
         return count == 1;
     }
@@ -59,4 +65,5 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
         Long userId = getLoginUserId();
         return mapper.selectPageByUserAndType(userId, reqVO.getType(), reqVO);
     }
+
 }
