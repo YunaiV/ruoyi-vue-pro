@@ -3,12 +3,9 @@ package cn.iocoder.yudao.module.product.controller.admin.spu;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
-import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
-import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,9 +20,7 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 
 @Tag(name = "管理后台 - 商品 SPU")
 @RestController
@@ -94,6 +89,8 @@ public class ProductSpuController {
     public CommonResult<PageResult<ProductSpuPageRespVO>> getSpuPage(@Valid ProductSpuPageReqVO pageVO) {
         return success(ProductSpuConvert.INSTANCE.convertPage(productSpuService.getSpuPage(pageVO)));
     }
+    
+    // TODO @tuihui999：get-count；另外，url 使用 - 拆分
     @GetMapping("/tabsCount")
     @Operation(summary = "获得商品 SPU tabsCount")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")

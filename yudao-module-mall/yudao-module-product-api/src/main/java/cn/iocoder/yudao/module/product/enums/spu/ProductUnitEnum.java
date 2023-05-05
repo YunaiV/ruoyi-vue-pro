@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @puhui999：是不是放到数据字典里？
 /**
  * 产品单位枚举
  *
@@ -14,6 +15,7 @@ import java.util.Arrays;
 @Getter
 @AllArgsConstructor
 public enum ProductUnitEnum implements IntArrayValuable {
+
     PIECE(1, "个"),
     DOZEN(2, "打"),
     BOX(3, "盒"),

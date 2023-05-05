@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.product.dal.mysql.spu;
 
 import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -14,24 +12,14 @@ import cn.iocoder.yudao.module.product.enums.spu.ProductSpuTabTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * 商品spu Mapper
- *
- * @author 芋道源码
- */
 @Mapper
 public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
 
-    //default PageResult<ProductSpuDO> selectPage(ProductSpuPageReqVO reqVO) {
-    //    return selectPage(reqVO, new LambdaQueryWrapperX<ProductSpuDO>()
-    //            .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
-    //            .orderByDesc(ProductSpuDO::getSort));
-    //}
     default PageResult<ProductSpuDO> selectPage(ProductSpuPageReqVO reqVO) {
+        // TODO @puhui999：多个 tab，写 if else 去补条件，可阅读性会好点哈
         return selectPage(reqVO, new LambdaQueryWrapperX<ProductSpuDO>()
                 // 商品名称
                 .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
@@ -42,7 +30,7 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .eq(ProductSpuTabTypeEnum.IN_WAREHOUSE.getType().equals(reqVO.getTabType()),ProductSpuDO::getStatus,ProductSpuStatusEnum.DISABLE.getStatus())
                 // 已售空商品
                 .eq(ProductSpuTabTypeEnum.SOLD_OUT.getType().equals(reqVO.getTabType()),ProductSpuDO::getStock,0)
-                // TODO 警戒库存暂时为 10，后期需要使用常量或者数据库配置替换
+                // TODO @phuui999：警戒库存暂时为 10，后期需要使用常量或者数据库配置替换
                 .le(ProductSpuTabTypeEnum.ALERT_STOCK.getType().equals(reqVO.getTabType()),ProductSpuDO::getStock,10)
                 // 回收站
                 .eq(ProductSpuTabTypeEnum.RECYCLE_BIN.getType().equals(reqVO.getTabType()),ProductSpuDO::getStatus,ProductSpuStatusEnum.RECYCLE.getStatus())

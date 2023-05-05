@@ -47,7 +47,7 @@ public interface ProductSpuConvert {
 
     List<ProductSpuSimpleRespVO> convertList02(List<ProductSpuDO> list);
 
-
+    // TODO @puhui999：是不是可以删除啦
     default ProductSpuDetailRespVO convert03(ProductSpuDO spu, List<ProductSkuDO> skus,
                                              List<ProductPropertyValueDetailRespBO> propertyValues) {
         ProductSpuDetailRespVO spuVO = convert03(spu);

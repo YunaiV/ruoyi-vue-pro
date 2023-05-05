@@ -1,11 +1,7 @@
 package cn.iocoder.yudao.module.product.controller.admin.sku.vo;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -50,6 +46,7 @@ public class ProductSkuBaseVO {
 
     @Schema(description = "商品体积", example = "1024") // 单位：m^3 平米
     private Double volume;
+    // TODO @pitui999：注释可以去掉，VO 使用 @Schema 作为注释
     /**
      * 一级分销的佣金，单位：分
      */

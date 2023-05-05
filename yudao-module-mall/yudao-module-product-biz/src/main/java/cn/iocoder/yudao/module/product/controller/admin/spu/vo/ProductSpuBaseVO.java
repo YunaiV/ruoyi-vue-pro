@@ -1,13 +1,5 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.delivery.DeliveryTemplateDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -115,6 +107,5 @@ public class ProductSpuBaseVO {
 
     @Schema(description = "虚拟销量", required = true, example = "芋道")
     private Integer virtualSalesCount;
-
 
 }

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.sku;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
@@ -28,7 +27,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductSkuDO extends TenantBaseDO {
+public class ProductSkuDO extends TenantBaseDO {  // TODO @puhui999：这里是不是用 BaseDO 就可以了？
 
     /**
      * 商品 SKU 编号，自增
@@ -116,7 +115,7 @@ public class ProductSkuDO extends TenantBaseDO {
         // * 冗余 {@link ProductPropertyDO#getName()}
         // *
         // * 注意：每次属性名字发生变化时，需要更新该冗余
-        // */ TODO 与已有代码逻辑存在冲突
+        // */ TODO @puhui999：与已有代码逻辑存在冲突；芋艿：冲突点是啥呀？
         //private String propertyName;
 
         /**
@@ -131,7 +130,7 @@ public class ProductSkuDO extends TenantBaseDO {
         // * 冗余 {@link ProductPropertyValueDO#getName()}
         // *
         // * 注意：每次属性值名字发生变化时，需要更新该冗余
-        // */ TODO 与已有代码逻辑存在冲突
+        // */ TODO @puhui999：与已有代码逻辑存在冲突；芋艿：冲突点是啥呀？
         //private String valueName;
 
     }

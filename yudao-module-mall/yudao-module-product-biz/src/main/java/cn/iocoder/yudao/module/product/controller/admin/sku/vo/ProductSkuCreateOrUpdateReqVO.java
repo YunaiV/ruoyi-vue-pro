@@ -11,6 +11,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSkuCreateOrUpdateReqVO extends ProductSkuBaseVO {
+
     @Schema(description = "商品属性")
     @Data
     @AllArgsConstructor

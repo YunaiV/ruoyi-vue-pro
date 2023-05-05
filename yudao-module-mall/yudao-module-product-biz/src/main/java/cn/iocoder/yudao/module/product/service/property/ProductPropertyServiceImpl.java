@@ -94,7 +94,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
 
     @Override
     public List<ProductPropertyDO> getPropertyList(ProductPropertyListReqVO listReqVO) {
-        // 增加使用属性id查询
+        // 增加使用属性 id 查询
         if (CollUtil.isNotEmpty(listReqVO.getPropertyIds())){
             return productPropertyMapper.selectBatchIds(listReqVO.getPropertyIds());
         }

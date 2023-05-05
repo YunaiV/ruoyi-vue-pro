@@ -20,6 +20,7 @@ public class ProductSpuPageReqVO extends PageParam {
     @Schema(description = "商品名称", example = "yutou")
     private String name;
 
+    // TODO @puhui999：加下 @InEnum 校验
     @Schema(description = "前端请求的tab类型", example = "1")
     private Integer tabType;
 

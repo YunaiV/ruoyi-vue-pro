@@ -40,6 +40,7 @@ public interface ProductPropertyService {
 
     /**
      * 获得属性项列表
+     *
      * @param listReqVO 集合查询
      * @return 属性项集合
      */

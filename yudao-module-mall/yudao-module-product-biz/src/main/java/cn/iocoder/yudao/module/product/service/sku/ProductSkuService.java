@@ -87,7 +87,9 @@ public interface ProductSkuService {
 
     /**
      * 基于 SPU 编号和状态，获得商品 SKU 集合
-     * TODO SKU中已经不存在status属性
+     *
+     * TODO @puhui999：SKU中已经不存在status属性；芋艿：那就去掉 status 哈
+     *
      * @param spuId SPU 编号
      * @param status 状态
      * @return 商品 SKU 集合
