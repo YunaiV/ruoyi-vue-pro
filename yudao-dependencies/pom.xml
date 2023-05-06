@@ -45,7 +45,7 @@
         <captcha-plus.version>1.0.2</captcha-plus.version>
         <jsoup.version>1.15.4</jsoup.version>
         <lombok.version>1.18.26</lombok.version>
-        <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
         <hutool.version>5.8.18</hutool.version>
         <easyexcel.verion>3.2.1</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
