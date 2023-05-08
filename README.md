@@ -251,7 +251,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 |---------------------------------------------------------------------------------------------|------------------|-------------|----------------------------------------------------------------|
 | [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.11      | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
 | [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器           | 5.7 / 8.0+  |                                                                |
-| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.17      | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.16      | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.3.1     | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
 | [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源            | 3.6.1       | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/)                                                                  | key-value 数据库    | 5.0 / 6.0   |                                                                |
@@ -261,7 +261,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件           | 6.2.5       | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
 | [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 6.8.0       | [文档](https://doc.iocoder.cn/bpm/)                              |
 | [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.3.2       | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
-| [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 1.7.0       | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
+| [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 1.6.15      | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
 | [Resilience4j](https://github.com/resilience4j/resilience4j)                                | 服务保障组件           | 1.7.1       | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao)    |
 | [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.12.0      | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao)      |
 | [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 2.7.10      | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
