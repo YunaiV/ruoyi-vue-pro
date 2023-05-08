@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class CouponTemplateUpdateReqVO extends CouponTemplateBaseVO {
 
-    @Schema(description = "模板编号", required = true, example = "1024")
+    @Schema(description = "模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "模板编号不能为空")
     private Long id;
 

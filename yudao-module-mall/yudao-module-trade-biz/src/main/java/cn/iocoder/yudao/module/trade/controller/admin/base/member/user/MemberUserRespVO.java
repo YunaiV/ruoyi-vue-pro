@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class MemberUserRespVO {
 
-    @Schema(description = "用户 ID", required = true, example = "1")
+    @Schema(description = "用户 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "用户昵称", required = true, example = "芋道源码")
+    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     private String nickname;
 
     @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")

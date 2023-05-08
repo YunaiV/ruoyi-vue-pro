@@ -14,11 +14,11 @@ import java.util.Map;
 @ToString(callSuper = true)
 public class FileConfigCreateReqVO extends FileConfigBaseVO {
 
-    @Schema(description = "存储器,参见 FileStorageEnum 枚举类参见 FileStorageEnum 枚举类", required = true, example = "1")
+    @Schema(description = "存储器,参见 FileStorageEnum 枚举类参见 FileStorageEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "存储器不能为空")
     private Integer storage;
 
-    @Schema(description = "存储配置,配置是动态参数，所以使用 Map 接收", required = true)
+    @Schema(description = "存储配置,配置是动态参数，所以使用 Map 接收", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "存储配置不能为空")
     private Map<String, Object> config;
 

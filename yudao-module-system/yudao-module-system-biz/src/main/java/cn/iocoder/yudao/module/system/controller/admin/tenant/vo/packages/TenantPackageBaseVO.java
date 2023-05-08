@@ -13,18 +13,18 @@ import java.util.Set;
 @Data
 public class TenantPackageBaseVO {
 
-    @Schema(description = "套餐名", required = true, example = "VIP")
+    @Schema(description = "套餐名", requiredMode = Schema.RequiredMode.REQUIRED, example = "VIP")
     @NotNull(message = "套餐名不能为空")
     private String name;
 
-    @Schema(description = "状态,参见 CommonStatusEnum 枚举", required = true, example = "1")
+    @Schema(description = "状态,参见 CommonStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
     @Schema(description = "备注", example = "好")
     private String remark;
 
-    @Schema(description = "关联的菜单编号", required = true)
+    @Schema(description = "关联的菜单编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "关联的菜单编号不能为空")
     private Set<Long> menuIds;
 

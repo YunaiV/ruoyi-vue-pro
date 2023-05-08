@@ -17,11 +17,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProductSkuBaseVO {
 
-    @Schema(description = "商品 SKU 名字", required = true, example = "芋道")
+    @Schema(description = "商品 SKU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     @NotEmpty(message = "商品 SKU 名字不能为空")
     private String name;
 
-    @Schema(description = "销售价格，单位：分", required = true, example = "1024")
+    @Schema(description = "销售价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "销售价格，单位：分不能为空")
     private Integer price;
 
@@ -34,16 +34,16 @@ public class ProductSkuBaseVO {
     @Schema(description = "条形码", example = "haha")
     private String barCode;
 
-    @Schema(description = "图片地址", required = true, example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
 
-    @Schema(description = "SKU 状态", required = true, example = "1")
+    @Schema(description = "SKU 状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "SKU 状态不能为空")
     @InEnum(CommonStatusEnum.class)
     private Integer status;
 
-    @Schema(description = "库存", required = true, example = "1")
+    @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "库存不能为空")
     private Integer stock;
 
@@ -62,11 +62,11 @@ public class ProductSkuBaseVO {
     @NoArgsConstructor
     public static class Property {
 
-        @Schema(description = "属性编号", required = true, example = "1")
+        @Schema(description = "属性编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         @NotNull(message = "属性编号不能为空")
         private Long propertyId;
 
-        @Schema(description = "属性值编号", required = true, example = "1024")
+        @Schema(description = "属性值编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         @NotNull(message = "属性值编号不能为空")
         private Long valueId;
 

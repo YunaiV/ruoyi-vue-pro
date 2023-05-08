@@ -16,7 +16,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSpuUpdateReqVO extends ProductSpuBaseVO {
 
-    @Schema(description = "商品编号", required = true, example = "1")
+    @Schema(description = "商品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "商品编号不能为空")
     private Long id;
 

@@ -12,18 +12,18 @@ import javax.validation.constraints.NotNull;
 @Data
 public class SmsChannelBaseVO {
 
-    @Schema(description = "短信签名", required = true, example = "芋道源码")
+    @Schema(description = "短信签名", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     @NotNull(message = "短信签名不能为空")
     private String signature;
 
-    @Schema(description = "启用状态", required = true, example = "1")
+    @Schema(description = "启用状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "启用状态不能为空")
     private Integer status;
 
     @Schema(description = "备注", example = "好吃！")
     private String remark;
 
-    @Schema(description = "短信 API 的账号", required = true, example = "yudao")
+    @Schema(description = "短信 API 的账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
     @NotNull(message = "短信 API 的账号不能为空")
     private String apiKey;
 

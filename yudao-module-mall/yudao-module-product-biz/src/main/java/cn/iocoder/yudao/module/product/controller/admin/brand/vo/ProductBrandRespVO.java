@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class ProductBrandRespVO extends ProductBrandBaseVO {
 
-    @Schema(description = "品牌编号", required = true, example = "1")
+    @Schema(description = "品牌编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

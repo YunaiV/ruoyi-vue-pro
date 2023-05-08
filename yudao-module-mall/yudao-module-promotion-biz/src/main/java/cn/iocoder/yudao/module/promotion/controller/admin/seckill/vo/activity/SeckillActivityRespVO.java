@@ -14,22 +14,22 @@ import java.util.List;
 @ToString(callSuper = true)
 public class SeckillActivityRespVO extends SeckillActivityBaseVO {
 
-    @Schema(description = "秒杀活动id", required = true, example = "1")
+    @Schema(description = "秒杀活动id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "付款订单数", required = true, example = "1")
+    @Schema(description = "付款订单数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer orderCount;
 
-    @Schema(description = "付款人数", required = true, example = "1")
+    @Schema(description = "付款人数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer userCount;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "秒杀时段id", required = true, example = "1,3")
+    @Schema(description = "秒杀时段id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,3")
     private List<Long> timeIds;
 
-    @Schema(description = "排序", required = true, example = "1")
+    @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer sort;
 
     @Schema(description = "备注", example = "限时秒杀活动")

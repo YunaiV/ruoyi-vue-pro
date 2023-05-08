@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class JobCreateReqVO extends JobBaseVO {
 
-    @Schema(description = "处理器的名字", required = true, example = "sysUserSessionTimeoutJob")
+    @Schema(description = "处理器的名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "sysUserSessionTimeoutJob")
     @NotNull(message = "处理器的名字不能为空")
     private String handlerName;
 

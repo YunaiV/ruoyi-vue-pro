@@ -11,10 +11,10 @@ import lombok.experimental.Accessors;
 @Data
 public class PayOrderSubmitRespVO {
 
-    @Schema(description = "展示模式", required = true, example = "url") // 参见 PayDisplayModeEnum 枚举
+    @Schema(description = "展示模式", requiredMode = Schema.RequiredMode.REQUIRED, example = "url") // 参见 PayDisplayModeEnum 枚举
     private String displayMode;
 
-    @Schema(description = "展示内容", required = true)
+    @Schema(description = "展示内容", requiredMode = Schema.RequiredMode.REQUIRED)
     private String displayContent;
 
 }

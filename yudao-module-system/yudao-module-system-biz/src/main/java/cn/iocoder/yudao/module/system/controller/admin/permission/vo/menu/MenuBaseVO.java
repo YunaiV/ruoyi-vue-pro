@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 @Data
 public class MenuBaseVO {
 
-    @Schema(description = "菜单名称", required = true, example = "芋道")
+    @Schema(description = "菜单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     @NotBlank(message = "菜单名称不能为空")
     @Size(max = 50, message = "菜单名称长度不能超过50个字符")
     private String name;
@@ -23,15 +23,15 @@ public class MenuBaseVO {
     @Size(max = 100)
     private String permission;
 
-    @Schema(description = "类型,参见 MenuTypeEnum 枚举类", required = true, example = "1")
+    @Schema(description = "类型,参见 MenuTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "菜单类型不能为空")
     private Integer type;
 
-    @Schema(description = "显示顺序不能为空", required = true, example = "1024")
+    @Schema(description = "显示顺序不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "显示顺序不能为空")
     private Integer sort;
 
-    @Schema(description = "父菜单 ID", required = true, example = "1024")
+    @Schema(description = "父菜单 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "父菜单 ID 不能为空")
     private Long parentId;
 
@@ -49,7 +49,7 @@ public class MenuBaseVO {
     @Schema(description = "组件名", example = "SystemUser")
     private String componentName;
 
-    @Schema(description = "状态,见 CommonStatusEnum 枚举", required = true, example = "1")
+    @Schema(description = "状态,见 CommonStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

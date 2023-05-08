@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class UserUpdateReqVO extends UserBaseVO {
 
-    @Schema(description = "用户编号", required = true, example = "1024")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "用户编号不能为空")
     private Long id;
 
