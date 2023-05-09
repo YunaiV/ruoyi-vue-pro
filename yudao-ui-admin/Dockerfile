@@ -1,11 +1,10 @@
-FROM node:16-alpine as DIST
+FROM node:16-alpine as build-stage
 
 WORKDIR /admim
 
-COPY ./package.json .
-COPY ./yarn.lock .
-COPY ./.npmrc .
-RUN yarn install
+COPY .npmrc package.json yarn.lock ./
+RUN --mount=type=cache,id=yarn-store,target=/root/.yarn-store \
+    yarn install
 
 COPY . .
 ARG NODE_ENV=""
@@ -17,6 +16,6 @@ FROM nginx:alpine
 ENV TZ=Asia/Shanghai
 
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=DIST /admim/dist /usr/share/nginx/html
+COPY --from=build-stage /admim/dist /usr/share/nginx/html
 
 EXPOSE 80
