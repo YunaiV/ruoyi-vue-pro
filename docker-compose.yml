@@ -1,5 +1,7 @@
 version: "3.8"
 
+name: yudao-system
+
 services:
   mysql:
     container_name: yudao-mysql
