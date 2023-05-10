@@ -97,9 +97,17 @@ export const createFormSchema: FormSchema[] = [
   #if ($column.htmlType == "input")
     component: 'Input'
   #elseif($column.htmlType == "imageUpload")## 图片上传
-    component: 'Upload'
+    component: 'FileUpload',
+    componentProps: {
+      fileType: 'file',
+      maxCount: 1
+    }
   #elseif($column.htmlType == "fileUpload")## 文件上传
-    component: 'Upload'
+    component: 'FileUpload',
+    componentProps: {
+      fileType: 'image',
+      maxCount: 1
+    }
   #elseif($column.htmlType == "editor")## 文本编辑器
     component: 'Editor'
   #elseif($column.htmlType == "select")## 下拉框
