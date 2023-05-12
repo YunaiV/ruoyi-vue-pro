@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-      - 3308:3306
+      - 13306:3306
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-ruoyi-vue-pro}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
@@ -23,7 +23,9 @@ services:
     image: redis:6-alpine
     restart: unless-stopped
     ports:
-      - 6379:6379
+      - 16379:6379
+    volumes:
+      - redis:/data
     networks:
       - yudao-network
 
@@ -88,4 +90,6 @@ networks:
 
 volumes:
   mysql:
+    driver: local
+  redis:
     driver: local
