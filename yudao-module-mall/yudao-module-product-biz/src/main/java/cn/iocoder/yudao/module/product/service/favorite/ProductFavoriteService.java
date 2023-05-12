@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteRes
 import javax.validation.Valid;
 
 /**
- * 喜爱商品 Service 接口
+ * 商品收藏 Service 接口
  *
  * @author jason
  */

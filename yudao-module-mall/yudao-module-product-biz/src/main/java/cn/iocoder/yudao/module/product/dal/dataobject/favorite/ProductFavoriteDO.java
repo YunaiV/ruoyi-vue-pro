@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 喜爱商品 DO
+ * 商品收藏 DO
  *
  * @author 芋道源码
  */
