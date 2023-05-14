@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
 * 交易订单 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -117,9 +116,6 @@ public class TradeOrderBaseVO {
 
     @Schema(description = "收件人地区编号", required = true, example = "110000")
     private Integer receiverAreaId;
-
-    @Schema(description = "收件人邮编", required = true, example = "100000")
-    private Integer receiverPostCode;
 
     @Schema(description = "收件人详细地址", required = true, example = "中关村大街 1 号")
     private String receiverDetailAddress;

@@ -22,6 +22,11 @@ public class AppTradeOrderPageItemRespVO {
     @Schema(description = "购买的商品数量", required = true, example = "10")
     private Integer productCount;
 
+    // ========== 价格 + 支付基本信息 ==========
+
+    @Schema(description = "应付金额，单位：分", required = true, example = "1000")
+    private Integer payPrice;
+
     /**
      * 订单项数组
      */

@@ -30,7 +30,6 @@ import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO.Item;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -49,7 +48,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_ORDER_NOT_FOUND;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
@@ -92,7 +92,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Transactional(rollbackFor = Exception.class)
     public Long createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
         // 商品 SKU 检查：可售状态、库存
-        List<ProductSkuRespDTO> skus = validateSkuSaleable(createReqVO.getItems());
+//        List<ProductSkuRespDTO> skus = validateSkuSaleable(createReqVO.getItems()); // TODO 芋艿，临时关闭。
+        List<ProductSkuRespDTO> skus = null;
         // 商品 SPU 检查：可售状态
         List<ProductSpuRespDTO> spus = validateSpuSaleable(convertSet(skus, ProductSkuRespDTO::getSpuId));
         // 用户收件地址的校验
@@ -112,28 +113,28 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return tradeOrderDO.getId();
     }
 
-    /**
-     * 校验商品 SKU 是否可出售
-     *
-     * @param items 商品 SKU
-     * @return 商品 SKU 数组
-     */
-    private List<ProductSkuRespDTO> validateSkuSaleable(List<Item> items) {
-        List<ProductSkuRespDTO> skus = productSkuApi.getSkuList(convertSet(items, Item::getSkuId));
-        // SKU 不存在
-        if (items.size() != skus.size()) {
-            throw exception(ORDER_CREATE_SKU_NOT_FOUND);
-        }
-        // 校验库存不足
-        Map<Long, ProductSkuRespDTO> skuMap = convertMap(skus, ProductSkuRespDTO::getId);
-        items.forEach(item -> {
-            ProductSkuRespDTO sku = skuMap.get(item.getSkuId());
-            if (item.getCount() > sku.getStock()) {
-                throw exception(ErrorCodeConstants.ORDER_CREATE_SKU_STOCK_NOT_ENOUGH);
-            }
-        });
-        return skus;
-    }
+//    /**
+//     * 校验商品 SKU 是否可出售
+//     *
+//     * @param items 商品 SKU
+//     * @return 商品 SKU 数组
+//     */
+//    private List<ProductSkuRespDTO> validateSkuSaleable(List<Item> items) {
+//        List<ProductSkuRespDTO> skus = productSkuApi.getSkuList(convertSet(items, Item::getSkuId));
+//        // SKU 不存在
+//        if (items.size() != skus.size()) {
+//            throw exception(ORDER_CREATE_SKU_NOT_FOUND);
+//        }
+//        // 校验库存不足
+//        Map<Long, ProductSkuRespDTO> skuMap = convertMap(skus, ProductSkuRespDTO::getId);
+//        items.forEach(item -> {
+//            ProductSkuRespDTO sku = skuMap.get(item.getSkuId());
+//            if (item.getCount() > sku.getStock()) {
+//                throw exception(ErrorCodeConstants.ORDER_CREATE_SKU_STOCK_NOT_ENOUGH);
+//            }
+//        });
+//        return skus;
+//    }
 
     /**
      * 校验商品 SPU 是否可出售
@@ -506,6 +507,9 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     @Override
     public List<TradeOrderItemDO> getOrderItemListByOrderId(Collection<Long> orderIds) {
+        if (CollUtil.isEmpty(orderIds)) {
+            return Collections.emptyList();
+        }
         return tradeOrderItemMapper.selectListByOrderId(orderIds);
     }
 

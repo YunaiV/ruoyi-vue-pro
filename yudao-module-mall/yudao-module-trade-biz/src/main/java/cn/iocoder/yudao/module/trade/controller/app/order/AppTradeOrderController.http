@@ -1,6 +1,6 @@
-### /trade-order/confirm-create-order-info 基于商品，确认创建订单
-GET {{appApi}}/trade/order/get-create-info?items[0].skuId=1&items[0].count=1
-Authorization: Bearer {{user-access-token}}
+### /trade-order/settlement 获得订单结算信息
+GET {{appApi}}/trade/order/settlement?cartIds=1
+Authorization: Bearer {{appToken}}
 tenant-id: {{appTenentId}}
 
 ### /trade-order/confirm-create-order-info-from-cart 基于购物车，确认创建订单

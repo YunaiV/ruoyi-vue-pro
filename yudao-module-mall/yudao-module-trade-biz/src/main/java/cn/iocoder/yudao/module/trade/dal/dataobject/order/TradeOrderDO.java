@@ -213,10 +213,6 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer receiverAreaId;
     /**
-     * 收件人邮编
-     */
-    private Integer receiverPostCode;
-    /**
      * 收件人详细地址
      */
     private String receiverDetailAddress;

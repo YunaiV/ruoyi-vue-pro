@@ -40,11 +40,17 @@ public class AppTradeOrderDetailRespVO {
 
     // ========== 价格 + 支付基本信息 ==========
 
+    @Schema(description = "是否已支付", required = true, example = "true")
+    private Boolean payed;
+
     @Schema(description = "支付订单编号", required = true, example = "1024")
     private Long payOrderId;
 
     @Schema(description = "付款时间")
     private LocalDateTime payTime;
+
+    @Schema(description = "支付渠道", required = true, example = "wx_lite_pay")
+    private String payChannelCode;
 
     @Schema(description = "商品原价（总）", required = true, example = "1000")
     private Integer originalPrice;
@@ -86,9 +92,6 @@ public class AppTradeOrderDetailRespVO {
 
     @Schema(description = "收件人地区名字", required = true, example = "上海 上海市 普陀区")
     private String receiverAreaName;
-
-    @Schema(description = "收件人邮编", required = true, example = "100000")
-    private Integer receiverPostCode;
 
     @Schema(description = "收件人详细地址", required = true, example = "中关村大街 1 号")
     private String receiverDetailAddress;

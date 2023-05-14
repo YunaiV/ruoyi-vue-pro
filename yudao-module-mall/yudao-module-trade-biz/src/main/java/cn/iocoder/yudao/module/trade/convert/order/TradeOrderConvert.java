@@ -50,7 +50,6 @@ public interface TradeOrderConvert {
             @Mapping(source = "address.name", target = "receiverName"),
             @Mapping(source = "address.mobile", target = "receiverMobile"),
             @Mapping(source = "address.areaId", target = "receiverAreaId"),
-            @Mapping(source = "address.postCode", target = "receiverPostCode"),
             @Mapping(source = "address.detailAddress", target = "receiverDetailAddress"),
     })
     TradeOrderDO convert(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO,

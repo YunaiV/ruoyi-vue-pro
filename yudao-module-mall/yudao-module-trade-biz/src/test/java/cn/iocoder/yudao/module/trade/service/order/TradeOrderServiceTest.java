@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
@@ -93,10 +92,12 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // 准备参数
         Long userId = 100L;
         String userIp = "127.0.0.1";
-        AppTradeOrderCreateReqVO reqVO = new AppTradeOrderCreateReqVO()
-                .setAddressId(10L).setCouponId(101L).setRemark("我是备注").setFromCart(true)
-                .setItems(Arrays.asList(new AppTradeOrderCreateReqVO.Item().setSkuId(1L).setCount(3),
-                        new AppTradeOrderCreateReqVO.Item().setSkuId(2L).setCount(4)));
+//        AppTradeOrderCreateReqVO reqVO = new AppTradeOrderCreateReqVO()
+//                .setAddressId(10L).setCouponId(101L).setRemark("我是备注").setFromCart(true)
+//                .setItems(Arrays.asList(new AppTradeOrderCreateReqVO.Item().setSkuId(1L).setCount(3),
+//                        new AppTradeOrderCreateReqVO.Item().setSkuId(2L).setCount(4)));
+        AppTradeOrderCreateReqVO reqVO = null;
+        // TODO 芋艿：重新高下
         // mock 方法（商品 SKU 检查）
         ProductSkuRespDTO sku01 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(1L).setSpuId(11L)
                 .setPrice(50).setStock(100)
@@ -183,7 +184,6 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderDO.getReceiverName(), "芋艿");
         assertEquals(tradeOrderDO.getReceiverMobile(), "15601691300");
         assertEquals(tradeOrderDO.getReceiverAreaId(), 3306);
-        assertEquals(tradeOrderDO.getReceiverPostCode(), 85757);
         assertEquals(tradeOrderDO.getReceiverDetailAddress(), "土豆村");
         assertEquals(tradeOrderDO.getAfterSaleStatus(), TradeOrderAfterSaleStatusEnum.NONE.getStatus());
         assertEquals(tradeOrderDO.getRefundPrice(), 0);

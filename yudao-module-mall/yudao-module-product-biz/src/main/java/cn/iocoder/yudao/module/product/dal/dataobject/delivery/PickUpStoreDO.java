@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.delivery;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.LocalTime;
 
+// TODO @Jason：DeliveryPickUpStoreDO
 /**
  * 自提门店 DO
  *
@@ -18,6 +19,7 @@ import java.time.LocalTime;
 @KeySequence("pick_up_store_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 public class PickUpStoreDO extends BaseDO {
+
     /**
      * 编号，自增
      */
@@ -40,17 +42,18 @@ public class PickUpStoreDO extends BaseDO {
     private String phone;
 
     /**
-     * 区域id
+     * 区域 id
      */
     private Integer areaId;
 
+    // TODO Jason：改成 detailAddress，主要和 AddressDO 保持一致哈
     /**
      * 门店详细地址
      */
     private String address;
 
     /**
-     * 门店logo
+     * 门店 logo
      */
     private String logo;
 
@@ -58,7 +61,6 @@ public class PickUpStoreDO extends BaseDO {
      * 营业开始时间
      */
     private LocalTime openingTime;
-
     /**
      * 营业结束时间
      */
@@ -68,18 +70,16 @@ public class PickUpStoreDO extends BaseDO {
      * 纬度
      */
     private String latitude;
-
     /**
      * 经度
      */
     private String longitude;
 
     /**
-     * 门店状态（0正常 1停用）
+     * 门店状态
+     *
+     * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
 
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }
