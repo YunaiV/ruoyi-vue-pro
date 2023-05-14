@@ -31,4 +31,5 @@ public interface ProductFavoriteMapper extends BaseMapperX<ProductFavoriteDO> {
                 .eq(ProductFavoriteDO::getType, type)
                 .orderByDesc(ProductFavoriteDO::getId));
     }
+
 }

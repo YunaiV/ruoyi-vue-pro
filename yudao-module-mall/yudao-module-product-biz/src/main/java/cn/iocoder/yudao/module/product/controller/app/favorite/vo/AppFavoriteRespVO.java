@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.product.controller.app.favorite.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 @Schema(description = "用户APP - 商品收藏 Response VO")
@@ -19,6 +18,7 @@ public class AppFavoriteRespVO {
     private Integer type;
 
     // ========== 商品相关字段 ==========
+
     @Schema(description = "商品 SPU 名称", example = "赵六")
     private String spuName;
 

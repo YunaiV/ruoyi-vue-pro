@@ -26,29 +26,27 @@ public class AppFavoriteController {
 
     @PostMapping(value = "/create")
     @Operation(summary = "商品收藏")
-    public CommonResult<Boolean> create(@RequestBody @Valid AppFavoriteReqVO reqVO) {
-        Long loginUserId = getLoginUserId();
-        return success(productFavoriteService.create(loginUserId, reqVO));
+    public CommonResult<Boolean> createFavorite(@RequestBody @Valid AppFavoriteReqVO reqVO) {
+        return success(productFavoriteService.createFavorite(getLoginUserId(), reqVO));
     }
 
     @DeleteMapping(value = "/delete")
-    @Operation(summary = "取消商品收藏(通过商品详情)")
-    public CommonResult<Boolean> delete(@RequestBody @Valid AppFavoriteReqVO reqVO) {
-        Long loginUserId = getLoginUserId();
-        return success(productFavoriteService.delete(loginUserId,reqVO));
+    @Operation(summary = "取消商品收藏")
+    public CommonResult<Boolean> deleteFavorite(@RequestBody @Valid AppFavoriteReqVO reqVO) {
+        return success(productFavoriteService.deleteFavorite(getLoginUserId(), reqVO));
     }
 
     @GetMapping(value = "/page")
     @Operation(summary = "分页获取商品收藏列表")
-    public CommonResult<PageResult<AppFavoriteRespVO>> page(AppFavoritePageReqVO reqVO) {
-        Long userId = getLoginUserId();
-        return success(productFavoriteService.page(userId,reqVO));
+    public CommonResult<PageResult<AppFavoriteRespVO>> getFavoritePage(AppFavoritePageReqVO reqVO) {
+        return success(productFavoriteService.getFavoritePage(getLoginUserId(),reqVO));
     }
 
-    @GetMapping(value = "/checkFavorite")
+
+    @GetMapping(value = "/exits")
     @Operation(summary = "检查是否收藏过商品")
-    public CommonResult<Boolean> checkFavorite(AppFavoriteReqVO reqVO) {
-        Long userId = getLoginUserId();
-        return success(productFavoriteService.checkFavorite(userId,reqVO));
+    public CommonResult<Boolean> isFavoriteExists(AppFavoriteReqVO reqVO) {
+        return success(productFavoriteService.checkFavorite(getLoginUserId(), reqVO));
     }
+
 }
