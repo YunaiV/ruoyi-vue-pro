@@ -1,5 +1,5 @@
 import { BasicColumn, FormSchema, useRender } from '@/components/Table'
-import { DICT_TYPE, getDictOpts } from '@/utils/dict'
+import { DICT_TYPE, getDictOptions } from '@/utils/dict'
 
 export const columns: BasicColumn[] = [
 #foreach($column in $columns)
@@ -53,7 +53,7 @@ export const searchFormSchema: FormSchema[] = [
     component: 'Select',
     componentProps: {
       #if ("" != $dictType)## 设置了 dictType 数据字典的情况
-        options: getDictOpts(DICT_TYPE.$dictType.toUpperCase())
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase())
       #else## 未设置 dictType 数据字典的情况
         options: []
       #end
@@ -107,7 +107,7 @@ export const createFormSchema: FormSchema[] = [
     component: 'Select',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOpts(DICT_TYPE.$dictType.toUpperCase())
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number')
       #else##没数据字典
         options:[]
       #end
@@ -116,7 +116,7 @@ export const createFormSchema: FormSchema[] = [
     component: 'Checkbox',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOpts(DICT_TYPE.$dictType.toUpperCase())
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number')
       #else##没数据字典
         options:[]
       #end
@@ -125,7 +125,7 @@ export const createFormSchema: FormSchema[] = [
     component: 'Radio',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOpts(DICT_TYPE.$dictType.toUpperCase())
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number')
       #else##没数据字典
         options:[]
       #end
@@ -173,7 +173,7 @@ export const updateFormSchema: FormSchema[] = [
     component: 'Select',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOpts(DICT_TYPE.$dictType.toUpperCase())
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number')
       #else##没数据字典
         options:[]
       #end
@@ -182,7 +182,7 @@ export const updateFormSchema: FormSchema[] = [
     component: 'Checkbox',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOpts(DICT_TYPE.$dictType.toUpperCase())
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number')
       #else##没数据字典
         options:[]
       #end
@@ -191,7 +191,7 @@ export const updateFormSchema: FormSchema[] = [
     component: 'Radio',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOpts(DICT_TYPE.$dictType.toUpperCase())
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number')
       #else##没数据字典
         options:[]
       #end
