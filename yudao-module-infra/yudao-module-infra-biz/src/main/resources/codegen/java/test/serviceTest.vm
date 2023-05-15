@@ -61,10 +61,10 @@ import static org.mockito.Mockito.*;
        #end
 #end
 /**
-* {@link ${table.className}ServiceImpl} 的单元测试类
-*
-* @author ${table.author}
-*/
+ * {@link ${table.className}ServiceImpl} 的单元测试类
+ *
+ * @author ${table.author}
+ */
 @Import(${table.className}ServiceImpl.class)
 public class ${table.className}ServiceImplTest extends BaseDbUnitTest {
 
