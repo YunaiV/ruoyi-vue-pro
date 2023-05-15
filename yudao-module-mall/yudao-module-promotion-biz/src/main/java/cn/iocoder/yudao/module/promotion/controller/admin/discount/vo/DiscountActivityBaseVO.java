@@ -22,16 +22,16 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class DiscountActivityBaseVO {
 
-    @Schema(description = "活动标题", required = true, example = "一个标题")
+    @Schema(description = "活动标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "一个标题")
     @NotNull(message = "活动标题不能为空")
     private String name;
 
-    @Schema(description = "开始时间", required = true)
+    @Schema(description = "开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "开始时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime startTime;
 
-    @Schema(description = "结束时间", required = true)
+    @Schema(description = "结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "结束时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime endTime;
@@ -43,15 +43,15 @@ public class DiscountActivityBaseVO {
     @Data
     public static class Product {
 
-        @Schema(description = "商品 SPU 编号", required = true, example = "1")
+        @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         @NotNull(message = "商品 SPU 编号不能为空")
         private Long spuId;
 
-        @Schema(description = "商品 SKU 编号", required = true, example = "1")
+        @Schema(description = "商品 SKU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         @NotNull(message = "商品 SKU 编号不能为空")
         private Long skuId;
 
-        @Schema(description = "优惠类型", required = true, example = "1")
+        @Schema(description = "优惠类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         @NotNull(message = "优惠类型不能为空")
         @InEnum(PromotionDiscountTypeEnum.class)
         private Integer discountType;

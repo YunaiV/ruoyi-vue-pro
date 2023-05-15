@@ -19,17 +19,17 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DE
 @Data
 public class SeckillActivityBaseVO {
 
-    @Schema(description = "秒杀活动名称", required = true, example = "晚九点限时秒杀")
+    @Schema(description = "秒杀活动名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "晚九点限时秒杀")
     @NotNull(message = "秒杀活动名称不能为空")
     private String name;
 
-    @Schema(description = "活动开始时间", required = true)
+    @Schema(description = "活动开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "活动开始时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
     private LocalDateTime startTime;
 
-    @Schema(description = "活动结束时间", required = true)
+    @Schema(description = "活动结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "活动结束时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
@@ -40,15 +40,15 @@ public class SeckillActivityBaseVO {
     @Data
     public static class Product {
 
-        @Schema(description = "商品 SPU 编号", required = true, example = "1")
+        @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         @NotNull(message = "商品 SPU 编号不能为空")
         private Long spuId;
 
-        @Schema(description = "商品 SKU 编号", required = true, example = "1")
+        @Schema(description = "商品 SKU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         @NotNull(message = "商品 SKU 编号不能为空")
         private Long skuId;
 
-        @Schema(description = "秒杀金额", required = true, example = "12.00")
+        @Schema(description = "秒杀金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "12.00")
         @NotNull(message = "秒杀金额不能为空")
         private Integer seckillPrice;
 

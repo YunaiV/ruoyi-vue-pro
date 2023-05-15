@@ -11,15 +11,15 @@ import java.util.List;
 @Data
 public class MpUserRespVO  {
 
-    @Schema(description = "编号", required = true, example = "1024")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "公众号粉丝标识", required = true, example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
+    @Schema(description = "公众号粉丝标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
     private String openid;
 
-    @Schema(description = "关注状态 参见 CommonStatusEnum 枚举", required = true, example = "1")
+    @Schema(description = "关注状态 参见 CommonStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer subscribeStatus;
-    @Schema(description = "关注时间", required = true)
+    @Schema(description = "关注时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime subscribeTime;
     @Schema(description = "取消关注时间")
     private LocalDateTime unsubscribeTime;
@@ -42,12 +42,12 @@ public class MpUserRespVO  {
     @Schema(description = "标签编号数组", example = "1,2,3")
     private List<Long> tagIds;
 
-    @Schema(description = "公众号账号的编号", required = true, example = "1")
+    @Schema(description = "公众号账号的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long accountId;
-    @Schema(description = "公众号账号的 appId", required = true, example = "wx1234567890")
+    @Schema(description = "公众号账号的 appId", requiredMode = Schema.RequiredMode.REQUIRED, example = "wx1234567890")
     private String appId;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private Date createTime;
 
 }

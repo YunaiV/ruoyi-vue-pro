@@ -15,11 +15,11 @@ import javax.validation.constraints.NotEmpty;
 @Builder
 public class AppAuthWeixinMiniAppLoginReqVO {
 
-    @Schema(description = "手机 code,小程序通过 wx.getPhoneNumber 方法获得", required = true, example = "hello")
+    @Schema(description = "手机 code,小程序通过 wx.getPhoneNumber 方法获得", requiredMode = Schema.RequiredMode.REQUIRED, example = "hello")
     @NotEmpty(message = "手机 code 不能为空")
     private String phoneCode;
 
-    @Schema(description = "登录 code,小程序通过 wx.login 方法获得", required = true, example = "word")
+    @Schema(description = "登录 code,小程序通过 wx.login 方法获得", requiredMode = Schema.RequiredMode.REQUIRED, example = "word")
     @NotEmpty(message = "登录 code 不能为空")
     private String loginCode;
 

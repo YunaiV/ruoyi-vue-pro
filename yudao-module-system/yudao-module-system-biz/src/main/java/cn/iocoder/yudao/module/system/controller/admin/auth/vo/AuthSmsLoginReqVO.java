@@ -16,12 +16,12 @@ import javax.validation.constraints.NotEmpty;
 @Builder
 public class AuthSmsLoginReqVO {
 
-    @Schema(description = "手机号", required = true, example = "yudaoyuanma")
+    @Schema(description = "手机号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudaoyuanma")
     @NotEmpty(message = "手机号不能为空")
     @Mobile
     private String mobile;
 
-    @Schema(description = "短信验证码", required = true, example = "1024")
+    @Schema(description = "短信验证码", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotEmpty(message = "验证码不能为空")
     private String code;
 

@@ -46,26 +46,26 @@ public class AppTradeCartDetailRespVO {
 
         // ========== 购物车相关的字段 ==========
 
-        @Schema(description = "商品数量", required = true, example = "1")
+        @Schema(description = "商品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer count;
-        @Schema(description = "是否选中", required = true, example = "true")
+        @Schema(description = "是否选中", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
         private Boolean selected;
 
         // ========== 价格相关的字段，对应 PriceCalculateRespDTO.OrderItem 的属性 ==========
 
         // TODO 芋艿：后续可以去除一些无用的字段
 
-        @Schema(description = "商品原价（单）", required = true, example = "100")
+        @Schema(description = "商品原价（单）", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
         private Integer originalPrice;
-        @Schema(description = "商品原价（总）", required = true, example = "200")
+        @Schema(description = "商品原价（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "200")
         private Integer totalOriginalPrice;
-        @Schema(description = "商品级优惠（总）", required = true, example = "300")
+        @Schema(description = "商品级优惠（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "300")
         private Integer totalPromotionPrice;
-        @Schema(description = "最终购买金额（总）", required = true, example = "400")
+        @Schema(description = "最终购买金额（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "400")
         private Integer totalPresentPrice;
-        @Schema(description = "最终购买金额（单）", required = true, example = "500")
+        @Schema(description = "最终购买金额（单）", requiredMode = Schema.RequiredMode.REQUIRED, example = "500")
         private Integer presentPrice;
-        @Schema(description = "应付金额（总）", required = true, example = "600")
+        @Schema(description = "应付金额（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "600")
         private Integer totalPayPrice;
 
         // ========== 营销相关的字段 ==========
@@ -82,15 +82,15 @@ public class AppTradeCartDetailRespVO {
 
         // TODO 芋艿：后续可以去除一些无用的字段
 
-        @Schema(description = "商品原价（总）", required = true, example = "100")
+        @Schema(description = "商品原价（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
         private Integer skuOriginalPrice;
-        @Schema(description = "商品优惠（总）", required = true, example = "200")
+        @Schema(description = "商品优惠（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "200")
         private Integer skuPromotionPrice;
-        @Schema(description = "订单优惠（总）", required = true, example = "300")
+        @Schema(description = "订单优惠（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "300")
         private Integer orderPromotionPrice;
-        @Schema(description = "运费金额", required = true, example = "400")
+        @Schema(description = "运费金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "400")
         private Integer deliveryPrice;
-        @Schema(description = "应付金额（总）", required = true, example = "500")
+        @Schema(description = "应付金额（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "500")
         private Integer payPrice;
 
     }
@@ -99,17 +99,17 @@ public class AppTradeCartDetailRespVO {
     @Data
     public static class Promotion {
 
-        @Schema(description = "营销编号", required = true, example = "1024") // 营销活动的编号、优惠劵的编号
+        @Schema(description = "营销编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024") // 营销活动的编号、优惠劵的编号
         private Long id;
-        @Schema(description = "营销名字", required = true, example = "xx 活动")
+        @Schema(description = "营销名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "xx 活动")
         private String name;
-        @Schema(description = "营销类型", required = true, example = "1")
+        @Schema(description = "营销类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer type;
 
         // ========== 匹配情况 ==========
-        @Schema(description = "是否满足优惠条件", required = true, example = "true")
+        @Schema(description = "是否满足优惠条件", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
         private Boolean meet;
-        @Schema(description = "满足条件的提示", required = true, example = "圣诞价:省 150.00 元")
+        @Schema(description = "满足条件的提示", requiredMode = Schema.RequiredMode.REQUIRED, example = "圣诞价:省 150.00 元")
         private String meetTip;
 
     }

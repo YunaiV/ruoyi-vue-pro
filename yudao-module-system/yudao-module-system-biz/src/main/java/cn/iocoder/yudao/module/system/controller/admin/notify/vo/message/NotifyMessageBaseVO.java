@@ -17,39 +17,39 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class NotifyMessageBaseVO {
 
-    @Schema(description = "用户编号", required = true, example = "25025")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "25025")
     @NotNull(message = "用户编号不能为空")
     private Long userId;
 
-    @Schema(description = "用户类型 - 参见 UserTypeEnum 枚举", required = true, example = "1")
+    @Schema(description = "用户类型 - 参见 UserTypeEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "用户类型不能为空")
     private Byte userType;
 
-    @Schema(description = "模版编号", required = true, example = "13013")
+    @Schema(description = "模版编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "13013")
     @NotNull(message = "模版编号不能为空")
     private Long templateId;
 
-    @Schema(description = "模板编码", required = true, example = "test_01")
+    @Schema(description = "模板编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "test_01")
     @NotNull(message = "模板编码不能为空")
     private String templateCode;
 
-    @Schema(description = "模版发送人名称", required = true, example = "芋艿")
+    @Schema(description = "模版发送人名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
     @NotNull(message = "模版发送人名称不能为空")
     private String templateNickname;
 
-    @Schema(description = "模版内容", required = true, example = "测试内容")
+    @Schema(description = "模版内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "测试内容")
     @NotNull(message = "模版内容不能为空")
     private String templateContent;
 
-    @Schema(description = "模版类型", required = true, example = "2")
+    @Schema(description = "模版类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "模版类型不能为空")
     private Integer templateType;
 
-    @Schema(description = "模版参数", required = true)
+    @Schema(description = "模版参数", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "模版参数不能为空")
     private Map<String, Object> templateParams;
 
-    @Schema(description = "是否已读", required = true, example = "true")
+    @Schema(description = "是否已读", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "是否已读不能为空")
     private Boolean readStatus;
 

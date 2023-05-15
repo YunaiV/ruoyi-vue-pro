@@ -10,11 +10,11 @@ import java.util.Collection;
 @Data
 public class AppTradeCartItemUpdateSelectedReqVO {
 
-    @Schema(description = "商品 SKU 编号列表", required = true, example = "1024,2048")
+    @Schema(description = "商品 SKU 编号列表", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024,2048")
     @NotNull(message = "商品 SKU 编号列表不能为空")
     private Collection<Long> skuIds;
 
-    @Schema(description = "是否选中", required = true, example = "true")
+    @Schema(description = "是否选中", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "是否选中不能为空")
     private Boolean selected;
 

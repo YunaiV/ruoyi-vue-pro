@@ -14,13 +14,13 @@ import java.util.Properties;
 @AllArgsConstructor
 public class RedisMonitorRespVO {
 
-    @Schema(description = "Redis info 指令结果,具体字段，查看 Redis 文档", required = true)
+    @Schema(description = "Redis info 指令结果,具体字段，查看 Redis 文档", requiredMode = Schema.RequiredMode.REQUIRED)
     private Properties info;
 
-    @Schema(description = "Redis key 数量", required = true, example = "1024")
+    @Schema(description = "Redis key 数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long dbSize;
 
-    @Schema(description = "CommandStat 数组", required = true)
+    @Schema(description = "CommandStat 数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<CommandStat> commandStats;
 
     @Schema(description = "Redis 命令统计结果")
@@ -29,13 +29,13 @@ public class RedisMonitorRespVO {
     @AllArgsConstructor
     public static class CommandStat {
 
-        @Schema(description = "Redis 命令", required = true, example = "get")
+        @Schema(description = "Redis 命令", requiredMode = Schema.RequiredMode.REQUIRED, example = "get")
         private String command;
 
-        @Schema(description = "调用次数", required = true, example = "1024")
+        @Schema(description = "调用次数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private Long calls;
 
-        @Schema(description = "消耗 CPU 秒数", required = true, example = "666")
+        @Schema(description = "消耗 CPU 秒数", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
         private Long usec;
 
     }

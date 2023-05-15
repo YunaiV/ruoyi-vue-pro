@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class BpmModeImportReqVO extends BpmModelCreateReqVO {
 
-    @Schema(description = "BPMN 文件", required = true)
+    @Schema(description = "BPMN 文件", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "BPMN 文件不能为空")
     private MultipartFile bpmnFile;
 

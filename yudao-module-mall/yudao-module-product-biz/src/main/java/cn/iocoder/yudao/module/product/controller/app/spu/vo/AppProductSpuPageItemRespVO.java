@@ -11,24 +11,24 @@ import java.util.List;
 @Data
 public class AppProductSpuPageItemRespVO {
 
-    @Schema(description = "商品 SPU 编号", required = true, example = "1")
+    @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "商品名称", required = true, example = "芋道")
+    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     @NotEmpty(message = "商品名称不能为空")
     private String name;
 
-    @Schema(description = "分类编号", required = true)
+    @Schema(description = "分类编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "分类编号不能为空")
     private Long categoryId;
 
-    @Schema(description = "商品图片的数组", required = true)
+    @Schema(description = "商品图片的数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<String> picUrls;
 
-    @Schema(description = " 最小价格，单位使用：分", required = true, example = "1024")
+    @Schema(description = " 最小价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer minPrice;
 
-    @Schema(description = "最大价格，单位使用：分", required = true, example = "1024")
+    @Schema(description = "最大价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer maxPrice;
 
     // ========== 统计相关字段 =========

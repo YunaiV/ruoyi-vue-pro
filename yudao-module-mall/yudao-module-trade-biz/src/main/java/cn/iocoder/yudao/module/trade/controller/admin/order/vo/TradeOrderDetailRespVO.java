@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class TradeOrderDetailRespVO extends TradeOrderBaseVO {
 
-    @Schema(description = "收件人地区名字", required = true, example = "上海 上海市 普陀区")
+    @Schema(description = "收件人地区名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "上海 上海市 普陀区")
     private String receiverAreaName;
 
     /**

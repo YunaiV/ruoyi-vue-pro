@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class ProductCategoryUpdateReqVO extends ProductCategoryBaseVO {
 
-    @Schema(description = "分类编号", required = true, example = "2")
+    @Schema(description = "分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "分类编号不能为空")
     private Long id;
 

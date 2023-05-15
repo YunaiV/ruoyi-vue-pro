@@ -44,7 +44,7 @@ public class AppTradeOrderGetCreateInfoRespVO {
     public static class Sku {
 
         // SKU 自带信息
-        @Schema(description = "SKU 编号", required = true, example = "1024")
+        @Schema(description = "SKU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private Integer id;
         /**
          * SPU 信息
@@ -144,7 +144,7 @@ public class AppTradeOrderGetCreateInfoRespVO {
     @AllArgsConstructor
     public static class Fee {
 
-        @Schema(description = "购买总价", required = true, example = "1024")
+        @Schema(description = "购买总价", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private Integer buyPrice;
         /**
          * 优惠总价

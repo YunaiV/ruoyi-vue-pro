@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class ProductSpuRespVO extends ProductSpuBaseVO {
 
-    @Schema(description = "主键", required = true, example = "1")
+    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
     @Schema(description = "创建时间")
@@ -21,13 +21,13 @@ public class ProductSpuRespVO extends ProductSpuBaseVO {
 
     // ========== SKU 相关字段 =========
 
-    @Schema(description = "库存", required = true, example = "true")
+    @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Integer totalStock;
 
-    @Schema(description = " 最小价格，单位使用：分", required = true, example = "1024")
+    @Schema(description = " 最小价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer minPrice;
 
-    @Schema(description = "最大价格，单位使用：分", required = true, example = "1024")
+    @Schema(description = "最大价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer maxPrice;
 
     @Schema(description = "商品销量", example = "1024")

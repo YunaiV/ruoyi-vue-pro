@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DictTypeSimpleRespVO {
 
-    @Schema(description = "字典类型编号", required = true, example = "1024")
+    @Schema(description = "字典类型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "字典类型名称", required = true, example = "芋道")
+    @Schema(description = "字典类型名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
-    @Schema(description = "字典类型", required = true, example = "sys_common_sex")
+    @Schema(description = "字典类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "sys_common_sex")
     private String type;
 
 }

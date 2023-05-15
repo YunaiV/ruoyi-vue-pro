@@ -11,14 +11,14 @@ import javax.validation.constraints.*;
 @Data
 public class GoViewProjectUpdateReqVO {
 
-    @Schema(description = "编号", required = true, example = "18993")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "18993")
     @NotNull(message = "编号不能为空")
     private Long id;
 
-    @Schema(description = "项目名称", required = true, example = "王五")
+    @Schema(description = "项目名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
     private String name;
 
-    @Schema(description = "发布状态", required = true, example = "1")
+    @Schema(description = "发布状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @InEnum(value = CommonStatusEnum.class, message = "发布状态必须是 {value}")
     private Integer status;
 

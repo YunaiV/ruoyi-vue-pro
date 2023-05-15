@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class ErrorCodeUpdateReqVO extends ErrorCodeBaseVO {
 
-    @Schema(description = "错误码编号", required = true, example = "1024")
+    @Schema(description = "错误码编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "错误码编号不能为空")
     private Long id;
 
