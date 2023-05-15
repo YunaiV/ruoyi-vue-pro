@@ -28,6 +28,7 @@
         <dynamic-datasource.version>3.6.1</dynamic-datasource.version>
         <mybatis-plus-join-boot-starter.version>1.4.3.2</mybatis-plus-join-boot-starter.version>
         <redisson.version>3.18.0</redisson.version>
+        <dm8.jdbc.version>8.1.2.141</dm8.jdbc.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.3</lock4j.version>
         <resilience4j.version>1.7.1</resilience4j.version>
@@ -227,6 +228,13 @@
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.dameng</groupId>
+                <artifactId>DmJdbcDriver18</artifactId>
+                <version>${dm8.jdbc.version}</version>
+            </dependency>
+
 
             <!-- Job 定时任务相关 -->
             <dependency>
