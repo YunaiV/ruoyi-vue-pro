@@ -307,15 +307,12 @@ CREATE TABLE `product_favorite` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB COMMENT='商品收藏表';
 
-
+-- Table structure for trade_delivery_express_template
 -- ----------------------------
--- Table structure for delivery_template
--- ----------------------------
-DROP TABLE IF EXISTS `delivery_template`;
-CREATE TABLE `delivery_template` (
+DROP TABLE IF EXISTS `trade_delivery_express_template`;
+CREATE TABLE `trade_delivery_express_template` (
    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
    `name` varchar(64)  NOT NULL COMMENT '模板名称',
-   `charge_type` tinyint NOT NULL DEFAULT 1 COMMENT '配送费用类型 1:全区域包邮 2：非全区域包邮',
    `charge_mode` tinyint NOT NULL DEFAULT 1 COMMENT '配送计费方式 1:按件 2:按重量 3:按体积',
    `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
@@ -325,18 +322,18 @@ CREATE TABLE `delivery_template` (
    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB COMMENT='配送模板';
+) ENGINE=InnoDB COMMENT='快递运费模板';
 
 -- ----------------------------
--- Table structure for delivery_free_detail
+-- Table structure for trade_delivery_express_template_free
 -- ----------------------------
-DROP TABLE IF EXISTS `delivery_free_detail`;
-CREATE TABLE `delivery_free_detail` (
+DROP TABLE IF EXISTS `trade_delivery_express_template_free`;
+CREATE TABLE `trade_delivery_express_template_free` (
    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
    `template_id` bigint NOT NULL COMMENT '配送模板编号, 对应delivery_template表id',
    `area_id` int NOT NULL  COMMENT '包邮区域id',
    `free_price` int NOT NULL  COMMENT '包邮金额(单位分) 订单总金额>包邮金额才免运费',
-   `free_number` int NOT NULL DEFAULT 0 COMMENT '包邮件数,订单总件数>包邮件数才免运费',
+   `free_count` int NOT NULL DEFAULT 0 COMMENT '包邮件数,订单总件数>包邮件数才免运费',
    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
@@ -344,20 +341,20 @@ CREATE TABLE `delivery_free_detail` (
    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB COMMENT='配送包邮详情';
+) ENGINE=InnoDB COMMENT='快递运费模板包邮配置';
 
 -- ----------------------------
--- Table structure for delivery_charge_detail
+-- Table structure for trade_delivery_express_template_charge
 -- ----------------------------
-DROP TABLE IF EXISTS `delivery_charge_detail`;
-CREATE TABLE `delivery_charge_detail` (
+DROP TABLE IF EXISTS `trade_delivery_express_template_charge`;
+CREATE TABLE `trade_delivery_express_template_charge` (
    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
    `template_id` bigint NOT NULL COMMENT '配送模板编号, 对应delivery_template表id',
    `area_id` int NOT NULL  COMMENT '配送区域id 1:适用于全国',
    `charge_mode` tinyint NOT NULL  COMMENT '配送计费方式 1:按件 2:按重量 3:按体积',
-   `start_quantity` double NOT NULL  COMMENT '起步数量(件数,重量，或体积)',
+   `start_count` double NOT NULL  COMMENT '首件数量(件数,重量，或体积)',
    `start_price`  int NOT NULL  COMMENT '起步价(单位分)',
-   `extra_quantity` double NOT NULL  COMMENT '续(件,重量，或体积)',
+   `extra_count` double NOT NULL  COMMENT '续件数量(件,重量，或体积)',
    `extra_price`  int NOT NULL  COMMENT '额外价(单位分)',
    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -366,19 +363,19 @@ CREATE TABLE `delivery_charge_detail` (
    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB COMMENT='配送费用详情';
+) ENGINE=InnoDB COMMENT='快递运费模板计费配置';
 
 -- ----------------------------
--- Table structure for pick_up_store
+-- Table structure for trade_delivery_pick_up_store
 -- ----------------------------
-DROP TABLE IF EXISTS `pick_up_store`;
-CREATE TABLE `pick_up_store` (
+DROP TABLE IF EXISTS `trade_delivery_pick_up_store`;
+CREATE TABLE `trade_delivery_pick_up_store` (
    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
    `name` varchar(64)  NOT NULL COMMENT '门店名称',
    `introduction` varchar(256)  COMMENT '门店简介',
    `phone` varchar(16) NOT NULL COMMENT '门店手机',
    `area_id` int NOT NULL  COMMENT '区域id',
-   `address` varchar(256) NOT NULL COMMENT '门店详细地址',
+   `detail_address` varchar(256) NOT NULL COMMENT '门店详细地址',
    `logo` varchar(256) NOT NULL COMMENT '门店logo',
    `opening_time` time NOT NULL  COMMENT '营业开始时间',
    `closing_time` time NOT NULL  COMMENT '营业结束时间',
@@ -394,8 +391,61 @@ CREATE TABLE `pick_up_store` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB COMMENT='自提门店';
 
-BEGIN;
-COMMIT;
+-- ----------------------------
+-- Table structure for trade_delivery_pick_up_store_staff
+-- ----------------------------
+DROP TABLE IF EXISTS `trade_delivery_pick_up_store_staff`;
+CREATE TABLE `trade_delivery_pick_up_store_staff` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+    store_id bigint NOT NULL  COMMENT '自提门店编号',
+   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态（0正常 1停用）',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='自提门店店员';
+
+-- ----------------------------
+-- Table structure for trade_delivery_pick_up_store_staff
+-- ----------------------------
+DROP TABLE IF EXISTS `trade_delivery_pick_up_store_staff`;
+CREATE TABLE `trade_delivery_pick_up_store_staff` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+   `admin_user_id` bigint  NOT NULL COMMENT '管理员用户id',
+    store_id bigint NOT NULL  COMMENT '自提门店编号',
+   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态（0正常 1停用）',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='自提门店店员';
+
+
+-- ----------------------------
+-- Table structure for trade_delivery_express
+-- ----------------------------
+DROP TABLE IF EXISTS `trade_delivery_express`;
+CREATE TABLE `trade_delivery_express` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+   `code` varchar(64) NOT NULL  COMMENT '快递公司 code',
+   `name` varchar(64) NOT NULL  COMMENT '快递公司名称',
+   `logo` varchar(256) COMMENT '快递公司logo',
+   `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
+   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态（0正常 1停用）',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='配送快递公司';
 
 SET FOREIGN_KEY_CHECKS = 1;
 

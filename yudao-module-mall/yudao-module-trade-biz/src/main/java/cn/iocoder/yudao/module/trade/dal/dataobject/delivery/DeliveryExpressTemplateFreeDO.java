@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.dal.dataobject.delivery;
+package cn.iocoder.yudao.module.trade.dal.dataobject.delivery;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -6,16 +6,15 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-// TODO @Jason：要不就叫 DeliveryExpressTemplateFreeDO；detail 主要用来作为明细，不适合作为条目
 /**
- * 配送包邮详情 DO
+ * 快递运费模板包邮配置 DO
  *
  * @author jason
  */
-@TableName(value ="delivery_free_detail")
-@KeySequence("delivery_free_detail_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value ="trade_delivery_express_template_free")
+@KeySequence("trade_delivery_express_template_free_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-public class DeliveryFreeDetailDO extends BaseDO {
+public class DeliveryExpressTemplateFreeDO extends BaseDO {
 
     /**
      * 编号，自增
@@ -26,7 +25,7 @@ public class DeliveryFreeDetailDO extends BaseDO {
     /**
      * 配送模板编号
      *
-     * 关联 {@link DeliveryTemplateDO#getId()}
+     * 关联 {@link DeliveryExpressTemplateDO#getId()}
      */
     private Long templateId;
 
@@ -42,12 +41,11 @@ public class DeliveryFreeDetailDO extends BaseDO {
      */
     private Integer freePrice;
 
-    // TODO @Jason：freeCount；一般 count 作为数量哈
     /**
      * 包邮件数
      *
      * 订单总件数 > 包邮件数时，才免运费
      */
-    private Integer freeNumber;
+    private Integer freeCount;
 
 }

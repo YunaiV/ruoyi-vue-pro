@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.dal.dataobject.delivery;
+package cn.iocoder.yudao.module.trade.dal.dataobject.delivery;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
@@ -9,16 +9,15 @@ import lombok.Data;
 
 import java.time.LocalTime;
 
-// TODO @Jason：DeliveryPickUpStoreDO
 /**
  * 自提门店 DO
  *
  * @author jason
  */
-@TableName(value ="pick_up_store")
-@KeySequence("pick_up_store_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value ="trade_delivery_pick_up_store")
+@KeySequence("trade_delivery_pick_up_store_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-public class PickUpStoreDO extends BaseDO {
+public class DeliveryPickUpStoreDO extends BaseDO {
 
     /**
      * 编号，自增
@@ -46,11 +45,10 @@ public class PickUpStoreDO extends BaseDO {
      */
     private Integer areaId;
 
-    // TODO Jason：改成 detailAddress，主要和 AddressDO 保持一致哈
     /**
      * 门店详细地址
      */
-    private String address;
+    private String detailAddress;
 
     /**
      * 门店 logo
