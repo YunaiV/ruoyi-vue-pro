@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.product.controller.app.favorite;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoritePageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteRespVO;
@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-
 import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "用户 APP - 商品收藏")
@@ -51,17 +51,19 @@ public class AppFavoriteController {
     @GetMapping(value = "/page")
     @Operation(summary = "分页获取商品收藏列表")
     public CommonResult<PageResult<AppFavoriteRespVO>> getFavoritePage(AppFavoritePageReqVO reqVO) {
-        PageResult<ProductFavoriteDO> favorites = productFavoriteService.getFavoritePage(getLoginUserId(), reqVO);
-        if (favorites.getTotal() <= 0) {
+        PageResult<ProductFavoriteDO> favoritePage = productFavoriteService.getFavoritePage(getLoginUserId(), reqVO);
+        if (CollUtil.isEmpty(favoritePage.getList())) {
             return success(PageResult.empty());
         }
-        List<ProductFavoriteDO> productFavoriteList = favorites.getList();
+
         // 得到商品 spu 信息
-        List<Long> spuIds = CollectionUtils.convertList(productFavoriteList, ProductFavoriteDO::getSpuId);
-        List<ProductSpuDO> spuList = productSpuService.getSpuList(spuIds);
-        //转换 VO
-        PageResult<AppFavoriteRespVO> pageResult = new PageResult<>(favorites.getTotal());
-        pageResult.setList(ProductFavoriteConvert.INSTANCE.convertList(productFavoriteList, spuList));
+        List<ProductFavoriteDO> favorites = favoritePage.getList();
+        List<Long> spuIds = convertList(favorites, ProductFavoriteDO::getSpuId);
+        List<ProductSpuDO> spus = productSpuService.getSpuList(spuIds);
+
+        // 转换 VO 结果
+        PageResult<AppFavoriteRespVO> pageResult = new PageResult<>(favoritePage.getTotal());
+        pageResult.setList(ProductFavoriteConvert.INSTANCE.convertList(favorites, spus));
         return success(pageResult);
     }
 

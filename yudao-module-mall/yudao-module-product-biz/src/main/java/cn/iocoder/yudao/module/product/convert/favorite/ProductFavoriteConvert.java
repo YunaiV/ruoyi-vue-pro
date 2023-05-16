@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.convert.favorite;
 
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDO;
@@ -13,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+
 @Mapper
 public interface ProductFavoriteConvert {
 
@@ -20,17 +21,18 @@ public interface ProductFavoriteConvert {
 
     ProductFavoriteDO convert(Long userId, AppFavoriteReqVO reqVO);
 
-    @Mapping(target = "id", source = "favoriteDO.id")
-    @Mapping(target = "spuName", source = "spuDO.name")
-    AppFavoriteRespVO convert(ProductSpuDO spuDO, ProductFavoriteDO favoriteDO);
+    @Mapping(target = "id", source = "favorite.id")
+    @Mapping(target = "spuName", source = "spu.name")
+    AppFavoriteRespVO convert(ProductSpuDO spu, ProductFavoriteDO favorite);
 
-    default List<AppFavoriteRespVO> convertList(List<ProductFavoriteDO> productFavoriteDOList, List<ProductSpuDO> productSpuDOList) {
-        List<AppFavoriteRespVO> resultList = new ArrayList<>(productFavoriteDOList.size());
-        Map<Long, ProductSpuDO> spuMap = CollectionUtils.convertMap(productSpuDOList, ProductSpuDO::getId);
-        for (ProductFavoriteDO item : productFavoriteDOList) {
-            ProductSpuDO spuDO = spuMap.get(item.getSpuId());
-            resultList.add(convert(spuDO, item));
+    default List<AppFavoriteRespVO> convertList(List<ProductFavoriteDO> favorites, List<ProductSpuDO> spus) {
+        List<AppFavoriteRespVO> resultList = new ArrayList<>(favorites.size());
+        Map<Long, ProductSpuDO> spuMap = convertMap(spus, ProductSpuDO::getId);
+        for (ProductFavoriteDO favorite : favorites) {
+            ProductSpuDO spuDO = spuMap.get(favorite.getSpuId());
+            resultList.add(convert(spuDO, favorite));
         }
         return resultList;
     }
+
 }

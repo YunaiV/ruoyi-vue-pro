@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
-@Schema(description = "用户 APP - 商品收藏 Request VO") // 用于收藏、取消收藏, 获取收藏
+@Schema(description = "用户 APP - 商品收藏 Request VO") // 用于收藏、取消收藏、获取收藏
 @Data
 public class AppFavoriteReqVO {
 
