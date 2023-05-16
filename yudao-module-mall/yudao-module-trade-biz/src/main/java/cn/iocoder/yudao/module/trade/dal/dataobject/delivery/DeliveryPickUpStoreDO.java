@@ -64,6 +64,7 @@ public class DeliveryPickUpStoreDO extends BaseDO {
      */
     private LocalTime closingTime;
 
+    // TODO @Jason：应该是 double？
     /**
      * 纬度
      */
