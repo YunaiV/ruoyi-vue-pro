@@ -29,9 +29,8 @@ public class DeliveryExpressTemplateChargeDO extends BaseDO {
      */
     private Long templateId;
 
-    // TODO @Jason：全国最好使用 0  @芋艿 Area.ID_CHINA 是 1
     /**
-     * 配送区域id 1:适用于全国
+     * 配送区域
      */
     private Integer areaId;
 

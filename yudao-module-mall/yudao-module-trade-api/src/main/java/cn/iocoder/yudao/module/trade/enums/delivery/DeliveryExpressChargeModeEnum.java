@@ -14,11 +14,13 @@ import java.util.Arrays;
 @AllArgsConstructor
 @Getter
 public enum DeliveryExpressChargeModeEnum implements IntArrayValuable {
-    BY_PIECE(1, "按件"),
-    BY_WEIGHT(2,"按重量"),
-    BY_VOLUME(3, "按体积");
+
+    PIECE(1, "按件"),
+    WEIGHT(2,"按重量"),
+    VOLUME(3, "按体积");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DeliveryExpressChargeModeEnum::getType).toArray();
+
     /**
      * 类型
      */
@@ -32,4 +34,5 @@ public enum DeliveryExpressChargeModeEnum implements IntArrayValuable {
     public int[] array() {
         return ARRAYS;
     }
+
 }

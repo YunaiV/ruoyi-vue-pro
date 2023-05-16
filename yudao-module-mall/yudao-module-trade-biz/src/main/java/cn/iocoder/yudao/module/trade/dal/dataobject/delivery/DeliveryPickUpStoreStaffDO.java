@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+// TODO @芋艿：后续再详细 review 一轮
 /**
  * 自提门店店员 DO
  *
@@ -16,6 +17,7 @@ import lombok.Data;
 @KeySequence("trade_delivery_pick_up_store_staff_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 public class DeliveryPickUpStoreStaffDO extends BaseDO {
+
     /**
      * 编号，自增
      */
@@ -24,6 +26,8 @@ public class DeliveryPickUpStoreStaffDO extends BaseDO {
 
     /**
      * 自提门店编号
+     *
+     * 关联 {@link DeliveryPickUpStoreDO#getId()}
      */
     private Long storeId;
 
@@ -40,4 +44,5 @@ public class DeliveryPickUpStoreStaffDO extends BaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+
 }

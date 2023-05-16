@@ -16,6 +16,7 @@ import lombok.Data;
 @KeySequence("trade_delivery_express_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 public class DeliveryExpressDO extends BaseDO {
+
     /**
      * 编号，自增
      */
@@ -33,7 +34,7 @@ public class DeliveryExpressDO extends BaseDO {
     private String name;
 
     /**
-     * 快递公司logo
+     * 快递公司 logo
      */
     private String logo;
 
