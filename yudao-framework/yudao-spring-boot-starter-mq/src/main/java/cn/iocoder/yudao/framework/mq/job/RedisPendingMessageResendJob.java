@@ -85,6 +85,7 @@ public class RedisPendingMessageResendJob {
                       .withStreamKey(listener.getStreamKey()));
                     // ack 消息消费完成
                     redisTemplate.getRedisTemplate().opsForStream().acknowledge(groupName, records.get(0));
+                    log.info("[processPendingMessage][消息({})重新投递成功]", records.get(0).getId());
                 }
             });
         });
