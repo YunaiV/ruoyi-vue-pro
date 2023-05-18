@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * 配送快递公司 DO
+ * 快递公司 DO
  *
  * @author jason
  */

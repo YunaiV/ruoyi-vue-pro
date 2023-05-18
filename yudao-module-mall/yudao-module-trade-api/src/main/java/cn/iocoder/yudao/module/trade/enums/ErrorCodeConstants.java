@@ -42,7 +42,11 @@ public interface ErrorCodeConstants {
     ErrorCode AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND = new ErrorCode(1011000110, "退款失败，售后单状态不是【待退款】");
     ErrorCode AFTER_SALE_CANCEL_FAIL_STATUS_NOT_APPLY_OR_AGREE = new ErrorCode(1011000111, "取消售后单失败，售后单状态不是【待审核】或【卖家同意】");
 
-    // ==========  Cart 模块 1-011-001-000 ==========
+    // ==========  Cart 模块 1-011-002-000 ==========
     ErrorCode CARD_ITEM_NOT_FOUND = new ErrorCode(1011002000, "购物车项不存在");
+
+    // ==========  物流配送模块 1-011-003-000 ==========
+    ErrorCode DELIVERY_EXPRESS_NOT_EXISTS = new ErrorCode(1011003000, "快递公司不存在");
+    ErrorCode EXPRESS_CODE_DUPLICATE = new ErrorCode(1011003001, "已经存在该编码的快递公司");
 
 }
