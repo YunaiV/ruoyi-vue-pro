@@ -94,6 +94,13 @@ public class TradeOrderDO extends BaseDO {
      * 商家备注
      */
     private String remark;
+    /**
+     * 是否评价
+     *
+     * true - 已评价
+     * false - 未评价
+     */
+    private Boolean commentStatus;
 
     // ========== 价格 + 支付基本信息 ==========
 
@@ -128,16 +135,17 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 商品原价（总），单位：分
      *
-     * 基于 {@link TradeOrderItemDO#getOriginalPrice()} 求和
+     * totalPrice = {@link TradeOrderItemDO#getPrice()} * {@link TradeOrderItemDO#getCount()} 求和
      *
      * 对应 taobao 的 trade.total_fee 字段
      */
-    private Integer originalPrice;
+    private Integer totalPrice;
+    // TODO 芋艿：是不是要删除这个字段？
     /**
      * 订单原价（总），单位：分
      *
-     * 基于 {@link OrderItem#getPayPrice()} 求和
-     * 和 {@link #originalPrice} 的差异：去除商品级优惠
+     * 1. orderPrice = {@link OrderItem#getPayPrice()} 求和
+     * 2. orderPrice = {@link #totalPrice} - 商品级优惠
      */
     private Integer orderPrice;
     /**
@@ -219,7 +227,7 @@ public class TradeOrderDO extends BaseDO {
 
     // ========== 售后基本信息 ==========
     /**
-     * 收货状态
+     * 售后状态
      *
      * 枚举 {@link TradeOrderAfterSaleStatusEnum}
      */

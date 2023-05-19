@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductProp
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageItemRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
@@ -191,7 +192,7 @@ public interface TradeOrderConvert {
                     if (CollUtil.isEmpty(properties)) {
                         continue;
                     }
-                    AppTradeOrderPageItemRespVO.Item item = orderVO.getItems().get(i);
+                    AppTradeOrderItemRespVO item = orderVO.getItems().get(i);
                     item.setProperties(new ArrayList<>(properties.size()));
                     // 遍历每个 properties，设置到 TradeOrderPageItemRespVO.Item 中
                     properties.forEach(property -> {
@@ -236,5 +237,7 @@ public interface TradeOrderConvert {
         return orderVO;
     }
     AppTradeOrderDetailRespVO convert3(TradeOrderDO order, List<TradeOrderItemDO> items);
+
+    AppTradeOrderItemRespVO convert03(TradeOrderItemDO bean);
 
 }

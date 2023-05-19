@@ -169,7 +169,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertNull(tradeOrderDO.getRemark());
         assertFalse(tradeOrderDO.getPayed());
         assertNull(tradeOrderDO.getPayTime());
-        assertEquals(tradeOrderDO.getOriginalPrice(), 230);
+        assertEquals(tradeOrderDO.getTotalPrice(), 230);
         assertEquals(tradeOrderDO.getOrderPrice(), 100);
         assertEquals(tradeOrderDO.getDiscountPrice(), 0);
         assertEquals(tradeOrderDO.getAdjustPrice(), 0);
@@ -204,8 +204,8 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         //assertEquals(tradeOrderItemDO01.getSpuName(), sku01.getSpuName()); TODO 找不到spuName
         assertEquals(tradeOrderItemDO01.getPicUrl(), sku01.getPicUrl());
         assertEquals(tradeOrderItemDO01.getCount(), 3);
-        assertEquals(tradeOrderItemDO01.getOriginalPrice(), 150);
-        assertEquals(tradeOrderItemDO01.getOriginalUnitPrice(), 50);
+//        assertEquals(tradeOrderItemDO01.getOriginalPrice(), 150);
+        assertEquals(tradeOrderItemDO01.getPrice(), 50);
         assertEquals(tradeOrderItemDO01.getDiscountPrice(), 20);
         assertEquals(tradeOrderItemDO01.getPayPrice(), 130);
         assertEquals(tradeOrderItemDO01.getOrderPartPrice(), 7);
@@ -224,8 +224,8 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         //assertEquals(tradeOrderItemDO02.getSpuName(), sku02.getSpuName()); TODO 找不到spuName
         assertEquals(tradeOrderItemDO02.getPicUrl(), sku02.getPicUrl());
         assertEquals(tradeOrderItemDO02.getCount(), 4);
-        assertEquals(tradeOrderItemDO02.getOriginalPrice(), 80);
-        assertEquals(tradeOrderItemDO02.getOriginalUnitPrice(), 20);
+//        assertEquals(tradeOrderItemDO02.getOriginalPrice(), 80);
+        assertEquals(tradeOrderItemDO02.getPrice(), 20);
         assertEquals(tradeOrderItemDO02.getDiscountPrice(), 40);
         assertEquals(tradeOrderItemDO02.getPayPrice(), 40);
         assertEquals(tradeOrderItemDO02.getOrderPartPrice(), 15);

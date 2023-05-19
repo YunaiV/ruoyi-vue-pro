@@ -84,29 +84,23 @@ public class TradeOrderItemDO extends BaseDO {
      * 购买数量
      */
     private Integer count;
-//    /**
-//     * 是否评论 TODO
-//     *
-//     * false - 未评论
-//     * true - 已评论
-//     */
-//    private Boolean commented;
+    /**
+     * 是否评价
+     *
+     * true - 已评价
+     * false - 未评价
+     */
+    private Boolean commentStatus;
 
     // ========== 价格 + 支付基本信息 ==========
 
-    /**
-     * 商品原价（总），单位：分
-     *
-     * = {@link #originalUnitPrice} * {@link #getCount()}
-     */
-    private Integer originalPrice;
     /**
      * 商品原价（单），单位：分
      *
      * 对应 ProductSkuDO 的 price 字段
      * 对应 taobao 的 order.price 字段
      */
-    private Integer originalUnitPrice;
+    private Integer price;
     /**
      * 商品优惠（总），单位：分
      *
@@ -116,9 +110,9 @@ public class TradeOrderItemDO extends BaseDO {
      */
     private Integer discountPrice;
     /**
-     * 子订单实付金额，不算主订单分摊金额，单位：分
+     * 子订单实付金额（总），不算主订单分摊金额，单位：分
      *
-     * = {@link #originalPrice}
+     * = {@link #price} * {@link #count}
      * - {@link #discountPrice}
      *
      * 对应 taobao 的 order.payment 字段

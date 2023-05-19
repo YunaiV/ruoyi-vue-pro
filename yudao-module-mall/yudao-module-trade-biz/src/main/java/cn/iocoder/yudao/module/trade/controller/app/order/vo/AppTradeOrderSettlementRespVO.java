@@ -61,7 +61,7 @@ public class AppTradeOrderSettlementRespVO {
     public static class Price {
 
         @Schema(description = "商品原价（总），单位：分", required = true, example = "500")
-        private Integer originalPrice;
+        private Integer totalPrice;
 
         @Schema(description = "运费金额，单位：分", required = true, example = "50")
         private Integer deliveryPrice;

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -53,7 +54,7 @@ public class AppTradeOrderController {
         AppTradeOrderSettlementRespVO settlement = new AppTradeOrderSettlementRespVO();
 
         AppTradeOrderSettlementRespVO.Price price = new AppTradeOrderSettlementRespVO.Price();
-        price.setOriginalPrice(1000);
+        price.setTotalPrice(1000);
         price.setDeliveryPrice(200);
         price.setCouponPrice(100);
         price.setPointPrice(50);
@@ -182,6 +183,23 @@ public class AppTradeOrderController {
         orderCount.put("uncommentedCount", 3);
         orderCount.put("allPrice", 300);
         return success(orderCount);
+    }
+
+    // ========== 订单项 ==========
+
+    @GetMapping("/item/get")
+    @Operation(summary = "获得交易订单项")
+    @Parameter(name = "id", description = "交易订单项编号")
+    public CommonResult<AppTradeOrderItemRespVO> getOrderItem(@RequestParam("id") Long id) {
+        TradeOrderItemDO item = tradeOrderService.getOrderItem(getLoginUserId(), id);
+        return success(TradeOrderConvert.INSTANCE.convert03(item));
+    }
+
+    // TODO 芋艿：待实现
+    @PostMapping("/item/create-comment")
+    @Operation(summary = "创建交易订单项的评价")
+    public CommonResult<Long> createOrderItemComment() {
+        return success(0L);
     }
 
 }

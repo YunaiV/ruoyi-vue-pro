@@ -123,12 +123,16 @@ public class AppTradeOrderDetailRespVO {
 
         @Schema(description = "商品 SPU 编号", required = true, example = "1")
         private Long spuId;
-
         @Schema(description = "商品 SPU 名称", required = true, example = "芋道源码")
         private String spuName;
 
         @Schema(description = "商品 SKU 编号", required = true, example = "1")
         private Long skuId;
+
+        /**
+         * 属性数组
+         */
+        private List<AppProductPropertyValueDetailRespVO> properties;
 
         @Schema(description = "商品图片", required = true, example = "https://www.iocoder.cn/1.png")
         private String picUrl;
@@ -136,16 +140,13 @@ public class AppTradeOrderDetailRespVO {
         @Schema(description = "购买数量", required = true, example = "1")
         private Integer count;
 
-        @Schema(description = "商品原价（总）", required = true, example = "100")
-        private Integer originalPrice;
+        @Schema(description = "是否评价", required = true, example = "true")
+        private Boolean commentStatus;
+
+        // ========== 价格 + 支付基本信息 ==========
 
         @Schema(description = "商品原价（单）", required = true, example = "100")
-        private Integer originalUnitPrice;
-
-        /**
-         * 属性数组
-         */
-        private List<AppProductPropertyValueDetailRespVO> properties;
+        private Integer price;
 
     }
 
