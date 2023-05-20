@@ -451,6 +451,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return tradeOrderMapper.selectPage(reqVO, userId);
     }
 
+    @Override
+    public Long getOrderCount(Long userId, Integer status, Boolean commentStatus) {
+        return tradeOrderMapper.selectCountByUserIdAndStatus(userId, status, commentStatus);
+    }
+
     // =================== Order Item ===================
 
     @Override

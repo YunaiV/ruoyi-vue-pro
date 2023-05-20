@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderI
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -171,17 +172,17 @@ public class AppTradeOrderController {
         return success(TradeOrderConvert.INSTANCE.convertPage02(pageResult, orderItems, propertyValueDetails));
     }
 
-    // TODO 芋艿：后续实现
     @GetMapping("/get-count")
     @Operation(summary = "获得交易订单数量")
-    public CommonResult<Map<String, Integer>> getOrderCount() {
-        Map<String, Integer> orderCount = new HashMap<>();
-        orderCount.put("allCount", 10);
-        orderCount.put("unpaidCount", 5);
-        orderCount.put("undeliveredCount", 2);
-        orderCount.put("deliveredCount", 1);
-        orderCount.put("uncommentedCount", 3);
-        orderCount.put("allPrice", 300);
+    public CommonResult<Map<String, Long>> getOrderCount() {
+        Map<String, Long> orderCount = new HashMap<>();
+        // 全部
+        orderCount.put("allCount", tradeOrderService.getOrderCount(getLoginUserId(), null, null));
+        // 待付款（未支付）
+        orderCount.put("unpaidCount", tradeOrderService.getOrderCount(getLoginUserId(), TradeOrderStatusEnum.UNPAID.getStatus(), null));
+        orderCount.put("undeliveredCount", tradeOrderService.getOrderCount(getLoginUserId(), TradeOrderStatusEnum.UNDELIVERED.getStatus(), null));
+        orderCount.put("deliveredCount", tradeOrderService.getOrderCount(getLoginUserId(),  TradeOrderStatusEnum.DELIVERED.getStatus(), null));
+        orderCount.put("uncommentedCount", tradeOrderService.getOrderCount(getLoginUserId(), TradeOrderStatusEnum.COMPLETED.getStatus(), false));
         return success(orderCount);
     }
 
