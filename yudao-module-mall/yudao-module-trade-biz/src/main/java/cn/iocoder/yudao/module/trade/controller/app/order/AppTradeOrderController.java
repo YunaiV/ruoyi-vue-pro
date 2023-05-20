@@ -180,8 +180,11 @@ public class AppTradeOrderController {
         orderCount.put("allCount", tradeOrderService.getOrderCount(getLoginUserId(), null, null));
         // 待付款（未支付）
         orderCount.put("unpaidCount", tradeOrderService.getOrderCount(getLoginUserId(), TradeOrderStatusEnum.UNPAID.getStatus(), null));
+        // 待发货
         orderCount.put("undeliveredCount", tradeOrderService.getOrderCount(getLoginUserId(), TradeOrderStatusEnum.UNDELIVERED.getStatus(), null));
+        // 待收货
         orderCount.put("deliveredCount", tradeOrderService.getOrderCount(getLoginUserId(),  TradeOrderStatusEnum.DELIVERED.getStatus(), null));
+        // 待评价
         orderCount.put("uncommentedCount", tradeOrderService.getOrderCount(getLoginUserId(), TradeOrderStatusEnum.COMPLETED.getStatus(), false));
         return success(orderCount);
     }
