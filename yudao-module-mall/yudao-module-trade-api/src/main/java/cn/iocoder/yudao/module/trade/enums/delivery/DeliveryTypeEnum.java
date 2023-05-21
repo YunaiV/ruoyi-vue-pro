@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.enums.delivery;
+package cn.iocoder.yudao.module.trade.enums.delivery;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
@@ -15,9 +15,8 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum DeliveryTypeEnum implements IntArrayValuable {
 
-    // TODO 芋艿：英文单词，需要再想下；
     EXPRESS(1, "快递发货"),
-    USER(2, "用户自提"),;
+    PICK_UP(2, "用户自提"),;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DeliveryTypeEnum::getMode).toArray();
 

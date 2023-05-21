@@ -212,8 +212,9 @@ public interface TradeOrderConvert {
     AppProductPropertyValueDetailRespVO convert02(ProductPropertyValueDetailRespDTO bean);
 
     default AppTradeOrderDetailRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
-                                                List<ProductPropertyValueDetailRespDTO> propertyValueDetails) {
+                                                List<ProductPropertyValueDetailRespDTO> propertyValueDetails, TradeOrderProperties tradeOrderProperties) {
         AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
+        orderVO.setPayExpireTime(addTime(tradeOrderProperties.getExpireTime()));
         // 处理商品属性
         Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);
         for (int i = 0; i < orderItems.size(); i++) {
@@ -221,7 +222,7 @@ public interface TradeOrderConvert {
             if (CollUtil.isEmpty(properties)) {
                 continue;
             }
-            AppTradeOrderDetailRespVO.Item item = orderVO.getItems().get(i);
+            AppTradeOrderItemRespVO item = orderVO.getItems().get(i);
             item.setProperties(new ArrayList<>(properties.size()));
             // 遍历每个 properties，设置到 TradeOrderPageItemRespVO.Item 中
             properties.forEach(property -> {

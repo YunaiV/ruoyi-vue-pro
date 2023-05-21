@@ -178,12 +178,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         tradeOrderDO.setNo(IdUtil.getSnowflakeNextId() + ""); // TODO @LeeYan9: 思考下, 怎么生成好点哈; 这个是会展示给用户的;
         tradeOrderDO.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
         tradeOrderDO.setType(TradeOrderTypeEnum.NORMAL.getType());
-        tradeOrderDO.setAfterSaleStatus(TradeOrderAfterSaleStatusEnum.NONE.getStatus());
+        tradeOrderDO.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         tradeOrderDO.setProductCount(getSumValue(order.getItems(),  PriceCalculateRespDTO.OrderItem::getCount, Integer::sum));
         tradeOrderDO.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
         tradeOrderDO.setAdjustPrice(0).setPayed(false); // 支付信息
         tradeOrderDO.setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus()); // 物流信息
-        tradeOrderDO.setAfterSaleStatus(TradeOrderAfterSaleStatusEnum.NONE.getStatus()).setRefundPrice(0); // 退款信息
+        tradeOrderDO.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0); // 退款信息
         tradeOrderMapper.insert(tradeOrderDO);
         return tradeOrderDO;
     }
@@ -491,7 +491,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         Integer orderRefundPrice = order.getRefundPrice() + refundPrice;
         if (isAllOrderItemAfterSaleSuccess(order.getId())) { // 如果都售后成功，则需要取消订单
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
-                    .setAfterSaleStatus(TradeOrderAfterSaleStatusEnum.ALL.getStatus()).setRefundPrice(orderRefundPrice)
+                    .setRefundStatus(TradeOrderRefundStatusEnum.ALL.getStatus()).setRefundPrice(orderRefundPrice)
                     .setCancelType(TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE.getType()).setCancelTime(LocalDateTime.now()));
 
             // TODO 芋艿：记录订单日志
@@ -499,7 +499,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             // TODO 芋艿：站内信？
         } else { // 如果部分售后，则更新退款金额
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
-                    .setAfterSaleStatus(TradeOrderAfterSaleStatusEnum.PART.getStatus()).setRefundPrice(orderRefundPrice));
+                    .setRefundStatus(TradeOrderRefundStatusEnum.PART.getStatus()).setRefundPrice(orderRefundPrice));
         }
 
         // TODO 芋艿：未来如果有分佣，需要更新相关分佣订单为已失效

@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
+import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,6 +46,9 @@ public class AppTradeOrderController {
 
     @Resource
     private ProductPropertyValueApi productPropertyValueApi;
+
+    @Resource
+    private TradeOrderProperties tradeOrderProperties;
 
     @GetMapping("/settlement")
     @Operation(summary = "获得订单结算信息")
@@ -154,7 +158,8 @@ public class AppTradeOrderController {
         List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
                 .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
         // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, propertyValueDetails));
+        return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems,
+                propertyValueDetails, tradeOrderProperties));
     }
 
     @GetMapping("/page")

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 
-import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductPropertyValueDetailRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -38,6 +38,9 @@ public class AppTradeOrderDetailRespVO {
     @Schema(description = "订单取消时间")
     private LocalDateTime cancelTime;
 
+    @Schema(description = "是否评价", required = true, example = "true")
+    private Boolean commentStatus;
+
     // ========== 价格 + 支付基本信息 ==========
 
     @Schema(description = "是否已支付", required = true, example = "true")
@@ -48,6 +51,9 @@ public class AppTradeOrderDetailRespVO {
 
     @Schema(description = "付款时间")
     private LocalDateTime payTime;
+
+    @Schema(description = "付款超时时间", required = true)
+    private LocalDateTime payExpireTime;
 
     @Schema(description = "支付渠道", required = true, example = "wx_lite_pay")
     private String payChannelCode;
@@ -71,6 +77,9 @@ public class AppTradeOrderDetailRespVO {
     private Integer payPrice;
 
     // ========== 收件 + 物流基本信息 ==========
+
+    @Schema(description = "配送方式", required = true, example = "1")
+    private Integer deliveryType;
 
     @Schema(description = "发货物流单号", example = "1024")
     private String logisticsNo;
@@ -112,42 +121,6 @@ public class AppTradeOrderDetailRespVO {
     /**
      * 订单项数组
      */
-    private List<Item> items;
-
-    @Schema(description = "用户 App - 交易订单的分页项的订单项目")
-    @Data
-    public static class Item {
-
-        @Schema(description = "编号", required = true, example = "1")
-        private Long id;
-
-        @Schema(description = "商品 SPU 编号", required = true, example = "1")
-        private Long spuId;
-        @Schema(description = "商品 SPU 名称", required = true, example = "芋道源码")
-        private String spuName;
-
-        @Schema(description = "商品 SKU 编号", required = true, example = "1")
-        private Long skuId;
-
-        /**
-         * 属性数组
-         */
-        private List<AppProductPropertyValueDetailRespVO> properties;
-
-        @Schema(description = "商品图片", required = true, example = "https://www.iocoder.cn/1.png")
-        private String picUrl;
-
-        @Schema(description = "购买数量", required = true, example = "1")
-        private Integer count;
-
-        @Schema(description = "是否评价", required = true, example = "true")
-        private Boolean commentStatus;
-
-        // ========== 价格 + 支付基本信息 ==========
-
-        @Schema(description = "商品原价（单）", required = true, example = "100")
-        private Integer price;
-
-    }
+    private List<AppTradeOrderItemRespVO> items;
 
 }

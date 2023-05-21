@@ -3,8 +3,9 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO.OrderItem;
+import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderDeliveryStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
@@ -180,6 +181,12 @@ public class TradeOrderDO extends BaseDO {
 
     // ========== 收件 + 物流基本信息 ==========
     /**
+     * 配送方式
+     *
+     * 枚举 {@link DeliveryTypeEnum}
+     */
+    private Integer deliveryType;
+    /**
      * 配置模板的编号
      *
      * 关联 DeliveryTemplateDO 的 id 编号
@@ -229,9 +236,9 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 售后状态
      *
-     * 枚举 {@link TradeOrderAfterSaleStatusEnum}
+     * 枚举 {@link TradeOrderRefundStatusEnum}
      */
-    private Integer afterSaleStatus;
+    private Integer refundStatus;
     /**
      * 退款金额，单位：分
      *

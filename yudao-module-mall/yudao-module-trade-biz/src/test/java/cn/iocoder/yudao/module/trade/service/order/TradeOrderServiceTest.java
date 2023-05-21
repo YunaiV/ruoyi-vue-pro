@@ -185,7 +185,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderDO.getReceiverMobile(), "15601691300");
         assertEquals(tradeOrderDO.getReceiverAreaId(), 3306);
         assertEquals(tradeOrderDO.getReceiverDetailAddress(), "土豆村");
-        assertEquals(tradeOrderDO.getAfterSaleStatus(), TradeOrderAfterSaleStatusEnum.NONE.getStatus());
+        assertEquals(tradeOrderDO.getRefundStatus(), TradeOrderRefundStatusEnum.NONE.getStatus());
         assertEquals(tradeOrderDO.getRefundPrice(), 0);
         assertEquals(tradeOrderDO.getCouponPrice(), 30);
         assertEquals(tradeOrderDO.getPointPrice(), 10);
