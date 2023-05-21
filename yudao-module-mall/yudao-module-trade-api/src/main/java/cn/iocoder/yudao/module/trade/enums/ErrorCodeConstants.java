@@ -48,5 +48,6 @@ public interface ErrorCodeConstants {
     // ==========  物流配送模块 1-011-003-000 ==========
     ErrorCode DELIVERY_EXPRESS_NOT_EXISTS = new ErrorCode(1011003000, "快递公司不存在");
     ErrorCode EXPRESS_CODE_DUPLICATE = new ErrorCode(1011003001, "已经存在该编码的快递公司");
-
+    ErrorCode EXPRESS_TEMPLATE_NOT_EXISTS = new ErrorCode(1011003002, "运费模板不存在");
+    ErrorCode EXPRESS_TEMPLATE_NAME_DUPLICATE = new ErrorCode(1011003002, "已经存在该运费模板名");
 }

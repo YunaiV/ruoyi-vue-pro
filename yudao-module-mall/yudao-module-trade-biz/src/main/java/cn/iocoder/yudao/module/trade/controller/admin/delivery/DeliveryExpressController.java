@@ -71,7 +71,7 @@ public class DeliveryExpressController {
 
     @GetMapping("/page")
     @Operation(summary = "获得快递公司分页")
-    @PreAuthorize("@ss.hasPermission('trade:delivery-express:query')")
+    @PreAuthorize("@ss.hasPermission('trade:delivery:express:query')")
     public CommonResult<PageResult<DeliveryExpressRespVO>> getDeliveryExpressPage(@Valid DeliveryExpressPageReqVO pageVO) {
         PageResult<DeliveryExpressDO> pageResult = deliveryExpressService.getDeliveryExpressPage(pageVO);
         return success(DeliveryExpressConvert.INSTANCE.convertPage(pageResult));

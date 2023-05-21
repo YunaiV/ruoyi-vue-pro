@@ -17,7 +17,7 @@ import lombok.Data;
 public class DeliveryExpressTemplateFreeDO extends BaseDO {
 
     /**
-     * 编号，自增
+     * 编号
      */
     @TableId
     private Long id;

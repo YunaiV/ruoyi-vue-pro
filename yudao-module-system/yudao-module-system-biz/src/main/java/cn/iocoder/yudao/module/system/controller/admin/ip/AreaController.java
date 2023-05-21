@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -28,10 +29,10 @@ public class AreaController {
 
     @GetMapping("/tree")
     @Operation(summary = "获得地区树")
-    public CommonResult<List<AreaNodeRespVO>> getAreaTree() {
-        Area area = AreaUtils.getArea(Area.ID_CHINA);
-        Assert.notNull(area, "获取不到中国");
-        return success(AreaConvert.INSTANCE.convertList(area.getChildren()));
+    public CommonResult<List<AreaNodeRespVO>> getAreaTree(Integer id) {
+        Area area = AreaUtils.getArea(id);
+        Assert.notNull(area, String.format("获取不到 id : %d的区域", id));
+        return success(AreaConvert.INSTANCE.convertList(Arrays.asList(area)));
     }
 
     @GetMapping("/get-by-ip")
