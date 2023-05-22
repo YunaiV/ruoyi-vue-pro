@@ -23,6 +23,7 @@
 <!--        <module>yudao-module-mall</module>-->
         <!-- 示例项目 -->
         <module>yudao-example</module>
+        <module>yudao-module-jl</module>
     </modules>
 
     <name>${project.artifactId}</name>
