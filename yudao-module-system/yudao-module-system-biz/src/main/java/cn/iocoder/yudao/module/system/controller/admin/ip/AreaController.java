@@ -6,17 +6,18 @@ import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.IPUtils;
 import cn.iocoder.yudao.module.system.controller.admin.ip.vo.AreaNodeRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.ip.vo.LazyAreaNodeRespVO;
 import cn.iocoder.yudao.module.system.convert.ip.AreaConvert;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -32,6 +33,24 @@ public class AreaController {
         Area area = AreaUtils.getArea(Area.ID_CHINA);
         Assert.notNull(area, "获取不到中国");
         return success(AreaConvert.INSTANCE.convertList(area.getChildren()));
+    }
+
+    @GetMapping("/getChildrenArea")
+    @Operation(summary = "获得地区的下级区域")
+    public CommonResult<List<LazyAreaNodeRespVO>> getChildrenArea(Integer id) {
+        Area area = AreaUtils.getArea(id);
+        Assert.notNull(area, String.format("获取不到 id : %d的区域", id));
+        return success(AreaConvert.INSTANCE.convertList2(area.getChildren()));
+    }
+
+    @PostMapping("/list")
+    @Operation(summary = "通过区域ids获得地区列表")
+    public CommonResult<List<LazyAreaNodeRespVO>> list(@RequestBody Set<Integer> areaIds) {
+        List<Area> areaList = new ArrayList<>(areaIds.size());
+        for (Integer areaId : areaIds) {
+            areaList.add(AreaUtils.getArea(areaId));
+        }
+        return success(AreaConvert.INSTANCE.convertList2(areaList));
     }
 
     @GetMapping("/get-by-ip")

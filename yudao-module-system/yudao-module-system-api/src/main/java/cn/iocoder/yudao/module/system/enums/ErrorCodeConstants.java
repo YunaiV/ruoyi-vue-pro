@@ -152,7 +152,7 @@ public interface ErrorCodeConstants {
 
     // ========== 邮件发送 1002025000 ==========
     ErrorCode MAIL_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002025000, "模板参数({})缺失");
-    ErrorCode MAIL_SEND_MAIL_NOT_EXISTS = new ErrorCode(1002025000, "邮箱不存在");
+    ErrorCode MAIL_SEND_MAIL_NOT_EXISTS = new ErrorCode(1002025001, "邮箱不存在");
 
     // ========== 站内信模版 1002026000 ==========
     ErrorCode NOTIFY_TEMPLATE_NOT_EXISTS = new ErrorCode(1002026000, "站内信模版不存在");
@@ -161,6 +161,6 @@ public interface ErrorCodeConstants {
     // ========== 站内信模版 1002027000 ==========
 
     // ========== 站内信发送 1002028000 ==========
-    ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002025000, "模板参数({})缺失");
+    ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002028000, "模板参数({})缺失");
 
 }

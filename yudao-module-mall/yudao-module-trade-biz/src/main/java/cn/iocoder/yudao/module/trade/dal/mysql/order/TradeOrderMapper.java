@@ -40,7 +40,14 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<TradeOrderDO>()
                 .eq(TradeOrderDO::getUserId, userId)
                 .eqIfPresent(TradeOrderDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(TradeOrderDO::getCommentStatus, reqVO.getCommentStatus())
                 .orderByDesc(TradeOrderDO::getId)); // TODO 芋艿：未来不同的 status，不同的排序
     }
 
+    default Long selectCountByUserIdAndStatus(Long userId, Integer status, Boolean commentStatus) {
+        return selectCount(new LambdaQueryWrapperX<TradeOrderDO>()
+                .eq(TradeOrderDO::getUserId, userId)
+                .eqIfPresent(TradeOrderDO::getStatus, status)
+                .eqIfPresent(TradeOrderDO::getCommentStatus, commentStatus));
+    }
 }

@@ -305,14 +305,147 @@ CREATE TABLE `product_favorite` (
     `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
     `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
     PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB COMMENT='喜欢的商品表';
+) ENGINE=InnoDB COMMENT='商品收藏表';
+
+-- Table structure for trade_delivery_express_template
+-- ----------------------------
+DROP TABLE IF EXISTS `trade_delivery_express_template`;
+CREATE TABLE `trade_delivery_express_template` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+   `name` varchar(64)  NOT NULL COMMENT '模板名称',
+   `charge_mode` tinyint NOT NULL DEFAULT 1 COMMENT '配送计费方式 1:按件 2:按重量 3:按体积',
+   `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='快递运费模板';
+
+-- ----------------------------
+-- Table structure for trade_delivery_express_template_free
+-- ----------------------------
+DROP TABLE IF EXISTS `trade_delivery_express_template_free`;
+CREATE TABLE `trade_delivery_express_template_free` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+   `template_id` bigint NOT NULL COMMENT '配送模板编号, 对应delivery_template表id',
+   `area_id` int NOT NULL  COMMENT '包邮区域id',
+   `free_price` int NOT NULL  COMMENT '包邮金额(单位分) 订单总金额>包邮金额才免运费',
+   `free_count` int NOT NULL DEFAULT 0 COMMENT '包邮件数,订单总件数>包邮件数才免运费',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='快递运费模板包邮配置';
+
+-- ----------------------------
+-- Table structure for trade_delivery_express_template_charge
+-- ----------------------------
+DROP TABLE IF EXISTS `trade_delivery_express_template_charge`;
+CREATE TABLE `trade_delivery_express_template_charge` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+   `template_id` bigint NOT NULL COMMENT '配送模板编号, 对应delivery_template表id',
+   `area_id` int NOT NULL  COMMENT '配送区域id 1:适用于全国',
+   `charge_mode` tinyint NOT NULL  COMMENT '配送计费方式 1:按件 2:按重量 3:按体积',
+   `start_count` double NOT NULL  COMMENT '首件数量(件数,重量，或体积)',
+   `start_price`  int NOT NULL  COMMENT '起步价(单位分)',
+   `extra_count` double NOT NULL  COMMENT '续件数量(件,重量，或体积)',
+   `extra_price`  int NOT NULL  COMMENT '额外价(单位分)',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='快递运费模板计费配置';
+
+-- ----------------------------
+-- Table structure for trade_delivery_pick_up_store
+-- ----------------------------
+DROP TABLE IF EXISTS `trade_delivery_pick_up_store`;
+CREATE TABLE `trade_delivery_pick_up_store` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+   `name` varchar(64)  NOT NULL COMMENT '门店名称',
+   `introduction` varchar(256)  COMMENT '门店简介',
+   `phone` varchar(16) NOT NULL COMMENT '门店手机',
+   `area_id` int NOT NULL  COMMENT '区域id',
+   `detail_address` varchar(256) NOT NULL COMMENT '门店详细地址',
+   `logo` varchar(256) NOT NULL COMMENT '门店logo',
+   `opening_time` time NOT NULL  COMMENT '营业开始时间',
+   `closing_time` time NOT NULL  COMMENT '营业结束时间',
+   `latitude`  varchar(128)  NOT NULL  COMMENT '纬度',
+   `longitude` varchar(128) NOT NULL  COMMENT '经度',
+   `status` tinyint NOT NULL DEFAULT 0 COMMENT '门店状态（0正常 1停用）',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='自提门店';
+
+-- ----------------------------
+-- Table structure for trade_delivery_pick_up_store_staff
+-- ----------------------------
+DROP TABLE IF EXISTS `trade_delivery_pick_up_store_staff`;
+CREATE TABLE `trade_delivery_pick_up_store_staff` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+    store_id bigint NOT NULL  COMMENT '自提门店编号',
+   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态（0正常 1停用）',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='自提门店店员';
+
+-- ----------------------------
+-- Table structure for trade_delivery_pick_up_store_staff
+-- ----------------------------
+DROP TABLE IF EXISTS `trade_delivery_pick_up_store_staff`;
+CREATE TABLE `trade_delivery_pick_up_store_staff` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+   `admin_user_id` bigint  NOT NULL COMMENT '管理员用户id',
+    store_id bigint NOT NULL  COMMENT '自提门店编号',
+   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态（0正常 1停用）',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='自提门店店员';
 
 
 -- ----------------------------
--- Records of product_spu
+-- Table structure for trade_delivery_express
 -- ----------------------------
-BEGIN;
-COMMIT;
+DROP TABLE IF EXISTS `trade_delivery_express`;
+CREATE TABLE `trade_delivery_express` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+   `code` varchar(64) NOT NULL  COMMENT '快递公司编号',
+   `name` varchar(64) NOT NULL  COMMENT '快递公司名称',
+   `logo` varchar(256) COMMENT '快递公司logo',
+   `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
+   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态（0正常 1停用）',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='快递公司';
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -347,6 +480,21 @@ INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2027, 'Banner创建', 'market:banner:create', 3, 2, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2028, 'Banner更新', 'market:banner:update', 3, 3, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2029, 'Banner删除', 'market:banner:delete', 3, 4, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2164, '配送管理', '', 1, 0, 2072, 'delivery', '', '', '', 0, b'1', b'1', b'1', '1', '2023-05-18 09:18:02', '1', '2023-05-18 09:48:48', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2165, '快递发货', '', 1, 0, 2164, 'express', '', '', '', 0, b'1', b'1', b'1', '1', '2023-05-18 09:22:06', '1', '2023-05-18 09:22:06', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2166, '门店自提', '', 1, 1, 2164, 'pick-up-store', '', '', '', 0, b'1', b'1', b'1', '1', '2023-05-18 09:23:14', '1', '2023-05-18 09:23:14', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2167, '快递公司', '', 2, 0, 2165, 'express', '', 'mall/trade/delivery/express/index', 'Express', 0, b'1', b'1', b'1', '1', '2023-05-18 09:27:21', '1', '2023-05-18 22:11:14', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2168, '快递公司查询', 'trade:delivery:express:query', 3, 1, 2167, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-18 09:37:53', '', '2023-05-18 09:37:53', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2169, '快递公司创建', 'trade:delivery:express:create', 3, 2, 2167, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-18 09:37:53', '', '2023-05-18 09:37:53', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2170, '快递公司更新', 'trade:delivery:express:update', 3, 3, 2167, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-18 09:37:53', '', '2023-05-18 09:37:53', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2171, '快递公司删除', 'trade:delivery:express:delete', 3, 4, 2167, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-18 09:37:53', '', '2023-05-18 09:37:53', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2172, '快递公司导出', 'trade:delivery:express:export', 3, 5, 2167, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-18 09:37:53', '', '2023-05-18 09:37:53', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2178, '快递运费模板导出', 'trade:delivery:express-template:export', 3, 5, 2173, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-20 06:49:53', '', '2023-05-20 06:49:53', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2177, '快递运费模板删除', 'trade:delivery:express-template:delete', 3, 4, 2173, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-20 06:49:53', '', '2023-05-20 06:49:53', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2176, '快递运费模板更新', 'trade:delivery:express-template:update', 3, 3, 2173, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-20 06:49:53', '', '2023-05-20 06:49:53', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2175, '快递运费模板创建', 'trade:delivery:express-template:create', 3, 2, 2173, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-20 06:49:53', '', '2023-05-20 06:49:53', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2174, '快递运费模板查询', 'trade:delivery:express-template:query', 3, 1, 2173, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-20 06:49:53', '', '2023-05-20 06:49:53', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2173, '运费模版', 'trade:delivery:express-template:query', 2, 1, 2165, 'express-template', '', 'mall/trade/delivery/expressTemplate/index', 'ExpressTemplate', 0, b'1', b'1', b'1', '1', '2023-05-20 06:48:10', '1', '2023-05-20 06:48:29', b'0');
 BEGIN;
 
 BEGIN;
@@ -359,4 +507,14 @@ INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, 
 INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '包', 7, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
 INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '双', 8, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
 INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '卷', 9, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
+COMMIT;
+
+-- ----------------------------
+-- 数字字典，快递计费方式
+-- ----------------------------
+BEGIN;
+INSERT INTO `ruoyi-vue-pro`.`system_dict_type`(`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `deleted_time`) VALUES (169, '快递计费方式', 'trade_delivery_express_charge_mode', 0, '用于商城交易模块配送管理', '1', '2023-05-21 22:45:03', '1', '2023-05-21 22:45:03', b'0', '1970-01-01 00:00:00');
+INSERT INTO `ruoyi-vue-pro`.`system_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1237, 2, '按体积', '3', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', '2023-05-21 22:47:18', '1', '2023-05-21 22:47:18', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1236, 1, '按重量', '2', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', '2023-05-21 22:46:58', '1', '2023-05-21 22:46:58', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1235, 0, '按件', '1', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', '2023-05-21 22:46:40', '1', '2023-05-21 22:46:40', b'0');
 COMMIT;

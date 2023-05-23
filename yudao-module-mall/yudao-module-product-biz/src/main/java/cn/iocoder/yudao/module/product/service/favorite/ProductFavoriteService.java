@@ -4,31 +4,47 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoritePageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteRespVO;
+import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDO;
 
 import javax.validation.Valid;
 
 /**
- * 喜爱商品 Service 接口
+ * 商品收藏 Service 接口
  *
  * @author jason
  */
 public interface ProductFavoriteService {
 
     /**
-     * 商品收藏
-     * @param reqVO 请求vo
+     * 创建商品收藏
+     *
+     * @param userId 用户 id
+     * @param reqVO 请求 vo
      */
-    Boolean collect(@Valid  AppFavoriteReqVO reqVO);
+    Long createFavorite(Long userId, @Valid AppFavoriteReqVO reqVO);
 
     /**
-     * 取消商品收藏 (通过商品详情页面)
-     * @param reqVO 请求vo
+     * 取消商品收藏
+     *
+     * @param userId 用户 id
+     * @param reqVO 请求 vo
      */
-    Boolean cancelCollect(@Valid AppFavoriteReqVO reqVO);
+    void deleteFavorite(Long userId, @Valid AppFavoriteReqVO reqVO);
 
     /**
      * 分页查询用户收藏列表
+     *
+     * @param userId 用户 id
      * @param reqVO 请求 vo
      */
-    PageResult<AppFavoriteRespVO> pageCollectList(@Valid AppFavoritePageReqVO reqVO);
+    PageResult<ProductFavoriteDO> getFavoritePage(Long userId, @Valid AppFavoritePageReqVO reqVO);
+
+    /**
+     * 获取收藏过商品
+     *
+     * @param userId 用户id
+     * @param reqVO 请求 vo
+     */
+    ProductFavoriteDO getFavorite(Long userId, @Valid AppFavoriteReqVO reqVO);
+
 }

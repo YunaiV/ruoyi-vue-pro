@@ -91,6 +91,16 @@ public interface TradeOrderService {
      */
     PageResult<TradeOrderDO> getOrderPage(Long userId, AppTradeOrderPageReqVO reqVO);
 
+    /**
+     * 【会员】获得交易订单数量
+     *
+     * @param userId       用户编号
+     * @param status       订单状态。如果为空，则不进行筛选
+     * @param commonStatus 评价状态。如果为空，则不进行筛选
+     * @return 订单数量
+     */
+    Long getOrderCount(Long userId, Integer status, Boolean commonStatus);
+
     // =================== Order Item ===================
 
     /**

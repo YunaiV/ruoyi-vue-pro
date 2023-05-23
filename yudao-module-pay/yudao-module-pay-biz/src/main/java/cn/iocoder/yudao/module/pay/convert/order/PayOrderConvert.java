@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespD
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
-import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
@@ -28,6 +27,7 @@ public interface PayOrderConvert {
 
     PayOrderConvert INSTANCE = Mappers.getMapper(PayOrderConvert.class);
 
+    @Mapping(source = "amount", target = "price")
     PayOrderRespVO convert(PayOrderDO bean);
 
     PayOrderRespDTO convert2(PayOrderDO order);

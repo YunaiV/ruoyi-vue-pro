@@ -55,6 +55,10 @@ public class PayOrderBaseVO {
     @NotNull(message = "支付金额，单位：分不能为空")
     private Long amount;
 
+    @Schema(description = "支付金额，单位：分", required = true)
+    @NotNull(message = "支付金额，单位：分不能为空")
+    private Long price;
+
     @Schema(description = "渠道手续费，单位：百分比")
     private Double channelFeeRate;
 

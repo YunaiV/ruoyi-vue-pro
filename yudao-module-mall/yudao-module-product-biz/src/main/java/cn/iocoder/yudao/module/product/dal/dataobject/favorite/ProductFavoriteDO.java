@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.favorite;
 
-import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
+import cn.iocoder.yudao.module.product.enums.favorite.ProductFavoriteTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 喜爱商品 DO
+ * 商品收藏 DO
  *
  * @author 芋道源码
  */
@@ -20,7 +21,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductFavoriteDO extends TenantBaseDO { // TODO @jason：如无必要，使用 BaseDO 哈。例如说 tenant_id 在业务里，是否需要使用到
+public class ProductFavoriteDO extends BaseDO {
 
     /**
      * 编号，主键自增
@@ -40,7 +41,9 @@ public class ProductFavoriteDO extends TenantBaseDO { // TODO @jason：如无必
      */
     private Long spuId;
     /**
-     * 类型  1 收藏；2 点赞 // TODO @jason：不要注释 1 收藏 2 点赞；而是注释好，它对应的枚举类
+     * 类型
+     *
+     * 枚举 {@link ProductFavoriteTypeEnum}
      */
     private Integer type;
 

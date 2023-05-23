@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductProp
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageItemRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
@@ -50,7 +51,6 @@ public interface TradeOrderConvert {
             @Mapping(source = "address.name", target = "receiverName"),
             @Mapping(source = "address.mobile", target = "receiverMobile"),
             @Mapping(source = "address.areaId", target = "receiverAreaId"),
-            @Mapping(source = "address.postCode", target = "receiverPostCode"),
             @Mapping(source = "address.detailAddress", target = "receiverDetailAddress"),
     })
     TradeOrderDO convert(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO,
@@ -192,7 +192,7 @@ public interface TradeOrderConvert {
                     if (CollUtil.isEmpty(properties)) {
                         continue;
                     }
-                    AppTradeOrderPageItemRespVO.Item item = orderVO.getItems().get(i);
+                    AppTradeOrderItemRespVO item = orderVO.getItems().get(i);
                     item.setProperties(new ArrayList<>(properties.size()));
                     // 遍历每个 properties，设置到 TradeOrderPageItemRespVO.Item 中
                     properties.forEach(property -> {
@@ -212,8 +212,9 @@ public interface TradeOrderConvert {
     AppProductPropertyValueDetailRespVO convert02(ProductPropertyValueDetailRespDTO bean);
 
     default AppTradeOrderDetailRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
-                                                List<ProductPropertyValueDetailRespDTO> propertyValueDetails) {
+                                                List<ProductPropertyValueDetailRespDTO> propertyValueDetails, TradeOrderProperties tradeOrderProperties) {
         AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
+        orderVO.setPayExpireTime(addTime(tradeOrderProperties.getExpireTime()));
         // 处理商品属性
         Map<Long, ProductPropertyValueDetailRespDTO> propertyValueDetailMap = convertMap(propertyValueDetails, ProductPropertyValueDetailRespDTO::getValueId);
         for (int i = 0; i < orderItems.size(); i++) {
@@ -221,7 +222,7 @@ public interface TradeOrderConvert {
             if (CollUtil.isEmpty(properties)) {
                 continue;
             }
-            AppTradeOrderDetailRespVO.Item item = orderVO.getItems().get(i);
+            AppTradeOrderItemRespVO item = orderVO.getItems().get(i);
             item.setProperties(new ArrayList<>(properties.size()));
             // 遍历每个 properties，设置到 TradeOrderPageItemRespVO.Item 中
             properties.forEach(property -> {
@@ -237,5 +238,7 @@ public interface TradeOrderConvert {
         return orderVO;
     }
     AppTradeOrderDetailRespVO convert3(TradeOrderDO order, List<TradeOrderItemDO> items);
+
+    AppTradeOrderItemRespVO convert03(TradeOrderItemDO bean);
 
 }

@@ -7,19 +7,19 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * 交易订单 - 售后状态
+ * 交易订单 - 退款状态
  *
  * @author Sin
  */
 @RequiredArgsConstructor
 @Getter
-public enum TradeOrderAfterSaleStatusEnum implements IntArrayValuable {
+public enum TradeOrderRefundStatusEnum implements IntArrayValuable {
 
     NONE(0, "未退款"),
-    PART(1, "部分退款"),
-    ALL(2, "全部退款");
+    PART(10, "部分退款"),
+    ALL(20, "全部退款");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderAfterSaleStatusEnum::getStatus).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderRefundStatusEnum::getStatus).toArray();
 
     /**
      * 状态值

@@ -1,22 +1,28 @@
 package cn.iocoder.yudao.module.product.controller.app.favorite;
 
-import cn.hutool.core.lang.Assert;
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoritePageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteReqVO;
-import cn.iocoder.yudao.module.product.service.favorite.ProductFavoriteService;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteRespVO;
+import cn.iocoder.yudao.module.product.convert.favorite.ProductFavoriteConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
+import cn.iocoder.yudao.module.product.service.favorite.ProductFavoriteService;
+import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.module.product.enums.favorite.ProductFavoriteTypeEnum.COLLECT;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "用户 APP - 商品收藏")
 @RestController
@@ -25,31 +31,48 @@ public class AppFavoriteController {
 
     @Resource
     private ProductFavoriteService productFavoriteService;
+    @Resource
+    private ProductSpuService productSpuService;
 
-    // TODO @jason：创建；create
-    @PostMapping(value = "/collect")
+    @PostMapping(value = "/create")
     @Operation(summary = "商品收藏")
-    public CommonResult<Boolean> collect(@RequestBody @Valid AppFavoriteReqVO reqVO) {
-        Assert.isTrue(Objects.equals(COLLECT.getType(), reqVO.getType()), "参数type 不匹配");
-        return success(productFavoriteService.collect(reqVO));
+    //@PreAuthenticated  TODO 暂时注释
+    public CommonResult<Long> createFavorite(@RequestBody @Valid AppFavoriteReqVO reqVO) {
+        return success(productFavoriteService.createFavorite(getLoginUserId(), reqVO));
     }
 
-    // TODO @jason：创建；delete；使用 @DeleteMapping
-    @PostMapping(value = "/cancelCollect")
-    @Operation(summary = "取消商品收藏(通过商品详情)")
-    public CommonResult<Boolean> cancelCollect(@RequestBody @Valid AppFavoriteReqVO reqVO) {
-        // TODO @jason：是不是不用校验呀？
-        Assert.isTrue(Objects.equals(COLLECT.getType(), reqVO.getType()), "参数type 不匹配");
-        return success(productFavoriteService.cancelCollect(reqVO));
+    @DeleteMapping(value = "/delete")
+    @Operation(summary = "取消商品收藏")
+    public CommonResult<Boolean> deleteFavorite(@RequestBody @Valid AppFavoriteReqVO reqVO) {
+        productFavoriteService.deleteFavorite(getLoginUserId(), reqVO);
+        return success(Boolean.TRUE);
     }
 
-    // TODO @jason：page；分页
-    @GetMapping(value = "/collectList")
-    @Operation(summary = "商品收藏列表")
-    public CommonResult<PageResult<AppFavoriteRespVO>> pageCollectList(AppFavoritePageReqVO reqVO) {
-        return success(productFavoriteService.pageCollectList(reqVO));
+    @GetMapping(value = "/page")
+    @Operation(summary = "分页获取商品收藏列表")
+    public CommonResult<PageResult<AppFavoriteRespVO>> getFavoritePage(AppFavoritePageReqVO reqVO) {
+        PageResult<ProductFavoriteDO> favoritePage = productFavoriteService.getFavoritePage(getLoginUserId(), reqVO);
+        if (CollUtil.isEmpty(favoritePage.getList())) {
+            return success(PageResult.empty());
+        }
+
+        // 得到商品 spu 信息
+        List<ProductFavoriteDO> favorites = favoritePage.getList();
+        List<Long> spuIds = convertList(favorites, ProductFavoriteDO::getSpuId);
+        List<ProductSpuDO> spus = productSpuService.getSpuList(spuIds);
+
+        // 转换 VO 结果
+        PageResult<AppFavoriteRespVO> pageResult = new PageResult<>(favoritePage.getTotal());
+        pageResult.setList(ProductFavoriteConvert.INSTANCE.convertList(favorites, spus));
+        return success(pageResult);
     }
 
-    // TODO @json：需要在给一个，用户查询某个商品是否收藏；详情页要用
+
+    @GetMapping(value = "/exits")
+    @Operation(summary = "检查是否收藏过商品")
+    public CommonResult<Boolean> isFavoriteExists(AppFavoriteReqVO reqVO) {
+        ProductFavoriteDO favoriteDO = productFavoriteService.getFavorite(getLoginUserId(), reqVO);
+        return success(Objects.nonNull(favoriteDO));
+    }
 
 }

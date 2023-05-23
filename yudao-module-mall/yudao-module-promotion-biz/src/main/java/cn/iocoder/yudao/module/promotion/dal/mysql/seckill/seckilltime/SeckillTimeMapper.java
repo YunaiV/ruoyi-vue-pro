@@ -10,11 +10,6 @@ import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * 秒杀时段 Mapper
- *
- * @author halfninety
- */
 @Mapper
 public interface SeckillTimeMapper extends BaseMapperX<SeckillTimeDO> {
 

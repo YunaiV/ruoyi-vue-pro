@@ -12,7 +12,7 @@ public interface ErrorCodeConstants {
     // ========== 公众号账号 1006000000============
     ErrorCode ACCOUNT_NOT_EXISTS = new ErrorCode(1006000000, "公众号账号不存在");
     ErrorCode ACCOUNT_GENERATE_QR_CODE_FAIL = new ErrorCode(1006000001, "生成公众号二维码失败，原因：{}");
-    ErrorCode ACCOUNT_CLEAR_QUOTA_FAIL = new ErrorCode(1006000001, "清空公众号的 API 配额失败，原因：{}");
+    ErrorCode ACCOUNT_CLEAR_QUOTA_FAIL = new ErrorCode(1006000002, "清空公众号的 API 配额失败，原因：{}");
 
     // ========== 公众号统计 1006001000============
     ErrorCode STATISTICS_GET_USER_SUMMARY_FAIL = new ErrorCode(1006001000, "获取粉丝增减数据失败，原因：{}");
@@ -23,9 +23,9 @@ public interface ErrorCodeConstants {
     // ========== 公众号标签 1006002000============
     ErrorCode TAG_NOT_EXISTS = new ErrorCode(1006002000, "标签不存在");
     ErrorCode TAG_CREATE_FAIL = new ErrorCode(1006002001, "创建标签失败，原因：{}");
-    ErrorCode TAG_UPDATE_FAIL = new ErrorCode(1006002001, "更新标签失败，原因：{}");
-    ErrorCode TAG_DELETE_FAIL = new ErrorCode(1006002001, "删除标签失败，原因：{}");
-    ErrorCode TAG_GET_FAIL = new ErrorCode(1006002001, "获得标签失败，原因：{}");
+    ErrorCode TAG_UPDATE_FAIL = new ErrorCode(1006002002, "更新标签失败，原因：{}");
+    ErrorCode TAG_DELETE_FAIL = new ErrorCode(1006002003, "删除标签失败，原因：{}");
+    ErrorCode TAG_GET_FAIL = new ErrorCode(1006002004, "获得标签失败，原因：{}");
 
     // ========== 公众号粉丝 1006003000============
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1006003000, "粉丝不存在");
@@ -43,13 +43,13 @@ public interface ErrorCodeConstants {
     // ========== 公众号发布能力 1006006000============
     ErrorCode FREE_PUBLISH_LIST_FAIL = new ErrorCode(1006006000, "获得已成功发布列表失败，原因：{}");
     ErrorCode FREE_PUBLISH_SUBMIT_FAIL = new ErrorCode(1006006001, "提交发布失败，原因：{}");
-    ErrorCode FREE_PUBLISH_DELETE_FAIL = new ErrorCode(1006006001, "删除发布失败，原因：{}");
+    ErrorCode FREE_PUBLISH_DELETE_FAIL = new ErrorCode(1006006002, "删除发布失败，原因：{}");
 
     // ========== 公众号草稿 1006007000============
     ErrorCode DRAFT_LIST_FAIL = new ErrorCode(1006007000, "获得草稿列表失败，原因：{}");
     ErrorCode DRAFT_CREATE_FAIL = new ErrorCode(1006007001, "创建草稿失败，原因：{}");
     ErrorCode DRAFT_UPDATE_FAIL = new ErrorCode(1006007002, "更新草稿失败，原因：{}");
-    ErrorCode DRAFT_DELETE_FAIL = new ErrorCode(1006007002, "删除草稿失败，原因：{}");
+    ErrorCode DRAFT_DELETE_FAIL = new ErrorCode(1006007003, "删除草稿失败，原因：{}");
 
     // ========== 公众号菜单 1006008000============
     ErrorCode MENU_SAVE_FAIL = new ErrorCode(1006008000, "创建菜单失败，原因：{}");

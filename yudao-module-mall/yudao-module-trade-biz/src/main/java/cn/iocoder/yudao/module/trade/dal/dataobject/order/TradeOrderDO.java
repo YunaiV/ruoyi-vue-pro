@@ -3,8 +3,9 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO.OrderItem;
+import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderDeliveryStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
@@ -94,6 +95,13 @@ public class TradeOrderDO extends BaseDO {
      * 商家备注
      */
     private String remark;
+    /**
+     * 是否评价
+     *
+     * true - 已评价
+     * false - 未评价
+     */
+    private Boolean commentStatus;
 
     // ========== 价格 + 支付基本信息 ==========
 
@@ -128,16 +136,17 @@ public class TradeOrderDO extends BaseDO {
     /**
      * 商品原价（总），单位：分
      *
-     * 基于 {@link TradeOrderItemDO#getOriginalPrice()} 求和
+     * totalPrice = {@link TradeOrderItemDO#getPrice()} * {@link TradeOrderItemDO#getCount()} 求和
      *
      * 对应 taobao 的 trade.total_fee 字段
      */
-    private Integer originalPrice;
+    private Integer totalPrice;
+    // TODO 芋艿：是不是要删除这个字段？
     /**
      * 订单原价（总），单位：分
      *
-     * 基于 {@link OrderItem#getPayPrice()} 求和
-     * 和 {@link #originalPrice} 的差异：去除商品级优惠
+     * 1. orderPrice = {@link OrderItem#getPayPrice()} 求和
+     * 2. orderPrice = {@link #totalPrice} - 商品级优惠
      */
     private Integer orderPrice;
     /**
@@ -171,6 +180,12 @@ public class TradeOrderDO extends BaseDO {
     private Integer payPrice;
 
     // ========== 收件 + 物流基本信息 ==========
+    /**
+     * 配送方式
+     *
+     * 枚举 {@link DeliveryTypeEnum}
+     */
+    private Integer deliveryType;
     /**
      * 配置模板的编号
      *
@@ -213,21 +228,17 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer receiverAreaId;
     /**
-     * 收件人邮编
-     */
-    private Integer receiverPostCode;
-    /**
      * 收件人详细地址
      */
     private String receiverDetailAddress;
 
     // ========== 售后基本信息 ==========
     /**
-     * 收货状态
+     * 售后状态
      *
-     * 枚举 {@link TradeOrderAfterSaleStatusEnum}
+     * 枚举 {@link TradeOrderRefundStatusEnum}
      */
-    private Integer afterSaleStatus;
+    private Integer refundStatus;
     /**
      * 退款金额，单位：分
      *

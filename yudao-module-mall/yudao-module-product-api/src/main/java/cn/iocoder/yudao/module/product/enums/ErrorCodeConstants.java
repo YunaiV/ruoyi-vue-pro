@@ -50,7 +50,7 @@ public interface ErrorCodeConstants {
     ErrorCode COMMENT_ADDITIONAL_EXISTS  = new ErrorCode(1008007003, "商品追加评价已存在");
 
     // ========== 商品 收藏 1008008000 ==========
-    ErrorCode COLLECTION_EXISTS = new ErrorCode(1008008000, "该商品已经被收藏");
-    ErrorCode COLLECTION_NOT_EXISTS = new ErrorCode(1008008001, "商品收藏不存在");
+    ErrorCode FAVORITE_EXISTS = new ErrorCode(1008008000, "该商品已经被收藏");
+    ErrorCode FAVORITE_NOT_EXISTS = new ErrorCode(1008008001, "商品收藏不存在");
 
 }

@@ -41,10 +41,6 @@ public class AddressDO extends BaseDO {
      */
     private Long areaId;
     /**
-     * 邮编
-     */
-    private String postCode;
-    /**
      * 收件详细地址
      */
     private String detailAddress;

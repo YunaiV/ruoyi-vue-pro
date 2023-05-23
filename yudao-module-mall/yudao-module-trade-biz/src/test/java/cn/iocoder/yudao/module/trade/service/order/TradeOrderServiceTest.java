@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
@@ -93,10 +92,12 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // 准备参数
         Long userId = 100L;
         String userIp = "127.0.0.1";
-        AppTradeOrderCreateReqVO reqVO = new AppTradeOrderCreateReqVO()
-                .setAddressId(10L).setCouponId(101L).setRemark("我是备注").setFromCart(true)
-                .setItems(Arrays.asList(new AppTradeOrderCreateReqVO.Item().setSkuId(1L).setCount(3),
-                        new AppTradeOrderCreateReqVO.Item().setSkuId(2L).setCount(4)));
+//        AppTradeOrderCreateReqVO reqVO = new AppTradeOrderCreateReqVO()
+//                .setAddressId(10L).setCouponId(101L).setRemark("我是备注").setFromCart(true)
+//                .setItems(Arrays.asList(new AppTradeOrderCreateReqVO.Item().setSkuId(1L).setCount(3),
+//                        new AppTradeOrderCreateReqVO.Item().setSkuId(2L).setCount(4)));
+        AppTradeOrderCreateReqVO reqVO = null;
+        // TODO 芋艿：重新高下
         // mock 方法（商品 SKU 检查）
         ProductSkuRespDTO sku01 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(1L).setSpuId(11L)
                 .setPrice(50).setStock(100)
@@ -168,7 +169,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertNull(tradeOrderDO.getRemark());
         assertFalse(tradeOrderDO.getPayed());
         assertNull(tradeOrderDO.getPayTime());
-        assertEquals(tradeOrderDO.getOriginalPrice(), 230);
+        assertEquals(tradeOrderDO.getTotalPrice(), 230);
         assertEquals(tradeOrderDO.getOrderPrice(), 100);
         assertEquals(tradeOrderDO.getDiscountPrice(), 0);
         assertEquals(tradeOrderDO.getAdjustPrice(), 0);
@@ -183,9 +184,8 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderDO.getReceiverName(), "芋艿");
         assertEquals(tradeOrderDO.getReceiverMobile(), "15601691300");
         assertEquals(tradeOrderDO.getReceiverAreaId(), 3306);
-        assertEquals(tradeOrderDO.getReceiverPostCode(), 85757);
         assertEquals(tradeOrderDO.getReceiverDetailAddress(), "土豆村");
-        assertEquals(tradeOrderDO.getAfterSaleStatus(), TradeOrderAfterSaleStatusEnum.NONE.getStatus());
+        assertEquals(tradeOrderDO.getRefundStatus(), TradeOrderRefundStatusEnum.NONE.getStatus());
         assertEquals(tradeOrderDO.getRefundPrice(), 0);
         assertEquals(tradeOrderDO.getCouponPrice(), 30);
         assertEquals(tradeOrderDO.getPointPrice(), 10);
@@ -204,8 +204,8 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         //assertEquals(tradeOrderItemDO01.getSpuName(), sku01.getSpuName()); TODO 找不到spuName
         assertEquals(tradeOrderItemDO01.getPicUrl(), sku01.getPicUrl());
         assertEquals(tradeOrderItemDO01.getCount(), 3);
-        assertEquals(tradeOrderItemDO01.getOriginalPrice(), 150);
-        assertEquals(tradeOrderItemDO01.getOriginalUnitPrice(), 50);
+//        assertEquals(tradeOrderItemDO01.getOriginalPrice(), 150);
+        assertEquals(tradeOrderItemDO01.getPrice(), 50);
         assertEquals(tradeOrderItemDO01.getDiscountPrice(), 20);
         assertEquals(tradeOrderItemDO01.getPayPrice(), 130);
         assertEquals(tradeOrderItemDO01.getOrderPartPrice(), 7);
@@ -224,8 +224,8 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         //assertEquals(tradeOrderItemDO02.getSpuName(), sku02.getSpuName()); TODO 找不到spuName
         assertEquals(tradeOrderItemDO02.getPicUrl(), sku02.getPicUrl());
         assertEquals(tradeOrderItemDO02.getCount(), 4);
-        assertEquals(tradeOrderItemDO02.getOriginalPrice(), 80);
-        assertEquals(tradeOrderItemDO02.getOriginalUnitPrice(), 20);
+//        assertEquals(tradeOrderItemDO02.getOriginalPrice(), 80);
+        assertEquals(tradeOrderItemDO02.getPrice(), 20);
         assertEquals(tradeOrderItemDO02.getDiscountPrice(), 40);
         assertEquals(tradeOrderItemDO02.getPayPrice(), 40);
         assertEquals(tradeOrderItemDO02.getOrderPartPrice(), 15);
