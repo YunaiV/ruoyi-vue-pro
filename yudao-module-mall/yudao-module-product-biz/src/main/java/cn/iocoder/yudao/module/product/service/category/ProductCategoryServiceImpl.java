@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCateg
 import cn.iocoder.yudao.module.product.convert.category.ProductCategoryConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.mysql.category.ProductCategoryMapper;
+import cn.iocoder.yudao.module.product.enums.ProductConstants;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -68,7 +69,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     private void validateParentProductCategory(Long id) {
         // 如果是根分类，无需验证
-        if (Objects.equals(id, ProductCategoryDO.PARENT_ID_NULL)) {
+        if (Objects.equals(id, ProductConstants.PARENT_ID_NULL)) {
             return;
         }
         // 父分类不存在
@@ -77,7 +78,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             throw exception(CATEGORY_PARENT_NOT_EXISTS);
         }
         // 父分类不能是二级分类
-        if (!Objects.equals(category.getParentId(), ProductCategoryDO.PARENT_ID_NULL)) {
+        if (!Objects.equals(category.getParentId(), ProductConstants.PARENT_ID_NULL)) {
             throw exception(CATEGORY_PARENT_NOT_FIRST_LEVEL);
         }
     }
@@ -107,15 +108,16 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public Integer getCategoryLevel(Long id) {
-        if (Objects.equals(id, ProductCategoryDO.PARENT_ID_NULL)) {
+        if (Objects.equals(id, ProductConstants.PARENT_ID_NULL)) {
             return 0;
         }
         int level = 1;
-        for (int i = 0; i < 100; i++) {
+        // fix: 循环次数不确定改为while循环
+        while (true){
             ProductCategoryDO category = productCategoryMapper.selectById(id);
             // 如果没有父节点，break 结束
             if (category == null
-                    || Objects.equals(category.getParentId(), ProductCategoryDO.PARENT_ID_NULL)) {
+                    || Objects.equals(category.getParentId(), ProductConstants.PARENT_ID_NULL)) {
                 break;
             }
             // 继续递归父节点

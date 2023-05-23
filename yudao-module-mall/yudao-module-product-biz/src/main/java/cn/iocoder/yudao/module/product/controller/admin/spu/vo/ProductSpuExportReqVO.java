@@ -1,30 +1,21 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-
-/**
- * 商品 SPU 分页 Request VO
- *
- * @author HUIHUI
- */
-@Schema(description = "管理后台 - 商品 SPU 分页 Request VO")
+@Schema(description = "管理后台 - 商品Spu导出 Request VO,参数和 ProductSpuPageReqVO 是一致的")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class ProductSpuPageReqVO extends PageParam {
-
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProductSpuExportReqVO {
     @Schema(description = "商品名称", example = "yutou")
     private String name;
 
@@ -38,5 +29,4 @@ public class ProductSpuPageReqVO extends PageParam {
     @Schema(description = "创建时间", example = "[2022-07-01 00:00:00,2022-07-01 23:59:59]")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
-
 }

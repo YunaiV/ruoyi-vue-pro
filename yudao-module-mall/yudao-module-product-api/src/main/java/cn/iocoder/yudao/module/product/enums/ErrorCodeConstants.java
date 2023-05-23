@@ -18,7 +18,7 @@ public interface ErrorCodeConstants {
 
     // ========== 商品品牌相关编号 1008002000 ==========
     ErrorCode BRAND_NOT_EXISTS = new ErrorCode(1008002000, "品牌不存在");
-    ErrorCode BRAND_DISABLED = new ErrorCode(1008002001, "品牌不存在");
+    ErrorCode BRAND_DISABLED = new ErrorCode(1008002001, "品牌已禁用");
     ErrorCode BRAND_NAME_EXISTS = new ErrorCode(1008002002, "品牌名称已存在");
 
     // ========== 商品属性项 1008003000 ==========
@@ -32,8 +32,9 @@ public interface ErrorCodeConstants {
 
     // ========== 商品 SPU 1008005000 ==========
     ErrorCode SPU_NOT_EXISTS = new ErrorCode(1008005000, "商品 SPU 不存在");
-    ErrorCode SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR = new ErrorCode(1008005001, "商品分类不正确，原因：必须使用第三级的商品分类下");
+    ErrorCode SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR = new ErrorCode(1008005001, "商品分类不正确，原因：必须使用第二级的商品分类及以下");
     ErrorCode SPU_NOT_ENABLE = new ErrorCode(1008005002, "商品 SPU 不处于上架状态");
+    ErrorCode SPU_NOT_RECYCLE = new ErrorCode(1008005003, "商品 SPU 不处于回收站状态");
 
     // ========== 商品 SKU 1008006000 ==========
     ErrorCode SKU_NOT_EXISTS = new ErrorCode(1008006000, "商品 SKU 不存在");

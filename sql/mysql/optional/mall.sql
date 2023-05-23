@@ -22,23 +22,23 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `market_activity`;
 CREATE TABLE `market_activity`  (
-                                    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '活动编号',
-                                    `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '活动标题',
-                                    `activity_type` tinyint NOT NULL COMMENT '活动类型',
-                                    `status` tinyint NOT NULL DEFAULT -1 COMMENT '活动状态',
-                                    `start_time` datetime NOT NULL COMMENT '开始时间',
-                                    `end_time` datetime NOT NULL COMMENT '结束时间',
-                                    `invalid_time` datetime NULL DEFAULT NULL COMMENT '失效时间',
-                                    `delete_time` datetime NULL DEFAULT NULL COMMENT '删除时间',
-                                    `time_limited_discount` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '限制折扣字符串，使用 JSON 序列化成字符串存储',
-                                    `full_privilege` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '限制折扣字符串，使用 JSON 序列化成字符串存储',
-                                    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '创建者',
-                                    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '更新者',
-                                    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-                                    PRIMARY KEY (`id`) USING BTREE
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '活动编号',
+    `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '活动标题',
+    `activity_type` tinyint NOT NULL COMMENT '活动类型',
+    `status` tinyint NOT NULL DEFAULT -1 COMMENT '活动状态',
+    `start_time` datetime NOT NULL COMMENT '开始时间',
+    `end_time` datetime NOT NULL COMMENT '结束时间',
+    `invalid_time` datetime NULL DEFAULT NULL COMMENT '失效时间',
+    `delete_time` datetime NULL DEFAULT NULL COMMENT '删除时间',
+    `time_limited_discount` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '限制折扣字符串，使用 JSON 序列化成字符串存储',
+    `full_privilege` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '限制折扣字符串，使用 JSON 序列化成字符串存储',
+    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '创建者',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '更新者',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '促销活动';
 
 -- ----------------------------
@@ -52,20 +52,20 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `market_banner`;
 CREATE TABLE `market_banner`  (
-                                  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Banner编号',
-                                  `title` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'Banner标题',
-                                  `pic_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '图片URL',
-                                  `status` tinyint NOT NULL DEFAULT -1 COMMENT '活动状态',
-                                  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '跳转地址',
-                                  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '创建者',
-                                  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '更新者',
-                                  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-                                  `sort` tinyint NULL DEFAULT NULL COMMENT '排序',
-                                  `memo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '描述',
-                                  PRIMARY KEY (`id`) USING BTREE
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Banner编号',
+    `title` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'Banner标题',
+    `pic_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '图片URL',
+    `status` tinyint NOT NULL DEFAULT -1 COMMENT '活动状态',
+    `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '跳转地址',
+    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '创建者',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '更新者',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    `sort` tinyint NULL DEFAULT NULL COMMENT '排序',
+    `memo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '描述',
+    PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Banner管理';
 
 -- ----------------------------
@@ -79,22 +79,22 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `member_address`;
 CREATE TABLE `member_address`  (
-                                   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '收件地址编号',
-                                   `user_id` bigint NOT NULL COMMENT '用户编号',
-                                   `name` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '收件人名称',
-                                   `mobile` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '手机号',
-                                   `area_id` bigint NOT NULL COMMENT '地区编码',
-                                   `post_code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '邮编',
-                                   `detail_address` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '收件详细地址',
-                                   `defaulted` bit(1) NOT NULL COMMENT '是否默认',
-                                   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-                                   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-                                   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-                                   PRIMARY KEY (`id`) USING BTREE,
-                                   INDEX `idx_userId`(`user_id` ASC) USING BTREE
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '收件地址编号',
+    `user_id` bigint NOT NULL COMMENT '用户编号',
+    `name` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '收件人名称',
+    `mobile` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '手机号',
+    `area_id` bigint NOT NULL COMMENT '地区编码',
+    `post_code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '邮编',
+    `detail_address` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '收件详细地址',
+    `defaulted` bit(1) NOT NULL COMMENT '是否默认',
+    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_userId`(`user_id` ASC) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin COMMENT = '用户收件地址';
 
 -- ----------------------------
@@ -109,19 +109,19 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `product_brand`;
 CREATE TABLE `product_brand`  (
-                                  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '品牌编号',
-                                  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '品牌名称',
-                                  `pic_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '品牌图片',
-                                  `sort` int NULL DEFAULT 0 COMMENT '品牌排序',
-                                  `description` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '品牌描述',
-                                  `status` tinyint NOT NULL COMMENT '状态',
-                                  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-                                  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-                                  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-                                  PRIMARY KEY (`id`) USING BTREE
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '品牌编号',
+    `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '品牌名称',
+    `pic_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '品牌图片',
+    `sort` int NULL DEFAULT 0 COMMENT '品牌排序',
+    `description` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '品牌描述',
+    `status` tinyint NOT NULL COMMENT '状态',
+    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '商品品牌';
 
 -- ----------------------------
@@ -136,20 +136,20 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `product_category`;
 CREATE TABLE `product_category`  (
-                                     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '分类编号',
-                                     `parent_id` bigint NOT NULL COMMENT '父分类编号',
-                                     `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类名称',
-                                     `pic_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类图片',
-                                     `sort` int NULL DEFAULT 0 COMMENT '分类排序',
-                                     `description` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '分类描述',
-                                     `status` tinyint NOT NULL COMMENT '开启状态',
-                                     `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-                                     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                     `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-                                     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                     `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                     `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-                                     PRIMARY KEY (`id`) USING BTREE
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '分类编号',
+    `parent_id` bigint NOT NULL COMMENT '父分类编号',
+    `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类名称',
+    `pic_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类图片',
+    `sort` int NULL DEFAULT 0 COMMENT '分类排序',
+    `description` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '分类描述',
+    `status` tinyint NOT NULL COMMENT '开启状态',
+    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '商品分类';
 
 -- ----------------------------
@@ -164,18 +164,18 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `product_property`;
 CREATE TABLE `product_property` (
-                                    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-                                    `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '规格名称',
-                                    `status` tinyint DEFAULT NULL COMMENT '状态： 0 开启 ，1 禁用',
-                                    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '创建人',
-                                    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '更新人',
-                                    `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                                    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                    `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-                                    PRIMARY KEY (`id`) USING BTREE,
-                                    KEY `idx_name` (`name`(32)) USING BTREE COMMENT '规格名称索引'
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '规格名称',
+    `status` tinyint DEFAULT NULL COMMENT '状态： 0 开启 ，1 禁用',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '创建人',
+    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '更新人',
+    `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+    PRIMARY KEY (`id`) USING BTREE,
+    KEY `idx_name` (`name`(32)) USING BTREE COMMENT '规格名称索引'
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='规格名称';
 
 -- ----------------------------
@@ -189,18 +189,18 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `product_property_value`;
 CREATE TABLE `product_property_value` (
-                                          `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-                                          `property_id` bigint DEFAULT NULL COMMENT '规格键id',
-                                          `name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '规格值名字',
-                                          `status` tinyint DEFAULT NULL COMMENT '状态： 1 开启 ，2 禁用',
-                                          `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                          `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                          `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '创建人',
-                                          `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '更新人',
-                                          `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                                          `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                          `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-                                          PRIMARY KEY (`id`) USING BTREE
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `property_id` bigint DEFAULT NULL COMMENT '规格键id',
+    `name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '规格值名字',
+    `status` tinyint DEFAULT NULL COMMENT '状态： 1 开启 ，2 禁用',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '创建人',
+    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '更新人',
+    `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+    PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='规格值';
 
 -- ----------------------------
@@ -214,26 +214,26 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `product_sku`;
 CREATE TABLE `product_sku` (
-                               `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-                               `spu_id` bigint NOT NULL COMMENT 'spu编号',
-                               `properties` varchar(512) DEFAULT NULL COMMENT '属性数组，JSON 格式 [{propertId: , valueId: }, {propertId: , valueId: }]',
-                               `price` int NOT NULL DEFAULT '-1' COMMENT '商品价格，单位：分',
-                               `market_price` int DEFAULT NULL COMMENT '市场价，单位：分',
-                               `cost_price` int NOT NULL DEFAULT '-1' COMMENT '成本价，单位： 分',
-                               `bar_code` varchar(64)  DEFAULT NULL COMMENT 'SKU 的条形码',
-                               `pic_url` varchar(256)  NOT NULL COMMENT '图片地址',
-                               `stock` int DEFAULT NULL COMMENT '库存',
-                               `weight` double DEFAULT NULL COMMENT '商品重量，单位：kg 千克',
-                               `volume` double DEFAULT NULL COMMENT '商品体积，单位：m^3 平米',
-                               `sub_commission_first_price` int DEFAULT NULL COMMENT '一级分销的佣金，单位：分',
-                               `sub_commission_second_price` int DEFAULT NULL COMMENT '二级分销的佣金，单位：分',
-                               `sales_count` int DEFAULT NULL COMMENT '商品销量',
-                               `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                               `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                               `creator` varchar(64) DEFAULT NULL COMMENT '创建人',
-                               `updater` double(64,0) DEFAULT NULL COMMENT '更新人',
-                               `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                               `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `spu_id` bigint NOT NULL COMMENT 'spu编号',
+    `properties` varchar(512) DEFAULT NULL COMMENT '属性数组，JSON 格式 [{propertId: , valueId: }, {propertId: , valueId: }]',
+    `price` int NOT NULL DEFAULT '-1' COMMENT '商品价格，单位：分',
+    `market_price` int DEFAULT NULL COMMENT '市场价，单位：分',
+    `cost_price` int NOT NULL DEFAULT '-1' COMMENT '成本价，单位： 分',
+    `bar_code` varchar(64)  DEFAULT NULL COMMENT 'SKU 的条形码',
+    `pic_url` varchar(256)  NOT NULL COMMENT '图片地址',
+    `stock` int DEFAULT NULL COMMENT '库存',
+    `weight` double DEFAULT NULL COMMENT '商品重量，单位：kg 千克',
+    `volume` double DEFAULT NULL COMMENT '商品体积，单位：m^3 平米',
+    `sub_commission_first_price` int DEFAULT NULL COMMENT '一级分销的佣金，单位：分',
+    `sub_commission_second_price` int DEFAULT NULL COMMENT '二级分销的佣金，单位：分',
+    `sales_count` int DEFAULT NULL COMMENT '商品销量',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `creator` varchar(64) DEFAULT NULL COMMENT '创建人',
+    `updater` double(64,0) DEFAULT NULL COMMENT '更新人',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB COMMENT='商品sku';
 
@@ -248,45 +248,45 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `product_spu`;
 CREATE TABLE `product_spu` (
-                               `id` bigint NOT NULL AUTO_INCREMENT COMMENT '商品 SPU 编号，自增',
-                               `name` varchar(128)  NOT NULL COMMENT '商品名称', 
-                               `keyword` varchar(256)  DEFAULT NULL COMMENT '关键字',
-                               `introduction` varchar(256)  COMMENT '商品简介',
-                               `description` text  COMMENT '商品详情', 
-                               `bar_code` varchar(64) DEFAULT NULL COMMENT '条形码',
-                               `category_id` bigint NOT NULL COMMENT '商品分类编号', 
-                               `brand_id` int DEFAULT NULL COMMENT '商品品牌编号',
-                               `pic_url` varchar(256)  NOT NULL COMMENT '商品封面图',
-                               `slider_pic_urls` varchar(2000)  DEFAULT '' COMMENT '商品轮播图地址\n 数组，以逗号分隔\n 最多上传15张',
-                               `video_url` varchar(256)  DEFAULT NULL COMMENT '商品视频', 
-                               `unit` tinyint NOT NULL COMMENT  '单位',
-                               `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段',
-                               `status` tinyint NOT NULL COMMENT '商品状态: 0 上架（开启） 1 下架（禁用）-1 回收',
-                               `spec_type` bit(1) DEFAULT NULL COMMENT '规格类型：0 单规格 1 多规格',
-                               `price` int NOT NULL DEFAULT '-1' COMMENT '商品价格，单位使用：分',
-                               `market_price` int DEFAULT NULL COMMENT '市场价，单位使用：分',
-                               `cost_price` int NOT NULL DEFAULT '-1' COMMENT '成本价，单位： 分',
-                               `stock` int NOT NULL DEFAULT '0' COMMENT '库存',
-                               `delivery_template_id` bigint NOT NULL COMMENT '物流配置模板编号',
-                               `recommend_hot` bit(1) DEFAULT NULL COMMENT '是否热卖推荐: 0 默认 1 热卖',
-                               `recommend_benefit` bit(1) DEFAULT NULL COMMENT '是否优惠推荐: 0 默认 1 优选',
-                               `recommend_best` bit(1) DEFAULT NULL COMMENT '是否精品推荐: 0 默认 1 精品',
-                               `recommend_new` bit(1) DEFAULT NULL COMMENT '是否新品推荐: 0 默认 1 新品',
-                               `recommend_good` bit(1) DEFAULT NULL COMMENT '是否优品推荐',
-                               `give_integral` int NOT NULL COMMENT '赠送积分',
-                               `give_coupon_template_ids` varchar(512) DEFAULT '' COMMENT '赠送的优惠劵编号的数组',
-                               `sub_commission_type` bit(1) DEFAULT NULL COMMENT '分销类型',
-                               `activity_orders` varchar(16) NOT NULL DEFAULT '' COMMENT '活动显示排序0=默认, 1=秒杀，2=砍价，3=拼团',
-                               `sales_count` int DEFAULT '0' COMMENT '商品销量',
-                               `virtual_sales_count` int DEFAULT '0' COMMENT '虚拟销量',
-                               `browse_count` int DEFAULT '0' COMMENT '商品点击量',
-                               `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                               `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                               `creator` varchar(64)  DEFAULT NULL COMMENT '创建人',
-                               `updater` varchar(64)  DEFAULT NULL COMMENT '更新人',
-                               `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除', 
-                               `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                               PRIMARY KEY (`id`) USING BTREE
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '商品 SPU 编号，自增',
+    `name` varchar(128)  NOT NULL COMMENT '商品名称',
+    `keyword` varchar(256)  DEFAULT NULL COMMENT '关键字',
+    `introduction` varchar(256)  COMMENT '商品简介',
+    `description` text  COMMENT '商品详情',
+    `bar_code` varchar(64) DEFAULT NULL COMMENT '条形码',
+    `category_id` bigint NOT NULL COMMENT '商品分类编号',
+    `brand_id` int DEFAULT NULL COMMENT '商品品牌编号',
+    `pic_url` varchar(256)  NOT NULL COMMENT '商品封面图',
+    `slider_pic_urls` varchar(2000)  DEFAULT '' COMMENT '商品轮播图地址\n 数组，以逗号分隔\n 最多上传15张',
+    `video_url` varchar(256)  DEFAULT NULL COMMENT '商品视频',
+    `unit` tinyint NOT NULL COMMENT  '单位',
+    `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段',
+    `status` tinyint NOT NULL COMMENT '商品状态: 0 上架（开启） 1 下架（禁用）-1 回收',
+    `spec_type` bit(1) DEFAULT NULL COMMENT '规格类型：0 单规格 1 多规格',
+    `price` int NOT NULL DEFAULT '-1' COMMENT '商品价格，单位使用：分',
+    `market_price` int DEFAULT NULL COMMENT '市场价，单位使用：分',
+    `cost_price` int NOT NULL DEFAULT '-1' COMMENT '成本价，单位： 分',
+    `stock` int NOT NULL DEFAULT '0' COMMENT '库存',
+    `delivery_template_id` bigint NOT NULL COMMENT '物流配置模板编号',
+    `recommend_hot` bit(1) DEFAULT NULL COMMENT '是否热卖推荐: 0 默认 1 热卖',
+    `recommend_benefit` bit(1) DEFAULT NULL COMMENT '是否优惠推荐: 0 默认 1 优选',
+    `recommend_best` bit(1) DEFAULT NULL COMMENT '是否精品推荐: 0 默认 1 精品',
+    `recommend_new` bit(1) DEFAULT NULL COMMENT '是否新品推荐: 0 默认 1 新品',
+    `recommend_good` bit(1) DEFAULT NULL COMMENT '是否优品推荐',
+    `give_integral` int NOT NULL COMMENT '赠送积分',
+    `give_coupon_template_ids` varchar(512) DEFAULT '' COMMENT '赠送的优惠劵编号的数组',
+    `sub_commission_type` bit(1) DEFAULT NULL COMMENT '分销类型',
+    `activity_orders` varchar(16) NOT NULL DEFAULT '' COMMENT '活动显示排序0=默认, 1=秒杀，2=砍价，3=拼团',
+    `sales_count` int DEFAULT '0' COMMENT '商品销量',
+    `virtual_sales_count` int DEFAULT '0' COMMENT '虚拟销量',
+    `browse_count` int DEFAULT '0' COMMENT '商品点击量',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `creator` varchar(64)  DEFAULT NULL COMMENT '创建人',
+    `updater` varchar(64)  DEFAULT NULL COMMENT '更新人',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+    PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB COMMENT='商品spu';
 
 -- ----------------------------
@@ -294,17 +294,17 @@ CREATE TABLE `product_spu` (
 -- ----------------------------
 DROP TABLE IF EXISTS `product_favorite`;
 CREATE TABLE `product_favorite` (
-   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
-   `spu_id` bigint NOT NULL COMMENT '商品 SPU 编号',
-   `user_id` bigint NOT NULL COMMENT '用户id',
-   `type` int(10) NOT NULL DEFAULT 1 COMMENT '类型1:收藏 2:点赞',
-   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-  PRIMARY KEY (`id`) USING BTREE
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+    `spu_id` bigint NOT NULL COMMENT '商品 SPU 编号',
+    `user_id` bigint NOT NULL COMMENT '用户id',
+    `type` int(10) NOT NULL DEFAULT 1 COMMENT '类型1:收藏 2:点赞',
+    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB COMMENT='喜欢的商品表';
 
 
@@ -316,6 +316,7 @@ COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
+BEGIN;
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2000, '商品中心', '', 1, 60, 0, '/product', 'merchant', NULL, 0, b'1', b'1', '', '2022-07-29 15:53:53', '1', '2022-07-30 22:26:19', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2002, '商品分类', '', 2, 2, 2000, 'category', 'dict', 'mall/product/category/index', 0, b'1', b'1', '', '2022-07-29 15:53:53', '1', '2022-07-30 22:23:37', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2003, '分类查询', 'product:category:query', 3, 1, 2002, '', '', '', 0, b'1', b'1', '', '2022-07-29 15:53:53', '', '2022-07-29 15:53:53', b'0');
@@ -334,6 +335,7 @@ INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2016, '商品创建', 'product:spu:create', 3, 2, 2014, '', '', '', 0, b'1', b'1', '', '2022-07-30 14:22:58', '', '2022-07-30 14:22:58', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2017, '商品更新', 'product:spu:update', 3, 3, 2014, '', '', '', 0, b'1', b'1', '', '2022-07-30 14:22:58', '', '2022-07-30 14:22:58', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2018, '商品删除', 'product:spu:delete', 3, 4, 2014, '', '', '', 0, b'1', b'1', '', '2022-07-30 14:22:58', '', '2022-07-30 14:22:58', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2018, '商品导出', 'product:spu:export', 3, 5, 2014, '', '', '', 0, b'1', b'1', '', '2022-07-30 14:22:58', '', '2022-07-30 14:22:58', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2019, '规格管理', '', 2, 3, 2000, 'property', '', 'mall/product/property/index', 0, b'1', b'1', '', '2022-08-01 14:55:35', '', '2022-08-01 14:55:35', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2020, '规格查询', 'product:property:query', 3, 1, 2019, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:55:35', '', '2022-08-01 14:55:35', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2021, '规格创建', 'product:property:create', 3, 2, 2019, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:55:35', '', '2022-08-01 14:55:35', b'0');
@@ -345,37 +347,16 @@ INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2027, 'Banner创建', 'market:banner:create', 3, 2, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2028, 'Banner更新', 'market:banner:update', 3, 3, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2029, 'Banner删除', 'market:banner:delete', 3, 4, 2025, '', '', '', 0, b'1', b'1', '', '2022-08-01 14:56:14', '', '2022-08-01 14:56:14', b'0');
+BEGIN;
 
-INSERT INTO `system_dict_data`(`sort`,`label`,`value`,`dict_type`,`status`,`color_type`,`css_class`,`remark`,`creator`,`create_time`,`updater`,`update_time`,`deleted`) VALUES
-                                                                                                                                                                            (1,'打',2,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'盒',3,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'袋',4,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'箱',5,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'套',6,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'包',7,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'双',8,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'卷',9,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'张',10,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'克',11,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'千克',12,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'毫克',13,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'微克',14,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'吨',15,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'升',16,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1,'毫升',17,'product_unit',0,'','','',1, NOW(),1, NOW(),0),
-                                                                                                                                                                            (1, '平方米', 18, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '平方千米', 19, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '平方英里', 20, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '平方码', 21, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '平方英尺', 22, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '立方米', 23, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '立方厘米', 24, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '立方英寸', 25, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '米', 26, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '千米', 27, 'product_unit', 0, '', '', '',  1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '厘米', 28, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '毫米', 29, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '英寸', 30, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '英尺', 31, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1, '码', 32, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), 0),
-                                                                                                                                                                            (1,'个',1,'product_unit',0,'','','',1, NOW(),1, NOW(),0);
+BEGIN;
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '个', 1, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '件', 2, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '盒', 3, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '袋', 4, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '箱', 5, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '套', 6, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '包', 7, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '双', 8, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
+INSERT INTO `system_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1, '卷', 9, 'product_unit', 0, '', '', '', 1, NOW(), 1, NOW(), b'0');
+COMMIT;

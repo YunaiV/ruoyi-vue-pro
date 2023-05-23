@@ -29,7 +29,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductSpuDO extends TenantBaseDO {
+public class ProductSpuDO extends BaseDO {
 
     /**
      * 商品 SPU 编号，自增

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.sku;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -27,7 +27,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductSkuDO extends TenantBaseDO {  // TODO @puhui999：这里是不是用 BaseDO 就可以了？
+public class ProductSkuDO extends BaseDO {
 
     /**
      * 商品 SKU 编号，自增
@@ -105,33 +105,29 @@ public class ProductSkuDO extends TenantBaseDO {  // TODO @puhui999：这里是�
 
         /**
          * 属性编号
-         *
          * 关联 {@link ProductPropertyDO#getId()}
          */
         private Long propertyId;
-        ///**
-        // * 属性名字
-        // *
-        // * 冗余 {@link ProductPropertyDO#getName()}
-        // *
-        // * 注意：每次属性名字发生变化时，需要更新该冗余
-        // */ TODO @puhui999：与已有代码逻辑存在冲突；芋艿：冲突点是啥呀？
-        //private String propertyName;
+        /**
+         * 属性名字
+         * 冗余 {@link ProductPropertyDO#getName()}
+         *
+         * 注意：每次属性名字发生变化时，需要更新该冗余
+         */
+        private String propertyName;
 
         /**
          * 属性值编号
-         *
          * 关联 {@link ProductPropertyValueDO#getId()}
          */
         private Long valueId;
-        ///**
-        // * 属性值名字
-        // *
-        // * 冗余 {@link ProductPropertyValueDO#getName()}
-        // *
-        // * 注意：每次属性值名字发生变化时，需要更新该冗余
-        // */ TODO @puhui999：与已有代码逻辑存在冲突；芋艿：冲突点是啥呀？
-        //private String valueName;
+        /**
+         * 属性值名字
+         * 冗余 {@link ProductPropertyValueDO#getName()}
+         *
+         * 注意：每次属性值名字发生变化时，需要更新该冗余
+         */
+        private String valueName;
 
     }
 

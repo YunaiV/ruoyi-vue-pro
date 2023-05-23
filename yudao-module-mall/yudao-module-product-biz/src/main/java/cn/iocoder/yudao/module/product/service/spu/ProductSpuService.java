@@ -75,6 +75,14 @@ public interface ProductSpuService {
     List<ProductSpuDO> getSpuList();
 
     /**
+     * 获得所有商品 SPU 列表
+     *
+     * @param reqVO 导出条件
+     * @return 商品 SPU 列表
+     */
+    List<ProductSpuDO> getSpuList(ProductSpuExportReqVO reqVO);
+
+    /**
      * 获得商品 SPU 分页，提供给挂你兰后台使用
      *
      * @param pageReqVO 分页查询

@@ -176,7 +176,6 @@ public class ProductSkuServiceImpl implements ProductSkuService {
             Long existsSkuId = existsSkuMap.remove(propertiesKey);
             if (existsSkuId != null) {
                 sku.setId(existsSkuId);
-                // TODO 那spuId岂不是为null了
                 updateSkus.add(sku);
                 return;
             }

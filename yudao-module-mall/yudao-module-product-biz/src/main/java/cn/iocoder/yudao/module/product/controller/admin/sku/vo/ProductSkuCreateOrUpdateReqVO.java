@@ -12,22 +12,6 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSkuCreateOrUpdateReqVO extends ProductSkuBaseVO {
 
-    @Schema(description = "商品属性")
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Property {
-
-        @Schema(description = "属性编号", required = true, example = "1")
-        @NotNull(message = "属性编号不能为空")
-        private Long propertyId;
-
-        @Schema(description = "属性值编号", required = true, example = "1024")
-        @NotNull(message = "属性值编号不能为空")
-        private Long valueId;
-
-    }
-
     /**
      * 属性数组
      */
