@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.property;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -19,7 +20,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductPropertyDO extends TenantBaseDO { // TODO @puhui999：这里是不是用 BaseDO 就可以了？
+public class ProductPropertyDO extends BaseDO {
 
     /**
      * 主键

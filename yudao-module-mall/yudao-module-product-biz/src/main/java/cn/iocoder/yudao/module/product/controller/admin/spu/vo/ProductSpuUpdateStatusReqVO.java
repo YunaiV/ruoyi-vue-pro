@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,6 +12,11 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * 商品 SPU Status 更新 Request VO
+ *
+ * @author HUIHUI
+ */
 @Schema(description = "管理后台 - 商品 SPU Status 更新 Request VO")
 @Data
 public class ProductSpuUpdateStatusReqVO{
@@ -20,7 +27,7 @@ public class ProductSpuUpdateStatusReqVO{
 
     @Schema(description = "商品状态", required = true, example = "1")
     @NotNull(message = "商品状态不能为空")
+    @InEnum(ProductSpuStatusEnum.class)
     private Integer status;
-
 
 }

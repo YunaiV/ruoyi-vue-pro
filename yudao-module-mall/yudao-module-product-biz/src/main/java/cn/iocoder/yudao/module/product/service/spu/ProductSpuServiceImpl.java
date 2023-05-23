@@ -17,8 +17,9 @@ import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
+import cn.iocoder.yudao.module.product.enums.ProductConstants;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuTabTypeEnum;
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
@@ -35,8 +36,7 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
 /**
  * 商品 SPU Service 实现类
@@ -63,11 +63,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createSpu(ProductSpuCreateReqVO createReqVO) {
-        // 校验分类 TODO puhui999：暂不清楚为什么只能选择第三层的结点；芋艿：改成二级分类，因为商品只能放在叶子节点级别；
-        //validateCategory(createReqVO.getCategoryId());
-        // 校验品牌 TODO puhui999：暂不校验，前端没有做品牌选择；芋艿：可以加下哈
-        //brandService.validateProductBrand(createReqVO.getBrandId());
-
+        // 校验分类 TODO puhui999：暂不清楚为什么只能选择第三层的结点；芋艿：改成二级分类，因为商品只能放在叶子节点级别；fix
+        validateCategory(createReqVO.getCategoryId());
+        brandService.validateProductBrand(createReqVO.getBrandId());
         List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = createReqVO.getSkus();
         // 校验 SKU
         productSkuService.validateSkuList(skuSaveReqList, createReqVO.getSpecType());
@@ -88,10 +86,10 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public void updateSpu(ProductSpuUpdateReqVO updateReqVO) {
         // 校验 SPU 是否存在
         validateSpuExists(updateReqVO.getId());
-        // 校验分类 TODO 暂不清楚为什么只能选择第三层的结点
-        //validateCategory(updateReqVO.getCategoryId());
-        // 校验品牌 TODO 暂不校验，前端没有做品牌选择
-        //brandService.validateProductBrand(updateReqVO.getBrandId());
+        // 校验分类
+        validateCategory(updateReqVO.getCategoryId());
+        // 校验品牌
+        brandService.validateProductBrand(updateReqVO.getBrandId());
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = updateReqVO.getSkus();
         productSkuService.validateSkuList(skuSaveReqList, updateReqVO.getSpecType());
@@ -107,7 +105,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
      * 基于 SKU 的信息，初始化 SPU 的信息
      * 主要是计数相关的字段，例如说市场价、最大最小价、库存等等
      *
-     * @param spu 商品 SPU
+     * @param spu  商品 SPU
      * @param skus 商品 SKU 数组
      */
     private void initSpuFromSkus(ProductSpuDO spu, List<ProductSkuCreateOrUpdateReqVO> skus) {
@@ -123,13 +121,17 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         spu.setCostPrice(vo.getCostPrice());
         // sku单价最低的商品的条形码
         spu.setBarCode(vo.getBarCode());
-        // 默认状态为上架
-        spu.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
-        // TODO 默认商品销量和浏览量为零
-        spu.setSalesCount(0);
-        spu.setBrowseCount(0);
         // skus库存总数
         spu.setStock(getSumValue(skus, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
+        // 若是 spu 已有状态则不处理
+        if (spu.getStatus() == null) {
+            // 默认状态为上架
+            spu.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
+            // 默认商品销量
+            spu.setSalesCount(ProductConstants.SALES_COUNT);
+            // 默认商品浏览量
+            spu.setBrowseCount(ProductConstants.BROWSE_COUNT);
+        }
     }
 
     /**
@@ -140,7 +142,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private void validateCategory(Long id) {
         categoryService.validateCategory(id);
         // 校验层级
-        if (categoryService.getCategoryLevel(id) != 3) {
+        if (categoryService.getCategoryLevel(id) != ProductConstants.CATEGORY_LEVEL) {
             throw exception(SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR);
         }
     }
@@ -150,6 +152,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public void deleteSpu(Long id) {
         // 校验存在
         validateSpuExists(id);
+        // 校验商品状态不是回收站不能删除
+        validateSpuStatus(id);
         // 删除 SPU
         productSpuMapper.deleteById(id);
         // 删除关联的 SKU
@@ -159,6 +163,19 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private void validateSpuExists(Long id) {
         if (productSpuMapper.selectById(id) == null) {
             throw exception(SPU_NOT_EXISTS);
+        }
+    }
+
+    /**
+     * 验证 SPU 状态是否为回收站
+     *
+     * @param id id
+     */
+    private void validateSpuStatus(Long id) {
+        ProductSpuDO spuDO = productSpuMapper.selectById(id);
+        // 判断 SPU 状态是否为回收站
+        if (ObjectUtil.notEqual(spuDO.getStatus(), ProductSpuStatusEnum.RECYCLE.getStatus())) {
+            throw exception(SPU_NOT_RECYCLE);
         }
     }
 
@@ -175,6 +192,11 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Override
     public List<ProductSpuDO> getSpuList() {
         return productSpuMapper.selectList();
+    }
+
+    @Override
+    public List<ProductSpuDO> getSpuList(ProductSpuExportReqVO reqVO) {
+        return productSpuMapper.selectList(reqVO);
     }
 
     @Override
@@ -202,7 +224,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         stockIncrCounts.forEach((id, incCount) -> productSpuMapper.updateStock(id, incCount));
     }
 
-    // TODO @puhui999：Service 尽量不做一些跟 VO 相关的拼接逻辑，目的是让 Service 更加简洁一点哈。
     @Override
     public ProductSpuDetailRespVO getSpuDetail(Long id) {
         // 获得商品 SPU
@@ -210,28 +231,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         if (spu == null) {
             throw exception(SPU_NOT_EXISTS);
         }
-        ProductSpuDetailRespVO productSpuDetailRespVO = ProductSpuConvert.INSTANCE.convert03(spu);
         // 查询商品 SKU
         List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
-        if (CollUtil.isNotEmpty(skus)){
-            // TODO @puhui999：skuVOs 更简洁一点。然后大小写要注释哈。RespVOs；因为 VO 是缩写，s 是复数
-            List<ProductSkuRespVO> skuRespVoS = ProductSkuConvert.INSTANCE.convertList(skus);
-            // 非多规格，不需要处理
-            // TODO @puhui999：统一模型，即使是单规格，也查询下，问题不大的
-            if (ObjectUtil.equal(productSpuDetailRespVO.getSpecType(), true)) {
-                // 获取所有的属性值 id
-                Set<Long> valueIds = skus.stream().flatMap(p -> p.getProperties().stream())
-                        .map(ProductSkuDO.Property::getValueId)
-                        .collect(Collectors.toSet());
-                List<ProductPropertyValueDetailRespBO> valueDetailList = productPropertyValueService.getPropertyValueDetailList(valueIds);
-                // TODO @puhui999：拼接的逻辑，最好查询好后，丢到 convert 里面统一处理；这样 Service or Controller 也可以更简洁；原则上，Controller 去组合；Service 写逻辑；Convert 转换
-                Map<Long, String> stringMap = valueDetailList.stream().collect(Collectors.toMap(ProductPropertyValueDetailRespBO::getValueId, ProductPropertyValueDetailRespBO::getValueName));
-                // 设置属性值名称
-                skuRespVoS.stream().flatMap(p -> p.getProperties().stream()).forEach(item ->item.setValueName(stringMap.get(item.getValueId())));
-            }
-            productSpuDetailRespVO.setSkus(skuRespVoS);
-        }
-        return productSpuDetailRespVO;
+        return ProductSpuConvert.INSTANCE.convertForSpuDetailRespVO(spu, skus, productPropertyValueService::getPropertyValueDetailList);
     }
 
     @Override
@@ -247,21 +249,21 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public Map<Integer, Long> getTabsCount() {
-        // TODO @puhui999：map =》counts；尽量避免出现 map 这种命名，无命名含义哈
-        Map<Integer, Long> map = new HashMap<>();
+        // TODO @puhui999：map =》；尽量避免出现 map 这种命名，无命名含义哈 fix
+        Map<Integer, Long> counts = new HashMap<>(ProductConstants.SPU_TAB_COUNTS);
         // 查询销售中的商品数量
-        map.put(ProductSpuTabTypeEnum.FOR_SALE.getType(), productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus()));
+        counts.put(ProductSpuPageTabEnum.FOR_SALE.getType(), productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus()));
         // 查询仓库中的商品数量
-        map.put(ProductSpuTabTypeEnum.IN_WAREHOUSE.getType(),productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus()));
+        counts.put(ProductSpuPageTabEnum.IN_WAREHOUSE.getType(), productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus()));
         // 查询售空的商品数量
-        map.put(ProductSpuTabTypeEnum.SOLD_OUT.getType(),productSpuMapper.selectCount(ProductSpuDO::getStock, 0));
-        // 查询触发警戒库存的商品数量 TODO 警戒库存暂时为 10，后期需要使用常量或者数据库配置替换
-        // TODO @puhui999：要有空格；, productSpuMapper
-        // TODO @puhui999：Service 不要有 Mapper 的逻辑；想想咋抽象一下哈
-        map.put(ProductSpuTabTypeEnum.ALERT_STOCK.getType(),productSpuMapper.selectCount(new LambdaQueryWrapperX<ProductSpuDO>().le(ProductSpuDO::getStock, 10)));
+        counts.put(ProductSpuPageTabEnum.SOLD_OUT.getType(), productSpuMapper.selectCount(ProductSpuDO::getStock, 0));
+        // 查询触发警戒库存的商品数量
+        // TODO @puhui999：要有空格；, productSpuMapper fix
+        // TODO @puhui999：Service 不要有 Mapper 的逻辑；想想咋抽象一下哈 fix：调整为在 productSpuMapper 中书写逻辑
+        counts.put(ProductSpuPageTabEnum.ALERT_STOCK.getType(), productSpuMapper.selectCountByStockAndStatus());
         // 查询回收站中的商品数量
-        map.put(ProductSpuTabTypeEnum.RECYCLE_BIN.getType(),productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
-        return map;
+        counts.put(ProductSpuPageTabEnum.RECYCLE_BIN.getType(), productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
+        return counts;
     }
 
 }

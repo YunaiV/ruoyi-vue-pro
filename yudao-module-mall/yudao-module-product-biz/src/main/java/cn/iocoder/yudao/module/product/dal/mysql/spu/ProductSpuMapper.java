@@ -1,40 +1,56 @@
 package cn.iocoder.yudao.module.product.dal.mysql.spu;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuExportReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
+import cn.iocoder.yudao.module.product.enums.ProductConstants;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuTabTypeEnum;
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.poi.ss.formula.functions.T;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 @Mapper
 public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
 
+    /**
+     * 获取 商品 SPU 分页列表数据
+     *
+     * @param reqVO 分页请求参数
+     * @return 商品 SPU 分页列表数据
+     */
     default PageResult<ProductSpuDO> selectPage(ProductSpuPageReqVO reqVO) {
-        // TODO @puhui999：多个 tab，写 if else 去补条件，可阅读性会好点哈
-        return selectPage(reqVO, new LambdaQueryWrapperX<ProductSpuDO>()
-                // 商品名称
+        Integer tabType = reqVO.getTabType();
+        LambdaQueryWrapperX<ProductSpuDO> queryWrapper = new LambdaQueryWrapperX<ProductSpuDO>()
                 .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
+                .eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId())
                 .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime())
-                // 出售中商品
-                .eq(ProductSpuTabTypeEnum.FOR_SALE.getType().equals(reqVO.getTabType()),ProductSpuDO::getStatus,ProductSpuStatusEnum.ENABLE.getStatus())
-                // 仓储中商品
-                .eq(ProductSpuTabTypeEnum.IN_WAREHOUSE.getType().equals(reqVO.getTabType()),ProductSpuDO::getStatus,ProductSpuStatusEnum.DISABLE.getStatus())
-                // 已售空商品
-                .eq(ProductSpuTabTypeEnum.SOLD_OUT.getType().equals(reqVO.getTabType()),ProductSpuDO::getStock,0)
-                // TODO @phuui999：警戒库存暂时为 10，后期需要使用常量或者数据库配置替换
-                .le(ProductSpuTabTypeEnum.ALERT_STOCK.getType().equals(reqVO.getTabType()),ProductSpuDO::getStock,10)
-                // 回收站
-                .eq(ProductSpuTabTypeEnum.RECYCLE_BIN.getType().equals(reqVO.getTabType()),ProductSpuDO::getStatus,ProductSpuStatusEnum.RECYCLE.getStatus())
-                .orderByDesc(ProductSpuDO::getSort));
+                .orderByDesc(ProductSpuDO::getSort);
+        validateTabType(tabType, queryWrapper);
+        return selectPage(reqVO, queryWrapper);
+    }
+
+    /**
+     * 获取库存小于value且状态不等于status的的个数
+     */
+    default Long selectCountByStockAndStatus() {
+        LambdaQueryWrapperX<ProductSpuDO> queryWrapper = new LambdaQueryWrapperX<>();
+        queryWrapper.le(ProductSpuDO::getStock, ProductConstants.ALERT_STOCK)
+                // 如果库存触发警戒库存且状态为回收站的话则不计入触发警戒库存的个数
+                .and(q -> q.ne(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
+        return selectCount(queryWrapper);
     }
 
     /**
@@ -42,10 +58,12 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
      */
     default PageResult<ProductSpuDO> selectPage(AppProductSpuPageReqVO pageReqVO, Set<Long> categoryIds) {
         LambdaQueryWrapperX<ProductSpuDO> query = new LambdaQueryWrapperX<ProductSpuDO>()
-                .likeIfPresent(ProductSpuDO::getName, pageReqVO.getKeyword()) // 关键字匹配，目前只匹配商品名
-                .inIfPresent(ProductSpuDO::getCategoryId, categoryIds); // 分类
-        query.eq(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus()) // 上架状态
-                .gt(ProductSpuDO::getStock, 0); // 有库存
+                // 关键字匹配，目前只匹配商品名
+                .likeIfPresent(ProductSpuDO::getName, pageReqVO.getKeyword())
+                // 分类
+                .inIfPresent(ProductSpuDO::getCategoryId, categoryIds);
+        // 上架状态 且有库存
+        query.eq(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus()).gt(ProductSpuDO::getStock, 0);
         // 推荐类型的过滤条件
         if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_HOT)) {
             query.eq(ProductSpuDO::getRecommendHot, true);
@@ -66,14 +84,60 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
     /**
      * 更新商品 SPU 库存
      *
-     * @param id 商品 SPU 编号
+     * @param id        商品 SPU 编号
      * @param incrCount 增加的库存数量
      */
     default void updateStock(Long id, Integer incrCount) {
         LambdaUpdateWrapper<ProductSpuDO> updateWrapper = new LambdaUpdateWrapper<ProductSpuDO>()
-                .setSql(" total_stock = total_stock +" + incrCount) // 负数，所以使用 + 号
+                // 负数，所以使用 + 号
+                .setSql(" stock = stock +" + incrCount)
                 .eq(ProductSpuDO::getId, id);
         update(null, updateWrapper);
     }
 
+    /**
+     * 获得 Spu 列表
+     *
+     * @param reqVO 查询条件
+     * @return Spu 列表
+     */
+    default List<ProductSpuDO> selectList(ProductSpuExportReqVO reqVO){
+        Integer tabType = reqVO.getTabType();
+        LambdaQueryWrapperX<ProductSpuDO> queryWrapper = new LambdaQueryWrapperX<>();
+        queryWrapper.eqIfPresent(ProductSpuDO::getName,reqVO.getName());
+        queryWrapper.eqIfPresent(ProductSpuDO::getCategoryId,reqVO.getCategoryId());
+        queryWrapper.betweenIfPresent(ProductSpuDO::getCreateTime,reqVO.getCreateTime());
+        validateTabType(tabType, queryWrapper);
+        return selectList(queryWrapper);
+    }
+
+    /**
+     * 验证选项卡类型构建条件
+     *
+     * @param tabType      标签类型
+     * @param queryWrapper 查询条件
+     */
+    static void validateTabType(Integer tabType, LambdaQueryWrapperX<ProductSpuDO> queryWrapper) {
+        if (ObjectUtil.equals(ProductSpuPageTabEnum.FOR_SALE.getType(), tabType)) {
+            // 出售中商品
+            queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus());
+        }
+        if (ObjectUtil.equals(ProductSpuPageTabEnum.IN_WAREHOUSE.getType(), tabType)) {
+            // 仓储中商品
+            queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus());
+        }
+        if (ObjectUtil.equals(ProductSpuPageTabEnum.SOLD_OUT.getType(), tabType)) {
+            // 已售空商品
+            queryWrapper.eqIfPresent(ProductSpuDO::getStock, 0);
+        }
+        if (ObjectUtil.equals(ProductSpuPageTabEnum.ALERT_STOCK.getType(), tabType)) {
+            queryWrapper.le(ProductSpuDO::getStock, ProductConstants.ALERT_STOCK)
+                    // 如果库存触发警戒库存且状态为回收站的话则不在警戒库存列表展示
+                    .and(q -> q.ne(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
+        }
+        if (ObjectUtil.equals(ProductSpuPageTabEnum.RECYCLE_BIN.getType(), tabType)) {
+            // 回收站
+            queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus());
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
@@ -49,23 +50,26 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
     @MockBean
     private ProductPropertyValueService productPropertyValueService;
 
+    public Long generateId() {
+        return RandomUtil.randomLong(100000, 999999);
+    }
+
+    public int generaInt(){return RandomUtil.randomInt(1,9999999);}
+
     @Test
     public void testUpdateSkuList() {
         // mock 数据
         ProductSkuDO sku01 = randomPojo(ProductSkuDO.class, o -> { // 测试更新
             o.setSpuId(1L);
-            //o.setProperties(singletonList(new ProductSkuDO.Property(
-            //        10L, "颜色", 20L, "红色"))); TODO 新增字段已注释
             o.setProperties(singletonList(new ProductSkuDO.Property(
-                    10L, 20L)));
+                    10L, "颜色", 20L, "红色")));
         });
         productSkuMapper.insert(sku01);
         ProductSkuDO sku02 = randomPojo(ProductSkuDO.class, o -> { // 测试删除
             o.setSpuId(1L);
-            //o.setProperties(singletonList(new ProductSkuDO.Property(
-            //        10L, "颜色", 30L, "蓝色"))); TODO 新增字段已注释
             o.setProperties(singletonList(new ProductSkuDO.Property(
-                    10L, 30L)));
+                    10L, "颜色", 30L, "蓝色")));
+
         });
         productSkuMapper.insert(sku02);
         // 准备参数
@@ -73,10 +77,12 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
         String spuName = "测试商品";
         List<ProductSkuCreateOrUpdateReqVO> skus = Arrays.asList(
                 randomPojo(ProductSkuCreateOrUpdateReqVO.class, o -> { // 测试更新
-                    o.setProperties(singletonList(new ProductSkuCreateOrUpdateReqVO.Property(10L, 20L)));
+                    o.setProperties(singletonList(new ProductSkuCreateOrUpdateReqVO.Property(
+                            10L, "颜色", 20L, "红色")));
                 }),
                 randomPojo(ProductSkuCreateOrUpdateReqVO.class, o -> { // 测试新增
-                    o.setProperties(singletonList(new ProductSkuCreateOrUpdateReqVO.Property(10L, 40L)));
+                    o.setProperties(singletonList(new ProductSkuCreateOrUpdateReqVO.Property(
+                            10L, "颜色", 20L, "红色")));
                 })
         );
 

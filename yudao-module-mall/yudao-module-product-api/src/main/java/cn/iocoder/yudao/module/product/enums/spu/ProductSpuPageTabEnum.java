@@ -1,24 +1,27 @@
 package cn.iocoder.yudao.module.product.enums.spu;
 
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 // TODO @puhui999：中英文之间要有空格； 商品 spu Tab 标签枚举；这个类可以改成 ProductSpuPageTabEnum 会更好一点哈；分页 Tab 的意思；
 /**
- * 商品spu标签枚举类型
+ * 商品 spu Tabs 标签枚举类型
  *
  * @author HUIHUI
  */
 @Getter
 @AllArgsConstructor
-public enum ProductSpuTabTypeEnum {
+public enum ProductSpuPageTabEnum implements IntArrayValuable {
 
     FOR_SALE(0,"出售中商品"),
     IN_WAREHOUSE(1,"仓库中商品"),
     SOLD_OUT(2,"已售空商品"),
     ALERT_STOCK(3,"警戒库存"),
     RECYCLE_BIN(4,"商品回收站");
-
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ProductSpuPageTabEnum::getType).toArray();
     /**
      * 状态
      */
@@ -28,4 +31,8 @@ public enum ProductSpuTabTypeEnum {
      */
     private final String name;
 
+    @Override
+    public int[] array() {
+        return ARRAYS;
+    }
 }

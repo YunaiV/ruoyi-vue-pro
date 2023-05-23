@@ -6,20 +6,36 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "管理后台 - 商品 SPU 详细 Response VO") // 包括关联的 SKU 等信息
+/**
+ * 商品 SPU 详细 Response VO
+ * 包括关联的 SKU 等信息
+ *
+ * @author HUIHUI
+ */
+@Schema(description = "管理后台 - 商品 SPU 详细 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSpuDetailRespVO extends ProductSpuBaseVO {
 
-    @Schema(description = "商品编号", example = "1")
+    @Schema(description = "spuId")
     private Long id;
+
+    @Schema(description = "商品销量")
+    private Integer salesCount;
+
+    @Schema(description = "浏览量")
+    private Integer browseCount;
+
+    @Schema(description = "商品状态")
+    private Integer status;
 
     // ========== SKU 相关字段 =========
 
-    @Schema(description = "SKU 数组", example = "1")
+    @Schema(description = "SKU 数组")
     private List<ProductSkuRespVO> skus;
 
 }

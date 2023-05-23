@@ -2,6 +2,9 @@ package cn.iocoder.yudao.module.product.controller.admin.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -16,12 +19,24 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
+/**
+ * 商品 SPU 相关接口
+ *
+ * @author HUIHUI
+ */
 @Tag(name = "管理后台 - 商品 SPU")
 @RestController
 @RequestMapping("/product/spu")
@@ -30,10 +45,6 @@ public class ProductSpuController {
 
     @Resource
     private ProductSpuService productSpuService;
-    @Resource
-    private ProductSkuService productSkuService;
-    @Resource
-    private ProductPropertyValueService productPropertyValueService;
 
     @PostMapping("/create")
     @Operation(summary = "创建商品 SPU")
@@ -50,7 +61,7 @@ public class ProductSpuController {
         return success(true);
     }
 
-    @PutMapping("/updateStatus")
+    @PutMapping("/update-status")
     @Operation(summary = "更新商品 SPU Status")
     @PreAuthorize("@ss.hasPermission('product:spu:update')")
     public CommonResult<Boolean> updateStatus(@Valid @RequestBody ProductSpuUpdateStatusReqVO updateReqVO) {
@@ -86,16 +97,27 @@ public class ProductSpuController {
     @GetMapping("/page")
     @Operation(summary = "获得商品 SPU 分页")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<PageResult<ProductSpuPageRespVO>> getSpuPage(@Valid ProductSpuPageReqVO pageVO) {
+    public CommonResult<PageResult<ProductSpuRespVO>> getSpuPage(@Valid ProductSpuPageReqVO pageVO) {
         return success(ProductSpuConvert.INSTANCE.convertPage(productSpuService.getSpuPage(pageVO)));
     }
-    
-    // TODO @tuihui999：get-count；另外，url 使用 - 拆分
-    @GetMapping("/tabsCount")
-    @Operation(summary = "获得商品 SPU tabsCount")
+
+    // TODO @tuihui999：get-count；另外，url 使用 - 拆分  fix
+    @GetMapping("/get-count")
+    @Operation(summary = "获得商品 SPU 分页 tab count")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<Map<Integer, Long>> getTabsCount() {
         return success(productSpuService.getTabsCount());
     }
 
+    @GetMapping("/export")
+    @Operation(summary = "导出用户")
+    @PreAuthorize("@ss.hasPermission('product:spu:export')")
+    @OperateLog(type = EXPORT)
+    public void exportUserList(@Validated ProductSpuExportReqVO reqVO,
+                               HttpServletResponse response) throws IOException {
+        List<ProductSpuDO> spuList = productSpuService.getSpuList(reqVO);
+        // 导出 Excel
+        List<ProductSpuExcelVO> datas = ProductSpuConvert.INSTANCE.convertList03(spuList);
+        ExcelUtils.write(response, "商品spu.xls", "数据", ProductSpuExcelVO.class, datas);
+    }
 }

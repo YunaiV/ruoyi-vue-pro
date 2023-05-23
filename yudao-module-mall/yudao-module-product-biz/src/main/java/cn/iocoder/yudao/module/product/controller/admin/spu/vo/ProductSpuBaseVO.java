@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -10,7 +11,9 @@ import java.util.List;
 /**
 * 商品 SPU Base VO，提供给添加、修改、详细的子 VO 使用
 * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
-*/
+ *
+ * @author HUIHUI
+ */
 @Data
 public class ProductSpuBaseVO {
 
@@ -30,11 +33,12 @@ public class ProductSpuBaseVO {
     @NotEmpty(message = "商品详情不能为空")
     private String description;
 
-    @Schema(description = "商品分类编号", required = true, example = "芋道")
-    @NotNull(message = "商品分类编号不能为空")
+    @Schema(description = "商品分类编号", required = true, example = "1")
+    @NotNull(message = "商品分类不能为空")
     private Long categoryId;
 
-    @Schema(description = "商品品牌编号", required = true, example = "芋道")
+    @Schema(description = "商品品牌编号", required = true, example = "1")
+    @NotNull(message = "商品品牌不能为空")
     private Long brandId;
 
     @Schema(description = "商品封面图", required = true, example = "芋道")
@@ -96,16 +100,16 @@ public class ProductSpuBaseVO {
     @Schema(description = "赠送的优惠劵编号的数组") // TODO 这块前端还未实现
     private List<Long> giveCouponTemplateIds;
 
-    @Schema(description = "分销类型")
+    @Schema(description = "分销类型", example = "true")
     @NotNull(message = "商品分销类型不能为空")
     private Boolean subCommissionType;
 
-    @Schema(description = "活动展示顺序") // TODO 这块前端还未实现
+    @Schema(description = "活动展示顺序", example = "[1、3、2、4、5]") // TODO 这块前端还未实现
     private List<Integer> activityOrders;
 
     // ========== 统计相关字段 =========
 
-    @Schema(description = "虚拟销量", required = true, example = "芋道")
+    @Schema(description = "虚拟销量", example = "芋道")
     private Integer virtualSalesCount;
 
 }
