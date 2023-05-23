@@ -10,13 +10,10 @@ import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReq
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.enums.ProductConstants;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.poi.ss.formula.functions.T;
 
 import java.util.List;
 import java.util.Objects;
@@ -26,7 +23,7 @@ import java.util.Set;
 public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
 
     /**
-     * 获取 商品 SPU 分页列表数据
+     * 获取商品 SPU 分页列表数据
      *
      * @param reqVO 分页请求参数
      * @return 商品 SPU 分页列表数据
@@ -43,11 +40,14 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
     }
 
     /**
-     * 获取库存小于value且状态不等于status的的个数
+     * 获取库存小于 value ，且状态不等于 status 的的个数
+     *
+     * @return 个数
      */
     default Long selectCountByStockAndStatus() {
         LambdaQueryWrapperX<ProductSpuDO> queryWrapper = new LambdaQueryWrapperX<>();
         queryWrapper.le(ProductSpuDO::getStock, ProductConstants.ALERT_STOCK)
+                // TODO @puhui999：IN 另外两个状态，会不会好点哈。尽量不用 !=
                 // 如果库存触发警戒库存且状态为回收站的话则不计入触发警戒库存的个数
                 .and(q -> q.ne(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
         return selectCount(queryWrapper);
@@ -111,6 +111,7 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
         return selectList(queryWrapper);
     }
 
+    // TODO @puhui999：应该不太适合 validate 验证，应该是补充条件，例如说 appendTabQuery
     /**
      * 验证选项卡类型构建条件
      *
@@ -118,8 +119,8 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
      * @param queryWrapper 查询条件
      */
     static void validateTabType(Integer tabType, LambdaQueryWrapperX<ProductSpuDO> queryWrapper) {
+        // 出售中商品 TODO puhui999：这样好点
         if (ObjectUtil.equals(ProductSpuPageTabEnum.FOR_SALE.getType(), tabType)) {
-            // 出售中商品
             queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus());
         }
         if (ObjectUtil.equals(ProductSpuPageTabEnum.IN_WAREHOUSE.getType(), tabType)) {

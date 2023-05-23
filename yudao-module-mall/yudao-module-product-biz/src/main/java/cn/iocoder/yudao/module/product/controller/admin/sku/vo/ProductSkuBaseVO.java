@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.product.controller.admin.sku.vo;
 
-import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -57,6 +55,7 @@ public class ProductSkuBaseVO {
     @Schema(description = "二级分销的佣金，单位：分", example = "1024")
     private Integer subCommissionSecondPrice;
 
+    // TODO @puhui999：这里要写 swagger 注解哈
     /**
      * 商品属性
      */
@@ -67,27 +66,19 @@ public class ProductSkuBaseVO {
 
         /**
          * 属性编号
-         * 关联 {@link ProductPropertyDO#getId()}
          */
         private Long propertyId;
         /**
          * 属性名字
-         * 冗余 {@link ProductPropertyDO#getName()}
-         *
-         * 注意：每次属性名字发生变化时，需要更新该冗余
          */
         private String propertyName;
 
         /**
          * 属性值编号
-         * 关联 {@link ProductPropertyValueDO#getId()}
          */
         private Long valueId;
         /**
          * 属性值名字
-         * 冗余 {@link ProductPropertyValueDO#getName()}
-         *
-         * 注意：每次属性值名字发生变化时，需要更新该冗余
          */
         private String valueName;
 

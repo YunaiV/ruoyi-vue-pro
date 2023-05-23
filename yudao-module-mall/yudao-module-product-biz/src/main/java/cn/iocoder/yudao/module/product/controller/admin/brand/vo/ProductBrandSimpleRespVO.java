@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// TODO @puhui999：class 类的开始和结束，都要有一个空行哈。
 @Schema(description = "管理后台 - 品牌精简信息 Response VO")
 @Data
 @NoArgsConstructor

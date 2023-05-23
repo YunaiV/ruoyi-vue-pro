@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -11,7 +10,6 @@ import lombok.ToString;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -24,6 +22,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSpuUpdateReqVO extends ProductSpuBaseVO {
+
+    // TODO @puhui999：swagger 的 required 和 example 写下
 
     @Schema(description = "商品编号", required = true, example = "1")
     @NotNull(message = "商品编号不能为空")

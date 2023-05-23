@@ -1,29 +1,24 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
-import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.ProductConstants;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
+import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
-import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -32,7 +27,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
@@ -63,11 +57,11 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createSpu(ProductSpuCreateReqVO createReqVO) {
-        // 校验分类 TODO puhui999：暂不清楚为什么只能选择第三层的结点；芋艿：改成二级分类，因为商品只能放在叶子节点级别；fix
+        // 校验分类、品牌
         validateCategory(createReqVO.getCategoryId());
         brandService.validateProductBrand(createReqVO.getBrandId());
-        List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = createReqVO.getSkus();
         // 校验 SKU
+        List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = createReqVO.getSkus();
         productSkuService.validateSkuList(skuSaveReqList, createReqVO.getSpecType());
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
         // 初始化 SPU 中 SKU 相关属性
@@ -86,13 +80,13 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public void updateSpu(ProductSpuUpdateReqVO updateReqVO) {
         // 校验 SPU 是否存在
         validateSpuExists(updateReqVO.getId());
-        // 校验分类
+        // 校验分类、品牌
         validateCategory(updateReqVO.getCategoryId());
-        // 校验品牌
         brandService.validateProductBrand(updateReqVO.getBrandId());
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = updateReqVO.getSkus();
         productSkuService.validateSkuList(skuSaveReqList, updateReqVO.getSpecType());
+        // TODO @puhui999：可以校验逻辑，和更新逻辑，中间有个空行，这样会发现，哟 这里到了关键逻辑啦，更有层次感
         // 更新 SPU
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);
         initSpuFromSkus(updateObj, skuSaveReqList);
@@ -111,17 +105,19 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private void initSpuFromSkus(ProductSpuDO spu, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // 断言，避免告警
         assert skus.size() > 0;
-        // 获取sku单价最低的商品
+        // 获取 sku 单价最低的商品
+        // TODO @puhui999：vo 改成 sku 会更好。vo dto 只是我们用来区分的，如果能区分的情况下，用更明确的名字会更好。
+//        CollectionUtils.getMinValue(); TODO @puhui999：可以用这个方法，常见的 stream 操作，封装成方法，让逻辑更简洁
         ProductSkuCreateOrUpdateReqVO vo = skus.stream().min(Comparator.comparing(ProductSkuCreateOrUpdateReqVO::getPrice)).get();
-        // sku单价最低的商品的价格
+        // sku 单价最低的商品的价格
         spu.setPrice(vo.getPrice());
-        // sku单价最低的商品的市场价格
+        // sku 单价最低的商品的市场价格
         spu.setMarketPrice(vo.getMarketPrice());
         // sku单价最低的商品的成本价格
         spu.setCostPrice(vo.getCostPrice());
         // sku单价最低的商品的条形码
         spu.setBarCode(vo.getBarCode());
-        // skus库存总数
+        // skus 库存总数
         spu.setStock(getSumValue(skus, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
         // 若是 spu 已有状态则不处理
         if (spu.getStatus() == null) {
@@ -233,6 +229,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         }
         // 查询商品 SKU
         List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
+        // TODO @puhui999：感觉还是查询好 productPropertyValueService，然后 propertyId 可以交给 convert 处理下即可。
         return ProductSpuConvert.INSTANCE.convertForSpuDetailRespVO(spu, skus, productPropertyValueService::getPropertyValueDetailList);
     }
 
@@ -249,7 +246,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public Map<Integer, Long> getTabsCount() {
-        // TODO @puhui999：map =》；尽量避免出现 map 这种命名，无命名含义哈 fix
         Map<Integer, Long> counts = new HashMap<>(ProductConstants.SPU_TAB_COUNTS);
         // 查询销售中的商品数量
         counts.put(ProductSpuPageTabEnum.FOR_SALE.getType(), productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus()));
@@ -258,8 +254,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 查询售空的商品数量
         counts.put(ProductSpuPageTabEnum.SOLD_OUT.getType(), productSpuMapper.selectCount(ProductSpuDO::getStock, 0));
         // 查询触发警戒库存的商品数量
-        // TODO @puhui999：要有空格；, productSpuMapper fix
-        // TODO @puhui999：Service 不要有 Mapper 的逻辑；想想咋抽象一下哈 fix：调整为在 productSpuMapper 中书写逻辑
         counts.put(ProductSpuPageTabEnum.ALERT_STOCK.getType(), productSpuMapper.selectCountByStockAndStatus());
         // 查询回收站中的商品数量
         counts.put(ProductSpuPageTabEnum.RECYCLE_BIN.getType(), productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));

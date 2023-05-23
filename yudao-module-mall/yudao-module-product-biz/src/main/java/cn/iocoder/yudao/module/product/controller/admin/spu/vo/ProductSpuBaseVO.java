@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -97,14 +96,14 @@ public class ProductSpuBaseVO {
     @NotNull(message = "商品赠送积分不能为空")
     private Integer giveIntegral;
 
-    @Schema(description = "赠送的优惠劵编号的数组") // TODO 这块前端还未实现
+    @Schema(description = "赠送的优惠劵编号的数组", example = "[1, 10]") // TODO 这块前端还未实现
     private List<Long> giveCouponTemplateIds;
 
-    @Schema(description = "分销类型", example = "true")
+    @Schema(description = "分销类型", required = true, example = "true")
     @NotNull(message = "商品分销类型不能为空")
     private Boolean subCommissionType;
 
-    @Schema(description = "活动展示顺序", example = "[1、3、2、4、5]") // TODO 这块前端还未实现
+    @Schema(description = "活动展示顺序", example = "[1, 3, 2, 4, 5]") // TODO 这块前端还未实现
     private List<Integer> activityOrders;
 
     // ========== 统计相关字段 =========

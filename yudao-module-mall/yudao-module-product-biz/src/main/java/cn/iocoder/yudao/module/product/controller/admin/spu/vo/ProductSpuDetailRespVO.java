@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -21,7 +20,9 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSpuDetailRespVO extends ProductSpuBaseVO {
 
-    @Schema(description = "spuId")
+    // TODO @puhui999：swagger 的 required 和 example 写下
+
+    @Schema(description = "商品 SPU 编号")
     private Long id;
 
     @Schema(description = "商品销量")

@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
@@ -15,6 +13,8 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 public class ProductSpuSimpleRespVO {
+
+    // TODO @puhui999：swagger 的 required 和 example 写下
 
     @Schema(description = "主键")
     private Long id;

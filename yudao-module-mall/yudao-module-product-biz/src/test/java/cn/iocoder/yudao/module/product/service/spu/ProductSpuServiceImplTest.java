@@ -6,13 +6,12 @@ import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
-import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
@@ -23,21 +22,20 @@ import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuServiceImpl;
 import com.google.common.collect.Lists;
-import org.apache.poi.ss.formula.functions.T;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -82,6 +80,8 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     }
 
     public int generaInt(){return RandomUtil.randomInt(1,9999999);}
+
+    // TODO @芋艿：单测后续 review 哈
 
     @Test
     public void testCreateSpu_success() {

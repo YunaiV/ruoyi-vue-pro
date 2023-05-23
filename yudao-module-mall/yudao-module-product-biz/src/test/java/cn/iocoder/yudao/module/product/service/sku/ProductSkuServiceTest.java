@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
@@ -50,6 +49,7 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
     @MockBean
     private ProductPropertyValueService productPropertyValueService;
 
+    // TODO @puhui999：是不是可以删除这 2 方法
     public Long generateId() {
         return RandomUtil.randomLong(100000, 999999);
     }

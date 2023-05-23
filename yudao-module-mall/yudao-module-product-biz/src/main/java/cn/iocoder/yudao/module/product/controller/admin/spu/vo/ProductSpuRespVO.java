@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,6 +17,8 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSpuRespVO extends ProductSpuBaseVO {
+
+    // TODO @puhui999：swagger 的 required 和 example 写下
 
     @Schema(description = "spuId")
     private Long id;

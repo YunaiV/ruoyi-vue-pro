@@ -26,7 +26,9 @@ public interface ProductBrandConvert {
     ProductBrandDO convert(ProductBrandUpdateReqVO bean);
 
     ProductBrandRespVO convert(ProductBrandDO bean);
+
     List<ProductBrandSimpleRespVO> convertList1(List<ProductBrandDO> list);
+
     List<ProductBrandRespVO> convertList(List<ProductBrandDO> list);
 
     PageResult<ProductBrandRespVO> convertPage(PageResult<ProductBrandDO> page);

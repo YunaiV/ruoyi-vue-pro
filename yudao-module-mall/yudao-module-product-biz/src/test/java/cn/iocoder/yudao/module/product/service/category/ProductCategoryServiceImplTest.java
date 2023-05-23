@@ -40,10 +40,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateCategory_success() {
         // 准备参数
-        ProductCategoryCreateReqVO reqVO = randomPojo(ProductCategoryCreateReqVO.class,o -> {
-            // 设置PC端图片可为空 TODO 数据库没有这个字段
-            //o.setBigPicUrl(null);
-        });
+        ProductCategoryCreateReqVO reqVO = randomPojo(ProductCategoryCreateReqVO.class);
 
         // mock 父类
         ProductCategoryDO parentProductCategory = randomPojo(ProductCategoryDO.class, o -> {

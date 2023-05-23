@@ -1,5 +1,4 @@
 package cn.iocoder.yudao.module.product.convert.spu;
-import java.time.LocalDateTime;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,8 +9,8 @@ import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageItemRespVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -52,6 +51,8 @@ public interface ProductSpuConvert {
     List<ProductSpuRespDTO> convertList2(List<ProductSpuDO> list);
 
     List<ProductSpuSimpleRespVO> convertList02(List<ProductSpuDO> list);
+
+    // TODO @puhui999：部分属性，可以通过 mapstruct 的 @Mapping(source = , target = , ) 映射转换，可以查下文档
     default List<ProductSpuExcelVO> convertList03(List<ProductSpuDO> list){
         ArrayList<ProductSpuExcelVO> spuExcelVOs = new ArrayList<>();
         list.forEach((spu)->{
@@ -95,6 +96,7 @@ public interface ProductSpuConvert {
     }
     ProductSpuDetailRespVO convert03(ProductSpuDO spu);
 
+    // TODO @puhui999：下面两个没用到，是不是删除呀？
     List<ProductSkuRespVO> convertList04(List<ProductSkuDO> skus);
 
     ProductPropertyValueDetailRespVO convert04(ProductPropertyValueDetailRespBO propertyValue);
@@ -142,11 +144,13 @@ public interface ProductSpuConvert {
 
     AppProductPropertyValueDetailRespVO convertForGetSpuDetail(ProductPropertyValueDetailRespBO propertyValue);
 
-    default ProductSpuDetailRespVO convertForSpuDetailRespVO(ProductSpuDO spu, List<ProductSkuDO> skus, Function<Set<Long>, List<ProductPropertyValueDetailRespBO>> func) {
+    default ProductSpuDetailRespVO convertForSpuDetailRespVO(ProductSpuDO spu, List<ProductSkuDO> skus,
+                                                             Function<Set<Long>, List<ProductPropertyValueDetailRespBO>> func) {
         ProductSpuDetailRespVO productSpuDetailRespVO = convert03(spu);
+        // TODO @puhui999：if return 哈，减少嵌套层数。
         if (CollUtil.isNotEmpty(skus)) {
             List<ProductSkuRespVO> skuVOs = ProductSkuConvert.INSTANCE.convertList(skus);
-            // fix:统一模型，即使是单规格，也查询下，如若Properties为空报错则为单属性不做处理
+            // fix:统一模型，即使是单规格，也查询下，如若 Properties 为空报错则为单属性不做处理
             try {
                 // 获取所有的属性值 id
                 Set<Long> valueIds = skus.stream().flatMap(p -> p.getProperties().stream())

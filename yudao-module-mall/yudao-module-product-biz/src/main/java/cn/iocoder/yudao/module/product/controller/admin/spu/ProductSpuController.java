@@ -2,14 +2,11 @@ package cn.iocoder.yudao.module.product.controller.admin.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
-import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
-import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,14 +19,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 /**
@@ -101,7 +94,7 @@ public class ProductSpuController {
         return success(ProductSpuConvert.INSTANCE.convertPage(productSpuService.getSpuPage(pageVO)));
     }
 
-    // TODO @tuihui999：get-count；另外，url 使用 - 拆分  fix
+    // TODO @puhui999：方法名改成 getSpuCount，只是用于 tab 哈，这样更抽象一点。
     @GetMapping("/get-count")
     @Operation(summary = "获得商品 SPU 分页 tab count")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
@@ -110,7 +103,7 @@ public class ProductSpuController {
     }
 
     @GetMapping("/export")
-    @Operation(summary = "导出用户")
+    @Operation(summary = "导出商品")
     @PreAuthorize("@ss.hasPermission('product:spu:export')")
     @OperateLog(type = EXPORT)
     public void exportUserList(@Validated ProductSpuExportReqVO reqVO,
@@ -118,6 +111,7 @@ public class ProductSpuController {
         List<ProductSpuDO> spuList = productSpuService.getSpuList(reqVO);
         // 导出 Excel
         List<ProductSpuExcelVO> datas = ProductSpuConvert.INSTANCE.convertList03(spuList);
-        ExcelUtils.write(response, "商品spu.xls", "数据", ProductSpuExcelVO.class, datas);
+        ExcelUtils.write(response, "商品列表.xls", "数据", ProductSpuExcelVO.class, datas);
     }
+
 }

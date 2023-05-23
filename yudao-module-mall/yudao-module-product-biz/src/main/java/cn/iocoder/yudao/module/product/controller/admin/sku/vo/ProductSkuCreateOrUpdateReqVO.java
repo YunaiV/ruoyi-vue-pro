@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.product.controller.admin.sku.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Schema(description = "管理后台 - 商品 SKU 创建/更新 Request VO")
@@ -12,6 +13,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSkuCreateOrUpdateReqVO extends ProductSkuBaseVO {
 
+    // TODO @puhui999：是不是可以抽到父类里？
     /**
      * 属性数组
      */

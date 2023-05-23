@@ -111,6 +111,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         if (Objects.equals(id, ProductConstants.PARENT_ID_NULL)) {
             return 0;
         }
+        // TODO @puhui999：for 的原因，是因为避免脏数据，导致可能的死循环。一般不会超过 100 层哈
         int level = 1;
         // fix: 循环次数不确定改为while循环
         while (true){
