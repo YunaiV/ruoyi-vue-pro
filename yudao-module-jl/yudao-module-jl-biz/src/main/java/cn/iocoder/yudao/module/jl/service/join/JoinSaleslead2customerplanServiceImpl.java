@@ -36,6 +36,17 @@ public class JoinSaleslead2customerplanServiceImpl implements JoinSaleslead2cust
         return joinSaleslead2customerplan.getId();
     }
 
+    /**
+     * 根据销售id，获得销售线索中的方案
+     *
+     * @param id 方案id
+     * @return 销售线索中的方案
+     */
+    @Override
+    public List<JoinSaleslead2customerplanDO> getCustomerPlanBySalesleadId(Long id) {
+        return joinSaleslead2customerplanMapper.selectBySalesleadId(id);
+    }
+
     @Override
     public void updateJoinSaleslead2customerplan(JoinSaleslead2customerplanUpdateReqVO updateReqVO) {
         // 校验存在

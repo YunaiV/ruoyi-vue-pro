@@ -26,6 +26,12 @@ public interface JoinSaleslead2reportMapper extends BaseMapperX<JoinSaleslead2re
                 .orderByDesc(JoinSaleslead2reportDO::getId));
     }
 
+    default List<JoinSaleslead2reportDO> selectBySalesleadId(Long salesleadId) {
+        return selectList(new LambdaQueryWrapperX<JoinSaleslead2reportDO>()
+                .eq(JoinSaleslead2reportDO::getSalesleadId, salesleadId)
+                .orderByDesc(JoinSaleslead2reportDO::getUpdateTime));
+    }
+
     default List<JoinSaleslead2reportDO> selectList(JoinSaleslead2reportExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<JoinSaleslead2reportDO>()
                 .betweenIfPresent(JoinSaleslead2reportDO::getCreateTime, reqVO.getCreateTime())

@@ -67,4 +67,5 @@ public interface JoinSaleslead2managerService {
      */
     List<JoinSaleslead2managerDO> getJoinSaleslead2managerList(JoinSaleslead2managerExportReqVO exportReqVO);
 
+    List<JoinSaleslead2managerDO> getBySalesleadId(Long salesleadId);
 }

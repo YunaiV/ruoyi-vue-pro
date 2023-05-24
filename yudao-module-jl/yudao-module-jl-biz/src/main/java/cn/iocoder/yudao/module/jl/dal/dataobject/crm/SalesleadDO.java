@@ -60,4 +60,8 @@ public class SalesleadDO extends BaseDO {
      */
     private Long projectId;
 
+    /**
+     * 业务类型
+     */
+    private String  businessType;
 }

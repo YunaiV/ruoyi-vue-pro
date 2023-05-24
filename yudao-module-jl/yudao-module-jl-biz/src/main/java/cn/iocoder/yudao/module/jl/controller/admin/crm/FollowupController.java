@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.jl.controller.admin.crm;
 
+import cn.iocoder.yudao.module.jl.service.crm.CustomerService;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.io.IOException;
 
@@ -37,11 +39,24 @@ public class FollowupController {
     @Resource
     private FollowupService followupService;
 
+    @Resource
+    private CustomerService customerService;
+
     @PostMapping("/create")
     @Operation(summary = "创建销售线索跟进，可以是跟进客户，也可以是跟进线索")
     @PreAuthorize("@ss.hasPermission('jl:followup:create')")
     public CommonResult<Long> createFollowup(@Valid @RequestBody FollowupCreateReqVO createReqVO) {
-        return success(followupService.createFollowup(createReqVO));
+        Long id = followupService.createFollowup(createReqVO);
+
+        // 为客户绑定最近的跟进记录
+        Long customerId = createReqVO.getCustomerId();
+        CustomerUpdateReqVO customerUpdateReqVO = new CustomerUpdateReqVO();
+        customerUpdateReqVO.setId(customerId);
+        customerUpdateReqVO.setLastFollowupId(id);
+        customerUpdateReqVO.setLastFollowupTime(LocalDateTime.now());
+        customerService.updateCustomer(customerUpdateReqVO);
+
+        return success(id);
     }
 
     @PutMapping("/update")

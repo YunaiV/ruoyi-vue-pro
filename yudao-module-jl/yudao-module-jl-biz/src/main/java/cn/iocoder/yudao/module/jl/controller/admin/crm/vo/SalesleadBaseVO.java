@@ -35,7 +35,9 @@ public class SalesleadBaseVO {
     @NotNull(message = "客户id不能为空")
     private Long customerId;
 
-    @Schema(description = "项目id", example = "8951")
+    @Schema(description = "项目id", example = "8951", nullable = true)
     private Long projectId;
 
+    @Schema(description = "业务类型", example = "课题研究", nullable = true)
+    private String businessType;
 }

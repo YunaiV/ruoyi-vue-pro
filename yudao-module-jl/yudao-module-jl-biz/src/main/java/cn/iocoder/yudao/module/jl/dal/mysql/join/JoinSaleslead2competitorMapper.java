@@ -35,4 +35,9 @@ public interface JoinSaleslead2competitorMapper extends BaseMapperX<JoinSaleslea
                 .orderByDesc(JoinSaleslead2competitorDO::getId));
     }
 
+    default List<JoinSaleslead2competitorDO> getCompetitorsBySalesleadId(Long id){
+        return selectList(new LambdaQueryWrapperX<JoinSaleslead2competitorDO>()
+                .eq(JoinSaleslead2competitorDO::getSalesleadId, id)
+                .orderByDesc(JoinSaleslead2competitorDO::getId));
+    };
 }

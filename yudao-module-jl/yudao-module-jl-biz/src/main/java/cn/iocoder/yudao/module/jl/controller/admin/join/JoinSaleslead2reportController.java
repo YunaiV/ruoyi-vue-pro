@@ -28,7 +28,7 @@ import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2reportDO;
 import cn.iocoder.yudao.module.jl.convert.join.JoinSaleslead2reportConvert;
 import cn.iocoder.yudao.module.jl.service.join.JoinSaleslead2reportService;
 
-@Tag(name = "管理后台 - 销售线索中的方案")
+@Tag(name = "管理后台 - 销售线索中的报告")
 @RestController
 @RequestMapping("/jl/join-saleslead2report")
 @Validated

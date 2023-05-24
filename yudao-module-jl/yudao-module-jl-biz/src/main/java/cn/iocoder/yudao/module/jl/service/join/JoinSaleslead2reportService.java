@@ -44,6 +44,14 @@ public interface JoinSaleslead2reportService {
     JoinSaleslead2reportDO getJoinSaleslead2report(Long id);
 
     /**
+     * 根据销售id，获得销售线索中的报告
+     *
+     * @param id 方案id
+     * @return 销售线索中的报告
+     */
+    List<JoinSaleslead2reportDO> getReportBySalesleadId(Long id);
+
+    /**
      * 获得销售线索中的方案列表
      *
      * @param ids 编号

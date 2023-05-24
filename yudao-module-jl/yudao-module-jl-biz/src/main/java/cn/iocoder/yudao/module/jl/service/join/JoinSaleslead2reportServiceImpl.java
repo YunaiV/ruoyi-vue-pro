@@ -65,6 +65,11 @@ public class JoinSaleslead2reportServiceImpl implements JoinSaleslead2reportServ
     }
 
     @Override
+    public List<JoinSaleslead2reportDO> getReportBySalesleadId(Long id) {
+        return joinSaleslead2reportMapper.selectBySalesleadId(id);
+    }
+
+    @Override
     public List<JoinSaleslead2reportDO> getJoinSaleslead2reportList(Collection<Long> ids) {
         return joinSaleslead2reportMapper.selectBatchIds(ids);
     }

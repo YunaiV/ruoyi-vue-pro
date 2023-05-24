@@ -65,6 +65,11 @@ public class JoinSaleslead2competitorServiceImpl implements JoinSaleslead2compet
     }
 
     @Override
+    public List<JoinSaleslead2competitorDO> getCompetitorBySalesleadId(Long id) {
+        return joinSaleslead2competitorMapper.getCompetitorsBySalesleadId(id);
+    }
+
+    @Override
     public List<JoinSaleslead2competitorDO> getJoinSaleslead2competitorList(Collection<Long> ids) {
         return joinSaleslead2competitorMapper.selectBatchIds(ids);
     }

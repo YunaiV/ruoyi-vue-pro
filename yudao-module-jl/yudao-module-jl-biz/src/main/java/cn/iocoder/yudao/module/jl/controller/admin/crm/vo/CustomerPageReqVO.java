@@ -61,4 +61,10 @@ public class CustomerPageReqVO extends PageParam {
     @Schema(description = "公司", example = "14623")
     private Long companyId;
 
+    @Schema(description = "type", example = "1")
+    private String type;
+
+    @Schema(description = "负责的销售id")
+    private Long salesId;
+
 }

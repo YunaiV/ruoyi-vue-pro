@@ -26,6 +26,15 @@ public interface JoinSaleslead2customerplanMapper extends BaseMapperX<JoinSalesl
                 .orderByDesc(JoinSaleslead2customerplanDO::getId));
     }
 
+    // selectBySalesleadId，按照时间倒序，只选择一个
+    default List<JoinSaleslead2customerplanDO> selectBySalesleadId(Long salesleadId) {
+        return selectList(new LambdaQueryWrapperX<JoinSaleslead2customerplanDO>()
+                .eq(JoinSaleslead2customerplanDO::getSalesleadId, salesleadId)
+                .orderByDesc(JoinSaleslead2customerplanDO::getCreateTime));
+    }
+
+
+
     default List<JoinSaleslead2customerplanDO> selectList(JoinSaleslead2customerplanExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<JoinSaleslead2customerplanDO>()
                 .betweenIfPresent(JoinSaleslead2customerplanDO::getCreateTime, reqVO.getCreateTime())

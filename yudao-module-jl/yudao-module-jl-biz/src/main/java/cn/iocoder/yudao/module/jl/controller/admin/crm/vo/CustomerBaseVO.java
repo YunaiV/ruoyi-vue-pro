@@ -48,13 +48,45 @@ public class CustomerBaseVO {
     @Schema(description = "学历")
     private String academicCredential;
 
-    @Schema(description = "医院", example = "13346")
+    @Schema(description = "医院id", example = "13346")
     private Long hospitalId;
 
-    @Schema(description = "学校机构", example = "32115")
+    @Schema(description = "学校机构id", example = "32115")
     private Long universityId;
 
-    @Schema(description = "公司", example = "14623")
+    @Schema(description = "公司id", example = "14623")
     private Long companyId;
 
+    @Schema(description = "省", example = "1")
+    private String province;
+
+    @Schema(description = "市", example = "2")
+    private String city;
+
+    @Schema(description = "区", example = "1")
+    private String area;
+
+    @Schema(description = "客户类型", example = "医院")
+    private String type;
+
+    @Schema(description = "成交次数", example = "1")
+    private Integer dealCount;
+
+    @Schema(description = "成交总额", example = "100")
+    private Integer dealTotalAmount;
+
+    @Schema(description = "欠款", example = "100")
+    private Integer arrears;
+
+    @Schema(description = "负责的销售id")
+    private Long salesId;
+
+    @Schema(description = "最近跟进记录", example = "最近跟进记录")
+    private LocalDateTime lastFollowupTime;
+
+    @Schema(description = "最近一次跟进 id")
+    private Long lastFollowupId;
+
+    @Schema(description = "最近一次销售线索 id")
+    private Long lastSalesleadId;
 }

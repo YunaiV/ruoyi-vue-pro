@@ -33,4 +33,12 @@ public interface JoinSaleslead2managerMapper extends BaseMapperX<JoinSaleslead2m
                 .orderByDesc(JoinSaleslead2managerDO::getId));
     }
 
+    default List<JoinSaleslead2managerDO> selectBySalesleadId(Long salesleadId) {
+        return selectList(new LambdaQueryWrapperX<JoinSaleslead2managerDO>()
+                .eq(JoinSaleslead2managerDO::getSalesleadId, salesleadId)
+                .orderByDesc(JoinSaleslead2managerDO::getCreateTime)
+        );
+    }
+
+
 }

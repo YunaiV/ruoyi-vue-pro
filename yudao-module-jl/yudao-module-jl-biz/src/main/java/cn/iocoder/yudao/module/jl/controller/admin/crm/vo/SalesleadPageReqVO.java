@@ -40,4 +40,6 @@ public class SalesleadPageReqVO extends PageParam {
     @Schema(description = "项目id", example = "8951")
     private Long projectId;
 
+    @Schema(description = "创建者", example = "8951")
+    private Long creator;
 }

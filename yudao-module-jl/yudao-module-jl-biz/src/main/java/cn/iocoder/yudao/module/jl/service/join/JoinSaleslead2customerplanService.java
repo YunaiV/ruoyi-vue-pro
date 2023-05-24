@@ -5,6 +5,7 @@ import javax.validation.*;
 import cn.iocoder.yudao.module.jl.controller.admin.join.vo.*;
 import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2customerplanDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2reportDO;
 
 /**
  * 销售线索中的客户方案 Service 接口
@@ -20,6 +21,14 @@ public interface JoinSaleslead2customerplanService {
      * @return 编号
      */
     Long createJoinSaleslead2customerplan(@Valid JoinSaleslead2customerplanCreateReqVO createReqVO);
+
+    /**
+     * 根据销售id，获得销售线索中的方案
+     *
+     * @param id 方案id
+     * @return 销售线索中的方案
+     */
+    List<JoinSaleslead2customerplanDO> getCustomerPlanBySalesleadId(Long id);
 
     /**
      * 更新销售线索中的客户方案

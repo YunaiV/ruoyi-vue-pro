@@ -26,6 +26,7 @@ public interface CustomerMapper extends BaseMapperX<CustomerDO> {
                 .eqIfPresent(CustomerDO::getPhone, reqVO.getPhone())
                 .eqIfPresent(CustomerDO::getEmail, reqVO.getEmail())
                 .eqIfPresent(CustomerDO::getMark, reqVO.getMark())
+                .eqIfPresent(CustomerDO::getType, reqVO.getType())
                 .eqIfPresent(CustomerDO::getWechat, reqVO.getWechat())
                 .eqIfPresent(CustomerDO::getDoctorProfessionalRank, reqVO.getDoctorProfessionalRank())
                 .eqIfPresent(CustomerDO::getHospitalDepartment, reqVO.getHospitalDepartment())

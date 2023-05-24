@@ -44,6 +44,14 @@ public interface JoinSaleslead2competitorService {
     JoinSaleslead2competitorDO getJoinSaleslead2competitor(Long id);
 
     /**
+     * 通过销售线索ID，获得销售线索中竞争对手的报价
+     *
+     * @param id 编号
+     * @return 销售线索中竞争对手的报价，数组形式
+     */
+    List<JoinSaleslead2competitorDO> getCompetitorBySalesleadId(Long id);
+
+    /**
      * 获得销售线索中竞争对手的报价列表
      *
      * @param ids 编号

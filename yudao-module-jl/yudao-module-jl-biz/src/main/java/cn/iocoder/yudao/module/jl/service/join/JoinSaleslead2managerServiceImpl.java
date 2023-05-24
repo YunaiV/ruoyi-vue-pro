@@ -79,4 +79,13 @@ public class JoinSaleslead2managerServiceImpl implements JoinSaleslead2managerSe
         return joinSaleslead2managerMapper.selectList(exportReqVO);
     }
 
+    /**
+     * @param salesleadId
+     * @return
+     */
+    @Override
+    public List<JoinSaleslead2managerDO> getBySalesleadId(Long salesleadId) {
+        return joinSaleslead2managerMapper.selectBySalesleadId(salesleadId);
+    }
+
 }

@@ -76,5 +76,11 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-excel</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-system-biz</artifactId>
+            <version>1.7.2-snapshot</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
