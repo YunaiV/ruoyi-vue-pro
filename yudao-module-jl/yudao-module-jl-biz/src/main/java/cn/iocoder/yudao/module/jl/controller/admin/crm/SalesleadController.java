@@ -4,19 +4,31 @@ import cn.iocoder.yudao.module.jl.controller.admin.join.vo.JoinSaleslead2competi
 import cn.iocoder.yudao.module.jl.controller.admin.join.vo.JoinSaleslead2customerplanRespVO;
 import cn.iocoder.yudao.module.jl.controller.admin.join.vo.JoinSaleslead2managerRespVO;
 import cn.iocoder.yudao.module.jl.controller.admin.join.vo.JoinSaleslead2reportRespVO;
+import cn.iocoder.yudao.module.jl.convert.crm.CustomerConvert;
+import cn.iocoder.yudao.module.jl.convert.crm.FollowupConvert;
+import cn.iocoder.yudao.module.jl.convert.crm.InstitutionConvert;
 import cn.iocoder.yudao.module.jl.convert.join.JoinSaleslead2competitorConvert;
 import cn.iocoder.yudao.module.jl.convert.join.JoinSaleslead2customerplanConvert;
 import cn.iocoder.yudao.module.jl.convert.join.JoinSaleslead2managerConvert;
 import cn.iocoder.yudao.module.jl.convert.join.JoinSaleslead2reportConvert;
+import cn.iocoder.yudao.module.jl.dal.dataobject.crm.CustomerDO;
+import cn.iocoder.yudao.module.jl.dal.dataobject.crm.FollowupDO;
+import cn.iocoder.yudao.module.jl.dal.dataobject.crm.InstitutionDO;
 import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2competitorDO;
 import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2customerplanDO;
 import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2managerDO;
 import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2reportDO;
 import cn.iocoder.yudao.module.jl.service.crm.CustomerService;
+import cn.iocoder.yudao.module.jl.service.crm.FollowupService;
+import cn.iocoder.yudao.module.jl.service.crm.InstitutionService;
 import cn.iocoder.yudao.module.jl.service.join.JoinSaleslead2competitorService;
 import cn.iocoder.yudao.module.jl.service.join.JoinSaleslead2customerplanService;
 import cn.iocoder.yudao.module.jl.service.join.JoinSaleslead2managerService;
 import cn.iocoder.yudao.module.jl.service.join.JoinSaleslead2reportService;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileRespVO;
+import cn.iocoder.yudao.module.system.convert.user.UserConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -57,6 +69,9 @@ public class SalesleadController {
     private SalesleadService salesleadService;
 
     @Resource
+    private InstitutionService institutionService;
+
+    @Resource
     private JoinSaleslead2reportService joinSaleslead2reportService;
 
     @Resource
@@ -70,6 +85,12 @@ public class SalesleadController {
 
     @Resource
     private CustomerService customerService;
+
+    @Resource
+    private FollowupService followupService;
+
+    @Resource
+    private AdminUserService userService;
 
     @PostMapping("/create")
     @Operation(summary = "创建销售线索")
@@ -147,7 +168,66 @@ public class SalesleadController {
             List<JoinSaleslead2competitorRespVO> competitorQuotations = JoinSaleslead2competitorConvert.INSTANCE.convertList(competitors);
             salesleadResp.setCompetitorQuotations(competitorQuotations);
         }
+
+        // 添加客户信息
+        Long customerId = saleslead.getCustomerId();
+        if(customerId != null) {
+            CustomerDO customer = customerService.getCustomer(customerId);
+            if(customer != null) {
+                salesleadResp.setCustomer(commonGetCustomer(customer));
+            }
+        }
+
+        // 添加销售信息
+//        Long salesId = Long.valueOf(saleslead.getCreator());
+//        if(customerId != null) {
+//            AdminUserDO salesDo = userService.getUser(salesId);
+//            commonGetCustomer(salesDo)
+//            UserProfileRespVO sales = UserConvert.INSTANCE.convert03(salesDo);
+//            salesleadResp.setSales(sales);
+//        }
+
+        // 跟进记录
+        Long salesleadId = saleslead.getId();
+        FollowupDO followupDo = followupService.selectLatestOneBySealsLeadId(salesleadId);
+        FollowupRespVO followup = FollowupConvert.INSTANCE.convert(followupDo);
+        salesleadResp.setLatestFollowup(followup);
+
         return salesleadResp;
+    }
+
+    private CustomerRespVO commonGetCustomer(CustomerDO customer) {
+        if(customer == null) {
+            return null;
+        }
+
+        CustomerRespVO customerRespVO = CustomerConvert.INSTANCE.convert(customer);
+
+        // 绑定销售人员
+        Long salesId = customer.getSalesId();
+        AdminUserDO salesDo = userService.getUser(salesId);
+        UserProfileRespVO sales = UserConvert.INSTANCE.convert03(salesDo);
+        customerRespVO.setSales(sales);
+
+        // 绑定公司
+        Long companyId = customer.getCompanyId();
+        InstitutionDO institutionDo = institutionService.getInstitution(companyId);
+        InstitutionRespVO institution = InstitutionConvert.INSTANCE.convert(institutionDo);
+        customerRespVO.setCompany(institution);
+
+        // 绑定医院
+        Long hospitalId = customer.getHospitalId();
+        InstitutionDO hospitalDo = institutionService.getInstitution(hospitalId);
+        InstitutionRespVO hospital = InstitutionConvert.INSTANCE.convert(hospitalDo);
+        customerRespVO.setHospital(hospital);
+
+        // 绑定学校
+        Long universityId = customer.getUniversityId();
+        InstitutionDO universityDo = institutionService.getInstitution(universityId);
+        InstitutionRespVO university = InstitutionConvert.INSTANCE.convert(universityDo);
+        customerRespVO.setUniversity(university);
+
+        return customerRespVO;
     }
 
     @GetMapping("/list")

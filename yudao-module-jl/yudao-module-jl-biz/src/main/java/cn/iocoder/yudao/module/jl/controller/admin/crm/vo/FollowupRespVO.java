@@ -16,4 +16,6 @@ public class FollowupRespVO extends FollowupBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
+    @Schema(description = "客户信息", defaultValue = "{}")
+    private CustomerRespVO customer;
 }

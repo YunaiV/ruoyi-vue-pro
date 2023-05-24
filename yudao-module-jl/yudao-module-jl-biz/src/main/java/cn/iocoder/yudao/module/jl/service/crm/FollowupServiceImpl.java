@@ -64,6 +64,12 @@ public class FollowupServiceImpl implements FollowupService {
         return followupMapper.selectById(id);
     }
 
+
+    @Override
+    public FollowupDO selectLatestOneBySealsLeadId(Long id) {
+        return followupMapper.selectLatestOneBySealsLeadId(id);
+    }
+
     @Override
     public List<FollowupDO> getFollowupList(Collection<Long> ids) {
         return followupMapper.selectBatchIds(ids);

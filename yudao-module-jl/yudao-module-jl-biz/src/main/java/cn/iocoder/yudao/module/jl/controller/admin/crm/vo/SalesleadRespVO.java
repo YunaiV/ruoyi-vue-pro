@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.jl.controller.admin.join.vo.JoinSaleslead2custome
 import cn.iocoder.yudao.module.jl.controller.admin.join.vo.JoinSaleslead2managerRespVO;
 import cn.iocoder.yudao.module.jl.controller.admin.join.vo.JoinSaleslead2reportRespVO;
 import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2customerplanDO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -33,4 +34,13 @@ public class SalesleadRespVO extends SalesleadBaseVO {
 
     @Schema(description = "上传的报告列表", defaultValue = "[]")
     private List<JoinSaleslead2reportRespVO> reports;
+
+    @Schema(description = "客户信息", defaultValue = "{}")
+    private CustomerRespVO customer;
+
+    @Schema(description = "销售信息", defaultValue = "{}")
+    private UserProfileRespVO sales;
+
+    @Schema(description = "最新的更新记录", defaultValue = "{}")
+    private FollowupRespVO latestFollowup;
 }

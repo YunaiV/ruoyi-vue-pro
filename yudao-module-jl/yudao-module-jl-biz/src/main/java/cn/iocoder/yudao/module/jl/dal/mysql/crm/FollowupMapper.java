@@ -27,6 +27,13 @@ public interface FollowupMapper extends BaseMapperX<FollowupDO> {
                 .orderByDesc(FollowupDO::getId));
     }
 
+    default FollowupDO selectLatestOneBySealsLeadId(Long id) {
+        return selectOne(new LambdaQueryWrapperX<FollowupDO>()
+                .eqIfPresent(FollowupDO::getRefId, id)
+                .orderByDesc(FollowupDO::getCreateTime)
+                .last("LIMIT 1"));
+    }
+
     default List<FollowupDO> selectList(FollowupExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<FollowupDO>()
                 .betweenIfPresent(FollowupDO::getCreateTime, reqVO.getCreateTime())

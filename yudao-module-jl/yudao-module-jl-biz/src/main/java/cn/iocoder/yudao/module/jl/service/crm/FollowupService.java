@@ -43,6 +43,8 @@ public interface FollowupService {
      */
     FollowupDO getFollowup(Long id);
 
+    FollowupDO selectLatestOneBySealsLeadId(Long id);
+
     /**
      * 获得销售线索跟进，可以是跟进客户，也可以是跟进线索列表
      *
