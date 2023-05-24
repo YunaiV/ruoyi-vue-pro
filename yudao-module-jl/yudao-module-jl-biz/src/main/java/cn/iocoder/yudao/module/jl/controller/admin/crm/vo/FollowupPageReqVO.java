@@ -29,6 +29,6 @@ public class FollowupPageReqVO extends PageParam {
     private Long refId;
 
     @Schema(description = "跟进类型：日常联系、销售线索、催款等")
-    private Integer type;
+    private String type;
 
 }

@@ -77,12 +77,12 @@ public class SalesleadController {
     public CommonResult<Long> createSaleslead(@Valid @RequestBody SalesleadCreateReqVO createReqVO) {
         Long id = salesleadService.createSaleslead(createReqVO);
 
-        // 为客户绑定最近的跟进记录
+        // 为客户绑定最近的线索记录
         Long customerId = createReqVO.getCustomerId();
-        CustomerUpdateReqVO customerUpdateReqVO = new CustomerUpdateReqVO();
+        CustomerUpdateSalesLeadVO customerUpdateReqVO = new CustomerUpdateSalesLeadVO();
         customerUpdateReqVO.setId(customerId);
-        customerUpdateReqVO.setLastSalesleadId(id);
-        customerService.updateCustomer(customerUpdateReqVO);
+        customerUpdateReqVO.setSalesId(id);
+        customerService.updateCustomerSalesLead(customerUpdateReqVO);
         return success(id);
     }
 

@@ -67,4 +67,19 @@ public class CustomerPageReqVO extends PageParam {
     @Schema(description = "负责的销售id")
     private Long salesId;
 
+    @Schema(description = "成交次数")
+    private Long dealCount;
+
+    @Schema(description = "排序：跟进时间", example = "DESC", allowableValues = {"DESC", "ASC"})
+    private String byFollowupTime;
+
+    @Schema(description = "排序：成交次数", example = "DESC", allowableValues = {"DESC", "ASC"})
+    private String byDealCount;
+
+    @Schema(description = "排序：成交金额", example = "DESC", allowableValues = {"DESC", "ASC"})
+    private String byDealTotalAmount;
+
+    @Schema(description = "排序：欠款金额", example = "DESC", allowableValues = {"DESC", "ASC"})
+    private String byArrears;
+
 }

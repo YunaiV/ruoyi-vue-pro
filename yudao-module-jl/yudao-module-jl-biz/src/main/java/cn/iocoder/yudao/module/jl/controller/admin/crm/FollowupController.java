@@ -50,11 +50,11 @@ public class FollowupController {
 
         // 为客户绑定最近的跟进记录
         Long customerId = createReqVO.getCustomerId();
-        CustomerUpdateReqVO customerUpdateReqVO = new CustomerUpdateReqVO();
-        customerUpdateReqVO.setId(customerId);
-        customerUpdateReqVO.setLastFollowupId(id);
-        customerUpdateReqVO.setLastFollowupTime(LocalDateTime.now());
-        customerService.updateCustomer(customerUpdateReqVO);
+        CustomerUpdateFollowupVO customerUpdateFollowupVO = new CustomerUpdateFollowupVO();
+        customerUpdateFollowupVO.setId(customerId);
+        customerUpdateFollowupVO.setLastFollowupId(id);
+        customerUpdateFollowupVO.setLastFollowupTime(LocalDateTime.now());
+        customerService.updateCustomerFollowup(customerUpdateFollowupVO);
 
         return success(id);
     }

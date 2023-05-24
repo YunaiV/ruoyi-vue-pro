@@ -83,11 +83,14 @@ public class SalesleadServiceImpl implements SalesleadService {
         // 将 joinSaleslead2competitorDO 写入，createReqVO.getCompetitorQuotations() 是数组，需要循环写入
         if(createReqVO.getCompetitorQuotations() != null) {
             for (SalesleadCompetitorQuotation competitorQuotation : createReqVO.getCompetitorQuotations()) {
-                JoinSaleslead2competitorDO joinSaleslead2competitorDO = new JoinSaleslead2competitorDO();
-                joinSaleslead2competitorDO.setSalesleadId(saleslead.getId());
-                joinSaleslead2competitorDO.setCompetitorId(competitorQuotation.getCompetitorId());
-                joinSaleslead2competitorDO.setCompetitorId(competitorQuotation.getQuotation());
-                joinSaleslead2competitorMapper.insert(joinSaleslead2competitorDO);
+                if(competitorQuotation.getCompetitorId() != null) {
+                    JoinSaleslead2competitorDO joinSaleslead2competitorDO = new JoinSaleslead2competitorDO();
+                    joinSaleslead2competitorDO.setSalesleadId(saleslead.getId());
+                    joinSaleslead2competitorDO.setCompetitorId(competitorQuotation.getCompetitorId());
+                    joinSaleslead2competitorDO.setCompetitorId(competitorQuotation.getQuotation());
+                    joinSaleslead2competitorMapper.insert(joinSaleslead2competitorDO);
+                }
+
             }
         }
 

@@ -23,6 +23,10 @@ public interface CustomerConvert {
 
     CustomerDO convert(CustomerUpdateReqVO bean);
 
+    CustomerDO convert(CustomerUpdateFollowupVO bean);
+
+    CustomerDO convert(CustomerUpdateSalesLeadVO bean);
+
     CustomerRespVO convert(CustomerDO bean);
 
     List<CustomerRespVO> convertList(List<CustomerDO> list);

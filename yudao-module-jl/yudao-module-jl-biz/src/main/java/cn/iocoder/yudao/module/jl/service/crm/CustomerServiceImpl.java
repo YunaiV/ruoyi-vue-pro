@@ -45,6 +45,30 @@ public class CustomerServiceImpl implements CustomerService {
         customerMapper.updateById(updateObj);
     }
 
+    /**
+     * @param updateReqVO
+     */
+    @Override
+    public void updateCustomerSalesLead(CustomerUpdateSalesLeadVO updateReqVO) {
+        // 校验存在
+        validateCustomerExists(updateReqVO.getId());
+        // 更新
+        CustomerDO updateObj = CustomerConvert.INSTANCE.convert(updateReqVO);
+        customerMapper.updateById(updateObj);
+    }
+
+    /**
+     * @param updateReqVO
+     */
+    @Override
+    public void updateCustomerFollowup(CustomerUpdateFollowupVO updateReqVO) {
+        // 校验存在
+        validateCustomerExists(updateReqVO.getId());
+        // 更新
+        CustomerDO updateObj = CustomerConvert.INSTANCE.convert(updateReqVO);
+        customerMapper.updateById(updateObj);
+    }
+
     @Override
     public void deleteCustomer(Long id) {
         // 校验存在

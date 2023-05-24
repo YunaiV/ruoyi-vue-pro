@@ -64,4 +64,10 @@ public class SalesleadDO extends BaseDO {
      * 业务类型
      */
     private String  businessType;
+
+    /**
+     * 丢单说明
+     */
+    private String lostNote;
+
 }

@@ -44,6 +44,6 @@ public class FollowupDO extends BaseDO {
      *
      * 枚举 {@link TODO followup_type 对应的类}
      */
-    private Integer type;
+    private String type;
 
 }

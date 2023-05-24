@@ -14,5 +14,4 @@ public class CustomerUpdateReqVO extends CustomerBaseVO {
     @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "28406")
     @NotNull(message = "ID不能为空")
     private Long id;
-
 }

@@ -28,6 +28,10 @@ public interface CustomerService {
      */
     void updateCustomer(@Valid CustomerUpdateReqVO updateReqVO);
 
+    void updateCustomerSalesLead(@Valid CustomerUpdateSalesLeadVO updateReqVO);
+
+    void updateCustomerFollowup(@Valid CustomerUpdateFollowupVO updateReqVO);
+
     /**
      * 删除客户
      *

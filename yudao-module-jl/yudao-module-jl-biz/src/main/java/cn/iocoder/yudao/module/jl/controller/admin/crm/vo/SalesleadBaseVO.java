@@ -40,4 +40,7 @@ public class SalesleadBaseVO {
 
     @Schema(description = "业务类型", example = "课题研究", nullable = true)
     private String businessType;
+
+    @Schema(description = "丢单说明", example = "...", nullable = true)
+    private String lostNote;
 }

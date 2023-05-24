@@ -2,9 +2,6 @@ package cn.iocoder.yudao.module.jl.controller.admin.crm.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 import javax.validation.constraints.*;
 
 /**
@@ -25,7 +22,6 @@ public class FollowupBaseVO {
     @Schema(description = "跟进实体的 id，项目、线索、款项，客户等", example = "29426")
     private Long refId;
 
-    @Schema(description = "跟进类型：日常联系、销售线索、催款等")
-    private Integer type;
-
+    @Schema(description = "跟进类型：日常联系、销售线索、催款等", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private String type;
 }
