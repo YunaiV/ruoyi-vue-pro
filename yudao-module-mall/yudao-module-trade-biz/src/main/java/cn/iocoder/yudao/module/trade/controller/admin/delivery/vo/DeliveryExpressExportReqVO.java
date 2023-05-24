@@ -12,7 +12,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class DeliveryExpressExportReqVO {
 
-    @Schema(description = "快递公司编号")
+    @Schema(description = "快递公司编码")
     private String code;
 
     @Schema(description = "快递公司名称", example = "李四")

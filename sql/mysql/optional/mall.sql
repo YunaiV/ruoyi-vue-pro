@@ -330,9 +330,9 @@ CREATE TABLE `product_favorite` (
 -- ----------------------------
 DROP TABLE IF EXISTS `trade_delivery_express_template`;
 CREATE TABLE `trade_delivery_express_template` (
-   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
    `name` varchar(64)  NOT NULL COMMENT '模板名称',
-   `charge_mode` tinyint NOT NULL DEFAULT 1 COMMENT '配送计费方式 1:按件 2:按重量 3:按体积',
+   `charge_mode` tinyint NOT NULL COMMENT '配送计费方式',
    `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -348,11 +348,11 @@ CREATE TABLE `trade_delivery_express_template` (
 -- ----------------------------
 DROP TABLE IF EXISTS `trade_delivery_express_template_free`;
 CREATE TABLE `trade_delivery_express_template_free` (
-   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
-   `template_id` bigint NOT NULL COMMENT '配送模板编号, 对应delivery_template表id',
-   `area_id` int NOT NULL  COMMENT '包邮区域id',
-   `free_price` int NOT NULL  COMMENT '包邮金额(单位分) 订单总金额>包邮金额才免运费',
-   `free_count` int NOT NULL DEFAULT 0 COMMENT '包邮件数,订单总件数>包邮件数才免运费',
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+   `template_id` bigint NOT NULL COMMENT '快递运费模板编号',
+   `area_id` int NOT NULL  COMMENT '包邮区域 id',
+   `free_price` int NOT NULL  COMMENT '包邮金额，单位：分',
+   `free_count` int NOT NULL DEFAULT 0 COMMENT '包邮件数,',
    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
@@ -368,13 +368,13 @@ CREATE TABLE `trade_delivery_express_template_free` (
 DROP TABLE IF EXISTS `trade_delivery_express_template_charge`;
 CREATE TABLE `trade_delivery_express_template_charge` (
    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
-   `template_id` bigint NOT NULL COMMENT '配送模板编号, 对应delivery_template表id',
-   `area_id` int NOT NULL  COMMENT '配送区域id 1:适用于全国',
-   `charge_mode` tinyint NOT NULL  COMMENT '配送计费方式 1:按件 2:按重量 3:按体积',
-   `start_count` double NOT NULL  COMMENT '首件数量(件数,重量，或体积)',
-   `start_price`  int NOT NULL  COMMENT '起步价(单位分)',
-   `extra_count` double NOT NULL  COMMENT '续件数量(件,重量，或体积)',
-   `extra_price`  int NOT NULL  COMMENT '额外价(单位分)',
+   `template_id` bigint NOT NULL COMMENT '快递运费模板编号',
+   `area_id` int NOT NULL  COMMENT '配送区域 id',
+   `charge_mode` tinyint NOT NULL  COMMENT '配送计费方式',
+   `start_count` double NOT NULL  COMMENT '首件数量',
+   `start_price`  int NOT NULL  COMMENT '起步价，单位：分',
+   `extra_count` double NOT NULL  COMMENT '续件数量',
+   `extra_price`  int NOT NULL  COMMENT '额外价，单位：分',
    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
@@ -417,7 +417,7 @@ DROP TABLE IF EXISTS `trade_delivery_pick_up_store_staff`;
 CREATE TABLE `trade_delivery_pick_up_store_staff` (
    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
     store_id bigint NOT NULL  COMMENT '自提门店编号',
-   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态（0正常 1停用）',
+   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态',
    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
@@ -451,12 +451,12 @@ CREATE TABLE `trade_delivery_pick_up_store_staff` (
 -- ----------------------------
 DROP TABLE IF EXISTS `trade_delivery_express`;
 CREATE TABLE `trade_delivery_express` (
-   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
-   `code` varchar(64) NOT NULL  COMMENT '快递公司编号',
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+   `code` varchar(64) NOT NULL  COMMENT '快递公司编码',
    `name` varchar(64) NOT NULL  COMMENT '快递公司名称',
-   `logo` varchar(256) COMMENT '快递公司logo',
+   `logo` varchar(256) COMMENT '快递公司 logo',
    `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
-   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态（0正常 1停用）',
+   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态',
    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
