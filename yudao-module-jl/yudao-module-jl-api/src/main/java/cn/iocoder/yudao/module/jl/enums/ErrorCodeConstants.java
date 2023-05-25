@@ -22,4 +22,6 @@ public interface ErrorCodeConstants {
     ErrorCode JOIN_SALESLEAD2MANAGER_NOT_EXISTS = new ErrorCode(2009000001, "销售线索中的项目售前支持人员不存在");
 
     ErrorCode JOIN_SALESLEAD2REPORT_NOT_EXISTS = new ErrorCode(2010000001, "销售线索中的方案不存在");
+
+    ErrorCode PROJECT_BASE_NOT_EXISTS = new ErrorCode(2011000001, "项目管理不存在");
 }
