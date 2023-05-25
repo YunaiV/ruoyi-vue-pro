@@ -70,4 +70,9 @@ public class SalesleadDO extends BaseDO {
      */
     private String lostNote;
 
+    /**
+     * 项目人员，负责报价和方案
+     */
+    private String managerId;
+
 }
