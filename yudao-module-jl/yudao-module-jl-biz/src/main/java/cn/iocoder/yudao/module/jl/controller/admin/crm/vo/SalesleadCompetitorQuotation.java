@@ -13,5 +13,5 @@ public class SalesleadCompetitorQuotation {
     private Long competitorId;
 
     @Schema(description = "报价")
-    private Long quotation;
+    private Long competitorQuotation;
 }

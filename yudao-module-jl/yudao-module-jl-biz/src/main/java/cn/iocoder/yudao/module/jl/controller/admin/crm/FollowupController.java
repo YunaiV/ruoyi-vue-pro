@@ -91,7 +91,8 @@ public class FollowupController {
     @PreAuthorize("@ss.hasPermission('jl:followup:query')")
     public CommonResult<List<FollowupRespVO>> getFollowupList(@RequestParam("ids") Collection<Long> ids) {
         List<FollowupDO> list = followupService.getFollowupList(ids);
-        return success(FollowupConvert.INSTANCE.convertList(list));
+        List<FollowupRespVO> followups = FollowupConvert.INSTANCE.convertList(list);
+        return success(followups);
     }
 
     @GetMapping("/page")
@@ -99,7 +100,8 @@ public class FollowupController {
     @PreAuthorize("@ss.hasPermission('jl:followup:query')")
     public CommonResult<PageResult<FollowupRespVO>> getFollowupPage(@Valid FollowupPageReqVO pageVO) {
         PageResult<FollowupDO> pageResult = followupService.getFollowupPage(pageVO);
-        return success(FollowupConvert.INSTANCE.convertPage(pageResult));
+        PageResult<FollowupRespVO> data = FollowupConvert.INSTANCE.convertPage(pageResult);
+        return success(data);
     }
 
     @GetMapping("/export-excel")

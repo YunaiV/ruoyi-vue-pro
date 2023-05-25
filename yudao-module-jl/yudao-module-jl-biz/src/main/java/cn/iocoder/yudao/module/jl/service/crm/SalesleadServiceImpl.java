@@ -87,7 +87,7 @@ public class SalesleadServiceImpl implements SalesleadService {
                     JoinSaleslead2competitorDO joinSaleslead2competitorDO = new JoinSaleslead2competitorDO();
                     joinSaleslead2competitorDO.setSalesleadId(saleslead.getId());
                     joinSaleslead2competitorDO.setCompetitorId(competitorQuotation.getCompetitorId());
-                    joinSaleslead2competitorDO.setCompetitorId(competitorQuotation.getQuotation());
+                    joinSaleslead2competitorDO.setCompetitorQuotation(competitorQuotation.getCompetitorQuotation());
                     joinSaleslead2competitorMapper.insert(joinSaleslead2competitorDO);
                 }
 
@@ -134,12 +134,20 @@ public class SalesleadServiceImpl implements SalesleadService {
 
         // 写入 joinSaleslead2competitorDO
         if(updateReqVO.getCompetitorQuotations() != null) {
+            // 删除旧的数据
+            joinSaleslead2competitorMapper.deleteByMap(new HashMap<String, Object>() {{
+                put("saleslead_id", updateReqVO.getId());
+            }});
+
             for (SalesleadCompetitorQuotation competitorQuotation : updateReqVO.getCompetitorQuotations()) {
-                JoinSaleslead2competitorDO joinSaleslead2competitorDO = new JoinSaleslead2competitorDO();
-                joinSaleslead2competitorDO.setSalesleadId(updateReqVO.getId());
-                joinSaleslead2competitorDO.setCompetitorId(competitorQuotation.getCompetitorId());
-                joinSaleslead2competitorDO.setCompetitorId(competitorQuotation.getQuotation());
-                joinSaleslead2competitorMapper.insert(joinSaleslead2competitorDO);
+                if(competitorQuotation.getCompetitorId() != null) {
+                    // 插入新数据
+                    JoinSaleslead2competitorDO joinSaleslead2competitorDO = new JoinSaleslead2competitorDO();
+                    joinSaleslead2competitorDO.setSalesleadId(updateReqVO.getId());
+                    joinSaleslead2competitorDO.setCompetitorId(competitorQuotation.getCompetitorId());
+                    joinSaleslead2competitorDO.setCompetitorQuotation(competitorQuotation.getCompetitorQuotation());
+                    joinSaleslead2competitorMapper.insert(joinSaleslead2competitorDO);
+                }
             }
         }
 

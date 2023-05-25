@@ -30,6 +30,7 @@ public interface FollowupMapper extends BaseMapperX<FollowupDO> {
     default FollowupDO selectLatestOneBySealsLeadId(Long id) {
         return selectOne(new LambdaQueryWrapperX<FollowupDO>()
                 .eqIfPresent(FollowupDO::getRefId, id)
+                .eq(FollowupDO::getType, "leadsFollowup")
                 .orderByDesc(FollowupDO::getCreateTime)
                 .last("LIMIT 1"));
     }

@@ -102,7 +102,7 @@ public class SalesleadController {
         Long customerId = createReqVO.getCustomerId();
         CustomerUpdateSalesLeadVO customerUpdateReqVO = new CustomerUpdateSalesLeadVO();
         customerUpdateReqVO.setId(customerId);
-        customerUpdateReqVO.setSalesId(id);
+        customerUpdateReqVO.setLastSalesleadId(id);
         customerService.updateCustomerSalesLead(customerUpdateReqVO);
         return success(id);
     }

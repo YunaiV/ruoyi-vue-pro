@@ -17,5 +17,5 @@ public class CustomerUpdateSalesLeadVO {
     private Long id;
 
     @Schema(description = "最近销售线索", example = "1")
-    private Long salesId;
+    private Long lastSalesleadId;
 }

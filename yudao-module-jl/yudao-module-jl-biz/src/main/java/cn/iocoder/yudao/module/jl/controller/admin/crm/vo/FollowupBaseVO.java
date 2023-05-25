@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
-public class FollowupBaseVO {
+public class FollowupBaseVO{
 
     @Schema(description = "内容", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "内容不能为空")

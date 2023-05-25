@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.jl.controller.admin.crm.vo;
 
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -18,4 +19,7 @@ public class FollowupRespVO extends FollowupBaseVO {
 
     @Schema(description = "客户信息", defaultValue = "{}")
     private CustomerRespVO customer;
+
+//    @Schema(description = "创建者", defaultValue = "{}")
+//    private UserProfileRespVO creator;
 }
