@@ -1,16 +1,17 @@
 package cn.iocoder.yudao.module.trade.convert.delivery;
 
-import java.util.*;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.*;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateChargeDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateFreeDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 快递运费模板 Convert
@@ -21,6 +22,8 @@ import org.mapstruct.factory.Mappers;
 public interface DeliveryExpressTemplateConvert {
 
     DeliveryExpressTemplateConvert INSTANCE = Mappers.getMapper(DeliveryExpressTemplateConvert.class);
+
+    // ========== Template ==========
 
     DeliveryExpressTemplateDO convert(DeliveryExpressTemplateCreateReqVO bean);
 
@@ -36,9 +39,34 @@ public interface DeliveryExpressTemplateConvert {
 
     List<DeliveryExpressTemplateExcelVO> convertList02(List<DeliveryExpressTemplateDO> list);
 
+    default DeliveryExpressTemplateRespVO convert(DeliveryExpressTemplateDO bean,
+                                                  List<DeliveryExpressTemplateChargeDO> chargeList,
+                                                  List<DeliveryExpressTemplateFreeDO> freeList){
+        DeliveryExpressTemplateRespVO respVO = convert2(bean);
+        respVO.setTemplateCharge(convertTemplateChargeList(chargeList));
+        respVO.setTemplateFree(convertTemplateFreeList(freeList));
+        return respVO;
+    }
+
+    // ========== Template Charge ==========
+
     DeliveryExpressTemplateChargeDO convertTemplateCharge(Long templateId, Integer chargeMode, ExpressTemplateChargeBaseVO vo);
 
     DeliveryExpressTemplateChargeDO convertTemplateCharge(ExpressTemplateChargeUpdateVO vo);
+
+    default List<DeliveryExpressTemplateChargeDO> convertTemplateChargeList(Long templateId, Integer chargeMode, List<ExpressTemplateChargeBaseVO> list) {
+        // TODO @jason：可以使用 CollectionUtils.convertList，本质上就是 stream convert list
+        if(CollUtil.isEmpty(list)){
+            return Collections.emptyList();
+        }
+        List<DeliveryExpressTemplateChargeDO> templateChargeList = new ArrayList<>(list.size());
+        for (ExpressTemplateChargeBaseVO item : list) {
+            templateChargeList.add(convertTemplateCharge(templateId, chargeMode, item));
+        }
+        return templateChargeList;
+    }
+
+    // ========== Template Free ==========
 
     DeliveryExpressTemplateFreeDO convertTemplateFree(Long templateId, ExpressTemplateFreeBaseVO vo);
 
@@ -48,20 +76,9 @@ public interface DeliveryExpressTemplateConvert {
 
     List<ExpressTemplateFreeBaseVO> convertTemplateFreeList(List<DeliveryExpressTemplateFreeDO> list);
 
-    default List<DeliveryExpressTemplateChargeDO> convertTemplateChargeList(Long templateId, Integer chargeMode, List<ExpressTemplateChargeBaseVO> list){
-        if(CollUtil.isEmpty(list)){
-            return Collections.emptyList();
-        }
-        List<DeliveryExpressTemplateChargeDO> templateChargeList = new ArrayList<>( list.size() );
-        for (ExpressTemplateChargeBaseVO item : list) {
-            templateChargeList.add(convertTemplateCharge(templateId, chargeMode, item));
-        }
-        return templateChargeList;
-    }
-
-
-
+    // TODO @jason：, List，中间一个空格哈。代码的空格和空行要注意，嘿嘿~
     default List<DeliveryExpressTemplateFreeDO> convertTemplateFreeList(Long templateId,  List<ExpressTemplateFreeBaseVO> list) {
+        // TODO @jason：可以使用 CollectionUtils.convertList，本质上就是 stream convert list
         if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
@@ -72,12 +89,4 @@ public interface DeliveryExpressTemplateConvert {
         return templateFreeList;
     }
 
-    default DeliveryExpressTemplateRespVO convert(DeliveryExpressTemplateDO bean,
-                                          List<DeliveryExpressTemplateChargeDO> chargeList,
-                                          List<DeliveryExpressTemplateFreeDO> freeList){
-        DeliveryExpressTemplateRespVO respVO = convert2(bean);
-        respVO.setTemplateCharge(convertTemplateChargeList(chargeList));
-        respVO.setTemplateFree(convertTemplateFreeList(freeList));
-        return respVO;
-    }
 }

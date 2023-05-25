@@ -15,7 +15,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +34,8 @@ public class AreaController {
         return success(AreaConvert.INSTANCE.convertList(area.getChildren()));
     }
 
+    // TODO @jason：1）url 使用中划线分隔哈，然后可以改成 children；2）id 需要添加 @RequestParam，因为可能会混淆编译；
+    // 3) swagger 注解要写下哈；
     @GetMapping("/getChildrenArea")
     @Operation(summary = "获得地区的下级区域")
     public CommonResult<List<LazyAreaNodeRespVO>> getChildrenArea(Integer id) {
@@ -43,8 +44,10 @@ public class AreaController {
         return success(AreaConvert.INSTANCE.convertList2(area.getChildren()));
     }
 
+    // TODO @jason：1）读请求，使用 get 哈。2）然后参数不应该使用 @RequestBody；3）areaIds 改成 ids 更合适；
+    // 4)方法改成 getAreaChildrenList 获得子节点们；5）url 可以已改成 children-list
     @PostMapping("/list")
-    @Operation(summary = "通过区域ids获得地区列表")
+    @Operation(summary = "通过区域 ids 获得地区列表")
     public CommonResult<List<LazyAreaNodeRespVO>> list(@RequestBody Set<Integer> areaIds) {
         List<Area> areaList = new ArrayList<>(areaIds.size());
         for (Integer areaId : areaIds) {

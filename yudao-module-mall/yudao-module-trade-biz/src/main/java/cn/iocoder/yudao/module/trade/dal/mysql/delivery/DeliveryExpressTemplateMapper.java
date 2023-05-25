@@ -3,11 +3,9 @@ package cn.iocoder.yudao.module.trade.dal.mysql.delivery;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.DeliveryExpressTemplateExportReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.DeliveryExpressTemplatePageReqVO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -33,8 +31,10 @@ public interface DeliveryExpressTemplateMapper extends BaseMapperX<DeliveryExpre
                 .orderByAsc(DeliveryExpressTemplateDO::getSort));
     }
 
+    // TODO @jason：可以用 selectOne（DeliveryExpressTemplateDO::getName, name），常用的我封装了哈。简洁一点~
     default DeliveryExpressTemplateDO selectByName(String name) {
         return selectOne(new LambdaQueryWrapper<DeliveryExpressTemplateDO>()
                 .eq(DeliveryExpressTemplateDO::getName, name));
     }
+
 }
