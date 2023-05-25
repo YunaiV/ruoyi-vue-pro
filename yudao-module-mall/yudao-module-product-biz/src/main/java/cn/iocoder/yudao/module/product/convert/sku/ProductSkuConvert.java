@@ -43,8 +43,6 @@ public interface ProductSkuConvert {
 
     ProductSkuRespDTO convert02(ProductSkuDO bean);
 
-    List<ProductSkuRespVO> convertList03(List<ProductSkuDO> list);
-
     List<ProductSkuRespDTO> convertList04(List<ProductSkuDO> list);
 
     List<ProductSkuOptionRespVO> convertList05(List<ProductSkuDO> skus);

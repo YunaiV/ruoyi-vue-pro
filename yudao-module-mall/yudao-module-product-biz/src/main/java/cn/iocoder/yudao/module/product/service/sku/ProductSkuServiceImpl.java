@@ -3,14 +3,12 @@ package cn.iocoder.yudao.module.product.service.sku;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
-import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
@@ -85,7 +83,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         }
 
         // 0、校验skus是否为空
-        if (CollUtil.isEmpty(skus)){
+        if (CollUtil.isEmpty(skus)) {
             throw exception(SKU_NOT_EXISTS);
         }
 
@@ -140,8 +138,8 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public List<ProductSkuDO> getSkuListBySpuIdAndStatus(Long spuId, Integer status) {
-        return productSkuMapper.selectListBySpuIdAndStatus(spuId, status);
+    public List<ProductSkuDO> getSkuListBySpuIdAndStatus(Long spuId) {
+        return productSkuMapper.selectListBySpuIdAndStatus(spuId);
     }
 
     @Override

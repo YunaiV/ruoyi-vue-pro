@@ -11,8 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductBrandSimpleRespVO {
+
     @Schema(description = "品牌编号", required = true, example = "1024")
     private Long id;
-    @Schema(description = "品牌名称", required = true, example = "芋道")
+
+    @Schema(description = "品牌名称", required = true, example = "苹果")
     private String name;
+
 }

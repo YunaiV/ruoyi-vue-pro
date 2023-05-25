@@ -67,8 +67,7 @@ public class AppProductSpuController {
         }
 
         // 查询商品 SKU
-        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuIdAndStatus(spu.getId(),
-                CommonStatusEnum.ENABLE.getStatus());
+        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuIdAndStatus(spu.getId());
         // 查询商品属性
         List<ProductPropertyValueDetailRespBO> propertyValues = productPropertyValueService
                 .getPropertyValueDetailList(ProductSkuConvert.INSTANCE.convertPropertyValueIds(skus));

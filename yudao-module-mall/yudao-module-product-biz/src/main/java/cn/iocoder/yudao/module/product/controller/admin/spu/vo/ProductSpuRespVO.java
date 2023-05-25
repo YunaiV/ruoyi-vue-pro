@@ -18,30 +18,28 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class ProductSpuRespVO extends ProductSpuBaseVO {
 
-    // TODO @puhui999：swagger 的 required 和 example 写下
-
-    @Schema(description = "spuId")
+    @Schema(description = "spuId", required = true, example = "111")
     private Long id;
 
-    @Schema(description = "商品价格")
+    @Schema(description = "商品价格", required = true, example = "1999")
     private Integer price;
 
-    @Schema(description = "商品销量")
+    @Schema(description = "商品销量", required = true, example = "2000")
     private Integer salesCount;
 
-    @Schema(description = "市场价，单位使用：分")
+    @Schema(description = "市场价，单位使用：分", required = true, example = "199")
     private Integer marketPrice;
 
-    @Schema(description = "成本价，单位使用：分")
+    @Schema(description = "成本价，单位使用：分", required = true, example = "19")
     private Integer costPrice;
 
-    @Schema(description = "商品库存")
+    @Schema(description = "商品库存", required = true, example = "10000")
     private Integer stock;
 
-    @Schema(description = "商品创建时间")
+    @Schema(description = "商品创建时间", required = true, example = "2023-05-24 00:00:00")
     private LocalDateTime createTime;
 
-    @Schema(description = "商品状态")
+    @Schema(description = "商品状态", required = true, example = "1")
     private Integer status;
 
 }

@@ -25,17 +25,17 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ProductSpuPageReqVO extends PageParam {
 
-    @Schema(description = "商品名称", example = "yutou")
+    @Schema(description = "商品名称", example = "清凉小短袖")
     private String name;
 
-    @Schema(description = "前端请求的tab类型", example = "1")
+    @Schema(description = "前端请求的tab类型", required = true, example = "1")
     @InEnum(ProductSpuPageTabEnum.class)
     private Integer tabType;
 
-    @Schema(description = "商品分类编号")
+    @Schema(description = "商品分类编号", example = "1")
     private Long categoryId;
 
-    @Schema(description = "创建时间", example = "[2022-07-01 00:00:00,2022-07-01 23:59:59]")
+    @Schema(description = "创建时间", example = "[2022-07-01 00:00:00, 2022-07-01 23:59:59]")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 

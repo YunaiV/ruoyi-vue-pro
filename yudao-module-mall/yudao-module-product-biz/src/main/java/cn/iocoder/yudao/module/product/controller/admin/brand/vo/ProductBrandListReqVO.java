@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class ProductBrandListReqVO {
 
-    @Schema(description = "品牌名称", example = "芋道")
+    @Schema(description = "品牌名称", example = "苹果")
     private String name;
 
 }

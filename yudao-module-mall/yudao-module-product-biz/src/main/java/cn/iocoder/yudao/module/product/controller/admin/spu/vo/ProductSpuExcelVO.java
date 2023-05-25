@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
  */
 @Data
 public class ProductSpuExcelVO {
+
     @ExcelProperty("商品编号")
     private Long id;
 
@@ -116,4 +117,5 @@ public class ProductSpuExcelVO {
 
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
+
 }

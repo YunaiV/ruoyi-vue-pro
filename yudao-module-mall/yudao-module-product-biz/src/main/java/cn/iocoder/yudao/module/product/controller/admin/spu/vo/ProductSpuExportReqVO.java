@@ -18,14 +18,14 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @AllArgsConstructor
 public class ProductSpuExportReqVO {
 
-    @Schema(description = "商品名称", example = "yutou")
+    @Schema(description = "商品名称", example = "清凉小短袖")
     private String name;
 
     @Schema(description = "前端请求的tab类型", example = "1")
     @InEnum(ProductSpuPageTabEnum.class)
     private Integer tabType;
 
-    @Schema(description = "商品分类编号")
+    @Schema(description = "商品分类编号", example = "100")
     private Long categoryId;
 
     @Schema(description = "创建时间", example = "[2022-07-01 00:00:00,2022-07-01 23:59:59]")
