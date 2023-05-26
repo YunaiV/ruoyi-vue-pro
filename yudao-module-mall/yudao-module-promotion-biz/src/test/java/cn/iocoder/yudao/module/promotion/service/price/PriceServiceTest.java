@@ -70,8 +70,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         PriceCalculateRespDTO priceCalculate = priceService.calculatePrice(calculateReqDTO);
         // 断言 Order 部分
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
-        assertEquals(order.getOriginalPrice(), 200);
-        assertEquals(order.getOrderPrice(), 180);
+        assertEquals(order.getTotalPrice(), 200);
         assertEquals(order.getDiscountPrice(), 0);
         assertEquals(order.getPointPrice(), 0);
         assertEquals(order.getDeliveryPrice(), 0);
@@ -95,7 +94,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotion.getName(), "会员折扣");
         assertEquals(promotion.getType(), PromotionTypeEnum.MEMBER.getType());
         assertEquals(promotion.getLevel(), PromotionLevelEnum.SKU.getLevel());
-        assertEquals(promotion.getOriginalPrice(), 200);
+        assertEquals(promotion.getTotalPrice(), 200);
         assertEquals(promotion.getDiscountPrice(), 20);
         assertTrue(promotion.getMeet());
         assertEquals(promotion.getMeetTip(), "会员折扣：省 0.20 元");
@@ -133,8 +132,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         PriceCalculateRespDTO priceCalculate = priceService.calculatePrice(calculateReqDTO);
         // 断言 Order 部分
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
-        assertEquals(order.getOriginalPrice(), 350);
-        assertEquals(order.getOrderPrice(), 210);
+        assertEquals(order.getTotalPrice(), 350);
         assertEquals(order.getDiscountPrice(), 0);
         assertEquals(order.getPointPrice(), 0);
         assertEquals(order.getDeliveryPrice(), 0);
@@ -167,7 +165,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotion01.getName(), "活动 1000 号");
         assertEquals(promotion01.getType(), PromotionTypeEnum.DISCOUNT_ACTIVITY.getType());
         assertEquals(promotion01.getLevel(), PromotionLevelEnum.SKU.getLevel());
-        assertEquals(promotion01.getOriginalPrice(), 200);
+        assertEquals(promotion01.getTotalPrice(), 200);
         assertEquals(promotion01.getDiscountPrice(), 80);
         assertTrue(promotion01.getMeet());
         assertEquals(promotion01.getMeetTip(), "限时折扣：省 0.80 元");
@@ -181,7 +179,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotion02.getName(), "活动 2000 号");
         assertEquals(promotion02.getType(), PromotionTypeEnum.DISCOUNT_ACTIVITY.getType());
         assertEquals(promotion02.getLevel(), PromotionLevelEnum.SKU.getLevel());
-        assertEquals(promotion02.getOriginalPrice(), 150);
+        assertEquals(promotion02.getTotalPrice(), 150);
         assertEquals(promotion02.getDiscountPrice(), 60);
         assertTrue(promotion02.getMeet());
         assertEquals(promotion02.getMeetTip(), "限时折扣：省 0.60 元");
@@ -225,8 +223,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         PriceCalculateRespDTO priceCalculate = priceService.calculatePrice(calculateReqDTO);
         // 断言 Order 部分
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
-        assertEquals(order.getOriginalPrice(), 470);
-        assertEquals(order.getOrderPrice(), 470);
+        assertEquals(order.getTotalPrice(), 470);
         assertEquals(order.getDiscountPrice(), 130);
         assertEquals(order.getPointPrice(), 0);
         assertEquals(order.getDeliveryPrice(), 0);
@@ -268,7 +265,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotion01.getName(), "活动 1000 号");
         assertEquals(promotion01.getType(), PromotionTypeEnum.REWARD_ACTIVITY.getType());
         assertEquals(promotion01.getLevel(), PromotionLevelEnum.ORDER.getLevel());
-        assertEquals(promotion01.getOriginalPrice(), 350);
+        assertEquals(promotion01.getTotalPrice(), 350);
         assertEquals(promotion01.getDiscountPrice(), 70);
         assertTrue(promotion01.getMeet());
         assertEquals(promotion01.getMeetTip(), "满减送：省 0.70 元");
@@ -287,7 +284,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotion02.getName(), "活动 2000 号");
         assertEquals(promotion02.getType(), PromotionTypeEnum.REWARD_ACTIVITY.getType());
         assertEquals(promotion02.getLevel(), PromotionLevelEnum.ORDER.getLevel());
-        assertEquals(promotion02.getOriginalPrice(), 120);
+        assertEquals(promotion02.getTotalPrice(), 120);
         assertEquals(promotion02.getDiscountPrice(), 60);
         assertTrue(promotion02.getMeet());
         assertEquals(promotion02.getMeetTip(), "满减送：省 0.60 元");
@@ -323,8 +320,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         PriceCalculateRespDTO priceCalculate = priceService.calculatePrice(calculateReqDTO);
         // 断言 Order 部分
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
-        assertEquals(order.getOriginalPrice(), 350);
-        assertEquals(order.getOrderPrice(), 350);
+        assertEquals(order.getTotalPrice(), 350);
         assertEquals(order.getDiscountPrice(), 0);
         assertEquals(order.getPointPrice(), 0);
         assertEquals(order.getDeliveryPrice(), 0);
@@ -357,7 +353,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotion01.getName(), "活动 1000 号");
         assertEquals(promotion01.getType(), PromotionTypeEnum.REWARD_ACTIVITY.getType());
         assertEquals(promotion01.getLevel(), PromotionLevelEnum.ORDER.getLevel());
-        assertEquals(promotion01.getOriginalPrice(), 350);
+        assertEquals(promotion01.getTotalPrice(), 350);
         assertEquals(promotion01.getDiscountPrice(), 0);
         assertFalse(promotion01.getMeet());
         assertEquals(promotion01.getMeetTip(), "TODO"); // TODO 芋艿：后面再想想
@@ -396,8 +392,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         PriceCalculateRespDTO priceCalculate = priceService.calculatePrice(calculateReqDTO);
         // 断言 Order 部分
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
-        assertEquals(order.getOriginalPrice(), 470);
-        assertEquals(order.getOrderPrice(), 470);
+        assertEquals(order.getTotalPrice(), 470);
         assertEquals(order.getDiscountPrice(), 0);
         assertEquals(order.getPointPrice(), 0);
         assertEquals(order.getDeliveryPrice(), 0);
@@ -440,7 +435,7 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotion01.getName(), "程序员节");
         assertEquals(promotion01.getType(), PromotionTypeEnum.COUPON.getType());
         assertEquals(promotion01.getLevel(), PromotionLevelEnum.COUPON.getLevel());
-        assertEquals(promotion01.getOriginalPrice(), 350);
+        assertEquals(promotion01.getTotalPrice(), 350);
         assertEquals(promotion01.getDiscountPrice(), 70);
         assertTrue(promotion01.getMeet());
         assertEquals(promotion01.getMeetTip(), "优惠劵：省 0.70 元");

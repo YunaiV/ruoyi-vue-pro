@@ -406,7 +406,7 @@ public class PriceServiceImpl implements PriceService {
         // 创建营销明细
         PriceCalculateRespDTO.Promotion promotion = new PriceCalculateRespDTO.Promotion()
                 .setId(id).setName(name).setType(type).setLevel(level)
-                .setOriginalPrice(promotionItem.getOriginalPrice()).setDiscountPrice(promotionItem.getDiscountPrice())
+                .setTotalPrice(promotionItem.getOriginalPrice()).setDiscountPrice(promotionItem.getDiscountPrice())
                 .setItems(singletonList(promotionItem)).setMeet(meet).setMeetTip(meetTip);
         priceCalculate.getPromotions().add(promotion);
     }
@@ -437,7 +437,7 @@ public class PriceServiceImpl implements PriceService {
         // 创建营销明细
         PriceCalculateRespDTO.Promotion promotion = new PriceCalculateRespDTO.Promotion()
                 .setId(id).setName(name).setType(type).setLevel(level)
-                .setOriginalPrice(getSumValue(orderItems, PriceCalculateRespDTO.OrderItem::getOrderDividePrice, Integer::sum))
+                .setTotalPrice(getSumValue(orderItems, PriceCalculateRespDTO.OrderItem::getOrderDividePrice, Integer::sum))
                 .setDiscountPrice(getSumValue(discountPrices, value -> value, Integer::sum))
                 .setItems(promotionItems).setMeet(meet).setMeetTip(meetTip);
         priceCalculate.getPromotions().add(promotion);
@@ -453,7 +453,7 @@ public class PriceServiceImpl implements PriceService {
         Integer originalPrice = getSumValue(orderItems, PriceCalculateRespDTO.OrderItem::getOrderDividePrice, Integer::sum);
         PriceCalculateRespDTO.Promotion promotion = new PriceCalculateRespDTO.Promotion()
                 .setId(id).setName(name).setType(type).setLevel(level)
-                .setOriginalPrice(originalPrice).setDiscountPrice(0)
+                .setTotalPrice(originalPrice).setDiscountPrice(0)
                 .setItems(promotionItems).setMeet(false).setMeetTip(meetTip);
         priceCalculate.getPromotions().add(promotion);
     }
@@ -476,7 +476,6 @@ public class PriceServiceImpl implements PriceService {
         // 设置 Order 相关相关字段
         PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
         order.setPayPrice(order.getPayPrice() - diffPayPrice);
-        order.setOrderPrice(order.getOrderPrice() - diffPayPrice);
     }
 
     /**

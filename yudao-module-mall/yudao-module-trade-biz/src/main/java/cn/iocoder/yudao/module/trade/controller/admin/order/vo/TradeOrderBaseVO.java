@@ -73,9 +73,6 @@ public class TradeOrderBaseVO {
     @Schema(description = "商品原价（总）", required = true, example = "1000")
     private Integer originalPrice;
 
-    @Schema(description = "订单原价（总）", required = true, example = "1000")
-    private Integer orderPrice;
-
     @Schema(description = "订单优惠（总）", required = true, example = "100")
     private Integer discountPrice;
 
