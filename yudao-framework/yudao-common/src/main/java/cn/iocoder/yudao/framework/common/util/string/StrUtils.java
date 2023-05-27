@@ -45,4 +45,10 @@ public class StrUtils {
         return Arrays.stream(longs).boxed().collect(Collectors.toList());
     }
 
+    public static List<Integer> splitToInteger(String value,  CharSequence separator) {
+        int[] integers = StrUtil.splitToInt(value, separator);
+        return Arrays.stream(integers).boxed().collect(Collectors.toList());
+    }
+
+
 }

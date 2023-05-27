@@ -84,17 +84,4 @@ public class DeliveryExpressTemplateController {
         PageResult<DeliveryExpressTemplateDO> pageResult = deliveryExpressTemplateService.getDeliveryExpressTemplatePage(pageVO);
         return success(DeliveryExpressTemplateConvert.INSTANCE.convertPage(pageResult));
     }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出快递运费模板 Excel")
-    @PreAuthorize("@ss.hasPermission('trade:delivery:express-template:export')")
-    @OperateLog(type = EXPORT)
-    public void exportDeliveryExpressTemplateExcel(@Valid DeliveryExpressTemplateExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<DeliveryExpressTemplateDO> list = deliveryExpressTemplateService.getDeliveryExpressTemplateList(exportReqVO);
-        // 导出 Excel
-        List<DeliveryExpressTemplateExcelVO> datas = DeliveryExpressTemplateConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "快递运费模板.xls", "数据", DeliveryExpressTemplateExcelVO.class, datas);
-    }
-
 }

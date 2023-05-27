@@ -3,12 +3,10 @@ package cn.iocoder.yudao.module.system.convert.ip;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
 import cn.iocoder.yudao.module.system.controller.admin.ip.vo.AreaNodeRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.ip.vo.LazyAreaNodeRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.ip.vo.AreaNodeSimpleRespVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,10 +18,10 @@ public interface AreaConvert {
 
     List<AreaNodeRespVO> convertList(List<Area> list);
 
-    List<LazyAreaNodeRespVO> convertList2(List<Area> list);
+    List<AreaNodeSimpleRespVO> convertList2(List<Area> list);
 
     @Mapping(source = "type", target = "leaf")
-    LazyAreaNodeRespVO convert(Area area);
+    AreaNodeSimpleRespVO convert(Area area);
 
     default Boolean convertAreaType(Integer type){
         return Objects.equals(AreaTypeEnum.DISTRICT.getType(),type);

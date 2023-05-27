@@ -74,7 +74,7 @@ public class DeliveryExpressController {
         return success(DeliveryExpressConvert.INSTANCE.convertPage(pageResult));
     }
 
-    // TODO @jason：运费模版，可以去掉哈，没啥用；
+    // TODO @jason：运费模版，@芋艿 你的意思是运费模板导出没有必要吧。已经去掉了。这个是快递公司导出
     @GetMapping("/export-excel")
     @Operation(summary = "导出快递公司 Excel")
     @PreAuthorize("@ss.hasPermission('trade:delivery:express:export')")

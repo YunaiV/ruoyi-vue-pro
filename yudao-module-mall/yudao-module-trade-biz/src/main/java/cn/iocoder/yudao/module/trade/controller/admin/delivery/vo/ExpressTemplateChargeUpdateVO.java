@@ -3,9 +3,7 @@ package cn.iocoder.yudao.module.trade.controller.admin.delivery.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-/**
- * @author jason
- */
+
 @Data
 public class ExpressTemplateChargeUpdateVO extends ExpressTemplateChargeBaseVO {
 

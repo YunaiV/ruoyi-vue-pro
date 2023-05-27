@@ -1,17 +1,21 @@
 package cn.iocoder.yudao.module.trade.dal.dataobject.delivery;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.IntegerListTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 快递运费模板计费配置 DO
  *
  * @author jason
  */
-@TableName(value ="trade_delivery_express_template_charge")
+@TableName(value ="trade_delivery_express_template_charge", autoResultMap = true)
 @KeySequence("trade_delivery_express_template_charge_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 public class DeliveryExpressTemplateChargeDO extends BaseDO {
@@ -30,9 +34,10 @@ public class DeliveryExpressTemplateChargeDO extends BaseDO {
     private Long templateId;
 
     /**
-     * 配送区域
+     * 配送区域编号列表
      */
-    private Integer areaId;
+    @TableField(typeHandler = IntegerListTypeHandler.class)
+    private List<Integer> areaIds;
 
     /**
      * 配送计费方式

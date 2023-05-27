@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.convert.delivery;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.*;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateChargeDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
@@ -16,7 +17,7 @@ import java.util.List;
 /**
  * 快递运费模板 Convert
  *
- * @author 芋道源码
+ * @author jason
  */
 @Mapper
 public interface DeliveryExpressTemplateConvert {
@@ -37,8 +38,6 @@ public interface DeliveryExpressTemplateConvert {
 
     PageResult<DeliveryExpressTemplateSimpleRespVO> convertPage(PageResult<DeliveryExpressTemplateDO> page);
 
-    List<DeliveryExpressTemplateExcelVO> convertList02(List<DeliveryExpressTemplateDO> list);
-
     default DeliveryExpressTemplateRespVO convert(DeliveryExpressTemplateDO bean,
                                                   List<DeliveryExpressTemplateChargeDO> chargeList,
                                                   List<DeliveryExpressTemplateFreeDO> freeList){
@@ -55,15 +54,7 @@ public interface DeliveryExpressTemplateConvert {
     DeliveryExpressTemplateChargeDO convertTemplateCharge(ExpressTemplateChargeUpdateVO vo);
 
     default List<DeliveryExpressTemplateChargeDO> convertTemplateChargeList(Long templateId, Integer chargeMode, List<ExpressTemplateChargeBaseVO> list) {
-        // TODO @jason：可以使用 CollectionUtils.convertList，本质上就是 stream convert list
-        if(CollUtil.isEmpty(list)){
-            return Collections.emptyList();
-        }
-        List<DeliveryExpressTemplateChargeDO> templateChargeList = new ArrayList<>(list.size());
-        for (ExpressTemplateChargeBaseVO item : list) {
-            templateChargeList.add(convertTemplateCharge(templateId, chargeMode, item));
-        }
-        return templateChargeList;
+        return CollectionUtils.convertList(list, vo -> convertTemplateCharge(templateId, chargeMode, vo));
     }
 
     // ========== Template Free ==========
@@ -76,17 +67,8 @@ public interface DeliveryExpressTemplateConvert {
 
     List<ExpressTemplateFreeBaseVO> convertTemplateFreeList(List<DeliveryExpressTemplateFreeDO> list);
 
-    // TODO @jason：, List，中间一个空格哈。代码的空格和空行要注意，嘿嘿~
-    default List<DeliveryExpressTemplateFreeDO> convertTemplateFreeList(Long templateId,  List<ExpressTemplateFreeBaseVO> list) {
-        // TODO @jason：可以使用 CollectionUtils.convertList，本质上就是 stream convert list
-        if (CollUtil.isEmpty(list)) {
-            return Collections.emptyList();
-        }
-        List<DeliveryExpressTemplateFreeDO> templateFreeList = new ArrayList<>(list.size());
-        for (ExpressTemplateFreeBaseVO item : list) {
-            templateFreeList.add(convertTemplateFree(templateId, item));
-        }
-        return templateFreeList;
+    default List<DeliveryExpressTemplateFreeDO> convertTemplateFreeList(Long templateId, List<ExpressTemplateFreeBaseVO> list) {
+        return CollectionUtils.convertList(list, vo -> convertTemplateFree(templateId, vo));
     }
 
 }

@@ -16,7 +16,7 @@ import org.mapstruct.factory.Mappers;
 /**
  * 快递公司 Convert
  *
- * @author 芋道源码
+ * @author jason
  */
 @Mapper
 public interface DeliveryExpressConvert {

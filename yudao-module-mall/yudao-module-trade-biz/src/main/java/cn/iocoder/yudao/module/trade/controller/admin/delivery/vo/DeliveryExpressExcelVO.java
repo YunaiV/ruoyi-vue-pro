@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.trade.controller.admin.delivery.vo;
 
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
+import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
@@ -7,8 +10,6 @@ import java.time.LocalDateTime;
 
 /**
  * 快递公司 Excel VO
- *
- * @author jason
  */
 @Data
 public class DeliveryExpressExcelVO {
@@ -28,9 +29,9 @@ public class DeliveryExpressExcelVO {
     @ExcelProperty("排序")
     private Integer sort;
 
-    @ExcelProperty("状态")
-    // TODO @jason：可以使用     @DictFormat(DictTypeConstants.COMMON_STATUS)
-    private Byte status;
+    @ExcelProperty(value = "状态", converter = DictConvert.class)
+    @DictFormat(DictTypeConstants.COMMON_STATUS)
+    private Integer status;
 
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;

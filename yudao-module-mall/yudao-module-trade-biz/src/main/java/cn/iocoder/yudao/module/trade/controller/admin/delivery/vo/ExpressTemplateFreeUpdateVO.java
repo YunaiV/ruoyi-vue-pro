@@ -5,8 +5,6 @@ import lombok.Data;
 
 /**
  * 快递运费模板包邮 更新 VO
- *
- * @author jason
  */
 @Data
 public class ExpressTemplateFreeUpdateVO extends ExpressTemplateFreeBaseVO {

@@ -58,13 +58,4 @@ public interface DeliveryExpressTemplateService {
      * @return 快递运费模板分页
      */
     PageResult<DeliveryExpressTemplateDO> getDeliveryExpressTemplatePage(DeliveryExpressTemplatePageReqVO pageReqVO);
-
-    /**
-     * 获得快递运费模板列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 快递运费模板列表
-     */
-    List<DeliveryExpressTemplateDO> getDeliveryExpressTemplateList(DeliveryExpressTemplateExportReqVO exportReqVO);
-
 }
