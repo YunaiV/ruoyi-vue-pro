@@ -14,6 +14,8 @@
 * 演示地址【Vue2 + element-ui】：<http://dashboard.yudao.iocoder.cn>
 * 启动文档：<https://doc.iocoder.cn/quick-start/>
 * 视频教程：<https://doc.iocoder.cn/video/>
+* 后台项目环境搭建地址：https://www.iocoder.cn/Yudao/build-debugger-environment/
+* 开发指南：https://doc.iocoder.cn/quick-start/
 
 ## 🐯 平台简介
 
