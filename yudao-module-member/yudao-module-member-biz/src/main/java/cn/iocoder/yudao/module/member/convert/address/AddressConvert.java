@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressRespVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.address.AddressDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.address.MemberAddressDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -21,16 +21,16 @@ public interface AddressConvert {
 
     AddressConvert INSTANCE = Mappers.getMapper(AddressConvert.class);
 
-    AddressDO convert(AppAddressCreateReqVO bean);
+    MemberAddressDO convert(AppAddressCreateReqVO bean);
 
-    AddressDO convert(AppAddressUpdateReqVO bean);
+    MemberAddressDO convert(AppAddressUpdateReqVO bean);
 
-    AppAddressRespVO convert(AddressDO bean);
+    AppAddressRespVO convert(MemberAddressDO bean);
 
-    List<AppAddressRespVO> convertList(List<AddressDO> list);
+    List<AppAddressRespVO> convertList(List<MemberAddressDO> list);
 
-    PageResult<AppAddressRespVO> convertPage(PageResult<AddressDO> page);
+    PageResult<AppAddressRespVO> convertPage(PageResult<MemberAddressDO> page);
 
-    AddressRespDTO convert02(AddressDO bean);
+    AddressRespDTO convert02(MemberAddressDO bean);
 
 }

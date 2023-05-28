@@ -1,18 +1,27 @@
-package cn.iocoder.yudao.module.promotion.api.price.dto;
+package cn.iocoder.yudao.module.trade.service.price.bo;
 
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * 价格计算 Request DTO
+ * 价格计算 Request BO
  *
- * @author 芋道源码
+ * @author yudao源码
  */
 @Data
-public class PriceCalculateReqDTO {
+public class TradePriceCalculateReqBO {
+
+    /**
+     * 订单类型
+     *
+     * 枚举 {@link TradeOrderTypeEnum}
+     */
+    private Integer orderType;
 
     /**
      * 用户编号
@@ -23,11 +32,15 @@ public class PriceCalculateReqDTO {
 
     /**
      * 优惠劵编号
+     *
+     * 对应 CouponDO 的 id 编号
      */
     private Long couponId;
 
     /**
      * 收货地址编号
+     *
+     * 对应 MemberAddressDO 的 id 编号
      */
     private Long addressId;
 
@@ -41,6 +54,7 @@ public class PriceCalculateReqDTO {
      * 商品 SKU
      */
     @Data
+    @Valid
     public static class Item {
 
         /**
@@ -53,8 +67,19 @@ public class PriceCalculateReqDTO {
          * SKU 数量
          */
         @NotNull(message = "商品 SKU 数量不能为空")
-        @Min(value = 0L, message = "商品 SKU 数量必须大于等于 0") // 可传递 0 数量，用于购物车未选中的情况
+        @Min(value = 0L, message = "商品 SKU 数量必须大于等于 0")
         private Integer count;
+
+        /**
+         * 购物车项的编号
+         */
+        private Long cartId;
+
+        /**
+         * 是否选中
+         */
+        @NotNull(message = "是否选中不能为空")
+        private Boolean selected;
 
     }
 

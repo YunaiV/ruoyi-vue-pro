@@ -1,25 +1,19 @@
-package cn.iocoder.yudao.module.promotion.service.discount.bo;
+package cn.iocoder.yudao.module.promotion.api.discount.dto;
 
 import lombok.Data;
 
 /**
- * 限时折扣活动商品 BO
+ * 限时折扣活动商品 Response DTO
  *
  * @author 芋道源码
  */
 @Data
-public class DiscountProductDetailBO {
-
-    // ========== DiscountProductDO 字段 ==========
+public class DiscountProductRespDTO {
 
     /**
      * 编号，主键自增
      */
     private Long id;
-    /**
-     * 限时折扣活动的编号
-     */
-    private Long activityId;
     /**
      * 商品 SPU 编号
      */
@@ -41,7 +35,11 @@ public class DiscountProductDetailBO {
      */
     private Integer discountPrice;
 
-    // ========== DiscountActivityDO 字段 ==========
+    // ========== 活动字段 ==========
+    /**
+     * 限时折扣活动的编号
+     */
+    private Long activityId;
     /**
      * 活动标题
      */

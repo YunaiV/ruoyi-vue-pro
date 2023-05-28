@@ -50,4 +50,8 @@ public interface ErrorCodeConstants {
     ErrorCode EXPRESS_CODE_DUPLICATE = new ErrorCode(1011003001, "已经存在该编码的快递公司");
     ErrorCode EXPRESS_TEMPLATE_NOT_EXISTS = new ErrorCode(1011003002, "运费模板不存在");
     ErrorCode EXPRESS_TEMPLATE_NAME_DUPLICATE = new ErrorCode(1011003002, "已经存在该运费模板名");
+
+    // ========== Price 相关 1011004000 ============
+    ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1011004000, "支付价格计算异常，原因：价格小于等于 0");
+
 }

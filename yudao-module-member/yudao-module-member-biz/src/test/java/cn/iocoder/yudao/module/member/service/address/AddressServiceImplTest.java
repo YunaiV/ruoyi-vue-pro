@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.member.service.address;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.address.AddressDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.address.MemberAddressDO;
 import cn.iocoder.yudao.module.member.dal.mysql.address.AddressMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -42,14 +42,14 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertNotNull(addressId);
         // 校验记录的属性是否正确
-        AddressDO address = addressMapper.selectById(addressId);
+        MemberAddressDO address = addressMapper.selectById(addressId);
         assertPojoEquals(reqVO, address);
     }
 
     @Test
     public void testUpdateAddress_success() {
         // mock 数据
-        AddressDO dbAddress = randomPojo(AddressDO.class);
+        MemberAddressDO dbAddress = randomPojo(MemberAddressDO.class);
         addressMapper.insert(dbAddress);// @Sql: 先插入出一条存在的数据
         // 准备参数
         AppAddressUpdateReqVO reqVO = randomPojo(AppAddressUpdateReqVO.class, o -> {
@@ -59,7 +59,7 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
         // 调用
         addressService.updateAddress(dbAddress.getUserId(), reqVO);
         // 校验是否更新正确
-        AddressDO address = addressMapper.selectById(reqVO.getId()); // 获取最新的
+        MemberAddressDO address = addressMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, address);
     }
 
@@ -75,7 +75,7 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteAddress_success() {
         // mock 数据
-        AddressDO dbAddress = randomPojo(AddressDO.class);
+        MemberAddressDO dbAddress = randomPojo(MemberAddressDO.class);
         addressMapper.insert(dbAddress);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbAddress.getId();

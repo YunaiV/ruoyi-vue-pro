@@ -17,7 +17,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressDO extends BaseDO {
+public class MemberAddressDO extends BaseDO {
 
     /**
      * 编号
