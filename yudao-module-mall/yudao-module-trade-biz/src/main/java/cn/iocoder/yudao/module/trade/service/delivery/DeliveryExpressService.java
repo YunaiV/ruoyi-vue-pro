@@ -4,10 +4,10 @@ import java.util.*;
 import javax.validation.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.DeliveryExpressCreateReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.DeliveryExpressExportReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.DeliveryExpressPageReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.DeliveryExpressUpdateReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressCreateReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressExportReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressUpdateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 
 /**

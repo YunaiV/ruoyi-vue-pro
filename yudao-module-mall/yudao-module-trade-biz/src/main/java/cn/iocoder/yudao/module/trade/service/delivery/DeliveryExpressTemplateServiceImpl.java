@@ -2,8 +2,7 @@ package cn.iocoder.yudao.module.trade.service.delivery;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.*;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.*;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateChargeDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateFreeDO;
@@ -18,8 +17,10 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.trade.convert.delivery.DeliveryExpressTemplateConvert.INSTANCE;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_TEMPLATE_NAME_DUPLICATE;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_TEMPLATE_NOT_EXISTS;
 
 /**
  * 快递运费模板 Service 实现类
@@ -42,6 +43,7 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
     public Long createDeliveryExpressTemplate(DeliveryExpressTemplateCreateReqVO createReqVO) {
         // 校验模板名是否唯一
         validateTemplateNameUnique(createReqVO.getName(), null);
+
         // 插入
         DeliveryExpressTemplateDO deliveryExpressTemplate = INSTANCE.convert(createReqVO);
         expressTemplateMapper.insert(deliveryExpressTemplate);
@@ -67,6 +69,7 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
         validateDeliveryExpressTemplateExists(updateReqVO.getId());
         // 校验模板名是否唯一
         validateTemplateNameUnique(updateReqVO.getName(), updateReqVO.getId());
+
         // 更新运费从表
         updateExpressTemplateCharge(updateReqVO);
         // 更新包邮从表
@@ -77,12 +80,11 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
     }
 
     private void updateExpressTemplateFree(DeliveryExpressTemplateUpdateReqVO updateReqVO) {
+        // 1.1 获得新增/修改的区域列表
         List<DeliveryExpressTemplateFreeDO> oldFreeList = expressTemplateFreeMapper.selectListByTemplateId(updateReqVO.getId());
         List<ExpressTemplateFreeUpdateVO> newFreeList = updateReqVO.getTemplateFree();
-        // 新增包邮区域列表
-        List<DeliveryExpressTemplateFreeDO> addFreeList = new ArrayList<>(newFreeList.size());
-        // 更新包邮区域列表
-        List<DeliveryExpressTemplateFreeDO> updateFreeList = new ArrayList<>(newFreeList.size());
+        List<DeliveryExpressTemplateFreeDO> addFreeList = new ArrayList<>(newFreeList.size()); // 新增包邮区域列表
+        List<DeliveryExpressTemplateFreeDO> updateFreeList = new ArrayList<>(newFreeList.size()); // 更新包邮区域列表
         for (ExpressTemplateFreeUpdateVO item : newFreeList) {
             if (Objects.nonNull(item.getId())) {
                 updateFreeList.add(INSTANCE.convertTemplateFree(item));
@@ -91,30 +93,29 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
                 addFreeList.add(INSTANCE.convertTemplateFree(item));
             }
         }
-        // 新增
+        // 1.2 新增
         if (CollUtil.isNotEmpty(addFreeList)) {
             expressTemplateFreeMapper.insertBatch(addFreeList);
         }
-        // 修改
+        // 1.3 修改
         if (CollUtil.isNotEmpty(updateFreeList)) {
             expressTemplateFreeMapper.updateBatch(updateFreeList);
         }
-        // 得到删除ids
-        Set<Long> deleteFreeIds = CollectionUtils.convertSet(oldFreeList, DeliveryExpressTemplateFreeDO::getId);
-        deleteFreeIds.removeAll(CollectionUtils.convertSet(updateFreeList, DeliveryExpressTemplateFreeDO::getId));
-        //删除
+
+        // 2. 删除
+        Set<Long> deleteFreeIds = convertSet(oldFreeList, DeliveryExpressTemplateFreeDO::getId);
+        deleteFreeIds.removeAll(convertSet(updateFreeList, DeliveryExpressTemplateFreeDO::getId));
         if (CollUtil.isNotEmpty(deleteFreeIds)) {
             expressTemplateFreeMapper.deleteBatchIds(deleteFreeIds);
         }
     }
 
     private void updateExpressTemplateCharge(DeliveryExpressTemplateUpdateReqVO updateReqVO) {
+        // 1.1 获得新增/修改的区域列表
         List<DeliveryExpressTemplateChargeDO> oldChargeList = expressTemplateChargeMapper.selectListByTemplateId(updateReqVO.getId());
         List<ExpressTemplateChargeUpdateVO> newChargeList = updateReqVO.getTemplateCharge();
-        // 新增运费区域列表
-        List<DeliveryExpressTemplateChargeDO> addList = new ArrayList<>(newChargeList.size());
-        // 更新运费区域列表
-        List<DeliveryExpressTemplateChargeDO> updateList = new ArrayList<>(newChargeList.size());
+        List<DeliveryExpressTemplateChargeDO> addList = new ArrayList<>(newChargeList.size()); // 新增运费区域列表
+        List<DeliveryExpressTemplateChargeDO> updateList = new ArrayList<>(newChargeList.size()); // 更新运费区域列表
         for (ExpressTemplateChargeUpdateVO item : newChargeList) {
             if (item.getId() != null) {
                 // 计费模式以主表为准
@@ -126,18 +127,18 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
                 addList.add(INSTANCE.convertTemplateCharge(item));
             }
         }
-        // 新增
+        // 1.2 新增
         if (CollUtil.isNotEmpty(addList)) {
             expressTemplateChargeMapper.insertBatch(addList);
         }
-        // 修改
+        // 1.3 修改
         if (CollUtil.isNotEmpty(updateList)) {
             expressTemplateChargeMapper.updateBatch(updateList);
         }
-        // 得到删除的ids
-        Set<Long> deleteChargeIds = CollectionUtils.convertSet(oldChargeList, DeliveryExpressTemplateChargeDO::getId);
-        deleteChargeIds.removeAll(CollectionUtils.convertSet(updateList, DeliveryExpressTemplateChargeDO::getId));
-        // 删除
+
+        // 2. 删除
+        Set<Long> deleteChargeIds = convertSet(oldChargeList, DeliveryExpressTemplateChargeDO::getId);
+        deleteChargeIds.removeAll(convertSet(updateList, DeliveryExpressTemplateChargeDO::getId));
         if (CollUtil.isNotEmpty(deleteChargeIds)) {
             expressTemplateChargeMapper.deleteBatchIds(deleteChargeIds);
         }
@@ -148,6 +149,7 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
     public void deleteDeliveryExpressTemplate(Long id) {
         // 校验存在
         validateDeliveryExpressTemplateExists(id);
+
         // 删除主表
         expressTemplateMapper.deleteById(id);
         // 删除运费从表
@@ -199,4 +201,5 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
     public PageResult<DeliveryExpressTemplateDO> getDeliveryExpressTemplatePage(DeliveryExpressTemplatePageReqVO pageReqVO) {
         return expressTemplateMapper.selectPage(pageReqVO);
     }
+
 }

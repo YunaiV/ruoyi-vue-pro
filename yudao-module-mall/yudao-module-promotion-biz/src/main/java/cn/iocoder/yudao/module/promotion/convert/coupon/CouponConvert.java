@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.convert.coupon;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageItemRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import org.mapstruct.Mapper;
@@ -17,5 +18,7 @@ public interface CouponConvert {
     CouponConvert INSTANCE = Mappers.getMapper(CouponConvert.class);
 
     PageResult<CouponPageItemRespVO> convertPage(PageResult<CouponDO> page);
+
+    CouponRespDTO convert(CouponDO bean);
 
 }

@@ -18,7 +18,7 @@ public enum PromotionTypeEnum implements IntArrayValuable {
     DISCOUNT_ACTIVITY(1, "限时折扣"),
     REWARD_ACTIVITY(2, "满减送"),
 
-    MEMBER(3, "会员折扣"),
+    MEMBER(3, "会员折扣"), // TODO 芋艿：待实现 StrUtil.format("会员折扣：省 {} 元", formatPrice(orderItem.getPayPrice() - memberPrice)
     COUPON(4, "优惠劵")
     ;
 
@@ -37,4 +37,5 @@ public enum PromotionTypeEnum implements IntArrayValuable {
     public int[] array() {
         return ARRAYS;
     }
+
 }

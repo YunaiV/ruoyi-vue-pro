@@ -4,7 +4,7 @@ package cn.iocoder.yudao.module.trade.dal.mysql.delivery;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.DeliveryExpressTemplatePageReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplatePageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
 import org.apache.ibatis.annotations.Mapper;
 

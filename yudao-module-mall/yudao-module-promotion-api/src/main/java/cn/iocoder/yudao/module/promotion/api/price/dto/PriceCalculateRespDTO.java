@@ -24,6 +24,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Data
+@Deprecated
 public class PriceCalculateRespDTO {
 
     /**
@@ -174,6 +175,7 @@ public class PriceCalculateRespDTO {
      * 营销明细
      */
     @Data
+    @Deprecated
     public static class Promotion {
 
         /**
@@ -216,14 +218,14 @@ public class PriceCalculateRespDTO {
         /**
          * 是否满足优惠条件
          */
-        private Boolean meet;
+        private Boolean match;
         /**
          * 满足条件的提示
          *
-         * 如果 {@link #meet} = true 满足，则提示“圣诞价:省 150.00 元”
-         * 如果 {@link #meet} = false 不满足，则提示“购满 85 元，可减 40 元”
+         * 如果 {@link #match} = true 满足，则提示“圣诞价:省 150.00 元”
+         * 如果 {@link #match} = false 不满足，则提示“购满 85 元，可减 40 元”
          */
-        private String meetTip;
+        private String description;
 
     }
 

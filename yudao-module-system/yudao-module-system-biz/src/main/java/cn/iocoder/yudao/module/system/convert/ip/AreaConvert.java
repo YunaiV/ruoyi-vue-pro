@@ -23,7 +23,8 @@ public interface AreaConvert {
     @Mapping(source = "type", target = "leaf")
     AreaNodeSimpleRespVO convert(Area area);
 
-    default Boolean convertAreaType(Integer type){
-        return Objects.equals(AreaTypeEnum.DISTRICT.getType(),type);
+    default Boolean convertAreaType(Integer type) {
+        return Objects.equals(AreaTypeEnum.DISTRICT.getType(), type);
     }
+
 }

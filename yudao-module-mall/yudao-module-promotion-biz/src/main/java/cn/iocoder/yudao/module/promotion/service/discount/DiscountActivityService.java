@@ -6,12 +6,10 @@ import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountAc
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
-import cn.iocoder.yudao.module.promotion.service.discount.bo.DiscountProductDetailBO;
 
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 限时折扣 Service 接口
@@ -28,7 +26,7 @@ public interface DiscountActivityService {
      * @param skuIds SKU 编号数组
      * @return 匹配的限时折扣商品
      */
-    Map<Long, DiscountProductDetailBO> getMatchDiscountProducts(Collection<Long> skuIds);
+    List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> skuIds);
 
     /**
      * 创建限时折扣活动
