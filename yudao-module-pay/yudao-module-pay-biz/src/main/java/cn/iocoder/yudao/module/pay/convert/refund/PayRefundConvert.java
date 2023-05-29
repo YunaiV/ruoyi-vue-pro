@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.pay.convert.refund;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.*;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
@@ -39,6 +41,10 @@ public interface PayRefundConvert {
      * @return 分页退款条目VO
      */
     PayRefundPageItemRespVO pageItemConvert(PayRefundDO bean);
+
+    PayRefundUnifiedReqDTO payRefundConvert(PayRefundCreateReqDTO reqDTO);
+
+    PayRefundDO payRefundDOConvert(PayOrderDO orderDO);
 
     List<PayRefundRespVO> convertList(List<PayRefundDO> list);
 

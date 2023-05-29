@@ -14,6 +14,7 @@ import cn.iocoder.yudao.framework.pay.core.enums.PayNotifyRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageReqVO;
+import cn.iocoder.yudao.module.pay.convert.refund.PayRefundConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
@@ -135,37 +136,25 @@ public class PayRefundServiceImpl implements PayRefundService {
             //可以重复提交，保证 退款请求号 一致，由渠道保证幂等
         } else {
             // 成功，插入退款单 状态为生成.没有和渠道交互
-            // TODO @jason：搞到 convert 里。一些额外的自动，手动 set 下；
-            payRefundDO = PayRefundDO.builder()
-                    .appId(order.getAppId())
-                    .channelOrderNo(order.getChannelOrderNo())
-                    .channelCode(order.getChannelCode())
-                    .channelId(order.getChannelId())
-                    .merchantId(order.getMerchantId())
-                    .orderId(order.getId())
-                    .merchantRefundNo(merchantRefundId) // TODO 芋艿：需要优化
-                    .notifyUrl(app.getRefundNotifyUrl())
-                    .payAmount(order.getAmount())
-                    .refundAmount(reqDTO.getAmount())
-                    .userIp(reqDTO.getUserIp())
-                    .merchantOrderId(order.getMerchantOrderId())
-                    .tradeNo(orderExtensionDO.getNo())
-                    .status(PayRefundStatusEnum.CREATE.getStatus())
-                    .reason(reqDTO.getReason())
-                    .notifyStatus(PayOrderNotifyStatusEnum.NO.getStatus())
-                    .type(refundType.getStatus())
-                    .build();
+            payRefundDO = PayRefundConvert.INSTANCE.payRefundDOConvert(order);
+            payRefundDO.setOrderId(order.getId());
+            payRefundDO.setMerchantRefundNo(merchantRefundId);// TODO 芋艿：需要优化
+            payRefundDO.setNotifyUrl(app.getRefundNotifyUrl());
+            payRefundDO.setPayAmount(order.getAmount());
+            payRefundDO.setRefundAmount(reqDTO.getAmount());
+            payRefundDO.setTradeNo(orderExtensionDO.getNo());
+            payRefundDO.setStatus(PayRefundStatusEnum.CREATE.getStatus());
+            payRefundDO.setNotifyStatus(PayOrderNotifyStatusEnum.NO.getStatus());
+            payRefundDO.setType(refundType.getStatus());
+
             refundMapper.insert(payRefundDO);
         }
-        // TODO @jason：搞到 convert 里。一些额外的自动，手动 set 下；
         PayRefundUnifiedReqDTO unifiedReqDTO = new PayRefundUnifiedReqDTO();
-        unifiedReqDTO.setUserIp(reqDTO.getUserIp())
-                .setAmount(reqDTO.getAmount())
-                .setChannelOrderNo(order.getChannelOrderNo())
-                .setPayTradeNo(orderExtensionDO.getNo())
-                .setMerchantRefundId(merchantRefundId)  // TODO 芋艿：需要优化
-                .setNotifyUrl(genChannelPayNotifyUrl(channel)) // TODO 芋艿：优化下 notifyUrl
-                .setReason(reqDTO.getReason());
+        unifiedReqDTO = PayRefundConvert.INSTANCE.payRefundConvert(reqDTO);
+        unifiedReqDTO.setPayTradeNo(orderExtensionDO.getNo());
+        unifiedReqDTO.setMerchantRefundId(merchantRefundId);// TODO 芋艿：需要优化
+        unifiedReqDTO.setNotifyUrl(genChannelPayNotifyUrl(channel));// TODO 芋艿：优化下 notifyUrl
+
         // 向渠道发起退款申请
         client.unifiedRefund(unifiedReqDTO);
         // 检查是否失败，失败抛出业务异常。
