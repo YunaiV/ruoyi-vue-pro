@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -109,8 +111,7 @@ public class PayAppController {
         // 得到所有的应用编号，查出所有的渠道
         Collection<Long> payAppIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getId);
         List<PayChannelDO> channels = channelService.getChannelListByAppIds(payAppIds);
-        // TODO @aquan：可以基于 appId 简历一个 multiMap。这样下面，直接 get 到之后，CollUtil buildSet 即可
-        Iterator<PayChannelDO> iterator = channels.iterator();
+        Map<Long, PayChannelDO> channelDOMap = channels.stream().collect(Collectors.toMap(PayChannelDO::getAppId, Function.identity()));
 
         // 得到所有的商户信息
         Collection<Long> merchantIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getMerchantId);
@@ -125,13 +126,8 @@ public class PayAppController {
             respVO.setPayMerchant(PayAppConvert.INSTANCE.convert(deptMap.get(app.getMerchantId())));
             // 写入支付渠道信息的数据
             Set<String> channelCodes = new HashSet<>(PayChannelEnum.values().length);
-            while (iterator.hasNext()) {
-                PayChannelDO channelDO = iterator.next();
-                if (channelDO.getAppId().equals(app.getId())) {
-                    channelCodes.add(channelDO.getCode());
-                    iterator.remove();
-                }
-            }
+            PayChannelDO payChannelDO = channelDOMap.get(app.getId());
+            channelCodes.add(payChannelDO.getCode());
             respVO.setChannelCodes(channelCodes);
             appList.add(respVO);
         });
