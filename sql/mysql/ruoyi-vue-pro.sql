@@ -517,9 +517,9 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `infra_api_error_log`;
 CREATE TABLE `infra_api_error_log`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
   `trace_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '链路追踪编号\n     *\n     * 一般来说，通过链路追踪编号，可以将访问日志，错误日志，链路追踪日志，logger 打印日志等，结合在一起，从而进行排错。',
-  `user_id` int NOT NULL DEFAULT 0 COMMENT '用户编号',
+  `user_id` bigint NOT NULL DEFAULT 0 COMMENT '用户编号',
   `user_type` tinyint NOT NULL DEFAULT 0 COMMENT '用户类型',
   `application_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '应用名\n     *\n     * 目前读取 spring.application.name',
   `request_method` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '请求方法名',
@@ -630,7 +630,7 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `infra_config`;
 CREATE TABLE `infra_config`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '参数主键',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '参数主键',
   `category` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '参数分组',
   `type` tinyint NOT NULL COMMENT '参数类型',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '参数名称',

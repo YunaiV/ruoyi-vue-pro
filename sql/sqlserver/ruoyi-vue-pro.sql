@@ -1669,9 +1669,9 @@ IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[in
 GO
 
 CREATE TABLE [dbo].[infra_api_error_log] (
-  [id] int  IDENTITY(1,1) NOT NULL,
+  [id] bigint  IDENTITY(1,1) NOT NULL,
   [trace_id] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [user_id] int DEFAULT 0 NOT NULL,
+  [user_id] bigint DEFAULT 0 NOT NULL,
   [user_type] tinyint DEFAULT 0 NOT NULL,
   [application_name] nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [request_method] nvarchar(16) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
@@ -2360,7 +2360,7 @@ IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[in
 GO
 
 CREATE TABLE [dbo].[infra_config] (
-  [id] int  NOT NULL,
+  [id] bigint  NOT NULL,
   [category] nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [type] tinyint  NOT NULL,
   [name] nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,

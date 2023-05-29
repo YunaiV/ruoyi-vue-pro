@@ -961,9 +961,9 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS "infra_api_error_log";
 CREATE TABLE "infra_api_error_log" (
-  "id" int4 NOT NULL,
+  "id" int8 NOT NULL,
   "trace_id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
-  "user_id" int4 NOT NULL DEFAULT 0,
+  "user_id" int8 NOT NULL DEFAULT 0,
   "user_type" int2 NOT NULL DEFAULT 0,
   "application_name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "request_method" varchar(16) COLLATE "pg_catalog"."default" NOT NULL,
@@ -1166,7 +1166,7 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS "infra_config";
 CREATE TABLE "infra_config" (
-  "id" int4 NOT NULL,
+  "id" int8 NOT NULL,
   "category" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "type" int2 NOT NULL,
   "name" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
