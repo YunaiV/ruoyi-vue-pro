@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.trade.service.price.bo;
 
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionLevelEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import lombok.Data;
@@ -193,7 +192,7 @@ public class TradePriceCalculateRespBO {
         /**
          * 营销级别
          *
-         * 枚举 {@link PromotionLevelEnum}
+         * 枚举 @link PromotionLevelEnum} TODO PromotionLevelEnum 没有这个枚举类
          */
         private Integer level;
         /**
