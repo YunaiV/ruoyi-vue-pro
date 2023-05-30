@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import javax.validation.constraints.*;
 
 /**
- * CRM 模块的机构/公司 Base VO，提供给添加、修改、详细的子 VO 使用
+ * 机构/公司 Base VO，提供给添加、修改、详细的子 VO 使用
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
@@ -33,8 +33,8 @@ public class InstitutionBaseVO {
     @Schema(description = "备注信息")
     private String mark;
 
-    @Schema(description = "机构类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "请选择")
-    @NotNull(message = "机构类型不能为空")
+    @Schema(description = "机构类型枚举值", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "机构类型枚举值不能为空")
     private String type;
 
 }

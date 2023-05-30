@@ -17,6 +17,8 @@ import java.io.IOException;
 
 import ${PageResultClassName};
 import ${CommonResultClassName};
+import static ${ServiceExceptionUtilClassName}.exception;
+import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
 import static ${CommonResultClassName}.success;
 
 import ${ExcelUtilsClassName};
@@ -26,6 +28,7 @@ import static ${OperateTypeEnumClassName}.*;
 
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 import ${basePackage}.module.${table.moduleName}.entity.${table.businessName}.${table.className};
+import ${basePackage}.module.${table.moduleName}.mapper.${table.businessName}.${table.className}Mapper;
 import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.${table.className}Service;
 
 @Tag(name = "${sceneEnum.name} - ${table.classComment}")
@@ -59,7 +62,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除${table.classComment}")
+    @Operation(summary = "通过 ID 删除${table.classComment}")
     @Parameter(name = "id", description = "编号", required = true)
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")#end
 
@@ -69,22 +72,22 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得${table.classComment}")
+    @Operation(summary = "通过 ID 获得${table.classComment}")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
 
     public CommonResult<${sceneEnum.prefixClass}${table.className}RespVO> get${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
-        ${table.className} ${classNameVar} = ${classNameVar}Service.get${simpleClassName}(id);
-        return success(${table.className}Mapper.toDto(${classNameVar}));
+            Optional<${table.className}> ${classNameVar} = ${classNameVar}Service.get${simpleClassName}(id);
+        return success(${classNameVar}.map(${classNameVar}Mapper::toDto).orElseThrow(() -> exception(${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS)));
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得${table.classComment}分页")
+    @Operation(summary = "(分页)获得${table.classComment}列表")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
 
     public CommonResult<PageResult<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}Page(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageVO) {
         PageResult<${table.className}> pageResult = ${classNameVar}Service.get${simpleClassName}Page(pageVO);
-        return success(${table.className}Mapper.toPage(pageResult));
+        return success(${classNameVar}Mapper.toPage(pageResult));
     }
 
     @GetMapping("/export-excel")
@@ -96,7 +99,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
               HttpServletResponse response) throws IOException {
         List<${table.className}> list = ${classNameVar}Service.get${simpleClassName}List(exportReqVO);
         // 导出 Excel
-        List<${sceneEnum.prefixClass}${table.className}ExcelVO> datas = ${table.className}Mapper.toExcelList(list);
+        List<${sceneEnum.prefixClass}${table.className}ExcelVO> datas = ${classNameVar}Mapper.toExcelList(list);
         ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${sceneEnum.prefixClass}${table.className}ExcelVO.class, datas);
     }
 

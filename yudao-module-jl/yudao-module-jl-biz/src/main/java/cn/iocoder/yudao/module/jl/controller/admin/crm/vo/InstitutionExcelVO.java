@@ -7,14 +7,11 @@ import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-
 
 /**
- * CRM 模块的机构/公司 Excel VO
+ * 机构/公司 Excel VO
  *
- * @author 芋道源码
+ * @author 北京惟象科技
  */
 @Data
 public class InstitutionExcelVO {
@@ -40,8 +37,7 @@ public class InstitutionExcelVO {
     @ExcelProperty("备注信息")
     private String mark;
 
-    @ExcelProperty(value = "机构类型", converter = DictConvert.class)
-    @DictFormat("institution_type") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
+    @ExcelProperty("机构类型枚举值")
     private String type;
 
 }

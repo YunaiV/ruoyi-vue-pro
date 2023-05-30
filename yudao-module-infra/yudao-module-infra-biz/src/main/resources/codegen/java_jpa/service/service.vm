@@ -40,7 +40,7 @@ public interface ${table.className}Service {
      * @param id 编号
      * @return ${table.classComment}
      */
-    ${table.className} get${simpleClassName}(${primaryColumn.javaType} id);
+    Optional<${table.className}> get${simpleClassName}(${primaryColumn.javaType} id);
 
     /**
      * 获得${table.classComment}列表

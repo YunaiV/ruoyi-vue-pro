@@ -11,7 +11,7 @@ import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePack
 import ${basePackage}.module.${table.moduleName}.entity.${table.businessName}.${table.className};
 import ${PageResultClassName};
 
-import ${basePackage}.module.${table.moduleName}.convert.${table.businessName}.${table.className}Mapper;
+import ${basePackage}.module.${table.moduleName}.mapper.${table.businessName}.${table.className}Mapper;
 import ${basePackage}.module.${table.moduleName}.repository.${table.businessName}.${table.className}Repository;
 
 import static ${ServiceExceptionUtilClassName}.exception;
@@ -28,10 +28,13 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     @Resource
     private ${table.className}Repository ${classNameVar}Repository;
 
+    @Resource
+    private ${table.className}Mapper ${classNameVar}Mapper;
+
     @Override
     public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
         // 插入
-        ${table.className} ${classNameVar} = ${table.className}Mapper.toEntity(createReqVO);
+        ${table.className} ${classNameVar} = ${classNameVar}Mapper.toEntity(createReqVO);
         ${classNameVar}Repository.save(${classNameVar});
         // 返回
         return ${classNameVar}.getId();
@@ -42,7 +45,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         // 校验存在
         validate${simpleClassName}Exists(updateReqVO.getId());
         // 更新
-        ${table.className} updateObj = ${table.className}Mapper.toEntity(updateReqVO);
+        ${table.className} updateObj = ${classNameVar}Mapper.toEntity(updateReqVO);
         ${classNameVar}Repository.save(updateObj);
     }
 

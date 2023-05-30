@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - CRM 模块的机构/公司分页 Request VO")
+@Schema(description = "管理后台 - 机构/公司分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -34,7 +34,7 @@ public class InstitutionPageReqVO extends PageParam {
     @Schema(description = "备注信息")
     private String mark;
 
-    @Schema(description = "机构类型", example = "请选择")
+    @Schema(description = "机构类型枚举值", example = "1")
     private String type;
 
 }

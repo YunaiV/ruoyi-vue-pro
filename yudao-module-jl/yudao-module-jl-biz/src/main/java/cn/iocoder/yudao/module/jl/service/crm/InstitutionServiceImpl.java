@@ -1,29 +1,25 @@
 package cn.iocoder.yudao.module.jl.service.crm;
 
-import cn.iocoder.yudao.module.jl.dal.dataobject.crm.Institution;
-import cn.iocoder.yudao.module.jl.mapper.InstitutionMapper;
-import cn.iocoder.yudao.module.jl.repository.InstitutionRepository;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import java.util.*;
 import cn.iocoder.yudao.module.jl.controller.admin.crm.vo.*;
-import cn.iocoder.yudao.module.jl.dal.dataobject.crm.InstitutionDO;
+import cn.iocoder.yudao.module.jl.entity.crm.Institution;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import cn.iocoder.yudao.module.jl.convert.crm.InstitutionConvert;
+import cn.iocoder.yudao.module.jl.mapper.crm.InstitutionMapper;
+import cn.iocoder.yudao.module.jl.repository.crm.InstitutionRepository;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.jl.enums.ErrorCodeConstants.*;
 
 /**
- * CRM 模块的机构/公司 Service 实现类
+ * 机构/公司 Service 实现类
  *
- * @author 芋道源码
  */
 @Service
 @Validated
@@ -36,7 +32,7 @@ public class InstitutionServiceImpl implements InstitutionService {
     private InstitutionMapper institutionMapper;
 
     @Override
-    public Long createInstitution(InstitutionCreateReq createReqVO) {
+    public Long createInstitution(InstitutionCreateReqVO createReqVO) {
         // 插入
         Institution institution = institutionMapper.toEntity(createReqVO);
         institutionRepository.save(institution);
@@ -45,7 +41,7 @@ public class InstitutionServiceImpl implements InstitutionService {
     }
 
     @Override
-    public void updateInstitution(InstitutionDto updateReqVO) {
+    public void updateInstitution(InstitutionUpdateReqVO updateReqVO) {
         // 校验存在
         validateInstitutionExists(updateReqVO.getId());
         // 更新
@@ -62,28 +58,27 @@ public class InstitutionServiceImpl implements InstitutionService {
     }
 
     private void validateInstitutionExists(Long id) {
-        institutionRepository.findById(id).orElseThrow(() -> exception(COMPETITOR_NOT_EXISTS));
+        institutionRepository.findById(id).orElseThrow(() -> exception(INSTITUTION_NOT_EXISTS));
     }
 
     @Override
-    public InstitutionDto getInstitution(Long id) {
-        return institutionRepository.findById(id).map(institutionMapper::toDto).orElse(null);
+    public Optional<Institution> getInstitution(Long id) {
+        return institutionRepository.findById(id);
     }
 
     @Override
-    public List<InstitutionDto> getInstitutionList(Collection<Long> ids) {
+    public List<Institution> getInstitutionList(Collection<Long> ids) {
         return StreamSupport.stream(institutionRepository.findAllById(ids).spliterator(), false)
-                .map(institutionMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public PageResult<InstitutionDto> getInstitutionPage(InstitutionPageReqVO pageReqVO) {
+    public PageResult<Institution> getInstitutionPage(InstitutionPageReqVO pageReqVO) {
         return null;
     }
 
     @Override
-    public List<InstitutionDto> getInstitutionList(InstitutionExportReqVO exportReqVO) {
+    public List<Institution> getInstitutionList(InstitutionExportReqVO exportReqVO) {
         return null;
     }
 

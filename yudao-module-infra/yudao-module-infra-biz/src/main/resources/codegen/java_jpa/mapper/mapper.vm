@@ -34,7 +34,6 @@ public interface ${table.className}Mapper {
 
     ${table.className}RespVO toDto(${table.className} entity);
 
-    CompetitorDto toDto(Competitor competitor);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     ${table.className} partialUpdate(${table.className}UpdateReqVO dto, @MappingTarget ${table.className} entity);

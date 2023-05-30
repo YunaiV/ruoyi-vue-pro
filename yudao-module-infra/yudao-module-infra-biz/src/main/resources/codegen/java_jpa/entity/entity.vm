@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-@Accessors(chain = true)
 @Entity(name = "${table.className}")
 @Table(name = "${table.tableName}")
 public class ${table.className} extends BaseEntity {

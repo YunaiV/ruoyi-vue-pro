@@ -3,68 +3,67 @@ package cn.iocoder.yudao.module.jl.service.crm;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.jl.controller.admin.crm.vo.*;
-import cn.iocoder.yudao.module.jl.dal.dataobject.crm.InstitutionDO;
+import cn.iocoder.yudao.module.jl.entity.crm.Institution;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
- * CRM 模块的机构/公司 Service 接口
+ * 机构/公司 Service 接口
  *
- * @author 芋道源码
  */
 public interface InstitutionService {
 
     /**
-     * 创建CRM 模块的机构/公司
+     * 创建机构/公司
      *
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createInstitution(@Valid InstitutionCreateReq createReqVO);
+    Long createInstitution(@Valid InstitutionCreateReqVO createReqVO);
 
     /**
-     * 更新CRM 模块的机构/公司
+     * 更新机构/公司
      *
      * @param updateReqVO 更新信息
      */
-    void updateInstitution(@Valid InstitutionDto updateReqVO);
+    void updateInstitution(@Valid InstitutionUpdateReqVO updateReqVO);
 
     /**
-     * 删除CRM 模块的机构/公司
+     * 删除机构/公司
      *
      * @param id 编号
      */
     void deleteInstitution(Long id);
 
     /**
-     * 获得CRM 模块的机构/公司
+     * 获得机构/公司
      *
      * @param id 编号
-     * @return CRM 模块的机构/公司
+     * @return 机构/公司
      */
-    InstitutionDto getInstitution(Long id);
+    Optional<Institution> getInstitution(Long id);
 
     /**
-     * 获得CRM 模块的机构/公司列表
+     * 获得机构/公司列表
      *
      * @param ids 编号
-     * @return CRM 模块的机构/公司列表
+     * @return 机构/公司列表
      */
-    List<InstitutionDto> getInstitutionList(Collection<Long> ids);
+    List<Institution> getInstitutionList(Collection<Long> ids);
 
     /**
-     * 获得CRM 模块的机构/公司分页
+     * 获得机构/公司分页
      *
      * @param pageReqVO 分页查询
-     * @return CRM 模块的机构/公司分页
+     * @return 机构/公司分页
      */
-    PageResult<InstitutionDto> getInstitutionPage(InstitutionPageReqVO pageReqVO);
+    PageResult<Institution> getInstitutionPage(InstitutionPageReqVO pageReqVO);
 
     /**
-     * 获得CRM 模块的机构/公司列表, 用于 Excel 导出
+     * 获得机构/公司列表, 用于 Excel 导出
      *
      * @param exportReqVO 查询条件
-     * @return CRM 模块的机构/公司列表
+     * @return 机构/公司列表
      */
-    List<InstitutionDto> getInstitutionList(InstitutionExportReqVO exportReqVO);
+    List<Institution> getInstitutionList(InstitutionExportReqVO exportReqVO);
 
 }
