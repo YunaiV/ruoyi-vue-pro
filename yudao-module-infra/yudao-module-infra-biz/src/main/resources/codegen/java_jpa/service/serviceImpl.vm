@@ -5,6 +5,16 @@ import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import java.util.*;
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
@@ -73,9 +83,34 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     }
 
     @Override
-    public PageResult<${table.className}> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO) {
-        return null;
-##        return ${classNameVar}Repository.selectPage(pageReqVO);
+    public PageResult<${table.className}> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO, ${sceneEnum.prefixClass}${table.className}PageOrder orderVo) {
+        // 创建 Sort 对象
+        Sort sort = createSort(orderVo);
+
+        // 创建 Pageable 对象
+        Pageable pageable = PageRequest.of(pageReqVO.getPageNo() - 1, pageReqVO.getPageSize(), sort);
+
+        // 创建 Specification
+        Specification<${table.className}> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            #foreach ($column in $columns)
+            #if (!${baseDOFields.contains(${column.javaField})} && !${column.primaryKey})##排除 BaseDO 的字段
+            if (pageReqVO.get${column.getJavaFieldCapitalize()}() != null) {
+                predicates.add(cb.equal(root.get("${column.javaField}"), pageReqVO.get${column.getJavaFieldCapitalize()}()));
+            }
+
+            #end
+            #end
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        // 执行查询
+        Page<Institution> page = institutionRepository.findAll(spec, pageable);
+
+        // 转换为 PageResult 并返回
+        return new PageResult<>(page.getContent(), page.getTotalElements());
     }
 
     @Override
@@ -84,4 +119,23 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 ##        return ${classNameVar}Repository.selectList(exportReqVO);
     }
 
+    private Sort createSort(${table.className}PageOrder order) {
+        List<Sort.Order> orders = new ArrayList<>();
+
+        // 根据 order 中的每个属性创建一个排序规则
+        // 注意，这里假设 order 中的每个属性都是 String 类型，代表排序的方向（"asc" 或 "desc"）
+        // 如果实际情况不同，你可能需要对这部分代码进行调整
+
+        #foreach ($column in $columns)
+        #if (!${baseDOFields.contains(${column.javaField})})##排除 BaseDO 的字段
+        if (order.get${column.getJavaFieldCapitalize()}() != null) {
+            orders.add(new Sort.Order(order.get${column.getJavaFieldCapitalize()}().equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, "${column.javaField}"));
+        }
+
+        #end
+        #end
+
+        // 创建 Sort 对象
+        return Sort.by(orders);
+    }
 }

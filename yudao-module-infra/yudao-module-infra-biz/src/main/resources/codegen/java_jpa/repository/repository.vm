@@ -1,11 +1,12 @@
 package ${basePackage}.module.${table.moduleName}.repository.${table.businessName};
 
 import ${basePackage}.module.${table.moduleName}.entity.${table.businessName}.${table.className};
-import org.springframework.data.repository.*;
+import org.springframework.data.jpa.repository.*;
 
 /**
 * ${table.className}Repository
 *
 */
-public interface ${table.className}Repository extends PagingAndSortingRepository<${table.className}, Long> {
+public interface ${table.className}Repository extends JpaRepository<${table.className}, Long>, JpaSpecificationExecutor<${table.className}> {
+
 }

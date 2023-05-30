@@ -85,8 +85,8 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     @Operation(summary = "(分页)获得${table.classComment}列表")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
 
-    public CommonResult<PageResult<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}Page(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageVO) {
-        PageResult<${table.className}> pageResult = ${classNameVar}Service.get${simpleClassName}Page(pageVO);
+    public CommonResult<PageResult<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}Page(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageVO, @Valid ${sceneEnum.prefixClass}${table.className}PageOrder orderVo) {
+        PageResult<${table.className}> pageResult = ${classNameVar}Service.get${simpleClassName}Page(pageVO, orderVo);
         return success(${classNameVar}Mapper.toPage(pageResult));
     }
 

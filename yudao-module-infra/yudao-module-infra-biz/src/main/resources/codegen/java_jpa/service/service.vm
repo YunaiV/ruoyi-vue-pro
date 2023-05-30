@@ -56,7 +56,7 @@ public interface ${table.className}Service {
      * @param pageReqVO 分页查询
      * @return ${table.classComment}分页
      */
-    PageResult<${table.className}> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO);
+    PageResult<${table.className}> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO, ${sceneEnum.prefixClass}${table.className}PageOrder orderVo);
 
     /**
      * 获得${table.classComment}列表, 用于 Excel 导出

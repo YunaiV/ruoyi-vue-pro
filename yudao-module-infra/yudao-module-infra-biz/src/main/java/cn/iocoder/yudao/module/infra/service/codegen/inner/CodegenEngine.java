@@ -63,6 +63,7 @@ public class CodegenEngine {
             .put(javaTemplatePath("controller/vo/baseVO"), javaModuleImplVOFilePath("BaseVO"))
             .put(javaTemplatePath("controller/vo/createReqVO"), javaModuleImplVOFilePath("CreateReqVO"))
             .put(javaTemplatePath("controller/vo/pageReqVO"), javaModuleImplVOFilePath("PageReqVO"))
+            .put(javaTemplatePath("controller/vo/order"), javaModuleImplVOFilePath("PageOrder"))
             .put(javaTemplatePath("controller/vo/respVO"), javaModuleImplVOFilePath("RespVO"))
             .put(javaTemplatePath("controller/vo/updateReqVO"), javaModuleImplVOFilePath("UpdateReqVO"))
             .put(javaTemplatePath("controller/vo/exportReqVO"), javaModuleImplVOFilePath("ExportReqVO"))

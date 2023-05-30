@@ -78,8 +78,8 @@ public class InstitutionController {
     @GetMapping("/page")
     @Operation(summary = "(分页)获得机构/公司列表")
     @PreAuthorize("@ss.hasPermission('jl:institution:query')")
-    public CommonResult<PageResult<InstitutionRespVO>> getInstitutionPage(@Valid InstitutionPageReqVO pageVO) {
-        PageResult<Institution> pageResult = institutionService.getInstitutionPage(pageVO);
+    public CommonResult<PageResult<InstitutionRespVO>> getInstitutionPage(@ModelAttribute InstitutionPageReqVO pageVO, @ModelAttribute InstitutionPageOrder orderVo) {
+        PageResult<Institution> pageResult = institutionService.getInstitutionPage(pageVO, orderVo);
         return success(institutionMapper.toPage(pageResult));
     }
 

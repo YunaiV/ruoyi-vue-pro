@@ -56,7 +56,7 @@ public interface InstitutionService {
      * @param pageReqVO 分页查询
      * @return 机构/公司分页
      */
-    PageResult<Institution> getInstitutionPage(InstitutionPageReqVO pageReqVO);
+    PageResult<Institution> getInstitutionPage(InstitutionPageReqVO pageReqVO, InstitutionPageOrder orderVo);
 
     /**
      * 获得机构/公司列表, 用于 Excel 导出

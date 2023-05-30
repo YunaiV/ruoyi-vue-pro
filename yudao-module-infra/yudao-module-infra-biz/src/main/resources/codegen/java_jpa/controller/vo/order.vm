@@ -1,0 +1,39 @@
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import java.util.*;
+#foreach ($column in $columns)
+#if (${column.javaType} == "BigDecimal")
+import java.math.BigDecimal;
+#end
+#if (${column.javaType} == "LocalDateTime")
+import java.time.LocalDateTime;
+#end
+#end
+import javax.validation.constraints.*;
+## 处理 Date 字段的引入
+#foreach ($column in $columns)
+#if (${column.createOperation} && ${column.updateOperation} && ${column.listOperationResult}
+    && ${column.javaType} == "LocalDateTime")## 时间类型
+import org.springframework.format.annotation.DateTimeFormat;
+
+import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+#break
+#end
+#end
+
+/**
+ * ${table.classComment} Order 设置，用于分页使用
+ */
+@Data
+public class ${sceneEnum.prefixClass}${table.className}PageOrder {
+
+#foreach ($column in $columns)
+#if (${column.listOperationResult})##通用操作
+    @Schema(allowableValues = {"desc", "asc"})
+    private String ${column.javaField};
+
+#end
+#end
+}
