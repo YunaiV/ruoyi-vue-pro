@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.jl.controller.admin.project;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -8,13 +10,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 
-import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
 import java.util.*;
 import java.io.IOException;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -82,9 +82,12 @@ public class ProjectBaseController {
     @GetMapping("/page")
     @Operation(summary = "获得项目管理分页")
     @PreAuthorize("@ss.hasPermission('jl:project-base:query')")
-    public CommonResult<PageResult<ProjectBaseRespVO>> getProjectBasePage(@Valid ProjectBasePageReqVO pageVO) {
-        PageResult<ProjectBaseDO> pageResult = projectBaseService.getProjectBasePage(pageVO);
-        return success(ProjectBaseConvert.INSTANCE.convertPage(pageResult));
+    public CommonResult<PageResult<ProjectBaseDO>> getProjectBasePage(@Valid ProjectBasePageReqVO pageVO) {
+        Page<ProjectBaseDO> pageResult = projectBaseService.getProjectBasePage(pageVO);
+        PageResult<ProjectBaseDO> result = new PageResult<>();
+        result.setList(pageResult.getContent());
+        result.setTotal(pageResult.getTotalElements());
+        return success(result);
     }
 
     @GetMapping("/export-excel")

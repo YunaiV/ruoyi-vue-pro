@@ -40,14 +40,14 @@ public class InstitutionController {
     @PostMapping("/create")
     @Operation(summary = "创建CRM 模块的机构/公司")
     @PreAuthorize("@ss.hasPermission('jl:institution:create')")
-    public CommonResult<Long> createInstitution(@Valid @RequestBody InstitutionCreateReqVO createReqVO) {
+    public CommonResult<Long> createInstitution(@Valid @RequestBody InstitutionCreateReq createReqVO) {
         return success(institutionService.createInstitution(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新CRM 模块的机构/公司")
     @PreAuthorize("@ss.hasPermission('jl:institution:update')")
-    public CommonResult<Boolean> updateInstitution(@Valid @RequestBody InstitutionUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateInstitution(@Valid @RequestBody InstitutionDto updateReqVO) {
         institutionService.updateInstitution(updateReqVO);
         return success(true);
     }
@@ -65,26 +65,18 @@ public class InstitutionController {
     @Operation(summary = "获得CRM 模块的机构/公司")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('jl:institution:query')")
-    public CommonResult<InstitutionRespVO> getInstitution(@RequestParam("id") Long id) {
-        InstitutionDO institution = institutionService.getInstitution(id);
-        return success(InstitutionConvert.INSTANCE.convert(institution));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得CRM 模块的机构/公司列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('jl:institution:query')")
-    public CommonResult<List<InstitutionRespVO>> getInstitutionList(@RequestParam("ids") Collection<Long> ids) {
-        List<InstitutionDO> list = institutionService.getInstitutionList(ids);
-        return success(InstitutionConvert.INSTANCE.convertList(list));
+    public CommonResult<InstitutionDto> getInstitution(@RequestParam("id") Long id) {
+        InstitutionDto institution = institutionService.getInstitution(id);
+        return success(institution);
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得CRM 模块的机构/公司分页")
     @PreAuthorize("@ss.hasPermission('jl:institution:query')")
     public CommonResult<PageResult<InstitutionRespVO>> getInstitutionPage(@Valid InstitutionPageReqVO pageVO) {
-        PageResult<InstitutionDO> pageResult = institutionService.getInstitutionPage(pageVO);
-        return success(InstitutionConvert.INSTANCE.convertPage(pageResult));
+//        PageResult<InstitutionDO> pageResult = institutionService.getInstitutionPage(pageVO);
+//        return success(InstitutionConvert.INSTANCE.convertPage(pageResult));
+        return null;
     }
 
     @GetMapping("/export-excel")
@@ -93,10 +85,11 @@ public class InstitutionController {
     @OperateLog(type = EXPORT)
     public void exportInstitutionExcel(@Valid InstitutionExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<InstitutionDO> list = institutionService.getInstitutionList(exportReqVO);
-        // 导出 Excel
-        List<InstitutionExcelVO> datas = InstitutionConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "CRM 模块的机构/公司.xls", "数据", InstitutionExcelVO.class, datas);
+//        List<InstitutionDO> list = institutionService.getInstitutionList(exportReqVO);
+//        // 导出 Excel
+//        List<InstitutionExcelVO> datas = InstitutionConvert.INSTANCE.convertList02(list);
+//        ExcelUtils.write(response, "CRM 模块的机构/公司.xls", "数据", InstitutionExcelVO.class, datas);
+
     }
 
 }

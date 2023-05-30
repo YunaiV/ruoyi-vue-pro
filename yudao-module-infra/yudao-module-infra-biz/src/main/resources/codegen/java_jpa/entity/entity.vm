@@ -1,0 +1,48 @@
+package ${basePackage}.module.${table.moduleName}.entity.${table.businessName};
+
+import ${basePackage}.module.${table.moduleName}.entity.BaseEntity;
+import lombok.*;
+import java.util.*;
+import javax.persistence.*;
+import javax.validation.constraints.*;
+#foreach ($column in $columns)
+#if (${column.javaType} == "BigDecimal")
+import java.math.BigDecimal;
+#end
+#if (${column.javaType} == "LocalDateTime")
+import java.time.LocalDateTime;
+#end
+#end
+
+/**
+ * ${table.classComment} Entity
+ *
+ */
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Accessors(chain = true)
+@Entity(name = "${table.className}")
+@Table(name = "${table.tableName}")
+public class ${table.className} extends BaseEntity {
+#foreach ($column in $columns)
+#if (!${baseDOFields.contains(${column.javaField})})##排除 BaseDO 的字段
+
+    /**
+     * ${column.columnComment}
+    #if ("$!column.dictType" != "")##处理枚举值
+     *
+     * 枚举 {@link TODO ${column.dictType} 对应的类}
+    #end
+     */
+    #if (${column.primaryKey})##处理主键
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    #end
+    @Column(name = "${column.columnName}"#if(!${column.nullable}), nullable = false #end)
+    private ${column.javaType} ${column.javaField};
+#end
+#end
+
+}

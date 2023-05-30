@@ -17,34 +17,4 @@ import cn.iocoder.yudao.module.jl.controller.admin.project.vo.*;
 @Mapper
 public interface ProjectBaseMapper extends BaseMapperX<ProjectBaseDO> {
 
-    default PageResult<ProjectBaseDO> selectPage(ProjectBasePageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<ProjectBaseDO>()
-                .betweenIfPresent(ProjectBaseDO::getCreateTime, reqVO.getCreateTime())
-                .eqIfPresent(ProjectBaseDO::getSalesleadId, reqVO.getSalesleadId())
-                .likeIfPresent(ProjectBaseDO::getName, reqVO.getName())
-                .eqIfPresent(ProjectBaseDO::getStage, reqVO.getStage())
-                .eqIfPresent(ProjectBaseDO::getStatus, reqVO.getStatus())
-                .eqIfPresent(ProjectBaseDO::getType, reqVO.getType())
-                .betweenIfPresent(ProjectBaseDO::getStartDate, reqVO.getStartDate())
-                .betweenIfPresent(ProjectBaseDO::getEndDate, reqVO.getEndDate())
-                .eqIfPresent(ProjectBaseDO::getManagerId, reqVO.getManagerId())
-                .eqIfPresent(ProjectBaseDO::getParticipants, reqVO.getParticipants())
-                .orderByDesc(ProjectBaseDO::getId));
-    }
-
-    default List<ProjectBaseDO> selectList(ProjectBaseExportReqVO reqVO) {
-        return selectList(new LambdaQueryWrapperX<ProjectBaseDO>()
-                .betweenIfPresent(ProjectBaseDO::getCreateTime, reqVO.getCreateTime())
-                .eqIfPresent(ProjectBaseDO::getSalesleadId, reqVO.getSalesleadId())
-                .likeIfPresent(ProjectBaseDO::getName, reqVO.getName())
-                .eqIfPresent(ProjectBaseDO::getStage, reqVO.getStage())
-                .eqIfPresent(ProjectBaseDO::getStatus, reqVO.getStatus())
-                .eqIfPresent(ProjectBaseDO::getType, reqVO.getType())
-                .betweenIfPresent(ProjectBaseDO::getStartDate, reqVO.getStartDate())
-                .betweenIfPresent(ProjectBaseDO::getEndDate, reqVO.getEndDate())
-                .eqIfPresent(ProjectBaseDO::getManagerId, reqVO.getManagerId())
-                .eqIfPresent(ProjectBaseDO::getParticipants, reqVO.getParticipants())
-                .orderByDesc(ProjectBaseDO::getId));
-    }
-
 }

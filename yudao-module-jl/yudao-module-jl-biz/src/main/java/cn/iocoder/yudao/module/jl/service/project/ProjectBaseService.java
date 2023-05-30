@@ -4,7 +4,7 @@ import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.jl.controller.admin.project.vo.*;
 import cn.iocoder.yudao.module.jl.dal.dataobject.project.ProjectBaseDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.springframework.data.domain.Page;
 
 /**
  * 项目管理 Service 接口
@@ -57,7 +57,7 @@ public interface ProjectBaseService {
      * @param pageReqVO 分页查询
      * @return 项目管理分页
      */
-    PageResult<ProjectBaseDO> getProjectBasePage(ProjectBasePageReqVO pageReqVO);
+    Page<ProjectBaseDO> getProjectBasePage(ProjectBasePageReqVO pageReqVO);
 
     /**
      * 获得项目管理列表, 用于 Excel 导出

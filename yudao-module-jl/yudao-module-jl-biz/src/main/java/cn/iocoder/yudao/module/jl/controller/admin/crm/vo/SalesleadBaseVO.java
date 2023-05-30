@@ -43,4 +43,7 @@ public class SalesleadBaseVO {
 
     @Schema(description = "丢单说明", example = "...", nullable = true)
     private String lostNote;
+
+    @Schema(description = "销售 id", example = "1", nullable = true)
+    private Long managerId;
 }

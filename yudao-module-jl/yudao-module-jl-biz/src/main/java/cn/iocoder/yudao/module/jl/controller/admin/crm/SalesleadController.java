@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.jl.controller.admin.join.vo.JoinSaleslead2competi
 import cn.iocoder.yudao.module.jl.controller.admin.join.vo.JoinSaleslead2customerplanRespVO;
 import cn.iocoder.yudao.module.jl.controller.admin.join.vo.JoinSaleslead2managerRespVO;
 import cn.iocoder.yudao.module.jl.controller.admin.join.vo.JoinSaleslead2reportRespVO;
+import cn.iocoder.yudao.module.jl.controller.admin.project.vo.ProjectBaseCreateReqVO;
 import cn.iocoder.yudao.module.jl.convert.crm.CustomerConvert;
 import cn.iocoder.yudao.module.jl.convert.crm.FollowupConvert;
 import cn.iocoder.yudao.module.jl.convert.crm.InstitutionConvert;
@@ -18,6 +19,7 @@ import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2competitorDO
 import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2customerplanDO;
 import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2managerDO;
 import cn.iocoder.yudao.module.jl.dal.dataobject.join.JoinSaleslead2reportDO;
+import cn.iocoder.yudao.module.jl.dal.dataobject.project.ProjectBaseDO;
 import cn.iocoder.yudao.module.jl.service.crm.CustomerService;
 import cn.iocoder.yudao.module.jl.service.crm.FollowupService;
 import cn.iocoder.yudao.module.jl.service.crm.InstitutionService;
@@ -25,6 +27,7 @@ import cn.iocoder.yudao.module.jl.service.join.JoinSaleslead2competitorService;
 import cn.iocoder.yudao.module.jl.service.join.JoinSaleslead2customerplanService;
 import cn.iocoder.yudao.module.jl.service.join.JoinSaleslead2managerService;
 import cn.iocoder.yudao.module.jl.service.join.JoinSaleslead2reportService;
+import cn.iocoder.yudao.module.jl.service.project.ProjectBaseService;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileRespVO;
 import cn.iocoder.yudao.module.system.convert.user.UserConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
@@ -92,6 +95,9 @@ public class SalesleadController {
     @Resource
     private AdminUserService userService;
 
+    @Resource
+    private ProjectBaseService projectBaseService;
+
     @PostMapping("/create")
     @Operation(summary = "创建销售线索")
     @PreAuthorize("@ss.hasPermission('jl:saleslead:create')")
@@ -103,7 +109,7 @@ public class SalesleadController {
         CustomerUpdateSalesLeadVO customerUpdateReqVO = new CustomerUpdateSalesLeadVO();
         customerUpdateReqVO.setId(customerId);
         customerUpdateReqVO.setLastSalesleadId(id);
-        customerService.updateCustomerSalesLead(customerUpdateReqVO);
+//        customerService.updateCustomerSalesLead(customerUpdateReqVO);
         return success(id);
     }
 
@@ -111,7 +117,22 @@ public class SalesleadController {
     @Operation(summary = "更新销售线索")
     @PreAuthorize("@ss.hasPermission('jl:saleslead:update')")
     public CommonResult<Boolean> updateSaleslead(@Valid @RequestBody SalesleadUpdateReqVO updateReqVO) {
+        Long loginUserId = getLoginUserId();
         salesleadService.updateSaleslead(updateReqVO);
+
+        if(updateReqVO.getStatus() == 4) {
+            // 创建合同
+
+            // 创建项目
+            ProjectBaseCreateReqVO project = new ProjectBaseCreateReqVO();
+            project.setName(updateReqVO.getContractName());
+            project.setStage("0"); // TODO 默认阶段，预开展阶段
+            project.setSalesleadId(updateReqVO.getId());
+            project.setSalesId(loginUserId);
+            project.setType("0"); // TODO 项目类型
+            project.setCustomerId(updateReqVO.getCustomerId());
+            projectBaseService.createProjectBase(project);
+        }
         return success(true);
     }
 
@@ -172,10 +193,10 @@ public class SalesleadController {
         // 添加客户信息
         Long customerId = saleslead.getCustomerId();
         if(customerId != null) {
-            CustomerDO customer = customerService.getCustomer(customerId);
-            if(customer != null) {
-                salesleadResp.setCustomer(commonGetCustomer(customer));
-            }
+//            CustomerDO customer = customerService.getCustomer(customerId);
+//            if(customer != null) {
+//                salesleadResp.setCustomer(commonGetCustomer(customer));
+//            }
         }
 
         // 添加销售信息
@@ -210,22 +231,22 @@ public class SalesleadController {
         customerRespVO.setSales(sales);
 
         // 绑定公司
-        Long companyId = customer.getCompanyId();
-        InstitutionDO institutionDo = institutionService.getInstitution(companyId);
-        InstitutionRespVO institution = InstitutionConvert.INSTANCE.convert(institutionDo);
-        customerRespVO.setCompany(institution);
-
-        // 绑定医院
-        Long hospitalId = customer.getHospitalId();
-        InstitutionDO hospitalDo = institutionService.getInstitution(hospitalId);
-        InstitutionRespVO hospital = InstitutionConvert.INSTANCE.convert(hospitalDo);
-        customerRespVO.setHospital(hospital);
-
-        // 绑定学校
-        Long universityId = customer.getUniversityId();
-        InstitutionDO universityDo = institutionService.getInstitution(universityId);
-        InstitutionRespVO university = InstitutionConvert.INSTANCE.convert(universityDo);
-        customerRespVO.setUniversity(university);
+//        Long companyId = customer.getCompanyId();
+//        InstitutionDO institutionDo = institutionService.getInstitution(companyId);
+//        InstitutionRespVO institution = InstitutionConvert.INSTANCE.convert(institutionDo);
+//        customerRespVO.setCompany(institution);
+//
+//        // 绑定医院
+//        Long hospitalId = customer.getHospitalId();
+//        InstitutionDO hospitalDo = institutionService.getInstitution(hospitalId);
+//        InstitutionRespVO hospital = InstitutionConvert.INSTANCE.convert(hospitalDo);
+//        customerRespVO.setHospital(hospital);
+//
+//        // 绑定学校
+//        Long universityId = customer.getUniversityId();
+//        InstitutionDO universityDo = institutionService.getInstitution(universityId);
+//        InstitutionRespVO university = InstitutionConvert.INSTANCE.convert(universityDo);
+//        customerRespVO.setUniversity(university);
 
         return customerRespVO;
     }

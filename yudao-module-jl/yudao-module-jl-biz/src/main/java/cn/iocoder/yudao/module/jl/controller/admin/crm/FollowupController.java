@@ -54,7 +54,7 @@ public class FollowupController {
         customerUpdateFollowupVO.setId(customerId);
         customerUpdateFollowupVO.setLastFollowupId(id);
         customerUpdateFollowupVO.setLastFollowupTime(LocalDateTime.now());
-        customerService.updateCustomerFollowup(customerUpdateFollowupVO);
+//        customerService.updateCustomerFollowup(customerUpdateFollowupVO);
 
         return success(id);
     }

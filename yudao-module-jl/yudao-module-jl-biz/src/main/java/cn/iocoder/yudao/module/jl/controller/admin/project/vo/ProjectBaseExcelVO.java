@@ -51,4 +51,7 @@ public class ProjectBaseExcelVO {
     @ExcelProperty("参与者 ids，数组")
     private String participants;
 
+    @ExcelProperty("销售 id")
+    private Long salesId;
+
 }

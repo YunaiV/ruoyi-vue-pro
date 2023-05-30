@@ -28,6 +28,9 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+    jpa:
+      hibernate:
+        ddl-auto: none # 设置为 update，方便开发
     dynamic: # 多数据源配置
       druid: # Druid 【连接池】相关的全局配置
         initial-size: 5 # 初始连接数
@@ -46,7 +49,7 @@ spring:
         master:
           name: jinglai
           url: jdbc:mysql://49.234.229.39:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
-          driver-class-name: com.mysql.jdbc.Driver
+          driver-class-name: com.mysql.cj.jdbc.Driver
           username: jinglai
           password: BBjGc8Wpdz7diKEx
 #        slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改

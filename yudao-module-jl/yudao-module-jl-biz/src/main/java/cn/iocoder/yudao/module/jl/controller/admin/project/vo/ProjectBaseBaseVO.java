@@ -45,4 +45,8 @@ public class ProjectBaseBaseVO {
     @Schema(description = "参与者 ids，数组")
     private String participants;
 
+    @Schema(description = "销售 id", example = "16310")
+    private Long salesId;
+
+    private Long customerId;
 }

@@ -33,4 +33,14 @@ public class SalesleadUpdateReqVO extends SalesleadBaseVO {
     @Schema(description = "项目售前人员 Id")
     private Long managerId;
 
+    // 线索成交的字段
+    @Schema(description = "项目名字")
+    private String projectName;
+
+    @Schema(description = "合同文件URL")
+    private String contractUrl;
+
+    @Schema(description = "合同文件名")
+    private String contractName;
+
 }

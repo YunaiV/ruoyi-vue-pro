@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.jl.controller.admin.crm;
 
+import cn.iocoder.yudao.module.jl.dal.dataobject.crm.Competitor;
+import cn.iocoder.yudao.module.jl.mapper.CompetitorMapper;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -37,17 +39,20 @@ public class CompetitorController {
     @Resource
     private CompetitorService competitorService;
 
+    @Resource
+    private CompetitorMapper competitorMapper;
+
     @PostMapping("/create")
     @Operation(summary = "创建友商")
     @PreAuthorize("@ss.hasPermission('jl:competitor:create')")
-    public CommonResult<Long> createCompetitor(@Valid @RequestBody CompetitorCreateReqVO createReqVO) {
+    public CommonResult<Long> createCompetitor(@Valid @RequestBody CompetitorCreateReq createReqVO) {
         return success(competitorService.createCompetitor(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新友商")
     @PreAuthorize("@ss.hasPermission('jl:competitor:update')")
-    public CommonResult<Boolean> updateCompetitor(@Valid @RequestBody CompetitorUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateCompetitor(@Valid @RequestBody CompetitorDto updateReqVO) {
         competitorService.updateCompetitor(updateReqVO);
         return success(true);
     }
@@ -65,26 +70,18 @@ public class CompetitorController {
     @Operation(summary = "获得友商")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('jl:competitor:query')")
-    public CommonResult<CompetitorRespVO> getCompetitor(@RequestParam("id") Long id) {
-        CompetitorDO competitor = competitorService.getCompetitor(id);
-        return success(CompetitorConvert.INSTANCE.convert(competitor));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得友商列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('jl:competitor:query')")
-    public CommonResult<List<CompetitorRespVO>> getCompetitorList(@RequestParam("ids") Collection<Long> ids) {
-        List<CompetitorDO> list = competitorService.getCompetitorList(ids);
-        return success(CompetitorConvert.INSTANCE.convertList(list));
+    public CommonResult<CompetitorDto> getCompetitor(@RequestParam("id") Long id) {
+        CompetitorDto competitor = competitorService.getCompetitor(id);
+        return success(competitor);
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得友商分页")
     @PreAuthorize("@ss.hasPermission('jl:competitor:query')")
     public CommonResult<PageResult<CompetitorRespVO>> getCompetitorPage(@Valid CompetitorPageReqVO pageVO) {
-        PageResult<CompetitorDO> pageResult = competitorService.getCompetitorPage(pageVO);
-        return success(CompetitorConvert.INSTANCE.convertPage(pageResult));
+//        PageResult<CompetitorDO> pageResult = competitorService.getCompetitorPage(pageVO);
+//        return success(CompetitorConvert.INSTANCE.convertPage(pageResult));
+        return null;
     }
 
     @GetMapping("/export-excel")
@@ -93,10 +90,10 @@ public class CompetitorController {
     @OperateLog(type = EXPORT)
     public void exportCompetitorExcel(@Valid CompetitorExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<CompetitorDO> list = competitorService.getCompetitorList(exportReqVO);
-        // 导出 Excel
-        List<CompetitorExcelVO> datas = CompetitorConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "友商.xls", "数据", CompetitorExcelVO.class, datas);
+//        List<CompetitorDO> list = competitorService.getCompetitorList(exportReqVO);
+//        // 导出 Excel
+//        List<CompetitorExcelVO> datas = CompetitorConvert.INSTANCE.convertList02(list);
+//        ExcelUtils.write(response, "友商.xls", "数据", CompetitorExcelVO.class, datas);
     }
 
 }

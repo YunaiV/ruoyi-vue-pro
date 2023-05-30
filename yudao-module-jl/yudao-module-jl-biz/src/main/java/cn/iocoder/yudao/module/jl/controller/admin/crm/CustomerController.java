@@ -3,9 +3,8 @@ package cn.iocoder.yudao.module.jl.controller.admin.crm;
 import cn.iocoder.yudao.module.jl.convert.crm.FollowupConvert;
 import cn.iocoder.yudao.module.jl.convert.crm.InstitutionConvert;
 import cn.iocoder.yudao.module.jl.convert.crm.SalesleadConvert;
-import cn.iocoder.yudao.module.jl.dal.dataobject.crm.FollowupDO;
-import cn.iocoder.yudao.module.jl.dal.dataobject.crm.InstitutionDO;
-import cn.iocoder.yudao.module.jl.dal.dataobject.crm.SalesleadDO;
+import cn.iocoder.yudao.module.jl.dal.dataobject.crm.*;
+import cn.iocoder.yudao.module.jl.repository.CustomerRepository;
 import cn.iocoder.yudao.module.jl.service.crm.FollowupService;
 import cn.iocoder.yudao.module.jl.service.crm.InstitutionService;
 import cn.iocoder.yudao.module.jl.service.crm.SalesleadService;
@@ -39,7 +38,6 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 import cn.iocoder.yudao.module.jl.controller.admin.crm.vo.*;
-import cn.iocoder.yudao.module.jl.dal.dataobject.crm.CustomerDO;
 import cn.iocoder.yudao.module.jl.convert.crm.CustomerConvert;
 import cn.iocoder.yudao.module.jl.service.crm.CustomerService;
 
@@ -64,10 +62,11 @@ public class CustomerController {
     @Resource
     private SalesleadService salesleadService;
 
+
     @PostMapping("/create")
     @Operation(summary = "创建客户")
     @PreAuthorize("@ss.hasPermission('jl:customer:create')")
-    public CommonResult<Long> createCustomer(@Valid @RequestBody CustomerCreateReqVO createReqVO) {
+    public CommonResult<Long> createCustomer(@Valid @RequestBody CustomerCreateReq createReqVO) {
         Long loginUserId = getLoginUserId();
         createReqVO.setSalesId(loginUserId); // 绑定当前账号作为销售人员
         return success(customerService.createCustomer(createReqVO));
@@ -76,7 +75,7 @@ public class CustomerController {
     @PutMapping("/update")
     @Operation(summary = "更新客户")
     @PreAuthorize("@ss.hasPermission('jl:customer:update')")
-    public CommonResult<Boolean> updateCustomer(@Valid @RequestBody CustomerUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateCustomer(@Valid @RequestBody CustomerDto updateReqVO) {
         customerService.updateCustomer(updateReqVO);
         return success(true);
     }
@@ -94,10 +93,9 @@ public class CustomerController {
     @Operation(summary = "获得客户")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('jl:customer:query')")
-    public CommonResult<CustomerRespVO> getCustomer(@RequestParam("id") Long id) {
-        CustomerDO customer = customerService.getCustomer(id);
-
-        return success(commonGetCustomer(customer));
+    public CommonResult<CustomerDto> getCustomer(@RequestParam("id") Long id) {
+        CustomerDto customer = customerService.getCustomer(id);
+        return success(customer);
     }
 
     private CustomerRespVO commonGetCustomer(CustomerDO customer) {
@@ -113,23 +111,23 @@ public class CustomerController {
         UserProfileRespVO sales = UserConvert.INSTANCE.convert03(salesDo);
         customerRespVO.setSales(sales);
 
-        // 绑定公司
-        Long companyId = customer.getCompanyId();
-        InstitutionDO institutionDo = institutionService.getInstitution(companyId);
-        InstitutionRespVO institution = InstitutionConvert.INSTANCE.convert(institutionDo);
-        customerRespVO.setCompany(institution);
-
-        // 绑定医院
-        Long hospitalId = customer.getHospitalId();
-        InstitutionDO hospitalDo = institutionService.getInstitution(hospitalId);
-        InstitutionRespVO hospital = InstitutionConvert.INSTANCE.convert(hospitalDo);
-        customerRespVO.setHospital(hospital);
-
-        // 绑定学校
-        Long universityId = customer.getUniversityId();
-        InstitutionDO universityDo = institutionService.getInstitution(universityId);
-        InstitutionRespVO university = InstitutionConvert.INSTANCE.convert(universityDo);
-        customerRespVO.setUniversity(university);
+//        // 绑定公司
+//        Long companyId = customer.getCompanyId();
+//        InstitutionDO institutionDo = institutionService.getInstitution(companyId);
+//        InstitutionRespVO institution = InstitutionConvert.INSTANCE.convert(institutionDo);
+//        customerRespVO.setCompany(institution);
+//
+//        // 绑定医院
+//        Long hospitalId = customer.getHospitalId();
+//        InstitutionDO hospitalDo = institutionService.getInstitution(hospitalId);
+//        InstitutionRespVO hospital = InstitutionConvert.INSTANCE.convert(hospitalDo);
+//        customerRespVO.setHospital(hospital);
+//
+//        // 绑定学校
+//        Long universityId = customer.getUniversityId();
+//        InstitutionDO universityDo = institutionService.getInstitution(universityId);
+//        InstitutionRespVO university = InstitutionConvert.INSTANCE.convert(universityDo);
+//        customerRespVO.setUniversity(university);
 
         // 绑定最近的跟进记录
         Long followId = customer.getLastFollowupId();
@@ -146,32 +144,24 @@ public class CustomerController {
         return customerRespVO;
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "获得客户列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('jl:customer:query')")
-    public CommonResult<List<CustomerRespVO>> getCustomerList(@RequestParam("ids") Collection<Long> ids) {
-        List<CustomerDO> list = customerService.getCustomerList(ids);
-        return success(CustomerConvert.INSTANCE.convertList(list));
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('jl:customer:query')")
     public CommonResult<PageResult<CustomerRespVO>> getCustomerPage(@Valid CustomerPageReqVO pageVO) {
-        Long loginUserId = getLoginUserId();
-        pageVO.setSalesId(loginUserId); // 制定当前账号作为销售人员，过滤掉其他人员的数据
-        // TODO 如果是管理者，就不需要过滤，需要根据岗位来区分
-        PageResult<CustomerDO> pageResult = customerService.getCustomerPage(pageVO);
-
-        PageResult<CustomerRespVO> pageData = CustomerConvert.INSTANCE.convertPage(pageResult);
-        List<CustomerRespVO> customers = new ArrayList<>();
-        for (CustomerDO customerDO : pageResult.getList()) {
-            customers.add(commonGetCustomer(customerDO));
-        }
-        pageData.setList(customers);
-
-        return success(pageData);
+//        Long loginUserId = getLoginUserId();
+//        pageVO.setSalesId(loginUserId); // 制定当前账号作为销售人员，过滤掉其他人员的数据
+//        // TODO 如果是管理者，就不需要过滤，需要根据岗位来区分
+//        PageResult<CustomerDO> pageResult = customerService.getCustomerPage(pageVO);
+//
+//        PageResult<CustomerRespVO> pageData = CustomerConvert.INSTANCE.convertPage(pageResult);
+//        List<CustomerRespVO> customers = new ArrayList<>();
+//        for (CustomerDO customerDO : pageResult.getList()) {
+//            customers.add(commonGetCustomer(customerDO));
+//        }
+//        pageData.setList(customers);
+//
+//        return success(pageData);
+        return null;
     }
 
     @GetMapping("/export-excel")
@@ -180,10 +170,10 @@ public class CustomerController {
     @OperateLog(type = EXPORT)
     public void exportCustomerExcel(@Valid CustomerExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<CustomerDO> list = customerService.getCustomerList(exportReqVO);
-        // 导出 Excel
-        List<CustomerExcelVO> datas = CustomerConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "客户.xls", "数据", CustomerExcelVO.class, datas);
+//        List<CustomerDO> list = customerService.getCustomerList(exportReqVO);
+//        // 导出 Excel
+//        List<CustomerExcelVO> datas = CustomerConvert.INSTANCE.convertList02(list);
+//        ExcelUtils.write(response, "客户.xls", "数据", CustomerExcelVO.class, datas);
     }
 
 }

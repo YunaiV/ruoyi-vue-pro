@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.jl.dal.dataobject.project;
 
+import cn.iocoder.yudao.module.jl.dal.dataobject.BaseEntity;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -9,26 +10,31 @@ import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
+import javax.persistence.*;
+import javax.validation.constraints.PositiveOrZero;
+
 /**
  * 项目管理 DO
  *
  * @author 惟象科技
  */
-@TableName("jl_project_base")
-@KeySequence("jl_project_base_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+
+//@KeySequence("jl_project_base_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectBaseDO extends BaseDO {
+@Entity
+@Table(name = "jl_project_base")
+public class ProjectBaseDO extends BaseEntity {
 
     /**
      * 岗位ID
      */
-    @TableId
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     /**
      * 销售线索 id
      */
@@ -65,5 +71,13 @@ public class ProjectBaseDO extends BaseDO {
      * 参与者 ids，数组
      */
     private String participants;
+    /**
+     * 销售 id
+     */
+    private Long salesId;
 
+    /**
+     * 客户 ID
+     */
+    private Long customerId;
 }

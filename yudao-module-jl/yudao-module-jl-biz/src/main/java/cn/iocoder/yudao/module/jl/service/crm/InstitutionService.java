@@ -19,14 +19,14 @@ public interface InstitutionService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createInstitution(@Valid InstitutionCreateReqVO createReqVO);
+    Long createInstitution(@Valid InstitutionCreateReq createReqVO);
 
     /**
      * 更新CRM 模块的机构/公司
      *
      * @param updateReqVO 更新信息
      */
-    void updateInstitution(@Valid InstitutionUpdateReqVO updateReqVO);
+    void updateInstitution(@Valid InstitutionDto updateReqVO);
 
     /**
      * 删除CRM 模块的机构/公司
@@ -41,7 +41,7 @@ public interface InstitutionService {
      * @param id 编号
      * @return CRM 模块的机构/公司
      */
-    InstitutionDO getInstitution(Long id);
+    InstitutionDto getInstitution(Long id);
 
     /**
      * 获得CRM 模块的机构/公司列表
@@ -49,7 +49,7 @@ public interface InstitutionService {
      * @param ids 编号
      * @return CRM 模块的机构/公司列表
      */
-    List<InstitutionDO> getInstitutionList(Collection<Long> ids);
+    List<InstitutionDto> getInstitutionList(Collection<Long> ids);
 
     /**
      * 获得CRM 模块的机构/公司分页
@@ -57,7 +57,7 @@ public interface InstitutionService {
      * @param pageReqVO 分页查询
      * @return CRM 模块的机构/公司分页
      */
-    PageResult<InstitutionDO> getInstitutionPage(InstitutionPageReqVO pageReqVO);
+    PageResult<InstitutionDto> getInstitutionPage(InstitutionPageReqVO pageReqVO);
 
     /**
      * 获得CRM 模块的机构/公司列表, 用于 Excel 导出
@@ -65,6 +65,6 @@ public interface InstitutionService {
      * @param exportReqVO 查询条件
      * @return CRM 模块的机构/公司列表
      */
-    List<InstitutionDO> getInstitutionList(InstitutionExportReqVO exportReqVO);
+    List<InstitutionDto> getInstitutionList(InstitutionExportReqVO exportReqVO);
 
 }

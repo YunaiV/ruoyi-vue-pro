@@ -27,8 +27,10 @@ public interface ProjectBaseConvert {
 
     List<ProjectBaseRespVO> convertList(List<ProjectBaseDO> list);
 
+    List<ProjectBaseExcelVO> convertList02(List<ProjectBaseDO> list);
+
     PageResult<ProjectBaseRespVO> convertPage(PageResult<ProjectBaseDO> page);
 
-    List<ProjectBaseExcelVO> convertList02(List<ProjectBaseDO> list);
+
 
 }

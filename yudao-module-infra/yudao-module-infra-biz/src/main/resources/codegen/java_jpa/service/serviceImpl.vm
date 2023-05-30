@@ -1,0 +1,84 @@
+package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
+
+import org.springframework.stereotype.Service;
+import javax.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import java.util.*;
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.entity.${table.businessName}.${table.className};
+import ${PageResultClassName};
+
+import ${basePackage}.module.${table.moduleName}.convert.${table.businessName}.${table.className}Mapper;
+import ${basePackage}.module.${table.moduleName}.repository.${table.businessName}.${table.className}Repository;
+
+import static ${ServiceExceptionUtilClassName}.exception;
+import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
+
+/**
+ * ${table.classComment} Service 实现类
+ *
+ */
+@Service
+@Validated
+public class ${table.className}ServiceImpl implements ${table.className}Service {
+
+    @Resource
+    private ${table.className}Repository ${classNameVar}Repository;
+
+    @Override
+    public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
+        // 插入
+        ${table.className} ${classNameVar} = ${table.className}Mapper.toEntity(createReqVO);
+        ${classNameVar}Repository.save(${classNameVar});
+        // 返回
+        return ${classNameVar}.getId();
+    }
+
+    @Override
+    public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO) {
+        // 校验存在
+        validate${simpleClassName}Exists(updateReqVO.getId());
+        // 更新
+        ${table.className} updateObj = ${table.className}Mapper.toEntity(updateReqVO);
+        ${classNameVar}Repository.save(updateObj);
+    }
+
+    @Override
+    public void delete${simpleClassName}(${primaryColumn.javaType} id) {
+        // 校验存在
+        validate${simpleClassName}Exists(id);
+        // 删除
+        ${classNameVar}Repository.deleteById(id);
+    }
+
+    private void validate${simpleClassName}Exists(${primaryColumn.javaType} id) {
+        ${classNameVar}Repository.findById(id).orElseThrow(() -> exception(${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS));
+    }
+
+    @Override
+    public Optional<${table.className}> get${simpleClassName}(${primaryColumn.javaType} id) {
+        return ${classNameVar}Repository.findById(id);
+    }
+
+    @Override
+    public List<${table.className}> get${simpleClassName}List(Collection<${primaryColumn.javaType}> ids) {
+        return StreamSupport.stream(${classNameVar}Repository.findAllById(ids).spliterator(), false)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PageResult<${table.className}> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO) {
+        return null;
+##        return ${classNameVar}Repository.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<${table.className}> get${simpleClassName}List(${sceneEnum.prefixClass}${table.className}ExportReqVO exportReqVO) {
+        return null;
+##        return ${classNameVar}Repository.selectList(exportReqVO);
+    }
+
+}

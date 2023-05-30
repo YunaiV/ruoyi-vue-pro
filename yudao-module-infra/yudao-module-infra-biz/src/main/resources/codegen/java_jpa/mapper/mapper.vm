@@ -1,0 +1,45 @@
+package ${basePackage}.module.${table.moduleName}.mapper.${table.businessName};
+
+import java.util.*;
+import ${PageResultClassName};
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.entity.${table.businessName}.${table.className};
+import org.mapstruct.*;
+
+##@Mapper
+##public interface ${table.className}Convert {
+##
+##    ${table.className}Convert INSTANCE = Mappers.getMapper(${table.className}Convert.class);
+##
+##    ${table.className}DO convert(${sceneEnum.prefixClass}${table.className}CreateReqVO bean);
+##
+##    ${table.className}DO convert(${sceneEnum.prefixClass}${table.className}UpdateReqVO bean);
+##
+##    ${sceneEnum.prefixClass}${table.className}RespVO convert(${table.className}DO bean);
+##
+##    List<${sceneEnum.prefixClass}${table.className}RespVO> convertList(List<${table.className}DO> list);
+##
+##    PageResult<${sceneEnum.prefixClass}${table.className}RespVO> convertPage(PageResult<${table.className}DO> page);
+##
+##    List<${sceneEnum.prefixClass}${table.className}ExcelVO> convertList02(List<${table.className}DO> list);
+##
+##}
+
+
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
+public interface ${table.className}Mapper {
+    ${table.className} toEntity(${table.className}CreateReqVO dto);
+
+    ${table.className} toEntity(${table.className}UpdateReqVO dto);
+
+    ${table.className}RespVO toDto(${table.className} entity);
+
+    CompetitorDto toDto(Competitor competitor);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    ${table.className} partialUpdate(${table.className}UpdateReqVO dto, @MappingTarget ${table.className} entity);
+
+    List<${table.className}ExcelVO> toExcelList(List<${table.className}> list);
+
+    PageResult<${table.className}RespVO> toPage(PageResult<${table.className}> page);
+}

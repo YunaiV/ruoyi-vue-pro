@@ -73,6 +73,6 @@ public class SalesleadDO extends BaseDO {
     /**
      * 项目人员，负责报价和方案
      */
-    private String managerId;
+    private Long managerId;
 
 }
