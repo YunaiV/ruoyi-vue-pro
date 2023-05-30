@@ -14,10 +14,6 @@ import java.util.List;
 @Mapper
 public interface DeliveryExpressTemplateFreeMapper extends BaseMapperX<DeliveryExpressTemplateFreeDO> {
 
-    @Repository
-    class BatchInsertMapper extends ServiceImpl<DeliveryExpressTemplateFreeMapper, DeliveryExpressTemplateFreeDO> {
-    }
-
     default List<DeliveryExpressTemplateFreeDO> selectListByTemplateId(Long templateId) {
         return selectList(new LambdaQueryWrapper<DeliveryExpressTemplateFreeDO>()
                 .eq(DeliveryExpressTemplateFreeDO::getTemplateId, templateId));

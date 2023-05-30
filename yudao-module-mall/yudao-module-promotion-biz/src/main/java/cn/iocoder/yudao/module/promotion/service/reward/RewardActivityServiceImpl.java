@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.promotion.service.reward;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityUpdateReqVO;
@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.promotion.convert.reward.RewardActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.reward.RewardActivityMapper;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -18,15 +17,10 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import static cn.hutool.core.collection.CollUtil.intersectionDistinct;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
 
 /**
  * 满减送活动 Service 实现类
@@ -105,6 +99,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         return activity;
     }
 
+    // TODO @芋艿：逻辑有问题，需要优化；要分成全场、和指定来校验；
     /**
      * 校验商品参加的活动是否冲突
      *
@@ -151,19 +146,21 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     }
 
     @Override
-    public Map<RewardActivityDO, Set<Long>> getMatchRewardActivities(Set<Long> spuIds) {
-        // 如果有全局活动，则直接选择它
-        List<RewardActivityDO> allActivities = rewardActivityMapper.selectListByProductScopeAndStatus(
-                PromotionProductScopeEnum.ALL.getScope(), PromotionActivityStatusEnum.RUN.getStatus());
-        if (CollUtil.isNotEmpty(allActivities)) {
-            return MapUtil.builder(allActivities.get(0), spuIds).build();
-        }
-
-        // 查询某个活动参加的活动
-        List<RewardActivityDO> productActivityList = getRewardActivityListBySpuIds(spuIds,
-                singleton(PromotionActivityStatusEnum.RUN.getStatus()));
-        return convertMap(productActivityList, activity -> activity,
-                rewardActivityDO -> intersectionDistinct(rewardActivityDO.getProductSpuIds(), spuIds)); // 求交集返回
+    public List<RewardActivityMatchRespDTO> getMatchRewardActivityList(Collection<Long> spuIds) {
+        // TODO 芋艿：待实现；先指定，然后再全局的；
+//        // 如果有全局活动，则直接选择它
+//        List<RewardActivityDO> allActivities = rewardActivityMapper.selectListByProductScopeAndStatus(
+//                PromotionProductScopeEnum.ALL.getScope(), PromotionActivityStatusEnum.RUN.getStatus());
+//        if (CollUtil.isNotEmpty(allActivities)) {
+//            return MapUtil.builder(allActivities.get(0), spuIds).build();
+//        }
+//
+//        // 查询某个活动参加的活动
+//        List<RewardActivityDO> productActivityList = getRewardActivityListBySpuIds(spuIds,
+//                singleton(PromotionActivityStatusEnum.RUN.getStatus()));
+//        return convertMap(productActivityList, activity -> activity,
+//                rewardActivityDO -> intersectionDistinct(rewardActivityDO.getProductSpuIds(), spuIds)); // 求交集返回
+        return null;
     }
 
 }

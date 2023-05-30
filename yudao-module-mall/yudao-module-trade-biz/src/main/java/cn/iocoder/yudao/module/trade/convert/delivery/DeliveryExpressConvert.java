@@ -4,10 +4,10 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.DeliveryExpressCreateReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.DeliveryExpressExcelVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.DeliveryExpressRespVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.DeliveryExpressUpdateReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressCreateReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressExcelVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressUpdateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -16,7 +16,7 @@ import org.mapstruct.factory.Mappers;
 /**
  * 快递公司 Convert
  *
- * @author 芋道源码
+ * @author jason
  */
 @Mapper
 public interface DeliveryExpressConvert {

@@ -113,8 +113,18 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         Db.saveBatch(entities, size);
     }
 
+    // @芋艿 是不是叫  updateByDo 或者  updateByEntity 更合适；回复：因为是使用实体作为条件去批量更新，所以没加 ByEntity，保持和 mybatis plus 风格一致
     default void updateBatch(T update) {
         update(update, new QueryWrapper<>());
+    }
+
+    /**
+     * 根据ID 批量更新，适合大量数据更新
+     *
+     * @param entities 实体们
+     */
+    default void updateBatch(Collection<T> entities) {
+        Db.updateBatchById(entities);
     }
 
     default void updateBatch(Collection<T> entities, int size) {

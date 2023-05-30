@@ -1,30 +1,24 @@
 package cn.iocoder.yudao.module.trade.controller.admin.delivery;
 
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.*;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.*;
 import cn.iocoder.yudao.module.trade.convert.delivery.DeliveryExpressTemplateConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressTemplateService;
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
 
 
 @Tag(name = "管理后台 - 快递运费模板")
@@ -83,18 +77,6 @@ public class DeliveryExpressTemplateController {
     public CommonResult<PageResult<DeliveryExpressTemplateSimpleRespVO>> getDeliveryExpressTemplatePage(@Valid DeliveryExpressTemplatePageReqVO pageVO) {
         PageResult<DeliveryExpressTemplateDO> pageResult = deliveryExpressTemplateService.getDeliveryExpressTemplatePage(pageVO);
         return success(DeliveryExpressTemplateConvert.INSTANCE.convertPage(pageResult));
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出快递运费模板 Excel")
-    @PreAuthorize("@ss.hasPermission('trade:delivery:express-template:export')")
-    @OperateLog(type = EXPORT)
-    public void exportDeliveryExpressTemplateExcel(@Valid DeliveryExpressTemplateExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<DeliveryExpressTemplateDO> list = deliveryExpressTemplateService.getDeliveryExpressTemplateList(exportReqVO);
-        // 导出 Excel
-        List<DeliveryExpressTemplateExcelVO> datas = DeliveryExpressTemplateConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "快递运费模板.xls", "数据", DeliveryExpressTemplateExcelVO.class, datas);
     }
 
 }

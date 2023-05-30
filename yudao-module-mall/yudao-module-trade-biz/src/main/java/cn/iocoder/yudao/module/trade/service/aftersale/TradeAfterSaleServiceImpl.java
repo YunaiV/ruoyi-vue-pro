@@ -97,7 +97,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService {
         }
 
         // 申请的退款金额，不能超过商品的价格
-        if (createReqVO.getRefundPrice() > orderItem.getOrderDividePrice()) {
+        if (createReqVO.getRefundPrice() > orderItem.getPayPrice()) {
             throw exception(AFTER_SALE_CREATE_FAIL_REFUND_PRICE_ERROR);
         }
 

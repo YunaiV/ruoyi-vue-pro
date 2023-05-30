@@ -22,7 +22,7 @@ public interface PriceConvert {
         // 创建 PriceCalculateRespDTO 对象
         PriceCalculateRespDTO priceCalculate = new PriceCalculateRespDTO();
         // 创建它的 Order 属性
-        PriceCalculateRespDTO.Order order = new PriceCalculateRespDTO.Order().setOriginalPrice(0).setDiscountPrice(0)
+        PriceCalculateRespDTO.Order order = new PriceCalculateRespDTO.Order().setTotalPrice(0).setDiscountPrice(0)
                 .setCouponPrice(0).setPointPrice(0).setDeliveryPrice(0).setPayPrice(0)
                 .setItems(new ArrayList<>()).setCouponId(calculateReqDTO.getCouponId());
         priceCalculate.setOrder(order).setPromotions(new ArrayList<>());
@@ -38,8 +38,8 @@ public interface PriceConvert {
             orderItem.setPayPrice(orderItem.getOriginalPrice()).setOrderDividePrice(orderItem.getOriginalPrice());
             priceCalculate.getOrder().getItems().add(orderItem);
             // 补充价格信息到 Order 中
-            order.setOriginalPrice(order.getOriginalPrice() + orderItem.getOriginalPrice())
-                    .setOrderPrice(order.getOriginalPrice()).setPayPrice(order.getOriginalPrice());
+            order.setTotalPrice(order.getTotalPrice() + orderItem.getOriginalPrice())
+                    .setPayPrice(order.getTotalPrice());
         });
         return priceCalculate;
     }

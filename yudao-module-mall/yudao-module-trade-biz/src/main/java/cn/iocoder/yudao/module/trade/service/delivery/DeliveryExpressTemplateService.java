@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.trade.service.delivery;
 
-import java.util.*;
-import javax.validation.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.*;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateCreateReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplatePageReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 快递运费模板 Service 接口
@@ -58,13 +63,4 @@ public interface DeliveryExpressTemplateService {
      * @return 快递运费模板分页
      */
     PageResult<DeliveryExpressTemplateDO> getDeliveryExpressTemplatePage(DeliveryExpressTemplatePageReqVO pageReqVO);
-
-    /**
-     * 获得快递运费模板列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 快递运费模板列表
-     */
-    List<DeliveryExpressTemplateDO> getDeliveryExpressTemplateList(DeliveryExpressTemplateExportReqVO exportReqVO);
-
 }

@@ -124,7 +124,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
                 .setSpuId(21L).setSkuId(2L).setCount(4).setOriginalPrice(80).setOriginalUnitPrice(20)
                 .setDiscountPrice(40).setPayPrice(40).setOrderPartPrice(15).setOrderDividePrice(25);
         PriceCalculateRespDTO.Order priceOrder = new PriceCalculateRespDTO.Order()
-                .setOriginalPrice(230).setOrderPrice(100).setDiscountPrice(0).setCouponPrice(30)
+                .setTotalPrice(230).setDiscountPrice(0).setCouponPrice(30)
                 .setPointPrice(10).setDeliveryPrice(20).setPayPrice(80).setCouponId(101L).setCouponPrice(30)
                 .setItems(Arrays.asList(priceOrderItem01, priceOrderItem02));
         when(priceApi.calculatePrice(argThat(priceCalculateReqDTO -> {
@@ -170,7 +170,6 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertFalse(tradeOrderDO.getPayed());
         assertNull(tradeOrderDO.getPayTime());
         assertEquals(tradeOrderDO.getTotalPrice(), 230);
-        assertEquals(tradeOrderDO.getOrderPrice(), 100);
         assertEquals(tradeOrderDO.getDiscountPrice(), 0);
         assertEquals(tradeOrderDO.getAdjustPrice(), 0);
         assertEquals(tradeOrderDO.getPayPrice(), 80);
@@ -208,8 +207,6 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderItemDO01.getPrice(), 50);
         assertEquals(tradeOrderItemDO01.getDiscountPrice(), 20);
         assertEquals(tradeOrderItemDO01.getPayPrice(), 130);
-        assertEquals(tradeOrderItemDO01.getOrderPartPrice(), 7);
-        assertEquals(tradeOrderItemDO01.getOrderDividePrice(), 35);
         assertEquals(tradeOrderItemDO01.getAfterSaleStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
         // 断言 TradeOrderItemDO 订单（第 2 个）
         TradeOrderItemDO tradeOrderItemDO02 = tradeOrderItemDOs.get(1);
@@ -228,8 +225,6 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         assertEquals(tradeOrderItemDO02.getPrice(), 20);
         assertEquals(tradeOrderItemDO02.getDiscountPrice(), 40);
         assertEquals(tradeOrderItemDO02.getPayPrice(), 40);
-        assertEquals(tradeOrderItemDO02.getOrderPartPrice(), 15);
-        assertEquals(tradeOrderItemDO02.getOrderDividePrice(), 25);
         assertEquals(tradeOrderItemDO02.getAfterSaleStatus(), TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
         // 校验调用
         verify(productSkuApi).updateSkuStock(argThat(updateStockReqDTO -> {

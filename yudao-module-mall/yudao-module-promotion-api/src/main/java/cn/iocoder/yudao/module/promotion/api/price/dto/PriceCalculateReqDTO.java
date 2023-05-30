@@ -27,6 +27,11 @@ public class PriceCalculateReqDTO {
     private Long couponId;
 
     /**
+     * 收货地址编号
+     */
+    private Long addressId;
+
+    /**
      * 商品 SKU 数组
      */
     @NotNull(message = "商品数组不能为空")
