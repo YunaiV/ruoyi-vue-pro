@@ -11,11 +11,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-/**
- * 快递运费模板 Convert
- *
- * @author jason
- */
 @Mapper
 public interface DeliveryExpressTemplateConvert {
 
@@ -48,7 +43,7 @@ public interface DeliveryExpressTemplateConvert {
 
     DeliveryExpressTemplateChargeDO convertTemplateCharge(Long templateId, Integer chargeMode, ExpressTemplateChargeBaseVO vo);
 
-    DeliveryExpressTemplateChargeDO convertTemplateCharge(ExpressTemplateChargeUpdateVO vo);
+    DeliveryExpressTemplateChargeDO convertTemplateCharge(DeliveryExpressTemplateUpdateReqVO.ExpressTemplateChargeUpdateVO vo);
 
     default List<DeliveryExpressTemplateChargeDO> convertTemplateChargeList(Long templateId, Integer chargeMode, List<ExpressTemplateChargeBaseVO> list) {
         return CollectionUtils.convertList(list, vo -> convertTemplateCharge(templateId, chargeMode, vo));
@@ -58,7 +53,7 @@ public interface DeliveryExpressTemplateConvert {
 
     DeliveryExpressTemplateFreeDO convertTemplateFree(Long templateId, ExpressTemplateFreeBaseVO vo);
 
-    DeliveryExpressTemplateFreeDO convertTemplateFree(ExpressTemplateFreeUpdateVO vo);
+    DeliveryExpressTemplateFreeDO convertTemplateFree(DeliveryExpressTemplateUpdateReqVO.ExpressTemplateFreeUpdateVO vo);
 
     List<ExpressTemplateChargeBaseVO> convertTemplateChargeList(List<DeliveryExpressTemplateChargeDO> list);
 

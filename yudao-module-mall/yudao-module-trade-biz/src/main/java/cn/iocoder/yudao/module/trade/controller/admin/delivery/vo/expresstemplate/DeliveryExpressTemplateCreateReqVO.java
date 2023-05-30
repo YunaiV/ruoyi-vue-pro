@@ -15,14 +15,12 @@ import java.util.List;
 @ToString(callSuper = true)
 public class DeliveryExpressTemplateCreateReqVO extends DeliveryExpressTemplateBaseVO {
 
-    // TODO @jason：不用给默认值哈
-
     @Schema(description = "区域运费列表")
     @Valid
-    private List<ExpressTemplateChargeBaseVO> templateCharge = Collections.emptyList();
+    private List<ExpressTemplateChargeBaseVO> templateCharge;
 
     @Schema(description = "包邮区域列表")
     @Valid
-    private List<ExpressTemplateFreeBaseVO> templateFree = Collections.emptyList();
+    private List<ExpressTemplateFreeBaseVO> templateFree;
 
 }

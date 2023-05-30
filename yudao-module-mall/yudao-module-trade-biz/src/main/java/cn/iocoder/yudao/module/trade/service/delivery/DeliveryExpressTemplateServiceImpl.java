@@ -82,10 +82,10 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
     private void updateExpressTemplateFree(DeliveryExpressTemplateUpdateReqVO updateReqVO) {
         // 1.1 获得新增/修改的区域列表
         List<DeliveryExpressTemplateFreeDO> oldFreeList = expressTemplateFreeMapper.selectListByTemplateId(updateReqVO.getId());
-        List<ExpressTemplateFreeUpdateVO> newFreeList = updateReqVO.getTemplateFree();
+        List<DeliveryExpressTemplateUpdateReqVO.ExpressTemplateFreeUpdateVO> newFreeList = updateReqVO.getTemplateFree();
         List<DeliveryExpressTemplateFreeDO> addFreeList = new ArrayList<>(newFreeList.size()); // 新增包邮区域列表
         List<DeliveryExpressTemplateFreeDO> updateFreeList = new ArrayList<>(newFreeList.size()); // 更新包邮区域列表
-        for (ExpressTemplateFreeUpdateVO item : newFreeList) {
+        for (DeliveryExpressTemplateUpdateReqVO.ExpressTemplateFreeUpdateVO item : newFreeList) {
             if (Objects.nonNull(item.getId())) {
                 updateFreeList.add(INSTANCE.convertTemplateFree(item));
             } else {
@@ -113,10 +113,10 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
     private void updateExpressTemplateCharge(DeliveryExpressTemplateUpdateReqVO updateReqVO) {
         // 1.1 获得新增/修改的区域列表
         List<DeliveryExpressTemplateChargeDO> oldChargeList = expressTemplateChargeMapper.selectListByTemplateId(updateReqVO.getId());
-        List<ExpressTemplateChargeUpdateVO> newChargeList = updateReqVO.getTemplateCharge();
+        List<DeliveryExpressTemplateUpdateReqVO.ExpressTemplateChargeUpdateVO> newChargeList = updateReqVO.getTemplateCharge();
         List<DeliveryExpressTemplateChargeDO> addList = new ArrayList<>(newChargeList.size()); // 新增运费区域列表
         List<DeliveryExpressTemplateChargeDO> updateList = new ArrayList<>(newChargeList.size()); // 更新运费区域列表
-        for (ExpressTemplateChargeUpdateVO item : newChargeList) {
+        for (DeliveryExpressTemplateUpdateReqVO.ExpressTemplateChargeUpdateVO item : newChargeList) {
             if (item.getId() != null) {
                 // 计费模式以主表为准
                 item.setChargeMode(updateReqVO.getChargeMode());

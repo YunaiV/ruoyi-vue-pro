@@ -27,8 +27,8 @@ public class DeliveryExpressBaseVO {
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
-    @Schema(description = "状态（0正常 1停用）", required = true, example = "1")
-    @NotNull(message = "状态（0正常 1停用）不能为空")
+    @Schema(description = "状态", required = true, example = "1")
+    @NotNull(message = "状态不能为空")
     private Integer status;
 
 }
