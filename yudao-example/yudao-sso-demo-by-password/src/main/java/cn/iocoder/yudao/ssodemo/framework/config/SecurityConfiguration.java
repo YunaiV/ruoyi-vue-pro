@@ -2,6 +2,7 @@ package cn.iocoder.yudao.ssodemo.framework.config;
 
 import cn.iocoder.yudao.ssodemo.framework.core.filter.TokenAuthenticationFilter;
 import cn.iocoder.yudao.ssodemo.framework.core.handler.AccessDeniedHandlerImpl;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,8 +11,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import javax.annotation.Resource;
+import javax.servlet.Filter;
 
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
@@ -47,6 +52,28 @@ public class SecurityConfiguration {
         // 添加 Token Filter
         httpSecurity.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
+    }
+    /**
+     * 创建 CorsFilter Bean，解决跨域问题
+     */
+    @Bean
+    public FilterRegistrationBean<CorsFilter> corsFilterBean() {
+        // 创建 CorsConfiguration 对象
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("*"); // 设置访问源地址
+        config.addAllowedHeader("*"); // 设置访问源请求头
+        config.addAllowedMethod("*"); // 设置访问源请求方法
+        // 创建 UrlBasedCorsConfigurationSource 对象
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config); // 对接口配置跨域设置
+        return createFilterBean(new CorsFilter(source), Integer.MIN_VALUE);
+    }
+
+    public static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
+        FilterRegistrationBean<T> bean = new FilterRegistrationBean<>(filter);
+        bean.setOrder(order);
+        return bean;
     }
 
 }
