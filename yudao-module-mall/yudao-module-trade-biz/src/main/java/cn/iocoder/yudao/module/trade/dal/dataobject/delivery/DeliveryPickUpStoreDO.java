@@ -20,7 +20,7 @@ import java.time.LocalTime;
 public class DeliveryPickUpStoreDO extends BaseDO {
 
     /**
-     * 编号，自增
+     * 编号
      */
     @TableId
     private Long id;
@@ -41,7 +41,7 @@ public class DeliveryPickUpStoreDO extends BaseDO {
     private String phone;
 
     /**
-     * 区域 id
+     * 区域编号
      */
     private Integer areaId;
 
@@ -59,20 +59,20 @@ public class DeliveryPickUpStoreDO extends BaseDO {
      * 营业开始时间
      */
     private LocalTime openingTime;
+
     /**
      * 营业结束时间
      */
     private LocalTime closingTime;
 
-    // TODO @Jason：应该是 double？
     /**
      * 纬度
      */
-    private String latitude;
+    private Double latitude;
     /**
      * 经度
      */
-    private String longitude;
+    private Double longitude;
 
     /**
      * 门店状态
