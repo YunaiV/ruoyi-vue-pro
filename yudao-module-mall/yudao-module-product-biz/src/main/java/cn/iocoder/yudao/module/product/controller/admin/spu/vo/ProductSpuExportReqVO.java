@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +10,11 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * 商品Spu导出 Request VO,参数和 ProductSpuPageReqVO 是一致的
+ *
+ * @author HUIHUI
+ */
 @Schema(description = "管理后台 - 商品Spu导出 Request VO,参数和 ProductSpuPageReqVO 是一致的")
 @Data
 @NoArgsConstructor
@@ -22,7 +25,6 @@ public class ProductSpuExportReqVO {
     private String name;
 
     @Schema(description = "前端请求的tab类型", example = "1")
-    @InEnum(ProductSpuPageTabEnum.class)
     private Integer tabType;
 
     @Schema(description = "商品分类编号", example = "100")

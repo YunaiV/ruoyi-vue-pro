@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 /**
  * 商品 SPU Response VO
- * TODO 移除ProductSpuPageRespVO相关应用跟换为ProductSpuRespVO已继承ProductSpuBaseVO 补全表格展示所需属性
+ *
  * @author HUIHUI
  */
 @Schema(description = "管理后台 - 商品 SPU Response VO")

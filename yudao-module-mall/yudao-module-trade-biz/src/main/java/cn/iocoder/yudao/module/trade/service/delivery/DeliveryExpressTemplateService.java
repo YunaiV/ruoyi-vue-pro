@@ -57,6 +57,13 @@ public interface DeliveryExpressTemplateService {
     List<DeliveryExpressTemplateDO> getDeliveryExpressTemplateList(Collection<Long> ids);
 
     /**
+     * 获得快递运费模板列表
+     *
+     * @return 快递运费模板列表
+     */
+    List<DeliveryExpressTemplateDO> getDeliveryExpressTemplateList();
+
+    /**
      * 获得快递运费模板分页
      *
      * @param pageReqVO 分页查询

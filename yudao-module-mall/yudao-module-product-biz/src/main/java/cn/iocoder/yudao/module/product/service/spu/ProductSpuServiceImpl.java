@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.ProductConstants;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
@@ -29,6 +28,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
+import static cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO.CATEGORY_LEVEL;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
 /**
@@ -129,7 +129,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private void validateCategory(Long id) {
         categoryService.validateCategory(id);
         // 校验层级
-        if (categoryService.getCategoryLevel(id) != ProductConstants.CATEGORY_LEVEL) {
+        if (categoryService.getCategoryLevel(id) < CATEGORY_LEVEL) {
             throw exception(SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR);
         }
     }
@@ -237,17 +237,17 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public Map<Integer, Long> getTabsCount() {
-        Map<Integer, Long> counts = new HashMap<>(ProductConstants.SPU_TAB_COUNTS);
+        Map<Integer, Long> counts = new HashMap<>(5);
         // 查询销售中的商品数量
-        counts.put(ProductSpuPageTabEnum.FOR_SALE.getType(), productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus()));
+        counts.put(ProductSpuPageReqVO.FOR_SALE, productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus()));
         // 查询仓库中的商品数量
-        counts.put(ProductSpuPageTabEnum.IN_WAREHOUSE.getType(), productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus()));
+        counts.put(ProductSpuPageReqVO.IN_WAREHOUSE, productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus()));
         // 查询售空的商品数量
-        counts.put(ProductSpuPageTabEnum.SOLD_OUT.getType(), productSpuMapper.selectCount(ProductSpuDO::getStock, 0));
+        counts.put(ProductSpuPageReqVO.SOLD_OUT, productSpuMapper.selectCount(ProductSpuDO::getStock, 0));
         // 查询触发警戒库存的商品数量
-        counts.put(ProductSpuPageTabEnum.ALERT_STOCK.getType(), productSpuMapper.selectCount());
+        counts.put(ProductSpuPageReqVO.ALERT_STOCK, productSpuMapper.selectCount());
         // 查询回收站中的商品数量
-        counts.put(ProductSpuPageTabEnum.RECYCLE_BIN.getType(), productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
+        counts.put(ProductSpuPageReqVO.RECYCLE_BIN, productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
         return counts;
     }
 

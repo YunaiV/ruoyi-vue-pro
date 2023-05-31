@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReq
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.enums.ProductConstants;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -119,25 +118,25 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
      */
     static void appendTabQuery(Integer tabType, LambdaQueryWrapperX<ProductSpuDO> queryWrapper) {
         // 出售中商品
-        if (ObjectUtil.equals(ProductSpuPageTabEnum.FOR_SALE.getType(), tabType)) {
+        if (ObjectUtil.equals(ProductSpuPageReqVO.FOR_SALE, tabType)) {
             queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus());
         }
         // 仓储中商品
-        if (ObjectUtil.equals(ProductSpuPageTabEnum.IN_WAREHOUSE.getType(), tabType)) {
+        if (ObjectUtil.equals(ProductSpuPageReqVO.IN_WAREHOUSE, tabType)) {
             queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus());
         }
         // 已售空商品
-        if (ObjectUtil.equals(ProductSpuPageTabEnum.SOLD_OUT.getType(), tabType)) {
+        if (ObjectUtil.equals(ProductSpuPageReqVO.SOLD_OUT, tabType)) {
             queryWrapper.eqIfPresent(ProductSpuDO::getStock, 0);
         }
         // 警戒库存
-        if (ObjectUtil.equals(ProductSpuPageTabEnum.ALERT_STOCK.getType(), tabType)) {
+        if (ObjectUtil.equals(ProductSpuPageReqVO.ALERT_STOCK, tabType)) {
             queryWrapper.le(ProductSpuDO::getStock, ProductConstants.ALERT_STOCK)
                     // 如果库存触发警戒库存且状态为回收站的话则不在警戒库存列表展示
                     .notIn(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus());
         }
         // 回收站
-        if (ObjectUtil.equals(ProductSpuPageTabEnum.RECYCLE_BIN.getType(), tabType)) {
+        if (ObjectUtil.equals(ProductSpuPageReqVO.RECYCLE_BIN, tabType)) {
             queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus());
         }
     }
