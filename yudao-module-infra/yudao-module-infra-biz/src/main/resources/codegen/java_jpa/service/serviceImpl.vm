@@ -118,7 +118,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         };
 
         // 执行查询
-        Page<Institution> page = institutionRepository.findAll(spec, pageable);
+        Page<${table.className}> page = ${classNameVar}Repository.findAll(spec, pageable);
 
         // 转换为 PageResult 并返回
         return new PageResult<>(page.getContent(), page.getTotalElements());
@@ -154,7 +154,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         };
 
         // 执行查询
-        return institutionRepository.findAll(spec);
+        return ${classNameVar}Repository.findAll(spec);
     }
 
     private Sort createSort(${table.className}PageOrder order) {
