@@ -109,6 +109,10 @@ public class Customer extends BaseEntity {
     @Column(name = "company_id")
     private Long companyId;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "company_id", insertable = false, updatable = false)
+    private Institution company;
+
     /**
      * 省
      */
