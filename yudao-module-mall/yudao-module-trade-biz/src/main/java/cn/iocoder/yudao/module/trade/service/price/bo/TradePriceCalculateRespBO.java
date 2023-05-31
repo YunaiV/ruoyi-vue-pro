@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.trade.service.price.bo;
 
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionLevelEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import lombok.Data;

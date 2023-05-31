@@ -77,7 +77,7 @@ public class AppTradeOrderSettlementRespVO {
 
     }
 
-    @Schema(description = "费用（合计）")
+    @Schema(description = "地址信息")
     @Data
     public static class Address {
 

@@ -20,7 +20,7 @@ public class PriceApiImpl implements PriceApi {
 
     @Override
     public PriceCalculateRespDTO calculatePrice(PriceCalculateReqDTO calculateReqDTO) {
-        return priceService.calculatePrice(calculateReqDTO);
+        return null;
     }
 
 }

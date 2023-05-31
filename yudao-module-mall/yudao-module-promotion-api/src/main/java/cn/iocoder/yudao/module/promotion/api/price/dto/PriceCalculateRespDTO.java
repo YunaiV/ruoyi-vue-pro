@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.promotion.api.price.dto;
 
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionLevelEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import lombok.Data;
 
