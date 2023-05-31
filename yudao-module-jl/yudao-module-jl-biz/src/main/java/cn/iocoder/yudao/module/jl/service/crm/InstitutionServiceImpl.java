@@ -83,9 +83,9 @@ public class InstitutionServiceImpl implements InstitutionService {
     }
 
     @Override
-    public PageResult<Institution> getInstitutionPage(InstitutionPageReqVO pageReqVO, InstitutionPageOrder orderVo) {
+    public PageResult<Institution> getInstitutionPage(InstitutionPageReqVO pageReqVO, InstitutionPageOrder orderV0) {
         // 创建 Sort 对象
-        Sort sort = createSort(orderVo);
+        Sort sort = createSort(orderV0);
 
         // 创建 Pageable 对象
         Pageable pageable = PageRequest.of(pageReqVO.getPageNo() - 1, pageReqVO.getPageSize(), sort);
@@ -94,27 +94,27 @@ public class InstitutionServiceImpl implements InstitutionService {
         Specification<Institution> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (pageReqVO.getProvince() != null) {
+            if(pageReqVO.getProvince() != null) {
                 predicates.add(cb.equal(root.get("province"), pageReqVO.getProvince()));
             }
 
-            if (pageReqVO.getCity() != null) {
+            if(pageReqVO.getCity() != null) {
                 predicates.add(cb.equal(root.get("city"), pageReqVO.getCity()));
             }
 
-            if (pageReqVO.getName() != null) {
-                predicates.add(cb.equal(root.get("name"), pageReqVO.getName()));
+            if(pageReqVO.getName() != null) {
+                predicates.add(cb.like(root.get("name"), "%" + pageReqVO.getName() + "%"));
             }
 
-            if (pageReqVO.getAddress() != null) {
+            if(pageReqVO.getAddress() != null) {
                 predicates.add(cb.equal(root.get("address"), pageReqVO.getAddress()));
             }
 
-            if (pageReqVO.getMark() != null) {
+            if(pageReqVO.getMark() != null) {
                 predicates.add(cb.equal(root.get("mark"), pageReqVO.getMark()));
             }
 
-            if (pageReqVO.getType() != null) {
+            if(pageReqVO.getType() != null) {
                 predicates.add(cb.equal(root.get("type"), pageReqVO.getType()));
             }
 
@@ -131,7 +131,40 @@ public class InstitutionServiceImpl implements InstitutionService {
 
     @Override
     public List<Institution> getInstitutionList(InstitutionExportReqVO exportReqVO) {
-        return null;
+        // 创建 Specification
+        Specification<Institution> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if(exportReqVO.getProvince() != null) {
+                predicates.add(cb.equal(root.get("province"), exportReqVO.getProvince()));
+            }
+
+            if(exportReqVO.getCity() != null) {
+                predicates.add(cb.equal(root.get("city"), exportReqVO.getCity()));
+            }
+
+            if(exportReqVO.getName() != null) {
+                predicates.add(cb.like(root.get("name"), "%" + exportReqVO.getName() + "%"));
+            }
+
+            if(exportReqVO.getAddress() != null) {
+                predicates.add(cb.equal(root.get("address"), exportReqVO.getAddress()));
+            }
+
+            if(exportReqVO.getMark() != null) {
+                predicates.add(cb.equal(root.get("mark"), exportReqVO.getMark()));
+            }
+
+            if(exportReqVO.getType() != null) {
+                predicates.add(cb.equal(root.get("type"), exportReqVO.getType()));
+            }
+
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        // 执行查询
+        return institutionRepository.findAll(spec);
     }
 
     private Sort createSort(InstitutionPageOrder order) {

@@ -83,9 +83,9 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     }
 
     @Override
-    public PageResult<${table.className}> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO, ${sceneEnum.prefixClass}${table.className}PageOrder orderVo) {
+    public PageResult<${table.className}> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO, ${sceneEnum.prefixClass}${table.className}PageOrder orderV0) {
         // 创建 Sort 对象
-        Sort sort = createSort(orderVo);
+        Sort sort = createSort(orderV0);
 
         // 创建 Pageable 对象
         Pageable pageable = PageRequest.of(pageReqVO.getPageNo() - 1, pageReqVO.getPageSize(), sort);
@@ -95,11 +95,22 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
             List<Predicate> predicates = new ArrayList<>();
 
             #foreach ($column in $columns)
-            #if (!${baseDOFields.contains(${column.javaField})} && !${column.primaryKey})##排除 BaseDO 的字段
-            if (pageReqVO.get${column.getJavaFieldCapitalize()}() != null) {
+            #if (!${baseDOFields.contains(${column.javaField})} && !${column.primaryKey})##排除 BaseDO 的字段和主键
+            #if (${column.listOperation})
+            #if (${column.listOperationCondition} == "BETWEEN")
+            if(pageReqVO.get${column.getJavaFieldCapitalize()}() != null) {
+                predicates.add(cb.between(root.get("${column.javaField}"), pageReqVO.get${column.getJavaFieldCapitalize()}()[0], pageReqVO.get${column.getJavaFieldCapitalize()}()[1]));
+            } #elseif(${column.listOperationCondition} == "LIKE")
+            if(pageReqVO.get${column.getJavaFieldCapitalize()}() != null) {
+                predicates.add(cb.like(root.get("${column.javaField}"), "%" + pageReqVO.get${column.getJavaFieldCapitalize()}() + "%"));
+            }
+            #else
+            if(pageReqVO.get${column.getJavaFieldCapitalize()}() != null) {
                 predicates.add(cb.equal(root.get("${column.javaField}"), pageReqVO.get${column.getJavaFieldCapitalize()}()));
             }
+            #end
 
+            #end
             #end
             #end
 
@@ -115,8 +126,35 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 
     @Override
     public List<${table.className}> get${simpleClassName}List(${sceneEnum.prefixClass}${table.className}ExportReqVO exportReqVO) {
-        return null;
-##        return ${classNameVar}Repository.selectList(exportReqVO);
+        // 创建 Specification
+        Specification<${table.className}> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            #foreach ($column in $columns)
+            #if (!${baseDOFields.contains(${column.javaField})} && !${column.primaryKey})##排除 BaseDO 的字段和主键
+            #if (${column.listOperation})
+            #if (${column.listOperationCondition} == "BETWEEN")
+            if(exportReqVO.get${column.getJavaFieldCapitalize()}() != null) {
+                predicates.add(cb.between(root.get("${column.javaField}"), exportReqVO.get${column.getJavaFieldCapitalize()}()[0], exportReqVO.get${column.getJavaFieldCapitalize()}()[1]));
+            } #elseif(${column.listOperationCondition} == "LIKE")
+            if(exportReqVO.get${column.getJavaFieldCapitalize()}() != null) {
+                predicates.add(cb.like(root.get("${column.javaField}"), "%" + exportReqVO.get${column.getJavaFieldCapitalize()}() + "%"));
+            }
+            #else
+            if(exportReqVO.get${column.getJavaFieldCapitalize()}() != null) {
+                predicates.add(cb.equal(root.get("${column.javaField}"), exportReqVO.get${column.getJavaFieldCapitalize()}()));
+            }
+            #end
+
+            #end
+            #end
+            #end
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        // 执行查询
+        return institutionRepository.findAll(spec);
     }
 
     private Sort createSort(${table.className}PageOrder order) {

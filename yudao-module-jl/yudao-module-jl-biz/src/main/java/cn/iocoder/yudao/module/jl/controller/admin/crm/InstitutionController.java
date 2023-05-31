@@ -78,8 +78,8 @@ public class InstitutionController {
     @GetMapping("/page")
     @Operation(summary = "(分页)获得机构/公司列表")
     @PreAuthorize("@ss.hasPermission('jl:institution:query')")
-    public CommonResult<PageResult<InstitutionRespVO>> getInstitutionPage(@ModelAttribute InstitutionPageReqVO pageVO, @ModelAttribute InstitutionPageOrder orderVo) {
-        PageResult<Institution> pageResult = institutionService.getInstitutionPage(pageVO, orderVo);
+    public CommonResult<PageResult<InstitutionRespVO>> getInstitutionPage(@Valid InstitutionPageReqVO pageVO, @Valid InstitutionPageOrder orderV0) {
+        PageResult<Institution> pageResult = institutionService.getInstitutionPage(pageVO, orderV0);
         return success(institutionMapper.toPage(pageResult));
     }
 
@@ -87,12 +87,11 @@ public class InstitutionController {
     @Operation(summary = "导出机构/公司 Excel")
     @PreAuthorize("@ss.hasPermission('jl:institution:export')")
     @OperateLog(type = EXPORT)
-    public void exportInstitutionExcel(@Valid InstitutionExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
+    public void exportInstitutionExcel(@Valid InstitutionExportReqVO exportReqVO, HttpServletResponse response) throws IOException {
         List<Institution> list = institutionService.getInstitutionList(exportReqVO);
         // 导出 Excel
-        List<InstitutionExcelVO> datas = institutionMapper.toExcelList(list);
-        ExcelUtils.write(response, "机构/公司.xls", "数据", InstitutionExcelVO.class, datas);
+        List<InstitutionExcelVO> excelData = institutionMapper.toExcelList(list);
+        ExcelUtils.write(response, "机构/公司.xls", "数据", InstitutionExcelVO.class, excelData);
     }
 
 }
