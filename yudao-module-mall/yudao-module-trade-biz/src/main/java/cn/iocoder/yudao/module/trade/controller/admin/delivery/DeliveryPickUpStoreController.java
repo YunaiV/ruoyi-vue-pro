@@ -84,6 +84,7 @@ public class DeliveryPickUpStoreController {
         return success(DeliveryPickUpStoreConvert.INSTANCE.convertPage(pageResult));
     }
 
+    // TODO @jason：导出去掉好列；简化下，一般用不到哈。
     @GetMapping("/export-excel")
     @Operation(summary = "导出自提门店 Excel")
     @PreAuthorize("@ss.hasPermission('trade:delivery:pick-up-store:export')")

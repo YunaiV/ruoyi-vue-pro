@@ -32,6 +32,7 @@ public class DeliveryPickUpStoreExcelVO {
     @ExcelProperty("门店logo")
     private String logo;
 
+    // TODO @jason：是不是可以加个 convert？
     /**
      * easy-excel 好像暂时不支持 LocalTime. 转成string
      */

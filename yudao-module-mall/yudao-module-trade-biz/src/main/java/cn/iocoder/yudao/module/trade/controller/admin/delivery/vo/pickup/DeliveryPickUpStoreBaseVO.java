@@ -22,10 +22,10 @@ public class DeliveryPickUpStoreBaseVO {
     @NotBlank(message = "门店名称不能为空")
     private String name;
 
-    @Schema(description = "门店简介")
+    @Schema(description = "门店简介", example = "我是门店简介")
     private String introduction;
 
-    @Schema(description = "门店手机", required = true)
+    @Schema(description = "门店手机", required = true, example = "15601892312")
     @NotBlank(message = "门店手机不能为空")
     @Mobile
     private String phone;
@@ -34,11 +34,11 @@ public class DeliveryPickUpStoreBaseVO {
     @NotNull(message = "区域编号不能为空")
     private Integer areaId;
 
-    @Schema(description = "门店详细地址", required = true)
+    @Schema(description = "门店详细地址", required = true, example = "复旦大学路 188 号")
     @NotBlank(message = "门店详细地址不能为空")
     private String detailAddress;
 
-    @Schema(description = "门店 logo", required = true)
+    @Schema(description = "门店 logo", required = true, example = "https://www.iocoder.cn/1.png")
     @NotBlank(message = "门店 logo 不能为空")
     private String logo;
 
@@ -52,11 +52,11 @@ public class DeliveryPickUpStoreBaseVO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime closingTime;
 
-    @Schema(description = "纬度", required = true)
+    @Schema(description = "纬度", required = true, example = "5.88")
     @NotNull(message = "纬度不能为空")
     private Double latitude;
 
-    @Schema(description = "经度", required = true)
+    @Schema(description = "经度", required = true, example = "6.99")
     @NotNull(message = "经度不能为空")
     private Double longitude;
 
