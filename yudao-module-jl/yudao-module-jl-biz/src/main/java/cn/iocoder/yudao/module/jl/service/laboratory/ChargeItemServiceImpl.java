@@ -114,6 +114,10 @@ public class ChargeItemServiceImpl implements ChargeItemService {
                 predicates.add(cb.equal(root.get("mark"), pageReqVO.getMark()));
             }
 
+            if(pageReqVO.getFeeStandard() != null) {
+                predicates.add(cb.equal(root.get("feeStandard"), pageReqVO.getFeeStandard()));
+            }
+
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
@@ -149,6 +153,10 @@ public class ChargeItemServiceImpl implements ChargeItemService {
 
             if(exportReqVO.getMark() != null) {
                 predicates.add(cb.equal(root.get("mark"), exportReqVO.getMark()));
+            }
+
+            if(exportReqVO.getFeeStandard() != null) {
+                predicates.add(cb.equal(root.get("feeStandard"), exportReqVO.getFeeStandard()));
             }
 
 
@@ -188,6 +196,10 @@ public class ChargeItemServiceImpl implements ChargeItemService {
 
         if (order.getMark() != null) {
             orders.add(new Sort.Order(order.getMark().equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, "mark"));
+        }
+
+        if (order.getFeeStandard() != null) {
+            orders.add(new Sort.Order(order.getFeeStandard().equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, "feeStandard"));
         }
 
 

@@ -47,4 +47,7 @@ public class ProjectFundPageOrder {
     @Schema(allowableValues = {"desc", "asc"})
     private String receiptName;
 
+    @Schema(allowableValues = {"desc", "asc"})
+    private String sort;
+
 }

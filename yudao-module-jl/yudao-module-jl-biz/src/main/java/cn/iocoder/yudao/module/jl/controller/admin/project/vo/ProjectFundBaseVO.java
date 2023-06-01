@@ -48,4 +48,7 @@ public class ProjectFundBaseVO {
     @Schema(description = "支付凭证文件名称", example = "芋艿")
     private String receiptName;
 
+    @Schema(description = "排序")
+    private Integer sort;
+
 }

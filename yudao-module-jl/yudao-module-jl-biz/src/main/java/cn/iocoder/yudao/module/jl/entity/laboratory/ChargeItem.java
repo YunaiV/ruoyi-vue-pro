@@ -58,4 +58,10 @@ public class ChargeItem extends BaseEntity {
     @Column(name = "mark")
     private String mark;
 
+    /**
+     * 收费的标准/规则
+     */
+    @Column(name = "fee_standard")
+    private String feeStandard;
+
 }

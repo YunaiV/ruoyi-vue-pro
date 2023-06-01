@@ -124,6 +124,10 @@ public class ProjectFundServiceImpl implements ProjectFundService {
                 predicates.add(cb.like(root.get("receiptName"), "%" + pageReqVO.getReceiptName() + "%"));
             }
 
+            if(pageReqVO.getSort() != null) {
+                predicates.add(cb.equal(root.get("sort"), pageReqVO.getSort()));
+            }
+
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
@@ -169,6 +173,10 @@ public class ProjectFundServiceImpl implements ProjectFundService {
 
             if(exportReqVO.getReceiptName() != null) {
                 predicates.add(cb.like(root.get("receiptName"), "%" + exportReqVO.getReceiptName() + "%"));
+            }
+
+            if(exportReqVO.getSort() != null) {
+                predicates.add(cb.equal(root.get("sort"), exportReqVO.getSort()));
             }
 
 
@@ -220,6 +228,10 @@ public class ProjectFundServiceImpl implements ProjectFundService {
 
         if (order.getReceiptName() != null) {
             orders.add(new Sort.Order(order.getReceiptName().equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, "receiptName"));
+        }
+
+        if (order.getSort() != null) {
+            orders.add(new Sort.Order(order.getSort().equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, "sort"));
         }
 
 

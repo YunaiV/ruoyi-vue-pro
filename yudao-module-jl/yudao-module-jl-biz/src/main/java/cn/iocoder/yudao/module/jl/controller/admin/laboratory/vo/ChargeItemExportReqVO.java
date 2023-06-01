@@ -32,4 +32,7 @@ public class ChargeItemExportReqVO {
     @Schema(description = "备注")
     private String mark;
 
+    @Schema(description = "收费的标准/规则")
+    private String feeStandard;
+
 }

@@ -49,4 +49,7 @@ public class ProjectFundExcelVO {
     @ExcelProperty("支付凭证文件名称")
     private String receiptName;
 
+    @ExcelProperty("排序")
+    private Integer sort;
+
 }

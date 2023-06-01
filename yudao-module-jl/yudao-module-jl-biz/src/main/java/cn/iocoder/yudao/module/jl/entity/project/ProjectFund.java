@@ -79,4 +79,10 @@ public class ProjectFund extends BaseEntity {
     @Column(name = "receipt_name")
     private String receiptName;
 
+    /**
+     * 排序
+     */
+    @Column(name = "sort")
+    private Integer sort;
+
 }

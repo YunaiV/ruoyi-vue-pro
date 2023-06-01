@@ -37,4 +37,7 @@ public class ChargeItemExcelVO {
     @ExcelProperty("备注")
     private String mark;
 
+    @ExcelProperty("收费的标准/规则")
+    private String feeStandard;
+
 }
