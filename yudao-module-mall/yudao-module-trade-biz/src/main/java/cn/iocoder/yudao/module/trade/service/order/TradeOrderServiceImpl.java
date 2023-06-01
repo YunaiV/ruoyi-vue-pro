@@ -31,6 +31,8 @@ import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliver
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -87,6 +89,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     private TradeOrderProperties tradeOrderProperties;
 
     // =================== Order ===================
+
+    @Override
+    public AppTradeOrderSettlementRespVO settlementOrder(Long userId, AppTradeOrderSettlementReqVO settlementReqVO) {
+        return null;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

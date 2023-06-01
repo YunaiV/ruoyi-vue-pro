@@ -55,6 +55,9 @@ public class AppTradeOrderController {
     @PreAuthenticated
     public CommonResult<AppTradeOrderSettlementRespVO> settlementOrder(
             @Valid AppTradeOrderSettlementReqVO settlementReqVO) {
+        if (true) {
+            return success(tradeOrderService.settlementOrder(getLoginUserId(), settlementReqVO));
+        }
 //        return success(tradeOrderService.getOrderConfirmCreateInfo(UserSecurityContextHolder.getUserId(), skuId, quantity, couponCardId));
         AppTradeOrderSettlementRespVO settlement = new AppTradeOrderSettlementRespVO();
 

@@ -12,12 +12,6 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-
-/**
- * 快递公司 Convert
- *
- * @author jason
- */
 @Mapper
 public interface DeliveryExpressConvert {
 

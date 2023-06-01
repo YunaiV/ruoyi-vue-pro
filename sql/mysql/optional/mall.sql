@@ -389,18 +389,18 @@ CREATE TABLE `trade_delivery_express_template_charge` (
 -- ----------------------------
 DROP TABLE IF EXISTS `trade_delivery_pick_up_store`;
 CREATE TABLE `trade_delivery_pick_up_store` (
-   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
    `name` varchar(64)  NOT NULL COMMENT '门店名称',
    `introduction` varchar(256)  COMMENT '门店简介',
    `phone` varchar(16) NOT NULL COMMENT '门店手机',
-   `area_id` int NOT NULL  COMMENT '区域id',
+   `area_id` int NOT NULL  COMMENT '区域编号',
    `detail_address` varchar(256) NOT NULL COMMENT '门店详细地址',
-   `logo` varchar(256) NOT NULL COMMENT '门店logo',
+   `logo` varchar(256) NOT NULL COMMENT '门店 logo',
    `opening_time` time NOT NULL  COMMENT '营业开始时间',
    `closing_time` time NOT NULL  COMMENT '营业结束时间',
-   `latitude`  varchar(128)  NOT NULL  COMMENT '纬度',
-   `longitude` varchar(128) NOT NULL  COMMENT '经度',
-   `status` tinyint NOT NULL DEFAULT 0 COMMENT '门店状态（0正常 1停用）',
+   `latitude`  double  NOT NULL  COMMENT '纬度',
+   `longitude` double NOT NULL  COMMENT '经度',
+   `status` tinyint NOT NULL DEFAULT 0 COMMENT '门店状态',
    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
@@ -426,25 +426,6 @@ CREATE TABLE `trade_delivery_pick_up_store_staff` (
    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB COMMENT='自提门店店员';
-
--- ----------------------------
--- Table structure for trade_delivery_pick_up_store_staff
--- ----------------------------
-DROP TABLE IF EXISTS `trade_delivery_pick_up_store_staff`;
-CREATE TABLE `trade_delivery_pick_up_store_staff` (
-   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，自增',
-   `admin_user_id` bigint  NOT NULL COMMENT '管理员用户id',
-    store_id bigint NOT NULL  COMMENT '自提门店编号',
-   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态（0正常 1停用）',
-   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB COMMENT='自提门店店员';
-
 
 -- ----------------------------
 -- Table structure for trade_delivery_express
@@ -540,4 +521,16 @@ INSERT INTO `ruoyi-vue-pro`.`system_dict_type` (`id`, `name`, `type`, `status`, 
 INSERT INTO `ruoyi-vue-pro`.`system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1237, 2, '按体积', '3', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', '2023-05-21 22:47:18', '1', '2023-05-21 22:47:18', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1236, 1, '按重量', '2', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', '2023-05-21 22:46:58', '1', '2023-05-21 22:46:58', b'0');
 INSERT INTO `ruoyi-vue-pro`.`system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1235, 0, '按件', '1', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', '2023-05-21 22:46:40', '1', '2023-05-21 22:46:40', b'0');
+COMMIT;
+
+-- ----------------------------
+-- 门店管理 菜单
+-- ----------------------------
+BEGIN;
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2179, '门店管理', '', 2, 1, 2166, 'pick-up-store', '', 'mall/trade/delivery/pickUpStore/index', 'PickUpStore', 0, b'1', b'1', b'1', '1', '2023-05-25 10:50:00', '1', '2023-05-25 10:50:00', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2180, '自提门店查询', 'trade:delivery:pick-up-store:query', 3, 1, 2179, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-25 10:53:29', '', '2023-05-25 10:53:29', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2181, '自提门店创建', 'trade:delivery:pick-up-store:create', 3, 2, 2179, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-25 10:53:29', '', '2023-05-25 10:53:29', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2182, '自提门店更新', 'trade:delivery:pick-up-store:update', 3, 3, 2179, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-25 10:53:29', '', '2023-05-25 10:53:29', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2183, '自提门店删除', 'trade:delivery:pick-up-store:delete', 3, 4, 2179, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-25 10:53:29', '', '2023-05-25 10:53:29', b'0');
+INSERT INTO `ruoyi-vue-pro`.`system_menu`(`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2184, '自提门店导出', 'trade:delivery:pick-up-store:export', 3, 5, 2179, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-05-25 10:53:29', '', '2023-05-25 10:53:29', b'0');
 COMMIT;

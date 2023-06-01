@@ -21,7 +21,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-
 @Tag(name = "管理后台 - 快递运费模板")
 @RestController
 @RequestMapping("/trade/delivery/express-template")
