@@ -66,4 +66,5 @@ public interface CategorySupplyService {
      */
     List<CategorySupply> getCategorySupplyList(CategorySupplyExportReqVO exportReqVO);
 
+    boolean saveCategorySupply(CategorySupplySaveReqVO saveReqVO);
 }

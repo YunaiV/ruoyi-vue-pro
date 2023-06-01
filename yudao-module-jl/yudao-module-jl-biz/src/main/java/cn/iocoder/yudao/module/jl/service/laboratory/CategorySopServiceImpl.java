@@ -50,6 +50,34 @@ public class CategorySopServiceImpl implements CategorySopService {
         return categorySop.getId();
     }
 
+    /**
+     * @param saveReqVO
+     * @return
+     */
+    @Override
+    public boolean saveAllCategorySop(CategorySopSaveReqVO saveReqVO) {
+        List<CategorySop> categorySopList = new ArrayList<>();
+
+        if(saveReqVO.getCategoryId() != null && saveReqVO.getCategoryId() > 0) {
+            // 删除原有的
+            categorySopRepository.deleteByCategoryId(saveReqVO.getCategoryId());
+        }
+
+        // 保存新的
+        for (CategorySopBaseWithoutIDVO sop : saveReqVO.getCategorySopList()) {
+            CategorySop categorySop = new CategorySop();
+            categorySop.setCategoryId(saveReqVO.getCategoryId());
+            categorySop.setStep(sop.getStep());
+            categorySop.setContent(sop.getContent());
+            categorySop.setDependIds(sop.getDependIds());
+            categorySop.setMark(sop.getMark());
+            categorySopList.add(categorySop);
+        }
+
+        categorySopRepository.saveAll(categorySopList);
+        return true;
+    }
+
     @Override
     public void updateCategorySop(CategorySopUpdateReqVO updateReqVO) {
         // 校验存在

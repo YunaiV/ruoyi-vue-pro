@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 
-import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
 import java.util.*;
@@ -47,6 +46,13 @@ public class CategorySupplyController {
     @PreAuthorize("@ss.hasPermission('jl:category-supply:create')")
     public CommonResult<Long> createCategorySupply(@Valid @RequestBody CategorySupplyCreateReqVO createReqVO) {
         return success(categorySupplyService.createCategorySupply(createReqVO));
+    }
+
+    @PostMapping("/save")
+    @Operation(summary = "全量保存")
+    @PreAuthorize("@ss.hasPermission('jl:category-supply:create')")
+    public CommonResult<Boolean> saveCategorySupply(@Valid @RequestBody CategorySupplySaveReqVO saveReqVO) {
+        return success(categorySupplyService.saveCategorySupply(saveReqVO));
     }
 
     @PutMapping("/update")

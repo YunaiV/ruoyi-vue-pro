@@ -20,6 +20,8 @@ public interface CategorySopService {
      */
     Long createCategorySop(@Valid CategorySopCreateReqVO createReqVO);
 
+    boolean saveAllCategorySop(@Valid CategorySopSaveReqVO saveReqVO);
+
     /**
      * 更新实验名目的操作SOP
      *

@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.*;
 *
 */
 public interface CategorySopRepository extends JpaRepository<CategorySop, Long>, JpaSpecificationExecutor<CategorySop> {
+    void deleteByCategoryId(Long categoryId);
 
 }

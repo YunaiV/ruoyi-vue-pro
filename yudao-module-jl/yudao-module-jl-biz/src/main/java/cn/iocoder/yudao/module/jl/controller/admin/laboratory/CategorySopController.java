@@ -52,8 +52,8 @@ public class CategorySopController {
     @PostMapping("/save")
     @Operation(summary = "全量保存")
     @PreAuthorize("@ss.hasPermission('jl:category-sop:create')")
-    public CommonResult<Long> saveCategorySop(@Valid @RequestBody CategorySopCreateReqVO createReqVO) {
-        return success(categorySopService.createCategorySop(createReqVO));
+    public CommonResult<Boolean> saveCategorySop(@Valid @RequestBody CategorySopSaveReqVO saveReqVO) {
+        return success(categorySopService.saveAllCategorySop(saveReqVO));
     }
 
     @PutMapping("/update")

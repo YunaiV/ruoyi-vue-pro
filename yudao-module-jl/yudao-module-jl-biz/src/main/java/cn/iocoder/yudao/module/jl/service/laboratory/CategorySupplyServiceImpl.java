@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.jl.service.laboratory;
 
+import cn.iocoder.yudao.module.jl.entity.laboratory.CategorySop;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -173,6 +174,36 @@ public class CategorySupplyServiceImpl implements CategorySupplyService {
 
         // 执行查询
         return categorySupplyRepository.findAll(spec);
+    }
+
+    /**
+     * @param saveReqVO
+     * @return
+     */
+    @Override
+    public boolean saveCategorySupply(CategorySupplySaveReqVO saveReqVO) {
+        List<CategorySupply> categorySupplyList = new ArrayList<>();
+
+        if(saveReqVO.getCategoryId() != null && saveReqVO.getCategoryId() > 0) {
+            // 删除原有的
+            categorySupplyRepository.deleteByCategoryId(saveReqVO.getCategoryId());
+        }
+
+        // 保存新的
+        for (CategorySupplyBaseWithoutIDVO supply : saveReqVO.getCategorySupplyList()) {
+            CategorySupply categorySupply = new CategorySupply();
+            categorySupply.setCategoryId(saveReqVO.getCategoryId());
+            categorySupply.setName(supply.getName());
+            categorySupply.setFeeStandard(supply.getFeeStandard());
+            categorySupply.setUnitFee(supply.getUnitFee());
+            categorySupply.setQuantity(supply.getQuantity());
+            categorySupply.setMark(supply.getMark());
+
+            categorySupplyList.add(categorySupply);
+        }
+
+        categorySupplyRepository.saveAll(categorySupplyList);
+        return true;
     }
 
     private Sort createSort(CategorySupplyPageOrder order) {
