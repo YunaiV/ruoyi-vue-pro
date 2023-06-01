@@ -28,4 +28,8 @@ public class CategoryBaseVO {
     @NotNull(message = "类型不能为空")
     private String type;
 
+    @Schema(description = "历史操作次数", example = "0")
+    @NotNull(message = "历史操作次数")
+    private Integer actionCount;
+
 }

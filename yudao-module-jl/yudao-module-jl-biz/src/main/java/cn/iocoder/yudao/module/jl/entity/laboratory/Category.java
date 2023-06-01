@@ -52,4 +52,10 @@ public class Category extends BaseEntity {
     @Column(name = "type", nullable = false )
     private String type;
 
+    /**
+     * 历史操作次数
+     */
+    @Column(name = "action_count" )
+    private Integer actionCount = 0;
+
 }
