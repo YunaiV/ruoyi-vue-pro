@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 public class Project extends BaseEntity {
 
     /**
-     * 岗位ID
+     * ID
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

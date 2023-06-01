@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 public class Supply extends BaseEntity {
 
     /**
-     * 岗位ID
+     * ID
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

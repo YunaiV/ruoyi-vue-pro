@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class CategorySupplyRespVO extends CategorySupplyBaseVO {
 
-    @Schema(description = "岗位ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "5812")
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "5812")
     private Long id;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)

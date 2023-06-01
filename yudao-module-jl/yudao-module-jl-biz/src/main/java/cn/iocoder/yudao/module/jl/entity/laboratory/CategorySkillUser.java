@@ -9,19 +9,19 @@ import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 
 /**
- * 实验名目的操作SOP Entity
+ * 实验名目的擅长人员 Entity
  *
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Entity(name = "CategorySop")
-@Table(name = "jl_laboratory_category_sop")
-public class CategorySop extends BaseEntity {
+@Entity(name = "CategorySkillUser")
+@Table(name = "jl_laboratory_category_skilluser")
+public class CategorySkillUser extends BaseEntity {
 
     /**
-     * ID
+     * 岗位ID
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,27 +35,9 @@ public class CategorySop extends BaseEntity {
     private Long categoryId;
 
     /**
-     * 操作步骤的内容
+     * 实验人员 id
      */
-    @Column(name = "content", nullable = false )
-    private String content;
-
-    /**
-     * 步骤序号
-     */
-    @Column(name = "step", nullable = false )
-    private Integer step;
-
-    /**
-     * 注意事项
-     */
-    @Column(name = "mark")
-    private String mark;
-
-    /**
-     * 依赖项(json数组多个)
-     */
-    @Column(name = "depend_ids")
-    private String dependIds;
+    @Column(name = "user_id", nullable = false )
+    private Long userId;
 
 }

@@ -3222,7 +3222,7 @@ CREATE TABLE "system_post" (
   "tenant_id" int8 NOT NULL DEFAULT 0
 )
 ;
-COMMENT ON COLUMN "system_post"."id" IS '岗位ID';
+COMMENT ON COLUMN "system_post"."id" IS 'ID';
 COMMENT ON COLUMN "system_post"."code" IS '岗位编码';
 COMMENT ON COLUMN "system_post"."name" IS '岗位名称';
 COMMENT ON COLUMN "system_post"."sort" IS '显示顺序';
@@ -3962,7 +3962,7 @@ CREATE TABLE "system_user_post" (
 ;
 COMMENT ON COLUMN "system_user_post"."id" IS 'id';
 COMMENT ON COLUMN "system_user_post"."user_id" IS '用户ID';
-COMMENT ON COLUMN "system_user_post"."post_id" IS '岗位ID';
+COMMENT ON COLUMN "system_user_post"."post_id" IS 'ID';
 COMMENT ON COLUMN "system_user_post"."creator" IS '创建者';
 COMMENT ON COLUMN "system_user_post"."create_time" IS '创建时间';
 COMMENT ON COLUMN "system_user_post"."updater" IS '更新者';

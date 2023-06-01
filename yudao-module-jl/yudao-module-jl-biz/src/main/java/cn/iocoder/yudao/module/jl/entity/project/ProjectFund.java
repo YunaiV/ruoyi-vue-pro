@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 public class ProjectFund extends BaseEntity {
 
     /**
-     * 岗位ID
+     * ID
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class InstitutionRespVO extends InstitutionBaseVO {
 
-    @Schema(description = "岗位ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "30743")
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "30743")
     private Long id;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)

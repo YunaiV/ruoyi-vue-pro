@@ -18,7 +18,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 @Data
 public class ProjectExcelVO {
 
-    @ExcelProperty("岗位ID")
+    @ExcelProperty("ID")
     private Long id;
 
     @ExcelProperty("创建时间")
