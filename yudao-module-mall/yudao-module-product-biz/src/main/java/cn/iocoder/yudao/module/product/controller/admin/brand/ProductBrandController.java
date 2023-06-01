@@ -65,7 +65,7 @@ public class ProductBrandController {
 
     @GetMapping("/list-all-simple")
     @Operation(summary = "获取品牌精简信息列表", description = "主要用于前端的下拉选项")
-    public CommonResult<List<ProductBrandSimpleRespVO>> getSimpleUserList() {
+    public CommonResult<List<ProductBrandSimpleRespVO>> getSimpleBrandList() {
         // 获取品牌列表，只要开启状态的
         List<ProductBrandDO> list = brandService.getBrandListByStatus(CommonStatusEnum.ENABLE.getStatus());
         // 排序后，返回给前端

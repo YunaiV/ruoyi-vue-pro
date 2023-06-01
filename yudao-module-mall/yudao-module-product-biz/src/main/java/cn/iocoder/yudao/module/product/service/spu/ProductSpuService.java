@@ -126,4 +126,13 @@ public interface ProductSpuService {
      * @return {@link Map}<{@link Integer}, {@link Integer}>
      */
     Map<Integer, Long> getTabsCount();
+
+    /**
+     * 通过分类 id 查询 spu 个数
+     *
+     * @param id 分类 id
+     * @return spu
+     */
+    Long getSpuCountByCategoryId(Long id);
+
 }

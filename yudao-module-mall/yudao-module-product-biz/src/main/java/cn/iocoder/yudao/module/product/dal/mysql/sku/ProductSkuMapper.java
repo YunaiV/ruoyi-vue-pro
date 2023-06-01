@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.product.dal.mysql.sku;
 
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -70,4 +73,22 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
         return selectList(new QueryWrapper<ProductSkuDO>().apply("stock <= warn_stock"));
     }
 
+    /**
+     * 更新 sku 属性值时使用的分页查询
+     *
+     * @param pageParam 页面参数
+     * @return {@link PageResult}<{@link ProductSkuDO}>
+     */
+    default PageResult<ProductSkuDO> selectPage(PageParam pageParam) {
+        return selectPage(pageParam, new LambdaQueryWrapper<ProductSkuDO>().isNotNull(ProductSkuDO::getProperties));
+    }
+
+    /**
+     * 查询 sku properties 不等于 null 的数量
+     *
+     * @return {@link Long}
+     */
+    default Long selectCountByPropertyNotNull() {
+        return selectCount(new LambdaQueryWrapper<ProductSkuDO>().isNotNull(ProductSkuDO::getProperties));
+    }
 }

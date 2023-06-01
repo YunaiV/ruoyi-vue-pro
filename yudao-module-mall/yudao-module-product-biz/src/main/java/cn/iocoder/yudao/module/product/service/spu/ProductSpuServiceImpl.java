@@ -251,4 +251,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         return counts;
     }
 
+    @Override
+    public Long getSpuCountByCategoryId(Long id) {
+        return productSpuMapper.selectCount(ProductSpuDO::getCategoryId, id);
+    }
+
 }

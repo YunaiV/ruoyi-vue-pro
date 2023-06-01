@@ -7,7 +7,8 @@ import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCateg
 import cn.iocoder.yudao.module.product.convert.category.ProductCategoryConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.mysql.category.ProductCategoryMapper;
-import cn.iocoder.yudao.module.product.enums.ProductConstants;
+import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -30,6 +31,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Resource
     private ProductCategoryMapper productCategoryMapper;
+    @Resource
+    @Lazy // 循环依赖，避免报错
+    private ProductSpuService productSpuService;
 
     @Override
     public Long createCategory(ProductCategoryCreateReqVO createReqVO) {
@@ -63,7 +67,8 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         if (productCategoryMapper.selectCountByParentId(id) > 0) {
             throw exception(CATEGORY_EXISTS_CHILDREN);
         }
-        // TODO 芋艿 补充只有不存在商品才可以删除
+        // 校验分类是否绑定了 SPU
+        validateProductCategoryIsHaveBindSpu(id);
         // 删除
         productCategoryMapper.deleteById(id);
     }
@@ -88,6 +93,13 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         ProductCategoryDO category = productCategoryMapper.selectById(id);
         if (category == null) {
             throw exception(CATEGORY_NOT_EXISTS);
+        }
+    }
+
+    private void validateProductCategoryIsHaveBindSpu(Long id) {
+        Long count = productSpuService.getSpuCountByCategoryId(id);
+        if (0 != count) {
+            throw exception(CATEGORY_HAVE_BIND_SPU);
         }
     }
 

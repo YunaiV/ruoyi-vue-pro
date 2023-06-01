@@ -455,7 +455,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     public void testUpdateSpuStock() {
         // 准备参数
         Map<Long, Integer> stockIncrCounts = MapUtil.builder(1L, 10).put(2L, -20).build();
-        // mock 方法（数据） // TODO ProductSpuDO中已没有相关属性
+        // mock 方法（数据）
         productSpuMapper.insert(randomPojo(ProductSpuDO.class, o ->{
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
@@ -495,7 +495,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         productSpuService.updateSpuStock(stockIncrCounts);
-        // 断言  // TODO ProductSpuDO中已没有相关属性
+        // 断言
         assertEquals(productSpuService.getSpu(1L).getStock(), 30);
         assertEquals(productSpuService.getSpu(2L).getStock(), 10);
     }

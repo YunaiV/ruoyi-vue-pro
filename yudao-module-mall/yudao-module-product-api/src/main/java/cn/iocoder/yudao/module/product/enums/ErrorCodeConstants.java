@@ -15,6 +15,7 @@ public interface ErrorCodeConstants {
     ErrorCode CATEGORY_PARENT_NOT_FIRST_LEVEL = new ErrorCode(1008001002, "父分类不能是二级分类");
     ErrorCode CATEGORY_EXISTS_CHILDREN = new ErrorCode(1008001003, "存在子分类，无法删除");
     ErrorCode CATEGORY_DISABLED = new ErrorCode(1008001004, "商品分类({})已禁用，无法使用");
+    ErrorCode CATEGORY_HAVE_BIND_SPU = new ErrorCode(1008001005, "类别下存在商品，无法删除");
 
     // ========== 商品品牌相关编号 1008002000 ==========
     ErrorCode BRAND_NOT_EXISTS = new ErrorCode(1008002000, "品牌不存在");

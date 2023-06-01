@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import org.springframework.lang.Nullable;
 
@@ -115,4 +117,19 @@ public interface ProductSkuService {
      */
     List<ProductSkuDO> getSkuListByAlarmStock();
 
+    /**
+     * 更新 sku 属性
+     *
+     * @param updateObj 属性对象
+     * @return int 影响的行数
+     */
+    int updateSkuProperty(ProductPropertyDO updateObj);
+
+    /**
+     * 更新 sku 属性值
+     *
+     * @param updateObj 属性值对象
+     * @return int 影响的行数
+     */
+    int updateSkuPropertyValue(ProductPropertyValueDO updateObj);
 }
