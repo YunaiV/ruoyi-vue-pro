@@ -49,6 +49,13 @@ public class CategoryChargeitemController {
         return success(categoryChargeitemService.createCategoryChargeitem(createReqVO));
     }
 
+    @PostMapping("/save")
+    @Operation(summary = "全量保存")
+    @PreAuthorize("@ss.hasPermission('jl:category-chargeitem:create')")
+    public CommonResult<Boolean> saveCategoryChargeitem(@Valid @RequestBody CategoryChargeItemSaveReqVO saveReqVO) {
+        return success(categoryChargeitemService.saveCategoryChargeItem(saveReqVO));
+    }
+
     @PutMapping("/update")
     @Operation(summary = "更新实验名目的收费项")
     @PreAuthorize("@ss.hasPermission('jl:category-chargeitem:update')")

@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.*;
 */
 public interface CategoryChargeitemRepository extends JpaRepository<CategoryChargeitem, Long>, JpaSpecificationExecutor<CategoryChargeitem> {
 
+    void deleteByCategoryId(Long categoryId);
 }

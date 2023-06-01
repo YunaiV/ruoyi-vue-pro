@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.jl.service.laboratory;
 
 import java.util.*;
 import javax.validation.*;
+
+import cn.iocoder.yudao.module.jl.controller.admin.laboratory.CategoryChargeItemSaveReqVO;
 import cn.iocoder.yudao.module.jl.controller.admin.laboratory.vo.*;
 import cn.iocoder.yudao.module.jl.entity.laboratory.CategoryChargeitem;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -66,4 +68,5 @@ public interface CategoryChargeitemService {
      */
     List<CategoryChargeitem> getCategoryChargeitemList(CategoryChargeitemExportReqVO exportReqVO);
 
+    Boolean saveCategoryChargeItem(CategoryChargeItemSaveReqVO saveReqVO);
 }

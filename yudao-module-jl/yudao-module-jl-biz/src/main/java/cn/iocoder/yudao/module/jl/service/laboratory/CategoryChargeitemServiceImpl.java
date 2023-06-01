@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.jl.service.laboratory;
 
+import cn.iocoder.yudao.module.jl.controller.admin.laboratory.CategoryChargeItemSaveReqVO;
+import cn.iocoder.yudao.module.jl.entity.laboratory.CategorySupply;
+import cn.iocoder.yudao.module.jl.repository.laboratory.CategorySupplyRepository;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -40,6 +43,11 @@ public class CategoryChargeitemServiceImpl implements CategoryChargeitemService 
 
     @Resource
     private CategoryChargeitemMapper categoryChargeitemMapper;
+    private final CategorySupplyRepository categorySupplyRepository;
+
+    public CategoryChargeitemServiceImpl(CategorySupplyRepository categorySupplyRepository) {
+        this.categorySupplyRepository = categorySupplyRepository;
+    }
 
     @Override
     public Long createCategoryChargeitem(CategoryChargeitemCreateReqVO createReqVO) {
@@ -181,6 +189,38 @@ public class CategoryChargeitemServiceImpl implements CategoryChargeitemService 
 
         // 执行查询
         return categoryChargeitemRepository.findAll(spec);
+    }
+
+    /**
+     * @param saveReqVO
+     * @return
+     */
+    @Override
+    public Boolean saveCategoryChargeItem(CategoryChargeItemSaveReqVO saveReqVO) {
+        List<CategoryChargeitem> categoryChargeitemList = new ArrayList<>();
+
+        if(saveReqVO.getCategoryId() != null && saveReqVO.getCategoryId() > 0) {
+            // 删除原有的
+            categoryChargeitemRepository.deleteByCategoryId(saveReqVO.getCategoryId());
+        }
+
+        // 保存新的
+        for (CategoryChargeitemBaseWithoutIDVO item : saveReqVO.getCategoryChargeitemList()) {
+            CategoryChargeitem categoryChargeitem = new CategoryChargeitem();
+            categoryChargeitem.setCategoryId(saveReqVO.getCategoryId());
+            categoryChargeitem.setChargeItemId(item.getChargeItemId());
+            categoryChargeitem.setName(item.getName());
+            categoryChargeitem.setFeeStandard(item.getFeeStandard());
+            categoryChargeitem.setUnitFee(item.getUnitFee());
+            categoryChargeitem.setQuantity(item.getQuantity());
+            categoryChargeitem.setMark(item.getMark());
+            categoryChargeitem.setUnitAmount(item.getUnitAmount());
+
+            categoryChargeitemList.add(categoryChargeitem);
+        }
+
+        categoryChargeitemRepository.saveAll(categoryChargeitemList);
+        return true;
     }
 
     private Sort createSort(CategoryChargeitemPageOrder order) {
