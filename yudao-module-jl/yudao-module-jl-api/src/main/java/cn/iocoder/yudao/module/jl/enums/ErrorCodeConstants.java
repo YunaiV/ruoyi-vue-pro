@@ -23,5 +23,15 @@ public interface ErrorCodeConstants {
 
     ErrorCode JOIN_SALESLEAD2REPORT_NOT_EXISTS = new ErrorCode(2010000001, "销售线索中的方案不存在");
 
-    ErrorCode PROJECT_BASE_NOT_EXISTS = new ErrorCode(2011000001, "项目管理不存在");
+    ErrorCode PROJECT_NOT_EXISTS = new ErrorCode(2011000001, "项目管理不存在");
+
+    ErrorCode USER_NOT_EXISTS = new ErrorCode(2012000001, "公司用户不存在");
+
+    ErrorCode CHARGE_ITEM_NOT_EXISTS = new ErrorCode(2013000001, "项目收费项不存在");
+
+    ErrorCode LAB_SUPPLY_NOT_EXISTS = new ErrorCode(2014000001, "实验物资不存在");
+
+    ErrorCode PROJECT_FUND_NOT_EXISTS = new ErrorCode(2015000001, "实验物资不存在");
+
+
 }

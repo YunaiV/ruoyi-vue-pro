@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.jl.controller.admin.crm;
 
+import cn.iocoder.yudao.module.jl.service.crm.CustomerService;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -40,13 +41,20 @@ public class SalesleadController {
     private SalesleadService salesleadService;
 
     @Resource
+    private CustomerService customerService;
+
+    @Resource
     private SalesleadMapper salesleadMapper;
 
     @PostMapping("/create")
     @Operation(summary = "创建销售线索")
     @PreAuthorize("@ss.hasPermission('jl:saleslead:create')")
     public CommonResult<Long> createSaleslead(@Valid @RequestBody SalesleadCreateReqVO createReqVO) {
-        return success(salesleadService.createSaleslead(createReqVO));
+        Long salesLeadId = salesleadService.createSaleslead(createReqVO);
+
+        // 给客户添加最近的销售线索
+        customerService.bindLastSaleslead(createReqVO.getCustomerId(), salesLeadId);
+        return success(salesLeadId);
     }
 
     @PutMapping("/update")

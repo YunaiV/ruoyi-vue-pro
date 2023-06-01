@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.jl.entity.crm;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import cn.iocoder.yudao.module.jl.entity.user.User;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import java.util.*;
 import javax.persistence.*;
@@ -97,11 +99,19 @@ public class Customer extends BaseEntity {
     @Column(name = "hospital_id")
     private Long hospitalId;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "hospital_id", insertable = false, updatable = false)
+    private Institution hospital;
+
     /**
      * 学校机构
      */
     @Column(name = "university_id")
     private Long universityId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "university_id", insertable = false, updatable = false)
+    private Institution university;
 
     /**
      * 公司
@@ -167,11 +177,19 @@ public class Customer extends BaseEntity {
     @Column(name = "sales_id")
     private Long salesId;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "sales_id", insertable = false, updatable = false)
+    private User sales;
+
     /**
      * 最后一次的跟进 id
      */
     @Column(name = "last_followup_id")
     private Long lastFollowupId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "last_followup_id", insertable = false, updatable = false)
+    private Followup lastFollowup;
 
     /**
      * 最后一次销售线索
@@ -179,4 +197,8 @@ public class Customer extends BaseEntity {
     @Column(name = "last_saleslead_id")
     private Long lastSalesleadId;
 
+//    @JsonManagedReference
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "last_saleslead_id", insertable = false, updatable = false)
+//    private Saleslead lastSaleslead;
 }

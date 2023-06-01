@@ -66,4 +66,12 @@ public interface CustomerService {
      */
     List<Customer> getCustomerList(CustomerExportReqVO exportReqVO);
 
+    /**
+     * 为客户绑定最新的销售线索
+     *
+     * @param customerId 手机号
+ *   * @param salesleadId 线索 ID
+     * @return 客户
+     */
+    Boolean bindLastSaleslead(Long customerId, Long salesleadId);
 }

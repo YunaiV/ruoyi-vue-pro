@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.jl.controller.admin.crm.vo;
 
+import cn.iocoder.yudao.module.jl.entity.crm.Customer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -46,5 +47,4 @@ public class SalesleadBaseVO {
 
     @Schema(description = "绑定的销售报价人员", example = "26885")
     private Long managerId;
-
 }

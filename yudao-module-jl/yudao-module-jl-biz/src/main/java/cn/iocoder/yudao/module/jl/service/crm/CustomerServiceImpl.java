@@ -309,6 +309,23 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findAll(spec);
     }
 
+    /**
+     * 为客户绑定最新的销售线索
+     *
+     * @param customerId
+     * @param salesleadId
+     * @return Boolean
+     */
+    @Override
+    public Boolean bindLastSaleslead(Long customerId, Long salesleadId) {
+        customerRepository.findById(customerId).map(customer -> {
+            customer.setLastSalesleadId(salesleadId);
+            return customerRepository.save(customer);
+        });
+
+        return null;
+    }
+
     private Sort createSort(CustomerPageOrder order) {
         List<Sort.Order> orders = new ArrayList<>();
 

@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.jl.entity.crm;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import cn.iocoder.yudao.module.jl.entity.user.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import java.util.*;
 import javax.persistence.*;
@@ -67,6 +69,11 @@ public class Saleslead extends BaseEntity {
      */
     @Column(name = "customer_id", nullable = false )
     private Long customerId;
+
+//    @JsonBackReference
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "customer_id", insertable = false, updatable = false)
+    private Customer customer;
 
     /**
      * 项目id
