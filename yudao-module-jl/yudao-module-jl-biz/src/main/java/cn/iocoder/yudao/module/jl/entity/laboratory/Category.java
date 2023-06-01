@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.jl.entity.laboratory;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import cn.iocoder.yudao.module.jl.entity.user.User;
 import lombok.*;
 import java.util.*;
 import javax.persistence.*;
@@ -57,5 +58,16 @@ public class Category extends BaseEntity {
      */
     @Column(name = "action_count" )
     private Integer actionCount = 0;
+
+    /**
+     * 实验名目的擅长人员
+     */
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "jl_laboratory_category_skilluser",
+            joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> skillUsers = new HashSet<>();
 
 }
