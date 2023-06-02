@@ -16,7 +16,7 @@ public class ProjectQuoteSaveReqVO  {
     @Schema(description = "报价 id", example = "1", nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long quoteId;
 
-    @Schema(description = "销售线索 id", example = "1", nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Schema(description = "销售线索 id", example = "1", nullable = true, requiredMode = Schema.RequiredMode.REQUIRED)
     private Long salesleadId;
 
     @Schema(description = "报价单的名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
@@ -31,7 +31,7 @@ public class ProjectQuoteSaveReqVO  {
     @NotNull(message = "折扣(100: 无折扣, 98: 98折)不能为空")
     private Integer discount;
 
-    @Schema(description = "状态, 已提交、已作废、已采用", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "状态, 已提交、已作废、已采用", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
     @NotNull(message = "状态, 已提交、已作废、已采用不能为空")
     private String status = "1";
 

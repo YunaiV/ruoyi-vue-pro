@@ -20,7 +20,7 @@ public class ProjectCategoryBaseVO {
     @Schema(description = "安排单 id", example = "14245")
     private Long scheduleId;
 
-    @Schema(description = "类型，报价/安排单", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "类型，报价/安排单", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
     @NotNull(message = "类型，报价/安排单不能为空")
     private String type;
 

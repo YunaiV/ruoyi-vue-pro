@@ -94,4 +94,20 @@ public class ProjectCategory extends BaseEntity {
     @Column(name = "mark")
     private String mark;
 
+    @ManyToOne
+    @JoinColumn(name="quote_id", insertable = false, updatable = false)
+    private ProjectQuote quote;
+
+    /**
+     * 实验物资
+     */
+    @OneToMany(mappedBy="category")
+    private List<ProjectSupply> supplyList;
+
+    /**
+     * 实验物资
+     */
+    @OneToMany(mappedBy="category")
+    private List<ProjectChargeitem> chargeitemList;
+
 }

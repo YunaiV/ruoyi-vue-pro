@@ -126,6 +126,7 @@ public class ProjectQuoteServiceImpl implements ProjectQuoteService {
                 if(chargetItemList != null && chargetItemList.size() >= 1) {
                     List<ProjectChargeitemSubClass> projectChargeitemList = chargetItemList.stream().map(chargeItem -> {
                         chargeItem.setProjectCategoryId(categoryDo.getId());
+                        chargeItem.setCategoryId(categoryDo.getCategoryId());
                         return chargeItem;
                     }).collect(Collectors.toList());
 
@@ -138,6 +139,7 @@ public class ProjectQuoteServiceImpl implements ProjectQuoteService {
                 if(supplyList != null && supplyList.size() >= 1) {
                     List<ProjectSupplySubClass> projectSupplyList = supplyList.stream().map(supply -> {
                         supply.setProjectCategoryId(categoryDo.getId());
+                        supply.setCategoryId(categoryDo.getCategoryId());
                         return supply;
                     }).collect(Collectors.toList());
 

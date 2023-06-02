@@ -10,10 +10,10 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 public class ProjectSupplySubClass {
-    @Schema(description = "实验名目 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "10361")
+    @Schema(description = "实验名目 id", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "10361")
     private Long projectCategoryId;
 
-    @Schema(description = "原始的实验名目 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "18163")
+    @Schema(description = "原始的实验名目 id", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "18163")
     @NotNull(message = "原始的实验名目 id不能为空")
     private Long categoryId;
 

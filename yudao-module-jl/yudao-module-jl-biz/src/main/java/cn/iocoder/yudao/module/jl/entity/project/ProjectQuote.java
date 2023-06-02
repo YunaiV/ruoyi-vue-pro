@@ -64,4 +64,9 @@ public class ProjectQuote extends BaseEntity {
     @Column(name = "status", nullable = false )
     private String status;
 
+    /**
+     * 实验名目
+     */
+    @OneToMany(mappedBy="quote")
+    private List<ProjectCategory> categoryList;
 }
