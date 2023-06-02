@@ -34,4 +34,12 @@ public class CategorySupplyBaseWithoutIDVO {
     @NotNull(message = "实验名目 id不能为空")
     private Long categoryId;
 
+    @Schema(description = "物品 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "27140")
+    @NotNull(message = "物品 id不能为空")
+    private Long supplyId;
+
+    @Schema(description = "实验单量", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "单量")
+    private Long unitAmount = 1L;
+
 }

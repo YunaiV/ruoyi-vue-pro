@@ -70,4 +70,10 @@ public class CategorySupply extends BaseEntity {
     @Column(name = "category_id", nullable = false )
     private Long categoryId;
 
+    /**
+     *单量
+     */
+    @Column(name = "unit_amount", nullable = false )
+    private Long unitAmount;
+
 }

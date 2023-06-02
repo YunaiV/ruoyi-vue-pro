@@ -5,6 +5,7 @@ import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
+import javax.persistence.Column;
 import javax.validation.constraints.*;
 
 /**
@@ -40,5 +41,9 @@ public class CategorySupplyBaseVO {
     @Schema(description = "实验名目 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "27140")
     @NotNull(message = "实验名目 id不能为空")
     private Long categoryId;
+
+    @Schema(description = "实验单量", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "单量")
+    private Long unitAmount = 1L;
 
 }

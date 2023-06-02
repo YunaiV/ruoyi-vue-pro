@@ -198,6 +198,8 @@ public class CategorySupplyServiceImpl implements CategorySupplyService {
             categorySupply.setUnitFee(supply.getUnitFee());
             categorySupply.setQuantity(supply.getQuantity());
             categorySupply.setMark(supply.getMark());
+            categorySupply.setSupplyId(supply.getSupplyId());
+            categorySupply.setUnitAmount(supply.getUnitAmount());
 
             categorySupplyList.add(categorySupply);
         }
