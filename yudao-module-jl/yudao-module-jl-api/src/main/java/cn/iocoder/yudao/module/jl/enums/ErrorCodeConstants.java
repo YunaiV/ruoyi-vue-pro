@@ -44,4 +44,17 @@ public interface ErrorCodeConstants {
     ErrorCode CATEGORY_CHARGEITEM_NOT_EXISTS = new ErrorCode(2020000001, "实验名目收费项不存在");
 
     ErrorCode CATEGORY_SKILL_USER_NOT_EXISTS = new ErrorCode(2021000001, "实验名目技术人员不存在");
+
+    ErrorCode PROJECT_SUPPLY_NOT_EXISTS = new ErrorCode(2022000001, "项目中的实验物资不存在");
+
+    ErrorCode PROJECT_QUOTE_NOT_EXISTS = new ErrorCode(2023000001, "报价不存在");
+
+    ErrorCode PROJECT_CHARGEITEM_NOT_EXISTS = new ErrorCode(2024000001, "项目中的收费项不存在");
+
+    ErrorCode PROJECT_SOP_NOT_EXISTS = new ErrorCode(2025000001, "项目中的操作SOP不存在");
+
+    ErrorCode PROJECT_SCHEDULE_NOT_EXISTS = new ErrorCode(2026000001, "项目中的操作SOP不存在");
+
+    ErrorCode PROJECT_CATEGORY_NOT_EXISTS = new ErrorCode(2027000001, "项目中的实验名目不存在");
+
 }
