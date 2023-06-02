@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.jl.service.project;
 
+import cn.iocoder.yudao.module.jl.entity.project.*;
+import cn.iocoder.yudao.module.jl.mapper.project.*;
+import cn.iocoder.yudao.module.jl.repository.project.*;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -18,11 +21,7 @@ import javax.persistence.criteria.Root;
 
 import java.util.*;
 import cn.iocoder.yudao.module.jl.controller.admin.project.vo.*;
-import cn.iocoder.yudao.module.jl.entity.project.ProjectSchedule;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import cn.iocoder.yudao.module.jl.mapper.project.ProjectScheduleMapper;
-import cn.iocoder.yudao.module.jl.repository.project.ProjectScheduleRepository;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.jl.enums.ErrorCodeConstants.*;
@@ -41,6 +40,30 @@ public class ProjectScheduleServiceImpl implements ProjectScheduleService {
     @Resource
     private ProjectScheduleMapper projectScheduleMapper;
 
+    @Resource
+    private ProjectQuoteRepository projectQuoteRepository;
+
+    @Resource
+    private ProjectQuoteMapper projectQuoteMapper;
+
+    @Resource
+    private ProjectCategoryRepository projectCategoryRepository;
+
+    @Resource
+    private ProjectCategoryMapper projectCategoryMapper;
+
+    @Resource
+    private ProjectSupplyRepository projectSupplyRepository;
+
+    @Resource
+    private ProjectSupplyMapper projectSupplyMapper;
+
+    @Resource
+    private ProjectChargeitemRepository projectChargeitemRepository;
+
+    @Resource
+    private ProjectChargeitemMapper projectChargeitemMapper;
+
     @Override
     public Long createProjectSchedule(ProjectScheduleCreateReqVO createReqVO) {
         // 插入
@@ -48,6 +71,77 @@ public class ProjectScheduleServiceImpl implements ProjectScheduleService {
         projectScheduleRepository.save(projectSchedule);
         // 返回
         return projectSchedule.getId();
+    }
+
+    /**
+     * @param saveReqVO
+     * @return
+     */
+    @Override
+    public Long saveProjectSchedule(ProjectScheduleSaveReqVO saveReqVO) {
+        // 如果提供了 scheduleId ，则更新。否则，创建
+        Long scheduleId;
+        if (saveReqVO.getScheduleId() != null) {
+            scheduleId = saveReqVO.getScheduleId();
+            // 校验存在
+            validateProjectScheduleExists(saveReqVO.getScheduleId());
+            // 更新
+            ProjectSchedule updateObj = projectScheduleMapper.toEntity(saveReqVO);
+            projectScheduleRepository.save(updateObj);
+        } else {
+            // 创建
+            ProjectSchedule projectSchedule = projectScheduleMapper.toEntity(saveReqVO);
+            projectScheduleRepository.save(projectSchedule);
+            scheduleId = projectSchedule.getId();
+        }
+
+        List<ProjectCategoryWithSupplyAndChargeItemVO> categoryList = saveReqVO.getCategoryList();
+        if(categoryList != null && categoryList.size() >= 1) {
+            List<ProjectCategory> categories = projectCategoryRepository.findByScheduleIdOrderByIdAsc(scheduleId);
+            // 获取 categories 里的 id
+            List<Long> categoryIds = categories.stream().map(ProjectCategory::getId).collect(Collectors.toList());
+            // 删除原来的
+            projectCategoryRepository.deleteByScheduleId(scheduleId);
+            projectSupplyRepository.deleteByProjectCategoryIdIn(categoryIds);
+            projectChargeitemRepository.deleteByProjectCategoryIdIn(categoryIds);
+
+            // 保存新的
+            for (int i = 0; i < categoryList.size(); i++) {
+                // 保存实验名目
+                ProjectCategoryWithSupplyAndChargeItemVO category = categoryList.get(i);
+                category.setCategoryType("schedule");
+                category.setScheduleId(scheduleId);
+                ProjectCategory categoryDo = projectCategoryMapper.toEntity(category);
+                projectCategoryRepository.save(categoryDo);
+
+                // 保存收费项
+                List<ProjectChargeitemSubClass> chargetItemList = category.getChargeItemList();
+                if(chargetItemList != null && chargetItemList.size() >= 1) {
+                    List<ProjectChargeitemSubClass> projectChargeitemList = chargetItemList.stream().map(chargeItem -> {
+                        chargeItem.setProjectCategoryId(categoryDo.getId());
+                        chargeItem.setCategoryId(categoryDo.getCategoryId());
+                        return chargeItem;
+                    }).collect(Collectors.toList());
+
+                    List<ProjectChargeitem> projectChargeitems = projectChargeitemMapper.toEntity(projectChargeitemList);
+                    projectChargeitemRepository.saveAll(projectChargeitems);
+                }
+
+                // 保存物资项
+                List<ProjectSupplySubClass> supplyList = category.getSupplyList();
+                if(supplyList != null && supplyList.size() >= 1) {
+                    List<ProjectSupplySubClass> projectSupplyList = supplyList.stream().map(supply -> {
+                        supply.setProjectCategoryId(categoryDo.getId());
+                        supply.setCategoryId(categoryDo.getCategoryId());
+                        return supply;
+                    }).collect(Collectors.toList());
+
+                    List<ProjectSupply> projectSupplies = projectSupplyMapper.toEntity(projectSupplyList);
+                    projectSupplyRepository.saveAll(projectSupplies);
+                }
+            }
+        }
+        return scheduleId;
     }
 
     @Override

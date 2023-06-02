@@ -16,6 +16,8 @@ public interface ProjectScheduleMapper {
 
     ProjectScheduleRespVO toDto(ProjectSchedule entity);
 
+    ProjectSchedule toEntity(ProjectScheduleSaveReqVO entity);
+
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     ProjectSchedule partialUpdate(ProjectScheduleUpdateReqVO dto, @MappingTarget ProjectSchedule entity);

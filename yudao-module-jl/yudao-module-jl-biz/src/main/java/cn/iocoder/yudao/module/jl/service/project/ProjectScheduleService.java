@@ -20,6 +20,9 @@ public interface ProjectScheduleService {
      */
     Long createProjectSchedule(@Valid ProjectScheduleCreateReqVO createReqVO);
 
+
+    Long saveProjectSchedule(@Valid ProjectScheduleSaveReqVO saveReqVO);
+
     /**
      * 更新项目安排单
      *

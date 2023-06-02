@@ -81,28 +81,28 @@ public class ProjectQuoteServiceImpl implements ProjectQuoteService {
 
     /**
      * 全量保存项目报价
-     * @param createReqVO
+     * @param saveReqVO
      * @return
      */
     @Override
-    public Long saveProjectQuote(ProjectQuoteSaveReqVO createReqVO) {
+    public Long saveProjectQuote(ProjectQuoteSaveReqVO saveReqVO) {
         // 如果提供了 quoteId ，则更新。否则，创建
         Long quoteId;
-        if (createReqVO.getQuoteId() != null) {
-            quoteId = createReqVO.getQuoteId();
+        if (saveReqVO.getQuoteId() != null) {
+            quoteId = saveReqVO.getQuoteId();
             // 校验存在
-            validateProjectQuoteExists(createReqVO.getQuoteId());
+            validateProjectQuoteExists(saveReqVO.getQuoteId());
             // 更新
-            ProjectQuote updateObj = projectQuoteMapper.toEntity(createReqVO);
+            ProjectQuote updateObj = projectQuoteMapper.toEntity(saveReqVO);
             projectQuoteRepository.save(updateObj);
         } else {
             // 创建
-            ProjectQuote projectQuote = projectQuoteMapper.toEntity(createReqVO);
+            ProjectQuote projectQuote = projectQuoteMapper.toEntity(saveReqVO);
             projectQuoteRepository.save(projectQuote);
             quoteId = projectQuote.getId();
         }
 
-        List<ProjectCategoryWithSupplyAndChargeItemVO> categoryList = createReqVO.getCategoryList();
+        List<ProjectCategoryWithSupplyAndChargeItemVO> categoryList = saveReqVO.getCategoryList();
         if(categoryList != null && categoryList.size() >= 1) {
             List<ProjectCategory> categories = projectCategoryRepository.getByQuoteId(quoteId);
             // 获取 categories 里的 id

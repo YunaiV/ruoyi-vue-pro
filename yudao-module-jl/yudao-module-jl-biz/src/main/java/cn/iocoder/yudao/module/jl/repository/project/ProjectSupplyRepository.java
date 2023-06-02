@@ -13,6 +13,10 @@ import java.util.Collection;
 public interface ProjectSupplyRepository extends JpaRepository<ProjectSupply, Long>, JpaSpecificationExecutor<ProjectSupply> {
     @Transactional
     @Modifying
+    @Query("delete from ProjectSupply p where p.projectCategoryId = ?1")
+    int deleteByProjectCategoryId(Long projectCategoryId);
+    @Transactional
+    @Modifying
     @Query("delete from ProjectSupply p where p.projectCategoryId in ?1")
     void deleteByProjectCategoryIdIn(Collection<Long> projectCategoryIds);
 
