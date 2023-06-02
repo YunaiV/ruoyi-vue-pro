@@ -1,24 +1,23 @@
 package cn.iocoder.yudao.module.jl.controller.admin.project.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import javax.validation.constraints.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-/**
- * 项目报价 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- */
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
+@Schema(description = "管理后台 - 项目报价保存 Request VO")
 @Data
-public class ProjectQuoteBaseVO {
+@ToString(callSuper = true)
+public class ProjectQuoteSaveReqVO  {
 
-    @Schema(description = "销售线索 id", example = "23498")
+    @Schema(description = "报价 id", example = "1", nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Long quoteId;
+
+    @Schema(description = "销售线索 id", example = "1", nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long salesleadId;
-
-    @Schema(description = "项目 id", example = "21263")
-    private Long projectId;
 
     @Schema(description = "报价单的名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
     @NotNull(message = "报价单的名字不能为空")
@@ -35,5 +34,8 @@ public class ProjectQuoteBaseVO {
     @Schema(description = "状态, 已提交、已作废、已采用", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态, 已提交、已作废、已采用不能为空")
     private String status = "1";
+
+    @Schema(description = "实验名目", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private List<ProjectCategoryWithSupplyAndChargeItemVO>  categoryList;
 
 }

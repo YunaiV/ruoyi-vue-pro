@@ -16,6 +16,7 @@ public interface ProjectSupplyMapper {
 
     ProjectSupplyRespVO toDto(ProjectSupply entity);
 
+    List<ProjectSupply> toEntity(List<ProjectSupplySubClass> dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     ProjectSupply partialUpdate(ProjectSupplyUpdateReqVO dto, @MappingTarget ProjectSupply entity);

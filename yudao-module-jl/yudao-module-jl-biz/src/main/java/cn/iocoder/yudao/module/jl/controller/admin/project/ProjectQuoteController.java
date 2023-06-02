@@ -42,20 +42,27 @@ public class ProjectQuoteController {
     @Resource
     private ProjectQuoteMapper projectQuoteMapper;
 
-    @PostMapping("/create")
-    @Operation(summary = "创建项目报价")
+//    @PostMapping("/create")
+//    @Operation(summary = "创建项目报价")
+//    @PreAuthorize("@ss.hasPermission('jl:project-quote:create')")
+//    public CommonResult<Long> createProjectQuote(@Valid @RequestBody ProjectQuoteCreateReqVO createReqVO) {
+//        return success(projectQuoteService.createProjectQuote(createReqVO));
+//    }
+
+    @PostMapping("/save")
+    @Operation(summary = "保存项目报价")
     @PreAuthorize("@ss.hasPermission('jl:project-quote:create')")
-    public CommonResult<Long> createProjectQuote(@Valid @RequestBody ProjectQuoteCreateReqVO createReqVO) {
-        return success(projectQuoteService.createProjectQuote(createReqVO));
+    public CommonResult<Long> saveProjectQuote(@Valid @RequestBody ProjectQuoteSaveReqVO saveReqVO) {
+        return success(projectQuoteService.saveProjectQuote(saveReqVO));
     }
 
-    @PutMapping("/update")
-    @Operation(summary = "更新项目报价")
-    @PreAuthorize("@ss.hasPermission('jl:project-quote:update')")
-    public CommonResult<Boolean> updateProjectQuote(@Valid @RequestBody ProjectQuoteUpdateReqVO updateReqVO) {
-        projectQuoteService.updateProjectQuote(updateReqVO);
-        return success(true);
-    }
+//    @PutMapping("/update")
+//    @Operation(summary = "更新项目报价")
+//    @PreAuthorize("@ss.hasPermission('jl:project-quote:update')")
+//    public CommonResult<Boolean> updateProjectQuote(@Valid @RequestBody ProjectQuoteUpdateReqVO updateReqVO) {
+//        projectQuoteService.updateProjectQuote(updateReqVO);
+//        return success(true);
+//    }
 
     @DeleteMapping("/delete")
     @Operation(summary = "通过 ID 删除项目报价")

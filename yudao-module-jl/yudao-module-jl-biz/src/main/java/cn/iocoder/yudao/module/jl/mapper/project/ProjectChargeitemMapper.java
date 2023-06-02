@@ -16,6 +16,7 @@ public interface ProjectChargeitemMapper {
 
     ProjectChargeitemRespVO toDto(ProjectChargeitem entity);
 
+    List<ProjectChargeitem> toEntity(List<ProjectChargeitemSubClass> dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     ProjectChargeitem partialUpdate(ProjectChargeitemUpdateReqVO dto, @MappingTarget ProjectChargeitem entity);

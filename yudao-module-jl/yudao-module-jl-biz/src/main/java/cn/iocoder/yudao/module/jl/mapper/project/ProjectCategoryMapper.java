@@ -16,6 +16,9 @@ public interface ProjectCategoryMapper {
 
     ProjectCategoryRespVO toDto(ProjectCategory entity);
 
+    ProjectCategory toEntity(ProjectCategoryWithSupplyAndChargeItemVO dto);
+
+    List<ProjectCategory> toEntity(List<ProjectCategoryWithSupplyAndChargeItemVO> list);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     ProjectCategory partialUpdate(ProjectCategoryUpdateReqVO dto, @MappingTarget ProjectCategory entity);

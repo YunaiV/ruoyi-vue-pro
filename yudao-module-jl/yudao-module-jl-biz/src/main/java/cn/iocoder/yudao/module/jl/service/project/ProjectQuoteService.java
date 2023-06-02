@@ -20,6 +20,8 @@ public interface ProjectQuoteService {
      */
     Long createProjectQuote(@Valid ProjectQuoteCreateReqVO createReqVO);
 
+    Long saveProjectQuote(@Valid ProjectQuoteSaveReqVO createReqVO);
+
     /**
      * 更新项目报价
      *

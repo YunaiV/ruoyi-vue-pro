@@ -14,6 +14,8 @@ public interface ProjectQuoteMapper {
 
     ProjectQuote toEntity(ProjectQuoteUpdateReqVO dto);
 
+    ProjectQuote toEntity(ProjectQuoteSaveReqVO dto);
+
     ProjectQuoteRespVO toDto(ProjectQuote entity);
 
 

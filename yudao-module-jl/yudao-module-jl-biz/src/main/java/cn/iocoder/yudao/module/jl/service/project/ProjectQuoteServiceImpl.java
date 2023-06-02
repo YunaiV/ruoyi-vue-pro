@@ -1,5 +1,15 @@
 package cn.iocoder.yudao.module.jl.service.project;
 
+import cn.iocoder.yudao.module.jl.entity.project.ProjectCategory;
+import cn.iocoder.yudao.module.jl.entity.project.ProjectChargeitem;
+import cn.iocoder.yudao.module.jl.entity.project.ProjectSupply;
+import cn.iocoder.yudao.module.jl.mapper.project.ProjectCategoryMapper;
+import cn.iocoder.yudao.module.jl.mapper.project.ProjectChargeitemMapper;
+import cn.iocoder.yudao.module.jl.mapper.project.ProjectSupplyMapper;
+import cn.iocoder.yudao.module.jl.repository.laboratory.CategoryRepository;
+import cn.iocoder.yudao.module.jl.repository.project.ProjectCategoryRepository;
+import cn.iocoder.yudao.module.jl.repository.project.ProjectChargeitemRepository;
+import cn.iocoder.yudao.module.jl.repository.project.ProjectSupplyRepository;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -41,6 +51,25 @@ public class ProjectQuoteServiceImpl implements ProjectQuoteService {
     @Resource
     private ProjectQuoteMapper projectQuoteMapper;
 
+    @Resource
+    private ProjectCategoryRepository projectCategoryRepository;
+
+    @Resource
+    private ProjectCategoryMapper projectCategoryMapper;
+
+    @Resource
+    private ProjectSupplyRepository projectSupplyRepository;
+
+    @Resource
+    private ProjectSupplyMapper projectSupplyMapper;
+
+    @Resource
+    private ProjectChargeitemRepository projectChargeitemRepository;
+
+    @Resource
+    private ProjectChargeitemMapper projectChargeitemMapper;
+
+
     @Override
     public Long createProjectQuote(ProjectQuoteCreateReqVO createReqVO) {
         // 插入
@@ -48,6 +77,77 @@ public class ProjectQuoteServiceImpl implements ProjectQuoteService {
         projectQuoteRepository.save(projectQuote);
         // 返回
         return projectQuote.getId();
+    }
+
+    /**
+     * 全量保存项目报价
+     * @param createReqVO
+     * @return
+     */
+    @Override
+    public Long saveProjectQuote(ProjectQuoteSaveReqVO createReqVO) {
+        // 如果提供了 quoteId ，则更新。否则，创建
+        Long quoteId;
+        if (createReqVO.getQuoteId() != null) {
+            quoteId = createReqVO.getQuoteId();
+            // 校验存在
+            validateProjectQuoteExists(createReqVO.getQuoteId());
+            // 更新
+            ProjectQuote updateObj = projectQuoteMapper.toEntity(createReqVO);
+            projectQuoteRepository.save(updateObj);
+        } else {
+            // 创建
+            ProjectQuote projectQuote = projectQuoteMapper.toEntity(createReqVO);
+            projectQuoteRepository.save(projectQuote);
+            quoteId = projectQuote.getId();
+        }
+
+        List<ProjectCategoryWithSupplyAndChargeItemVO> categoryList = createReqVO.getCategoryList();
+        if(categoryList != null && categoryList.size() >= 1) {
+            List<ProjectCategory> categories = projectCategoryRepository.getByQuoteId(quoteId);
+            // 获取 categories 里的 id
+            List<Long> categoryIds = categories.stream().map(ProjectCategory::getId).collect(Collectors.toList());
+            // 删除原来的
+            projectCategoryRepository.deleteByQuoteId(quoteId);
+            projectSupplyRepository.deleteByProjectCategoryIdIn(categoryIds);
+            projectChargeitemRepository.deleteByProjectCategoryIdIn(categoryIds);
+
+            // 保存新的
+            for (int i = 0; i < categoryList.size(); i++) {
+                // 保存实验名目
+                ProjectCategoryWithSupplyAndChargeItemVO category = categoryList.get(i);
+                category.setCategoryType("quote");
+                category.setQuoteId(quoteId);
+                ProjectCategory categoryDo = projectCategoryMapper.toEntity(category);
+                projectCategoryRepository.save(categoryDo);
+
+                // 保存收费项
+                List<ProjectChargeitemSubClass> chargetItemList = category.getChargeItemList();
+                if(chargetItemList != null && chargetItemList.size() >= 1) {
+                    List<ProjectChargeitemSubClass> projectChargeitemList = chargetItemList.stream().map(chargeItem -> {
+                        chargeItem.setProjectCategoryId(categoryDo.getId());
+                        return chargeItem;
+                    }).collect(Collectors.toList());
+
+                    List<ProjectChargeitem> projectChargeitems = projectChargeitemMapper.toEntity(projectChargeitemList);
+                    projectChargeitemRepository.saveAll(projectChargeitems);
+                }
+
+                // 保存物资项
+                List<ProjectSupplySubClass> supplyList = category.getSupplyList();
+                if(supplyList != null && supplyList.size() >= 1) {
+                    List<ProjectSupplySubClass> projectSupplyList = supplyList.stream().map(supply -> {
+                        supply.setProjectCategoryId(categoryDo.getId());
+                        return supply;
+                    }).collect(Collectors.toList());
+
+                    List<ProjectSupply> projectSupplies = projectSupplyMapper.toEntity(projectSupplyList);
+                    projectSupplyRepository.saveAll(projectSupplies);
+                }
+            }
+        }
+
+        return quoteId;
     }
 
     @Override
