@@ -46,4 +46,9 @@ public class ProjectSchedule extends BaseEntity {
     @Column(name = "status", nullable = false )
     private String status;
 
+    /**
+     * 实验名目
+     */
+    @OneToMany(mappedBy="schedule")
+    private List<ProjectCategory> categoryList;
 }

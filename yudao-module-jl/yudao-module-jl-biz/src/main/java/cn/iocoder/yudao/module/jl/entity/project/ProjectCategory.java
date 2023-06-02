@@ -98,6 +98,10 @@ public class ProjectCategory extends BaseEntity {
     @JoinColumn(name="quote_id", insertable = false, updatable = false)
     private ProjectQuote quote;
 
+    @ManyToOne
+    @JoinColumn(name="schedule_id", insertable = false, updatable = false)
+    private ProjectSchedule schedule;
+
     /**
      * 实验物资
      */
