@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Mapper
 public interface TradeCartMapper extends BaseMapperX<TradeCartDO> {
@@ -68,6 +69,12 @@ public interface TradeCartMapper extends BaseMapperX<TradeCartDO> {
 
     default void updateByIds(Collection<Long> ids, TradeCartDO updateObject) {
         update(updateObject, new LambdaQueryWrapper<TradeCartDO>().in(TradeCartDO::getId, ids));
+    }
+
+    default List<TradeCartDO> selectListByUserId(Long userId, Set<Long> ids) {
+        return selectList(new LambdaQueryWrapper<TradeCartDO>()
+                .eq(TradeCartDO::getUserId, userId)
+                .in(TradeCartDO::getId, ids));
     }
 
 }

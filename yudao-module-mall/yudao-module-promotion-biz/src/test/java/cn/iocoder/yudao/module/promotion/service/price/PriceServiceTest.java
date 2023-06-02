@@ -93,7 +93,6 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertNull(promotion.getId());
         assertEquals(promotion.getName(), "会员折扣");
         assertEquals(promotion.getType(), PromotionTypeEnum.MEMBER.getType());
-        assertEquals(promotion.getLevel(), PromotionLevelEnum.SKU.getLevel());
         assertEquals(promotion.getTotalPrice(), 200);
         assertEquals(promotion.getDiscountPrice(), 20);
         assertTrue(promotion.getMatch());
@@ -264,7 +263,6 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotion01.getId(), 1000L);
         assertEquals(promotion01.getName(), "活动 1000 号");
         assertEquals(promotion01.getType(), PromotionTypeEnum.REWARD_ACTIVITY.getType());
-        assertEquals(promotion01.getLevel(), PromotionLevelEnum.ORDER.getLevel());
         assertEquals(promotion01.getTotalPrice(), 350);
         assertEquals(promotion01.getDiscountPrice(), 70);
         assertTrue(promotion01.getMatch());
@@ -283,7 +281,6 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotion02.getId(), 2000L);
         assertEquals(promotion02.getName(), "活动 2000 号");
         assertEquals(promotion02.getType(), PromotionTypeEnum.REWARD_ACTIVITY.getType());
-        assertEquals(promotion02.getLevel(), PromotionLevelEnum.ORDER.getLevel());
         assertEquals(promotion02.getTotalPrice(), 120);
         assertEquals(promotion02.getDiscountPrice(), 60);
         assertTrue(promotion02.getMatch());
@@ -352,7 +349,6 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotion01.getId(), 1000L);
         assertEquals(promotion01.getName(), "活动 1000 号");
         assertEquals(promotion01.getType(), PromotionTypeEnum.REWARD_ACTIVITY.getType());
-        assertEquals(promotion01.getLevel(), PromotionLevelEnum.ORDER.getLevel());
         assertEquals(promotion01.getTotalPrice(), 350);
         assertEquals(promotion01.getDiscountPrice(), 0);
         assertFalse(promotion01.getMatch());
@@ -434,7 +430,6 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
         assertEquals(promotion01.getId(), 1024L);
         assertEquals(promotion01.getName(), "程序员节");
         assertEquals(promotion01.getType(), PromotionTypeEnum.COUPON.getType());
-        assertEquals(promotion01.getLevel(), PromotionLevelEnum.COUPON.getLevel());
         assertEquals(promotion01.getTotalPrice(), 350);
         assertEquals(promotion01.getDiscountPrice(), 70);
         assertTrue(promotion01.getMatch());

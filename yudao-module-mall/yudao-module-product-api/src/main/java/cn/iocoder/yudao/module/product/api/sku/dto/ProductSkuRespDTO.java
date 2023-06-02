@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.api.sku.dto;
 
+import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import lombok.Data;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class ProductSkuRespDTO {
     /**
      * 属性数组
      */
-    private List<Property> properties;
+    private List<ProductPropertyValueDetailRespDTO> properties;
     /**
      * 销售价格，单位：分
      */
@@ -62,31 +63,5 @@ public class ProductSkuRespDTO {
      * 商品体积，单位：m^3 平米
      */
     private Double volume;
-
-    /**
-     * 商品属性
-     */
-    @Data
-    public static class Property {
-
-        /**
-         * 属性编号
-         */
-        private Long propertyId;
-        /**
-         * 属性名字
-         */
-        private String propertyName;
-
-        /**
-         * 属性值编号
-         */
-        private Long valueId;
-        /**
-         * 属性值名字
-         */
-        private String valueName;
-
-    }
 
 }

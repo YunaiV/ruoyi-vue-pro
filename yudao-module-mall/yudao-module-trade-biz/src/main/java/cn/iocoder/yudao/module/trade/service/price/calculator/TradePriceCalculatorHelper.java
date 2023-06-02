@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 
@@ -14,6 +15,8 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
 import static java.util.Collections.singletonList;
 
+// TODO 芋艿：改成父类
+
 /**
  * {@link TradePriceCalculator} 的工具类
  *
@@ -24,25 +27,42 @@ import static java.util.Collections.singletonList;
 public class TradePriceCalculatorHelper {
 
     public static TradePriceCalculateRespBO buildCalculateResp(TradePriceCalculateReqBO param,
-                                                               List<ProductSkuRespDTO> skuList) {
+                                                               List<ProductSpuRespDTO> spuList, List<ProductSkuRespDTO> skuList) {
         // 创建 PriceCalculateRespDTO 对象
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO();
-        result.setOrderType(param.getOrderType());
+        result.setType(param.getType());
+        result.setPromotions(new ArrayList<>());
+
         // 创建它的 OrderItem 属性
-        Map<Long, TradePriceCalculateReqBO.Item> skuItemMap = convertMap(param.getItems(),
-                TradePriceCalculateReqBO.Item::getSkuId);
-        result.setItems(new ArrayList<>(skuItemMap.size()));
-        skuList.forEach(sku -> {
-            TradePriceCalculateReqBO.Item skuItem = skuItemMap.get(sku.getId());
-            TradePriceCalculateRespBO.OrderItem orderItem = new TradePriceCalculateRespBO.OrderItem()
-                    // SKU 字段
-                    .setSpuId(sku.getSpuId()).setSkuId(sku.getId())
-                    .setCount(skuItem.getCount()).setCartId(skuItem.getCartId()).setSelected(skuItem.getSelected())
-                    // 价格字段
-                    .setPrice(sku.getPrice()).setPayPrice(sku.getPrice() * skuItem.getCount())
-                    .setDiscountPrice(0).setDeliveryPrice(0).setCouponPrice(0).setPointPrice(0);
+        result.setItems(new ArrayList<>(param.getItems().size()));
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
+        Map<Long, ProductSkuRespDTO> skuMap = convertMap(skuList, ProductSkuRespDTO::getId);
+        param.getItems().forEach(item -> {
+            ProductSkuRespDTO sku = skuMap.get(item.getSkuId());
+            if (sku == null) {
+                return;
+            }
+            ProductSpuRespDTO spu = spuMap.get(sku.getSpuId());
+            if (spu == null) {
+                return;
+            }
+            // 商品项
+            TradePriceCalculateRespBO.OrderItem orderItem = new TradePriceCalculateRespBO.OrderItem();
             result.getItems().add(orderItem);
+            orderItem.setSpuId(sku.getSpuId()).setSkuId(sku.getId())
+                    .setCount(item.getCount()).setCartId(item.getCartId()).setSelected(item.getSelected());
+            // sku 价格
+            orderItem.setPrice(sku.getPrice()).setPayPrice(sku.getPrice() * item.getCount())
+                    .setDiscountPrice(0).setDeliveryPrice(0).setCouponPrice(0).setPointPrice(0);
+            // sku 信息
+            orderItem.setPicUrl(sku.getPicUrl()).setProperties(sku.getProperties());
+            // spu 信息
+            orderItem.setSpuName(spu.getName()).setCategoryId(spu.getCategoryId());
+            if (orderItem.getPicUrl() == null) {
+                orderItem.setPicUrl(spu.getPicUrl());
+            }
         });
+
         // 创建它的 Price 属性
         result.setPrice(new TradePriceCalculateRespBO.Price());
         recountAllPrice(result);

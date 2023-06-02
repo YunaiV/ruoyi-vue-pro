@@ -21,7 +21,7 @@ public class TradePriceCalculateReqBO {
      *
      * 枚举 {@link TradeOrderTypeEnum}
      */
-    private Integer orderType;
+    private Integer type;
 
     /**
      * 用户编号

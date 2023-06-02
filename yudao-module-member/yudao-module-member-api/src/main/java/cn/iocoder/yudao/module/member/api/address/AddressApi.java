@@ -18,4 +18,12 @@ public interface AddressApi {
      */
     AddressRespDTO getAddress(Long id, Long userId);
 
+    /**
+     * 获得用户默认收件地址
+     *
+     * @param userId 用户编号
+     * @return 用户收件地址
+     */
+    AddressRespDTO getDefaultAddress(Long userId);
+
 }

@@ -29,7 +29,7 @@ public class AddressRespDTO {
     /**
      * 地区编号
      */
-    private Long areaId;
+    private Integer areaId;
     /**
      * 邮编
      */

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.convert.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
@@ -18,14 +19,15 @@ import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.Prod
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductPropertyValueDetailRespVO;
-import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderDetailRespVO;
-import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageItemRespVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
+import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -240,5 +242,46 @@ public interface TradeOrderConvert {
     AppTradeOrderDetailRespVO convert3(TradeOrderDO order, List<TradeOrderItemDO> items);
 
     AppTradeOrderItemRespVO convert03(TradeOrderItemDO bean);
+
+    default TradePriceCalculateReqBO convert(Long userId, AppTradeOrderSettlementReqVO settlementReqVO,
+                                             List<TradeCartDO> cartList) {
+        TradePriceCalculateReqBO reqBO = new TradePriceCalculateReqBO();
+        reqBO.setUserId(userId).setType(settlementReqVO.getType())
+                .setCouponId(settlementReqVO.getCouponId()).setAddressId(settlementReqVO.getAddressId())
+                .setItems(new ArrayList<>(settlementReqVO.getItems().size()));
+        // 商品项的构建
+        Map<Long, TradeCartDO> cartMap = convertMap(cartList, TradeCartDO::getId);
+        for (AppTradeOrderSettlementReqVO.Item item : settlementReqVO.getItems()) {
+            // 情况一：skuId + count
+            if (item.getSkuId() != null) {
+                reqBO.getItems().add(new TradePriceCalculateReqBO.Item().setSkuId(item.getSkuId()).setCount(item.getCount())
+                        .setSelected(true)); // true 的原因，下单一定选中
+                continue;
+            }
+            // 情况二：cartId
+            TradeCartDO cart = cartMap.get(item.getCartId());
+            if (cart == null) {
+                continue;
+            }
+            reqBO.getItems().add(new TradePriceCalculateReqBO.Item().setSkuId(cart.getSkuId()).setCount(cart.getCount())
+                    .setCartId(item.getCartId()).setSelected(true)); // true 的原因，下单一定选中
+        }
+        return reqBO;
+    }
+
+    default AppTradeOrderSettlementRespVO convert(TradePriceCalculateRespBO calculate, AddressRespDTO address) {
+        AppTradeOrderSettlementRespVO respVO = convert0(calculate, address);
+        if (address != null) {
+            Area area = AreaUtils.getArea(address.getAreaId());
+            respVO.getAddress().setDistrictId(area.getId());
+            respVO.getAddress().setDistrictName(area.getName());
+            respVO.getAddress().setCityId(area.getParent().getId());
+            respVO.getAddress().setCityName(area.getParent().getName());
+            respVO.getAddress().setProvinceId(area.getParent().getParent().getId());
+            respVO.getAddress().setProvinceName(area.getParent().getParent().getName());
+        }
+        return respVO;
+    }
+    AppTradeOrderSettlementRespVO convert0(TradePriceCalculateRespBO calculate, AddressRespDTO address);
 
 }

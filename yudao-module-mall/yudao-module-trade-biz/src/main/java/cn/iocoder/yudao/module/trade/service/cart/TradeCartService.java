@@ -4,10 +4,13 @@ import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartAddReqVO
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartListRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartResetReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.cart.vo.AppTradeCartUpdateReqVO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 购物车 Service 接口
@@ -66,6 +69,15 @@ public interface TradeCartService {
      * @return 购物车列表
      */
     AppTradeCartListRespVO getCartList(Long userId);
+
+    /**
+     * 查询用户的购物车列表
+     *
+     * @param userId 用户编号
+     * @param ids 购物项的编号
+     * @return 购物车列表
+     */
+    List<TradeCartDO> getCartList(Long userId, Set<Long> ids);
 
     /**
      * 获得用户的购物车商品 SPU 数量的 Map

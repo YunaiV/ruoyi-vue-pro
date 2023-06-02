@@ -34,6 +34,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageRe
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
@@ -41,6 +42,10 @@ import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import cn.iocoder.yudao.module.trade.service.cart.TradeCartService;
+import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
+import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
+import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,8 +55,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_ORDER_NOT_FOUND;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
@@ -69,6 +73,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     private TradeOrderMapper tradeOrderMapper;
     @Resource
     private TradeOrderItemMapper tradeOrderItemMapper;
+
+    @Resource
+    private TradeCartService tradeCartService;
+    @Resource
+    private TradePriceService tradePriceService;
 
     @Resource
     private PriceApi priceApi;
@@ -92,7 +101,48 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     @Override
     public AppTradeOrderSettlementRespVO settlementOrder(Long userId, AppTradeOrderSettlementReqVO settlementReqVO) {
-        return null;
+        // 1. 获得收货地址
+        AddressRespDTO address = getAddress(userId, settlementReqVO.getAddressId());
+        if (address != null) {
+            settlementReqVO.setAddressId(address.getId());
+        }
+
+        // 2. 计算价格
+        TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, settlementReqVO);
+
+        // 3. 拼接返回
+        return TradeOrderConvert.INSTANCE.convert(calculateRespBO, address);
+    }
+
+    /**
+     * 获得用户地址
+     *
+     * @param userId    用户编号
+     * @param addressId 地址编号
+     * @return 地址
+     */
+    private AddressRespDTO getAddress(Long userId, Long addressId) {
+        if (addressId != null) {
+            return addressApi.getAddress(addressId, userId);
+        }
+        return addressApi.getDefaultAddress(userId);
+    }
+
+    /**
+     * 计算订单价格
+     *
+     * @param userId 用户编号
+     * @param settlementReqVO 结算信息
+     * @return 订单价格
+     */
+    private TradePriceCalculateRespBO calculatePrice(Long userId, AppTradeOrderSettlementReqVO settlementReqVO) {
+        // 1. 如果来自购物车，则获得购物车的商品
+        List<TradeCartDO> cartList = tradeCartService.getCartList(userId,
+                convertSet(settlementReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId));
+
+        // 2. 计算价格
+        TradePriceCalculateReqBO calculateReqBO = TradeOrderConvert.INSTANCE.convert(userId, settlementReqVO, cartList);
+        return tradePriceService.calculatePrice(calculateReqBO);
     }
 
     @Override
@@ -119,29 +169,6 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
         return tradeOrderDO.getId();
     }
-
-//    /**
-//     * 校验商品 SKU 是否可出售
-//     *
-//     * @param items 商品 SKU
-//     * @return 商品 SKU 数组
-//     */
-//    private List<ProductSkuRespDTO> validateSkuSaleable(List<Item> items) {
-//        List<ProductSkuRespDTO> skus = productSkuApi.getSkuList(convertSet(items, Item::getSkuId));
-//        // SKU 不存在
-//        if (items.size() != skus.size()) {
-//            throw exception(ORDER_CREATE_SKU_NOT_FOUND);
-//        }
-//        // 校验库存不足
-//        Map<Long, ProductSkuRespDTO> skuMap = convertMap(skus, ProductSkuRespDTO::getId);
-//        items.forEach(item -> {
-//            ProductSkuRespDTO sku = skuMap.get(item.getSkuId());
-//            if (item.getCount() > sku.getStock()) {
-//                throw exception(ErrorCodeConstants.ORDER_CREATE_SKU_STOCK_NOT_ENOUGH);
-//            }
-//        });
-//        return skus;
-//    }
 
     /**
      * 校验商品 SPU 是否可出售
