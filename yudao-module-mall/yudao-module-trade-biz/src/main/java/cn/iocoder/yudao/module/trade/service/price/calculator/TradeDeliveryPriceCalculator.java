@@ -34,12 +34,15 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @Component
 @Order(TradePriceCalculator.ORDER_DELIVERY)
 public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
+
     @Resource
     private AddressApi addressApi;
     @Resource
     private ProductSkuApi productSkuApi;
+
     @Resource
     private DeliveryExpressTemplateService deliveryExpressTemplateService;
+    // TODO @jason：走 Service 哈。Mapper 只允许自己的 Service 调用，保护好数据结构；
     @Resource
     private DeliveryExpressTemplateChargeMapper templateChargeMapper;
     @Resource
@@ -106,20 +109,22 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
         // 得到SKU 详情。得到 重量体积
         Map<Long, ProductSkuRespDTO> skuRespMap = convertMap(productSkuApi.getSkuList(skuIds), ProductSkuRespDTO::getId);
         // 一个 spuId 可能对应多条订单商品 SKU
+        // TODO @jason：得确认下，按照 sku 算，还是 spu 算；
         Map<Long, List<OrderItem>> spuIdItemMap = convertMultiMap(selectedItem, OrderItem::getSpuId);
         // 依次计算每个 SPU 的快递运费
         for (Map.Entry<Long, List<OrderItem>> entry : spuIdItemMap.entrySet()) {
             List<OrderItem> orderItems = entry.getValue();
             // 总件数, 总金额, 总重量， 总体积
-            int totalCount = 0, totalPrice = 0;
+            int totalCount = 0;
+            int totalPrice = 0;
             double totalWeight = 0;
             double totalVolume = 0;
             for (OrderItem orderItem : orderItems) {
                 totalCount += orderItem.getCount();
-                totalPrice += orderItem.getPrice();
+                totalPrice += orderItem.getPrice(); // TODO jason：应该按照 payPrice？
                 ProductSkuRespDTO skuResp = skuRespMap.get(orderItem.getSkuId());
                 if (skuResp != null) {
-                    totalWeight = totalWeight + skuResp.getWeight();
+                    totalWeight = totalWeight + skuResp.getWeight(); // TODO @jason：* 数量
                     totalVolume = totalVolume + skuResp.getVolume();
                 }
             }
@@ -130,6 +135,7 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
                 continue;
             }
             // 计算快递运费
+            // TODO @jason：貌似也可以抽成 checkExpressFree 类似方法
             if (areaTemplateChargeMap.containsKey(receiverAreaId)) {
                 DeliveryExpressTemplateChargeDO templateCharge = areaTemplateChargeMap.get(receiverAreaId);
                 DeliveryExpressChargeModeEnum chargeModeEnum = DeliveryExpressChargeModeEnum.valueOf(chargeMode);
@@ -170,8 +176,8 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
             int extraPrice = templateCharge.getExtraPrice() * extraNum;
             deliveryPrice = templateCharge.getStartPrice() + extraPrice;
         }
-        //
-        // TODO @芋艿 分摊快递费用到 SKU. 是不是搞复杂了
+        // TODO @芋艿 分摊快递费用到 SKU. 是不是搞复杂了；
+        // TODO @jason：因为退费的时候，可能按照 SKU 考虑退费金额
         divideDeliveryPrice(deliveryPrice, orderItems);
     }
 

@@ -141,7 +141,7 @@ public class ProductSpuDO extends BaseDO {
     /**
      * 物流配置模板编号
      *
-     * 对应 { TradeDeliveryExpressTemplateDO 的 id 编号}
+     * 对应 TradeDeliveryExpressTemplateDO 的 id 编号
      */
     private Long deliveryTemplateId;
 

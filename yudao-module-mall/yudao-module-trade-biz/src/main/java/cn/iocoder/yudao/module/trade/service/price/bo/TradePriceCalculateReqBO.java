@@ -58,6 +58,7 @@ public class TradePriceCalculateReqBO {
      *
      * 关联 {@link DeliveryExpressTemplateDO#getId()}
      */
+    // TODO @jason：运费模版，是不是每个 SKU 传入哈
     private Long templateId;
 
     /**

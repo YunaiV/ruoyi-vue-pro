@@ -66,8 +66,11 @@ public interface DeliveryExpressTemplateService {
 
     /**
      * 校验快递运费模板
+     *
+     * 如果校验不通过，抛出 {@link cn.iocoder.yudao.framework.common.exception.ServiceException} 异常
+     *
      * @param templateId 模板编号
-     * @return DeliveryExpressTemplateDO 非空
+     * @return 快递运费模板
      */
     DeliveryExpressTemplateDO validateDeliveryExpressTemplate(Long templateId);
 }
