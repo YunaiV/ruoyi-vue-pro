@@ -198,6 +198,11 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
     }
 
     @Override
+    public List<DeliveryExpressTemplateDO> getDeliveryExpressTemplateList() {
+        return expressTemplateMapper.selectList();
+    }
+
+    @Override
     public PageResult<DeliveryExpressTemplateDO> getDeliveryExpressTemplatePage(DeliveryExpressTemplatePageReqVO pageReqVO) {
         return expressTemplateMapper.selectPage(pageReqVO);
     }

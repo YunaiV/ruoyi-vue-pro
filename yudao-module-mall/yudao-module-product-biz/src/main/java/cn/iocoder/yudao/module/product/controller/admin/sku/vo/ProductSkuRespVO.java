@@ -15,9 +15,4 @@ public class ProductSkuRespVO extends ProductSkuBaseVO {
     @Schema(description = "主键", required = true, example = "1024")
     private Long id;
 
-    /**
-     * 属性数组
-     */
-    private List<Property> properties;
-
 }

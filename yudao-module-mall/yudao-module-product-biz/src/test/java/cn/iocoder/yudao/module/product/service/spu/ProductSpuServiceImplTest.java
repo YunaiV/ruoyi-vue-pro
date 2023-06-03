@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateR
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandServiceImpl;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryServiceImpl;
@@ -318,7 +317,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         productSpuMapper.insertBatch(createReqVOs);
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
-        productSpuPageReqVO.setTabType(ProductSpuPageTabEnum.ALERT_STOCK.getType());
+        productSpuPageReqVO.setTabType(ProductSpuPageReqVO.ALERT_STOCK);
 
         PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
@@ -366,7 +365,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         productSpuMapper.insertBatch(createReqVOs);
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
-        productSpuPageReqVO.setTabType(ProductSpuPageTabEnum.ALERT_STOCK.getType());
+        productSpuPageReqVO.setTabType(ProductSpuPageReqVO.ALERT_STOCK);
         PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
         assertEquals(createReqVOs.size(), spuPage.getTotal());
     }
@@ -407,11 +406,11 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         // 调用
         ProductSpuPageReqVO productSpuPageReqVO = new ProductSpuPageReqVO();
         // 查询条件 按需打开
-        //productSpuPageReqVO.setTabType(ProductSpuPageTabEnum.ALERT_STOCK.getType());
-        //productSpuPageReqVO.setTabType(ProductSpuPageTabEnum.RECYCLE_BIN.getType());
-        //productSpuPageReqVO.setTabType(ProductSpuPageTabEnum.FOR_SALE.getType());
-        //productSpuPageReqVO.setTabType(ProductSpuPageTabEnum.IN_WAREHOUSE.getType());
-        //productSpuPageReqVO.setTabType(ProductSpuPageTabEnum.SOLD_OUT.getType());
+        //productSpuPageReqVO.setTabType(ProductSpuPageReqVO.ALERT_STOCK);
+        //productSpuPageReqVO.setTabType(ProductSpuPageReqVO.RECYCLE_BIN);
+        //productSpuPageReqVO.setTabType(ProductSpuPageReqVO.FOR_SALE);
+        //productSpuPageReqVO.setTabType(ProductSpuPageReqVO.IN_WAREHOUSE);
+        //productSpuPageReqVO.setTabType(ProductSpuPageReqVO.SOLD_OUT);
         //productSpuPageReqVO.setName(createReqVO.getName());
         //productSpuPageReqVO.setCategoryId(createReqVO.getCategoryId());
 
@@ -456,7 +455,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     public void testUpdateSpuStock() {
         // 准备参数
         Map<Long, Integer> stockIncrCounts = MapUtil.builder(1L, 10).put(2L, -20).build();
-        // mock 方法（数据） // TODO ProductSpuDO中已没有相关属性
+        // mock 方法（数据）
         productSpuMapper.insert(randomPojo(ProductSpuDO.class, o ->{
             o.setCategoryId(generateId());
             o.setBrandId(generateId());
@@ -496,7 +495,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         productSpuService.updateSpuStock(stockIncrCounts);
-        // 断言  // TODO ProductSpuDO中已没有相关属性
+        // 断言
         assertEquals(productSpuService.getSpu(1L).getStock(), 30);
         assertEquals(productSpuService.getSpu(2L).getStock(), 10);
     }

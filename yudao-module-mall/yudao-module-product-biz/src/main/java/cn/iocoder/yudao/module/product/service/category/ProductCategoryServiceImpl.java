@@ -7,7 +7,8 @@ import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCateg
 import cn.iocoder.yudao.module.product.convert.category.ProductCategoryConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
 import cn.iocoder.yudao.module.product.dal.mysql.category.ProductCategoryMapper;
-import cn.iocoder.yudao.module.product.enums.ProductConstants;
+import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO.PARENT_ID_NULL;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
 /**
@@ -29,6 +31,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Resource
     private ProductCategoryMapper productCategoryMapper;
+    @Resource
+    @Lazy // 循环依赖，避免报错
+    private ProductSpuService productSpuService;
 
     @Override
     public Long createCategory(ProductCategoryCreateReqVO createReqVO) {
@@ -62,14 +67,15 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         if (productCategoryMapper.selectCountByParentId(id) > 0) {
             throw exception(CATEGORY_EXISTS_CHILDREN);
         }
-        // TODO 芋艿 补充只有不存在商品才可以删除
+        // 校验分类是否绑定了 SPU
+        validateProductCategoryIsHaveBindSpu(id);
         // 删除
         productCategoryMapper.deleteById(id);
     }
 
     private void validateParentProductCategory(Long id) {
         // 如果是根分类，无需验证
-        if (Objects.equals(id, ProductConstants.PARENT_ID_NULL)) {
+        if (Objects.equals(id, PARENT_ID_NULL)) {
             return;
         }
         // 父分类不存在
@@ -78,7 +84,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             throw exception(CATEGORY_PARENT_NOT_EXISTS);
         }
         // 父分类不能是二级分类
-        if (!Objects.equals(category.getParentId(), ProductConstants.PARENT_ID_NULL)) {
+        if (!Objects.equals(category.getParentId(), PARENT_ID_NULL)) {
             throw exception(CATEGORY_PARENT_NOT_FIRST_LEVEL);
         }
     }
@@ -87,6 +93,13 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         ProductCategoryDO category = productCategoryMapper.selectById(id);
         if (category == null) {
             throw exception(CATEGORY_NOT_EXISTS);
+        }
+    }
+
+    private void validateProductCategoryIsHaveBindSpu(Long id) {
+        Long count = productSpuService.getSpuCountByCategoryId(id);
+        if (0 != count) {
+            throw exception(CATEGORY_HAVE_BIND_SPU);
         }
     }
 
@@ -108,17 +121,16 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public Integer getCategoryLevel(Long id) {
-        if (Objects.equals(id, ProductConstants.PARENT_ID_NULL)) {
+        if (Objects.equals(id, PARENT_ID_NULL)) {
             return 0;
         }
-        // TODO @puhui999：for 的原因，是因为避免脏数据，导致可能的死循环。一般不会超过 100 层哈
         int level = 1;
-        // fix: 循环次数不确定改为while循环
-        while (true){
+        // for 的原因，是因为避免脏数据，导致可能的死循环。一般不会超过 100 层哈
+        for (int i = 0; i < 100; i++) {
             ProductCategoryDO category = productCategoryMapper.selectById(id);
             // 如果没有父节点，break 结束
             if (category == null
-                    || Objects.equals(category.getParentId(), ProductConstants.PARENT_ID_NULL)) {
+                    || Objects.equals(category.getParentId(), PARENT_ID_NULL)) {
                 break;
             }
             // 继续递归父节点

@@ -94,11 +94,10 @@ public class ProductSpuController {
         return success(ProductSpuConvert.INSTANCE.convertPage(productSpuService.getSpuPage(pageVO)));
     }
 
-    // TODO @puhui999：方法名改成 getSpuCount，只是用于 tab 哈，这样更抽象一点。
     @GetMapping("/get-count")
     @Operation(summary = "获得商品 SPU 分页 tab count")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<Map<Integer, Long>> getTabsCount() {
+    public CommonResult<Map<Integer, Long>> getSpuCount() {
         return success(productSpuService.getTabsCount());
     }
 

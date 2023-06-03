@@ -49,12 +49,9 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
     @MockBean
     private ProductPropertyValueService productPropertyValueService;
 
-    // TODO @puhui999：是不是可以删除这 2 方法
     public Long generateId() {
         return RandomUtil.randomLong(100000, 999999);
     }
-
-    public int generaInt(){return RandomUtil.randomInt(1,9999999);}
 
     @Test
     public void testUpdateSkuList() {
@@ -109,7 +106,14 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
         ProductSkuUpdateStockReqDTO updateStockReqDTO = new ProductSkuUpdateStockReqDTO()
                 .setItems(singletonList(new ProductSkuUpdateStockReqDTO.Item().setId(1L).setIncrCount(10)));
         // mock 数据
-        productSkuMapper.insert(randomPojo(ProductSkuDO.class, o -> o.setId(1L).setSpuId(10L).setStock(20)));
+        productSkuMapper.insert(randomPojo(ProductSkuDO.class, o -> {
+            o.setId(1L).setSpuId(10L).setStock(20);
+            o.getProperties().forEach(p -> {
+                // 指定 id 范围 解决 Value too long
+                p.setPropertyId(generateId());
+                p.setValueId(generateId());
+            });
+        }));
 
         // 调用
         productSkuService.updateSkuStock(updateStockReqDTO);
@@ -129,7 +133,14 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
         ProductSkuUpdateStockReqDTO updateStockReqDTO = new ProductSkuUpdateStockReqDTO()
                 .setItems(singletonList(new ProductSkuUpdateStockReqDTO.Item().setId(1L).setIncrCount(-10)));
         // mock 数据
-        productSkuMapper.insert(randomPojo(ProductSkuDO.class, o -> o.setId(1L).setSpuId(10L).setStock(20)));
+        productSkuMapper.insert(randomPojo(ProductSkuDO.class, o -> {
+            o.setId(1L).setSpuId(10L).setStock(20);
+            o.getProperties().forEach(p -> {
+                // 指定 id 范围 解决 Value too long
+                p.setPropertyId(generateId());
+                p.setValueId(generateId());
+            });
+        }));
 
         // 调用
         productSkuService.updateSkuStock(updateStockReqDTO);
@@ -149,8 +160,14 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
         ProductSkuUpdateStockReqDTO updateStockReqDTO = new ProductSkuUpdateStockReqDTO()
                 .setItems(singletonList(new ProductSkuUpdateStockReqDTO.Item().setId(1L).setIncrCount(-30)));
         // mock 数据
-        productSkuMapper.insert(randomPojo(ProductSkuDO.class, o -> o.setId(1L).setSpuId(10L).setStock(20)));
-
+        productSkuMapper.insert(randomPojo(ProductSkuDO.class, o -> {
+            o.setId(1L).setSpuId(10L).setStock(20);
+            o.getProperties().forEach(p -> {
+                // 指定 id 范围 解决 Value too long
+                p.setPropertyId(generateId());
+                p.setValueId(generateId());
+            });
+        }));
         // 调用并断言
         AssertUtils.assertServiceException(() -> productSkuService.updateSkuStock(updateStockReqDTO),
                 SKU_STOCK_NOT_ENOUGH);
@@ -158,9 +175,16 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testDeleteSku_success() {
+        ProductSkuDO dbSku = randomPojo(ProductSkuDO.class, o -> {
+            o.setId(generateId()).setSpuId(generateId());
+            o.getProperties().forEach(p -> {
+                // 指定 id 范围 解决 Value too long
+                p.setPropertyId(generateId());
+                p.setValueId(generateId());
+            });
+        });
         // mock 数据
-        ProductSkuDO dbSku = randomPojo(ProductSkuDO.class);
-        productSkuMapper.insert(dbSku);// @Sql: 先插入出一条存在的数据
+        productSkuMapper.insert(dbSku);
         // 准备参数
         Long id = dbSku.getId();
 

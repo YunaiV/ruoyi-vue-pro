@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import org.springframework.lang.Nullable;
 
@@ -88,14 +90,10 @@ public interface ProductSkuService {
     /**
      * 基于 SPU 编号和状态，获得商品 SKU 集合
      *
-     * TODO @puhui999：SKU中已经不存在status属性；芋艿：那就去掉 status 哈
-     *
      * @param spuId SPU 编号
-     * @param status 状态
      * @return 商品 SKU 集合
      */
-    List<ProductSkuDO> getSkuListBySpuIdAndStatus(Long spuId,
-                                                  @Nullable Integer status);
+    List<ProductSkuDO> getSkuListBySpuIdAndStatus(Long spuId);
 
     /**
      * 获得 spu 对应的 SKU 集合
@@ -119,4 +117,19 @@ public interface ProductSkuService {
      */
     List<ProductSkuDO> getSkuListByAlarmStock();
 
+    /**
+     * 更新 sku 属性
+     *
+     * @param updateObj 属性对象
+     * @return int 影响的行数
+     */
+    int updateSkuProperty(ProductPropertyDO updateObj);
+
+    /**
+     * 更新 sku 属性值
+     *
+     * @param updateObj 属性值对象
+     * @return int 影响的行数
+     */
+    int updateSkuPropertyValue(ProductPropertyValueDO updateObj);
 }

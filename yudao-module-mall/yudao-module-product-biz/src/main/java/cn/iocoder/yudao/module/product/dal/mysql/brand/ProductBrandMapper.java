@@ -31,8 +31,7 @@ public interface ProductBrandMapper extends BaseMapperX<ProductBrandDO> {
         return selectOne(ProductBrandDO::getName, name);
     }
 
-    // TODO @puhui999：) { 中间要有空格哈。
-    default List<ProductBrandDO> selectListByStatus(Integer status){
-        return selectList(ProductBrandDO::getStatus,status);
+    default List<ProductBrandDO> selectListByStatus(Integer status) {
+        return selectList(ProductBrandDO::getStatus, status);
     }
 }

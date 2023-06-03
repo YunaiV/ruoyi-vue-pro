@@ -12,6 +12,8 @@ import javax.validation.constraints.NotBlank;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductCategoryCreateReqVO extends ProductCategoryBaseVO {
-    @Schema(description = "分类描述")
+
+    @Schema(description = "分类描述", example = "描述")
     private String description;
+
 }

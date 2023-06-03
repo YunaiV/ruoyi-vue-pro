@@ -16,6 +16,8 @@ import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
@@ -52,54 +54,37 @@ public interface ProductSpuConvert {
 
     List<ProductSpuSimpleRespVO> convertList02(List<ProductSpuDO> list);
 
-    // TODO @puhui999：部分属性，可以通过 mapstruct 的 @Mapping(source = , target = , ) 映射转换，可以查下文档
-    default List<ProductSpuExcelVO> convertList03(List<ProductSpuDO> list){
-        ArrayList<ProductSpuExcelVO> spuExcelVOs = new ArrayList<>();
-        list.forEach((spu)->{
-            ProductSpuExcelVO spuExcelVO = new ProductSpuExcelVO();
-            spuExcelVO.setId(spu.getId());
-            spuExcelVO.setName(spu.getName());
-            spuExcelVO.setKeyword(spu.getKeyword());
-            spuExcelVO.setIntroduction(spu.getIntroduction());
-            spuExcelVO.setDescription(spu.getDescription());
-            spuExcelVO.setBarCode(spu.getBarCode());
-            spuExcelVO.setCategoryId(spu.getCategoryId());
-            spuExcelVO.setBrandId(spu.getBrandId());
-            spuExcelVO.setPicUrl(spu.getPicUrl());
-            spuExcelVO.setSliderPicUrls(StrUtil.toString(spu.getSliderPicUrls()));
-            spuExcelVO.setVideoUrl(spu.getVideoUrl());
-            spuExcelVO.setUnit(spu.getUnit());
-            spuExcelVO.setSort(spu.getSort());
-            spuExcelVO.setStatus(spu.getStatus());
-            spuExcelVO.setSpecType(spu.getSpecType());
-            spuExcelVO.setPrice(spu.getPrice()/100);
-            spuExcelVO.setMarketPrice(spu.getMarketPrice()/100);
-            spuExcelVO.setCostPrice(spu.getCostPrice()/100);
-            spuExcelVO.setStock(spu.getStock());
-            spuExcelVO.setDeliveryTemplateId(spu.getDeliveryTemplateId());
-            spuExcelVO.setRecommendHot(spu.getRecommendHot());
-            spuExcelVO.setRecommendBenefit(spu.getRecommendBenefit());
-            spuExcelVO.setRecommendBest(spu.getRecommendBest());
-            spuExcelVO.setRecommendNew(spu.getRecommendNew());
-            spuExcelVO.setRecommendGood(spu.getRecommendGood());
-            spuExcelVO.setGiveIntegral(spu.getGiveIntegral());
-            spuExcelVO.setGiveCouponTemplateIds(StrUtil.toString(spu.getGiveCouponTemplateIds())); // TODO 暂定
-            spuExcelVO.setSubCommissionType(spu.getSubCommissionType());
-            spuExcelVO.setActivityOrders(StrUtil.toString(spu.getActivityOrders())); // TODO 暂定
-            spuExcelVO.setSalesCount(spu.getSalesCount());
-            spuExcelVO.setVirtualSalesCount(spu.getVirtualSalesCount());
-            spuExcelVO.setBrowseCount(spu.getBrowseCount());
-            spuExcelVO.setCreateTime(spu.getCreateTime());
+    /**
+     * 列表转字符串
+     *
+     * @param list 列表
+     * @return 字符串
+     */
+    @Named("convertListToString")
+    default String convertListToString(List<?> list) {
+        return StrUtil.toString(list);
+    }
+
+    // TODO @puhui999：部分属性，可以通过 mapstruct 的 @Mapping(source = , target = , ) 映射转换，可以查下文档 fix:哈哈 这样确实丝滑哈
+
+    @Mapping(source = "sliderPicUrls", target = "sliderPicUrls", qualifiedByName = "convertListToString")
+    @Mapping(source = "giveCouponTemplateIds", target = "giveCouponTemplateIds", qualifiedByName = "convertListToString")
+    @Mapping(source = "activityOrders", target = "activityOrders", qualifiedByName = "convertListToString")
+    @Mapping(target = "price", expression = "java(spu.getPrice() / 100)")
+    @Mapping(target = "marketPrice", expression = "java(spu.getMarketPrice() / 100)")
+    @Mapping(target = "costPrice", expression = "java(spu.getCostPrice() / 100)")
+    ProductSpuExcelVO convert(ProductSpuDO spu);
+
+    default List<ProductSpuExcelVO> convertList03(List<ProductSpuDO> list) {
+        List<ProductSpuExcelVO> spuExcelVOs = new ArrayList<>();
+        list.forEach(spu -> {
+            ProductSpuExcelVO spuExcelVO = convert(spu);
             spuExcelVOs.add(spuExcelVO);
         });
         return spuExcelVOs;
     }
+
     ProductSpuDetailRespVO convert03(ProductSpuDO spu);
-
-    // TODO @puhui999：下面两个没用到，是不是删除呀？
-    List<ProductSkuRespVO> convertList04(List<ProductSkuDO> skus);
-
-    ProductPropertyValueDetailRespVO convert04(ProductPropertyValueDetailRespBO propertyValue);
 
     // ========== 用户 App 相关 ==========
 
@@ -144,26 +129,15 @@ public interface ProductSpuConvert {
 
     AppProductPropertyValueDetailRespVO convertForGetSpuDetail(ProductPropertyValueDetailRespBO propertyValue);
 
-    default ProductSpuDetailRespVO convertForSpuDetailRespVO(ProductSpuDO spu, List<ProductSkuDO> skus,
-                                                             Function<Set<Long>, List<ProductPropertyValueDetailRespBO>> func) {
+    default ProductSpuDetailRespVO convertForSpuDetailRespVO(ProductSpuDO spu, List<ProductSkuDO> skus) {
         ProductSpuDetailRespVO productSpuDetailRespVO = convert03(spu);
-        // TODO @puhui999：if return 哈，减少嵌套层数。
-        if (CollUtil.isNotEmpty(skus)) {
-            List<ProductSkuRespVO> skuVOs = ProductSkuConvert.INSTANCE.convertList(skus);
-            // fix:统一模型，即使是单规格，也查询下，如若 Properties 为空报错则为单属性不做处理
-            try {
-                // 获取所有的属性值 id
-                Set<Long> valueIds = skus.stream().flatMap(p -> p.getProperties().stream())
-                        .map(ProductSkuDO.Property::getValueId)
-                        .collect(Collectors.toSet());
-                List<ProductPropertyValueDetailRespBO> valueDetailList = func.apply(valueIds);
-                Map<Long, String> stringMap = valueDetailList.stream().collect(Collectors.toMap(ProductPropertyValueDetailRespBO::getValueId, ProductPropertyValueDetailRespBO::getValueName));
-                // 设置属性值名称
-                skuVOs.stream().flatMap(p -> p.getProperties().stream()).forEach(item -> item.setValueName(stringMap.get(item.getValueId())));
-            } catch (Exception ignored) {
-            }
-            productSpuDetailRespVO.setSkus(skuVOs);
+        // skus 为空直接返回
+        if (CollUtil.isEmpty(skus)) {
+            return productSpuDetailRespVO;
         }
+        List<ProductSkuRespVO> skuVOs = ProductSkuConvert.INSTANCE.convertList(skus);
+        // fix: 因为现在已改为 sku 属性列表 属性 已包含 属性名字 属性值名字 所以不需要再额外处理，属性更新时更新 sku 中的属性相关冗余即可
+        productSpuDetailRespVO.setSkus(skuVOs);
         return productSpuDetailRespVO;
     }
 

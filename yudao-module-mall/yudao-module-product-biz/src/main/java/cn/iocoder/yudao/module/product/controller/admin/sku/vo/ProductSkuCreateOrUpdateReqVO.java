@@ -13,10 +13,4 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSkuCreateOrUpdateReqVO extends ProductSkuBaseVO {
 
-    // TODO @puhui999：是不是可以抽到父类里？
-    /**
-     * 属性数组
-     */
-    private List<Property> properties;
-
 }

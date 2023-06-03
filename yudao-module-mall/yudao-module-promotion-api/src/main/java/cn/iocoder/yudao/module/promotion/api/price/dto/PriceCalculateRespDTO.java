@@ -196,7 +196,7 @@ public class PriceCalculateRespDTO {
         /**
          * 营销级别
          *
-         * 枚举 {@link PromotionLevelEnum}
+         * 枚举 @link PromotionLevelEnum} TODO PromotionLevelEnum 没有这个枚举类
          */
         private Integer level;
         /**

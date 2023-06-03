@@ -7,22 +7,6 @@ package cn.iocoder.yudao.module.product.enums;
  */
 public interface ProductConstants {
 
-    // TODO @puhui999：这个变量，可以放到 CategoryDO 的实体里
-    /**
-     * 父分类编号 - 根分类
-     */
-    Long PARENT_ID_NULL = 0L;
-    /**
-     * 限定分类层级
-     */
-    int CATEGORY_LEVEL = 2;
-
-    // TODO @puhui999：这个变量，必要项不大哈
-    /**
-     * SPU 分页 tab 个数
-     */
-    int SPU_TAB_COUNTS = 5;
-
     /**
      * 警戒库存 TODO 警戒库存暂时为 10，后期需要使用常量或者数据库配置替换
      */

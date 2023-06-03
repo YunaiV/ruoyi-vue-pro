@@ -17,7 +17,8 @@ public class ProductCategoryUpdateReqVO extends ProductCategoryBaseVO {
     @Schema(description = "分类编号", required = true, example = "2")
     @NotNull(message = "分类编号不能为空")
     private Long id;
-    @Schema(description = "分类描述")
+
+    @Schema(description = "分类描述", example = "描述")
     private String description;
 
 }

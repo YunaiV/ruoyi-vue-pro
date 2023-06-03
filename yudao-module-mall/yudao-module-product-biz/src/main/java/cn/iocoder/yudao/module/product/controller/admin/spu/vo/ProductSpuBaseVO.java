@@ -16,19 +16,19 @@ import java.util.List;
 @Data
 public class ProductSpuBaseVO {
 
-    @Schema(description = "商品名称", required = true, example = "芋道")
+    @Schema(description = "商品名称", required = true, example = "清凉小短袖")
     @NotEmpty(message = "商品名称不能为空")
     private String name;
 
-    @Schema(description = "关键字", required = true, example = "芋道")
+    @Schema(description = "关键字", required = true, example = "清凉丝滑不出汗")
     @NotEmpty(message = "商品关键字不能为空")
     private String keyword;
 
-    @Schema(description = "商品简介", required = true, example = "芋道")
+    @Schema(description = "商品简介", required = true, example = "清凉小短袖简介")
     @NotEmpty(message = "商品简介不能为空")
     private String introduction;
 
-    @Schema(description = "商品详情", required = true, example = "芋道")
+    @Schema(description = "商品详情", required = true, example = "清凉小短袖详情")
     @NotEmpty(message = "商品详情不能为空")
     private String description;
 
@@ -40,14 +40,14 @@ public class ProductSpuBaseVO {
     @NotNull(message = "商品品牌不能为空")
     private Long brandId;
 
-    @Schema(description = "商品封面图", required = true, example = "芋道")
+    @Schema(description = "商品封面图", required = true, example = "https://www.iocoder.cn/xx.png")
     @NotEmpty(message = "商品封面图不能为空")
     private String picUrl;
 
-    @Schema(description = "商品轮播图", required = true)
+    @Schema(description = "商品轮播图", required = true, example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
     private List<String> sliderPicUrls;
 
-    @Schema(description = "商品视频")
+    @Schema(description = "商品视频", example = "https://www.iocoder.cn/xx.mp4")
     private String videoUrl;
 
     @Schema(description = "单位", required = true, example = "1")

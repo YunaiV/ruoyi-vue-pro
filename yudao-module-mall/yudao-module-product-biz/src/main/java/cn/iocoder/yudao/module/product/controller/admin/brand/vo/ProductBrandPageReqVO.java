@@ -17,7 +17,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ProductBrandPageReqVO extends PageParam {
 
-    @Schema(description = "品牌名称", example = "芋道")
+    @Schema(description = "品牌名称", example = "苹果")
     private String name;
 
     @Schema(description = "状态", example = "0")

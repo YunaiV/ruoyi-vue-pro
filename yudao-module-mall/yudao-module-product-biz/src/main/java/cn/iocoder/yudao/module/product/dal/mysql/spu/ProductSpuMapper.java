@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReq
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.enums.ProductConstants;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuPageTabEnum;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -35,21 +34,21 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId())
                 .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ProductSpuDO::getSort);
-        validateTabType(tabType, queryWrapper);
+        appendTabQuery(tabType, queryWrapper);
         return selectPage(reqVO, queryWrapper);
     }
 
     /**
-     * 获取库存小于 value ，且状态不等于 status 的的个数
+     * 查询触发警戒库存的 SPU 数量
      *
-     * @return 个数
+     * @return 触发警戒库存的 SPU 数量
      */
-    default Long selectCountByStockAndStatus() {
+    default Long selectCount() {
         LambdaQueryWrapperX<ProductSpuDO> queryWrapper = new LambdaQueryWrapperX<>();
+        // 库存小于等于警戒库存
         queryWrapper.le(ProductSpuDO::getStock, ProductConstants.ALERT_STOCK)
-                // TODO @puhui999：IN 另外两个状态，会不会好点哈。尽量不用 !=
                 // 如果库存触发警戒库存且状态为回收站的话则不计入触发警戒库存的个数
-                .and(q -> q.ne(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
+                .notIn(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus());
         return selectCount(queryWrapper);
     }
 
@@ -101,43 +100,43 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
      * @param reqVO 查询条件
      * @return Spu 列表
      */
-    default List<ProductSpuDO> selectList(ProductSpuExportReqVO reqVO){
+    default List<ProductSpuDO> selectList(ProductSpuExportReqVO reqVO) {
         Integer tabType = reqVO.getTabType();
         LambdaQueryWrapperX<ProductSpuDO> queryWrapper = new LambdaQueryWrapperX<>();
-        queryWrapper.eqIfPresent(ProductSpuDO::getName,reqVO.getName());
-        queryWrapper.eqIfPresent(ProductSpuDO::getCategoryId,reqVO.getCategoryId());
-        queryWrapper.betweenIfPresent(ProductSpuDO::getCreateTime,reqVO.getCreateTime());
-        validateTabType(tabType, queryWrapper);
+        queryWrapper.eqIfPresent(ProductSpuDO::getName, reqVO.getName());
+        queryWrapper.eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId());
+        queryWrapper.betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime());
+        appendTabQuery(tabType, queryWrapper);
         return selectList(queryWrapper);
     }
 
-    // TODO @puhui999：应该不太适合 validate 验证，应该是补充条件，例如说 appendTabQuery
     /**
      * 验证选项卡类型构建条件
      *
      * @param tabType      标签类型
      * @param queryWrapper 查询条件
      */
-    static void validateTabType(Integer tabType, LambdaQueryWrapperX<ProductSpuDO> queryWrapper) {
-        // 出售中商品 TODO puhui999：这样好点
-        if (ObjectUtil.equals(ProductSpuPageTabEnum.FOR_SALE.getType(), tabType)) {
+    static void appendTabQuery(Integer tabType, LambdaQueryWrapperX<ProductSpuDO> queryWrapper) {
+        // 出售中商品
+        if (ObjectUtil.equals(ProductSpuPageReqVO.FOR_SALE, tabType)) {
             queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus());
         }
-        if (ObjectUtil.equals(ProductSpuPageTabEnum.IN_WAREHOUSE.getType(), tabType)) {
-            // 仓储中商品
+        // 仓储中商品
+        if (ObjectUtil.equals(ProductSpuPageReqVO.IN_WAREHOUSE, tabType)) {
             queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus());
         }
-        if (ObjectUtil.equals(ProductSpuPageTabEnum.SOLD_OUT.getType(), tabType)) {
-            // 已售空商品
+        // 已售空商品
+        if (ObjectUtil.equals(ProductSpuPageReqVO.SOLD_OUT, tabType)) {
             queryWrapper.eqIfPresent(ProductSpuDO::getStock, 0);
         }
-        if (ObjectUtil.equals(ProductSpuPageTabEnum.ALERT_STOCK.getType(), tabType)) {
+        // 警戒库存
+        if (ObjectUtil.equals(ProductSpuPageReqVO.ALERT_STOCK, tabType)) {
             queryWrapper.le(ProductSpuDO::getStock, ProductConstants.ALERT_STOCK)
                     // 如果库存触发警戒库存且状态为回收站的话则不在警戒库存列表展示
-                    .and(q -> q.ne(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
+                    .notIn(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus());
         }
-        if (ObjectUtil.equals(ProductSpuPageTabEnum.RECYCLE_BIN.getType(), tabType)) {
-            // 回收站
+        // 回收站
+        if (ObjectUtil.equals(ProductSpuPageReqVO.RECYCLE_BIN, tabType)) {
             queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus());
         }
     }

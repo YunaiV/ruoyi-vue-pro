@@ -19,6 +19,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductCategoryDO extends BaseDO {
+
+    /**
+     * 父分类编号 - 根分类
+     */
+    public static final Long PARENT_ID_NULL = 0L;
+    /**
+     * 限定分类层级
+     */
+    public static final int CATEGORY_LEVEL = 2;
+
     /**
      * 分类编号
      */

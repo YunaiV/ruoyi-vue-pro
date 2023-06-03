@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProductBrandBaseVO {
 
-    @Schema(description = "品牌名称", required = true, example = "芋道")
+    @Schema(description = "品牌名称", required = true, example = "苹果")
     @NotNull(message = "品牌名称不能为空")
     private String name;
 
