@@ -185,7 +185,7 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
     }
 
     @Override
-    public DeliveryExpressTemplateRespVO getDeliveryExpressTemplate(Long id) {
+    public DeliveryExpressTemplateDetailRespVO getDeliveryExpressTemplate(Long id) {
         List<DeliveryExpressTemplateChargeDO> chargeList = expressTemplateChargeMapper.selectListByTemplateId(id);
         List<DeliveryExpressTemplateFreeDO> freeList = expressTemplateFreeMapper.selectListByTemplateId(id);
         DeliveryExpressTemplateDO template = expressTemplateMapper.selectById(id);

@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.trade.service.delivery;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateCreateReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplatePageReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
 
@@ -46,7 +46,7 @@ public interface DeliveryExpressTemplateService {
      * @param id 编号
      * @return 快递运费模板详情
      */
-    DeliveryExpressTemplateRespVO getDeliveryExpressTemplate(Long id);
+    DeliveryExpressTemplateDetailRespVO getDeliveryExpressTemplate(Long id);
 
     /**
      * 获得快递运费模板列表
