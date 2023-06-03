@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.price.bo;
 
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
+import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import lombok.Data;
 
@@ -45,6 +47,20 @@ public class TradePriceCalculateReqBO {
     private Long addressId;
 
     /**
+     * 配送方式
+     *
+     * 枚举 {@link DeliveryTypeEnum}
+     */
+    private Integer deliveryType;
+
+    /**
+     * 配送模板编号
+     *
+     * 关联 {@link DeliveryExpressTemplateDO#getId()}
+     */
+    private Long templateId;
+
+    /**
      * 商品 SKU 数组
      */
     @NotNull(message = "商品数组不能为空")
@@ -82,5 +98,4 @@ public class TradePriceCalculateReqBO {
         private Boolean selected;
 
     }
-
 }

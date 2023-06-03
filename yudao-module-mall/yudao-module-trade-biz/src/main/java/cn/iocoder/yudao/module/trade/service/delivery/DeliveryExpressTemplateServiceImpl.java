@@ -202,4 +202,13 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
         return expressTemplateMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public DeliveryExpressTemplateDO validateDeliveryExpressTemplate(Long templateId) {
+        DeliveryExpressTemplateDO template = expressTemplateMapper.selectById(templateId);
+        if (template == null) {
+            throw exception(EXPRESS_TEMPLATE_NOT_EXISTS);
+        }
+        return template;
+    }
+
 }

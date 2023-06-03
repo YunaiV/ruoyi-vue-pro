@@ -63,4 +63,11 @@ public interface DeliveryExpressTemplateService {
      * @return 快递运费模板分页
      */
     PageResult<DeliveryExpressTemplateDO> getDeliveryExpressTemplatePage(DeliveryExpressTemplatePageReqVO pageReqVO);
+
+    /**
+     * 校验快递运费模板
+     * @param templateId 模板编号
+     * @return DeliveryExpressTemplateDO 非空
+     */
+    DeliveryExpressTemplateDO validateDeliveryExpressTemplate(Long templateId);
 }

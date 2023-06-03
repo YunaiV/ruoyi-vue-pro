@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.enums.delivery;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +34,10 @@ public enum DeliveryExpressChargeModeEnum implements IntArrayValuable {
     @Override
     public int[] array() {
         return ARRAYS;
+    }
+
+    public static DeliveryExpressChargeModeEnum valueOf(Integer value) {
+        return ArrayUtil.firstMatch(chargeMode -> chargeMode.getType().equals(value), DeliveryExpressChargeModeEnum.values());
     }
 
 }
