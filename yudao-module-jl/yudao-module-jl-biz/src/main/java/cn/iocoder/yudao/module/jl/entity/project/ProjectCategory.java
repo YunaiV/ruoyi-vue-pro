@@ -2,6 +2,9 @@ package cn.iocoder.yudao.module.jl.entity.project;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -105,13 +108,15 @@ public class ProjectCategory extends BaseEntity {
     /**
      * 实验物资
      */
-    @OneToMany(mappedBy="category")
+    @OneToMany(mappedBy="category", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
     private List<ProjectSupply> supplyList;
 
     /**
-     * 实验物资
+     * 实验收费项
      */
-    @OneToMany(mappedBy="category1")
-    private List<ProjectChargeitem> chargeitemList;
+    @OneToMany(mappedBy="category", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.JOIN)
+    private List<ProjectChargeitem> chargeList;
 
 }

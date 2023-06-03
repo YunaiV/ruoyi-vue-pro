@@ -14,7 +14,7 @@ import java.util.List;
 public class ProjectCategoryWithSupplyAndChargeItemVO extends ProjectCategoryBaseVO {
 
     @Schema(description = "收费项", example = "[]")
-    private List<ProjectChargeitemSubClass> chargeItemList;
+    private List<ProjectChargeitemSubClass> chargeList;
 
     @Schema(description = "物资项", example = "[]")
     private List<ProjectSupplySubClass> supplyList;

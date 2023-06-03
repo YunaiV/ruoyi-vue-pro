@@ -29,7 +29,7 @@ public class ProjectChargeitem extends BaseEntity {
     private Long id;
 
     /**
-     * 选中的实验名目 id
+     * 实验名目 id
      */
     @Column(name = "project_category_id", nullable = false )
     private Long projectCategoryId;
@@ -84,5 +84,5 @@ public class ProjectChargeitem extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name="project_category_id", insertable = false, updatable = false)
-    private ProjectCategory category1;
+    private ProjectCategory category;
 }

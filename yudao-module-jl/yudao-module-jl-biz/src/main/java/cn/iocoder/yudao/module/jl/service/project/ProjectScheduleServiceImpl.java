@@ -118,7 +118,7 @@ public class ProjectScheduleServiceImpl implements ProjectScheduleService {
                 projectCategoryRepository.save(categoryDo);
 
                 // 保存收费项
-                List<ProjectChargeitemSubClass> chargetItemList = category.getChargeItemList();
+                List<ProjectChargeitemSubClass> chargetItemList = category.getChargeList();
                 if(chargetItemList != null && chargetItemList.size() >= 1) {
                     List<ProjectChargeitemSubClass> projectChargeitemList = chargetItemList.stream().map(chargeItem -> {
                         chargeItem.setProjectCategoryId(categoryDo.getId());
