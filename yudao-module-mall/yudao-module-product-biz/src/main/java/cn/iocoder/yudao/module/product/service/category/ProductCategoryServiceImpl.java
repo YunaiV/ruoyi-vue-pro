@@ -96,6 +96,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         }
     }
 
+    // TODO @puhui999：不用抽方法，因为不太会复用这个方法哈。
     private void validateProductCategoryIsHaveBindSpu(Long id) {
         Long count = productSpuService.getSpuCountByCategoryId(id);
         if (0 != count) {
@@ -126,9 +127,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         }
         int level = 1;
         // for 的原因，是因为避免脏数据，导致可能的死循环。一般不会超过 100 层哈
-        for (int i = 0; i < 100; i++) {
-            ProductCategoryDO category = productCategoryMapper.selectById(id);
+        for (int i = 0; i < Byte.MAX_VALUE; i++) {
             // 如果没有父节点，break 结束
+            ProductCategoryDO category = productCategoryMapper.selectById(id);
             if (category == null
                     || Objects.equals(category.getParentId(), PARENT_ID_NULL)) {
                 break;

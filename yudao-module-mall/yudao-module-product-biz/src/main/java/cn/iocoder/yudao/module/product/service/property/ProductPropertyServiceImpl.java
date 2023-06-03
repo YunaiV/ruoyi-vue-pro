@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.service.property;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyCreateReqVO;
@@ -72,7 +71,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         // 更新
         ProductPropertyDO updateObj = ProductPropertyConvert.INSTANCE.convert(updateReqVO);
         productPropertyMapper.updateById(updateObj);
-        // TODO 芋艿：更新时，需要看看 sku 表 fix
+        // TODO @puhui：是不是只要传递变量，不传递整个 updateObj 变量哈
         productSkuService.updateSkuProperty(updateObj);
     }
 

@@ -141,11 +141,6 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public List<ProductSkuDO> getSkuListBySpuIdAndStatus(Long spuId) {
-        return productSkuMapper.selectListBySpuIdAndStatus(spuId);
-    }
-
-    @Override
     public List<ProductSkuDO> getSkuListBySpuId(List<Long> spuIds) {
         return productSkuMapper.selectListBySpuId(spuIds);
     }
@@ -163,9 +158,10 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     @Override
     public int updateSkuProperty(ProductPropertyDO updateObj) {
         // TODO 看了一下数据库有关于 json 字符串的处理，怕数据库出现兼容问题这里还是用数据库常规操作来实现
+        // TODO @puhui999：直接全部查询处理，批量处理就好列；一般项目的商品不会超过几十万的哈。
         Long count = productSkuMapper.selectCountByPropertyNotNull();
         int currentPage = 1;
-        List<ProductSkuDO> skuDOs = new ArrayList<>();
+        List<ProductSkuDO> updateSkus = new ArrayList<>();
         if (count == 0) {
             return 0;
         }
@@ -178,25 +174,25 @@ public class ProductSkuServiceImpl implements ProductSkuService {
             if (CollUtil.isEmpty(records)) {
                 break;
             }
-            records.stream()
-                    .filter(sku -> sku.getProperties() != null)
+            records.stream().filter(sku -> sku.getProperties() != null)
                     .forEach(sku -> sku.getProperties().forEach(property -> {
                         if (property.getPropertyId().equals(updateObj.getId())) {
                             property.setPropertyName(updateObj.getName());
-                            skuDOs.add(sku);
+                            updateSkus.add(sku);
                         }
                     }));
         }
-        if (CollUtil.isEmpty(skuDOs)) {
+        if (CollUtil.isEmpty(updateSkus)) {
             return 0;
         }
+        // TODO @puhui999：貌似 updateBatch 自己会拆分批次，这里不用再拆分了
         // 每批处理的大小
         int batchSize = 1000;
-        for (int i = 0; i < skuDOs.size(); i += batchSize) {
-            List<ProductSkuDO> batchSkuDOs = skuDOs.subList(i, Math.min(i + batchSize, skuDOs.size()));
+        for (int i = 0; i < updateSkus.size(); i += batchSize) {
+            List<ProductSkuDO> batchSkuDOs = updateSkus.subList(i, Math.min(i + batchSize, updateSkus.size()));
             productSkuMapper.updateBatch(batchSkuDOs, batchSize);
         }
-        return skuDOs.size();
+        return updateSkus.size();
     }
 
     @Override
@@ -204,7 +200,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         // TODO 看了一下数据库有关于 json 字符串的处理，怕数据库出现兼容问题这里还是用数据库常规操作来实现
         Long count = productSkuMapper.selectCountByPropertyNotNull();
         int currentPage = 1;
-        List<ProductSkuDO> skuDOs = new ArrayList<>();
+        List<ProductSkuDO> updateSkus = new ArrayList<>();
         if (count == 0) {
             return 0;
         }
@@ -222,20 +218,20 @@ public class ProductSkuServiceImpl implements ProductSkuService {
                     .forEach(sku -> sku.getProperties().forEach(property -> {
                         if (property.getValueId().equals(updateObj.getId())) {
                             property.setValueName(updateObj.getName());
-                            skuDOs.add(sku);
+                            updateSkus.add(sku);
                         }
                     }));
         }
-        if (CollUtil.isEmpty(skuDOs)) {
+        if (CollUtil.isEmpty(updateSkus)) {
             return 0;
         }
         // 每批处理的大小
         int batchSize = 1000;
-        for (int i = 0; i < skuDOs.size(); i += batchSize) {
-            List<ProductSkuDO> batchSkuDOs = skuDOs.subList(i, Math.min(i + batchSize, skuDOs.size()));
+        for (int i = 0; i < updateSkus.size(); i += batchSize) {
+            List<ProductSkuDO> batchSkuDOs = updateSkus.subList(i, Math.min(i + batchSize, updateSkus.size()));
             productSkuMapper.updateBatch(batchSkuDOs, batchSize);
         }
-        return skuDOs.size();
+        return updateSkus.size();
     }
 
     @Override

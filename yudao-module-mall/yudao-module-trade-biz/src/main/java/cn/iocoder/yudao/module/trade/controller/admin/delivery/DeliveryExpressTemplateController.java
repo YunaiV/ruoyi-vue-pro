@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.trade.controller.admin.delivery;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.*;
@@ -71,6 +70,7 @@ public class DeliveryExpressTemplateController {
         return success(DeliveryExpressTemplateConvert.INSTANCE.convertList(list));
     }
 
+    // TODO @puhui999：DeliveryExpressTemplateRespVO 搞个 simple 的哈
     @GetMapping("/list-all-simple")
     @Operation(summary = "获取快递模版精简信息列表", description = "主要用于前端的下拉选项")
     public CommonResult<List<DeliveryExpressTemplateRespVO>> getSimpleTemplateList() {

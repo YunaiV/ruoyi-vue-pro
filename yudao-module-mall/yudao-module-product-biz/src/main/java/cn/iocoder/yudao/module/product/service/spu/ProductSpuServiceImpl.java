@@ -13,7 +13,6 @@ import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
-import cn.iocoder.yudao.module.product.enums.ProductConstants;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
@@ -27,6 +26,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMinValue;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
 import static cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO.CATEGORY_LEVEL;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
@@ -101,13 +101,13 @@ public class ProductSpuServiceImpl implements ProductSpuService {
      */
     private void initSpuFromSkus(ProductSpuDO spu, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // sku 单价最低的商品的价格
-        spu.setPrice(CollectionUtils.getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
+        spu.setPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
         // sku 单价最低的商品的市场价格
-        spu.setMarketPrice(CollectionUtils.getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
+        spu.setMarketPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
         // sku单价最低的商品的成本价格
-        spu.setCostPrice(CollectionUtils.getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getCostPrice));
+        spu.setCostPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getCostPrice));
         // sku单价最低的商品的条形码
-        spu.setBarCode(CollectionUtils.getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getBarCode));
+        spu.setBarCode(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getBarCode));
         // skus 库存总数
         spu.setStock(getSumValue(skus, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
         // 若是 spu 已有状态则不处理
@@ -115,9 +115,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
             // 默认状态为上架
             spu.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
             // 默认商品销量
-            spu.setSalesCount(ProductConstants.SALES_COUNT);
+            spu.setSalesCount(0);
             // 默认商品浏览量
-            spu.setBrowseCount(ProductConstants.BROWSE_COUNT);
+            spu.setBrowseCount(0);
         }
     }
 
@@ -159,6 +159,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
      *
      * @param id id
      */
+    // TODO puhui999：感觉不用独立出来一个方法，直接在 deleteSpu 方法中校验即可
     private void validateSpuStatus(Long id) {
         ProductSpuDO spuDO = productSpuMapper.selectById(id);
         // 判断 SPU 状态是否为回收站

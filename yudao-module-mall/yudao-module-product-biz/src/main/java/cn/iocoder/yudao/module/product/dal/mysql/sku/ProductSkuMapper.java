@@ -14,21 +14,11 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * 商品 SKU Mapper
- *
- * @author 芋道源码
- */
 @Mapper
 public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
 
     default List<ProductSkuDO> selectListBySpuId(Long spuId) {
         return selectList(ProductSkuDO::getSpuId, spuId);
-    }
-
-    default List<ProductSkuDO> selectListBySpuIdAndStatus(Long spuId) {
-        return selectList(new LambdaQueryWrapperX<ProductSkuDO>()
-                .eq(ProductSkuDO::getSpuId, spuId));
     }
 
     default List<ProductSkuDO> selectListBySpuId(Collection<Long> spuIds) {
@@ -73,6 +63,7 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
         return selectList(new QueryWrapper<ProductSkuDO>().apply("stock <= warn_stock"));
     }
 
+    // TODO @puhui999：貌似 IN 不出来数据哈。直接全部查询出来，处理就好列；
     /**
      * 更新 sku 属性值时使用的分页查询
      *

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.controller.app.spu;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
@@ -67,7 +66,7 @@ public class AppProductSpuController {
         }
 
         // 查询商品 SKU
-        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuIdAndStatus(spu.getId());
+        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
         // 查询商品属性
         List<ProductPropertyValueDetailRespBO> propertyValues = productPropertyValueService
                 .getPropertyValueDetailList(ProductSkuConvert.INSTANCE.convertPropertyValueIds(skus));

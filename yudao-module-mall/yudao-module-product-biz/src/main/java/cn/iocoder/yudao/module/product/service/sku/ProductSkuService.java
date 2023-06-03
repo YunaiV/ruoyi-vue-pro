@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateO
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
-import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -86,14 +85,6 @@ public interface ProductSkuService {
      * @return 商品sku 集合
      */
     List<ProductSkuDO> getSkuListBySpuId(Long spuId);
-
-    /**
-     * 基于 SPU 编号和状态，获得商品 SKU 集合
-     *
-     * @param spuId SPU 编号
-     * @return 商品 SKU 集合
-     */
-    List<ProductSkuDO> getSkuListBySpuIdAndStatus(Long spuId);
 
     /**
      * 获得 spu 对应的 SKU 集合
