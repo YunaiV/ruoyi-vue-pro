@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.jl.service.project;
 
 import cn.iocoder.yudao.module.jl.entity.project.*;
 import cn.iocoder.yudao.module.jl.mapper.project.*;
+import cn.iocoder.yudao.module.jl.repository.crm.SalesleadRepository;
 import cn.iocoder.yudao.module.jl.repository.project.*;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
@@ -81,10 +82,10 @@ public class ProjectScheduleServiceImpl implements ProjectScheduleService {
     public Long saveProjectSchedule(ProjectScheduleSaveReqVO saveReqVO) {
         // 如果提供了 scheduleId ，则更新。否则，创建
         Long scheduleId;
-        if (saveReqVO.getScheduleId() != null) {
-            scheduleId = saveReqVO.getScheduleId();
+        if (saveReqVO.getId() != null) {
+            scheduleId = saveReqVO.getId();
             // 校验存在
-            validateProjectScheduleExists(saveReqVO.getScheduleId());
+            validateProjectScheduleExists(saveReqVO.getId());
             // 更新
             ProjectSchedule updateObj = projectScheduleMapper.toEntity(saveReqVO);
             projectScheduleRepository.save(updateObj);
@@ -92,6 +93,7 @@ public class ProjectScheduleServiceImpl implements ProjectScheduleService {
             // 创建
             ProjectSchedule projectSchedule = projectScheduleMapper.toEntity(saveReqVO);
             projectScheduleRepository.save(projectSchedule);
+
             scheduleId = projectSchedule.getId();
         }
 

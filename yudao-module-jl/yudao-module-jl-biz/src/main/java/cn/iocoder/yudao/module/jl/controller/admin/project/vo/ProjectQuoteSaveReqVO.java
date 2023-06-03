@@ -13,8 +13,10 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProjectQuoteSaveReqVO  {
 
+
+
     @Schema(description = "报价 id", example = "1", nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private Long quoteId;
+    private Long id;
 
     @Schema(description = "销售线索 id", example = "1", nullable = true, requiredMode = Schema.RequiredMode.REQUIRED)
     private Long salesleadId;

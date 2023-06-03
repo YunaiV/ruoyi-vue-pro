@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.jl.entity.project.ProjectSupply;
 import cn.iocoder.yudao.module.jl.mapper.project.ProjectCategoryMapper;
 import cn.iocoder.yudao.module.jl.mapper.project.ProjectChargeitemMapper;
 import cn.iocoder.yudao.module.jl.mapper.project.ProjectSupplyMapper;
+import cn.iocoder.yudao.module.jl.repository.crm.SalesleadRepository;
 import cn.iocoder.yudao.module.jl.repository.laboratory.CategoryRepository;
 import cn.iocoder.yudao.module.jl.repository.project.ProjectCategoryRepository;
 import cn.iocoder.yudao.module.jl.repository.project.ProjectChargeitemRepository;
@@ -44,6 +45,8 @@ import static cn.iocoder.yudao.module.jl.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 public class ProjectQuoteServiceImpl implements ProjectQuoteService {
+    @Resource
+    private SalesleadRepository salesleadRepository;
 
     @Resource
     private ProjectQuoteRepository projectQuoteRepository;
@@ -88,10 +91,10 @@ public class ProjectQuoteServiceImpl implements ProjectQuoteService {
     public Long saveProjectQuote(ProjectQuoteSaveReqVO saveReqVO) {
         // 如果提供了 quoteId ，则更新。否则，创建
         Long quoteId;
-        if (saveReqVO.getQuoteId() != null) {
-            quoteId = saveReqVO.getQuoteId();
+        if (saveReqVO.getId() != null) {
+            quoteId = saveReqVO.getId();
             // 校验存在
-            validateProjectQuoteExists(saveReqVO.getQuoteId());
+            validateProjectQuoteExists(saveReqVO.getId());
             // 更新
             ProjectQuote updateObj = projectQuoteMapper.toEntity(saveReqVO);
             projectQuoteRepository.save(updateObj);
@@ -99,6 +102,10 @@ public class ProjectQuoteServiceImpl implements ProjectQuoteService {
             // 创建
             ProjectQuote projectQuote = projectQuoteMapper.toEntity(saveReqVO);
             projectQuoteRepository.save(projectQuote);
+
+            // 更新销售线索的报价内容
+            salesleadRepository.updateQuotationById(projectQuote.getSalesleadId(), projectQuote.getId());
+
             quoteId = projectQuote.getId();
         }
 

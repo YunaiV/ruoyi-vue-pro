@@ -12,7 +12,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProjectScheduleSaveReqVO {
     @Schema(description = "安排单 id", example = "1", nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private Long scheduleId;
+    private Long id;
 
     @Schema(description = "项目 id", example = "1", nullable = false, requiredMode = Schema.RequiredMode.REQUIRED)
     private Long projectId;
