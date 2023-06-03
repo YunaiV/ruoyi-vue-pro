@@ -58,7 +58,7 @@ public class DeliveryExpressTemplateController {
     @Operation(summary = "获得快递运费模板")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('trade:delivery:express-template:query')")
-    public CommonResult<DeliveryExpressTemplateRespVO> getDeliveryExpressTemplate(@RequestParam("id") Long id) {
+    public CommonResult<DeliveryExpressTemplateDetailRespVO> getDeliveryExpressTemplate(@RequestParam("id") Long id) {
         return success(deliveryExpressTemplateService.getDeliveryExpressTemplate(id));
     }
 
@@ -66,7 +66,7 @@ public class DeliveryExpressTemplateController {
     @Operation(summary = "获得快递运费模板列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     @PreAuthorize("@ss.hasPermission('trade:delivery:express-template:query')")
-    public CommonResult<List<DeliveryExpressTemplateSimpleRespVO>> getDeliveryExpressTemplateList(@RequestParam("ids") Collection<Long> ids) {
+    public CommonResult<List<DeliveryExpressTemplateRespVO>> getDeliveryExpressTemplateList(@RequestParam("ids") Collection<Long> ids) {
         List<DeliveryExpressTemplateDO> list = deliveryExpressTemplateService.getDeliveryExpressTemplateList(ids);
         return success(DeliveryExpressTemplateConvert.INSTANCE.convertList(list));
     }
@@ -83,7 +83,7 @@ public class DeliveryExpressTemplateController {
     @GetMapping("/page")
     @Operation(summary = "获得快递运费模板分页")
     @PreAuthorize("@ss.hasPermission('trade:delivery:express-template:query')")
-    public CommonResult<PageResult<DeliveryExpressTemplateSimpleRespVO>> getDeliveryExpressTemplatePage(@Valid DeliveryExpressTemplatePageReqVO pageVO) {
+    public CommonResult<PageResult<DeliveryExpressTemplateRespVO>> getDeliveryExpressTemplatePage(@Valid DeliveryExpressTemplatePageReqVO pageVO) {
         PageResult<DeliveryExpressTemplateDO> pageResult = deliveryExpressTemplateService.getDeliveryExpressTemplatePage(pageVO);
         return success(DeliveryExpressTemplateConvert.INSTANCE.convertPage(pageResult));
     }

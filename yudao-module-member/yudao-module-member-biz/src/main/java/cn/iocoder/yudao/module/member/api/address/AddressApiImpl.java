@@ -25,4 +25,9 @@ public class AddressApiImpl implements AddressApi {
         return AddressConvert.INSTANCE.convert02(addressService.getAddress(userId, id));
     }
 
+    @Override
+    public AddressRespDTO getDefaultAddress(Long userId) {
+        return AddressConvert.INSTANCE.convert02(addressService.getDefaultUserAddress(userId));
+    }
+
 }

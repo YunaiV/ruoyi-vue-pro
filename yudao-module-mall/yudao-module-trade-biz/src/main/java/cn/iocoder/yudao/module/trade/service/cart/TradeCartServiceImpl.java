@@ -17,10 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -164,6 +161,14 @@ public class TradeCartServiceImpl implements TradeCartService {
 
         // 拼接数据
         return TradeCartConvert.INSTANCE.convertList(carts, spus, skus);
+    }
+
+    @Override
+    public List<TradeCartDO> getCartList(Long userId, Set<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return cartMapper.selectListByUserId(userId, ids);
     }
 
     private void deleteCartIfSpuDeleted(List<TradeCartDO> carts, List<ProductSpuRespDTO> spus) {

@@ -91,17 +91,17 @@ public class AppTradeOrderSettlementRespVO {
         private String mobile;
 
         @Schema(description = "省份编号", required = true, example = "1")
-        private Long provinceId;
+        private Integer provinceId;
         @Schema(description = "省份名字", required = true, example = "北京")
         private String provinceName;
 
         @Schema(description = "城市编号", required = true, example = "1")
-        private Long cityId;
+        private Integer cityId;
         @Schema(description = "城市名字", required = true, example = "北京")
         private String cityName;
 
         @Schema(description = "地区编号", required = true, example = "1")
-        private Long districtId;
+        private Integer districtId;
         @Schema(description = "地区名字", required = true, example = "朝阳区")
         private String districtName;
 

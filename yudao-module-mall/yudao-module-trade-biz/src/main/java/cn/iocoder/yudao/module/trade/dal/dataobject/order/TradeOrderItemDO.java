@@ -167,11 +167,24 @@ public class TradeOrderItemDO extends BaseDO {
          */
         private Long propertyId;
         /**
+         * 属性名字
+         *
+         * 关联 ProductPropertyDO 的 name 字段
+         */
+        private String propertyName;
+
+        /**
          * 属性值编号
          *
          * 关联 ProductPropertyValueDO 的 id 编号
          */
         private Long valueId;
+        /**
+         * 属性值名字
+         *
+         * 关联 ProductPropertyValueDO 的 name 字段
+         */
+        private String valueName;
 
     }
 

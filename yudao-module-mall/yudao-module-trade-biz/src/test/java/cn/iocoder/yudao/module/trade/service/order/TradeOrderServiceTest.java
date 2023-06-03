@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -101,10 +102,10 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         // mock 方法（商品 SKU 检查）
         ProductSkuRespDTO sku01 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(1L).setSpuId(11L)
                 .setPrice(50).setStock(100)
-                .setProperties(singletonList(new ProductSkuRespDTO.Property().setPropertyId(111L).setValueId(222L))));
+                .setProperties(singletonList(new ProductPropertyValueDetailRespDTO().setPropertyId(111L).setValueId(222L))));
         ProductSkuRespDTO sku02 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(2L).setSpuId(21L)
                 .setPrice(20).setStock(50))
-                .setProperties(singletonList(new ProductSkuRespDTO.Property().setPropertyId(333L).setValueId(444L)));
+                .setProperties(singletonList(new ProductPropertyValueDetailRespDTO().setPropertyId(333L).setValueId(444L)));
         when(productSkuApi.getSkuList(eq(asSet(1L, 2L)))).thenReturn(Arrays.asList(sku01, sku02));
         // mock 方法（商品 SPU 检查）
         ProductSpuRespDTO spu01 = randomPojo(ProductSpuRespDTO.class, o -> o.setId(11L)
@@ -114,7 +115,7 @@ public class TradeOrderServiceTest extends BaseDbUnitTest {
         when(productSpuApi.getSpuList(eq(asSet(11L, 21L)))).thenReturn(Arrays.asList(spu01, spu02));
         // mock 方法（用户收件地址的校验）
         AddressRespDTO addressRespDTO = new AddressRespDTO().setId(10L).setUserId(userId).setName("芋艿")
-                .setMobile("15601691300").setAreaId(3306L).setPostCode("85757").setDetailAddress("土豆村");
+                .setMobile("15601691300").setAreaId(3306).setPostCode("85757").setDetailAddress("土豆村");
         when(addressApi.getAddress(eq(10L), eq(userId))).thenReturn(addressRespDTO);
         // mock 方法（价格计算）
         PriceCalculateRespDTO.OrderItem priceOrderItem01 = new PriceCalculateRespDTO.OrderItem()

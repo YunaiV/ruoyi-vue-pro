@@ -22,18 +22,18 @@ public interface DeliveryExpressTemplateConvert {
 
     DeliveryExpressTemplateDO convert(DeliveryExpressTemplateUpdateReqVO bean);
 
-    DeliveryExpressTemplateSimpleRespVO convert(DeliveryExpressTemplateDO bean);
+    DeliveryExpressTemplateRespVO convert(DeliveryExpressTemplateDO bean);
 
-    DeliveryExpressTemplateRespVO convert2(DeliveryExpressTemplateDO bean);
+    DeliveryExpressTemplateDetailRespVO convert2(DeliveryExpressTemplateDO bean);
 
-    List<DeliveryExpressTemplateSimpleRespVO> convertList(List<DeliveryExpressTemplateDO> list);
+    List<DeliveryExpressTemplateRespVO> convertList(List<DeliveryExpressTemplateDO> list);
 
-    PageResult<DeliveryExpressTemplateSimpleRespVO> convertPage(PageResult<DeliveryExpressTemplateDO> page);
+    PageResult<DeliveryExpressTemplateRespVO> convertPage(PageResult<DeliveryExpressTemplateDO> page);
 
-    default DeliveryExpressTemplateRespVO convert(DeliveryExpressTemplateDO bean,
-                                                  List<DeliveryExpressTemplateChargeDO> chargeList,
-                                                  List<DeliveryExpressTemplateFreeDO> freeList){
-        DeliveryExpressTemplateRespVO respVO = convert2(bean);
+    default DeliveryExpressTemplateDetailRespVO convert(DeliveryExpressTemplateDO bean,
+                                                        List<DeliveryExpressTemplateChargeDO> chargeList,
+                                                        List<DeliveryExpressTemplateFreeDO> freeList){
+        DeliveryExpressTemplateDetailRespVO respVO = convert2(bean);
         respVO.setTemplateCharge(convertTemplateChargeList(chargeList));
         respVO.setTemplateFree(convertTemplateFreeList(freeList));
         return respVO;

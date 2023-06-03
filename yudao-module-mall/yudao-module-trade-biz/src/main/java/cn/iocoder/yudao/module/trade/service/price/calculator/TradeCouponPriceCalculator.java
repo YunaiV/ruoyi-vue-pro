@@ -101,7 +101,8 @@ public class TradeCouponPriceCalculator implements TradePriceCalculator {
                                                                                   CouponRespDTO coupon) {
         Predicate<TradePriceCalculateRespBO.OrderItem> matchPredicate = TradePriceCalculateRespBO.OrderItem::getSelected;
         if (PromotionProductScopeEnum.SPU.getScope().equals(coupon.getProductScope())) {
-            matchPredicate = orderItem -> coupon.getProductSpuIds().contains(orderItem.getSpuId());
+            matchPredicate = matchPredicate // 额外加如下条件
+                    .and(orderItem -> coupon.getProductSpuIds().contains(orderItem.getSpuId()));
         }
         return filterList(result.getItems(), matchPredicate);
     }

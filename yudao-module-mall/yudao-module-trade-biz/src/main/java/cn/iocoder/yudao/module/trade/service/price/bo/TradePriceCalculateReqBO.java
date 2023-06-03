@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.price.bo;
 
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
+import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import lombok.Data;
 
@@ -21,7 +23,7 @@ public class TradePriceCalculateReqBO {
      *
      * 枚举 {@link TradeOrderTypeEnum}
      */
-    private Integer orderType;
+    private Integer type;
 
     /**
      * 用户编号
@@ -43,6 +45,21 @@ public class TradePriceCalculateReqBO {
      * 对应 MemberAddressDO 的 id 编号
      */
     private Long addressId;
+
+    /**
+     * 配送方式
+     *
+     * 枚举 {@link DeliveryTypeEnum}
+     */
+    private Integer deliveryType;
+
+    /**
+     * 配送模板编号
+     *
+     * 关联 {@link DeliveryExpressTemplateDO#getId()}
+     */
+    // TODO @jason：运费模版，是不是每个 SKU 传入哈
+    private Long templateId;
 
     /**
      * 商品 SKU 数组
@@ -82,5 +99,4 @@ public class TradePriceCalculateReqBO {
         private Boolean selected;
 
     }
-
 }

@@ -53,6 +53,9 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         // 1.2 获得最大匹配的满减送活动的规则
         RewardActivityMatchRespDTO.Rule rule = getMaxMatchRewardActivityRule(rewardActivity, orderItems);
         if (rule == null) {
+            TradePriceCalculatorHelper.addNotMatchPromotion(result, orderItems,
+                    rewardActivity.getId(), rewardActivity.getName(), PromotionTypeEnum.REWARD_ACTIVITY.getType(),
+                    getRewardActivityNotMeetTip(rewardActivity));
             return;
         }
 

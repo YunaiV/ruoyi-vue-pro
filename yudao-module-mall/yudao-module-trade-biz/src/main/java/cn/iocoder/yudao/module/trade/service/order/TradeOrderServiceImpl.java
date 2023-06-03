@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
@@ -18,15 +18,9 @@ import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
-import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
-import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
-import cn.iocoder.yudao.module.promotion.api.price.PriceApi;
-import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
@@ -34,13 +28,19 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageRe
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import cn.iocoder.yudao.module.trade.service.cart.TradeCartService;
+import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
+import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
+import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,11 +71,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     private TradeOrderItemMapper tradeOrderItemMapper;
 
     @Resource
-    private PriceApi priceApi;
+    private TradeCartService tradeCartService;
+    @Resource
+    private TradePriceService tradePriceService;
+
     @Resource
     private ProductSkuApi productSkuApi;
-    @Resource
-    private ProductSpuApi productSpuApi;
     @Resource
     private PayOrderApi payOrderApi;
     @Resource
@@ -92,76 +93,70 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     @Override
     public AppTradeOrderSettlementRespVO settlementOrder(Long userId, AppTradeOrderSettlementReqVO settlementReqVO) {
-        return null;
+        // 1. 获得收货地址
+        AddressRespDTO address = getAddress(userId, settlementReqVO.getAddressId());
+        if (address != null) {
+            settlementReqVO.setAddressId(address.getId());
+        }
+
+        // 2. 计算价格
+        TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, settlementReqVO);
+
+        // 3. 拼接返回
+        return TradeOrderConvert.INSTANCE.convert(calculateRespBO, address);
+    }
+
+    /**
+     * 获得用户地址
+     *
+     * @param userId    用户编号
+     * @param addressId 地址编号
+     * @return 地址
+     */
+    private AddressRespDTO getAddress(Long userId, Long addressId) {
+        if (addressId != null) {
+            return addressApi.getAddress(addressId, userId);
+        }
+        return addressApi.getDefaultAddress(userId);
+    }
+
+    /**
+     * 计算订单价格
+     *
+     * @param userId 用户编号
+     * @param settlementReqVO 结算信息
+     * @return 订单价格
+     */
+    private TradePriceCalculateRespBO calculatePrice(Long userId, AppTradeOrderSettlementReqVO settlementReqVO) {
+        // 1. 如果来自购物车，则获得购物车的商品
+        List<TradeCartDO> cartList = tradeCartService.getCartList(userId,
+                convertSet(settlementReqVO.getItems(), AppTradeOrderSettlementReqVO.Item::getCartId));
+
+        // 2. 计算价格
+        TradePriceCalculateReqBO calculateReqBO = TradeOrderConvert.INSTANCE.convert(userId, settlementReqVO, cartList);
+        calculateReqBO.getItems().forEach(item -> Assert.isTrue(item.getSelected(), // 防御性编程，保证都是选中的
+                "商品({}) 未设置为选中", item.getSkuId()));
+        return tradePriceService.calculatePrice(calculateReqBO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
-        // 商品 SKU 检查：可售状态、库存
-//        List<ProductSkuRespDTO> skus = validateSkuSaleable(createReqVO.getItems()); // TODO 芋艿，临时关闭。
-        List<ProductSkuRespDTO> skus = null;
-        // 商品 SPU 检查：可售状态
-        List<ProductSpuRespDTO> spus = validateSpuSaleable(convertSet(skus, ProductSkuRespDTO::getSpuId));
-        // 用户收件地址的校验
+        // 1. 用户收件地址的校验
         AddressRespDTO address = validateAddress(userId, createReqVO.getAddressId());
 
-        // 价格计算
-        PriceCalculateRespDTO priceResp = priceApi.calculatePrice(TradeOrderConvert.INSTANCE.convert(createReqVO, userId));
+        // 2. 价格计算
+        TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, createReqVO);
 
-        // 插入 TradeOrderDO 订单
-        TradeOrderDO tradeOrderDO = createTradeOrder(userId, userIp, createReqVO, priceResp.getOrder(), address);
-        // 插入 TradeOrderItemDO 订单项
-        List<TradeOrderItemDO> tradeOrderItems = createTradeOrderItems(tradeOrderDO, priceResp.getOrder().getItems(), skus);
+        // 3.1 插入 TradeOrderDO 订单
+        TradeOrderDO order = createTradeOrder(userId, userIp, createReqVO, calculateRespBO, address);
+        // 3.2 插入 TradeOrderItemDO 订单项
+        List<TradeOrderItemDO> orderItems = createTradeOrderItems(order, calculateRespBO);
 
         // 订单创建完后的逻辑
-        afterCreateTradeOrder(userId, createReqVO, tradeOrderDO, tradeOrderItems, spus);
+        afterCreateTradeOrder(userId, createReqVO, order, orderItems, calculateRespBO);
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
-        return tradeOrderDO.getId();
-    }
-
-//    /**
-//     * 校验商品 SKU 是否可出售
-//     *
-//     * @param items 商品 SKU
-//     * @return 商品 SKU 数组
-//     */
-//    private List<ProductSkuRespDTO> validateSkuSaleable(List<Item> items) {
-//        List<ProductSkuRespDTO> skus = productSkuApi.getSkuList(convertSet(items, Item::getSkuId));
-//        // SKU 不存在
-//        if (items.size() != skus.size()) {
-//            throw exception(ORDER_CREATE_SKU_NOT_FOUND);
-//        }
-//        // 校验库存不足
-//        Map<Long, ProductSkuRespDTO> skuMap = convertMap(skus, ProductSkuRespDTO::getId);
-//        items.forEach(item -> {
-//            ProductSkuRespDTO sku = skuMap.get(item.getSkuId());
-//            if (item.getCount() > sku.getStock()) {
-//                throw exception(ErrorCodeConstants.ORDER_CREATE_SKU_STOCK_NOT_ENOUGH);
-//            }
-//        });
-//        return skus;
-//    }
-
-    /**
-     * 校验商品 SPU 是否可出售
-     *
-     * @param spuIds 商品 SPU 编号数组
-     * @return 商品 SPU 数组
-     */
-    private List<ProductSpuRespDTO> validateSpuSaleable(Set<Long> spuIds) {
-        List<ProductSpuRespDTO> spus = productSpuApi.getSpuList(spuIds);
-        // SPU 不存在
-        if (spus.size() != spuIds.size()) {
-            throw exception(ORDER_CREATE_SPU_NOT_FOUND);
-        }
-        // 校验是否存在禁用的 SPU
-        ProductSpuRespDTO spu = CollectionUtils.findFirst(spus,
-                spuDTO -> ObjectUtil.notEqual(ProductSpuStatusEnum.ENABLE.getStatus(), spuDTO.getStatus()));
-        if (spu != null) {
-            throw exception(ErrorCodeConstants.ORDER_CREATE_SPU_NOT_SALE);
-        }
-        return spus;
+        return order.getId();
     }
 
     /**
@@ -173,33 +168,35 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      */
     private AddressRespDTO validateAddress(Long userId, Long addressId) {
         AddressRespDTO address = addressApi.getAddress(addressId, userId);
-        if (Objects.isNull(address)) {
+        if (address == null) {
             throw exception(ErrorCodeConstants.ORDER_CREATE_ADDRESS_NOT_FOUND);
         }
         return address;
     }
 
     private TradeOrderDO createTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
-                                          PriceCalculateRespDTO.Order order, AddressRespDTO address) {
-        TradeOrderDO tradeOrderDO = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, order, address);
-        tradeOrderDO.setNo(IdUtil.getSnowflakeNextId() + ""); // TODO @LeeYan9: 思考下, 怎么生成好点哈; 这个是会展示给用户的;
-        tradeOrderDO.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
-        tradeOrderDO.setType(TradeOrderTypeEnum.NORMAL.getType());
-        tradeOrderDO.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
-        tradeOrderDO.setProductCount(getSumValue(order.getItems(),  PriceCalculateRespDTO.OrderItem::getCount, Integer::sum));
-        tradeOrderDO.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
-        tradeOrderDO.setAdjustPrice(0).setPayed(false); // 支付信息
-        tradeOrderDO.setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus()); // 物流信息
-        tradeOrderDO.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0); // 退款信息
-        tradeOrderMapper.insert(tradeOrderDO);
-        return tradeOrderDO;
+                                          TradePriceCalculateRespBO calculateRespBO, AddressRespDTO address) {
+        TradeOrderDO order = TradeOrderConvert.INSTANCE.convert(userId, clientIp, createReqVO, calculateRespBO, address);
+        order.setNo(IdUtil.getSnowflakeNextId() + ""); // TODO @LeeYan9: 思考下, 怎么生成好点哈; 这个是会展示给用户的;
+        order.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
+        order.setType(TradeOrderTypeEnum.NORMAL.getType());
+        order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
+        order.setProductCount(getSumValue(calculateRespBO.getItems(),  TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
+        order.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
+        // 支付信息
+        order.setAdjustPrice(0).setPayed(false);
+        // 物流信息 TODO 芋艿：暂时写死物流方式；应该是前端选择的
+        order.setDeliveryType(DeliveryTypeEnum.EXPRESS.getMode()).setDeliveryStatus(TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus());
+        // 退款信息
+        order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
+        tradeOrderMapper.insert(order);
+        return order;
     }
 
-    private List<TradeOrderItemDO> createTradeOrderItems(TradeOrderDO tradeOrderDO,
-                                                         List<PriceCalculateRespDTO.OrderItem> orderItems, List<ProductSkuRespDTO> skus) {
-        List<TradeOrderItemDO> tradeOrderItemDOs = TradeOrderConvert.INSTANCE.convertList(tradeOrderDO, orderItems, skus);
-        tradeOrderItemMapper.insertBatch(tradeOrderItemDOs);
-        return tradeOrderItemDOs;
+    private List<TradeOrderItemDO> createTradeOrderItems(TradeOrderDO tradeOrderDO, TradePriceCalculateRespBO calculateRespBO) {
+        List<TradeOrderItemDO> orderItems = TradeOrderConvert.INSTANCE.convertList(tradeOrderDO, calculateRespBO);
+        tradeOrderItemMapper.insertBatch(orderItems);
+        return orderItems;
     }
 
     /**
@@ -210,12 +207,13 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      * @param userId 用户编号
      * @param createReqVO 创建订单请求
      * @param tradeOrderDO 交易订单
+     * @param calculateRespBO 订单价格计算结果
      */
     private void afterCreateTradeOrder(Long userId, AppTradeOrderCreateReqVO createReqVO,
-                                       TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItemDOs,
-                                       List<ProductSpuRespDTO> spus) {
+                                       TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> orderItems,
+                                       TradePriceCalculateRespBO calculateRespBO) {
         // 下单时扣减商品库存
-        productSkuApi.updateSkuStock(new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(tradeOrderItemDOs)));
+        productSkuApi.updateSkuStock(new ProductSkuUpdateStockReqDTO(TradeOrderConvert.INSTANCE.convertList(orderItems)));
 
         // 删除购物车商品 TODO 芋艿：待实现
 
@@ -228,20 +226,19 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         }
 
         // 生成预支付
-        createPayOrder(tradeOrderDO, tradeOrderItemDOs, spus);
+        createPayOrder(tradeOrderDO, orderItems, calculateRespBO);
 
         // 增加订单日志 TODO 芋艿：待实现
     }
 
-    private void createPayOrder(TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItemDOs,
-                                List<ProductSpuRespDTO> spus) {
+    private void createPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems, TradePriceCalculateRespBO calculateRespBO) {
         // 创建支付单，用于后续的支付
         PayOrderCreateReqDTO payOrderCreateReqDTO = TradeOrderConvert.INSTANCE.convert(
-                tradeOrderDO, tradeOrderItemDOs, spus, tradeOrderProperties);
+                order, orderItems, calculateRespBO, tradeOrderProperties);
         Long payOrderId = payOrderApi.createOrder(payOrderCreateReqDTO);
 
         // 更新到交易单上
-        tradeOrderMapper.updateById(new TradeOrderDO().setId(tradeOrderDO.getId()).setPayOrderId(payOrderId));
+        tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setPayOrderId(payOrderId));
     }
 
     @Override

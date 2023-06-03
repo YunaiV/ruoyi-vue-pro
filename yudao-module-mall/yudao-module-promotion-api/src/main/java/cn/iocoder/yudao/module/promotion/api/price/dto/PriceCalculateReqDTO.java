@@ -12,6 +12,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Data
+@Deprecated
 public class PriceCalculateReqDTO {
 
     /**

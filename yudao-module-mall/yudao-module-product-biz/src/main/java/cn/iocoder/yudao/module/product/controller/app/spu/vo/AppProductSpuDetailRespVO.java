@@ -18,6 +18,9 @@ public class AppProductSpuDetailRespVO {
     @Schema(description = "商品名称", required = true, example = "芋道")
     private String name;
 
+    @Schema(description = "商品简介", required = true, example = "我是一个快乐简介")
+    private String introduction;
+
     @Schema(description = "商品详情", required = true, example = "我是商品描述")
     private String description;
 
