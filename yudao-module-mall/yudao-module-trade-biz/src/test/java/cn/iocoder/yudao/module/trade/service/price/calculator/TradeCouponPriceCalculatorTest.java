@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
  *
  * @author 芋道源码
  */
-class TradeCouponPriceCalculatorTest extends BaseMockitoUnitTest {
+public class TradeCouponPriceCalculatorTest extends BaseMockitoUnitTest {
 
     @InjectMocks
     private TradeCouponPriceCalculator tradeCouponPriceCalculator;
