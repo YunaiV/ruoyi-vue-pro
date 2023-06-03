@@ -48,98 +48,11 @@ public class PriceServiceTest extends BaseMockitoUnitTest {
     private PriceServiceImpl priceService;
 
     @Mock
-    private DiscountActivityService discountService;
-    @Mock
     private RewardActivityService rewardActivityService;
     @Mock
     private CouponService couponService;
     @Mock
     private ProductSkuApi productSkuApi;
-
-    @Test
-    public void testCalculatePrice_discountActivity() {
-        // 准备参数
-        PriceCalculateReqDTO calculateReqDTO = new PriceCalculateReqDTO().setUserId(randomLongId())
-                .setItems(asList(new PriceCalculateReqDTO.Item().setSkuId(10L).setCount(2),
-                        new PriceCalculateReqDTO.Item().setSkuId(20L).setCount(3)));
-        // mock 方法(商品 SKU 信息)
-        ProductSkuRespDTO productSku01 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(10L).setPrice(100));
-        ProductSkuRespDTO productSku02 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(20L).setPrice(50));
-        when(productSkuApi.getSkuList(eq(asSet(10L, 20L)))).thenReturn(asList(productSku01, productSku02));
-        // mock 方法（限时折扣 DiscountActivity 信息）
-        DiscountProductDetailBO discountProduct01 = randomPojo(DiscountProductDetailBO.class, o -> o.setActivityId(1000L)
-                .setActivityName("活动 1000 号").setSkuId(10L)
-                .setDiscountType(PromotionDiscountTypeEnum.PRICE.getType()).setDiscountPrice(40));
-        DiscountProductDetailBO discountProduct02 = randomPojo(DiscountProductDetailBO.class, o -> o.setActivityId(2000L)
-                .setActivityName("活动 2000 号").setSkuId(20L)
-                .setDiscountType(PromotionDiscountTypeEnum.PERCENT.getType()).setDiscountPercent(60));
-        when(discountService.getMatchDiscountProductList(eq(asSet(10L, 20L)))).thenReturn(
-                MapUtil.builder(10L, discountProduct01).put(20L, discountProduct02).map());
-
-        // 10L: 100 * 2 - 40 * 2 = 120
-        // 20L：50 * 3 - 50 * 3 * 0.4 = 90
-
-        // 调用
-        PriceCalculateRespDTO priceCalculate = priceService.calculatePrice(calculateReqDTO);
-        // 断言 Order 部分
-        PriceCalculateRespDTO.Order order = priceCalculate.getOrder();
-        assertEquals(order.getTotalPrice(), 350);
-        assertEquals(order.getDiscountPrice(), 0);
-        assertEquals(order.getPointPrice(), 0);
-        assertEquals(order.getDeliveryPrice(), 0);
-        assertEquals(order.getPayPrice(), 210);
-        assertNull(order.getCouponId());
-        // 断言 OrderItem 部分
-        assertEquals(order.getItems().size(), 2);
-        PriceCalculateRespDTO.OrderItem orderItem01 = order.getItems().get(0);
-        assertEquals(orderItem01.getSkuId(), 10L);
-        assertEquals(orderItem01.getCount(), 2);
-        assertEquals(orderItem01.getOriginalPrice(), 200);
-        assertEquals(orderItem01.getOriginalUnitPrice(), 100);
-        assertEquals(orderItem01.getDiscountPrice(), 80);
-        assertEquals(orderItem01.getPayPrice(), 120);
-        assertEquals(orderItem01.getOrderPartPrice(), 0);
-        assertEquals(orderItem01.getOrderDividePrice(), 120);
-        PriceCalculateRespDTO.OrderItem orderItem02 = order.getItems().get(1);
-        assertEquals(orderItem02.getSkuId(), 20L);
-        assertEquals(orderItem02.getCount(), 3);
-        assertEquals(orderItem02.getOriginalPrice(), 150);
-        assertEquals(orderItem02.getOriginalUnitPrice(), 50);
-        assertEquals(orderItem02.getDiscountPrice(), 60);
-        assertEquals(orderItem02.getPayPrice(), 90);
-        assertEquals(orderItem02.getOrderPartPrice(), 0);
-        assertEquals(orderItem02.getOrderDividePrice(), 90);
-        // 断言 Promotion 部分
-        assertEquals(priceCalculate.getPromotions().size(), 2);
-        PriceCalculateRespDTO.Promotion promotion01 = priceCalculate.getPromotions().get(0);
-        assertEquals(promotion01.getId(), 1000L);
-        assertEquals(promotion01.getName(), "活动 1000 号");
-        assertEquals(promotion01.getType(), PromotionTypeEnum.DISCOUNT_ACTIVITY.getType());
-        assertEquals(promotion01.getLevel(), PromotionLevelEnum.SKU.getLevel());
-        assertEquals(promotion01.getTotalPrice(), 200);
-        assertEquals(promotion01.getDiscountPrice(), 80);
-        assertTrue(promotion01.getMatch());
-        assertEquals(promotion01.getDescription(), "限时折扣：省 0.80 元");
-        PriceCalculateRespDTO.PromotionItem promotionItem01 = promotion01.getItems().get(0);
-        assertEquals(promotion01.getItems().size(), 1);
-        assertEquals(promotionItem01.getSkuId(), 10L);
-        assertEquals(promotionItem01.getOriginalPrice(), 200);
-        assertEquals(promotionItem01.getDiscountPrice(), 80);
-        PriceCalculateRespDTO.Promotion promotion02 = priceCalculate.getPromotions().get(1);
-        assertEquals(promotion02.getId(), 2000L);
-        assertEquals(promotion02.getName(), "活动 2000 号");
-        assertEquals(promotion02.getType(), PromotionTypeEnum.DISCOUNT_ACTIVITY.getType());
-        assertEquals(promotion02.getLevel(), PromotionLevelEnum.SKU.getLevel());
-        assertEquals(promotion02.getTotalPrice(), 150);
-        assertEquals(promotion02.getDiscountPrice(), 60);
-        assertTrue(promotion02.getMatch());
-        assertEquals(promotion02.getDescription(), "限时折扣：省 0.60 元");
-        PriceCalculateRespDTO.PromotionItem promotionItem02 = promotion02.getItems().get(0);
-        assertEquals(promotion02.getItems().size(), 1);
-        assertEquals(promotionItem02.getSkuId(), 20L);
-        assertEquals(promotionItem02.getOriginalPrice(), 150);
-        assertEquals(promotionItem02.getDiscountPrice(), 60);
-    }
 
     /**
      * 测试满减送活动，匹配的情况

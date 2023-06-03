@@ -53,10 +53,13 @@ public class TradeDiscountActivityPriceCalculator implements TradePriceCalculato
             Integer newDiscountPrice = orderItem.getPayPrice() - newPayPrice;
 
             // 3.1 记录优惠明细
-            TradePriceCalculatorHelper.addPromotion(result, orderItem,
-                    discountProduct.getActivityId(), discountProduct.getActivityName(), PromotionTypeEnum.DISCOUNT_ACTIVITY.getType(),
-                    StrUtil.format("限时折扣：省 {} 元", formatPrice(newDiscountPrice)),
-                    newDiscountPrice);
+            if (orderItem.getSelected()) {
+                // 注意，只有在选中的情况下，才会记录到优惠明细。否则仅仅是更新 SKU 优惠金额，用于展示
+                TradePriceCalculatorHelper.addPromotion(result, orderItem,
+                        discountProduct.getActivityId(), discountProduct.getActivityName(), PromotionTypeEnum.DISCOUNT_ACTIVITY.getType(),
+                        StrUtil.format("限时折扣：省 {} 元", formatPrice(newDiscountPrice)),
+                        newDiscountPrice);
+            }
             // 3.2 更新 SKU 优惠金额
             orderItem.setDiscountPrice(orderItem.getDiscountPrice() + newDiscountPrice);
             TradePriceCalculatorHelper.recountPayPrice(orderItem);

@@ -36,7 +36,7 @@ class TradeCouponPriceCalculatorTest extends BaseMockitoUnitTest {
     private CouponApi couponApi;
 
     @Test
-    void calculate() {
+    public void testCalculate() {
         // 准备参数
         TradePriceCalculateReqBO param = new TradePriceCalculateReqBO()
                 .setUserId(233L).setCouponId(1024L)
@@ -120,7 +120,7 @@ class TradeCouponPriceCalculatorTest extends BaseMockitoUnitTest {
         assertEquals(orderItem04.getCouponPrice(), 0);
         assertEquals(orderItem04.getPointPrice(), 0);
         assertEquals(orderItem04.getPayPrice(), 300);
-        // 断言 Promotion 部分
+        // 断言：Promotion 部分
         assertEquals(result.getPromotions().size(), 1);
         TradePriceCalculateRespBO.Promotion promotion01 = result.getPromotions().get(0);
         assertEquals(promotion01.getId(), 1024L);
@@ -140,4 +140,5 @@ class TradeCouponPriceCalculatorTest extends BaseMockitoUnitTest {
         assertEquals(promotionItem012.getTotalPrice(), 150);
         assertEquals(promotionItem012.getDiscountPrice(), 30);
     }
+
 }
