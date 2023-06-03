@@ -15,8 +15,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
 import static java.util.Collections.singletonList;
 
-// TODO 芋艿：改成父类
-
 /**
  * {@link TradePriceCalculator} 的工具类
  *
@@ -107,6 +105,31 @@ public class TradePriceCalculatorHelper {
     }
 
     /**
+     * 重新计算每个订单项的支付金额
+     *
+     * 【目前主要是单测使用】
+     *
+     * @param orderItems 订单项数组
+     */
+    public static void recountPayPrice(List<TradePriceCalculateRespBO.OrderItem> orderItems) {
+        orderItems.forEach(orderItem -> {
+            if (orderItem.getDiscountPrice() == null) {
+                orderItem.setDiscountPrice(0);
+            }
+            if (orderItem.getDeliveryPrice() == null) {
+                orderItem.setDeliveryPrice(0);
+            }
+            if (orderItem.getCouponPrice() == null) {
+                orderItem.setCouponPrice(0);
+            }
+            if (orderItem.getPointPrice() == null) {
+                orderItem.setPointPrice(0);
+            }
+            recountPayPrice(orderItem);
+        });
+    }
+
+    /**
      * 计算已选中的订单项，总支付金额
      *
      * @param orderItems 订单项数组
@@ -114,7 +137,7 @@ public class TradePriceCalculatorHelper {
      */
     public static Integer calculateTotalPayPrice(List<TradePriceCalculateRespBO.OrderItem> orderItems) {
         return getSumValue(orderItems,
-                orderItem -> orderItem.getSelected() ? orderItem.getPayPrice() :  0, // 未选中的情况下，不计算支付金额
+                orderItem -> orderItem.getSelected() ? orderItem.getPayPrice() : 0, // 未选中的情况下，不计算支付金额
                 Integer::sum);
     }
 
