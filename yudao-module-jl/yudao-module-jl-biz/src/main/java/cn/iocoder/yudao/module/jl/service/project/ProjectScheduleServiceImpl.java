@@ -48,6 +48,12 @@ public class ProjectScheduleServiceImpl implements ProjectScheduleService {
     private ProjectQuoteMapper projectQuoteMapper;
 
     @Resource
+    private ProjectSopRepository projectSopRepository;
+
+    @Resource
+    private ProjectSopMapper projectSopMapper ;
+
+    @Resource
     private ProjectCategoryRepository projectCategoryRepository;
 
     @Resource
@@ -106,6 +112,7 @@ public class ProjectScheduleServiceImpl implements ProjectScheduleService {
             projectCategoryRepository.deleteByScheduleId(scheduleId);
             projectSupplyRepository.deleteByProjectCategoryIdIn(categoryIds);
             projectChargeitemRepository.deleteByProjectCategoryIdIn(categoryIds);
+            projectSopRepository.deleteByProjectCategoryIdIn(categoryIds);
 
             // 保存新的
             for (int i = 0; i < categoryList.size(); i++) {
@@ -113,7 +120,7 @@ public class ProjectScheduleServiceImpl implements ProjectScheduleService {
                 ProjectCategoryWithSupplyAndChargeItemVO category = categoryList.get(i);
                 category.setCategoryType("schedule");
                 category.setScheduleId(scheduleId);
-                category.setType("1");
+                category.setType("1"); // TODO 今后要更改状态，这里是创建和修改的状态。
                 ProjectCategory categoryDo = projectCategoryMapper.toEntity(category);
                 projectCategoryRepository.save(categoryDo);
 
@@ -141,6 +148,19 @@ public class ProjectScheduleServiceImpl implements ProjectScheduleService {
 
                     List<ProjectSupply> projectSupplies = projectSupplyMapper.toEntity(projectSupplyList);
                     projectSupplyRepository.saveAll(projectSupplies);
+                }
+
+                // 保存 SOP
+                List<ProjectSopBaseVO> sopList = category.getSopList();
+                if(sopList != null && sopList.size() >= 1) {
+                    List<ProjectSopBaseVO> projectSopList = sopList.stream().map(sop -> {
+                        sop.setProjectCategoryId(categoryDo.getId());
+                        sop.setCategoryId(categoryDo.getCategoryId());
+                        return sop;
+                    }).collect(Collectors.toList());
+
+                    List<ProjectSop> projectSupplies = projectSopMapper.toEntity(projectSopList);
+                    projectSopRepository.saveAll(projectSupplies);
                 }
             }
         }

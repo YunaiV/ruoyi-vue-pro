@@ -18,4 +18,7 @@ public class ProjectCategoryWithSupplyAndChargeItemVO extends ProjectCategoryBas
 
     @Schema(description = "物资项", example = "[]")
     private List<ProjectSupplySubClass> supplyList;
+
+    @Schema(description = "SOP步骤", example = "[]")
+    private List<ProjectSopBaseVO> sopList;
 }

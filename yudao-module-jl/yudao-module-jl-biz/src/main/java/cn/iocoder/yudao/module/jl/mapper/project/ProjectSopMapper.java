@@ -14,6 +14,8 @@ public interface ProjectSopMapper {
 
     ProjectSop toEntity(ProjectSopUpdateReqVO dto);
 
+    List<ProjectSop> toEntity(List<ProjectSopBaseVO> dto);
+
     ProjectSopRespVO toDto(ProjectSop entity);
 
 
