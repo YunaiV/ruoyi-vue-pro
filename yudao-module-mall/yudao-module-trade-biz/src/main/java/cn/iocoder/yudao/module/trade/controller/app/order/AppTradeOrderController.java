@@ -22,7 +22,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +29,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "用户 App - 交易订单")
@@ -58,15 +58,9 @@ public class AppTradeOrderController {
     @PostMapping("/create")
     @Operation(summary = "创建订单")
     @PreAuthenticated
-    public CommonResult<Long> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO,
-                                          HttpServletRequest servletRequest) {
-        return success(1L);
-//        // 获取登录用户、用户 IP 地址
-//        Long loginUserId = getLoginUserId();
-//        String clientIp = ServletUtils.getClientIP(servletRequest);
-//        // 创建交易订单，预支付记录
-//        Long orderId = tradeOrderService.createOrder(loginUserId, clientIp, createReqVO);
-//        return success(orderId);
+    public CommonResult<Long> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO) {
+        Long orderId = tradeOrderService.createOrder(getLoginUserId(), getClientIP(), createReqVO);
+        return success(orderId);
     }
 
     @PostMapping("/update-paid")

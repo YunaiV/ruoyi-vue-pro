@@ -9,11 +9,8 @@ import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
-import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
-import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
@@ -50,32 +47,32 @@ public interface TradeOrderConvert {
             @Mapping(source = "createReqVO.couponId", target = "couponId"),
             @Mapping(target = "remark", ignore = true),
             @Mapping(source = "createReqVO.remark", target = "userRemark"),
+            @Mapping(source = "createReqVO.type", target = "type"),
+            @Mapping(source = "calculateRespBO.price.totalPrice", target = "totalPrice"),
+            @Mapping(source = "calculateRespBO.price.discountPrice", target = "discountPrice"),
+            @Mapping(source = "calculateRespBO.price.deliveryPrice", target = "deliveryPrice"),
+            @Mapping(source = "calculateRespBO.price.couponPrice", target = "couponPrice"),
+            @Mapping(source = "calculateRespBO.price.pointPrice", target = "pointPrice"),
+            @Mapping(source = "calculateRespBO.price.payPrice", target = "payPrice"),
             @Mapping(source = "address.name", target = "receiverName"),
             @Mapping(source = "address.mobile", target = "receiverMobile"),
             @Mapping(source = "address.areaId", target = "receiverAreaId"),
             @Mapping(source = "address.detailAddress", target = "receiverDetailAddress"),
     })
     TradeOrderDO convert(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO,
-                         PriceCalculateRespDTO.Order order, AddressRespDTO address);
+                         TradePriceCalculateRespBO calculateRespBO, AddressRespDTO address);
 
-    @Mappings({
-            @Mapping(target = "id", ignore = true),
-            @Mapping(source = "sku.spuId", target = "spuId"),
-    })
-    TradeOrderItemDO convert(PriceCalculateRespDTO.OrderItem orderItem, ProductSkuRespDTO sku);
-
-    default List<TradeOrderItemDO> convertList(TradeOrderDO tradeOrderDO,
-                                               List<PriceCalculateRespDTO.OrderItem> orderItems, List<ProductSkuRespDTO> skus) {
-        Map<Long, ProductSkuRespDTO> skuMap = convertMap(skus, ProductSkuRespDTO::getId);
-        return CollectionUtils.convertList(orderItems, orderItem -> {
-            TradeOrderItemDO tradeOrderItemDO = convert(orderItem, skuMap.get(orderItem.getSkuId()));
-            tradeOrderItemDO.setOrderId(tradeOrderDO.getId());
-            tradeOrderItemDO.setUserId(tradeOrderDO.getUserId());
-            tradeOrderItemDO.setAfterSaleStatus(TradeOrderItemAfterSaleStatusEnum.NONE.getStatus()); // 退款信息
-//            tradeOrderItemDO.setCommented(false);
-            return tradeOrderItemDO;
+    default List<TradeOrderItemDO> convertList(TradeOrderDO tradeOrderDO, TradePriceCalculateRespBO calculateRespBO) {
+        return CollectionUtils.convertList(calculateRespBO.getItems(), item -> {
+            TradeOrderItemDO orderItem = convert(item);
+            orderItem.setOrderId(tradeOrderDO.getId());
+            orderItem.setUserId(tradeOrderDO.getUserId());
+            orderItem.setAfterSaleStatus(TradeOrderItemAfterSaleStatusEnum.NONE.getStatus());
+            orderItem.setCommentStatus(false);
+            return orderItem;
         });
     }
+    TradeOrderItemDO convert(TradePriceCalculateRespBO.OrderItem item);
 
     @Mapping(source = "userId" , target = "userId")
     PriceCalculateReqDTO convert(AppTradeOrderCreateReqVO createReqVO, Long userId);
@@ -87,19 +84,20 @@ public interface TradeOrderConvert {
     ProductSkuUpdateStockReqDTO.Item convert(TradeOrderItemDO bean);
     List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
 
-    default PayOrderCreateReqDTO convert(TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItemDOs,
-                                         List<ProductSpuRespDTO> spus, TradeOrderProperties tradeOrderProperties) {
+    default PayOrderCreateReqDTO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
+                                         TradePriceCalculateRespBO calculateRespBO, TradeOrderProperties orderProperties) {
         PayOrderCreateReqDTO createReqDTO = new PayOrderCreateReqDTO()
-                .setAppId(tradeOrderProperties.getAppId()).setUserIp(tradeOrderDO.getUserIp());
+                .setAppId(orderProperties.getAppId()).setUserIp(order.getUserIp());
         // 商户相关字段
-        createReqDTO.setMerchantOrderId(String.valueOf(tradeOrderDO.getId()));
-        String subject = spus.get(0).getName();
-        if (spus.size() > 1) {
+        createReqDTO.setMerchantOrderId(String.valueOf(order.getId()));
+        String subject = calculateRespBO.getItems().get(0).getSpuName();
+        if (calculateRespBO.getItems().size() > 1) {
             subject += " 等多件";
         }
         createReqDTO.setSubject(subject);
+        createReqDTO.setBody(subject); // TODO 芋艿：临时写死
         // 订单相关字段
-        createReqDTO.setAmount(tradeOrderDO.getPayPrice()).setExpireTime(addTime(tradeOrderProperties.getExpireTime()));
+        createReqDTO.setAmount(order.getPayPrice()).setExpireTime(addTime(orderProperties.getExpireTime()));
         return createReqDTO;
     }
 
@@ -113,6 +111,7 @@ public interface TradeOrderConvert {
                 .collect(Collectors.toSet());
     }
 
+    // TODO 芋艿：可简化
     default PageResult<TradeOrderPageItemRespVO> convertPage(PageResult<TradeOrderDO> pageResult, List<TradeOrderItemDO> orderItems,
                                                              List<ProductPropertyValueDetailRespDTO> propertyValueDetails) {
         Map<Long, List<TradeOrderItemDO>> orderItemMap = convertMultiMap(orderItems, TradeOrderItemDO::getOrderId);
@@ -149,6 +148,7 @@ public interface TradeOrderConvert {
     TradeOrderPageItemRespVO convert(TradeOrderDO order, List<TradeOrderItemDO> items);
     ProductPropertyValueDetailRespVO convert(ProductPropertyValueDetailRespDTO bean);
 
+    // TODO 芋艿：可简化
     default TradeOrderDetailRespVO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                            List<ProductPropertyValueDetailRespDTO> propertyValueDetails, MemberUserRespDTO user) {
         TradeOrderDetailRespVO orderVO = convert2(order, orderItems);
@@ -179,6 +179,7 @@ public interface TradeOrderConvert {
     TradeOrderDetailRespVO convert2(TradeOrderDO order, List<TradeOrderItemDO> items);
     MemberUserRespVO convert(MemberUserRespDTO bean);
 
+    // TODO 芋艿：可简化
     default PageResult<AppTradeOrderPageItemRespVO> convertPage02(PageResult<TradeOrderDO> pageResult, List<TradeOrderItemDO> orderItems,
                                                                   List<ProductPropertyValueDetailRespDTO> propertyValueDetails) {
         Map<Long, List<TradeOrderItemDO>> orderItemMap = convertMultiMap(orderItems, TradeOrderItemDO::getOrderId);
