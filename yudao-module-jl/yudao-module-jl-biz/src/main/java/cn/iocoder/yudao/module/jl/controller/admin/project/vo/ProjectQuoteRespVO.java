@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.jl.controller.admin.project.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 项目报价 Response VO")
 @Data
@@ -16,4 +17,6 @@ public class ProjectQuoteRespVO extends ProjectQuoteBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
+    @Schema(description = "实验名目", example = "1")
+    private List<ProjectCategoryWithSupplyAndChargeItemVO> categoryList;
 }

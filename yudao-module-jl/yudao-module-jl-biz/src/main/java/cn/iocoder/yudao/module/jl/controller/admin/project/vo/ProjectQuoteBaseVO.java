@@ -28,6 +28,8 @@ public class ProjectQuoteBaseVO {
     @NotNull(message = "方案 URL不能为空")
     private String reportUrl;
 
+    private String reportName;
+
     @Schema(description = "折扣(100: 无折扣, 98: 98折)", requiredMode = Schema.RequiredMode.REQUIRED, example = "6647")
     @NotNull(message = "折扣(100: 无折扣, 98: 98折)不能为空")
     private Integer discount;

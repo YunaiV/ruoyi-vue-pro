@@ -111,7 +111,7 @@ public class ProjectCategory extends BaseEntity {
     /**
      * 实验物资
      */
-    @OneToMany(mappedBy="category")
+    @OneToMany(mappedBy="category1")
     private List<ProjectChargeitem> chargeitemList;
 
 }

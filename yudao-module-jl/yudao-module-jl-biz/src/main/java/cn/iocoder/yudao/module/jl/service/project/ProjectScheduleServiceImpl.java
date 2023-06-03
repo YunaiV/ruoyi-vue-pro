@@ -111,6 +111,7 @@ public class ProjectScheduleServiceImpl implements ProjectScheduleService {
                 ProjectCategoryWithSupplyAndChargeItemVO category = categoryList.get(i);
                 category.setCategoryType("schedule");
                 category.setScheduleId(scheduleId);
+                category.setType("1");
                 ProjectCategory categoryDo = projectCategoryMapper.toEntity(category);
                 projectCategoryRepository.save(categoryDo);
 

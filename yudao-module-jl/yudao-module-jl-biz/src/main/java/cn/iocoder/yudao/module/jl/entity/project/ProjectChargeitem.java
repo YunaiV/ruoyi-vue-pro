@@ -84,5 +84,5 @@ public class ProjectChargeitem extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name="project_category_id", insertable = false, updatable = false)
-    private ProjectCategory category;
+    private ProjectCategory category1;
 }

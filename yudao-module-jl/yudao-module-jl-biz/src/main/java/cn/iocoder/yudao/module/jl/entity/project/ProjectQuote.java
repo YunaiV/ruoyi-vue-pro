@@ -52,6 +52,9 @@ public class ProjectQuote extends BaseEntity {
     @Column(name = "report_url", nullable = false )
     private String reportUrl;
 
+    @Column(name = "report_name", nullable = false )
+    private String reportName;
+
     /**
      * 折扣(100: 无折扣, 98: 98折)
      */

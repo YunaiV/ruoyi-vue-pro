@@ -23,9 +23,13 @@ public class ProjectQuoteSaveReqVO  {
     @NotNull(message = "报价单的名字不能为空")
     private String name;
 
-    @Schema(description = "方案 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
+    @Schema(description = "方案 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://viseem.com")
     @NotNull(message = "方案 URL不能为空")
     private String reportUrl;
+
+    @Schema(description = "方案名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "报告名字")
+    @NotNull(message = "方案 URL不能为空")
+    private String reportName;
 
     @Schema(description = "折扣(100: 无折扣, 98: 98折)", requiredMode = Schema.RequiredMode.REQUIRED, example = "6647")
     @NotNull(message = "折扣(100: 无折扣, 98: 98折)不能为空")
