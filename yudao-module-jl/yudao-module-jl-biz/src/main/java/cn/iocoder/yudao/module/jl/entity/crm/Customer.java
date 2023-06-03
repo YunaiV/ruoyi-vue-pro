@@ -177,7 +177,7 @@ public class Customer extends BaseEntity {
     @Column(name = "sales_id")
     private Long salesId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sales_id", insertable = false, updatable = false)
     private User sales;
 

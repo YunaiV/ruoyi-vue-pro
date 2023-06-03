@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.jl.entity.crm;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import cn.iocoder.yudao.module.jl.entity.project.ProjectQuote;
 import cn.iocoder.yudao.module.jl.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
@@ -99,4 +100,14 @@ public class Saleslead extends BaseEntity {
     @Column(name = "manager_id")
     private Long managerId;
 
+    @OneToOne
+    @JoinColumn(name="quotation", referencedColumnName="id", insertable = false, updatable = false)
+    private ProjectQuote quote;
+
+    @Column(name = "last_followup_id")
+    private Long lastFollowUpId;
+
+    @OneToOne
+    @JoinColumn(name = "last_followup_id", referencedColumnName="id", insertable = false, updatable = false)
+    private Followup lastFollowup;
 }

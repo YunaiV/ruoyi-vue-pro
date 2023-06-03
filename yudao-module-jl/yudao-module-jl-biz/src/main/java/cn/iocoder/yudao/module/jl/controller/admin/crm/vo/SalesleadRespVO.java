@@ -1,5 +1,9 @@
 package cn.iocoder.yudao.module.jl.controller.admin.crm.vo;
 
+import cn.iocoder.yudao.module.jl.controller.admin.project.vo.ProjectQuoteBaseVO;
+import cn.iocoder.yudao.module.jl.controller.admin.project.vo.ProjectQuoteOrScheduleSaveReqVO;
+import cn.iocoder.yudao.module.jl.controller.admin.project.vo.ProjectQuoteRespVO;
+import cn.iocoder.yudao.module.jl.entity.project.ProjectQuote;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -16,5 +20,10 @@ public class SalesleadRespVO extends SalesleadBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    private CustomerBaseVO customer;
+    private CustomerRespVO customer;
+
+    private ProjectQuoteRespVO quote;
+
+    @Schema(description = "折扣前总价", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Long totalPrice = 10000L;
 }

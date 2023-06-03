@@ -18,5 +18,5 @@ public class ProjectQuoteRespVO extends ProjectQuoteBaseVO {
     private LocalDateTime createTime;
 
     @Schema(description = "实验名目", example = "[]")
-    private List<ProjectCategoryWithSupplyAndChargeItemVO> categoryList;
+    private List<ProjectCategoryRespVO> categoryList;
 }

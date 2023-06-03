@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.jl.service.crm;
 
+import cn.iocoder.yudao.module.jl.repository.crm.SalesleadRepository;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -39,6 +40,9 @@ public class FollowupServiceImpl implements FollowupService {
     private FollowupRepository followupRepository;
 
     @Resource
+    private SalesleadRepository salesleadRepository;
+
+    @Resource
     private FollowupMapper followupMapper;
 
     @Override
@@ -46,6 +50,10 @@ public class FollowupServiceImpl implements FollowupService {
         // 插入
         Followup followup = followupMapper.toEntity(createReqVO);
         followupRepository.save(followup);
+
+        // 更新销售线索
+        salesleadRepository.updateLastFollowUpIdById(createReqVO.getRefId(), followup.getId());
+
         // 返回
         return followup.getId();
     }

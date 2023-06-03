@@ -11,6 +11,8 @@ import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
