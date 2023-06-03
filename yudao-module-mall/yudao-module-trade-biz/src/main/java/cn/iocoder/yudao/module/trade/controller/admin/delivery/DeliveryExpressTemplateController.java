@@ -73,7 +73,7 @@ public class DeliveryExpressTemplateController {
 
     @GetMapping("/list-all-simple")
     @Operation(summary = "获取快递模版精简信息列表", description = "主要用于前端的下拉选项")
-    public CommonResult<List<DeliveryExpressTemplateSimpleRespVO>> getSimpleTemplateList() {
+    public CommonResult<List<DeliveryExpressTemplateRespVO>> getSimpleTemplateList() {
         // 获取运费模版列表，只要开启状态的
         List<DeliveryExpressTemplateDO> list = deliveryExpressTemplateService.getDeliveryExpressTemplateList();
         // 排序后，返回给前端
