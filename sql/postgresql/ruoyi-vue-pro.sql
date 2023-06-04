@@ -4239,7 +4239,7 @@ CREATE TABLE "system_notify_message" (
   "template_content" varchar(1024) COLLATE "pg_catalog"."default" NOT NULL,
   "template_type" int4 NOT NULL,
   "template_params" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "read_status" varchar(1) COLLATE "pg_catalog"."default" NOT NULL,
+  "read_status"" bool NOT NULL,
   "read_time" timestamp(6),
   "creator" varchar(64) COLLATE "pg_catalog"."default",
   "create_time" timestamp(6) NOT NULL,
