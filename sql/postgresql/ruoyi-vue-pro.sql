@@ -2607,7 +2607,7 @@ CREATE TABLE "system_menu" (
   "update_time" timestamp(6) NOT NULL,
   "deleted" int2 NOT NULL DEFAULT 0,
   "component_name" varchar(255) COLLATE "pg_catalog"."default",
-  "always_show" char(1) COLLATE "pg_catalog"."default"
+  "always_show" bool NULL
 )
 ;
 COMMENT ON COLUMN "system_menu"."id" IS '菜单ID';
