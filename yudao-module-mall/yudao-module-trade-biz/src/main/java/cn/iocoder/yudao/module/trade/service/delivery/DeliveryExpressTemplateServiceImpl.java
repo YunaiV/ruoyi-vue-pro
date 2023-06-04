@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.trade.service.delivery;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.*;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateChargeDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
@@ -9,6 +12,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemp
 import cn.iocoder.yudao.module.trade.dal.mysql.delivery.DeliveryExpressTemplateChargeMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.delivery.DeliveryExpressTemplateFreeMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.delivery.DeliveryExpressTemplateMapper;
+import cn.iocoder.yudao.module.trade.service.delivery.bo.SpuDeliveryExpressTemplateRespBO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +21,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.trade.convert.delivery.DeliveryExpressTemplateConvert.INSTANCE;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_TEMPLATE_NAME_DUPLICATE;
@@ -37,6 +42,8 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
     private DeliveryExpressTemplateChargeMapper expressTemplateChargeMapper;
     @Resource
     private DeliveryExpressTemplateFreeMapper expressTemplateFreeMapper;
+    @Resource
+    private ProductSpuApi productSpuApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -214,6 +221,52 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
             throw exception(EXPRESS_TEMPLATE_NOT_EXISTS);
         }
         return template;
+    }
+
+    @Override
+    public Map<Long, SpuDeliveryExpressTemplateRespBO> getExpressTemplateBySpuIdsAndArea(Collection<Long> spuIds, Integer areaId) {
+        Assert.notNull(areaId, "区域编号 {} 不能为空", areaId);
+        List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(spuIds);
+        if (CollUtil.isEmpty(spuList)) {
+            return Collections.emptyMap();
+        }
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getDeliveryTemplateId);
+        List<DeliveryExpressTemplateDO> templateList = expressTemplateMapper.selectBatchIds(spuMap.keySet());
+        Map<Long, SpuDeliveryExpressTemplateRespBO> result = new HashMap<>(templateList.size());
+        templateList.forEach(item -> {
+            if (spuMap.containsKey(item.getId())) {
+                ProductSpuRespDTO spuDTO = spuMap.get(item.getId());
+                SpuDeliveryExpressTemplateRespBO bo = new SpuDeliveryExpressTemplateRespBO()
+                        .setSpuId(spuDTO.getId()).setAreaId(areaId)
+                        .setChargeMode(item.getChargeMode())
+                        .setTemplateCharge(findMatchExpressTemplateCharge(item.getId(), areaId))
+                        .setTemplateFree(findMatchExpressTemplateFree(item.getId(), areaId));
+                result.put(spuDTO.getId(), bo);
+            }
+        });
+        return result;
+    }
+
+    private DeliveryExpressTemplateChargeDO findMatchExpressTemplateCharge(Long templateId, Integer areaId) {
+        List<DeliveryExpressTemplateChargeDO> list = expressTemplateChargeMapper.selectListByTemplateId(templateId);
+        for (DeliveryExpressTemplateChargeDO item : list) {
+            // 第一个匹配的返回。 areaId 不能重复
+            if (item.getAreaIds().contains(areaId)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    private DeliveryExpressTemplateFreeDO findMatchExpressTemplateFree(Long templateId, Integer areaId) {
+        List<DeliveryExpressTemplateFreeDO> list = expressTemplateFreeMapper.selectListByTemplateId(templateId);
+        for (DeliveryExpressTemplateFreeDO item : list) {
+            // 第一个匹配的返回。 areaId 不能重复
+            if (item.getAreaIds().contains(areaId)) {
+                return item;
+            }
+        }
+        return null;
     }
 
 }
