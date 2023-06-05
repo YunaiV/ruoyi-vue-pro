@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.jl.entity.project;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 import java.util.*;
 import javax.persistence.*;
@@ -50,5 +53,6 @@ public class ProjectSchedule extends BaseEntity {
      * 实验名目
      */
     @OneToMany(mappedBy="schedule")
+    @JsonManagedReference
     private List<ProjectCategory> categoryList;
 }

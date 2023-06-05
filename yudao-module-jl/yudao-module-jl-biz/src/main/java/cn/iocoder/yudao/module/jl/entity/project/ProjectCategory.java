@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.jl.entity.project;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -98,18 +102,20 @@ public class ProjectCategory extends BaseEntity {
     private String mark;
 
     @ManyToOne
-    @JoinColumn(name="quote_id", insertable = false, updatable = false)
-    private ProjectQuote quote;
+    @JoinColumn(name="schedule_id", insertable = false, updatable = false)
+    @JsonBackReference
+    private ProjectSchedule schedule;
 
     @ManyToOne
-    @JoinColumn(name="schedule_id", insertable = false, updatable = false)
-    private ProjectSchedule schedule;
+    @JoinColumn(name="quote_id", insertable = false, updatable = false)
+    private ProjectQuote quote;
 
     /**
      * 实验物资
      */
     @OneToMany(mappedBy="category", fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
+    @JsonManagedReference
     private List<ProjectSupply> supplyList;
 
     /**
@@ -117,6 +123,15 @@ public class ProjectCategory extends BaseEntity {
      */
     @OneToMany(mappedBy="category", fetch = FetchType.EAGER)
     @Fetch(FetchMode.JOIN)
+    @JsonManagedReference
     private List<ProjectChargeitem> chargeList;
+
+    /**
+     * 实验SOP
+     */
+    @OneToMany(mappedBy="category", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @JsonManagedReference
+    private List<ProjectSop> sopList;
 
 }

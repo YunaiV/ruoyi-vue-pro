@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.jl.entity.project;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import java.util.*;
 import javax.persistence.*;
@@ -84,5 +85,6 @@ public class ProjectChargeitem extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name="project_category_id", insertable = false, updatable = false)
+    @JsonBackReference
     private ProjectCategory category;
 }
