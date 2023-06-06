@@ -100,7 +100,7 @@ public class Saleslead extends BaseEntity {
     @Column(name = "manager_id")
     private Long managerId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER, optional=true)
     @JoinColumn(name="quotation", referencedColumnName="id", insertable = false, updatable = false)
     private ProjectQuote quote;
 
