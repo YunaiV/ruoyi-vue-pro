@@ -96,4 +96,16 @@ public class Project extends BaseEntity {
     @Column(name = "customer_id")
     private Long customerId;
 
+    /**
+     * 当前安排单 id
+     */
+    @Column(name = "current_schedule_id")
+    private Long currentScheduleId;
+
+    /**
+     * 当前安排单
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "current_schedule_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private ProjectSchedule currentSchedule;
 }

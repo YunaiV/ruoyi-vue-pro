@@ -123,9 +123,8 @@ public class ProjectQuoteServiceImpl implements ProjectQuoteService {
             for (int i = 0; i < categoryList.size(); i++) {
                 // 保存实验名目
                 ProjectCategoryWithSupplyAndChargeItemVO category = categoryList.get(i);
-                category.setCategoryType("quote");
+                category.setType("quote");
                 category.setQuoteId(quoteId);
-                category.setType("1");
                 ProjectCategory categoryDo = projectCategoryMapper.toEntity(category);
                 projectCategoryRepository.save(categoryDo);
 

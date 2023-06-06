@@ -118,9 +118,8 @@ public class ProjectScheduleServiceImpl implements ProjectScheduleService {
             for (int i = 0; i < categoryList.size(); i++) {
                 // 保存实验名目
                 ProjectCategoryWithSupplyAndChargeItemVO category = categoryList.get(i);
-                category.setCategoryType("schedule");
+                category.setType("schedule");
                 category.setScheduleId(scheduleId);
-                category.setType("1"); // TODO 今后要更改状态，这里是创建和修改的状态。
                 ProjectCategory categoryDo = projectCategoryMapper.toEntity(category);
                 projectCategoryRepository.save(categoryDo);
 
