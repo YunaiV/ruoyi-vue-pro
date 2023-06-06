@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.jl.entity.crm;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import cn.iocoder.yudao.module.jl.entity.project.Project;
 import cn.iocoder.yudao.module.jl.entity.project.ProjectQuote;
 import cn.iocoder.yudao.module.jl.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -110,4 +111,8 @@ public class Saleslead extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "last_followup_id", referencedColumnName="id", insertable = false, updatable = false)
     private Followup lastFollowup;
+
+    @OneToOne
+    @JoinColumn(name = "project_id", referencedColumnName="id", insertable = false, updatable = false)
+    private Project project;
 }
