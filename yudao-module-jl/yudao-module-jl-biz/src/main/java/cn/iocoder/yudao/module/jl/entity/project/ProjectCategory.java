@@ -107,6 +107,7 @@ public class ProjectCategory extends BaseEntity {
     private ProjectSchedule schedule;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name="quote_id", insertable = false, updatable = false)
     private ProjectQuote quote;
 

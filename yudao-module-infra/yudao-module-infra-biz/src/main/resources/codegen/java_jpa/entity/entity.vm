@@ -5,6 +5,8 @@ import lombok.*;
 import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 #foreach ($column in $columns)
 #if (${column.javaType} == "BigDecimal")
 import java.math.BigDecimal;
@@ -27,6 +29,7 @@ import java.time.LocalDate;
 @Setter
 @Entity(name = "${table.className}")
 @Table(name = "${table.tableName}")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class ${table.className} extends BaseEntity {
 #foreach ($column in $columns)
 #if (!${baseDOFields.contains(${column.javaField})})##排除 BaseDO 的字段

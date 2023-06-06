@@ -2,7 +2,10 @@ package cn.iocoder.yudao.module.jl.entity.crm;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
 import cn.iocoder.yudao.module.jl.entity.user.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 import java.util.*;
 import javax.persistence.*;
@@ -21,6 +24,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity(name = "Customer")
 @Table(name = "jl_crm_customer")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Customer extends BaseEntity {
 
     /**
@@ -197,8 +201,8 @@ public class Customer extends BaseEntity {
     @Column(name = "last_saleslead_id")
     private Long lastSalesleadId;
 
-//    @JsonManagedReference
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "last_saleslead_id", insertable = false, updatable = false)
-//    private Saleslead lastSaleslead;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "last_saleslead_id", insertable = false, updatable = false)
+    @JsonManagedReference
+    private Saleslead lastSaleslead;
 }

@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.jl.entity.project;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import java.util.*;
 import javax.persistence.*;
@@ -71,5 +73,6 @@ public class ProjectQuote extends BaseEntity {
      * 实验名目
      */
     @OneToMany(mappedBy="quote")
+    @JsonManagedReference
     private List<ProjectCategory> categoryList;
 }
