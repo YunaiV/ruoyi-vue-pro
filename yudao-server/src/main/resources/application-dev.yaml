@@ -28,6 +28,9 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+    jpa:
+      hibernate:
+        ddl-auto: none # 设置为 update，方便开发
     dynamic: # 多数据源配置
       druid: # Druid 【连接池】相关的全局配置
         initial-size: 5 # 初始连接数
@@ -44,24 +47,24 @@ spring:
       primary: master
       datasource:
         master:
-          name: ruoyi-vue-pro
-          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&serverTimezone=CTT&allowPublicKeyRetrieval=true
-          driver-class-name: com.mysql.jdbc.Driver
-          username: root
-          password: 3WLiVUBEwTbvAfsh
-        slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
-          name: ruoyi-vue-pro
-          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&serverTimezone=CTT&allowPublicKeyRetrieval=true
-          driver-class-name: com.mysql.jdbc.Driver
-          username: root
-          password: 3WLiVUBEwTbvAfsh
+          name: jinglai
+          url: jdbc:mysql://49.234.229.39:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: jinglai
+          password: BBjGc8Wpdz7diKEx
+#        slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
+#          name: jinglai_dev
+#          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&serverTimezone=CTT&allowPublicKeyRetrieval=true
+#          driver-class-name: com.mysql.jdbc.Driver
+#          username: root
+#          password: 3WLiVUBEwTbvAfsh
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
-    host: 400-infra.server.iocoder.cn # 地址
-    port: 6379 # 端口
-    database: 1 # 数据库索引
-#    password: 123456 # 密码，建议生产环境开启
+    host: 49.234.229.39
+    port: 6379
+    database: 1
+    password: zTPPZPAPJCSd2HEp
 
 --- #################### 定时任务相关配置 ####################
 
@@ -169,7 +172,7 @@ yudao:
   pay:
     callback-url: http://yunai.natapp1.cc/admin-api/pay/notify/callback
     return-url: http://yunai.natapp1.cc/admin-api/pay/notify/return
-  demo: true # 开启演示模式
+  demo: false # 开启演示模式
 
 justauth:
   enabled: true

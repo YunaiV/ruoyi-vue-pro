@@ -8426,7 +8426,7 @@ ALTER TABLE [dbo].[system_post] SET (LOCK_ESCALATION = TABLE)
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'岗位ID',
+'MS_Description', N'ID',
 'SCHEMA', N'dbo',
 'TABLE', N'system_post',
 'COLUMN', N'id'
@@ -10906,7 +10906,7 @@ EXEC sp_addextendedproperty
 GO
 
 EXEC sp_addextendedproperty
-'MS_Description', N'岗位ID',
+'MS_Description', N'ID',
 'SCHEMA', N'dbo',
 'TABLE', N'system_user_post',
 'COLUMN', N'post_id'

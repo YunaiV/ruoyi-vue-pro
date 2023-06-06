@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.generator.config.po.TableField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Transient;
 
 /**
  * 代码生成 column 字段定义
@@ -94,6 +95,16 @@ public class CodegenColumnDO extends BaseDO {
      * 关联 {@link TableField#getPropertyName()}
      */
     private String javaField;
+
+
+    /**
+     * Java 属性名，首字母大写
+     *
+     * 关联 {@link TableField#getPropertyName()}
+     */
+    public String getJavaFieldCapitalize() {
+        return javaField.substring(0, 1).toUpperCase() + javaField.substring(1);
+    }
     /**
      * 字典类型
      * <p>

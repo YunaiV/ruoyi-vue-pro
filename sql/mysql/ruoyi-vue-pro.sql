@@ -2377,7 +2377,7 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `system_post`;
 CREATE TABLE `system_post`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '岗位ID',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '岗位编码',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '岗位名称',
   `sort` int NOT NULL COMMENT '显示顺序',
@@ -3559,7 +3559,7 @@ DROP TABLE IF EXISTS `system_user_post`;
 CREATE TABLE `system_user_post`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
   `user_id` bigint NOT NULL DEFAULT 0 COMMENT '用户ID',
-  `post_id` bigint NOT NULL DEFAULT 0 COMMENT '岗位ID',
+  `post_id` bigint NOT NULL DEFAULT 0 COMMENT 'ID',
   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',

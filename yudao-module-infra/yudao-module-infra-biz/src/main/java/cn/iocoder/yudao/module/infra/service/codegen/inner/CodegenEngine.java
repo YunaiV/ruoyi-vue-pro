@@ -63,25 +63,21 @@ public class CodegenEngine {
             .put(javaTemplatePath("controller/vo/baseVO"), javaModuleImplVOFilePath("BaseVO"))
             .put(javaTemplatePath("controller/vo/createReqVO"), javaModuleImplVOFilePath("CreateReqVO"))
             .put(javaTemplatePath("controller/vo/pageReqVO"), javaModuleImplVOFilePath("PageReqVO"))
+            .put(javaTemplatePath("controller/vo/order"), javaModuleImplVOFilePath("PageOrder"))
             .put(javaTemplatePath("controller/vo/respVO"), javaModuleImplVOFilePath("RespVO"))
             .put(javaTemplatePath("controller/vo/updateReqVO"), javaModuleImplVOFilePath("UpdateReqVO"))
             .put(javaTemplatePath("controller/vo/exportReqVO"), javaModuleImplVOFilePath("ExportReqVO"))
             .put(javaTemplatePath("controller/vo/excelVO"), javaModuleImplVOFilePath("ExcelVO"))
             .put(javaTemplatePath("controller/controller"), javaModuleImplControllerFilePath())
-            .put(javaTemplatePath("convert/convert"),
-                    javaModuleImplMainFilePath("convert/${table.businessName}/${table.className}Convert"))
-            .put(javaTemplatePath("dal/do"),
-                    javaModuleImplMainFilePath("dal/dataobject/${table.businessName}/${table.className}DO"))
-            .put(javaTemplatePath("dal/mapper"),
-                    javaModuleImplMainFilePath("dal/mysql/${table.businessName}/${table.className}Mapper"))
-            .put(javaTemplatePath("dal/mapper.xml"), mapperXmlFilePath())
-            .put(javaTemplatePath("service/serviceImpl"),
-                    javaModuleImplMainFilePath("service/${table.businessName}/${table.className}ServiceImpl"))
-            .put(javaTemplatePath("service/service"),
-                    javaModuleImplMainFilePath("service/${table.businessName}/${table.className}Service"))
+
+            .put(javaTemplatePath("repository/repository"), javaModuleImplMainFilePath("repository/${table.businessName}/${table.className}Repository"))
+            .put(javaTemplatePath("entity/entity"), javaModuleImplMainFilePath("entity/${table.businessName}/${table.className}"))
+            .put(javaTemplatePath("mapper/mapper"), javaModuleImplMainFilePath("mapper/${table.businessName}/${table.className}Mapper"))
+            .put(javaTemplatePath("service/serviceImpl"), javaModuleImplMainFilePath("service/${table.businessName}/${table.className}ServiceImpl"))
+            .put(javaTemplatePath("service/service"), javaModuleImplMainFilePath("service/${table.businessName}/${table.className}Service"))
             // Java module-biz Test
-            .put(javaTemplatePath("test/serviceTest"),
-                    javaModuleImplTestFilePath("service/${table.businessName}/${table.className}ServiceImplTest"))
+//            .put(javaTemplatePath("test/serviceTest"),
+//                    javaModuleImplTestFilePath("service/${table.businessName}/${table.className}ServiceImplTest"))
             // Java module-api Main
             .put(javaTemplatePath("enums/errorcode"), javaModuleApiMainFilePath("enums/ErrorCodeConstants_手动操作"))
             // SQL
@@ -210,6 +206,7 @@ public class CodegenEngine {
     }
 
     private Map<String, String> getTemplates(Integer frontType) {
+
         Map<String, String> templates = new LinkedHashMap<>();
         templates.putAll(SERVER_TEMPLATES);
         templates.putAll(FRONT_TEMPLATES.row(frontType));
@@ -232,11 +229,12 @@ public class CodegenEngine {
         filePath = StrUtil.replace(filePath, "${table.moduleName}", table.getModuleName());
         filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName());
         filePath = StrUtil.replace(filePath, "${table.className}", table.getClassName());
+
         return filePath;
     }
 
     private static String javaTemplatePath(String path) {
-        return "codegen/java/" + path + ".vm";
+        return "codegen/java_jpa/" + path + ".vm";
     }
 
     private static String javaModuleImplVOFilePath(String path) {

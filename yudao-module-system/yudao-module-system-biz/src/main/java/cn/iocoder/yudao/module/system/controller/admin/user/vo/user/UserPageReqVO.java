@@ -19,10 +19,13 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @EqualsAndHashCode(callSuper = true)
 public class UserPageReqVO extends PageParam {
 
-    @Schema(description = "用户账号,模糊匹配", example = "yudao")
+    @Schema(description = "用户账号,模糊匹配", example = "admin")
     private String username;
 
-    @Schema(description = "手机号码,模糊匹配", example = "yudao")
+    @Schema(description = "公司职员名字,模糊匹配", example = "王红")
+    private String nickname;
+
+    @Schema(description = "手机号码,模糊匹配", example = "18514007293")
     private String mobile;
 
     @Schema(description = "展示状态,参见 CommonStatusEnum 枚举类", example = "1")

@@ -12,8 +12,8 @@ spring:
   servlet:
     # 文件上传相关配置项
     multipart:
-      max-file-size: 16MB # 单个文件大小
-      max-request-size: 32MB # 设置总上传的文件大小
+      max-file-size: 64MB # 单个文件大小
+      max-request-size: 128MB # 设置总上传的文件大小
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER # 解决 SpringFox 与 SpringBoot 2.6.x 不兼容的问题，参见 SpringFoxHandlerProviderBeanPostProcessor 类
@@ -32,7 +32,7 @@ spring:
   cache:
     type: REDIS
     redis:
-      time-to-live: 1h # 设置过期时间为 1 小时
+      time-to-live: 24h # 设置过期时间为 1 小时
 
 --- #################### 接口文档配置 ####################
 
@@ -86,7 +86,7 @@ aj:
     cache-number: 1000 # local 缓存的阈值,达到这个值，清除缓存
     timing-clear: 180 # local定时清除过期缓存(单位秒),设置为0代表不执行
     type: blockPuzzle # 验证码类型 default两种都实例化。 blockPuzzle 滑块拼图 clickWord 文字点选
-    water-mark: 芋道源码 # 右下角水印文字(我的水印)，可使用 https://tool.chinaz.com/tools/unicode.aspx 中文转 Unicode，Linux 可能需要转 unicode
+    water-mark: 晶莱生物 # 右下角水印文字(我的水印)，可使用 https://tool.chinaz.com/tools/unicode.aspx 中文转 Unicode，Linux 可能需要转 unicode
     interference-options: 0 # 滑动干扰项(0/1/2)
     req-frequency-limit-enable: false # 接口请求次数一分钟限制是否开启 true|false
     req-get-lock-limit: 5 # 验证失败 5 次，get接口锁定
@@ -113,13 +113,13 @@ yudao:
     maxOnlineCount: 0 # 最大连接人数
     sessionMap: true # 保存sessionMap
   swagger:
-    title: 芋道快速开发平台
+    title: 晶莱数字化平台
     description: 提供管理后台、用户 App 的所有功能
-    version: ${yudao.info.version}
-    url: ${yudao.web.admin-ui.url}
-    email: xingyu4j@vip.qq.com
-    license: MIT
-    license-url: https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE
+    version:
+    url:
+    email:
+    license:
+    license-url:
   captcha:
     enable: true # 验证码的开关，默认为 true
   codegen:
