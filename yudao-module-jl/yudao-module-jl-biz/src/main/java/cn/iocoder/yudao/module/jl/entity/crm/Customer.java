@@ -182,7 +182,7 @@ public class Customer extends BaseEntity {
     private Long salesId;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "sales_id", insertable = false, updatable = false)
+    @JoinColumn(name = "sales_id", referencedColumnName = "id", insertable = false, updatable = false)
     private User sales;
 
     /**
