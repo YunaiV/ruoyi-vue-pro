@@ -1,12 +1,21 @@
 package cn.iocoder.yudao.module.jl.service.crm;
 
+import cn.iocoder.yudao.module.jl.controller.admin.project.vo.ProjectConstractItemVO;
 import cn.iocoder.yudao.module.jl.entity.crm.SalesleadCompetitor;
 import cn.iocoder.yudao.module.jl.entity.crm.SalesleadCustomerPlan;
+import cn.iocoder.yudao.module.jl.entity.project.Project;
+import cn.iocoder.yudao.module.jl.entity.project.ProjectConstract;
+import cn.iocoder.yudao.module.jl.enums.ProjectTypeEnums;
+import cn.iocoder.yudao.module.jl.enums.SalesLeadStatusEnums;
 import cn.iocoder.yudao.module.jl.mapper.crm.SalesleadCompetitorMapper;
 import cn.iocoder.yudao.module.jl.mapper.crm.SalesleadCustomerPlanMapper;
+import cn.iocoder.yudao.module.jl.mapper.project.ProjectConstractMapper;
+import cn.iocoder.yudao.module.jl.mapper.project.ProjectMapper;
 import cn.iocoder.yudao.module.jl.repository.crm.CompetitorRepository;
 import cn.iocoder.yudao.module.jl.repository.crm.SalesleadCompetitorRepository;
 import cn.iocoder.yudao.module.jl.repository.crm.SalesleadCustomerPlanRepository;
+import cn.iocoder.yudao.module.jl.repository.project.ProjectConstractRepository;
+import cn.iocoder.yudao.module.jl.repository.project.ProjectRepository;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -47,6 +56,18 @@ public class SalesleadServiceImpl implements SalesleadService {
 
     @Resource
     private SalesleadMapper salesleadMapper;
+
+    @Resource
+    private ProjectRepository projectRepository;
+
+    @Resource
+    private ProjectMapper projectMapper;
+
+    @Resource
+    private ProjectConstractRepository projectConstractRepository;
+
+    @Resource
+    private ProjectConstractMapper projectConstractMapper;
 
     @Resource
     private SalesleadCustomerPlanRepository salesleadCustomerPlanRepository;
@@ -106,7 +127,46 @@ public class SalesleadServiceImpl implements SalesleadService {
             salesleadCustomerPlanRepository.saveAll(plans);
         }
 
-        // 判断是否转成项目
+        // 转成项目的逻辑
+        if(updateReqVO.getStatus().toString().equals(SalesLeadStatusEnums.CompletedTransaction.getStatus())) {
+            // 1. 创建项目
+            Project project = new Project();
+            project.setSalesleadId(salesleadId);
+            project.setCustomerId(updateReqVO.getCustomerId());
+            project.setName(updateReqVO.getProjectName());
+            project.setStage("0");
+            project.setStatus("0");
+            project.setType(ProjectTypeEnums.NormalProject.getStatus());
+            project.setSalesId(updateObj.getCreator()); // 线索的销售人员 id
+            projectRepository.save(project);
+
+            // 2. 保存合同
+            ProjectConstract contract = new ProjectConstract();
+
+            // 遍历 updateReqVO.getProjectConstracts(), 创建合同
+            List<ProjectConstractItemVO> projectConstracts = updateReqVO.getProjectConstracts();
+            if(projectConstracts != null && projectConstracts.size() > 0) {
+                // 遍历 projectConstracts，将它的 projectId 字段设置为 project.getId()
+                projectConstracts.forEach(projectConstract -> {
+                    projectConstract.setProjectId(project.getId());
+                    projectConstract.setName(project.getName());
+                });
+                List<ProjectConstract> contracts = projectConstractMapper.toEntityList(projectConstracts);
+                projectConstractRepository.saveAll(contracts);
+            }
+        } else if (updateReqVO.getStatus().toString().equals(SalesLeadStatusEnums.EmergencyProject.getStatus())) {
+            // 临时应急项目
+            // 1. 创建项目
+            Project project = new Project();
+            project.setSalesleadId(salesleadId);
+            project.setCustomerId(updateReqVO.getCustomerId());
+            project.setName(updateReqVO.getProjectName());
+            project.setStage("0");
+            project.setStatus("0");
+            project.setType(ProjectTypeEnums.EmergencyProject.getStatus());
+            project.setSalesId(updateObj.getCreator()); // 线索的销售人员 id
+            projectRepository.save(project);
+        }
 
     }
 
