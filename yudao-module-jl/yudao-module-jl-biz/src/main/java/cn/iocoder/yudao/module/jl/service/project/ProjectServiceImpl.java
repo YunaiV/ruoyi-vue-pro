@@ -60,6 +60,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public void setProjectCurrentSchedule(Long projectId, Long scheduleId) {
+        // 校验存在
+        validateProjectExists(projectId);
+
+        projectRepository.updateCurrentScheduleIdById(projectId, scheduleId);
+    }
+
+    @Override
     public void deleteProject(Long id) {
         // 校验存在
         validateProjectExists(id);

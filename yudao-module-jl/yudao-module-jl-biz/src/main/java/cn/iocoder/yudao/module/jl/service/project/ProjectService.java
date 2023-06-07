@@ -28,6 +28,11 @@ public interface ProjectService {
     void updateProject(@Valid ProjectUpdateReqVO updateReqVO);
 
     /**
+     * 设置项目的主安排单
+     */
+    void setProjectCurrentSchedule(Long projectId, Long scheduleId);
+
+    /**
      * 删除项目管理
      *
      * @param id 编号

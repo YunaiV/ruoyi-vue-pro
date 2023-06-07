@@ -57,6 +57,14 @@ public class ProjectController {
         return success(true);
     }
 
+    @PutMapping("/current-schedule")
+    @Operation(summary = "设置当前的主安排单")
+    @PreAuthorize("@ss.hasPermission('jl:project:update')")
+    public CommonResult<Boolean> setCurrentSchedule(@Valid @RequestBody ProjectSetCurrentScheduleReqVO updateReqVO) {
+        projectService.setProjectCurrentSchedule(updateReqVO.getProjectId(), updateReqVO.getScheduleId());
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "通过 ID 删除项目管理")
     @Parameter(name = "id", description = "编号", required = true)
