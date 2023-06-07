@@ -25,5 +25,5 @@ public interface SalesleadCustomerPlanMapper {
 
     PageResult<SalesleadCustomerPlanRespVO> toPage(PageResult<SalesleadCustomerPlan> page);
 
-    List<SalesleadCustomerPlan> toEntityList(List<SalesleadCompetitorItemVO> competitorQuotations);
+    List<SalesleadCustomerPlan> toEntityList(List<SalesleadCustomerPlanItemVO> competitorQuotations);
 }

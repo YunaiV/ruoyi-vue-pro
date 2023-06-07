@@ -102,9 +102,11 @@ public class SalesleadServiceImpl implements SalesleadService {
         if(customerPlans != null && customerPlans.size() > 0) {
             // 遍历 customerPlans，将它的 salesleadId 字段设置为 updateObj.getId()
             customerPlans.forEach(customerPlan -> customerPlan.setSalesleadId(salesleadId));
-            List<SalesleadCustomerPlan> plans = salesleadCustomerPlanMapper.toEntityList(competitorQuotations);
+            List<SalesleadCustomerPlan> plans = salesleadCustomerPlanMapper.toEntityList(customerPlans);
             salesleadCustomerPlanRepository.saveAll(plans);
         }
+
+        // 判断是否转成项目
 
     }
 
