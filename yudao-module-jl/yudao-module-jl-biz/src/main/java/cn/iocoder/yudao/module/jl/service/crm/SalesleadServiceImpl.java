@@ -1,5 +1,12 @@
 package cn.iocoder.yudao.module.jl.service.crm;
 
+import cn.iocoder.yudao.module.jl.entity.crm.SalesleadCompetitor;
+import cn.iocoder.yudao.module.jl.entity.crm.SalesleadCustomerPlan;
+import cn.iocoder.yudao.module.jl.mapper.crm.SalesleadCompetitorMapper;
+import cn.iocoder.yudao.module.jl.mapper.crm.SalesleadCustomerPlanMapper;
+import cn.iocoder.yudao.module.jl.repository.crm.CompetitorRepository;
+import cn.iocoder.yudao.module.jl.repository.crm.SalesleadCompetitorRepository;
+import cn.iocoder.yudao.module.jl.repository.crm.SalesleadCustomerPlanRepository;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -41,6 +48,18 @@ public class SalesleadServiceImpl implements SalesleadService {
     @Resource
     private SalesleadMapper salesleadMapper;
 
+    @Resource
+    private SalesleadCustomerPlanRepository salesleadCustomerPlanRepository;
+
+    @Resource
+    private SalesleadCustomerPlanMapper salesleadCustomerPlanMapper;
+
+    @Resource
+    private SalesleadCompetitorRepository salesleadCompetitorRepository;
+
+    @Resource
+    private SalesleadCompetitorMapper salesleadCompetitorMapper;
+
     @Override
     public Long createSaleslead(SalesleadCreateReqVO createReqVO) {
         // 插入
@@ -52,11 +71,41 @@ public class SalesleadServiceImpl implements SalesleadService {
 
     @Override
     public void updateSaleslead(SalesleadUpdateReqVO updateReqVO) {
-        // 校验存在
-        validateSalesleadExists(updateReqVO.getId());
-        // 更新
+
+        if(updateReqVO.getId() != null) {
+            // 校验存在
+            validateSalesleadExists(updateReqVO.getId());
+        }
+
+        // 更新线索
         Saleslead updateObj = salesleadMapper.toEntity(updateReqVO);
         salesleadRepository.save(updateObj);
+        Long salesleadId = updateReqVO.getId();
+
+        // 更新竞争对手的报价
+        // 删除原有的
+        salesleadCompetitorRepository.deleteBySalesleadId(salesleadId);
+        // 再插入
+        List<SalesleadCompetitorItemVO> competitorQuotations = updateReqVO.getCompetitorQuotations();
+        if(competitorQuotations != null && competitorQuotations.size() > 0) {
+            // 遍历 competitorQuotations，将它的 salesleadId 字段设置为 updateObj.getId()
+            competitorQuotations.forEach(competitorQuotation -> competitorQuotation.setSalesleadId(salesleadId));
+            List<SalesleadCompetitor> quotations = salesleadCompetitorMapper.toEntityList(competitorQuotations);
+            salesleadCompetitorRepository.saveAll(quotations);
+        }
+
+        // 更新客户方案
+        // 删除原有的
+        salesleadCustomerPlanRepository.deleteBySalesleadId(salesleadId);
+        // 再插入
+        List<SalesleadCustomerPlanItemVO> customerPlans = updateReqVO.getCustomerPlans();
+        if(customerPlans != null && customerPlans.size() > 0) {
+            // 遍历 customerPlans，将它的 salesleadId 字段设置为 updateObj.getId()
+            customerPlans.forEach(customerPlan -> customerPlan.setSalesleadId(salesleadId));
+            List<SalesleadCustomerPlan> plans = salesleadCustomerPlanMapper.toEntityList(competitorQuotations);
+            salesleadCustomerPlanRepository.saveAll(plans);
+        }
+
     }
 
     @Override

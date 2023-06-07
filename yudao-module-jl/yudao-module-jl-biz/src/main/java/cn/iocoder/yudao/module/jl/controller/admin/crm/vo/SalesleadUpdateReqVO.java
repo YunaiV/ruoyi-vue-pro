@@ -11,8 +11,12 @@ import javax.validation.constraints.*;
 @ToString(callSuper = true)
 public class SalesleadUpdateReqVO extends SalesleadBaseVO {
 
-    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "26580")
-    @NotNull(message = "ID不能为空")
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
     private Long id;
 
+    @Schema(description = "竞争对手报价", example = "[]")
+    private List<SalesleadCompetitorItemVO> competitorQuotations = new ArrayList<>();
+
+    @Schema(description = "客户方案", example = "[]")
+    private List<SalesleadCustomerPlanItemVO> customerPlans = new ArrayList<>();
 }

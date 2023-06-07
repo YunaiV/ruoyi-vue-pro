@@ -12,6 +12,8 @@ import org.mapstruct.*;
 public interface SalesleadCompetitorMapper {
     SalesleadCompetitor toEntity(SalesleadCompetitorCreateReqVO dto);
 
+    List<SalesleadCompetitor> toEntityList(List<SalesleadCompetitorItemVO> dto);
+
     SalesleadCompetitor toEntity(SalesleadCompetitorUpdateReqVO dto);
 
     SalesleadCompetitorRespVO toDto(SalesleadCompetitor entity);

@@ -120,4 +120,12 @@ public class Saleslead extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "project_id", referencedColumnName="id", insertable = false, updatable = false)
     private Project project;
+
+    @OneToMany
+    @JoinColumn(name = "saleslead_id", referencedColumnName="id", insertable = false, updatable = false)
+    private List<SalesleadCompetitor> competitorQuotations;
+
+    @OneToMany
+    @JoinColumn(name = "saleslead_id", referencedColumnName="id", insertable = false, updatable = false)
+    private List<SalesleadCustomerPlan> customerPlans;
 }
