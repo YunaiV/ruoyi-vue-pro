@@ -217,6 +217,14 @@ public class SalesleadServiceImpl implements SalesleadService {
                 predicates.add(cb.equal(root.get("budget"), pageReqVO.getBudget()));
             }
 
+            if(Objects.equals(pageReqVO.getQuotationStatus(), "1")) {
+                // 待报价的
+                predicates.add(cb.isNull(root.get("quotation")));
+            } else if (Objects.equals(pageReqVO.getQuotationStatus(), "2")) {
+                // 已报价的
+                predicates.add(cb.isNotNull(root.get("quotation")));
+            }
+
             if(pageReqVO.getQuotation() != null) {
                 predicates.add(cb.equal(root.get("quotation"), pageReqVO.getQuotation()));
             }

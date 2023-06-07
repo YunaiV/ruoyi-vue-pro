@@ -31,6 +31,9 @@ public class SalesleadPageReqVO extends PageParam {
     @Schema(description = "报价")
     private Long quotation;
 
+    @Schema(description = "报价状态", allowableValues = "'0', '1', '2'", example = "0: 全部。1：待报价。2：已报价。")
+    private String quotationStatus;
+
     @Schema(description = "状态")
     private Integer status;
 
