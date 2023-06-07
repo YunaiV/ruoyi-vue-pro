@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
+import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
@@ -80,16 +79,25 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     public void validateSkuList(List<ProductSkuCreateOrUpdateReqVO> skus, Boolean specType) {
-        // 非多规格，不需要校验
-        if (ObjectUtil.notEqual(specType, true)) {
-            return;
-        }
-
         // 0、校验skus是否为空
         if (CollUtil.isEmpty(skus)) {
             throw exception(SKU_NOT_EXISTS);
         }
-
+        // 单规格处理
+        if (ObjectUtil.equal(specType, false)) {
+            ProductSkuCreateOrUpdateReqVO skuVO = skus.get(0);
+            // 赋予单规格默认属性
+            List<ProductSkuBaseVO.Property> properties = new ArrayList<>();
+            ProductSkuBaseVO.Property property = new ProductSkuBaseVO.Property();
+            property.setPropertyId(ProductPropertyDO.PROPERTY_ID);
+            property.setPropertyName(ProductPropertyDO.PROPERTY_NAME);
+            property.setValueId(ProductPropertyValueDO.VALUE_ID);
+            property.setValueName(ProductPropertyValueDO.VALUE_NAME);
+            properties.add(property);
+            skuVO.setProperties(properties);
+            // 单规格不需要后续的校验
+            return;
+        }
         // 1、校验属性项存在
         Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null)
                 // 遍历多个 Property 属性
@@ -156,81 +164,51 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    public int updateSkuProperty(ProductPropertyDO updateObj) {
-        // TODO 看了一下数据库有关于 json 字符串的处理，怕数据库出现兼容问题这里还是用数据库常规操作来实现
-        // TODO @puhui999：直接全部查询处理，批量处理就好列；一般项目的商品不会超过几十万的哈。
-        Long count = productSkuMapper.selectCountByPropertyNotNull();
-        int currentPage = 1;
+    public int updateSkuProperty(Long propertyId, String propertyName) {
+        // 获取所有的 sku
+        List<ProductSkuDO> skuDOList = productSkuMapper.selectList();
+        // 处理后需要更新的 sku
         List<ProductSkuDO> updateSkus = new ArrayList<>();
-        if (count == 0) {
+        if (CollUtil.isEmpty(skuDOList)) {
             return 0;
         }
-        int pageSize = 100;
-        for (int i = 0; i <= count / 100; i++) {
-            PageParam pageParam = new PageParam().setPageNo(currentPage + i).setPageSize(pageSize);
-            // 分页查找出 sku 属性不为 null 的
-            PageResult<ProductSkuDO> skuPage = productSkuMapper.selectPage(pageParam);
-            List<ProductSkuDO> records = skuPage.getList();
-            if (CollUtil.isEmpty(records)) {
-                break;
-            }
-            records.stream().filter(sku -> sku.getProperties() != null)
-                    .forEach(sku -> sku.getProperties().forEach(property -> {
-                        if (property.getPropertyId().equals(updateObj.getId())) {
-                            property.setPropertyName(updateObj.getName());
-                            updateSkus.add(sku);
-                        }
-                    }));
-        }
+        skuDOList.stream().filter(sku -> sku.getProperties() != null)
+                .forEach(sku -> sku.getProperties().forEach(property -> {
+                    if (property.getPropertyId().equals(propertyId)) {
+                        property.setPropertyName(propertyName);
+                        updateSkus.add(sku);
+                    }
+                }));
         if (CollUtil.isEmpty(updateSkus)) {
             return 0;
         }
-        // TODO @puhui999：貌似 updateBatch 自己会拆分批次，这里不用再拆分了
-        // 每批处理的大小
-        int batchSize = 1000;
-        for (int i = 0; i < updateSkus.size(); i += batchSize) {
-            List<ProductSkuDO> batchSkuDOs = updateSkus.subList(i, Math.min(i + batchSize, updateSkus.size()));
-            productSkuMapper.updateBatch(batchSkuDOs, batchSize);
-        }
+
+        productSkuMapper.updateBatch(updateSkus);
         return updateSkus.size();
     }
 
     @Override
-    public int updateSkuPropertyValue(ProductPropertyValueDO updateObj) {
-        // TODO 看了一下数据库有关于 json 字符串的处理，怕数据库出现兼容问题这里还是用数据库常规操作来实现
-        Long count = productSkuMapper.selectCountByPropertyNotNull();
-        int currentPage = 1;
+    public int updateSkuPropertyValue(Long propertyValueId, String propertyValueName) {
+        // 获取所有的 sku
+        List<ProductSkuDO> skuDOList = productSkuMapper.selectList();
+        // 处理后需要更新的 sku
         List<ProductSkuDO> updateSkus = new ArrayList<>();
-        if (count == 0) {
+        if (CollUtil.isEmpty(skuDOList)) {
             return 0;
         }
-        int pageSize = 100;
-        for (int i = 0; i <= count / 100; i++) {
-            PageParam pageParam = new PageParam().setPageNo(currentPage + i).setPageSize(pageSize);
-            // 分页查找出 sku 属性不为 null 的
-            PageResult<ProductSkuDO> skuPage = productSkuMapper.selectPage(pageParam);
-            List<ProductSkuDO> records = skuPage.getList();
-            if (CollUtil.isEmpty(records)) {
-                break;
-            }
-            records.stream()
-                    .filter(sku -> sku.getProperties() != null)
-                    .forEach(sku -> sku.getProperties().forEach(property -> {
-                        if (property.getValueId().equals(updateObj.getId())) {
-                            property.setValueName(updateObj.getName());
-                            updateSkus.add(sku);
-                        }
-                    }));
-        }
+        skuDOList.stream()
+                .filter(sku -> sku.getProperties() != null)
+                .forEach(sku -> sku.getProperties().forEach(property -> {
+                    if (property.getValueId().equals(propertyValueId)) {
+                        property.setValueName(propertyValueName);
+                        updateSkus.add(sku);
+                    }
+                }));
         if (CollUtil.isEmpty(updateSkus)) {
             return 0;
         }
-        // 每批处理的大小
-        int batchSize = 1000;
-        for (int i = 0; i < updateSkus.size(); i += batchSize) {
-            List<ProductSkuDO> batchSkuDOs = updateSkus.subList(i, Math.min(i + batchSize, updateSkus.size()));
-            productSkuMapper.updateBatch(batchSkuDOs, batchSize);
-        }
+
+        productSkuMapper.updateBatch(updateSkus);
         return updateSkus.size();
     }
 

@@ -8,7 +8,11 @@ import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommen
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentAdditionalReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
+import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
+import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
+import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +22,7 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 
 /**
  * 商品评论 Service 实现类
@@ -30,6 +35,11 @@ public class ProductCommentServiceImpl implements ProductCommentService {
 
     @Resource
     private ProductCommentMapper productCommentMapper;
+    @Resource
+    private TradeOrderApi tradeOrderApi;
+
+    @Resource
+    private ProductSpuService productSpuService;
 
     @Override
     public PageResult<ProductCommentDO> getCommentPage(ProductCommentPageReqVO pageReqVO) {
@@ -60,6 +70,16 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Override
     public void createComment(ProductCommentDO productComment, Boolean system) {
         if (!system) {
+            // TODO 判断订单是否存在 fix
+            TradeOrderRespDTO order = tradeOrderApi.getOrder(productComment.getOrderId());
+            if (null == order) {
+                throw exception(ORDER_NOT_FOUND);
+            }
+            // TODO 判断 SPU 是否存在 fix
+            ProductSpuDO spu = productSpuService.getSpu(productComment.getSpuId());
+            if (null == spu) {
+                throw exception(SPU_NOT_EXISTS);
+            }
             // 判断当前订单的当前商品用户是否评价过
             ProductCommentDO exist = productCommentMapper.findByUserIdAndOrderIdAndSpuId(productComment.getId(), productComment.getOrderId(), productComment.getSpuId());
             if (null != exist) {

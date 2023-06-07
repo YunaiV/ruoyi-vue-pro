@@ -73,10 +73,8 @@ public class ProductPropertyValueServiceImpl implements ProductPropertyValueServ
         // 更新
         ProductPropertyValueDO updateObj = ProductPropertyValueConvert.INSTANCE.convert(updateReqVO);
         productPropertyValueMapper.updateById(updateObj);
-
-        // TODO 芋艿：更新时，需要看看 sku 表 fix
-        // TODO @puhui：是不是只要传递变量，不传递整个 updateObj 变量哈
-        productSkuService.updateSkuPropertyValue(updateObj);
+        // 更新 sku 相关属性
+        productSkuService.updateSkuPropertyValue(updateObj.getId(), updateObj.getName());
     }
 
     @Override
