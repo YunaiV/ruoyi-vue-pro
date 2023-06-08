@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -104,6 +107,7 @@ public class Customer extends BaseEntity {
     private Long hospitalId;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "hospital_id", insertable = false, updatable = false)
     private Institution hospital;
 
@@ -114,6 +118,7 @@ public class Customer extends BaseEntity {
     private Long universityId;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "university_id", insertable = false, updatable = false)
     private Institution university;
 
@@ -124,6 +129,7 @@ public class Customer extends BaseEntity {
     private Long companyId;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "company_id", insertable = false, updatable = false)
     private Institution company;
 
@@ -182,6 +188,7 @@ public class Customer extends BaseEntity {
     private Long salesId;
 
     @OneToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "sales_id", referencedColumnName = "id", insertable = false, updatable = false)
     private User sales;
 
@@ -192,6 +199,7 @@ public class Customer extends BaseEntity {
     private Long lastFollowupId;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "last_followup_id", insertable = false, updatable = false)
     private Followup lastFollowup;
 
@@ -202,6 +210,7 @@ public class Customer extends BaseEntity {
     private Long lastSalesleadId;
 
     @OneToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "last_saleslead_id", insertable = false, updatable = false)
     @JsonManagedReference
     private Saleslead lastSaleslead;

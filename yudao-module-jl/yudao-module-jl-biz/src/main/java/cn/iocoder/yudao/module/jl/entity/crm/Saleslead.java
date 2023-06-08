@@ -10,6 +10,9 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -79,6 +82,7 @@ public class Saleslead extends BaseEntity {
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "customer_id", insertable = false, updatable = false)
     private Customer customer;
 
@@ -107,6 +111,7 @@ public class Saleslead extends BaseEntity {
     private Long managerId;
 
     @OneToOne(fetch = FetchType.EAGER, optional=true)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name="quotation", referencedColumnName="id", insertable = false, updatable = false)
     private ProjectQuote quote;
 
@@ -114,18 +119,22 @@ public class Saleslead extends BaseEntity {
     private Long lastFollowUpId;
 
     @OneToOne
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "last_followup_id", referencedColumnName="id", insertable = false, updatable = false)
     private Followup lastFollowup;
 
     @OneToOne
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "project_id", referencedColumnName="id", insertable = false, updatable = false)
     private Project project;
 
     @OneToMany
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "saleslead_id", referencedColumnName="id", insertable = false, updatable = false)
     private List<SalesleadCompetitor> competitorQuotations;
 
     @OneToMany
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "saleslead_id", referencedColumnName="id", insertable = false, updatable = false)
     private List<SalesleadCustomerPlan> customerPlans;
 }

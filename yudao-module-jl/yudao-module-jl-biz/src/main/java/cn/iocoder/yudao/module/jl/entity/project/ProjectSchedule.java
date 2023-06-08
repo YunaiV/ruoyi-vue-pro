@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -53,6 +56,7 @@ public class ProjectSchedule extends BaseEntity {
      * 实验名目
      */
     @OneToMany(mappedBy="schedule")
+    @NotFound(action = NotFoundAction.IGNORE)
     @JsonManagedReference
     private List<ProjectCategory> categoryList;
 }

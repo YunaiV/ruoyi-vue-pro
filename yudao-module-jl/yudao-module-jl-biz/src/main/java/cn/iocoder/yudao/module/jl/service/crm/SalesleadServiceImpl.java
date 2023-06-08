@@ -101,7 +101,7 @@ public class SalesleadServiceImpl implements SalesleadService {
         // 更新线索
         Saleslead updateObj = salesleadMapper.toEntity(updateReqVO);
         salesleadRepository.save(updateObj);
-        Long salesleadId = updateReqVO.getId();
+        Long salesleadId = updateObj.getId();
 
         // 更新竞争对手的报价
         // 删除原有的

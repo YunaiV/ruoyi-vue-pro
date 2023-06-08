@@ -3,6 +3,9 @@ package cn.iocoder.yudao.module.jl.entity.laboratory;
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
 import cn.iocoder.yudao.module.jl.entity.user.User;
 import lombok.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -63,6 +66,7 @@ public class Category extends BaseEntity {
      * 实验名目的擅长人员
      */
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinTable(
             name = "jl_laboratory_category_skilluser",
             joinColumns = @JoinColumn(name = "category_id"),
