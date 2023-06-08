@@ -11,15 +11,22 @@ import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommen
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentAdditionalReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
+import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentRespVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
 import cn.iocoder.yudao.module.product.enums.comment.ProductCommentScoresEnum;
+import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
+import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -39,7 +46,13 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
     private ProductCommentMapper productCommentMapper;
 
     @Resource
+    @Lazy
     private ProductCommentServiceImpl productCommentService;
+
+    @MockBean
+    private TradeOrderApi tradeOrderApi;
+    @MockBean
+    private ProductSpuService productSpuService;
 
     public String generateNo() {
         return DateUtil.format(new Date(), "yyyyMMddHHmmss") + RandomUtil.randomInt(100000, 999999);
@@ -70,6 +83,23 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
             o.setScores(ProductCommentScoresEnum.FOUR.getScores());
             o.setReplied(Boolean.TRUE);
             o.setVisible(Boolean.TRUE);
+            o.setId(generateId());
+            o.setUserId(generateId());
+            o.setAnonymous(Boolean.TRUE);
+            o.setOrderId(generateId());
+            o.setOrderItemId(generateId());
+            o.setSpuId(generateId());
+            o.setSkuId(generateId());
+            o.setDescriptionScores(ProductCommentScoresEnum.FOUR.getScores());
+            o.setBenefitScores(ProductCommentScoresEnum.FOUR.getScores());
+            o.setDeliveryScores(ProductCommentScoresEnum.FOUR.getScores());
+            o.setContent("真好吃");
+            o.setReplyUserId(generateId());
+            o.setReplyContent("确实");
+            o.setReplyTime(LocalDateTime.now());
+            o.setAdditionalTime(LocalDateTime.now());
+            o.setCreateTime(LocalDateTime.now());
+            o.setUpdateTime(LocalDateTime.now());
         });
         productCommentMapper.insert(productComment);
 
@@ -77,7 +107,7 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         Long spuId = productComment.getSpuId();
 
         // 测试 userNickname 不匹配
-        productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setUserNickname("王三")));
+        productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setUserNickname("王三").setScores(ProductCommentScoresEnum.ONE.getScores())));
         // 测试 orderId 不匹配
         productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setOrderId(generateId())));
         // 测试 spuId 不匹配
@@ -107,8 +137,25 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         PageResult<ProductCommentDO> all = productCommentService.getCommentPage(new ProductCommentPageReqVO());
         assertEquals(8, all.getTotal());
 
-        PageResult<ProductCommentDO> visible = productCommentService.getCommentPage(new AppCommentPageReqVO(), Boolean.TRUE);
-        assertEquals(7, visible.getTotal());
+        // 测试获取所有商品分页评论数据
+        PageResult<AppCommentRespVO> result1 = productCommentService.getCommentPage(new AppCommentPageReqVO(), Boolean.TRUE);
+        assertEquals(7, result1.getTotal());
+
+        // 测试获取所有商品分页中评数据
+        PageResult<AppCommentRespVO> result2 = productCommentService.getCommentPage(new AppCommentPageReqVO().setType(ProductCommentDO.MEDIOCRE_COMMENT), Boolean.TRUE);
+        assertEquals(2, result2.getTotal());
+
+        // 测试获取指定 spuId 商品分页中评数据
+        PageResult<AppCommentRespVO> result3 = productCommentService.getCommentPage(new AppCommentPageReqVO().setSpuId(spuId).setType(ProductCommentDO.MEDIOCRE_COMMENT), Boolean.TRUE);
+        assertEquals(2, result3.getTotal());
+
+        // 测试分页 tab count
+        Map<String, Long> tabsCount = productCommentService.getCommentPageTabsCount(spuId, Boolean.TRUE);
+        assertEquals(6, tabsCount.get(ProductCommentDO.ALL_COUNT));
+        assertEquals(4, tabsCount.get(ProductCommentDO.FAVOURABLE_COMMENT_COUNT));
+        assertEquals(2, tabsCount.get(ProductCommentDO.MEDIOCRE_COMMENT_COUNT));
+        assertEquals(0, tabsCount.get(ProductCommentDO.NEGATIVE_COMMENT_COUNT));
+
     }
 
     @Test

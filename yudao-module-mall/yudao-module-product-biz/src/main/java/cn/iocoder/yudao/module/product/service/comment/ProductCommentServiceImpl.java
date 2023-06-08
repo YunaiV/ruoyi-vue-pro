@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.service.comment;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
@@ -7,6 +8,8 @@ import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommen
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentAdditionalReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
+import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentRespVO;
+import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
@@ -18,6 +21,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -68,19 +73,30 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     public Map<String, Long> getCommentPageTabsCount(Long spuId, Boolean visible) {
         Map<String, Long> countMap = new HashMap<>(4);
         // 查询商品 id = spuId 的所有评论数量
-        countMap.put("allCount", productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.ALL));
+        countMap.put(ProductCommentDO.ALL_COUNT, productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.ALL));
         // 查询商品 id = spuId 的所有好评数量
-        countMap.put("favourableCommentCount", productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.FAVOURABLE_COMMENT));
+        countMap.put(ProductCommentDO.FAVOURABLE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.FAVOURABLE_COMMENT));
         // 查询商品 id = spuId 的所有中评数量
-        countMap.put("mediocreCommentCount", productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.MEDIOCRE_COMMENT));
+        countMap.put(ProductCommentDO.MEDIOCRE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.MEDIOCRE_COMMENT));
         // 查询商品 id = spuId 的所有差评数量
-        countMap.put("negativeCommentCount", productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.NEGATIVE_COMMENT));
+        countMap.put(ProductCommentDO.NEGATIVE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.NEGATIVE_COMMENT));
         return countMap;
     }
 
     @Override
-    public PageResult<ProductCommentDO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible) {
-        return productCommentMapper.selectPage(pageVO, visible);
+    public PageResult<AppCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible) {
+        PageResult<AppCommentRespVO> result = ProductCommentConvert.INSTANCE.convertPage02(productCommentMapper.selectPage(pageVO, visible));
+        result.getList().forEach(item -> {
+            // 判断用户是否选择匿名
+            if (ObjectUtil.equal(item.getAnonymous(), true)) {
+                item.setUserNickname(ProductCommentDO.ANONYMOUS_NICKNAME);
+            }
+            // 计算评价最终综合评分 最终星数 = （商品评星 + 服务评星） / 2
+            BigDecimal sumScore = new BigDecimal(item.getScores() + item.getBenefitScores());
+            BigDecimal divide = sumScore.divide(BigDecimal.valueOf(2L), 0, RoundingMode.DOWN);
+            item.setFinalScore(divide.intValue());
+        });
+        return result;
     }
 
     @Override
