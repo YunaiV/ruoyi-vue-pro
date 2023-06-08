@@ -28,7 +28,7 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -166,13 +166,13 @@ public class AliyunSmsClient extends AbstractSmsClient {
          */
         @JsonProperty("send_time")
         @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-        private Date sendTime;
+        private LocalDateTime sendTime;
         /**
          * 状态报告时间
          */
         @JsonProperty("report_time")
         @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-        private Date reportTime;
+        private LocalDateTime reportTime;
         /**
          * 是否接收成功
          */

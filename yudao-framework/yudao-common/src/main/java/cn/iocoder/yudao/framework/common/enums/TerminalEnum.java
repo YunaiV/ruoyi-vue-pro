@@ -15,11 +15,12 @@ import java.util.Arrays;
 @Getter
 public enum TerminalEnum implements IntArrayValuable {
 
-    //TODO terminal 重复，请参考 '订单来源终端：[1:小程序 2:H5 3:iOS 4:安卓]'
-    MINI_PROGRAM(1, "小程序"),
-    H5(2, "H5"),
-    IOS(3, "iOS"),
-    ANDROID(3, "安卓"),;
+    WECHAT_MINI_PROGRAM(10, "微信小程序"),
+    WECHAT_WAP(11, "微信公众号"),
+    H5(20, "H5 网页"),
+    IOS(31, "苹果 App"),
+    ANDROID(32, "安卓 App"),
+    ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TerminalEnum::getTerminal).toArray();
 

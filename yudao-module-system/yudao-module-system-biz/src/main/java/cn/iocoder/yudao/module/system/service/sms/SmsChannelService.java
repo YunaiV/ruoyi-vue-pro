@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,7 +20,7 @@ public interface SmsChannelService {
     /**
      * 初始化短信客户端
      */
-    void initSmsClients();
+    void initLocalCache();
 
     /**
      * 创建短信渠道
@@ -52,14 +51,6 @@ public interface SmsChannelService {
      * @return 短信渠道
      */
     SmsChannelDO getSmsChannel(Long id);
-
-    /**
-     * 获得短信渠道列表
-     *
-     * @param ids 编号
-     * @return 短信渠道列表
-     */
-    List<SmsChannelDO> getSmsChannelList(Collection<Long> ids);
 
     /**
      * 获得所有短信渠道列表

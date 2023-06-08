@@ -75,7 +75,7 @@ public class TenantServiceImpl implements TenantService {
     private PermissionService permissionService;
 
     @Override
-    public List<Long> getTenantIds() {
+    public List<Long> getTenantIdList() {
         List<TenantDO> tenants = tenantMapper.selectList();
         return CollectionUtils.convertList(tenants, TenantDO::getId);
     }
@@ -97,6 +97,8 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createTenant(TenantCreateReqVO createReqVO) {
+        // 校验租户名称是否重复
+        validTenantNameDuplicate(createReqVO.getName(), null);
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(createReqVO.getPackageId());
 
@@ -138,7 +140,9 @@ public class TenantServiceImpl implements TenantService {
     @Transactional(rollbackFor = Exception.class)
     public void updateTenant(TenantUpdateReqVO updateReqVO) {
         // 校验存在
-        TenantDO tenant = checkUpdateTenant(updateReqVO.getId());
+        TenantDO tenant = validateUpdateTenant(updateReqVO.getId());
+        // 校验租户名称是否重复
+        validTenantNameDuplicate(updateReqVO.getName(), updateReqVO.getId());
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(updateReqVO.getPackageId());
 
@@ -151,12 +155,26 @@ public class TenantServiceImpl implements TenantService {
         }
     }
 
+    private void validTenantNameDuplicate(String name, Long id) {
+        TenantDO tenant = tenantMapper.selectByName(name);
+        if (tenant == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同名字的租户
+        if (id == null) {
+            throw exception(TENANT_NAME_DUPLICATE, name);
+        }
+        if (!tenant.getId().equals(id)) {
+            throw exception(TENANT_NAME_DUPLICATE, name);
+        }
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateTenantRoleMenu(Long tenantId, Set<Long> menuIds) {
         TenantUtils.execute(tenantId, () -> {
             // 获得所有角色
-            List<RoleDO> roles = roleService.getRoles(null);
+            List<RoleDO> roles = roleService.getRoleListByStatus(null);
             roles.forEach(role -> Assert.isTrue(tenantId.equals(role.getTenantId()), "角色({}/{}) 租户不匹配",
                     role.getId(), role.getTenantId(), tenantId)); // 兜底校验
             // 重新分配每个角色的权限
@@ -179,12 +197,12 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public void deleteTenant(Long id) {
         // 校验存在
-        checkUpdateTenant(id);
+        validateUpdateTenant(id);
         // 删除
         tenantMapper.deleteById(id);
     }
 
-    private TenantDO checkUpdateTenant(Long id) {
+    private TenantDO validateUpdateTenant(Long id) {
         TenantDO tenant = tenantMapper.selectById(id);
         if (tenant == null) {
             throw exception(TENANT_NOT_EXISTS);
@@ -248,7 +266,7 @@ public class TenantServiceImpl implements TenantService {
         TenantDO tenant = getTenant(TenantContextHolder.getRequiredTenantId());
         Set<Long> menuIds;
         if (isSystemTenant(tenant)) { // 系统租户，菜单是全量的
-            menuIds = CollectionUtils.convertSet(menuService.getMenus(), MenuDO::getId);
+            menuIds = CollectionUtils.convertSet(menuService.getMenuList(), MenuDO::getId);
         } else {
             menuIds = tenantPackageService.getTenantPackage(tenant.getPackageId()).getMenuIds();
         }

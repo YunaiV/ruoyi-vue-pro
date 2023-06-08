@@ -69,7 +69,7 @@ public class JobServiceImpl implements JobService {
     public void updateJob(JobUpdateReqVO updateReqVO) throws SchedulerException {
         validateCronExpression(updateReqVO.getCronExpression());
         // 校验存在
-        JobDO job = this.validateJobExists(updateReqVO.getId());
+        JobDO job = validateJobExists(updateReqVO.getId());
         // 只有开启状态，才可以修改.原因是，如果出暂停状态，修改 Quartz Job 时，会导致任务又开始执行
         if (!job.getStatus().equals(JobStatusEnum.NORMAL.getStatus())) {
             throw exception(JOB_UPDATE_ONLY_NORMAL_STATUS);
@@ -92,7 +92,7 @@ public class JobServiceImpl implements JobService {
             throw exception(JOB_CHANGE_STATUS_INVALID);
         }
         // 校验存在
-        JobDO job = this.validateJobExists(id);
+        JobDO job = validateJobExists(id);
         // 校验是否已经为当前状态
         if (job.getStatus().equals(status)) {
             throw exception(JOB_CHANGE_STATUS_EQUALS);
@@ -112,7 +112,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public void triggerJob(Long id) throws SchedulerException {
         // 校验存在
-        JobDO job = this.validateJobExists(id);
+        JobDO job = validateJobExists(id);
 
         // 触发 Quartz 中的 Job
         schedulerManager.triggerJob(job.getId(), job.getHandlerName(), job.getHandlerParam());
@@ -122,7 +122,7 @@ public class JobServiceImpl implements JobService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteJob(Long id) throws SchedulerException {
         // 校验存在
-        JobDO job = this.validateJobExists(id);
+        JobDO job = validateJobExists(id);
         // 更新
         jobMapper.deleteById(id);
 

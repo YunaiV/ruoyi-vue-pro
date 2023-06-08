@@ -36,17 +36,19 @@ public class ProductSkuDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 商品 SKU 名字
-     */
-    private String name;
-    /**
      * SPU 编号
      * <p>
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
     /**
-     * 规格值数组，JSON 格式
+     * SPU 名字
+     *
+     * 冗余 {@link ProductSkuDO#getSpuName()}
+     */
+    private String spuName;
+    /**
+     * 属性数组，JSON 格式
      */
     @TableField(typeHandler = PropertyTypeHandler.class)
     private List<Property> properties;
@@ -97,6 +99,8 @@ public class ProductSkuDO extends BaseDO {
      * 商品属性
      */
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Property {
 
         /**
@@ -128,20 +132,6 @@ public class ProductSkuDO extends BaseDO {
         }
 
     }
-
-    // TODO ========== 待定字段：yv =========
-    // TODO brokerage：一级返佣
-    // TODO brokerage_two：二级返佣
-    // TODO pink_price：拼团价
-    // TODO pink_stock：拼团库存
-    // TODO seckill_price：秒杀价
-    // TODO seckill_stock：秒杀库存
-    // TODO integral：需要积分
-
-    // TODO ========== 待定字段：cf =========
-    // TODO type 活动显示排序 0=默认 1=秒 2=砍价 3=拼团
-    // TODO quota 活动限购数量
-    // TODO quota_show 活动限购数量显示
 
 }
 

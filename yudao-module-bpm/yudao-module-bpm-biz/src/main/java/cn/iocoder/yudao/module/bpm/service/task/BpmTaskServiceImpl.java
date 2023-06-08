@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
@@ -32,6 +35,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -73,11 +77,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
-        if (pageVO.getBeginCreateTime() != null) {
-            taskQuery.taskCreatedAfter(pageVO.getBeginCreateTime());
+        if (ArrayUtil.get(pageVO.getCreateTime(), 0) != null) {
+            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
         }
-        if (pageVO.getEndCreateTime() != null) {
-            taskQuery.taskCreatedBefore(pageVO.getEndCreateTime());
+        if (ArrayUtil.get(pageVO.getCreateTime(), 1) != null) {
+            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
         }
         // 执行查询
         List<Task> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
@@ -106,10 +110,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
         if (pageVO.getBeginCreateTime() != null) {
-            taskQuery.taskCreatedAfter(pageVO.getBeginCreateTime());
+            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getBeginCreateTime()));
         }
         if (pageVO.getEndCreateTime() != null) {
-            taskQuery.taskCreatedBefore(pageVO.getEndCreateTime());
+            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getEndCreateTime()));
         }
         // 执行查询
         List<HistoricTaskInstance> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
@@ -205,7 +209,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 更新任务拓展表为不通过
         taskExtMapper.updateByTaskId(
             new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.REJECT.getResult())
-                    .setEndTime(new Date()).setReason(reqVO.getReason()));
+                    .setEndTime(LocalDateTime.now()).setReason(reqVO.getReason()));
     }
 
     @Override
@@ -249,7 +253,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     public void updateTaskExtComplete(Task task) {
         BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert2TaskExt(task)
                 .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult()) // 不设置也问题不大，因为 Complete 一般是审核通过，已经设置
-                .setEndTime(new Date());
+                .setEndTime(LocalDateTime.now());
         taskExtMapper.updateByTaskId(taskExtDO);
     }
 
@@ -280,7 +284,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
                 // 更新任务
                 taskExtMapper.updateById(new BpmTaskExtDO().setId(taskExt.getId()).setResult(BpmProcessInstanceResultEnum.CANCEL.getResult())
-                        .setEndTime(new Date()).setReason(BpmProcessInstanceDeleteReasonEnum.translateReason(task.getDeleteReason())));
+                        .setEndTime(LocalDateTime.now()).setReason(BpmProcessInstanceDeleteReasonEnum.translateReason(task.getDeleteReason())));
             }
 
         });

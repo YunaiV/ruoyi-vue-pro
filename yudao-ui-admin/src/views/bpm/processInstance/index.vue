@@ -52,39 +52,39 @@
       <el-table-column label="编号" align="center" prop="id" width="320" />
       <el-table-column label="流程名" align="center" prop="name" />
       <el-table-column label="流程分类" align="center" prop="category">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.BPM_MODEL_CATEGORY" :value="scope.row.category" />
         </template>
       </el-table-column>
       <el-table-column label="当前审批任务" align="center" prop="tasks">
-        <template slot-scope="scope">
-          <el-button v-for="task in scope.row.tasks" :key="task.id" type="text" @click="handleFormDetail(task.id)">
+        <template v-slot="scope">
+          <el-button v-for="task in scope.row.tasks" :key="task.id" type="text"">
             <span>{{ task.name }}</span>
           </el-button>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="结果" align="center" prop="result">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT" :value="scope.row.result"/>
         </template>
       </el-table-column>
       <el-table-column label="提交时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="结束时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.endTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button type="text" size="small" icon="el-icon-delete" v-if="scope.row.result === 1"
                      v-hasPermi="['bpm:process-instance:cancel']" @click="handleCancel(scope.row)">取消</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleDetail(scope.row)"
@@ -103,7 +103,7 @@
 import { getMyProcessInstancePage, cancelProcessInstance } from "@/api/bpm/processInstance";
 
 export default {
-  name: "ProcessInstance",
+  name: "BpmProcessInstance",
   components: {
   },
   data() {
@@ -155,7 +155,7 @@ export default {
     },
     /** 新增按钮操作 **/
     handleAdd() {
-      this.$router.push({ path: "/bpm/process-instance/create"})
+      this.$router.push({ name: "BpmProcessInstanceCreate"})
     },
     /** 取消按钮操作 */
     handleCancel(row) {
@@ -164,7 +164,7 @@ export default {
         type: 'warning',
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        inputPattern: /^[\s\S]*.*[^\s][\s\S]*$/, // 判断非空，且非空格
+        inputPattern: /^[\s\S]*.*\S[\s\S]*$/, // 判断非空，且非空格
         inputErrorMessage: "取消原因不能为空",
       }).then(({ value }) => {
         return cancelProcessInstance(id, value);
@@ -175,7 +175,7 @@ export default {
     },
     /** 处理详情按钮 */
     handleDetail(row) {
-      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.id}});
+      this.$router.push({ name: "BpmProcessInstanceDetail", query: { id: row.id}});
     },
   }
 };

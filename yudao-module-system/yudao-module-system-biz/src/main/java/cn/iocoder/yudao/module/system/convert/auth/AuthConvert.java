@@ -9,12 +9,14 @@ import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.module.system.enums.permission.MenuIdEnum;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO.ID_ROOT;
 
 @Mapper
 public interface AuthConvert {
@@ -47,7 +49,7 @@ public interface AuthConvert {
         Map<Long, AuthMenuRespVO> treeNodeMap = new LinkedHashMap<>();
         menuList.forEach(menu -> treeNodeMap.put(menu.getId(), AuthConvert.INSTANCE.convertTreeNode(menu)));
         // 处理父子关系
-        treeNodeMap.values().stream().filter(node -> !node.getParentId().equals(MenuIdEnum.ROOT.getId())).forEach(childNode -> {
+        treeNodeMap.values().stream().filter(node -> !node.getParentId().equals(ID_ROOT)).forEach(childNode -> {
             // 获得父节点
             AuthMenuRespVO parentNode = treeNodeMap.get(childNode.getParentId());
             if (parentNode == null) {
@@ -62,7 +64,7 @@ public interface AuthConvert {
             parentNode.getChildren().add(childNode);
         });
         // 获得到所有的根节点
-        return CollectionUtils.filterList(treeNodeMap.values(), node -> MenuIdEnum.ROOT.getId().equals(node.getParentId()));
+        return filterList(treeNodeMap.values(), node -> ID_ROOT.equals(node.getParentId()));
     }
 
     SocialUserBindReqDTO convert(Long userId, Integer userType, AuthSocialLoginReqVO reqVO);

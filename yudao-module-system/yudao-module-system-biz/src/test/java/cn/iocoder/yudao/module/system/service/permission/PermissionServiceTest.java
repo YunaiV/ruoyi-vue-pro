@@ -3,18 +3,15 @@ package cn.iocoder.yudao.module.system.service.permission;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.UserRoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuMapper;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
@@ -27,7 +24,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -41,8 +41,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@Import({PermissionServiceImpl.class,
-        RoleMenuBatchInsertMapper.class, UserRoleBatchInsertMapper.class})
+@Import({PermissionServiceImpl.class})
 public class PermissionServiceTest extends BaseDbUnitTest {
 
     @Resource
@@ -51,11 +50,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     @Resource
     private RoleMenuMapper roleMenuMapper;
     @Resource
-    private RoleMenuBatchInsertMapper roleMenuBatchInsertMapper;
-    @Resource
     private UserRoleMapper userRoleMapper;
-    @Resource
-    private UserRoleBatchInsertMapper userRoleBatchInsertMapper;
 
     @MockBean
     private RoleService roleService;
@@ -70,7 +65,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     private PermissionProducer permissionProducer;
 
     @Test
-    public void testInitRoleMenuLocalCache() {
+    public void testInitLocalCacheForRoleMenu() {
         // mock 数据
         RoleMenuDO roleMenuDO01 = randomPojo(RoleMenuDO.class, o -> o.setRoleId(1L).setMenuId(10L));
         roleMenuMapper.insert(roleMenuDO01);
@@ -78,7 +73,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         roleMenuMapper.insert(roleMenuDO02);
 
         // 调用
-        permissionService.initRoleMenuLocalCache();
+        permissionService.initLocalCacheForRoleMenu();
         // 断言 roleMenuCache 缓存
         assertEquals(1, permissionService.getRoleMenuCache().keySet().size());
         assertEquals(asList(10L, 20L), permissionService.getRoleMenuCache().get(1L));
@@ -86,13 +81,10 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         assertEquals(2, permissionService.getMenuRoleCache().size());
         assertEquals(singletonList(1L), permissionService.getMenuRoleCache().get(10L));
         assertEquals(singletonList(1L), permissionService.getMenuRoleCache().get(20L));
-        // 断言 maxUpdateTime 缓存
-        Date maxUpdateTime = permissionService.getRoleMenuMaxUpdateTime();
-        assertEquals(ObjectUtils.max(roleMenuDO01.getUpdateTime(), roleMenuDO02.getUpdateTime()), maxUpdateTime);
     }
 
     @Test
-    public void testInitUserRoleLocalCache() {
+    public void testInitLocalCacheForUserRole() {
         // mock 数据
         UserRoleDO userRoleDO01 = randomPojo(UserRoleDO.class, o -> o.setUserId(1L).setRoleId(10L));
         userRoleMapper.insert(userRoleDO01);
@@ -100,13 +92,10 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         userRoleMapper.insert(roleMenuDO02);
 
         // 调用
-        permissionService.initUserRoleLocalCache();
+        permissionService.initLocalCacheForUserRole();
         // 断言 roleMenuCache 缓存
         assertEquals(1, permissionService.getUserRoleCache().size());
         assertEquals(asSet(10L, 20L), permissionService.getUserRoleCache().get(1L));
-        // 断言 maxUpdateTime 缓存
-        Date maxUpdateTime = permissionService.getUserRoleMaxUpdateTime();
-        assertEquals(ObjectUtils.max(userRoleDO01.getUpdateTime(), roleMenuDO02.getUpdateTime()), maxUpdateTime);
     }
 
     @Test
@@ -117,7 +106,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         Collection<Integer> menusStatuses = asList(0, 1);
         // mock 方法
         List<RoleDO> roleList = singletonList(randomPojo(RoleDO.class, o -> o.setId(100L)));
-        when(roleService.getRolesFromCache(eq(roleIds))).thenReturn(roleList);
+        when(roleService.getRoleListFromCache(eq(roleIds))).thenReturn(roleList);
         when(roleService.hasAnySuperAdmin(same(roleList))).thenReturn(true);
         List<MenuDO> menuList = randomPojoList(MenuDO.class);
         when(menuService.getMenuListFromCache(eq(menuTypes), eq(menusStatuses))).thenReturn(menuList);
@@ -174,7 +163,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 方法
         when(roleService.hasAnySuperAdmin(eq(singleton(100L)))).thenReturn(true);
         List<MenuDO> menuList = singletonList(randomPojo(MenuDO.class).setId(1L));
-        when(menuService.getMenus()).thenReturn(menuList);
+        when(menuService.getMenuList()).thenReturn(menuList);
 
         // 调用
         Set<Long> menuIds = permissionService.getRoleMenuIds(roleId);
@@ -430,7 +419,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         when(roleService.getRoleFromCache(eq(100L))).thenReturn(role);
         // mock 其它方法
-        when(roleService.getRolesFromCache(eq(asSet(100L)))).thenReturn(singletonList(role));
+        when(roleService.getRoleListFromCache(eq(asSet(100L)))).thenReturn(singletonList(role));
 
         // 调用
         boolean has = permissionService.hasAnyRoles(userId, roles);
@@ -447,7 +436,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 获得用户的角色
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.ALL.getScope())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
         when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
 
         // 调用
@@ -467,7 +456,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 获得用户的角色
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_CUSTOM.getScope())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
         when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
         // mock 部门的返回
         when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO().setDeptId(3L), null, null); // 最后返回 null 的目的，看看会不会重复调用
@@ -491,7 +480,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 获得用户的角色
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_ONLY.getScope())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
         when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
         // mock 部门的返回
         when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO().setDeptId(3L), null, null); // 最后返回 null 的目的，看看会不会重复调用
@@ -514,13 +503,13 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 获得用户的角色
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_AND_CHILD.getScope())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
         when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
         // mock 部门的返回
         when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO().setDeptId(3L), null, null); // 最后返回 null 的目的，看看会不会重复调用
         // mock 方法（部门）
         DeptDO deptDO = randomPojo(DeptDO.class);
-        when(deptService.getDeptsByParentIdFromCache(eq(3L), eq(true)))
+        when(deptService.getDeptListByParentIdFromCache(eq(3L), eq(true)))
                 .thenReturn(singletonList(deptDO));
 
         // 调用
@@ -542,7 +531,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // mock 获得用户的角色
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.SELF.getScope())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
         when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
 
         // 调用

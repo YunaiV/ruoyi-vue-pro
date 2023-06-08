@@ -19,7 +19,7 @@ export default {
   props: {
     src: {
       type: String,
-      required: true
+      default: ""
     },
     width: {
       type: [Number, String],
@@ -32,6 +32,9 @@ export default {
   },
   computed: {
     realSrc() {
+      if (!this.src) {
+        return;
+      }
       let real_src = this.src.split(",")[0];
       if (isExternal(real_src)) {
         return real_src;
@@ -39,6 +42,9 @@ export default {
       return process.env.VUE_APP_BASE_API + real_src;
     },
     realSrcList() {
+      if (!this.src) {
+        return;
+      }
       let real_src_list = this.src.split(",");
       let srcList = [];
       real_src_list.forEach(item => {
@@ -64,14 +70,14 @@ export default {
   border-radius: 5px;
   background-color: #ebeef5;
   box-shadow: 0 0 5px 1px #ccc;
-  ::v-deep .el-image__inner {
+  :deep(.el-image__inner) {
     transition: all 0.3s;
     cursor: pointer;
     &:hover {
       transform: scale(1.2);
     }
   }
-  ::v-deep .image-slot {
+  :deep(.image-slot) {
     display: flex;
     justify-content: center;
     align-items: center;

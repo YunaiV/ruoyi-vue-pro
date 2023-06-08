@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.quartz.core.service;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * Job 日志 Framework Service 接口
@@ -22,7 +22,7 @@ public interface JobLogFrameworkService {
      * @return Job 日志的编号
      */
     Long createJobLog(@NotNull(message = "任务编号不能为空") Long jobId,
-                      @NotNull(message = "开始时间") Date beginTime,
+                      @NotNull(message = "开始时间") LocalDateTime beginTime,
                       @NotEmpty(message = "Job 处理器的名字不能为空") String jobHandlerName,
                       String jobHandlerParam,
                       @NotNull(message = "第几次执行不能为空") Integer executeIndex);
@@ -37,7 +37,7 @@ public interface JobLogFrameworkService {
      * @param result   成功数据
      */
     void updateJobLogResultAsync(@NotNull(message = "日志编号不能为空") Long logId,
-                                 @NotNull(message = "结束时间不能为空") Date endTime,
+                                 @NotNull(message = "结束时间不能为空") LocalDateTime endTime,
                                  @NotNull(message = "运行时长不能为空") Integer duration,
                                  boolean success, String result);
 

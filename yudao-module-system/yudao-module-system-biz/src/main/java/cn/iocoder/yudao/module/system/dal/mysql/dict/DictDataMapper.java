@@ -17,13 +17,11 @@ import java.util.List;
 public interface DictDataMapper extends BaseMapperX<DictDataDO> {
 
     default DictDataDO selectByDictTypeAndValue(String dictType, String value) {
-        return selectOne(new LambdaQueryWrapper<DictDataDO>().eq(DictDataDO::getDictType, dictType)
-                .eq(DictDataDO::getValue, value));
+        return selectOne(DictDataDO::getDictType, dictType, DictDataDO::getValue, value);
     }
 
     default DictDataDO selectByDictTypeAndLabel(String dictType, String label) {
-        return selectOne(new LambdaQueryWrapper<DictDataDO>().eq(DictDataDO::getDictType, dictType)
-                .eq(DictDataDO::getLabel, label));
+        return selectOne(DictDataDO::getDictType, dictType, DictDataDO::getLabel, label);
     }
 
     default List<DictDataDO> selectByDictTypeAndValues(String dictType, Collection<String> values) {
@@ -38,14 +36,15 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
     default PageResult<DictDataDO> selectPage(DictDataPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<DictDataDO>()
                 .likeIfPresent(DictDataDO::getLabel, reqVO.getLabel())
-                .likeIfPresent(DictDataDO::getDictType, reqVO.getDictType())
+                .eqIfPresent(DictDataDO::getDictType, reqVO.getDictType())
                 .eqIfPresent(DictDataDO::getStatus, reqVO.getStatus())
                 .orderByDesc(Arrays.asList(DictDataDO::getDictType, DictDataDO::getSort)));
     }
 
     default List<DictDataDO> selectList(DictDataExportReqVO reqVO) {
-        return selectList(new LambdaQueryWrapperX<DictDataDO>().likeIfPresent(DictDataDO::getLabel, reqVO.getLabel())
-                .likeIfPresent(DictDataDO::getDictType, reqVO.getDictType())
+        return selectList(new LambdaQueryWrapperX<DictDataDO>()
+                .likeIfPresent(DictDataDO::getLabel, reqVO.getLabel())
+                .eqIfPresent(DictDataDO::getDictType, reqVO.getDictType())
                 .eqIfPresent(DictDataDO::getStatus, reqVO.getStatus()));
     }
 

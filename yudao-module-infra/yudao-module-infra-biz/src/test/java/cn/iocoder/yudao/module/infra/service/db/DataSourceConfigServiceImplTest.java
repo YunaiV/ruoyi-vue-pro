@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.infra.service.db;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.crypto.symmetric.AES;
 import cn.iocoder.yudao.framework.mybatis.core.type.EncryptTypeHandler;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
@@ -8,8 +10,8 @@ import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigCrea
 import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigUpdateReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.db.DataSourceConfigMapper;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
-import org.jasypt.encryption.StringEncryptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -18,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -45,7 +48,7 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
     private DataSourceConfigMapper dataSourceConfigMapper;
 
     @MockBean
-    private StringEncryptor stringEncryptor;
+    private AES aes;
 
     @MockBean
     private DynamicDataSourceProperties dynamicDataSourceProperties;
@@ -53,9 +56,14 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
     @BeforeEach
     public void setUp() {
         // mock 一个空实现的 StringEncryptor，避免 EncryptTypeHandler 报错
-        ReflectUtil.setFieldValue(EncryptTypeHandler.class, "encryptor", stringEncryptor);
-        when(stringEncryptor.encrypt(anyString())).then((Answer<String>) invocation -> invocation.getArgument(0));
-        when(stringEncryptor.decrypt(anyString())).then((Answer<String>) invocation -> invocation.getArgument(0));
+        ReflectUtil.setFieldValue(EncryptTypeHandler.class, "aes", aes);
+        when(aes.encryptBase64(anyString())).then((Answer<String>) invocation -> invocation.getArgument(0));
+        when(aes.decryptStr(anyString())).then((Answer<String>) invocation -> invocation.getArgument(0));
+
+        // mock DynamicDataSourceProperties
+        when(dynamicDataSourceProperties.getPrimary()).thenReturn("primary");
+        when(dynamicDataSourceProperties.getDatasource()).thenReturn(MapUtil.of("primary",
+                new DataSourceProperty().setUrl("http://localhost:3306").setUsername("yunai").setPassword("tudou")));
     }
 
     @Test
@@ -88,7 +96,6 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
                 o.setId(dbDataSourceConfig.getId()); // 设置更新的 ID
             });
             // mock 方法
-//            when(stringEncryptor.encrypt(eq(reqVO.getPassword()))).thenReturn("123456");
             databaseUtilsMock.when(() -> JdbcUtils.isConnectionOK(eq(reqVO.getUrl()),
                     eq(reqVO.getUsername()), eq(reqVO.getPassword()))).thenReturn(true);
 
@@ -141,7 +148,58 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
         // 调用
         DataSourceConfigDO result = dataSourceConfigMapper.selectOne(DataSourceConfigDO::getPassword,
                 EncryptTypeHandler.encrypt(dbDataSourceConfig.getPassword()));
-        System.out.println(result);
+        assertPojoEquals(dbDataSourceConfig, result);
+    }
+
+    @Test
+    public void testGetDataSourceConfig_master() {
+        // 准备参数
+        Long id = 0L;
+        // mock 方法
+
+        // 调用
+        DataSourceConfigDO dataSourceConfig = dataSourceConfigService.getDataSourceConfig(id);
+        // 断言
+        assertEquals(id, dataSourceConfig.getId());
+        assertEquals("primary", dataSourceConfig.getName());
+        assertEquals("http://localhost:3306", dataSourceConfig.getUrl());
+        assertEquals("yunai", dataSourceConfig.getUsername());
+        assertEquals("tudou", dataSourceConfig.getPassword());
+    }
+
+    @Test
+    public void testGetDataSourceConfig_normal() {
+        // mock 数据
+        DataSourceConfigDO dbDataSourceConfig = randomPojo(DataSourceConfigDO.class);
+        dataSourceConfigMapper.insert(dbDataSourceConfig);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbDataSourceConfig.getId();
+
+        // 调用
+        DataSourceConfigDO dataSourceConfig = dataSourceConfigService.getDataSourceConfig(id);
+        // 断言
+        assertPojoEquals(dbDataSourceConfig, dataSourceConfig);
+    }
+
+    @Test
+    public void testGetDataSourceConfigList() {
+        // mock 数据
+        DataSourceConfigDO dbDataSourceConfig = randomPojo(DataSourceConfigDO.class);
+        dataSourceConfigMapper.insert(dbDataSourceConfig);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+
+        // 调用
+        List<DataSourceConfigDO> dataSourceConfigList = dataSourceConfigService.getDataSourceConfigList();
+        // 断言
+        assertEquals(2, dataSourceConfigList.size());
+        // master
+        assertEquals(0L, dataSourceConfigList.get(0).getId());
+        assertEquals("primary", dataSourceConfigList.get(0).getName());
+        assertEquals("http://localhost:3306", dataSourceConfigList.get(0).getUrl());
+        assertEquals("yunai", dataSourceConfigList.get(0).getUsername());
+        assertEquals("tudou", dataSourceConfigList.get(0).getPassword());
+        // normal
+        assertPojoEquals(dbDataSourceConfig, dataSourceConfigList.get(1));
     }
 
 }

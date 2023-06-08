@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.infra.service.logger;
 
-import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiAccessLogCreateReqDTO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog.ApiAccessLogExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog.ApiAccessLogPageReqVO;
@@ -16,149 +13,121 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Import(ApiAccessLogServiceImpl.class)
 public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private ApiAccessLogService apiAccessLogService;
+    private ApiAccessLogServiceImpl apiAccessLogService;
 
     @Resource
     private ApiAccessLogMapper apiAccessLogMapper;
 
     @Test
     public void testGetApiAccessLogPage() {
-        // 构造测试数据
-        long userId = 2233L;
-        int userType = UserTypeEnum.ADMIN.getValue();
-        String applicationName = "yudao-test";
-        String requestUrl = "foo";
-        Date beginTime = buildTime(2021, 3, 13);
-        int duration = 1000;
-        int resultCode = GlobalErrorCodeConstants.SUCCESS.getCode();
-
-        ApiAccessLogDO infApiAccessLogDO = RandomUtils.randomPojo(ApiAccessLogDO.class, dto -> {
-            dto.setUserId(userId);
-            dto.setUserType(userType);
-            dto.setApplicationName(applicationName);
-            dto.setRequestUrl(requestUrl);
-            dto.setBeginTime(beginTime);
-            dto.setDuration(duration);
-            dto.setResultCode(resultCode);
+        ApiAccessLogDO apiAccessLogDO = randomPojo(ApiAccessLogDO.class, o -> {
+            o.setUserId(2233L);
+            o.setUserType(UserTypeEnum.ADMIN.getValue());
+            o.setApplicationName("yudao-test");
+            o.setRequestUrl("foo");
+            o.setBeginTime(buildTime(2021, 3, 13));
+            o.setDuration(1000);
+            o.setResultCode(GlobalErrorCodeConstants.SUCCESS.getCode());
         });
-        apiAccessLogMapper.insert(infApiAccessLogDO);
-
-        // 下面几个都是不匹配的数据
-        // userId 不同的
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setUserId(3344L)));
-        // userType
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
-        // applicationName 不同的
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setApplicationName("test")));
-        // requestUrl 不同的
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setRequestUrl("bar")));
-        // 构造一个早期时间 2021-02-06 00:00:00
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setBeginTime(buildTime(2021, 2, 6))));
-        // duration 不同的
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setDuration(100)));
-        // resultCode 不同的
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setResultCode(2)));
-
-        // 构造调用参数
+        apiAccessLogMapper.insert(apiAccessLogDO);
+        // 测试 userId 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setUserId(3344L)));
+        // 测试 userType 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setUserType(UserTypeEnum.MEMBER.getValue())));
+        // 测试 applicationName 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setApplicationName("test")));
+        // 测试 requestUrl 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setRequestUrl("bar")));
+        // 测试 beginTime 不匹配：构造一个早期时间 2021-02-06 00:00:00
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setBeginTime(buildTime(2021, 2, 6))));
+        // 测试 duration 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setDuration(100)));
+        // 测试 resultCode 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setResultCode(2)));
+        // 准备参数
         ApiAccessLogPageReqVO reqVO = new ApiAccessLogPageReqVO();
-        reqVO.setUserId(userId);
-        reqVO.setUserType(userType);
-        reqVO.setApplicationName(applicationName);
-        reqVO.setRequestUrl(requestUrl);
-        reqVO.setBeginTime((new Date[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
-        reqVO.setDuration(duration);
-        reqVO.setResultCode(resultCode);
+        reqVO.setUserId(2233L);
+        reqVO.setUserType(UserTypeEnum.ADMIN.getValue());
+        reqVO.setApplicationName("yudao-test");
+        reqVO.setRequestUrl("foo");
+        reqVO.setBeginTime(buildBetweenTime(2021, 3, 13, 2021, 3, 13));
+        reqVO.setDuration(1000);
+        reqVO.setResultCode(GlobalErrorCodeConstants.SUCCESS.getCode());
 
-        // 调用service方法
+        // 调用
         PageResult<ApiAccessLogDO> pageResult = apiAccessLogService.getApiAccessLogPage(reqVO);
-
         // 断言，只查到了一条符合条件的
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
-        assertPojoEquals(infApiAccessLogDO, pageResult.getList().get(0));
+        assertPojoEquals(apiAccessLogDO, pageResult.getList().get(0));
     }
 
     @Test
     public void testGetApiAccessLogList() {
-        // 构造测试数据
-        long userId = 2233L;
-        int userType = UserTypeEnum.ADMIN.getValue();
-        String applicationName = "yudao-test";
-        String requestUrl = "foo";
-        Date beginTime = buildTime(2021, 3, 13);
-        int duration = 1000;
-        int resultCode = GlobalErrorCodeConstants.SUCCESS.getCode();
-
-        ApiAccessLogDO infApiAccessLogDO = RandomUtils.randomPojo(ApiAccessLogDO.class, dto -> {
-            dto.setUserId(userId);
-            dto.setUserType(userType);
-            dto.setApplicationName(applicationName);
-            dto.setRequestUrl(requestUrl);
-            dto.setBeginTime(beginTime);
-            dto.setDuration(duration);
-            dto.setResultCode(resultCode);
+        ApiAccessLogDO apiAccessLogDO = randomPojo(ApiAccessLogDO.class, o -> {
+            o.setUserId(2233L);
+            o.setUserType(UserTypeEnum.ADMIN.getValue());
+            o.setApplicationName("yudao-test");
+            o.setRequestUrl("foo");
+            o.setBeginTime(buildTime(2021, 3, 13));
+            o.setDuration(1000);
+            o.setResultCode(GlobalErrorCodeConstants.SUCCESS.getCode());
         });
-        apiAccessLogMapper.insert(infApiAccessLogDO);
-
-        // 下面几个都是不匹配的数据
-        // userId 不同的
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setUserId(3344L)));
-        // userType
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
-        // applicationName 不同的
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setApplicationName("test")));
-        // requestUrl 不同的
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setRequestUrl("bar")));
-        // 构造一个早期时间 2021-02-06 00:00:00
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setBeginTime(buildTime(2021, 2, 6))));
-        // duration 不同的
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setDuration(100)));
-        // resultCode 不同的
-        apiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setResultCode(2)));
-
-        // 构造调用参数
+        apiAccessLogMapper.insert(apiAccessLogDO);
+        // 测试 userId 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setUserId(3344L)));
+        // 测试 userType 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setUserType(UserTypeEnum.MEMBER.getValue())));
+        // 测试 applicationName 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setApplicationName("test")));
+        // 测试 requestUrl 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setRequestUrl("bar")));
+        // 测试 beginTime 不匹配：构造一个早期时间 2021-02-06 00:00:00
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setBeginTime(buildTime(2021, 2, 6))));
+        // 测试 duration 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setDuration(100)));
+        // 测试 resultCode 不匹配
+        apiAccessLogMapper.insert(cloneIgnoreId(apiAccessLogDO, o -> o.setResultCode(2)));
+        // 准备参数
         ApiAccessLogExportReqVO reqVO = new ApiAccessLogExportReqVO();
-        reqVO.setUserId(userId);
-        reqVO.setUserType(userType);
-        reqVO.setApplicationName(applicationName);
-        reqVO.setRequestUrl(requestUrl);
-        reqVO.setBeginTime((new Date[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
-        reqVO.setDuration(duration);
-        reqVO.setResultCode(resultCode);
+        reqVO.setUserId(2233L);
+        reqVO.setUserType(UserTypeEnum.ADMIN.getValue());
+        reqVO.setApplicationName("yudao-test");
+        reqVO.setRequestUrl("foo");
+        reqVO.setBeginTime(buildBetweenTime(2021, 3, 13, 2021, 3, 13));
+        reqVO.setDuration(1000);
+        reqVO.setResultCode(GlobalErrorCodeConstants.SUCCESS.getCode());
 
-        // 调用service方法
+        // 调用
         List<ApiAccessLogDO> list = apiAccessLogService.getApiAccessLogList(reqVO);
-
         // 断言，只查到了一条符合条件的
         assertEquals(1, list.size());
-        assertPojoEquals(infApiAccessLogDO, list.get(0));
+        assertPojoEquals(apiAccessLogDO, list.get(0));
     }
 
     @Test
-    public void testCreateApiAccessLogAsync() {
+    public void testCreateApiAccessLog() {
         // 准备参数
-        ApiAccessLogCreateReqDTO createDTO = RandomUtils.randomPojo(ApiAccessLogCreateReqDTO.class,
-                dto -> dto.setUserType(RandomUtil.randomEle(UserTypeEnum.values()).getValue()));
+        ApiAccessLogCreateReqDTO createDTO = randomPojo(ApiAccessLogCreateReqDTO.class);
 
         // 调用
         apiAccessLogService.createApiAccessLog(createDTO);
         // 断言
-        ApiAccessLogDO infApiAccessLogDO = apiAccessLogMapper.selectOne(null);
-        assertNotNull(infApiAccessLogDO);
-        assertPojoEquals(createDTO, infApiAccessLogDO);
+        ApiAccessLogDO apiAccessLogDO = apiAccessLogMapper.selectOne(null);
+        assertPojoEquals(createDTO, apiAccessLogDO);
     }
-
 
 }

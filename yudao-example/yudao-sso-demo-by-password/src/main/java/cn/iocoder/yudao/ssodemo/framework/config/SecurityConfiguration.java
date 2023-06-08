@@ -2,17 +2,20 @@ package cn.iocoder.yudao.ssodemo.framework.config;
 
 import cn.iocoder.yudao.ssodemo.framework.core.filter.TokenAuthenticationFilter;
 import cn.iocoder.yudao.ssodemo.framework.core.handler.AccessDeniedHandlerImpl;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.annotation.Resource;
 
-@Configuration
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+@Configuration(proxyBeanMethods = false)
+@EnableWebSecurity
+public class SecurityConfiguration {
 
     @Resource
     private TokenAuthenticationFilter tokenAuthenticationFilter;
@@ -22,8 +25,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Resource
     private AuthenticationEntryPoint authenticationEntryPoint;
 
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
+    @Bean
+    protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         // 设置 URL 安全权限
         httpSecurity.csrf().disable() // 禁用 CSRF 保护
                 .authorizeRequests()
@@ -43,6 +46,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // 添加 Token Filter
         httpSecurity.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return httpSecurity.build();
     }
 
 }

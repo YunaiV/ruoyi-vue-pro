@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemRefundStatusEnum;
+import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -16,7 +19,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@TableName(value = "trade_order_item")
+@TableName(value = "trade_order_item", autoResultMap = true)
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
@@ -40,7 +43,7 @@ public class TradeOrderItemDO extends BaseDO {
      */
     private Long orderId;
 
-    // ========== 商品基本信息 ==========
+    // ========== 商品基本信息; 冗余较多字段，减少关联查询 ==========
     /**
      * 商品 SPU 编号
      *
@@ -48,20 +51,24 @@ public class TradeOrderItemDO extends BaseDO {
      */
     private Long spuId;
     /**
+     * 商品 SPU 名称
+     *
+     * 冗余 ProductSkuDO 的 spuName 编号
+     */
+    private String spuName;
+    /**
      * 商品 SKU 编号
      *
      * 关联 ProductSkuDO 的 id 编号
      */
     private Long skuId;
     /**
-     * 规格值数组，JSON 格式
+     * 属性数组，JSON 格式
+     *
+     * 冗余 ProductSkuDO 的 properties 字段
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = PropertyTypeHandler.class)
     private List<Property> properties;
-    /**
-     * 商品名称
-     */
-    private String name;
     /**
      * 商品图片
      */
@@ -70,93 +77,84 @@ public class TradeOrderItemDO extends BaseDO {
      * 购买数量
      */
     private Integer count;
-    /**
-     * 是否评论
-     *
-     * false - 未评论
-     * true - 已评论
-     */
-    private Boolean commented;
+//    /**
+//     * 是否评论 TODO
+//     *
+//     * false - 未评论
+//     * true - 已评论
+//     */
+//    private Boolean commented;
 
     // ========== 价格 + 支付基本信息 ==========
+
+    /**
+     * 商品原价（总），单位：分
+     *
+     * = {@link #originalUnitPrice} * {@link #getCount()}
+     */
+    private Integer originalPrice;
     /**
      * 商品原价（单），单位：分
      *
      * 对应 ProductSkuDO 的 price 字段
+     * 对应 taobao 的 order.price 字段
      */
-    // like - original_price；niu - costPrice
-    private Integer originalPrice;
+    private Integer originalUnitPrice;
     /**
-     * 商品原价（总），单位：分
+     * 商品优惠（总），单位：分
      *
-     * = {@link #originalPrice} * {@link #count}
-     */
-    // like - total_price；niu - 暂无
-    private Integer totalOriginalPrice;
-    /**
-     * 商品级优惠（总），单位：分
+     * 商品级优惠：对单个商品的，常见如：商品原价的 8 折；商品原价的减 50 元
      *
-     * 例如说“限时折扣”：商品原价的 8 折；商品原价的减 50 元
+     * 对应 taobao 的 order.discount_fee 字段
      */
-    // taobao - order.discount_fee（子订单商品优惠）
-    private Integer totalPromotionPrice;
+    private Integer discountPrice;
     /**
-     * 最终购买金额（单），单位：分。
+     * 子订单实付金额，不算主订单分摊金额，单位：分
      *
-     * = {@link #totalPresentPrice} / {@link #count}
-     */
-    private Integer presentPrice;
-    /**
-     * 最终购买金额（总），单位：分。
+     * = {@link #originalPrice}
+     * - {@link #discountPrice}
      *
-     * = {@link #totalOriginalPrice}
-     * - {@link #totalPromotionPrice}
+     * 对应 taobao 的 order.payment 字段
      */
-    // like -  total_pay_price；niu - goods_money; taobao - order.payment（子订单实付金额，不算主订单分摊金额） | order.total_fee（子订单应付金额，参考使用）
-    private Integer totalPresentPrice;
-    // TODO 芋艿：part_mjz_discount(子订单分摊金额)；本质上，totalOriginalPrice - totalPayPrice
+    private Integer payPrice;
+
     /**
-     * 应付金额（总），单位：分
+     * 子订单分摊金额（总），单位：分
+     * 需要分摊 {@link TradeOrderDO#getDiscountPrice()}、{@link TradeOrderDO#getCouponPrice()}、{@link TradeOrderDO#getPointPrice()}
+     *
+     * 对应 taobao 的 order.part_mjz_discount 字段
+     * 淘宝说明：子订单分摊优惠基础逻辑：一般正常优惠券和满减优惠按照子订单的金额进行分摊，特殊情况如果优惠券是指定商品使用的，只会分摊到对应商品子订单上不分摊。
      */
-    // taobao - divide_order_fee （分摊后子订单实付金额）；
-    private Integer totalPayPrice;
+    private Integer orderPartPrice;
+    /**
+     * 分摊后子订单实付金额（总），单位：分
+     *
+     * = {@link #payPrice}
+     * - {@link #orderPartPrice}
+     *
+     * 对应 taobao 的 divide_order_fee 字段
+     */
+    private Integer orderDividePrice;
 
     // ========== 营销基本信息 ==========
-//    /**
-//     * 积分抵扣的金额，单位：分
-//     */
-//    private Integer integralTotal; // like - integral_price；niu - point_money
-//    /**
-//     * 使用的积分
-//     */
-//    private Integer useIntegral; // niu - use_point
 
-    // ========== 退款基本信息 ==========
+    // TODO 芋艿：在捉摸一下
+
+    // ========== 售后基本信息 ==========
     /**
-     * 退款状态
+     * 售后状态
      *
-     * 枚举 {@link TradeOrderItemRefundStatusEnum}
+     * 枚举 {@link TradeOrderItemAfterSaleStatusEnum}
+     *
+     * @see TradeAfterSaleDO
      */
-    private Integer refundStatus; // TODO 芋艿：可以考虑去查
-    // 如上字段，举个例子：
-    // 假设购买三个，即 stock = 3 。
-    // originPrice = 15
-    // 使用限时折扣（单品优惠）8 折，buyPrice = 12
-    // 开始算总的价格
-    // buyTotal = buyPrice * stock = 12 * 3 = 36
-    // discountTotal ，假设有满减送（分组优惠）满 20 减 10 ，并且使用优惠劵满 1.01 减 1 ，则 discountTotal = 10 + 1 = 11
-    // presentTotal = buyTotal - discountTotal = 24 - 11 = 13
-    // 最终 presentPrice = presentTotal / stock = 13 / 3 = 4.33
-    /**
-     * 退款总金额，单位：分
-     */
-    private Integer refundTotal;
+    private Integer afterSaleStatus;
 
     /**
      * 商品属性
      */
     @Data
-    public static class Property {
+    public static class Property implements Serializable {
 
         /**
          * 属性编号
@@ -173,42 +171,20 @@ public class TradeOrderItemDO extends BaseDO {
 
     }
 
-    // TODO 芋艿：basket_date 加入购物车时间；
-    // TODO 芋艿：distribution_card_no 推广员使用的推销卡号
+    // TODO @芋艿：可以找一些新的思路
+    public static class PropertyTypeHandler extends AbstractJsonTypeHandler<List<Property>> {
 
-    // TODO 待确定：mf
-    // TODO give_integral：赠送积分
-    // TODO is_reply：是否评价，0-未评价，1-已评价
-    // TODO is_sub：是否单独分佣,0-否，1-是
-    // TODO vip_price：会员价
-    // TODO product_type：商品类型:0-普通，1-秒杀，2-砍价，3-拼团，4-视频号
+        @Override
+        protected List<Property> parse(String json) {
+            return JsonUtils.parseArray(json, Property.class);
+        }
 
-    // TODO 待确定：lf
-    // TODO integral_price：积分抵扣的金额
-    // TODO member_price：会员价格
-    // TODO is_member：是否为会员折扣;0-不是;1-是
-    // TODO member_discount：会员折扣(百分比)
+        @Override
+        protected String toJson(List<Property> obj) {
+            return JsonUtils.toJsonString(obj);
+        }
 
-    // TODO goods_info 商品信息
-
-    // TODO integral_price：积分抵扣的金额
-
-    // TODO 待确定：niu
-    // TODO is_virtual '是否是虚拟商品'
-    // TODO goods_class '商品种类(1.实物 2.虚拟3.卡券)'
-    // TODO adjust_money ''调整金额''
-
-    // TODO is_fenxiao 是否分销,
-    // TODO adjust_money 是否分销,
-
-    // TODO delivery_status '配送状态'
-    // TODO delivery_no ''配送单号''
-    // TODO gift_flag '赠品标识'
-    // TODO gift_flag '赠品标识'
-
-    // TODO refund_status '退款状态'
-    // TODO refund_type '退款状态'
-    // TODO 一堆退款字段
+    }
 
 }
 

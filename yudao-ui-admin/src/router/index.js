@@ -75,7 +75,8 @@ export const constantRoutes = [
         meta: {title: '首页', icon: 'dashboard', affix: true}
       }
     ]
-  }, {
+  },
+  {
     path: '/user',
     component: Layout,
     hidden: true,
@@ -85,27 +86,33 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/system/user/profile/index'], resolve),
         name: 'Profile',
         meta: {title: '个人中心', icon: 'user'}
-      }
-    ]
-  }, {
+      }, {
+        path: 'notify-message',
+        component: (resolve) => require(['@/views/system/notify/my/index'], resolve),
+        name: 'MyNotifyMessage',
+        meta: { title: '我的站内信', icon: 'message' },
+    }]
+  },
+  {
     path: '/dict',
     component: Layout,
     hidden: true,
     children: [{
         path: 'type/data/:dictId(\\d+)',
         component: (resolve) => require(['@/views/system/dict/data'], resolve),
-        name: 'Data',
+        name: 'SystemDictData',
         meta: {title: '字典数据', icon: '', activeMenu: '/system/dict'}
       }
     ]
-  }, {
+  },
+  {
     path: '/job',
     component: Layout,
     hidden: true,
     children: [{
         path: 'log',
         component: (resolve) => require(['@/views/infra/job/log'], resolve),
-        name: 'JobLog',
+        name: 'InfraJobLog',
         meta: {title: '调度日志', activeMenu: '/infra/job'}
       }
     ]
@@ -116,11 +123,12 @@ export const constantRoutes = [
     children: [{
         path: 'edit/:tableId(\\d+)',
         component: (resolve) => require(['@/views/infra/codegen/editTable'], resolve),
-        name: 'GenEdit',
+        name: 'InfraCodegenEditTable',
         meta: {title: '修改生成配置', activeMenu: '/infra/codegen'}
       }
     ]
-  }, {
+  },
+  {
     path: '/bpm',
     component: Layout,
     hidden: true,
@@ -128,46 +136,106 @@ export const constantRoutes = [
     children: [{
         path: 'oa/leave/create',
         component: (resolve) => require(['@/views/bpm/oa/leave/create'], resolve),
-        name: '发起 OA 请假',
+        name: 'BpmOALeaveCreate',
         meta: {title: '发起 OA 请假', icon: 'form', activeMenu: '/bpm/oa/leave'}
       }, {
         path: 'oa/leave/detail',
         component: (resolve) => require(['@/views/bpm/oa/leave/detail'], resolve),
-        name: '查看 OA 请假',
+        name: 'BpmOALeaveDetail',
         meta: {title: '查看 OA 请假', icon: 'view', activeMenu: '/bpm/oa/leave'}
       }
     ]
-  }, {
+  },
+  {
     path: '/bpm',
     component: Layout,
     hidden: true,
     children: [{
         path: 'manager/form/edit',
         component: (resolve) => require(['@/views/bpm/form/formEditor'], resolve),
-        name: '流程表单-编辑',
+        name: 'BpmFormEditor',
         meta: {title: '流程表单-编辑', activeMenu: '/bpm/manager/form'}
       }, {
         path: 'manager/definition',
         component: (resolve) => require(['@/views/bpm/definition/index'], resolve),
-        name: '流程定义',
+        name: 'BpmProcessDefinition',
         meta: {title: '流程定义', activeMenu: '/bpm/manager/model'}
       }, {
         path: 'manager/model/design',
         component: (resolve) => require(['@/views/bpm/model/modelEditor'], resolve),
-        name: '设计流程',
+        name: 'BpmModelEditor',
         meta: {title: '设计流程', activeMenu: '/bpm/manager/model'}
       }, {
         path: 'process-instance/create',
         component: (resolve) => require(['@/views/bpm/processInstance/create'], resolve),
-        name: '发起流程',
+        name: 'BpmProcessInstanceCreate',
         meta: {title: '发起流程', activeMenu: '/bpm/task/my'}
       }, {
         path: 'process-instance/detail',
         component: (resolve) => require(['@/views/bpm/processInstance/detail'], resolve),
-        name: '流程详情',
+        name: 'BpmProcessInstanceDetail',
         meta: {title: '流程详情', activeMenu: '/bpm/task/my'}
       }
     ]
+  },
+  {
+    path: '/property',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: 'value/:propertyId(\\d+)',
+      component: (resolve) => require(['@/views/mall/product/property/value'], resolve),
+      name: 'ProductPropertyValue',
+      meta: {title: '商品属性值', icon: '', activeMenu: '/product/property'}
+    }
+    ]
+  },
+  {
+    path: '/spu',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: 'edit/:spuId(\\d+)',
+      component: (resolve) => require(['@/views/mall/product/spu/save'], resolve),
+      name: 'ProductSpuUpdate',
+      meta: {title: '修改商品', activeMenu: '/product/spu'}
+    },
+      {
+        path: 'add',
+        component: (resolve) => require(['@/views/mall/product/spu/save'], resolve),
+        name: 'ProductSpuCreate',
+        meta: {title: '添加商品', activeMenu: '/product/spu'}
+      }
+    ]
+  },
+  {
+    path: '/trade/order',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'detail',
+        name: 'TradeOrderDetail',
+        hidden: true,
+        meta: { title: '订单详情' },
+        component: (resolve) => require(['@/views/mall/trade/order/detail'], resolve)
+      }
+    ]
+  },
+  {
+    path: '/pay',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: 'order/submit',
+      name: 'PayOrderSubmit',
+      hidden: true,
+      meta: {
+        title: '收银台',
+        noCache: true
+      },
+      component: (resolve) => require(['@/views/pay/order/submit'], resolve)
+    }]
   }
 ]
 

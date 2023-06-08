@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 支付退款单 DO
@@ -80,7 +80,6 @@ public class PayRefundDO extends BaseDO {
      */
     private String tradeNo;
 
-
     // ========== 商户相关字段 ==========
     /**
      * 商户订单编号
@@ -132,11 +131,11 @@ public class PayRefundDO extends BaseDO {
     /**
      * 支付金额，单位：分
      */
-    private Long payAmount;
+    private Integer payAmount;
     /**
      * 退款金额，单位：分
      */
-    private Long refundAmount;
+    private Integer refundAmount;
 
     /**
      * 退款原因
@@ -171,29 +170,24 @@ public class PayRefundDO extends BaseDO {
      */
     private String channelErrorMsg;
 
-
     /**
      * 支付渠道的额外参数
      * 参见 https://www.pingxx.com/api/Refunds%20退款概述.html
      */
     private String channelExtras;
 
-
     /**
      * TODO
      * 退款失效时间
      */
-    private Date expireTime;
+    private LocalDateTime expireTime;
     /**
      * 退款成功时间
      */
-    private Date successTime;
+    private LocalDateTime successTime;
     /**
      * 退款通知时间
      */
-    private Date notifyTime;
-
-
-
+    private LocalDateTime notifyTime;
 
 }

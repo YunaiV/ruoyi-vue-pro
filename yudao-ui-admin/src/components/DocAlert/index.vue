@@ -1,5 +1,9 @@
 <template>
-  <el-alert v-if="enable()" :title="'【' + title + '】文档地址：' + url" type="success" show-icon />
+  <el-alert v-if="enable()" type="success" show-icon>
+    <template slot="title">
+      <div @click="goToUrl">{{ '【' + title + '】文档地址：' + url }}</div>
+    </template>
+  </el-alert>
 </template>
 
 <script>
@@ -14,6 +18,9 @@ export default {
   methods: {
     enable: function () {
       return getDocEnable();
+    },
+    goToUrl: function() {
+      window.open(this.url);
     }
   }
 };
@@ -21,5 +28,6 @@ export default {
 <style scoped>
 .el-alert--success.is-light {
   margin-bottom: 10px;
+  cursor: pointer;
 }
 </style>

@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -79,7 +79,7 @@ public class BpmProcessInstanceExtDO extends BaseDO {
      *
      * 冗余 HistoricProcessInstance 的 endTime 属性
      */
-    private Date endTime;
+    private LocalDateTime endTime;
 
     /**
      * 提交的表单值

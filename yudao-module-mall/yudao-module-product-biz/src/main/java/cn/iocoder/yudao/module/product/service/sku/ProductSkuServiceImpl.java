@@ -1,18 +1,21 @@
 package cn.iocoder.yudao.module.product.service.sku;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyAndValueRespVO;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuBaseVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.module.product.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuSpecTypeEnum;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
+import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
+import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +25,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
 /**
@@ -37,12 +42,17 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     private ProductSkuMapper productSkuMapper;
 
     @Resource
+    @Lazy // 循环依赖，避免报错
+    private ProductSpuService productSpuService;
+    @Resource
     private ProductPropertyService productPropertyService;
+    @Resource
+    private ProductPropertyValueService productPropertyValueService;
 
     @Override
     public void deleteSku(Long id) {
         // 校验存在
-        this.validateSkuExists(id);
+        validateSkuExists(id);
         // 删除
         productSkuMapper.deleteById(id);
     }
@@ -59,37 +69,42 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
+    public List<ProductSkuDO> getSkuList() {
+        return productSkuMapper.selectList();
+    }
+
+    @Override
     public List<ProductSkuDO> getSkuList(Collection<Long> ids) {
         return productSkuMapper.selectBatchIds(ids);
     }
 
     @Override
-    public void validateSkus(List<ProductSkuCreateOrUpdateReqVO> skus, Integer specType) {
+    public void validateSkuList(List<ProductSkuCreateOrUpdateReqVO> skus, Integer specType) {
         // 非多规格，不需要校验
         if (ObjectUtil.notEqual(specType, ProductSpuSpecTypeEnum.DISABLE.getType())) {
             return;
         }
 
-        // 1、校验规格属性存在
-        // TODO @Luowenfeng：stream 的写法；不用改哈，就是说下可以酱紫写；
-        Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null).flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
-                .map(ProductSkuBaseVO.Property::getPropertyId).collect(Collectors.toSet()); // 将每个 Property 转换成对应的 propertyId，最后形成集合
-        List<ProductPropertyAndValueRespVO> propertyAndValueList = productPropertyService.getPropertyAndValueList(propertyIds);
-        if (propertyAndValueList.size() == propertyIds.size()) {
+        // 1、校验属性项存在
+        Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null)
+                .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
+                .map(ProductSkuBaseVO.Property::getPropertyId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
+                .collect(Collectors.toSet());
+        List<ProductPropertyDO> propertyList = productPropertyService.getPropertyList(propertyIds);
+        if (propertyList.size() != propertyIds.size()) {
             throw exception(PROPERTY_NOT_EXISTS);
         }
 
-        // 2. 校验，一个 SKU 下，没有重复的规格。校验方式是，遍历每个 SKU ，看看是否有重复的规格 propertyId
-        Map<Long, ProductPropertyValueRespVO> propertyValueMap = propertyAndValueList.stream().filter(p -> p.getValues() != null).flatMap(p -> p.getValues().stream())
-                .collect(Collectors.toMap(ProductPropertyValueRespVO::getId, value -> value)); // KEY：规格属性值的编号
+        // 2. 校验，一个 SKU 下，没有重复的属性。校验方式是，遍历每个 SKU ，看看是否有重复的属性 propertyId
+        Map<Long, ProductPropertyValueDO> propertyValueMap = convertMap(productPropertyValueService.getPropertyValueListByPropertyId(propertyIds), ProductPropertyValueDO::getId);
         skus.forEach(sku -> {
-            Set<Long> skuPropertyIds = CollectionUtils.convertSet(sku.getProperties(), propertyItem -> propertyValueMap.get(propertyItem.getValueId()).getPropertyId());
+            Set<Long> skuPropertyIds = convertSet(sku.getProperties(), propertyItem -> propertyValueMap.get(propertyItem.getValueId()).getPropertyId());
             if (skuPropertyIds.size() != sku.getProperties().size()) {
                 throw exception(SKU_PROPERTIES_DUPLICATED);
             }
         });
 
-        // 3. 再校验，每个 Sku 的规格值的数量，是一致的。
+        // 3. 再校验，每个 Sku 的属性值的数量，是一致的。
         int attrValueIdsSize = skus.get(0).getProperties().size();
         for (int i = 1; i < skus.size(); i++) {
             if (attrValueIdsSize != skus.get(i).getProperties().size()) {
@@ -100,29 +115,30 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         // 4. 最后校验，每个 Sku 之间不是重复的
         Set<Set<Long>> skuAttrValues = new HashSet<>(); // 每个元素，都是一个 Sku 的 attrValueId 集合。这样，通过最外层的 Set ，判断是否有重复的.
         for (ProductSkuCreateOrUpdateReqVO sku : skus) {
-            // TODO @Luowenfeng：可以使用 CollectionUtils.convertSet()，简化下面的 stream 操作
-            if (!skuAttrValues.add(sku.getProperties().stream().map(ProductSkuBaseVO.Property::getValueId).collect(Collectors.toSet()))) { // 添加失败，说明重复
+            if (!skuAttrValues.add(convertSet(sku.getProperties(), ProductSkuBaseVO.Property::getValueId))) { // 添加失败，说明重复
                 throw exception(ErrorCodeConstants.SPU_SKU_NOT_DUPLICATE);
             }
         }
     }
 
     @Override
-    public void createSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList) {
-        // 批量插入 SKU
-        List<ProductSkuDO> skuDOList = ProductSkuConvert.INSTANCE.convertSkuDOList(skuCreateReqList);
-        skuDOList.forEach(v -> v.setSpuId(spuId));
-        productSkuMapper.insertBatch(skuDOList);
+    public void createSkuList(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skuCreateReqList) {
+        productSkuMapper.insertBatch(ProductSkuConvert.INSTANCE.convertList06(skuCreateReqList, spuId, spuName));
     }
 
     @Override
-    public List<ProductSkuDO> getSkusBySpuId(Long spuId) {
-        return productSkuMapper.selectListBySpuIds(Collections.singletonList(spuId));
+    public List<ProductSkuDO> getSkuListBySpuId(Long spuId) {
+        return productSkuMapper.selectListBySpuId(spuId);
     }
 
     @Override
-    public List<ProductSkuDO> getSkusBySpuIds(List<Long> spuIds) {
-        return productSkuMapper.selectListBySpuIds(spuIds);
+    public List<ProductSkuDO> getSkuListBySpuIdAndStatus(Long spuId, Integer status) {
+        return productSkuMapper.selectListBySpuIdAndStatus(spuId, status);
+    }
+
+    @Override
+    public List<ProductSkuDO> getSkuListBySpuId(List<Long> spuIds) {
+        return productSkuMapper.selectListBySpuId(spuIds);
     }
 
     @Override
@@ -131,40 +147,68 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
-    @Transactional
-    public void updateProductSkus(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
-        // 查询 SPU 下已经存在的 SKU 的集合
-        List<ProductSkuDO> existsSkus = productSkuMapper.selectListBySpuId(spuId);
-        Map<Long, ProductSkuDO> existsSkuMap = CollectionUtils.convertMap(existsSkus, ProductSkuDO::getId);
+    public List<ProductSkuDO> getSkuListByAlarmStock() {
+        return productSkuMapper.selectListByAlarmStock();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSkuList(Long spuId, String spuName, List<ProductSkuCreateOrUpdateReqVO> skus) {
+        // 构建属性与 SKU 的映射关系;
+        Map<String, Long> existsSkuMap = convertMap(productSkuMapper.selectListBySpuId(spuId),
+                ProductSkuConvert.INSTANCE::buildPropertyKey, ProductSkuDO::getId);
 
         // 拆分三个集合，新插入的、需要更新的、需要删除的
         List<ProductSkuDO> insertSkus = new ArrayList<>();
-        List<ProductSkuDO> updateSkus = new ArrayList<>(); // TODO Luowenfeng：使用 Long 即可
-        List<ProductSkuDO> deleteSkus = new ArrayList<>();
-
-        // TODO @Luowenfeng：是不是基于规格匹配会比较好。可以参考下 onemall 的 ProductSpuServiceImpl 的 updateProductSpu 逻辑
-        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertSkuDOList(skus);
-        allUpdateSkus.forEach(p -> {
-            if (p.getId() != null) {
-                if (existsSkuMap.containsKey(p.getId())) {
-                    updateSkus.add(p);
-                    return;
-                }
-                deleteSkus.add(p);
+        List<ProductSkuDO> updateSkus = new ArrayList<>();
+        List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertList06(skus, null, spuName);
+        allUpdateSkus.forEach(sku -> {
+            String propertiesKey = ProductSkuConvert.INSTANCE.buildPropertyKey(sku);
+            // 1、找得到的，进行更新
+            Long existsSkuId = existsSkuMap.remove(propertiesKey);
+            if (existsSkuId != null) {
+                sku.setId(existsSkuId);
+                updateSkus.add(sku);
                 return;
             }
-            p.setSpuId(spuId);
-            insertSkus.add(p);
+            // 2、找不到，进行插入
+            sku.setSpuId(spuId);
+            insertSkus.add(sku);
         });
 
-        if (CollectionUtil.isNotEmpty(insertSkus)) {
+        // 执行最终的批量操作
+        if (CollUtil.isNotEmpty(insertSkus)) {
             productSkuMapper.insertBatch(insertSkus);
         }
-        if (updateSkus.size() > 0) {
-            updateSkus.forEach(p -> productSkuMapper.updateById(p));
+        if (CollUtil.isNotEmpty(updateSkus)) {
+            updateSkus.forEach(sku -> productSkuMapper.updateById(sku));
         }
-        if (deleteSkus.size() > 0) {
-            productSkuMapper.deleteBatchIds(deleteSkus.stream().map(ProductSkuDO::getId).collect(Collectors.toList()));
+        if (CollUtil.isNotEmpty(existsSkuMap)) {
+            productSkuMapper.deleteBatchIds(existsSkuMap.values());
         }
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSkuStock(ProductSkuUpdateStockReqDTO updateStockReqDTO) {
+        // 更新 SKU 库存
+        updateStockReqDTO.getItems().forEach(item -> {
+            if (item.getIncrCount() > 0) {
+                productSkuMapper.updateStockIncr(item.getId(), item.getIncrCount());
+            } else if (item.getIncrCount() < 0) {
+                int updateStockIncr = productSkuMapper.updateStockDecr(item.getId(), item.getIncrCount());
+                if (updateStockIncr == 0) {
+                    throw exception(SKU_STOCK_NOT_ENOUGH);
+                }
+            }
+        });
+
+        // 更新 SPU 库存
+        List<ProductSkuDO> skus = productSkuMapper.selectBatchIds(
+                convertSet(updateStockReqDTO.getItems(), ProductSkuUpdateStockReqDTO.Item::getId));
+        Map<Long, Integer> spuStockIncrCounts = ProductSkuConvert.INSTANCE.convertSpuStockMap(
+                updateStockReqDTO.getItems(), skus);
+        productSpuService.updateSpuStock(spuStockIncrCounts);
+    }
+
 }

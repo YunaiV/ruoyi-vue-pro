@@ -1,23 +1,24 @@
 package cn.iocoder.yudao.module.product.api.spu;
 
-import cn.iocoder.yudao.module.product.api.sku.dto.SkuInfoRespDTO;
-import cn.iocoder.yudao.module.product.api.spu.dto.SpuInfoRespDTO;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 
 import java.util.Collection;
 import java.util.List;
 
 /**
+ * 商品 SPU API 接口
+ *
  * @author LeeYan9
  * @since 2022-08-26
  */
 public interface ProductSpuApi {
 
-
     /**
-     * 根据spuId列表 查询spu信息
+     * 批量查询 SPU 数组
      *
-     * @param spuIds spu ID列表
-     * @return spu信息列表
+     * @param ids SPU 编号列表
+     * @return SPU 数组
      */
-    List<SpuInfoRespDTO> getSpusByIds(Collection<Long> spuIds);
+    List<ProductSpuRespDTO> getSpuList(Collection<Long> ids);
+
 }

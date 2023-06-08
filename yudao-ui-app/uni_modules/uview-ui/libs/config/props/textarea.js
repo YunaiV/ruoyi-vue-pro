@@ -15,7 +15,7 @@ export default {
 		placeholderClass: 'textarea-placeholder',
 		placeholderStyle: 'color: #c0c4cc',
 		height: 70,
-		confirmType: '',
+		confirmType: 'done',
 		disabled: false,
 		count: false,
 		focus: false,

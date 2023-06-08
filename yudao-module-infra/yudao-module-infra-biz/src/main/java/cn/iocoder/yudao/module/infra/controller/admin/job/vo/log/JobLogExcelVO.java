@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 定时任务 Excel VO
@@ -32,10 +32,10 @@ public class JobLogExcelVO {
     private Integer executeIndex;
 
     @ExcelProperty("开始执行时间")
-    private Date beginTime;
+    private LocalDateTime beginTime;
 
     @ExcelProperty("结束执行时间")
-    private Date endTime;
+    private LocalDateTime endTime;
 
     @ExcelProperty("执行时长")
     private Integer duration;
@@ -48,6 +48,6 @@ public class JobLogExcelVO {
     private String result;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

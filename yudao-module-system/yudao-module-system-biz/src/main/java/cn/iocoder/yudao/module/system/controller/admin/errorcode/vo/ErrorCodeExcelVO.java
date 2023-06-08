@@ -2,11 +2,10 @@ package cn.iocoder.yudao.module.system.controller.admin.errorcode.vo;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-//import cn.iocoder.yudao.adminserver.modules.infra.enums.InfDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 错误码 Excel VO
@@ -36,6 +35,6 @@ public class ErrorCodeExcelVO {
     private String memo;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }

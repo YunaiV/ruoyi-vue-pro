@@ -39,10 +39,7 @@
         </div>
       </el-col>
       <div v-if="this.processInstance.processDefinition && this.processInstance.processDefinition.formType === 20">
-        <router-link :to="this.processInstance.processDefinition.formCustomViewPath + '?id='
-                          + this.processInstance.businessKey">
-          <el-button type="primary">点击查看</el-button>
-        </router-link>
+        <async-biz-form-component :id="this.processInstance.businessKey"></async-biz-form-component>
       </div>
     </el-card>
 
@@ -110,11 +107,12 @@ import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import store from "@/store";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
-import {createProcessInstance, getProcessInstance} from "@/api/bpm/processInstance";
-import {approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssignee,backTask} from "@/api/bpm/task";
+import {getProcessInstance} from "@/api/bpm/processInstance";
+import {approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssignee} from "@/api/bpm/task";
 import {getDate} from "@/utils/dateUtils";
 import {listSimpleUsers} from "@/api/system/user";
 import {getActivityList} from "@/api/bpm/activity";
+import Vue from "vue";
 
 // 流程实例的详情页，可用于审批
 export default {
@@ -163,10 +161,7 @@ export default {
         rules: {
           assigneeUserId: [{ required: true, message: "新审批人不能为空", trigger: "change" }],
         }
-      },
-
-      // 数据字典
-      categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
+      }
     };
   },
   created() {
@@ -195,6 +190,12 @@ export default {
         }
         // 设置流程信息
         this.processInstance = response.data;
+
+        //将业务表单，注册为动态组件
+        const path = this.processInstance.processDefinition.formCustomViewPath;
+        Vue.component("async-biz-form-component", function(resolve) {
+          require([`@/views${path}`], resolve);
+        });
 
         // 设置表单信息
         if (this.processInstance.processDefinition.formType === 10) {
@@ -274,23 +275,6 @@ export default {
         // 取消加载中
         this.tasksLoad = false;
       });
-    },
-    /** 处理选择流程的按钮操作 **/
-    handleSelect(row) {
-      // 设置选择的流程
-      this.selectProcessInstance = row;
-
-      // 流程表单
-      if (row.formId) {
-        // 设置对应的表单
-        this.detailForm = {
-          ...JSON.parse(row.formConf),
-          fields: decodeFields(row.formFields)
-        }
-      } else if (row.formCustomCreatePath) {
-        this.$router.push({ path: row.formCustomCreatePath});
-        // 这里暂时无需加载流程图，因为跳出到另外个 Tab；
-      }
     },
     getDateStar(ms) {
       return getDate(ms);

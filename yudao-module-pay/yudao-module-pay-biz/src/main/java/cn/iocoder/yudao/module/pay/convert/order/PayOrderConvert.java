@@ -1,16 +1,17 @@
 package cn.iocoder.yudao.module.pay.convert.order;
 
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderDetailsRespVO;
-import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExcelVO;
-import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageItemRespVO;
-import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderRespVO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
+import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
+import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
-import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderCreateReqDTO;
-import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitReqDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
@@ -29,6 +30,8 @@ public interface PayOrderConvert {
 
     PayOrderRespVO convert(PayOrderDO bean);
 
+    PayOrderRespDTO convert2(PayOrderDO order);
+
     PayOrderDetailsRespVO orderDetailConvert(PayOrderDO bean);
 
     PayOrderDetailsRespVO.PayOrderExtension orderDetailExtensionConvert(PayOrderExtensionDO bean);
@@ -40,13 +43,14 @@ public interface PayOrderConvert {
     List<PayOrderExcelVO> convertList02(List<PayOrderDO> list);
 
     /**
-     * 订单DO转自定义分页对象
+     * 订单 DO 转自定义分页对象
      *
      * @param bean 订单DO
      * @return 分页对象
      */
     PayOrderPageItemRespVO pageConvertItemPage(PayOrderDO bean);
 
+    // TODO 芋艿：优化下 convert 逻辑
     default PayOrderExcelVO excelConvert(PayOrderDO bean) {
         if (bean == null) {
             return null;
@@ -85,11 +89,15 @@ public interface PayOrderConvert {
         return payOrderExcelVO;
     }
 
-
     PayOrderDO convert(PayOrderCreateReqDTO bean);
 
-    PayOrderExtensionDO convert(PayOrderSubmitReqDTO bean);
+    @Mapping(target = "id", ignore = true)
+    PayOrderExtensionDO convert(PayOrderSubmitReqVO bean, String userIp);
 
-    PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqDTO bean);
+    PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqVO reqVO);
+
+    PayOrderSubmitRespVO convert(PayOrderUnifiedRespDTO bean);
+
+    AppPayOrderSubmitRespVO convert3(PayOrderSubmitRespVO bean);
 
 }

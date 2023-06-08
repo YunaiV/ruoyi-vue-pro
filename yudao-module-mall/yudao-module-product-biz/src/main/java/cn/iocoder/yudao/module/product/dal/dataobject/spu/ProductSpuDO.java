@@ -47,7 +47,7 @@ public class ProductSpuDO extends BaseDO {
      */
     private String code;
     /**
-     * 商品卖点
+     * 促销语
      */
     private String sellPoint;
     /**

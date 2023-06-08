@@ -1,0 +1,2 @@
+cn.iocoder.yudao.framework.idempotent.config.YudaoIdempotentConfiguration
+cn.iocoder.yudao.framework.lock4j.config.YudaoLock4jConfiguration

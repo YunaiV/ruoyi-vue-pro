@@ -227,7 +227,7 @@ class DeptDataPermissionRuleTest extends BaseMockitoUnitTest {
             // 调用
             Expression expression = rule.getExpression(tableName, tableAlias);
             // 断言
-            assertEquals("u.dept_id IN (10, 20) OR u.id = 1", expression.toString());
+            assertEquals("(u.dept_id IN (10, 20) OR u.id = 1)", expression.toString());
             assertSame(deptDataPermission, loginUser.getContext(DeptDataPermissionRule.CONTEXT_KEY, DeptDataPermissionRespDTO.class));
         }
     }

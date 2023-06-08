@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.oauth2;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
@@ -20,11 +21,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.time.Duration;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -128,7 +127,7 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
         // mock 数据（访问令牌）
         OAuth2RefreshTokenDO refreshTokenDO = randomPojo(OAuth2RefreshTokenDO.class)
                 .setRefreshToken(refreshToken).setClientId(clientId)
-                .setExpiresTime(addTime(Duration.ofDays(-1)));
+                .setExpiresTime(LocalDateTime.now().minusDays(1));
         oauth2RefreshTokenMapper.insert(refreshTokenDO);
 
         // 调用，并断言
@@ -150,7 +149,7 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
         // mock 数据（访问令牌）
         OAuth2RefreshTokenDO refreshTokenDO = randomPojo(OAuth2RefreshTokenDO.class)
                 .setRefreshToken(refreshToken).setClientId(clientId)
-                .setExpiresTime(addTime(Duration.ofDays(1)));
+                .setExpiresTime(LocalDateTime.now().plusDays(1));
         oauth2RefreshTokenMapper.insert(refreshTokenDO);
         // mock 数据（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class).setRefreshToken(refreshToken);
@@ -177,7 +176,7 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
     public void testGetAccessToken() {
         // mock 数据（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(addTime(Duration.ofDays(1)));
+                .setExpiresTime(LocalDateTime.now().plusDays(1));
         oauth2AccessTokenMapper.insert(accessTokenDO);
         // 准备参数
         String accessToken = accessTokenDO.getAccessToken();
@@ -202,7 +201,7 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
     public void testCheckAccessToken_expired() {
         // mock 数据（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(addTime(Duration.ofDays(-1)));
+                .setExpiresTime(LocalDateTime.now().minusDays(1));
         oauth2AccessTokenMapper.insert(accessTokenDO);
         // 准备参数
         String accessToken = accessTokenDO.getAccessToken();
@@ -216,7 +215,7 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
     public void testCheckAccessToken_success() {
         // mock 数据（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(addTime(Duration.ofDays(1)));
+                .setExpiresTime(LocalDateTime.now().plusDays(1));
         oauth2AccessTokenMapper.insert(accessTokenDO);
         // 准备参数
         String accessToken = accessTokenDO.getAccessToken();
@@ -238,7 +237,7 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
     public void testRemoveAccessToken_success() {
         // mock 数据（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
-                .setExpiresTime(addTime(Duration.ofDays(1)));
+                .setExpiresTime(LocalDateTime.now().plusDays(1));
         oauth2AccessTokenMapper.insert(accessTokenDO);
         // mock 数据（刷新令牌）
         OAuth2RefreshTokenDO refreshTokenDO = randomPojo(OAuth2RefreshTokenDO.class)
@@ -262,7 +261,7 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
             o.setUserId(10L);
             o.setUserType(1);
             o.setClientId("test_client");
-            o.setExpiresTime(DateUtils.addTime(Duration.ofDays(1)));
+            o.setExpiresTime(LocalDateTime.now().plusDays(1));
         });
         oauth2AccessTokenMapper.insert(dbAccessToken);
         // 测试 userId 不匹配
@@ -272,7 +271,7 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
         // 测试 userType 不匹配
         oauth2AccessTokenMapper.insert(cloneIgnoreId(dbAccessToken, o -> o.setClientId("it_client")));
         // 测试 expireTime 不匹配
-        oauth2AccessTokenMapper.insert(cloneIgnoreId(dbAccessToken, o -> o.setExpiresTime(new Date())));
+        oauth2AccessTokenMapper.insert(cloneIgnoreId(dbAccessToken, o -> o.setExpiresTime(LocalDateTimeUtil.now())));
         // 准备参数
         OAuth2AccessTokenPageReqVO reqVO = new OAuth2AccessTokenPageReqVO();
         reqVO.setUserId(10L);

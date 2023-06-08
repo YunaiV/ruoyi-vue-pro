@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * API 错误日志 Excel VO
@@ -48,7 +48,7 @@ public class ApiErrorLogExcelVO {
     private String userAgent;
 
     @ExcelProperty("异常发生时间")
-    private Date exceptionTime;
+    private LocalDateTime exceptionTime;
 
     @ExcelProperty("异常名")
     private String exceptionName;
@@ -75,14 +75,14 @@ public class ApiErrorLogExcelVO {
     private Integer exceptionLineNumber;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ExcelProperty(value = "处理状态", converter = DictConvert.class)
     @DictFormat(DictTypeConstants.API_ERROR_LOG_PROCESS_STATUS)
     private Integer processStatus;
 
     @ExcelProperty("处理时间")
-    private Date processTime;
+    private LocalDateTime processTime;
 
     @ExcelProperty("处理用户编号")
     private Integer processUserId;

@@ -47,20 +47,15 @@
       <el-table-column label="应用编号" align="center" prop="id"/>
       <el-table-column label="应用名" align="center" prop="name"/>
       <el-table-column label="开启状态" align="center" prop="status">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-switch v-model="scope.row.status" :active-value="0" :inactive-value="1"
                      @change="handleStatusChange(scope.row)"/>
         </template>
       </el-table-column>
       <el-table-column label="商户名称" align="center" prop="payMerchant.name"/>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="支付宝配置" align="center">
         <el-table-column :label="payChannelEnum.ALIPAY_APP.name" align="center">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.ALIPAY_APP.code)"
                        @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_APP.code,payType.ALIPAY)">
@@ -72,7 +67,7 @@
           </template>
         </el-table-column>
         <el-table-column :label="payChannelEnum.ALIPAY_PC.name" align="center">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.ALIPAY_PC.code)"
                        @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_PC.code,payType.ALIPAY)">
@@ -84,7 +79,7 @@
           </template>
         </el-table-column>
         <el-table-column :label="payChannelEnum.ALIPAY_WAP.name" align="center">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.ALIPAY_WAP.code)"
                        @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_WAP.code,payType.ALIPAY)">
@@ -96,7 +91,7 @@
           </template>
         </el-table-column>
         <el-table-column :label="payChannelEnum.ALIPAY_QR.name" align="center">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.ALIPAY_QR.code)"
                        @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_QR.code,payType.ALIPAY)">
@@ -107,10 +102,22 @@
             </el-button>
           </template>
         </el-table-column>
+        <el-table-column :label="payChannelEnum.ALIPAY_BAR.name" align="center">
+          <template v-slot="scope">
+            <el-button type="success" icon="el-icon-check" circle
+                       v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.ALIPAY_BAR.code)"
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_BAR.code,payType.ALIPAY)">
+            </el-button>
+            <el-button v-else
+                       type="danger" icon="el-icon-close" circle
+                       @click="handleCreateChannel(scope.row,payChannelEnum.ALIPAY_BAR.code,payType.ALIPAY)">
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table-column>
       <el-table-column label="微信配置" align="center">
         <el-table-column :label="payChannelEnum.WX_LITE.name" align="center">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.WX_LITE.code)"
                        @click="handleUpdateChannel(scope.row,payChannelEnum.WX_LITE.code,payType.WECHAT)">
@@ -122,7 +129,7 @@
           </template>
         </el-table-column>
         <el-table-column :label="payChannelEnum.WX_PUB.name" align="center">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.WX_PUB.code)"
                        @click="handleUpdateChannel(scope.row,payChannelEnum.WX_PUB.code,payType.WECHAT)">
@@ -134,7 +141,7 @@
           </template>
         </el-table-column>
         <el-table-column :label="payChannelEnum.WX_APP.name" align="center">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.WX_APP.code)"
                        @click="handleUpdateChannel(scope.row,payChannelEnum.WX_APP.code,payType.WECHAT)">
@@ -147,7 +154,7 @@
         </el-table-column>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['pay:app:update']">修改
           </el-button>
@@ -222,7 +229,7 @@ import wechatChannelForm from "@/views/pay/app/components/wechatChannelForm";
 import aliPayChannelForm from "@/views/pay/app/components/aliPayChannelForm";
 
 export default {
-  name: "App",
+  name: "PayApp",
   components: {
     "wechatChannelForm": wechatChannelForm,
     "aliPayChannelForm": aliPayChannelForm

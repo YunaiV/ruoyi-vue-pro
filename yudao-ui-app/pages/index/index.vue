@@ -8,17 +8,13 @@
     </u-sticky>
 
     <!--轮播图-->
-    <u-swiper :list="swiperList" previousMargin="20" nextMargin="20" circular height="200" @change="e => (current = e.current)" :autoplay="true" @click="handleSwiperClick">
-      <view slot="indicator" class="indicator">
-        <view class="indicator__dot" v-for="(item, index) in swiperList" :key="index" :class="[index === current && 'indicator__dot--active']"> </view>
-      </view>
-    </u-swiper>
+    <yd-banner :banner-list="bannerList"></yd-banner>
 
     <u-gap height="20px"></u-gap>
 
     <!--宫格菜单按钮-->
-    <u-grid :border="false" col="4"
-      ><u-grid-item v-for="(item, index) in menuList" :key="index">
+    <u-grid :border="false" col="4">
+      <u-grid-item v-for="(item, index) in menuList" :key="index">
         <u-icon :name="item.icon" :size="40"></u-icon>
         <text class="grid-title">{{ item.title }}</text>
       </u-grid-item>
@@ -30,81 +26,11 @@
     <u-notice-bar style="padding: 13px 12px" :text="noticeList" mode="link" direction="column" @click="click"></u-notice-bar>
 
     <!--商品展示栏-->
-    <view>
-      <u-gap height="180" bgColor="#398ade"></u-gap>
-      <view class="prod-block">
-        <view class="bloc-header">
-          <text class="bloc-title">每日上新</text>
-          <text class="see-more">查看更多</text>
-        </view>
-        <view class="prod-grid">
-          <view class="prod-item" v-for="(item, index) in productList" :key="item.id" @click="handleProdItemClick(item.id)">
-            <image class="prod-image" :src="item.image"></image>
-            <view class="item-info">
-              <view class="info-text">
-                <u--text :lines="2" size="14px" color="#333333" :text="item.title"></u--text>
-              </view>
-              <view class="price-and-cart">
-                <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
-                <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
-              </view>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
+    <yd-product-box :product-list="productList" :title="'每日上新'" show-type="normal"></yd-product-box>
+    <yd-product-box :product-list="productList" :title="'热卖商品'" show-type="half"></yd-product-box>
+    <yd-product-more :product-list="productList" :more-status="moreStatus"></yd-product-more>
 
-    <view>
-      <view class="prod-block half">
-        <view class="bloc-header">
-          <text class="bloc-title">商品热卖</text>
-          <text class="more">更多 &gt;</text>
-        </view>
-        <view class="prod-grid half">
-          <view class="prod-item" v-for="(item, index) in productList" :key="item.id" @click="handleProdItemClick(item.id)">
-            <image class="prod-image" :src="item.image"></image>
-            <view class="item-info">
-              <view class="info-text">
-                <u--text :lines="1" size="14px" color="#333333" :text="item.title"></u--text>
-                <u--text :lines="1" size="12px" color="#939393" :text="item.desc"></u--text>
-              </view>
-              <view class="price-and-cart">
-                <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
-                <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
-              </view>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <view>
-      <view class="prod-block list">
-        <view class="bloc-header">
-          <text class="bloc-title">更多宝贝</text>
-          <text></text>
-        </view>
-
-        <view class="prod-list" v-for="(item, index) in productList" :key="item.id">
-          <view class="prod-item" @click="handleProdItemClick(item.id)">
-            <image class="prod-image" :src="item.image"></image>
-            <view class="item-info">
-              <view class="info-text">
-                <u--text :lines="1" size="14px" color="#333333" :text="item.title"></u--text>
-                <u-gap height="2px"></u-gap>
-                <u--text class="info-desc" :lines="2" size="12px" color="#939393" :text="item.desc"></u--text>
-              </view>
-              <view class="price-and-cart">
-                <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
-                <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
-              </view>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-    <!--加载更多-->
-    <u-loadmore fontSize="28rpx" :status="status" :loading-text="loadingText" :loadmore-text="loadmoreText" :nomore-text="nomoreText" />
+    <u-gap height="5px"></u-gap>
   </view>
 </template>
 
@@ -115,9 +41,23 @@ export default {
   components: {},
   data() {
     return {
-      current: 0,
-      currentNum: 0,
-      bannerList: ['https://cdn.uviewui.com/uview/swiper/swiper3.png', 'https://cdn.uviewui.com/uview/swiper/swiper2.png', 'https://cdn.uviewui.com/uview/swiper/swiper1.png'],
+      bannerList: [
+        {
+          id: 1,
+          title: '山不在高，有仙则名',
+          url: 'https://cdn.uviewui.com/uview/swiper/swiper1.png'
+        },
+        {
+          id: 2,
+          title: '水不在深，有龙则灵',
+          url: 'https://cdn.uviewui.com/uview/swiper/swiper2.png'
+        },
+        {
+          id: 3,
+          title: '斯是陋室，惟吾德馨',
+          url: 'https://cdn.uviewui.com/uview/swiper/swiper3.png'
+        }
+      ],
       menuList: [
         { icon: 'gift', title: '热门推荐' },
         { icon: 'star', title: '收藏转发' },
@@ -162,15 +102,12 @@ export default {
           price: '53.00'
         }
       ],
-      status: 'nomore',
-      loadingText: '努力加载中...',
-      loadmoreText: '轻轻上拉',
-      nomoreText: '实在没有了...'
+      moreStatus: 'nomore'
     }
   },
   onLoad() {
-    this.loadBannerData();
-    this.loadNoticeData();
+    this.loadBannerData()
+    this.loadNoticeData()
   },
   methods: {
     loadBannerData() {
@@ -185,24 +122,9 @@ export default {
     },
     handleSearchClick(e) {
       uni.$u.route('/pages/search/search')
-    },
-    handleSwiperClick(index) {
-      console.log('点击了图片索引值：', index)
-    },
-    handleProdItemClick(productId) {
-      uni.$u.route('/pages/product/product', {
-        productId: productId
-      })
     }
   },
   computed: {
-    swiperList() {
-      return this.bannerList.map(item => {
-        if (item) {
-          return item
-        }
-      })
-    },
     noticeTextList() {
       return this.noticeList.map(item => {
         if (item.title) {
@@ -220,131 +142,8 @@ export default {
   padding: 20rpx;
 }
 
-.indicator {
-  @include flex(row);
-  justify-content: center;
-
-  &__dot {
-    height: 15rpx;
-    width: 15rpx;
-    border-radius: 100rpx;
-    background-color: rgba(255, 255, 255, 0.35);
-    margin: 0 10rpx;
-    transition: background-color 0.3s;
-
-    &--active {
-      background-color: $custom-bg-color;
-    }
-  }
-}
-
 .grid-title {
   line-height: 50rpx;
   font-size: 26rpx;
-}
-
-.prod-block {
-  margin-top: -160px;
-  .bloc-header {
-    @include flex-space-between;
-    padding: 10rpx 20rpx;
-
-    .bloc-title {
-      color: $custom-bg-color;
-      font-size: 34rpx;
-    }
-    .see-more {
-      color: $custom-bg-color;
-      background: $u-primary;
-      padding: 0 30rpx;
-      height: 50rpx;
-      line-height: 50rpx;
-      border-radius: 50rpx;
-      font-size: 24rpx;
-    }
-  }
-
-  &.half,
-  &.list {
-    margin-top: 0;
-    .bloc-header {
-      margin-top: 50rpx;
-      margin-bottom: 20rpx;
-      .bloc-title {
-        color: #333333;
-      }
-      .more {
-        font-size: 24rpx;
-      }
-    }
-  }
-
-  .prod-grid {
-    width: 730rpx;
-    margin: 0 auto;
-    @include flex;
-    flex-wrap: wrap;
-    justify-content: left;
-
-    &.half {
-      .prod-item {
-        width: 346rpx;
-        margin: 10rpx;
-        .prod-image {
-          width: 346rpx;
-          height: 346rpx;
-        }
-      }
-    }
-
-    .prod-item {
-      width: 224rpx;
-      margin: 10rpx;
-      background: #ffffff;
-      border-radius: 10rpx;
-      box-shadow: 0rpx 6rpx 8rpx rgba(58,134,185,0.2);
-      .prod-image {
-        width: 224rpx;
-        height: 224rpx;
-        border-radius: 10rpx 10rpx 0 0;
-      }
-      .item-info {
-        padding: 15rpx;
-        .info-text {
-          height: 70rpx;
-          padding-bottom: 10rpx;
-        }
-        .price-and-cart {
-          @include flex-space-between;
-        }
-      }
-    }
-  }
-}
-
-.prod-list {
-  .prod-item {
-    background: #ffffff;
-    @include flex-space-between;
-    border-bottom: $custom-border-style;
-    padding: 20rpx;
-    .prod-image {
-      width: 200rpx;
-      height: 200rpx;
-      border-radius: 10rpx;
-    }
-
-    .item-info {
-      flex: 1;
-      padding: 20rpx 20rpx 0;
-      .info-text {
-        height: 100rpx;
-        padding-bottom: 10rpx;
-      }
-      .price-and-cart {
-        @include flex-space-between;
-      }
-    }
-  }
 }
 </style>

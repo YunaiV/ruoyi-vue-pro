@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnListConditionEnu
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.generator.config.po.TableField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -29,7 +30,7 @@ public class CodegenColumnDO extends BaseDO {
     private Long id;
     /**
      * 表编号
-     *
+     * <p>
      * 关联 {@link CodegenTableDO#getId()}
      */
     private Long tableId;
@@ -38,26 +39,38 @@ public class CodegenColumnDO extends BaseDO {
 
     /**
      * 字段名
+     *
+     * 关联 {@link TableField#getName()}
      */
     private String columnName;
     /**
-     * 字段类型
+     * 数据库字段类型
+     *
+     * 关联 {@link TableField.MetaInfo#getJdbcType()}
      */
     private String dataType;
     /**
      * 字段描述
+     *
+     * 关联 {@link TableField#getComment()}
      */
     private String columnComment;
     /**
      * 是否允许为空
+     *
+     * 关联 {@link TableField.MetaInfo#isNullable()}
      */
     private Boolean nullable;
     /**
      * 是否主键
+     *
+     * 关联 {@link TableField#isKeyFlag()}
      */
     private Boolean primaryKey;
     /**
      * 是否自增
+     *
+     * 关联 {@link TableField#isKeyIdentityFlag()}
      */
     private Boolean autoIncrement;
     /**
@@ -71,15 +84,19 @@ public class CodegenColumnDO extends BaseDO {
      * Java 属性类型
      *
      * 例如说 String、Boolean 等等
+     *
+     * 关联 {@link TableField#getColumnType()}
      */
     private String javaType;
     /**
      * Java 属性名
+     *
+     * 关联 {@link TableField#getPropertyName()}
      */
     private String javaField;
     /**
      * 字典类型
-     *
+     * <p>
      * 关联 DictTypeDO 的 type 属性
      */
     private String dictType;
@@ -104,7 +121,7 @@ public class CodegenColumnDO extends BaseDO {
     private Boolean listOperation;
     /**
      * List 查询操作的条件类型
-     *
+     * <p>
      * 枚举 {@link CodegenColumnListConditionEnum}
      */
     private String listOperationCondition;
@@ -117,7 +134,7 @@ public class CodegenColumnDO extends BaseDO {
 
     /**
      * 显示类型
-     *
+     * <p>
      * 枚举 {@link CodegenColumnHtmlTypeEnum}
      */
     private String htmlType;

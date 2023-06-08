@@ -21,11 +21,11 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
@@ -35,7 +35,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Objects;
 
-@Configuration
+@AutoConfiguration
 @ConditionalOnProperty(prefix = "yudao.tenant", value = "enable", matchIfMissing = true) // 允许使用 yudao.tenant.enable=false 禁用多租户
 @EnableConfigurationProperties(TenantProperties.class)
 public class YudaoTenantAutoConfiguration {
@@ -118,6 +118,8 @@ public class YudaoTenantAutoConfiguration {
 
         };
     }
+
+    // ========== Redis ==========
 
     @Bean
     @Primary // 引入租户时，tenantRedisCacheManager 为主 Bean

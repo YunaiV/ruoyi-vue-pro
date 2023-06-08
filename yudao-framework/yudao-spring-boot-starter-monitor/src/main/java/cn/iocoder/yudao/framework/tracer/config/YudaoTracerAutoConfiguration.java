@@ -3,19 +3,19 @@ package cn.iocoder.yudao.framework.tracer.config;
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.tracer.core.aop.BizTraceAspect;
 import cn.iocoder.yudao.framework.tracer.core.filter.TraceFilter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Tracer 配置类
  *
  * @author mashu
  */
-@Configuration
+@AutoConfiguration
 @ConditionalOnClass({BizTraceAspect.class})
 @EnableConfigurationProperties(TracerProperties.class)
 @ConditionalOnProperty(prefix = "yudao.tracer", value = "enable", matchIfMissing = true)

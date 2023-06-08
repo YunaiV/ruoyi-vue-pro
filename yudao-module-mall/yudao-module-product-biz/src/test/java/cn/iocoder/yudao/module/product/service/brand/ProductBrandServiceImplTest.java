@@ -12,9 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import java.time.LocalDateTime;
+
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -119,7 +120,7 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
        ProductBrandPageReqVO reqVO = new ProductBrandPageReqVO();
        reqVO.setName("芋道");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setCreateTime((new Date[]{buildTime(2022, 1, 1), buildTime(2022, 2, 25)}));
+       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 1, 1), buildTime(2022, 2, 25)}));
 
        // 调用
        PageResult<ProductBrandDO> pageResult = brandService.getBrandPage(reqVO);

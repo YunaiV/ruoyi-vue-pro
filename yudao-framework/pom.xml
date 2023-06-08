@@ -20,7 +20,6 @@
         <module>yudao-spring-boot-starter-file</module>
         <module>yudao-spring-boot-starter-monitor</module>
         <module>yudao-spring-boot-starter-protection</module>
-        <module>yudao-spring-boot-starter-config</module>
         <module>yudao-spring-boot-starter-job</module>
         <module>yudao-spring-boot-starter-mq</module>
 
@@ -37,9 +36,12 @@
         <module>yudao-spring-boot-starter-biz-tenant</module>
         <module>yudao-spring-boot-starter-biz-data-permission</module>
         <module>yudao-spring-boot-starter-biz-error-code</module>
+        <module>yudao-spring-boot-starter-biz-ip</module>
 
         <module>yudao-spring-boot-starter-flowable</module>
         <module>yudao-spring-boot-starter-captcha</module>
+        <module>yudao-spring-boot-starter-websocket</module>
+        <module>yudao-spring-boot-starter-desensitize</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>

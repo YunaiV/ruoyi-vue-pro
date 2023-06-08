@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.sms.core.client.dto;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 消息接收 Response DTO
@@ -32,7 +32,7 @@ public class SmsReceiveRespDTO {
     /**
      * 用户接收时间
      */
-    private Date receiveTime;
+    private LocalDateTime receiveTime;
 
     /**
      * 短信 API 发送返回的序号

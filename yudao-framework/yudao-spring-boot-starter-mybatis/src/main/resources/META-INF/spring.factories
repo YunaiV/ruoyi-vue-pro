@@ -1,5 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  cn.iocoder.yudao.framework.datasource.config.YudaoDataSourceAutoConfiguration,\
-  cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration
 org.springframework.boot.env.EnvironmentPostProcessor=\
   cn.iocoder.yudao.framework.mybatis.config.IdTypeEnvironmentPostProcessor

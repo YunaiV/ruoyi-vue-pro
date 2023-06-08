@@ -64,7 +64,7 @@
  * */
 import { aesEncrypt } from '@/utils/ase'
 import { resetSize } from './../utils/util'
-import { reqGet, reqCheck } from './../api/index'
+import { reqGet, reqCheck } from '@/api/login'
 
 //  "captchaType":"blockPuzzle",
 export default {
@@ -193,7 +193,7 @@ export default {
         this.$parent.$emit('ready', this)
       })
 
-      var _this = this
+      const _this = this
 
       window.removeEventListener('touchmove', function(e) {
         _this.move(e)
@@ -228,11 +228,12 @@ export default {
 
     // 鼠标按下
     start: function(e) {
+      let x
       e = e || window.event
       if (!e.touches) { // 兼容PC端
-        var x = e.clientX
+        x = e.clientX
       } else { // 兼容移动端
-        var x = e.touches[0].pageX
+        x = e.touches[0].pageX
       }
       this.startLeft = Math.floor(x - this.barArea.getBoundingClientRect().left)
       this.startMoveTime = +new Date() // 开始滑动的时间
@@ -247,15 +248,16 @@ export default {
     },
     // 鼠标移动
     move: function(e) {
+      let x
       e = e || window.event
       if (this.status && this.isEnd === false) {
         if (!e.touches) { // 兼容PC端
-          var x = e.clientX
+          x = e.clientX
         } else { // 兼容移动端
-          var x = e.touches[0].pageX
+          x = e.touches[0].pageX
         }
-        var bar_area_left = this.barArea.getBoundingClientRect().left
-        var move_block_left = x - bar_area_left // 小方块相对于父元素的left值
+        const bar_area_left = this.barArea.getBoundingClientRect().left
+        let move_block_left = x - bar_area_left  // 小方块相对于父元素的left值
         if (move_block_left >= this.barArea.offsetWidth - parseInt(parseInt(this.blockSize.width) / 2) - 2) {
           move_block_left = this.barArea.offsetWidth - parseInt(parseInt(this.blockSize.width) / 2) - 2
         }
@@ -271,10 +273,10 @@ export default {
     // 鼠标松开
     end: function() {
       this.endMovetime = +new Date()
-      var _this = this
+      const _this = this
       // 判断是否重合
       if (this.status && this.isEnd === false) {
-        var moveLeftDistance = parseInt((this.moveBlockLeft || '').replace('px', ''))
+        let moveLeftDistance = parseInt((this.moveBlockLeft || '').replace('px', ''))
         moveLeftDistance = moveLeftDistance * 310 / parseInt(this.setSize.imgWidth)
         const data = {
           captchaType: this.captchaType,
@@ -297,7 +299,10 @@ export default {
             }
             this.passFlag = true
             this.tipWords = `${((this.endMovetime - this.startMoveTime) / 1000).toFixed(2)}s验证成功`
-            var captchaVerification = this.secretKey ? aesEncrypt(this.backToken + '---' + JSON.stringify({ x: moveLeftDistance, y: 5.0 }), this.secretKey) : this.backToken + '---' + JSON.stringify({ x: moveLeftDistance, y: 5.0 })
+            const captchaVerification = this.secretKey ? aesEncrypt(this.backToken + '---' + JSON.stringify({
+              x: moveLeftDistance,
+              y: 5.0
+            }), this.secretKey) : this.backToken + '---' + JSON.stringify({ x: moveLeftDistance, y: 5.0 })
             setTimeout(() => {
               this.tipWords = ''
               this.$parent.closeBox()

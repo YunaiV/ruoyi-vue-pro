@@ -1,210 +1,285 @@
-<script setup lang="ts">
-  import { ref, unref } from 'vue'
-  import dayjs from 'dayjs'
-  import { ElMessage } from 'element-plus'
-  import { DICT_TYPE } from '@/utils/dict'
-  import { useTable } from '@/hooks/web/useTable'
-  import { useI18n } from '@/hooks/web/useI18n'
-  import { FormExpose } from '@/components/Form'
-  import type { ${simpleClassName}VO } from '@/api/${table.moduleName}/${simpleClassName}/types'
-  import { rules, allSchemas } from './${simpleClassName}.data'
-  import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${simpleClassName}'
-  const { t } = useI18n() // 国际化
-
-  // ========== 列表相关 ==========
-  const { register, tableObject, methods } = useTable<${simpleClassName}VO>({
-    getListApi: ${simpleClassName}Api.get${simpleClassName}PageApi,
-    delListApi: ${simpleClassName}Api.delete${simpleClassName}Api,
-    exportListApi: ${simpleClassName}Api.export${simpleClassName}Api
-  })
-  const { getList, setSearchParams, delList, exportList } = methods
-
-  // ========== CRUD 相关 ==========
-  const actionLoading = ref(false) // 遮罩层
-  const actionType = ref('') // 操作按钮的类型
-  const dialogVisible = ref(false) // 是否显示弹出层
-  const dialogTitle = ref('edit') // 弹出层标题
-  const formRef = ref<FormExpose>() // 表单 Ref
-
-  // 设置标题
-  const setDialogTile = (type: string) => {
-    dialogTitle.value = t('action.' + type)
-    actionType.value = type
-    dialogVisible.value = true
-  }
-
-  // 新增操作
-  const handleCreate = () => {
-    setDialogTile('create')
-    // 重置表单
-    unref(formRef)?.getElFormRef()?.resetFields()
-  }
-
-  // 修改操作
-  const handleUpdate = async (row: ${simpleClassName}VO) => {
-    setDialogTile('update')
-    // 设置数据
-    const res = await ${simpleClassName}Api.get${simpleClassName}Api(row.id)
-    unref(formRef)?.setValues(res)
-  }
-
-  // 提交按钮
-  const submitForm = async () => {
-    const elForm = unref(formRef)?.getElFormRef()
-    if (!elForm) return
-    elForm.validate(async (valid) => {
-      if (valid) {
-        actionLoading.value = true
-        // 提交请求
-        try {
-          const data = unref(formRef)?.formModel as ${simpleClassName}VO
-          if (actionType.value === 'create') {
-            await ${simpleClassName}Api.create${simpleClassName}Api(data)
-            ElMessage.success(t('common.createSuccess'))
-          } else {
-            await ${simpleClassName}Api.update${simpleClassName}Api(data)
-            ElMessage.success(t('common.updateSuccess'))
-          }
-          // 操作成功，重新加载列表
-          dialogVisible.value = false
-          await getList()
-        } finally {
-          actionLoading.value = false
-        }
-      }
-    })
-  }
-
-  // ========== 详情相关 ==========
-  const detailRef = ref() // 详情 Ref
-
-  // 详情操作
-  const handleDetail = async (row: ${simpleClassName}VO) => {
-    // 设置数据
-    detailRef.value = row
-    setDialogTile('detail')
-  }
-
-  // ========== 初始化 ==========
-  getList()
-</script>
-
 <template>
-  <!-- 搜索工作区 -->
   <ContentWrap>
-    <Search :schema="allSchemas.searchSchema" @search="setSearchParams" @reset="setSearchParams" />
-  </ContentWrap>
-  <ContentWrap>
-    <!-- 操作工具栏 -->
-    <div class="mb-10px">
-      <el-button type="primary" v-hasPermi="['${permissionPrefix}:create']" @click="handleCreate">
-        <Icon icon="ep:zoom-in" class="mr-5px" /> {{ t('action.add') }}
-      </el-button>
-      <el-button
-          type="warning"
-          v-hasPermi="['${permissionPrefix}:export']"
-          :loading="tableObject.exportLoading"
-          @click="exportList('数据.xls')"
-      >
-        <Icon icon="ep:download" class="mr-5px" /> {{ t('action.export') }}
-      </el-button>
-    </div>
-    <!-- 列表 -->
-    <Table
-        :columns="allSchemas.tableColumns"
-        :selection="false"
-        :data="tableObject.tableList"
-        :loading="tableObject.loading"
-        :pagination="{
-        total: tableObject.total
-      }"
-        v-model:pageSize="tableObject.pageSize"
-        v-model:currentPage="tableObject.currentPage"
-        @register="register"
+    <!-- 搜索工作栏 -->
+    <el-form
+      class="-mb-15px"
+      :model="queryParams"
+      ref="queryFormRef"
+      :inline="true"
+      label-width="68px"
     >
-#foreach($column in $columns)
-#if ($column.listOperationResult)
-  #set ($dictType=$column.dictType)
-  #if ($column.javaType == "Date")## 时间类型
-    <template #${column.javaField}="{ row }">
-      <span>{{ dayjs(row.${column.javaField}).format('YYYY-MM-DD HH:mm:ss') }}</span>
-    </template>
-  #elseif("" != $column.dictType)## 数据字典
-    <template #${column.javaField}="{ row }">
-      <DictTag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${column.javaField}" />
-    </template>
-  #end
-#end
-#end
-      <template #action="{ row }">
-        <el-button
-            link
-            type="primary"
-            v-hasPermi="['${permissionPrefix}:update']"
-            @click="handleUpdate(row)"
+    #set ($dictMethods = [])## 使用到的 dict 字典方法
+    #foreach($column in $columns)
+        #if ($column.listOperation)
+            #set ($dictType = $column.dictType)
+            #set ($javaField = $column.javaField)
+            #set ($javaType = $column.javaType)
+            #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+            #set ($comment = $column.columnComment)
+            #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
+            #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                #set ($dictMethod = "getIntDictOptions")
+            #elseif ($javaType == "String")
+                #set ($dictMethod = "getStrDictOptions")
+            #elseif ($javaType == "Boolean")
+                #set ($dictMethod = "getBoolDictOptions")
+            #end
+            #if ($column.htmlType == "input")
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-input
+          v-model="queryParams.${javaField}"
+          placeholder="请输入${comment}"
+          clearable
+          @keyup.enter="handleQuery"
+          class="!w-240px"
+        />
+      </el-form-item>
+            #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
+      <el-form-item label="${comment}" prop="${javaField}">
+                #if ($javaField.length() + $comment.length() > 8)
+        <el-select
+          v-model="queryParams.${javaField}"
+          placeholder="请选择${comment}"
+          clearable
+          class="!w-240px"
         >
-          <Icon icon="ep:edit" class="mr-1px" /> {{ t('action.edit') }}
+                #else
+        <el-select v-model="queryParams.${javaField}" placeholder="请选择${comment}" clearable class="!w-240px">
+                #end
+                #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+                    #if (!$dictMethods.contains($dictMethod))## 如果不存在，则添加到 dictMethods 数组中，后续好 import
+                        #set($ignore = $dictMethods.add($dictMethod) )
+                    #end
+          <el-option
+            v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+                #else## 未设置 dictType 数据字典的情况
+          <el-option label="请选择字典生成" value="" />
+                #end
+        </el-select>
+      </el-form-item>
+    #elseif($column.htmlType == "datetime")
+      #if ($column.listOperationCondition != "BETWEEN")## 非范围
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker
+          v-model="queryParams.${javaField}"
+          value-format="YYYY-MM-DD"
+          type="date"
+          placeholder="选择${comment}"
+          clearable
+          class="!w-240px"
+        />
+      </el-form-item>
+      #else## 范围
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker
+          v-model="queryParams.${javaField}"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          type="daterange"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :default-time="[new Date('1 00:00:00'), new Date('1 23:59:59')]"
+          class="!w-240px"
+        />
+      </el-form-item>
+      #end
+    #end
+    #end
+    #end
+      <el-form-item>
+        <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button>
+        <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
+        #if ($permissionPrefix.length() <= 12)
+        <el-button type="primary" @click="openForm('create')" v-hasPermi="['${permissionPrefix}:create']">
+        #else
+        <el-button
+          type="primary"
+          plain
+          @click="openForm('create')"
+          v-hasPermi="['${permissionPrefix}:create']"
+        >
+        #end
+          <Icon icon="ep:plus" class="mr-5px" /> 新增
         </el-button>
         <el-button
-            link
-            type="primary"
-            v-hasPermi="['${permissionPrefix}:update']"
-            @click="handleDetail(row)"
+          type="success"
+          plain
+          @click="handleExport"
+          :loading="exportLoading"
+          v-hasPermi="['${permissionPrefix}:export']"
         >
-          <Icon icon="ep:view" class="mr-1px" /> {{ t('action.detail') }}
+          <Icon icon="ep:download" class="mr-5px" /> 导出
         </el-button>
-        <el-button
-            link
-            type="primary"
-            v-hasPermi="['${permissionPrefix}:delete']"
-            @click="delList(row.id, false)"
-        >
-          <Icon icon="ep:delete" class="mr-1px" /> {{ t('action.del') }}
-        </el-button>
-      </template>
-    </Table>
+      </el-form-item>
+    </el-form>
   </ContentWrap>
 
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
-    <!-- 对话框(添加 / 修改) -->
-    <Form
-        v-if="['create', 'update'].includes(actionType)"
-        :schema="allSchemas.formSchema"
-        :rules="rules"
-        ref="formRef"
+  <!-- 列表 -->
+  <ContentWrap>
+    <el-table v-loading="loading" :data="list">
+    #foreach($column in $columns)
+      #if ($column.listOperationResult)
+        #set ($dictType=$column.dictType)
+        #set ($javaField = $column.javaField)
+        #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+        #set ($comment=$column.columnComment)
+        #if ($column.javaType == "LocalDateTime")## 时间类型
+      <el-table-column
+        label="${comment}"
+        align="center"
+        prop="${javaField}"
+        :formatter="dateFormatter"
+      />
+        #elseif("" != $column.dictType)## 数据字典
+      <el-table-column label="${comment}" align="center" prop="${javaField}">
+        <template #default="scope">
+          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.${column.javaField}" />
+        </template>
+      </el-table-column>
+        #else
+      <el-table-column label="${comment}" align="center" prop="${javaField}" />
+        #end
+      #end
+    #end
+      <el-table-column label="操作" align="center">
+        <template #default="scope">
+          <el-button
+            link
+            type="primary"
+            @click="openForm('update', scope.row.id)"
+            v-hasPermi="['${permissionPrefix}:update']"
+          >
+            编辑
+          </el-button>
+          <el-button
+            link
+            type="danger"
+            @click="handleDelete(scope.row.id)"
+            v-hasPermi="['${permissionPrefix}:delete']"
+          >
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 分页 -->
+    <Pagination
+      :total="total"
+      v-model:page="queryParams.pageNo"
+      v-model:limit="queryParams.pageSize"
+      @pagination="getList"
     />
-    <!-- 对话框(详情) -->
-    <Descriptions
-        v-if="actionType === 'detail'"
-        :schema="allSchemas.detailSchema"
-        :data="detailRef"
-    >
-#foreach($column in $columns)
-  #if ($column.listOperationResult)
-    #set ($dictType=$column.dictType)
-    #if ($column.javaType == "Date")## 时间类型
-      <template #${column.javaField}="{ row }">
-        <span>{{ dayjs(row.${column.javaField}).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      </template>
-    #elseif("" != $column.dictType)## 数据字典
-      <template #${column.javaField}="{ row }">
-        <DictTag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${column.javaField}" />
-      </template>
+  </ContentWrap>
+
+  <!-- 表单弹窗：添加/修改 -->
+  <${simpleClassName}Form ref="formRef" @success="getList" />
+</template>
+
+<script setup lang="ts" name="${table.className}">
+#if ($dictMethods.size() > 0)
+import { DICT_TYPE#foreach ($dictMethod in $dictMethods), ${dictMethod}#end } from '@/utils/dict'
+#end
+#foreach ($column in $columns)
+    #if ($column.listOperationResult && $column.htmlType == "datetime")
+import { dateFormatter } from '@/utils/formatTime'
+    #break
+    #end
+#end
+import download from '@/utils/download'
+import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
+import ${simpleClassName}Form from './${simpleClassName}Form.vue'
+const message = useMessage() // 消息弹窗
+const { t } = useI18n() // 国际化
+
+const loading = ref(true) // 列表的加载中
+const total = ref(0) // 列表的总页数
+const list = ref([]) // 列表的数据
+const queryParams = reactive({
+  pageNo: 1,
+  pageSize: 10,
+  #set ($listOperationLastIndex = -1)## 求最后一个需要 , 的地方
+  #foreach ($column in $columns)
+    #if ($column.listOperation)
+      #set ($listOperationLastIndex = $foreach.index)
     #end
   #end
-#end
-    </Descriptions>
-    <!-- 操作按钮 -->
-    <template #footer>
-      <el-button
-          v-if="['create', 'update'].includes(actionType)"
-          type="primary"
-          :loading="actionLoading"
-          @click="submitForm"
-      >
-        {{ t('action.save') }}
-      </el-button>
-      <el-button @click="dialogVisible = false">{{ t('dialog.close') }}</el-button>
-    </template>
-  </Dialog>
-</template>
+  #foreach ($column in $columns)
+    #if ($column.listOperation)
+      #if ($column.listOperationCondition != 'BETWEEN')
+  $column.javaField: null#if($foreach.index < $listOperationLastIndex),#end
+  #end
+      #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+  $column.javaField: []#if($foreach.index < $listOperationLastIndex),#end
+      #end
+    #end
+  #end
+})
+const queryFormRef = ref() // 搜索的表单
+const exportLoading = ref(false) // 导出的加载中
+
+/** 查询列表 */
+const getList = async () => {
+  loading.value = true
+  try {
+    const data = await ${simpleClassName}Api.get${simpleClassName}Page(queryParams)
+    list.value = data.list
+    total.value = data.total
+  } finally {
+    loading.value = false
+  }
+}
+
+/** 搜索按钮操作 */
+const handleQuery = () => {
+  queryParams.pageNo = 1
+  getList()
+}
+
+/** 重置按钮操作 */
+const resetQuery = () => {
+  queryFormRef.value.resetFields()
+  handleQuery()
+}
+
+/** 添加/修改操作 */
+const formRef = ref()
+const openForm = (type: string, id?: number) => {
+  formRef.value.open(type, id)
+}
+
+/** 删除按钮操作 */
+const handleDelete = async (id: number) => {
+  try {
+    // 删除的二次确认
+    await message.delConfirm()
+    // 发起删除
+    await ${simpleClassName}Api.delete${simpleClassName}(id)
+    message.success(t('common.delSuccess'))
+    // 刷新列表
+    await getList()
+  } catch {}
+}
+
+/** 导出按钮操作 */
+const handleExport = async () => {
+  try {
+    // 导出的二次确认
+    await message.exportConfirm()
+    // 发起导出
+    exportLoading.value = true
+    const data = await ${simpleClassName}Api.export${simpleClassName}(queryParams)
+    download.excel(data, '${table.classComment}.xls')
+  } catch {
+  } finally {
+    exportLoading.value = false
+  }
+}
+
+/** 初始化 **/
+onMounted(() => {
+  getList()
+})
+</script>

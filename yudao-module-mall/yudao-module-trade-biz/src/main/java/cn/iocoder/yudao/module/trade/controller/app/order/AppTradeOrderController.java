@@ -1,76 +1,102 @@
 package cn.iocoder.yudao.module.trade.controller.app.order;
 
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderGetCreateInfoRespVO;
-import cn.iocoder.yudao.module.trade.controller.app.order.vo.TradeOrderPageReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.order.vo.TradeOrderRespVO;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
+import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
+import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
+import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
-@Api(tags = "用户 App - 交易订单")
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+
+@Tag(name = "用户 App - 交易订单")
 @RestController
 @RequestMapping("/trade/order")
-@RequiredArgsConstructor
 @Validated
 @Slf4j
 public class AppTradeOrderController {
 
-    // TODO 在思考下；
+    @Resource
+    private TradeOrderService tradeOrderService;
 
-    private final TradeOrderService tradeOrderService;
-
+    @Resource
+    private ProductPropertyValueApi productPropertyValueApi;
 
     @GetMapping("/get-create-info")
-    @ApiOperation("基于商品，确认创建订单")
+    @Operation(summary = "基于商品，确认创建订单")
     @PreAuthenticated
-    public CommonResult<AppTradeOrderGetCreateInfoRespVO> getTradeOrderCreateInfo(AppTradeOrderCreateReqVO createReqVO) {
+    public CommonResult<AppTradeOrderGetCreateInfoRespVO> getOrderCreateInfo(AppTradeOrderCreateReqVO createReqVO) {
 //        return success(tradeOrderService.getOrderConfirmCreateInfo(UserSecurityContextHolder.getUserId(), skuId, quantity, couponCardId));
         return null;
     }
 
     @PostMapping("/create")
-    @ApiOperation("创建订单")
+    @Operation(summary = "创建订单")
     @PreAuthenticated
-    public CommonResult<Long> createTradeOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO,
-                                               HttpServletRequest servletRequest) {
-//        return success(tradeOrderService.createTradeOrder(UserSecurityContextHolder.getUserId(),
-//                HttpUtil.getIp(servletRequest), createReqVO));
-        // 获取登录用户
-        Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
-        // 获取用户ip地址
-        String clientIp = ServletUtil.getClientIP(servletRequest);
+    public CommonResult<Long> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO,
+                                          HttpServletRequest servletRequest) {
+        // 获取登录用户、用户 IP 地址
+        Long loginUserId = getLoginUserId();
+        String clientIp = ServletUtils.getClientIP(servletRequest);
         // 创建交易订单，预支付记录
-        Long result = tradeOrderService.createTradeOrder(loginUserId, clientIp, createReqVO);
-
-        return CommonResult.success(result);
+        Long orderId = tradeOrderService.createOrder(loginUserId, clientIp, createReqVO);
+        return success(orderId);
     }
 
-    @GetMapping("/get")
-    @ApiOperation("获得交易订单")
-    @ApiImplicitParam(name = "tradeOrderId", value = "交易订单编号", required = true)
-    public CommonResult<TradeOrderRespVO> getTradeOrder(@RequestParam("tradeOrderId") Integer tradeOrderId) {
-//        return success(tradeOrderService.getTradeOrder(tradeOrderId));
-        return null;
+    @PostMapping("/update-paid")
+    @Operation(description = "更新订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    public CommonResult<Boolean> updateOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
+        tradeOrderService.updateOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+                notifyReqDTO.getPayOrderId());
+        return success(true);
+    }
+
+    @GetMapping("/get-detail")
+    @Operation(summary = "获得交易订单")
+    @Parameter(name = "id", description = "交易订单编号")
+    public CommonResult<AppTradeOrderDetailRespVO> getOrder(@RequestParam("id") Long id) {
+        // 查询订单
+        TradeOrderDO order = tradeOrderService.getOrder(getLoginUserId(), id);
+        // 查询订单项
+        List<TradeOrderItemDO> orderItems = tradeOrderService.getOrderItemListByOrderId(order.getId());
+        // 查询商品属性
+        List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
+                .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
+        // 最终组合
+        return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, propertyValueDetails));
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得订单交易分页")
-    public CommonResult<PageResult<TradeOrderRespVO>> pageTradeOrder(TradeOrderPageReqVO pageVO) {
-//        return success(tradeOrderService.pageTradeOrder(UserSecurityContextHolder.getUserId(), pageVO));
-        return null;
+    @Operation(summary = "获得订单交易分页")
+    public CommonResult<PageResult<AppTradeOrderPageItemRespVO>> getOrderPage(AppTradeOrderPageReqVO reqVO) {
+        // 查询订单
+        PageResult<TradeOrderDO> pageResult = tradeOrderService.getOrderPage(getLoginUserId(), reqVO);
+        // 查询订单项
+        List<TradeOrderItemDO> orderItems = tradeOrderService.getOrderItemListByOrderId(
+                convertSet(pageResult.getList(), TradeOrderDO::getId));
+        // 查询商品属性
+        List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
+                .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
+        // 最终组合
+        return success(TradeOrderConvert.INSTANCE.convertPage02(pageResult, orderItems, propertyValueDetails));
     }
 
 }

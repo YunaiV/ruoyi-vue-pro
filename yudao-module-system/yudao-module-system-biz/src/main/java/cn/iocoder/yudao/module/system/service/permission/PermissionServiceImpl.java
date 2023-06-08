@@ -9,15 +9,14 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.UserRoleDO;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuMapper;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
@@ -31,8 +30,6 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -44,7 +41,6 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
 import static java.util.Collections.singleton;
 
 /**
@@ -55,12 +51,6 @@ import static java.util.Collections.singleton;
 @Service
 @Slf4j
 public class PermissionServiceImpl implements PermissionService {
-
-    /**
-     * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
-     * 因为已经通过 Redis Pub/Sub 机制，所以频率不需要高
-     */
-    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
 
     /**
      * 角色编号与菜单编号的缓存映射
@@ -82,11 +72,6 @@ public class PermissionServiceImpl implements PermissionService {
     @Getter
     @Setter // 单元测试需要
     private volatile Multimap<Long, Long> menuRoleCache;
-    /**
-     * 缓存 RoleMenu 的最大更新时间，用于后续的增量轮询，判断是否有更新
-     */
-    @Getter
-    private volatile Date roleMenuMaxUpdateTime;
 
     /**
      * 用户编号与角色编号的缓存映射
@@ -98,20 +83,11 @@ public class PermissionServiceImpl implements PermissionService {
     @Getter
     @Setter // 单元测试需要
     private volatile Map<Long, Set<Long>> userRoleCache;
-    /**
-     * 缓存 UserRole 的最大更新时间，用于后续的增量轮询，判断是否有更新
-     */
-    @Getter
-    private volatile Date userRoleMaxUpdateTime;
 
     @Resource
     private RoleMenuMapper roleMenuMapper;
     @Resource
-    private RoleMenuBatchInsertMapper roleMenuBatchInsertMapper;
-    @Resource
     private UserRoleMapper userRoleMapper;
-    @Resource
-    private UserRoleBatchInsertMapper userRoleBatchInsertMapper;
 
     @Resource
     private RoleService roleService;
@@ -125,106 +101,52 @@ public class PermissionServiceImpl implements PermissionService {
     @Resource
     private PermissionProducer permissionProducer;
 
-    @Resource
-    @Lazy // 注入自己，所以延迟加载
-    private PermissionService self;
-
     @Override
     @PostConstruct
-    @TenantIgnore // 初始化缓存，无需租户过滤
     public void initLocalCache() {
-        initUserRoleLocalCache();
-        initRoleMenuLocalCache();
+        initLocalCacheForRoleMenu();
+        initLocalCacheForUserRole();
     }
 
     /**
-     * 初始化 {@link #roleMenuCache} 和 {@link #menuRoleCache} 缓存
+     * 刷新 RoleMenu 本地缓存
      */
     @VisibleForTesting
-    void initRoleMenuLocalCache() {
-        // 获取角色与菜单的关联列表，如果有更新
-        List<RoleMenuDO> roleMenuList = loadRoleMenuIfUpdate(roleMenuMaxUpdateTime);
-        if (CollUtil.isEmpty(roleMenuList)) {
-            return;
-        }
+    void initLocalCacheForRoleMenu() {
+        // 注意：忽略自动多租户，因为要全局初始化缓存
+        TenantUtils.executeIgnore(() -> {
+            // 第一步：查询数据
+            List<RoleMenuDO> roleMenus = roleMenuMapper.selectList();
+            log.info("[initLocalCacheForRoleMenu][缓存角色与菜单，数量为:{}]", roleMenus.size());
 
-        // 初始化 roleMenuCache 和 menuRoleCache 缓存
-        ImmutableMultimap.Builder<Long, Long> roleMenuCacheBuilder = ImmutableMultimap.builder();
-        ImmutableMultimap.Builder<Long, Long> menuRoleCacheBuilder = ImmutableMultimap.builder();
-        roleMenuList.forEach(roleMenuDO -> {
-            roleMenuCacheBuilder.put(roleMenuDO.getRoleId(), roleMenuDO.getMenuId());
-            menuRoleCacheBuilder.put(roleMenuDO.getMenuId(), roleMenuDO.getRoleId());
+            // 第二步：构建缓存
+            ImmutableMultimap.Builder<Long, Long> roleMenuCacheBuilder = ImmutableMultimap.builder();
+            ImmutableMultimap.Builder<Long, Long> menuRoleCacheBuilder = ImmutableMultimap.builder();
+            roleMenus.forEach(roleMenuDO -> {
+                roleMenuCacheBuilder.put(roleMenuDO.getRoleId(), roleMenuDO.getMenuId());
+                menuRoleCacheBuilder.put(roleMenuDO.getMenuId(), roleMenuDO.getRoleId());
+            });
+            roleMenuCache = roleMenuCacheBuilder.build();
+            menuRoleCache = menuRoleCacheBuilder.build();
         });
-        roleMenuCache = roleMenuCacheBuilder.build();
-        menuRoleCache = menuRoleCacheBuilder.build();
-        roleMenuMaxUpdateTime = getMaxValue(roleMenuList, RoleMenuDO::getUpdateTime);
-        log.info("[initRoleMenuLocalCache][初始化角色与菜单的关联数量为 {}]", roleMenuList.size());
     }
 
     /**
-     * 初始化 {@link #userRoleCache} 缓存
+     * 刷新 UserRole 本地缓存
      */
     @VisibleForTesting
-    void initUserRoleLocalCache() {
-        // 获取用户与角色的关联列表，如果有更新
-        List<UserRoleDO> userRoleList = loadUserRoleIfUpdate(userRoleMaxUpdateTime);
-        if (CollUtil.isEmpty(userRoleList)) {
-            return;
-        }
+    void initLocalCacheForUserRole() {
+        // 注意：忽略自动多租户，因为要全局初始化缓存
+        TenantUtils.executeIgnore(() -> {
+            // 第一步：加载数据
+            List<UserRoleDO> userRoles = userRoleMapper.selectList();
+            log.info("[initLocalCacheForUserRole][缓存用户与角色，数量为:{}]", userRoles.size());
 
-        // 初始化 userRoleCache 缓存
-        ImmutableMultimap.Builder<Long, Long> userRoleCacheBuilder = ImmutableMultimap.builder();
-        userRoleList.forEach(userRoleDO -> userRoleCacheBuilder.put(userRoleDO.getUserId(), userRoleDO.getRoleId()));
-        userRoleCache = CollectionUtils.convertMultiMap2(userRoleList, UserRoleDO::getUserId, UserRoleDO::getRoleId);
-        userRoleMaxUpdateTime = getMaxValue(userRoleList, UserRoleDO::getUpdateTime);
-        log.info("[initUserRoleLocalCache][初始化用户与角色的关联数量为 {}]", userRoleList.size());
-    }
-
-    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
-    public void schedulePeriodicRefresh() {
-        self.initLocalCache();
-    }
-
-    /**
-     * 如果角色与菜单的关联发生变化，从数据库中获取最新的全量角色与菜单的关联。
-     * 如果未发生变化，则返回空
-     *
-     * @param maxUpdateTime 当前角色与菜单的关联的最大更新时间
-     * @return 角色与菜单的关联列表
-     */
-    protected List<RoleMenuDO> loadRoleMenuIfUpdate(Date maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadRoleMenuIfUpdate][首次加载全量角色与菜单的关联]");
-        } else { // 判断数据库中是否有更新的角色与菜单的关联
-            if (roleMenuMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
-            }
-            log.info("[loadRoleMenuIfUpdate][增量加载全量角色与菜单的关联]");
-        }
-        // 第二步，如果有更新，则从数据库加载所有角色与菜单的关联
-        return roleMenuMapper.selectList();
-    }
-
-    /**
-     * 如果用户与角色的关联发生变化，从数据库中获取最新的全量用户与角色的关联。
-     * 如果未发生变化，则返回空
-     *
-     * @param maxUpdateTime 当前角色与菜单的关联的最大更新时间
-     * @return 角色与菜单的关联列表
-     */
-    protected List<UserRoleDO> loadUserRoleIfUpdate(Date maxUpdateTime) {
-        // 第一步，判断是否要更新。
-        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadUserRoleIfUpdate][首次加载全量用户与角色的关联]");
-        } else { // 判断数据库中是否有更新的用户与角色的关联
-            if (userRoleMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
-                return null;
-            }
-            log.info("[loadUserRoleIfUpdate][增量加载全量用户与角色的关联]");
-        }
-        // 第二步，如果有更新，则从数据库加载所有用户与角色的关联
-        return userRoleMapper.selectList();
+            // 第二步：构建缓存。
+            ImmutableMultimap.Builder<Long, Long> userRoleCacheBuilder = ImmutableMultimap.builder();
+            userRoles.forEach(userRoleDO -> userRoleCacheBuilder.put(userRoleDO.getUserId(), userRoleDO.getRoleId()));
+            userRoleCache = CollectionUtils.convertMultiMap2(userRoles, UserRoleDO::getUserId, UserRoleDO::getRoleId);
+        });
     }
 
     @Override
@@ -236,7 +158,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // 判断角色是否包含超级管理员。如果是超级管理员，获取到全部
-        List<RoleDO> roleList = roleService.getRolesFromCache(roleIds);
+        List<RoleDO> roleList = roleService.getRoleListFromCache(roleIds);
         if (roleService.hasAnySuperAdmin(roleList)) {
             return menuService.getMenuListFromCache(menuTypes, menusStatuses);
         }
@@ -268,7 +190,7 @@ public class PermissionServiceImpl implements PermissionService {
     public Set<Long> getRoleMenuIds(Long roleId) {
         // 如果是管理员的情况下，获取全部菜单编号
         if (roleService.hasAnySuperAdmin(Collections.singleton(roleId))) {
-            return convertSet(menuService.getMenus(), MenuDO::getId);
+            return convertSet(menuService.getMenuList(), MenuDO::getId);
         }
         // 如果是非管理员的情况下，获得拥有的菜单编号
         return convertSet(roleMenuMapper.selectListByRoleId(roleId), RoleMenuDO::getMenuId);
@@ -285,7 +207,7 @@ public class PermissionServiceImpl implements PermissionService {
         Collection<Long> deleteMenuIds = CollUtil.subtract(dbMenuIds, menuIds);
         // 执行新增和删除。对于已经授权的菜单，不用做任何处理
         if (!CollectionUtil.isEmpty(createMenuIds)) {
-            roleMenuBatchInsertMapper.saveBatch(CollectionUtils.convertList(createMenuIds, menuId -> {
+            roleMenuMapper.insertBatch(CollectionUtils.convertList(createMenuIds, menuId -> {
                 RoleMenuDO entity = new RoleMenuDO();
                 entity.setRoleId(roleId);
                 entity.setMenuId(menuId);
@@ -329,7 +251,7 @@ public class PermissionServiceImpl implements PermissionService {
         Collection<Long> deleteMenuIds = CollUtil.subtract(dbRoleIds, roleIds);
         // 执行新增和删除。对于已经授权的角色，不用做任何处理
         if (!CollectionUtil.isEmpty(createRoleIds)) {
-            userRoleBatchInsertMapper.saveBatch(CollectionUtils.convertList(createRoleIds, roleId -> {
+            userRoleMapper.insertBatch(CollectionUtils.convertList(createRoleIds, roleId -> {
                 UserRoleDO entity = new UserRoleDO();
                 entity.setUserId(userId);
                 entity.setRoleId(roleId);
@@ -449,7 +371,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (roleService.hasAnySuperAdmin(roleIds)) {
             return true;
         }
-        Set<String> userRoles = convertSet(roleService.getRolesFromCache(roleIds),
+        Set<String> userRoles = convertSet(roleService.getRoleListFromCache(roleIds),
                 RoleDO::getCode);
         return CollUtil.containsAny(userRoles, Sets.newHashSet(roles));
     }
@@ -466,7 +388,7 @@ public class PermissionServiceImpl implements PermissionService {
             result.setSelf(true);
             return result;
         }
-        List<RoleDO> roles = roleService.getRolesFromCache(roleIds);
+        List<RoleDO> roles = roleService.getRoleListFromCache(roleIds);
 
         // 获得用户的部门编号的缓存，通过 Guava 的 Suppliers 惰性求值，即有且仅有第一次发起 DB 的查询
         Supplier<Long> userDeptIdCache = Suppliers.memoize(() -> userService.getUser(userId).getDeptId());
@@ -496,7 +418,7 @@ public class PermissionServiceImpl implements PermissionService {
             }
             // 情况四，DEPT_DEPT_AND_CHILD
             if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_AND_CHILD.getScope())) {
-                List<DeptDO> depts = deptService.getDeptsByParentIdFromCache(userDeptIdCache.get(), true);
+                List<DeptDO> depts = deptService.getDeptListByParentIdFromCache(userDeptIdCache.get(), true);
                 CollUtil.addAll(result.getDeptIds(), CollectionUtils.convertList(depts, DeptDO::getId));
                 // 添加本身部门编号
                 CollUtil.addAll(result.getDeptIds(), userDeptIdCache.get());

@@ -16,11 +16,13 @@ import ${PageResultClassName};
 import javax.annotation.Resource;
 import org.springframework.context.annotation.Import;
 import java.util.*;
+import java.time.LocalDateTime;
 
 import static cn.hutool.core.util.RandomUtil.*;
 import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
 import static ${baseFrameworkPackage}.test.core.util.AssertUtils.*;
 import static ${baseFrameworkPackage}.test.core.util.RandomUtils.*;
+import static ${LocalDateTimeUtilsClassName}.*;
 import static ${ObjectUtilsClassName}.*;
 import static ${DateUtilsClassName}.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,7 +53,7 @@ import static org.mockito.Mockito.*;
        #if (${column.listOperation})
        #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
        #if (${column.listOperationCondition} == "BETWEEN")## BETWEEN 的情况
-       reqVO.set${JavaField}((new Date[]{}));
+       reqVO.set${JavaField}(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        #else
        reqVO.set$JavaField(null);
        #end
@@ -59,10 +61,10 @@ import static org.mockito.Mockito.*;
        #end
 #end
 /**
-* {@link ${table.className}ServiceImpl} 的单元测试类
-*
-* @author ${table.author}
-*/
+ * {@link ${table.className}ServiceImpl} 的单元测试类
+ *
+ * @author ${table.author}
+ */
 @Import(${table.className}ServiceImpl.class)
 public class ${table.className}ServiceImplTest extends BaseDbUnitTest {
 

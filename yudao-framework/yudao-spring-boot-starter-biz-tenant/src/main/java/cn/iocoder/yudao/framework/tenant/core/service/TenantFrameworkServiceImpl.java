@@ -32,7 +32,7 @@ public class TenantFrameworkServiceImpl implements TenantFrameworkService {
 
                 @Override
                 public List<Long> load(Object key) {
-                    return tenantApi.getTenantIds();
+                    return tenantApi.getTenantIdList();
                 }
 
             });
@@ -47,7 +47,7 @@ public class TenantFrameworkServiceImpl implements TenantFrameworkService {
                 @Override
                 public ServiceException load(Long id) {
                     try {
-                        tenantApi.validTenant(id);
+                        tenantApi.validateTenant(id);
                         return SERVICE_EXCEPTION_NULL;
                     } catch (ServiceException ex) {
                         return ex;

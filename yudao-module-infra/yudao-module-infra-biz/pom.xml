@@ -58,10 +58,6 @@
         </dependency>
 
         <!-- Config 配置中心相关 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-config</artifactId>
-        </dependency>
 
         <!-- Job 定时任务相关 -->
         <dependency>
@@ -83,10 +79,6 @@
         </dependency>
 
         <!-- 工具类相关 -->
-        <dependency>
-            <groupId>com.github.ulisesbocchio</groupId>
-            <artifactId>jasypt-spring-boot-starter</artifactId> <!-- 加解密 -->
-        </dependency>
 
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
@@ -118,6 +110,12 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-file</artifactId>
+        </dependency>
+
+        <!-- WebSocket -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
     </dependencies>
 

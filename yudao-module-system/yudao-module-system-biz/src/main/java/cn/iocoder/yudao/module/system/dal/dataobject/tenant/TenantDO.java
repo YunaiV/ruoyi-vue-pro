@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 租户 DO
@@ -73,7 +73,7 @@ public class TenantDO extends BaseDO {
     /**
      * 过期时间
      */
-    private Date expireTime;
+    private LocalDateTime expireTime;
     /**
      * 账号数量
      */

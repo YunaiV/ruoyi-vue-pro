@@ -1,53 +1,52 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
-@ApiModel("管理后台 - 流程实例的分页 Item Response VO")
+@Schema(description = "管理后台 - 流程实例的分页 Item Response VO")
 @Data
 public class BpmProcessInstancePageItemRespVO {
 
-    @ApiModelProperty(value = "流程实例的编号", required = true, example = "1024")
+    @Schema(description = "流程实例的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String id;
 
-    @ApiModelProperty(value = "流程名称", required = true, example = "芋道")
+    @Schema(description = "流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
-    @ApiModelProperty(value = "流程定义的编号", required = true, example = "2048")
+    @Schema(description = "流程定义的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private String processDefinitionId;
 
-    @ApiModelProperty(value = "流程分类", required = true, notes = "参见 bpm_model_category 数据字典", example = "1")
+    @Schema(description = "流程分类-参见 bpm_model_category 数据字典", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String category;
 
-    @ApiModelProperty(value = "流程实例的状态", required = true, notes = "参见 bpm_process_instance_status", example = "1")
+    @Schema(description = "流程实例的状态-参见 bpm_process_instance_status", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
-    @ApiModelProperty(value = "流程实例的结果", required = true, notes = "参见 bpm_process_instance_result", example = "2")
+    @Schema(description = "流程实例的结果-参见 bpm_process_instance_result", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Integer result;
 
-    @ApiModelProperty(value = "提交时间", required = true)
-    private Date createTime;
+    @Schema(description = "提交时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime createTime;
 
-    @ApiModelProperty(value = "结束时间", required = true)
-    private Date endTime;
+    @Schema(description = "结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime endTime;
 
     /**
      * 当前任务
      */
     private List<Task> tasks;
 
-    @ApiModel("流程任务")
+    @Schema(description = "流程任务")
     @Data
     public static class Task {
 
-        @ApiModelProperty(value = "流程任务的编号", required = true, example = "1024")
+        @Schema(description = "流程任务的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private String id;
 
-        @ApiModelProperty(value = "任务名称", required = true, example = "芋道")
+        @Schema(description = "任务名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
         private String name;
 
     }

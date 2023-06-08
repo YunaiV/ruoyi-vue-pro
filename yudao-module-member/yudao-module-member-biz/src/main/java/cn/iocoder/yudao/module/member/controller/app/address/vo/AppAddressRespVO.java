@@ -1,19 +1,18 @@
 package cn.iocoder.yudao.module.member.controller.app.address.vo;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
+import java.time.LocalDateTime;
 
-@ApiModel("用户 APP - 用户收件地址 Response VO")
+@Schema(description = "用户 APP - 用户收件地址 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class AppAddressRespVO extends AppAddressBaseVO {
 
-    @ApiModelProperty(value = "编号", required = true)
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
-    @ApiModelProperty(value = "创建时间", required = true)
-    private Date createTime;
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime createTime;
 
 }

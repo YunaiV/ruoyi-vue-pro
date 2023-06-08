@@ -18,7 +18,7 @@ public class RoleApiImpl implements RoleApi {
     private RoleService roleService;
 
     @Override
-    public void validRoles(Collection<Long> ids) {
-        roleService.validRoles(ids);
+    public void validRoleList(Collection<Long> ids) {
+        roleService.validateRoleList(ids);
     }
 }

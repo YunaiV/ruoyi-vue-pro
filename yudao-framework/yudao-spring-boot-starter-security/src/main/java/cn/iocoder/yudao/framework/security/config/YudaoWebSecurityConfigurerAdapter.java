@@ -4,17 +4,17 @@ import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.method.HandlerMethod;
@@ -32,9 +32,9 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-@Configuration
+@AutoConfiguration
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+public class YudaoWebSecurityConfigurerAdapter {
 
     @Resource
     private WebProperties webProperties;
@@ -72,11 +72,9 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
      * 通过覆写父类的该方法，添加 @Bean 注解，解决该问题
      */
-    @Override
     @Bean
-    @ConditionalOnMissingBean(AuthenticationManager.class)
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     /**
@@ -96,8 +94,8 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      * rememberMe          |   允许通过remember-me登录的用户访问
      * authenticated       |   用户登录后可访问
      */
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
+    @Bean
+    protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         // 登出
         httpSecurity
                 // 开启跨域
@@ -131,6 +129,8 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                 .antMatchers(buildAppApi("/**")).permitAll()
                 // 1.5 验证码captcha 允许匿名访问
                 .antMatchers("/captcha/get", "/captcha/check").permitAll()
+                // 1.6 webSocket 允许匿名访问
+                .antMatchers("/websocket/message").permitAll()
                 // ②：每个项目的自定义规则
                 .and().authorizeRequests(registry -> // 下面，循环设置自定义规则
                         authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(registry)))
@@ -141,6 +141,8 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
 
         // 添加 Token Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return httpSecurity.build();
     }
 
     private String buildAppApi(String url) {

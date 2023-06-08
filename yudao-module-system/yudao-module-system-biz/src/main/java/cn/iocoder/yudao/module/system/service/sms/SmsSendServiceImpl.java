@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
@@ -55,6 +56,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     private SmsProducer smsProducer;
 
     @Override
+    @DataPermission(enable = false) // 发送短信时，无需考虑数据权限
     public Long sendSingleSmsToAdmin(String mobile, Long userId, String templateCode, Map<String, Object> templateParams) {
         // 如果 mobile 为空，则加载用户编号对应的手机号
         if (StrUtil.isEmpty(mobile)) {
@@ -64,7 +66,7 @@ public class SmsSendServiceImpl implements SmsSendService {
             }
         }
         // 执行发送
-        return this.sendSingleSms(mobile, userId, UserTypeEnum.ADMIN.getValue(), templateCode, templateParams);
+        return sendSingleSms(mobile, userId, UserTypeEnum.ADMIN.getValue(), templateCode, templateParams);
     }
 
     @Override
@@ -74,21 +76,21 @@ public class SmsSendServiceImpl implements SmsSendService {
             mobile = memberService.getMemberUserMobile(userId);
         }
         // 执行发送
-        return this.sendSingleSms(mobile, userId, UserTypeEnum.MEMBER.getValue(), templateCode, templateParams);
+        return sendSingleSms(mobile, userId, UserTypeEnum.MEMBER.getValue(), templateCode, templateParams);
     }
 
     @Override
     public Long sendSingleSms(String mobile, Long userId, Integer userType,
                               String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否合法
-        SmsTemplateDO template = this.checkSmsTemplateValid(templateCode);
+        SmsTemplateDO template = validateSmsTemplate(templateCode);
         // 校验短信渠道是否合法
-        SmsChannelDO smsChannel = this.checkSmsChannelValid(template.getChannelId());
+        SmsChannelDO smsChannel = validateSmsChannel(template.getChannelId());
 
         // 校验手机号码是否存在
-        mobile = this.checkMobile(mobile);
+        mobile = validateMobile(mobile);
         // 构建有序的模板参数。为什么放在这个位置，是提前保证模板参数的正确性，而不是到了插入发送日志
-        List<KeyValue<String, Object>> newTemplateParams = this.buildTemplateParams(template, templateParams);
+        List<KeyValue<String, Object>> newTemplateParams = buildTemplateParams(template, templateParams);
 
         // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus())
@@ -106,18 +108,18 @@ public class SmsSendServiceImpl implements SmsSendService {
     }
 
     @VisibleForTesting
-    public SmsChannelDO checkSmsChannelValid(Long channelId) {
+    SmsChannelDO validateSmsChannel(Long channelId) {
         // 获得短信模板。考虑到效率，从缓存中获取
         SmsChannelDO channelDO = smsChannelService.getSmsChannel(channelId);
         // 短信模板不存在
         if (channelDO == null) {
-            throw exception(SMS_SEND_TEMPLATE_NOT_EXISTS);
+            throw exception(SMS_CHANNEL_NOT_EXISTS);
         }
         return channelDO;
     }
 
     @VisibleForTesting
-    public SmsTemplateDO checkSmsTemplateValid(String templateCode) {
+    SmsTemplateDO validateSmsTemplate(String templateCode) {
         // 获得短信模板。考虑到效率，从缓存中获取
         SmsTemplateDO template = smsTemplateService.getSmsTemplateByCodeFromCache(templateCode);
         // 短信模板不存在
@@ -137,7 +139,7 @@ public class SmsSendServiceImpl implements SmsSendService {
      * @return 处理后的参数
      */
     @VisibleForTesting
-    public List<KeyValue<String, Object>> buildTemplateParams(SmsTemplateDO template, Map<String, Object> templateParams) {
+    List<KeyValue<String, Object>> buildTemplateParams(SmsTemplateDO template, Map<String, Object> templateParams) {
         return template.getParams().stream().map(key -> {
             Object value = templateParams.get(key);
             if (value == null) {
@@ -148,7 +150,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     }
 
     @VisibleForTesting
-    public String checkMobile(String mobile) {
+    public String validateMobile(String mobile) {
         if (StrUtil.isEmpty(mobile)) {
             throw exception(SMS_SEND_MOBILE_NOT_EXISTS);
         }
@@ -180,7 +182,7 @@ public class SmsSendServiceImpl implements SmsSendService {
         }
         // 更新短信日志的接收结果. 因为量一般不大，所以先使用 for 循环更新
         receiveResults.forEach(result -> smsLogService.updateSmsReceiveResult(result.getLogId(),
-                result.getSuccess(), result.getReceiveTime(), result.getErrorCode(), result.getErrorCode()));
+                result.getSuccess(), result.getReceiveTime(), result.getErrorCode(), result.getErrorMsg()));
     }
 
 }

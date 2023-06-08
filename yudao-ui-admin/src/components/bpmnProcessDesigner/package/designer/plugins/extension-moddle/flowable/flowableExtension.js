@@ -1,12 +1,12 @@
 "use strict";
 
-var some = require("min-dash").some;
+const some = require('min-dash').some
 
-var ALLOWED_TYPES = {
-  FailedJobRetryTimeCycle: ["bpmn:StartEvent", "bpmn:BoundaryEvent", "bpmn:IntermediateCatchEvent", "bpmn:Activity"],
-  Connector: ["bpmn:EndEvent", "bpmn:IntermediateThrowEvent"],
-  Field: ["bpmn:EndEvent", "bpmn:IntermediateThrowEvent"]
-};
+const ALLOWED_TYPES = {
+  FailedJobRetryTimeCycle: ['bpmn:StartEvent', 'bpmn:BoundaryEvent', 'bpmn:IntermediateCatchEvent', 'bpmn:Activity'],
+  Connector: ['bpmn:EndEvent', 'bpmn:IntermediateThrowEvent'],
+  Field: ['bpmn:EndEvent', 'bpmn:IntermediateThrowEvent']
+}
 
 function is(element, type) {
   return element && typeof element.$instanceOf === "function" && element.$instanceOf(type);
@@ -32,8 +32,8 @@ function anyType(element, types) {
 }
 
 function isAllowed(propName, propDescriptor, newElement) {
-  var name = propDescriptor.name,
-    types = ALLOWED_TYPES[name.replace(/flowable:/, "")];
+  const name = propDescriptor.name,
+    types = ALLOWED_TYPES[name.replace(/flowable:/, '')]
 
   return name === propName && anyType(newElement, types);
 }
@@ -42,8 +42,8 @@ function FlowableModdleExtension(eventBus) {
   eventBus.on(
     "property.clone",
     function(context) {
-      var newElement = context.newElement,
-        propDescriptor = context.propertyDescriptor;
+      const newElement = context.newElement,
+        propDescriptor = context.propertyDescriptor
 
       this.canCloneProperty(newElement, propDescriptor);
     },

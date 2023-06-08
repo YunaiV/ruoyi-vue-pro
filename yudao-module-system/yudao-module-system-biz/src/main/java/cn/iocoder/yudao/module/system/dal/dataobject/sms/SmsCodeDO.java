@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 手机验证码 DO
@@ -26,7 +26,7 @@ public class SmsCodeDO extends BaseDO {
     /**
      * 编号
      */
-    private Integer id;
+    private Long id;
     /**
      * 手机号
      */
@@ -56,7 +56,7 @@ public class SmsCodeDO extends BaseDO {
     /**
      * 使用时间
      */
-    private Date usedTime;
+    private LocalDateTime usedTime;
     /**
      * 使用 IP
      */

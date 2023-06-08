@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.pay.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 退款订单 Excel VO
@@ -74,15 +74,15 @@ public class PayRefundExcelVO {
     private String channelRefundNo;
 
     @ExcelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ExcelProperty("退款成功时间")
-    private Date successTime;
+    private LocalDateTime successTime;
 
     @ExcelProperty("退款通知时间")
-    private Date notifyTime;
+    private LocalDateTime notifyTime;
 
     @ExcelProperty("退款失效时间")
-    private Date expireTime;
+    private LocalDateTime expireTime;
 
 }

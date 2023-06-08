@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.service.oa;
 
-import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
@@ -46,7 +46,7 @@ public class BpmOALeaveServiceImpl implements BpmOALeaveService {
     @Transactional(rollbackFor = Exception.class)
     public Long createLeave(Long userId, BpmOALeaveCreateReqVO createReqVO) {
         // 插入 OA 请假单
-        long day = DateUtil.betweenDay(createReqVO.getStartTime(), createReqVO.getEndTime(), false);
+        long day = LocalDateTimeUtil.between(createReqVO.getStartTime(), createReqVO.getEndTime()).toDays();
         BpmOALeaveDO leave = BpmOALeaveConvert.INSTANCE.convert(createReqVO).setUserId(userId).setDay(day)
                 .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
         leaveMapper.insert(leave);

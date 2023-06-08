@@ -45,13 +45,13 @@ spring:
       datasource:
         master:
           name: ruoyi-vue-pro
-          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT&nullCatalogMeansCurrent=true
+          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&serverTimezone=CTT&allowPublicKeyRetrieval=true
           driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: 3WLiVUBEwTbvAfsh
         slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
           name: ruoyi-vue-pro
-          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT&nullCatalogMeansCurrent=true
+          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&serverTimezone=CTT&allowPublicKeyRetrieval=true
           driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: 3WLiVUBEwTbvAfsh
@@ -62,10 +62,6 @@ spring:
     port: 6379 # 端口
     database: 1 # 数据库索引
 #    password: 123456 # 密码，建议生产环境开启
-
-jasypt:
-  encryptor:
-    password: yuanma # 加解密的秘钥
 
 --- #################### 定时任务相关配置 ####################
 
@@ -97,20 +93,6 @@ spring:
             class: org.quartz.simpl.SimpleThreadPool # 线程池类型
     jdbc: # 使用 JDBC 的 JobStore 的时候，JDBC 的配置
       initialize-schema: NEVER # 是否自动使用 SQL 初始化 Quartz 表结构。这里设置成 never ，我们手动创建表结构。
-
---- #################### 配置中心相关配置 ####################
-
-# Apollo 配置中心
-apollo:
-  bootstrap:
-    enabled: true # 设置 Apollo 在启动阶段生效
-    eagerLoad:
-      enabled: true # 设置 Apollo 在日志初始化前生效，可以实现日志的动态级别配置
-  jdbc: # 自定义的 JDBC 配置项，用于数据库的地址
-    dao: cn.iocoder.yudao.module.infra.dal.mysql.config.ConfigDAOImpl
-    url: ${spring.datasource.dynamic.datasource.master.url}
-    username: ${spring.datasource.dynamic.datasource.master.username}
-    password: ${spring.datasource.dynamic.datasource.master.password}
 
 --- #################### 服务保障相关配置 ####################
 
@@ -185,9 +167,8 @@ yudao:
       - ${spring.boot.admin.context-path}/** # 不处理 Spring Boot Admin 的请求
       - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求
   pay:
-    pay-notify-url: http://niubi.natapp1.cc/api/pay/order/notify
-    pay-return-url: http://niubi.natapp1.cc/api/pay/order/return
-    refund-notify-url: http://niubi.natapp1.cc/api/pay/refund/notify
+    callback-url: http://yunai.natapp1.cc/admin-api/pay/notify/callback
+    return-url: http://yunai.natapp1.cc/admin-api/pay/notify/return
   demo: true # 开启演示模式
 
 justauth:
@@ -206,3 +187,11 @@ justauth:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
+wx:
+  mp:
+    useRedis: false
+    defaultContent: \u60A8\u597D\uFF0C\u6709\u4EC0\u4E48\u95EE\u9898\uFF1F
+    redisConfig:
+      host: 127.0.0.1
+      port: 6379
+      password:

@@ -2,7 +2,7 @@
 	"id": "uview-ui",
 	"name": "uview-ui",
 	"displayName": "uView2.0重磅发布，利剑出鞘，一统江湖",
-	"version": "2.0.30",
+	"version": "2.0.34",
 	"description": "uView UI已完美兼容nvue，全面的组件和便捷的工具会让您信手拈来，如鱼得水",
 	"keywords": [
         "uview",
@@ -17,12 +17,8 @@
 	"engines": {
 		"HBuilderX": "^3.1.0"
 	},
-	"dcloudext": {
-		"category": [
-			"前端组件",
-			"通用组件"
-		],
-		"sale": {
+    "dcloudext": {
+        "sale": {
 			"regular": {
 				"price": "0.00"
 			},
@@ -38,7 +34,8 @@
 			"data": "无",
 			"permissions": "无"
 		},
-		"npmurl": "https://www.npmjs.com/package/uview-ui"
+        "npmurl": "https://www.npmjs.com/package/uview-ui",
+        "type": "component-vue"
 	},
 	"uni_modules": {
 		"dependencies": [],

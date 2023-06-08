@@ -2,10 +2,13 @@ package cn.iocoder.yudao.module.infra.dal.dataobject.codegen;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -25,6 +28,7 @@ public class CodegenTableDO extends BaseDO {
     /**
      * ID 编号
      */
+    @TableId
     private Long id;
 
     /**
@@ -44,10 +48,14 @@ public class CodegenTableDO extends BaseDO {
 
     /**
      * 表名称
+     *
+     * 关联 {@link TableInfo#getName()}
      */
     private String tableName;
     /**
      * 表描述
+     *
+     * 关联 {@link TableInfo#getComment()}
      */
     private String tableComment;
     /**
@@ -92,6 +100,12 @@ public class CodegenTableDO extends BaseDO {
      * 枚举 {@link CodegenTemplateTypeEnum}
      */
     private Integer templateType;
+    /**
+     * 代码生成的前端类型
+     *
+     * 枚举 {@link CodegenFrontTypeEnum}
+     */
+    private Integer frontType;
 
     // ========== 菜单相关字段 ==========
 

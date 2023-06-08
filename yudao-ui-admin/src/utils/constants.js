@@ -3,6 +3,37 @@
  *
  * 枚举类
  */
+import {beginOfDay, endOfDay} from "@/utils/dateUtils";
+
+export const datePickerOptions = {
+  shortcuts: [{
+    text: '最近一周',
+    onClick(picker) {
+      const start = new Date();
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+      const end = new Date();
+      picker.$emit('pick', [beginOfDay(start), endOfDay(end)]);
+    }
+  }, {
+    text: '最近一个月',
+    onClick(picker) {
+      const start = new Date();
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+      const end = new Date();
+      picker.$emit('pick', [beginOfDay(start), endOfDay(end)]);
+    }
+  }, {
+    text: '最近三个月',
+    onClick(picker) {
+      const start = new Date();
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+      const end = new Date();
+      picker.$emit('pick', [beginOfDay(start), endOfDay(end)]);
+    }
+  }]
+}
+
+// ========== 静态变量 ==========
 
 /**
  * 全局通用状态枚举
@@ -117,6 +148,28 @@ export const PayChannelEnum = {
     "code": "alipay_qr",
     "name": "支付宝扫码支付"
   },
+  ALIPAY_BAR: {
+    "code": "alipay_bar",
+    "name": "支付宝条码支付"
+  },
+}
+
+/**
+ * 支付的展示模式每局
+ */
+export const PayDisplayModeEnum = {
+  URL: {
+    "mode": "url",
+  },
+  IFRAME: {
+    "mode": "iframe",
+  },
+  FORM: {
+    "mode": "form"
+  },
+  QR_CODE: {
+    "mode": "qr_code"
+  }
 }
 
 /**
@@ -141,7 +194,7 @@ export const PayOrderStatusEnum = {
   },
   CLOSED: {
     status: 20,
-    name: '未支付'
+    name: '支付关闭'
   }
 }
 
@@ -185,37 +238,132 @@ export const PayOrderRefundStatusEnum = {
  * 支付退款订单状态枚举
  */
 export const PayRefundStatusEnum = {
-  CREATE:{
-    status:0,
+  CREATE: {
+    status: 0,
     name: '退款订单生成'
   },
-  SUCCESS:{
-    status:1,
+  SUCCESS: {
+    status: 1,
     name: '退款成功'
   },
-  FAILURE:{
-    status:2,
+  FAILURE: {
+    status: 2,
     name: '退款失败'
   },
-  PROCESSING_NOTIFY:{
-    status:3,
+  PROCESSING_NOTIFY: {
+    status: 3,
     name: '退款中，渠道通知结果'
   },
-  PROCESSING_QUERY:{
-    status:4,
+  PROCESSING_QUERY: {
+    status: 4,
     name: '退款中，系统查询结果'
   },
-  UNKNOWN_RETRY:{
-    status:5,
+  UNKNOWN_RETRY: {
+    status: 5,
     name: '状态未知，请重试'
   },
-  UNKNOWN_QUERY:{
-    status:6,
+  UNKNOWN_QUERY: {
+    status: 6,
     name: '状态未知，系统查询结果'
   },
-  CLOSE:{
-    status:99,
+  CLOSE: {
+    status: 99,
     name: '退款关闭'
   }
 }
 
+/**
+ * 商品 SPU 状态
+ */
+export const ProductSpuStatusEnum = {
+  RECYCLE: {
+    status: -1,
+    name: '回收站'
+  },
+  DISABLE: {
+    status: 0,
+    name: '下架'
+  },
+  ENABLE: {
+    status: 1,
+    name: '上架'
+  },
+}
+
+/**
+ * 优惠类型枚举
+ */
+export const PromotionDiscountTypeEnum = {
+  PRICE: {
+    type: 1,
+    name: '满减'
+  },
+  PERCENT: {
+    type: 2,
+    name: '折扣'
+  }
+}
+
+/**
+ * 优惠劵模板的有限期类型的枚举
+ */
+export const CouponTemplateValidityTypeEnum = {
+  DATE: {
+    type: 1,
+    name: '固定日期可用'
+  },
+  TERM: {
+    type: 2,
+    name: '领取之后可用'
+  }
+}
+
+/**
+ * 营销的商品范围枚举
+ */
+export const PromotionProductScopeEnum = {
+  ALL: {
+    scope: 1,
+    name: '全部商品参与'
+  },
+  SPU: {
+    scope: 2,
+    name: '指定商品参与'
+  }
+}
+
+/**
+ * 营销的条件类型枚举
+ */
+export const PromotionConditionTypeEnum = {
+  PRICE: {
+    type: 10,
+    name: '满 N 元'
+  },
+  COUNT: {
+    type: 20,
+    name: '满 N 件'
+  }
+}
+
+/**
+ * 促销活动的状态枚举
+ */
+export const PromotionActivityStatusEnum = {
+  WAIT: {
+    type: 10,
+    name: '未开始'
+  },
+  RUN: {
+    type: 20,
+    name: '进行中'
+  },
+  END: {
+    type: 30,
+    name: '已结束'
+  },
+  CLOSE: {
+    type: 40,
+    name: '已关闭'
+  }
+}

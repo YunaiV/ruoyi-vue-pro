@@ -19,12 +19,12 @@ public enum ProductSpuStatusEnum implements IntArrayValuable {
     DISABLE(0, "下架"),
     ENABLE(1, "上架"),;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ProductSpuStatusEnum::getStyle).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ProductSpuStatusEnum::getStatus).toArray();
 
     /**
      * 状态
      */
-    private final Integer style;
+    private final Integer status;
     /**
      * 状态名
      */
@@ -33,6 +33,16 @@ public enum ProductSpuStatusEnum implements IntArrayValuable {
     @Override
     public int[] array() {
         return ARRAYS;
+    }
+
+    /**
+     * 判断是否处于【上架】状态
+     *
+     * @param status 状态
+     * @return 是否处于【上架】状态
+     */
+    public static boolean isEnable(Integer status) {
+        return ENABLE.getStatus().equals(status);
     }
 
 }

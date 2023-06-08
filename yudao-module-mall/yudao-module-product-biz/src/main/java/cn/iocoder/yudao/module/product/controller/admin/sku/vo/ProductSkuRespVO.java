@@ -1,28 +1,27 @@
 package cn.iocoder.yudao.module.product.controller.admin.sku.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
-@ApiModel("管理后台 - 商品sku Response VO")
+@Schema(description = "管理后台 - 商品 SKU Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSkuRespVO extends ProductSkuBaseVO {
 
-    @ApiModelProperty(value = "主键", required = true, example = "1024")
+    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @ApiModelProperty(value = "创建时间")
-    private Date createTime;
+    @Schema(description = "创建时间")
+    private LocalDateTime createTime;
 
     /**
-     * 规格值数组
+     * 属性数组
      */
     private List<Property> properties;
 

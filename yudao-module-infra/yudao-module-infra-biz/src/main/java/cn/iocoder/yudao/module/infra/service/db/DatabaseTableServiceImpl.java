@@ -41,7 +41,7 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
         return CollUtil.getFirst(getTableList0(dataSourceConfigId, name));
     }
 
-    public List<TableInfo> getTableList0(Long dataSourceConfigId, String name) {
+    private List<TableInfo> getTableList0(Long dataSourceConfigId, String name) {
         // 获得数据源配置
         DataSourceConfigDO config = dataSourceConfigService.getDataSourceConfig(dataSourceConfigId);
         Assert.notNull(config, "数据源({}) 不存在！", dataSourceConfigId);
@@ -52,8 +52,12 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
         StrategyConfig.Builder strategyConfig = new StrategyConfig.Builder();
         if (StrUtil.isNotEmpty(name)) {
             strategyConfig.addInclude(name);
+        } else {
+            // 移除工作流和定时任务前缀的表名 // TODO 未来做成可配置
+            strategyConfig.addExclude("ACT_[\\S\\s]+|QRTZ_[\\S\\s]+|FLW_[\\S\\s]+");
         }
-        GlobalConfig globalConfig = new GlobalConfig.Builder().dateType(DateType.ONLY_DATE).build(); // 只使用 Date 类型，不使用 LocalDate
+
+        GlobalConfig globalConfig = new GlobalConfig.Builder().dateType(DateType.TIME_PACK).build(); // 只使用 Date 类型，不使用 LocalDate
         ConfigBuilder builder = new ConfigBuilder(null, dataSourceConfig, strategyConfig.build(),
                 null, globalConfig, null);
         // 按照名字排序

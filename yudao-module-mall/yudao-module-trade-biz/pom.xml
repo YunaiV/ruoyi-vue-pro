@@ -29,16 +29,19 @@
             <artifactId>yudao-module-product-api</artifactId>
             <version>${revision}</version>
         </dependency>
-
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-pay-api</artifactId>
             <version>${revision}</version>
         </dependency>
-
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-market-api</artifactId>
+            <artifactId>yudao-module-promotion-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-member-api</artifactId>
             <version>${revision}</version>
         </dependency>
 
@@ -47,15 +50,26 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-biz-ip</artifactId>
+        </dependency>
 
         <!-- Web 相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-web</artifactId>
         </dependency>
+
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- TODO 芋艿：引入依赖要优化下： -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-biz-pay</artifactId>
         </dependency>
 
         <!-- DB 相关 -->

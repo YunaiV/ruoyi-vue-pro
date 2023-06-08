@@ -49,12 +49,12 @@ service.interceptors.request.use(config => {
     let url = config.url + '?';
     for (const propName of Object.keys(config.params)) {
       const value = config.params[propName];
-      var part = encodeURIComponent(propName) + "=";
+      const part = encodeURIComponent(propName) + '='
       if (value !== null && typeof(value) !== "undefined") {
         if (typeof value === 'object') {
           for (const key of Object.keys(value)) {
             let params = propName + '[' + key + ']';
-            var subPart = encodeURIComponent(params) + "=";
+            const subPart = encodeURIComponent(params) + '='
             url += subPart + encodeURIComponent(value[key]) + "&";
           }
         } else {
@@ -117,6 +117,13 @@ service.interceptors.response.use(async res => {
     Message({
       message: msg,
       type: 'error'
+    })
+    return Promise.reject(new Error(msg))
+  } else if (code === 501) {
+    Message({
+      type: 'error',
+      duration: 0,
+      message: msg
     })
     return Promise.reject(new Error(msg))
   } else if (code === 901) {

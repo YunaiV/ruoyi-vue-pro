@@ -35,8 +35,8 @@ public class AliyunSmsCodeMapping implements SmsCodeMapping {
             case "isv.OUT_OF_SERVICE": return SmsFrameworkErrorCodeConstants.SMS_ACCOUNT_MONEY_NOT_ENOUGH;
             case "isv.MOBILE_NUMBER_ILLEGAL": return SmsFrameworkErrorCodeConstants.SMS_MOBILE_INVALID;
             case "isv.TEMPLATE_MISSING_PARAMETERS": return SmsFrameworkErrorCodeConstants.SMS_TEMPLATE_PARAM_ERROR;
+            default: return SmsFrameworkErrorCodeConstants.SMS_UNKNOWN;
         }
-        return SmsFrameworkErrorCodeConstants.SMS_UNKNOWN;
     }
 
 }

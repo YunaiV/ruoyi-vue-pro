@@ -3,10 +3,13 @@
     <u-navbar :title="title" :autoBack="true" placeholder="true" titleStyle="font-size: 28rpx">
     </u-navbar>
     <view class="context">
+      <!-- 分类列表 -->
+      <!-- TODO @Luowenfeng：不应该展示商品分类；应该是上面一个筛选；之后是【综合】【销量】【价格】的排序 -->
       <view class="tabs-top">
         <u-tabs :list="categoryList" @click="changeTabs" :current="current" lineHeight="2" lineWidth="85rpx"
           itemStyle="padding-left: 15px; padding-right: 15px; height: 85rpx;"></u-tabs>
       </view>
+      <!-- 商品列表 -->
       <scroll-view scroll-y="true" class="product-list" enable-flex="true">
         <view class="flex-box">
           <block v-for="(item, index) in productList[current]" :key="index">
@@ -15,11 +18,11 @@
                 <image :src="item.picUrls[0]" mode='widthFix' />
               </view>
               <view class="product-button">
-                <view class="product-text">【{{ item.sellPoint }}】{{ item.name }}</view>
+                <view class="product-text">{{ item.name }}</view>
                 <view class="product-price-button">
                   <text class="product-price">￥
-                    <text class="price-size">{{ towNumber(item.price) }}</text></text>
-                  <text class="product-like-ccount">销量 {{ item.likeCount }}</text>
+                    <text class="price-size">{{ towNumber(item.minPrice) }}</text></text>
+                  <text class="product-like-count">销量 {{ item.salesCount }}</text>
                 </view>
               </view>
             </view>
@@ -52,7 +55,7 @@
     },
     methods: {
       changeTabs(item) {
-        if (item.index != this.current) {
+        if (item.index !== this.current) {
           this.handleProductSpu(item.index)
         }
       },
@@ -144,7 +147,7 @@
               }
             }
 
-            .product-like-ccount {
+            .product-like-count {
               font-size: 16rpx;
               margin-left: 10rpx;
             }
