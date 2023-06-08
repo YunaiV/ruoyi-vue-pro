@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -39,6 +40,12 @@ public class AppCommentController {
     public CommonResult<PageResult<AppCommentRespVO>> getCommentPage(@Valid AppCommentPageReqVO pageVO) {
         PageResult<ProductCommentDO> pageResult = productCommentService.getCommentPage(pageVO, Boolean.TRUE);
         return success(ProductCommentConvert.INSTANCE.convertPage02(pageResult));
+    }
+
+    @GetMapping("/get-count")
+    @Operation(summary = "获得商品评价分页 tab count")
+    public CommonResult<Map<String, Long>> getCommentPage(@Valid Long spuId) {
+        return success(productCommentService.getCommentPageTabsCount(spuId, Boolean.TRUE));
     }
 
     @PostMapping(value = "/create")

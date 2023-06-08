@@ -18,6 +18,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -60,6 +62,20 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         validateCommentExists(replyVO.getId());
 
         productCommentMapper.commentReply(replyVO, loginUserId);
+    }
+
+    @Override
+    public Map<String, Long> getCommentPageTabsCount(Long spuId, Boolean visible) {
+        Map<String, Long> countMap = new HashMap<>(4);
+        // 查询商品 id = spuId 的所有评论数量
+        countMap.put("allCount", productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.ALL));
+        // 查询商品 id = spuId 的所有好评数量
+        countMap.put("favourableCommentCount", productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.FAVOURABLE_COMMENT));
+        // 查询商品 id = spuId 的所有中评数量
+        countMap.put("mediocreCommentCount", productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.MEDIOCRE_COMMENT));
+        // 查询商品 id = spuId 的所有差评数量
+        countMap.put("negativeCommentCount", productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.NEGATIVE_COMMENT));
+        return countMap;
     }
 
     @Override

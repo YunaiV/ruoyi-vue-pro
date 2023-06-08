@@ -18,4 +18,8 @@ public class AppCommentPageReqVO extends PageParam {
     @NotNull(message = "商品SPU编号不能为空")
     private Long spuId;
 
+    @Schema(description = "app 评论页 tab 类型 (0 全部、1 好评、2 中评、3 差评)", example = "0")
+    @NotNull(message = "商品SPU编号不能为空")
+    private Integer type;
+
 }

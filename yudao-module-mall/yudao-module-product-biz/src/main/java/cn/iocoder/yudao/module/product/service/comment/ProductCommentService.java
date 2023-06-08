@@ -11,6 +11,8 @@ import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Map;
+
 /**
  * 商品评论 Service 接口
  *
@@ -68,4 +70,12 @@ public interface ProductCommentService {
      */
     void additionalComment(MemberUserRespDTO user, AppCommentAdditionalReqVO createReqVO);
 
+    /**
+     * 评论页面标签数
+     *
+     * @param spuId   spu id
+     * @param visible 是否可见
+     * @return 获得商品评价分页 tab count
+     */
+    Map<String, Long> getCommentPageTabsCount(Long spuId, Boolean visible);
 }

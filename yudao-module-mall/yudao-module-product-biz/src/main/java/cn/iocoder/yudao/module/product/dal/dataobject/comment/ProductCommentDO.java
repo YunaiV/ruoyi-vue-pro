@@ -29,6 +29,23 @@ import java.util.List;
 public class ProductCommentDO extends BaseDO {
 
     /**
+     * 所有
+     */
+    public static final Integer ALL = 0;
+    /**
+     * 好评
+     */
+    public static final Integer FAVOURABLE_COMMENT = 1;
+    /**
+     * 中评
+     */
+    public static final Integer MEDIOCRE_COMMENT = 2;
+    /**
+     * 差评
+     */
+    public static final Integer NEGATIVE_COMMENT = 3;
+
+    /**
      * 评论编号，主键自增
      */
     @TableId
