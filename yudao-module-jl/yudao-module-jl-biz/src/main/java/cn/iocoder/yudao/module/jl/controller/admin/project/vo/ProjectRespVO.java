@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.jl.controller.admin.project.vo;
 
+import cn.iocoder.yudao.module.jl.entity.crm.Customer;
 import cn.iocoder.yudao.module.jl.entity.project.ProjectSchedule;
+import cn.iocoder.yudao.module.jl.entity.user.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -20,4 +22,8 @@ public class ProjectRespVO extends ProjectBaseVO {
     private Long currentScheduleId;
 
     private ProjectSchedule currentSchedule;
+
+    private Customer customer;
+
+    private User sales;
 }

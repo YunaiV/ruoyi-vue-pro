@@ -17,6 +17,7 @@ import java.io.IOException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.jl.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -46,6 +47,8 @@ public class CustomerController {
     @Operation(summary = "创建客户")
     @PreAuthorize("@ss.hasPermission('jl:customer:create')")
     public CommonResult<Long> createCustomer(@Valid @RequestBody CustomerCreateReqVO createReqVO) {
+        Long userId = getLoginUserId();
+        createReqVO.setSalesId(userId);
         return success(customerService.createCustomer(createReqVO));
     }
 

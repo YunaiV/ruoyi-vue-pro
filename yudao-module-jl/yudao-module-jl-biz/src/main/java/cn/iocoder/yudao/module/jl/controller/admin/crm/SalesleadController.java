@@ -46,19 +46,19 @@ public class SalesleadController {
     @Resource
     private SalesleadMapper salesleadMapper;
 
-    @PostMapping("/create")
-    @Operation(summary = "创建销售线索")
-    @PreAuthorize("@ss.hasPermission('jl:saleslead:create')")
-    public CommonResult<Long> createSaleslead(@Valid @RequestBody SalesleadCreateReqVO createReqVO) {
-        Long salesLeadId = salesleadService.createSaleslead(createReqVO);
+//    @PostMapping("/create")
+//    @Operation(summary = "创建销售线索")
+//    @PreAuthorize("@ss.hasPermission('jl:saleslead:create')")
+//    public CommonResult<Long> createSaleslead(@Valid @RequestBody SalesleadCreateReqVO createReqVO) {
+//        Long salesLeadId = salesleadService.createSaleslead(createReqVO);
+//
+//        // 给客户添加最近的销售线索
+//        customerService.bindLastSaleslead(createReqVO.getCustomerId(), salesLeadId);
+//        return success(salesLeadId);
+//    }
 
-        // 给客户添加最近的销售线索
-        customerService.bindLastSaleslead(createReqVO.getCustomerId(), salesLeadId);
-        return success(salesLeadId);
-    }
-
-    @PutMapping("/update")
-    @Operation(summary = "更新销售线索")
+    @PutMapping("/save")
+    @Operation(summary = "保存销售线索")
     @PreAuthorize("@ss.hasPermission('jl:saleslead:update')")
     public CommonResult<Boolean> updateSaleslead(@Valid @RequestBody SalesleadUpdateReqVO updateReqVO) {
         salesleadService.updateSaleslead(updateReqVO);

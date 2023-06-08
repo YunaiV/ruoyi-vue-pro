@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.jl.entity.project;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import cn.iocoder.yudao.module.jl.entity.crm.Customer;
+import cn.iocoder.yudao.module.jl.entity.user.User;
 import lombok.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -91,10 +95,27 @@ public class Project extends BaseEntity {
     private Long salesId;
 
     /**
-     * 销售 id
+     * JPA 级联出 sales
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "sales_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private User sales;
+
+    /**
+     * 客户 id
      */
     @Column(name = "customer_id")
     private Long customerId;
+
+    /**
+     * 级联出客户信息
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "customer_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Customer customer;
+
 
     /**
      * 当前安排单 id

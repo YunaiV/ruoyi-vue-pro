@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import java.util.*;
 import javax.persistence.*;
@@ -103,10 +105,13 @@ public class ProjectCategory extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name="schedule_id", insertable = false, updatable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JsonBackReference
     private ProjectSchedule schedule;
 
     @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonBackReference
     @JoinColumn(name="quote_id", insertable = false, updatable = false)
     private ProjectQuote quote;
 
@@ -114,6 +119,7 @@ public class ProjectCategory extends BaseEntity {
      * 实验物资
      */
     @OneToMany(mappedBy="category", fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @Fetch(FetchMode.SUBSELECT)
     @JsonManagedReference
     private List<ProjectSupply> supplyList;
@@ -122,6 +128,7 @@ public class ProjectCategory extends BaseEntity {
      * 实验收费项
      */
     @OneToMany(mappedBy="category", fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @Fetch(FetchMode.JOIN)
     @JsonManagedReference
     private List<ProjectChargeitem> chargeList;

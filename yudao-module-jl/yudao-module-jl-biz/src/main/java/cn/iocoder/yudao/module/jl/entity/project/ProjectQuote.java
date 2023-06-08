@@ -1,7 +1,12 @@
 package cn.iocoder.yudao.module.jl.entity.project;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -71,5 +76,7 @@ public class ProjectQuote extends BaseEntity {
      * 实验名目
      */
     @OneToMany(mappedBy="quote")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonManagedReference
     private List<ProjectCategory> categoryList;
 }

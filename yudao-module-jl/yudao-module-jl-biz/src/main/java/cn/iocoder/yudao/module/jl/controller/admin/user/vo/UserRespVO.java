@@ -13,7 +13,7 @@ public class UserRespVO extends UserBaseVO {
     @Schema(description = "用户ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "22805")
     private Long id;
 
-    @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
+    @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "王五")
     private String username;
 
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")

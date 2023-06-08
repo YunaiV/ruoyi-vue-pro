@@ -2,8 +2,14 @@ package cn.iocoder.yudao.module.jl.entity.crm;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
 import cn.iocoder.yudao.module.jl.entity.user.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -21,6 +27,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity(name = "Customer")
 @Table(name = "jl_crm_customer")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Customer extends BaseEntity {
 
     /**
@@ -100,6 +107,7 @@ public class Customer extends BaseEntity {
     private Long hospitalId;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "hospital_id", insertable = false, updatable = false)
     private Institution hospital;
 
@@ -110,6 +118,7 @@ public class Customer extends BaseEntity {
     private Long universityId;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "university_id", insertable = false, updatable = false)
     private Institution university;
 
@@ -120,6 +129,7 @@ public class Customer extends BaseEntity {
     private Long companyId;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "company_id", insertable = false, updatable = false)
     private Institution company;
 
@@ -178,7 +188,8 @@ public class Customer extends BaseEntity {
     private Long salesId;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "sales_id", insertable = false, updatable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "sales_id", referencedColumnName = "id", insertable = false, updatable = false)
     private User sales;
 
     /**
@@ -188,6 +199,7 @@ public class Customer extends BaseEntity {
     private Long lastFollowupId;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "last_followup_id", insertable = false, updatable = false)
     private Followup lastFollowup;
 
@@ -197,8 +209,9 @@ public class Customer extends BaseEntity {
     @Column(name = "last_saleslead_id")
     private Long lastSalesleadId;
 
-//    @JsonManagedReference
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "last_saleslead_id", insertable = false, updatable = false)
-//    private Saleslead lastSaleslead;
+    @OneToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "last_saleslead_id", insertable = false, updatable = false)
+    @JsonManagedReference
+    private Saleslead lastSaleslead;
 }

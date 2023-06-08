@@ -57,4 +57,12 @@ public interface ErrorCodeConstants {
 
     ErrorCode PROJECT_CATEGORY_NOT_EXISTS = new ErrorCode(2027000001, "项目中的实验名目不存在");
 
+    ErrorCode SALESLEAD_COMPETITOR_NOT_EXISTS = new ErrorCode(2028000001, "销售线索的竞争报价信息不存在");
+
+    ErrorCode SALESLEAD_CUSTOMER_PLAN_NOT_EXISTS = new ErrorCode(2029000001, "销售线索的竞争报价信息不存在");
+
+    ErrorCode SALESLEAD_MANAGER_NOT_EXISTS = new ErrorCode(2030000001, "销售线索的竞争报价信息不存在");
+
+    ErrorCode PROJECT_CONSTRACT_NOT_EXISTS = new ErrorCode(2031000001, "项目合同不存在");
+
 }

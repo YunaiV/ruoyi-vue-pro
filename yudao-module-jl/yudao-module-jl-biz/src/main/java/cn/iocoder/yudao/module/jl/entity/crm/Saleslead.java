@@ -1,10 +1,18 @@
 package cn.iocoder.yudao.module.jl.entity.crm;
 
 import cn.iocoder.yudao.module.jl.entity.BaseEntity;
+import cn.iocoder.yudao.module.jl.entity.project.Project;
 import cn.iocoder.yudao.module.jl.entity.project.ProjectQuote;
 import cn.iocoder.yudao.module.jl.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -21,6 +29,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity(name = "Saleslead")
 @Table(name = "jl_crm_saleslead")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Saleslead extends BaseEntity {
 
     /**
@@ -71,8 +80,9 @@ public class Saleslead extends BaseEntity {
     @Column(name = "customer_id", nullable = false )
     private Long customerId;
 
-//    @JsonBackReference
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "customer_id", insertable = false, updatable = false)
     private Customer customer;
 
@@ -100,7 +110,8 @@ public class Saleslead extends BaseEntity {
     @Column(name = "manager_id")
     private Long managerId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER, optional=true)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name="quotation", referencedColumnName="id", insertable = false, updatable = false)
     private ProjectQuote quote;
 
@@ -108,6 +119,22 @@ public class Saleslead extends BaseEntity {
     private Long lastFollowUpId;
 
     @OneToOne
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "last_followup_id", referencedColumnName="id", insertable = false, updatable = false)
     private Followup lastFollowup;
+
+    @OneToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "project_id", referencedColumnName="id", insertable = false, updatable = false)
+    private Project project;
+
+    @OneToMany
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "saleslead_id", referencedColumnName="id", insertable = false, updatable = false)
+    private List<SalesleadCompetitor> competitorQuotations;
+
+    @OneToMany
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "saleslead_id", referencedColumnName="id", insertable = false, updatable = false)
+    private List<SalesleadCustomerPlan> customerPlans;
 }
