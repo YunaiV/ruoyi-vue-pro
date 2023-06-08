@@ -37,17 +37,17 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
 
     static void appendTabQuery(LambdaQueryWrapperX<ProductCommentDO> queryWrapper, Integer type) {
         // 构建好评查询语句
-        if (ObjectUtil.equal(type, ProductCommentDO.FAVOURABLE_COMMENT)) {
+        if (ObjectUtil.equal(type, AppCommentPageReqVO.FAVOURABLE_COMMENT)) {
             // 好评计算 (商品评分星级+服务评分星级) >= 8
             queryWrapper.apply("(scores + benefit_scores) >= 8");
         }
         // 构建中评查询语句
-        if (ObjectUtil.equal(type, ProductCommentDO.MEDIOCRE_COMMENT)) {
+        if (ObjectUtil.equal(type, AppCommentPageReqVO.MEDIOCRE_COMMENT)) {
             // 中评计算 (商品评分星级+服务评分星级) > 4 且 (商品评分星级+服务评分星级) < 8
             queryWrapper.apply("(scores + benefit_scores) > 4 and (scores + benefit_scores) < 8");
         }
         // 构建差评查询语句
-        if (ObjectUtil.equal(type, ProductCommentDO.NEGATIVE_COMMENT)) {
+        if (ObjectUtil.equal(type, AppCommentPageReqVO.NEGATIVE_COMMENT)) {
             // 差评计算 (商品评分星级+服务评分星级) <= 4
             queryWrapper.apply("(scores + benefit_scores) <= 4");
         }

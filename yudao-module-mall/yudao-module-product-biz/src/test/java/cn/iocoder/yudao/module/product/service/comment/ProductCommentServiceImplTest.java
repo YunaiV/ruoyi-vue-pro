@@ -142,19 +142,19 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         assertEquals(7, result1.getTotal());
 
         // 测试获取所有商品分页中评数据
-        PageResult<AppCommentRespVO> result2 = productCommentService.getCommentPage(new AppCommentPageReqVO().setType(ProductCommentDO.MEDIOCRE_COMMENT), Boolean.TRUE);
+        PageResult<AppCommentRespVO> result2 = productCommentService.getCommentPage(new AppCommentPageReqVO().setType(AppCommentPageReqVO.MEDIOCRE_COMMENT), Boolean.TRUE);
         assertEquals(2, result2.getTotal());
 
         // 测试获取指定 spuId 商品分页中评数据
-        PageResult<AppCommentRespVO> result3 = productCommentService.getCommentPage(new AppCommentPageReqVO().setSpuId(spuId).setType(ProductCommentDO.MEDIOCRE_COMMENT), Boolean.TRUE);
+        PageResult<AppCommentRespVO> result3 = productCommentService.getCommentPage(new AppCommentPageReqVO().setSpuId(spuId).setType(AppCommentPageReqVO.MEDIOCRE_COMMENT), Boolean.TRUE);
         assertEquals(2, result3.getTotal());
 
         // 测试分页 tab count
         Map<String, Long> tabsCount = productCommentService.getCommentPageTabsCount(spuId, Boolean.TRUE);
-        assertEquals(6, tabsCount.get(ProductCommentDO.ALL_COUNT));
-        assertEquals(4, tabsCount.get(ProductCommentDO.FAVOURABLE_COMMENT_COUNT));
-        assertEquals(2, tabsCount.get(ProductCommentDO.MEDIOCRE_COMMENT_COUNT));
-        assertEquals(0, tabsCount.get(ProductCommentDO.NEGATIVE_COMMENT_COUNT));
+        assertEquals(6, tabsCount.get(AppCommentPageReqVO.ALL_COUNT));
+        assertEquals(4, tabsCount.get(AppCommentPageReqVO.FAVOURABLE_COMMENT_COUNT));
+        assertEquals(2, tabsCount.get(AppCommentPageReqVO.MEDIOCRE_COMMENT_COUNT));
+        assertEquals(0, tabsCount.get(AppCommentPageReqVO.NEGATIVE_COMMENT_COUNT));
 
     }
 

@@ -73,13 +73,13 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     public Map<String, Long> getCommentPageTabsCount(Long spuId, Boolean visible) {
         Map<String, Long> countMap = new HashMap<>(4);
         // 查询商品 id = spuId 的所有评论数量
-        countMap.put(ProductCommentDO.ALL_COUNT, productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.ALL));
+        countMap.put(AppCommentPageReqVO.ALL_COUNT, productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.ALL));
         // 查询商品 id = spuId 的所有好评数量
-        countMap.put(ProductCommentDO.FAVOURABLE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.FAVOURABLE_COMMENT));
+        countMap.put(AppCommentPageReqVO.FAVOURABLE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.FAVOURABLE_COMMENT));
         // 查询商品 id = spuId 的所有中评数量
-        countMap.put(ProductCommentDO.MEDIOCRE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.MEDIOCRE_COMMENT));
+        countMap.put(AppCommentPageReqVO.MEDIOCRE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.MEDIOCRE_COMMENT));
         // 查询商品 id = spuId 的所有差评数量
-        countMap.put(ProductCommentDO.NEGATIVE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, ProductCommentDO.NEGATIVE_COMMENT));
+        countMap.put(AppCommentPageReqVO.NEGATIVE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.NEGATIVE_COMMENT));
         return countMap;
     }
 
@@ -89,7 +89,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         result.getList().forEach(item -> {
             // 判断用户是否选择匿名
             if (ObjectUtil.equal(item.getAnonymous(), true)) {
-                item.setUserNickname(ProductCommentDO.ANONYMOUS_NICKNAME);
+                item.setUserNickname(AppCommentPageReqVO.ANONYMOUS_NICKNAME);
             }
             // 计算评价最终综合评分 最终星数 = （商品评星 + 服务评星） / 2
             BigDecimal sumScore = new BigDecimal(item.getScores() + item.getBenefitScores());
