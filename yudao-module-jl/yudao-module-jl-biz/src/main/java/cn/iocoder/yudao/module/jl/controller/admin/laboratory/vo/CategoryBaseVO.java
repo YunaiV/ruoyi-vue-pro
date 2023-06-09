@@ -29,7 +29,6 @@ public class CategoryBaseVO {
     private String type;
 
     @Schema(description = "历史操作次数", example = "0")
-    @NotNull(message = "历史操作次数")
     private Integer actionCount;
 
 }
