@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.dal.mysql.comment;
 
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -34,11 +35,33 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
                 .orderByDesc(ProductCommentDO::getId));
     }
 
+    static void appendTabQuery(LambdaQueryWrapperX<ProductCommentDO> queryWrapper, Integer type) {
+        // 构建好评查询语句
+        if (ObjectUtil.equal(type, AppCommentPageReqVO.FAVOURABLE_COMMENT)) {
+            // 好评计算 (商品评分星级+服务评分星级) >= 8
+            queryWrapper.apply("(scores + benefit_scores) >= 8");
+        }
+        // 构建中评查询语句
+        if (ObjectUtil.equal(type, AppCommentPageReqVO.MEDIOCRE_COMMENT)) {
+            // 中评计算 (商品评分星级+服务评分星级) > 4 且 (商品评分星级+服务评分星级) < 8
+            queryWrapper.apply("(scores + benefit_scores) > 4 and (scores + benefit_scores) < 8");
+        }
+        // 构建差评查询语句
+        if (ObjectUtil.equal(type, AppCommentPageReqVO.NEGATIVE_COMMENT)) {
+            // 差评计算 (商品评分星级+服务评分星级) <= 4
+            queryWrapper.apply("(scores + benefit_scores) <= 4");
+        }
+    }
+
     default PageResult<ProductCommentDO> selectPage(AppCommentPageReqVO reqVO, Boolean visible) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<ProductCommentDO>()
+        LambdaQueryWrapperX<ProductCommentDO> queryWrapper = new LambdaQueryWrapperX<ProductCommentDO>()
                 .eqIfPresent(ProductCommentDO::getSpuId, reqVO.getSpuId())
-                .eqIfPresent(ProductCommentDO::getVisible, visible)
-                .orderByDesc(ProductCommentDO::getId));
+                .eqIfPresent(ProductCommentDO::getVisible, visible);
+        // 构建评价查询语句
+        appendTabQuery(queryWrapper, reqVO.getType());
+        // 按评价时间排序最新的显示在前面
+        queryWrapper.orderByDesc(ProductCommentDO::getCreateTime);
+        return selectPage(reqVO, queryWrapper);
     }
 
     default void updateCommentVisible(Long id, Boolean visible) {
@@ -72,6 +95,15 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
                 .set(ProductCommentDO::getAdditionalContent, createReqVO.getAdditionalContent())
                 .eq(ProductCommentDO::getId, createReqVO.getId());
         update(null, lambdaUpdateWrapper);
+    }
+
+    default Long selectTabCount(Long spuId, Boolean visible, Integer type) {
+        LambdaQueryWrapperX<ProductCommentDO> queryWrapper = new LambdaQueryWrapperX<ProductCommentDO>()
+                .eqIfPresent(ProductCommentDO::getSpuId, spuId)
+                .eqIfPresent(ProductCommentDO::getVisible, visible);
+        // 构建评价查询语句
+        appendTabQuery(queryWrapper, type);
+        return selectCount(queryWrapper);
     }
 
 }

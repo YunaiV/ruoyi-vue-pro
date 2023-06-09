@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.property;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,6 +20,15 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductPropertyDO extends BaseDO {
+
+    /**
+     * 默认属性id
+     */
+    public static final Long PROPERTY_ID = 0L;
+    /**
+     * 默认属性名字
+     */
+    public static final String PROPERTY_NAME = "默认";
 
     /**
      * 主键

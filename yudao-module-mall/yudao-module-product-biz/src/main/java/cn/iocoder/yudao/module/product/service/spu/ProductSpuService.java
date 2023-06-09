@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 
@@ -135,4 +136,11 @@ public interface ProductSpuService {
      */
     Long getSpuCountByCategoryId(Long id);
 
+    /**
+     * 通过 spu id 获取商品 SPU 明细
+     *
+     * @param id id
+     * @return 用户 App - 商品 SPU 明细
+     */
+    AppProductSpuDetailRespVO getAppProductSpuDetail(Long id);
 }

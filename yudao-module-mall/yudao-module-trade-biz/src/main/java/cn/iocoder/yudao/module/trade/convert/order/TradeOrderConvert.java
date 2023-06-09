@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
+import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUserRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailRespVO;
@@ -61,6 +62,8 @@ public interface TradeOrderConvert {
     })
     TradeOrderDO convert(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO,
                          TradePriceCalculateRespBO calculateRespBO, AddressRespDTO address);
+
+    TradeOrderRespDTO convert(TradeOrderDO orderDO);
 
     default List<TradeOrderItemDO> convertList(TradeOrderDO tradeOrderDO, TradePriceCalculateRespBO calculateRespBO) {
         return CollectionUtils.convertList(calculateRespBO.getItems(), item -> {

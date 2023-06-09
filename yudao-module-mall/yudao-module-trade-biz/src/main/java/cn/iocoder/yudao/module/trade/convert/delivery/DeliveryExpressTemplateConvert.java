@@ -28,11 +28,13 @@ public interface DeliveryExpressTemplateConvert {
 
     List<DeliveryExpressTemplateRespVO> convertList(List<DeliveryExpressTemplateDO> list);
 
+    List<DeliveryExpressTemplateSimpleRespVO> convertList1(List<DeliveryExpressTemplateDO> list);
+
     PageResult<DeliveryExpressTemplateRespVO> convertPage(PageResult<DeliveryExpressTemplateDO> page);
 
     default DeliveryExpressTemplateDetailRespVO convert(DeliveryExpressTemplateDO bean,
                                                         List<DeliveryExpressTemplateChargeDO> chargeList,
-                                                        List<DeliveryExpressTemplateFreeDO> freeList){
+                                                        List<DeliveryExpressTemplateFreeDO> freeList) {
         DeliveryExpressTemplateDetailRespVO respVO = convert2(bean);
         respVO.setTemplateCharge(convertTemplateChargeList(chargeList));
         respVO.setTemplateFree(convertTemplateFreeList(freeList));

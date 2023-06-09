@@ -7,9 +7,12 @@ import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommen
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentAdditionalReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
+import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.Map;
 
 /**
  * 商品评论 Service 接口
@@ -50,7 +53,7 @@ public interface ProductCommentService {
      * @param visible 是否可见
      * @return 商品评价分页
      */
-    PageResult<ProductCommentDO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible);
+    PageResult<AppCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible);
 
     /**
      * 创建商品评论
@@ -68,4 +71,12 @@ public interface ProductCommentService {
      */
     void additionalComment(MemberUserRespDTO user, AppCommentAdditionalReqVO createReqVO);
 
+    /**
+     * 评论页面标签数
+     *
+     * @param spuId   spu id
+     * @param visible 是否可见
+     * @return 获得商品评价分页 tab count
+     */
+    Map<String, Long> getCommentPageTabsCount(Long spuId, Boolean visible);
 }
