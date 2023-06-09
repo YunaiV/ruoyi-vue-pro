@@ -5,7 +5,10 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.*;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateCreateReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateDetailRespVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplatePageReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateChargeDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateFreeDO;
@@ -234,14 +237,16 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
         List<DeliveryExpressTemplateDO> templateList = expressTemplateMapper.selectBatchIds(spuMap.keySet());
         Map<Long, SpuDeliveryExpressTemplateRespBO> result = new HashMap<>(templateList.size());
         templateList.forEach(item -> {
+            // TODO @jason：if return ，更简洁哈；
             if (spuMap.containsKey(item.getId())) {
-                ProductSpuRespDTO spuDTO = spuMap.get(item.getId());
+                ProductSpuRespDTO spu = spuMap.get(item.getId());
                 SpuDeliveryExpressTemplateRespBO bo = new SpuDeliveryExpressTemplateRespBO()
-                        .setSpuId(spuDTO.getId()).setAreaId(areaId)
+                        .setSpuId(spu.getId()).setAreaId(areaId)
                         .setChargeMode(item.getChargeMode())
+                        // TODO @jason：是不是只要查询到一个，就不用查询下一个了；TemplateCharge 和 TemplateFree
                         .setTemplateCharge(findMatchExpressTemplateCharge(item.getId(), areaId))
                         .setTemplateFree(findMatchExpressTemplateFree(item.getId(), areaId));
-                result.put(spuDTO.getId(), bo);
+                result.put(spu.getId(), bo);
             }
         });
         return result;
@@ -249,6 +254,7 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
 
     private DeliveryExpressTemplateChargeDO findMatchExpressTemplateCharge(Long templateId, Integer areaId) {
         List<DeliveryExpressTemplateChargeDO> list = expressTemplateChargeMapper.selectListByTemplateId(templateId);
+        // TODO @jason：可以使用 CollectionUtils.findFirst()
         for (DeliveryExpressTemplateChargeDO item : list) {
             // 第一个匹配的返回。 areaId 不能重复
             if (item.getAreaIds().contains(areaId)) {
@@ -260,6 +266,7 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
 
     private DeliveryExpressTemplateFreeDO findMatchExpressTemplateFree(Long templateId, Integer areaId) {
         List<DeliveryExpressTemplateFreeDO> list = expressTemplateFreeMapper.selectListByTemplateId(templateId);
+        // TODO @jason：可以使用 CollectionUtils.findFirst()
         for (DeliveryExpressTemplateFreeDO item : list) {
             // 第一个匹配的返回。 areaId 不能重复
             if (item.getAreaIds().contains(areaId)) {

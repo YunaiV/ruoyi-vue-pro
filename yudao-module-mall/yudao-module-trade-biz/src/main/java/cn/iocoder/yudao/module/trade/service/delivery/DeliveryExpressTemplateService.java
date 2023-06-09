@@ -83,10 +83,11 @@ public interface DeliveryExpressTemplateService {
      */
     DeliveryExpressTemplateDO validateDeliveryExpressTemplate(Long templateId);
 
+    // TODO @jason 方法名可以改成 getExpressTemplateMapBySpuIdsAndArea
     /**
      * 基于指定的 SPU 编号数组和收件人地址区域编号. 获取匹配运费模板
      *
-     * @param ids    SPU 编号列表
+     * @param ids    SPU 编号列表 // TODO @jason：模版编号？
      * @param areaId 区域编号
      * @return Map (spuId -> 运费模板设置)
      */

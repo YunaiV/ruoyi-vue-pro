@@ -13,9 +13,11 @@ import lombok.Data;
 @Data
 public class SpuDeliveryExpressTemplateRespBO {
 
+    // TODO @jason：是不是可以简单一点；是否包邮；然后直接把  templateCharge、templateFree 需要的字段平铺开
+
     /**
      * 配送计费方式
-     * <p>
+     *
      * 枚举 {@link DeliveryExpressChargeModeEnum}
      */
     private Integer chargeMode;
@@ -30,6 +32,7 @@ public class SpuDeliveryExpressTemplateRespBO {
      */
     private DeliveryExpressTemplateFreeDO templateFree;
 
+    // TODO @jason：下面两个字段不用返回也可以呀
     /**
      * SPU 编号
      * <p>
