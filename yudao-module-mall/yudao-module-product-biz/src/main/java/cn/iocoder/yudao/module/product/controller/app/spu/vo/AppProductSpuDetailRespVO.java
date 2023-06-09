@@ -36,6 +36,9 @@ public class AppProductSpuDetailRespVO {
     @Schema(description = "商品视频", required = true)
     private String videoUrl;
 
+    @Schema(description = "单位名", required = true, example = "个")
+    private String unitName;
+
     // ========== SKU 相关字段 =========
 
     @Schema(description = "规格类型", required = true, example = "true")
@@ -46,6 +49,9 @@ public class AppProductSpuDetailRespVO {
 
     @Schema(description = "市场价，单位使用：分", required = true, example = "1024")
     private Integer marketPrice;
+
+    @Schema(description = "VIP 价格，单位使用：分", required = true, example = "968") // 通过会员等级，计算出折扣后价格
+    private Integer vipPrice;
 
     @Schema(description = "库存", required = true, example = "666")
     private Integer stock;
@@ -78,6 +84,9 @@ public class AppProductSpuDetailRespVO {
         @Schema(description = "市场价，单位使用：分", required = true, example = "1024")
         private Integer marketPrice;
 
+        @Schema(description = "VIP 价格，单位使用：分", required = true, example = "968") // 通过会员等级，计算出折扣后价格
+        private Integer vipPrice;
+
         @Schema(description = "图片地址", required = true, example = "https://www.iocoder.cn/xx.png")
         private String picUrl;
 
@@ -89,6 +98,7 @@ public class AppProductSpuDetailRespVO {
 
         @Schema(description = "商品体积", example = "1024") // 单位：m^3 平米
         private Double volume;
+
     }
 
 }

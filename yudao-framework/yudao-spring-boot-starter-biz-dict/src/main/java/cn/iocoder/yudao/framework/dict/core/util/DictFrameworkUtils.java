@@ -58,6 +58,11 @@ public class DictFrameworkUtils {
     }
 
     @SneakyThrows
+    public static String getDictDataLabel(String dictType, Integer value) {
+        return GET_DICT_DATA_CACHE.get(new KeyValue<>(dictType, String.valueOf(value))).getLabel();
+    }
+
+    @SneakyThrows
     public static String getDictDataLabel(String dictType, String value) {
         return GET_DICT_DATA_CACHE.get(new KeyValue<>(dictType, value)).getLabel();
     }

@@ -68,16 +68,6 @@ public interface ProductSkuConvert {
         return spuIdAndStockMap;
     }
 
-    default Collection<Long> convertPropertyValueIds(List<ProductSkuDO> list) {
-        if (CollUtil.isEmpty(list)) {
-            return new HashSet<>();
-        }
-        return list.stream().filter(item -> item.getProperties() != null)
-                .flatMap(p -> p.getProperties().stream()) // 遍历多个 Property 属性
-                .map(ProductSkuDO.Property::getValueId) // 将每个 Property 转换成对应的 propertyId，最后形成集合
-                .collect(Collectors.toSet());
-    }
-
     default String buildPropertyKey(ProductSkuDO bean) {
         if (CollUtil.isEmpty(bean.getProperties())) {
             return StrUtil.EMPTY;

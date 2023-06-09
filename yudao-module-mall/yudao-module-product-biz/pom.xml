@@ -35,10 +35,9 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
         </dependency>
-        <!-- TODO 芋艿：是不是可以去掉这个依赖呀？ -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
+            <artifactId>yudao-spring-boot-starter-biz-dict</artifactId>
         </dependency>
 
         <!-- Web 相关 -->

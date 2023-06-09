@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
+import com.google.common.collect.Maps;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -238,17 +239,22 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public Map<Integer, Long> getTabsCount() {
-        Map<Integer, Long> counts = new HashMap<>(5);
+        Map<Integer, Long> counts = Maps.newLinkedHashMapWithExpectedSize(5);
         // 查询销售中的商品数量
-        counts.put(ProductSpuPageReqVO.FOR_SALE, productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus()));
+        counts.put(ProductSpuPageReqVO.FOR_SALE,
+                productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus()));
         // 查询仓库中的商品数量
-        counts.put(ProductSpuPageReqVO.IN_WAREHOUSE, productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus()));
+        counts.put(ProductSpuPageReqVO.IN_WAREHOUSE,
+                productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus()));
         // 查询售空的商品数量
-        counts.put(ProductSpuPageReqVO.SOLD_OUT, productSpuMapper.selectCount(ProductSpuDO::getStock, 0));
+        counts.put(ProductSpuPageReqVO.SOLD_OUT,
+                productSpuMapper.selectCount(ProductSpuDO::getStock, 0));
         // 查询触发警戒库存的商品数量
-        counts.put(ProductSpuPageReqVO.ALERT_STOCK, productSpuMapper.selectCount());
+        counts.put(ProductSpuPageReqVO.ALERT_STOCK,
+                productSpuMapper.selectCount());
         // 查询回收站中的商品数量
-        counts.put(ProductSpuPageReqVO.RECYCLE_BIN, productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
+        counts.put(ProductSpuPageReqVO.RECYCLE_BIN,
+                productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
         return counts;
     }
 

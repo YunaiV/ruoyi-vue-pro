@@ -3,17 +3,17 @@ package cn.iocoder.yudao.module.product.convert.spu;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
-import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageItemRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
-import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
+import cn.iocoder.yudao.module.product.enums.DictTypeConstants;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -21,10 +21,8 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 商品 SPU Convert
@@ -91,28 +89,17 @@ public interface ProductSpuConvert {
 
     PageResult<AppProductSpuPageItemRespVO> convertPageForGetSpuPage0(PageResult<ProductSpuDO> page);
 
-    default AppProductSpuDetailRespVO convertForGetSpuDetail(ProductSpuDO spu, List<ProductSkuDO> skus,
-                                                             List<ProductPropertyValueDetailRespBO> propertyValues) {
+    default AppProductSpuDetailRespVO convertForGetSpuDetail(ProductSpuDO spu, List<ProductSkuDO> skus) {
+        // 处理 SPU
         AppProductSpuDetailRespVO spuVO = convertForGetSpuDetail(spu)
-                .setSalesCount(spu.getSalesCount() + defaultIfNull(spu.getVirtualSalesCount(), 0));
+                .setSalesCount(spu.getSalesCount() + defaultIfNull(spu.getVirtualSalesCount(), 0))
+                .setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
+        // 处理 SKU
         spuVO.setSkus(convertListForGetSpuDetail(skus));
-        // 处理商品属性
-        Map<Long, ProductPropertyValueDetailRespBO> propertyValueMap = convertMap(propertyValues, ProductPropertyValueDetailRespBO::getValueId);
-        for (int i = 0; i < skus.size(); i++) {
-            List<ProductSkuDO.Property> properties = skus.get(i).getProperties();
-            if (CollUtil.isEmpty(properties)) {
-                continue;
-            }
-            AppProductSpuDetailRespVO.Sku sku = spuVO.getSkus().get(i);
-            sku.setProperties(new ArrayList<>(properties.size()));
-            // 遍历每个 properties，设置到 AppSpuDetailRespVO.Sku 中
-            properties.forEach(property -> {
-                ProductPropertyValueDetailRespBO propertyValue = propertyValueMap.get(property.getValueId());
-                if (propertyValue == null) {
-                    return;
-                }
-                sku.getProperties().add(convertForGetSpuDetail(propertyValue));
-            });
+        // 计算 vip 价格 TODO 芋艿：临时的逻辑，等 vip 支持后
+        if (true) {
+            spuVO.setVipPrice((int) (spuVO.getPrice() * 0.9));
+            spuVO.getSkus().forEach(sku -> sku.setVipPrice((int) (sku.getPrice() * 0.9)));
         }
         return spuVO;
     }
@@ -120,8 +107,6 @@ public interface ProductSpuConvert {
     AppProductSpuDetailRespVO convertForGetSpuDetail(ProductSpuDO spu);
 
     List<AppProductSpuDetailRespVO.Sku> convertListForGetSpuDetail(List<ProductSkuDO> skus);
-
-    AppProductPropertyValueDetailRespVO convertForGetSpuDetail(ProductPropertyValueDetailRespBO propertyValue);
 
     default ProductSpuDetailRespVO convertForSpuDetailRespVO(ProductSpuDO spu, List<ProductSkuDO> skus) {
         ProductSpuDetailRespVO productSpuDetailRespVO = convert03(spu);
