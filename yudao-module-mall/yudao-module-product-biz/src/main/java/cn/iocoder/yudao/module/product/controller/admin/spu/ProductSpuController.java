@@ -6,7 +6,9 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
+import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,8 +24,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 
 /**
  * 商品 SPU 相关接口
@@ -38,6 +42,8 @@ public class ProductSpuController {
 
     @Resource
     private ProductSpuService productSpuService;
+    @Resource
+    private ProductSkuService productSkuService;
 
     @PostMapping("/create")
     @Operation(summary = "创建商品 SPU")
@@ -58,7 +64,7 @@ public class ProductSpuController {
     @Operation(summary = "更新商品 SPU Status")
     @PreAuthorize("@ss.hasPermission('product:spu:update')")
     public CommonResult<Boolean> updateStatus(@Valid @RequestBody ProductSpuUpdateStatusReqVO updateReqVO) {
-        productSpuService.updateStatus(updateReqVO);
+        productSpuService.updateSpuStatus(updateReqVO);
         return success(true);
     }
 
@@ -76,7 +82,14 @@ public class ProductSpuController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
     public CommonResult<ProductSpuDetailRespVO> getSpuDetail(@RequestParam("id") Long id) {
-        return success(productSpuService.getSpuDetail(id));
+        // 获得商品 SPU
+        ProductSpuDO spu = productSpuService.getSpu(id);
+        if (spu == null) {
+            throw exception(SPU_NOT_EXISTS);
+        }
+        // 查询商品 SKU
+        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
+        return success(ProductSpuConvert.INSTANCE.convertForSpuDetailRespVO(spu, skus));
     }
 
     @GetMapping("/get-simple-list")

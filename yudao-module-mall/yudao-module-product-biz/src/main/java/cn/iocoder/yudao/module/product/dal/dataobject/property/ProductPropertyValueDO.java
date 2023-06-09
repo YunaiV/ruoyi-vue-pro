@@ -23,13 +23,13 @@ import lombok.*;
 public class ProductPropertyValueDO extends BaseDO {
 
     /**
-     * 默认属性值id
+     * SPU 单规格时，默认属性值 id
      */
-    public static final Long VALUE_ID = 0L;
+    public static final Long ID_DEFAULT = 0L;
     /**
-     * 默认属性值名字
+     * SPU 单规格时，默认属性值名字
      */
-    public static final String VALUE_NAME = "默认";
+    public static final String NAME_DEFAULT = "默认";
 
     /**
      * 主键

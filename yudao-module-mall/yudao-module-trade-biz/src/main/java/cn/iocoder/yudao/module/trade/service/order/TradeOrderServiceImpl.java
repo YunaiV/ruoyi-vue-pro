@@ -100,6 +100,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     private AdminUserApi adminUserApi;
     @Resource
     private NotifyMessageSendApi notifyMessageSendApi;
+
     @Resource
     private TradeOrderProperties tradeOrderProperties;
 
@@ -356,6 +357,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // TODO 芋艿：发送订单变化的消息
 
         // TODO 芋艿：发送站内信 fix
+        // TODO @puhui999：使用 sendSingleMessageToMember 呀；走模版；不用判断模版是否存在哈
         // 1、获取模版编码为 order_delivery 的模版，判断是否存在 存在放回 true
         if (!notifyMessageSendApi.validateNotifyTemplate("order_delivery")) {
             // 1、1 站内信模版不存在则创建模版

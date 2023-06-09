@@ -31,6 +31,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 
+// TODO @芋艿：详细 review 下
 /**
  * 商品评论 Service 实现类
  *
@@ -73,13 +74,17 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     public Map<String, Long> getCommentPageTabsCount(Long spuId, Boolean visible) {
         Map<String, Long> countMap = new HashMap<>(4);
         // 查询商品 id = spuId 的所有评论数量
-        countMap.put(AppCommentPageReqVO.ALL_COUNT, productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.ALL));
+        countMap.put(AppCommentPageReqVO.ALL_COUNT,
+                productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.ALL));
         // 查询商品 id = spuId 的所有好评数量
-        countMap.put(AppCommentPageReqVO.FAVOURABLE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.FAVOURABLE_COMMENT));
+        countMap.put(AppCommentPageReqVO.FAVOURABLE_COMMENT_COUNT,
+                productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.FAVOURABLE_COMMENT));
         // 查询商品 id = spuId 的所有中评数量
-        countMap.put(AppCommentPageReqVO.MEDIOCRE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.MEDIOCRE_COMMENT));
+        countMap.put(AppCommentPageReqVO.MEDIOCRE_COMMENT_COUNT,
+                productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.MEDIOCRE_COMMENT));
         // 查询商品 id = spuId 的所有差评数量
-        countMap.put(AppCommentPageReqVO.NEGATIVE_COMMENT_COUNT, productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.NEGATIVE_COMMENT));
+        countMap.put(AppCommentPageReqVO.NEGATIVE_COMMENT_COUNT,
+                productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.NEGATIVE_COMMENT));
         return countMap;
     }
 
@@ -101,13 +106,14 @@ public class ProductCommentServiceImpl implements ProductCommentService {
 
     @Override
     public void createComment(ProductCommentDO productComment, Boolean system) {
+        // TODO @puhui999：这里不区分是否为 system；直接都校验
         if (!system) {
-            // TODO 判断订单是否存在 fix
+            // TODO 判断订单是否存在 fix；
+            // TODO @puhui999：改成 order 那有个 comment 接口，哪里校验下；商品评论这里不校验订单是否存在哈
             TradeOrderRespDTO order = tradeOrderApi.getOrder(productComment.getOrderId());
             if (null == order) {
                 throw exception(ORDER_NOT_FOUND);
             }
-            // TODO 判断 SPU 是否存在 fix
             ProductSpuDO spu = productSpuService.getSpu(productComment.getSpuId());
             if (null == spu) {
                 throw exception(SPU_NOT_EXISTS);
@@ -146,6 +152,5 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         }
         return productComment;
     }
-
 
 }

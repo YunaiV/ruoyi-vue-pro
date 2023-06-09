@@ -7,21 +7,15 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
-import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
-import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import com.google.common.collect.Maps;
 import org.springframework.context.annotation.Lazy;
@@ -114,9 +108,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         spu.setPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getPrice));
         // sku 单价最低的商品的市场价格
         spu.setMarketPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getMarketPrice));
-        // sku单价最低的商品的成本价格
+        // sku 单价最低的商品的成本价格
         spu.setCostPrice(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getCostPrice));
-        // sku单价最低的商品的条形码
+        // sku 单价最低的商品的条形码
         spu.setBarCode(getMinValue(skus, ProductSkuCreateOrUpdateReqVO::getBarCode));
         // skus 库存总数
         spu.setStock(getSumValue(skus, ProductSkuCreateOrUpdateReqVO::getStock, Integer::sum));
@@ -214,20 +208,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public ProductSpuDetailRespVO getSpuDetail(Long id) {
-        // 获得商品 SPU
-        ProductSpuDO spu = getSpu(id);
-        if (spu == null) {
-            throw exception(SPU_NOT_EXISTS);
-        }
-        // 查询商品 SKU
-        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
-        return ProductSpuConvert.INSTANCE.convertForSpuDetailRespVO(spu, skus);
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateStatus(ProductSpuUpdateStatusReqVO updateReqVO) {
+    public void updateSpuStatus(ProductSpuUpdateStatusReqVO updateReqVO) {
         // 校验存在
         validateSpuExists(updateReqVO.getId());
 
@@ -258,39 +240,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public Long getSpuCountByCategoryId(Long id) {
-        return productSpuMapper.selectCount(ProductSpuDO::getCategoryId, id);
-    }
-
-    @Override
-    public AppProductSpuDetailRespVO getAppProductSpuDetail(Long id) {
-        // 获得商品 SPU
-        ProductSpuDO spu = getSpu(id);
-        if (spu == null) {
-            throw exception(SPU_NOT_EXISTS);
-        }
-        if (!ProductSpuStatusEnum.isEnable(spu.getStatus())) {
-            throw exception(SPU_NOT_ENABLE);
-        }
-
-        // 查询商品 SKU
-        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
-        List<ProductPropertyValueDetailRespBO> propertyValues = new ArrayList<>();
-        // 单规格商品 赋予默认属性值
-        if (ObjectUtil.equal(spu.getSpecType(), false)) {
-            ProductPropertyValueDetailRespBO respBO = new ProductPropertyValueDetailRespBO();
-            respBO.setPropertyId(ProductPropertyDO.PROPERTY_ID);
-            respBO.setPropertyName(ProductPropertyDO.PROPERTY_NAME);
-            respBO.setValueId(ProductPropertyValueDO.VALUE_ID);
-            respBO.setValueName(ProductPropertyValueDO.VALUE_NAME);
-            propertyValues.add(respBO);
-        } else {
-            // 多规格商品则查询商品属性
-            propertyValues = productPropertyValueService
-                    .getPropertyValueDetailList(ProductSkuConvert.INSTANCE.convertPropertyValueIds(skus));
-        }
-        // 拼接
-        return ProductSpuConvert.INSTANCE.convertForGetSpuDetail(spu, skus, propertyValues);
+    public Long getSpuCountByCategoryId(Long categoryId) {
+        return productSpuMapper.selectCount(ProductSpuDO::getCategoryId, categoryId);
     }
 
 }

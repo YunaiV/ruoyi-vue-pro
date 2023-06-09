@@ -68,8 +68,8 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             throw exception(CATEGORY_EXISTS_CHILDREN);
         }
         // 校验分类是否绑定了 SPU
-        Long count = productSpuService.getSpuCountByCategoryId(id);
-        if (0 != count) {
+        Long spuCount = productSpuService.getSpuCountByCategoryId(id);
+        if (spuCount > 0) {
             throw exception(CATEGORY_HAVE_BIND_SPU);
         }
         // 删除

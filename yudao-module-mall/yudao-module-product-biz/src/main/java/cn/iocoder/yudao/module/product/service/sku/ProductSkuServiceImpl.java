@@ -83,21 +83,20 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         if (CollUtil.isEmpty(skus)) {
             throw exception(SKU_NOT_EXISTS);
         }
-        // 单规格处理
+        // 单规格，赋予单规格默认属性
         if (ObjectUtil.equal(specType, false)) {
             ProductSkuCreateOrUpdateReqVO skuVO = skus.get(0);
-            // 赋予单规格默认属性
             List<ProductSkuBaseVO.Property> properties = new ArrayList<>();
             ProductSkuBaseVO.Property property = new ProductSkuBaseVO.Property();
-            property.setPropertyId(ProductPropertyDO.PROPERTY_ID);
-            property.setPropertyName(ProductPropertyDO.PROPERTY_NAME);
-            property.setValueId(ProductPropertyValueDO.VALUE_ID);
-            property.setValueName(ProductPropertyValueDO.VALUE_NAME);
+            property.setPropertyId(ProductPropertyDO.ID_DEFAULT);
+            property.setPropertyName(ProductPropertyDO.NAME_DEFAULT);
+            property.setValueId(ProductPropertyValueDO.ID_DEFAULT);
+            property.setValueName(ProductPropertyValueDO.NAME_DEFAULT);
             properties.add(property);
             skuVO.setProperties(properties);
-            // 单规格不需要后续的校验
-            return;
+            return; // 单规格不需要后续的校验
         }
+
         // 1、校验属性项存在
         Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null)
                 // 遍历多个 Property 属性

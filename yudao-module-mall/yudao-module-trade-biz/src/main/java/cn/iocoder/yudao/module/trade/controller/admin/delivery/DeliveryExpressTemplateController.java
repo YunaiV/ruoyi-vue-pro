@@ -70,7 +70,6 @@ public class DeliveryExpressTemplateController {
         return success(DeliveryExpressTemplateConvert.INSTANCE.convertList(list));
     }
 
-    // TODO @puhui999：DeliveryExpressTemplateRespVO 搞个 simple 的哈 fix
     @GetMapping("/list-all-simple")
     @Operation(summary = "获取快递模版精简信息列表", description = "主要用于前端的下拉选项")
     public CommonResult<List<DeliveryExpressTemplateSimpleRespVO>> getSimpleTemplateList() {

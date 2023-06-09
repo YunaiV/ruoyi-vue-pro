@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 
@@ -107,40 +106,25 @@ public interface ProductSpuService {
     void updateSpuStock(Map<Long, Integer> stockIncrCounts);
 
     /**
-     * 得到spu详细
+     * 更新 SPU 状态
      *
-     * @param id id
-     * @return {@link ProductSpuDetailRespVO}
+     * @param updateReqVO 更新请求
      */
-    ProductSpuDetailRespVO getSpuDetail(Long id);
+    void updateSpuStatus(ProductSpuUpdateStatusReqVO updateReqVO);
 
     /**
-     * 更新状态
+     * 获取 SPU 列表标签对应的 Count 数量
      *
-     * @param updateReqVO 更新请求签证官
-     */
-    void updateStatus(ProductSpuUpdateStatusReqVO updateReqVO);
-
-    /**
-     * 获取spu列表标签对应的Count数量
-     *
-     * @return {@link Map}<{@link Integer}, {@link Integer}>
+     * @return Count 数量
      */
     Map<Integer, Long> getTabsCount();
 
     /**
-     * 通过分类 id 查询 spu 个数
+     * 通过分类 categoryId 查询 SPU 个数
      *
-     * @param id 分类 id
-     * @return spu
+     * @param categoryId 分类 categoryId
+     * @return SPU 数量
      */
-    Long getSpuCountByCategoryId(Long id);
+    Long getSpuCountByCategoryId(Long categoryId);
 
-    /**
-     * 通过 spu id 获取商品 SPU 明细
-     *
-     * @param id id
-     * @return 用户 App - 商品 SPU 明细
-     */
-    AppProductSpuDetailRespVO getAppProductSpuDetail(Long id);
 }
