@@ -164,6 +164,15 @@ public class TradePriceCalculateRespBO {
          */
         private Integer payPrice;
 
+        /**
+         * 商品重量，单位：kg 千克
+         */
+        private Double weight;
+        /**
+         * 商品体积，单位：m^3 平米
+         */
+        private Double volume;
+
         // ========== 商品信息 ==========
         /**
          * 商品名
