@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.convert.favorite;
 
-import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.favorite.ProductFavoriteDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -19,7 +18,7 @@ public interface ProductFavoriteConvert {
 
     ProductFavoriteConvert INSTANCE = Mappers.getMapper(ProductFavoriteConvert.class);
 
-    ProductFavoriteDO convert(Long userId, AppFavoriteReqVO reqVO);
+    ProductFavoriteDO convert(Long userId, Long spuId);
 
     @Mapping(target = "id", source = "favorite.id")
     @Mapping(target = "spuName", source = "spu.name")

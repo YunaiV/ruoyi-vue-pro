@@ -14,9 +14,6 @@ public class AppFavoriteRespVO {
     @Schema(description = "商品 SPU 编号", requiredMode = REQUIRED, example = "29502")
     private Long spuId;
 
-    @Schema(description = "类型", requiredMode = REQUIRED, example = "1")
-    private Integer type;
-
     // ========== 商品相关字段 ==========
 
     @Schema(description = "商品 SPU 名称", example = "赵六")

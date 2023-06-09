@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.product.controller.app.favorite;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoritePageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteRespVO;
@@ -35,21 +36,23 @@ public class AppFavoriteController {
     private ProductSpuService productSpuService;
 
     @PostMapping(value = "/create")
-    @Operation(summary = "商品收藏")
-    //@PreAuthenticated  TODO 暂时注释
+    @Operation(summary = "添加商品收藏")
+    @PreAuthenticated
     public CommonResult<Long> createFavorite(@RequestBody @Valid AppFavoriteReqVO reqVO) {
-        return success(productFavoriteService.createFavorite(getLoginUserId(), reqVO));
+        return success(productFavoriteService.createFavorite(getLoginUserId(), reqVO.getSpuId()));
     }
 
     @DeleteMapping(value = "/delete")
     @Operation(summary = "取消商品收藏")
+    @PreAuthenticated
     public CommonResult<Boolean> deleteFavorite(@RequestBody @Valid AppFavoriteReqVO reqVO) {
-        productFavoriteService.deleteFavorite(getLoginUserId(), reqVO);
+        productFavoriteService.deleteFavorite(getLoginUserId(), reqVO.getSpuId());
         return success(Boolean.TRUE);
     }
 
     @GetMapping(value = "/page")
     @Operation(summary = "分页获取商品收藏列表")
+    @PreAuthenticated
     public CommonResult<PageResult<AppFavoriteRespVO>> getFavoritePage(AppFavoritePageReqVO reqVO) {
         PageResult<ProductFavoriteDO> favoritePage = productFavoriteService.getFavoritePage(getLoginUserId(), reqVO);
         if (CollUtil.isEmpty(favoritePage.getList())) {
@@ -67,11 +70,11 @@ public class AppFavoriteController {
         return success(pageResult);
     }
 
-
     @GetMapping(value = "/exits")
     @Operation(summary = "检查是否收藏过商品")
+    @PreAuthenticated
     public CommonResult<Boolean> isFavoriteExists(AppFavoriteReqVO reqVO) {
-        ProductFavoriteDO favoriteDO = productFavoriteService.getFavorite(getLoginUserId(), reqVO);
+        ProductFavoriteDO favoriteDO = productFavoriteService.getFavorite(getLoginUserId(), reqVO.getSpuId());
         return success(Objects.nonNull(favoriteDO));
     }
 
