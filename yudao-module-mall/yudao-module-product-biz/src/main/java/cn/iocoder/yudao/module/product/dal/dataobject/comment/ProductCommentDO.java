@@ -36,20 +36,18 @@ public class ProductCommentDO extends BaseDO {
 
     /**
      * 评价人 用户编号
+     *
      * 关联 MemberUserDO 的 id 编号
      */
     private Long userId;
-
     /**
      * 评价人名称
      */
     private String userNickname;
-
     /**
      * 评价人头像
      */
     private String userAvatar;
-
     /**
      * 是否匿名
      */
@@ -57,12 +55,13 @@ public class ProductCommentDO extends BaseDO {
 
     /**
      * 交易订单编号
+     *
      * 关联 TradeOrderDO 的 id 编号
      */
     private Long orderId;
-
     /**
      * 交易订单项编号
+     *
      * 关联 TradeOrderItemDO 的 id 编号
      */
     private Long orderItemId;
@@ -72,53 +71,46 @@ public class ProductCommentDO extends BaseDO {
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
-
     /**
      * 商品 SPU 名称
      */
     private String spuName;
-
     /**
      * 商品 SKU 编号
+     *
      * 关联 {@link ProductSkuDO#getId()}
      */
     private Long skuId;
 
     /**
      * 是否可见
-     * true:显示 false:隐藏
+     *
+     * true:显示
+     * false:隐藏
      */
     private Boolean visible;
-
     /**
      * 评分星级
+     *
      * 1-5分
      */
     private Integer scores;
-
     /**
      * 描述星级
+     *
      * 1-5 星
      */
     private Integer descriptionScores;
-
     /**
      * 服务星级
+     *
      * 1-5 星
      */
     private Integer benefitScores;
-
-    /**
-     * 配送星级
-     * 1-5 星
-     */
-    private Integer deliveryScores;
-
     /**
      * 评论内容
      */
     private String content;
-
     /**
      * 评论图片地址数组
      */
@@ -128,38 +120,19 @@ public class ProductCommentDO extends BaseDO {
     /**
      * 商家是否回复
      */
-    private Boolean replied;
-
+    private Boolean replyStatus;
     /**
      * 回复管理员编号
      * 关联 AdminUserDO 的 id 编号
      */
     private Long replyUserId;
-
     /**
      * 商家回复内容
      */
     private String replyContent;
-
     /**
      * 商家回复时间
      */
     private LocalDateTime replyTime;
-
-    /**
-     * 追加评价内容
-     */
-    private String additionalContent;
-
-    /**
-     * 追评评价图片地址数组
-     */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<String> additionalPicUrls;
-
-    /**
-     * 追加评价时间
-     */
-    private LocalDateTime additionalTime;
 
 }

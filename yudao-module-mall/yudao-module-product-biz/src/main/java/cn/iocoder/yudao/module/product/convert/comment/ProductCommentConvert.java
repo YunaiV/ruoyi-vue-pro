@@ -30,6 +30,7 @@ public interface ProductCommentConvert {
 
     PageResult<AppCommentRespVO> convertPage02(PageResult<ProductCommentDO> pageResult);
 
+    // TODO @puhui999：用 mapstruct 的映射
     default ProductCommentDO convert(MemberUserRespDTO user, AppCommentCreateReqVO createReqVO) {
         ProductCommentDO productComment = new ProductCommentDO();
         productComment.setUserId(user.getId());
@@ -44,12 +45,12 @@ public interface ProductCommentConvert {
         productComment.setScores(createReqVO.getScores());
         productComment.setDescriptionScores(createReqVO.getDescriptionScores());
         productComment.setBenefitScores(createReqVO.getBenefitScores());
-        productComment.setDeliveryScores(createReqVO.getDeliveryScores());
         productComment.setContent(createReqVO.getContent());
         productComment.setPicUrls(createReqVO.getPicUrls());
         return productComment;
     }
 
+    // TODO @puhui999：用 mapstruct 的映射
     default ProductCommentDO convert(ProductCommentCreateReqVO createReq) {
         ProductCommentDO productComment = new ProductCommentDO();
         productComment.setUserId(0L);
@@ -64,7 +65,6 @@ public interface ProductCommentConvert {
         productComment.setScores(createReq.getScores());
         productComment.setDescriptionScores(createReq.getDescriptionScores());
         productComment.setBenefitScores(createReq.getBenefitScores());
-        productComment.setDeliveryScores(createReq.getDeliveryScores());
         productComment.setContent(createReq.getContent());
         productComment.setPicUrls(createReq.getPicUrls());
         return productComment;

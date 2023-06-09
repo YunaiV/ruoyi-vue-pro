@@ -14,7 +14,9 @@ import java.util.List;
 @ToString(callSuper = true)
 public class AppCommentRespVO extends AppCommentBaseVO {
 
-    @Schema(description = "评价人 用户编号", required = true, example = "15721")
+    // TODO puhui999：把 example 也补充下哈
+
+    @Schema(description = "评价人的用户编号", required = true, example = "15721")
     private Long userId;
 
     @Schema(description = "评价人名称", required = true, example = "张三")
@@ -36,7 +38,7 @@ public class AppCommentRespVO extends AppCommentBaseVO {
     private Long orderItemId;
 
     @Schema(description = "商家是否回复", required = true)
-    private Boolean replied;
+    private Boolean replyStatus;
 
     @Schema(description = "回复管理员编号", example = "22212")
     private Long replyUserId;
@@ -61,4 +63,5 @@ public class AppCommentRespVO extends AppCommentBaseVO {
 
     @Schema(description = "最终评分", required = true)
     private Integer finalScore;
+
 }

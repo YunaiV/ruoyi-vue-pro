@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
-import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentAdditionalReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentRespVO;
@@ -22,6 +21,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
+// TODO @puhui999：AppCommentController =》 AppProductCommentController
 @Tag(name = "用户 APP - 商品评价")
 @RestController
 @RequestMapping("/product/comment")
@@ -40,8 +40,9 @@ public class AppCommentController {
         return success(productCommentService.getCommentPage(pageVO, Boolean.TRUE));
     }
 
+    // TODO @puhui999：方法名改成 getCommentStatistics？然后搞个对应的 vo？想了下，这样更优雅
     @GetMapping("/get-count")
-    @Operation(summary = "获得商品评价分页 tab count")
+    @Operation(summary = "获得商品的评价统计") // TODO @puhui999：@RequestParam 哈，针对 spuId
     public CommonResult<Map<String, Long>> getCommentPage(@Valid Long spuId) {
         return success(productCommentService.getCommentPageTabsCount(spuId, Boolean.TRUE));
     }
@@ -50,17 +51,9 @@ public class AppCommentController {
     @Operation(summary = "创建商品评价")
     public CommonResult<Boolean> createComment(@RequestBody AppCommentCreateReqVO createReqVO) {
         // TODO: 2023/3/20 要不要判断订单、商品是否存在
+        // TODO @ouhui999：这个接口，搞到交易那比较合适；
         MemberUserRespDTO user = memberUserApi.getUser(getLoginUserId());
         productCommentService.createComment(ProductCommentConvert.INSTANCE.convert(user, createReqVO), Boolean.FALSE);
-        return success(true);
-    }
-
-    @PostMapping(value = "/additional")
-    @Operation(summary = "追加评论")
-    public CommonResult<Boolean> additionalComment(@RequestBody AppCommentAdditionalReqVO createReqVO) {
-        // 查询会员
-        MemberUserRespDTO user = memberUserApi.getUser(getLoginUserId());
-        productCommentService.additionalComment(user, createReqVO);
         return success(true);
     }
 

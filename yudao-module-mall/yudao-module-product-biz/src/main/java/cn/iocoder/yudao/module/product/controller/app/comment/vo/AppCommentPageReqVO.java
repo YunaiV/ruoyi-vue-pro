@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class AppCommentPageReqVO extends PageParam {
 
+    // TODO @puhui999：不传递就是 all；
     /**
      * 所有
      */
@@ -24,11 +25,13 @@ public class AppCommentPageReqVO extends PageParam {
      */
     public static final String ALL_COUNT = "allCount";
 
+    // TODO @puhui999：good 好评；
     /**
      * 好评
      */
     public static final Integer FAVOURABLE_COMMENT = 1;
 
+    // TODO @puhui999：medium 中评；然后 mediumCount 就好啦；
     /**
      * 好评数量 key
      */
@@ -54,6 +57,7 @@ public class AppCommentPageReqVO extends PageParam {
      */
     public static final String NEGATIVE_COMMENT_COUNT = "negativeCommentCount";
 
+    // TODO @puhui999：这个挪到 DO 那没问题的哈；NICKNAME_ANONYMOUS
     /**
      * 默认匿名昵称
      */

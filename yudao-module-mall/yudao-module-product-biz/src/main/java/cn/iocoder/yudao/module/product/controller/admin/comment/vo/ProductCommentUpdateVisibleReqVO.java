@@ -15,7 +15,7 @@ public class ProductCommentUpdateVisibleReqVO {
     @NotNull(message = "评价编号不能为空")
     private Long id;
 
-    @Schema(description = "是否可见 true:显示 false:隐藏", required = true, example = "false")
+    @Schema(description = "是否可见", required = true, example = "false")
     @NotNull(message = "是否可见不能为空")
     private Boolean visible;
 

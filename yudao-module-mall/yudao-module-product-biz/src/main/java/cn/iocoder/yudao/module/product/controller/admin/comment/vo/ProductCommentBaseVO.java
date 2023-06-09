@@ -10,6 +10,8 @@ import java.util.List;
 @Data
 public class ProductCommentBaseVO {
 
+    // TODO @puhui999：把 example 补充下
+
     @Schema(description = "评价人名称", required = true, example = "张三")
     @NotNull(message = "评价人名称不能为空")
     private String userNickname;
@@ -18,33 +20,29 @@ public class ProductCommentBaseVO {
     @NotNull(message = "评价人头像不能为空")
     private String userAvatar;
 
-    @Schema(description = "商品SPU编号", required = true, example = "29502")
-    @NotNull(message = "商品SPU编号不能为空")
+    @Schema(description = "商品 SPU 编号", required = true, example = "29502")
+    @NotNull(message = "商品 SPU 编号不能为空")
     private Long spuId;
 
-    @Schema(description = "商品SPU名称", required = true, example = "赵六")
-    @NotNull(message = "商品SPU名称不能为空")
+    @Schema(description = "商品 SPU 名称", required = true, example = "赵六")
+    @NotNull(message = "商品 SPU 名称不能为空")
     private String spuName;
 
-    @Schema(description = "商品SKU编号", required = true, example = "3082")
-    @NotNull(message = "商品SKU编号不能为空")
+    @Schema(description = "商品 SKU 编号", required = true, example = "3082")
+    @NotNull(message = "商品 SKU 编号不能为空")
     private Long skuId;
 
     @Schema(description = "评分星级 1-5分", required = true)
-    @NotNull(message = "评分星级 1-5分不能为空")
+    @NotNull(message = "评分星级不能为空")
     private Integer scores;
 
     @Schema(description = "描述星级 1-5分", required = true)
-    @NotNull(message = "描述星级 1-5分不能为空")
+    @NotNull(message = "描述星级不能为空")
     private Integer descriptionScores;
 
     @Schema(description = "服务星级 1-5分", required = true)
-    @NotNull(message = "服务星级 1-5分不能为空")
+    @NotNull(message = "服务星级分不能为空")
     private Integer benefitScores;
-
-    @Schema(description = "配送星级 1-5分", required = true)
-    @NotNull(message = "配送星级 1-5分不能为空")
-    private Integer deliveryScores;
 
     @Schema(description = "评论内容", required = true)
     @NotNull(message = "评论内容不能为空")

@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Schema(description = "管理后台 - 商品评价 Response VO")
 @Data
@@ -33,7 +32,7 @@ public class ProductCommentRespVO extends ProductCommentBaseVO {
     private Boolean visible;
 
     @Schema(description = "商家是否回复：[1:回复 0:未回复]", required = true)
-    private Boolean replied;
+    private Boolean replyStatus;
 
     @Schema(description = "回复管理员编号", example = "22212")
     private Long replyUserId;
@@ -43,15 +42,6 @@ public class ProductCommentRespVO extends ProductCommentBaseVO {
 
     @Schema(description = "商家回复时间")
     private LocalDateTime replyTime;
-
-    @Schema(description = "追加评价内容")
-    private String additionalContent;
-
-    @Schema(description = "追评评价图片地址数组，以逗号分隔最多上传9张")
-    private List<String> additionalPicUrls;
-
-    @Schema(description = "追加评价时间")
-    private LocalDateTime additionalTime;
 
     @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;

@@ -35,6 +35,7 @@ public class ProductCommentController {
         return success(ProductCommentConvert.INSTANCE.convertPage(pageResult));
     }
 
+    // TODO @puhui999：update-visible
     @PutMapping("/update/visible")
     @Operation(summary = "显示 / 隐藏评论")
     @PreAuthorize("@ss.hasPermission('product:comment:update')")
@@ -55,6 +56,7 @@ public class ProductCommentController {
     @Operation(summary = "添加自评")
     @PreAuthorize("@ss.hasPermission('product:comment:update')")
     public CommonResult<Boolean> createComment(@Valid @RequestBody ProductCommentCreateReqVO createReqVO) {
+        // TODO @puhui999：不用 ProductCommentConvert.INSTANCE.convert(createReqVO) 哈；多写一个 create 方法即可；
         productCommentService.createComment(ProductCommentConvert.INSTANCE.convert(createReqVO), Boolean.TRUE);
         return success(true);
     }

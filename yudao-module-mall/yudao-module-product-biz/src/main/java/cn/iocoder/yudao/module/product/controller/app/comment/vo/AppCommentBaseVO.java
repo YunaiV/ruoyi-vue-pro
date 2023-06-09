@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
+// TODO @puhui999：把 Product 前缀给补下哈
 @Data
 public class AppCommentBaseVO {
 
@@ -33,10 +34,6 @@ public class AppCommentBaseVO {
     @Schema(description = "服务星级 1-5分", required = true)
     @NotNull(message = "服务星级 1-5分不能为空")
     private Integer benefitScores;
-
-    @Schema(description = "配送星级 1-5分", required = true)
-    @NotNull(message = "配送星级 1-5分不能为空")
-    private Integer deliveryScores;
 
     @Schema(description = "评论内容", required = true)
     @NotNull(message = "评论内容不能为空")

@@ -82,7 +82,7 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
             o.setUserNickname("王二狗");
             o.setSpuName("感冒药");
             o.setScores(ProductCommentScoresEnum.FOUR.getScores());
-            o.setReplied(Boolean.TRUE);
+            o.setReplyStatus(Boolean.TRUE);
             o.setVisible(Boolean.TRUE);
             o.setId(generateId());
             o.setUserId(generateId());
@@ -118,7 +118,7 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         // 测试 scores 不匹配
         productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setScores(ProductCommentScoresEnum.ONE.getScores())));
         // 测试 replied 不匹配
-        productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setReplied(Boolean.FALSE)));
+        productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setReplyStatus(Boolean.FALSE)));
         // 测试 visible 不匹配
         productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setVisible(Boolean.FALSE)));
 
