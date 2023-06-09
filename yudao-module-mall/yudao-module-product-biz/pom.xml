@@ -23,7 +23,12 @@
             <artifactId>yudao-module-product-api</artifactId>
             <version>${revision}</version>
         </dependency>
-
+        <!-- TODO 芋艿：看看~~~ -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-trade-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-member-api</artifactId>

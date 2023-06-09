@@ -68,7 +68,10 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             throw exception(CATEGORY_EXISTS_CHILDREN);
         }
         // 校验分类是否绑定了 SPU
-        validateProductCategoryIsHaveBindSpu(id);
+        Long count = productSpuService.getSpuCountByCategoryId(id);
+        if (0 != count) {
+            throw exception(CATEGORY_HAVE_BIND_SPU);
+        }
         // 删除
         productCategoryMapper.deleteById(id);
     }
@@ -93,14 +96,6 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         ProductCategoryDO category = productCategoryMapper.selectById(id);
         if (category == null) {
             throw exception(CATEGORY_NOT_EXISTS);
-        }
-    }
-
-    // TODO @puhui999：不用抽方法，因为不太会复用这个方法哈。
-    private void validateProductCategoryIsHaveBindSpu(Long id) {
-        Long count = productSpuService.getSpuCountByCategoryId(id);
-        if (0 != count) {
-            throw exception(CATEGORY_HAVE_BIND_SPU);
         }
     }
 

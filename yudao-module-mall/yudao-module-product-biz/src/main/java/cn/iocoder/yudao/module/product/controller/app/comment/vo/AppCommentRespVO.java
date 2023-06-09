@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class AppCommentRespVO extends AppCommentBaseVO {
     @Schema(description = "订单项编号", required = true, example = "24965")
     private Long id;
 
-    @Schema(description = "是否匿名：[0:不匿名 1:匿名]", required = true)
+    @Schema(description = "是否匿名", required = true)
     private Boolean anonymous;
 
     @Schema(description = "交易订单编号", required = true, example = "24428")
@@ -36,7 +35,7 @@ public class AppCommentRespVO extends AppCommentBaseVO {
     @Schema(description = "交易订单项编号", required = true, example = "8233")
     private Long orderItemId;
 
-    @Schema(description = "商家是否回复：[1:回复 0:未回复]", required = true)
+    @Schema(description = "商家是否回复", required = true)
     private Boolean replied;
 
     @Schema(description = "回复管理员编号", example = "22212")
@@ -60,4 +59,6 @@ public class AppCommentRespVO extends AppCommentBaseVO {
     @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
+    @Schema(description = "最终评分", required = true)
+    private Integer finalScore;
 }

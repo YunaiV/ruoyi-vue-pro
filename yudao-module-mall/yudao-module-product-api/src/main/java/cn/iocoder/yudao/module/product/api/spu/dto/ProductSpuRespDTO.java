@@ -103,6 +103,15 @@ public class ProductSpuRespDTO {
      */
     private Integer stock;
 
+    // ========== 物流相关字段 =========
+
+    /**
+     * 物流配置模板编号
+     *
+     * 对应 TradeDeliveryExpressTemplateDO 的 id 编号
+     */
+    private Long deliveryTemplateId;
+
     // ========== 统计相关字段 =========
 
     /**

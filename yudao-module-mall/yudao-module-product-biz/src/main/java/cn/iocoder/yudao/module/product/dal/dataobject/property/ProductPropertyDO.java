@@ -22,6 +22,15 @@ import lombok.*;
 public class ProductPropertyDO extends BaseDO {
 
     /**
+     * 默认属性id
+     */
+    public static final Long PROPERTY_ID = 0L;
+    /**
+     * 默认属性名字
+     */
+    public static final String PROPERTY_NAME = "默认";
+
+    /**
      * 主键
      */
     @TableId

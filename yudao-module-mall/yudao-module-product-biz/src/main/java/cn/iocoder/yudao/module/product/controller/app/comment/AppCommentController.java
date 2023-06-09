@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentCreat
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentRespVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
-import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.service.comment.ProductCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -37,8 +37,13 @@ public class AppCommentController {
     @GetMapping("/page")
     @Operation(summary = "获得商品评价分页")
     public CommonResult<PageResult<AppCommentRespVO>> getCommentPage(@Valid AppCommentPageReqVO pageVO) {
-        PageResult<ProductCommentDO> pageResult = productCommentService.getCommentPage(pageVO, Boolean.TRUE);
-        return success(ProductCommentConvert.INSTANCE.convertPage02(pageResult));
+        return success(productCommentService.getCommentPage(pageVO, Boolean.TRUE));
+    }
+
+    @GetMapping("/get-count")
+    @Operation(summary = "获得商品评价分页 tab count")
+    public CommonResult<Map<String, Long>> getCommentPage(@Valid Long spuId) {
+        return success(productCommentService.getCommentPageTabsCount(spuId, Boolean.TRUE));
     }
 
     @PostMapping(value = "/create")

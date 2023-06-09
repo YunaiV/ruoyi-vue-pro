@@ -6,7 +6,9 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
@@ -21,6 +23,11 @@ import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
+import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
+import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
+import cn.iocoder.yudao.module.system.api.notify.dto.NotifyTemplateReqDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.enums.notify.NotifyTemplateTypeEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
@@ -29,6 +36,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettle
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
@@ -38,6 +46,7 @@ import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.cart.TradeCartService;
+import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
@@ -74,6 +83,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     private TradeCartService tradeCartService;
     @Resource
     private TradePriceService tradePriceService;
+    @Resource
+    private DeliveryExpressService deliveryExpressService;
 
     @Resource
     private ProductSkuApi productSkuApi;
@@ -85,7 +96,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     private CouponApi couponApi;
     @Resource
     private MemberUserApi memberUserApi;
-
+    @Resource
+    private AdminUserApi adminUserApi;
+    @Resource
+    private NotifyMessageSendApi notifyMessageSendApi;
     @Resource
     private TradeOrderProperties tradeOrderProperties;
 
@@ -123,7 +137,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     /**
      * 计算订单价格
      *
-     * @param userId 用户编号
+     * @param userId          用户编号
      * @param settlementReqVO 结算信息
      * @return 订单价格
      */
@@ -162,7 +176,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     /**
      * 校验收件地址是否存在
      *
-     * @param userId 用户编号
+     * @param userId    用户编号
      * @param addressId 收件地址编号
      * @return 收件地址
      */
@@ -181,7 +195,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         order.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
         order.setType(TradeOrderTypeEnum.NORMAL.getType());
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
-        order.setProductCount(getSumValue(calculateRespBO.getItems(),  TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
+        order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
         order.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
         // 支付信息
         order.setAdjustPrice(0).setPayed(false);
@@ -201,12 +215,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     /**
      * 执行创建完创建完订单后的逻辑
-     *
+     * <p>
      * 例如说：优惠劵的扣减、积分的扣减、支付单的创建等等
      *
-     * @param userId 用户编号
-     * @param createReqVO 创建订单请求
-     * @param tradeOrderDO 交易订单
+     * @param userId          用户编号
+     * @param createReqVO     创建订单请求
+     * @param tradeOrderDO    交易订单
      * @param calculateRespBO 订单价格计算结果
      */
     private void afterCreateTradeOrder(Long userId, AppTradeOrderCreateReqVO createReqVO,
@@ -265,11 +279,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     /**
      * 校验交易订单满足被支付的条件
-     *
+     * <p>
      * 1. 交易订单未支付
      * 2. 支付单已支付
      *
-     * @param id 交易订单编号
+     * @param id         交易订单编号
      * @param payOrderId 支付订单编号
      * @return 交易订单
      */
@@ -324,8 +338,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     public void deliveryOrder(Long userId, TradeOrderDeliveryReqVO deliveryReqVO) {
         // 校验并获得交易订单（可发货）
         TradeOrderDO order = validateOrderDeliverable(deliveryReqVO.getId());
-
-        // TODO 芋艿：logisticsId 校验存在
+        // TODO 芋艿：logisticsId 校验存在 发货物流公司 fix
+        DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
+        if (deliveryExpress == null) {
+            throw exception(DELIVERY_EXPRESS_NOT_EXISTS);
+        }
 
         // 更新 TradeOrderDO 状态为已发货，等待收货
         int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(),
@@ -338,8 +355,32 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
         // TODO 芋艿：发送订单变化的消息
 
-        // TODO 芋艿：发送站内信
-
+        // TODO 芋艿：发送站内信 fix
+        // 1、获取模版编码为 order_delivery 的模版，判断是否存在 存在放回 true
+        if (!notifyMessageSendApi.validateNotifyTemplate("order_delivery")) {
+            // 1、1 站内信模版不存在则创建模版
+            NotifyTemplateReqDTO templateReqDTO = new NotifyTemplateReqDTO();
+            templateReqDTO.setName("订单发货通知模版");
+            templateReqDTO.setCode("order_delivery");
+            templateReqDTO.setType(NotifyTemplateTypeEnum.NOTIFICATION_MESSAGE.getType()); // 系统消息
+            // 获取操作用户
+            // AdminUserRespDTO user = adminUserApi.getUser(userId);
+            // templateReqDTO.setNickname(user.getNickname());
+            templateReqDTO.setNickname(UserTypeEnum.ADMIN.getName());
+            templateReqDTO.setContent("订单:{orderId}{msg}");
+            templateReqDTO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            notifyMessageSendApi.createNotifyTemplate(templateReqDTO);
+        }
+        // 2、构造消息
+        Map<String, Object> msgMap = new HashMap<>();
+        msgMap.put("orderId", deliveryReqVO.getId());
+        msgMap.put("msg", TradeOrderStatusEnum.DELIVERED.getStatus());
+        // 2、发送站内信
+        notifyMessageSendApi.sendSingleMessageToAdmin(
+                new NotifySendSingleToUserReqDTO()
+                        .setUserId(userId)
+                        .setTemplateCode("order_delivery")
+                        .setTemplateParams(msgMap));
         // TODO 芋艿：OrderLog
 
         // TODO 设计：like：是否要单独一个 delivery 发货单表？？？
@@ -349,7 +390,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     /**
      * 校验交易订单满足被发货的条件
-     *
+     * <p>
      * 1. 交易订单未发货
      *
      * @param id 交易订单编号
@@ -363,7 +404,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         }
         // 校验订单是否是待发货状态
         if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())
-            || ObjectUtil.notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus())) {
+                || ObjectUtil.notEqual(order.getDeliveryStatus(), TradeOrderDeliveryStatusEnum.UNDELIVERED.getStatus())) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
         return order;
@@ -397,11 +438,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     /**
      * 校验交易订单满足可售货的条件
-     *
+     * <p>
      * 1. 交易订单待收货
      *
      * @param userId 用户编号
-     * @param id 交易订单编号
+     * @param id     交易订单编号
      * @return 交易订单
      */
     private TradeOrderDO validateOrderReceivable(Long userId, Long id) {
@@ -476,7 +517,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     public void updateOrderItemAfterSaleStatus(Long id, Integer oldAfterSaleStatus, Integer newAfterSaleStatus, Integer refundPrice) {
         // 如果退款成功，则 refundPrice 非空
         if (Objects.equals(newAfterSaleStatus, TradeOrderItemAfterSaleStatusEnum.SUCCESS.getStatus())
-            && refundPrice == null) {
+                && refundPrice == null) {
             throw new IllegalArgumentException(StrUtil.format("id({}) 退款成功，退款金额不能为空", id));
         }
 

@@ -6,10 +6,12 @@ import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplat
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplatePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
+import cn.iocoder.yudao.module.trade.service.delivery.bo.SpuDeliveryExpressTemplateRespBO;
 
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 快递运费模板 Service 接口
@@ -73,11 +75,21 @@ public interface DeliveryExpressTemplateService {
 
     /**
      * 校验快递运费模板
-     *
+     * <p>
      * 如果校验不通过，抛出 {@link cn.iocoder.yudao.framework.common.exception.ServiceException} 异常
      *
      * @param templateId 模板编号
      * @return 快递运费模板
      */
     DeliveryExpressTemplateDO validateDeliveryExpressTemplate(Long templateId);
+
+    /**
+     * 基于指定的 SPU 编号数组和收件人地址区域编号. 获取匹配运费模板
+     *
+     * @param ids    SPU 编号列表
+     * @param areaId 区域编号
+     * @return Map (spuId -> 运费模板设置)
+     */
+    Map<Long, SpuDeliveryExpressTemplateRespBO> getExpressTemplateBySpuIdsAndArea(Collection<Long> ids, Integer areaId);
+
 }

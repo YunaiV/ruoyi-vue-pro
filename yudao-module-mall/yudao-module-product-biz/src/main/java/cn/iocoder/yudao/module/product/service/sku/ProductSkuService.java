@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.product.service.sku;
 
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
-import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 
 import java.util.Collection;
@@ -111,16 +109,18 @@ public interface ProductSkuService {
     /**
      * 更新 sku 属性
      *
-     * @param updateObj 属性对象
+     * @param propertyId   属性 id
+     * @param propertyName 属性名
      * @return int 影响的行数
      */
-    int updateSkuProperty(ProductPropertyDO updateObj);
+    int updateSkuProperty(Long propertyId, String propertyName);
 
     /**
      * 更新 sku 属性值
      *
-     * @param updateObj 属性值对象
+     * @param propertyValueId   属性值 id
+     * @param propertyValueName 属性值名字
      * @return int 影响的行数
      */
-    int updateSkuPropertyValue(ProductPropertyValueDO updateObj);
+    int updateSkuPropertyValue(Long propertyValueId, String propertyValueName);
 }

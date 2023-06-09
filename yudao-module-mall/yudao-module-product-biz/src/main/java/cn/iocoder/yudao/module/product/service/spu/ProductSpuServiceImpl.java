@@ -7,15 +7,21 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.ProductCategoryListReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuCreateOrUpdateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.product.service.brand.ProductBrandService;
 import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
+import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
+import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import com.google.common.collect.Maps;
 import org.springframework.context.annotation.Lazy;
@@ -51,6 +57,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private ProductBrandService brandService;
     @Resource
     private ProductCategoryService categoryService;
+    @Resource
+    @Lazy // 循环依赖，避免报错
+    private ProductPropertyValueService productPropertyValueService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -141,7 +150,11 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // 校验存在
         validateSpuExists(id);
         // 校验商品状态不是回收站不能删除
-        validateSpuStatus(id);
+        ProductSpuDO spuDO = productSpuMapper.selectById(id);
+        // 判断 SPU 状态是否为回收站
+        if (ObjectUtil.notEqual(spuDO.getStatus(), ProductSpuStatusEnum.RECYCLE.getStatus())) {
+            throw exception(SPU_NOT_RECYCLE);
+        }
 
         // 删除 SPU
         productSpuMapper.deleteById(id);
@@ -152,20 +165,6 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     private void validateSpuExists(Long id) {
         if (productSpuMapper.selectById(id) == null) {
             throw exception(SPU_NOT_EXISTS);
-        }
-    }
-
-    /**
-     * 验证 SPU 状态是否为回收站
-     *
-     * @param id id
-     */
-    // TODO puhui999：感觉不用独立出来一个方法，直接在 deleteSpu 方法中校验即可
-    private void validateSpuStatus(Long id) {
-        ProductSpuDO spuDO = productSpuMapper.selectById(id);
-        // 判断 SPU 状态是否为回收站
-        if (ObjectUtil.notEqual(spuDO.getStatus(), ProductSpuStatusEnum.RECYCLE.getStatus())) {
-            throw exception(SPU_NOT_RECYCLE);
         }
     }
 
@@ -261,6 +260,37 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Override
     public Long getSpuCountByCategoryId(Long id) {
         return productSpuMapper.selectCount(ProductSpuDO::getCategoryId, id);
+    }
+
+    @Override
+    public AppProductSpuDetailRespVO getAppProductSpuDetail(Long id) {
+        // 获得商品 SPU
+        ProductSpuDO spu = getSpu(id);
+        if (spu == null) {
+            throw exception(SPU_NOT_EXISTS);
+        }
+        if (!ProductSpuStatusEnum.isEnable(spu.getStatus())) {
+            throw exception(SPU_NOT_ENABLE);
+        }
+
+        // 查询商品 SKU
+        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
+        List<ProductPropertyValueDetailRespBO> propertyValues = new ArrayList<>();
+        // 单规格商品 赋予默认属性值
+        if (ObjectUtil.equal(spu.getSpecType(), false)) {
+            ProductPropertyValueDetailRespBO respBO = new ProductPropertyValueDetailRespBO();
+            respBO.setPropertyId(ProductPropertyDO.PROPERTY_ID);
+            respBO.setPropertyName(ProductPropertyDO.PROPERTY_NAME);
+            respBO.setValueId(ProductPropertyValueDO.VALUE_ID);
+            respBO.setValueName(ProductPropertyValueDO.VALUE_NAME);
+            propertyValues.add(respBO);
+        } else {
+            // 多规格商品则查询商品属性
+            propertyValues = productPropertyValueService
+                    .getPropertyValueDetailList(ProductSkuConvert.INSTANCE.convertPropertyValueIds(skus));
+        }
+        // 拼接
+        return ProductSpuConvert.INSTANCE.convertForGetSpuDetail(spu, skus, propertyValues);
     }
 
 }
