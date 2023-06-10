@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuExportReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
@@ -66,7 +67,10 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
         // 推荐类型的过滤条件
         if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_HOT)) {
             query.eq(ProductSpuDO::getRecommendHot, true);
+        } else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_GOOD)) {
+            query.eq(ProductSpuDO::getRecommendGood, true);
         }
+
         // 排序逻辑
         if (Objects.equals(pageReqVO.getSortField(), AppProductSpuPageReqVO.SORT_FIELD_SALES_COUNT)) {
             query.last(String.format(" ORDER BY (sales_count + virtual_sales_count) %s, sort DESC, id DESC",
@@ -78,6 +82,21 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
             query.orderByDesc(ProductSpuDO::getSort).orderByDesc(ProductSpuDO::getId);
         }
         return selectPage(pageReqVO, query);
+    }
+
+    default List<ProductSpuDO> selectListByRecommendType(String recommendType, Integer count) {
+        QueryWrapperX<ProductSpuDO> query = new QueryWrapperX<>();
+        // 上架状态 且有库存
+        query.eq("status", ProductSpuStatusEnum.ENABLE.getStatus()).gt("stock", 0);
+        // 推荐类型的过滤条件
+        if (ObjUtil.equal(recommendType, AppProductSpuPageReqVO.RECOMMEND_TYPE_HOT)) {
+            query.eq("recommend_hot", true);
+        } else if (ObjUtil.equal(recommendType, AppProductSpuPageReqVO.RECOMMEND_TYPE_GOOD)) {
+            query.eq("recommend_good", true);
+        }
+        // 设置最大长度
+        query.limitN(count);
+        return selectList(query);
     }
 
     /**
@@ -111,33 +130,34 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
     }
 
     /**
-     * 验证选项卡类型构建条件
+     * 添加后台 Tab 选项的查询条件
      *
      * @param tabType      标签类型
-     * @param queryWrapper 查询条件
+     * @param query 查询条件
      */
-    static void appendTabQuery(Integer tabType, LambdaQueryWrapperX<ProductSpuDO> queryWrapper) {
+    static void appendTabQuery(Integer tabType, LambdaQueryWrapperX<ProductSpuDO> query) {
         // 出售中商品
         if (ObjectUtil.equals(ProductSpuPageReqVO.FOR_SALE, tabType)) {
-            queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus());
+            query.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus());
         }
         // 仓储中商品
         if (ObjectUtil.equals(ProductSpuPageReqVO.IN_WAREHOUSE, tabType)) {
-            queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus());
+            query.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus());
         }
         // 已售空商品
         if (ObjectUtil.equals(ProductSpuPageReqVO.SOLD_OUT, tabType)) {
-            queryWrapper.eqIfPresent(ProductSpuDO::getStock, 0);
+            query.eqIfPresent(ProductSpuDO::getStock, 0);
         }
         // 警戒库存
         if (ObjectUtil.equals(ProductSpuPageReqVO.ALERT_STOCK, tabType)) {
-            queryWrapper.le(ProductSpuDO::getStock, ProductConstants.ALERT_STOCK)
+            query.le(ProductSpuDO::getStock, ProductConstants.ALERT_STOCK)
                     // 如果库存触发警戒库存且状态为回收站的话则不在警戒库存列表展示
                     .notIn(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus());
         }
         // 回收站
         if (ObjectUtil.equals(ProductSpuPageReqVO.RECYCLE_BIN, tabType)) {
-            queryWrapper.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus());
+            query.eqIfPresent(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus());
         }
     }
+
 }

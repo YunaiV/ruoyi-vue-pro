@@ -20,6 +20,7 @@ public class AppProductSpuPageReqVO extends PageParam {
     public static final String SORT_FIELD_SALES_COUNT = "salesCount";
 
     public static final String RECOMMEND_TYPE_HOT = "hot";
+    public static final String RECOMMEND_TYPE_GOOD = "good";
 
     @Schema(description = "分类编号", example = "1")
     private Long categoryId;
@@ -33,7 +34,7 @@ public class AppProductSpuPageReqVO extends PageParam {
     @Schema(description = "排序方式", example = "true")
     private Boolean sortAsc;
 
-    @Schema(description = "推荐类型", example = "hot") // 参见 AppProductSpuPageReqVO.RECOMMEND_TYPE_XXX 常亮
+    @Schema(description = "推荐类型", example = "hot") // 参见 AppProductSpuPageReqVO.RECOMMEND_TYPE_XXX 常量
     private String recommendType;
 
     @AssertTrue(message = "排序字段不合法")

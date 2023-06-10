@@ -5,9 +5,9 @@ import lombok.Data;
 
 import java.util.List;
 
-@Schema(description = "用户 App - 商品 SPU 分页项 Response VO")
+@Schema(description = "用户 App - 商品 SPU Response VO")
 @Data
-public class AppProductSpuPageItemRespVO {
+public class AppProductSpuPageRespVO {
 
     @Schema(description = "商品 SPU 编号", required = true, example = "1")
     private Long id;
@@ -34,6 +34,11 @@ public class AppProductSpuPageItemRespVO {
 
     @Schema(description = "库存", required = true, example = "666")
     private Integer stock;
+
+    // ========== 营销相关字段 =========
+
+    @Schema(description = "活动排序数组", required = true, example = "1024")
+    private List<Integer> activityOrders;
 
     // ========== 统计相关字段 =========
 
