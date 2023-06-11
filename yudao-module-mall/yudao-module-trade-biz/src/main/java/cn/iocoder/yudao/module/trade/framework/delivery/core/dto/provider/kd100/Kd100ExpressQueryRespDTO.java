@@ -18,23 +18,22 @@ public class Kd100ExpressQueryRespDTO {
      */
     @JsonProperty("com")
     private String expressCompanyCode;
-
     /**
      * 快递单号
      */
     @JsonProperty("nu")
     private String logisticsNo;
-
     /**
      * 快递单当前状态
      */
     private String state;
 
     /**
-     * 查询结果， 失败返回 "false"
+     * 查询结果
+     *
+     * 失败返回 "false"
      */
     private String result;
-
     /**
      * 查询结果失败时的错误信息
      */
@@ -56,4 +55,5 @@ public class Kd100ExpressQueryRespDTO {
         @JsonProperty("context")
         private String state;
     }
+
 }

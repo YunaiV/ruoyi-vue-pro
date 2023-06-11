@@ -23,4 +23,5 @@ public interface ExpressQueryConvert {
     KdNiaoExpressQueryReqDTO convert(ExpressQueryReqDTO dto);
 
     Kd100ExpressQueryReqDTO convert2(ExpressQueryReqDTO dto);
+
 }

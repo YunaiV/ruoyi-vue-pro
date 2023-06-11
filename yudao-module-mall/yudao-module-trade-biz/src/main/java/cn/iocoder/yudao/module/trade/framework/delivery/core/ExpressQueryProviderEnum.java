@@ -8,9 +8,12 @@ import lombok.Getter;
  * @author jason
  */
 @Getter
+
 public enum ExpressQueryProviderEnum {
+
     KD_NIAO("kd-niao", "快递鸟"),
     KD_100("kd-100", "快递100");
+
     /**
      * 快递服务商唯一编码
      */
@@ -21,8 +24,10 @@ public enum ExpressQueryProviderEnum {
      */
     private final String name;
 
+    // TODO @jaosn：@AllArgsConstructor 可以替代哈
     ExpressQueryProviderEnum(String code, String name) {
         this.code = code;
         this.name = name;
     }
+
 }

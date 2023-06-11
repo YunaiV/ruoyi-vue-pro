@@ -13,6 +13,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Kd100ExpressQueryReqDTO {
 
+    // TODO @jaosn：要不改成 expressCode；项目里使用这个哈
     /**
      * 快递公司编码
      */
@@ -29,19 +30,20 @@ public class Kd100ExpressQueryReqDTO {
      * 收、寄件人的电话号码
      */
     private String phone;
-
     /**
      * 出发地城市
      */
     private String from;
-
     /**
      * 目的地城市，到达目的地后会加大监控频率
      */
     private String to;
 
     /**
-     * 返回结果排序:desc降序（默认）,asc 升序
+     * 返回结果排序
+     *
+     * desc 降序（默认）, asc 升序
      */
     private String order;
+
 }

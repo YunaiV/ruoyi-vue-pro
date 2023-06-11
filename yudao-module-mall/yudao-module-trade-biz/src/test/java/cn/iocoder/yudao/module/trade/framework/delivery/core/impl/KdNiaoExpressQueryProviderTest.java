@@ -17,11 +17,12 @@ import javax.annotation.Resource;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+// TODO @芋艿：单测最后 review
 /**
  * @author jason
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = KdNiaoExpressQueryProviderTest.Application.class)
-@ActiveProfiles("trade-delivery-query") // 设置使用 trade-delivery-query 配置文件
+@ActiveProfiles("trade-delivery-query") // 设置使用 trade-delivery-query 配置文件 TODO @jason：可以直接写到 application-unit-test.yaml 配置文件里
 public class KdNiaoExpressQueryProviderTest {
     @Resource
     private RestTemplateBuilder builder;

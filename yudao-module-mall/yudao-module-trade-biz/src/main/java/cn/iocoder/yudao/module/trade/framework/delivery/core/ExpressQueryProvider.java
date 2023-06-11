@@ -11,10 +11,12 @@ import java.util.List;
  * @author jason
  */
 public interface ExpressQueryProvider {
+
     /**
      * 快递实时查询
      *
      * @param reqDTO 查询请求参数
      */
     List<ExpressQueryRespDTO> realTimeQueryExpress(ExpressQueryReqDTO reqDTO);
+
 }

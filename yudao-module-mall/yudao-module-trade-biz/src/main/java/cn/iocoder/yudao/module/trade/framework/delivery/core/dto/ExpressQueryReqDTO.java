@@ -14,8 +14,9 @@ public class ExpressQueryReqDTO {
     /**
      * 快递公司编码
      *
-     * 对应 {@link DeliveryExpressDO#getCode()} }
+     * 对应 {@link DeliveryExpressDO#getCode()}
      */
+    // TODO @jaosn：要不改成 expressCode；项目里使用这个哈
     private String expressCompanyCode;
 
     /**
@@ -27,4 +28,5 @@ public class ExpressQueryReqDTO {
      * 收、寄件人的电话号码
      */
     private String phone;
+
 }

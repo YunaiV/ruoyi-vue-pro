@@ -10,13 +10,15 @@ import lombok.Data;
 @Data
 public class ExpressQueryRespDTO {
 
+    // TODO @jason：LocalDateTime
     /**
      * 发生时间
      */
     private String time;
-
+    // TODO @jason：其它字段可能要补充下
     /**
      * 快递状态
      */
     private String state;
+
 }

@@ -110,19 +110,19 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
         return createFilterBean(new DemoFilter(), WebFilterOrderEnum.DEMO_FILTER);
     }
 
-    /**
-     * 创建 RestTemplate 实例
-     * @param restTemplateBuilder {@link RestTemplateAutoConfiguration#restTemplateBuilder}
-     */
-    @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder){
-        return restTemplateBuilder.build();
-    }
-
     public static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
         FilterRegistrationBean<T> bean = new FilterRegistrationBean<>(filter);
         bean.setOrder(order);
         return bean;
     }
 
+    /**
+     * 创建 RestTemplate 实例
+     *
+     * @param restTemplateBuilder {@link RestTemplateAutoConfiguration#restTemplateBuilder}
+     */
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
+        return restTemplateBuilder.build();
+    }
 }

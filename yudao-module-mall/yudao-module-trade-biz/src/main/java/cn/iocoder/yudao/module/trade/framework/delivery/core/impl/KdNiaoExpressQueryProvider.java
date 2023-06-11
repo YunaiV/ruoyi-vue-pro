@@ -32,21 +32,27 @@ import static cn.iocoder.yudao.module.trade.framework.delivery.core.convert.Expr
  */
 @Slf4j
 public class KdNiaoExpressQueryProvider implements ExpressQueryProvider {
+
     private static final String REAL_TIME_QUERY_URL = "https://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx";
+
     /**
      * 快递鸟即时查询免费版 RequestType
      */
     private static final String REAL_TIME_FREE_REQ_TYPE = "1002";
+
     private final RestTemplate restTemplate;
     private final TradeExpressQueryProperties.KdNiaoConfig config;
 
+    // TODO @jason：可以改成 lombok 哈
     public KdNiaoExpressQueryProvider(RestTemplate restTemplate, TradeExpressQueryProperties.KdNiaoConfig config) {
         this.restTemplate = restTemplate;
         this.config = config;
     }
 
     /**
-     * 快递鸟即时查询免费版本  参见 <a href="https://www.yuque.com/kdnjishuzhichi/dfcrg1/wugo6k">快递鸟接口文档</a>
+     * 快递鸟即时查询免费版本
+     *
+     * @see <a href="https://www.yuque.com/kdnjishuzhichi/dfcrg1/wugo6k">快递鸟接口文档</a>
      * @param reqDTO 查询请求参数
      */
     @Override
@@ -56,7 +62,7 @@ public class KdNiaoExpressQueryProvider implements ExpressQueryProvider {
         kdNiaoReqData.setExpressCompanyCode(reqDTO.getExpressCompanyCode().toUpperCase());
         KdNiaoExpressQueryRespDTO respDTO = sendKdNiaoApiRequest(REAL_TIME_QUERY_URL, REAL_TIME_FREE_REQ_TYPE,
                 kdNiaoReqData, KdNiaoExpressQueryRespDTO.class);
-        log.debug("快递鸟即时查询接口返回 {}", respDTO);
+        log.debug("[realTimeQueryExpress][快递鸟即时查询接口返回 {}]", respDTO);
         if(!respDTO.getSuccess()){
             throw exception(EXPRESS_API_QUERY_FAILED, respDTO.getReason());
         }else{
@@ -85,16 +91,16 @@ public class KdNiaoExpressQueryProvider implements ExpressQueryProvider {
         // 请求体
         String reqData = JsonUtils.toJsonString(req);
         String dataSign = generateDataSign(reqData, config.getApiKey());
-        log.trace("得到快递鸟接口 RequestType : {} 的 签名: {}", requestType, dataSign);
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("RequestData", reqData);
         requestBody.add("DataType", "2");
         requestBody.add("EBusinessID", config.getBusinessId());
         requestBody.add("DataSign", dataSign);
         requestBody.add("RequestType", requestType);
-        log.debug("快递鸟接口 RequestType : {}, 的请求参数 {}", requestType, requestBody);
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+        log.debug("[sendKdNiaoApiRequest][快递鸟接口 RequestType : {}, 的请求参数 {}]", requestType, requestBody);
+
         // 发送请求
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
         log.debug("快递鸟接口 RequestType : {}, 的响应结果 {}", requestType,  responseEntity);
         // 处理响应
@@ -113,7 +119,7 @@ public class KdNiaoExpressQueryProvider implements ExpressQueryProvider {
      */
     private String generateDataSign(String reqData, String apiKey) {
         String plainText = String.format("%s%s", reqData, apiKey);
-        log.trace("签名前的数据 {}", plainText);
         return URLEncodeUtil.encode(Base64.encode(DigestUtil.md5Hex(plainText)));
     }
+
 }

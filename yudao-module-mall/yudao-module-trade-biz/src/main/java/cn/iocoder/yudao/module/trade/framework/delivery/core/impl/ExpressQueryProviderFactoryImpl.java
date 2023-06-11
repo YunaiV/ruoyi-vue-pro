@@ -12,12 +12,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * // TODO @jason：注释不全
  * @author jason
  */
 @Component
 public class ExpressQueryProviderFactoryImpl implements ExpressQueryProviderFactory {
 
     private final Map<ExpressQueryProviderEnum, ExpressQueryProvider> providerMap = new ConcurrentHashMap<>(8);
+
     @Resource
     private TradeExpressQueryProperties tradeExpressQueryProperties;
     @Resource
@@ -31,6 +33,7 @@ public class ExpressQueryProviderFactoryImpl implements ExpressQueryProviderFact
 
     private ExpressQueryProvider createExpressQueryProvider(ExpressQueryProviderEnum queryProviderEnum,
                                                             TradeExpressQueryProperties tradeExpressQueryProperties) {
+        // TODO @jason：是不是直接 return 就好啦，更简洁一点
         ExpressQueryProvider result = null;
         switch (queryProviderEnum) {
             case KD_NIAO:
