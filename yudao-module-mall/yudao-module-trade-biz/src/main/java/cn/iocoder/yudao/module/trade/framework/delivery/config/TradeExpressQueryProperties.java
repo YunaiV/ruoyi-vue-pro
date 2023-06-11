@@ -55,10 +55,20 @@ public class TradeExpressQueryProperties {
     }
 
     /**
-     * 快递100 配置项 TODO
+     * 快递100 配置项
      */
+    @Data
     public static class Kd100Config {
-
+        /**
+         * 快递 100 授权码
+         */
+        @NotEmpty(message = "快递 100 授权码配置项不能为空")
+        private String customer;
+        /**
+         * 快递 100 授权 key
+         */
+        @NotEmpty(message = "快递 100 授权 Key 配置项不能为空")
+        private String key;
     }
 
 

@@ -3,7 +3,7 @@ spring:
     lazy-initialization: true # 开启懒加载，加快速度
     banner-mode: off # 单元测试，禁用 Banner
 
---- #################### 数据库相关配置 ####################
+--- #################### 交易快递查询相关配置 ####################
 
 yudao:
   trade:
@@ -11,5 +11,8 @@ yudao:
       query:
         express-query-provider: kd_niao
         kd-niao:
-          api-key: 8e22d97d-6a3d-442e-b243-2190c9f0cfdd
-          business-id: 1801700
+          api-key: xxx
+          business-id: xxxxxxxx
+        kd100:
+          customer: xxxx
+          key: xxxxx

@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.trade.framework.delivery.core.dto.ExpressQueryReq
 import cn.iocoder.yudao.module.trade.framework.delivery.core.dto.ExpressQueryRespDTO;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.dto.provider.kdniao.KdNiaoExpressQueryReqDTO;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.dto.provider.kdniao.KdNiaoExpressQueryRespDTO;
-import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,6 +22,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_API_QUERY_FAILED;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_API_QUERY_ERROR;
 import static cn.iocoder.yudao.module.trade.framework.delivery.core.convert.ExpressQueryConvert.INSTANCE;
 
 /**
@@ -57,34 +57,28 @@ public class KdNiaoExpressQueryProvider implements ExpressQueryProvider {
         KdNiaoExpressQueryRespDTO respDTO = sendKdNiaoApiRequest(REAL_TIME_QUERY_URL, REAL_TIME_FREE_REQ_TYPE,
                 kdNiaoReqData, KdNiaoExpressQueryRespDTO.class);
         log.debug("快递鸟即时查询接口返回 {}", respDTO);
-        if (respDTO.getSuccess() && CollUtil.isNotEmpty(respDTO.getTracks())) {
-            return INSTANCE.convertList(respDTO.getTracks());
+        if(!respDTO.getSuccess()){
+            throw exception(EXPRESS_API_QUERY_FAILED, respDTO.getReason());
         }else{
-            return Collections.emptyList();
+            if (CollUtil.isNotEmpty(respDTO.getTracks())) {
+                return INSTANCE.convertList(respDTO.getTracks());
+            }else{
+                return Collections.emptyList();
+            }
         }
     }
 
-    private  <Req, Resp> Resp sendKdNiaoApiRequest(String url, String requestType, Req req,
-                                                   Class<Resp> respClass){
-        return sendKdNiaoApiRequest(url, requestType, req, respClass, null);
-    }
-    private  <Req, Resp> Resp sendKdNiaoApiRequest(String url, String requestType, Req req,
-                                                   TypeReference<Resp> typeRefResp){
-        return sendKdNiaoApiRequest(url, requestType, req, null, typeRefResp);
-    }
-
     /**
-     * 快递鸟 通用的 API 请求
+     * 快递鸟 通用的 API 请求, 暂时没有其他应用场景， 暂时放这里
      * @param url 请求 url
      * @param requestType 对应的请求指令 (快递鸟的RequestType)
      * @param req  对应请求的请求参数
      * @param respClass 对应请求的响应 class
-     * @param typeRefResp 对应请求的响应  TypeReference
      * @param <Req> 每个请求的请求结构 Req DTO
      * @param <Resp> 每个请求的响应结构 Resp DTO
      */
     private  <Req, Resp> Resp sendKdNiaoApiRequest(String url, String requestType, Req req,
-                                                   Class<Resp> respClass, TypeReference<Resp> typeRefResp){
+                                                   Class<Resp> respClass){
         // 请求头
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -106,13 +100,9 @@ public class KdNiaoExpressQueryProvider implements ExpressQueryProvider {
         // 处理响应
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String response = responseEntity.getBody();
-            if (respClass != null && typeRefResp == null) {
-                return JsonUtils.parseObject(response, respClass);
-            } else {
-                return JsonUtils.parseObject(response, typeRefResp);
-            }
+            return JsonUtils.parseObject(response, respClass);
         } else {
-            throw exception(EXPRESS_API_QUERY_FAILED);
+            throw exception(EXPRESS_API_QUERY_ERROR);
         }
     }
 
