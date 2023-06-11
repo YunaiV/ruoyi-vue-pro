@@ -18,6 +18,8 @@ public class SpuDeliveryExpressTemplateRespBO {
      */
     private Integer chargeMode;
 
+    // TODO @jaosn：可以把 DeliveryExpressTemplateChargeBO 和 DeliveryExpressTemplateFreeBO 搞成内嵌的类。这样简洁一点
+
     /**
      * 运费模板快递运费设置
      */
