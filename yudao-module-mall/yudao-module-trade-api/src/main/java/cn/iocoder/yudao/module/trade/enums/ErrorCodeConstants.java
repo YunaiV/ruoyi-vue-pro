@@ -53,7 +53,9 @@ public interface ErrorCodeConstants {
     ErrorCode EXPRESS_TEMPLATE_NAME_DUPLICATE = new ErrorCode(1011003003, "已经存在该运费模板名");
     ErrorCode DELIVERY_EXPRESS_USER_ADDRESS_IS_EMPTY = new ErrorCode(1011003004, "计算快递运费时，收件人地址编号为空");
     ErrorCode PRODUCT_EXPRESS_TEMPLATE_NOT_FOUND = new ErrorCode(1011003005, "找不到到商品对应的运费模板");
-    ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1011003006, "自提门店不存在");
+    ErrorCode EXPRESS_API_QUERY_ERROR = new ErrorCode(1011003006, "快递查询接口异常");
+    ErrorCode EXPRESS_API_QUERY_FAILED = new ErrorCode(1011003007, "快递查询返回失败, 原因：{}");
+    ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1011003008, "自提门店不存在");
 
     // ========== Price 相关 1011004000 ============
     ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1011004000, "支付价格计算异常，原因：价格小于等于 0");

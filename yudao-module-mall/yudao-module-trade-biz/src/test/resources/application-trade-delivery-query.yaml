@@ -1,0 +1,18 @@
+spring:
+  main:
+    lazy-initialization: true # 开启懒加载，加快速度
+    banner-mode: off # 单元测试，禁用 Banner
+
+--- #################### 交易快递查询相关配置 ####################
+
+yudao:
+  trade:
+    express:
+      query:
+        express-query-provider: kd_niao
+        kd-niao:
+          api-key: xxx
+          business-id: xxxxxxxx
+        kd100:
+          customer: xxxx
+          key: xxxxx
