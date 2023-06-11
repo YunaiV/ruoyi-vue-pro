@@ -46,6 +46,9 @@ public class AppSeckillActivitiDetailRespVO {
         @Schema(description = "秒杀限量库存", required = true, example = "50")
         private Integer quota;
 
+        @Schema(description = "limitCount", required = true, example = "10")
+        private Integer limitCount;
+
     }
 
 }

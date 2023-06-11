@@ -56,7 +56,7 @@ public interface SeckillActivityConvert {
                 && ObjectUtil.equals(productDO.getSkuId(), productVO.getSkuId())
                 && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice())
                 && ObjectUtil.equals(productDO.getStock(), productVO.getStock())
-                && ObjectUtil.equals(productDO.getLimitBuyCount(), productVO.getLimitBuyCount());
+                && ObjectUtil.equals(productDO.getLimitCount(), productVO.getLimitCount());
     }
 
     /**
@@ -71,7 +71,7 @@ public interface SeckillActivityConvert {
                 && ObjectUtil.equals(productDO.getSkuId(), productVO.getSkuId())
                 && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice())
                 && ObjectUtil.equals(productDO.getStock(), productVO.getStock())
-                && ObjectUtil.equals(productDO.getLimitBuyCount(), productVO.getLimitBuyCount());
+                && ObjectUtil.equals(productDO.getLimitCount(), productVO.getLimitCount());
 
     }
 

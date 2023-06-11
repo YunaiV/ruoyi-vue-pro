@@ -33,30 +33,33 @@ public class AppSeckillActivityController {
         obj.setId(id);
         obj.setName("晚九点限时秒杀");
         obj.setStatus(1);
-        obj.setStartTime(LocalDateTime.of(2023, 6, 10, 0, 0, 0));
-        obj.setEndTime(LocalDateTime.of(2023, 6, 10, 23, 59, 0));
+        obj.setStartTime(LocalDateTime.of(2023, 6, 11, 0, 0, 0));
+        obj.setEndTime(LocalDateTime.of(2023, 6, 11, 23, 59, 0));
         obj.setSpuId(633L);
         // 创建一个Product对象的列表
         List<AppSeckillActivitiDetailRespVO.Product> productList = new ArrayList<>();
         // 创建三个新的Product对象并设置其属性的值
         AppSeckillActivitiDetailRespVO.Product product1 = new AppSeckillActivitiDetailRespVO.Product();
-        product1.setSkuId(4096L);
+        product1.setSkuId(1L);
         product1.setSeckillPrice(100);
         product1.setQuota(50);
+        product1.setLimitCount(3);
         // 将第一个Product对象添加到列表中
         productList.add(product1);
         // 创建第二个Product对象并设置其属性的值
         AppSeckillActivitiDetailRespVO.Product product2 = new AppSeckillActivitiDetailRespVO.Product();
-        product2.setSkuId(4097L);
+        product2.setSkuId(2L);
         product2.setSeckillPrice(200);
         product2.setQuota(100);
+        product2.setLimitCount(4);
         // 将第二个Product对象添加到列表中
         productList.add(product2);
         // 创建第三个Product对象并设置其属性的值
         AppSeckillActivitiDetailRespVO.Product product3 = new AppSeckillActivitiDetailRespVO.Product();
-        product3.setSkuId(4098L);
+        product3.setSkuId(3L);
         product3.setSeckillPrice(300);
         product3.setQuota(150);
+        product3.setLimitCount(5);
         // 将第三个Product对象添加到列表中
         productList.add(product3);
         // 将Product列表设置为对象的属性值
