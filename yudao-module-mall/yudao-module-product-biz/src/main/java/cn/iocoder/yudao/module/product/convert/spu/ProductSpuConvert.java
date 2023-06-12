@@ -1,14 +1,12 @@
 package cn.iocoder.yudao.module.product.convert.spu;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.product.controller.admin.sku.vo.ProductSkuRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageItemRespVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
@@ -80,14 +78,15 @@ public interface ProductSpuConvert {
 
     // ========== 用户 App 相关 ==========
 
-    default PageResult<AppProductSpuPageItemRespVO> convertPageForGetSpuPage(PageResult<ProductSpuDO> page) {
-        // 累加虚拟销量
-        page.getList().forEach(spu -> spu.setSalesCount(spu.getSalesCount() + spu.getVirtualSalesCount()));
-        // 然后进行转换
-        return convertPageForGetSpuPage0(page);
-    }
+    PageResult<AppProductSpuPageRespVO> convertPageForGetSpuPage(PageResult<ProductSpuDO> page);
 
-    PageResult<AppProductSpuPageItemRespVO> convertPageForGetSpuPage0(PageResult<ProductSpuDO> page);
+    default List<AppProductSpuPageRespVO> convertListForGetSpuList(List<ProductSpuDO> list) {
+        // 处理虚拟销量
+        list.forEach(spu -> spu.setSalesCount(spu.getSalesCount() + spu.getVirtualSalesCount()));
+        return convertListForGetSpuList0(list);
+    }
+    @Named("convertListForGetSpuList0")
+    List<AppProductSpuPageRespVO> convertListForGetSpuList0(List<ProductSpuDO> list);
 
     default AppProductSpuDetailRespVO convertForGetSpuDetail(ProductSpuDO spu, List<ProductSkuDO> skus) {
         // 处理 SPU
@@ -109,15 +108,9 @@ public interface ProductSpuConvert {
     List<AppProductSpuDetailRespVO.Sku> convertListForGetSpuDetail(List<ProductSkuDO> skus);
 
     default ProductSpuDetailRespVO convertForSpuDetailRespVO(ProductSpuDO spu, List<ProductSkuDO> skus) {
-        ProductSpuDetailRespVO productSpuDetailRespVO = convert03(spu);
-        // skus 为空直接返回
-        if (CollUtil.isEmpty(skus)) {
-            return productSpuDetailRespVO;
-        }
-        List<ProductSkuRespVO> skuVOs = ProductSkuConvert.INSTANCE.convertList(skus);
-        // fix: 因为现在已改为 sku 属性列表 属性 已包含 属性名字 属性值名字 所以不需要再额外处理，属性更新时更新 sku 中的属性相关冗余即可
-        productSpuDetailRespVO.setSkus(skuVOs);
-        return productSpuDetailRespVO;
+        ProductSpuDetailRespVO detailRespVO = convert03(spu);
+        detailRespVO.setSkus(ProductSkuConvert.INSTANCE.convertList(skus));
+        return detailRespVO;
     }
 
 }

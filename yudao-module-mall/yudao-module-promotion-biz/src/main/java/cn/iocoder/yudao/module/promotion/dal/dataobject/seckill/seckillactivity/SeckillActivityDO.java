@@ -37,7 +37,7 @@ public class SeckillActivityDO extends BaseDO {
     private String name;
     /**
      * 活动状态
-     * <p>
+     *
      * 枚举 {@link PromotionActivityStatusEnum 对应的类}
      */
     private Integer status;

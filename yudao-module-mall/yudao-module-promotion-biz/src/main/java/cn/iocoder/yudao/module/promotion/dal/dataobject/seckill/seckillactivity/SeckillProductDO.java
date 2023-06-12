@@ -53,6 +53,7 @@ public class SeckillProductDO extends BaseDO {
      */
     private Integer seckillPrice;
 
+    // TODO @芋艿：改成 quota 限量库存；每次购买时，需要减小；
     /**
      * 秒杀库存
      */
@@ -61,5 +62,6 @@ public class SeckillProductDO extends BaseDO {
     /**
      * 每人限购
      */
-    private Integer limitBuyCount;
+    private Integer limitCount;
+
 }

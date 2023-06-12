@@ -40,7 +40,7 @@ public class ProductCommentDO extends BaseDO {
     private Long id;
 
     /**
-     * 评价人 用户编号
+     * 评价人的用户编号
      *
      * 关联 MemberUserDO 的 id 编号
      */

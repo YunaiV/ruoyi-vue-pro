@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.product.controller.app.spu;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageItemRespVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,9 +41,22 @@ public class AppProductSpuController {
     @Resource
     private ProductSkuService productSkuService;
 
+    @GetMapping("/list")
+    @Operation(summary = "获得商品 SPU 列表")
+    @Parameters({
+            @Parameter(name = "recommendType", description = "推荐类型", required = true), // 参见 AppProductSpuPageReqVO.RECOMMEND_TYPE_XXX 常量
+            @Parameter(name = "count", description = "数量", required = true)
+    })
+    public CommonResult<List<AppProductSpuPageRespVO>> getSpuList(
+            @RequestParam("recommendType") String recommendType,
+            @RequestParam(value = "count", defaultValue = "10") Integer count) {
+        List<ProductSpuDO> list = productSpuService.getSpuList(recommendType, count);
+        return success(ProductSpuConvert.INSTANCE.convertListForGetSpuList(list));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得商品 SPU 分页")
-    public CommonResult<PageResult<AppProductSpuPageItemRespVO>> getSpuPage(@Valid AppProductSpuPageReqVO pageVO) {
+    public CommonResult<PageResult<AppProductSpuPageRespVO>> getSpuPage(@Valid AppProductSpuPageReqVO pageVO) {
         PageResult<ProductSpuDO> pageResult = productSpuService.getSpuPage(pageVO);
         return success(ProductSpuConvert.INSTANCE.convertPageForGetSpuPage(pageResult));
     }

@@ -99,6 +99,15 @@ public interface ProductSpuService {
     PageResult<ProductSpuDO> getSpuPage(AppProductSpuPageReqVO pageReqVO);
 
     /**
+     * 获得商品 SPU 列表，提供给用户 App 使用
+     *
+     * @param recommendType 推荐类型
+     * @param count 数量
+     * @return 商品 SPU 列表
+     */
+    List<ProductSpuDO> getSpuList(String recommendType, Integer count);
+
+    /**
      * 更新商品 SPU 库存（增量）
      *
      * @param stockIncrCounts SPU 编号与库存变化（增量）的映射

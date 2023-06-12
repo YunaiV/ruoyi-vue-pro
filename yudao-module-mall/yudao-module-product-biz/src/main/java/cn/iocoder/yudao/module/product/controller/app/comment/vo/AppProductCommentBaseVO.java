@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.app.comment.vo;
 
+import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -26,6 +27,9 @@ public class AppProductCommentBaseVO {
     @Schema(description = "商品SKU编号", required = true, example = "81192")
     @NotNull(message = "商品SKU编号不能为空")
     private Long skuId;
+
+    @Schema(description = "商品 SKU 属性", required = true)
+    private List<AppProductPropertyValueDetailRespVO> skuProperties; // TODO puhui999：这个需要从数据库查询哈
 
     @Schema(description = "评分星级 1-5分", required = true, example = "5")
     @NotNull(message = "评分星级 1-5分不能为空")

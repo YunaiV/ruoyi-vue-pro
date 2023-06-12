@@ -75,7 +75,7 @@ public interface DeliveryExpressTemplateService {
 
     /**
      * 校验快递运费模板
-     * <p>
+     *
      * 如果校验不通过，抛出 {@link cn.iocoder.yudao.framework.common.exception.ServiceException} 异常
      *
      * @param templateId 模板编号
@@ -83,6 +83,7 @@ public interface DeliveryExpressTemplateService {
      */
     DeliveryExpressTemplateDO validateDeliveryExpressTemplate(Long templateId);
 
+    // TODO @jason：可以把 spuIds 改成传递 ids 么？价格计算那，在 TradePriceCalculateRespBO 冗余好 templateId 字段。目的是，减少重复的查询
     /**
      * 基于指定的 SPU 编号数组和收件人地址区域编号. 获取匹配运费模板
      *

@@ -9,8 +9,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-
 @Schema(description = "用户APP - 商品评价 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

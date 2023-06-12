@@ -192,9 +192,4 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         assertEquals("测试", productCommentDO.getReplyContent());
     }
 
-    @Test
-    public void testCreateComment_success() {
-        // mock 测试
-    }
-
 }

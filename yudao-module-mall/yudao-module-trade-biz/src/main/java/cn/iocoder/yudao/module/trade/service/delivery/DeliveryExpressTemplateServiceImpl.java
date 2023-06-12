@@ -242,10 +242,9 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
             if (spu == null) {
                 return;
             }
+            // TODO @jason：避免循环查询；最好类似 expressTemplateMapper.selectBatchIds(spuMap.keySet()); 批量查询，内存组合；
             SpuDeliveryExpressTemplateRespBO bo = new SpuDeliveryExpressTemplateRespBO()
                     .setChargeMode(item.getChargeMode())
-                    // TODO @jason：是不是只要查询到一个，就不用查询下一个了；TemplateCharge 和 TemplateFree
-                    //  @芋艿 包邮的优先级> 费用的优先级 所以两个都要查询
                     .setTemplateCharge(findMatchExpressTemplateCharge(item.getId(), areaId))
                     .setTemplateFree(findMatchExpressTemplateFree(item.getId(), areaId));
             result.put(spu.getId(), bo);

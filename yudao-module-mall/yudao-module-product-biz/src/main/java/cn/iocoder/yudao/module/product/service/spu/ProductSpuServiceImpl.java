@@ -202,6 +202,11 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
+    public List<ProductSpuDO> getSpuList(String recommendType, Integer count) {
+        return productSpuMapper.selectListByRecommendType(recommendType, count);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSpuStock(Map<Long, Integer> stockIncrCounts) {
         stockIncrCounts.forEach((id, incCount) -> productSpuMapper.updateStock(id, incCount));

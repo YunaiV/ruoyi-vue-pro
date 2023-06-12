@@ -62,7 +62,7 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
                 deliveryExpressTemplateService.getExpressTemplateMapBySpuIdsAndArea(spuIds, address.getAreaId());
         // 3. 计算配送费用
         if (CollUtil.isEmpty(spuExpressTemplateMap)) {
-            log.error("找不到商品 SPU ID {}, area Id {} ,对应的运费模板", spuIds, address.getAreaId());
+            log.error("[calculate][找不到商品 spuId{} areaId{} 对应的运费模板]", spuIds, address.getAreaId());
             throw exception(PRODUCT_EXPRESS_TEMPLATE_NOT_FOUND);
         }
         calculateDeliveryPrice(selectedItem, spuExpressTemplateMap, result);
@@ -170,7 +170,8 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
      */
     private void divideDeliveryPrice(int deliveryPrice, List<OrderItem> orderItems) {
         // TODO @jason：分摊的话，是不是要按照比例呀？重量、价格、数量等等,
-        //  按比例是不是有点复杂。后面看看是否需要
+        //  按比例是不是有点复杂。后面看看是否需要；
+        // TODO 可以看看别的项目怎么搞的哈。
         int dividePrice = deliveryPrice / orderItems.size();
         for (OrderItem item : orderItems) {
             // 更新快递运费
@@ -207,6 +208,7 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
                 // freeCount 是不是应该是 double ??
                 // TODO @jason：要不配置的时候，把它的单位和商品对齐？到底是 kg、还是斤
                 // TODO @芋艿 目前 包邮 件数/重量/体积 都用的是这个字段
+                // TODO @jason：那要不快递模版也改成 kg？这样是不是就不用 double ？
                 if (totalWeight >= templateFree.getFreeCount()
                         && totalPrice >= templateFree.getFreePrice()) {
                     return true;

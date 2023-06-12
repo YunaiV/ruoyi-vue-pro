@@ -39,6 +39,11 @@ public class AppProductSpuDetailRespVO {
     @Schema(description = "单位名", required = true, example = "个")
     private String unitName;
 
+    // ========== 营销相关字段 =========
+
+    @Schema(description = "活动排序数组", required = true, example = "1024")
+    private List<Integer> activityOrders;
+
     // ========== SKU 相关字段 =========
 
     @Schema(description = "规格类型", required = true, example = "true")
