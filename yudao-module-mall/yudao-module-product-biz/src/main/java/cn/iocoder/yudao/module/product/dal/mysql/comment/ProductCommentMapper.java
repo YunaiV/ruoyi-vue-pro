@@ -6,13 +6,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
-
-import java.time.LocalDateTime;
 
 @Mapper
 public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
@@ -53,23 +49,6 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
         // 按评价时间排序最新的显示在前面
         queryWrapper.orderByDesc(ProductCommentDO::getCreateTime);
         return selectPage(reqVO, queryWrapper);
-    }
-
-    default void updateCommentVisible(Long id, Boolean visible) {
-        LambdaUpdateWrapper<ProductCommentDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<ProductCommentDO>()
-                .set(ProductCommentDO::getVisible, visible)
-                .eq(ProductCommentDO::getId, id);
-        update(null, lambdaUpdateWrapper);
-    }
-
-    default void commentReply(ProductCommentReplyVO replyVO, Long loginUserId) {
-        LambdaUpdateWrapper<ProductCommentDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<ProductCommentDO>()
-                .set(ProductCommentDO::getReplyStatus, Boolean.TRUE)
-                .set(ProductCommentDO::getReplyTime, LocalDateTime.now())
-                .set(ProductCommentDO::getReplyUserId, loginUserId)
-                .set(ProductCommentDO::getReplyContent, replyVO.getReplyContent())
-                .eq(ProductCommentDO::getId, replyVO.getId());
-        update(null, lambdaUpdateWrapper);
     }
 
     default ProductCommentDO selectByUserIdAndOrderIdAndSpuId(Long userId, Long orderId, Long spuId) {

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.product.service.comment;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyVO;
+import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
@@ -36,15 +36,13 @@ public interface ProductCommentService {
      */
     void updateCommentVisible(ProductCommentUpdateVisibleReqVO updateReqVO);
 
-    // TODO @puhui999：replyComment
-
     /**
      * 商家回复
      *
      * @param replyVO     商家回复
      * @param loginUserId 管理后台商家登陆人 ID
      */
-    void replyComment(ProductCommentReplyVO replyVO, Long loginUserId);
+    void replyComment(ProductCommentReplyReqVO replyVO, Long loginUserId);
 
     /**
      * 获得商品评价分页

@@ -8,6 +8,11 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * 用户 APP - 商品评价分页 Request VO
+ *
+ * @author HUIHUI
+ */
 @Schema(description = "用户APP - 商品评价分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

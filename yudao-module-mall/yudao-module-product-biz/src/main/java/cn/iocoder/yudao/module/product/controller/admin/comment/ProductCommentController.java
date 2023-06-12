@@ -46,7 +46,7 @@ public class ProductCommentController {
     @PutMapping("/reply")
     @Operation(summary = "商家回复")
     @PreAuthorize("@ss.hasPermission('product:comment:update')")
-    public CommonResult<Boolean> commentReply(@Valid @RequestBody ProductCommentReplyVO replyVO) {
+    public CommonResult<Boolean> commentReply(@Valid @RequestBody ProductCommentReplyReqVO replyVO) {
         productCommentService.replyComment(replyVO, getLoginUserId());
         return success(true);
     }

@@ -1,25 +1,36 @@
 package cn.iocoder.yudao.module.product.service.comment;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyVO;
+import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
+import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
+import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
@@ -42,6 +53,10 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Resource
     private ProductSpuService productSpuService;
 
+    @Resource
+    @Lazy
+    private ProductSkuService productSkuService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateCommentVisible(ProductCommentUpdateVisibleReqVO updateReqVO) {
@@ -55,7 +70,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void replyComment(ProductCommentReplyVO replyVO, Long loginUserId) {
+    public void replyComment(ProductCommentReplyReqVO replyVO, Long loginUserId) {
         // 校验评论是否存在
         ProductCommentDO productCommentDO = validateCommentExists(replyVO.getId());
         productCommentDO.setReplyTime(LocalDateTime.now());
@@ -127,7 +142,26 @@ public class ProductCommentServiceImpl implements ProductCommentService {
 
     @Override
     public PageResult<AppProductCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible) {
-        return ProductCommentConvert.INSTANCE.convertPage02(productCommentMapper.selectPage(pageVO, visible));
+        PageResult<AppProductCommentRespVO> result = ProductCommentConvert.INSTANCE.convertPage02(
+                productCommentMapper.selectPage(pageVO, visible));
+        Set<Long> skuIds = result.getList().stream().map(AppProductCommentRespVO::getSkuId).collect(Collectors.toSet());
+        List<ProductSkuDO> skuList = productSkuService.getSkuList(skuIds);
+        Map<Long, ProductSkuDO> skuDOMap = new HashMap<>(skuIds.size());
+        if (CollUtil.isNotEmpty(skuList)) {
+            skuDOMap.putAll(skuList.stream().collect(Collectors.toMap(ProductSkuDO::getId, c -> c)));
+        }
+        result.getList().forEach(item -> {
+            // 判断用户是否选择匿名
+            if (ObjectUtil.equal(item.getAnonymous(), true)) {
+                item.setUserNickname(ProductCommentDO.NICKNAME_ANONYMOUS);
+            }
+            ProductSkuDO productSkuDO = skuDOMap.get(item.getSkuId());
+            if (productSkuDO != null) {
+                List<AppProductPropertyValueDetailRespVO> skuProperties = ProductCommentConvert.INSTANCE.convertList01(productSkuDO.getProperties());
+                item.setSkuProperties(skuProperties);
+            }
+        });
+        return result;
     }
 
     @Override

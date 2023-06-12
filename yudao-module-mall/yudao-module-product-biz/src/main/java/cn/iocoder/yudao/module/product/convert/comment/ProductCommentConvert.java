@@ -6,7 +6,9 @@ import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommen
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentRespVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
+import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -35,6 +37,8 @@ public interface ProductCommentConvert {
     AppCommentStatisticsRespVO convert(Long allCount, Long goodCount, Long mediocreCount, Long negativeCount);
 
     List<ProductCommentRespVO> convertList(List<ProductCommentDO> list);
+
+    List<AppProductPropertyValueDetailRespVO> convertList01(List<ProductSkuDO.Property> properties);
 
     PageResult<ProductCommentRespVO> convertPage(PageResult<ProductCommentDO> page);
 
