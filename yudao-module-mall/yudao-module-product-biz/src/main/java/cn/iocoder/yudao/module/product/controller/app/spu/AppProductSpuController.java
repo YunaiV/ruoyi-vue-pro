@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
-import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,8 +39,6 @@ public class AppProductSpuController {
     private ProductSpuService productSpuService;
     @Resource
     private ProductSkuService productSkuService;
-    @Resource
-    private ProductPropertyValueService productPropertyValueService;
 
     @GetMapping("/page")
     @Operation(summary = "获得商品 SPU 分页")

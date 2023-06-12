@@ -31,7 +31,7 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
     // TODO 芋艿：在看看这块
     static void appendTabQuery(LambdaQueryWrapperX<ProductCommentDO> queryWrapper, Integer type) {
         // 构建好评查询语句：好评计算 (商品评分星级+服务评分星级) >= 8
-        if (ObjectUtil.equal(type, AppCommentPageReqVO.FAVOURABLE_COMMENT)) {
+        if (ObjectUtil.equal(type, AppCommentPageReqVO.GOOD_COMMENT)) {
             queryWrapper.apply("(scores + benefit_scores) >= 8");
         }
         // 构建中评查询语句：中评计算 (商品评分星级+服务评分星级) > 4 且 (商品评分星级+服务评分星级) < 8
@@ -72,16 +72,14 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
         update(null, lambdaUpdateWrapper);
     }
 
-    // TODO @puhui999：使用 select 替代 find
-    default ProductCommentDO findByUserIdAndOrderIdAndSpuId(Long userId, Long orderId, Long spuId) {
+    default ProductCommentDO selectByUserIdAndOrderIdAndSpuId(Long userId, Long orderId, Long spuId) {
         return selectOne(new LambdaQueryWrapperX<ProductCommentDO>()
                 .eq(ProductCommentDO::getUserId, userId)
                 .eq(ProductCommentDO::getOrderId, orderId)
                 .eq(ProductCommentDO::getSpuId, spuId));
     }
 
-    // TODO @puhui999：selectCountBySpuId 即可
-    default Long selectTabCount(Long spuId, Boolean visible, Integer type) {
+    default Long selectCountBySpuId(Long spuId, Boolean visible, Integer type) {
         LambdaQueryWrapperX<ProductCommentDO> queryWrapper = new LambdaQueryWrapperX<ProductCommentDO>()
                 .eqIfPresent(ProductCommentDO::getSpuId, spuId)
                 .eqIfPresent(ProductCommentDO::getVisible, visible);

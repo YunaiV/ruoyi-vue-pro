@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.product.api.comment.dto.CommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
@@ -18,6 +19,7 @@ import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDetailR
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageItemRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.TradeCartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -75,9 +77,10 @@ public interface TradeOrderConvert {
             return orderItem;
         });
     }
+
     TradeOrderItemDO convert(TradePriceCalculateRespBO.OrderItem item);
 
-    @Mapping(source = "userId" , target = "userId")
+    @Mapping(source = "userId", target = "userId")
     PriceCalculateReqDTO convert(AppTradeOrderCreateReqVO createReqVO, Long userId);
 
     @Mappings({
@@ -85,6 +88,7 @@ public interface TradeOrderConvert {
             @Mapping(source = "count", target = "incrCount"),
     })
     ProductSkuUpdateStockReqDTO.Item convert(TradeOrderItemDO bean);
+
     List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
 
     default PayOrderCreateReqDTO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
@@ -136,7 +140,7 @@ public interface TradeOrderConvert {
                     properties.forEach(property -> {
                         ProductPropertyValueDetailRespDTO propertyValueDetail = propertyValueDetailMap.get(property.getValueId());
                         if (propertyValueDetail == null) {
-                           return;
+                            return;
                         }
                         item.getProperties().add(convert(propertyValueDetail));
                     });
@@ -148,7 +152,9 @@ public interface TradeOrderConvert {
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());
     }
+
     TradeOrderPageItemRespVO convert(TradeOrderDO order, List<TradeOrderItemDO> items);
+
     ProductPropertyValueDetailRespVO convert(ProductPropertyValueDetailRespDTO bean);
 
     // TODO 芋艿：可简化
@@ -179,7 +185,9 @@ public interface TradeOrderConvert {
         orderVO.setUser(convert(user));
         return orderVO;
     }
+
     TradeOrderDetailRespVO convert2(TradeOrderDO order, List<TradeOrderItemDO> items);
+
     MemberUserRespVO convert(MemberUserRespDTO bean);
 
     // TODO 芋艿：可简化
@@ -214,7 +222,9 @@ public interface TradeOrderConvert {
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());
     }
+
     AppTradeOrderPageItemRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> items);
+
     AppProductPropertyValueDetailRespVO convert02(ProductPropertyValueDetailRespDTO bean);
 
     default AppTradeOrderDetailRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
@@ -243,9 +253,12 @@ public interface TradeOrderConvert {
         orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
         return orderVO;
     }
+
     AppTradeOrderDetailRespVO convert3(TradeOrderDO order, List<TradeOrderItemDO> items);
 
     AppTradeOrderItemRespVO convert03(TradeOrderItemDO bean);
+
+    CommentCreateReqDTO convert04(AppTradeOrderItemCommentCreateReqVO createReqVO);
 
     default TradePriceCalculateReqBO convert(Long userId, AppTradeOrderSettlementReqVO settlementReqVO,
                                              List<TradeCartDO> cartList) {
@@ -286,6 +299,8 @@ public interface TradeOrderConvert {
         }
         return respVO;
     }
+
     AppTradeOrderSettlementRespVO convert0(TradePriceCalculateRespBO calculate, AddressRespDTO address);
+
 
 }

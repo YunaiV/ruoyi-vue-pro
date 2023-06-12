@@ -7,22 +7,16 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
-// TODO @puhui999：不应该继承 AppCommentCreateReqVO
+// TODO @puhui999：不应该继承 AppProductCommentCreateReqVO
 @Schema(description = "用户APP - 商品评价创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class AppCommentCreateReqVO extends AppCommentBaseVO {
+public class AppProductCommentCreateReqVO extends AppProductCommentBaseVO {
 
     @Schema(description = "是否匿名", required = true, example = "true")
     @NotNull(message = "是否匿名不能为空")
     private Boolean anonymous;
-
-    // TODO @puhui999:不应该传递 orderId
-
-    @Schema(description = "交易订单编号", required = true, example = "12312")
-    @NotNull(message = "交易订单编号不能为空")
-    private Long orderId;
 
     @Schema(description = "交易订单项编号", required = true, example = "2312312")
     @NotNull(message = "交易订单项编号不能为空")

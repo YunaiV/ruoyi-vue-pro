@@ -14,28 +14,10 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class AppCommentPageReqVO extends PageParam {
 
-    // TODO @puhui999：不传递就是 all；
-    /**
-     * 所有
-     */
-    public static final Integer ALL = 0;
-
-    /**
-     * 所有数量 key
-     */
-    public static final String ALL_COUNT = "allCount";
-
-    // TODO @puhui999：good 好评；
     /**
      * 好评
      */
-    public static final Integer FAVOURABLE_COMMENT = 1;
-
-    // TODO @puhui999：medium 中评；然后 mediumCount 就好啦；
-    /**
-     * 好评数量 key
-     */
-    public static final String FAVOURABLE_COMMENT_COUNT = "favourableCommentCount";
+    public static final Integer GOOD_COMMENT = 1;
 
     /**
      * 中评
@@ -43,25 +25,9 @@ public class AppCommentPageReqVO extends PageParam {
     public static final Integer MEDIOCRE_COMMENT = 2;
 
     /**
-     * 中评数量 key
-     */
-    public static final String MEDIOCRE_COMMENT_COUNT = "mediocreCommentCount";
-
-    /**
      * 差评
      */
     public static final Integer NEGATIVE_COMMENT = 3;
-
-    /**
-     * 差评数量 key
-     */
-    public static final String NEGATIVE_COMMENT_COUNT = "negativeCommentCount";
-
-    // TODO @puhui999：这个挪到 DO 那没问题的哈；NICKNAME_ANONYMOUS
-    /**
-     * 默认匿名昵称
-     */
-    public static final String ANONYMOUS_NICKNAME = "匿名用户";
 
     @Schema(description = "商品SPU编号", example = "29502")
     @NotNull(message = "商品SPU编号不能为空")
