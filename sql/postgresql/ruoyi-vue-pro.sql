@@ -2405,6 +2405,10 @@ INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "st
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1158, 3, 'implicit', 'implicit', 'system_oauth2_grant_type', 0, 'success', '', '简化模式', '1', '2022-05-12 00:23:40', '1', '2022-05-11 16:26:05', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1159, 4, 'client_credentials', 'client_credentials', 'system_oauth2_grant_type', 0, 'default', '', '客户端模式', '1', '2022-05-12 00:23:51', '1', '2022-05-11 16:26:08', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1160, 5, 'refresh_token', 'refresh_token', 'system_oauth2_grant_type', 0, 'info', '', '刷新模式', '1', '2022-05-12 00:24:02', '1', '2022-05-11 16:26:11', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1161, 4, 'Vue 3 Vben', '30', 'infra_codegen_front_type', 0, '', '', '', '1', '2023-06-14 15:24:37.447', '1', '2023-06-14 15:24:37.447', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1162, 3, 'Vue 3 Schema', '21', 'infra_codegen_front_type', 0, '', '', 'Vue 3 Element Plus Schema', '1', '2023-06-14 15:24:18.714', '1', '2023-06-14 15:36:40.317', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1163, 2, 'Vue 3', '20', 'infra_codegen_front_type', 0, '', '', 'Vue 3 Element Plus', '1', '2023-06-14 15:24:05.654', '1', '2023-06-14 15:24:05.654', 0);
+INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1164, 1, 'Vue 2', '10', 'infra_codegen_front_type', 0, '', '', 'Vue 2', '1', '2023-06-14 15:23:12.211', '1', '2023-06-14 15:23:57.816', 0);
 COMMIT;
 
 -- ----------------------------
@@ -2500,6 +2504,7 @@ INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creat
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (145, '角色类型', 'system_role_type', 0, '角色类型', '1', '2022-02-16 13:01:46', '1', '2022-02-16 13:01:46', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (146, '文件存储器', 'infra_file_storage', 0, '文件存储器', '1', '2022-03-15 00:24:38', '1', '2022-03-15 00:24:38', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (147, 'OAuth 2.0 授权类型', 'system_oauth2_grant_type', 0, 'OAuth 2.0 授权类型（模式）', '1', '2022-05-12 00:20:52', '1', '2022-05-11 16:25:49', 0);
+INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (148, '生成前端代码类型', 'infra_codegen_front_type', 0, '生成前端代码类型', '1', '2023-6-14 16:07:35', '1', '2023-6-14 16:07:39', 0);
 COMMIT;
 
 -- ----------------------------
@@ -2589,7 +2594,7 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS "system_menu";
 CREATE TABLE "system_menu" (
-  "id" int8 NOT NULL,
+  "id" int8 NOT NULL DEFAULT nextval('system_menu_seq'::regclass),
   "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "permission" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
   "type" int2 NOT NULL,
@@ -2599,12 +2604,12 @@ CREATE TABLE "system_menu" (
   "icon" varchar(100) COLLATE "pg_catalog"."default",
   "component" varchar(255) COLLATE "pg_catalog"."default",
   "status" int2 NOT NULL,
-  "visible" bool NOT NULL,
-  "keep_alive" bool NOT NULL,
+  "visible" bool NOT NULL DEFAULT true,
+  "keep_alive" bool NOT NULL DEFAULT false,
   "creator" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6) NOT NULL,
+  "create_time" timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   "updater" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6) NOT NULL,
+  "update_time" timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   "deleted" int2 NOT NULL DEFAULT 0,
   "component_name" varchar(255) COLLATE "pg_catalog"."default",
   "always_show" char(1) COLLATE "pg_catalog"."default"
