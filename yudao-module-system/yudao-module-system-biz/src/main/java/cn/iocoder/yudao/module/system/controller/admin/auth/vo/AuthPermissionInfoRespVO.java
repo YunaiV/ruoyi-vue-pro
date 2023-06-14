@@ -15,13 +15,13 @@ import java.util.Set;
 @Builder
 public class AuthPermissionInfoRespVO {
 
-    @Schema(description = "用户信息", required = true)
+    @Schema(description = "用户信息", requiredMode = Schema.RequiredMode.REQUIRED)
     private UserVO user;
 
-    @Schema(description = "角色标识数组", required = true)
+    @Schema(description = "角色标识数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private Set<String> roles;
 
-    @Schema(description = "操作权限数组", required = true)
+    @Schema(description = "操作权限数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private Set<String> permissions;
 
     @Schema(description = "用户信息 VO")
@@ -31,13 +31,13 @@ public class AuthPermissionInfoRespVO {
     @Builder
     public static class UserVO {
 
-        @Schema(description = "用户编号", required = true, example = "1024")
+        @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private Long id;
 
-        @Schema(description = "用户昵称", required = true, example = "芋道源码")
+        @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
         private String nickname;
 
-        @Schema(description = "用户头像", required = true, example = "http://www.iocoder.cn/xx.jpg")
+        @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "http://www.iocoder.cn/xx.jpg")
         private String avatar;
 
     }

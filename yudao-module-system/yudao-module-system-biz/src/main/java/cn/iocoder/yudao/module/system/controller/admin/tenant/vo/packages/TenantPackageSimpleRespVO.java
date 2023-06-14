@@ -9,11 +9,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class TenantPackageSimpleRespVO {
 
-    @Schema(description = "套餐编号", required = true, example = "1024")
+    @Schema(description = "套餐编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "套餐编号不能为空")
     private Long id;
 
-    @Schema(description = "套餐名", required = true, example = "VIP")
+    @Schema(description = "套餐名", requiredMode = Schema.RequiredMode.REQUIRED, example = "VIP")
     @NotNull(message = "套餐名不能为空")
     private String name;
 

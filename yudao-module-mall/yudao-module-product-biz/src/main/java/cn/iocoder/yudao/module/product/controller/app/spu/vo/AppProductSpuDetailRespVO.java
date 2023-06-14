@@ -10,55 +10,55 @@ import java.util.List;
 @Data
 public class AppProductSpuDetailRespVO {
 
-    @Schema(description = "商品 SPU 编号", required = true, example = "1")
+    @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
     // ========== 基本信息 =========
 
-    @Schema(description = "商品名称", required = true, example = "芋道")
+    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
-    @Schema(description = "商品简介", required = true, example = "我是一个快乐简介")
+    @Schema(description = "商品简介", requiredMode = Schema.RequiredMode.REQUIRED, example = "我是一个快乐简介")
     private String introduction;
 
-    @Schema(description = "商品详情", required = true, example = "我是商品描述")
+    @Schema(description = "商品详情", requiredMode = Schema.RequiredMode.REQUIRED, example = "我是商品描述")
     private String description;
 
-    @Schema(description = "商品分类编号", required = true, example = "1")
+    @Schema(description = "商品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long categoryId;
 
-    @Schema(description = "商品封面图", required = true)
+    @Schema(description = "商品封面图", requiredMode = Schema.RequiredMode.REQUIRED)
     private String picUrl;
 
-    @Schema(description = "商品轮播图", required = true)
+    @Schema(description = "商品轮播图", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<String> sliderPicUrls;
 
-    @Schema(description = "商品视频", required = true)
+    @Schema(description = "商品视频", requiredMode = Schema.RequiredMode.REQUIRED)
     private String videoUrl;
 
-    @Schema(description = "单位名", required = true, example = "个")
+    @Schema(description = "单位名", requiredMode = Schema.RequiredMode.REQUIRED, example = "个")
     private String unitName;
 
     // ========== 营销相关字段 =========
 
-    @Schema(description = "活动排序数组", required = true, example = "1024")
+    @Schema(description = "活动排序数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private List<Integer> activityOrders;
 
     // ========== SKU 相关字段 =========
 
-    @Schema(description = "规格类型", required = true, example = "true")
+    @Schema(description = "规格类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean specType;
 
-    @Schema(description = "商品价格，单位使用：分", required = true, example = "1024")
+    @Schema(description = "商品价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer price;
 
-    @Schema(description = "市场价，单位使用：分", required = true, example = "1024")
+    @Schema(description = "市场价，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer marketPrice;
 
-    @Schema(description = "VIP 价格，单位使用：分", required = true, example = "968") // 通过会员等级，计算出折扣后价格
+    @Schema(description = "VIP 价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "968") // 通过会员等级，计算出折扣后价格
     private Integer vipPrice;
 
-    @Schema(description = "库存", required = true, example = "666")
+    @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
     private Integer stock;
 
     /**
@@ -68,7 +68,7 @@ public class AppProductSpuDetailRespVO {
 
     // ========== 统计相关字段 =========
 
-    @Schema(description = "商品销量", required = true, example = "1024")
+    @Schema(description = "商品销量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer salesCount;
 
     @Schema(description = "用户 App - 商品 SPU 明细的 SKU 信息")
@@ -83,19 +83,19 @@ public class AppProductSpuDetailRespVO {
          */
         private List<AppProductPropertyValueDetailRespVO> properties;
 
-        @Schema(description = "销售价格，单位：分", required = true, example = "1024")
+        @Schema(description = "销售价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private Integer price;
 
-        @Schema(description = "市场价，单位使用：分", required = true, example = "1024")
+        @Schema(description = "市场价，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private Integer marketPrice;
 
-        @Schema(description = "VIP 价格，单位使用：分", required = true, example = "968") // 通过会员等级，计算出折扣后价格
+        @Schema(description = "VIP 价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "968") // 通过会员等级，计算出折扣后价格
         private Integer vipPrice;
 
-        @Schema(description = "图片地址", required = true, example = "https://www.iocoder.cn/xx.png")
+        @Schema(description = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
         private String picUrl;
 
-        @Schema(description = "库存", required = true, example = "1")
+        @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer stock;
 
         @Schema(description = "商品重量", example = "1") // 单位：kg 千克

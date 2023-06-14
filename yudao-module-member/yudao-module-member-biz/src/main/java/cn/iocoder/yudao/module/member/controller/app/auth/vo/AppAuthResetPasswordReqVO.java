@@ -20,18 +20,18 @@ import javax.validation.constraints.Pattern;
 @Builder
 public class AppAuthResetPasswordReqVO {
 
-    @Schema(description = "新密码", required = true, example = "buzhidao")
+    @Schema(description = "新密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "buzhidao")
     @NotEmpty(message = "新密码不能为空")
     @Length(min = 4, max = 16, message = "密码长度为 4-16 位")
     private String password;
 
-    @Schema(description = "手机验证码", required = true, example = "1024")
+    @Schema(description = "手机验证码", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotEmpty(message = "手机验证码不能为空")
     @Length(min = 4, max = 6, message = "手机验证码长度为 4-6 位")
     @Pattern(regexp = "^[0-9]+$", message = "手机验证码必须都是数字")
     private String code;
 
-    @Schema(description = "手机号",required = true,example = "15878962356")
+    @Schema(description = "手机号",requiredMode = Schema.RequiredMode.REQUIRED,example = "15878962356")
     @NotBlank(message = "手机号不能为空")
     @Mobile
     private String mobile;

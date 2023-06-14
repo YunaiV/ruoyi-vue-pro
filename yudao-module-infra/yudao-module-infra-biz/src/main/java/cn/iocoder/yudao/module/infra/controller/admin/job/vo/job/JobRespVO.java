@@ -14,17 +14,17 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class JobRespVO extends JobBaseVO {
 
-    @Schema(description = "任务编号", required = true, example = "1024")
+    @Schema(description = "任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "任务状态", required = true, example = "1")
+    @Schema(description = "任务状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
-    @Schema(description = "处理器的名字", required = true, example = "sysUserSessionTimeoutJob")
+    @Schema(description = "处理器的名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "sysUserSessionTimeoutJob")
     @NotNull(message = "处理器的名字不能为空")
     private String handlerName;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

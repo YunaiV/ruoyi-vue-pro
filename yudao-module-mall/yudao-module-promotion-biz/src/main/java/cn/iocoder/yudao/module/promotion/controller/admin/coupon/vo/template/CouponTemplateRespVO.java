@@ -15,20 +15,20 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class CouponTemplateRespVO extends CouponTemplateBaseVO {
 
-    @Schema(description = "模板编号", required = true, example = "1024")
+    @Schema(description = "模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "状态", required = true, example = "1")
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @InEnum(CommonStatusEnum.class)
     private Integer status;
 
-    @Schema(description = "领取优惠券的数量", required = true, example = "1024")
+    @Schema(description = "领取优惠券的数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer takeCount;
 
-    @Schema(description = "使用优惠券的次数", required = true, example = "2048")
+    @Schema(description = "使用优惠券的次数", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Integer useCount;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

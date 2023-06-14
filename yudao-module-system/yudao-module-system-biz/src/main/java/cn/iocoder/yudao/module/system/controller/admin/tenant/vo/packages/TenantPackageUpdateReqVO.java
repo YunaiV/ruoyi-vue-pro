@@ -10,7 +10,7 @@ import javax.validation.constraints.*;
 @ToString(callSuper = true)
 public class TenantPackageUpdateReqVO extends TenantPackageBaseVO {
 
-    @Schema(description = "套餐编号", required = true, example = "1024")
+    @Schema(description = "套餐编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "套餐编号不能为空")
     private Long id;
 

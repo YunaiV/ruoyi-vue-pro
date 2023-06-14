@@ -15,13 +15,13 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 public class DictTypeRespVO extends DictTypeBaseVO {
 
-    @Schema(description = "字典类型编号", required = true, example = "1024")
+    @Schema(description = "字典类型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "字典类型", required = true, example = "sys_common_sex")
+    @Schema(description = "字典类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "sys_common_sex")
     private String type;
 
-    @Schema(description = "创建时间", required = true, example = "时间戳格式")
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "时间戳格式")
     private LocalDateTime createTime;
 
 }

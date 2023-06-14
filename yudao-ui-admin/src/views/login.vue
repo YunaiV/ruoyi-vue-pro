@@ -83,6 +83,14 @@
                     </div>
                 </div>
               </el-form-item>
+
+              <!-- 教程说明 -->
+              <el-form-item style="width:100%; margin-top:-25px">
+                <el-link href="https://doc.iocoder.cn/" target="_blank">📚开发指南</el-link>
+                <el-link href="https://doc.iocoder.cn/video/" target="_blank" style="padding-left: 10px">🔥视频教程</el-link>
+                <el-link href="https://www.iocoder.cn/Interview/good-collection/" target="_blank" style="padding-left: 10px">⚡面试手册</el-link>
+                <el-link href="http://static.yudao.iocoder.cn/mp/Aix9975.jpeg" target="_blank" style="padding-left: 10px">🤝外包咨询</el-link>
+              </el-form-item>
             </el-form>
           </div>
         </div>

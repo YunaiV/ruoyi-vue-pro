@@ -13,13 +13,13 @@ import java.util.Date;
 @ToString(callSuper = true)
 public class MpTagRespVO extends MpTagBaseVO {
 
-    @Schema(description = "编号", required = true, example = "1024")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "此标签下粉丝数量", required = true, example = "0")
+    @Schema(description = "此标签下粉丝数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer count;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private Date createTime;
 
 }

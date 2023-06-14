@@ -16,10 +16,10 @@ import java.util.List;
 @ToString(callSuper = true)
 public class TradeAfterSaleRespPageItemVO extends TradeAfterSaleBaseVO {
 
-    @Schema(description = "售后编号", required = true, example = "27630")
+    @Schema(description = "售后编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "27630")
     private Long id;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
     /**

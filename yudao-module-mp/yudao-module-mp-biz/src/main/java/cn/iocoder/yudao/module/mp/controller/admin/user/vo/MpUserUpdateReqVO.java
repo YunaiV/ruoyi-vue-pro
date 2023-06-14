@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class MpUserUpdateReqVO {
 
-    @Schema(description = "编号", required = true, example = "1024")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "编号不能为空")
     private Long id;
 

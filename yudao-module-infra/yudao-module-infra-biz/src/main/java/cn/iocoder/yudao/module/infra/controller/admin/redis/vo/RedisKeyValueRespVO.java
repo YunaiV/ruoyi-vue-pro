@@ -9,10 +9,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class RedisKeyValueRespVO {
 
-    @Schema(description = "c5f6990767804a928f4bb96ca249febf", required = true, example = "String")
+    @Schema(description = "c5f6990767804a928f4bb96ca249febf", requiredMode = Schema.RequiredMode.REQUIRED, example = "String")
     private String key;
 
-    @Schema(required = true, example = "String")
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "String")
     private String value;
 
 }

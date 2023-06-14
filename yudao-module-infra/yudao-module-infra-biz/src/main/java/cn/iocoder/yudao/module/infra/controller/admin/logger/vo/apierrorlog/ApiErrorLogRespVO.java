@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class ApiErrorLogRespVO extends ApiErrorLogBaseVO {
 
-    @Schema(description = "编号", required = true, example = "1024")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer id;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "处理时间", required = true)
+    @Schema(description = "处理时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime processTime;
 
     @Schema(description = "处理用户编号", example = "233")

@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class PayChannelRespVO extends PayChannelBaseVO {
 
-    @Schema(description = "商户编号", required = true)
+    @Schema(description = "商户编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "配置", required = true)
+    @Schema(description = "配置", requiredMode = Schema.RequiredMode.REQUIRED)
     private String config;
 }

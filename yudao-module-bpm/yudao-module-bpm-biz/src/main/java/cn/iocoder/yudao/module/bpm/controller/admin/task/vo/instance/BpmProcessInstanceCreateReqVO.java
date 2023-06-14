@@ -10,7 +10,7 @@ import java.util.Map;
 @Data
 public class BpmProcessInstanceCreateReqVO {
 
-    @Schema(description = "流程定义的编号", required = true, example = "1024")
+    @Schema(description = "流程定义的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotEmpty(message = "流程定义编号不能为空")
     private String processDefinitionId;
 

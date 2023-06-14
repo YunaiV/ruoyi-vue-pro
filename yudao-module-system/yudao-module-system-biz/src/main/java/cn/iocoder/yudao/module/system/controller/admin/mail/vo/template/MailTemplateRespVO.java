@@ -14,13 +14,13 @@ import java.util.List;
 @ToString(callSuper = true)
 public class MailTemplateRespVO extends MailTemplateBaseVO {
 
-    @Schema(description = "编号", required = true, example = "1024")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
     @Schema(description = "参数数组", example = "name,code")
     private List<String> params;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }
