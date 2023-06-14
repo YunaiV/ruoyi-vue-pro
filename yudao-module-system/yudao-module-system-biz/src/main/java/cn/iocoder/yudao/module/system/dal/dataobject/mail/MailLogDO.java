@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -108,7 +108,7 @@ public class MailLogDO extends BaseDO implements Serializable {
     /**
      * 发送时间
      */
-    private Date sendTime;
+    private LocalDateTime sendTime;
     /**
      * 发送返回的消息 ID
      */

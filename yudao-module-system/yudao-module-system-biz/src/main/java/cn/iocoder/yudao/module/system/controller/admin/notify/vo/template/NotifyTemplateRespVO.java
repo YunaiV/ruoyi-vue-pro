@@ -10,13 +10,13 @@ import java.util.*;
 @ToString(callSuper = true)
 public class NotifyTemplateRespVO extends NotifyTemplateBaseVO {
 
-    @Schema(description = "ID", required = true, example = "1024")
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
     @Schema(description = "参数数组", example = "name,code")
     private List<String> params;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private Date createTime;
 
 }

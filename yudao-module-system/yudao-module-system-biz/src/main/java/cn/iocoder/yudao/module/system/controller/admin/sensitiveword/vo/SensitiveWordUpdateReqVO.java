@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class SensitiveWordUpdateReqVO extends SensitiveWordBaseVO {
 
-    @Schema(description = "编号", required = true, example = "1")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "编号不能为空")
     private Long id;
 

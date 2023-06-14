@@ -1,5 +1,5 @@
 import { defHttp } from '@/utils/http/axios'
-
+#set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
 
 // 查询${table.classComment}列表
 export function get${simpleClassName}Page(params) {

@@ -19,11 +19,11 @@ public class SeckillActivityCreateReqVO extends SeckillActivityBaseVO {
     @Schema(description = "备注", example = "限时秒杀活动")
     private String remark;
 
-    @Schema(description = "排序", required = true, example = "1")
+    @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
-    @Schema(description = "秒杀时段id", required = true, example = "1,3")
+    @Schema(description = "秒杀时段id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,3")
     @NotEmpty(message = "参与场次不能为空")
     private List<Long> timeIds;
 

@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class ProductPropertyBaseVO {
 
-    @Schema(description = "名称", required = true, example = "颜色")
+    @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "颜色")
     @NotBlank(message = "名称不能为空")
     private String name;
 

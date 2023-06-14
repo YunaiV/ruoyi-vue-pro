@@ -11,15 +11,15 @@ import javax.validation.constraints.NotNull;
 @Data
 public class PayMerchantBaseVO {
 
-    @Schema(description = "商户全称", required = true)
+    @Schema(description = "商户全称", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商户全称不能为空")
     private String name;
 
-    @Schema(description = "商户简称", required = true)
+    @Schema(description = "商户简称", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商户简称不能为空")
     private String shortName;
 
-    @Schema(description = "开启状态", required = true)
+    @Schema(description = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 

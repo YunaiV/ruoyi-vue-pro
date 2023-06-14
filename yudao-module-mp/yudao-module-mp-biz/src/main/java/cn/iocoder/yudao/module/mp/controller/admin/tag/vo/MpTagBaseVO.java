@@ -14,7 +14,7 @@ import javax.validation.constraints.NotEmpty;
 @Data
 public class MpTagBaseVO {
 
-    @Schema(description = "标签名", required = true, example = "土豆")
+    @Schema(description = "标签名", requiredMode = Schema.RequiredMode.REQUIRED, example = "土豆")
     @NotEmpty(message = "标签名不能为空")
     private String name;
 

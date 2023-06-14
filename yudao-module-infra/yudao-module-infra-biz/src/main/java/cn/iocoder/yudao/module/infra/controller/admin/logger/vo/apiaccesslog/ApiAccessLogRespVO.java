@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class ApiAccessLogRespVO extends ApiAccessLogBaseVO {
 
-    @Schema(description = "日志主键", required = true, example = "1024")
+    @Schema(description = "日志主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }
