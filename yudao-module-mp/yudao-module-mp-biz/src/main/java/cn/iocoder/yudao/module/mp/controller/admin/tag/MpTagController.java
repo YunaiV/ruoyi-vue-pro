@@ -55,9 +55,9 @@ public class MpTagController {
     @GetMapping("/get")
     @Operation(summary = "获取公众号标签详情")
     @PreAuthorize("@ss.hasPermission('mp:tag:query')")
-    public CommonResult<MpTagDO> get(@RequestParam("id") Long id) {
+    public CommonResult<MpTagRespVO> get(@RequestParam("id") Long id) {
         MpTagDO mpTagDO = mpTagService.get(id);
-        return success(mpTagDO);
+        return success(MpTagConvert.INSTANCE.convert(mpTagDO));
     }
 
     @GetMapping("/page")
