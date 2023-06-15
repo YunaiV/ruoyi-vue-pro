@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplat
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplatePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplate.DeliveryExpressTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
-import cn.iocoder.yudao.module.trade.service.delivery.bo.SpuDeliveryExpressTemplateRespBO;
+import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateRespBO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -83,14 +83,12 @@ public interface DeliveryExpressTemplateService {
      */
     DeliveryExpressTemplateDO validateDeliveryExpressTemplate(Long templateId);
 
-    // TODO @jason：可以把 spuIds 改成传递 ids 么？价格计算那，在 TradePriceCalculateRespBO 冗余好 templateId 字段。目的是，减少重复的查询
     /**
-     * 基于指定的 SPU 编号数组和收件人地址区域编号. 获取匹配运费模板
+     * 基于运费模板编号数组和收件人地址区域编号. 获取匹配运费模板
      *
-     * @param spuIds    SPU 编号列表
+     * @param ids    编号列表
      * @param areaId 区域编号
-     * @return Map (spuId -> 运费模板设置)
+     * @return Map (templateId -> 运费模板设置)
      */
-    Map<Long, SpuDeliveryExpressTemplateRespBO> getExpressTemplateMapBySpuIdsAndArea(Collection<Long> spuIds, Integer areaId);
-
+    Map<Long, DeliveryExpressTemplateRespBO> getExpressTemplateMapByIdsAndArea(Collection<Long> ids, Integer areaId);
 }

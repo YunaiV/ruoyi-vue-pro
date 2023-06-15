@@ -6,8 +6,7 @@ import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.expresstemplat
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateChargeDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateFreeDO;
-import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateChargeBO;
-import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateFreeBO;
+import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateRespBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -49,7 +48,7 @@ public interface DeliveryExpressTemplateConvert {
 
     DeliveryExpressTemplateChargeDO convertTemplateCharge(DeliveryExpressTemplateUpdateReqVO.ExpressTemplateChargeUpdateVO vo);
 
-    DeliveryExpressTemplateChargeBO convertTemplateCharge(DeliveryExpressTemplateChargeDO bean);
+    DeliveryExpressTemplateRespBO.DeliveryExpressTemplateChargeBO convertTemplateCharge(DeliveryExpressTemplateChargeDO bean);
 
     default List<DeliveryExpressTemplateChargeDO> convertTemplateChargeList(Long templateId, Integer chargeMode, List<ExpressTemplateChargeBaseVO> list) {
         return CollectionUtils.convertList(list, vo -> convertTemplateCharge(templateId, chargeMode, vo));
@@ -61,7 +60,7 @@ public interface DeliveryExpressTemplateConvert {
 
     DeliveryExpressTemplateFreeDO convertTemplateFree(DeliveryExpressTemplateUpdateReqVO.ExpressTemplateFreeUpdateVO vo);
 
-    DeliveryExpressTemplateFreeBO convertTemplateFree(DeliveryExpressTemplateFreeDO bean);
+    DeliveryExpressTemplateRespBO.DeliveryExpressTemplateFreeBO convertTemplateFree(DeliveryExpressTemplateFreeDO bean);
 
     List<ExpressTemplateChargeBaseVO> convertTemplateChargeList(List<DeliveryExpressTemplateChargeDO> list);
 

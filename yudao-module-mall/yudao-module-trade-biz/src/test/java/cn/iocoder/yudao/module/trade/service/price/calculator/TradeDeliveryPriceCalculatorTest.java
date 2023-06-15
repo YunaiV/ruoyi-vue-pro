@@ -4,9 +4,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressTemplateService;
-import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateChargeBO;
-import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateFreeBO;
-import cn.iocoder.yudao.module.trade.service.delivery.bo.SpuDeliveryExpressTemplateRespBO;
+import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,9 +42,9 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
     private TradePriceCalculateReqBO reqBO;
     private TradePriceCalculateRespBO resultBO;
     private AddressRespDTO addressResp;
-    private DeliveryExpressTemplateChargeBO chargeBO;
-    private DeliveryExpressTemplateFreeBO freeBO;
-    private SpuDeliveryExpressTemplateRespBO spuTemplateRespBO;
+    private DeliveryExpressTemplateRespBO.DeliveryExpressTemplateChargeBO chargeBO;
+    private DeliveryExpressTemplateRespBO.DeliveryExpressTemplateFreeBO freeBO;
+    private DeliveryExpressTemplateRespBO templateRespBO;
 
     @BeforeEach
     public void init(){
@@ -64,11 +62,11 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
                 .setPrice(new TradePriceCalculateRespBO.Price())
                 .setPromotions(new ArrayList<>())
                 .setItems(asList(
-                        new TradePriceCalculateRespBO.OrderItem().setSpuId(1L).setSkuId(10L).setCount(2).setSelected(true)
+                        new TradePriceCalculateRespBO.OrderItem().setDeliveryTemplateId(1L).setSkuId(10L).setCount(2).setSelected(true)
                                 .setWeight(10d).setVolume(10d).setPrice(100),
-                        new TradePriceCalculateRespBO.OrderItem().setSpuId(1L).setSkuId(20L).setCount(10).setSelected(true)
+                        new TradePriceCalculateRespBO.OrderItem().setDeliveryTemplateId(1L).setSkuId(20L).setCount(10).setSelected(true)
                                 .setWeight(10d).setVolume(10d).setPrice(200),
-                        new TradePriceCalculateRespBO.OrderItem().setSpuId(1L).setSkuId(30L).setCount(1).setSelected(false)
+                        new TradePriceCalculateRespBO.OrderItem().setDeliveryTemplateId(1L).setSkuId(30L).setCount(1).setSelected(false)
                                 .setWeight(10d).setVolume(10d).setPrice(300)
                 ));
         // 保证价格被初始化上
@@ -77,13 +75,13 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
         // 准备收件地址数据
         addressResp = randomPojo(AddressRespDTO.class, item -> item.setAreaId(10));
         // 准备运费模板费用配置数据
-        chargeBO = randomPojo(DeliveryExpressTemplateChargeBO.class,
+        chargeBO = randomPojo(DeliveryExpressTemplateRespBO.DeliveryExpressTemplateChargeBO.class,
                 item -> item.setStartCount(10D).setStartPrice(1000).setExtraCount(10D).setExtraPrice(2000));
         // 准备运费模板包邮配置数据 订单总件数 < 包邮件数时 12 < 20
-        freeBO = randomPojo(DeliveryExpressTemplateFreeBO.class,
+        freeBO = randomPojo(DeliveryExpressTemplateRespBO.DeliveryExpressTemplateFreeBO.class,
                 item -> item.setFreeCount(20).setFreePrice(100));
         // 准备 SP 运费模板 数据
-        spuTemplateRespBO = randomPojo(SpuDeliveryExpressTemplateRespBO.class,
+        templateRespBO = randomPojo(DeliveryExpressTemplateRespBO.class,
                 item -> item.setChargeMode(PIECE.getType())
                         .setTemplateCharge(chargeBO).setTemplateFree(freeBO));
     }
@@ -94,12 +92,12 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
         // SKU 1 : 100 * 2  = 200
         // SKU 2 ：200 * 10 = 2000
         // 运费  首件 1000 +  续件 2000 = 3000
-        Map<Long, SpuDeliveryExpressTemplateRespBO> respMap = new HashMap<>();
-        respMap.put(1L, spuTemplateRespBO);
+        Map<Long, DeliveryExpressTemplateRespBO> respMap = new HashMap<>();
+        respMap.put(1L, templateRespBO);
 
         // mock 方法
         when(addressApi.getAddress(eq(10L), eq(1L))).thenReturn(addressResp);
-        when(deliveryExpressTemplateService.getExpressTemplateMapBySpuIdsAndArea(eq(asSet(1L)), eq(10)))
+        when(deliveryExpressTemplateService.getExpressTemplateMapByIdsAndArea(eq(asSet(1L)), eq(10)))
                 .thenReturn(respMap);
 
         calculator.calculate(reqBO, resultBO);
@@ -131,15 +129,15 @@ public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
         // SKU 1 : 100 * 2  = 200
         // SKU 2 ：200 * 10 = 2000
         // 运费  0
-        Map<Long, SpuDeliveryExpressTemplateRespBO> respMap = new HashMap<>();
-        respMap.put(1L, spuTemplateRespBO);
+        Map<Long, DeliveryExpressTemplateRespBO> respMap = new HashMap<>();
+        respMap.put(1L, templateRespBO);
         // 准备运费模板包邮配置数据 包邮 订单总件数 > 包邮件数时 12 > 10
-        freeBO = randomPojo(DeliveryExpressTemplateFreeBO.class,
+        freeBO = randomPojo(DeliveryExpressTemplateRespBO.DeliveryExpressTemplateFreeBO.class,
                 item -> item.setFreeCount(10).setFreePrice(1000));
-        spuTemplateRespBO.setTemplateFree(freeBO);
+        templateRespBO.setTemplateFree(freeBO);
         // mock 方法
         when(addressApi.getAddress(eq(10L), eq(1L))).thenReturn(addressResp);
-        when(deliveryExpressTemplateService.getExpressTemplateMapBySpuIdsAndArea(eq(asSet(1L)), eq(10)))
+        when(deliveryExpressTemplateService.getExpressTemplateMapByIdsAndArea(eq(asSet(1L)), eq(10)))
                 .thenReturn(respMap);
 
         calculator.calculate(reqBO, resultBO);
