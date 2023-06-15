@@ -29,7 +29,7 @@ export function getUserPage(query) {
 // 同步公众号粉丝
 export function syncUser(accountId) {
   return request({
-    url: '/mp/tag/sync?accountId=' + accountId,
+    url: '/mp/user/sync?accountId=' + accountId,
     method: 'post'
   })
 }

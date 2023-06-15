@@ -14,7 +14,7 @@ import javax.validation.constraints.NotEmpty;
 @ToString(callSuper = true)
 public class MpTagPageReqVO extends PageParam {
 
-    @Schema(description = "公众号账号的编号", required = true, example = "2048")
+    @Schema(description = "公众号账号的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     @NotEmpty(message = "公众号账号的编号不能为空")
     private Long accountId;
 

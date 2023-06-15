@@ -13,11 +13,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProductPropertyValueBaseVO {
 
-    @Schema(description = "属性项的编号", required = true, example = "1024")
+    @Schema(description = "属性项的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "属性项的编号不能为空")
     private Long propertyId;
 
-    @Schema(description = "名称", required = true, example = "红色")
+    @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "红色")
     @NotEmpty(message = "名称名字不能为空")
     private String name;
 

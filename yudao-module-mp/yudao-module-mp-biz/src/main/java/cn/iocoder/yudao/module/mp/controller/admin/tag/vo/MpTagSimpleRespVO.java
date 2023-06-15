@@ -7,13 +7,13 @@ import lombok.Data;
 @Data
 public class MpTagSimpleRespVO {
 
-    @Schema(description = "编号", required = true, example = "1024")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "公众号的标签编号", required = true, example = "2048")
+    @Schema(description = "公众号的标签编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Long tagId;
 
-    @Schema(description = "标签名称", required = true, example = "快乐")
+    @Schema(description = "标签名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "快乐")
     private String name;
 
 }

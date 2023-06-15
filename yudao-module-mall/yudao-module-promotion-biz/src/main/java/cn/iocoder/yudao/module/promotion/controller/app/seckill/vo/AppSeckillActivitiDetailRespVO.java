@@ -27,10 +27,13 @@ public class AppSeckillActivitiDetailRespVO {
     @Schema(description = "活动结束时间", required = true)
     private LocalDateTime endTime;
 
+
+    private Long successGruopCount;
+
     @Schema(description = "商品 SPU 编号", required = true, example = "2048")
     private Long spuId;
 
-    @Schema(description = "商品 SPU 名字", required = true)
+    @Schema(description = "商品信息数组", required = true)
     private List<Product> products;
 
     @Schema(description = "商品信息")
@@ -46,7 +49,7 @@ public class AppSeckillActivitiDetailRespVO {
         @Schema(description = "秒杀限量库存", required = true, example = "50")
         private Integer quota;
 
-        @Schema(description = "limitCount", required = true, example = "10")
+        @Schema(description = "每人限购数量", required = true, example = "10")
         private Integer limitCount;
 
     }

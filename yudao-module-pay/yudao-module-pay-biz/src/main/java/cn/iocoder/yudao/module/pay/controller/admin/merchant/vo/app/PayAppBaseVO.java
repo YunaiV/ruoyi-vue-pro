@@ -10,26 +10,26 @@ import javax.validation.constraints.*;
 @Data
 public class PayAppBaseVO {
 
-    @Schema(description = "应用名", required = true)
+    @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "应用名不能为空")
     private String name;
 
-    @Schema(description = "开启状态", required = true)
+    @Schema(description = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
     @Schema(description = "备注")
     private String remark;
 
-    @Schema(description = "支付结果的回调地址", required = true)
+    @Schema(description = "支付结果的回调地址", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "支付结果的回调地址不能为空")
     private String payNotifyUrl;
 
-    @Schema(description = "退款结果的回调地址", required = true)
+    @Schema(description = "退款结果的回调地址", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "退款结果的回调地址不能为空")
     private String refundNotifyUrl;
 
-    @Schema(description = "商户编号", required = true)
+    @Schema(description = "商户编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商户编号不能为空")
     private Long merchantId;
 

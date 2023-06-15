@@ -13,19 +13,19 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 public class UserRespVO extends UserBaseVO {
 
-    @Schema(description = "用户编号", required = true, example = "1")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "状态,参见 CommonStatusEnum 枚举类", required = true, example = "1")
+    @Schema(description = "状态,参见 CommonStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
-    @Schema(description = "最后登录 IP", required = true, example = "192.168.1.1")
+    @Schema(description = "最后登录 IP", requiredMode = Schema.RequiredMode.REQUIRED, example = "192.168.1.1")
     private String loginIp;
 
-    @Schema(description = "最后登录时间", required = true, example = "时间戳格式")
+    @Schema(description = "最后登录时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "时间戳格式")
     private LocalDateTime loginDate;
 
-    @Schema(description = "创建时间", required = true, example = "时间戳格式")
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "时间戳格式")
     private LocalDateTime createTime;
 
 }

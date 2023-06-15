@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
@@ -13,11 +13,11 @@ import java.util.Set;
 @Data
 public class BpmTaskAssignRuleBaseVO {
 
-    @Schema(description = "规则类型", required = true, example = "bpm_task_assign_rule_type")
+    @Schema(description = "规则类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "bpm_task_assign_rule_type")
     @NotNull(message = "规则类型不能为空")
     private Integer type;
 
-    @Schema(description = "规则值数组", required = true, example = "1,2,3")
+    @Schema(description = "规则值数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2,3")
     @NotNull(message = "规则值数组不能为空")
     private Set<Long> options;
 

@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class BannerUpdateReqVO extends BannerBaseVO {
 
-    @Schema(description = "banner 编号", required = true)
+    @Schema(description = "banner 编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "banner 编号不能为空")
     private Long id;
 

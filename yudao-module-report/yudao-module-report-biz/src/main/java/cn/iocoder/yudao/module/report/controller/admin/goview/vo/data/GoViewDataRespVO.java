@@ -10,10 +10,10 @@ import java.util.Map;
 @Data
 public class GoViewDataRespVO {
 
-    @Schema(description = "数据维度", required = true, example = "['product', 'data1', 'data2']")
+    @Schema(description = "数据维度", requiredMode = Schema.RequiredMode.REQUIRED, example = "['product', 'data1', 'data2']")
     private List<String> dimensions;
 
-    @Schema(description = "数据明细列表", required = true)
+    @Schema(description = "数据明细列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Map<String, Object>> source;
 
 }

@@ -12,22 +12,22 @@ import java.time.LocalDateTime;
 @Data
 public class PayDemoOrderRespVO {
 
-    @Schema(description = "订单编号", required = true, example = "1024")
+    @Schema(description = "订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "用户编号", required = true, example = "23199")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23199")
     private Long userId;
 
-    @Schema(description = "商品编号", required = true, example = "17682")
+    @Schema(description = "商品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17682")
     private Long spuId;
 
     @Schema(description = "商家备注", example = "李四")
     private String spuName;
 
-    @Schema(description = "价格，单位：分", required = true, example = "30381")
+    @Schema(description = "价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "30381")
     private Integer price;
 
-    @Schema(description = "是否已支付", required = true)
+    @Schema(description = "是否已支付", requiredMode = Schema.RequiredMode.REQUIRED)
     private Boolean payed;
 
     @Schema(description = "支付订单编号", example = "16863")
@@ -42,13 +42,13 @@ public class PayDemoOrderRespVO {
     @Schema(description = "支付退款编号", example = "23366")
     private Long payRefundId;
 
-    @Schema(description = "退款金额，单位：分", required = true, example = "14039")
+    @Schema(description = "退款金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "14039")
     private Integer refundPrice;
 
     @Schema(description = "退款时间")
     private LocalDateTime refundTime;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

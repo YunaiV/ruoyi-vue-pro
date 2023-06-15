@@ -13,25 +13,25 @@ import java.util.List;
 @Data
 public class MpMessageRespVO {
 
-    @Schema(description = "主键", required = true, example = "1024")
+    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer id;
 
-    @Schema(description = "微信公众号消息 id", required = true, example = "23953173569869169")
+    @Schema(description = "微信公众号消息 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "23953173569869169")
     private Long msgId;
 
-    @Schema(description = "公众号账号的编号", required = true, example = "1")
+    @Schema(description = "公众号账号的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long accountId;
-    @Schema(description = "公众号账号的 appid", required = true, example = "wx1234567890")
+    @Schema(description = "公众号账号的 appid", requiredMode = Schema.RequiredMode.REQUIRED, example = "wx1234567890")
     private String appId;
 
-    @Schema(description = "公众号粉丝编号", required = true, example = "2048")
+    @Schema(description = "公众号粉丝编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Long userId;
-    @Schema(description = "公众号粉丝标志", required = true, example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
+    @Schema(description = "公众号粉丝标志", requiredMode = Schema.RequiredMode.REQUIRED, example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
     private String openid;
 
-    @Schema(description = "消息类型 参见 WxConsts.XmlMsgType 枚举", required = true, example = "text")
+    @Schema(description = "消息类型 参见 WxConsts.XmlMsgType 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "text")
     private String type;
-    @Schema(description = "消息来源 参见 MpMessageSendFromEnum 枚举", required = true, example = "1")
+    @Schema(description = "消息来源 参见 MpMessageSendFromEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer sendFrom;
 
     // ========= 普通消息内容 https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_standard_messages.html
@@ -95,7 +95,7 @@ public class MpMessageRespVO {
     @Schema(description = "事件 Key 参见 WxConsts.EventType 枚举", example = "qrscene_123456")
     private String eventKey;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private Date createTime;
 
 }

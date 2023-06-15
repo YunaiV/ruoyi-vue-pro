@@ -11,11 +11,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class MpMaterialUploadNewsImageReqVO {
 
-    @Schema(description = "公众号账号的编号", required = true, example = "2048")
+    @Schema(description = "公众号账号的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     @NotNull(message = "公众号账号的编号不能为空")
     private Long accountId;
 
-    @Schema(description = "文件附件", required = true)
+    @Schema(description = "文件附件", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "文件不能为空")
     @JsonIgnore // 避免被操作日志，进行序列化，导致报错
     private MultipartFile file;

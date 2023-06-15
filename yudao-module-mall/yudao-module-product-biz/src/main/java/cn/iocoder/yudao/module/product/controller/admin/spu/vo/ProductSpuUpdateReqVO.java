@@ -23,17 +23,17 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSpuUpdateReqVO extends ProductSpuBaseVO {
 
-    @Schema(description = "商品编号", required = true, example = "1")
+    @Schema(description = "商品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "商品编号不能为空")
     private Long id;
 
-    @Schema(description = "商品销量", required = true, example = "1999")
+    @Schema(description = "商品销量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1999")
     private Integer salesCount;
 
-    @Schema(description = "浏览量", required = true, example = "1999")
+    @Schema(description = "浏览量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1999")
     private Integer browseCount;
 
-    @Schema(description = "商品状态", required = true, example = "1")
+    @Schema(description = "商品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @InEnum(ProductSpuStatusEnum.class)
     private Integer status;
 

@@ -14,22 +14,22 @@ import java.time.Duration;
 @AllArgsConstructor
 public class RedisKeyDefineRespVO {
 
-    @Schema(description = "Key 模板", required = true, example = "login_user:%s")
+    @Schema(description = "Key 模板", requiredMode = Schema.RequiredMode.REQUIRED, example = "login_user:%s")
     private String keyTemplate;
 
-    @Schema(description = "Key 类型的枚举", required = true, example = "String")
+    @Schema(description = "Key 类型的枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "String")
     private RedisKeyDefine.KeyTypeEnum keyType;
 
-    @Schema(description = "Value 类型", required = true, example = "java.lang.String")
+    @Schema(description = "Value 类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "java.lang.String")
     private Class<?> valueType;
 
-    @Schema(description = "超时类型", required = true, example = "1")
+    @Schema(description = "超时类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private RedisKeyDefine.TimeoutTypeEnum timeoutType;
 
-    @Schema(description = "过期时间，单位：毫秒", required = true, example = "1024")
+    @Schema(description = "过期时间，单位：毫秒", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Duration timeout;
 
-    @Schema(description = "备注", required = true, example = "啦啦啦啦~")
+    @Schema(description = "备注", requiredMode = Schema.RequiredMode.REQUIRED, example = "啦啦啦啦~")
     private String memo;
 
 }

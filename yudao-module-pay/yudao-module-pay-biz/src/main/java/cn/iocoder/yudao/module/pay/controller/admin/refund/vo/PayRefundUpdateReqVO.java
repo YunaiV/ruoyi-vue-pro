@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 @ToString(callSuper = true)
 public class PayRefundUpdateReqVO extends PayRefundBaseVO {
 
-    @Schema(description = "支付退款编号", required = true)
+    @Schema(description = "支付退款编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "支付退款编号不能为空")
     private Long id;
 

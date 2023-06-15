@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDateTime;
-
 
 @Schema(description = "管理后台 - 用户组 Response VO")
 @Data
@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class BpmUserGroupRespVO extends BpmUserGroupBaseVO {
 
-    @Schema(description = "编号", required = true, example = "1024")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

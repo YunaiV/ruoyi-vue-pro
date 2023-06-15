@@ -22,10 +22,10 @@ public class UserPageItemRespVO extends UserRespVO {
     @Data
     public static class Dept {
 
-        @Schema(description = "部门编号", required = true, example = "1")
+        @Schema(description = "部门编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long id;
 
-        @Schema(description = "部门名称", required = true, example = "研发部")
+        @Schema(description = "部门名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "研发部")
         private String name;
 
     }
