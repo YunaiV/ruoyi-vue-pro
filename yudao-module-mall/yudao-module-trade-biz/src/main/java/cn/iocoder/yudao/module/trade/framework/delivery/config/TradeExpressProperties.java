@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.framework.delivery.config;
 
-import cn.iocoder.yudao.module.trade.framework.delivery.core.ExpressQueryProviderEnum;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClientEnum;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -9,27 +9,24 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
-// TODO @jason：TradeExpressProperties；更通用哈
 // TODO @芋艿：未来要不要放数据库中？考虑 saas 多租户时，不同租户使用不同的配置？
 /**
- * 交易快递查询的配置项
+ * 交易运费快递的配置项
  *
  * @author jason
  */
 @Component
-@ConfigurationProperties(prefix = "yudao.trade.express.query")
+@ConfigurationProperties(prefix = "yudao.trade.express")
 @Data
 @Validated
-public class TradeExpressQueryProperties {
+public class TradeExpressProperties {
 
     /**
-     * 快递查询服务商
+     * 快递客户端
      *
-     * 如果未配置，默认使用快递鸟
+     * 默认不提供，需要提醒用户配置一个快递服务商。
      */
-    // TODO @jason：可以把 expressQueryProvider 改成 client 变量，更简洁一点；
-    private ExpressQueryProviderEnum expressQueryProvider; // TODO @jaosn：默认值可以通过属性直接赋值哈；
-    // TODO @jason：需要考虑下，用户只配置了其中一个；
+    private ExpressClientEnum client = ExpressClientEnum.NOT_PROVIDE;
     /**
      * 快递鸟配置
      */

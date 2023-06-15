@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.trade.framework.delivery.core.dto.provider.kd100;
+package cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.kd100;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

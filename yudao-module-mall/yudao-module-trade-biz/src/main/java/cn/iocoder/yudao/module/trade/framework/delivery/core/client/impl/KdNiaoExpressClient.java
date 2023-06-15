@@ -1,16 +1,17 @@
-package cn.iocoder.yudao.module.trade.framework.delivery.core.impl;
+package cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.trade.framework.delivery.config.TradeExpressQueryProperties;
-import cn.iocoder.yudao.module.trade.framework.delivery.core.ExpressQueryProvider;
-import cn.iocoder.yudao.module.trade.framework.delivery.core.dto.ExpressQueryReqDTO;
-import cn.iocoder.yudao.module.trade.framework.delivery.core.dto.ExpressQueryRespDTO;
-import cn.iocoder.yudao.module.trade.framework.delivery.core.dto.provider.kdniao.KdNiaoExpressQueryReqDTO;
-import cn.iocoder.yudao.module.trade.framework.delivery.core.dto.provider.kdniao.KdNiaoExpressQueryRespDTO;
+import cn.iocoder.yudao.module.trade.framework.delivery.config.TradeExpressProperties;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClient;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressQueryReqDTO;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressQueryRespDTO;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.kdniao.KdNiaoExpressQueryReqDTO;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.kdniao.KdNiaoExpressQueryRespDTO;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,15 +24,16 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_API_QUERY_FAILED;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_API_QUERY_ERROR;
-import static cn.iocoder.yudao.module.trade.framework.delivery.core.convert.ExpressQueryConvert.INSTANCE;
+import static cn.iocoder.yudao.module.trade.framework.delivery.core.client.convert.ExpressQueryConvert.INSTANCE;
 
 /**
- * 快递鸟服务商
+ * 快递鸟客户端
  *
  * @author jason
  */
 @Slf4j
-public class KdNiaoExpressQueryProvider implements ExpressQueryProvider {
+@AllArgsConstructor
+public class KdNiaoExpressClient implements ExpressClient {
 
     private static final String REAL_TIME_QUERY_URL = "https://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx";
 
@@ -39,15 +41,8 @@ public class KdNiaoExpressQueryProvider implements ExpressQueryProvider {
      * 快递鸟即时查询免费版 RequestType
      */
     private static final String REAL_TIME_FREE_REQ_TYPE = "1002";
-
     private final RestTemplate restTemplate;
-    private final TradeExpressQueryProperties.KdNiaoConfig config;
-
-    // TODO @jason：可以改成 lombok 哈
-    public KdNiaoExpressQueryProvider(RestTemplate restTemplate, TradeExpressQueryProperties.KdNiaoConfig config) {
-        this.restTemplate = restTemplate;
-        this.config = config;
-    }
+    private final TradeExpressProperties.KdNiaoConfig config;
 
     /**
      * 快递鸟即时查询免费版本
@@ -56,21 +51,20 @@ public class KdNiaoExpressQueryProvider implements ExpressQueryProvider {
      * @param reqDTO 查询请求参数
      */
     @Override
-    public List<ExpressQueryRespDTO> realTimeQueryExpress(ExpressQueryReqDTO reqDTO) {
+    public List<ExpressQueryRespDTO> getExpressTrackList(ExpressQueryReqDTO reqDTO) {
         KdNiaoExpressQueryReqDTO kdNiaoReqData = INSTANCE.convert(reqDTO);
         // 快递公司编码需要转成大写
-        kdNiaoReqData.setExpressCompanyCode(reqDTO.getExpressCompanyCode().toUpperCase());
-        KdNiaoExpressQueryRespDTO respDTO = sendKdNiaoApiRequest(REAL_TIME_QUERY_URL, REAL_TIME_FREE_REQ_TYPE,
+        kdNiaoReqData.setExpressCode(reqDTO.getExpressCode().toUpperCase());
+        KdNiaoExpressQueryRespDTO respDTO = requestKdNiaoApi(REAL_TIME_QUERY_URL, REAL_TIME_FREE_REQ_TYPE,
                 kdNiaoReqData, KdNiaoExpressQueryRespDTO.class);
-        log.debug("[realTimeQueryExpress][快递鸟即时查询接口返回 {}]", respDTO);
-        if(!respDTO.getSuccess()){
-            throw exception(EXPRESS_API_QUERY_FAILED, respDTO.getReason());
-        }else{
-            if (CollUtil.isNotEmpty(respDTO.getTracks())) {
-                return INSTANCE.convertList(respDTO.getTracks());
-            }else{
-                return Collections.emptyList();
-            }
+        log.debug("[getExpressTrackList][快递鸟即时查询接口返回 {}]", respDTO);
+        if (respDTO == null || !respDTO.getSuccess()) {
+            throw exception(EXPRESS_API_QUERY_FAILED, respDTO == null ? "" : respDTO.getReason());
+        }
+        if (CollUtil.isNotEmpty(respDTO.getTracks())) {
+            return INSTANCE.convertList(respDTO.getTracks());
+        } else {
+            return Collections.emptyList();
         }
     }
 
@@ -83,8 +77,8 @@ public class KdNiaoExpressQueryProvider implements ExpressQueryProvider {
      * @param <Req> 每个请求的请求结构 Req DTO
      * @param <Resp> 每个请求的响应结构 Resp DTO
      */
-    private  <Req, Resp> Resp sendKdNiaoApiRequest(String url, String requestType, Req req,
-                                                   Class<Resp> respClass){
+    private  <Req, Resp> Resp requestKdNiaoApi(String url, String requestType, Req req,
+                                               Class<Resp> respClass){
         // 请求头
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -97,19 +91,16 @@ public class KdNiaoExpressQueryProvider implements ExpressQueryProvider {
         requestBody.add("EBusinessID", config.getBusinessId());
         requestBody.add("DataSign", dataSign);
         requestBody.add("RequestType", requestType);
-        log.debug("[sendKdNiaoApiRequest][快递鸟接口 RequestType : {}, 的请求参数 {}]", requestType, requestBody);
-
+        log.debug("[requestKdNiaoApi][快递鸟接口 RequestType : {}, 的请求参数 {}]", requestType, requestBody);
         // 发送请求
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
         log.debug("快递鸟接口 RequestType : {}, 的响应结果 {}", requestType,  responseEntity);
         // 处理响应
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            String response = responseEntity.getBody();
-            return JsonUtils.parseObject(response, respClass);
-        } else {
+        if (!responseEntity.getStatusCode().is2xxSuccessful()) {
             throw exception(EXPRESS_API_QUERY_ERROR);
         }
+        return JsonUtils.parseObject(responseEntity.getBody(), respClass);
     }
 
     /**

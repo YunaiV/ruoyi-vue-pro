@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.trade.framework.delivery.core.dto;
+package cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto;
 
 import lombok.Data;
 

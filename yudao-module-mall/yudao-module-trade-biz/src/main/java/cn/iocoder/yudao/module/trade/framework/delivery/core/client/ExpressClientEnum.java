@@ -1,16 +1,15 @@
-package cn.iocoder.yudao.module.trade.framework.delivery.core;
+package cn.iocoder.yudao.module.trade.framework.delivery.core.client;
 
 import lombok.Getter;
 
 /**
- * 快递查询服务商枚举
+ * 快递客户端枚举
  *
  * @author jason
  */
 @Getter
-
-public enum ExpressQueryProviderEnum {
-
+public enum ExpressClientEnum {
+    NOT_PROVIDE("not-provide","未提供"),
     KD_NIAO("kd-niao", "快递鸟"),
     KD_100("kd-100", "快递100");
 
@@ -24,10 +23,8 @@ public enum ExpressQueryProviderEnum {
      */
     private final String name;
 
-    // TODO @jaosn：@AllArgsConstructor 可以替代哈
-    ExpressQueryProviderEnum(String code, String name) {
+    ExpressClientEnum(String code, String name) {
         this.code = code;
         this.name = name;
     }
-
 }

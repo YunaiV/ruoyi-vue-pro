@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.trade.framework.delivery.core.dto;
+package cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto;
 
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import lombok.Data;
@@ -16,8 +16,7 @@ public class ExpressQueryReqDTO {
      *
      * 对应 {@link DeliveryExpressDO#getCode()}
      */
-    // TODO @jaosn：要不改成 expressCode；项目里使用这个哈
-    private String expressCompanyCode;
+    private String expressCode;
 
     /**
      * 发货快递单号

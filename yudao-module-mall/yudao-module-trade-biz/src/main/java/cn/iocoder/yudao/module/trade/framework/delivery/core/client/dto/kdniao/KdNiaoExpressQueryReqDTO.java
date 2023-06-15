@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.trade.framework.delivery.core.dto.provider.kdniao;
+package cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.kdniao;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,12 +13,11 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class KdNiaoExpressQueryReqDTO {
 
-    // TODO @jaosn：要不改成 expressCode；项目里使用这个哈
     /**
      * 快递公司编码
      */
     @JsonProperty("ShipperCode")
-    private String expressCompanyCode;
+    private String expressCode;
     /**
      * 快递单号
      */

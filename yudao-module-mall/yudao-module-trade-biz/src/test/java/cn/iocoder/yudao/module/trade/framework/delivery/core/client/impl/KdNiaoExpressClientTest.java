@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.module.trade.framework.delivery.core.impl;
+package cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.module.trade.framework.delivery.config.TradeExpressQueryProperties;
-import cn.iocoder.yudao.module.trade.framework.delivery.core.dto.ExpressQueryReqDTO;
+import cn.iocoder.yudao.module.trade.framework.delivery.config.TradeExpressProperties;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressQueryReqDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -21,35 +21,35 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author jason
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = KdNiaoExpressQueryProviderTest.Application.class)
-@ActiveProfiles("trade-delivery-query") // 设置使用 trade-delivery-query 配置文件 TODO @jason：可以直接写到 application-unit-test.yaml 配置文件里
-public class KdNiaoExpressQueryProviderTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = KdNiaoExpressClientTest.Application.class)
+@ActiveProfiles("unit-test")
+public class KdNiaoExpressClientTest {
     @Resource
     private RestTemplateBuilder builder;
     @Resource
-    private TradeExpressQueryProperties expressQueryProperties;
+    private TradeExpressProperties expressQueryProperties;
 
-    private KdNiaoExpressQueryProvider kdNiaoExpressQueryProvider;
+    private KdNiaoExpressClient kdNiaoExpressClient;
 
     @BeforeEach
     public void init(){
-        kdNiaoExpressQueryProvider = new KdNiaoExpressQueryProvider(builder.build(),expressQueryProperties.getKdNiao());
+        kdNiaoExpressClient = new KdNiaoExpressClient(builder.build(),expressQueryProperties.getKdNiao());
     }
     @Test
     @Disabled("需要 授权 key. 暂时忽略")
     void testRealTimeQueryExpressFailed() {
         assertThrows(ServiceException.class,() ->{
             ExpressQueryReqDTO reqDTO = new ExpressQueryReqDTO();
-            reqDTO.setExpressCompanyCode("yy");
+            reqDTO.setExpressCode("yy");
             reqDTO.setLogisticsNo("YT9383342193097");
-            kdNiaoExpressQueryProvider.realTimeQueryExpress(reqDTO);
+            kdNiaoExpressClient.getExpressTrackList(reqDTO);
         });
     }
 
     @Import({
             RestTemplateAutoConfiguration.class
     })
-    @EnableConfigurationProperties(TradeExpressQueryProperties.class)
+    @EnableConfigurationProperties(TradeExpressProperties.class)
     public static class Application {
     }
 }
