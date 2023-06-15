@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/promotion/combination-activity")
 @Validated
-public class AppCombinationController {
+public class AppCombinationActivityController {
 
     @GetMapping("/get-detail")
     @Operation(summary = "获得拼团活动明细")
@@ -33,8 +33,10 @@ public class AppCombinationController {
         obj.setId(id);
         obj.setName("晚九点限时秒杀");
         obj.setStatus(1);
-        obj.setStartTime(LocalDateTime.of(2023, 6, 11, 0, 0, 0));
-        obj.setEndTime(LocalDateTime.of(2023, 6, 11, 23, 59, 0));
+        obj.setStartTime(LocalDateTime.of(2023, 6, 15, 0, 0, 0));
+        obj.setEndTime(LocalDateTime.of(2023, 6, 15, 23, 59, 0));
+        obj.setUserSize(2);
+        obj.setSuccessCount(100);
         obj.setSpuId(633L);
         // 创建一个Product对象的列表
         List<AppCombinationActivityDetailRespVO.Product> productList = new ArrayList<>();
