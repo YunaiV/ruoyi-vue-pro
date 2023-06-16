@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.promotion.controller.app.combination;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordDetailRespVO;
-import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordSimpleRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordRespVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.Max;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,18 +29,23 @@ public class AppCombinationRecordController {
 
     @GetMapping("/get-head-list")
     @Operation(summary = "获得最近 n 条拼团记录（团长发起的）")
-    public CommonResult<List<AppCombinationRecordSimpleRespVO>> getHeadCombinationRecordList(
+    // TODO @芋艿：注解要补全
+    public CommonResult<List<AppCombinationRecordRespVO>> getHeadCombinationRecordList(
+            @RequestParam(value = "activityId", required = false) Long activityId,
             @RequestParam("status") Integer status,
             @RequestParam(value = "count", defaultValue = "20") @Max(20) Integer count) {
-        List<AppCombinationRecordSimpleRespVO> list = new ArrayList<>();
+        List<AppCombinationRecordRespVO> list = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
-            AppCombinationRecordSimpleRespVO record = new AppCombinationRecordSimpleRespVO();
+            AppCombinationRecordRespVO record = new AppCombinationRecordRespVO();
             record.setId((long) i);
             record.setNickname("用户" + i);
             record.setAvatar("头像" + i);
             record.setExpireTime(new Date());
             record.setUserSize(10);
             record.setUserCount(i);
+            record.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+            record.setActivityId(1L);
+            record.setActivityName("活动：" + i);
             list.add(record);
         }
         return success(list);
@@ -50,23 +57,29 @@ public class AppCombinationRecordController {
     public CommonResult<AppCombinationRecordDetailRespVO> getCombinationRecordDetail(@RequestParam("id") Long id) {
         AppCombinationRecordDetailRespVO detail = new AppCombinationRecordDetailRespVO();
         // 团长
-        AppCombinationRecordSimpleRespVO headRecord = new AppCombinationRecordSimpleRespVO();
+        AppCombinationRecordRespVO headRecord = new AppCombinationRecordRespVO();
         headRecord.setId(1L);
         headRecord.setNickname("用户" + 1);
         headRecord.setAvatar("头像" + 1);
-        headRecord.setExpireTime(new Date());
+        headRecord.setExpireTime(DateUtils.addTime(Duration.ofDays(1)));
         headRecord.setUserSize(10);
         headRecord.setUserCount(3);
+        headRecord.setStatus(1);
+        headRecord.setActivityId(10L);
+        headRecord.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        headRecord.setCombinationPrice(100);
+        detail.setHeadRecord(headRecord);
         // 团员
-        List<AppCombinationRecordSimpleRespVO> list = new ArrayList<>();
+        List<AppCombinationRecordRespVO> list = new ArrayList<>();
         for (int i = 1; i <= 2; i++) {
-            AppCombinationRecordSimpleRespVO record = new AppCombinationRecordSimpleRespVO();
+            AppCombinationRecordRespVO record = new AppCombinationRecordRespVO();
             record.setId((long) i);
             record.setNickname("用户" + i);
             record.setAvatar("头像" + i);
             record.setExpireTime(new Date());
             record.setUserSize(10);
             record.setUserCount(i);
+            record.setStatus(1);
             list.add(record);
         }
         detail.setMemberRecords(list);

@@ -10,10 +10,10 @@ import java.util.List;
 public class AppCombinationRecordDetailRespVO {
 
     @Schema(description = "团长的拼团记录", required = true)
-    private AppCombinationRecordSimpleRespVO headRecord;
+    private AppCombinationRecordRespVO headRecord;
 
     @Schema(description = "成员的拼团记录", required = true)
-    private List<AppCombinationRecordSimpleRespVO> memberRecords;
+    private List<AppCombinationRecordRespVO> memberRecords;
 
     @Schema(description = "当前用户参团记录对应的订单编号", required = true, example = "1024") // 如果没参团，返回 null
     private Long orderId;
