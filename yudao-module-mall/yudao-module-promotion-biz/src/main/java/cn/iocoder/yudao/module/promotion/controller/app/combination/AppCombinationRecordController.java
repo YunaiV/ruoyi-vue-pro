@@ -45,7 +45,7 @@ public class AppCombinationRecordController {
             record.setUserCount(i);
             record.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
             record.setActivityId(1L);
-            record.setActivityName("活动：" + i);
+            record.setSpuName("活动：" + i);
             list.add(record);
         }
         return success(list);

@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.promotion.controller.app.combination;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityDetailRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityPageItemRespVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,10 +26,37 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class AppCombinationActivityController {
 
+    @GetMapping("/page")
+    @Operation(summary = "获得拼团活动分页")
+    public CommonResult<PageResult<AppCombinationActivityPageItemRespVO>> getCombinationActivityPage(PageParam pageParam) {
+        List<AppCombinationActivityPageItemRespVO> activityList = new ArrayList<>();
+        AppCombinationActivityPageItemRespVO activity1 = new AppCombinationActivityPageItemRespVO();
+        activity1.setId(1L);
+        activity1.setName("618 大拼团");
+        activity1.setUserSize(3);
+        activity1.setSpuId(2048L);
+        activity1.setPicUrl("商品图片地址");
+        activity1.setMarketPrice(50);
+        activity1.setCombinationPrice(100);
+        activityList.add(activity1);
+
+        AppCombinationActivityPageItemRespVO activity2 = new AppCombinationActivityPageItemRespVO();
+        activity2.setId(2L);
+        activity2.setName("双十一拼团");
+        activity2.setUserSize(5);
+        activity2.setSpuId(4096L);
+        activity2.setPicUrl("商品图片地址");
+        activity2.setMarketPrice(100);
+        activity2.setCombinationPrice(200);
+        activityList.add(activity2);
+
+        return success(new PageResult<>(activityList, 2L));
+    }
+
     @GetMapping("/get-detail")
     @Operation(summary = "获得拼团活动明细")
     @Parameter(name = "id", description = "活动编号", required = true, example = "1024")
-    public CommonResult<AppCombinationActivityDetailRespVO> getCombinationActivity(@RequestParam("id") Long id) {
+    public CommonResult<AppCombinationActivityDetailRespVO> getCombinationActivityDetail(@RequestParam("id") Long id) {
         // TODO 芋艿：如果禁用的时候，需要抛出异常；
         AppCombinationActivityDetailRespVO obj = new AppCombinationActivityDetailRespVO();
         // 设置其属性的值

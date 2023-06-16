@@ -33,15 +33,13 @@ public class AppCombinationRecordRespVO {
     @Schema(description = "拼团状态", required = true, example = "1")
     private Integer status;
 
+    @Schema(description = "商品名字", required = true, example = "我是大黄豆")
+    private String spuName;
+
     @Schema(description = "商品图片", required = true, example = "https://www.iocoder.cn/1.png")
     private String picUrl;
 
     @Schema(description = "拼团金额，单位：分", required = true, example = "100")
     private Integer combinationPrice;
-
-    // ========== 获得最近 n 条拼团记录（团长发起的）返回的字段 ==========
-
-    @Schema(description = "拼团活动名字", required = true, example = "1024")
-    private String activityName;
 
 }
