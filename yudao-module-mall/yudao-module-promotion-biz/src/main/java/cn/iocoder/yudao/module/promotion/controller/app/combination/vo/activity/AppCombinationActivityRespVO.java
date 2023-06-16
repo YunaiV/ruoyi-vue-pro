@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@Schema(description = "用户 App - 拼团活动分页项 Response VO")
+@Schema(description = "用户 App - 拼团活动 Response VO")
 @Data
-public class AppCombinationActivityPageItemRespVO {
+public class AppCombinationActivityRespVO {
 
     @Schema(description = "拼团活动编号", required = true, example = "1024")
     private Long id;

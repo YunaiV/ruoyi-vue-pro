@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityDetailRespVO;
-import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityPageItemRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.activity.AppCombinationActivityRespVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,11 +26,14 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class AppCombinationActivityController {
 
-    @GetMapping("/page")
-    @Operation(summary = "获得拼团活动分页")
-    public CommonResult<PageResult<AppCombinationActivityPageItemRespVO>> getCombinationActivityPage(PageParam pageParam) {
-        List<AppCombinationActivityPageItemRespVO> activityList = new ArrayList<>();
-        AppCombinationActivityPageItemRespVO activity1 = new AppCombinationActivityPageItemRespVO();
+    @GetMapping("/list")
+    @Operation(summary = "获得拼团活动列表", description = "用于小程序首页")
+    // TODO 芋艿：增加 Spring Cache
+    // TODO 芋艿：缺少 swagger 注解
+    public CommonResult<List<AppCombinationActivityRespVO>> getCombinationActivityList(
+            @RequestParam(name = "count", defaultValue = "6") Integer count) {
+        List<AppCombinationActivityRespVO> activityList = new ArrayList<>();
+        AppCombinationActivityRespVO activity1 = new AppCombinationActivityRespVO();
         activity1.setId(1L);
         activity1.setName("618 大拼团");
         activity1.setUserSize(3);
@@ -40,7 +43,34 @@ public class AppCombinationActivityController {
         activity1.setCombinationPrice(100);
         activityList.add(activity1);
 
-        AppCombinationActivityPageItemRespVO activity2 = new AppCombinationActivityPageItemRespVO();
+        AppCombinationActivityRespVO activity2 = new AppCombinationActivityRespVO();
+        activity2.setId(2L);
+        activity2.setName("双十一拼团");
+        activity2.setUserSize(5);
+        activity2.setSpuId(4096L);
+        activity2.setPicUrl("商品图片地址");
+        activity2.setMarketPrice(100);
+        activity2.setCombinationPrice(200);
+        activityList.add(activity2);
+
+        return success(activityList);
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "获得拼团活动分页")
+    public CommonResult<PageResult<AppCombinationActivityRespVO>> getCombinationActivityPage(PageParam pageParam) {
+        List<AppCombinationActivityRespVO> activityList = new ArrayList<>();
+        AppCombinationActivityRespVO activity1 = new AppCombinationActivityRespVO();
+        activity1.setId(1L);
+        activity1.setName("618 大拼团");
+        activity1.setUserSize(3);
+        activity1.setSpuId(2048L);
+        activity1.setPicUrl("商品图片地址");
+        activity1.setMarketPrice(50);
+        activity1.setCombinationPrice(100);
+        activityList.add(activity1);
+
+        AppCombinationActivityRespVO activity2 = new AppCombinationActivityRespVO();
         activity2.setId(2L);
         activity2.setName("双十一拼团");
         activity2.setUserSize(5);

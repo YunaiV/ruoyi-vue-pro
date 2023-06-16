@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordSummaryRespVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +27,23 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("/promotion/combination-record")
 @Validated
 public class AppCombinationRecordController {
+
+    @GetMapping("/get-summary")
+    @Operation(summary = "获得拼团活动的概要信息", description = "用于小程序首页")
+    // TODO 芋艿：增加 @Cache 缓存，1 分钟过期
+    public CommonResult<AppCombinationRecordSummaryRespVO> getCombinationSummary() {
+        AppCombinationRecordSummaryRespVO summary = new AppCombinationRecordSummaryRespVO();
+        summary.setUserCount(1024);
+        summary.setAvatars(new ArrayList<>());
+        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLjFK35Wvia9lJKHoXfQuHhk0qZbvpPNxrAiaEKF7aL2k4I8kuqrdTWwliamdPHeyAA7DjAg725X2GIQ/132");
+        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTK1pXgdj5DvBMwrbe8v3tFibSWeQATEsAibt3fllD8XwJ460P2r6KS3WCQvDefuv1bVpDhNCle6CTCA/132");
+        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTL7KRGHBE62N0awFyBesmmxiaCicf1fJ7E7UCh6zA8GWlT1QC1zT01gG4OxI7BWDESkdPZ5o7tno4hA/132");
+        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/ouwtwJycbic2JrCoZjETict0klxd1uRuicRneKk00ewMcCClxVcVHQT91Sh9MJGtwibf1fOicD1WpwSP4icJM6eQq1AA/132");
+        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/RpUrhwens58qc99OcGs993xL4M5QPOe05ekqF9Eia440kRicAlicicIdQWicHBmy2bzLgHzHguWEzHHxnIgeictL7bLA/132");
+        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/S4tfqmxc8GZGsKc1K4mnhpvtG16gtMrLnTQfDibhr7jJich9LRI5RQKZDoqEjZM3azMib5nic7F4ZXKMEgYyLO08KA/132");
+        summary.getAvatars().add("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXMYJOomfp7cebz3cIeb8sHk3GGSIJtWEgREe3j7J1WoAbTvIOicpcNdFkWAziatBSMod8b5RyS4CQ/132");
+        return success(summary);
+    }
 
     @GetMapping("/get-head-list")
     @Operation(summary = "获得最近 n 条拼团记录（团长发起的）")
