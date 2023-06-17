@@ -29,7 +29,7 @@ public class YudaoCaptchaConfiguration {
         // 缓存类型 redis/local/....
         CaptchaCacheService ret = CaptchaServiceFactory.getCache(config.getCacheType().name());
         if (ret instanceof RedisCaptchaServiceImpl) {
-            ((RedisCaptchaServiceImpl)ret).setStringRedisTemplate(stringRedisTemplate);
+            ((RedisCaptchaServiceImpl) ret).setStringRedisTemplate(stringRedisTemplate);
         }
         return ret;
     }
