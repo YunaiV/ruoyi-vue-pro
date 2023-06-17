@@ -25,17 +25,17 @@ public class AppCombinationActivityDetailRespVO {
     @Schema(description = "活动结束时间", required = true)
     private LocalDateTime endTime;
 
+    @Schema(description = "拼团人数", required = true, example = "3")
+    private Integer userSize;
+
+    @Schema(description = "成功的拼团数量", required = true, example = "100")
+    private Integer successCount;
+
     @Schema(description = "商品 SPU 编号", required = true, example = "2048")
     private Long spuId;
 
     @Schema(description = "商品信息数组", required = true)
     private List<Product> products;
-
-    @Schema(description = "成功的拼团记录", required = true)
-    private List<Record> successRecords;
-
-    @Schema(description = "进行中的拼团记录", required = true)
-    private List<Record> runningRecords;
 
     @Schema(description = "商品信息")
     @Data
@@ -52,15 +52,6 @@ public class AppCombinationActivityDetailRespVO {
 
         @Schema(description = "每人限购数量", required = true, example = "10")
         private Integer limitCount;
-
-    }
-
-    @Schema(description = "拼团记录")
-    @Data
-    public static class Record {
-
-        @Schema(description = "拼团记录编号", required = true, example = "1024")
-        private Long id;
 
     }
 

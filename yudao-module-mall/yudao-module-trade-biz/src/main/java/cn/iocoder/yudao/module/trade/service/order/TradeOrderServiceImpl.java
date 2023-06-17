@@ -342,7 +342,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // TODO 芋艿：logisticsId 校验存在 发货物流公司 fix
         DeliveryExpressDO deliveryExpress = deliveryExpressService.getDeliveryExpress(deliveryReqVO.getLogisticsId());
         if (deliveryExpress == null) {
-            throw exception(DELIVERY_EXPRESS_NOT_EXISTS);
+            throw exception(EXPRESS_NOT_EXISTS);
         }
 
         // 更新 TradeOrderDO 状态为已发货，等待收货

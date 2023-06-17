@@ -27,9 +27,6 @@ public class AppSeckillActivitiDetailRespVO {
     @Schema(description = "活动结束时间", required = true)
     private LocalDateTime endTime;
 
-
-    private Long successGruopCount;
-
     @Schema(description = "商品 SPU 编号", required = true, example = "2048")
     private Long spuId;
 
