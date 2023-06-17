@@ -2,9 +2,12 @@ package cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl;
 
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.trade.framework.delivery.config.TradeExpressProperties;
-import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClientEnum;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClient;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl.kd100.Kd100ExpressClient;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl.kdniao.KdNiaoExpressClient;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.enums.ExpressClientEnum;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClientFactory;
+import lombok.AllArgsConstructor;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
@@ -15,18 +18,13 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author jason
  */
+@AllArgsConstructor
 public class ExpressClientFactoryImpl implements ExpressClientFactory {
 
     private final Map<ExpressClientEnum, ExpressClient> clientMap = new ConcurrentHashMap<>(8);
 
     private final TradeExpressProperties tradeExpressProperties;
     private final RestTemplate restTemplate;
-
-    public ExpressClientFactoryImpl(TradeExpressProperties tradeExpressProperties,
-                                    RestTemplate restTemplate) {
-        this.tradeExpressProperties = tradeExpressProperties;
-        this.restTemplate = restTemplate;
-    }
 
     @Override
     public ExpressClient getDefaultExpressClient() {

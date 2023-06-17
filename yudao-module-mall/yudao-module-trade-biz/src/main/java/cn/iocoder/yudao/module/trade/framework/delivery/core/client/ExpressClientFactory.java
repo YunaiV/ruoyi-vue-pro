@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.trade.framework.delivery.core.client;
 
+import cn.iocoder.yudao.module.trade.framework.delivery.core.enums.ExpressClientEnum;
+
 /**
- * 快递客户端工厂接口，快递客户端工厂：用于创建和缓存快递客户端
+ * 快递客户端工厂接口：用于创建和缓存快递客户端
  *
  * @author jason
  */
@@ -18,6 +20,5 @@ public interface ExpressClientFactory {
      * @param clientEnum 快递客户端枚举
      */
     ExpressClient getOrCreateExpressClient(ExpressClientEnum clientEnum);
-
 
 }

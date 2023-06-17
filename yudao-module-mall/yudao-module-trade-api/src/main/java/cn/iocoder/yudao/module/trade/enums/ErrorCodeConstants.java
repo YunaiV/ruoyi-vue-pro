@@ -53,9 +53,10 @@ public interface ErrorCodeConstants {
     // ==========  物流 Express 模块 1011004000 ==========
     ErrorCode EXPRESS_NOT_EXISTS = new ErrorCode(1011004000, "快递公司不存在");
     ErrorCode EXPRESS_CODE_DUPLICATE = new ErrorCode(1011004001, "已经存在该编码的快递公司");
-    ErrorCode EXPRESS_API_QUERY_ERROR = new ErrorCode(1011004002, "快递查询接口异常");
-    ErrorCode EXPRESS_API_QUERY_FAILED = new ErrorCode(1011004003, "快递查询返回失败，原因：{}");
-    ErrorCode EXPRESS_CLIENT_NOT_PROVIDE = new ErrorCode(1011004004, "需要接入快递服务商，比如【快递100】");
+    ErrorCode EXPRESS_CLIENT_NOT_PROVIDE = new ErrorCode(1011004002, "需要接入快递服务商，比如【快递100】");
+
+    ErrorCode EXPRESS_API_QUERY_ERROR = new ErrorCode(1011004101, "快递查询接口异常");
+    ErrorCode EXPRESS_API_QUERY_FAILED = new ErrorCode(1011004102, "快递查询返回失败，原因：{}");
 
     // ==========  物流 Template 模块 1011005000 ==========
     ErrorCode EXPRESS_TEMPLATE_NAME_DUPLICATE = new ErrorCode(1011005000, "已经存在该运费模板名");

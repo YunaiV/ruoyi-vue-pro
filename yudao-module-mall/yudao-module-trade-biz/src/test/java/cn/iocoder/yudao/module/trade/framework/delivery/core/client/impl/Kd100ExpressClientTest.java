@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.trade.framework.delivery.config.TradeExpressProperties;
-import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressQueryReqDTO;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackQueryReqDTO;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl.kd100.Kd100ExpressClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -18,12 +19,14 @@ import javax.annotation.Resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+// TODO @jason：可以参考 AliyunSmsClientTest 写，纯 mockito，无需启动 spring 容器
 /**
  * @author jason
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = Kd100ExpressClientTest.Application.class)
 @ActiveProfiles("unit-test") // 设置使用 trade-delivery-query 配置文件
 public class Kd100ExpressClientTest {
+
     @Resource
     private RestTemplateBuilder builder;
     @Resource
@@ -39,7 +42,7 @@ public class Kd100ExpressClientTest {
     @Disabled("需要 授权 key. 暂时忽略")
     void testRealTimeQueryExpressFailed() {
         ServiceException t =  assertThrows(ServiceException.class, () -> {
-            ExpressQueryReqDTO reqDTO = new ExpressQueryReqDTO();
+            ExpressTrackQueryReqDTO reqDTO = new ExpressTrackQueryReqDTO();
             reqDTO.setExpressCode("yto");
             reqDTO.setLogisticsNo("YT9383342193097");
             kd100ExpressClient.getExpressTrackList(reqDTO);

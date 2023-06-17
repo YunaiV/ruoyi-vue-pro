@@ -4,12 +4,12 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import lombok.Data;
 
 /**
- * 快递查询 Req DTO
+ * 快递轨迹的查询 Req DTO
  *
  * @author jason
  */
 @Data
-public class ExpressQueryReqDTO {
+public class ExpressTrackQueryReqDTO {
 
     /**
      * 快递公司编码

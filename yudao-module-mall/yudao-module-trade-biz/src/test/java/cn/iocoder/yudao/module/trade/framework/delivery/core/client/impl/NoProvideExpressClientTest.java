@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+// TODO @jason：可以参考 AliyunSmsClientTest 写，纯 mockito，无需启动 spring 容器
 /**
  * @author jason
  */

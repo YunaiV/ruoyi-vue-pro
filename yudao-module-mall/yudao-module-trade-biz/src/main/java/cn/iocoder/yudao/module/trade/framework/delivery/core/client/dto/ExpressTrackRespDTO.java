@@ -8,7 +8,7 @@ import lombok.Data;
  * @author jason
  */
 @Data
-public class ExpressQueryRespDTO {
+public class ExpressTrackRespDTO {
 
     // TODO @jason：LocalDateTime
     /**

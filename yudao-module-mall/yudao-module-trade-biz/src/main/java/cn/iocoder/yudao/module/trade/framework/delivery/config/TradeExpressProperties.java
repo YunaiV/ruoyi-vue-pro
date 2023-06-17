@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.framework.delivery.config;
 
-import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClientEnum;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.enums.ExpressClientEnum;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -27,6 +27,7 @@ public class TradeExpressProperties {
      * 默认不提供，需要提醒用户配置一个快递服务商。
      */
     private ExpressClientEnum client = ExpressClientEnum.NOT_PROVIDE;
+
     /**
      * 快递鸟配置
      */

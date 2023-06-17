@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl;
+package cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl.kdniao;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
@@ -7,8 +7,8 @@ import cn.hutool.crypto.digest.DigestUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.trade.framework.delivery.config.TradeExpressProperties;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClient;
-import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressQueryReqDTO;
-import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressQueryRespDTO;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackQueryReqDTO;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.kdniao.KdNiaoExpressQueryReqDTO;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.kdniao.KdNiaoExpressQueryRespDTO;
 import lombok.AllArgsConstructor;
@@ -51,25 +51,27 @@ public class KdNiaoExpressClient implements ExpressClient {
      * @param reqDTO 查询请求参数
      */
     @Override
-    public List<ExpressQueryRespDTO> getExpressTrackList(ExpressQueryReqDTO reqDTO) {
+    public List<ExpressTrackRespDTO> getExpressTrackList(ExpressTrackQueryReqDTO reqDTO) {
         KdNiaoExpressQueryReqDTO kdNiaoReqData = INSTANCE.convert(reqDTO);
         // 快递公司编码需要转成大写
         kdNiaoReqData.setExpressCode(reqDTO.getExpressCode().toUpperCase());
         KdNiaoExpressQueryRespDTO respDTO = requestKdNiaoApi(REAL_TIME_QUERY_URL, REAL_TIME_FREE_REQ_TYPE,
                 kdNiaoReqData, KdNiaoExpressQueryRespDTO.class);
         log.debug("[getExpressTrackList][快递鸟即时查询接口返回 {}]", respDTO);
+
+        // 处理结果
         if (respDTO == null || !respDTO.getSuccess()) {
             throw exception(EXPRESS_API_QUERY_FAILED, respDTO == null ? "" : respDTO.getReason());
         }
         if (CollUtil.isNotEmpty(respDTO.getTracks())) {
-            return INSTANCE.convertList(respDTO.getTracks());
-        } else {
             return Collections.emptyList();
         }
+        return INSTANCE.convertList(respDTO.getTracks());
     }
 
     /**
-     * 快递鸟 通用的 API 请求, 暂时没有其他应用场景， 暂时放这里
+     * 快递鸟 通用的 API 请求，暂时没有其他应用场景， 暂时放这里
+     *
      * @param url 请求 url
      * @param requestType 对应的请求指令 (快递鸟的RequestType)
      * @param req  对应请求的请求参数
@@ -77,8 +79,8 @@ public class KdNiaoExpressClient implements ExpressClient {
      * @param <Req> 每个请求的请求结构 Req DTO
      * @param <Resp> 每个请求的响应结构 Resp DTO
      */
-    private  <Req, Resp> Resp requestKdNiaoApi(String url, String requestType, Req req,
-                                               Class<Resp> respClass){
+    private <Req, Resp> Resp requestKdNiaoApi(String url, String requestType, Req req,
+                                              Class<Resp> respClass){
         // 请求头
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
