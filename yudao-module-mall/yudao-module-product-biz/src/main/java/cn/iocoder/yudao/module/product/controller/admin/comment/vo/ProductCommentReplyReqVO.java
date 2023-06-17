@@ -7,11 +7,10 @@ import lombok.ToString;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-// TODO @puhui999：ReqVO
 @Schema(description = "管理后台 - 商品评价可见修改 Request VO")
 @Data
 @ToString(callSuper = true)
-public class ProductCommentReplyVO {
+public class ProductCommentReplyReqVO {
 
     @Schema(description = "评价编号", required = true, example = "15721")
     @NotNull(message = "评价编号不能为空")

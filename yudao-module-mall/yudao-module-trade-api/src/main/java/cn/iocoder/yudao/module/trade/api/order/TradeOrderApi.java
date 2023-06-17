@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.trade.api.order;
 
-import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
-
 /**
  * 订单 API 接口
  *
@@ -10,11 +8,12 @@ import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 public interface TradeOrderApi {
 
     /**
-     * 获取订单通过订单 id
+     * 验证订单
      *
-     * @param id id
-     * @return 订单信息 Response DTO
+     * @param userId      用户 id
+     * @param orderItemId 订单项 id
+     * @return 校验通过返回订单 id
      */
-    TradeOrderRespDTO getOrder(Long id);
+    Long validateOrder(Long userId, Long orderItemId);
 
 }

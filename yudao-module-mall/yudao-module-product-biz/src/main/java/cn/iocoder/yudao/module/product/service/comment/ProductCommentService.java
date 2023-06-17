@@ -1,16 +1,16 @@
 package cn.iocoder.yudao.module.product.service.comment;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyVO;
+import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentRespVO;
+import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
+import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.Map;
 
 /**
  * 商品评论 Service 接口
@@ -36,14 +36,13 @@ public interface ProductCommentService {
      */
     void updateCommentVisible(ProductCommentUpdateVisibleReqVO updateReqVO);
 
-    // TODO @puhui999：replyComment
     /**
      * 商家回复
      *
      * @param replyVO     商家回复
      * @param loginUserId 管理后台商家登陆人 ID
      */
-    void commentReply(ProductCommentReplyVO replyVO, Long loginUserId);
+    void replyComment(ProductCommentReplyReqVO replyVO, Long loginUserId);
 
     /**
      * 获得商品评价分页
@@ -52,15 +51,23 @@ public interface ProductCommentService {
      * @param visible 是否可见
      * @return 商品评价分页
      */
-    PageResult<AppCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible);
+    PageResult<AppProductCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible);
 
     /**
-     * 创建商品评论
+     * 创建商品评论 后台管理员创建评论使用
      *
-     * @param productComment 创建实体
-     * @param system         是否系统评价
+     * @param createReqVO 商品评价创建 Request VO 对象
      */
-    void createComment(ProductCommentDO productComment, Boolean system);
+    void createComment(ProductCommentCreateReqVO createReqVO);
+
+    /**
+     * 创建评论
+     * 创建商品评论 APP 端创建商品评论使用
+     *
+     * @param commentDO 评论对象
+     * @return 返回评论 id
+     */
+    Long createComment(ProductCommentDO commentDO);
 
     /**
      * 获得商品的评价统计
@@ -69,6 +76,6 @@ public interface ProductCommentService {
      * @param visible 是否可见
      * @return 评价统计
      */
-    Map<String, Long> getCommentPageTabsCount(Long spuId, Boolean visible);
+    AppCommentStatisticsRespVO getCommentPageTabsCount(Long spuId, Boolean visible);
 
 }
