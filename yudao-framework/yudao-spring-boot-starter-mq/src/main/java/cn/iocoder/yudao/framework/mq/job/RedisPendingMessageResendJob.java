@@ -7,17 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.data.redis.connection.stream.Consumer;
-import org.springframework.data.redis.connection.stream.MapRecord;
-import org.springframework.data.redis.connection.stream.PendingMessagesSummary;
-import org.springframework.data.redis.connection.stream.ReadOffset;
-import org.springframework.data.redis.connection.stream.StreamOffset;
-import org.springframework.data.redis.connection.stream.StreamRecords;
+import org.springframework.data.domain.Range;
+import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 这个任务用于处理，crash 之后的消费者未消费完的消息
@@ -32,6 +29,13 @@ public class RedisPendingMessageResendJob {
     private final RedisMQTemplate redisTemplate;
     private final String groupName;
     private final RedissonClient redissonClient;
+    /**
+     * 消息超时时间，默认5分钟
+     * <p>超时的消息才会被重新投递<p/>
+     * <p>由于定时任务1分钟一次，消息超时后不会被立即重投，
+     * 极端情况下消息5分钟过期后，再等1分钟才会被扫瞄到<p/>
+     */
+    private final long expireTime = 5 * 60;
 
     /**
      * 一分钟执行一次,这里选择每分钟的35秒执行，是为了避免整点任务过多的问题
@@ -54,25 +58,34 @@ public class RedisPendingMessageResendJob {
     private void execute() {
         StreamOperations<String, Object, Object> ops = redisTemplate.getRedisTemplate().opsForStream();
         listeners.forEach(listener -> {
-            PendingMessagesSummary pendingMessagesSummary = ops.pending(listener.getStreamKey(), groupName);
+            PendingMessagesSummary pendingMessagesSummary = Objects.requireNonNull(ops.pending(listener.getStreamKey(), groupName));
             // 每个消费者的 pending 队列消息数量
             Map<String, Long> pendingMessagesPerConsumer = pendingMessagesSummary.getPendingMessagesPerConsumer();
             pendingMessagesPerConsumer.forEach((consumerName, pendingMessageCount) -> {
                 log.info("[processPendingMessage][消费者({}) 消息数量({})]", consumerName, pendingMessageCount);
-
-                // 从消费者的 pending 队列中读取消息
-                List<MapRecord<String, Object, Object>> records = ops.read(Consumer.from(groupName, consumerName), StreamOffset.create(listener.getStreamKey(), ReadOffset.from("0")));
-                if (CollUtil.isEmpty(records)) {
+                // 每个消费者的 pending消息的详情信息
+                PendingMessages pendingMessages = ops.pending(listener.getStreamKey(), Consumer.from(groupName, consumerName), Range.unbounded(), pendingMessageCount);
+                if(pendingMessages.isEmpty()){
                     return;
                 }
-                for (MapRecord<String, Object, Object> record : records) {
+                for (PendingMessage pendingMessage : pendingMessages) {
+                    // 获取消息上一次传递到 consumer 的时间,
+                    long lastDelivery = pendingMessage.getElapsedTimeSinceLastDelivery().getSeconds();
+                    if(lastDelivery < expireTime){
+                        continue;
+                    }
+                    // 获取指定id的消息体
+                    List<MapRecord<String, Object, Object>> records = ops.range(listener.getStreamKey(), Range.of(Range.Bound.inclusive(pendingMessage.getIdAsString()), Range.Bound.inclusive(pendingMessage.getIdAsString())));
+                    if(CollUtil.isEmpty(records)){
+                        continue;
+                    }
                     // 重新投递消息
                     redisTemplate.getRedisTemplate().opsForStream().add(StreamRecords.newRecord()
-                            .ofObject(record.getValue()) // 设置内容
-                            .withStreamKey(listener.getStreamKey()));
-
+                      .ofObject(records.get(0).getValue()) // 设置内容
+                      .withStreamKey(listener.getStreamKey()));
                     // ack 消息消费完成
-                    redisTemplate.getRedisTemplate().opsForStream().acknowledge(groupName, record);
+                    redisTemplate.getRedisTemplate().opsForStream().acknowledge(groupName, records.get(0));
+                    log.info("[processPendingMessage][消息({})重新投递成功]", records.get(0).getId());
                 }
             });
         });
