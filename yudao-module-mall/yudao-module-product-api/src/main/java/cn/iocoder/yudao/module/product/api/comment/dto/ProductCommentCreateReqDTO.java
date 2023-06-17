@@ -10,71 +10,64 @@ import java.util.List;
  * @author HUIHUI
  */
 @Data
-public class CommentCreateReqDTO {
+public class ProductCommentCreateReqDTO {
 
     /**
-     * 是否匿名
+     * 商品 SKU 编号
      */
-    private Boolean anonymous;
-
+    private Long skuId;
     /**
      * 交易订单项编号
      */
     private Long orderItemId;
 
+    // TODO @huihui：spuId、spuName 去查询哇？通过 skuId
     /**
      * 商品 SPU 编号
      */
     private Long spuId;
-
     /**
      * 商品 SPU 名称
      */
     private String spuName;
 
     /**
-     * 商品 SKU 编号
-     */
-    private Long skuId;
-
-    /**
      * 评分星级 1-5 分
      */
     private Integer scores;
-
     /**
      * 描述星级 1-5 分
      */
     private Integer descriptionScores;
-
     /**
      * 服务星级 1-5 分
      */
     private Integer benefitScores;
-
     /**
      * 评论内容
      */
     private String content;
-
     /**
-     * 评论图片地址数组，以逗号分隔最多上传9张
+     * 评论图片地址数组，以逗号分隔最多上传 9 张
      */
     private List<String> picUrls;
 
     /**
-     * 评价人名称
+     * 是否匿名
      */
-    private String userNickname;
-
-    /**
-     * 评价人头像
-     */
-    private String userAvatar;
-
+    private Boolean anonymous;
     /**
      * 评价人
      */
     private Long userId;
+    // TODO @puhui999：是不是 userNickname、userAvatar 去掉？通过 userId 查询
+    /**
+     * 评价人名称
+     */
+    private String userNickname;
+    /**
+     * 评价人头像
+     */
+    private String userAvatar;
 
 }

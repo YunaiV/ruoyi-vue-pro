@@ -4,11 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
 
-/**
- * APP 商品评价页评论分类数统计 Response VO
- *
- * @author HUIHUI
- */
 @Schema(description = "APP - 商品评价页评论分类数统计 Response VO")
 @Data
 @ToString(callSuper = true)

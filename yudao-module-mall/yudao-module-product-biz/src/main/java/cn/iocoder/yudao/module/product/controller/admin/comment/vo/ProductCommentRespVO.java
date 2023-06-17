@@ -16,7 +16,7 @@ public class ProductCommentRespVO extends ProductCommentBaseVO {
     @Schema(description = "订单项编号", required = true, example = "24965")
     private Long id;
 
-    @Schema(description = "是否匿名：[false:不匿名 true:匿名]", required = true, example = "false")
+    @Schema(description = "是否匿名", required = true, example = "false")
     private Boolean anonymous;
 
     @Schema(description = "交易订单编号", required = true, example = "24428")

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.trade.controller.app.order;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
@@ -49,12 +48,11 @@ public class AppTradeOrderController {
 
     @Resource
     private ProductPropertyValueApi productPropertyValueApi;
+    @Resource
+    private ProductCommentApi productCommentApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
-
-    @Resource
-    private ProductCommentApi productCommentApi;
 
     @GetMapping("/settlement")
     @Operation(summary = "获得订单结算信息")
@@ -141,6 +139,7 @@ public class AppTradeOrderController {
     @Operation(summary = "创建交易订单项的评价")
     public CommonResult<Long> createOrderItemComment(@RequestBody AppTradeOrderItemCommentCreateReqVO createReqVO) {
         // 校验订单项，订单项存在订单就存在
+        // TODO @puhui999：要去查询订单是不是自己的；不然别人模拟请求哈；
         TradeOrderItemDO item = tradeOrderService.getOrderItem(createReqVO.getUserId(), createReqVO.getOrderItemId());
         if (item == null) {
             throw exception(ORDER_ITEM_NOT_FOUND);
@@ -149,6 +148,6 @@ public class AppTradeOrderController {
         return success(productCommentApi.createComment(TradeOrderConvert.INSTANCE.convert04(createReqVO), item.getOrderId()));
     }
 
-    // TODO 合并代码后发现只有商家回复功能 用户追评不要了吗？
+    // TODO 合并代码后发现只有商家回复功能 用户追评不要了吗？不要了哈；
 
 }

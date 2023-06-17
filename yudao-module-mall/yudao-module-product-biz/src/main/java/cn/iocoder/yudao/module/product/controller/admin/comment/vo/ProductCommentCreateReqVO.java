@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class ProductCommentCreateReqVO extends ProductCommentBaseVO {
 
+    // TODO @puhui999：是不是也放到父类里？
     @Schema(description = "评价人", required = true, example = "16868")
     @NotNull(message = "评价人不能为空")
     private Long userId;

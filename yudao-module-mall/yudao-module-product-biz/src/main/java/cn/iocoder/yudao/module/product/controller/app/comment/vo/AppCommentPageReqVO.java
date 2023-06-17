@@ -8,11 +8,6 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
-/**
- * 用户 APP - 商品评价分页 Request VO
- *
- * @author HUIHUI
- */
 @Schema(description = "用户APP - 商品评价分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -23,12 +18,10 @@ public class AppCommentPageReqVO extends PageParam {
      * 好评
      */
     public static final Integer GOOD_COMMENT = 1;
-
     /**
      * 中评
      */
     public static final Integer MEDIOCRE_COMMENT = 2;
-
     /**
      * 差评
      */

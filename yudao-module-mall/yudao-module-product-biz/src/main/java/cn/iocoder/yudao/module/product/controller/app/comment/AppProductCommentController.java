@@ -36,6 +36,7 @@ public class AppProductCommentController {
     @Resource
     private ProductCommentService productCommentService;
 
+    // TODO @puhui999：可以实现下
     @GetMapping("/list")
     @Operation(summary = "获得最近的 n 条商品评价")
     @Parameters({
@@ -44,7 +45,6 @@ public class AppProductCommentController {
     })
     public CommonResult<List<AppProductCommentRespVO>> getCommentList(@RequestParam("spuId") Long spuId,
                                                                       @RequestParam(value = "count", defaultValue = "10") Integer count) {
-
         List<AppProductPropertyValueDetailRespVO> list = new ArrayList<>();
 
         AppProductPropertyValueDetailRespVO item1 = new AppProductPropertyValueDetailRespVO();
@@ -101,6 +101,7 @@ public class AppProductCommentController {
         return success(productCommentService.getCommentPage(pageVO, Boolean.TRUE));
     }
 
+    // TODO @puhui：get-statistics；方法改成 getCommentStatistics；getCommentPageTabsCount 也改掉哈
     @GetMapping("/getCommentStatistics")
     @Operation(summary = "获得商品的评价统计")
     public CommonResult<AppCommentStatisticsRespVO> getCommentPage(@Valid @RequestParam("spuId") Long spuId) {

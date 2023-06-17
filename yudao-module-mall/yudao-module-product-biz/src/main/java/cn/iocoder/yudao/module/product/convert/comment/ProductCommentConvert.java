@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.product.convert.comment;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.api.comment.dto.CommentCreateReqDTO;
+import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentRespVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
@@ -49,7 +49,7 @@ public interface ProductCommentConvert {
      *
      * @param descriptionScores 描述星级
      * @param benefitScores     服务星级
-     * @return {@link Integer}
+     * @return 综合评分
      */
     @Named("convertScores")
     default Integer convertScores(Integer descriptionScores, Integer benefitScores) {
@@ -61,7 +61,7 @@ public interface ProductCommentConvert {
 
     @Mapping(target = "orderId", source = "orderId")
     @Mapping(target = "scores", expression = "java(convertScores(createReqDTO.getDescriptionScores(), createReqDTO.getBenefitScores()))")
-    ProductCommentDO convert(CommentCreateReqDTO createReqDTO, Long orderId);
+    ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO, Long orderId);
 
     @Mapping(target = "userId", constant = "0L")
     @Mapping(target = "orderId", constant = "0L")

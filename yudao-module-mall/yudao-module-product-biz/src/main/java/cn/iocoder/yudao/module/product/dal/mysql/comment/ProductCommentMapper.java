@@ -25,6 +25,7 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
     }
 
     // TODO 芋艿：在看看这块
+    // TODO @puhui999：直接使用 scores 来算好评、中评、差评
     static void appendTabQuery(LambdaQueryWrapperX<ProductCommentDO> queryWrapper, Integer type) {
         // 构建好评查询语句：好评计算 (商品评分星级+服务评分星级) >= 8
         if (ObjectUtil.equal(type, AppCommentPageReqVO.GOOD_COMMENT)) {
