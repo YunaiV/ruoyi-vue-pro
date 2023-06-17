@@ -46,9 +46,5 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-security</artifactId>
-        </dependency>
     </dependencies>
 </project>
