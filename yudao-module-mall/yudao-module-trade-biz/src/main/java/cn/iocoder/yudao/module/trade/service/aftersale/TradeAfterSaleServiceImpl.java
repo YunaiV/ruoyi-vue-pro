@@ -5,7 +5,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.trade.core.dto.TradeAfterSaleLogDTO;
+import cn.iocoder.yudao.framework.trade.core.dto.TradeAfterSaleLogCreateReqDTO;
 import cn.iocoder.yudao.framework.trade.core.service.AfterSaleLogService;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
@@ -388,7 +388,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
     @Deprecated
     private void createAfterSaleLog(Long userId, Integer userType, TradeAfterSaleDO afterSale,
                                     Integer beforeStatus, Integer afterStatus) {
-        TradeAfterSaleLogDTO logDTO = new TradeAfterSaleLogDTO()
+        TradeAfterSaleLogCreateReqDTO logDTO = new TradeAfterSaleLogCreateReqDTO()
                 .setUserId(userId)
                 .setUserType(userType)
                 .setAfterSaleId(afterSale.getId())
@@ -406,7 +406,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
      */
     @Override
     @Async
-    public void insert(TradeAfterSaleLogDTO logDTO) {
+    public void insert(TradeAfterSaleLogCreateReqDTO logDTO) {
         try {
             TradeAfterSaleLogDO afterSaleLog = new TradeAfterSaleLogDO()
                     .setUserId(logDTO.getUserId())

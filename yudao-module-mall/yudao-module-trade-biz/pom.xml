@@ -61,6 +61,7 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-trade</artifactId>
+            <version>${revision}</version>
         </dependency>
 
         <!-- Web 相关 -->
