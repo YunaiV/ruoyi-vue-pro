@@ -57,7 +57,7 @@ public class SeckillProductDO extends BaseDO {
     /**
      * 秒杀库存
      */
-    private Integer stock;
+    private Integer quota;
 
     /**
      * 每人限购

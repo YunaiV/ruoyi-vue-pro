@@ -54,7 +54,7 @@ public class SeckillActivityBaseVO {
 
         @Schema(description = "秒杀库存", example = "80")
         @Min(value = 0, message = "秒杀库存需要大于等于 0")
-        private Integer stock;
+        private Integer quota;
 
         @Schema(description = "每人限购", example = "10") // 如果为 0 则不限购
         @Min(value = 0, message = "每人限购需要大于等于 0")

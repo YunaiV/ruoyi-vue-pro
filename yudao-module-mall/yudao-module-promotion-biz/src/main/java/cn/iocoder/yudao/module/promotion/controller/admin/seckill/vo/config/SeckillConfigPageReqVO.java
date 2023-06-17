@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,21 +9,29 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
 
+/**
+ * 管理后台 - 秒杀时段分页 Request VO
+ *
+ * @author HUIHUI
+ */
 @Schema(description = "管理后台 - 秒杀时段分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SeckillTimePageReqVO extends PageParam {
+public class SeckillConfigPageReqVO extends PageParam {
 
     @Schema(description = "秒杀时段名称", example = "上午场")
     private String name;
 
+    @Schema(description = "状态", example = "0")
+    private Integer status;
+
     @Schema(description = "开始时间点", example = "16:30:40")
     @DateTimeFormat(pattern = "HH:mm:ss")
-    private LocalTime startTime;
+    private LocalTime[] startTime;
 
     @Schema(description = "结束时间点", example = "16:30:40")
     @DateTimeFormat(pattern = "HH:mm:ss")
-    private LocalTime endTime;
+    private LocalTime[] endTime;
 
 }

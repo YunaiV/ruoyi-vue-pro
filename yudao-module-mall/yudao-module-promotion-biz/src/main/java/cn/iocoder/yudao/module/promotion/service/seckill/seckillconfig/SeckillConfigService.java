@@ -1,0 +1,87 @@
+package cn.iocoder.yudao.module.promotion.service.seckill.seckillconfig;
+
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigCreateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
+
+/**
+ * 秒杀时段 Service 接口
+ *
+ * @author halfninety
+ */
+public interface SeckillConfigService {
+
+    /**
+     * 创建秒杀时段
+     *
+     * @param createReqVO 创建信息
+     * @return 编号
+     */
+    Long createSeckillConfig(@Valid SeckillConfigCreateReqVO createReqVO);
+
+    /**
+     * 更新秒杀时段
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateSeckillConfig(@Valid SeckillConfigUpdateReqVO updateReqVO);
+
+    /**
+     * 删除秒杀时段
+     *
+     * @param id 编号
+     */
+    void deleteSeckillConfig(Long id);
+
+    /**
+     * 获得秒杀时段
+     *
+     * @param id 编号
+     * @return 秒杀时段
+     */
+    SeckillConfigDO getSeckillConfig(Long id);
+
+    /**
+     * 获得所有秒杀时段列表
+     *
+     * @return 所有秒杀时段列表
+     */
+    List<SeckillConfigDO> getSeckillConfigList();
+
+    /**
+     * 校验秒杀时段是否存在
+     *
+     * @param timeIds 秒杀时段id集合
+     */
+    void validateSeckillConfigExists(Collection<Long> timeIds);
+
+    /**
+     * 秒杀时段列表的秒杀活动数量加 1
+     *
+     * @param ids 秒杀时段id列表
+     */
+    void seckillActivityCountIncr(Collection<Long> ids);
+
+
+    /**
+     * 秒杀时段列表的秒杀活动数量减 1
+     *
+     * @param ids 秒杀时段id列表
+     */
+    void seckillActivityCountDecr(Collection<Long> ids);
+
+    /**
+     * 获得秒杀时间段配置分页数据
+     *
+     * @param pageVO 分页请求参数
+     * @return 秒杀时段分页列表
+     */
+    PageResult<SeckillConfigDO> getSeckillConfigPage(SeckillConfigPageReqVO pageVO);
+
+}

@@ -1,5 +1,6 @@
-package cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckilltime;
+package cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -15,12 +16,12 @@ import java.time.LocalTime;
  *
  * @author 芋道源码
  */
-@TableName("promotion_seckill_time")
-@KeySequence("promotion_seckill_time_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("promotion_seckill_config")
+@KeySequence("promotion_seckill_config_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SeckillTimeDO extends BaseDO {
+public class SeckillConfigDO extends BaseDO {
 
     /**
      * 编号
@@ -40,8 +41,14 @@ public class SeckillTimeDO extends BaseDO {
      */
     private LocalTime endTime;
     /**
-     * 秒杀活动数量
+     * 秒杀主图
      */
-    private Integer seckillActivityCount;
+    private String picUrl;
+    /**
+     * 状态 开启：0 禁用：1
+     * <p>
+     * 枚举 {@link CommonStatusEnum 对应的类}
+     */
+    private Integer status;
 
 }

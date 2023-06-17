@@ -1797,27 +1797,112 @@ INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT"
 INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2046,'满减送活动关闭','promotion:reward-activity:close',3,5,2041,'','','',null,0,1,1,1,'1','2022-11-05 10:42:53','1','2022-11-05 10:42:53',0);
 INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2047,'限时折扣活动','',2,7,2030,'discount-activity','time','mall/promotion/discountActivity/index','PromotionDiscountActivity',0,1,1,1,'','2022-11-05 17:12:15','1','2023-04-08 11:45:44',0);
 INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2048,'限时折扣活动查询','promotion:discount-activity:query',3,1,2047,'','','',null,0,1,1,1,'','2022-11-05 17:12:15','','2022-11-05 17:12:15',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2049,'限时折扣活动创建','promotion:discount-activity:create',3,2,2047,'','','',null,0,1,1,1,'','2022-11-05 17:12:15','','2022-11-05 17:12:15',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2050,'限时折扣活动更新','promotion:discount-activity:update',3,3,2047,'','','',null,0,1,1,1,'','2022-11-05 17:12:16','','2022-11-05 17:12:16',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2051,'限时折扣活动删除','promotion:discount-activity:delete',3,4,2047,'','','',null,0,1,1,1,'','2022-11-05 17:12:16','','2022-11-05 17:12:16',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2052,'限时折扣活动关闭','promotion:discount-activity:close',3,5,2047,'','','',null,0,1,1,1,'','2022-11-05 17:12:16','','2022-11-05 17:12:16',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2059,'秒杀活动管理','',2,0,2030,'seckill-activity','time-range','mall/promotion/seckill/seckillActivity/index','PromotionSeckillActivity',0,1,1,1,'','2022-11-06 22:24:49','1','2023-04-08 11:46:02',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2060,'秒杀活动查询','promotion:seckill-activity:query',3,1,2059,'','','',null,0,1,1,1,'','2022-11-06 22:24:49','','2022-11-06 22:24:49',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2061,'秒杀活动创建','promotion:seckill-activity:create',3,2,2059,'','','',null,0,1,1,1,'','2022-11-06 22:24:49','','2022-11-06 22:24:49',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2062,'秒杀活动更新','promotion:seckill-activity:update',3,3,2059,'','','',null,0,1,1,1,'','2022-11-06 22:24:49','','2022-11-06 22:24:49',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2063,'秒杀活动删除','promotion:seckill-activity:delete',3,4,2059,'','','',null,0,1,1,1,'','2022-11-06 22:24:49','','2022-11-06 22:24:49',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2064,'秒杀活动导出','promotion:seckill-activity:export',3,5,2059,'','','',null,0,1,1,1,'','2022-11-06 22:24:49','','2022-11-06 22:24:49',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2066,'秒杀时段管理','',2,0,2030,'seckill-time','','mall/promotion/seckill/seckillTime/index','PromotionSeckillTime',0,0,1,1,'','2022-11-15 19:46:50','1','2023-04-08 11:46:17',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2067,'秒杀时段查询','promotion:seckill-time:query',3,1,2066,'','','',null,0,1,1,1,'','2022-11-15 19:46:51','','2022-11-15 19:46:51',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2068,'秒杀时段创建','promotion:seckill-time:create',3,2,2066,'','','',null,0,1,1,1,'','2022-11-15 19:46:51','','2022-11-15 19:46:51',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2069,'秒杀时段更新','promotion:seckill-time:update',3,3,2066,'','','',null,0,1,1,1,'','2022-11-15 19:46:51','','2022-11-15 19:46:51',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2070,'秒杀时段删除','promotion:seckill-time:delete',3,4,2066,'','','',null,0,1,1,1,'','2022-11-15 19:46:51','','2022-11-15 19:46:51',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2071,'秒杀时段导出','promotion:seckill-time:export',3,5,2066,'','','',null,0,1,1,1,'','2022-11-15 19:46:51','','2022-11-15 19:46:51',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2072,'订单中心','',1,65,0,'/trade','order',null,null,0,1,1,1,'1','2022-11-19 18:57:19','1','2022-12-10 16:32:57',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2073,'售后退款','',2,1,2072,'trade/after-sale','education','mall/trade/afterSale/index','TradeAfterSale',0,1,1,1,'','2022-11-19 20:15:32','1','2023-04-08 11:43:19',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2074,'售后查询','trade:after-sale:query',3,1,2073,'','','',null,0,1,1,1,'','2022-11-19 20:15:33','1','2022-12-10 21:04:29',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2075,'秒杀活动关闭','promotion:sekill-activity:close',3,6,2059,'','','',null,0,1,1,1,'1','2022-11-28 20:20:15','1','2022-11-28 20:20:15',0);
-INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2076,'订单列表','',2,0,2072,'trade/order','list','mall/trade/order/index','TradeOrder',0,1,1,1,'1','2022-12-10 21:05:44','1','2023-04-08 11:42:23',0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2049, '限时折扣活动创建', 'promotion:discount-activity:create', 3, 2, 2047, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-05 17:12:15', '', '2022-11-05 17:12:15', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2050, '限时折扣活动更新', 'promotion:discount-activity:update', 3, 3, 2047, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-05 17:12:16', '', '2022-11-05 17:12:16', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2051, '限时折扣活动删除', 'promotion:discount-activity:delete', 3, 4, 2047, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-05 17:12:16', '', '2022-11-05 17:12:16', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2052, '限时折扣活动关闭', 'promotion:discount-activity:close', 3, 5, 2047, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-05 17:12:16', '', '2022-11-05 17:12:16', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2059, '秒杀活动管理', '', 2, 0, 2030, 'seckill-activity', 'time-range',
+        'mall/promotion/seckill/seckillActivity/index', 'PromotionSeckillActivity', 0, 1, 1, 1, '',
+        '2022-11-06 22:24:49', '1', '2023-04-08 11:46:02', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2060, '秒杀活动查询', 'promotion:seckill-activity:query', 3, 1, 2059, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-06 22:24:49', '', '2022-11-06 22:24:49', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2061, '秒杀活动创建', 'promotion:seckill-activity:create', 3, 2, 2059, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-06 22:24:49', '', '2022-11-06 22:24:49', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2062, '秒杀活动更新', 'promotion:seckill-activity:update', 3, 3, 2059, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-06 22:24:49', '', '2022-11-06 22:24:49', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2063, '秒杀活动删除', 'promotion:seckill-activity:delete', 3, 4, 2059, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-06 22:24:49', '', '2022-11-06 22:24:49', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2064, '秒杀活动导出', 'promotion:seckill-activity:export', 3, 5, 2059, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-06 22:24:49', '', '2022-11-06 22:24:49', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2066, '秒杀时段管理', '', 2, 0, 2030, 'seckill-time', '', 'mall/promotion/seckill/SeckillConfig/index',
+        'PromotionSeckillConfig', 0, 0, 1, 1, '', '2022-11-15 19:46:50', '1', '2023-04-08 11:46:17', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2067, '秒杀时段查询', 'promotion:seckill-time:query', 3, 1, 2066, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-15 19:46:51', '', '2022-11-15 19:46:51', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2068, '秒杀时段创建', 'promotion:seckill-time:create', 3, 2, 2066, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-15 19:46:51', '', '2022-11-15 19:46:51', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2069, '秒杀时段更新', 'promotion:seckill-time:update', 3, 3, 2066, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-15 19:46:51', '', '2022-11-15 19:46:51', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2070, '秒杀时段删除', 'promotion:seckill-time:delete', 3, 4, 2066, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-15 19:46:51', '', '2022-11-15 19:46:51', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2071, '秒杀时段导出', 'promotion:seckill-time:export', 3, 5, 2066, '', '', '', null, 0, 1, 1, 1, '',
+        '2022-11-15 19:46:51', '', '2022-11-15 19:46:51', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2072, '订单中心', '', 1, 65, 0, '/trade', 'order', null, null, 0, 1, 1, 1, '1', '2022-11-19 18:57:19', '1',
+        '2022-12-10 16:32:57', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2073, '售后退款', '', 2, 1, 2072, 'trade/after-sale', 'education', 'mall/trade/afterSale/index',
+        'TradeAfterSale', 0, 1, 1, 1, '', '2022-11-19 20:15:32', '1', '2023-04-08 11:43:19', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2074, '售后查询', 'trade:after-sale:query', 3, 1, 2073, '', '', '', null, 0, 1, 1, 1, '', '2022-11-19 20:15:33',
+        '1', '2022-12-10 21:04:29', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2075, '秒杀活动关闭', 'promotion:sekill-activity:close', 3, 6, 2059, '', '', '', null, 0, 1, 1, 1, '1',
+        '2022-11-28 20:20:15', '1', '2022-11-28 20:20:15', 0);
+INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID", "NAME", "PERMISSION", "TYPE", "SORT", "PARENT_ID", "PATH", "ICON",
+                                          "COMPONENT", "COMPONENT_NAME", "STATUS", "VISIBLE", "KEEP_ALIVE",
+                                          "ALWAYS_SHOW", "CREATOR", "CREATE_TIME", "UPDATER", "UPDATE_TIME", "DELETED")
+VALUES (2076, '订单列表', '', 2, 0, 2072, 'trade/order', 'list', 'mall/trade/order/index', 'TradeOrder', 0, 1, 1, 1,
+        '1', '2022-12-10 21:05:44', '1', '2023-04-08 11:42:23', 0);
 INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2077,'物流公司管理管理','',2,0,2072,'express-company','','mall/trade/expressCompany/index',null,0,1,1,1,'','2022-12-20 23:27:55','1','2022-12-20 23:36:20',0);
 INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2078,'物流公司管理查询','trade:express-company:query',3,1,2077,'','','',null,0,1,1,1,'','2022-12-20 23:27:55','','2022-12-20 23:27:55',0);
 INSERT INTO "RUOYI_VUE_PRO"."SYSTEM_MENU"("ID","NAME","PERMISSION","TYPE","SORT","PARENT_ID","PATH","ICON","COMPONENT","COMPONENT_NAME","STATUS","VISIBLE","KEEP_ALIVE","ALWAYS_SHOW","CREATOR","CREATE_TIME","UPDATER","UPDATE_TIME","DELETED") VALUES(2079,'物流公司管理创建','trade:express-company:create',3,2,2077,'','','',null,0,1,1,1,'','2022-12-20 23:27:55','','2022-12-20 23:27:55',0);

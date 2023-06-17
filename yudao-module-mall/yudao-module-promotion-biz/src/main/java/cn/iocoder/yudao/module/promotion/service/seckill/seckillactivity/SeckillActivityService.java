@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity;
 
-import java.util.*;
-import javax.validation.*;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 秒杀活动 Service 接口
@@ -77,4 +78,5 @@ public interface SeckillActivityService {
      * @return 活动商品列表
      */
     List<SeckillProductDO> getSeckillProductListByActivityId(Long id);
+
 }

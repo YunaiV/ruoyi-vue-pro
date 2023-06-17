@@ -63,14 +63,19 @@
 </template>
 
 <script>
-import { createSeckillTime, updateSeckillTime, deleteSeckillTime, getSeckillTime, getSeckillTimePage, exportSeckillTimeExcel, getSeckillTimeList } from "@/api/mall/promotion/seckillTime";
+import {
+  createSeckillConfig,
+  deleteSeckillConfig,
+  getSeckillConfig,
+  getSeckillConfigList,
+  updateSeckillConfig
+} from "@/api/mall/promotion/SeckillConfig";
 import router from "@/router";
-import { deepClone } from "@/utils";
+import {deepClone} from "@/utils";
 
 export default {
-  name: "PromotionSeckillTime",
-  components: {
-  },
+  name: "PromotionSeckillConfig",
+  components: {},
   data() {
     return {
       // 遮罩层
@@ -104,7 +109,7 @@ export default {
     getList() {
       this.loading = true;
       // 执行查询
-      getSeckillTimeList().then(response => {
+      getSeckillConfigList().then(response => {
         this.list = response.data;
         this.loading = false;
       });
@@ -148,7 +153,7 @@ export default {
     handleUpdate(row) {
       this.reset();
       const id = row.id;
-      getSeckillTime(id).then(response => {
+      getSeckillConfig(id).then(response => {
         response.data.startAndEndTime = [response.data.startTime, response.data.endTime]
         this.form = response.data;
         this.open = true;
@@ -168,7 +173,7 @@ export default {
         data.endTime = this.form.startAndEndTime[1];
         // 修改的提交
         if (this.form.id != null) {
-          updateSeckillTime(data).then(response => {
+          updateSeckillConfig(data).then(response => {
             this.$modal.msgSuccess("修改成功");
             this.open = false;
             this.getList();
@@ -176,7 +181,7 @@ export default {
           return;
         }
         // 添加的提交
-        createSeckillTime(data).then(response => {
+        createSeckillConfig(data).then(response => {
           this.$modal.msgSuccess("新增成功");
           this.open = false;
           this.getList();
@@ -187,7 +192,7 @@ export default {
     handleDelete(row) {
       const id = row.id;
       this.$modal.confirm('是否确认删除秒杀时段编号为"' + id + '"的数据项?').then(function () {
-        return deleteSeckillTime(id);
+        return deleteSeckillConfig(id);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
