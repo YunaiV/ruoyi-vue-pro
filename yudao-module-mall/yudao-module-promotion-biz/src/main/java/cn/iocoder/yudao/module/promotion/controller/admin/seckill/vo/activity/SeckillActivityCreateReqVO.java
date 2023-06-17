@@ -16,6 +16,13 @@ import java.util.List;
 @ToString(callSuper = true)
 public class SeckillActivityCreateReqVO extends SeckillActivityBaseVO {
 
+    /**
+     * 秒杀活动商品
+     */
+    @Schema(description = "秒杀活动商品", example = "1")
+    @NotNull(message = "秒杀活动商品不能为空")
+    private Long spuId;
+
     @Schema(description = "备注", example = "限时秒杀活动")
     private String remark;
 
@@ -25,7 +32,7 @@ public class SeckillActivityCreateReqVO extends SeckillActivityBaseVO {
 
     @Schema(description = "秒杀时段id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,3")
     @NotEmpty(message = "参与场次不能为空")
-    private List<Long> timeIds;
+    private List<Long> configIds;
 
     /**
      * 商品列表

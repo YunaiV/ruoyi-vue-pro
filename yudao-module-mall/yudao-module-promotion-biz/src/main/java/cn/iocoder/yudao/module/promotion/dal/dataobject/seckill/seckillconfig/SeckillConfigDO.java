@@ -9,8 +9,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.time.LocalTime;
-
 /**
  * 秒杀时段 DO
  *
@@ -35,11 +33,11 @@ public class SeckillConfigDO extends BaseDO {
     /**
      * 开始时间点
      */
-    private LocalTime startTime;
+    private String startTime;
     /**
      * 结束时间点
      */
-    private LocalTime endTime;
+    private String endTime;
     /**
      * 秒杀主图
      */

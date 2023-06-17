@@ -2,12 +2,8 @@ package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalTime;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_HOUR_MINUTE_SECOND;
 
 /**
  * 秒杀时段 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -24,13 +20,11 @@ public class SeckillConfigBaseVO {
 
     @Schema(description = "开始时间点", requiredMode = Schema.RequiredMode.REQUIRED, example = "09:00:00")
     @NotNull(message = "开始时间点不能为空")
-    @DateTimeFormat(pattern = FORMAT_HOUR_MINUTE_SECOND)
-    private LocalTime startTime;
+    private String startTime;
 
     @Schema(description = "结束时间点", requiredMode = Schema.RequiredMode.REQUIRED, example = "16:00:00")
     @NotNull(message = "结束时间点不能为空")
-    @DateTimeFormat(pattern = FORMAT_HOUR_MINUTE_SECOND)
-    private LocalTime endTime;
+    private String endTime;
 
     @Schema(description = "秒杀主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
     @NotNull(message = "秒杀主图不能为空")

@@ -29,7 +29,7 @@ public class SeckillActivityUpdateReqVO extends SeckillActivityBaseVO {
 
     @Schema(description = "秒杀时段id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,3")
     @NotEmpty(message = "秒杀时段id不能为空")
-    private List<Long> timeIds;
+    private List<Long> configIds;
 
     /**
      * 商品列表

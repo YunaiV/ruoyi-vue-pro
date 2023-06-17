@@ -21,6 +21,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class SeckillProductDO extends BaseDO {
+
     /**
      * 秒杀参与商品编号
      */
@@ -36,7 +37,7 @@ public class SeckillProductDO extends BaseDO {
      * 秒杀时段id
      */
     @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> timeIds;
+    private List<Long> configIds;
 
     /**
      * 商品id
@@ -53,9 +54,8 @@ public class SeckillProductDO extends BaseDO {
      */
     private Integer seckillPrice;
 
-    // TODO @芋艿：改成 quota 限量库存；每次购买时，需要减小；
     /**
-     * 秒杀库存
+     * 秒杀库存 限量库存；每次购买时，需要减小；
      */
     private Integer quota;
 

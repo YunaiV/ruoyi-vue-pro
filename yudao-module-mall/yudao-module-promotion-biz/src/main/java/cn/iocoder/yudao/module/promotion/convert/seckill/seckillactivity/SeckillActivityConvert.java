@@ -55,7 +55,7 @@ public interface SeckillActivityConvert {
         return ObjectUtil.equals(productDO.getSpuId(), productVO.getSpuId())
                 && ObjectUtil.equals(productDO.getSkuId(), productVO.getSkuId())
                 && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice())
-                && ObjectUtil.equals(productDO.getStock(), productVO.getStock())
+                && ObjectUtil.equals(productDO.getQuota(), productVO.getQuota())
                 && ObjectUtil.equals(productDO.getLimitCount(), productVO.getLimitCount());
     }
 
@@ -70,14 +70,14 @@ public interface SeckillActivityConvert {
         return ObjectUtil.equals(productDO.getSpuId(), productVO.getSpuId())
                 && ObjectUtil.equals(productDO.getSkuId(), productVO.getSkuId())
                 && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice())
-                && ObjectUtil.equals(productDO.getStock(), productVO.getStock())
+                && ObjectUtil.equals(productDO.getQuota(), productVO.getQuota())
                 && ObjectUtil.equals(productDO.getLimitCount(), productVO.getLimitCount());
 
     }
 
     default List<SeckillProductDO> convertList(List<SeckillActivityBaseVO.Product> products, SeckillActivityDO seckillActivity) {
         return CollectionUtils.convertList(products, product -> convert(product)
-                .setActivityId(seckillActivity.getId()).setTimeIds(seckillActivity.getTimeIds()));
+                .setActivityId(seckillActivity.getId()).setConfigIds(seckillActivity.getConfigIds()));
     }
 
 }

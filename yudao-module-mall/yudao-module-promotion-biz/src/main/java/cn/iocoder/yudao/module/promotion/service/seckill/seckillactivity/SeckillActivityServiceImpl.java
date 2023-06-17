@@ -47,7 +47,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         // 校验商品是否冲突
         validateSeckillActivityProductConflicts(null, createReqVO.getProducts());
         // 校验秒杀时段是否存在
-        seckillConfigService.validateSeckillConfigExists(createReqVO.getTimeIds());
+        seckillConfigService.validateSeckillConfigExists(createReqVO.getConfigIds());
 
         // 插入秒杀活动
         SeckillActivityDO seckillActivity = SeckillActivityConvert.INSTANCE.convert(createReqVO)
@@ -57,7 +57,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         List<SeckillProductDO> productDOs = SeckillActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), seckillActivity);
         seckillProductMapper.insertBatch(productDOs);
         // 更新秒杀时段的秒杀活动数量
-        seckillConfigService.seckillActivityCountIncr(createReqVO.getTimeIds());
+        seckillConfigService.seckillActivityCountIncr(createReqVO.getConfigIds());
         return seckillActivity.getId();
     }
 
@@ -78,7 +78,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         // 更新商品
         updateSeckillProduct(updateReqVO);
         // 更新秒杀时段的秒杀活动数量
-        updateSeckillConfigActivityCount(seckillActivity, updateReqVO.getTimeIds());
+        updateSeckillConfigActivityCount(seckillActivity, updateReqVO.getConfigIds());
     }
 
     /**
@@ -89,7 +89,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
      */
     private void updateSeckillConfigActivityCount(SeckillActivityDO seckillActivity, List<Long> updateTimeIds) {
         // 查询出 timeIds
-        List<Long> existsTimeIds = seckillActivity.getTimeIds();
+        List<Long> existsTimeIds = seckillActivity.getConfigIds();
         // 需要减少的时间段
         Collection<Long> reduceIds = CollUtil.filterNew(existsTimeIds, existsTimeId -> !updateTimeIds.contains(existsTimeId));
         // 需要添加的时间段
@@ -134,7 +134,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         }
 
         //全量更新当前活动商品的秒杀时段id列表（timeIds）
-        seckillProductMapper.updateTimeIdsByActivityId(updateReqVO.getId(), updateReqVO.getTimeIds());
+        seckillProductMapper.updateTimeIdsByActivityId(updateReqVO.getId(), updateReqVO.getConfigIds());
     }
 
     /**
@@ -190,7 +190,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
             throw exception(SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END);
         }
         // 更新秒杀时段的秒杀活动数量
-        seckillConfigService.seckillActivityCountDecr(seckillActivity.getTimeIds());
+        seckillConfigService.seckillActivityCountDecr(seckillActivity.getConfigIds());
         // 删除
         seckillActivityMapper.deleteById(id);
     }

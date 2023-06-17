@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.Seck
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -25,7 +24,6 @@ public interface SeckillConfigConvert {
 
     SeckillConfigDO convert(SeckillConfigUpdateReqVO bean);
 
-    @Mapping(target = "s")
     SeckillConfigRespVO convert(SeckillConfigDO bean);
 
     List<SeckillConfigRespVO> convertList(List<SeckillConfigDO> list);

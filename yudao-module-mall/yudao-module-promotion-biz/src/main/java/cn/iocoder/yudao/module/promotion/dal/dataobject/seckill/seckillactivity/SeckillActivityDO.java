@@ -32,12 +32,16 @@ public class SeckillActivityDO extends BaseDO {
     @TableId
     private Long id;
     /**
+     * 秒杀活动商品
+     */
+    private Long spuId;
+    /**
      * 秒杀活动名称
      */
     private String name;
     /**
      * 活动状态
-     *
+     * <p>
      * 枚举 {@link PromotionActivityStatusEnum 对应的类}
      */
     private Integer status;
@@ -61,9 +65,9 @@ public class SeckillActivityDO extends BaseDO {
      * 秒杀时段 id
      */
     @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> timeIds;
+    private List<Long> configIds;
     /**
-     * 付款订单数
+     * 新增订单数
      */
     private Integer orderCount;
     /**

@@ -20,7 +20,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .likeIfPresent(SeckillActivityDO::getName, reqVO.getName())
                 .eqIfPresent(SeckillActivityDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(SeckillActivityDO::getCreateTime, reqVO.getCreateTime())
-                .apply(ObjectUtil.isNotNull(reqVO.getTimeId()),"FIND_IN_SET(" + reqVO.getTimeId() + ",time_ids) > 0")
+                .apply(ObjectUtil.isNotNull(reqVO.getConfigId()), "FIND_IN_SET(" + reqVO.getConfigId() + ",time_ids) > 0")
                 .orderByDesc(SeckillActivityDO::getId));
     }
 }

@@ -5,9 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalTime;
 
 /**
  * 管理后台 - 秒杀时段分页 Request VO
@@ -25,13 +22,5 @@ public class SeckillConfigPageReqVO extends PageParam {
 
     @Schema(description = "状态", example = "0")
     private Integer status;
-
-    @Schema(description = "开始时间点", example = "16:30:40")
-    @DateTimeFormat(pattern = "HH:mm:ss")
-    private LocalTime[] startTime;
-
-    @Schema(description = "结束时间点", example = "16:30:40")
-    @DateTimeFormat(pattern = "HH:mm:ss")
-    private LocalTime[] endTime;
 
 }

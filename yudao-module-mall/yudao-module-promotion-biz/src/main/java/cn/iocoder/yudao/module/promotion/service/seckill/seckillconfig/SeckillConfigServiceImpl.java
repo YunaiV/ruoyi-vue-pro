@@ -36,7 +36,8 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     @Override
     public Long createSeckillConfig(SeckillConfigCreateReqVO createReqVO) {
         // 校验时间段是否冲突
-        validateSeckillConfigConflict(null, createReqVO.getStartTime(), createReqVO.getEndTime());
+        //validateSeckillConfigConflict(null, createReqVO.getStartTime(), createReqVO.getEndTime());
+
         // 插入
         SeckillConfigDO seckillConfig = SeckillConfigConvert.INSTANCE.convert(createReqVO);
         seckillConfigMapper.insert(seckillConfig);
@@ -49,7 +50,8 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         // 校验存在
         this.validateSeckillConfigExists(updateReqVO.getId());
         // 校验时间段是否冲突
-        validateSeckillConfigConflict(updateReqVO.getId(), updateReqVO.getStartTime(), updateReqVO.getEndTime());
+        //validateSeckillConfigConflict(updateReqVO.getId(), updateReqVO.getStartTime(), updateReqVO.getEndTime());
+
         // 更新
         SeckillConfigDO updateObj = SeckillConfigConvert.INSTANCE.convert(updateReqVO);
         seckillConfigMapper.updateById(updateObj);
@@ -77,6 +79,7 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
      */
     private void validateSeckillConfigConflict(Long id, LocalTime startTime, LocalTime endTime) {
         //查询开始时间，结束时间，是否在别人的时间段内
+        // TODO 为什么要检查这个时间段是否冲突 比如早上 09:00:00 - 10:00:00 我再添加一个 09:00:00 - 09:30:00 不可以这样吗？
         List<SeckillConfigDO> startTimeList = seckillConfigMapper.selectListByTime(startTime);
         List<SeckillConfigDO> endTimeList = seckillConfigMapper.selectListByTime(endTime);
         //查询自己时间段内是否有时间段

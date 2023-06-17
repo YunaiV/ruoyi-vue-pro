@@ -36,8 +36,6 @@ public interface SeckillConfigMapper extends BaseMapperX<SeckillConfigDO> {
     default PageResult<SeckillConfigDO> selectPage(SeckillConfigPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SeckillConfigDO>()
                 .likeIfPresent(SeckillConfigDO::getName, reqVO.getName())
-                .betweenIfPresent(SeckillConfigDO::getStartTime, reqVO.getStartTime())
-                .betweenIfPresent(SeckillConfigDO::getEndTime, reqVO.getEndTime())
                 .eqIfPresent(SeckillConfigDO::getStatus, reqVO.getStatus())
                 .orderByDesc(SeckillConfigDO::getId));
     }

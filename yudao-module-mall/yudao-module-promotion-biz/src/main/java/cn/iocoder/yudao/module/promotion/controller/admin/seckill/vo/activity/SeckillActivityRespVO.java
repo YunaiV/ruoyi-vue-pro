@@ -17,7 +17,7 @@ public class SeckillActivityRespVO extends SeckillActivityBaseVO {
     @Schema(description = "秒杀活动id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "付款订单数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "新增订单数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer orderCount;
 
     @Schema(description = "付款人数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -27,7 +27,7 @@ public class SeckillActivityRespVO extends SeckillActivityBaseVO {
     private LocalDateTime createTime;
 
     @Schema(description = "秒杀时段id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,3")
-    private List<Long> timeIds;
+    private List<Long> configIds;
 
     @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer sort;
