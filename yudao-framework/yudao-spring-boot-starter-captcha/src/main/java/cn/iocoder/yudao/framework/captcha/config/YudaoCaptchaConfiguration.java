@@ -26,9 +26,9 @@ public class YudaoCaptchaConfiguration {
 
     @Bean
     public CaptchaCacheService captchaCacheService(AjCaptchaProperties config) {
-        //缓存类型redis/local/....
+        // 缓存类型 redis/local/....
         CaptchaCacheService ret = CaptchaServiceFactory.getCache(config.getCacheType().name());
-        if(ret instanceof RedisCaptchaServiceImpl){
+        if (ret instanceof RedisCaptchaServiceImpl) {
             ((RedisCaptchaServiceImpl)ret).setStringRedisTemplate(stringRedisTemplate);
         }
         return ret;

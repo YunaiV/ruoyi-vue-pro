@@ -43,7 +43,7 @@
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.8.0</flowable.version>
         <!-- 工具类相关 -->
-        <captcha-plus.version>1.0.4</captcha-plus.version>
+        <captcha-plus.version>1.0.2</captcha-plus.version>
         <jsoup.version>1.15.4</jsoup.version>
         <lombok.version>1.18.26</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
