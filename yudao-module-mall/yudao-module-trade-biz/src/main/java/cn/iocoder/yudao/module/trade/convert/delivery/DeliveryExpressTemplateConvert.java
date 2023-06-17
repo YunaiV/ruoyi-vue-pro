@@ -7,10 +7,15 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemp
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateFreeDO;
 import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateRespBO;
+import com.google.common.collect.Maps;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.findFirst;
 
 @Mapper
 public interface DeliveryExpressTemplateConvert {
@@ -48,7 +53,7 @@ public interface DeliveryExpressTemplateConvert {
 
     DeliveryExpressTemplateChargeDO convertTemplateCharge(DeliveryExpressTemplateUpdateReqVO.ExpressTemplateChargeUpdateVO vo);
 
-    DeliveryExpressTemplateRespBO.DeliveryExpressTemplateChargeBO convertTemplateCharge(DeliveryExpressTemplateChargeDO bean);
+    DeliveryExpressTemplateRespBO.Charge convertTemplateCharge(DeliveryExpressTemplateChargeDO bean);
 
     default List<DeliveryExpressTemplateChargeDO> convertTemplateChargeList(Long templateId, Integer chargeMode, List<ExpressTemplateChargeBaseVO> list) {
         return CollectionUtils.convertList(list, vo -> convertTemplateCharge(templateId, chargeMode, vo));
@@ -60,7 +65,7 @@ public interface DeliveryExpressTemplateConvert {
 
     DeliveryExpressTemplateFreeDO convertTemplateFree(DeliveryExpressTemplateUpdateReqVO.ExpressTemplateFreeUpdateVO vo);
 
-    DeliveryExpressTemplateRespBO.DeliveryExpressTemplateFreeBO convertTemplateFree(DeliveryExpressTemplateFreeDO bean);
+    DeliveryExpressTemplateRespBO.Free convertTemplateFree(DeliveryExpressTemplateFreeDO bean);
 
     List<ExpressTemplateChargeBaseVO> convertTemplateChargeList(List<DeliveryExpressTemplateChargeDO> list);
 
@@ -70,4 +75,22 @@ public interface DeliveryExpressTemplateConvert {
         return CollectionUtils.convertList(list, vo -> convertTemplateFree(templateId, vo));
     }
 
+    default Map<Long, DeliveryExpressTemplateRespBO> convertMap(Integer areaId, List<DeliveryExpressTemplateDO> templateList,
+                                                                List<DeliveryExpressTemplateChargeDO> chargeList,
+                                                                List<DeliveryExpressTemplateFreeDO> freeList) {
+        Map<Long, List<DeliveryExpressTemplateChargeDO>> templateIdChargeMap = convertMultiMap(chargeList,
+                DeliveryExpressTemplateChargeDO::getTemplateId);
+        Map<Long, List<DeliveryExpressTemplateFreeDO>> templateIdFreeMap = convertMultiMap(freeList,
+                DeliveryExpressTemplateFreeDO::getTemplateId);
+        // 组合运费模板配置 RespBO
+        Map<Long, DeliveryExpressTemplateRespBO> result = Maps.newHashMapWithExpectedSize(templateList.size());
+        templateList.forEach(template -> {
+            DeliveryExpressTemplateRespBO bo = new DeliveryExpressTemplateRespBO()
+                    .setChargeMode(template.getChargeMode())
+                    .setCharge(convertTemplateCharge(findFirst(templateIdChargeMap.get(template.getId()), charge -> charge.getAreaIds().contains(areaId))))
+                    .setFree(convertTemplateFree(findFirst(templateIdFreeMap.get(template.getId()), free -> free.getAreaIds().contains(areaId))));
+            result.put(template.getId(), bo);
+        });
+        return result;
+    }
 }

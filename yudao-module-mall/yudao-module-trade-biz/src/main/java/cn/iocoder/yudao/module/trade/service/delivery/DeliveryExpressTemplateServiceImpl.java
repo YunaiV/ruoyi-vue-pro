@@ -224,36 +224,26 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
     @Override
     public Map<Long, DeliveryExpressTemplateRespBO> getExpressTemplateMapByIdsAndArea(Collection<Long> ids, Integer areaId) {
         Assert.notNull(areaId, "区域编号 {} 不能为空", areaId);
+        // 查询 template 数组
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyMap();
         }
         List<DeliveryExpressTemplateDO> templateList = expressTemplateMapper.selectBatchIds(ids);
-        // 查询 templateCharge
-        List<DeliveryExpressTemplateChargeDO> templeChargeList = expressTemplateChargeMapper.selectByTemplateIds(ids);
-        Map<Long, List<DeliveryExpressTemplateChargeDO>> templateChargeMap = convertMultiMap(templeChargeList,
-                DeliveryExpressTemplateChargeDO::getTemplateId);
-        // 查询 templateFree
-        List<DeliveryExpressTemplateFreeDO> templateFreeList = expressTemplateFreeMapper.selectListByTemplateIds(ids);
-        Map<Long, List<DeliveryExpressTemplateFreeDO>> templateFreeMap = convertMultiMap(templateFreeList,
-                DeliveryExpressTemplateFreeDO::getTemplateId);
+        // 查询 templateCharge 数组
+        List<DeliveryExpressTemplateChargeDO> chargeList = expressTemplateChargeMapper.selectByTemplateIds(ids);
+        // 查询 templateFree 数组
+        List<DeliveryExpressTemplateFreeDO> freeList = expressTemplateFreeMapper.selectListByTemplateIds(ids);
+
         // 组合运费模板配置 RespBO
-        Map<Long, DeliveryExpressTemplateRespBO> result = new HashMap<>(templateList.size());
-        templateList.forEach(item -> {
-            DeliveryExpressTemplateRespBO bo = new DeliveryExpressTemplateRespBO()
-                    .setChargeMode(item.getChargeMode())
-                    .setTemplateCharge(findMatchExpressTemplateCharge(templateChargeMap.get(item.getId()), areaId))
-                    .setTemplateFree(findMatchExpressTemplateFree(templateFreeMap.get(item.getId()), areaId));
-            result.put(item.getId(), bo);
-        });
-        return result;
+        return INSTANCE.convertMap(areaId, templateList, chargeList, freeList);
     }
 
-    private DeliveryExpressTemplateRespBO.DeliveryExpressTemplateChargeBO findMatchExpressTemplateCharge(
+    private DeliveryExpressTemplateRespBO.Charge findMatchExpressTemplateCharge(
             List<DeliveryExpressTemplateChargeDO> templateChargeList, Integer areaId) {
         return INSTANCE.convertTemplateCharge(findFirst(templateChargeList, item -> item.getAreaIds().contains(areaId)));
     }
 
-    private DeliveryExpressTemplateRespBO.DeliveryExpressTemplateFreeBO findMatchExpressTemplateFree(
+    private DeliveryExpressTemplateRespBO.Free findMatchExpressTemplateFree(
             List<DeliveryExpressTemplateFreeDO> templateFreeList, Integer areaId) {
         return INSTANCE.convertTemplateFree(findFirst(templateFreeList, item -> item.getAreaIds().contains(areaId)));
     }

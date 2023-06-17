@@ -84,11 +84,12 @@ public interface DeliveryExpressTemplateService {
     DeliveryExpressTemplateDO validateDeliveryExpressTemplate(Long templateId);
 
     /**
-     * 基于运费模板编号数组和收件人地址区域编号. 获取匹配运费模板
+     * 基于运费模板编号数组和收件人地址区域编号，获取匹配运费模板
      *
      * @param ids    编号列表
      * @param areaId 区域编号
      * @return Map (templateId -> 运费模板设置)
      */
     Map<Long, DeliveryExpressTemplateRespBO> getExpressTemplateMapByIdsAndArea(Collection<Long> ids, Integer areaId);
+
 }

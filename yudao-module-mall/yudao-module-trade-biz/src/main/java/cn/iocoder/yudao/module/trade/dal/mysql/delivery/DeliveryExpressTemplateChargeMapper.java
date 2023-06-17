@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.trade.dal.mysql.delivery;
 
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateChargeDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -24,9 +23,9 @@ public interface DeliveryExpressTemplateChargeMapper extends BaseMapperX<Deliver
     }
 
     default List<DeliveryExpressTemplateChargeDO> selectByTemplateIds(Collection<Long> templateIds) {
-        return selectList(new LambdaQueryWrapperX<DeliveryExpressTemplateChargeDO>()
-                .inIfPresent(DeliveryExpressTemplateChargeDO::getTemplateId, templateIds));
+        return selectList(DeliveryExpressTemplateChargeDO::getTemplateId, templateIds);
     }
+
 }
 
 

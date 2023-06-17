@@ -21,12 +21,12 @@ public class DeliveryExpressTemplateRespBO {
     /**
      * 运费模板快递运费设置
      */
-    private DeliveryExpressTemplateChargeBO templateCharge;
+    private Charge charge;
 
     /**
      * 运费模板包邮设置
      */
-    private DeliveryExpressTemplateFreeBO templateFree;
+    private Free free;
 
     /**
      * 快递运费模板费用配置 BO
@@ -34,7 +34,7 @@ public class DeliveryExpressTemplateRespBO {
      * @author jason
      */
     @Data
-    public static class DeliveryExpressTemplateChargeBO {
+    public static class Charge {
 
         /**
          * 首件数量(件数,重量，或体积)
@@ -60,7 +60,7 @@ public class DeliveryExpressTemplateRespBO {
      * @author jason
      */
     @Data
-    public static class DeliveryExpressTemplateFreeBO {
+    public static class Free {
 
         /**
          * 包邮金额，单位：分
@@ -76,4 +76,5 @@ public class DeliveryExpressTemplateRespBO {
          */
         private Integer freeCount;
     }
+
 }
