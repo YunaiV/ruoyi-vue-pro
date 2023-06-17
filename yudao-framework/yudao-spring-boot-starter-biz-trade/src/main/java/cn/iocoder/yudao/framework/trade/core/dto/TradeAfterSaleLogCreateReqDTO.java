@@ -3,13 +3,14 @@ package cn.iocoder.yudao.framework.trade.core.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
+/**
+ * 售后日志的创建 Request DTO
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
-public class TradeAfterSaleLogDTO {
+public class TradeAfterSaleLogCreateReqDTO {
 
     /**
      * 编号

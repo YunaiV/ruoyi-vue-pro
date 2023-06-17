@@ -32,6 +32,7 @@ public class AppTradeAfterSaleCreateReqVO {
     @NotNull(message = "申请原因不能为空")
     private String applyReason;
 
+    // TODO @陈賝：这个参数不应该有呀。
     /**
      * @see AfterSaleStatusEnum
      */

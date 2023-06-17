@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.framework.trade.core.enums;
 
 /**
- * 售后状态
+ * 售后状态的枚举
  *
  * @author 陈賝
- * @date 2023/6/13 13:53
+ * @since 2023/6/13 13:53
  */
 public enum AfterSaleStatusEnum {
 
@@ -22,6 +22,5 @@ public enum AfterSaleStatusEnum {
     public String description() {
         return description;
     }
-
 
 }
