@@ -52,7 +52,7 @@
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <guava.version>31.1-jre</guava.version>
+        <guava.version>32.0.0-jre</guava.version>
         <guice.version>5.1.0</guice.version>
         <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
         <commons-net.version>3.9.0</commons-net.version>
