@@ -8,11 +8,11 @@
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
+    <artifactId>yudao-spring-boot-starter-biz-trade</artifactId>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
-    <description>操作日志</description>
+    <description>交易模块</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <dependencies>
@@ -37,7 +37,7 @@
         <!-- 业务组件 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-system-api</artifactId>
+            <artifactId>yudao-module-system-api</artifactId> <!-- 需要使用它，进行操作日志的记录 -->
             <version>${revision}</version>
         </dependency>
 
@@ -46,6 +46,9 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-security</artifactId>
+        </dependency>
     </dependencies>
-
 </project>
