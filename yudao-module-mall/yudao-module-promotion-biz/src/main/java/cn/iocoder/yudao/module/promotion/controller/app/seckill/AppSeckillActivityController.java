@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityNowRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.config.AppSeckillConfigRespVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,7 +59,7 @@ public class AppSeckillActivityController {
     @GetMapping("/page")
     @Operation(summary = "获得秒杀活动分页")
     // TODO @芋艿：分页参数
-    public CommonResult<PageResult<AppSeckillActivityRespVO>> getSeckillActivityPage() {
+    public CommonResult<PageResult<AppSeckillActivityRespVO>> getSeckillActivityPage(AppSeckillActivityPageReqVO pageReqVO) {
         List<AppSeckillActivityRespVO> activityList = new ArrayList<>();
         AppSeckillActivityRespVO activity1 = new AppSeckillActivityRespVO();
         activity1.setId(1L);
@@ -67,6 +68,9 @@ public class AppSeckillActivityController {
         activity1.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         activity1.setMarketPrice(50);
         activity1.setSeckillPrice(100);
+        activity1.setUnitName("个");
+        activity1.setStock(1);
+        activity1.setTotalStock(2);
         activityList.add(activity1);
 
         AppSeckillActivityRespVO activity2 = new AppSeckillActivityRespVO();
@@ -76,6 +80,9 @@ public class AppSeckillActivityController {
         activity2.setPicUrl("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXMYJOomfp7cebz3cIeb8sHk3GGSIJtWEgREe3j7J1WoAbTvIOicpcNdFkWAziatBSMod8b5RyS4CQ/132");
         activity2.setMarketPrice(100);
         activity2.setSeckillPrice(200);
+        activity2.setUnitName("套");
+        activity2.setStock(2);
+        activity2.setTotalStock(3);
         activityList.add(activity2);
         return success(new PageResult<>(activityList, 100L));
     }

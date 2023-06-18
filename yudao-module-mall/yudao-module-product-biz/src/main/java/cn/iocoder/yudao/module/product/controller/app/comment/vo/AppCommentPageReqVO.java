@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
-@Schema(description = "用户APP - 商品评价分页 Request VO")
+@Schema(description = "用户 App - 商品评价分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
