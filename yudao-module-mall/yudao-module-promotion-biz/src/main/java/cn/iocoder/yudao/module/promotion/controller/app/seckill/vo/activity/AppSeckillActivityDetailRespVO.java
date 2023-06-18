@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.app.seckill.vo;
+package cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -6,9 +6,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "用户 App - 秒杀活动 Response VO")
+@Schema(description = "用户 App - 秒杀活动的详细 Response VO")
 @Data
-public class AppSeckillActivitiDetailRespVO {
+public class AppSeckillActivityDetailRespVO {
 
     @Schema(description = "秒杀活动编号", required = true, example = "1024")
     private Long id;

@@ -60,7 +60,7 @@ public class AppProductCommentRespVO {
     @Schema(description = "追加评价内容", example = "穿了很久都很丝滑诶")
     private String additionalContent;
 
-    @Schema(description = "追评评价图片地址数组，以逗号分隔最多上传9张", example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
+    @Schema(description = "追评评价图片地址数组，以逗号分隔最多上传 9 张", example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
     private List<String> additionalPicUrls;
 
     @Schema(description = "追加评价时间")
@@ -86,24 +86,24 @@ public class AppProductCommentRespVO {
     @Schema(description = "商品 SKU 属性", required = true)
     private List<AppProductPropertyValueDetailRespVO> skuProperties;
 
-    @Schema(description = "评分星级 1-5分", required = true, example = "5")
-    @NotNull(message = "评分星级 1-5分不能为空")
+    @Schema(description = "评分星级 1-5 分", required = true, example = "5")
+    @NotNull(message = "评分星级 1-5 分不能为空")
     private Integer scores;
 
-    @Schema(description = "描述星级 1-5分", required = true, example = "5")
-    @NotNull(message = "描述星级 1-5分不能为空")
+    @Schema(description = "描述星级 1-5 分", required = true, example = "5")
+    @NotNull(message = "描述星级 1-5 分不能为空")
     private Integer descriptionScores;
 
-    @Schema(description = "服务星级 1-5分", required = true, example = "5")
-    @NotNull(message = "服务星级 1-5分不能为空")
+    @Schema(description = "服务星级 1-5 分", required = true, example = "5")
+    @NotNull(message = "服务星级 1-5 分不能为空")
     private Integer benefitScores;
 
     @Schema(description = "评论内容", required = true, example = "哇，真的很丝滑凉快诶，好评")
     @NotNull(message = "评论内容不能为空")
     private String content;
 
-    @Schema(description = "评论图片地址数组，以逗号分隔最多上传9张", required = true, example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
-    @Size(max = 9, message = "评论图片地址数组长度不能超过9张")
+    @Schema(description = "评论图片地址数组，以逗号分隔最多上传 9 张", required = true, example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
+    @Size(max = 9, message = "评论图片地址数组长度不能超过 9 张")
     private List<String> picUrls;
 
 }

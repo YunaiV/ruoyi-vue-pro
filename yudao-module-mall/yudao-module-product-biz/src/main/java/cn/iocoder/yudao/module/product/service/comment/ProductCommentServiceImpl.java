@@ -86,6 +86,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Transactional(rollbackFor = Exception.class)
     public void createComment(ProductCommentCreateReqVO createReqVO) {
         // 校验订单
+        // TODO @puhui999：不校验哈；尽可能解耦
         Long orderId = tradeOrderApi.validateOrder(createReqVO.getUserId(), createReqVO.getOrderItemId());
         // 校验评论
         validateComment(createReqVO.getSpuId(), createReqVO.getUserId(), orderId);
@@ -103,8 +104,6 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         productCommentMapper.insert(commentDO);
         return commentDO.getId();
     }
-
-    // TODO 只有创建和更新诶 要不要删除接口
 
     private void validateComment(Long spuId, Long userId, Long orderId) {
         ProductSpuDO spu = productSpuService.getSpu(spuId);
@@ -144,6 +143,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     public PageResult<AppProductCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible) {
         PageResult<AppProductCommentRespVO> result = ProductCommentConvert.INSTANCE.convertPage02(
                 productCommentMapper.selectPage(pageVO, visible));
+        // TODO @puhui999：要不这块放到 controller 里拼接？
         Set<Long> skuIds = result.getList().stream().map(AppProductCommentRespVO::getSkuId).collect(Collectors.toSet());
         List<ProductSkuDO> skuList = productSkuService.getSkuList(skuIds);
         Map<Long, ProductSkuDO> skuDOMap = new HashMap<>(skuIds.size());

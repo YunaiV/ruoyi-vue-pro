@@ -126,6 +126,7 @@ CREATE TABLE IF NOT EXISTS `product_property_value` (
     PRIMARY KEY("id")
 ) COMMENT '规格值';
 
+-- TODO @puhui999：格式不太对哈
 CREATE TABLE IF NOT EXISTS `product_comment`
 (
     `id`
@@ -166,7 +167,7 @@ CREATE TABLE IF NOT EXISTS `product_comment`
 (
     1
 ) DEFAULT NULL COMMENT '是否可见true:显示false:隐藏',
-    `scores` tinyint DEFAULT NULL COMMENT '评分星级1-5分',
+    `scores` tinyint DEFAULT NULL COMMENT '评分星级1-5 分',
     `description_scores` tinyint DEFAULT NULL COMMENT '描述星级1-5 星',
     `benefit_scores` tinyint DEFAULT NULL COMMENT '服务星级1-5 星',
     `content` varchar

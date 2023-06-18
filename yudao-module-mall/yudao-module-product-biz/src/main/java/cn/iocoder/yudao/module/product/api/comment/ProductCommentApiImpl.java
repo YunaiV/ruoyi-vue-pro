@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.product.api.comment;
 
-import cn.iocoder.yudao.module.product.api.comment.dto.CommentCreateReqDTO;
+import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.service.comment.ProductCommentService;
@@ -17,12 +17,14 @@ import javax.annotation.Resource;
 @Service
 @Validated
 public class ProductCommentApiImpl implements ProductCommentApi {
+
     @Resource
     private ProductCommentService productCommentService;
 
     @Override
-    public Long createComment(CommentCreateReqDTO createReqDTO, Long orderId) {
+    public Long createComment(ProductCommentCreateReqDTO createReqDTO, Long orderId) {
         ProductCommentDO commentDO = ProductCommentConvert.INSTANCE.convert(createReqDTO, orderId);
         return productCommentService.createComment(commentDO);
     }
+
 }

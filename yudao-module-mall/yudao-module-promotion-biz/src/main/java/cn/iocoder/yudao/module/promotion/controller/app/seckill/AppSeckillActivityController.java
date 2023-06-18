@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.promotion.controller.app.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.AppSeckillActivitiDetailRespVO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityDetailRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityNowRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.config.AppSeckillConfigRespVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,12 +27,65 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class AppSeckillActivityController {
 
+    @GetMapping("/get-now")
+    @Operation(summary = "获得当前秒杀活动") // 提供给首页使用
+    // TODO 芋艿：需要增加 spring cache
+    public CommonResult<AppSeckillActivityNowRespVO> getNowSeckillActivity() {
+        AppSeckillActivityNowRespVO respVO = new AppSeckillActivityNowRespVO();
+        respVO.setConfig(new AppSeckillConfigRespVO().setId(10L).setStartTime("01:00").setEndTime("09:59"));
+        List<AppSeckillActivityRespVO> activityList = new ArrayList<>();
+        AppSeckillActivityRespVO activity1 = new AppSeckillActivityRespVO();
+        activity1.setId(1L);
+        activity1.setName("618 大秒杀");
+        activity1.setSpuId(2048L);
+        activity1.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        activity1.setMarketPrice(50);
+        activity1.setSeckillPrice(100);
+        activityList.add(activity1);
+
+        AppSeckillActivityRespVO activity2 = new AppSeckillActivityRespVO();
+        activity2.setId(2L);
+        activity2.setName("双十一大秒杀");
+        activity2.setSpuId(4096L);
+        activity2.setPicUrl("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXMYJOomfp7cebz3cIeb8sHk3GGSIJtWEgREe3j7J1WoAbTvIOicpcNdFkWAziatBSMod8b5RyS4CQ/132");
+        activity2.setMarketPrice(100);
+        activity2.setSeckillPrice(200);
+        activityList.add(activity2);
+        respVO.setActivities(activityList);
+        return success(respVO);
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "获得秒杀活动分页")
+    // TODO @芋艿：分页参数
+    public CommonResult<PageResult<AppSeckillActivityRespVO>> getSeckillActivityPage() {
+        List<AppSeckillActivityRespVO> activityList = new ArrayList<>();
+        AppSeckillActivityRespVO activity1 = new AppSeckillActivityRespVO();
+        activity1.setId(1L);
+        activity1.setName("618 大秒杀");
+        activity1.setSpuId(2048L);
+        activity1.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        activity1.setMarketPrice(50);
+        activity1.setSeckillPrice(100);
+        activityList.add(activity1);
+
+        AppSeckillActivityRespVO activity2 = new AppSeckillActivityRespVO();
+        activity2.setId(2L);
+        activity2.setName("双十一大秒杀");
+        activity2.setSpuId(4096L);
+        activity2.setPicUrl("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXMYJOomfp7cebz3cIeb8sHk3GGSIJtWEgREe3j7J1WoAbTvIOicpcNdFkWAziatBSMod8b5RyS4CQ/132");
+        activity2.setMarketPrice(100);
+        activity2.setSeckillPrice(200);
+        activityList.add(activity2);
+        return success(new PageResult<>(activityList, 100L));
+    }
+
     @GetMapping("/get-detail")
     @Operation(summary = "获得秒杀活动明细")
     @Parameter(name = "id", description = "活动编号", required = true, example = "1024")
-    public CommonResult<AppSeckillActivitiDetailRespVO> getSeckillActivity(@RequestParam("id") Long id) {
+    public CommonResult<AppSeckillActivityDetailRespVO> getSeckillActivity(@RequestParam("id") Long id) {
         // TODO 芋艿：如果禁用的时候，需要抛出异常；
-        AppSeckillActivitiDetailRespVO obj = new AppSeckillActivitiDetailRespVO();
+        AppSeckillActivityDetailRespVO obj = new AppSeckillActivityDetailRespVO();
         // 设置其属性的值
         obj.setId(id);
         obj.setName("晚九点限时秒杀");
@@ -37,9 +94,9 @@ public class AppSeckillActivityController {
         obj.setEndTime(LocalDateTime.of(2023, 6, 11, 23, 59, 0));
         obj.setSpuId(633L);
         // 创建一个Product对象的列表
-        List<AppSeckillActivitiDetailRespVO.Product> productList = new ArrayList<>();
+        List<AppSeckillActivityDetailRespVO.Product> productList = new ArrayList<>();
         // 创建三个新的Product对象并设置其属性的值
-        AppSeckillActivitiDetailRespVO.Product product1 = new AppSeckillActivitiDetailRespVO.Product();
+        AppSeckillActivityDetailRespVO.Product product1 = new AppSeckillActivityDetailRespVO.Product();
         product1.setSkuId(1L);
         product1.setSeckillPrice(100);
         product1.setQuota(50);
@@ -47,7 +104,7 @@ public class AppSeckillActivityController {
         // 将第一个Product对象添加到列表中
         productList.add(product1);
         // 创建第二个Product对象并设置其属性的值
-        AppSeckillActivitiDetailRespVO.Product product2 = new AppSeckillActivitiDetailRespVO.Product();
+        AppSeckillActivityDetailRespVO.Product product2 = new AppSeckillActivityDetailRespVO.Product();
         product2.setSkuId(2L);
         product2.setSeckillPrice(200);
         product2.setQuota(100);
@@ -55,7 +112,7 @@ public class AppSeckillActivityController {
         // 将第二个Product对象添加到列表中
         productList.add(product2);
         // 创建第三个Product对象并设置其属性的值
-        AppSeckillActivitiDetailRespVO.Product product3 = new AppSeckillActivitiDetailRespVO.Product();
+        AppSeckillActivityDetailRespVO.Product product3 = new AppSeckillActivityDetailRespVO.Product();
         product3.setSkuId(3L);
         product3.setSeckillPrice(300);
         product3.setQuota(150);

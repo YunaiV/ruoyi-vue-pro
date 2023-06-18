@@ -97,7 +97,7 @@ public class ProductCommentDO extends BaseDO {
     /**
      * 评分星级
      *
-     * 1-5分
+     * 1-5 分
      */
     private Integer scores;
     /**

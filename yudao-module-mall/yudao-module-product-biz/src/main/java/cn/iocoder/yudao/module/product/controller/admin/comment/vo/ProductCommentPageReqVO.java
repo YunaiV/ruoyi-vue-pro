@@ -31,7 +31,7 @@ public class ProductCommentPageReqVO extends PageParam {
     @Schema(description = "商品SPU名称", example = "感冒药")
     private String spuName;
 
-    @Schema(description = "评分星级 1-5分", example = "5")
+    @Schema(description = "评分星级 1-5 分", example = "5")
     @InEnum(ProductCommentScoresEnum.class)
     private Integer scores;
 

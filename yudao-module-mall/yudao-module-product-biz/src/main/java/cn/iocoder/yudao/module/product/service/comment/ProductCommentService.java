@@ -54,7 +54,8 @@ public interface ProductCommentService {
     PageResult<AppProductCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible);
 
     /**
-     * 创建商品评论 后台管理员创建评论使用
+     * 创建商品评论
+     * 后台管理员创建评论使用
      *
      * @param createReqVO 商品评价创建 Request VO 对象
      */

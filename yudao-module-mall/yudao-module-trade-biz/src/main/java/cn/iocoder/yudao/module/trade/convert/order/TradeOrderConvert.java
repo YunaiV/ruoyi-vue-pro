@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
-import cn.iocoder.yudao.module.product.api.comment.dto.CommentCreateReqDTO;
+import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.promotion.api.price.dto.PriceCalculateReqDTO;
@@ -227,6 +227,7 @@ public interface TradeOrderConvert {
 
     AppProductPropertyValueDetailRespVO convert02(ProductPropertyValueDetailRespDTO bean);
 
+    // TODO 芋艿：可简化
     default AppTradeOrderDetailRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                                 List<ProductPropertyValueDetailRespDTO> propertyValueDetails, TradeOrderProperties tradeOrderProperties) {
         AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
@@ -258,7 +259,7 @@ public interface TradeOrderConvert {
 
     AppTradeOrderItemRespVO convert03(TradeOrderItemDO bean);
 
-    CommentCreateReqDTO convert04(AppTradeOrderItemCommentCreateReqVO createReqVO);
+    ProductCommentCreateReqDTO convert04(AppTradeOrderItemCommentCreateReqVO createReqVO);
 
     default TradePriceCalculateReqBO convert(Long userId, AppTradeOrderSettlementReqVO settlementReqVO,
                                              List<TradeCartDO> cartList) {
@@ -301,6 +302,5 @@ public interface TradeOrderConvert {
     }
 
     AppTradeOrderSettlementRespVO convert0(TradePriceCalculateRespBO calculate, AddressRespDTO address);
-
 
 }
