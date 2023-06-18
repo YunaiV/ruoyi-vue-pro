@@ -94,34 +94,31 @@ public class AppCombinationActivityController {
         obj.setName("晚九点限时秒杀");
         obj.setStatus(1);
         obj.setStartTime(LocalDateTime.of(2023, 6, 15, 0, 0, 0));
-        obj.setEndTime(LocalDateTime.of(2023, 6, 15, 23, 59, 0));
+        obj.setEndTime(LocalDateTime.of(2023, 6, 20, 23, 59, 0));
         obj.setUserSize(2);
         obj.setSuccessCount(100);
         obj.setSpuId(633L);
+        obj.setSingleLimitCount(2);
+        obj.setTotalLimitCount(3);
+
         // 创建一个Product对象的列表
         List<AppCombinationActivityDetailRespVO.Product> productList = new ArrayList<>();
         // 创建三个新的Product对象并设置其属性的值
         AppCombinationActivityDetailRespVO.Product product1 = new AppCombinationActivityDetailRespVO.Product();
         product1.setSkuId(1L);
         product1.setCombinationPrice(100);
-        product1.setQuota(50);
-        product1.setLimitCount(3);
         // 将第一个Product对象添加到列表中
         productList.add(product1);
         // 创建第二个Product对象并设置其属性的值
         AppCombinationActivityDetailRespVO.Product product2 = new AppCombinationActivityDetailRespVO.Product();
         product2.setSkuId(2L);
         product2.setCombinationPrice(200);
-        product2.setQuota(100);
-        product2.setLimitCount(4);
         // 将第二个Product对象添加到列表中
         productList.add(product2);
         // 创建第三个Product对象并设置其属性的值
         AppCombinationActivityDetailRespVO.Product product3 = new AppCombinationActivityDetailRespVO.Product();
         product3.setSkuId(3L);
         product3.setCombinationPrice(300);
-        product3.setQuota(150);
-        product3.setLimitCount(5);
         // 将第三个Product对象添加到列表中
         productList.add(product3);
         // 将Product列表设置为对象的属性值

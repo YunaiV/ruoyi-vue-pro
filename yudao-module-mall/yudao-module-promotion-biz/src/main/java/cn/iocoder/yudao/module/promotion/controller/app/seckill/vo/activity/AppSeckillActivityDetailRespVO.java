@@ -30,6 +30,18 @@ public class AppSeckillActivityDetailRespVO {
     @Schema(description = "商品 SPU 编号", required = true, example = "2048")
     private Long spuId;
 
+    @Schema(description = "总共限购数量", example = "10")
+    private Integer totalLimitCount;
+
+    @Schema(description = "单次限购数量", example = "5")
+    private Integer singleLimitCount;
+
+    @Schema(description = "秒杀库存（剩余）", required = true, example = "50")
+    private Integer stock;
+
+    @Schema(description = "秒杀库存（总计）", required = true, example = "100")
+    private Integer totalStock;
+
     @Schema(description = "商品信息数组", required = true)
     private List<Product> products;
 
@@ -44,10 +56,7 @@ public class AppSeckillActivityDetailRespVO {
         private Integer seckillPrice;
 
         @Schema(description = "秒杀限量库存", required = true, example = "50")
-        private Integer quota;
-
-        @Schema(description = "每人限购数量", required = true, example = "10")
-        private Integer limitCount;
+        private Integer stock;
 
     }
 

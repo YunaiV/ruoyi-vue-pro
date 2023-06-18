@@ -34,6 +34,12 @@ public class AppCombinationActivityDetailRespVO {
     @Schema(description = "商品 SPU 编号", required = true, example = "2048")
     private Long spuId;
 
+    @Schema(description = "总共限购数量", example = "10")
+    private Integer totalLimitCount;
+
+    @Schema(description = "单次限购数量", example = "5")
+    private Integer singleLimitCount;
+
     @Schema(description = "商品信息数组", required = true)
     private List<Product> products;
 
@@ -46,12 +52,6 @@ public class AppCombinationActivityDetailRespVO {
 
         @Schema(description = "拼团金额，单位：分", required = true, example = "100")
         private Integer combinationPrice;
-
-        @Schema(description = "拼团限量库存", required = true, example = "50")
-        private Integer quota;
-
-        @Schema(description = "每人限购数量", required = true, example = "10")
-        private Integer limitCount;
 
     }
 
