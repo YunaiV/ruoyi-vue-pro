@@ -1,4 +1,6 @@
-package cn.iocoder.yudao.framework.trade.core.annotations;
+package cn.iocoder.yudao.module.trade.framework.aftersalelog.core.annotations;
+
+import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.enums.AfterSaleStatusEnum;
 
 import java.lang.annotation.*;
 
@@ -18,11 +20,10 @@ public @interface AfterSaleLog {
      */
     String id();
 
-    // TODO @陈賝：是不是改成一个操作的枚举？
     /**
      * 操作类型
      */
-    String operateType() default "";
+    AfterSaleStatusEnum operateType() default AfterSaleStatusEnum.APPLY;
 
     /**
      * 日志内容

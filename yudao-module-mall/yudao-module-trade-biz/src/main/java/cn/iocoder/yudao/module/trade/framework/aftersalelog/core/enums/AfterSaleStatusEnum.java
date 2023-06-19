@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.trade.core.enums;
+package cn.iocoder.yudao.module.trade.framework.aftersalelog.core.enums;
 
 /**
  * 售后状态的枚举

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.trade.core.dto;
+package cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 /**
  * 售后日志的创建 Request DTO
+ *
+ * @author 陈賝
+ * @since 2023/6/19 09:54
  */
 @Data
 @NoArgsConstructor
@@ -18,7 +21,7 @@ public class TradeAfterSaleLogCreateReqDTO {
     private Long id;
     /**
      * 用户编号
-     *
+     * <p>
      * 关联 1：AdminUserDO 的 id 字段
      * 关联 2：MemberUserDO 的 id 字段
      */
