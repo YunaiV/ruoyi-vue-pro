@@ -70,10 +70,10 @@ public class TradeOrderBaseVO {
     @Schema(description = "支付渠道", required = true, example = "wx_lite")
     private String payChannelCode;
 
-    @Schema(description = "商品原价（总）", required = true, example = "1000")
-    private Integer originalPrice;
+    @Schema(description = "商品原价（总），单位：分", required = true, example = "1000")
+    private Integer totalPrice;
 
-    @Schema(description = "订单优惠（总）", required = true, example = "100")
+    @Schema(description = "订单优惠（总），单位：分", required = true, example = "100")
     private Integer discountPrice;
 
     @Schema(description = "运费金额", required = true, example = "100")

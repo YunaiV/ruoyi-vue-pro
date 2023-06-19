@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -54,6 +55,10 @@ public class TradeOrderController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty());
         }
+
+        //查询用户信息 mod by 矿泉水 20230614 begin
+        Map<Long, MemberUserRespDTO> userRespVOMap = memberUserApi.getUserMap(convertSet(pageResult.getList(),TradeOrderDO::getUserId));;
+        // end
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderService.getOrderItemListByOrderId(
                 convertSet(pageResult.getList(), TradeOrderDO::getId));
@@ -61,7 +66,7 @@ public class TradeOrderController {
         List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
                 .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
         // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, propertyValueDetails));
+        return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, propertyValueDetails, userRespVOMap));
     }
 
     @GetMapping("/get-detail")
