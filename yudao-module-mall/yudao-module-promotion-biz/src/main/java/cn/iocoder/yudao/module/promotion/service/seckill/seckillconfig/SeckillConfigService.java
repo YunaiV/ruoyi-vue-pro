@@ -61,20 +61,6 @@ public interface SeckillConfigService {
      */
     void validateSeckillConfigExists(Collection<Long> timeIds);
 
-    /**
-     * 秒杀时段列表的秒杀活动数量加 1
-     *
-     * @param ids 秒杀时段id列表
-     */
-    void seckillActivityCountIncr(Collection<Long> ids);
-
-
-    /**
-     * 秒杀时段列表的秒杀活动数量减 1
-     *
-     * @param ids 秒杀时段id列表
-     */
-    void seckillActivityCountDecr(Collection<Long> ids);
 
     /**
      * 获得秒杀时间段配置分页数据
@@ -84,4 +70,10 @@ public interface SeckillConfigService {
      */
     PageResult<SeckillConfigDO> getSeckillConfigPage(SeckillConfigPageReqVO pageVO);
 
+    /**
+     * 获得所有正常状态的时段配置列表
+     *
+     * @return 秒杀时段列表
+     */
+    List<SeckillConfigDO> getListAllSimple();
 }

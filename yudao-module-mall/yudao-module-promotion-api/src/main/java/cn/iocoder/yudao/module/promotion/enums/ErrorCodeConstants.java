@@ -56,5 +56,7 @@ public interface ErrorCodeConstants {
     // ========== 秒杀时段 1013009000 ==========
     ErrorCode SECKILL_TIME_NOT_EXISTS = new ErrorCode(1013009000, "秒杀时段不存在");
     ErrorCode SECKILL_TIME_CONFLICTS = new ErrorCode(1013009001, "秒杀时段冲突");
+    ErrorCode SECKILL_TIME_EQUAL = new ErrorCode(1013009002, "秒杀时段开始时间和结束时间不能相等");
+    ErrorCode SECKILL_START_TIME_BEFORE_END_TIME = new ErrorCode(1013009003, "秒杀时段开始时间不能在结束时间之后");
 
 }

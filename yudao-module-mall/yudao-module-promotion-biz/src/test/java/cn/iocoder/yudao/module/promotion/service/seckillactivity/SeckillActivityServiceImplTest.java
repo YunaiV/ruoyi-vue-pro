@@ -113,26 +113,26 @@ public class SeckillActivityServiceImplTest extends BaseDbUnitTest {
        });
        seckillActivityMapper.insert(dbSeckillActivity);
        // 测试 name 不匹配
-       seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setName(null)));
-       // 测试 status 不匹配
-       seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setStatus(null)));
-       // 测试 timeId 不匹配
+        seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setName(null)));
+        // 测试 status 不匹配
+        seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setStatus(null)));
+        // 测试 timeId 不匹配
         seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setConfigIds(null)));
-       // 测试 createTime 不匹配
-       seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setCreateTime(null)));
-       // 准备参数
-       SeckillActivityPageReqVO reqVO = new SeckillActivityPageReqVO();
-       reqVO.setName(null);
+        // 测试 createTime 不匹配
+        seckillActivityMapper.insert(cloneIgnoreId(dbSeckillActivity, o -> o.setCreateTime(null)));
+        // 准备参数
+        SeckillActivityPageReqVO reqVO = new SeckillActivityPageReqVO();
+        reqVO.setName(null);
         reqVO.setStatus(null);
         reqVO.setConfigId(null);
         reqVO.setCreateTime((new LocalDateTime[]{}));
 
-       // 调用
-       PageResult<SeckillActivityDO> pageResult = seckillActivityService.getSeckillActivityPage(reqVO);
-       // 断言
-       assertEquals(1, pageResult.getTotal());
-       assertEquals(1, pageResult.getList().size());
-       assertPojoEquals(dbSeckillActivity, pageResult.getList().get(0));
+        // 调用
+        PageResult<SeckillActivityDO> pageResult = seckillActivityService.getSeckillActivityPage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbSeckillActivity, pageResult.getList().get(0));
     }
 
     @Test

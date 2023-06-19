@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.seckill.seckillconfig;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigPageReqVO;
@@ -15,11 +16,11 @@ import javax.annotation.Resource;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.SECKILL_TIME_CONFLICTS;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.SECKILL_TIME_NOT_EXISTS;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
 /**
  * 秒杀时段 Service 实现类
@@ -36,7 +37,7 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     @Override
     public Long createSeckillConfig(SeckillConfigCreateReqVO createReqVO) {
         // 校验时间段是否冲突
-        //validateSeckillConfigConflict(null, createReqVO.getStartTime(), createReqVO.getEndTime());
+        validateSeckillConfigConflict(createReqVO.getStartTime(), createReqVO.getEndTime());
 
         // 插入
         SeckillConfigDO seckillConfig = SeckillConfigConvert.INSTANCE.convert(createReqVO);
@@ -48,9 +49,9 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     @Override
     public void updateSeckillConfig(SeckillConfigUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validateSeckillConfigExists(updateReqVO.getId());
+        validateSeckillConfigExists(updateReqVO.getId());
         // 校验时间段是否冲突
-        //validateSeckillConfigConflict(updateReqVO.getId(), updateReqVO.getStartTime(), updateReqVO.getEndTime());
+        validateSeckillConfigConflict(updateReqVO.getStartTime(), updateReqVO.getEndTime());
 
         // 更新
         SeckillConfigDO updateObj = SeckillConfigConvert.INSTANCE.convert(updateReqVO);
@@ -60,7 +61,8 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     @Override
     public void deleteSeckillConfig(Long id) {
         // 校验存在
-        this.validateSeckillConfigExists(id);
+        validateSeckillConfigExists(id);
+
         // 删除
         seckillConfigMapper.deleteById(id);
     }
@@ -77,21 +79,32 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
      * @param startTime 开始时间
      * @param endTime   结束时间
      */
-    private void validateSeckillConfigConflict(Long id, LocalTime startTime, LocalTime endTime) {
-        //查询开始时间，结束时间，是否在别人的时间段内
-        // TODO 为什么要检查这个时间段是否冲突 比如早上 09:00:00 - 10:00:00 我再添加一个 09:00:00 - 09:30:00 不可以这样吗？
-        List<SeckillConfigDO> startTimeList = seckillConfigMapper.selectListByTime(startTime);
-        List<SeckillConfigDO> endTimeList = seckillConfigMapper.selectListByTime(endTime);
-        //查询自己时间段内是否有时间段
-        List<SeckillConfigDO> startEndTimeList = seckillConfigMapper.selectListByTime(startTime, endTime);
-        if (id != null) {
-            //移除自己
-            startTimeList.removeIf(seckillConfig -> Objects.equals(seckillConfig.getId(), id));
-            endTimeList.removeIf(seckillConfig -> Objects.equals(seckillConfig.getId(), id));
-            startEndTimeList.removeIf(seckillConfig -> Objects.equals(seckillConfig.getId(), id));
+    private void validateSeckillConfigConflict(String startTime, String endTime) {
+        LocalTime startTime1 = LocalTime.parse(startTime);
+        LocalTime endTime1 = LocalTime.parse(endTime);
+        // 检查选择的时间是否相等
+        if (startTime1.equals(endTime1)) {
+            throw exception(SECKILL_TIME_EQUAL);
         }
-        if (CollUtil.isNotEmpty(startTimeList) || CollUtil.isNotEmpty(endTimeList)
-                || CollUtil.isNotEmpty(startEndTimeList)) {
+        // 检查开始时间是否在结束时间之前
+        if (startTime1.isAfter(endTime1)) {
+            throw exception(SECKILL_START_TIME_BEFORE_END_TIME);
+        }
+        // 查询出所有的时段配置
+        List<SeckillConfigDO> configDOs = seckillConfigMapper.selectList();
+        // 过滤出重叠的时段 ids
+        Set<Long> ids = configDOs.stream().filter((config) -> {
+            LocalTime startTime2 = LocalTime.parse(config.getStartTime());
+            LocalTime endTime2 = LocalTime.parse(config.getEndTime());
+            // 判断时间是否重叠
+            // 开始时间在已配置时段的结束时间之前 且 结束时间在已配置时段的开始时间之后 []
+            return startTime1.isBefore(endTime2) && endTime1.isAfter(startTime2)
+                    // 开始时间在已配置时段的开始时间之前 且 结束时间在已配置时段的开始时间之后 (] 或 ()
+                    || startTime1.isBefore(startTime2) && endTime1.isAfter(startTime2)
+                    // 开始时间在已配置时段的结束时间之前 且 结束时间在已配值时段的结束时间之后 [) 或 ()
+                    || startTime1.isBefore(endTime2) && endTime1.isAfter(endTime2);
+        }).map(SeckillConfigDO::getId).collect(Collectors.toSet());
+        if (CollUtil.isNotEmpty(ids)) {
             throw exception(SECKILL_TIME_CONFLICTS);
         }
     }
@@ -107,28 +120,23 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     }
 
     @Override
-    public void validateSeckillConfigExists(Collection<Long> timeIds) {
-        if (CollUtil.isEmpty(timeIds)) {
+    public void validateSeckillConfigExists(Collection<Long> configIds) {
+        if (CollUtil.isEmpty(configIds)) {
             throw exception(SECKILL_TIME_NOT_EXISTS);
         }
-        if (seckillConfigMapper.selectBatchIds(timeIds).size() != timeIds.size()) {
+        if (seckillConfigMapper.selectBatchIds(configIds).size() != configIds.size()) {
             throw exception(SECKILL_TIME_NOT_EXISTS);
         }
-    }
-
-    @Override
-    public void seckillActivityCountIncr(Collection<Long> ids) {
-        seckillConfigMapper.updateActivityCount(ids, "+", 1);
-    }
-
-    @Override
-    public void seckillActivityCountDecr(Collection<Long> ids) {
-        seckillConfigMapper.updateActivityCount(ids, "-", 1);
     }
 
     @Override
     public PageResult<SeckillConfigDO> getSeckillConfigPage(SeckillConfigPageReqVO pageVO) {
         return seckillConfigMapper.selectPage(pageVO);
+    }
+
+    @Override
+    public List<SeckillConfigDO> getListAllSimple() {
+        return seckillConfigMapper.selectList(SeckillConfigDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
     }
 
 }

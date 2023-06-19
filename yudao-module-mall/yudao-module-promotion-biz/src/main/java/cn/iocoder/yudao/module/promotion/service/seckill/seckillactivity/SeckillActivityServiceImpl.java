@@ -56,8 +56,6 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         // 插入商品
         List<SeckillProductDO> productDOs = SeckillActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), seckillActivity);
         seckillProductMapper.insertBatch(productDOs);
-        // 更新秒杀时段的秒杀活动数量
-        seckillConfigService.seckillActivityCountIncr(createReqVO.getConfigIds());
         return seckillActivity.getId();
     }
 
@@ -77,31 +75,8 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         seckillActivityMapper.updateById(updateObj);
         // 更新商品
         updateSeckillProduct(updateReqVO);
-        // 更新秒杀时段的秒杀活动数量
-        updateSeckillConfigActivityCount(seckillActivity, updateReqVO.getConfigIds());
     }
 
-    /**
-     * 更新秒杀时段的秒杀活动数量
-     *
-     * @param seckillActivity 查询出的秒杀活动
-     * @param updateTimeIds   更新后的秒杀时段id列表
-     */
-    private void updateSeckillConfigActivityCount(SeckillActivityDO seckillActivity, List<Long> updateTimeIds) {
-        // 查询出 timeIds
-        List<Long> existsTimeIds = seckillActivity.getConfigIds();
-        // 需要减少的时间段
-        Collection<Long> reduceIds = CollUtil.filterNew(existsTimeIds, existsTimeId -> !updateTimeIds.contains(existsTimeId));
-        // 需要添加的时间段
-        updateTimeIds.removeIf(existsTimeIds::contains);
-        // 更新减少时间段和增加时间段
-        if (CollUtil.isNotEmpty(updateTimeIds)) {
-            seckillConfigService.seckillActivityCountIncr(updateTimeIds);
-        }
-        if (CollUtil.isNotEmpty(reduceIds)) {
-            seckillConfigService.seckillActivityCountDecr(reduceIds);
-        }
-    }
 
     /**
      * 更新秒杀商品

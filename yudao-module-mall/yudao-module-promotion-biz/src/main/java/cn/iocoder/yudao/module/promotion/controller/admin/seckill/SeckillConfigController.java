@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.promotion.controller.admin.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.*;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillconfig.SeckillConfigConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.service.seckill.seckillconfig.SeckillConfigService;
@@ -75,6 +72,13 @@ public class SeckillConfigController {
     public CommonResult<List<SeckillConfigRespVO>> getSeckillConfigList() {
         List<SeckillConfigDO> list = seckillConfigService.getSeckillConfigList();
         return success(SeckillConfigConvert.INSTANCE.convertList(list));
+    }
+
+    @GetMapping("/list-all-simple")
+    @Operation(summary = "获得所有开启状态的秒杀时段精简列表", description = "主要用于前端的下拉选项")
+    public CommonResult<List<SeckillConfigSimpleRespVO>> getListAllSimple() {
+        List<SeckillConfigDO> list = seckillConfigService.getListAllSimple();
+        return success(SeckillConfigConvert.INSTANCE.convertList1(list));
     }
 
     @GetMapping("/page")
