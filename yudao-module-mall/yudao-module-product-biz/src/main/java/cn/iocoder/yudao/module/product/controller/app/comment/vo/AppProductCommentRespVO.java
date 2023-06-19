@@ -14,11 +14,11 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * 用户APP - 商品评价详情 Response VO
+ * 用户 App - 商品评价详情 Response VO
  *
  * @author HUIHUI
  */
-@Schema(description = "用户APP - 商品评价详情 Response VO")
+@Schema(description = "用户 App - 商品评价详情 Response VO")
 @Data
 @ToString(callSuper = true)
 public class AppProductCommentRespVO {

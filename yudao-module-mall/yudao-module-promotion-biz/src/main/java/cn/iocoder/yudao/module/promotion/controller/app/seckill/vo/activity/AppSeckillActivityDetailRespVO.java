@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.app.seckill.vo;
+package cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -6,9 +6,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "用户 App - 秒杀活动 Response VO")
+@Schema(description = "用户 App - 秒杀活动的详细 Response VO")
 @Data
-public class AppSeckillActivitiDetailRespVO {
+public class AppSeckillActivityDetailRespVO {
 
     @Schema(description = "秒杀活动编号", required = true, example = "1024")
     private Long id;
@@ -30,6 +30,18 @@ public class AppSeckillActivitiDetailRespVO {
     @Schema(description = "商品 SPU 编号", required = true, example = "2048")
     private Long spuId;
 
+    @Schema(description = "总共限购数量", example = "10")
+    private Integer totalLimitCount;
+
+    @Schema(description = "单次限购数量", example = "5")
+    private Integer singleLimitCount;
+
+    @Schema(description = "秒杀库存（剩余）", required = true, example = "50")
+    private Integer stock;
+
+    @Schema(description = "秒杀库存（总计）", required = true, example = "100")
+    private Integer totalStock;
+
     @Schema(description = "商品信息数组", required = true)
     private List<Product> products;
 
@@ -44,10 +56,7 @@ public class AppSeckillActivitiDetailRespVO {
         private Integer seckillPrice;
 
         @Schema(description = "秒杀限量库存", required = true, example = "50")
-        private Integer quota;
-
-        @Schema(description = "每人限购数量", required = true, example = "10")
-        private Integer limitCount;
+        private Integer stock;
 
     }
 
