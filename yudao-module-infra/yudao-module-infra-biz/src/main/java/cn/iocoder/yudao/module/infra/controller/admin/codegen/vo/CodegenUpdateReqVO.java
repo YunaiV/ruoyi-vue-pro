@@ -33,7 +33,7 @@ public class CodegenUpdateReqVO {
     @Valid
     public static class Table extends CodegenTableBaseVO {
 
-        @Schema(description = "编号", required = true, example = "1")
+        @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long id;
 
         @AssertTrue(message = "上级菜单不能为空，请前往 [修改生成配置 -> 生成信息] 界面，设置“上级菜单”字段")
@@ -51,7 +51,7 @@ public class CodegenUpdateReqVO {
     @ToString(callSuper = true)
     public static class Column extends CodegenColumnBaseVO {
 
-        @Schema(description = "编号", required = true, example = "1")
+        @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long id;
 
     }

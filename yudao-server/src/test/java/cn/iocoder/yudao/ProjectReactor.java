@@ -66,7 +66,7 @@ public class ProjectReactor {
         // 写入文件
         files.forEach(file -> {
             // 如果是白名单的文件类型，不进行重写，直接拷贝
-            String fileType = FileTypeUtil.getType(file);
+            String fileType = getFileType(file);
             if (WHITE_FILE_TYPES.contains(fileType)) {
                 copyFile(file, projectBaseDir, projectBaseDirNew, packageNameNew, artifactIdNew);
                 return;
@@ -106,7 +106,7 @@ public class ProjectReactor {
                                              String titleNew) {
         String content = FileUtil.readString(file, StandardCharsets.UTF_8);
         // 如果是白名单的文件类型，不进行重写
-        String fileType = FileTypeUtil.getType(file);
+        String fileType = getFileType(file);
         if (WHITE_FILE_TYPES.contains(fileType)) {
             return content;
         }
@@ -137,6 +137,10 @@ public class ProjectReactor {
                         packageNameNew.replaceAll("\\.", Matcher.quoteReplacement(separator)))
                 .replace(ARTIFACT_ID, artifactIdNew) //
                 .replaceAll(StrUtil.upperFirst(ARTIFACT_ID), StrUtil.upperFirst(artifactIdNew));
+    }
+
+    private static String getFileType(File file) {
+        return file.length() > 0 ? FileTypeUtil.getType(file) : "";
     }
 
 }

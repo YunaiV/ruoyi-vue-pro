@@ -10,15 +10,15 @@ import javax.validation.constraints.*;
 @Data
 public class DataSourceConfigBaseVO {
 
-    @Schema(description = "数据源名称", required = true, example = "test")
+    @Schema(description = "数据源名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "test")
     @NotNull(message = "数据源名称不能为空")
     private String name;
 
-    @Schema(description = "数据源连接", required = true, example = "jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro")
+    @Schema(description = "数据源连接", requiredMode = Schema.RequiredMode.REQUIRED, example = "jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro")
     @NotNull(message = "数据源连接不能为空")
     private String url;
 
-    @Schema(description = "用户名", required = true, example = "root")
+    @Schema(description = "用户名", requiredMode = Schema.RequiredMode.REQUIRED, example = "root")
     @NotNull(message = "用户名不能为空")
     private String username;
 

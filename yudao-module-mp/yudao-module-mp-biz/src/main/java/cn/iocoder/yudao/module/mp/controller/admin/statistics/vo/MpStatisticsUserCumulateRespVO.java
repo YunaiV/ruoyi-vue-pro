@@ -9,10 +9,10 @@ import java.util.Date;
 @Data
 public class MpStatisticsUserCumulateRespVO {
 
-    @Schema(description = "日期", required = true)
+    @Schema(description = "日期", requiredMode = Schema.RequiredMode.REQUIRED)
     private Date refDate;
 
-    @Schema(description = "累计粉丝量", required = true, example = "10")
+    @Schema(description = "累计粉丝量", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer cumulateUser;
 
 }

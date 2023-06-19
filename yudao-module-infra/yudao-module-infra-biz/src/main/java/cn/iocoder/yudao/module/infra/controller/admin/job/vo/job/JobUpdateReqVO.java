@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class JobUpdateReqVO extends JobBaseVO {
 
-    @Schema(description = "任务编号", required = true, example = "1024")
+    @Schema(description = "任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "任务编号不能为空")
     private Long id;
 

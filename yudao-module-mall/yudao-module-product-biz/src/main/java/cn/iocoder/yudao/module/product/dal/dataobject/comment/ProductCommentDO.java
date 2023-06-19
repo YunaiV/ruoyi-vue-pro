@@ -29,6 +29,11 @@ import java.util.List;
 public class ProductCommentDO extends BaseDO {
 
     /**
+     * 默认匿名昵称
+     */
+    public static final String NICKNAME_ANONYMOUS = "匿名用户";
+
+    /**
      * 评论编号，主键自增
      */
     @TableId
@@ -92,7 +97,7 @@ public class ProductCommentDO extends BaseDO {
     /**
      * 评分星级
      *
-     * 1-5分
+     * 1-5 分
      */
     private Integer scores;
     /**

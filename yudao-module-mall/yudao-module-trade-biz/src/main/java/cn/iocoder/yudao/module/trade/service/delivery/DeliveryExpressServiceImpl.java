@@ -75,7 +75,7 @@ public class DeliveryExpressServiceImpl implements DeliveryExpressService {
     }
     private void validateDeliveryExpressExists(Long id) {
         if (deliveryExpressMapper.selectById(id) == null) {
-            throw exception(DELIVERY_EXPRESS_NOT_EXISTS);
+            throw exception(EXPRESS_NOT_EXISTS);
         }
     }
 

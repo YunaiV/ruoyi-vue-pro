@@ -9,7 +9,7 @@
         文档可见：https://www.iocoder.cn/MyBatis/x-plugins/
      -->
 
-    <select id="selectList2" resultType="TestDemoDO">
+    <select id="selectList2" resultType="cn.iocoder.yudao.module.infra.dal.dataobject.test.TestDemoDO">
         SELECT * FROM infra_test_demo
     </select>
 

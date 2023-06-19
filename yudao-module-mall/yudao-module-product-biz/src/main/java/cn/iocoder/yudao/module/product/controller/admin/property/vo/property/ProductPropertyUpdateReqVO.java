@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class ProductPropertyUpdateReqVO extends ProductPropertyBaseVO {
 
-    @Schema(description = "主键", required = true, example = "1")
+    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "主键不能为空")
     private Long id;
 

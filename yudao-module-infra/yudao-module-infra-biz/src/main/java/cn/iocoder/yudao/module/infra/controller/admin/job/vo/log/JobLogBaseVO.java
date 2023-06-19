@@ -1,4 +1,5 @@
 package cn.iocoder.yudao.module.infra.controller.admin.job.vo.log;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,22 +16,22 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class JobLogBaseVO {
 
-    @Schema(description = "任务编号", required = true, example = "1024")
+    @Schema(description = "任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "任务编号不能为空")
     private Long jobId;
 
-    @Schema(description = "处理器的名字", required = true, example = "sysUserSessionTimeoutJob")
+    @Schema(description = "处理器的名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "sysUserSessionTimeoutJob")
     @NotNull(message = "处理器的名字不能为空")
     private String handlerName;
 
     @Schema(description = "处理器的参数", example = "yudao")
     private String handlerParam;
 
-    @Schema(description = "第几次执行", required = true, example = "1")
+    @Schema(description = "第几次执行", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "第几次执行不能为空")
     private Integer executeIndex;
 
-    @Schema(description = "开始执行时间", required = true)
+    @Schema(description = "开始执行时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "开始执行时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime beginTime;
@@ -42,7 +43,7 @@ public class JobLogBaseVO {
     @Schema(description = "执行时长", example = "123")
     private Integer duration;
 
-    @Schema(description = "任务状态,参见 JobLogStatusEnum 枚举", required = true, example = "1")
+    @Schema(description = "任务状态,参见 JobLogStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "任务状态不能为空")
     private Integer status;
 

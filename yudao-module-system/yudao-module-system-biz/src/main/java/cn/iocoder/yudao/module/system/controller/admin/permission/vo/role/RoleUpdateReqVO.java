@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class RoleUpdateReqVO extends RoleBaseVO {
 
-    @Schema(description = "角色编号", required = true, example = "1024")
+    @Schema(description = "角色编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "角色编号不能为空")
     private Long id;
 

@@ -5,15 +5,17 @@ import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyVO;
+import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentRespVO;
+import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
+import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
 import cn.iocoder.yudao.module.product.enums.comment.ProductCommentScoresEnum;
+import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import org.junit.jupiter.api.Test;
@@ -24,7 +26,6 @@ import org.springframework.context.annotation.Lazy;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -52,6 +53,8 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
     private TradeOrderApi tradeOrderApi;
     @MockBean
     private ProductSpuService productSpuService;
+    @MockBean
+    private ProductSkuService productSkuService;
 
     public String generateNo() {
         return DateUtil.format(new Date(), "yyyyMMddHHmmss") + RandomUtil.randomInt(100000, 999999);
@@ -135,23 +138,23 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         assertEquals(8, all.getTotal());
 
         // 测试获取所有商品分页评论数据
-        PageResult<AppCommentRespVO> result1 = productCommentService.getCommentPage(new AppCommentPageReqVO(), Boolean.TRUE);
+        PageResult<AppProductCommentRespVO> result1 = productCommentService.getCommentPage(new AppCommentPageReqVO(), Boolean.TRUE);
         assertEquals(7, result1.getTotal());
 
         // 测试获取所有商品分页中评数据
-        PageResult<AppCommentRespVO> result2 = productCommentService.getCommentPage(new AppCommentPageReqVO().setType(AppCommentPageReqVO.MEDIOCRE_COMMENT), Boolean.TRUE);
+        PageResult<AppProductCommentRespVO> result2 = productCommentService.getCommentPage(new AppCommentPageReqVO().setType(AppCommentPageReqVO.MEDIOCRE_COMMENT), Boolean.TRUE);
         assertEquals(2, result2.getTotal());
 
         // 测试获取指定 spuId 商品分页中评数据
-        PageResult<AppCommentRespVO> result3 = productCommentService.getCommentPage(new AppCommentPageReqVO().setSpuId(spuId).setType(AppCommentPageReqVO.MEDIOCRE_COMMENT), Boolean.TRUE);
+        PageResult<AppProductCommentRespVO> result3 = productCommentService.getCommentPage(new AppCommentPageReqVO().setSpuId(spuId).setType(AppCommentPageReqVO.MEDIOCRE_COMMENT), Boolean.TRUE);
         assertEquals(2, result3.getTotal());
 
         // 测试分页 tab count
-        Map<String, Long> tabsCount = productCommentService.getCommentPageTabsCount(spuId, Boolean.TRUE);
-        assertEquals(6, tabsCount.get(AppCommentPageReqVO.ALL_COUNT));
-        assertEquals(4, tabsCount.get(AppCommentPageReqVO.FAVOURABLE_COMMENT_COUNT));
-        assertEquals(2, tabsCount.get(AppCommentPageReqVO.MEDIOCRE_COMMENT_COUNT));
-        assertEquals(0, tabsCount.get(AppCommentPageReqVO.NEGATIVE_COMMENT_COUNT));
+        AppCommentStatisticsRespVO tabsCount = productCommentService.getCommentPageTabsCount(spuId, Boolean.TRUE);
+        assertEquals(6, tabsCount.getAllCount());
+        assertEquals(4, tabsCount.getGoodCount());
+        assertEquals(2, tabsCount.getMediocreCount());
+        assertEquals(0, tabsCount.getNegativeCount());
 
     }
 
@@ -183,10 +186,10 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
 
         Long productCommentId = productComment.getId();
 
-        ProductCommentReplyVO replyVO = new ProductCommentReplyVO();
+        ProductCommentReplyReqVO replyVO = new ProductCommentReplyReqVO();
         replyVO.setId(productCommentId);
         replyVO.setReplyContent("测试");
-        productCommentService.commentReply(replyVO, 1L);
+        productCommentService.replyComment(replyVO, 1L);
 
         ProductCommentDO productCommentDO = productCommentMapper.selectById(productCommentId);
         assertEquals("测试", productCommentDO.getReplyContent());

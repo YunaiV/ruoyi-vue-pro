@@ -1,31 +1,39 @@
 package cn.iocoder.yudao.module.product.service.comment;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyVO;
+import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
-import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentRespVO;
+import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
+import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
+import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
+import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
-import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 
 /**
  * 商品评论 Service 实现类
@@ -45,95 +53,120 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Resource
     private ProductSpuService productSpuService;
 
-    @Override
-    public PageResult<ProductCommentDO> getCommentPage(ProductCommentPageReqVO pageReqVO) {
-        return productCommentMapper.selectPage(pageReqVO);
-    }
+    @Resource
+    @Lazy
+    private ProductSkuService productSkuService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateCommentVisible(ProductCommentUpdateVisibleReqVO updateReqVO) {
         // 校验评论是否存在
-        validateCommentExists(updateReqVO.getId());
+        ProductCommentDO productCommentDO = validateCommentExists(updateReqVO.getId());
+        productCommentDO.setVisible(updateReqVO.getVisible());
 
         // 更新可见状态
-        // TODO @puhui999：直接使用 update 操作
-        productCommentMapper.updateCommentVisible(updateReqVO.getId(), updateReqVO.getVisible());
+        productCommentMapper.updateById(productCommentDO);
     }
 
     @Override
-    public void commentReply(ProductCommentReplyVO replyVO, Long loginUserId) {
+    @Transactional(rollbackFor = Exception.class)
+    public void replyComment(ProductCommentReplyReqVO replyVO, Long loginUserId) {
         // 校验评论是否存在
-        validateCommentExists(replyVO.getId());
+        ProductCommentDO productCommentDO = validateCommentExists(replyVO.getId());
+        productCommentDO.setReplyTime(LocalDateTime.now());
+        productCommentDO.setReplyUserId(loginUserId);
+        productCommentDO.setReplyStatus(Boolean.TRUE);
+        productCommentDO.setReplyContent(replyVO.getReplyContent());
 
         // 回复评论
-        // TODO @puhui999：直接使用 update 操作
-        productCommentMapper.commentReply(replyVO, loginUserId);
+        productCommentMapper.updateById(productCommentDO);
     }
 
     @Override
-    public Map<String, Long> getCommentPageTabsCount(Long spuId, Boolean visible) {
-        Map<String, Long> countMap = new HashMap<>(4);
-        // 查询商品 id = spuId 的所有评论数量
-        countMap.put(AppCommentPageReqVO.ALL_COUNT,
-                productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.ALL));
-        // 查询商品 id = spuId 的所有好评数量
-        countMap.put(AppCommentPageReqVO.FAVOURABLE_COMMENT_COUNT,
-                productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.FAVOURABLE_COMMENT));
-        // 查询商品 id = spuId 的所有中评数量
-        countMap.put(AppCommentPageReqVO.MEDIOCRE_COMMENT_COUNT,
-                productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.MEDIOCRE_COMMENT));
-        // 查询商品 id = spuId 的所有差评数量
-        countMap.put(AppCommentPageReqVO.NEGATIVE_COMMENT_COUNT,
-                productCommentMapper.selectTabCount(spuId, visible, AppCommentPageReqVO.NEGATIVE_COMMENT));
-        return countMap;
+    @Transactional(rollbackFor = Exception.class)
+    public void createComment(ProductCommentCreateReqVO createReqVO) {
+        // 校验订单
+        // TODO @puhui999：不校验哈；尽可能解耦
+        Long orderId = tradeOrderApi.validateOrder(createReqVO.getUserId(), createReqVO.getOrderItemId());
+        // 校验评论
+        validateComment(createReqVO.getSpuId(), createReqVO.getUserId(), orderId);
+
+        ProductCommentDO commentDO = ProductCommentConvert.INSTANCE.convert(createReqVO);
+        productCommentMapper.insert(commentDO);
     }
 
     @Override
-    public PageResult<AppCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible) {
-        // TODO @puhui999：逻辑可以在 controller 做哈。让 service 简介一点；因为是 view 需要不展示昵称
-        PageResult<AppCommentRespVO> result = ProductCommentConvert.INSTANCE.convertPage02(productCommentMapper.selectPage(pageVO, visible));
+    @Transactional(rollbackFor = Exception.class)
+    public Long createComment(ProductCommentDO commentDO) {
+        // 校验评论
+        validateComment(commentDO.getSpuId(), commentDO.getUserId(), commentDO.getOrderId());
+
+        productCommentMapper.insert(commentDO);
+        return commentDO.getId();
+    }
+
+    private void validateComment(Long spuId, Long userId, Long orderId) {
+        ProductSpuDO spu = productSpuService.getSpu(spuId);
+        if (null == spu) {
+            throw exception(SPU_NOT_EXISTS);
+        }
+        // 判断当前订单的当前商品用户是否评价过
+        ProductCommentDO exist = productCommentMapper.selectByUserIdAndOrderIdAndSpuId(userId, orderId, spuId);
+        if (null != exist) {
+            throw exception(ORDER_SPU_COMMENT_EXISTS);
+        }
+    }
+
+    private ProductCommentDO validateCommentExists(Long id) {
+        ProductCommentDO productComment = productCommentMapper.selectById(id);
+        if (productComment == null) {
+            throw exception(COMMENT_NOT_EXISTS);
+        }
+        return productComment;
+    }
+
+    @Override
+    public AppCommentStatisticsRespVO getCommentPageTabsCount(Long spuId, Boolean visible) {
+        return ProductCommentConvert.INSTANCE.convert(
+                // 查询商品 id = spuId 的所有评论数量
+                productCommentMapper.selectCountBySpuId(spuId, visible, null),
+                // 查询商品 id = spuId 的所有好评数量
+                productCommentMapper.selectCountBySpuId(spuId, visible, AppCommentPageReqVO.GOOD_COMMENT),
+                // 查询商品 id = spuId 的所有中评数量
+                productCommentMapper.selectCountBySpuId(spuId, visible, AppCommentPageReqVO.MEDIOCRE_COMMENT),
+                // 查询商品 id = spuId 的所有差评数量
+                productCommentMapper.selectCountBySpuId(spuId, visible, AppCommentPageReqVO.NEGATIVE_COMMENT)
+        );
+    }
+
+    @Override
+    public PageResult<AppProductCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible) {
+        PageResult<AppProductCommentRespVO> result = ProductCommentConvert.INSTANCE.convertPage02(
+                productCommentMapper.selectPage(pageVO, visible));
+        // TODO @puhui999：要不这块放到 controller 里拼接？
+        Set<Long> skuIds = result.getList().stream().map(AppProductCommentRespVO::getSkuId).collect(Collectors.toSet());
+        List<ProductSkuDO> skuList = productSkuService.getSkuList(skuIds);
+        Map<Long, ProductSkuDO> skuDOMap = new HashMap<>(skuIds.size());
+        if (CollUtil.isNotEmpty(skuList)) {
+            skuDOMap.putAll(skuList.stream().collect(Collectors.toMap(ProductSkuDO::getId, c -> c)));
+        }
         result.getList().forEach(item -> {
             // 判断用户是否选择匿名
             if (ObjectUtil.equal(item.getAnonymous(), true)) {
-                item.setUserNickname(AppCommentPageReqVO.ANONYMOUS_NICKNAME);
+                item.setUserNickname(ProductCommentDO.NICKNAME_ANONYMOUS);
             }
-            // TODO @puhui999：直接插入的时候，计算到 scores 字段里；这样就去掉 finalScore 字段哈
-            // 计算评价最终综合评分 最终星数 = （商品评星 + 服务评星） / 2
-            BigDecimal sumScore = new BigDecimal(item.getScores() + item.getBenefitScores());
-            BigDecimal divide = sumScore.divide(BigDecimal.valueOf(2L), 0, RoundingMode.DOWN);
-            item.setFinalScore(divide.intValue());
+            ProductSkuDO productSkuDO = skuDOMap.get(item.getSkuId());
+            if (productSkuDO != null) {
+                List<AppProductPropertyValueDetailRespVO> skuProperties = ProductCommentConvert.INSTANCE.convertList01(productSkuDO.getProperties());
+                item.setSkuProperties(skuProperties);
+            }
         });
         return result;
     }
 
     @Override
-    public void createComment(ProductCommentDO productComment, Boolean system) {
-        // TODO @puhui999：这里不区分是否为 system；直接都校验
-        if (!system) {
-            // TODO 判断订单是否存在 fix；
-            // TODO @puhui999：改成 order 那有个 comment 接口，哪里校验下；商品评论这里不校验订单是否存在哈
-            TradeOrderRespDTO order = tradeOrderApi.getOrder(productComment.getOrderId());
-            if (null == order) {
-                throw exception(ORDER_NOT_FOUND);
-            }
-            ProductSpuDO spu = productSpuService.getSpu(productComment.getSpuId());
-            if (null == spu) {
-                throw exception(SPU_NOT_EXISTS);
-            }
-            // 判断当前订单的当前商品用户是否评价过
-            ProductCommentDO exist = productCommentMapper.findByUserIdAndOrderIdAndSpuId(productComment.getId(), productComment.getOrderId(), productComment.getSpuId());
-            if (null != exist) {
-                throw exception(ORDER_SPU_COMMENT_EXISTS);
-            }
-        }
-        productCommentMapper.insert(productComment);
-    }
-
-    private void validateCommentExists(Long id) {
-        ProductCommentDO productComment = productCommentMapper.selectById(id);
-        if (productComment == null) {
-            throw exception(COMMENT_NOT_EXISTS);
-        }
+    public PageResult<ProductCommentDO> getCommentPage(ProductCommentPageReqVO pageReqVO) {
+        return productCommentMapper.selectPage(pageReqVO);
     }
 
 }

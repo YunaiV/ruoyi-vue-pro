@@ -180,6 +180,11 @@ public class TradePriceCalculateRespBO {
          */
         private Long categoryId;
 
+        /**
+         * 运费模板 Id
+         */
+        private Long deliveryTemplateId;
+
         // ========== 商品 SKU 信息 ==========
         /**
          * 商品重量，单位：kg 千克

@@ -52,29 +52,9 @@ public class TradeAfterSaleLogDO extends BaseDO {
      */
     private Long afterSaleId;
     /**
-     * 订单编号
-     *
-     * 关联 {@link TradeOrderDO#getId()}
+     * 操作类型 {@link TradeAfterSaleStatusEnum}
      */
-    private Long orderId;
-    /**
-     * 订单项编号
-     *
-     * 关联 {@link TradeOrderItemDO#getId()}
-     */
-    private Long orderItemId;
-    /**
-     * 售后状态（之前）
-     *
-     * 枚举 {@link TradeAfterSaleStatusEnum}
-     */
-    private Integer beforeStatus;
-    /**
-     * 售后状态（之后）
-     *
-     * 枚举 {@link TradeAfterSaleStatusEnum}
-     */
-    private Integer afterStatus;
+    private String operateType;
     /**
      * 操作明细
      */

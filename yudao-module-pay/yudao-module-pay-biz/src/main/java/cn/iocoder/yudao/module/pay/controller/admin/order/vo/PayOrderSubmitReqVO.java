@@ -13,11 +13,11 @@ import java.util.Map;
 @Data
 public class PayOrderSubmitReqVO {
 
-    @Schema(description = "支付单编号", required = true, example = "1024")
+    @Schema(description = "支付单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "支付单编号不能为空")
     private Long id;
 
-    @Schema(description = "支付渠道", required = true, example = "wx_pub")
+    @Schema(description = "支付渠道", requiredMode = Schema.RequiredMode.REQUIRED, example = "wx_pub")
     @NotEmpty(message = "支付渠道不能为空")
     private String channelCode;
 

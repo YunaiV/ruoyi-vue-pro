@@ -51,3 +51,11 @@ yudao:
     order:
       app-id: 1
       merchant-order-id: 1
+    express:
+      kd-niao:
+        api-key: xxxx
+        business-id: xxxxx
+      kd100:
+        customer: xxxxx
+        key: xxxxx
+      client: not_provide

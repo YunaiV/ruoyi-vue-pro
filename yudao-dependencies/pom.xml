@@ -14,9 +14,9 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.7.1-snapshot</revision>
+        <revision>1.7.3-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.7.10</spring.boot.version>
+        <spring.boot.version>2.7.11</spring.boot.version>
         <!-- Web 相关 -->
         <springdoc.version>1.6.15</springdoc.version>
         <knife4j.version>4.1.0</knife4j.version>
@@ -28,6 +28,7 @@
         <dynamic-datasource.version>3.6.1</dynamic-datasource.version>
         <mybatis-plus-join-boot-starter.version>1.4.3.2</mybatis-plus-join-boot-starter.version>
         <redisson.version>3.18.0</redisson.version>
+        <dm8.jdbc.version>8.1.2.141</dm8.jdbc.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.3</lock4j.version>
         <resilience4j.version>1.7.1</resilience4j.version>
@@ -45,9 +46,9 @@
         <captcha-plus.version>1.0.2</captcha-plus.version>
         <jsoup.version>1.15.4</jsoup.version>
         <lombok.version>1.18.26</lombok.version>
-        <mapstruct.version>1.5.3.Final</mapstruct.version>
-        <hutool.version>5.8.15</hutool.version>
-        <easyexcel.verion>3.2.1</easyexcel.verion>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <hutool.version>5.8.18</hutool.version>
+        <easyexcel.verion>3.3.1</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
@@ -62,6 +63,7 @@
         <!-- 三方云服务相关 -->
         <okio.version>3.0.0</okio.version>
         <okhttp3.version>4.10.0</okhttp3.version>
+        <commons-io.version>2.11.0</commons-io.version>
         <minio.version>8.5.2</minio.version>
         <aliyun-java-sdk-core.version>4.6.3</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
@@ -226,6 +228,12 @@
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.dameng</groupId>
+                <artifactId>DmJdbcDriver18</artifactId>
+                <version>${dm8.jdbc.version}</version>
             </dependency>
 
             <!-- Job 定时任务相关 -->
@@ -437,7 +445,11 @@
                 <artifactId>easyexcel</artifactId>
                 <version>${easyexcel.verion}</version>
             </dependency>
-
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId> <!-- 文件类型的识别 -->

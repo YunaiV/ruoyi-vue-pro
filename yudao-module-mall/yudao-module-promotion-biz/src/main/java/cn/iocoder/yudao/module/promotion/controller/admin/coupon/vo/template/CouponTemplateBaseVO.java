@@ -29,27 +29,27 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DE
 @Data
 public class CouponTemplateBaseVO {
 
-    @Schema(description = "优惠劵名", required = true, example = "春节送送送")
+    @Schema(description = "优惠劵名", requiredMode = Schema.RequiredMode.REQUIRED, example = "春节送送送")
     @NotNull(message = "优惠劵名不能为空")
     private String name;
 
-    @Schema(description = "发行总量", required = true, example = "1024") // -1 - 则表示不限制发放数量
+    @Schema(description = "发行总量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024") // -1 - 则表示不限制发放数量
     @NotNull(message = "发行总量不能为空")
     private Integer totalCount;
 
-    @Schema(description = "每人限领个数", required = true, example = "66") // -1 - 则表示不限制
+    @Schema(description = "每人限领个数", requiredMode = Schema.RequiredMode.REQUIRED, example = "66") // -1 - 则表示不限制
     @NotNull(message = "每人限领个数不能为空")
     private Integer takeLimitCount;
 
-    @Schema(description = "领取方式", required = true, example = "1")
+    @Schema(description = "领取方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "领取方式不能为空")
     private Integer takeType;
 
-    @Schema(description = "是否设置满多少金额可用", required = true, example = "100") // 单位：分；0 - 不限制
+    @Schema(description = "是否设置满多少金额可用", requiredMode = Schema.RequiredMode.REQUIRED, example = "100") // 单位：分；0 - 不限制
     @NotNull(message = "是否设置满多少金额可用不能为空")
     private Integer usePrice;
 
-    @Schema(description = "商品范围", required = true, example = "1")
+    @Schema(description = "商品范围", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "商品范围不能为空")
     @InEnum(PromotionProductScopeEnum.class)
     private Integer productScope;
@@ -57,7 +57,7 @@ public class CouponTemplateBaseVO {
     @Schema(description = "商品 SPU 编号的数组", example = "1,3")
     private List<Long> productSpuIds;
 
-    @Schema(description = "生效日期类型", required = true, example = "1")
+    @Schema(description = "生效日期类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "生效日期类型不能为空")
     @InEnum(CouponTemplateValidityTypeEnum.class)
     private Integer validityType;
@@ -80,7 +80,7 @@ public class CouponTemplateBaseVO {
     @Min(value = 1L, message = "开始天数必须大于 1")
     private Integer fixedEndTerm;
 
-    @Schema(description = "优惠类型", required = true, example = "1")
+    @Schema(description = "优惠类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "优惠类型不能为空")
     @InEnum(PromotionDiscountTypeEnum.class)
     private Integer discountType;

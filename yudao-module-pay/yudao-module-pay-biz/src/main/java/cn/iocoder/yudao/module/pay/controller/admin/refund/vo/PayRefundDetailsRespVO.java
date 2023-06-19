@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class PayRefundDetailsRespVO extends PayRefundBaseVO {
 
-    @Schema(description = "支付退款编号", required = true)
+    @Schema(description = "支付退款编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
     @Schema(description = "商户名称")

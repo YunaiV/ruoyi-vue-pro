@@ -9,13 +9,13 @@ import java.util.Date;
 @Data
 public class MpStatisticsUpstreamMessageRespVO {
 
-    @Schema(description = "日期", required = true)
+    @Schema(description = "日期", requiredMode = Schema.RequiredMode.REQUIRED)
     private Date refDate;
 
-    @Schema(description = "上行发送了（向公众号发送了）消息的粉丝数", required = true, example = "10")
+    @Schema(description = "上行发送了（向公众号发送了）消息的粉丝数", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer messageUser;
 
-    @Schema(description = "上行发送了消息的消息总数", required = true, example = "20")
+    @Schema(description = "上行发送了消息的消息总数", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     private Integer messageCount;
 
 }
