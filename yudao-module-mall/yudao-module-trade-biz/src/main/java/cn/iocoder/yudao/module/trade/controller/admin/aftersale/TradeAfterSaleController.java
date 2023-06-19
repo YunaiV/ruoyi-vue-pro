@@ -11,11 +11,8 @@ import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSal
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRefuseReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleRespPageItemVO;
-import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppTradeAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.convert.aftersale.TradeAfterSaleConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.TradeAfterSaleDO;
-import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.annotations.AfterSaleLog;
-import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.enums.AfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.service.aftersale.TradeAfterSaleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -111,22 +108,6 @@ public class TradeAfterSaleController {
     public CommonResult<Boolean> refundAfterSale(@RequestParam("id") Long id) {
         afterSaleService.refundAfterSale(getLoginUserId(), getClientIP(), id);
         return success(true);
-    }
-
-    // TODO @陈賝：后续要删除下
-    /**
-     * 售后日志测试
-     *
-     * @param createReqVO
-     * @return cn.iocoder.yudao.framework.common.pojo.CommonResult<java.lang.Long>
-     * @author 陈賝
-     * @date 2023/6/14 21:39
-     */
-    @PostMapping(value = "/create")
-    @AfterSaleLog(id = "#createReqVO.orderItemId", content = "'申请售后:售后编号['+#createReqVO.orderItemId+'] , '", operateType = AfterSaleStatusEnum.APPLY)
-    public CommonResult<Long> createAfterSale(@RequestBody AppTradeAfterSaleCreateReqVO createReqVO) {
-        return success(1L);
-//        return success(afterSaleService.createAfterSale(getLoginUserId(), createReqVO));
     }
 
 }

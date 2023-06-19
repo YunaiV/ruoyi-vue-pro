@@ -66,7 +66,6 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
         AppTradeAfterSaleCreateReqVO createReqVO = new AppTradeAfterSaleCreateReqVO()
                 .setOrderItemId(1L).setRefundPrice(100).setWay(TradeAfterSaleWayEnum.RETURN_AND_REFUND.getWay())
                 .setApplyReason("退钱").setApplyDescription("快退")
-                .setOperateType("APPLY")
                 .setApplyPicUrls(asList("https://www.baidu.com/1.png", "https://www.baidu.com/2.png"));
         // mock 方法（交易订单项）
         TradeOrderItemDO orderItem = randomPojo(TradeOrderItemDO.class, o -> {
@@ -103,8 +102,6 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
         assertEquals(afterSaleLog.getUserType(), UserTypeEnum.MEMBER.getValue());
         assertEquals(afterSaleLog.getAfterSaleId(), afterSaleId);
         assertPojoEquals(afterSale, orderItem, "id", "creator", "createTime", "updater", "updateTime");
-//        assertNull(afterSaleLog.getBeforeStatus());
-//        assertEquals(afterSaleLog.getAfterStatus(), TradeAfterSaleStatusEnum.APPLY.getStatus());
         assertEquals(afterSaleLog.getContent(), TradeAfterSaleStatusEnum.APPLY.getContent());
     }
 

@@ -25,8 +25,6 @@ import java.util.Map;
  */
 public class SpringExpressionUtils {
 
-
-
     /**
      * spel表达式解析器
      */
@@ -92,14 +90,14 @@ public class SpringExpressionUtils {
     /**
      * JoinPoint 切面 批量解析 EL 表达式，转换 jspl参数
      *
-     * @param joinPoint 切面点
-     * @param rvt       返回值
-     * @param expressionStrings      EL 表达式数组
-     * @return java.lang.String 结果
+     * @param joinPoint         切面点
+     * @param info              返回值
+     * @param expressionStrings EL 表达式数组
+     * @return Map<String, Object> 结果
      * @author 陈賝
      * @since 2023/6/18 11:20
      */
-    public static Map<String, Object> parseExpression(JoinPoint joinPoint, Object rvt, List<String> expressionStrings) {
+    public static Map<String, Object> parseExpression(JoinPoint joinPoint, Object info, List<String> expressionStrings) {
         // 如果为空，则不进行解析
         if (CollUtil.isEmpty(expressionStrings)) {
             return MapUtil.newHashMap();
@@ -120,7 +118,7 @@ public class SpringExpressionUtils {
                 //替换spel里的变量值为实际值， 比如 #user -->  user对象
                 context.setVariable(parameterNames[i], args[i]);
             }
-            context.setVariable("rvt", rvt);
+            context.setVariable("info", info);
         }
         // 第二步，逐个参数解析
         Map<String, Object> result = MapUtil.newHashMap(expressionStrings.size(), true);
