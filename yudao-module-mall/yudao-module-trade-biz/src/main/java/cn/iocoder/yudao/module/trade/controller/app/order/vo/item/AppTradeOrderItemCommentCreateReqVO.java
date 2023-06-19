@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-@Schema(description = "用户APP - 商品评价创建 Request VO")
+@Schema(description = "用户 App - 商品评价创建 Request VO")
 @Data
 public class AppTradeOrderItemCommentCreateReqVO {
 

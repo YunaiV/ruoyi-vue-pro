@@ -18,9 +18,15 @@ public class AppSeckillActivityRespVO {
 
     @Schema(description = "商品图片", required = true, example = "4096") // 从 SPU 的 picUrl 读取
     private String picUrl;
-
+    @Schema(description = "单位名", requiredMode = Schema.RequiredMode.REQUIRED, example = "个")
+    private String unitName;
     @Schema(description = "商品市场价，单位：分", required = true, example = "50") // 从 SPU 的 marketPrice 读取
     private Integer marketPrice;
+
+    @Schema(description = "秒杀库存（剩余）", required = true, example = "100")
+    private Integer stock;
+    @Schema(description = "秒杀库存（总共）", required = true, example = "200")
+    private Integer totalStock;
 
     @Schema(description = "秒杀金额，单位：分", required = true, example = "100") // 从秒杀商品里取最低价
     private Integer seckillPrice;

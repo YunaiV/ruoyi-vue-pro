@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityNowRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.config.AppSeckillConfigRespVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,7 +59,7 @@ public class AppSeckillActivityController {
     @GetMapping("/page")
     @Operation(summary = "获得秒杀活动分页")
     // TODO @芋艿：分页参数
-    public CommonResult<PageResult<AppSeckillActivityRespVO>> getSeckillActivityPage() {
+    public CommonResult<PageResult<AppSeckillActivityRespVO>> getSeckillActivityPage(AppSeckillActivityPageReqVO pageReqVO) {
         List<AppSeckillActivityRespVO> activityList = new ArrayList<>();
         AppSeckillActivityRespVO activity1 = new AppSeckillActivityRespVO();
         activity1.setId(1L);
@@ -67,6 +68,9 @@ public class AppSeckillActivityController {
         activity1.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
         activity1.setMarketPrice(50);
         activity1.setSeckillPrice(100);
+        activity1.setUnitName("个");
+        activity1.setStock(1);
+        activity1.setTotalStock(2);
         activityList.add(activity1);
 
         AppSeckillActivityRespVO activity2 = new AppSeckillActivityRespVO();
@@ -76,6 +80,9 @@ public class AppSeckillActivityController {
         activity2.setPicUrl("https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKXMYJOomfp7cebz3cIeb8sHk3GGSIJtWEgREe3j7J1WoAbTvIOicpcNdFkWAziatBSMod8b5RyS4CQ/132");
         activity2.setMarketPrice(100);
         activity2.setSeckillPrice(200);
+        activity2.setUnitName("套");
+        activity2.setStock(2);
+        activity2.setTotalStock(3);
         activityList.add(activity2);
         return success(new PageResult<>(activityList, 100L));
     }
@@ -90,33 +97,35 @@ public class AppSeckillActivityController {
         obj.setId(id);
         obj.setName("晚九点限时秒杀");
         obj.setStatus(1);
-        obj.setStartTime(LocalDateTime.of(2023, 6, 11, 0, 0, 0));
-        obj.setEndTime(LocalDateTime.of(2023, 6, 11, 23, 59, 0));
+        obj.setStartTime(LocalDateTime.of(2023, 6, 16, 0, 0, 0));
+        obj.setEndTime(LocalDateTime.of(2023, 6, 20, 23, 59, 0));
         obj.setSpuId(633L);
+        obj.setSingleLimitCount(2);
+        obj.setTotalLimitCount(3);
+        obj.setStock(100);
+        obj.setTotalStock(200);
+
         // 创建一个Product对象的列表
         List<AppSeckillActivityDetailRespVO.Product> productList = new ArrayList<>();
         // 创建三个新的Product对象并设置其属性的值
         AppSeckillActivityDetailRespVO.Product product1 = new AppSeckillActivityDetailRespVO.Product();
         product1.setSkuId(1L);
         product1.setSeckillPrice(100);
-        product1.setQuota(50);
-        product1.setLimitCount(3);
+        product1.setStock(50);
         // 将第一个Product对象添加到列表中
         productList.add(product1);
         // 创建第二个Product对象并设置其属性的值
         AppSeckillActivityDetailRespVO.Product product2 = new AppSeckillActivityDetailRespVO.Product();
         product2.setSkuId(2L);
         product2.setSeckillPrice(200);
-        product2.setQuota(100);
-        product2.setLimitCount(4);
+        product2.setStock(100);
         // 将第二个Product对象添加到列表中
         productList.add(product2);
         // 创建第三个Product对象并设置其属性的值
         AppSeckillActivityDetailRespVO.Product product3 = new AppSeckillActivityDetailRespVO.Product();
         product3.setSkuId(3L);
         product3.setSeckillPrice(300);
-        product3.setQuota(150);
-        product3.setLimitCount(5);
+        product3.setStock(150);
         // 将第三个Product对象添加到列表中
         productList.add(product3);
         // 将Product列表设置为对象的属性值
