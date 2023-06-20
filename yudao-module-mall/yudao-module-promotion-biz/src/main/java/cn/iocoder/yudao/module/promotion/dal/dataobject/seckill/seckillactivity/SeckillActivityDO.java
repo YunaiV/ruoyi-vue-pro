@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
@@ -42,7 +43,7 @@ public class SeckillActivityDO extends BaseDO {
     /**
      * 活动状态
      *
-     * 枚举 {@link PromotionActivityStatusEnum 对应的类}
+     * 枚举 {@link CommonStatusEnum 对应的类}
      */
     private Integer status;
     /**
@@ -78,5 +79,21 @@ public class SeckillActivityDO extends BaseDO {
      * 订单实付金额，单位：分
      */
     private Long totalPrice;
+    /**
+     * 总限购数量
+     */
+    private Integer totalLimitCount;
+    /**
+     * 单次限够数量
+     */
+    private Integer singleLimitCount;
+    /**
+     * 秒杀库存
+     */
+    private Integer stock;
+    /**
+     * 秒杀总库存
+     */
+    private Integer totalStock;
 
 }

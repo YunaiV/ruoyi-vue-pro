@@ -48,6 +48,14 @@ public class SeckillConfigController {
         return success(true);
     }
 
+    @PutMapping("/update-status")
+    @Operation(summary = "修改时段配置状态")
+    @PreAuthorize("@ss.hasPermission('system:seckill-config:update')")
+    public CommonResult<Boolean> updateSeckillConfigStatus(@Valid @RequestBody SeckillConfigUpdateStatusReqVo reqVO) {
+        seckillConfigService.updateSeckillConfigStatus(reqVO.getId(), reqVO.getStatus());
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除秒杀时段")
     @Parameter(name = "id", description = "编号", required = true)

@@ -139,4 +139,16 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         return seckillConfigMapper.selectList(SeckillConfigDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
     }
 
+    @Override
+    public void updateSeckillConfigStatus(Long id, Integer status) {
+        // 校验秒杀时段是否存在
+        validateSeckillConfigExists(id);
+
+        SeckillConfigDO seckillConfigDO = new SeckillConfigDO();
+        seckillConfigDO.setId(id);
+        seckillConfigDO.setStatus(status);
+        // 更新状态
+        seckillConfigMapper.updateById(seckillConfigDO);
+    }
+
 }

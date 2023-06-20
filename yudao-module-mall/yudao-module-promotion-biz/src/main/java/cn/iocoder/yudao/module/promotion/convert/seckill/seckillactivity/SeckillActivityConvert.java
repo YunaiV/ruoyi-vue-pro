@@ -2,13 +2,10 @@ package cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.*;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -25,12 +22,7 @@ public interface SeckillActivityConvert {
 
     SeckillProductDO convert(SeckillActivityBaseVO.Product product);
 
-
     SeckillActivityDO convert(SeckillActivityCreateReqVO bean);
-
-    default String map(Long[] value) {
-        return value.toString();
-    }
 
     SeckillActivityDO convert(SeckillActivityUpdateReqVO bean);
 
@@ -40,7 +32,6 @@ public interface SeckillActivityConvert {
 
     PageResult<SeckillActivityRespVO> convertPage(PageResult<SeckillActivityDO> page);
 
-    @Mappings({@Mapping(target = "products", source = "seckillProducts")})
     SeckillActivityDetailRespVO convert(SeckillActivityDO seckillActivity, List<SeckillProductDO> seckillProducts);
 
 
@@ -54,9 +45,9 @@ public interface SeckillActivityConvert {
     default boolean isEquals(SeckillProductDO productDO, SeckillActivityBaseVO.Product productVO) {
         return ObjectUtil.equals(productDO.getSpuId(), productVO.getSpuId())
                 && ObjectUtil.equals(productDO.getSkuId(), productVO.getSkuId())
-                && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice())
-                && ObjectUtil.equals(productDO.getQuota(), productVO.getQuota())
-                && ObjectUtil.equals(productDO.getLimitCount(), productVO.getLimitCount());
+                && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice());
+                //&& ObjectUtil.equals(productDO.getQuota(), productVO.getQuota())
+                //&& ObjectUtil.equals(productDO.getLimitCount(), productVO.getLimitCount());
     }
 
     /**
@@ -69,15 +60,10 @@ public interface SeckillActivityConvert {
     default boolean isEquals(SeckillProductDO productDO, SeckillProductDO productVO) {
         return ObjectUtil.equals(productDO.getSpuId(), productVO.getSpuId())
                 && ObjectUtil.equals(productDO.getSkuId(), productVO.getSkuId())
-                && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice())
-                && ObjectUtil.equals(productDO.getQuota(), productVO.getQuota())
-                && ObjectUtil.equals(productDO.getLimitCount(), productVO.getLimitCount());
+                && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice());
+                //&& ObjectUtil.equals(productDO.getQuota(), productVO.getQuota())
+                //&& ObjectUtil.equals(productDO.getLimitCount(), productVO.getLimitCount());
 
-    }
-
-    default List<SeckillProductDO> convertList(List<SeckillActivityBaseVO.Product> products, SeckillActivityDO seckillActivity) {
-        return CollectionUtils.convertList(products, product -> convert(product)
-                .setActivityId(seckillActivity.getId()).setConfigIds(seckillActivity.getConfigIds()));
     }
 
 }

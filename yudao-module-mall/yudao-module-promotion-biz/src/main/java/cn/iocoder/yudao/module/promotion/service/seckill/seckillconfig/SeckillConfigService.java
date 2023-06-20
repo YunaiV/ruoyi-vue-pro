@@ -76,4 +76,12 @@ public interface SeckillConfigService {
      * @return 秒杀时段列表
      */
     List<SeckillConfigDO> getListAllSimple();
+
+    /**
+     * 更新秒杀时段配置状态
+     *
+     * @param id     id
+     * @param status 状态
+     */
+    void updateSeckillConfigStatus(Long id, Integer status);
 }
