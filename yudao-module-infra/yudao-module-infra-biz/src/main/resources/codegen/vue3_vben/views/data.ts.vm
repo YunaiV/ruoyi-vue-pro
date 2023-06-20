@@ -122,7 +122,7 @@ export const createFormSchema: FormSchema[] = [
       #end
     }
   #elseif($column.htmlType == "radio")## 单选框
-    component: 'Radio',
+    component: 'RadioButtonGroup',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
         options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number')
@@ -188,7 +188,7 @@ export const updateFormSchema: FormSchema[] = [
       #end
     }
     #elseif($column.htmlType == "radio")## 单选框
-    component: 'Radio',
+    component: 'RadioButtonGroup',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
         options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number')

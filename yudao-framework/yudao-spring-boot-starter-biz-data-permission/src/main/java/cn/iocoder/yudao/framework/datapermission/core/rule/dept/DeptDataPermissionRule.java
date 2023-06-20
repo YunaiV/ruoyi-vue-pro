@@ -36,7 +36,7 @@ import java.util.Set;
  * 注意，使用 DeptDataPermissionRule 时，需要保证表中有 dept_id 部门编号的字段，可自定义。
  *
  * 实际业务场景下，会存在一个经典的问题？当用户修改部门时，冗余的 dept_id 是否需要修改？
- * 1. 一般情况下，dept_id 不进行修改，则会导致用户看到之前的数据。【yudao-server 采用该方案】
+ * 1. 一般情况下，dept_id 不进行修改，则会导致用户看不到之前的数据。【yudao-server 采用该方案】
  * 2. 部分情况下，希望该用户还是能看到之前的数据，则有两种方式解决：【需要你改造该 DeptDataPermissionRule 的实现代码】
  *  1）编写洗数据的脚本，将 dept_id 修改成新部门的编号；【建议】
  *      最终过滤条件是 WHERE dept_id = ?

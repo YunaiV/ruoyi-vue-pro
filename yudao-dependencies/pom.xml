@@ -16,7 +16,7 @@
     <properties>
         <revision>1.7.3-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.7.11</spring.boot.version>
+        <spring.boot.version>2.7.12</spring.boot.version>
         <!-- Web 相关 -->
         <springdoc.version>1.6.15</springdoc.version>
         <knife4j.version>4.1.0</knife4j.version>
@@ -52,10 +52,10 @@
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <guava.version>31.1-jre</guava.version>
+        <guava.version>32.0.0-jre</guava.version>
         <guice.version>5.1.0</guice.version>
         <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
-        <commons-net.version>3.8.0</commons-net.version>
+        <commons-net.version>3.9.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.7.0</tika-core.version>
         <netty-all.version>4.1.90.Final</netty-all.version>
@@ -67,7 +67,7 @@
         <minio.version>8.5.2</minio.version>
         <aliyun-java-sdk-core.version>4.6.3</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
-        <tencentcloud-sdk-java.version>3.1.715</tencentcloud-sdk-java.version>
+        <tencentcloud-sdk-java.version>3.1.758</tencentcloud-sdk-java.version>
         <justauth.version>1.4.0</justauth.version>
         <jimureport.version>1.5.6</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
