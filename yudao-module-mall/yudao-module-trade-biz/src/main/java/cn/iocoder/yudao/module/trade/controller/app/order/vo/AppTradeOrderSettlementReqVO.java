@@ -21,7 +21,7 @@ public class AppTradeOrderSettlementReqVO {
     @Deprecated // TODO 芋艿：后续干掉这个字段，对于前端不需要关注这个
     private Integer type;
 
-    @Schema(description = "商品项数组", required = true)
+    @Schema(description = "商品项数组", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商品不能为空")
     private List<Item> items;
 

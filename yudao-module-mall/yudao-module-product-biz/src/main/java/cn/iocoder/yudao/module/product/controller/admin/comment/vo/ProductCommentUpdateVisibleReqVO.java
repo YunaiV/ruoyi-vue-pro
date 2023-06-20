@@ -11,11 +11,11 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class ProductCommentUpdateVisibleReqVO {
 
-    @Schema(description = "评价编号", required = true, example = "15721")
+    @Schema(description = "评价编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15721")
     @NotNull(message = "评价编号不能为空")
     private Long id;
 
-    @Schema(description = "是否可见", required = true, example = "false")
+    @Schema(description = "是否可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     @NotNull(message = "是否可见不能为空")
     private Boolean visible;
 

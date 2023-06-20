@@ -10,15 +10,15 @@ import java.util.List;
 @Data
 public class AppTradeOrderItemRespVO {
 
-    @Schema(description = "编号", required = true, example = "1")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "商品 SPU 编号", required = true, example = "1")
+    @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long spuId;
-    @Schema(description = "商品 SPU 名称", required = true, example = "芋道源码")
+    @Schema(description = "商品 SPU 名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     private String spuName;
 
-    @Schema(description = "商品 SKU 编号", required = true, example = "1")
+    @Schema(description = "商品 SKU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long skuId;
 
     /**
@@ -26,18 +26,18 @@ public class AppTradeOrderItemRespVO {
      */
     private List<AppProductPropertyValueDetailRespVO> properties;
 
-    @Schema(description = "商品图片", required = true, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
     private String picUrl;
 
-    @Schema(description = "购买数量", required = true, example = "1")
+    @Schema(description = "购买数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer count;
 
-    @Schema(description = "是否评价", required = true, example = "true")
+    @Schema(description = "是否评价", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean commentStatus;
 
     // ========== 价格 + 支付基本信息 ==========
 
-    @Schema(description = "商品原价（单）", required = true, example = "100")
+    @Schema(description = "商品原价（单）", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer price;
 
     // ========== 营销基本信息 ==========
@@ -46,7 +46,7 @@ public class AppTradeOrderItemRespVO {
 
     // ========== 售后基本信息 ==========
 
-    @Schema(description = "售后状态", required = true, example = "1")
+    @Schema(description = "售后状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer afterSaleStatus;
     
 }

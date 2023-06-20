@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.convert.comment;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentRespVO;
@@ -9,6 +10,7 @@ import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductComme
 import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -59,9 +61,18 @@ public interface ProductCommentConvert {
         return divide.intValue();
     }
 
-    @Mapping(target = "orderId", source = "orderId")
+    ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO);
+
     @Mapping(target = "scores", expression = "java(convertScores(createReqDTO.getDescriptionScores(), createReqDTO.getBenefitScores()))")
-    ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO, Long orderId);
+    default ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO, ProductSpuDO spuDO, MemberUserRespDTO user) {
+        ProductCommentDO commentDO = convert(createReqDTO);
+        commentDO.setUserId(user.getId());
+        commentDO.setUserNickname(user.getNickname());
+        commentDO.setUserAvatar(user.getAvatar());
+        commentDO.setSpuId(spuDO.getId());
+        commentDO.setSpuName(spuDO.getName());
+        return commentDO;
+    }
 
     @Mapping(target = "userId", constant = "0L")
     @Mapping(target = "orderId", constant = "0L")
@@ -70,4 +81,5 @@ public interface ProductCommentConvert {
     @Mapping(target = "scores", expression = "java(convertScores(createReq.getDescriptionScores(), createReq.getBenefitScores()))")
     ProductCommentDO convert(ProductCommentCreateReqVO createReq);
 
+    List<AppProductCommentRespVO> convertList02(List<ProductCommentDO> list);
 }

@@ -17,19 +17,13 @@ public class ProductCommentCreateReqDTO {
      */
     private Long skuId;
     /**
+     * 订单编号
+     */
+    private Long orderId;
+    /**
      * 交易订单项编号
      */
     private Long orderItemId;
-
-    // TODO @huihui：spuId、spuName 去查询哇？通过 skuId
-    /**
-     * 商品 SPU 编号
-     */
-    private Long spuId;
-    /**
-     * 商品 SPU 名称
-     */
-    private String spuName;
 
     /**
      * 评分星级 1-5 分
@@ -60,14 +54,6 @@ public class ProductCommentCreateReqDTO {
      * 评价人
      */
     private Long userId;
-    // TODO @puhui999：是不是 userNickname、userAvatar 去掉？通过 userId 查询
-    /**
-     * 评价人名称
-     */
-    private String userNickname;
-    /**
-     * 评价人头像
-     */
-    private String userAvatar;
+
 
 }

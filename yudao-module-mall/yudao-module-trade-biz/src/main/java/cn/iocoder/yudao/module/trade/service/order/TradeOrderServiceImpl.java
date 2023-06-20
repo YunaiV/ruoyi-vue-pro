@@ -565,6 +565,16 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return tradeOrderItemMapper.selectListByOrderId(orderIds);
     }
 
+    @Override
+    public TradeOrderItemDO getOrderItemByIdAndUserId(Long orderItemId, Long loginUserId) {
+        return tradeOrderItemMapper.selectOrderItemByIdAndUserId(orderItemId, loginUserId);
+    }
+
+    @Override
+    public TradeOrderDO getOrderByIdAndUserId(Long orderId, Long loginUserId) {
+        return tradeOrderMapper.selectOrderByIdAndUserId(orderId, loginUserId);
+    }
+
     /**
      * 判断指定订单的所有订单项，是不是都售后成功
      *

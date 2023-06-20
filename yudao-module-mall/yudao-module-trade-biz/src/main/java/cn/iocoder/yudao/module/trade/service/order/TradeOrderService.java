@@ -160,4 +160,21 @@ public interface TradeOrderService {
      */
     List<TradeOrderItemDO> getOrderItemListByOrderId(Collection<Long> orderIds);
 
+    /**
+     * 得到订单项通过 订单项 id 和用户 id
+     *
+     * @param orderItemId 订单项 id
+     * @param loginUserId 登录用户 id
+     * @return 得到订单项
+     */
+    TradeOrderItemDO getOrderItemByIdAndUserId(Long orderItemId, Long loginUserId);
+
+    /**
+     * 得到订单通过 id 和 用户 id
+     *
+     * @param orderId     订单 id
+     * @param loginUserId 登录用户 id
+     * @return 得到订单
+     */
+    TradeOrderDO getOrderByIdAndUserId(Long orderId, Long loginUserId);
 }

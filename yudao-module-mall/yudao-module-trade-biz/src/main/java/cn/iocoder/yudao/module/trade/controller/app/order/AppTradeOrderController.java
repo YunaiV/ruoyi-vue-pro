@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
+import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
@@ -35,6 +36,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_ITEM_NOT_FOUND;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 
 @Tag(name = "用户 App - 交易订单")
 @RestController
@@ -138,16 +140,20 @@ public class AppTradeOrderController {
     @PostMapping("/item/create-comment")
     @Operation(summary = "创建交易订单项的评价")
     public CommonResult<Long> createOrderItemComment(@RequestBody AppTradeOrderItemCommentCreateReqVO createReqVO) {
-        // 校验订单项，订单项存在订单就存在
-        // TODO @puhui999：要去查询订单是不是自己的；不然别人模拟请求哈；
-        TradeOrderItemDO item = tradeOrderService.getOrderItem(createReqVO.getUserId(), createReqVO.getOrderItemId());
-        if (item == null) {
+        Long loginUserId = getLoginUserId();
+        // 先通过订单项 ID 查询订单项是否存在
+        TradeOrderItemDO orderItemDO = tradeOrderService.getOrderItemByIdAndUserId(createReqVO.getOrderItemId(), loginUserId);
+        if (orderItemDO == null) {
             throw exception(ORDER_ITEM_NOT_FOUND);
         }
+        // 校验订单
+        TradeOrderDO orderDO = tradeOrderService.getOrderByIdAndUserId(orderItemDO.getOrderId(), loginUserId);
+        if (orderDO == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
 
-        return success(productCommentApi.createComment(TradeOrderConvert.INSTANCE.convert04(createReqVO), item.getOrderId()));
+        ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItemDO);
+        return success(productCommentApi.createComment(productCommentCreateReqDTO));
     }
-
-    // TODO 合并代码后发现只有商家回复功能 用户追评不要了吗？不要了哈；
 
 }
