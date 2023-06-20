@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.activity.AppBargainActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.activity.AppBargainActivityRespVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -83,6 +84,27 @@ public class AppBargainActivityController {
         activityList.add(activity2);
 
         return success(activityList);
+    }
+
+    @GetMapping("/get-detail")
+    @Operation(summary = "获得砍价活动详情")
+    // TODO 芋艿：缺少 swagger 注解
+    public CommonResult<AppBargainActivityDetailRespVO> getBargainActivityDetail(@RequestParam("id") Long id) {
+        AppBargainActivityDetailRespVO activity = new AppBargainActivityDetailRespVO();
+        activity.setId(2L);
+        activity.setName("618 大砍价");
+        activity.setSpuId(2048L);
+        activity.setPicUrl("https://demo26.crmeb.net/uploads/attach/2021/11/15/a79f5d2ea6bf0c3c11b2127332dfe2df.jpg");
+        activity.setMarketPrice(50);
+        activity.setBargainPrice(100);
+        activity.setStock(10);
+        activity.setUnitName("件");
+        activity.setPrice(40);
+        activity.setStartTime(LocalDateTimeUtils.addTime(Duration.ofDays(-2)));
+        activity.setEndTime(LocalDateTimeUtils.addTime(Duration.ofDays(-10)));
+        activity.setDescription("我吃西红柿");
+        activity.setSuccessCount(10);
+        return success(activity);
     }
 
 }
