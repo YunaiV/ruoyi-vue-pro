@@ -51,5 +51,4 @@ public class AppBargainRecordDetailRespVO {
     // 6-已帮砍：其他人的，有帮砍过；
     // 7-帮砍次数已满：其他人的，帮砍次数已满
 
-
 }

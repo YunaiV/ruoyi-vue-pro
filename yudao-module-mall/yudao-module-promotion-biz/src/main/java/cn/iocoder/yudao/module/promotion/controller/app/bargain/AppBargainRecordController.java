@@ -2,15 +2,13 @@ package cn.iocoder.yudao.module.promotion.controller.app.bargain;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.bargain.vo.record.AppBargainRecordSummaryRespVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -60,9 +58,16 @@ public class AppBargainRecordController {
         detail.setPrice(200);
         detail.setPayPrice(180);
         detail.setStatus(1);
-        detail.setAction(AppBargainRecordDetailRespVO.ACTION_SUCCESS);
+        detail.setAction(AppBargainRecordDetailRespVO.ACTION_ORDER_CREATE);
+        detail.setHelpAction(AppBargainRecordDetailRespVO.HELP_ACTION_NONE);
         detail.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(2)));
         return success(detail);
+    }
+
+    @PostMapping("/create")
+    @Operation(summary = "创建砍价记录", description = "参与拼团活动")
+    public CommonResult<Long> createBargainRecord(@RequestBody AppBargainRecordCreateReqVO reqVO) {
+         return success(1L);
     }
 
 }
