@@ -31,7 +31,6 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 

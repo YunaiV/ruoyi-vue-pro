@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.system.dal.mysql.mail;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import org.apache.ibatis.annotations.Mapper;

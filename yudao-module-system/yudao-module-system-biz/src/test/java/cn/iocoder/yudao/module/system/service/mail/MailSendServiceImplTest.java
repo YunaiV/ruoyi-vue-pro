@@ -30,7 +30,6 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class MailSendServiceImplTest extends BaseMockitoUnitTest {

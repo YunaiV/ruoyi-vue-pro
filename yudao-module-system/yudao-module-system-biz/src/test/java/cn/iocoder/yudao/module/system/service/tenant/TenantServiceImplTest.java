@@ -45,7 +45,6 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**

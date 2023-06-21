@@ -2,8 +2,6 @@ package cn.iocoder.yudao.framework.pay.core.client.impl;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
@@ -12,7 +10,6 @@ import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayWapPayClient
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPubPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import com.alipay.api.response.AlipayTradePrecreateResponse;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

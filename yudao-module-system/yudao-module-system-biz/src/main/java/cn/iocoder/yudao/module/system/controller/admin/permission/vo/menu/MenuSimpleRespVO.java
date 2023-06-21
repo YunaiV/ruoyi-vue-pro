@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
-
 @Schema(description = "管理后台 - 菜单精简信息 Response VO")
 @Data
 @NoArgsConstructor

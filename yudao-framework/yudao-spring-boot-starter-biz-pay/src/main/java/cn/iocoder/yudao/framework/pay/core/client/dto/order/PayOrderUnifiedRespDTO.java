@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.pay.core.client.dto.order;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**

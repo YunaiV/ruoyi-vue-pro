@@ -50,7 +50,6 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @Import(AdminUserServiceImpl.class)

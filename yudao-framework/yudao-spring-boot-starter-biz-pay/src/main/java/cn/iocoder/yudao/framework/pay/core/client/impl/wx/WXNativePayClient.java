@@ -8,7 +8,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;

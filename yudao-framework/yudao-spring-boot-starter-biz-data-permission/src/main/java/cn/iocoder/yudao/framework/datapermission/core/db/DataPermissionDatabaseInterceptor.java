@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRule;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRuleFactory;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
-import com.alibaba.ttl.TransmittableThreadLocal;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserSupport;

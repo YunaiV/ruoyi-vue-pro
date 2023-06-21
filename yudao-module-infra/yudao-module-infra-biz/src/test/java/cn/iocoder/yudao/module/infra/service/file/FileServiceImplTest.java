@@ -22,7 +22,6 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.*;
 
 @Import({FileServiceImpl.class})

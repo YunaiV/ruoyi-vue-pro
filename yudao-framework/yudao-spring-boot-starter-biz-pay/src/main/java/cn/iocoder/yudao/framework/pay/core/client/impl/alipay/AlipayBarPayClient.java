@@ -13,7 +13,6 @@ import com.alipay.api.response.AlipayTradePayResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 
 /**

@@ -38,7 +38,6 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @Import(AdminAuthServiceImpl.class)

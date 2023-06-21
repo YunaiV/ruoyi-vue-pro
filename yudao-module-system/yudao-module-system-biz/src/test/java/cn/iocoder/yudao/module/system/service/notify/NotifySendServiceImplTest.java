@@ -20,7 +20,6 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.NOTICE_NOT
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.NOTIFY_SEND_TEMPLATE_PARAM_MISS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class NotifySendServiceImplTest extends BaseMockitoUnitTest {

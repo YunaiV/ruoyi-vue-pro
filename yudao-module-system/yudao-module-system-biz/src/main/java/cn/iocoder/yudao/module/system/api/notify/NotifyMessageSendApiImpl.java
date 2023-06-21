@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.api.notify;
 
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
-import cn.iocoder.yudao.module.system.service.notify.NotifyMessageService;
 import cn.iocoder.yudao.module.system.service.notify.NotifySendService;
 import org.springframework.stereotype.Service;
 

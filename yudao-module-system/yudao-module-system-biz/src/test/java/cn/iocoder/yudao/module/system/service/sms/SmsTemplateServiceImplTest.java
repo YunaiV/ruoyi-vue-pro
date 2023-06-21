@@ -37,7 +37,6 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @Import(SmsTemplateServiceImpl.class)

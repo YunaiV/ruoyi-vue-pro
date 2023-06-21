@@ -8,7 +8,6 @@ import org.hibernate.validator.constraints.URL;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 

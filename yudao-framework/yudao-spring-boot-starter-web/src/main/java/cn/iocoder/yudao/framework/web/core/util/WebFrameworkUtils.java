@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.web.core.util;
 
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
