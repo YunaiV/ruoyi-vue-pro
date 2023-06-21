@@ -29,9 +29,9 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class AppCombinationRecordController {
 
     @GetMapping("/get-summary")
-    @Operation(summary = "获得拼团活动的概要信息", description = "用于小程序首页")
+    @Operation(summary = "获得拼团记录的概要信息", description = "用于小程序首页")
     // TODO 芋艿：增加 @Cache 缓存，1 分钟过期
-    public CommonResult<AppCombinationRecordSummaryRespVO> getCombinationSummary() {
+    public CommonResult<AppCombinationRecordSummaryRespVO> getCombinationRecordSummary() {
         AppCombinationRecordSummaryRespVO summary = new AppCombinationRecordSummaryRespVO();
         summary.setUserCount(1024);
         summary.setAvatars(new ArrayList<>());
