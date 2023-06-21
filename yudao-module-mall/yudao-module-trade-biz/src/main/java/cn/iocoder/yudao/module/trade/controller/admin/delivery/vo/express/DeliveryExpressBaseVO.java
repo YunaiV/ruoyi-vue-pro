@@ -12,22 +12,22 @@ import javax.validation.constraints.NotNull;
 @Data
 public class DeliveryExpressBaseVO {
 
-    @Schema(description = "快递公司编码", required = true)
+    @Schema(description = "快递公司编码", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "快递公司编码不能为空")
     private String code;
 
-    @Schema(description = "快递公司名称", required = true, example = "李四")
+    @Schema(description = "快递公司名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
     @NotNull(message = "快递公司名称不能为空")
     private String name;
 
     @Schema(description = "快递公司logo")
     private String logo;
 
-    @Schema(description = "排序", required = true)
+    @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
-    @Schema(description = "状态", required = true, example = "1")
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

@@ -9,15 +9,15 @@ import java.util.List;
 @Data
 public class AppSeckillConfigRespVO {
 
-    @Schema(description = "秒杀时间段编号", required = true, example = "1024")
+    @Schema(description = "秒杀时间段编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "开始时间点", required = true, example = "09:00")
+    @Schema(description = "开始时间点", requiredMode = Schema.RequiredMode.REQUIRED, example = "09:00")
     private String startTime;
-    @Schema(description = "结束时间点", required = true, example = "09:59")
+    @Schema(description = "结束时间点", requiredMode = Schema.RequiredMode.REQUIRED, example = "09:59")
     private String endTime;
 
-    @Schema(description = "轮播图", required = true)
+    @Schema(description = "轮播图", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<String> sliderPicUrls;
 
 }

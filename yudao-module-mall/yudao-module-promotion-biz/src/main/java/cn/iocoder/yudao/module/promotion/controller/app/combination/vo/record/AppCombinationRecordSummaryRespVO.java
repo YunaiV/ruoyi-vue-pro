@@ -9,10 +9,10 @@ import java.util.List;
 @Data
 public class AppCombinationRecordSummaryRespVO {
 
-    @Schema(description = "拼团用户数量", required = true, example = "1024")
+    @Schema(description = "拼团用户数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer userCount;
 
-    @Schema(description = "拼团用户头像列表", required = true) // 只返回最近的 7 个
+    @Schema(description = "拼团用户头像列表", requiredMode = Schema.RequiredMode.REQUIRED) // 只返回最近的 7 个
     private List<String> avatars;
 
 }

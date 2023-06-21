@@ -17,7 +17,7 @@ public class AppTradeCartAddReqVO {
     @NotNull(message = "数量不能为空")
     private Integer count;
 
-    @Schema(description = "是否添加到购物车", required = true, example = "true")
+    @Schema(description = "是否添加到购物车", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "是否添加购物车不能为空")
     private Boolean addStatus;
 

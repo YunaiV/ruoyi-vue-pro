@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class DeliveryExpressUpdateReqVO extends DeliveryExpressBaseVO {
 
-    @Schema(description = "编号", required = true, example = "6592")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "6592")
     @NotNull(message = "编号不能为空")
     private Long id;
 

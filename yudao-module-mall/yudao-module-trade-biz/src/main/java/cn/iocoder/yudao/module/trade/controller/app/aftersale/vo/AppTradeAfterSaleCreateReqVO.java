@@ -36,7 +36,7 @@ public class AppTradeAfterSaleCreateReqVO {
     /**
      * @see AfterSaleStatusEnum
      */
-    @Schema(description = "操作类型", required = true, example = "1")
+    @Schema(description = "操作类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "操作类型不能为空")
     private String operateType;
 

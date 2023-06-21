@@ -82,4 +82,5 @@ public interface ProductCommentConvert {
     ProductCommentDO convert(ProductCommentCreateReqVO createReq);
 
     List<AppProductCommentRespVO> convertList02(List<ProductCommentDO> list);
+
 }
