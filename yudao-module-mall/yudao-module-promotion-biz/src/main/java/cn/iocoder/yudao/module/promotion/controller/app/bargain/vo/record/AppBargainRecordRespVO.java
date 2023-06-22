@@ -5,13 +5,11 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "用户 App - 砍价记录的明细 Response VO")
+@Schema(description = "用户 App - 砍价记录的 Response VO")
 @Data
-public class AppBargainRecordDetailRespVO {
+public class AppBargainRecordRespVO {
 
-    public static final int HELP_ACTION_NONE = 1; // 帮砍动作 - 未帮砍，可以帮砍
-    public static final int HELP_ACTION_FULL = 2; // 帮砍动作 - 未帮砍，无法帮砍（可帮砍次数已满)
-    public static final int HELP_ACTION_SUCCESS = 3; // 帮砍动作 - 已帮砍
+    // TODO @芋艿：status；如果砍价对应的订单支付超时，算失败么？砍价的支付时间，以 expireTime 为准么？
 
     private Long id;
     private Long userId;
@@ -22,12 +20,13 @@ public class AppBargainRecordDetailRespVO {
     private Integer price;
     private Integer payPrice;
     private Integer status;
-
     private LocalDateTime expireTime;
 
     private Long orderId;
     private Boolean payStatus;
+    private Long payOrderId;
 
-    private Integer helpAction;
+    private String activityName;
+    private String picUrl;
 
 }
