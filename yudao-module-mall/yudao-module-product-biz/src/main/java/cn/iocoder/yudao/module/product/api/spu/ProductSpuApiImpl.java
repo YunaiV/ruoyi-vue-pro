@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.product.api.spu;
 
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.convert.spu.ProductSpuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * TODO LeeYan9: 类注释;
+ * 商品 SPU API 接口实现类
  *
  * @author LeeYan9
  * @since 2022-09-06
@@ -28,11 +28,12 @@ public class ProductSpuApiImpl implements ProductSpuApi {
 
     @Override
     public List<ProductSpuRespDTO> getSpuList(Collection<Long> spuIds) {
-        // TODO TODO LeeYan9: AllEmpty?
-        if (CollectionUtils.isAnyEmpty(spuIds)) {
+        // TODO 需不需要判断集合中是否有 null 值
+        if (CollectionUtil.isEmpty(spuIds)) {
             return Collections.emptyList();
         }
         List<ProductSpuDO> productSpuDOList = productSpuMapper.selectBatchIds(spuIds);
         return ProductSpuConvert.INSTANCE.convertList2(productSpuDOList);
     }
+
 }

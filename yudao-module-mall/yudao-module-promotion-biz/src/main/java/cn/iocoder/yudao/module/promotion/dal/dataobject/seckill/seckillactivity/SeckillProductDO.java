@@ -1,9 +1,16 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity;
 
-import lombok.*;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 秒杀参与商品 DO
@@ -32,7 +39,8 @@ public class SeckillProductDO extends BaseDO {
     /**
      * 秒杀时段 id
      */
-    private String configIds;
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> configIds;
     /**
      * 商品 spu_id
      */
@@ -51,6 +59,7 @@ public class SeckillProductDO extends BaseDO {
     private Integer stock;
     /**
      * 秒杀商品状态
+     * 枚举 {@link CommonStatusEnum 对应的类}
      */
     private Integer activityStatus;
     /**

@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.time.LocalDateTime;
-import javax.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Data;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import javax.validation.constraints.NotNull;
 
 /**
  * 秒杀参与商品 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -17,15 +14,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class SeckillProductBaseVO {
 
-    @Schema(description = "秒杀活动id", requiredMode = Schema.RequiredMode.REQUIRED, example = "20173")
-    @NotNull(message = "秒杀活动id不能为空")
-    private Long activityId;
-
-    @Schema(description = "秒杀时段id", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "秒杀时段id不能为空")
-    private String configIds;
-
-    @Schema(description = "商品spu_id", requiredMode = Schema.RequiredMode.REQUIRED, example = "10290")
+    @Schema(description = "商品spu_id", requiredMode = Schema.RequiredMode.REQUIRED, example = "30563")
     @NotNull(message = "商品spu_id不能为空")
     private Long spuId;
 
@@ -41,18 +30,5 @@ public class SeckillProductBaseVO {
     @NotNull(message = "秒杀库存不能为空")
     private Integer stock;
 
-    @Schema(description = "秒杀商品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "秒杀商品状态不能为空")
-    private Integer activityStatus;
-
-    @Schema(description = "活动开始时间点", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "活动开始时间点不能为空")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime activityStartTime;
-
-    @Schema(description = "活动结束时间点", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "活动结束时间点不能为空")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime activityEndTime;
 
 }

@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -35,7 +34,8 @@ public class SeckillActivityDO extends BaseDO {
     /**
      * 秒杀活动商品
      */
-    private Long spuId;
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> spuIds;
     /**
      * 秒杀活动名称
      */

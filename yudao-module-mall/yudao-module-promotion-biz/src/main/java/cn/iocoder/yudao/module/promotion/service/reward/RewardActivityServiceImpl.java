@@ -41,7 +41,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
 
         // 插入
         RewardActivityDO rewardActivity = RewardActivityConvert.INSTANCE.convert(createReqVO)
-                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getStartTime(), createReqVO.getEndTime()));
+                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()));
         rewardActivityMapper.insert(rewardActivity);
         // 返回
         return rewardActivity.getId();
@@ -59,7 +59,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
 
         // 更新
         RewardActivityDO updateObj = RewardActivityConvert.INSTANCE.convert(updateReqVO)
-                .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getStartTime(), updateReqVO.getEndTime()));
+                .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getEndTime()));
         rewardActivityMapper.updateById(updateObj);
     }
 
