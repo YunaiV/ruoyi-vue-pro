@@ -61,8 +61,6 @@ public class AppBargainRecordController {
         detail.setPrice(200);
         detail.setPayPrice(180);
         detail.setStatus(1);
-        detail.setAction(AppBargainRecordDetailRespVO.ACTION_ORDER_CREATE);
-        detail.setHelpAction(AppBargainRecordDetailRespVO.HELP_ACTION_NONE);
         detail.setExpireTime(LocalDateTimeUtils.addTime(Duration.ofDays(2)));
         return success(detail);
     }
