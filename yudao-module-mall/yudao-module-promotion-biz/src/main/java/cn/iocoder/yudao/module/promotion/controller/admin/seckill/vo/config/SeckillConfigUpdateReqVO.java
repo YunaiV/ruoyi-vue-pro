@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time;
+package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -7,11 +7,16 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * 管理后台 - 秒杀时段更新 Request VO
+ *
+ * @author HUIHUI
+ */
 @Schema(description = "管理后台 - 秒杀时段更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SeckillTimeUpdateReqVO extends SeckillTimeBaseVO {
+public class SeckillConfigUpdateReqVO extends SeckillConfigBaseVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "编号不能为空")

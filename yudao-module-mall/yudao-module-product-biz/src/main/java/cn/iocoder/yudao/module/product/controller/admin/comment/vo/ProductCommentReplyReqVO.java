@@ -12,11 +12,11 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class ProductCommentReplyReqVO {
 
-    @Schema(description = "评价编号", required = true, example = "15721")
+    @Schema(description = "评价编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15721")
     @NotNull(message = "评价编号不能为空")
     private Long id;
 
-    @Schema(description = "商家回复内容", required = true, example = "谢谢亲")
+    @Schema(description = "商家回复内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "谢谢亲")
     @NotEmpty(message = "商家回复内容不能为空")
     private String replyContent;
 

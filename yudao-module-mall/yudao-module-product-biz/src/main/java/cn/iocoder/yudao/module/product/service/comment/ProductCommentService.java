@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.service.comment;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyReqVO;
@@ -11,6 +12,8 @@ import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductComme
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
 
 /**
  * 商品评论 Service 接口
@@ -65,10 +68,10 @@ public interface ProductCommentService {
      * 创建评论
      * 创建商品评论 APP 端创建商品评论使用
      *
-     * @param commentDO 评论对象
+     * @param createReqDTO 创建请求 dto
      * @return 返回评论 id
      */
-    Long createComment(ProductCommentDO commentDO);
+    Long createComment(ProductCommentCreateReqDTO createReqDTO);
 
     /**
      * 获得商品的评价统计
@@ -77,6 +80,15 @@ public interface ProductCommentService {
      * @param visible 是否可见
      * @return 评价统计
      */
-    AppCommentStatisticsRespVO getCommentPageTabsCount(Long spuId, Boolean visible);
+    AppCommentStatisticsRespVO getCommentStatistics(Long spuId, Boolean visible);
+
+    /**
+     * 得到评论列表
+     *
+     * @param spuId 商品 id
+     * @param count 数量
+     * @return {@link Object}
+     */
+    List<AppProductCommentRespVO> getCommentList(Long spuId, Integer count);
 
 }

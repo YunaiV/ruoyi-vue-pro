@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.product.service.comment;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyReqVO;
@@ -10,7 +11,6 @@ import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommen
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentStatisticsRespVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppProductCommentRespVO;
-import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
@@ -18,7 +18,6 @@ import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.comment.ProductCommentMapper;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
-import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,11 +25,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
@@ -48,14 +43,14 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     private ProductCommentMapper productCommentMapper;
 
     @Resource
-    private TradeOrderApi tradeOrderApi;
-
-    @Resource
     private ProductSpuService productSpuService;
 
     @Resource
     @Lazy
     private ProductSkuService productSkuService;
+
+    @Resource
+    private MemberUserApi memberUserApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -85,11 +80,8 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createComment(ProductCommentCreateReqVO createReqVO) {
-        // 校验订单
-        // TODO @puhui999：不校验哈；尽可能解耦
-        Long orderId = tradeOrderApi.validateOrder(createReqVO.getUserId(), createReqVO.getOrderItemId());
         // 校验评论
-        validateComment(createReqVO.getSpuId(), createReqVO.getUserId(), orderId);
+        validateComment(createReqVO.getSpuId(), createReqVO.getUserId(), createReqVO.getOrderItemId());
 
         ProductCommentDO commentDO = ProductCommentConvert.INSTANCE.convert(createReqVO);
         productCommentMapper.insert(commentDO);
@@ -97,24 +89,39 @@ public class ProductCommentServiceImpl implements ProductCommentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createComment(ProductCommentDO commentDO) {
+    public Long createComment(ProductCommentCreateReqDTO createReqDTO) {
+        // 通过 sku ID 拿到 spu 相关信息
+        ProductSkuDO sku = productSkuService.getSku(createReqDTO.getSkuId());
+        if (sku == null) {
+            throw exception(SKU_NOT_EXISTS);
+        }
+        // 校验 spu 如果存在返回详情
+        ProductSpuDO spuDO = validateSpu(sku.getSpuId());
         // 校验评论
-        validateComment(commentDO.getSpuId(), commentDO.getUserId(), commentDO.getOrderId());
+        validateComment(spuDO.getId(), createReqDTO.getUserId(), createReqDTO.getOrderId());
+        // 获取用户详细信息
+        MemberUserRespDTO user = memberUserApi.getUser(createReqDTO.getUserId());
 
+        // 创建评论
+        ProductCommentDO commentDO = ProductCommentConvert.INSTANCE.convert(createReqDTO, spuDO, user);
         productCommentMapper.insert(commentDO);
         return commentDO.getId();
     }
 
-    private void validateComment(Long spuId, Long userId, Long orderId) {
+    private void validateComment(Long spuId, Long userId, Long orderItemId) {
+        // 判断当前订单的当前商品用户是否评价过
+        ProductCommentDO exist = productCommentMapper.selectByUserIdAndOrderItemIdAndSpuId(userId, orderItemId, spuId);
+        if (null != exist) {
+            throw exception(ORDER_SPU_COMMENT_EXISTS);
+        }
+    }
+
+    private ProductSpuDO validateSpu(Long spuId) {
         ProductSpuDO spu = productSpuService.getSpu(spuId);
         if (null == spu) {
             throw exception(SPU_NOT_EXISTS);
         }
-        // 判断当前订单的当前商品用户是否评价过
-        ProductCommentDO exist = productCommentMapper.selectByUserIdAndOrderIdAndSpuId(userId, orderId, spuId);
-        if (null != exist) {
-            throw exception(ORDER_SPU_COMMENT_EXISTS);
-        }
+        return spu;
     }
 
     private ProductCommentDO validateCommentExists(Long id) {
@@ -126,7 +133,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     }
 
     @Override
-    public AppCommentStatisticsRespVO getCommentPageTabsCount(Long spuId, Boolean visible) {
+    public AppCommentStatisticsRespVO getCommentStatistics(Long spuId, Boolean visible) {
         return ProductCommentConvert.INSTANCE.convert(
                 // 查询商品 id = spuId 的所有评论数量
                 productCommentMapper.selectCountBySpuId(spuId, visible, null),
@@ -140,28 +147,17 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     }
 
     @Override
+    public List<AppProductCommentRespVO> getCommentList(Long spuId, Integer count) {
+        // 校验商品 spu 是否存在
+        ProductSpuDO spuDO = validateSpu(spuId);
+
+        return ProductCommentConvert.INSTANCE.convertList02(productCommentMapper.selectCommentList(spuDO.getId(), count).getList());
+    }
+
+    @Override
     public PageResult<AppProductCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible) {
-        PageResult<AppProductCommentRespVO> result = ProductCommentConvert.INSTANCE.convertPage02(
+        return ProductCommentConvert.INSTANCE.convertPage02(
                 productCommentMapper.selectPage(pageVO, visible));
-        // TODO @puhui999：要不这块放到 controller 里拼接？
-        Set<Long> skuIds = result.getList().stream().map(AppProductCommentRespVO::getSkuId).collect(Collectors.toSet());
-        List<ProductSkuDO> skuList = productSkuService.getSkuList(skuIds);
-        Map<Long, ProductSkuDO> skuDOMap = new HashMap<>(skuIds.size());
-        if (CollUtil.isNotEmpty(skuList)) {
-            skuDOMap.putAll(skuList.stream().collect(Collectors.toMap(ProductSkuDO::getId, c -> c)));
-        }
-        result.getList().forEach(item -> {
-            // 判断用户是否选择匿名
-            if (ObjectUtil.equal(item.getAnonymous(), true)) {
-                item.setUserNickname(ProductCommentDO.NICKNAME_ANONYMOUS);
-            }
-            ProductSkuDO productSkuDO = skuDOMap.get(item.getSkuId());
-            if (productSkuDO != null) {
-                List<AppProductPropertyValueDetailRespVO> skuProperties = ProductCommentConvert.INSTANCE.convertList01(productSkuDO.getProperties());
-                item.setSkuProperties(skuProperties);
-            }
-        });
-        return result;
     }
 
     @Override

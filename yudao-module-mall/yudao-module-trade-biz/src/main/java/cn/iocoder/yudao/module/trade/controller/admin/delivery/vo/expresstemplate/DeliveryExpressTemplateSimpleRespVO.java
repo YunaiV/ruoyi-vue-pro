@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DeliveryExpressTemplateSimpleRespVO {
 
-    @Schema(description = "模版编号", required = true, example = "1024")
+    @Schema(description = "模版编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "模板名称", required = true, example = "测试模版")
+    @Schema(description = "模板名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "测试模版")
     private String name;
 
 }

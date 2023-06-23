@@ -10,11 +10,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class AppTradeCartUpdateReqVO {
 
-    @Schema(description = "编号", required = true, example = "1024")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "编号不能为空")
     private Long id;
 
-    @Schema(description = "商品数量", required = true, example = "1")
+    @Schema(description = "商品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "数量不能为空")
     @Min(message = "数量必须大于 0", value = 1L)
     private Integer count;

@@ -52,7 +52,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
 
         // 插入活动
         DiscountActivityDO discountActivity = DiscountActivityConvert.INSTANCE.convert(createReqVO)
-                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getStartTime(), createReqVO.getEndTime()));
+                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()));
         discountActivityMapper.insert(discountActivity);
         // 插入商品
         List<DiscountProductDO> discountProducts = convertList(createReqVO.getProducts(),
@@ -74,7 +74,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
 
         // 更新活动
         DiscountActivityDO updateObj = DiscountActivityConvert.INSTANCE.convert(updateReqVO)
-                .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getStartTime(), updateReqVO.getEndTime()));
+                .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getEndTime()));
         discountActivityMapper.updateById(updateObj);
         // 更新商品
         updateDiscountProduct(updateReqVO);

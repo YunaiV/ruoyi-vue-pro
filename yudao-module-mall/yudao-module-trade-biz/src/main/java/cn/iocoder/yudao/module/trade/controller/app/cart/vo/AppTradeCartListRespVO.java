@@ -25,10 +25,10 @@ public class AppTradeCartListRespVO {
     @Data
     public static class Cart {
 
-        @Schema(description = "购物项的编号", required = true, example = "1024")
+        @Schema(description = "购物项的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private Long id;
 
-        @Schema(description = "商品数量", required = true, example = "1")
+        @Schema(description = "商品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer count;
 
         /**

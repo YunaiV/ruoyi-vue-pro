@@ -6,9 +6,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
@@ -25,9 +23,7 @@ import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
-import cn.iocoder.yudao.module.system.api.notify.dto.NotifyTemplateReqDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.enums.notify.NotifyTemplateTypeEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
@@ -357,28 +353,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // TODO 芋艿：发送订单变化的消息
 
         // TODO 芋艿：发送站内信 fix
-        // TODO @puhui999：使用 sendSingleMessageToMember 呀；走模版；不用判断模版是否存在哈
-        // 1、获取模版编码为 order_delivery 的模版，判断是否存在 存在放回 true
-        if (!notifyMessageSendApi.validateNotifyTemplate("order_delivery")) {
-            // 1、1 站内信模版不存在则创建模版
-            NotifyTemplateReqDTO templateReqDTO = new NotifyTemplateReqDTO();
-            templateReqDTO.setName("订单发货通知模版");
-            templateReqDTO.setCode("order_delivery");
-            templateReqDTO.setType(NotifyTemplateTypeEnum.NOTIFICATION_MESSAGE.getType()); // 系统消息
-            // 获取操作用户
-            // AdminUserRespDTO user = adminUserApi.getUser(userId);
-            // templateReqDTO.setNickname(user.getNickname());
-            templateReqDTO.setNickname(UserTypeEnum.ADMIN.getName());
-            templateReqDTO.setContent("订单:{orderId}{msg}");
-            templateReqDTO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            notifyMessageSendApi.createNotifyTemplate(templateReqDTO);
-        }
-        // 2、构造消息
+        // 1、构造消息
         Map<String, Object> msgMap = new HashMap<>();
         msgMap.put("orderId", deliveryReqVO.getId());
         msgMap.put("msg", TradeOrderStatusEnum.DELIVERED.getStatus());
         // 2、发送站内信
-        notifyMessageSendApi.sendSingleMessageToAdmin(
+        notifyMessageSendApi.sendSingleMessageToMember(
                 new NotifySendSingleToUserReqDTO()
                         .setUserId(userId)
                         .setTemplateCode("order_delivery")
@@ -563,6 +543,16 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             return Collections.emptyList();
         }
         return tradeOrderItemMapper.selectListByOrderId(orderIds);
+    }
+
+    @Override
+    public TradeOrderItemDO getOrderItemByIdAndUserId(Long orderItemId, Long loginUserId) {
+        return tradeOrderItemMapper.selectOrderItemByIdAndUserId(orderItemId, loginUserId);
+    }
+
+    @Override
+    public TradeOrderDO getOrderByIdAndUserId(Long orderId, Long loginUserId) {
+        return tradeOrderMapper.selectOrderByIdAndUserId(orderId, loginUserId);
     }
 
     /**

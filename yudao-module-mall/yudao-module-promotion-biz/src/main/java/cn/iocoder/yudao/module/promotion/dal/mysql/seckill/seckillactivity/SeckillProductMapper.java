@@ -27,7 +27,7 @@ public interface SeckillProductMapper extends BaseMapperX<SeckillProductDO> {
 
     default void updateTimeIdsByActivityId(Long id, List<Long> timeIds) {
         new LambdaUpdateChainWrapper<>(this)
-                .set(SeckillProductDO::getTimeIds, CollUtil.join(timeIds, ","))
+                .set(SeckillProductDO::getConfigIds, CollUtil.join(timeIds, ","))
                 .eq(SeckillProductDO::getActivityId, id)
                 .update();
     }

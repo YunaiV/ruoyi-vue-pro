@@ -26,7 +26,7 @@ public class SeckillActivityPageReqVO extends PageParam {
     private Integer status;
 
     @Schema(description = "秒杀时段id", example = "1")
-    private Long timeId;
+    private Long configId;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

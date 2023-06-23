@@ -5,17 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// TODO @puhui999：class 类的开始和结束，都要有一个空行哈。
 @Schema(description = "管理后台 - 品牌精简信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductBrandSimpleRespVO {
 
-    @Schema(description = "品牌编号", required = true, example = "1024")
+    @Schema(description = "品牌编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "品牌名称", required = true, example = "苹果")
+    @Schema(description = "品牌名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "苹果")
     private String name;
 
 }

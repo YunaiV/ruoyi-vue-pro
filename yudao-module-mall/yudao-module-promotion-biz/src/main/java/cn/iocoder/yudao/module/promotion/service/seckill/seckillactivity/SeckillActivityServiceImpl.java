@@ -1,19 +1,26 @@
 package cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityBaseVO;
+import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductBaseVO;
 import cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity.SeckillActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillProductMapper;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
-import cn.iocoder.yudao.module.promotion.service.seckill.seckilltime.SeckillTimeService;
+import cn.iocoder.yudao.module.promotion.service.seckill.seckillconfig.SeckillConfigService;
 import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +28,12 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 
@@ -34,74 +45,103 @@ import static java.util.Arrays.asList;
 @Service
 @Validated
 public class SeckillActivityServiceImpl implements SeckillActivityService {
+
     @Resource
     private SeckillActivityMapper seckillActivityMapper;
     @Resource
     private SeckillProductMapper seckillProductMapper;
     @Resource
-    private SeckillTimeService seckillTimeService;
+    private SeckillConfigService seckillConfigService;
+    @Resource
+    private ProductSpuApi productSpuApi;
+    @Resource
+    private ProductSkuApi productSkuApi;
 
     @Override
     public Long createSeckillActivity(SeckillActivityCreateReqVO createReqVO) {
-        // 校验商品是否冲突
-        validateSeckillActivityProductConflicts(null, createReqVO.getProducts());
-        // 校验秒杀时段是否存在
-        seckillTimeService.validateSeckillTimeExists(createReqVO.getTimeIds());
+        // 校验商品秒秒杀时段是否冲突
+        validateProductSpuSeckillConflict(createReqVO.getConfigIds(), createReqVO.getSpuIds());
+        // 校验商品 sku 是否存在
+        validateProductSkuExistence(createReqVO.getSpuIds(), createReqVO.getProducts());
 
         // 插入秒杀活动
         SeckillActivityDO seckillActivity = SeckillActivityConvert.INSTANCE.convert(createReqVO)
-                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getStartTime(), createReqVO.getEndTime()));
+                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()));
         seckillActivityMapper.insert(seckillActivity);
         // 插入商品
-        List<SeckillProductDO> productDOS = SeckillActivityConvert.INSTANCE.convertList(createReqVO.getProducts(), seckillActivity);
-        seckillProductMapper.insertBatch(productDOS);
-        // 更新秒杀时段的秒杀活动数量
-        seckillTimeService.sekillActivityCountIncr(createReqVO.getTimeIds());
+        List<SeckillProductDO> productDOs = SeckillActivityConvert.INSTANCE.convertList(seckillActivity, createReqVO.getProducts());
+        seckillProductMapper.insertBatch(productDOs);
         return seckillActivity.getId();
+    }
+
+    private <T extends SeckillProductBaseVO> void validateProductSkuExistence(List<Long> spuIds, List<T> products) {
+        Set<Long> convertedSpuIds = CollectionUtils.convertSet(products, T::getSpuId);
+        // 校验 spu 个数是否相等
+        if (ObjectUtil.notEqual(spuIds.size(), convertedSpuIds.size())) {
+            throw exception(SKU_NOT_EXISTS);
+        }
+        // 获取所选 spu下的所有 sku
+        List<ProductSkuRespDTO> skuRespDTOs = productSkuApi.getSkuListBySpuId(spuIds);
+        // 校验 sku 个数是否一致
+        Set<Long> skuIdsSet = CollectionUtils.convertSet(products, T::getSkuId);
+        Set<Long> skuIdsSet1 = CollectionUtils.convertSet(skuRespDTOs, ProductSkuRespDTO::getId);
+        if (ObjectUtil.notEqual(skuIdsSet.size(), skuIdsSet1.size())) {
+            throw exception(SKU_NOT_EXISTS);
+        }
+        // 校验 skuId 是否存在
+        if (!skuIdsSet1.containsAll(skuIdsSet) || !skuIdsSet.containsAll(skuIdsSet1)) {
+            throw exception(SKU_NOT_EXISTS);
+        }
+    }
+
+    private void validateProductSpuSeckillConflict(List<Long> configIds, List<Long> spuIds) {
+        // 校验秒杀时段是否存在
+        seckillConfigService.validateSeckillConfigExists(configIds);
+        // 校验商品 spu 是否存在
+        List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(spuIds);
+        if (ObjectUtil.notEqual(spuIds.size(), spuList.size())) {
+            throw exception(SPU_NOT_EXISTS);
+        }
+        // 查询所有开启的秒杀活动
+        List<SeckillActivityDO> activityDOs = seckillActivityMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        // 过滤出所有 spuIds 有交集的活动
+        List<SeckillActivityDO> doList = activityDOs.stream().filter(s -> {
+            // 判断 spu 是否有交集
+            List<Long> spuIdsClone = ArrayUtil.clone(s.getSpuIds());
+            spuIdsClone.retainAll(spuIds);
+            if (CollUtil.isEmpty(spuIdsClone)) {
+                return false;
+            }
+            // 判断秒杀时段是否有交集
+            List<Long> configIdsClone = ArrayUtil.clone(s.getConfigIds());
+            configIdsClone.retainAll(configIds);
+            return CollUtil.isNotEmpty(configIdsClone);
+        }).collect(Collectors.toList());
+        if (CollUtil.isNotEmpty(doList)) {
+            throw exception(SECKILL_ACTIVITY_SPU_CONFLICTS);
+        }
     }
 
     @Override
     public void updateSeckillActivity(SeckillActivityUpdateReqVO updateReqVO) {
         // 校验存在
         SeckillActivityDO seckillActivity = validateSeckillActivityExists(updateReqVO.getId());
-        if (PromotionActivityStatusEnum.CLOSE.getStatus().equals(seckillActivity.getStatus())) {
+        if (CommonStatusEnum.ENABLE.getStatus().equals(seckillActivity.getStatus())) {
             throw exception(SECKILL_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED);
         }
         // 校验商品是否冲突
-        validateSeckillActivityProductConflicts(updateReqVO.getId(), updateReqVO.getProducts());
+        validateProductSpuSeckillConflict(updateReqVO.getConfigIds(), updateReqVO.getSpuIds());
+        // 校验商品 sku 是否存在
+        validateProductSkuExistence(updateReqVO.getSpuIds(), updateReqVO.getProducts());
 
         // 更新活动
         SeckillActivityDO updateObj = SeckillActivityConvert.INSTANCE.convert(updateReqVO)
-                .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getStartTime(), updateReqVO.getEndTime()));
+                .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getEndTime()));
         seckillActivityMapper.updateById(updateObj);
         // 更新商品
-        updateSeckillProduct(updateReqVO);
-        // 更新秒杀时段的秒杀活动数量
-        updateSeckillTimeActivityCount(seckillActivity, updateReqVO.getTimeIds());
+        //updateSeckillProduct(updateReqVO);
     }
 
-
-    /**
-     * 更新秒杀时段的秒杀活动数量
-     *
-     * @param seckillActivity 查询出的秒杀活动
-     * @param updateTimeIds   更新后的秒杀时段id列表
-     */
-    private void updateSeckillTimeActivityCount(SeckillActivityDO seckillActivity, List<Long> updateTimeIds) {
-        // 查询出 timeIds
-        List<Long> existsTimeIds = seckillActivity.getTimeIds();
-        // 需要减少的时间段
-        Collection<Long> reduceIds = CollUtil.filterNew(existsTimeIds, existsTimeId -> !updateTimeIds.contains(existsTimeId));
-        // 需要添加的时间段
-        updateTimeIds.removeIf(existsTimeIds::contains);
-        // 更新减少时间段和增加时间段
-        if (CollUtil.isNotEmpty(updateTimeIds)) {
-            seckillTimeService.sekillActivityCountIncr(updateTimeIds);
-        }
-        if (CollUtil.isNotEmpty(reduceIds)) {
-            seckillTimeService.sekillActivityCountDecr(reduceIds);
-        }
-    }
 
     /**
      * 更新秒杀商品
@@ -113,57 +153,29 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
      * @param updateReqVO 更新的请求VO
      */
     private void updateSeckillProduct(SeckillActivityUpdateReqVO updateReqVO) {
-        List<SeckillProductDO> seckillProductDOS = seckillProductMapper.selectListByActivityId(updateReqVO.getId());
-        List<SeckillActivityBaseVO.Product> products = updateReqVO.getProducts();
+        // TODO puhui999：后续完善
+        //List<SeckillProductDO> seckillProductDOs = seckillProductMapper.selectListByActivityId(updateReqVO.getId());
+        //List<SeckillProductUpdateReqVO> products = updateReqVO.getProducts();
 
-        // 计算需要删除的数据
-        List<Long> deleteIds = CollectionUtils.convertList(seckillProductDOS, SeckillProductDO::getId,
-                seckillProductDO -> products.stream()
-                        .noneMatch(product -> SeckillActivityConvert.INSTANCE.isEquals(seckillProductDO, product)));
-        if (CollUtil.isNotEmpty(deleteIds)) {
-            seckillProductMapper.deleteBatchIds(deleteIds);
-        }
-
-        // 计算需要新增的数据
-        List<SeckillProductDO> newSeckillProductDOs = CollectionUtils.convertList(products,
-                product -> SeckillActivityConvert.INSTANCE.convert(product).setActivityId(updateReqVO.getId()));
-        newSeckillProductDOs.removeIf(product -> seckillProductDOS.stream()
-                .anyMatch(seckillProduct -> SeckillActivityConvert.INSTANCE.isEquals(seckillProduct, product)));
-        if (CollUtil.isNotEmpty(newSeckillProductDOs)) {
-            seckillProductMapper.insertBatch(newSeckillProductDOs);
-        }
+        ////计算需要删除的数据
+        //List<Long> deleteIds = CollectionUtils.convertList(seckillProductDOs, SeckillProductDO::getId,
+        //        seckillProductDO -> products.stream()
+        //                .noneMatch(product -> SeckillActivityConvert.INSTANCE.isEquals(seckillProductDO, product)));
+        //if (CollUtil.isNotEmpty(deleteIds)) {
+        //    seckillProductMapper.deleteBatchIds(deleteIds);
+        //}
+        //
+        //// 计算需要新增的数据
+        //List<SeckillProductDO> newSeckillProductDOs = CollectionUtils.convertList(products,
+        //        product -> SeckillActivityConvert.INSTANCE.convert(product).setActivityId(updateReqVO.getId()));
+        //newSeckillProductDOs.removeIf(product -> seckillProductDOs.stream()
+        //        .anyMatch(seckillProduct -> SeckillActivityConvert.INSTANCE.isEquals(seckillProduct, product)));
+        //if (CollUtil.isNotEmpty(newSeckillProductDOs)) {
+        //    seckillProductMapper.insertBatch(newSeckillProductDOs);
+        //}
 
         //全量更新当前活动商品的秒杀时段id列表（timeIds）
-        seckillProductMapper.updateTimeIdsByActivityId(updateReqVO.getId(), updateReqVO.getTimeIds());
-    }
-
-    /**
-     * 校验商品是否冲突
-     *
-     * @param id       秒杀活动编号
-     * @param products 商品列表
-     */
-    private void validateSeckillActivityProductConflicts(Long id, List<SeckillActivityBaseVO.Product> products) {
-        if (CollUtil.isEmpty(products)) {
-            return;
-        }
-        List<SeckillProductDO> seckillProductDOS = seckillProductMapper
-                .selectListBySkuIds(CollectionUtils.convertSet(products, SeckillActivityBaseVO.Product::getSkuId));
-        if (CollUtil.isEmpty(seckillProductDOS)) {
-            return;
-        }
-        List<SeckillActivityDO> seckillActivityDOS = seckillActivityMapper
-                .selectBatchIds(CollectionUtils.convertSet(seckillProductDOS, SeckillProductDO::getActivityId));
-        if (id != null) { // 排除自己这个活动
-            seckillActivityDOS.removeIf(item -> id.equals(item.getId()));
-        }
-        // 排除不满足 status 的活动
-        List<Integer> statuses = asList(PromotionActivityStatusEnum.WAIT.getStatus(), PromotionActivityStatusEnum.RUN.getStatus());
-        seckillActivityDOS.removeIf(item -> !statuses.contains(item.getStatus()));
-        // 如果非空，则说明冲突
-        if (CollUtil.isNotEmpty(seckillActivityDOS)) {
-            throw exception(SECKILL_ACTIVITY_SPU_CONFLICTS);
-        }
+        seckillProductMapper.updateTimeIdsByActivityId(updateReqVO.getId(), updateReqVO.getConfigIds());
     }
 
     @Override
@@ -189,8 +201,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         if (!statuses.contains(seckillActivity.getStatus())) {
             throw exception(SECKILL_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END);
         }
-        // 更新秒杀时段的秒杀活动数量
-        seckillTimeService.sekillActivityCountDecr(seckillActivity.getTimeIds());
+
         // 删除
         seckillActivityMapper.deleteById(id);
     }

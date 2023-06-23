@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.product.dal.mysql.comment;
 
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -25,19 +26,18 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
     }
 
     // TODO 芋艿：在看看这块
-    // TODO @puhui999：直接使用 scores 来算好评、中评、差评
     static void appendTabQuery(LambdaQueryWrapperX<ProductCommentDO> queryWrapper, Integer type) {
-        // 构建好评查询语句：好评计算 (商品评分星级+服务评分星级) >= 8
+        // 构建好评查询语句：好评计算 总评 >= 4
         if (ObjectUtil.equal(type, AppCommentPageReqVO.GOOD_COMMENT)) {
-            queryWrapper.apply("(scores + benefit_scores) >= 8");
+            queryWrapper.apply("scores >= 4");
         }
-        // 构建中评查询语句：中评计算 (商品评分星级+服务评分星级) > 4 且 (商品评分星级+服务评分星级) < 8
+        // 构建中评查询语句：中评计算 总评 >= 3 且 总评 < 4
         if (ObjectUtil.equal(type, AppCommentPageReqVO.MEDIOCRE_COMMENT)) {
-            queryWrapper.apply("(scores + benefit_scores) > 4 and (scores + benefit_scores) < 8");
+            queryWrapper.apply("scores >=3 and scores < 4");
         }
-        // 构建差评查询语句：差评计算 (商品评分星级+服务评分星级) <= 4
+        // 构建差评查询语句：差评计算 总评 < 3
         if (ObjectUtil.equal(type, AppCommentPageReqVO.NEGATIVE_COMMENT)) {
-            queryWrapper.apply("(scores + benefit_scores) <= 4");
+            queryWrapper.apply("scores < 3");
         }
     }
 
@@ -52,10 +52,10 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
         return selectPage(reqVO, queryWrapper);
     }
 
-    default ProductCommentDO selectByUserIdAndOrderIdAndSpuId(Long userId, Long orderId, Long spuId) {
+    default ProductCommentDO selectByUserIdAndOrderItemIdAndSpuId(Long userId, Long orderItemId, Long spuId) {
         return selectOne(new LambdaQueryWrapperX<ProductCommentDO>()
                 .eq(ProductCommentDO::getUserId, userId)
-                .eq(ProductCommentDO::getOrderId, orderId)
+                .eq(ProductCommentDO::getOrderItemId, orderItemId)
                 .eq(ProductCommentDO::getSpuId, spuId));
     }
 
@@ -66,6 +66,14 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
         // 构建评价查询语句
         appendTabQuery(queryWrapper, type);
         return selectCount(queryWrapper);
+    }
+
+    default PageResult<ProductCommentDO> selectCommentList(Long spuId, Integer count) {
+        // 构建分页查询条件
+        return selectPage(new PageParam().setPageSize(count), new LambdaQueryWrapperX<ProductCommentDO>()
+                .eqIfPresent(ProductCommentDO::getSpuId, spuId)
+                .orderByDesc(ProductCommentDO::getCreateTime)
+        );
     }
 
 }

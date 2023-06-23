@@ -10,10 +10,10 @@ import java.util.List;
 @Data
 public class AppSeckillActivityNowRespVO {
 
-    @Schema(description = "秒杀时间段", required = true)
+    @Schema(description = "秒杀时间段", requiredMode = Schema.RequiredMode.REQUIRED)
     private AppSeckillConfigRespVO config;
 
-    @Schema(description = "秒杀活动数组", required = true)
+    @Schema(description = "秒杀活动数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<AppSeckillActivityRespVO> activities;
 
 }
