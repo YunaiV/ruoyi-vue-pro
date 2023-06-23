@@ -31,7 +31,6 @@
         <module>yudao-spring-boot-starter-biz-sms</module>
 
         <module>yudao-spring-boot-starter-biz-pay</module>
-        <module>yudao-spring-boot-starter-biz-trade</module>
         <module>yudao-spring-boot-starter-biz-weixin</module>
         <module>yudao-spring-boot-starter-biz-social</module>
         <module>yudao-spring-boot-starter-biz-tenant</module>

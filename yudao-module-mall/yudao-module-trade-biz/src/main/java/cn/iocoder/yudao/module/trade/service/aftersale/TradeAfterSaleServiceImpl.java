@@ -5,8 +5,6 @@ import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.trade.core.dto.TradeAfterSaleLogCreateReqDTO;
-import cn.iocoder.yudao.framework.trade.core.service.AfterSaleLogService;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.TradeAfterSaleDisagreeReqVO;
@@ -26,6 +24,8 @@ import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
+import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto.TradeAfterSaleLogCreateReqDTO;
+import cn.iocoder.yudao.module.trade.framework.aftersalelog.core.service.AfterSaleLogService;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +40,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -394,7 +395,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
                 .setAfterSaleId(afterSale.getId())
                 .setOperateType(afterStatus.toString());
         // TODO 废弃，待删除
-        this.insert(logDTO);
+        this.createLog(logDTO);
     }
 
     /**
@@ -406,7 +407,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
      */
     @Override
     @Async
-    public void insert(TradeAfterSaleLogCreateReqDTO logDTO) {
+    public void createLog(TradeAfterSaleLogCreateReqDTO logDTO) {
         try {
             TradeAfterSaleLogDO afterSaleLog = new TradeAfterSaleLogDO()
                     .setUserId(logDTO.getUserId())
@@ -416,7 +417,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
                     .setContent(logDTO.getContent());
             tradeAfterSaleLogMapper.insert(afterSaleLog);
         }catch (Exception exception){
-            log.error("日志记录错误", exception);
+            log.error("[request({}) 日志记录错误]", toJsonString(logDTO), exception);
         }
     }
 }

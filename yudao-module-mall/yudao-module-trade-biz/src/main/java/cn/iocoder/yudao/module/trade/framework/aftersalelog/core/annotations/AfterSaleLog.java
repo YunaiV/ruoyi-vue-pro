@@ -1,4 +1,6 @@
-package cn.iocoder.yudao.framework.trade.core.annotations;
+package cn.iocoder.yudao.module.trade.framework.aftersalelog.core.annotations;
+
+import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleOperateTypeEnum;
 
 import java.lang.annotation.*;
 
@@ -8,7 +10,7 @@ import java.lang.annotation.*;
  * @author 陈賝
  * @since 2023/6/8 17:04
  */
-@Target({ElementType.METHOD,ElementType.TYPE})
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface AfterSaleLog {
@@ -18,11 +20,10 @@ public @interface AfterSaleLog {
      */
     String id();
 
-    // TODO @陈賝：是不是改成一个操作的枚举？
     /**
      * 操作类型
      */
-    String operateType() default "";
+    AfterSaleOperateTypeEnum operateType();
 
     /**
      * 日志内容

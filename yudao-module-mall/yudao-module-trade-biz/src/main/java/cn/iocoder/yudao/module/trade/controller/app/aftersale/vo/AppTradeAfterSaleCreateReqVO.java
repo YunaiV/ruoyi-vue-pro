@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.trade.controller.app.aftersale.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.framework.trade.core.enums.AfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleWayEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -31,14 +30,6 @@ public class AppTradeAfterSaleCreateReqVO {
     @Schema(description = "申请原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "申请原因不能为空")
     private String applyReason;
-
-    // TODO @陈賝：这个参数不应该有呀。
-    /**
-     * @see AfterSaleStatusEnum
-     */
-    @Schema(description = "操作类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "操作类型不能为空")
-    private String operateType;
 
     @Schema(description = "补充描述", example = "商品质量不好")
     private String applyDescription;

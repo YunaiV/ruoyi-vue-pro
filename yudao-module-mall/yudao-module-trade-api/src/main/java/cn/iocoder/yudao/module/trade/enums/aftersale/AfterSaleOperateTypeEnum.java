@@ -1,21 +1,22 @@
-package cn.iocoder.yudao.framework.trade.core.enums;
+package cn.iocoder.yudao.module.trade.enums.aftersale;
 
 /**
- * 售后状态的枚举
+ * 售后操作类型的枚举
  *
  * @author 陈賝
  * @since 2023/6/13 13:53
  */
-public enum AfterSaleStatusEnum {
+public enum AfterSaleOperateTypeEnum {
 
     /**
-     * 申请中
+     * 用户申请
      */
-    APPLY("申请中");
+    APPLY("用户申请"),
+    ;
 
     private final String description;
 
-    AfterSaleStatusEnum(String description) {
+    AfterSaleOperateTypeEnum(String description) {
         this.description = description;
     }
 
