@@ -71,7 +71,7 @@ public class TradeOrderBaseVO {
     private String payChannelCode;
 
     @Schema(description = "商品原价（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
-    private Integer originalPrice;
+    private Integer totalPrice;
 
     @Schema(description = "订单优惠（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer discountPrice;

@@ -33,6 +33,7 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .eqIfPresent(TradeOrderDO::getType, reqVO.getType())
                 .eqIfPresent(TradeOrderDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(TradeOrderDO::getPayChannelCode, reqVO.getPayChannelCode())
+                .eqIfPresent(TradeOrderDO::getTerminal,reqVO.getTerminal())  //add by 矿泉水 20230615
                 .betweenIfPresent(TradeOrderDO::getCreateTime, reqVO.getCreateTime()));
     }
 
