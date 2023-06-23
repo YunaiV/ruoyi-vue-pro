@@ -447,6 +447,25 @@ CREATE TABLE `trade_delivery_express` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB COMMENT='快递公司';
 
+-- ----------------------------
+-- 页面装修表结构
+-- ----------------------------
+DROP TABLE IF EXISTS `promotion_page_decorate`;
+CREATE TABLE `promotion_page_decorate` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+   `type` int  NOT NULL COMMENT '页面类型',
+   `component_code` varchar(64)  NOT NULL COMMENT '组件编码',
+   `component_value` json NOT NULL  COMMENT '组件值：json 格式。包含配置和数据',
+   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态',
+   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+   PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB COMMENT='页面装修';
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 BEGIN;

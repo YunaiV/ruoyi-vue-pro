@@ -14,6 +14,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +67,18 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, clazz);
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T parseObject(String text, Type type) {
+        if (StrUtil.isEmpty(text)) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(text, objectMapper.getTypeFactory().constructType(type));
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
