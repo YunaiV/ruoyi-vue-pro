@@ -448,10 +448,10 @@ CREATE TABLE `trade_delivery_express` (
 ) ENGINE=InnoDB COMMENT='快递公司';
 
 -- ----------------------------
--- 页面装修表结构
+-- 页面装修表
 -- ----------------------------
-DROP TABLE IF EXISTS `promotion_page_decorate`;
-CREATE TABLE `promotion_page_decorate` (
+DROP TABLE IF EXISTS `promotion_decorate_component`;
+CREATE TABLE `promotion_decorate_component` (
    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
    `type` int  NOT NULL COMMENT '页面类型',
    `component_code` varchar(64)  NOT NULL COMMENT '组件编码',
@@ -464,7 +464,7 @@ CREATE TABLE `promotion_page_decorate` (
    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
    PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB COMMENT='页面装修';
+) ENGINE=InnoDB COMMENT='页面装修表';
 
 SET FOREIGN_KEY_CHECKS = 1;
 

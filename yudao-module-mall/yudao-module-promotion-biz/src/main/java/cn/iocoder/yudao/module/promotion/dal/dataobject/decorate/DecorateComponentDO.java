@@ -3,20 +3,20 @@ package cn.iocoder.yudao.module.promotion.dal.dataobject.decorate;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.promotion.enums.decorate.DecoratePageTypeEnum;
-import cn.iocoder.yudao.module.promotion.enums.decorate.PageComponentEnum;
+import cn.iocoder.yudao.module.promotion.enums.decorate.DecorateComponentEnum;
 import com.baomidou.mybatisplus.annotation.*;
 
 import lombok.Data;
 
 /**
- * 页面装修 DO
+ * 页面装修组件 DO, 一个页面由多个组件构成
  *
  * @author jason
  */
-@TableName(value ="promotion_page_decorate")
-@KeySequence("promotion_page_decorate_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value ="promotion_decorate_component")
+@KeySequence("promotion_decorate_component_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-public class PageDecorateDO extends BaseDO {
+public class DecorateComponentDO extends BaseDO {
     /**
      * 编号
      */
@@ -31,7 +31,7 @@ public class PageDecorateDO extends BaseDO {
 
     /**
      *  组件编码
-     *  枚举 {@link PageComponentEnum#getCode()}
+     *  枚举 {@link DecorateComponentEnum#getCode()}
      */
     private String componentCode;
 
