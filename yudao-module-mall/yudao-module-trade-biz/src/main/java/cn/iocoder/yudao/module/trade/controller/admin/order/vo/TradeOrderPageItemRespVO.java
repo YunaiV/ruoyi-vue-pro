@@ -19,6 +19,7 @@ public class TradeOrderPageItemRespVO extends TradeOrderBaseVO {
      */
     private List<Item> items;
 
+    // TODO @xiaobai：使用 MemberUserRespVO 返回哈；DTO 不直接给前端
     /**
      * 用户信息
      */

@@ -56,9 +56,8 @@ public class TradeOrderController {
             return success(PageResult.empty());
         }
 
-        //查询用户信息 mod by 矿泉水 20230614 begin
-        Map<Long, MemberUserRespDTO> userRespVOMap = memberUserApi.getUserMap(convertSet(pageResult.getList(),TradeOrderDO::getUserId));;
-        // end
+        // 查询用户信息
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(pageResult.getList(), TradeOrderDO::getUserId));;
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderService.getOrderItemListByOrderId(
                 convertSet(pageResult.getList(), TradeOrderDO::getId));
@@ -66,7 +65,7 @@ public class TradeOrderController {
         List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
                 .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
         // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, propertyValueDetails, userRespVOMap));
+        return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, propertyValueDetails, userMap));
     }
 
     @GetMapping("/get-detail")

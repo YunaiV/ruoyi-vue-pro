@@ -119,15 +119,6 @@ public interface TradeOrderConvert {
     }
 
     // TODO 芋艿：可简化
-
-    /**
-     *
-     * @param pageResult
-     * @param orderItems
-     * @param propertyValueDetails
-     * @param memberUserRespDTOMap 新增参数会员DTO
-     * @return
-     */
     default PageResult<TradeOrderPageItemRespVO> convertPage(PageResult<TradeOrderDO> pageResult, List<TradeOrderItemDO> orderItems,
                                                              List<ProductPropertyValueDetailRespDTO> propertyValueDetails,
                                                              Map<Long,MemberUserRespDTO> memberUserRespDTOMap) {
@@ -158,10 +149,8 @@ public interface TradeOrderConvert {
             }
             // 处理收货地址
             orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
-
             // 增加用户昵称
             orderVO.setUser(memberUserRespDTOMap.get(orderVO.getUserId()));
-
             return orderVO;
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());
