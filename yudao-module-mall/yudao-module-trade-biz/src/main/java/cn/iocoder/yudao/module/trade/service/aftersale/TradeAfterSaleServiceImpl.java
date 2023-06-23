@@ -398,6 +398,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
         this.createLog(logDTO);
     }
 
+    // TODO @CHENCHEN：这个注释，写在接口就好了，补充重复写哈；@date 应该是 @since
     /**
      * 日志记录
      *
@@ -416,8 +417,9 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
                     .setOperateType(logDTO.getOperateType())
                     .setContent(logDTO.getContent());
             tradeAfterSaleLogMapper.insert(afterSaleLog);
+       // TODO @CHENCHEN：代码排版哈；空格要正确
         }catch (Exception exception){
-            log.error("[request({}) 日志记录错误]", toJsonString(logDTO), exception);
+            log.error("[createLog][request({}) 日志记录错误]", toJsonString(logDTO), exception);
         }
     }
 }

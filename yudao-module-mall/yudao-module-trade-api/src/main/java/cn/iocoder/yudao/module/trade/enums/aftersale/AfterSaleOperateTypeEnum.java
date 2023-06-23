@@ -6,6 +6,7 @@ package cn.iocoder.yudao.module.trade.enums.aftersale;
  * @author 陈賝
  * @since 2023/6/13 13:53
  */
+// TODO @chenchen：可以 lombok 简化构造方法，和 get 方法
 public enum AfterSaleOperateTypeEnum {
 
     /**

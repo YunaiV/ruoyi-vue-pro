@@ -2,9 +2,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.aftersale;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleOperateTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -51,8 +49,11 @@ public class TradeAfterSaleLogDO extends BaseDO {
      * 关联 {@link TradeAfterSaleDO#getId()}
      */
     private Long afterSaleId;
+    // todo @CHENCHEN: 改成 Integer 哈；主要未来改文案，不好洗 log 存的字段；
     /**
-     * 操作类型 {@link TradeAfterSaleStatusEnum}
+     * 操作类型
+     *
+     * 枚举 {@link AfterSaleOperateTypeEnum}
      */
     private String operateType;
     /**

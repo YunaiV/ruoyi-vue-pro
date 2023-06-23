@@ -97,6 +97,7 @@ public class SpringExpressionUtils {
      * @author 陈賝
      * @since 2023/6/18 11:20
      */
+    // TODO @chenchen: 这个方法，和 parseExpressions 比较接近，是不是可以合并下；
     public static Map<String, Object> parseExpression(JoinPoint joinPoint, Object info, List<String> expressionStrings) {
         // 如果为空，则不进行解析
         if (CollUtil.isEmpty(expressionStrings)) {
@@ -115,7 +116,7 @@ public class SpringExpressionUtils {
             //获取方法参数值
             Object[] args = joinPoint.getArgs();
             for (int i = 0; i < args.length; i++) {
-                //替换spel里的变量值为实际值， 比如 #user -->  user对象
+                // 替换 SP EL 里的变量值为实际值， 比如 #user --> user对象
                 context.setVariable(parameterNames[i], args[i]);
             }
             context.setVariable("info", info);

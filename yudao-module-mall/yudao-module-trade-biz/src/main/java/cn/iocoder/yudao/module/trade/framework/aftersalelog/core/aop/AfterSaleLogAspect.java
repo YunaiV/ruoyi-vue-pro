@@ -30,9 +30,11 @@ import static java.util.Arrays.asList;
 @Slf4j
 @Aspect
 public class AfterSaleLogAspect {
-    @Resource
-    private AfterSaleLogService saleLogService;
 
+    @Resource
+    private AfterSaleLogService afterSaleLogService;
+
+    // TODO chenchen: 这个分 3 行把；
     private final static String OPERATE_TYPE = "operateType", ID = "id", CONTENT = "content";
 
     /**
@@ -52,9 +54,9 @@ public class AfterSaleLogAspect {
                     .setOperateType(MapUtil.getStr(formatObj, OPERATE_TYPE))
                     .setContent(MapUtil.getStr(formatObj, CONTENT));
             // 异步存入数据库
-            saleLogService.createLog(dto);
+            afterSaleLogService.createLog(dto);
         } catch (Exception exception) {
-            log.error("[afterSaleLog({}) 日志记录错误]", toJsonString(afterSaleLog), exception);
+            log.error("[doAfterReturning][afterSaleLog({}) 日志记录错误]", toJsonString(afterSaleLog), exception);
         }
     }
 
@@ -67,6 +69,7 @@ public class AfterSaleLogAspect {
         HashMap<String, String> result = Maps.newHashMapWithExpectedSize(2);
         Map<String, Object> spelMap = SpringExpressionUtils.parseExpression(joinPoint, info,
                 asList(afterSaleLogPoint.id(), afterSaleLogPoint.content()));
+        // TODO @chenchen：是不是抽成 3 个方法好点；毕竟 map 太抽象了；；
         // 售后ID
         String id = MapUtil.getStr(spelMap, afterSaleLogPoint.id());
         result.put(ID, id);

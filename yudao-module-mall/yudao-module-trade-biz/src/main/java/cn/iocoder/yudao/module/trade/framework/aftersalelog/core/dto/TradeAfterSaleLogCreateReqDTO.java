@@ -21,7 +21,7 @@ public class TradeAfterSaleLogCreateReqDTO {
     private Long id;
     /**
      * 用户编号
-     * <p>
+     *
      * 关联 1：AdminUserDO 的 id 字段
      * 关联 2：MemberUserDO 的 id 字段
      */
