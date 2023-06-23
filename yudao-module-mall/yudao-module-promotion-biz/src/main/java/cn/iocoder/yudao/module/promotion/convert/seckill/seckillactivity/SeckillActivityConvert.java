@@ -69,7 +69,6 @@ public interface SeckillActivityConvert {
                 && ObjectUtil.equals(productDO.getSeckillPrice(), productVO.getSeckillPrice());
         //&& ObjectUtil.equals(productDO.getQuota(), productVO.getQuota())
         //&& ObjectUtil.equals(productDO.getLimitCount(), productVO.getLimitCount());
-
     }
 
     default List<SeckillProductDO> convertList(SeckillActivityDO seckillActivity, List<SeckillProductCreateReqVO> products) {

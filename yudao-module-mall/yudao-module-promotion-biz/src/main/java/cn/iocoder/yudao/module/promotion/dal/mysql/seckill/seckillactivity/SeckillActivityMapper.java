@@ -17,6 +17,7 @@ import java.util.List;
  */
 @Mapper
 public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
+
     default PageResult<SeckillActivityDO> selectPage(SeckillActivityPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SeckillActivityDO>()
                 .likeIfPresent(SeckillActivityDO::getName, reqVO.getName())
@@ -30,4 +31,5 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
         return selectList(new LambdaQueryWrapperX<SeckillActivityDO>()
                 .eqIfPresent(SeckillActivityDO::getStatus, status));
     }
+
 }

@@ -149,13 +149,15 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Override
     public List<AppProductCommentRespVO> getCommentList(Long spuId, Integer count) {
         // 校验商品 spu 是否存在
+        // TODO @puhui 这里校验可以去掉哈。
         ProductSpuDO spuDO = validateSpu(spuId);
-
         return ProductCommentConvert.INSTANCE.convertList02(productCommentMapper.selectCommentList(spuDO.getId(), count).getList());
     }
 
+    // TODO @puhui 可以放到 controller 去 convert 哈
     @Override
     public PageResult<AppProductCommentRespVO> getCommentPage(AppCommentPageReqVO pageVO, Boolean visible) {
+        // TODO @puhui 可以放到 controller 去 convert 哈
         return ProductCommentConvert.INSTANCE.convertPage02(
                 productCommentMapper.selectPage(pageVO, visible));
     }

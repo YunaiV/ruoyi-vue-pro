@@ -38,13 +38,14 @@ public class SeckillConfigDO extends BaseDO {
      * 结束时间点
      */
     private String endTime;
+    // TODO puhui999：应该是轮播图；    private List<String> sliderPicUrls;
     /**
      * 秒杀主图
      */
     private String picUrl;
     /**
-     * 状态 开启：0 禁用：1
-     * <p>
+     * 状态
+     *
      * 枚举 {@link CommonStatusEnum 对应的类}
      */
     private Integer status;

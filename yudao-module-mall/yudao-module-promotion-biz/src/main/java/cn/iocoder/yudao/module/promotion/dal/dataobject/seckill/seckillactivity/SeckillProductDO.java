@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillconfig.SeckillConfigDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -34,10 +35,14 @@ public class SeckillProductDO extends BaseDO {
     private Long id;
     /**
      * 秒杀活动 id
+     *
+     * 关联 {@link SeckillActivityDO#getId()}
      */
     private Long activityId;
     /**
      * 秒杀时段 id
+     *
+     * 关联 {@link SeckillConfigDO#getId()}
      */
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> configIds;
@@ -57,8 +62,10 @@ public class SeckillProductDO extends BaseDO {
      * 秒杀库存
      */
     private Integer stock;
+
     /**
      * 秒杀商品状态
+     *
      * 枚举 {@link CommonStatusEnum 对应的类}
      */
     private Integer activityStatus;

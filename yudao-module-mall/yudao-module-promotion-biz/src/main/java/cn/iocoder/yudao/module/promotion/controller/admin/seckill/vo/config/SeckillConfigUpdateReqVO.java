@@ -7,11 +7,6 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
-/**
- * 管理后台 - 秒杀时段更新 Request VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 秒杀时段更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

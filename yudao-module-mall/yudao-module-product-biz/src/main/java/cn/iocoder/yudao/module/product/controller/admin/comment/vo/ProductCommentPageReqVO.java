@@ -35,6 +35,7 @@ public class ProductCommentPageReqVO extends PageParam {
     @InEnum(ProductCommentScoresEnum.class)
     private Integer scores;
 
+    // TODO @puhui999：replyStatus 哈
     @Schema(description = "商家是否回复", example = "true")
     private Boolean replied;
 

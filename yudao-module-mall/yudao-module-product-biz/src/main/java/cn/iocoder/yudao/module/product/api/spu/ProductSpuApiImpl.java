@@ -28,7 +28,6 @@ public class ProductSpuApiImpl implements ProductSpuApi {
 
     @Override
     public List<ProductSpuRespDTO> getSpuList(Collection<Long> spuIds) {
-        // TODO 需不需要判断集合中是否有 null 值
         if (CollectionUtil.isEmpty(spuIds)) {
             return Collections.emptyList();
         }

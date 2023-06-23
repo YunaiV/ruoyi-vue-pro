@@ -7,11 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
-/**
- * 管理后台 - 秒杀时段配置精简信息 Response VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 秒杀时段配置精简信息 Response VO")
 @Data
 @NoArgsConstructor

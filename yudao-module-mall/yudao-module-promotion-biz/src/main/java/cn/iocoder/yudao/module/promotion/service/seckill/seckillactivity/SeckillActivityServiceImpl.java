@@ -65,22 +65,24 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         validateProductSkuExistence(createReqVO.getSpuIds(), createReqVO.getProducts());
 
         // 插入秒杀活动
-        SeckillActivityDO seckillActivity = SeckillActivityConvert.INSTANCE.convert(createReqVO)
+        SeckillActivityDO activity = SeckillActivityConvert.INSTANCE.convert(createReqVO)
                 .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()));
-        seckillActivityMapper.insert(seckillActivity);
+        seckillActivityMapper.insert(activity);
         // 插入商品
-        List<SeckillProductDO> productDOs = SeckillActivityConvert.INSTANCE.convertList(seckillActivity, createReqVO.getProducts());
-        seckillProductMapper.insertBatch(productDOs);
-        return seckillActivity.getId();
+        List<SeckillProductDO> product = SeckillActivityConvert.INSTANCE.convertList(activity, createReqVO.getProducts());
+        seckillProductMapper.insertBatch(product);
+        return activity.getId();
     }
 
     private <T extends SeckillProductBaseVO> void validateProductSkuExistence(List<Long> spuIds, List<T> products) {
-        Set<Long> convertedSpuIds = CollectionUtils.convertSet(products, T::getSpuId);
         // 校验 spu 个数是否相等
+        // TODO @puhui999：不用校验 SPU 哈，只校验 sku 对应的 spuId 是否一致；
+        Set<Long> convertedSpuIds = CollectionUtils.convertSet(products, T::getSpuId);
         if (ObjectUtil.notEqual(spuIds.size(), convertedSpuIds.size())) {
             throw exception(SKU_NOT_EXISTS);
         }
         // 获取所选 spu下的所有 sku
+        // TODO @puhui999：变量可以简单一点；skus
         List<ProductSkuRespDTO> skuRespDTOs = productSkuApi.getSkuListBySpuId(spuIds);
         // 校验 sku 个数是否一致
         Set<Long> skuIdsSet = CollectionUtils.convertSet(products, T::getSkuId);
@@ -153,6 +155,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
      * @param updateReqVO 更新的请求VO
      */
     private void updateSeckillProduct(SeckillActivityUpdateReqVO updateReqVO) {
+        // TODO puhui999：要不这里简单一点；删除原本的，插入新增的；不做的这么细致
         // TODO puhui999：后续完善
         //List<SeckillProductDO> seckillProductDOs = seckillProductMapper.selectListByActivityId(updateReqVO.getId());
         //List<SeckillProductUpdateReqVO> products = updateReqVO.getProducts();

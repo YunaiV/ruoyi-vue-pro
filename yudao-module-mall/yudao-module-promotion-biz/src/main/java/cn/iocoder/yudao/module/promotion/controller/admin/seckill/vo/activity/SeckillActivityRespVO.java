@@ -28,5 +28,4 @@ public class SeckillActivityRespVO extends SeckillActivityBaseVO {
     @Schema(description = "活动状态 开启：0 禁用：1", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status;
 
-
 }

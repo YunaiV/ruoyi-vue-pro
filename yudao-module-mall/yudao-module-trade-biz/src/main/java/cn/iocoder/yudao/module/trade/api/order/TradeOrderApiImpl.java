@@ -29,7 +29,6 @@ public class TradeOrderApiImpl implements TradeOrderApi {
         if (item == null) {
             throw exception(ORDER_ITEM_NOT_FOUND);
         }
-
         return item.getOrderId();
     }
 

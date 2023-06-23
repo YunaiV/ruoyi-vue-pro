@@ -56,19 +56,20 @@ public class AppProductCommentController {
     public CommonResult<List<AppProductCommentRespVO>> getCommentList(@RequestParam("spuId") Long spuId,
                                                                       @RequestParam(value = "count", defaultValue = "10") Integer count) {
         return success(productCommentService.getCommentList(spuId, count));
-
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得商品评价分页")
     public CommonResult<PageResult<AppProductCommentRespVO>> getCommentPage(@Valid AppCommentPageReqVO pageVO) {
         PageResult<AppProductCommentRespVO> page = productCommentService.getCommentPage(pageVO, Boolean.TRUE);
+        // TODO @puhui CollUtils 有简化 convertmap 和 list 的方法
         Set<Long> skuIds = page.getList().stream().map(AppProductCommentRespVO::getSkuId).collect(Collectors.toSet());
         List<ProductSkuDO> skuList = productSkuService.getSkuList(skuIds);
         Map<Long, ProductSkuDO> skuDOMap = new HashMap<>(skuIds.size());
         if (CollUtil.isNotEmpty(skuList)) {
             skuDOMap.putAll(skuList.stream().collect(Collectors.toMap(ProductSkuDO::getId, c -> c)));
         }
+        // TODO @puihui999：下面也可以放到 convert 里哈
         page.getList().forEach(item -> {
             // 判断用户是否选择匿名
             if (ObjectUtil.equal(item.getAnonymous(), true)) {
@@ -83,6 +84,7 @@ public class AppProductCommentController {
         return success(page);
     }
 
+    // TODO 芋艿：需要搞下
     @GetMapping("/getCommentStatistics")
     @Operation(summary = "获得商品的评价统计")
     public CommonResult<AppCommentStatisticsRespVO> getCommentStatistics(@Valid @RequestParam("spuId") Long spuId) {

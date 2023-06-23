@@ -7,11 +7,6 @@ import lombok.ToString;
 
 import java.util.List;
 
-/**
- * 管理后台 - 秒杀活动的详细 Response VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 秒杀活动的详细 Response VO")
 @Data
 @ToString(callSuper = true)

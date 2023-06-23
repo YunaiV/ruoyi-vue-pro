@@ -25,7 +25,6 @@ public interface ProductCommentMapper extends BaseMapperX<ProductCommentDO> {
                 .orderByDesc(ProductCommentDO::getId));
     }
 
-    // TODO 芋艿：在看看这块
     static void appendTabQuery(LambdaQueryWrapperX<ProductCommentDO> queryWrapper, Integer type) {
         // 构建好评查询语句：好评计算 总评 >= 4
         if (ObjectUtil.equal(type, AppCommentPageReqVO.GOOD_COMMENT)) {

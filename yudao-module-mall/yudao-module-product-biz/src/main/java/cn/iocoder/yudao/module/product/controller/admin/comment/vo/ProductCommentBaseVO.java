@@ -26,6 +26,7 @@ public class ProductCommentBaseVO {
     @NotNull(message = "评价人头像不能为空")
     private String userAvatar;
 
+    // TODO @puhui：spuId、spuName 是不是只有 ProductCommentRespVO 有呀。
     @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "清凉丝滑透气小短袖")
     @NotNull(message = "商品 SPU 编号不能为空")
     private Long spuId;
@@ -54,7 +55,7 @@ public class ProductCommentBaseVO {
     @NotNull(message = "评论内容不能为空")
     private String content;
 
-    @Schema(description = "评论图片地址数组，以逗号分隔最多上传 9 张", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
+    @Schema(description = "评论图片地址数组，以逗号分隔最多上传 9 张", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn/xx.png]")
     @Size(max = 9, message = "评论图片地址数组长度不能超过 9 张")
     private List<String> picUrls;
 

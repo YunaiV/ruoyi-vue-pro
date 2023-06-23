@@ -1,22 +1,13 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity;
 
-import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.SeckillProductUpdateReqVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
-/**
- * 管理后台 - 秒杀活动更新 Request VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 秒杀活动更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -28,6 +19,5 @@ public class SeckillActivityUpdateReqVO extends SeckillActivityBaseVO {
 
     @Schema(description = "秒杀商品", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<SeckillProductUpdateReqVO> products;
-
 
 }

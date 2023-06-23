@@ -4,14 +4,11 @@ import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProdu
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
  * 用户 App - 商品评价详情 Response VO
@@ -54,7 +51,6 @@ public class AppProductCommentRespVO {
     private String replyContent;
 
     @Schema(description = "商家回复时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime replyTime;
 
     @Schema(description = "追加评价内容", example = "穿了很久都很丝滑诶")
@@ -64,23 +60,21 @@ public class AppProductCommentRespVO {
     private List<String> additionalPicUrls;
 
     @Schema(description = "追加评价时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime additionalTime;
 
     @Schema(description = "创建时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime createTime;
 
-    @Schema(description = "商品SPU编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "91192")
-    @NotNull(message = "商品SPU编号不能为空")
+    @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "91192")
+    @NotNull(message = "商品 SPU 编号不能为空")
     private Long spuId;
 
-    @Schema(description = "商品SPU名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "清凉丝滑小短袖")
-    @NotNull(message = "商品SPU名称不能为空")
+    @Schema(description = "商品 SPU 名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "清凉丝滑小短袖")
+    @NotNull(message = "商品 SPU 名称不能为空")
     private String spuName;
 
-    @Schema(description = "商品SKU编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "81192")
-    @NotNull(message = "商品SKU编号不能为空")
+    @Schema(description = "商品 SKU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "81192")
+    @NotNull(message = "商品 SKU 编号不能为空")
     private Long skuId;
 
     @Schema(description = "商品 SKU 属性", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -102,7 +96,7 @@ public class AppProductCommentRespVO {
     @NotNull(message = "评论内容不能为空")
     private String content;
 
-    @Schema(description = "评论图片地址数组，以逗号分隔最多上传 9 张", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
+    @Schema(description = "评论图片地址数组，以逗号分隔最多上传 9 张", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn/xx.png]")
     @Size(max = 9, message = "评论图片地址数组长度不能超过 9 张")
     private List<String> picUrls;
 

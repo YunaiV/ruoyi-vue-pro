@@ -7,7 +7,7 @@ import lombok.ToString;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@Schema(description = "管理后台 - 商品评价可见修改 Request VO")
+@Schema(description = "管理后台 - 商品评价的商家回复 Request VO")
 @Data
 @ToString(callSuper = true)
 public class ProductCommentReplyReqVO {

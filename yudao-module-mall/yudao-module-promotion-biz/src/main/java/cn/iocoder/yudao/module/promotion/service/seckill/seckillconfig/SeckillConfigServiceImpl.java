@@ -82,6 +82,7 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
     private void validateSeckillConfigConflict(String startTime, String endTime) {
         LocalTime startTime1 = LocalTime.parse(startTime);
         LocalTime endTime1 = LocalTime.parse(endTime);
+        // TODO @puhui999： 这个可以用 validator 里的 assertTrue 去做哈；
         // 检查选择的时间是否相等
         if (startTime1.equals(endTime1)) {
             throw exception(SECKILL_TIME_EQUAL);
@@ -93,11 +94,13 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         // 查询出所有的时段配置
         List<SeckillConfigDO> configDOs = seckillConfigMapper.selectList();
         // 过滤出重叠的时段 ids
+        // TODO @puhui999：感觉 findOne 就可以了？
         Set<Long> ids = configDOs.stream().filter((config) -> {
             LocalTime startTime2 = LocalTime.parse(config.getStartTime());
             LocalTime endTime2 = LocalTime.parse(config.getEndTime());
             // 判断时间是否重叠
             // 开始时间在已配置时段的结束时间之前 且 结束时间在已配置时段的开始时间之后 []
+            // todo @puhui999：LocalDateUtils 可以写个工具类？是否是有重叠的时间？感觉别的场景，可能也会有需要
             return startTime1.isBefore(endTime2) && endTime1.isAfter(startTime2)
                     // 开始时间在已配置时段的开始时间之前 且 结束时间在已配置时段的开始时间之后 (] 或 ()
                     || startTime1.isBefore(startTime2) && endTime1.isAfter(startTime2)
@@ -127,6 +130,7 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         if (seckillConfigMapper.selectBatchIds(configIds).size() != configIds.size()) {
             throw exception(SECKILL_TIME_NOT_EXISTS);
         }
+        // TODO @puhui999：应该要校验个 status 哈；如果有禁用的，也不行
     }
 
     @Override
@@ -134,11 +138,13 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
         return seckillConfigMapper.selectPage(pageVO);
     }
 
+    // TODO  @puhui999:写个查询状态的; 尽可能通用哈
     @Override
     public List<SeckillConfigDO> getListAllSimple() {
         return seckillConfigMapper.selectList(SeckillConfigDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
     }
 
+    // TODO  @puhui999: 这个要不合并到更新操作里? 不单独有个操作咧;
     @Override
     public void updateSeckillConfigStatus(Long id, Integer status) {
         // 校验秒杀时段是否存在

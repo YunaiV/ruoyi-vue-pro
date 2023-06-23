@@ -140,6 +140,7 @@ public class AppTradeOrderController {
     @PostMapping("/item/create-comment")
     @Operation(summary = "创建交易订单项的评价")
     public CommonResult<Long> createOrderItemComment(@RequestBody AppTradeOrderItemCommentCreateReqVO createReqVO) {
+        // TODO @puhui999：这个逻辑，最好写到 service 哈；
         Long loginUserId = getLoginUserId();
         // 先通过订单项 ID 查询订单项是否存在
         TradeOrderItemDO orderItemDO = tradeOrderService.getOrderItemByIdAndUserId(createReqVO.getOrderItemId(), loginUserId);
@@ -151,6 +152,7 @@ public class AppTradeOrderController {
         if (orderDO == null) {
             throw exception(ORDER_NOT_FOUND);
         }
+        // TODO @puhui999：要校验订单已完成，但是未评价；
 
         ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItemDO);
         return success(productCommentApi.createComment(productCommentCreateReqDTO));

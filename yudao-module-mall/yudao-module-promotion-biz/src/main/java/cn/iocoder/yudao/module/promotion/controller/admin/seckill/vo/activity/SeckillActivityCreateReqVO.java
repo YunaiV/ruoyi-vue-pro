@@ -9,11 +9,6 @@ import lombok.ToString;
 
 import java.util.List;
 
-/**
- * 管理后台 - 秒杀活动创建 Request VO
- *
- * @author HUIHUI
- */
 @Schema(description = "管理后台 - 秒杀活动创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

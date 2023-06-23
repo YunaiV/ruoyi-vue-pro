@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+// TODO @puhui：VO 上不写注释，已经有注解啦。
 /**
  * 管理后台 - 秒杀时段分页 Request VO
  *
