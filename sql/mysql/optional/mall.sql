@@ -453,9 +453,9 @@ CREATE TABLE `trade_delivery_express` (
 DROP TABLE IF EXISTS `promotion_decorate_component`;
 CREATE TABLE `promotion_decorate_component` (
    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-   `type` int  NOT NULL COMMENT '页面类型',
-   `component_code` varchar(64)  NOT NULL COMMENT '组件编码',
-   `component_value` json NOT NULL  COMMENT '组件值：json 格式。包含配置和数据',
+   `page_id` int  NOT NULL COMMENT '所属页面id',
+   `code` varchar(64)  NOT NULL COMMENT '组件编码',
+   `value` json NOT NULL  COMMENT '组件值：json 格式。包含配置和数据',
    `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态',
    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

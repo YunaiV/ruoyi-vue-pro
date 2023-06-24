@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.promotion.dal.dataobject.decorate;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.promotion.enums.decorate.DecoratePageTypeEnum;
+import cn.iocoder.yudao.module.promotion.enums.decorate.DecoratePageEnum;
 import cn.iocoder.yudao.module.promotion.enums.decorate.DecorateComponentEnum;
 import com.baomidou.mybatisplus.annotation.*;
 
@@ -24,23 +24,22 @@ public class DecorateComponentDO extends BaseDO {
     @TableId
     private Long id;
 
-    // TODO @jason：要不改成 page？貌似更合理；
     /**
-     * 页面类型
-     * 枚举 {@link DecoratePageTypeEnum#getType()}
+     * 所属页面 id
+     * 枚举 {@link DecoratePageEnum#getId()}
      */
-    private Integer type;
+    private Integer pageId;
 
-    // TODO @jason：code、value，因为在 component
     /**
      *  组件编码
      *  枚举 {@link DecorateComponentEnum#getCode()}
      */
-    private String componentCode;
+    private String code;
+
     /**
      * 组件值：json 格式。包含配置和数据
      */
-    private String componentValue;
+    private String value;
 
     /**
      * 状态

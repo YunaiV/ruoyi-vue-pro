@@ -18,23 +18,23 @@ public interface DecorateComponentConvert {
 
     DecorateComponentConvert INSTANCE = Mappers.getMapper(DecorateComponentConvert.class);
 
-    default List<DecorateComponentDO> convertList(Integer type, List<DecorateComponentReqVO.ComponentReqVO> components) {
-        return CollectionUtils.convertList(components, c -> convert(type, c));
+    default List<DecorateComponentDO> convertList(Integer pageId, List<DecorateComponentReqVO.ComponentReqVO> components) {
+        return CollectionUtils.convertList(components, c -> convert(pageId, c));
     }
 
-    default DecorateComponentRespVO convert2(Integer type, List<DecorateComponentDO> list) {
+    default DecorateComponentRespVO convert2(Integer pageId, List<DecorateComponentDO> list) {
         List<ComponentRespVO> components = CollectionUtils.convertList(list, this::convert3);
-        return new DecorateComponentRespVO().setType(type).setComponents(components);
+        return new DecorateComponentRespVO().setPageId(pageId).setComponents(components);
     }
 
-    DecorateComponentDO convert(Integer type, DecorateComponentReqVO.ComponentReqVO reqVO);
+    DecorateComponentDO convert(Integer pageId, DecorateComponentReqVO.ComponentReqVO reqVO);
 
     ComponentRespVO convert3(DecorateComponentDO componentDO);
 
     // ========== App convert ==========
-    default AppDecorateComponentRespVO appConvert(Integer type, List<DecorateComponentDO> list) {
+    default AppDecorateComponentRespVO appConvert(Integer pageId, List<DecorateComponentDO> list) {
         List<AppComponentRespVO> components = CollectionUtils.convertList(list, this::appConvert2);
-        return new AppDecorateComponentRespVO().setType(type).setComponents(components);
+        return new AppDecorateComponentRespVO().setPageId(pageId).setComponents(components);
     }
 
     AppComponentRespVO appConvert2(DecorateComponentDO bean);

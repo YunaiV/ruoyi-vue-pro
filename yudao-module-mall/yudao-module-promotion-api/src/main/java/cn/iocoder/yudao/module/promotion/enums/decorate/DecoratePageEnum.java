@@ -7,22 +7,22 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * 装修页面类型枚举
+ * 装修页面枚举
  *
  * @author jason
  */
 @AllArgsConstructor
 @Getter
-public enum DecoratePageTypeEnum implements IntArrayValuable {
+public enum DecoratePageEnum implements IntArrayValuable {
 
     INDEX(1, "首页");
 
-    private static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DecoratePageTypeEnum::getType).toArray();
+    private static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DecoratePageEnum::getId).toArray();
 
     /**
-     * 页面类型
+     * 页面 id
      */
-    private final Integer type;
+    private final Integer id;
     /**
      * 页面名称
      */

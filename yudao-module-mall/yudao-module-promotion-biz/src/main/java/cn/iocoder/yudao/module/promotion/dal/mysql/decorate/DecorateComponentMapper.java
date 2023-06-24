@@ -9,8 +9,8 @@ import java.util.List;
 @Mapper
 public interface DecorateComponentMapper extends BaseMapperX<DecorateComponentDO> {
 
-    default List<DecorateComponentDO> selectByPageType(Integer type){
-        return selectList(DecorateComponentDO::getType, type);
+    default List<DecorateComponentDO> selectByPage(Integer pageId){
+        return selectList(DecorateComponentDO::getPageId, pageId);
     }
 
 }

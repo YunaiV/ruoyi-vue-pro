@@ -29,9 +29,9 @@ public class DecorateComponentServiceImpl implements DecorateComponentService {
     @Override
     public void pageSave(DecorateComponentReqVO reqVO) {
         // 1.新增或修改页面组件
-        List<DecorateComponentDO> oldList = decorateComponentMapper.selectByPageType(reqVO.getType());
+        List<DecorateComponentDO> oldList = decorateComponentMapper.selectByPage(reqVO.getPageId());
 
-        decorateComponentMapper.saveOrUpdateBatch(INSTANCE.convertList(reqVO.getType(), reqVO.getComponents()));
+        decorateComponentMapper.saveOrUpdateBatch(INSTANCE.convertList(reqVO.getPageId(), reqVO.getComponents()));
         // 2.删除相关组件
         Set<Long> deleteIds = convertSet(oldList, DecorateComponentDO::getId);
         deleteIds.removeAll(convertSet(reqVO.getComponents(), ComponentReqVO::getId, vo->Objects.nonNull(vo.getId())));
@@ -41,8 +41,8 @@ public class DecorateComponentServiceImpl implements DecorateComponentService {
     }
 
     @Override
-    public List<DecorateComponentDO> getPageComponents(Integer type) {
-        return decorateComponentMapper.selectByPageType(type);
+    public List<DecorateComponentDO> getPageComponents(Integer pageId) {
+        return decorateComponentMapper.selectByPage(pageId);
     }
 
 }
