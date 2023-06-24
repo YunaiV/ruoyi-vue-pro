@@ -132,9 +132,10 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
     /**
      * 批量修改插入, 会根据实体的主键是否为空，更新还是修改。默认为 1000
+     *
      * @param entities 实体们
      */
-    default  void saveOrUpdateBatch(Collection<T> entities){
+    default void saveOrUpdateBatch(Collection<T> entities){
         Db.saveOrUpdateBatch(entities);
     }
 

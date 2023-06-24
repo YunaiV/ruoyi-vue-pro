@@ -31,8 +31,9 @@ public class AppDecorateController {
     @GetMapping("/get-page-components")
     @Operation(summary = "获取装修页面组件")
     @Parameter(name = "type", description = "页面类型", required = true)
-    public CommonResult<AppDecorateComponentRespVO> getPageComponents(@RequestParam("type")
-                                                                      @InEnum(DecoratePageTypeEnum.class) Integer type) {
+    public CommonResult<AppDecorateComponentRespVO> getPageComponents(
+            @RequestParam("type") @InEnum(DecoratePageTypeEnum.class) Integer type) {
         return success(INSTANCE.appConvert(type, decorateComponentService.getPageComponents(type)));
     }
+
 }

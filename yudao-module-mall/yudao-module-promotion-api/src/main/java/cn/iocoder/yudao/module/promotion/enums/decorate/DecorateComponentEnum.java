@@ -9,6 +9,7 @@ import lombok.Getter;
  */
 @Getter
 public enum DecorateComponentEnum {
+
     NAV_MENU("nav-menu", "导航菜单"),
     ROLLING_BANNER("rolling-banner", "滚动横幅广告"),
     PRODUCT_CATEGORY("product-category", "商品分类");
@@ -27,4 +28,5 @@ public enum DecorateComponentEnum {
         this.code = code;
         this.desc = desc;
     }
+
 }

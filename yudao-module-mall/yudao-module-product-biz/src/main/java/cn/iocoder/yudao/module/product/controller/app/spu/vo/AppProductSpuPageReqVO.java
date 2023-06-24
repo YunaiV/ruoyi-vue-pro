@@ -20,6 +20,9 @@ public class AppProductSpuPageReqVO extends PageParam {
     public static final String SORT_FIELD_SALES_COUNT = "salesCount";
 
     public static final String RECOMMEND_TYPE_HOT = "hot";
+    public static final String RECOMMEND_TYPE_BENEFIT = "benefit";
+    public static final String RECOMMEND_TYPE_BEST = "best";
+    public static final String RECOMMEND_TYPE_NEW = "new";
     public static final String RECOMMEND_TYPE_GOOD = "good";
 
     @Schema(description = "分类编号", example = "1")

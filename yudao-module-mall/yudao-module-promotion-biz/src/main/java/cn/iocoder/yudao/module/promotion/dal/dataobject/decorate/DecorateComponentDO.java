@@ -17,24 +17,26 @@ import lombok.Data;
 @KeySequence("promotion_decorate_component_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 public class DecorateComponentDO extends BaseDO {
+
     /**
      * 编号
      */
     @TableId
     private Long id;
 
+    // TODO @jason：要不改成 page？貌似更合理；
     /**
      * 页面类型
      * 枚举 {@link DecoratePageTypeEnum#getType()}
      */
     private Integer type;
 
+    // TODO @jason：code、value，因为在 component
     /**
      *  组件编码
      *  枚举 {@link DecorateComponentEnum#getCode()}
      */
     private String componentCode;
-
     /**
      * 组件值：json 格式。包含配置和数据
      */
@@ -42,6 +44,7 @@ public class DecorateComponentDO extends BaseDO {
 
     /**
      * 状态
+     *
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

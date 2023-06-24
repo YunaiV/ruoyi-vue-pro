@@ -67,6 +67,12 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
         // 推荐类型的过滤条件
         if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_HOT)) {
             query.eq(ProductSpuDO::getRecommendHot, true);
+        } else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_BENEFIT)) {
+            query.eq(ProductSpuDO::getRecommendBenefit, true);
+        } else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_BEST)) {
+            query.eq(ProductSpuDO::getRecommendBest, true);
+        }  else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_NEW)) {
+            query.eq(ProductSpuDO::getRecommendNew, true);
         } else if (ObjUtil.equal(pageReqVO.getRecommendType(), AppProductSpuPageReqVO.RECOMMEND_TYPE_GOOD)) {
             query.eq(ProductSpuDO::getRecommendGood, true);
         }

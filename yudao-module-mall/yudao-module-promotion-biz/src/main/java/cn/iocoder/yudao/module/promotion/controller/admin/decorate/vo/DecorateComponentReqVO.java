@@ -10,9 +10,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-/**
- * @author jason
- */
 @Schema(description = "管理后台 - 页面装修 Request VO ")
 @Data
 public class DecorateComponentReqVO {
@@ -20,6 +17,7 @@ public class DecorateComponentReqVO {
     @NotNull(message = "页面类型不能为空")
     @InEnum(DecoratePageTypeEnum.class)
     private Integer type;
+
     @Schema(description = "页面组件列表", requiredMode = Schema.RequiredMode.REQUIRED, example = "TODO")
     @NotEmpty(message = "页面组件列表不能为空")
     @Valid

@@ -22,8 +22,8 @@ public interface DecorateComponentConvert {
         return CollectionUtils.convertList(components, c -> convert(type, c));
     }
 
-    default DecorateComponentRespVO convert2(Integer type, List<DecorateComponentDO> doList) {
-        List<ComponentRespVO> components = CollectionUtils.convertList(doList, this::convert3);
+    default DecorateComponentRespVO convert2(Integer type, List<DecorateComponentDO> list) {
+        List<ComponentRespVO> components = CollectionUtils.convertList(list, this::convert3);
         return new DecorateComponentRespVO().setType(type).setComponents(components);
     }
 
@@ -32,10 +32,11 @@ public interface DecorateComponentConvert {
     ComponentRespVO convert3(DecorateComponentDO componentDO);
 
     // ========== App convert ==========
-    default AppDecorateComponentRespVO appConvert(Integer type, List<DecorateComponentDO> doList) {
-        List<AppComponentRespVO> components = CollectionUtils.convertList(doList, this::appConvert2);
+    default AppDecorateComponentRespVO appConvert(Integer type, List<DecorateComponentDO> list) {
+        List<AppComponentRespVO> components = CollectionUtils.convertList(list, this::appConvert2);
         return new AppDecorateComponentRespVO().setType(type).setComponents(components);
     }
 
-    AppComponentRespVO appConvert2(DecorateComponentDO componentDO);
+    AppComponentRespVO appConvert2(DecorateComponentDO bean);
+
 }

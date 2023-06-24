@@ -16,11 +16,13 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.module.promotion.convert.decorate.DecorateComponentConvert.INSTANCE;
 
 /**
- * 装修组件 Service 接口实现
+ * 装修组件 Service 实现
+ *
  * @author jason
  */
 @Service
 public class DecorateComponentServiceImpl implements DecorateComponentService {
+
     @Resource
     private DecorateComponentMapper decorateComponentMapper;
 
@@ -42,4 +44,5 @@ public class DecorateComponentServiceImpl implements DecorateComponentService {
     public List<DecorateComponentDO> getPageComponents(Integer type) {
         return decorateComponentMapper.selectByPageType(type);
     }
+
 }

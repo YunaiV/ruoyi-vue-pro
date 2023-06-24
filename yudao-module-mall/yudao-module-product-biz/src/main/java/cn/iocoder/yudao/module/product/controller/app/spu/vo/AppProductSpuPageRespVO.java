@@ -32,6 +32,9 @@ public class AppProductSpuPageRespVO {
     @Schema(description = "商品价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer price;
 
+    @Schema(description = "市场价，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Integer marketPrice;
+
     @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
     private Integer stock;
 

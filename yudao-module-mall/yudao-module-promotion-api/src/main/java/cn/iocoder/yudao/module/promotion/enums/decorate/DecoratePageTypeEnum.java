@@ -14,6 +14,7 @@ import java.util.Arrays;
 @AllArgsConstructor
 @Getter
 public enum DecoratePageTypeEnum implements IntArrayValuable {
+
     INDEX(1, "首页");
 
     private static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DecoratePageTypeEnum::getType).toArray();
@@ -31,4 +32,5 @@ public enum DecoratePageTypeEnum implements IntArrayValuable {
     public int[] array() {
         return ARRAYS;
     }
+
 }

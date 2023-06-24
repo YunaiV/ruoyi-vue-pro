@@ -38,8 +38,9 @@ public class DecorateComponentController {
     @Operation(summary = "获取装修页面组件")
     @Parameter(name = "type", description = "页面类型", required = true)
     // TODO 加权限
-    public CommonResult<DecorateComponentRespVO> getPageComponents(@RequestParam("type")
-                                                                   @InEnum(DecoratePageTypeEnum.class) Integer type) {
+    public CommonResult<DecorateComponentRespVO> getPageComponents(
+            @RequestParam("type") @InEnum(DecoratePageTypeEnum.class) Integer type) {
         return success(INSTANCE.convert2(type, decorateComponentService.getPageComponents(type)));
     }
+
 }
