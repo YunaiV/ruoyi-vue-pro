@@ -20,7 +20,7 @@ public class AppCouponController {
 
     // TODO 芋艿：待实现
     @PostMapping("/take")
-    @Operation(description = "领取优惠劵")
+    @Operation(summary = "领取优惠劵")
     public CommonResult<Long> takeCoupon(@RequestBody AppCouponTemplatePageReqVO pageReqVO) {
         return success(1L);
     }

@@ -18,49 +18,49 @@ import java.time.LocalTime;
 @Data
 public class DeliveryPickUpStoreBaseVO {
 
-    @Schema(description = "门店名称", required = true, example = "李四")
+    @Schema(description = "门店名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
     @NotBlank(message = "门店名称不能为空")
     private String name;
 
     @Schema(description = "门店简介", example = "我是门店简介")
     private String introduction;
 
-    @Schema(description = "门店手机", required = true, example = "15601892312")
+    @Schema(description = "门店手机", requiredMode = Schema.RequiredMode.REQUIRED, example = "15601892312")
     @NotBlank(message = "门店手机不能为空")
     @Mobile
     private String phone;
 
-    @Schema(description = "区域编号", required = true, example = "18733")
+    @Schema(description = "区域编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "18733")
     @NotNull(message = "区域编号不能为空")
     private Integer areaId;
 
-    @Schema(description = "门店详细地址", required = true, example = "复旦大学路 188 号")
+    @Schema(description = "门店详细地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "复旦大学路 188 号")
     @NotBlank(message = "门店详细地址不能为空")
     private String detailAddress;
 
-    @Schema(description = "门店 logo", required = true, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "门店 logo", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
     @NotBlank(message = "门店 logo 不能为空")
     private String logo;
 
-    @Schema(description = "营业开始时间", required = true)
+    @Schema(description = "营业开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "营业开始时间不能为空")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime openingTime;
 
-    @Schema(description = "营业结束时间", required = true)
+    @Schema(description = "营业结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "营业结束时间不能为空")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime closingTime;
 
-    @Schema(description = "纬度", required = true, example = "5.88")
+    @Schema(description = "纬度", requiredMode = Schema.RequiredMode.REQUIRED, example = "5.88")
     @NotNull(message = "纬度不能为空")
     private Double latitude;
 
-    @Schema(description = "经度", required = true, example = "6.99")
+    @Schema(description = "经度", requiredMode = Schema.RequiredMode.REQUIRED, example = "6.99")
     @NotNull(message = "经度不能为空")
     private Double longitude;
 
-    @Schema(description = "门店状态", required = true, example = "1")
+    @Schema(description = "门店状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "门店状态不能为空")
     @InEnum(CommonStatusEnum.class)
     private Integer status;

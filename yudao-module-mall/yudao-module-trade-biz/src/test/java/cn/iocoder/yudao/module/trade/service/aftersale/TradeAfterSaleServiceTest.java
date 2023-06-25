@@ -102,8 +102,6 @@ public class TradeAfterSaleServiceTest extends BaseDbUnitTest {
         assertEquals(afterSaleLog.getUserType(), UserTypeEnum.MEMBER.getValue());
         assertEquals(afterSaleLog.getAfterSaleId(), afterSaleId);
         assertPojoEquals(afterSale, orderItem, "id", "creator", "createTime", "updater", "updateTime");
-        assertNull(afterSaleLog.getBeforeStatus());
-        assertEquals(afterSaleLog.getAfterStatus(), TradeAfterSaleStatusEnum.APPLY.getStatus());
         assertEquals(afterSaleLog.getContent(), TradeAfterSaleStatusEnum.APPLY.getContent());
     }
 

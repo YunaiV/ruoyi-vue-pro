@@ -2,9 +2,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.aftersale;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
-import cn.iocoder.yudao.module.trade.enums.aftersale.TradeAfterSaleStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleOperateTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -51,30 +49,13 @@ public class TradeAfterSaleLogDO extends BaseDO {
      * 关联 {@link TradeAfterSaleDO#getId()}
      */
     private Long afterSaleId;
+    // todo @CHENCHEN: 改成 Integer 哈；主要未来改文案，不好洗 log 存的字段；
     /**
-     * 订单编号
+     * 操作类型
      *
-     * 关联 {@link TradeOrderDO#getId()}
+     * 枚举 {@link AfterSaleOperateTypeEnum}
      */
-    private Long orderId;
-    /**
-     * 订单项编号
-     *
-     * 关联 {@link TradeOrderItemDO#getId()}
-     */
-    private Long orderItemId;
-    /**
-     * 售后状态（之前）
-     *
-     * 枚举 {@link TradeAfterSaleStatusEnum}
-     */
-    private Integer beforeStatus;
-    /**
-     * 售后状态（之后）
-     *
-     * 枚举 {@link TradeAfterSaleStatusEnum}
-     */
-    private Integer afterStatus;
+    private String operateType;
     /**
      * 操作明细
      */

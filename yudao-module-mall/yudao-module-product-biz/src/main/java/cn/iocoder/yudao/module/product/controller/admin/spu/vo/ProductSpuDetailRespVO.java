@@ -20,16 +20,16 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSpuDetailRespVO extends ProductSpuBaseVO {
 
-    @Schema(description = "商品 SPU 编号", required = true, example = "1212")
+    @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1212")
     private Long id;
 
-    @Schema(description = "商品销量", required = true, example = "10000")
+    @Schema(description = "商品销量", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
     private Integer salesCount;
 
-    @Schema(description = "浏览量", required = true, example = "20000")
+    @Schema(description = "浏览量", requiredMode = Schema.RequiredMode.REQUIRED, example = "20000")
     private Integer browseCount;
 
-    @Schema(description = "商品状态", required = true, example = "1")
+    @Schema(description = "商品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
     // ========== SKU 相关字段 =========

@@ -15,7 +15,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class DeliveryExpressTemplateUpdateReqVO extends DeliveryExpressTemplateBaseVO {
 
-    @Schema(description = "编号", required = true, example = "371")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "371")
     @NotNull(message = "编号不能为空")
     private Long id;
 

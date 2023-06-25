@@ -13,37 +13,31 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class ProductCommentRespVO extends ProductCommentBaseVO {
 
-    @Schema(description = "订单项编号", required = true, example = "24965")
+    @Schema(description = "订单项编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "24965")
     private Long id;
 
-    @Schema(description = "是否匿名：[false:不匿名 true:匿名]", required = true)
+    @Schema(description = "是否匿名", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean anonymous;
 
-    @Schema(description = "交易订单编号", required = true, example = "24428")
+    @Schema(description = "交易订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "24428")
     private Long orderId;
 
-    @Schema(description = "评价人 用户编号", required = true, example = "15721")
-    private Long userId;
-
-    @Schema(description = "交易订单项编号", required = true, example = "8233")
-    private Long orderItemId;
-
-    @Schema(description = "是否可见：[true:显示 false:隐藏]", required = true)
+    @Schema(description = "是否可见：[true:显示 false:隐藏]", requiredMode = Schema.RequiredMode.REQUIRED)
     private Boolean visible;
 
-    @Schema(description = "商家是否回复：[1:回复 0:未回复]", required = true)
+    @Schema(description = "商家是否回复：[1:回复 0:未回复]", requiredMode = Schema.RequiredMode.REQUIRED)
     private Boolean replyStatus;
 
-    @Schema(description = "回复管理员编号", example = "22212")
+    @Schema(description = "回复管理员编号", example = "9527")
     private Long replyUserId;
 
-    @Schema(description = "商家回复内容")
+    @Schema(description = "商家回复内容", example = "感谢好评哦亲(づ￣3￣)づ╭❤～")
     private String replyContent;
 
-    @Schema(description = "商家回复时间")
+    @Schema(description = "商家回复时间", example = "2023-08-08 12:20:55")
     private LocalDateTime replyTime;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

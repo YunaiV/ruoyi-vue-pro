@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class PayDemoOrderCreateReqVO {
 
-    @Schema(description = "商品编号", required = true, example = "17682")
+    @Schema(description = "商品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17682")
     @NotNull(message = "商品编号不能为空")
     private Long spuId;
 

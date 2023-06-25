@@ -33,6 +33,7 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .eqIfPresent(TradeOrderDO::getType, reqVO.getType())
                 .eqIfPresent(TradeOrderDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(TradeOrderDO::getPayChannelCode, reqVO.getPayChannelCode())
+                .eqIfPresent(TradeOrderDO::getTerminal,reqVO.getTerminal())
                 .betweenIfPresent(TradeOrderDO::getCreateTime, reqVO.getCreateTime()));
     }
 
@@ -49,5 +50,11 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .eq(TradeOrderDO::getUserId, userId)
                 .eqIfPresent(TradeOrderDO::getStatus, status)
                 .eqIfPresent(TradeOrderDO::getCommentStatus, commentStatus));
+    }
+
+    default TradeOrderDO selectOrderByIdAndUserId(Long orderId, Long loginUserId) {
+        return selectOne(new LambdaQueryWrapperX<TradeOrderDO>()
+                .eq(TradeOrderDO::getId, orderId)
+                .eq(TradeOrderDO::getUserId, loginUserId));
     }
 }

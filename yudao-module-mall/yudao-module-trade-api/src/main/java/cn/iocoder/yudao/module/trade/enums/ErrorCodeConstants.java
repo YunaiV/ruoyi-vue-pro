@@ -45,17 +45,26 @@ public interface ErrorCodeConstants {
     // ==========  Cart 模块 1011002000 ==========
     ErrorCode CARD_ITEM_NOT_FOUND = new ErrorCode(1011002000, "购物车项不存在");
 
-    // ==========  物流配送模块 1011003000 ==========
-    ErrorCode DELIVERY_EXPRESS_NOT_EXISTS = new ErrorCode(1011003000, "快递公司不存在");
-    // TODO @jason：最好每个模块一段哈。express 一个；exmpresstemplate 一个；pickup 一个
-    ErrorCode EXPRESS_CODE_DUPLICATE = new ErrorCode(1011003001, "已经存在该编码的快递公司");
-    ErrorCode EXPRESS_TEMPLATE_NOT_EXISTS = new ErrorCode(1011003002, "运费模板不存在");
-    ErrorCode EXPRESS_TEMPLATE_NAME_DUPLICATE = new ErrorCode(1011003003, "已经存在该运费模板名");
-    ErrorCode DELIVERY_EXPRESS_USER_ADDRESS_IS_EMPTY = new ErrorCode(1011003004, "计算快递运费时，收件人地址编号为空");
-    ErrorCode PRODUCT_EXPRESS_TEMPLATE_NOT_FOUND = new ErrorCode(1011003005, "找不到到商品对应的运费模板");
-    ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1011003006, "自提门店不存在");
+    // ========== Price 相关 1011003000 ============
+    ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1011003000, "支付价格计算异常，原因：价格小于等于 0");
+    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_USER_ADDR_IS_EMPTY = new ErrorCode(1011003001, "计算快递运费异常，收件人地址编号为空");
+    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TEMPLATE_NOT_FOUND = new ErrorCode(1011003002, "计算快递运费异常，找不到对应的运费模板");
 
-    // ========== Price 相关 1011004000 ============
-    ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1011004000, "支付价格计算异常，原因：价格小于等于 0");
+    // ==========  物流 Express 模块 1011004000 ==========
+    ErrorCode EXPRESS_NOT_EXISTS = new ErrorCode(1011004000, "快递公司不存在");
+    ErrorCode EXPRESS_CODE_DUPLICATE = new ErrorCode(1011004001, "已经存在该编码的快递公司");
+    ErrorCode EXPRESS_CLIENT_NOT_PROVIDE = new ErrorCode(1011004002, "需要接入快递服务商，比如【快递100】");
+
+    ErrorCode EXPRESS_API_QUERY_ERROR = new ErrorCode(1011004101, "快递查询接口异常");
+    ErrorCode EXPRESS_API_QUERY_FAILED = new ErrorCode(1011004102, "快递查询返回失败，原因：{}");
+
+    // ==========  物流 Template 模块 1011005000 ==========
+    ErrorCode EXPRESS_TEMPLATE_NAME_DUPLICATE = new ErrorCode(1011005000, "已经存在该运费模板名");
+    ErrorCode EXPRESS_TEMPLATE_NOT_EXISTS = new ErrorCode(1011005001, "运费模板不存在");
+
+    // ==========  物流 PICK_UP 模块 1011006000 ==========
+
+    ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1011006000, "自提门店不存在");
+
 
 }

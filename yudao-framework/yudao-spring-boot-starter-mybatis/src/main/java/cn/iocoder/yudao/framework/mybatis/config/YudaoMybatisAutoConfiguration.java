@@ -5,10 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.handler.DefaultDBFieldHandler;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
-import com.baomidou.mybatisplus.extension.incrementer.H2KeyGenerator;
-import com.baomidou.mybatisplus.extension.incrementer.KingbaseKeyGenerator;
-import com.baomidou.mybatisplus.extension.incrementer.OracleKeyGenerator;
-import com.baomidou.mybatisplus.extension.incrementer.PostgreKeyGenerator;
+import com.baomidou.mybatisplus.extension.incrementer.*;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.apache.ibatis.annotations.Mapper;
@@ -55,6 +52,8 @@ public class YudaoMybatisAutoConfiguration {
                     return new H2KeyGenerator();
                 case KINGBASE_ES:
                     return new KingbaseKeyGenerator();
+                case DM:
+                    return new DmKeyGenerator();
             }
         }
         // 找不到合适的 IKeyGenerator 实现类

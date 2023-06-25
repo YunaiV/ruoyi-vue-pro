@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class BpmModelPageItemRespVO extends BpmModelBaseVO {
 
-    @Schema(description = "编号", required = true, example = "1024")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String id;
 
     @Schema(description = "表单名字", example = "请假表单")
     private String formName;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
     /**
@@ -31,16 +31,16 @@ public class BpmModelPageItemRespVO extends BpmModelBaseVO {
     @Data
     public static class ProcessDefinition {
 
-        @Schema(description = "编号", required = true, example = "1024")
+        @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private String id;
 
-        @Schema(description = "版本", required = true, example = "1")
+        @Schema(description = "版本", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer version;
 
-        @Schema(description = "部署时间", required = true)
+        @Schema(description = "部署时间", requiredMode = Schema.RequiredMode.REQUIRED)
         private LocalDateTime deploymentTime;
 
-        @Schema(description = "中断状态-参见 SuspensionState 枚举", required = true, example = "1")
+        @Schema(description = "中断状态-参见 SuspensionState 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer suspensionState;
 
     }

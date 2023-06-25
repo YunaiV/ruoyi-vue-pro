@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 public class PostRespVO extends PostBaseVO {
 
-    @Schema(description = "岗位序号", required = true, example = "1024")
+    @Schema(description = "岗位序号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "创建时间", required = true, example = "时间戳格式")
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "时间戳格式")
     private LocalDateTime createTime;
 
 }

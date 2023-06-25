@@ -43,6 +43,15 @@ public class ProductSkuApiImpl implements ProductSkuApi {
     }
 
     @Override
+    public List<ProductSkuRespDTO> getSkuListBySpuId(List<Long> spuIds) {
+        if (CollUtil.isEmpty(spuIds)) {
+            return Collections.emptyList();
+        }
+        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spuIds);
+        return ProductSkuConvert.INSTANCE.convertList04(skus);
+    }
+
+    @Override
     public void updateSkuStock(ProductSkuUpdateStockReqDTO updateStockReqDTO) {
         productSkuService.updateSkuStock(updateStockReqDTO);
     }

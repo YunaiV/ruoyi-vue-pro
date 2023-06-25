@@ -18,9 +18,10 @@ public class AppTradeOrderSettlementReqVO {
 
     @NotNull(message = "交易类型不能为空")
     @InEnum(value = TradeOrderTypeEnum.class, message = "交易类型必须是 {value}")
+    @Deprecated // TODO 芋艿：后续干掉这个字段，对于前端不需要关注这个
     private Integer type;
 
-    @Schema(description = "商品项数组", required = true)
+    @Schema(description = "商品项数组", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商品不能为空")
     private List<Item> items;
 
@@ -29,6 +30,17 @@ public class AppTradeOrderSettlementReqVO {
 
     @Schema(description = "优惠劵编号", example = "1024")
     private Long couponId;
+
+    // ========== 秒杀活动相关字段 ==========
+    @Schema(description = "秒杀活动编号", example = "1024")
+    private Long seckillActivityId;
+
+    // ========== 拼团活动相关字段 ==========
+    @Schema(description = "拼团活动编号", example = "1024")
+    private Long combinationActivityId;
+
+    @Schema(description = "拼团团长编号", example = "2048")
+    private Long combinationHeadId;
 
     @Data
     @Schema(description = "用户 App - 商品项")

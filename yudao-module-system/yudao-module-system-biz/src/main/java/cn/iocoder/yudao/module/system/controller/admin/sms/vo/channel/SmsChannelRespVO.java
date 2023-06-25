@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class SmsChannelRespVO extends SmsChannelBaseVO {
 
-    @Schema(description = "编号", required = true, example = "1024")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "渠道编码,参见 SmsChannelEnum 枚举类", required = true, example = "YUN_PIAN")
+    @Schema(description = "渠道编码,参见 SmsChannelEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "YUN_PIAN")
     private String code;
 
-    @Schema(description = "创建时间", required = true)
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

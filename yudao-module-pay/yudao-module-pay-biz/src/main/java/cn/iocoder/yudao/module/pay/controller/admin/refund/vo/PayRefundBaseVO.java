@@ -15,70 +15,70 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class PayRefundBaseVO {
 
-    @Schema(description = "商户编号", required = true)
+    @Schema(description = "商户编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商户编号不能为空")
     private Long merchantId;
 
-    @Schema(description = "应用编号", required = true)
+    @Schema(description = "应用编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "应用编号不能为空")
     private Long appId;
 
-    @Schema(description = "渠道编号", required = true)
+    @Schema(description = "渠道编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "渠道编号不能为空")
     private Long channelId;
 
-    @Schema(description = "渠道编码", required = true)
+    @Schema(description = "渠道编码", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "渠道编码不能为空")
     private String channelCode;
 
-    @Schema(description = "支付订单编号 pay_order 表id", required = true)
+    @Schema(description = "支付订单编号 pay_order 表id", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "支付订单编号 pay_order 表id不能为空")
     private Long orderId;
 
-    @Schema(description = "交易订单号 pay_extension 表no 字段", required = true)
+    @Schema(description = "交易订单号 pay_extension 表no 字段", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "交易订单号 pay_extension 表no 字段不能为空")
     private String tradeNo;
 
-    @Schema(description = "商户订单编号（商户系统生成）", required = true)
+    @Schema(description = "商户订单编号（商户系统生成）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商户订单编号（商户系统生成）不能为空")
     private String merchantOrderId;
 
-    @Schema(description = "商户退款订单号（商户系统生成）", required = true)
+    @Schema(description = "商户退款订单号（商户系统生成）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商户退款订单号（商户系统生成）不能为空")
     private String merchantRefundNo;
 
-    @Schema(description = "异步通知商户地址", required = true)
+    @Schema(description = "异步通知商户地址", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "异步通知商户地址不能为空")
     private String notifyUrl;
 
-    @Schema(description = "通知商户退款结果的回调状态", required = true)
+    @Schema(description = "通知商户退款结果的回调状态", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "通知商户退款结果的回调状态不能为空")
     private Integer notifyStatus;
 
-    @Schema(description = "退款状态", required = true)
+    @Schema(description = "退款状态", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "退款状态不能为空")
     private Integer status;
 
-    @Schema(description = "退款类型(部分退款，全部退款)", required = true)
+    @Schema(description = "退款类型(部分退款，全部退款)", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "退款类型(部分退款，全部退款)不能为空")
     private Integer type;
 
-    @Schema(description = "支付金额,单位分", required = true)
+    @Schema(description = "支付金额,单位分", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "支付金额,单位分不能为空")
     private Long payAmount;
 
-    @Schema(description = "退款金额,单位分", required = true)
+    @Schema(description = "退款金额,单位分", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "退款金额,单位分不能为空")
     private Long refundAmount;
 
-    @Schema(description = "退款原因", required = true)
+    @Schema(description = "退款原因", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "退款原因不能为空")
     private String reason;
 
     @Schema(description = "用户 IP")
     private String userIp;
 
-    @Schema(description = "渠道订单号，pay_order 中的channel_order_no 对应", required = true)
+    @Schema(description = "渠道订单号，pay_order 中的channel_order_no 对应", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "渠道订单号，pay_order 中的channel_order_no 对应不能为空")
     private String channelOrderNo;
 

@@ -10,27 +10,28 @@ import java.time.LocalDateTime;
 @Data
 public class AppCouponTemplateRespVO {
 
-    @Schema(description = "优惠劵模板编号", required = true, example = "1")
+    @Schema(description = "优惠劵模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "优惠劵名", required = true, example = "春节送送送")
+    @Schema(description = "优惠劵名", requiredMode = Schema.RequiredMode.REQUIRED, example = "春节送送送")
     private String name;
 
-    @Schema(description = "每人限领个数", required = true, example = "66") // -1 - 则表示不限制
+    @Schema(description = "每人限领个数", requiredMode = Schema.RequiredMode.REQUIRED, example = "66") // -1 - 则表示不限制
     private Integer takeLimitCount;
 
-    @Schema(description = "是否设置满多少金额可用", required = true, example = "100") // 单位：分；0 - 不限制
+    @Schema(description = "是否设置满多少金额可用", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+    // 单位：分；0 - 不限制
     private Integer usePrice;
 
     // TODO 芋艿：这两要改的
-//    @Schema(description = "商品范围", required = true, example = "1")
+//    @Schema(description = "商品范围", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
 //    @InEnum(PromotionProductScopeEnum.class)
 //    private Integer productScope;
 //
 //    @Schema(description = "商品 SPU 编号的数组", example = "1,3")
 //    private List<Long> productSpuIds;
 
-    @Schema(description = "生效日期类型", required = true, example = "1")
+    @Schema(description = "生效日期类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer validityType;
 
     @Schema(description = "固定日期 - 生效开始时间")
@@ -47,7 +48,7 @@ public class AppCouponTemplateRespVO {
     @Min(value = 1L, message = "开始天数必须大于 1")
     private Integer fixedEndTerm;
 
-    @Schema(description = "优惠类型", required = true, example = "1")
+    @Schema(description = "优惠类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer discountType;
 
     @Schema(description = "折扣百分比", example = "80") //  例如说，80% 为 80
@@ -62,7 +63,7 @@ public class AppCouponTemplateRespVO {
 
     // ========== 用户相关字段 ==========
 
-    @Schema(description = "是否已领取", required = true, example = "true")
+    @Schema(description = "是否已领取", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean takeStatus;
 
 }

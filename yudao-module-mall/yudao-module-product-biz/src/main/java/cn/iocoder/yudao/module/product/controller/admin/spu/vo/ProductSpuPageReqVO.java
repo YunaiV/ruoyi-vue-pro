@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -51,7 +50,7 @@ public class ProductSpuPageReqVO extends PageParam {
     @Schema(description = "商品名称", example = "清凉小短袖")
     private String name;
 
-    @Schema(description = "前端请求的tab类型", required = true, example = "1")
+    @Schema(description = "前端请求的tab类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer tabType;
 
     @Schema(description = "商品分类编号", example = "1")

@@ -10,19 +10,19 @@ import javax.validation.constraints.*;
 @Data
 public class TestDemoBaseVO {
 
-    @Schema(description = "名字", required = true)
+    @Schema(description = "名字", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "名字不能为空")
     private String name;
 
-    @Schema(description = "状态", required = true)
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "状态不能为空")
     private Integer status;
 
-    @Schema(description = "类型", required = true)
+    @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "类型不能为空")
     private Integer type;
 
-    @Schema(description = "分类", required = true)
+    @Schema(description = "分类", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "分类不能为空")
     private Integer category;
 

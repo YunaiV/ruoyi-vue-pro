@@ -84,7 +84,7 @@ export default {
           ],
         },
         placeholder: "请输入内容",
-        readOnly: this.readOnly,
+        readOnly: true,
       },
     };
   },
@@ -123,6 +123,13 @@ export default {
     init() {
       const editor = this.$refs.editor;
       this.Quill = new Quill(editor, this.options);
+      // 取消自动聚焦 start
+      this.$nextTick(()=>{
+        this.Quill.blur();
+        if(!this.readOnly){
+          this.Quill.enable();
+        }
+      });
       // 如果设置了上传地址则自定义图片上传事件
       if (this.type === 'url') {
         let toolbar = this.Quill.getModule("toolbar");

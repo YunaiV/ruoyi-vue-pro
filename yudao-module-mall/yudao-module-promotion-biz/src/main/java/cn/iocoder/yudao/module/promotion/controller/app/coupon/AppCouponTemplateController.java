@@ -34,7 +34,7 @@ public class AppCouponTemplateController {
 
     // TODO 芋艿：待实现
     @GetMapping("/list")
-    @Operation(description = "获得优惠劵模版列表") // 目前主要给商品详情使用
+    @Operation(summary = "获得优惠劵模版列表") // 目前主要给商品详情使用
     @Parameters({
             @Parameter(name = "spuId", description = "商品 SPU 编号", required = true),
             @Parameter(name = "useType", description = "使用类型"),
@@ -76,7 +76,7 @@ public class AppCouponTemplateController {
 
     // TODO 芋艿：待实现
     @GetMapping("/page")
-    @Operation(description = "获得优惠劵模版分页")
+    @Operation(summary = "获得优惠劵模版分页")
     public CommonResult<PageResult<AppCouponTemplateRespVO>> getCouponTemplatePage(AppCouponTemplatePageReqVO pageReqVO) {
         return null;
     }

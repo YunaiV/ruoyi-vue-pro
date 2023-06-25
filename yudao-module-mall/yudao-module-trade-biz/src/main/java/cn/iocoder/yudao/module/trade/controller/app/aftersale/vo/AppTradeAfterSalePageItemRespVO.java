@@ -11,48 +11,48 @@ import java.util.List;
 @Data
 public class AppTradeAfterSalePageItemRespVO {
 
-    @Schema(description = "售后编号", required = true, example = "1024")
+    @Schema(description = "售后编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "售后流水号", required = true, example = "1146347329394184195")
+    @Schema(description = "售后流水号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1146347329394184195")
     private String no;
 
-    @Schema(description = "售后状态", required = true, example = "1")
+    @Schema(description = "售后状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
-    @Schema(description = "售后方式", required = true, example = "1")
+    @Schema(description = "售后方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer way;
 
-    @Schema(description = "售后类型", required = true, example = "1")
+    @Schema(description = "售后类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer type;
 
-    @Schema(description = "申请原因", required = true, example = "1")
+    @Schema(description = "申请原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String applyReason;
 
-    @Schema(description = "补充描述", required = true, example = "1")
+    @Schema(description = "补充描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String applyDescription;
 
-    @Schema(description = "补充凭证图片", required = true, example = "1")
+    @Schema(description = "补充凭证图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private List<String> applyPicUrls;
 
     // ========== 交易订单相关 ==========
 
-    @Schema(description = "交易订单编号", required = true, example = "1")
+    @Schema(description = "交易订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long orderId;
 
-    @Schema(description = "交易订单流水号", required = true, example = "1")
+    @Schema(description = "交易订单流水号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String orderNo;
 
-    @Schema(description = "交易订单项编号", required = true, example = "1")
+    @Schema(description = "交易订单项编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long orderItemId;
 
-    @Schema(description = "商品 SPU 编号", required = true, example = "1")
+    @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long spuId;
 
-    @Schema(description = "商品 SPU 名称", required = true, example = "1")
+    @Schema(description = "商品 SPU 名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String spuName;
 
-    @Schema(description = "商品 SKU 编号", required = true, example = "1")
+    @Schema(description = "商品 SKU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long skuId;
 
     /**
@@ -60,10 +60,10 @@ public class AppTradeAfterSalePageItemRespVO {
      */
     private List<AppProductPropertyValueDetailRespVO> properties;
 
-    @Schema(description = "商品图片", required = true, example = "https://www.iocoder.cn/01.jpg")
+    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/01.jpg")
     private String picUrl;
 
-    @Schema(description = "退货商品数量", required = true, example = "1")
+    @Schema(description = "退货商品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer count;
 
     // ========== 审批相关 ==========

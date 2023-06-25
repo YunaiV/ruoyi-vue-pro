@@ -59,6 +59,7 @@ public class AppActivityController {
         }
         Map<Long, List<AppActivityRespVO>> map = new HashMap<>();
         map.put(109L, randomList);
+        map.put(2L, randomList);
         return success(map);
     }
 

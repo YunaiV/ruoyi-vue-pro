@@ -15,23 +15,23 @@ import java.util.Map;
 @Data
 public class OperateLogBaseVO {
 
-    @Schema(description = "链路追踪编号", required = true, example = "89aca178-a370-411c-ae02-3f0d672be4ab")
+    @Schema(description = "链路追踪编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "89aca178-a370-411c-ae02-3f0d672be4ab")
     @NotEmpty(message = "链路追踪编号不能为空")
     private String traceId;
 
-    @Schema(description = "用户编号", required = true, example = "1024")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "用户编号不能为空")
     private Long userId;
 
-    @Schema(description = "操作模块", required = true, example = "订单")
+    @Schema(description = "操作模块", requiredMode = Schema.RequiredMode.REQUIRED, example = "订单")
     @NotEmpty(message = "操作模块不能为空")
     private String module;
 
-    @Schema(description = "操作名", required = true, example = "创建订单")
+    @Schema(description = "操作名", requiredMode = Schema.RequiredMode.REQUIRED, example = "创建订单")
     @NotEmpty(message = "操作名")
     private String name;
 
-    @Schema(description = "操作分类,参见 OperateLogTypeEnum 枚举类", required = true, example = "1")
+    @Schema(description = "操作分类,参见 OperateLogTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "操作分类不能为空")
     private Integer type;
 
@@ -41,38 +41,38 @@ public class OperateLogBaseVO {
     @Schema(description = "拓展字段", example = "{'orderId': 1}")
     private Map<String, Object> exts;
 
-    @Schema(description = "请求方法名", required = true, example = "GET")
+    @Schema(description = "请求方法名", requiredMode = Schema.RequiredMode.REQUIRED, example = "GET")
     @NotEmpty(message = "请求方法名不能为空")
     private String requestMethod;
 
-    @Schema(description = "请求地址", required = true, example = "/xxx/yyy")
+    @Schema(description = "请求地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "/xxx/yyy")
     @NotEmpty(message = "请求地址不能为空")
     private String requestUrl;
 
-    @Schema(description = "用户 IP", required = true, example = "127.0.0.1")
+    @Schema(description = "用户 IP", requiredMode = Schema.RequiredMode.REQUIRED, example = "127.0.0.1")
     @NotEmpty(message = "用户 IP 不能为空")
     private String userIp;
 
-    @Schema(description = "浏览器 UserAgent", required = true, example = "Mozilla/5.0")
+    @Schema(description = "浏览器 UserAgent", requiredMode = Schema.RequiredMode.REQUIRED, example = "Mozilla/5.0")
     @NotEmpty(message = "浏览器 UserAgent 不能为空")
     private String userAgent;
 
-    @Schema(description = "Java 方法名", required = true, example = "cn.iocoder.yudao.adminserver.UserController.save(...)")
+    @Schema(description = "Java 方法名", requiredMode = Schema.RequiredMode.REQUIRED, example = "cn.iocoder.yudao.adminserver.UserController.save(...)")
     @NotEmpty(message = "Java 方法名不能为空")
     private String javaMethod;
 
     @Schema(description = "Java 方法的参数")
     private String javaMethodArgs;
 
-    @Schema(description = "开始时间", required = true)
+    @Schema(description = "开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "开始时间不能为空")
     private LocalDateTime startTime;
 
-    @Schema(description = "执行时长，单位：毫秒", required = true)
+    @Schema(description = "执行时长，单位：毫秒", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "执行时长不能为空")
     private Integer duration;
 
-    @Schema(description = "结果码", required = true)
+    @Schema(description = "结果码", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "结果码不能为空")
     private Integer resultCode;
 

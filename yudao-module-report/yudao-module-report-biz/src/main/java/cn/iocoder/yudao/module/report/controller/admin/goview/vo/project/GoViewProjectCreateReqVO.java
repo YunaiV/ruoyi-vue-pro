@@ -8,7 +8,7 @@ import javax.validation.constraints.*;
 @Data
 public class GoViewProjectCreateReqVO {
 
-    @Schema(description = "项目名称", required = true, example = "王五")
+    @Schema(description = "项目名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
     @NotEmpty(message = "项目名称不能为空")
     private String name;
 

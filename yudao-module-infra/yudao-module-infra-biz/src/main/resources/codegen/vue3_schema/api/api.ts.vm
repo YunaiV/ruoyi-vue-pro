@@ -1,4 +1,5 @@
 import request from '@/config/axios'
+#set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
 
 export interface ${simpleClassName}VO {
     #foreach ($column in $columns)
@@ -15,7 +16,7 @@ export interface ${simpleClassName}VO {
 }
 
 // 查询${table.classComment}列表
-export const get${simpleClassName}Page = async (params: ${simpleClassName}PageReqVO) => {
+export const get${simpleClassName}Page = async (params) => {
   return await request.get({ url: '${baseURL}/page', params })
 }
 

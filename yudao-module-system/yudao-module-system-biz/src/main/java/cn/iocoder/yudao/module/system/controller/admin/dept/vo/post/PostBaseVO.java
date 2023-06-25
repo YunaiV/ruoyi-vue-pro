@@ -13,21 +13,21 @@ import javax.validation.constraints.Size;
 @Data
 public class PostBaseVO {
 
-    @Schema(description = "岗位名称", required = true, example = "小博主")
+    @Schema(description = "岗位名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "小博主")
     @NotBlank(message = "岗位名称不能为空")
     @Size(max = 50, message = "岗位名称长度不能超过50个字符")
     private String name;
 
-    @Schema(description = "岗位编码", required = true, example = "yudao")
+    @Schema(description = "岗位编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
     @NotBlank(message = "岗位编码不能为空")
     @Size(max = 64, message = "岗位编码长度不能超过64个字符")
     private String code;
 
-    @Schema(description = "显示顺序不能为空", required = true, example = "1024")
+    @Schema(description = "显示顺序不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "显示顺序不能为空")
     private Integer sort;
 
-    @Schema(description = "状态,参见 CommonStatusEnum 枚举类", required = true, example = "1")
+    @Schema(description = "状态,参见 CommonStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
     @Schema(description = "备注", example = "快乐的备注")

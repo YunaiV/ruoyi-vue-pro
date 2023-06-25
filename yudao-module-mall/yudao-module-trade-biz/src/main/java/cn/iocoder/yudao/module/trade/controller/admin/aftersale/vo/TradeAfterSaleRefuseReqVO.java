@@ -9,11 +9,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class TradeAfterSaleRefuseReqVO {
 
-    @Schema(description = "售后编号", required = true, example = "1024")
+    @Schema(description = "售后编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "售后编号不能为空")
     private Long id;
 
-    @Schema(description = "收货备注", required = true, example = "你猜")
+    @Schema(description = "收货备注", requiredMode = Schema.RequiredMode.REQUIRED, example = "你猜")
     @NotNull(message = "收货备注不能为空")
     private String refuseMemo;
 

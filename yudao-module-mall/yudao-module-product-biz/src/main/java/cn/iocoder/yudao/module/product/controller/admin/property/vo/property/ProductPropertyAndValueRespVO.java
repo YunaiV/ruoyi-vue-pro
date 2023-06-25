@@ -9,10 +9,10 @@ import java.util.List;
 @Data
 public class ProductPropertyAndValueRespVO {
 
-    @Schema(description = "属性项的编号", required = true, example = "1024")
+    @Schema(description = "属性项的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "属性项的名称", required = true, example = "颜色")
+    @Schema(description = "属性项的名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "颜色")
     private String name;
 
     /**
@@ -24,10 +24,10 @@ public class ProductPropertyAndValueRespVO {
     @Data
     public static class Value {
 
-        @Schema(description = "属性值的编号", required = true, example = "2048")
+        @Schema(description = "属性值的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
         private Long id;
 
-        @Schema(description = "属性值的名称", required = true, example = "红色")
+        @Schema(description = "属性值的名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "红色")
         private String name;
 
     }

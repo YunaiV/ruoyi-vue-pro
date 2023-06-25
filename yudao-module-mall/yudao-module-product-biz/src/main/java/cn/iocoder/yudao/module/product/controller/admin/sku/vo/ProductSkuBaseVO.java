@@ -16,11 +16,11 @@ import java.util.List;
 @Data
 public class ProductSkuBaseVO {
 
-    @Schema(description = "商品 SKU 名字", required = true, example = "清凉小短袖")
+    @Schema(description = "商品 SKU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "清凉小短袖")
     @NotEmpty(message = "商品 SKU 名字不能为空")
     private String name;
 
-    @Schema(description = "销售价格，单位：分", required = true, example = "1999")
+    @Schema(description = "销售价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1999")
     @NotNull(message = "销售价格，单位：分不能为空")
     private Integer price;
 
@@ -33,11 +33,11 @@ public class ProductSkuBaseVO {
     @Schema(description = "条形码", example = "15156165456")
     private String barCode;
 
-    @Schema(description = "图片地址", required = true, example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
 
-    @Schema(description = "库存", required = true, example = "200")
+    @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "200")
     @NotNull(message = "库存不能为空")
     private Integer stock;
 

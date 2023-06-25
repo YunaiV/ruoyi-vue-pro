@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class MpMaterialUploadRespVO {
 
-    @Schema(description = "素材的 media_id", required = true, example = "123")
+    @Schema(description = "素材的 media_id", requiredMode = Schema.RequiredMode.REQUIRED, example = "123")
     private String mediaId;
 
-    @Schema(description = "素材的 URL", required = true, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "素材的 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
     private String url;
 
 }
