@@ -31,11 +31,12 @@ import static java.util.Arrays.asList;
 @Aspect
 public class AfterSaleLogAspect {
 
+    private final static String OPERATE_TYPE = "operateType";
+    private final static String ID = "id";
+    private final static String CONTENT = "content";
+
     @Resource
     private AfterSaleLogService afterSaleLogService;
-
-    // TODO chenchen: 这个分 3 行把；
-    private final static String OPERATE_TYPE = "operateType", ID = "id", CONTENT = "content";
 
     /**
      * 切面存入日志

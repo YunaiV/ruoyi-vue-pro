@@ -49,7 +49,6 @@ public class TradeAfterSaleLogDO extends BaseDO {
      * 关联 {@link TradeAfterSaleDO#getId()}
      */
     private Long afterSaleId;
-    // todo @CHENCHEN: 改成 Integer 哈；主要未来改文案，不好洗 log 存的字段；
     /**
      * 操作类型
      *
