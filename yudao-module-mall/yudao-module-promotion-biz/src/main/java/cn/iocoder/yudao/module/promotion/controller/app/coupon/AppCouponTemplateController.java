@@ -74,11 +74,40 @@ public class AppCouponTemplateController {
         return success(list);
     }
 
-    // TODO 芋艿：待实现
+    // TODO 芋艿：待实现；和 getCouponTemplateList 类似
     @GetMapping("/page")
     @Operation(summary = "获得优惠劵模版分页")
     public CommonResult<PageResult<AppCouponTemplateRespVO>> getCouponTemplatePage(AppCouponTemplatePageReqVO pageReqVO) {
-        return null;
+        List<AppCouponTemplateRespVO> list = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            AppCouponTemplateRespVO vo = new AppCouponTemplateRespVO();
+            vo.setId(i + 1L);
+            vo.setName("优惠劵" + (i + 1));
+            vo.setTakeLimitCount(random.nextInt(10) + 1);
+            vo.setUsePrice(random.nextInt(100) * 100);
+            vo.setValidityType(random.nextInt(2) + 1);
+            if (vo.getValidityType() == 1) {
+                vo.setValidStartTime(LocalDateTime.now().plusDays(random.nextInt(10)));
+                vo.setValidEndTime(LocalDateTime.now().plusDays(random.nextInt(20) + 10));
+            } else {
+                vo.setFixedStartTerm(random.nextInt(10));
+                vo.setFixedEndTerm(random.nextInt(10) + vo.getFixedStartTerm() + 1);
+            }
+            vo.setDiscountType(random.nextInt(2) + 1);
+            if (vo.getDiscountType() == 1) {
+                vo.setDiscountPercent(null);
+                vo.setDiscountPrice(random.nextInt(50) * 100);
+                vo.setDiscountLimitPrice(null);
+            } else {
+                vo.setDiscountPercent(random.nextInt(90) + 10);
+                vo.setDiscountPrice(null);
+                vo.setDiscountLimitPrice(random.nextInt(200) * 100);
+            }
+            vo.setTakeStatus(random.nextBoolean());
+            list.add(vo);
+        }
+        return success(new PageResult<>(list, 20L));
     }
 
 }

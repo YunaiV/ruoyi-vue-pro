@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteBatchReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoritePageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteRespVO;
@@ -43,15 +44,24 @@ public class AppFavoriteController {
     }
 
     @DeleteMapping(value = "/delete")
-    @Operation(summary = "取消商品收藏")
+    @Operation(summary = "取消单个商品收藏")
     @PreAuthenticated
     public CommonResult<Boolean> deleteFavorite(@RequestBody @Valid AppFavoriteReqVO reqVO) {
         productFavoriteService.deleteFavorite(getLoginUserId(), reqVO.getSpuId());
         return success(Boolean.TRUE);
     }
 
+    @DeleteMapping(value = "/delete-list")
+    @Operation(summary = "取消多个商品收藏")
+    @PreAuthenticated
+    public CommonResult<Boolean> deleteFavoriteList(@RequestBody @Valid AppFavoriteBatchReqVO reqVO) {
+        // todo @jason：待实现
+//        productFavoriteService.deleteFavorite(getLoginUserId(), reqVO.getSpuId());
+        return success(Boolean.TRUE);
+    }
+
     @GetMapping(value = "/page")
-    @Operation(summary = "分页获取商品收藏列表")
+    @Operation(summary = "获得商品收藏分页")
     @PreAuthenticated
     public CommonResult<PageResult<AppFavoriteRespVO>> getFavoritePage(AppFavoritePageReqVO reqVO) {
         PageResult<ProductFavoriteDO> favoritePage = productFavoriteService.getFavoritePage(getLoginUserId(), reqVO);
