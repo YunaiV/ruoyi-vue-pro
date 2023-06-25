@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.convert.decorate;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentSaveReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.decorate.vo.AppDecorateComponentRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.decorate.DecorateComponentDO;
@@ -18,7 +18,7 @@ public interface DecorateComponentConvert {
 
     DecorateComponentConvert INSTANCE = Mappers.getMapper(DecorateComponentConvert.class);
 
-    default List<DecorateComponentDO> convertList(Integer pageId, List<DecorateComponentReqVO.ComponentReqVO> components) {
+    default List<DecorateComponentDO> convertList(Integer pageId, List<DecorateComponentSaveReqVO.ComponentReqVO> components) {
         return CollectionUtils.convertList(components, c -> convert(pageId, c));
     }
 
@@ -27,7 +27,7 @@ public interface DecorateComponentConvert {
         return new DecorateComponentRespVO().setPageId(pageId).setComponents(components);
     }
 
-    DecorateComponentDO convert(Integer pageId, DecorateComponentReqVO.ComponentReqVO reqVO);
+    DecorateComponentDO convert(Integer pageId, DecorateComponentSaveReqVO.ComponentReqVO reqVO);
 
     ComponentRespVO convert3(DecorateComponentDO componentDO);
 

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.promotion.service.decorate;
 
-import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentSaveReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.decorate.DecorateComponentDO;
 import cn.iocoder.yudao.module.promotion.enums.decorate.DecoratePageEnum;
 
@@ -18,7 +18,7 @@ public interface DecorateComponentService {
      *
      * @param reqVO 请求 VO
      */
-    void pageSave(DecorateComponentReqVO reqVO);
+    void savePageComponents(DecorateComponentSaveReqVO reqVO);
 
     /**
      * 根据页面 id。获取页面的组件信息

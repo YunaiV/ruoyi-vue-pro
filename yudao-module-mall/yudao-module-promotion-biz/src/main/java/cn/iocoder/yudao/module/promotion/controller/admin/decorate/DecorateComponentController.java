@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.promotion.controller.admin.decorate;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentSaveReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentRespVO;
 import cn.iocoder.yudao.module.promotion.enums.decorate.DecoratePageEnum;
 import cn.iocoder.yudao.module.promotion.service.decorate.DecorateComponentService;
@@ -27,10 +27,10 @@ public class DecorateComponentController {
     private DecorateComponentService decorateComponentService;
 
     @PostMapping("/page-save")
-    @Operation(summary = "页面装修保存")
+    @Operation(summary = "保存页面装修")
     // TODO 加权限
-    public CommonResult<Boolean> pageSave(@Valid @RequestBody DecorateComponentReqVO reqVO) {
-        decorateComponentService.pageSave(reqVO);
+    public CommonResult<Boolean> savePageComponents(@Valid @RequestBody DecorateComponentSaveReqVO reqVO) {
+        decorateComponentService.savePageComponents(reqVO);
         return success(true);
     }
 

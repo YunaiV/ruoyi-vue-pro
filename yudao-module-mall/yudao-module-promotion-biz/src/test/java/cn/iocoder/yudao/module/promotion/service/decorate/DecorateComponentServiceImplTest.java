@@ -16,6 +16,7 @@ import static cn.iocoder.yudao.module.promotion.enums.decorate.DecorateComponent
 import static cn.iocoder.yudao.module.promotion.enums.decorate.DecoratePageEnum.INDEX;
 import static org.mockito.ArgumentMatchers.eq;
 
+// TODO @芋艿：后续 review 下
 /**
  * @author jason
  */

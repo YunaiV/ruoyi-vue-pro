@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.promotion.service.decorate;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentReqVO.ComponentReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentSaveReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.decorate.vo.DecorateComponentSaveReqVO.ComponentReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.decorate.DecorateComponentDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.decorate.DecorateComponentMapper;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class DecorateComponentServiceImpl implements DecorateComponentService {
     private DecorateComponentMapper decorateComponentMapper;
 
     @Override
-    public void pageSave(DecorateComponentReqVO reqVO) {
+    public void savePageComponents(DecorateComponentSaveReqVO reqVO) {
         // 1.新增或修改页面组件
         List<DecorateComponentDO> oldList = decorateComponentMapper.selectByPage(reqVO.getPageId());
 
