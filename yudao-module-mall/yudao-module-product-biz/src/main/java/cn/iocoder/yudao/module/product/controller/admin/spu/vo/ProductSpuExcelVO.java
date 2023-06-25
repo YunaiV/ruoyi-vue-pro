@@ -44,9 +44,6 @@ public class ProductSpuExcelVO {
     @ExcelProperty("商品封面图")
     private String picUrl;
 
-    @ExcelProperty("商品轮播图地址")
-    private String sliderPicUrls;
-
     @ExcelProperty("商品视频")
     private String videoUrl;
 
@@ -97,14 +94,8 @@ public class ProductSpuExcelVO {
     @ExcelProperty("赠送积分")
     private Integer giveIntegral;
 
-    @ExcelProperty("赠送的优惠劵编号的数组")
-    private String giveCouponTemplateIds;
-
     @ExcelProperty("分销类型")
     private Boolean subCommissionType;
-
-    @ExcelProperty("活动显示排序")
-    private String activityOrders;
 
     @ExcelProperty("商品销量")
     private Integer salesCount;

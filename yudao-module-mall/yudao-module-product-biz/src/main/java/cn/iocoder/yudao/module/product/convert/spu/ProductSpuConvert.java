@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.product.convert.spu;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.*;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
-import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageRespVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
+import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageRespVO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -46,20 +45,6 @@ public interface ProductSpuConvert {
 
     List<ProductSpuSimpleRespVO> convertList02(List<ProductSpuDO> list);
 
-    /**
-     * 列表转字符串
-     *
-     * @param list 列表
-     * @return 字符串
-     */
-    @Named("convertListToString")
-    default String convertListToString(List<?> list) {
-        return StrUtil.toString(list);
-    }
-
-    @Mapping(source = "sliderPicUrls", target = "sliderPicUrls", qualifiedByName = "convertListToString")
-    @Mapping(source = "giveCouponTemplateIds", target = "giveCouponTemplateIds", qualifiedByName = "convertListToString")
-    @Mapping(source = "activityOrders", target = "activityOrders", qualifiedByName = "convertListToString")
     @Mapping(target = "price", expression = "java(spu.getPrice() / 100)")
     @Mapping(target = "marketPrice", expression = "java(spu.getMarketPrice() / 100)")
     @Mapping(target = "costPrice", expression = "java(spu.getCostPrice() / 100)")
@@ -83,7 +68,16 @@ public interface ProductSpuConvert {
     default List<AppProductSpuPageRespVO> convertListForGetSpuList(List<ProductSpuDO> list) {
         // 处理虚拟销量
         list.forEach(spu -> spu.setSalesCount(spu.getSalesCount() + spu.getVirtualSalesCount()));
-        return convertListForGetSpuList0(list);
+        // 处理 VO 字段
+        List<AppProductSpuPageRespVO> voList = convertListForGetSpuList0(list);
+        for (int i = 0; i < list.size(); i++) {
+            ProductSpuDO spu = list.get(i);
+            AppProductSpuPageRespVO spuVO = voList.get(i);
+            spuVO.setUnitName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.PRODUCT_UNIT, spu.getUnit()));
+            // 计算 vip 价格 TODO 芋艿：临时的逻辑，等 vip 支持后
+            spuVO.setVipPrice((int) (spuVO.getPrice() * 0.9));
+        }
+        return voList;
     }
     @Named("convertListForGetSpuList0")
     List<AppProductSpuPageRespVO> convertListForGetSpuList0(List<ProductSpuDO> list);
