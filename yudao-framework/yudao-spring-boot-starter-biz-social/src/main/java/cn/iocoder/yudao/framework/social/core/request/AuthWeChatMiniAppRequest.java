@@ -73,7 +73,7 @@ public class AuthWeChatMiniAppRequest extends AuthDefaultRequest {
         return UrlBuilder.fromBaseUrl(source.accessToken())
                 .queryParam("appid", config.getClientId())
                 .queryParam("secret", config.getClientSecret())
-                .queryParam("js_code", code) // 和父类不同，所以需要重写该方法
+                .queryParam("js_code", code)
                 .queryParam("grant_type", "authorization_code")
                 .build();
     }

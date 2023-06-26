@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.framework.social.config;
 
 import cn.iocoder.yudao.framework.social.core.YudaoAuthRequestFactory;
+import com.xingyuv.http.HttpUtil;
+import com.xingyuv.http.support.hutool.HutoolImpl;
 import com.xingyuv.jushauth.cache.AuthStateCache;
 import com.xingyuv.justauth.autoconfigure.JustAuthProperties;
-import com.xkcoding.http.HttpUtil;
-import com.xkcoding.http.support.hutool.HutoolImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
