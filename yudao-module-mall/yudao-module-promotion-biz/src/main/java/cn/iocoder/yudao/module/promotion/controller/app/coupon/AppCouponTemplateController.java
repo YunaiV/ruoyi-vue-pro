@@ -34,14 +34,15 @@ public class AppCouponTemplateController {
 
     // TODO 芋艿：待实现
     @GetMapping("/list")
-    @Operation(summary = "获得优惠劵模版列表") // 目前主要给商品详情使用
+    @Operation(summary = "获得优惠劵模版列表")
     @Parameters({
-            @Parameter(name = "spuId", description = "商品 SPU 编号", required = true),
+            @Parameter(name = "spuId", description = "商品 SPU 编号"), // 目前主要给商品详情使用
             @Parameter(name = "useType", description = "使用类型"),
             @Parameter(name = "count", description = "数量", required = true)
     })
-    public CommonResult<List<AppCouponTemplateRespVO>> getCouponTemplateList(@RequestParam("spuId") Long spuId,
-                                                                             @RequestParam(value = "useType", required = false) Integer useType) {
+    public CommonResult<List<AppCouponTemplateRespVO>> getCouponTemplateList(@RequestParam(value = "spuId", required = false) Long spuId,
+                                                                             @RequestParam(value = "useType", required = false) Integer useType,
+                                                                             @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
         List<AppCouponTemplateRespVO> list = new ArrayList<>();
         Random random = new Random();
         for (int i = 0; i < 10; i++) {

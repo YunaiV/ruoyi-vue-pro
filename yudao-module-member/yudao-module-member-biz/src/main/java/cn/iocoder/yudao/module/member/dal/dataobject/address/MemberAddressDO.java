@@ -49,6 +49,6 @@ public class MemberAddressDO extends BaseDO {
      *
      * true - 默认收件地址
      */
-    private Boolean defaulted;
+    private Boolean defaultStatus;
 
 }
