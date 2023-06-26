@@ -26,7 +26,7 @@
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.3.1</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.6.1</dynamic-datasource.version>
-        <mybatis-plus-join-boot-starter.version>1.4.3.2</mybatis-plus-join-boot-starter.version>
+        <mybatis-plus-join-boot-starter.version>1.4.5</mybatis-plus-join-boot-starter.version>
         <redisson.version>3.18.0</redisson.version>
         <dm8.jdbc.version>8.1.2.141</dm8.jdbc.version>
         <!-- 服务保障相关 -->
@@ -52,7 +52,7 @@
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <guava.version>32.0.0-jre</guava.version>
+        <guava.version>32.0.1-jre</guava.version>
         <guice.version>5.1.0</guice.version>
         <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
         <commons-net.version>3.9.0</commons-net.version>
@@ -64,14 +64,14 @@
         <okio.version>3.0.0</okio.version>
         <okhttp3.version>4.10.0</okhttp3.version>
         <commons-io.version>2.11.0</commons-io.version>
-        <minio.version>8.5.2</minio.version>
+        <minio.version>8.5.4</minio.version>
         <aliyun-java-sdk-core.version>4.6.3</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
         <tencentcloud-sdk-java.version>3.1.758</tencentcloud-sdk-java.version>
         <justauth.version>1.4.0</justauth.version>
-        <jimureport.version>1.5.6</jimureport.version>
+        <jimureport.version>1.5.8</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
-        <wx-java-mp.version>4.3.0</wx-java-mp.version>
+        <wx-java-mp.version>4.5.0</wx-java-mp.version>
     </properties>
 
     <dependencyManagement>
