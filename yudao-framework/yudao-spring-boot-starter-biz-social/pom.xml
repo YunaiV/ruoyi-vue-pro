@@ -36,8 +36,8 @@
         </dependency>
         <!-- 三方云服务相关 -->
         <dependency>
-            <groupId>com.xkcoding.justauth</groupId>
-            <artifactId>justauth-spring-boot-starter</artifactId>
+            <groupId>com.xingyuv</groupId>
+            <artifactId>spring-boot-starter-justauth</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>cn.hutool</groupId>
