@@ -33,11 +33,10 @@ public interface ProductCommentConvert {
     ProductCommentRespVO convert(ProductCommentDO bean);
 
     // TODO @puhui999：这里貌似字段对上，就不用 mapping 了；可以测试下看看哈
-    @Mapping(target = "allCount", source = "allCount")
     @Mapping(target = "goodCount", source = "goodCount")
     @Mapping(target = "mediocreCount", source = "mediocreCount")
     @Mapping(target = "negativeCount", source = "negativeCount")
-    AppCommentStatisticsRespVO convert(Long allCount, Long goodCount, Long mediocreCount, Long negativeCount);
+    AppCommentStatisticsRespVO convert(Long goodCount, Long mediocreCount, Long negativeCount);
 
     List<ProductCommentRespVO> convertList(List<ProductCommentDO> list);
 
